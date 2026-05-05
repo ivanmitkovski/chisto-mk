@@ -7,9 +7,11 @@ import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/home/domain/models/comment.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/domain/repositories/sites_repository_types.dart';
+import 'package:chisto_mobile/features/home/presentation/providers/feed_providers.dart';
 import 'package:chisto_mobile/features/home/presentation/providers/repository_providers.dart';
 import 'package:chisto_mobile/features/home/presentation/providers/site_engagement_provider.dart';
 import 'package:chisto_mobile/features/home/presentation/utils/site_comment_mapping.dart';
+import 'package:chisto_mobile/features/home/presentation/utils/site_comments_engagement_count.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/comments_bottom_sheet.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/site_comments_modal_bottom_sheet.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/pollution_site_card_analytics.dart';
@@ -42,12 +44,17 @@ Future<void> openPollutionSiteCardCommentsSheet({
       site.id,
       sort: sort,
     );
+    final List<Comment> mapped =
+        result.items.map(commentFromSiteCommentItem).toList();
     if (context.mounted) {
-      ref
-          .read(siteEngagementNotifierProvider(site.id).notifier)
-          .setCommentCount(result.total);
+      final int n = commentCountForEngagementAfterFetch(
+        result: result,
+        mappedComments: mapped,
+      );
+      ref.read(siteEngagementNotifierProvider(site.id).notifier).setCommentCount(n);
+      ref.read(feedSitesNotifierProvider.notifier).patchSiteCommentsCount(site.id, n);
     }
-    return result.items.map(commentFromSiteCommentItem).toList();
+    return mapped;
   }
 
   List<Comment> commentsForSheet = List<Comment>.from(initialSessionComments);
@@ -79,9 +86,8 @@ Future<void> openPollutionSiteCardCommentsSheet({
         scrollController: scrollController,
         onCommentsCountChanged: (int count) {
           if (!sheetContext.mounted) return;
-          ref
-              .read(siteEngagementNotifierProvider(site.id).notifier)
-              .setCommentCount(count);
+          ref.read(siteEngagementNotifierProvider(site.id).notifier).setCommentCount(count);
+          ref.read(feedSitesNotifierProvider.notifier).patchSiteCommentsCount(site.id, count);
         },
         onCommentsChanged: (List<Comment> comments) {
           if (!sheetContext.mounted) return;

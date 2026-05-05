@@ -65,8 +65,9 @@ Future<void> _runChistoMobile() async {
     DeviceOrientation.portraitUp,
   ]);
   runApp(
-    const ProviderScope(
-      child: ChistoApp(),
+    UncontrolledProviderScope(
+      container: ServiceLocator.instance.providerContainer,
+      child: const ChistoApp(),
     ),
   );
 }

@@ -412,9 +412,12 @@ export class SiteCommentsService {
         data: { isDeleted: true },
       });
       if (updated.count > 0) {
+        const actualCount = await tx.siteComment.count({
+          where: { siteId, isDeleted: false },
+        });
         await tx.site.update({
           where: { id: siteId },
-          data: { commentsCount: { decrement: updated.count } },
+          data: { commentsCount: actualCount },
         });
       }
       return updated.count;

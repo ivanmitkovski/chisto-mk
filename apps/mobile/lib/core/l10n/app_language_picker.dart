@@ -26,34 +26,39 @@ class LanguagePickerOptionRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        Material(
-          color: AppColors.transparent,
-          child: InkWell(
-            onTap: onTap,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.md,
-                vertical: AppSpacing.sm + 2,
-              ),
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Text(
-                      label,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppColors.textPrimary,
-                            fontWeight: FontWeight.w500,
-                          ),
+        Semantics(
+          button: true,
+          selected: selected,
+          label: label,
+          child: Material(
+            color: AppColors.transparent,
+            child: InkWell(
+              onTap: onTap,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.sm + 2,
+                ),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Text(
+                        label,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: AppColors.textPrimary,
+                              fontWeight: FontWeight.w500,
+                            ),
+                      ),
                     ),
-                  ),
-                  if (selected)
-                    Icon(
-                      Icons.check_rounded,
-                      size: 22,
-                      color: AppColors.primaryDark,
-                    ),
-                ],
+                    if (selected)
+                      Icon(
+                        Icons.check_rounded,
+                        size: 22,
+                        color: AppColors.primaryDark,
+                      ),
+                  ],
+                ),
               ),
             ),
           ),

@@ -1,3 +1,4 @@
+import 'package:chisto_mobile/features/home/domain/models/comment.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/feed_filter_sheet.dart';
 
@@ -14,6 +15,29 @@ List<PollutionSite> patchPollutionSitesSavedFlag(
       .map(
         (PollutionSite s) =>
             s.id == siteId ? s.copyWith(isSavedByMe: isSavedByMe) : s,
+      )
+      .toList(growable: false);
+}
+
+/// Updates [commentsCount] for [siteId] and clears embedded [PollutionSite.comments] so
+/// [PollutionSite.commentCount] cannot stay inflated from a stale preview tree after edits
+/// in the comments sheet.
+List<PollutionSite> patchPollutionSitesCommentsCount(
+  List<PollutionSite> source,
+  String siteId,
+  int commentsCount,
+) {
+  if (siteId.isEmpty) {
+    return List<PollutionSite>.from(source);
+  }
+  return source
+      .map(
+        (PollutionSite s) => s.id == siteId
+            ? s.copyWith(
+                commentsCount: commentsCount,
+                comments: const <Comment>[],
+              )
+            : s,
       )
       .toList(growable: false);
 }

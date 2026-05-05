@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import 'cleaning_event.dart';
@@ -88,8 +90,13 @@ class PollutionSite {
   /// When non-null, matches [User.id] of [latestReporterName] (feed: `latestReportReporterId`).
   final String? latestReporterUserId;
 
-  /// Number of comments (convenience for UI).
-  int get commentCount => comments.isNotEmpty ? comments.length : commentsCount;
+  /// Total comments for UI: uses [commentsCount] when no embedded tree; otherwise counts
+  /// all nodes in [comments] (replies included) and uses `max` with [commentsCount] so
+  /// feed previews that only embed top-level roots never under-report the API total.
+  int get commentCount {
+    if (comments.isEmpty) return commentsCount;
+    return math.max(_commentForestTotalCount(comments), commentsCount);
+  }
 
   /// Stats chip (groups icon): co-reporter count, or merged duplicate count when there are no other reporters.
   int get siteParticipantStatsBadgeValue =>
@@ -173,4 +180,12 @@ class PollutionSite {
           latestReporterUserId ?? this.latestReporterUserId,
     );
   }
+}
+
+int _commentForestTotalCount(List<Comment> roots) {
+  int n = 0;
+  for (final Comment c in roots) {
+    n += 1 + _commentForestTotalCount(c.replies);
+  }
+  return n;
 }

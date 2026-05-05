@@ -66,7 +66,7 @@ class CommentsSheetCommentList extends StatelessWidget {
           AppSpacing.lg,
           0,
           AppSpacing.lg,
-          AppSpacing.sm,
+          AppSpacing.xs,
         ),
         itemCount: flattened.length,
         separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.xs),

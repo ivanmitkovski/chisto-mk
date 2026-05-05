@@ -5,7 +5,7 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
-import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
+import 'package:chisto_mobile/features/profile/presentation/widgets/profile_sub_screen_header.dart';
 
 /// Shimmer layout matching [WeeklyRankingsScreen] while rankings load.
 class WeeklyRankingsSkeleton extends StatefulWidget {
@@ -46,34 +46,18 @@ class _WeeklyRankingsSkeletonState extends State<WeeklyRankingsSkeleton>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.lg,
-            AppSpacing.md,
-            AppSpacing.lg,
-            AppSpacing.sm,
+          padding: const EdgeInsets.only(top: AppSpacing.md),
+          child: ProfileSubScreenHeader(
+            title: context.l10n.profileWeeklyRankingsTitle,
+            subtitle: context.l10n.profileWeeklyRankingsSubtitle,
+            includeBottomSpacing: false,
           ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              const AppBackButton(),
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                context.l10n.profileWeeklyRankingsTitle,
-                style: AppTypography.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.25,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                context.l10n.profileWeeklyRankingsSubtitle,
-                style: AppTypography.cardSubtitle.copyWith(
-                  color: AppColors.textSecondary,
-                  height: 1.25,
-                  letterSpacing: -0.05,
-                ),
-              ),
               const SizedBox(height: AppSpacing.sm),
               AnimatedBuilder(
                 animation: _shimmer,

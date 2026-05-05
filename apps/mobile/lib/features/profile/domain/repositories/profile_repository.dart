@@ -11,7 +11,7 @@ abstract class ProfileRepository {
   /// Updates profile and returns the updated user, or null if no changes were sent.
   Future<ProfileUser?> updateProfile({String? firstName, String? lastName});
 
-  Future<String?> uploadAvatar(String filePath);
+  Future<String> uploadAvatar(String filePath);
 
   Future<void> removeAvatar();
 

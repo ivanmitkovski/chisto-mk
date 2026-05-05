@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 /// Authenticated citizen profile from `GET /auth/me` (plus derived display fields).
 class ProfileUser {
   const ProfileUser({
@@ -21,7 +19,7 @@ class ProfileUser {
     required this.weeklyRank,
     required this.weekStartsAt,
     required this.weekEndsAt,
-    required this.avatarColor,
+    required this.avatarColorValue,
     this.avatarUrl,
   });
 
@@ -50,7 +48,8 @@ class ProfileUser {
   final String weekStartsAt;
   final String weekEndsAt;
 
-  final Color avatarColor;
+  /// ARGB color for avatar initials (e.g. `0xFF2FD788`). Use [ProfileUserUi] for [Color].
+  final int avatarColorValue;
   final String? avatarUrl;
 
   ProfileUser copyWith({
@@ -71,7 +70,7 @@ class ProfileUser {
     int? weeklyRank,
     String? weekStartsAt,
     String? weekEndsAt,
-    Color? avatarColor,
+    int? avatarColorValue,
     String? avatarUrl,
   }) {
     return ProfileUser(
@@ -93,7 +92,7 @@ class ProfileUser {
       weeklyRank: weeklyRank ?? this.weeklyRank,
       weekStartsAt: weekStartsAt ?? this.weekStartsAt,
       weekEndsAt: weekEndsAt ?? this.weekEndsAt,
-      avatarColor: avatarColor ?? this.avatarColor,
+      avatarColorValue: avatarColorValue ?? this.avatarColorValue,
       avatarUrl: avatarUrl ?? this.avatarUrl,
     );
   }

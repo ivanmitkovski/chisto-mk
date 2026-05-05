@@ -9,7 +9,8 @@ import 'package:chisto_mobile/features/auth/domain/repositories/auth_repository.
 import 'package:chisto_mobile/features/notifications/data/push_notification_service.dart';
 import 'package:chisto_mobile/features/events/data/chat/outbox/chat_outbox_store.dart';
 import 'package:chisto_mobile/features/events/data/events_local_cache.dart';
-import 'package:chisto_mobile/features/profile/data/profile_avatar_state.dart';
+import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/features/profile/presentation/providers/profile_avatar_notifier.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Citizen auth over HTTP — paths align with NestJS `AuthController` in `apps/api`:
@@ -208,8 +209,9 @@ class ApiAuthRepository implements AuthRepository {
     _cancelProactiveRefresh();
     unawaited(pushService?.unregisterCurrentToken() ?? Future<void>.value());
     _authState.setUnauthenticated();
-    profileAvatarState.setRemoteUrl(null);
-    profileAvatarState.clearLocalPath();
+    ServiceLocator.instance.providerContainer
+        .read(profileAvatarNotifierProvider.notifier)
+        .clearAll();
     await _tokenStorage.clearTokens();
     await ChatOutboxStore.shared.clearAll();
     await const EventsLocalCache().clear();
@@ -270,8 +272,9 @@ class ApiAuthRepository implements AuthRepository {
     final String? storedAccess = await _tokenStorage.accessToken;
     if (storedAccess == null || storedAccess.isEmpty) {
       _authState.setUnauthenticated();
-      profileAvatarState.setRemoteUrl(null);
-      profileAvatarState.clearLocalPath();
+      ServiceLocator.instance.providerContainer
+          .read(profileAvatarNotifierProvider.notifier)
+          .clearAll();
       return;
     }
 
@@ -372,7 +375,9 @@ class ApiAuthRepository implements AuthRepository {
       syncOrganizerCertifiedAt: hasOrganizerCertifiedAtKey || switchedAccount,
     );
 
-    profileAvatarState.setRemoteUrl(_extractAvatarUrl(user));
+    ServiceLocator.instance.providerContainer
+        .read(profileAvatarNotifierProvider.notifier)
+        .setRemoteUrl(_extractAvatarUrl(user));
 
     await _tokenStorage.saveSessionData(
       userId: id,
@@ -402,7 +407,9 @@ class ApiAuthRepository implements AuthRepository {
       organizerCertifiedAt: organizerCertifiedAt,
       syncOrganizerCertifiedAt: true,
     );
-    profileAvatarState.setRemoteUrl(_extractAvatarUrl(json));
+    ServiceLocator.instance.providerContainer
+        .read(profileAvatarNotifierProvider.notifier)
+        .setRemoteUrl(_extractAvatarUrl(json));
     await _tokenStorage.saveSessionData(
       userId: id,
       displayName: displayName.isEmpty ? id : displayName,
