@@ -1,4 +1,3 @@
-import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/features/profile/domain/models/profile_user.dart';
 
 /// Parses `GET /auth/me` JSON into [ProfileUser] (shared with tests).
@@ -56,7 +55,7 @@ ProfileUser profileUserFromMeJson(Map<String, dynamic> json) {
     weeklyRank: weeklyRank,
     weekStartsAt: weekStartsAt,
     weekEndsAt: weekEndsAt,
-    avatarColor: AppColors.primary,
+    avatarColorValue: 0xFF2FD788,
     avatarUrl: (avatarUrl?.isNotEmpty ?? false) ? avatarUrl : null,
   );
 }

@@ -384,6 +384,14 @@ class FeedSitesNotifier extends StateNotifier<FeedSitesState> {
     );
   }
 
+  /// Keeps [PollutionSite.commentsCount] in sync after comments sheet loads or mutates,
+  /// so [PollutionSite.commentCount] / engagement hydrate match server state.
+  void patchSiteCommentsCount(String siteId, int commentsCount) {
+    state = state.copyWith(
+      allSites: patchPollutionSitesCommentsCount(state.allSites, siteId, commentsCount),
+    );
+  }
+
   Future<void> _resolveUserLocation() async {
     bool locationAvailable = true;
     double? lat;

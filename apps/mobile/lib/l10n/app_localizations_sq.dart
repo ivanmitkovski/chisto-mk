@@ -876,6 +876,16 @@ class AppLocalizationsSq extends AppLocalizations {
   String get profileLoadingSemantic => 'Po ngarkohet profili';
 
   @override
+  String get profileErrorSemantic => 'Profili nuk u ngarkua';
+
+  @override
+  String get profileLevelCardSemantic =>
+      'Niveli dhe pikët. Hap historinë e pikëve';
+
+  @override
+  String get profileWeeklyRankCardSemantic => 'Renditja javore. Hap renditjet';
+
+  @override
   String get profilePointsHistoryMilestonesSection => 'Nivel i ri';
 
   @override
@@ -896,6 +906,22 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String get profilePointsHistoryLoadMore => 'Duke u ngarkuar…';
+
+  @override
+  String get profilePointsHistoryLoadMoreErrorTitle =>
+      'Nuk u ngarkuan më shumë aktivitete';
+
+  @override
+  String get profilePointsHistoryLoadMoreRetry => 'Provo përsëri';
+
+  @override
+  String profilePointsActivityRowSemantic(
+    String reason,
+    String time,
+    String delta,
+  ) {
+    return '$reason. $time. $delta';
+  }
 
   @override
   String profilePointsDeltaPositive(int points) {
@@ -964,6 +990,14 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String get profileLanguageScreenTitle => 'Gjuha e aplikacionit';
+
+  @override
+  String get profileLanguageScreenSubtitle =>
+      'Zgjidhni një gjuhë ose përdorni atë të pajisjes.';
+
+  @override
+  String get profileLanguageChangeFailed =>
+      'Nuk mund të përditësohej gjuha. Provo përsëri.';
 
   @override
   String get profileLanguageSubtitleDevice => 'Sipas pajisjes';
@@ -1059,6 +1093,10 @@ class AppLocalizationsSq extends AppLocalizations {
   String get profilePasswordSessionExpired => 'Sesioni skadoi. Hyni përsëri.';
 
   @override
+  String get profilePasswordGenericError =>
+      'Diçka shkoi keq. Kontrollo lidhjen dhe provo përsëri.';
+
+  @override
   String get profilePasswordCurrentSemantic => 'Fjalëkalimi aktual';
 
   @override
@@ -1068,7 +1106,13 @@ class AppLocalizationsSq extends AppLocalizations {
   String get profilePasswordConfirmSemantic => 'Konfirmo fjalëkalimin e ri';
 
   @override
+  String get profilePasswordToggleVisibility => 'Shfaq ose fsheh fjalëkalimin';
+
+  @override
   String get commonCancel => 'Anulo';
+
+  @override
+  String get commonContinue => 'Vazhdo';
 
   @override
   String get commonRetry => 'Provo përsëri';
@@ -1108,6 +1152,9 @@ class AppLocalizationsSq extends AppLocalizations {
       'Mund të hysh përsëri me llogarinë tënde.';
 
   @override
+  String get profileSignOutFailedSnack => 'Nuk mund të dilnim. Provo përsëri.';
+
+  @override
   String get profileDeleteAccountDialogTitle => 'Të fshihet llogaria?';
 
   @override
@@ -1115,11 +1162,8 @@ class AppLocalizationsSq extends AppLocalizations {
       'Të gjitha të dhënat do të hiqen përgjithmonë. Ky veprim nuk kthehet mbrapsht.';
 
   @override
-  String get profileDeleteAccountFinalDialogTitle => 'Fshirje përfundimtare?';
-
-  @override
-  String get profileDeleteAccountFinalDialogBody =>
-      'Llogaria jote dhe të gjitha të dhënat e lidhura do të fshihen përgjithmonë.';
+  String get profileDeleteAccountFailedSnack =>
+      'Nuk mund të fshihej llogaria. Provo përsëri.';
 
   @override
   String get profileDeleteAccountTypeConfirmTitle => 'Konfirmo me shkrim';
@@ -1522,6 +1566,9 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String get feedPullToRefreshSemantic => 'Tërhiq për rifreskim';
+
+  @override
+  String get feedRefreshingSemantic => 'Po rifreskohet rrjedha';
 
   @override
   String get feedLoadMoreFailedSnack =>

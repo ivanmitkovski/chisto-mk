@@ -45,97 +45,97 @@ class CommentsInputBar extends StatelessWidget {
     final double bottomPadding = keyboardOpen
         ? mediaQuery.viewInsets.bottom + AppSpacing.xs
         : AppSpacing.md + mediaQuery.padding.bottom;
+    final bool showComposerBanner =
+        editingCommentId != null || replyToCommentId != null;
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
         AppSpacing.lg,
-        AppSpacing.xs,
+        showComposerBanner ? AppSpacing.xs : AppSpacing.xxs,
         AppSpacing.lg,
         bottomPadding,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          SizedBox(
-            height: 20,
-            child: Row(
-              children: <Widget>[
-                const SizedBox(width: 36),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: AnimatedSwitcher(
-                    duration: CommentsMotion.composerBannerSwitcherDuration(
-                      context,
-                    ),
-                    child: editingCommentId != null
-                        ? Text(
-                            context.l10n.commentsEditingBanner,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context).textTheme.labelSmall
-                                ?.copyWith(
-                                  color: AppColors.primaryDark,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                          )
-                        : replyToCommentId == null
-                        ? const SizedBox.shrink()
-                        : Text(
-                            context.l10n.commentsReplyingToBanner(
-                              replyToAuthor ??
-                                  context.l10n.commentsReplyTargetFallback,
+          if (showComposerBanner) ...<Widget>[
+            SizedBox(
+              height: 20,
+              child: Row(
+                children: <Widget>[
+                  const SizedBox(width: 36),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: AnimatedSwitcher(
+                      duration: CommentsMotion.composerBannerSwitcherDuration(
+                        context,
+                      ),
+                      child: editingCommentId != null
+                          ? Text(
+                              context.l10n.commentsEditingBanner,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.labelSmall
+                                  ?.copyWith(
+                                    color: AppColors.primaryDark,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                            )
+                          : Text(
+                              context.l10n.commentsReplyingToBanner(
+                                replyToAuthor ??
+                                    context.l10n.commentsReplyTargetFallback,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.labelSmall
+                                  ?.copyWith(color: AppColors.textMuted),
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context).textTheme.labelSmall
-                                ?.copyWith(color: AppColors.textMuted),
-                          ),
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.xs),
-                SizedBox(
-                  width: 36,
-                  child: AnimatedSwitcher(
-                    duration: CommentsMotion.composerBannerSwitcherDuration(
-                      context,
                     ),
-                    child: editingCommentId != null
-                        ? Semantics(
-                            button: true,
-                            label: context.l10n.commentsCancelEditSemantic,
-                            child: GestureDetector(
-                              onTap: onCancelEdit,
-                              child: const Center(
-                                child: Icon(
-                                  Icons.close_rounded,
-                                  size: 20,
-                                  color: AppColors.textMuted,
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                  SizedBox(
+                    width: 36,
+                    child: AnimatedSwitcher(
+                      duration: CommentsMotion.composerBannerSwitcherDuration(
+                        context,
+                      ),
+                      child: editingCommentId != null
+                          ? Semantics(
+                              button: true,
+                              label: context.l10n.commentsCancelEditSemantic,
+                              child: GestureDetector(
+                                onTap: onCancelEdit,
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.close_rounded,
+                                    size: 20,
+                                    color: AppColors.textMuted,
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Semantics(
+                              button: true,
+                              label: context.l10n.commentsCancelReplySemantic,
+                              child: GestureDetector(
+                                onTap: onCancelReply,
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.close_rounded,
+                                    size: 20,
+                                    color: AppColors.textMuted,
+                                  ),
                                 ),
                               ),
                             ),
-                          )
-                        : replyToCommentId == null
-                        ? const SizedBox.shrink()
-                        : Semantics(
-                            button: true,
-                            label: context.l10n.commentsCancelReplySemantic,
-                            child: GestureDetector(
-                              onTap: onCancelReply,
-                              child: const Center(
-                                child: Icon(
-                                  Icons.close_rounded,
-                                  size: 20,
-                                  color: AppColors.textMuted,
-                                ),
-                              ),
-                            ),
-                          ),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: AppSpacing.xxs),
+            const SizedBox(height: AppSpacing.xxs),
+          ],
           Builder(
             builder: (BuildContext context) {
               final int used = CommentInputValidator.normalizeBody(

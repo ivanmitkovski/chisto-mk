@@ -1,3 +1,4 @@
+import 'package:chisto_mobile/features/home/domain/models/comment.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/presentation/utils/feed_visible_sites.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/feed_filter_sheet.dart';
@@ -68,5 +69,20 @@ void main() {
     final List<PollutionSite> out = patchPollutionSitesSavedFlag(sites, '', true);
     expect(out, hasLength(1));
     expect(out[0].isSavedByMe, isFalse);
+  });
+
+  test('patchPollutionSitesCommentsCount sets count and clears embedded comments', () {
+    final DateTime t = DateTime.utc(2026, 1, 1);
+    final PollutionSite withPreview = _dummy(id: '1').copyWith(
+      commentsCount: 3,
+      comments: <Comment>[
+        Comment(id: 'c1', authorName: 'A', text: 'x', createdAt: t),
+      ],
+    );
+    final List<PollutionSite> out =
+        patchPollutionSitesCommentsCount(<PollutionSite>[withPreview], '1', 1);
+    expect(out[0].commentsCount, 1);
+    expect(out[0].comments, isEmpty);
+    expect(withPreview.commentsCount, 3);
   });
 }

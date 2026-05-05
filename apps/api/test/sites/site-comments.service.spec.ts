@@ -94,6 +94,7 @@ describe('SiteCommentsService', () => {
     const prisma = {
       siteComment: {
         findMany: jest.fn(async () => [root, child]),
+        count: jest.fn(async () => 1),
       },
     } as never;
     const engagement = { ensureSiteExists: jest.fn().mockResolvedValue(undefined) } as never;

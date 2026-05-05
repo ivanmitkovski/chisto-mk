@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui' show PlatformDispatcher;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:chisto_mobile/core/auth/auth_state.dart';
 import 'package:chisto_mobile/core/l10n/app_locale_resolution.dart';
@@ -112,6 +113,19 @@ class ServiceLocator {
 
   bool _initialized = false;
   bool get isInitialized => _initialized;
+
+  /// Root Riverpod container (created in [initialize]). Used by non-widget code
+  /// (e.g. auth) to sync profile avatar preview with [profileAvatarNotifierProvider].
+  ProviderContainer? _providerContainer;
+
+  /// Non-null after [initialize] completes.
+  ProviderContainer get providerContainer {
+    final ProviderContainer? c = _providerContainer;
+    if (c == null) {
+      throw StateError('ServiceLocator.providerContainer before initialize');
+    }
+    return c;
+  }
 
   Future<void> initialize({AppConfig? config}) async {
     if (_initialized) return;
@@ -235,6 +249,7 @@ class ServiceLocator {
 
     unawaited(maybeEvictReportImagesDiskCacheIfHeavy());
 
+    _providerContainer = ProviderContainer();
     _initialized = true;
   }
 
@@ -268,6 +283,8 @@ class ServiceLocator {
   }
 
   void reset() {
+    _providerContainer?.dispose();
+    _providerContainer = null;
     EngagementOutboxCoordinator.dispose();
     EventOfflineWorkCoordinator.instance.dispose();
     CheckInSyncService.dispose();

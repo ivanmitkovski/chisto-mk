@@ -4,8 +4,7 @@ import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
-import 'package:chisto_mobile/core/theme/app_typography.dart';
-import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
+import 'package:chisto_mobile/features/profile/presentation/widgets/profile_sub_screen_header.dart';
 
 /// Shimmer layout matching [ProfilePointsHistoryScreen] while history loads.
 class ProfilePointsHistorySkeleton extends StatefulWidget {
@@ -41,37 +40,14 @@ class _ProfilePointsHistorySkeletonState extends State<ProfilePointsHistorySkele
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.lg,
-            AppSpacing.md,
-            AppSpacing.lg,
-            AppSpacing.sm,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              const AppBackButton(),
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                context.l10n.profilePointsHistoryTitle,
-                style: AppTypography.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.25,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                context.l10n.profilePointsHistorySubtitle,
-                style: AppTypography.cardSubtitle.copyWith(
-                  color: AppColors.textSecondary,
-                  height: 1.25,
-                  letterSpacing: -0.05,
-                ),
-              ),
-            ],
+          padding: const EdgeInsets.only(top: AppSpacing.md),
+          child: ProfileSubScreenHeader(
+            title: context.l10n.profilePointsHistoryTitle,
+            subtitle: context.l10n.profilePointsHistorySubtitle,
+            includeBottomSpacing: false,
           ),
         ),
+        const SizedBox(height: AppSpacing.lg),
         Expanded(
           child: Semantics(
             label: context.l10n.profilePointsHistoryLoadingSemantic,

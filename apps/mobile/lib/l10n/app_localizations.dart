@@ -1600,6 +1600,24 @@ abstract class AppLocalizations {
   /// **'Loading profile'**
   String get profileLoadingSemantic;
 
+  /// No description provided for @profileErrorSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile failed to load'**
+  String get profileErrorSemantic;
+
+  /// No description provided for @profileLevelCardSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Level and points. Opens points history'**
+  String get profileLevelCardSemantic;
+
+  /// No description provided for @profileWeeklyRankCardSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly rank. Opens rankings'**
+  String get profileWeeklyRankCardSemantic;
+
   /// No description provided for @profilePointsHistoryMilestonesSection.
   ///
   /// In en, this message translates to:
@@ -1641,6 +1659,28 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Loading…'**
   String get profilePointsHistoryLoadMore;
+
+  /// No description provided for @profilePointsHistoryLoadMoreErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load more activity'**
+  String get profilePointsHistoryLoadMoreErrorTitle;
+
+  /// No description provided for @profilePointsHistoryLoadMoreRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get profilePointsHistoryLoadMoreRetry;
+
+  /// No description provided for @profilePointsActivityRowSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{reason}. {time}. {delta}'**
+  String profilePointsActivityRowSemantic(
+    String reason,
+    String time,
+    String delta,
+  );
 
   /// No description provided for @profilePointsDeltaPositive.
   ///
@@ -1755,6 +1795,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'App language'**
   String get profileLanguageScreenTitle;
+
+  /// No description provided for @profileLanguageScreenSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a language or follow your device.'**
+  String get profileLanguageScreenSubtitle;
+
+  /// No description provided for @profileLanguageChangeFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not update language. Try again.'**
+  String get profileLanguageChangeFailed;
 
   /// No description provided for @profileLanguageSubtitleDevice.
   ///
@@ -1930,6 +1982,12 @@ abstract class AppLocalizations {
   /// **'Session expired. Please sign in again.'**
   String get profilePasswordSessionExpired;
 
+  /// No description provided for @profilePasswordGenericError.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Check your connection and try again.'**
+  String get profilePasswordGenericError;
+
   /// No description provided for @profilePasswordCurrentSemantic.
   ///
   /// In en, this message translates to:
@@ -1948,11 +2006,23 @@ abstract class AppLocalizations {
   /// **'Confirm new password'**
   String get profilePasswordConfirmSemantic;
 
+  /// No description provided for @profilePasswordToggleVisibility.
+  ///
+  /// In en, this message translates to:
+  /// **'Show or hide password'**
+  String get profilePasswordToggleVisibility;
+
   /// No description provided for @commonCancel.
   ///
   /// In en, this message translates to:
   /// **'Cancel'**
   String get commonCancel;
+
+  /// No description provided for @commonContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get commonContinue;
 
   /// No description provided for @commonRetry.
   ///
@@ -2026,6 +2096,12 @@ abstract class AppLocalizations {
   /// **'You can sign back in anytime with your account.'**
   String get profileSignOutDialogBody;
 
+  /// No description provided for @profileSignOutFailedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not sign out. Try again.'**
+  String get profileSignOutFailedSnack;
+
   /// No description provided for @profileDeleteAccountDialogTitle.
   ///
   /// In en, this message translates to:
@@ -2038,17 +2114,11 @@ abstract class AppLocalizations {
   /// **'All your data will be permanently removed. This action cannot be undone.'**
   String get profileDeleteAccountDialogBody;
 
-  /// No description provided for @profileDeleteAccountFinalDialogTitle.
+  /// No description provided for @profileDeleteAccountFailedSnack.
   ///
   /// In en, this message translates to:
-  /// **'Permanently delete?'**
-  String get profileDeleteAccountFinalDialogTitle;
-
-  /// No description provided for @profileDeleteAccountFinalDialogBody.
-  ///
-  /// In en, this message translates to:
-  /// **'Your account and all associated data will be permanently deleted.'**
-  String get profileDeleteAccountFinalDialogBody;
+  /// **'Could not delete your account. Try again.'**
+  String get profileDeleteAccountFailedSnack;
 
   /// No description provided for @profileDeleteAccountTypeConfirmTitle.
   ///
@@ -2607,6 +2677,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pull to refresh'**
   String get feedPullToRefreshSemantic;
+
+  /// No description provided for @feedRefreshingSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Refreshing feed'**
+  String get feedRefreshingSemantic;
 
   /// No description provided for @feedLoadMoreFailedSnack.
   ///

@@ -11,10 +11,14 @@ class FeedNotificationBell extends StatefulWidget {
     super.key,
     required this.unreadCount,
     required this.onTap,
-  });
+    this.size = 46,
+  }) : assert(size >= 28 && size <= 56, 'size must be between 28 and 56');
 
   final int unreadCount;
   final VoidCallback onTap;
+
+  /// Outer hit target / layout size. Default 46 matches the full feed header.
+  final double size;
 
   @override
   State<FeedNotificationBell> createState() => _FeedNotificationBellState();
@@ -56,6 +60,17 @@ class _FeedNotificationBellState extends State<FeedNotificationBell>
   @override
   Widget build(BuildContext context) {
     final bool hasUnread = widget.unreadCount > 0;
+    final double box = widget.size;
+    final double m = box / 46.0;
+    final double margin = 1 * m;
+    final double inner = (box - 2 * margin).clamp(20.0, 52.0);
+    final double icon = (21 * m).clamp(14.0, 24.0);
+    final double badgeTop = -2 * m;
+    final double badgeRight = -3 * m;
+    final double badgeMinWidth = (18 * m).clamp(14.0, 20.0);
+    final double badgeHeight = (18 * m).clamp(14.0, 20.0);
+    final double badgeFont = (10 * m).clamp(8.0, 11.0);
+    final double badgeHPad = (4 * m).clamp(3.0, 6.0);
     return Semantics(
       button: true,
       label: hasUnread
@@ -65,8 +80,8 @@ class _FeedNotificationBellState extends State<FeedNotificationBell>
         onTap: widget.onTap,
         behavior: HitTestBehavior.opaque,
         child: SizedBox(
-          width: 46,
-          height: 46,
+          width: box,
+          height: box,
           child: Stack(
             clipBehavior: Clip.none,
             children: <Widget>[
@@ -87,69 +102,76 @@ class _FeedNotificationBellState extends State<FeedNotificationBell>
                     ),
                   ),
                 ),
-              Container(
-                width: 44,
-                height: 44,
-                margin: const EdgeInsets.all(1),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: hasUnread
-                        ? <Color>[
-                            AppColors.white,
-                            AppColors.accentDanger.withValues(alpha: 0.04),
-                          ]
-                        : <Color>[
-                            AppColors.white,
-                            AppColors.inputFill,
-                          ],
-                  ),
-                  border: Border.all(
-                    color: hasUnread
-                        ? AppColors.accentDanger.withValues(alpha: 0.22)
-                        : AppColors.divider,
-                    width: 1,
-                  ),
-                  boxShadow: <BoxShadow>[
-                    BoxShadow(
-                      color: AppColors.shadowLight,
-                      blurRadius: 10,
-                      offset: const Offset(0, 3),
+              Center(
+                child: Container(
+                  width: inner,
+                  height: inner,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: hasUnread
+                          ? <Color>[
+                              AppColors.white,
+                              AppColors.accentDanger.withValues(alpha: 0.04),
+                            ]
+                          : <Color>[
+                              AppColors.white,
+                              AppColors.inputFill,
+                            ],
                     ),
-                  ],
-                ),
-                child: Center(
-                  child: SvgPicture.asset(
-                    AppAssets.notificationBing,
-                    width: 21,
-                    height: 21,
-                    colorFilter: ColorFilter.mode(
-                      hasUnread ? AppColors.accentDanger : AppColors.textPrimary,
-                      BlendMode.srcIn,
+                    border: Border.all(
+                      color: hasUnread
+                          ? AppColors.accentDanger.withValues(alpha: 0.22)
+                          : AppColors.divider,
+                      width: 1,
+                    ),
+                    boxShadow: <BoxShadow>[
+                      BoxShadow(
+                        color: AppColors.shadowLight,
+                        blurRadius: 10 * m,
+                        offset: Offset(0, 3 * m),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: SvgPicture.asset(
+                      AppAssets.notificationBing,
+                      width: icon,
+                      height: icon,
+                      colorFilter: ColorFilter.mode(
+                        hasUnread
+                            ? AppColors.accentDanger
+                            : AppColors.textPrimary,
+                        BlendMode.srcIn,
+                      ),
                     ),
                   ),
                 ),
               ),
               if (hasUnread)
                 Positioned(
-                  top: -2,
-                  right: -3,
+                  top: badgeTop,
+                  right: badgeRight,
                   child: Container(
-                    constraints: const BoxConstraints(minWidth: 18),
-                    height: 18,
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    constraints: BoxConstraints(minWidth: badgeMinWidth),
+                    height: badgeHeight,
+                    padding: EdgeInsets.symmetric(horizontal: badgeHPad),
                     decoration: BoxDecoration(
                       color: AppColors.accentDanger,
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+                      borderRadius:
+                          BorderRadius.circular(AppSpacing.radiusPill),
                       border: Border.all(
-                          color: AppColors.panelBackground, width: 1.5),
+                        color: AppColors.panelBackground,
+                        width: 1.5,
+                      ),
                       boxShadow: <BoxShadow>[
                         BoxShadow(
-                          color: AppColors.accentDanger.withValues(alpha: 0.35),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
+                          color:
+                              AppColors.accentDanger.withValues(alpha: 0.35),
+                          blurRadius: 8 * m,
+                          offset: Offset(0, 2 * m),
                         ),
                       ],
                     ),
@@ -158,7 +180,7 @@ class _FeedNotificationBellState extends State<FeedNotificationBell>
                         widget.unreadCount > 9 ? '9+' : '${widget.unreadCount}',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: AppColors.textOnDark,
-                              fontSize: 10,
+                              fontSize: badgeFont,
                               fontWeight: FontWeight.w700,
                               height: 1,
                             ),

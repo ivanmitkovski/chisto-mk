@@ -13,6 +13,7 @@ void main() {
       String id = 'site-1',
       List<String> mediaUrls = const <String>[primaryUrl],
       List<Comment> comments = const [],
+      int commentsCount = 0,
       List<CleaningEvent> cleaningEvents = const [],
     }) {
       return PollutionSite(
@@ -26,6 +27,7 @@ void main() {
         participantCount: 5,
         mediaUrls: mediaUrls,
         comments: comments,
+        commentsCount: commentsCount,
         cleaningEvents: cleaningEvents,
         urgencyLabel: 'High',
         pollutionType: 'Plastic',
@@ -90,7 +92,7 @@ void main() {
       expect(siteGalleryImageProviders(site).length, 2);
     });
 
-    test('commentCount returns comments length', () {
+    test('commentCount counts roots and nested replies', () {
       final DateTime t = DateTime.utc(2026, 3, 1, 12);
       final List<Comment> comments = <Comment>[
         Comment(id: 'c1', authorName: 'A', text: 'Comment 1', createdAt: t),
@@ -99,6 +101,47 @@ void main() {
       final PollutionSite site = buildSite(comments: comments);
 
       expect(site.commentCount, 2);
+    });
+
+    test('commentCount includes nested replies in thread', () {
+      final DateTime t = DateTime.utc(2026, 3, 1, 12);
+      final List<Comment> comments = <Comment>[
+        Comment(
+          id: 'c1',
+          authorName: 'A',
+          text: 'Root',
+          createdAt: t,
+          replies: <Comment>[
+            Comment(
+              id: 'c2',
+              authorName: 'B',
+              text: 'Reply 1',
+              createdAt: t,
+              parentId: 'c1',
+            ),
+            Comment(
+              id: 'c3',
+              authorName: 'C',
+              text: 'Reply 2',
+              createdAt: t,
+              parentId: 'c1',
+            ),
+          ],
+        ),
+      ];
+      final PollutionSite site = buildSite(comments: comments, commentsCount: 3);
+
+      expect(site.commentCount, 3);
+    });
+
+    test('commentCount uses max of tree and server when tree under-reports', () {
+      final DateTime t = DateTime.utc(2026, 3, 1, 12);
+      final List<Comment> comments = <Comment>[
+        Comment(id: 'c1', authorName: 'A', text: 'Root only', createdAt: t),
+      ];
+      final PollutionSite site = buildSite(comments: comments, commentsCount: 3);
+
+      expect(site.commentCount, 3);
     });
 
     test('commentCount returns 0 when no comments', () {

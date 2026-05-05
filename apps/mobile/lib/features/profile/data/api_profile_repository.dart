@@ -63,13 +63,15 @@ class ApiProfileRepository implements ProfileRepository {
   }
 
   @override
-  Future<String?> uploadAvatar(String filePath) async {
+  Future<String> uploadAvatar(String filePath) async {
     final ApiResponse response = await _client.postMultipart(
       '/auth/me/avatar',
       <String>[filePath],
     );
     final String? avatarUrl = (response.json?['avatarUrl'] as String?)?.trim();
-    if (avatarUrl == null || avatarUrl.isEmpty) return null;
+    if (avatarUrl == null || avatarUrl.isEmpty) {
+      throw AppError.unknown();
+    }
     return avatarUrl;
   }
 

@@ -1,5 +1,7 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
@@ -7,31 +9,33 @@ import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/validation/phone_display_formatter.dart';
 import 'package:chisto_mobile/features/profile/domain/models/profile_user.dart';
-import 'package:chisto_mobile/features/profile/data/profile_avatar_state.dart';
+import 'package:chisto_mobile/features/profile/presentation/providers/profile_avatar_notifier.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
+import 'package:chisto_mobile/features/profile/presentation/widgets/profile_sub_screen_header.dart';
 import 'package:chisto_mobile/shared/widgets/keyboard_aware_form_scroll.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 import 'package:chisto_mobile/shared/widgets/primary_button.dart';
-import 'package:chisto_mobile/shared/widgets/app_avatar.dart';
 import 'package:chisto_mobile/shared/widgets/profile_avatar_peek_overlay.dart';
+import 'package:chisto_mobile/features/profile/presentation/widgets/profile_avatar_section.dart';
+import 'package:chisto_mobile/features/profile/presentation/widgets/profile_info_fields_card.dart';
 import 'package:chisto_mobile/features/profile/presentation/avatar/profile_avatar_flow.dart';
 import 'package:chisto_mobile/features/profile/presentation/widgets/profile_primary_action_bar.dart';
 
-class ProfileGeneralInfoScreen extends StatefulWidget {
-  const ProfileGeneralInfoScreen({super.key, this.user});
+class ProfileGeneralInfoScreen extends ConsumerStatefulWidget {
+  const ProfileGeneralInfoScreen({super.key, required this.user});
 
-  /// Current user (from profile screen or auth). If null, built from auth state.
-  final ProfileUser? user;
+  /// Current user (from profile screen).
+  final ProfileUser user;
 
   @override
-  State<ProfileGeneralInfoScreen> createState() =>
+  ConsumerState<ProfileGeneralInfoScreen> createState() =>
       _ProfileGeneralInfoScreenState();
 }
 
-class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
+class _ProfileGeneralInfoScreenState
+    extends ConsumerState<ProfileGeneralInfoScreen> {
   late final TextEditingController _nameController;
   late final TextEditingController _phoneController;
   late String _email;
@@ -56,41 +60,6 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
     );
   }
 
-  Future<void> _fetchAndInitUser() async {
-    try {
-      final ProfileUser user = await ServiceLocator.instance.profileRepository
-          .getMe();
-      if (!mounted) return;
-      setState(() {
-        _email = user.email.trim();
-        _nameController.text =
-            user.firstName.isNotEmpty || user.lastName.isNotEmpty
-            ? '${user.firstName} ${user.lastName}'.trim()
-            : user.name;
-        _phoneController.text = formatPhoneForDisplay(user.phoneNumber);
-        _remoteAvatarUrl = _normalizeAvatarUrl(user.avatarUrl);
-      });
-      profileAvatarState.setRemoteUrl(_normalizeAvatarUrl(user.avatarUrl));
-    } on AppError catch (e) {
-      if (!mounted) return;
-      if (_isAuthError(e.code)) {
-        Navigator.of(context).pushNamedAndRemoveUntil(
-          AppRoutes.signIn,
-          (Route<dynamic> route) => false,
-        );
-        return;
-      }
-      AppSnack.show(context, message: e.message, type: AppSnackType.warning);
-    } catch (_) {
-      if (!mounted) return;
-      AppSnack.show(
-        context,
-        message: context.l10n.profileGeneralLoadFailedSnack,
-        type: AppSnackType.warning,
-      );
-    }
-  }
-
   static bool _isAuthError(String code) =>
       code == 'UNAUTHORIZED' ||
       code == 'INVALID_TOKEN_USER' ||
@@ -106,20 +75,11 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
   @override
   void initState() {
     super.initState();
-    if (widget.user != null) {
-      _initFromUser(widget.user!);
-    } else {
-      _initFromUser(_profileUserFromAuthState());
-      WidgetsBinding.instance.addPostFrameCallback((_) => _fetchAndInitUser());
-    }
-    _localAvatarPath = profileAvatarState.localPath;
-    // When [user] is passed from Profile, it is the source of truth — do not fall back to
-    // [profileAvatarState.remoteUrl], which can be stale and incorrectly show "Remove".
-    _remoteAvatarUrl = _normalizeAvatarUrl(
-      widget.user != null
-          ? widget.user!.avatarUrl
-          : profileAvatarState.remoteUrl,
-    );
+    _initFromUser(widget.user);
+    _localAvatarPath = ref.read(profileAvatarNotifierProvider).localPath;
+    // [user] from Profile is the source of truth — do not fall back to global remote preview,
+    // which can be stale and incorrectly show "Remove".
+    _remoteAvatarUrl = _normalizeAvatarUrl(widget.user.avatarUrl);
     _nameFocus.addListener(_scrollToFocusedField);
     _phoneFocus.addListener(_scrollToFocusedField);
     _nameFocus.addListener(_onFocusChange);
@@ -184,32 +144,6 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
       duration: AppMotion.medium,
       curve: AppMotion.smooth,
       alignmentPolicy: ScrollPositionAlignmentPolicy.explicit,
-    );
-  }
-
-  static ProfileUser _profileUserFromAuthState() {
-    final authState = ServiceLocator.instance.authState;
-    return ProfileUser(
-      id: authState.userId ?? 'unknown',
-      name: authState.displayName ?? 'User',
-      firstName: '',
-      lastName: '',
-      email: '',
-      phoneNumber: '—',
-      points: 0,
-      totalPointsEarned: 0,
-      level: 1,
-      levelTierKey: 'numeric_1',
-      levelDisplayName: 'Level 1',
-      pointsToNextLevel: 36,
-      levelProgress: 0,
-      pointsInLevel: 0,
-      weeklyPoints: 0,
-      weeklyRank: null,
-      weekStartsAt: '',
-      weekEndsAt: '',
-      avatarColor: AppColors.primary,
-      avatarUrl: null,
     );
   }
 
@@ -333,18 +267,22 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
       _isAvatarBusy = true;
       _localAvatarPath = pickedPath;
     });
-    profileAvatarState.setLocalPath(pickedPath);
+    ref.read(profileAvatarNotifierProvider.notifier).setLocalPath(pickedPath);
 
     try {
-      final String? avatarUrl = await ServiceLocator.instance.profileRepository
-          .uploadAvatar(pickedPath);
+      final String avatarUrl =
+          await ServiceLocator.instance.profileRepository.uploadAvatar(
+        pickedPath,
+      );
       if (!mounted) return;
       setState(() {
         _remoteAvatarUrl = _normalizeAvatarUrl(avatarUrl);
         _localAvatarPath = null;
       });
-      profileAvatarState.clearLocalPath();
-      profileAvatarState.setRemoteUrl(_normalizeAvatarUrl(avatarUrl));
+      ref.read(profileAvatarNotifierProvider.notifier).clearLocalPath();
+      ref
+          .read(profileAvatarNotifierProvider.notifier)
+          .setRemoteUrl(_normalizeAvatarUrl(avatarUrl));
       AppSnack.show(
         context,
         message: context.l10n.profileGeneralPictureUpdatedSnack,
@@ -356,9 +294,11 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
         _localAvatarPath = previousLocalPath;
       });
       if (previousLocalPath != null && previousLocalPath.isNotEmpty) {
-        profileAvatarState.setLocalPath(previousLocalPath);
+        ref
+            .read(profileAvatarNotifierProvider.notifier)
+            .setLocalPath(previousLocalPath);
       } else {
-        profileAvatarState.clearLocalPath();
+        ref.read(profileAvatarNotifierProvider.notifier).clearLocalPath();
       }
       if (_isAuthError(e.code)) {
         Navigator.of(context).pushNamedAndRemoveUntil(
@@ -368,6 +308,23 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
         return;
       }
       AppSnack.show(context, message: e.message, type: AppSnackType.error);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _localAvatarPath = previousLocalPath;
+      });
+      if (previousLocalPath != null && previousLocalPath.isNotEmpty) {
+        ref
+            .read(profileAvatarNotifierProvider.notifier)
+            .setLocalPath(previousLocalPath);
+      } else {
+        ref.read(profileAvatarNotifierProvider.notifier).clearLocalPath();
+      }
+      AppSnack.show(
+        context,
+        message: context.l10n.profileAvatarProcessPhotoFailed,
+        type: AppSnackType.warning,
+      );
     } finally {
       if (mounted) {
         setState(() => _isAvatarBusy = false);
@@ -384,8 +341,8 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
         _remoteAvatarUrl = null;
         _localAvatarPath = null;
       });
-      profileAvatarState.clearLocalPath();
-      profileAvatarState.setRemoteUrl(null);
+      ref.read(profileAvatarNotifierProvider.notifier).clearLocalPath();
+      ref.read(profileAvatarNotifierProvider.notifier).setRemoteUrl(null);
       AppHaptics.success();
       AppSnack.show(
         context,
@@ -416,7 +373,6 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final double avatarDiameter = AppSpacing.avatarLg + AppSpacing.lg;
     final bool canPeekAvatar = _canPeekGeneralInfoAvatar();
     return Scaffold(
       backgroundColor: AppColors.panelBackground,
@@ -435,39 +391,10 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.lg,
-                0,
-                AppSpacing.lg,
-                0,
-              ),
-              child: AppBackButton(backgroundColor: AppColors.inputFill),
+            ProfileSubScreenHeader(
+              title: context.l10n.profileGeneralInfoTile,
+              subtitle: context.l10n.profileGeneralInfoSubtitle,
             ),
-            const SizedBox(height: AppSpacing.sm),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    context.l10n.profileGeneralInfoTile,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: -0.2,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    context.l10n.profileGeneralInfoSubtitle,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: AppSpacing.lg),
             Expanded(
               child: KeyboardAwareFormScroll(
                 controller: _scrollController,
@@ -480,344 +407,38 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Center(
-                      child: Column(
-                        children: <Widget>[
-                          Semantics(
-                            label: _isAvatarBusy
-                                ? context.l10n.profileGeneralAvatarSemanticUpdating
-                                : context.l10n.profileGeneralAvatarSemanticChange,
-                            button: true,
-                            enabled: !_isSaving && !_isAvatarBusy,
-                            child: Material(
-                              color: AppColors.transparent,
-                              child: InkWell(
-                                onTap: _isSaving || _isAvatarBusy
-                                    ? null
-                                    : _handleChangeAvatar,
-                                onLongPress: canPeekAvatar
-                                    ? () {
-                                        final ImageProvider? image =
-                                            _generalInfoPeekImageProvider();
-                                        if (image == null) return;
-                                        ProfileAvatarPeek.show(
-                                          context,
-                                          image: image,
-                                          semanticLabel: context.l10n
-                                              .profileAvatarPeekSemantic,
-                                        );
-                                      }
-                                    : null,
-                                onLongPressUp: canPeekAvatar
-                                    ? ProfileAvatarPeek.hide
-                                    : null,
-                                customBorder: const CircleBorder(),
-                                child: SizedBox(
-                                  width: avatarDiameter + 14,
-                                  height: avatarDiameter + 14,
-                                  child: Stack(
-                                    alignment: Alignment.center,
-                                    clipBehavior: Clip.none,
-                                    children: <Widget>[
-                                      ClipOval(
-                                        clipBehavior: Clip.antiAlias,
-                                        child: AnimatedContainer(
-                                          duration: AppMotion.fast,
-                                          curve: AppMotion.smooth,
-                                          width: avatarDiameter,
-                                          height: avatarDiameter,
-                                          decoration: BoxDecoration(
-                                            color: AppColors.inputFill,
-                                            border: Border.all(
-                                              color: _isAvatarBusy
-                                                  ? AppColors.primary
-                                                      .withValues(alpha: 0.45)
-                                                  : AppColors.primaryDark
-                                                      .withValues(alpha: 0.12),
-                                              width: _isAvatarBusy ? 2.5 : 1.5,
-                                            ),
-                                          ),
-                                          child: Stack(
-                                            fit: StackFit.expand,
-                                            clipBehavior: Clip.hardEdge,
-                                            children: <Widget>[
-                                              Positioned.fill(
-                                                child: _localAvatarPath != null
-                                                    ? Image.file(
-                                                        File(
-                                                          _localAvatarPath!,
-                                                        ),
-                                                        fit: BoxFit.cover,
-                                                        filterQuality:
-                                                            FilterQuality
-                                                                .medium,
-                                                      )
-                                                    : AppAvatar(
-                                                        name: _nameController
-                                                                .text
-                                                                .trim()
-                                                                .isEmpty
-                                                            ? context.l10n
-                                                                .profileGeneralDefaultDisplayName
-                                                            : _nameController
-                                                                  .text
-                                                                  .trim(),
-                                                        size: avatarDiameter,
-                                                        imageUrl:
-                                                            _remoteAvatarUrl,
-                                                      ),
-                                              ),
-                                              if (_isAvatarBusy)
-                                                Positioned.fill(
-                                                  child: ColoredBox(
-                                                    color: AppColors.black
-                                                        .withValues(
-                                                          alpha: 0.28,
-                                                        ),
-                                                    child: const Center(
-                                                      child: SizedBox(
-                                                        width: 28,
-                                                        height: 28,
-                                                        child:
-                                                            CircularProgressIndicator(
-                                                          strokeWidth: 2.5,
-                                                          color:
-                                                              AppColors.white,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      if (!_isAvatarBusy)
-                                        Positioned(
-                                          right: 0,
-                                          bottom: 0,
-                                          child: DecoratedBox(
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: AppColors.primaryDark,
-                                              border: Border.all(
-                                                color: AppColors.white,
-                                                width: 2,
-                                              ),
-                                              boxShadow: <BoxShadow>[
-                                                BoxShadow(
-                                                  color: AppColors.black
-                                                      .withValues(alpha: 0.12),
-                                                  blurRadius: 4,
-                                                  offset: const Offset(0, 2),
-                                                ),
-                                              ],
-                                            ),
-                                            child: const Padding(
-                                              padding: EdgeInsets.all(6),
-                                              child: Icon(
-                                                Icons.camera_alt_rounded,
-                                                size: 16,
-                                                color: AppColors.white,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: AppSpacing.sm),
-                          ExcludeSemantics(
-                            child: AnimatedSwitcher(
-                              duration: AppMotion.fast,
-                              switchInCurve: AppMotion.smooth,
-                              switchOutCurve: AppMotion.standardCurve,
-                              child: Text(
-                                _isAvatarBusy
-                                    ? context
-                                        .l10n.profileAvatarUploadingCaption
-                                    : context.l10n.profileAvatarTapToChange,
-                                key: ValueKey<bool>(_isAvatarBusy),
-                                textAlign: TextAlign.center,
-                                style: Theme.of(context).textTheme.bodySmall
-                                    ?.copyWith(
-                                  color: AppColors.textMuted,
-                                  fontWeight: FontWeight.w500,
-                                  letterSpacing: -0.1,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                    ListenableBuilder(
+                      listenable: _nameController,
+                      builder: (BuildContext context, Widget? _) {
+                        final String avatarDisplayName =
+                            _nameController.text.trim().isEmpty
+                                ? context
+                                    .l10n.profileGeneralDefaultDisplayName
+                                : _nameController.text.trim();
+                        return ProfileAvatarSection(
+                          avatarDisplayName: avatarDisplayName,
+                          localAvatarPath: _localAvatarPath,
+                          remoteAvatarUrl: _remoteAvatarUrl,
+                          isSaving: _isSaving,
+                          isAvatarBusy: _isAvatarBusy,
+                          canPeekAvatar: canPeekAvatar,
+                          peekImageProvider: _generalInfoPeekImageProvider,
+                          onChangeAvatar: _handleChangeAvatar,
+                        );
+                      },
                     ),
                     const SizedBox(height: AppSpacing.xl),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.panelBackground,
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radius18,
-                        ),
-                        boxShadow: <BoxShadow>[
-                          BoxShadow(
-                            color: AppColors.shadowLight,
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                        border: Border.all(
-                          color: AppColors.divider.withValues(alpha: 0.9),
-                        ),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(AppSpacing.md),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              context.l10n.profileGeneralNameLabel,
-                              style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(
-                                    color: AppColors.textSecondary,
-                                    fontWeight: FontWeight.w600,
-                                    letterSpacing: -0.1,
-                                  ),
-                            ),
-                            const SizedBox(height: AppSpacing.xs),
-                            RepaintBoundary(
-                              key: _nameFieldKey,
-                              child: TextField(
-                                controller: _nameController,
-                                focusNode: _nameFocus,
-                                textInputAction: TextInputAction.next,
-                                style: _profileFieldValueStyle(context),
-                                onSubmitted: (_) => FocusScope.of(
-                                  context,
-                                ).requestFocus(_phoneFocus),
-                                decoration: _inputDecoration(
-                                  context,
-                                  context.l10n.profileGeneralNameHint,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            Text(
-                              context.l10n.profileEmailLabel,
-                              style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(
-                                    color: AppColors.textSecondary,
-                                    fontWeight: FontWeight.w600,
-                                    letterSpacing: -0.1,
-                                  ),
-                            ),
-                            const SizedBox(height: AppSpacing.xs),
-                            Semantics(
-                              readOnly: true,
-                              label: context.l10n.profileEmailLabel,
-                              child: Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: AppSpacing.md,
-                                  vertical: AppSpacing.sm,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppColors.inputFill,
-                                  borderRadius: BorderRadius.circular(
-                                    AppSpacing.radius18,
-                                  ),
-                                  border: Border.all(
-                                    color: AppColors.inputBorder,
-                                    width: 1,
-                                  ),
-                                ),
-                                child: Text(
-                                  _email.isEmpty
-                                      ? context.l10n.profileGeneralEmptyValue
-                                      : _email,
-                                  style: _profileFieldValueStyle(context),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: AppSpacing.xs),
-                            Text(
-                              context.l10n.profileEmailReadOnlyHint,
-                              style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(
-                                    color: AppColors.textMuted,
-                                    height: 1.35,
-                                  ),
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            Text(
-                              context.l10n.profileGeneralMobileLabel,
-                              style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(
-                                    color: AppColors.textSecondary,
-                                    fontWeight: FontWeight.w600,
-                                    letterSpacing: -0.1,
-                                  ),
-                            ),
-                            const SizedBox(height: AppSpacing.xs),
-                            RepaintBoundary(
-                              key: _phoneFieldKey,
-                              child: TextField(
-                                controller: _phoneController,
-                                focusNode: _phoneFocus,
-                                readOnly: true,
-                                keyboardType: TextInputType.phone,
-                                textInputAction: TextInputAction.done,
-                                style: _profileFieldValueStyle(context),
-                                decoration: _inputDecoration(
-                                  context,
-                                  context.l10n.profileGeneralPhonePlaceholder,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: AppSpacing.sm),
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.all(AppSpacing.sm),
-                              decoration: BoxDecoration(
-                                color: AppColors.inputFill,
-                                borderRadius: BorderRadius.circular(
-                                  AppSpacing.radius14,
-                                ),
-                                border: Border.all(
-                                  color: AppColors.divider.withValues(
-                                    alpha: 0.9,
-                                  ),
-                                ),
-                              ),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  const Icon(
-                                    Icons.info_outline_rounded,
-                                    size: AppSpacing.iconMd,
-                                    color: AppColors.textMuted,
-                                  ),
-                                  const SizedBox(width: AppSpacing.xs),
-                                  Expanded(
-                                    child: Text(
-                                      context.l10n.profileGeneralLimitsNotice,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall
-                                          ?.copyWith(
-                                            color: AppColors.textMuted,
-                                            height: 1.35,
-                                          ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                    ProfileInfoFieldsCard(
+                      nameController: _nameController,
+                      phoneController: _phoneController,
+                      nameFocus: _nameFocus,
+                      phoneFocus: _phoneFocus,
+                      nameFieldKey: _nameFieldKey,
+                      phoneFieldKey: _phoneFieldKey,
+                      email: _email,
+                      fieldValueStyle: _profileFieldValueStyle(context),
+                      inputDecoration: (String hint) =>
+                          _inputDecoration(context, hint),
                     ),
                   ],
                 ),

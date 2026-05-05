@@ -5,6 +5,7 @@ import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/features/home/domain/models/comment.dart';
 import 'package:chisto_mobile/features/home/domain/repositories/sites_repository.dart';
+import 'package:chisto_mobile/features/home/presentation/providers/feed_providers.dart';
 import 'package:chisto_mobile/features/home/presentation/providers/site_comments_route_notifier.dart';
 import 'package:chisto_mobile/features/home/presentation/providers/site_engagement_provider.dart';
 import 'package:chisto_mobile/features/home/presentation/utils/site_comment_mapping.dart';
@@ -170,6 +171,9 @@ class _FeedSiteCommentsRouteScreenState
                             ).notifier,
                           )
                           .setCommentCount(count);
+                      ref
+                          .read(feedSitesNotifierProvider.notifier)
+                          .patchSiteCommentsCount(widget.siteId, count);
                     },
                     onCommentsChanged: (List<Comment> next) {
                       ref

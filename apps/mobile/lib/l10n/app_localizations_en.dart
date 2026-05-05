@@ -872,6 +872,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileLoadingSemantic => 'Loading profile';
 
   @override
+  String get profileErrorSemantic => 'Profile failed to load';
+
+  @override
+  String get profileLevelCardSemantic =>
+      'Level and points. Opens points history';
+
+  @override
+  String get profileWeeklyRankCardSemantic => 'Weekly rank. Opens rankings';
+
+  @override
   String get profilePointsHistoryMilestonesSection => 'Level ups';
 
   @override
@@ -892,6 +902,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profilePointsHistoryLoadMore => 'Loading…';
+
+  @override
+  String get profilePointsHistoryLoadMoreErrorTitle =>
+      'Could not load more activity';
+
+  @override
+  String get profilePointsHistoryLoadMoreRetry => 'Try again';
+
+  @override
+  String profilePointsActivityRowSemantic(
+    String reason,
+    String time,
+    String delta,
+  ) {
+    return '$reason. $time. $delta';
+  }
 
   @override
   String profilePointsDeltaPositive(int points) {
@@ -957,6 +983,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileLanguageScreenTitle => 'App language';
+
+  @override
+  String get profileLanguageScreenSubtitle =>
+      'Choose a language or follow your device.';
+
+  @override
+  String get profileLanguageChangeFailed =>
+      'Could not update language. Try again.';
 
   @override
   String get profileLanguageSubtitleDevice => 'Device settings';
@@ -1054,6 +1088,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Session expired. Please sign in again.';
 
   @override
+  String get profilePasswordGenericError =>
+      'Something went wrong. Check your connection and try again.';
+
+  @override
   String get profilePasswordCurrentSemantic => 'Current password';
 
   @override
@@ -1063,7 +1101,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profilePasswordConfirmSemantic => 'Confirm new password';
 
   @override
+  String get profilePasswordToggleVisibility => 'Show or hide password';
+
+  @override
   String get commonCancel => 'Cancel';
+
+  @override
+  String get commonContinue => 'Continue';
 
   @override
   String get commonRetry => 'Retry';
@@ -1103,6 +1147,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'You can sign back in anytime with your account.';
 
   @override
+  String get profileSignOutFailedSnack => 'Could not sign out. Try again.';
+
+  @override
   String get profileDeleteAccountDialogTitle => 'Delete account?';
 
   @override
@@ -1110,11 +1157,8 @@ class AppLocalizationsEn extends AppLocalizations {
       'All your data will be permanently removed. This action cannot be undone.';
 
   @override
-  String get profileDeleteAccountFinalDialogTitle => 'Permanently delete?';
-
-  @override
-  String get profileDeleteAccountFinalDialogBody =>
-      'Your account and all associated data will be permanently deleted.';
+  String get profileDeleteAccountFailedSnack =>
+      'Could not delete your account. Try again.';
 
   @override
   String get profileDeleteAccountTypeConfirmTitle => 'Confirm by typing';
@@ -1513,6 +1557,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get feedPullToRefreshSemantic => 'Pull to refresh';
+
+  @override
+  String get feedRefreshingSemantic => 'Refreshing feed';
 
   @override
   String get feedLoadMoreFailedSnack => 'Could not load more posts. Tap retry.';

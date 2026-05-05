@@ -5,7 +5,7 @@ import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/feed_filter_sheet.dart';
 import 'package:flutter/material.dart';
 
-/// Horizontal filter chips for the pollution feed (always visible).
+/// Horizontal filter chips for the pollution feed (scrolls with the list).
 class FeedFilterBar extends StatelessWidget {
   const FeedFilterBar({
     super.key,
@@ -25,7 +25,7 @@ class FeedFilterBar extends StatelessWidget {
         AppSpacing.lg,
         0,
         AppSpacing.lg,
-        AppSpacing.sm,
+        AppSpacing.xs,
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -34,30 +34,39 @@ class FeedFilterBar extends StatelessWidget {
             for (final FeedFilter filter in FeedFilter.values) ...<Widget>[
               Padding(
                 padding: const EdgeInsets.only(right: AppSpacing.xs),
-                child: FilterChip(
-                  label: Text(filter.displayName(context.l10n)),
+                child: Semantics(
+                  button: true,
                   selected: activeFilter == filter,
-                  showCheckmark: false,
-                  onSelected: (_) => onFilterSelected(filter),
-                  selectedColor: AppColors.primaryDark.withValues(alpha: 0.12),
-                  labelStyle: AppTypography.chipLabel.copyWith(
-                    color: activeFilter == filter
-                        ? AppColors.primaryDark
-                        : AppColors.textSecondary,
-                    fontWeight:
-                        activeFilter == filter ? FontWeight.w600 : FontWeight.w500,
+                  excludeSemantics: true,
+                  label: context.l10n.feedFilterSemantic(
+                    filter.displayName(context.l10n),
                   ),
-                  side: BorderSide(
-                    color: activeFilter == filter
-                        ? AppColors.primaryDark.withValues(alpha: 0.35)
-                        : AppColors.divider,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.sm,
-                    vertical: AppSpacing.xxs,
+                  child: FilterChip(
+                    label: Text(filter.displayName(context.l10n)),
+                    selected: activeFilter == filter,
+                    showCheckmark: false,
+                    onSelected: (_) => onFilterSelected(filter),
+                    selectedColor: AppColors.primaryDark.withValues(alpha: 0.12),
+                    labelStyle: AppTypography.chipLabel.copyWith(
+                      color: activeFilter == filter
+                          ? AppColors.primaryDark
+                          : AppColors.textSecondary,
+                      fontWeight: activeFilter == filter
+                          ? FontWeight.w600
+                          : FontWeight.w500,
+                    ),
+                    side: BorderSide(
+                      color: activeFilter == filter
+                          ? AppColors.primaryDark.withValues(alpha: 0.35)
+                          : AppColors.divider,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm,
+                      vertical: AppSpacing.xxs,
+                    ),
                   ),
                 ),
               ),

@@ -875,6 +875,17 @@ class AppLocalizationsMk extends AppLocalizations {
   String get profileLoadingSemantic => 'Се вчитува профилот';
 
   @override
+  String get profileErrorSemantic => 'Профилот не можеше да се вчита';
+
+  @override
+  String get profileLevelCardSemantic =>
+      'Ниво и поени. Отвора историја на поени';
+
+  @override
+  String get profileWeeklyRankCardSemantic =>
+      'Неделен пласман. Отвора рангирања';
+
+  @override
   String get profilePointsHistoryMilestonesSection => 'Ново ниво';
 
   @override
@@ -895,6 +906,22 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get profilePointsHistoryLoadMore => 'Се вчитува…';
+
+  @override
+  String get profilePointsHistoryLoadMoreErrorTitle =>
+      'Не можеше да се вчита повеќе активност';
+
+  @override
+  String get profilePointsHistoryLoadMoreRetry => 'Обиди се повторно';
+
+  @override
+  String profilePointsActivityRowSemantic(
+    String reason,
+    String time,
+    String delta,
+  ) {
+    return '$reason. $time. $delta';
+  }
 
   @override
   String profilePointsDeltaPositive(int points) {
@@ -962,6 +989,14 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get profileLanguageScreenTitle => 'Јазик на апликацијата';
+
+  @override
+  String get profileLanguageScreenSubtitle =>
+      'Изберете јазик или следете го уредот.';
+
+  @override
+  String get profileLanguageChangeFailed =>
+      'Не можевме да го зачуваме јазикот. Обидете се повторно.';
 
   @override
   String get profileLanguageSubtitleDevice => 'Поставки на уредот';
@@ -1058,6 +1093,10 @@ class AppLocalizationsMk extends AppLocalizations {
       'Сесијата истече. Најавете се повторно.';
 
   @override
+  String get profilePasswordGenericError =>
+      'Нешто не е во ред. Проверете ја врската и обидете се повторно.';
+
+  @override
   String get profilePasswordCurrentSemantic => 'Моментална лозинка';
 
   @override
@@ -1067,7 +1106,13 @@ class AppLocalizationsMk extends AppLocalizations {
   String get profilePasswordConfirmSemantic => 'Потврда на нова лозинка';
 
   @override
+  String get profilePasswordToggleVisibility => 'Прикажи или сокриј лозинка';
+
+  @override
   String get commonCancel => 'Откажи';
+
+  @override
+  String get commonContinue => 'Продолжи';
 
   @override
   String get commonRetry => 'Обиди повторно';
@@ -1107,6 +1152,10 @@ class AppLocalizationsMk extends AppLocalizations {
       'Можете повторно да се најавите со вашата сметка.';
 
   @override
+  String get profileSignOutFailedSnack =>
+      'Не можевме да ве одјавиме. Обидете се повторно.';
+
+  @override
   String get profileDeleteAccountDialogTitle => 'Да се избрише сметката?';
 
   @override
@@ -1114,11 +1163,8 @@ class AppLocalizationsMk extends AppLocalizations {
       'Сите податоци трајно ќе бидат избришани. Ова не може да се врати.';
 
   @override
-  String get profileDeleteAccountFinalDialogTitle => 'Трајно бришење?';
-
-  @override
-  String get profileDeleteAccountFinalDialogBody =>
-      'Вашата сметка и сите поврзани податоци трајно ќе бидат избришани.';
+  String get profileDeleteAccountFailedSnack =>
+      'Не можевме да ја избришеме сметката. Обидете се повторно.';
 
   @override
   String get profileDeleteAccountTypeConfirmTitle => 'Потврда со внес';
@@ -1521,6 +1567,9 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get feedPullToRefreshSemantic => 'Повлечи за освежување';
+
+  @override
+  String get feedRefreshingSemantic => 'Се освежува фидот';
 
   @override
   String get feedLoadMoreFailedSnack =>

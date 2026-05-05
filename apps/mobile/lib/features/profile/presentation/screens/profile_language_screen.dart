@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/l10n/app_language_picker.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/features/profile/presentation/widgets/profile_sub_screen_header.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
+import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 
 /// Lets the user pick a fixed locale or follow the device language.
-class ProfileLanguageScreen extends StatefulWidget {
+class ProfileLanguageScreen extends ConsumerStatefulWidget {
   const ProfileLanguageScreen({super.key});
 
   @override
-  State<ProfileLanguageScreen> createState() => _ProfileLanguageScreenState();
+  ConsumerState<ProfileLanguageScreen> createState() =>
+      _ProfileLanguageScreenState();
 }
 
-class _ProfileLanguageScreenState extends State<ProfileLanguageScreen> {
+class _ProfileLanguageScreenState extends ConsumerState<ProfileLanguageScreen> {
   @override
   void initState() {
     super.initState();
@@ -35,7 +38,17 @@ class _ProfileLanguageScreenState extends State<ProfileLanguageScreen> {
 
   Future<void> _select(Locale? locale) async {
     AppHaptics.tap();
-    await ServiceLocator.instance.setAppLocale(locale);
+    try {
+      await ServiceLocator.instance.setAppLocale(locale);
+    } catch (_) {
+      if (!mounted) return;
+      AppSnack.show(
+        context,
+        message: context.l10n.profileLanguageChangeFailed,
+        type: AppSnackType.warning,
+      );
+      return;
+    }
     if (!mounted) return;
     Navigator.of(context).pop();
   }
@@ -48,37 +61,17 @@ class _ProfileLanguageScreenState extends State<ProfileLanguageScreen> {
       backgroundColor: AppColors.appBackground,
       body: SafeArea(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.sm,
-                AppSpacing.sm,
-                AppSpacing.sm,
-                AppSpacing.xs,
-              ),
-              child: Row(
-                children: <Widget>[
-                  AppBackButton(backgroundColor: AppColors.inputFill),
-                  Expanded(
-                    child: Text(
-                      context.l10n.profileLanguageScreenTitle,
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: AppColors.textPrimary,
-                            fontWeight: FontWeight.w600,
-                          ),
-                    ),
-                  ),
-                  const SizedBox(width: 48),
-                ],
-              ),
+            ProfileSubScreenHeader(
+              title: context.l10n.profileLanguageScreenTitle,
+              subtitle: context.l10n.profileLanguageScreenSubtitle,
             ),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(
                   AppSpacing.lg,
-                  AppSpacing.md,
+                  0,
                   AppSpacing.lg,
                   AppSpacing.xl,
                 ),
