@@ -819,6 +819,256 @@
   "feedScrollToTopSemantic": "Shkrollo në krye të rrjedhës",
   "mapResetFiltersSemantic": "Rivendos filtrat",
   "mapOpenMapsFailed": "Nuk u hap Hartat",
+  "mapSearchRecentsLabel": "Të fundit",
+  "mapSearchClearRecentsButton": "Pastro",
+  "mapSearchEmptyTitle": "Kërko vende ndotjeje",
+  "mapSearchEmptySubtitle": "Shkruaj titull, kategori ose përshkrim. Ose prek një kërkim të fundit.",
+  "mapSearchNoResultsTitle": "Nuk u gjet asgjë",
+  "mapSearchNoResultsSubtitle": "Provo fjalë të tjera ose pastro filtrat në hartë.",
+  "mapSearchResultsBadge": "{count} rezultate",
+  "@mapSearchResultsBadge": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mapSearchRemoteLoading": "Duke kërkuar të gjitha vendet…",
+  "mapSearchRemoteError": "Nuk u krye kërkimi në të gjitha vendet.",
+  "mapSearchRemoteRetry": "Provo sërish",
+  "mapSearchSectionOnMap": "Në këtë hartë",
+  "mapSearchSectionEverywhere": "Më shumë rezultate",
+  "mapSearchSuggestionsLabel": "Sugjerime",
+  "mapUpdatedToast": "Harta u përditësua",
+  "mapErrorAutoRetryFootnote": "Do të provojmë sërish për disa sekonda. Mund edhe të prek Try again.",
+  "mapFilteredSitesAnnounce": "{count, plural, one{Një vend shfaqet në hartë} other{{count} vende shfaqen në hartë}}",
+  "@mapFilteredSitesAnnounce": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mapClusterExpansionAnnounce": "{count, plural, one{Një vend u nda në hartë} other{{count} vende u ndanë në hartë}}",
+  "@mapClusterExpansionAnnounce": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mapScreenRouteSemantic": "Harta e ndotjes. Prek fijet për detaje të vendit.",
+  "mapLoadingSemantic": "Po ngarkohet harta",
+  "mapSiteNotOnMapSnack": "Ky vend ende nuk është në hartë.",
+  "mapOpenLocationFailedSnack": "Nuk mund të hapet kjo vendndodhje në hartë.",
+  "mapEmptyFiltersLiveRegion": "Asnjë vend nuk përputhet me filtrat aktualë",
+  "mapEmptyFiltersTitle": "Asnjë vend nuk përputhet me filtrat",
+  "mapEmptyFiltersSubtitle": "Provo të ndryshosh filtrat ose të kërkosh.",
+  "mapDirectionsSheetOpenInMaps": "Hape në Hartat",
+  "mapDirectionsSheetViewLocation": "Shiko vendndodhjen",
+  "mapDirectionsSheetSubtitleDirections": "Zgjidh aplikacionin për drejtime.",
+  "mapDirectionsSheetSubtitleViewLocation": "Zgjidh aplikacionin për ta parë në hartë.",
+  "mapDirectionsAppleMapsTitle": "Apple Maps",
+  "mapDirectionsAppleMapsSubtitle": "Hartat e integruara në këtë pajisje.",
+  "mapDirectionsGoogleMapsTitle": "Google Maps",
+  "mapDirectionsGoogleMapsSubtitle": "Në web dhe në aplikacionin Google Maps.",
+  "mapSemanticCloseActionsMenu": "Mbyll menunë e veprimeve",
+  "mapSemanticOpenActionsMenu": "Hap menunë e veprimeve",
+  "mapSemanticHideHeatmap": "Fshih hartën e nxehtësisë",
+  "mapSemanticShowHeatmap": "Shfaq hartën e nxehtësisë",
+  "mapSemanticSwitchToLightMap": "Kalo në hartë të çelët",
+  "mapSemanticSwitchToDarkMap": "Kalo në hartë të errët",
+  "mapSemanticZoomWholeCountry": "Zmadho për të parë gjithë vendin",
+  "mapSemanticUnlockRotation": "Shkyç rrotullimin e hartës",
+  "mapSemanticLockRotation": "Kyç rrotullimin e hartës",
+  "mapSemanticCenterOnMyLocation": "Qendro hartën te vendndodhja ime",
+  "mapSemanticSearchSites": "Kërko vende",
+  "mapSemanticResetRotationNorth": "Rivendos rrotullimin drejt veriut",
+  "mapFilterButtonSemanticPrefix": "Filtro vendet.",
+  "mapFilterButtonSemanticNoMatch": "Asnjë vend nuk përputhet me filtrat në këtë zonë.",
+  "mapFilterButtonSemanticNoSites": "Nuk ka vende në këtë zonë.",
+  "mapFilterButtonSemanticSitesCount": "{count} vende në këtë zonë.",
+  "@mapFilterButtonSemanticSitesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mapFilterButtonSemanticSuffix": "Prek për të hapur filtrat.",
+  "mapFilterCountNoMatch": "Asnjë përputhje",
+  "mapFilterCountNoSites": "Asnjë vend",
+  "mapFilterSheetTitle": "Filtro vendet",
+  "mapFilterCloseTooltip": "Mbyll filtrat",
+  "mapFilterSectionSiteStatus": "Statusi i vendit",
+  "mapFilterSectionArea": "Komunë / zona",
+  "mapFilterSectionPollutionType": "Lloji i ndotjes",
+  "mapFilterSectionVisibility": "Dukshmëria",
+  "mapFilterShowArchivedSites": "Shfaq vendet e arkivuara",
+  "mapFilterShowingLiveRegion": "{visible} nga {total} vende ndotjeje të dukshme në këtë zonë",
+  "@mapFilterShowingLiveRegion": {
+    "placeholders": {
+      "visible": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "mapFilterShowingInline": "Po shfaqen {visible} nga {total}",
+  "@mapFilterShowingInline": {
+    "placeholders": {
+      "visible": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "mapFilterPollutionTypeSemantic": "Filtro vendet e llojit {type}",
+  "@mapFilterPollutionTypeSemantic": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "mapFilterPollutionTypeHintOff": "Prek dy herë për të shfaqur këtë lloj",
+  "mapFilterPollutionTypeHintOn": "Prek dy herë për ta fshehur këtë lloj",
+  "mapFilterPollutionTypeUnknown": "Lloj i panjohur",
+  "mapFilterSiteStatusReported": "E raportuar",
+  "mapFilterSiteStatusVerified": "E verifikuar",
+  "mapFilterSiteStatusCleanupScheduled": "Pastrimi i planifikuar",
+  "mapFilterSiteStatusInProgress": "Në progres",
+  "mapFilterSiteStatusCleaned": "E pastruar",
+  "mapFilterSiteStatusDisputed": "E kontestuar",
+  "mapFilterSiteStatusArchived": "E arkivuar",
+  "mapFilterSiteStatusUnknown": "Status i panjohur",
+  "mapFilterSiteStatusSemantic": "Filtro vendet me status {status}",
+  "@mapFilterSiteStatusSemantic": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "mapFilterSiteStatusHintOff": "Prek dy herë për ta shfaqur këtë status",
+  "mapFilterSiteStatusHintOn": "Prek dy herë për ta fshehur këtë status",
+  "mapGeoWholeCountry": "E gjithë vendi",
+  "mapGeoSkopjeWhole": "Të gjitha komunat e Shkupit",
+  "mapGeoSkopje": "Shkupi",
+  "mapGeoSkopjeCentar": "Qendra",
+  "mapGeoSkopjeAerodrom": "Aerodromi",
+  "mapGeoSkopjeKarposh": "Karposhi",
+  "mapGeoSkopjeChair": "Çairi",
+  "mapGeoSkopjeKiselaVoda": "Kisela Vodë",
+  "mapGeoSkopjeGaziBaba": "Gazi Babë",
+  "mapGeoSkopjeButel": "Buteli",
+  "mapGeoSkopjeGjorcePetrov": "Gjorçe Petrov",
+  "mapGeoSkopjeSaraj": "Saraj",
+  "mapGeoBitola": "Manastiri",
+  "mapGeoKumanovo": "Kumanova",
+  "mapGeoPrilep": "Prilepi",
+  "mapGeoTetovo": "Tetova",
+  "mapGeoVeles": "Velesi",
+  "mapGeoOhrid": "Ohri",
+  "mapGeoStip": "Shtipi",
+  "mapGeoGostivar": "Gostivari",
+  "mapGeoStrumica": "Strumica",
+  "mapGeoKavadarci": "Kavadari",
+  "mapGeoKocani": "Koçani",
+  "mapGeoStruga": "Struga",
+  "mapGeoRadovis": "Radovishti",
+  "mapGeoGevgelija": "Gjevgjelia",
+  "mapGeoKrivaPalanka": "Kriva Pallanka",
+  "mapGeoSvetiNikole": "Shënti Nikolla",
+  "mapGeoVinica": "Vinica",
+  "mapGeoDelcevo": "Delçeva",
+  "mapGeoProbistip": "Probishtipi",
+  "mapGeoBerovo": "Berova",
+  "mapGeoKratovo": "Kratova",
+  "mapGeoKicevo": "Kicheva",
+  "mapGeoMakedonskiBrod": "Brod",
+  "mapGeoNegotino": "Negocina",
+  "mapGeoResen": "Reseni",
+  "mapGeoUnknownArea": "Zona e panjohur",
+  "mapPinPreviewSemantic": "{title}, {severity}. Prek dy herë për parapamje.",
+  "@mapPinPreviewSemantic": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "severity": {
+        "type": "String"
+      }
+    }
+  },
+  "mapClusterSemantic": "{count, plural, one{1 vend ndotjeje i grupuar. Prek dy herë për ta zgjeruar.} other{{count} vende ndotjeje të grupuara. Prek dy herë për t’i zgjeruar.}}",
+  "@mapClusterSemantic": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mapUserLocationSemantic": "Vendndodhja juaj aktuale",
+  "mapPreviewDismissAnnouncement": "Parapamja e vendit u mbyll.",
+  "mapDistanceMetersAway": "{meters} m larg",
+  "@mapDistanceMetersAway": {
+    "placeholders": {
+      "meters": {
+        "type": "int"
+      }
+    }
+  },
+  "mapDistanceKilometersAway": "{kilometers} km larg",
+  "@mapDistanceKilometersAway": {
+    "placeholders": {
+      "kilometers": {
+        "type": "String"
+      }
+    }
+  },
+  "mapPreviewSemanticLabel": "Vendi i zgjedhur: {title}. {distance}. Prek dy herë për detaje. Tërhiq poshtë për ta mbyllur.",
+  "@mapPreviewSemanticLabel": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "mapPreviewSemanticHint": "Përdor veprimet për drejtime ose detaje të plota.",
+  "mapPreviewDirections": "Drejtime",
+  "mapPreviewDetails": "Detaje",
+  "mapSyncNoticeSemanticRefreshHint": "Prek dy herë për të rifreskuar menjëherë hartën.",
+  "mapSyncLiveUpdatesDelayed": "Përditësimet në kohë reale u vonuan. Po riprovohet në heshtje…",
+  "mapSyncConnectionUnstable": "Lidhja është e paqëndrueshme. Po rifreskohet në sfond…",
+  "mapSyncOfflineSnapshot": "Jashtë linje. Po shfaqet pamja e fundit e ruajtur e hartës.",
+  "mapSyncOfflineSnapshotJustNow": "Jashtë linje. Po shfaqet pamja e fundit e ruajtur e hartës nga tani.",
+  "mapSyncOfflineSnapshotMinutesAgo": "Jashtë linje. Po shfaqet pamja e fundit e ruajtur e hartës para {minutes} min.",
+  "@mapSyncOfflineSnapshotMinutesAgo": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "mapSyncOfflineSnapshotHoursAgo": "Jashtë linje. Po shfaqet pamja e fundit e ruajtur e hartës para {hours} orësh.",
+  "@mapSyncOfflineSnapshotHoursAgo": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "mapSearchLocationUnavailableSnack": "Vendndodhja nuk është e disponueshme për këtë vend.",
+  "mapSearchFieldSemanticHint": "Shkruaj titull, kategori ose përshkrim",
+  "mapSearchBarHint": "Kërko vende…",
   "locationRetryAddressSemantic": "Provo përsëri adresën",
   "photoReviewDiscardTitle": "Të hidhet poshtë kjo foto?",
   "photoReviewDiscardBody": "Mund të rifotografosh ose të zgjedhësh një tjetër nga biblioteka.",
@@ -2128,6 +2378,7 @@
   "reportIssueDetailsLabel": "Detaje shtesë (opsionale)",
   "reportIssueDetailsHint": "Përshkruaj problemin…",
   "searchModalCancel": "Anulo",
+  "searchModalPlaceholder": "Kërko vendndotje",
   "appSmartImageRetry": "Provo përsëri",
   "appSmartImageRetryIn": "Provo përsëri pas {seconds} s",
   "@appSmartImageRetryIn": {
@@ -3022,6 +3273,7 @@
   "homeSiteCleaningEventUnavailable": "Detajet e ngjarjes nuk janë të disponueshme për momentin.",
   "homeSiteCleaningListLoadError": "Nuk u ngarkuan ngjarjet. Kontrollo lidhjen dhe provo përsëri.",
   "homeSiteCleaningRetry": "Riprovo",
+  "homeSiteCleaningLoadingSemantic": "Po ngarkohen veprimet ekologjike.",
   "eventsDistanceLessThan100m": "<100 m",
   "eventsDistanceMeters": "{meters} m",
   "@eventsDistanceMeters": {
@@ -3405,5 +3657,9 @@
   },
   "reportDraftIncomingPhotoContinue": "Vazhdo draftin",
   "reportDraftIncomingPhotoReplace": "Zëvendëso draftin",
-  "reportDraftIncomingPhotoAdd": "Shto në draft"
+  "reportDraftIncomingPhotoAdd": "Shto në draft",
+  "savedMapAreasTitle": "Zonat e ruajtura të hartës",
+  "savedMapAreasPlaceholder": "Rajonet offline dhe shkarkimet në sfond do të shfaqen këtu.",
+  "mapWhatsNewTitle": "Përditësime të hartës",
+  "mapWhatsNewBody": "Parapërgatitje më e zgjuar, grupe më të qëndrueshme dhe rrjedha më e sigurt e hartës."
 }

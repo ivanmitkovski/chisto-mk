@@ -120,9 +120,11 @@ describe('EventsService', () => {
       findUnique: jest.Mock;
       update: jest.Mock;
     };
-    eventCheckIn: { findMany: jest.Mock };
+    eventCheckIn: { findMany: jest.Mock; count: jest.Mock };
     pointTransaction: { findMany: jest.Mock };
     userDeviceToken: { findMany: jest.Mock };
+    $executeRaw: jest.Mock;
+    $queryRaw: jest.Mock;
     $transaction: jest.Mock;
   };
   let uploads: ReturnType<typeof makeUploads>;
@@ -190,9 +192,14 @@ describe('EventsService', () => {
         findUnique: jest.fn(),
         update: jest.fn(),
       },
-      eventCheckIn: { findMany: jest.fn().mockResolvedValue([]) },
+      eventCheckIn: {
+        findMany: jest.fn().mockResolvedValue([]),
+        count: jest.fn().mockResolvedValue(0),
+      },
       pointTransaction: { findMany: jest.fn().mockResolvedValue([]) },
       userDeviceToken: { findMany: jest.fn().mockResolvedValue([]) },
+      $executeRaw: jest.fn().mockResolvedValue(1),
+      $queryRaw: jest.fn().mockResolvedValue([]),
       $transaction: jest.fn(async (arg: unknown) => {
         if (typeof arg === 'function') {
           return arg(prisma);
@@ -1025,9 +1032,11 @@ describe('EventsService', () => {
         { joinedAt: new Date('2025-06-01T10:00:00Z') },
         { joinedAt: new Date('2025-06-01T14:00:00Z') },
       ]);
+      prisma.eventCheckIn.count.mockResolvedValue(1);
       prisma.eventCheckIn.findMany.mockResolvedValue([
         { checkedInAt: new Date('2025-06-01T11:15:00Z') },
       ]);
+      prisma.$queryRaw.mockResolvedValue([{ hour: 11, count: BigInt(1) }]);
       const out = await service.getAnalytics('evt-1', user('org-1'));
       expect(out.totalJoiners).toBe(2);
       expect(out.checkedInCount).toBe(1);

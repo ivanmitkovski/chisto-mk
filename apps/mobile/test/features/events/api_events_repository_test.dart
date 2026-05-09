@@ -1,6 +1,7 @@
 import 'package:chisto_mobile/core/config/app_config.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/network/api_client.dart';
+import 'package:chisto_mobile/core/network/request_cancellation.dart';
 import 'package:chisto_mobile/features/events/data/api_events_repository.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event_search_params.dart';
@@ -27,7 +28,11 @@ class _FakeApiClient extends ApiClient {
   }
 
   @override
-  Future<ApiResponse> get(String path, {Map<String, String>? headers}) async {
+  Future<ApiResponse> get(
+    String path, {
+    RequestCancellationToken? cancellation,
+    Map<String, String>? headers,
+  }) async {
     getCalls += 1;
     final ApiResponse? response = _responses[path];
     if (response == null) {
@@ -148,6 +153,24 @@ void main() {
     expect(client.getCalls, 1);
   });
 
+  test('refreshEvents includes user location hint when available', () async {
+    final _FakeApiClient client = _FakeApiClient();
+    client.stubGet(
+      '/events?limit=50&lat=41.997300&lng=21.428000',
+      <String, dynamic>{
+        'data': <dynamic>[],
+        'meta': <String, dynamic>{
+          'hasMore': false,
+          'nextCursor': null,
+        },
+      },
+    );
+    final ApiEventsRepository repo = ApiEventsRepository(client: client);
+    repo.setUserLocationHint(latitude: 41.9973, longitude: 21.4280);
+    await repo.refreshEvents();
+    expect(client.getCalls, 1);
+  });
+
   test('bootstrap loads global list without lifecycle filter', () async {
     final _FakeApiClient client = _FakeApiClient();
     client.stubGet(
@@ -192,7 +215,11 @@ void main() {
 /// First `/events?limit=50` page has more; second page request throws.
 class _PagingFakeApiClient extends _FakeApiClient {
   @override
-  Future<ApiResponse> get(String path, {Map<String, String>? headers}) async {
+  Future<ApiResponse> get(
+    String path, {
+    RequestCancellationToken? cancellation,
+    Map<String, String>? headers,
+  }) async {
     getCalls += 1;
     if (path.contains('cursor=c2')) {
       throw const AppError(code: 'SERVER', message: 'page failed');
@@ -209,6 +236,6 @@ class _PagingFakeApiClient extends _FakeApiClient {
         },
       );
     }
-    return super.get(path, headers: headers);
+    return super.get(path, cancellation: cancellation, headers: headers);
   }
 }

@@ -85,4 +85,25 @@ void main() {
     expect(out[0].comments, isEmpty);
     expect(withPreview.commentsCount, 3);
   });
+
+  test('nearby filter uses user location when server distance is unknown', () {
+    final List<PollutionSite> out = computeVisibleSitesForFilter(
+      source: <PollutionSite>[
+        _dummy(id: 'near').copyWith(
+          distanceKm: -1,
+          latitude: 41.9981,
+          longitude: 21.4254,
+        ),
+        _dummy(id: 'far').copyWith(
+          distanceKm: -1,
+          latitude: 41.85,
+          longitude: 22.0,
+        ),
+      ],
+      filter: FeedFilter.nearby,
+      userLatitude: 41.9973,
+      userLongitude: 21.4280,
+    );
+    expect(out.first.id, 'near');
+  });
 }

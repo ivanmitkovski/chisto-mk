@@ -7,7 +7,15 @@ export class MetricsController {
   @Header('Content-Type', 'text/plain; version=0.0.4')
   metrics(@Headers('authorization') authorization?: string): string {
     const token = process.env.METRICS_BEARER_TOKEN?.trim();
-    if (token && authorization !== `Bearer ${token}`) {
+    const nodeEnv = (process.env.NODE_ENV ?? 'development').trim().toLowerCase();
+    const mustBeProtected = nodeEnv !== 'development' && nodeEnv !== 'test';
+    if (mustBeProtected && !token) {
+      throw new UnauthorizedException({
+        code: 'METRICS_UNAUTHORIZED',
+        message: 'Metrics bearer token is required in non-local environments',
+      });
+    }
+    if ((mustBeProtected || !!token) && authorization !== `Bearer ${token}`) {
       throw new UnauthorizedException({
         code: 'METRICS_UNAUTHORIZED',
         message: 'Metrics access denied',
@@ -137,6 +145,9 @@ export class MetricsController {
       '# HELP map_cache_hit_rate Map cache hit ratio',
       '# TYPE map_cache_hit_rate gauge',
       `map_cache_hit_rate ${s.mapCacheHitRate}`,
+      '# HELP map_cache_entries Current in-memory map cache entries',
+      '# TYPE map_cache_entries gauge',
+      `map_cache_entries ${s.mapCacheEntries}`,
       '# HELP map_fallback_responses_total Map responses served from persisted fallback',
       '# TYPE map_fallback_responses_total counter',
       `map_fallback_responses_total ${s.mapFallbackResponses}`,
@@ -170,6 +181,54 @@ export class MetricsController {
       '# HELP map_sse_replay_events_total Replayed map SSE events served from ring buffer',
       '# TYPE map_sse_replay_events_total counter',
       `map_sse_replay_events_total ${s.mapSseReplayEvents}`,
+      '# HELP map_outbox_dispatched_total Map outbox events successfully dispatched',
+      '# TYPE map_outbox_dispatched_total counter',
+      `map_outbox_dispatched_total ${s.mapOutboxDispatched}`,
+      '# HELP map_outbox_failed_total Map outbox dispatch failures',
+      '# TYPE map_outbox_failed_total counter',
+      `map_outbox_failed_total ${s.mapOutboxFailed}`,
+      '# HELP map_outbox_lag_ms Current lag between event occurrence and outbox dispatch',
+      '# TYPE map_outbox_lag_ms gauge',
+      `map_outbox_lag_ms ${s.mapOutboxLagMs}`,
+
+      '# HELP map_projection_rows_total Total rows in map projection table (latest sample)',
+      '# TYPE map_projection_rows_total gauge',
+      `map_projection_rows_total ${s.mapProjectionRowsTotal}`,
+      '# HELP map_projection_hot_rows Rows in map projection flagged hot',
+      '# TYPE map_projection_hot_rows gauge',
+      `map_projection_hot_rows ${s.mapProjectionHotRows}`,
+      '# HELP map_projection_staleness_seconds Age in seconds of oldest hot projection row',
+      '# TYPE map_projection_staleness_seconds gauge',
+      `map_projection_staleness_seconds ${s.mapProjectionStalenessSeconds}`,
+      '# HELP map_cold_sites_archived_total Number of rows touched by hotness lifecycle refresh',
+      '# TYPE map_cold_sites_archived_total counter',
+      `map_cold_sites_archived_total ${s.mapColdSitesArchivedTotal}`,
+      '# HELP map_outbox_rows_purged_total Outbox rows purged by TTL cleanup',
+      '# TYPE map_outbox_rows_purged_total counter',
+      `map_outbox_rows_purged_total ${s.mapOutboxRowsPurgedTotal}`,
+      '# HELP map_zoom_tier_requests_total Map requests by zoom tier',
+      '# TYPE map_zoom_tier_requests_total counter',
+      ...Object.entries(s.mapZoomTierRequests).flatMap(([tier, value]) => [
+        `map_zoom_tier_requests_total{tier="${tier}"} ${value}`,
+      ]),
+      '# HELP map_query_row_count_avg Average row count in map responses',
+      '# TYPE map_query_row_count_avg gauge',
+      `map_query_row_count_avg ${s.mapAvgQueryRowCount}`,
+      '# HELP map_requests_by_mode_zoom_total Map requests by mode and zoom bucket',
+      '# TYPE map_requests_by_mode_zoom_total counter',
+      ...Object.entries(s.mapRequestsByModeZoom).flatMap(([key, value]) => [
+        `map_requests_by_mode_zoom_total{slice="${key}"} ${value}`,
+      ]),
+      '# HELP map_cache_hits_by_mode_zoom_total Map cache hits by mode and zoom bucket',
+      '# TYPE map_cache_hits_by_mode_zoom_total counter',
+      ...Object.entries(s.mapCacheHitsByModeZoom).flatMap(([key, value]) => [
+        `map_cache_hits_by_mode_zoom_total{slice="${key}"} ${value}`,
+      ]),
+      '# HELP map_mode_zoom_latency_ms_p95 Map latency p95 by mode and zoom bucket (ms)',
+      '# TYPE map_mode_zoom_latency_ms_p95 gauge',
+      ...Object.entries(s.mapModeZoomLatencyP95Ms).flatMap(([key, value]) => [
+        `map_mode_zoom_latency_ms_p95{slice="${key}"} ${value}`,
+      ]),
       '# HELP reports_submit_success_total Successful citizen report submissions',
       '# TYPE reports_submit_success_total counter',
       `reports_submit_success_total ${s.reportsSubmitSuccess}`,

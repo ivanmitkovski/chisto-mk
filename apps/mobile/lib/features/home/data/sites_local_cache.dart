@@ -8,8 +8,10 @@ class SitesLocalCache {
 
   static const String feedPersistedCacheKey = 'feed_cache_pages_v2';
   static const String mapPersistedCacheKey = 'map_sites_snapshot_v1';
+  static const String mapCorpusPersistedCacheKey = 'map_site_corpus_v1';
   static const Duration feedPersistedCacheTtl = Duration(hours: 24);
   static const Duration mapPersistedCacheTtl = Duration(hours: 6);
+  static const Duration mapCorpusPersistedCacheTtl = Duration(minutes: 45);
   static const int maxPersistedFeeds = 8;
   static const int maxPersistedPagesPerFeed = 6;
 
@@ -204,9 +206,57 @@ class SitesLocalCache {
     return (payload: payload, cachedAt: cachedAt);
   }
 
+  Future<void> persistMapCorpus({
+    required int filterKey,
+    required List<Map<String, dynamic>> sites,
+  }) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final Map<String, dynamic> wrapper = <String, dynamic>{
+      'filterKey': filterKey,
+      'cachedAtMs': DateTime.now().millisecondsSinceEpoch,
+      'sites': sites,
+    };
+    await prefs.setString(mapCorpusPersistedCacheKey, jsonEncode(wrapper));
+  }
+
+  Future<({int filterKey, List<Map<String, dynamic>> sites})?> loadMapCorpus() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? raw = prefs.getString(mapCorpusPersistedCacheKey);
+    if (raw == null || raw.isEmpty) {
+      return null;
+    }
+    final Object? decoded;
+    try {
+      decoded = jsonDecode(raw);
+    } on FormatException {
+      return null;
+    }
+    if (decoded is! Map<String, dynamic>) {
+      return null;
+    }
+    final int cachedAtMs = (decoded['cachedAtMs'] as num?)?.toInt() ?? 0;
+    if (cachedAtMs <= 0) {
+      return null;
+    }
+    final DateTime cachedAt = DateTime.fromMillisecondsSinceEpoch(cachedAtMs);
+    if (DateTime.now().difference(cachedAt) > mapCorpusPersistedCacheTtl) {
+      return null;
+    }
+    final int filterKey = (decoded['filterKey'] as num?)?.toInt() ?? 0;
+    final Object? sitesRaw = decoded['sites'];
+    if (sitesRaw is! List<dynamic>) {
+      return null;
+    }
+    final List<Map<String, dynamic>> sites = sitesRaw
+        .whereType<Map<String, dynamic>>()
+        .toList();
+    return (filterKey: filterKey, sites: sites);
+  }
+
   Future<void> clearFeedAndMapSnapshots() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove(feedPersistedCacheKey);
     await prefs.remove(mapPersistedCacheKey);
+    await prefs.remove(mapCorpusPersistedCacheKey);
   }
 }

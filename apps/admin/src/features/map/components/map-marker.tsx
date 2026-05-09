@@ -15,14 +15,24 @@ const STATUS_CLASS: Record<string, string> = {
   DISPUTED: styles.markerDisputed,
 };
 
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
 function createMarkerIcon(site: SiteMapRow, selected: boolean): L.DivIcon {
   const statusClass = STATUS_CLASS[site.status] ?? styles.markerDefault;
   const reportCount = site.reportCount > 0 ? site.reportCount : '';
   const pinClass = selected ? `${styles.markerPin} ${statusClass} ${styles.markerPinSelected}` : `${styles.markerPin} ${statusClass}`;
 
+  const safeAriaLabel = escapeHtml(`Site ${site.id}, ${site.reportCount} reports`);
   return L.divIcon({
     className: styles.markerIcon,
-    html: `<span class="${pinClass}" aria-label="Site ${site.id}, ${site.reportCount} reports">${reportCount}</span>`,
+    html: `<span class="${pinClass}" aria-label="${safeAriaLabel}">${reportCount}</span>`,
     iconSize: [24, 24],
     iconAnchor: [12, 12],
   });

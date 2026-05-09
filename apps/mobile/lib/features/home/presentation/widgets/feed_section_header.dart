@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 
 class FeedSectionHeader extends StatelessWidget {
-  const FeedSectionHeader({
-    super.key,
-  });
+  const FeedSectionHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,17 +14,11 @@ class FeedSectionHeader extends StatelessWidget {
         AppSpacing.lg,
         AppSpacing.md,
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          Expanded(
-            child: Text(
-              context.l10n.feedPollutionFeedTitle,
-              style: AppTypography.sectionHeader,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
+      child: Text(
+        'Pollution sites',
+        style: AppTypography.sectionHeader.copyWith(
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }

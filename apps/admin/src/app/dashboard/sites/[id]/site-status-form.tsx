@@ -36,6 +36,8 @@ function statusPillClass(status: string): string {
 type SiteStatusFormProps = {
   siteId: string;
   initialStatus: string;
+  initialArchivedByAdmin: boolean;
+  initialArchiveReason: string | null;
   latitude: number;
   longitude: number;
   description: string | null;
@@ -46,6 +48,8 @@ type SiteStatusFormProps = {
 export function SiteStatusForm({
   siteId,
   initialStatus,
+  initialArchivedByAdmin,
+  initialArchiveReason,
   latitude,
   longitude,
   description,
@@ -53,11 +57,14 @@ export function SiteStatusForm({
   createdAt,
 }: SiteStatusFormProps) {
   const router = useRouter();
+  const [currentStatus, setCurrentStatus] = useState(initialStatus);
   const [status, setStatus] = useState(initialStatus);
+  const [isArchived, setIsArchived] = useState(initialArchivedByAdmin);
+  const [archiveReason, setArchiveReason] = useState(initialArchiveReason ?? '');
   const [saving, setSaving] = useState(false);
   const [snack, setSnack] = useState<SnackState | null>(null);
 
-  const allowedNext = ALLOWED_TRANSITIONS[initialStatus] ?? [];
+  const allowedNext = ALLOWED_TRANSITIONS[currentStatus] ?? [];
   const canChange = allowedNext.length > 0;
 
   const gm = `https://www.google.com/maps?q=${latitude},${longitude}`;
@@ -75,7 +82,34 @@ export function SiteStatusForm({
         method: 'PATCH',
         body: { status },
       });
+      setCurrentStatus(status);
       setSnack({ tone: 'success', title: 'Saved', message: 'Site status updated.' });
+      router.refresh();
+    } catch (e) {
+      const msg = e instanceof ApiError ? e.message : 'Update failed';
+      setSnack({ tone: 'warning', title: 'Error', message: msg });
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function saveArchive() {
+    if (isArchived && !archiveReason.trim()) {
+      setSnack({ tone: 'warning', title: 'Reason required', message: 'Add archive reason before saving.' });
+      return;
+    }
+    setSaving(true);
+    setSnack(null);
+    try {
+      await adminBrowserFetch(`/sites/${siteId}/archive`, {
+        method: 'PATCH',
+        body: { archived: isArchived, reason: archiveReason.trim() || undefined },
+      });
+      setSnack({
+        tone: 'success',
+        title: 'Saved',
+        message: isArchived ? 'Site archived from default map visibility.' : 'Site unarchived.',
+      });
       router.refresh();
     } catch (e) {
       const msg = e instanceof ApiError ? e.message : 'Update failed';
@@ -146,8 +180,8 @@ export function SiteStatusForm({
       <section className={styles.sectionCard}>
         <span className={styles.sectionLabel}>Lifecycle status</span>
         <div className={styles.statusForm}>
-          <span className={statusPillClass(initialStatus)}>
-            {formatStatus(initialStatus)}
+          <span className={statusPillClass(currentStatus)}>
+            {formatStatus(currentStatus)}
           </span>
           {canChange && (
             <>
@@ -173,6 +207,36 @@ export function SiteStatusForm({
               </div>
             </>
           )}
+        </div>
+      </section>
+
+      <section className={styles.sectionCard}>
+        <span className={styles.sectionLabel}>Visibility moderation</span>
+        <div className={styles.statusForm}>
+          <label>
+            <span className={styles.metaLabel}>Map visibility</span>
+            <select
+              value={isArchived ? 'archived' : 'visible'}
+              onChange={(e) => setIsArchived(e.target.value === 'archived')}
+            >
+              <option value="visible">Visible by default</option>
+              <option value="archived">Archived (hidden by default)</option>
+            </select>
+          </label>
+          <label>
+            <span className={styles.metaLabel}>Moderation reason</span>
+            <textarea
+              value={archiveReason}
+              onChange={(e) => setArchiveReason(e.target.value)}
+              placeholder="Why should this site be archived?"
+              rows={3}
+            />
+          </label>
+          <div className={styles.formActions}>
+            <Button type="button" onClick={() => void saveArchive()} disabled={saving}>
+              {saving ? 'Saving…' : 'Save visibility'}
+            </Button>
+          </div>
         </div>
       </section>
 

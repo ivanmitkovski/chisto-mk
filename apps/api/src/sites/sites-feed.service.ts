@@ -249,7 +249,7 @@ export class SitesFeedService {
       duplicateTitleCounts.set(title, (duplicateTitleCounts.get(title) ?? 0) + 1);
     }
 
-    type SiteEnriched = Site & {
+    type SiteEnriched = Omit<FeedSiteRow, 'reports' | 'votes' | 'saves' | '_count'> & {
       reportCount: number;
       latestReportTitle: string | null;
       latestReportDescription: string | null;
@@ -339,15 +339,7 @@ export class SitesFeedService {
               },
             };
       return {
-        id: siteBase.id,
-        latitude: siteBase.latitude,
-        longitude: siteBase.longitude,
-        address: siteBase.address,
-        description: siteBase.description,
-        status: siteBase.status,
-        upvotesCount: siteBase.upvotesCount,
-        commentsCount: siteBase.commentsCount,
-        sharesCount: siteBase.sharesCount,
+        ...siteBase,
         reportCount: _count.reports,
         latestReportTitle: firstReport?.title ?? null,
         latestReportDescription: firstReport?.description ?? null,
@@ -358,15 +350,12 @@ export class SitesFeedService {
         latestReportReporterName,
         latestReportReporterAvatarUrl,
         latestReportReporterId,
-        savesCount: siteBase.savesCount,
         isUpvotedByMe: Array.isArray(votes) && votes.length > 0,
         isSavedByMe: Array.isArray(saves) && saves.length > 0,
         rankingScore: rankingDetail.score,
         rankingReasons: rankingDetail.reasonCodes,
         ...(query.explain ? { rankingComponents: rankingDetail.components } : {}),
         distanceKm,
-        createdAt: siteBase.createdAt,
-        updatedAt: siteBase.updatedAt,
       } as SiteEnriched;
     });
     const feedVariant = await this.feedV2.resolveVariant(user);

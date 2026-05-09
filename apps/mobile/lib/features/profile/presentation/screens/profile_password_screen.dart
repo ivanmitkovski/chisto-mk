@@ -154,7 +154,7 @@ class _ProfilePasswordScreenState extends State<ProfilePasswordScreen> {
           : messageForAuthError(context.l10n, e);
       AppSnack.show(context, message: message, type: AppSnackType.error);
       if (e.code == 'UNAUTHORIZED' || e.code == 'INVALID_TOKEN_USER') {
-        Navigator.of(context).pushNamedAndRemoveUntil(
+        Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
           AppRoutes.signIn,
           (Route<dynamic> route) => false,
         );

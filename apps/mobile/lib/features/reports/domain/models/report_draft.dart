@@ -76,6 +76,28 @@ List<String> get reportPollutionTypeLabels => ReportCategory.values
     .map((ReportCategory c) => c.apiPollutionTypeLabel)
     .toList();
 
+/// Canonical API pollution type codes (stable identity for filters/search).
+List<String> get reportPollutionTypeCodes =>
+    ReportCategory.values.map((ReportCategory c) => c.apiString).toList();
+
+String reportPollutionTypeCodeFromUnknown(String? raw) {
+  final String candidate = (raw ?? '').trim();
+  if (candidate.isEmpty) {
+    return ReportCategory.other.apiString;
+  }
+  final ReportCategory? fromApi = ReportCategory.fromApiString(candidate);
+  if (fromApi != null) {
+    return fromApi.apiString;
+  }
+  final String lower = candidate.toLowerCase();
+  for (final ReportCategory category in ReportCategory.values) {
+    if (category.apiPollutionTypeLabel.toLowerCase() == lower) {
+      return category.apiString;
+    }
+  }
+  return ReportCategory.other.apiString;
+}
+
 enum ReportRequirement {
   photos,
   category,

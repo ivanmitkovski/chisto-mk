@@ -65,7 +65,72 @@ void main() {
       );
 
       expect(find.text('Try again'), findsNothing);
-      expect(find.byType(FilledButton), findsNothing);
+      expect(find.text('Sign out'), findsOneWidget);
+    });
+
+    testWidgets('shows logout button for session-invalid errors',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
+          home: Scaffold(
+            body: AppErrorView(
+              error: AppError.unauthorized(),
+              onLogout: () {},
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Sign out'), findsOneWidget);
+      expect(find.byIcon(Icons.logout_rounded), findsOneWidget);
+      expect(find.text('Try again'), findsNothing);
+    });
+
+    testWidgets('does not show logout button for non-auth errors',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
+          home: Scaffold(
+            body: AppErrorView(
+              error: AppError.network(),
+              onRetry: () {},
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Sign out'), findsNothing);
+      expect(find.byIcon(Icons.logout_rounded), findsNothing);
+      expect(find.text('Try again'), findsOneWidget);
+    });
+
+    testWidgets('onLogout callback fires', (WidgetTester tester) async {
+      var loggedOut = false;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
+          home: Scaffold(
+            body: AppErrorView(
+              error: AppError.unauthorized(),
+              onLogout: () => loggedOut = true,
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Sign out'));
+      await tester.pumpAndSettle();
+
+      expect(loggedOut, isTrue);
     });
 
     testWidgets('onRetry callback fires', (WidgetTester tester) async {

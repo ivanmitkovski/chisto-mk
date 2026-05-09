@@ -41,7 +41,7 @@ abstract final class ProfileActionsHandler {
       await ServiceLocator.instance.authRepository.signOut();
       AppHaptics.success();
       if (!context.mounted) return;
-      Navigator.of(context).pushNamedAndRemoveUntil(
+      Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
         AppRoutes.signIn,
         (Route<dynamic> route) => false,
       );
@@ -94,7 +94,7 @@ abstract final class ProfileActionsHandler {
       await ServiceLocator.instance.authRepository.deleteAccount();
       AppHaptics.success();
       if (!context.mounted) return;
-      Navigator.of(context).pushNamedAndRemoveUntil(
+      Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
         AppRoutes.signIn,
         (Route<dynamic> route) => false,
       );

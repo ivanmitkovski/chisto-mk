@@ -26,6 +26,24 @@ export class AuditService {
     });
   }
 
+  async findByActionAndIdempotencyKey(
+    action: string,
+    idempotencyKey: string,
+  ): Promise<{ metadata: Record<string, unknown> } | null> {
+    const entry = await this.prisma.auditLog.findFirst({
+      where: {
+        action,
+        metadata: { path: ['idempotencyKey'], equals: idempotencyKey },
+      },
+      select: { metadata: true },
+      orderBy: { createdAt: 'desc' },
+    });
+    if (!entry || entry.metadata == null || typeof entry.metadata !== 'object') {
+      return null;
+    }
+    return { metadata: entry.metadata as Record<string, unknown> };
+  }
+
   async listForAdmin(query: {
     page: number;
     limit: number;

@@ -14,7 +14,7 @@ class _StubApiClient extends ApiClient {
   ApiResponse? nextGet;
 
   @override
-  Future<ApiResponse> get(String path, {Map<String, String>? headers}) async {
+  Future<ApiResponse> get(String path, {Map<String, String>? headers, cancellation}) async {
     return nextGet ??
         const ApiResponse(statusCode: 200, json: <String, dynamic>{});
   }

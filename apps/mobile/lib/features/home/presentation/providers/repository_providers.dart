@@ -1,4 +1,5 @@
 import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/location/location_service.dart';
 import 'package:chisto_mobile/core/auth/auth_state.dart';
 import 'package:chisto_mobile/features/home/domain/repositories/feed_analytics_repository.dart';
 import 'package:chisto_mobile/features/home/domain/repositories/feed_sites_repository.dart';
@@ -38,4 +39,8 @@ final feedAnalyticsRepositoryProvider =
 
 final notificationsRepositoryProvider = Provider<NotificationsRepository>((Ref ref) {
   return ServiceLocator.instance.notificationsRepository;
+});
+
+final locationServiceProvider = Provider<LocationService>((Ref ref) {
+  return ServiceLocator.instance.locationService;
 });

@@ -1,40 +1,62 @@
-import 'dart:math' as math;
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
-import 'package:flutter_map_heatmap/flutter_map_heatmap.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:chisto_mobile/core/cache/site_image_prefetch_queue.dart';
 import 'package:chisto_mobile/core/cache/site_image_provider.dart';
-import 'package:chisto_mobile/core/di/service_locator.dart';
-import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
+import 'package:chisto_mobile/core/location/location_service.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
-import 'package:chisto_mobile/shared/widgets/app_error_view.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
-import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
-import 'package:chisto_mobile/features/home/data/map_realtime/map_site_event.dart';
 import 'package:chisto_mobile/features/home/data/map_realtime/map_sync_coordinator.dart';
-import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
+import 'package:chisto_mobile/features/home/data/map_regions/map_boundaries_repository.dart';
+import 'package:chisto_mobile/features/home/data/map_regions/macedonia_map_regions.dart';
+import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
+import 'package:chisto_mobile/features/home/domain/repositories/sites_repository_types.dart';
+import 'package:chisto_mobile/features/home/presentation/providers/repository_providers.dart';
+import 'package:chisto_mobile/features/home/presentation/providers/map_camera_notifier.dart';
+import 'package:chisto_mobile/features/home/presentation/providers/map_cluster_effective_zoom_notifier.dart';
+import 'package:chisto_mobile/features/home/presentation/providers/map_cluster_expansion_notifier.dart';
+import 'package:chisto_mobile/features/home/presentation/providers/map_clusters_provider.dart';
+import 'package:chisto_mobile/features/home/presentation/providers/map_derived_providers.dart';
+import 'package:chisto_mobile/features/home/presentation/providers/map_filter_notifier.dart';
+import 'package:chisto_mobile/features/home/presentation/providers/map_location_notifier.dart';
+import 'package:chisto_mobile/features/home/presentation/providers/map_selection_notifier.dart';
+import 'package:chisto_mobile/features/home/presentation/providers/map_sites_notifier.dart';
+import 'package:chisto_mobile/features/home/presentation/providers/map_ui_mode_notifier.dart';
 import 'package:chisto_mobile/features/home/presentation/screens/pollution_site_detail_screen.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/utils/cached_tile_provider.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/map/cluster_bucket.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/map/map_actions_menu.dart';
-import 'package:chisto_mobile/features/home/presentation/widgets/map/search_modal.dart';
+import 'package:chisto_mobile/features/home/presentation/widgets/map/map_canvas.dart';
+import 'package:chisto_mobile/features/home/presentation/widgets/map/map_error_overlay.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/map/map_filter_sheet.dart';
-import 'package:chisto_mobile/features/home/presentation/widgets/map/site_preview_sheet.dart';
-import 'package:chisto_mobile/features/home/presentation/widgets/map/pollution_markers.dart';
+import 'package:chisto_mobile/features/home/presentation/widgets/map/map_heatmap_layer.dart';
+import 'package:chisto_mobile/features/home/presentation/widgets/map/map_layout_tokens.dart';
+import 'package:chisto_mobile/features/home/presentation/widgets/map/animated_pollution_map_markers.dart';
+import 'package:chisto_mobile/features/home/presentation/widgets/map/map_marker_entrance_cache.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/map/map_overlays.dart';
+import 'package:chisto_mobile/features/home/presentation/widgets/map/map_region_fence_builder.dart';
+import 'package:chisto_mobile/features/home/presentation/widgets/map/map_sheet_launcher.dart';
+import 'package:chisto_mobile/features/home/presentation/widgets/map/map_site_preview_positioned.dart';
+import 'package:chisto_mobile/features/home/presentation/widgets/map/map_sync_notice_banner.dart';
+import 'package:chisto_mobile/features/home/presentation/widgets/map/map_toolbar.dart';
+import 'package:chisto_mobile/features/home/presentation/widgets/map/search_modal.dart';
+import 'package:chisto_mobile/features/home/presentation/controllers/map_search_coordinator.dart';
+import 'package:chisto_mobile/features/home/presentation/controllers/map_viewport_controller.dart';
+import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/map/directions_sheet.dart';
+import 'package:chisto_mobile/shared/utils/app_haptics.dart';
+import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 
-class PollutionMapScreen extends StatefulWidget {
+class PollutionMapScreen extends ConsumerStatefulWidget {
   const PollutionMapScreen({
     super.key,
     this.pendingSiteFocus,
@@ -47,38 +69,27 @@ class PollutionMapScreen extends StatefulWidget {
   final bool isActive;
 
   @override
-  State<PollutionMapScreen> createState() => _PollutionMapScreenState();
+  ConsumerState<PollutionMapScreen> createState() => _PollutionMapScreenState();
 }
 
-class _PollutionMapScreenState extends State<PollutionMapScreen>
+class _PollutionMapScreenState extends ConsumerState<PollutionMapScreen>
     with TickerProviderStateMixin {
+  final MapViewportController _viewportController =
+      const MapViewportController();
+  final MapSearchCoordinator _searchCoordinator = const MapSearchCoordinator();
+  final MapBoundariesRepository _boundariesRepository =
+      MapBoundariesRepository.instance;
   late final AnimatedMapController _animatedMapController =
       AnimatedMapController(
         vsync: this,
-        duration: const Duration(milliseconds: 520),
-        curve: Curves.easeOutCubic,
+        duration: AppMotion.mapCameraFly,
+        curve: AppMotion.mapCameraFlyCurve,
       );
-
-  List<PollutionSite> _allSites = <PollutionSite>[];
-  Set<String> _activeStatuses = <String>{};
-  AppError? _loadError;
-  Set<String> _activePollutionTypes = <String>{};
-  PollutionSite? _selectedSite;
-  LatLng? _userLocation;
-  bool _isLocating = false;
-  bool _locationJustFound = false;
-  final ValueNotifier<double> _mapRotationNotifier = ValueNotifier<double>(0);
-  bool _rotationLocked = false;
-  bool _useDarkTiles = false;
-  bool _showHeatmap = false;
-  final TextEditingController _searchController = TextEditingController();
-  final FocusNode _searchFocusNode = FocusNode();
 
   late final AnimationController _entranceController = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 700),
   )..forward();
-
   late final Animation<double> _legendOpacity = CurvedAnimation(
     parent: _entranceController,
     curve: const Interval(0, 0.65, curve: Curves.easeOutCubic),
@@ -91,197 +102,98 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
         ),
       );
 
-  /// Center of Macedonia (geographic center) and bounds for country view.
   static final LatLngBounds _macedoniaBounds = LatLngBounds(
     LatLng(ReportGeoFence.minLat, ReportGeoFence.minLng),
     LatLng(ReportGeoFence.maxLat, ReportGeoFence.maxLng),
   );
 
-  /// Screen-space overscan (logical points) for map data prefetch — same idea as
-  /// system maps: load slightly beyond the visible rect so edge pins exist before
-  /// the user pans. Derived from view size + text scaling, not a fixed lat/lng fudge.
-  static const double _mapPrefetchOverscanBasePt = 72;
-
-  static LatLngBounds _prefetchQueryBoundsFromCamera(
-    MapCamera camera,
-    double overscanLogicalPx,
-    LatLngBounds strictVisible,
-  ) {
-    final double w = camera.nonRotatedSize.x;
-    final double h = camera.nonRotatedSize.y;
-    if (w <= 0 || h <= 0) {
-      return strictVisible;
-    }
-    final double o = overscanLogicalPx.clamp(40.0, 120.0);
-    final List<LatLng> corners = <LatLng>[
-      camera.pointToLatLng(math.Point<double>(-o, -o)),
-      camera.pointToLatLng(math.Point<double>(w + o, -o)),
-      camera.pointToLatLng(math.Point<double>(w + o, h + o)),
-      camera.pointToLatLng(math.Point<double>(-o, h + o)),
-    ];
-    double south = strictVisible.south;
-    double north = strictVisible.north;
-    double west = strictVisible.west;
-    double east = strictVisible.east;
-    for (final LatLng p in corners) {
-      south = math.min(south, p.latitude);
-      north = math.max(north, p.latitude);
-      west = math.min(west, p.longitude);
-      east = math.max(east, p.longitude);
-    }
-    south = south.clamp(-85.0, 85.0);
-    north = north.clamp(-85.0, 85.0);
-    west = west.clamp(-180.0, 180.0);
-    east = east.clamp(-180.0, 180.0);
-    if (south > north) {
-      final double t = south;
-      south = north;
-      north = t;
-    }
-    return LatLngBounds(LatLng(south, west), LatLng(north, east));
-  }
-
-  static const double _zoomCity = 11.0;
-
-  /// Minimum zoom when expanding a cluster so pins stay visible (don't re-cluster).
-  /// At z=15, pixel-radius threshold ≈ 0.0022°, separating Skopje's closest pair (~0.003°).
-  static const double _minZoomClusterExpand = 15.0;
-
-  Map<String, LatLng> _siteCoordinates = <String, LatLng>{};
-
-  /// Whether we've already tried to zoom to user location on startup.
-  bool _hasAttemptedInitialLocate = false;
-
-  /// Whether to show the tile loading skeleton overlay.
+  late final MapLocationNotifier _mapLocationNotifier;
   bool _showTileLoadingOverlay = true;
-
-  /// [FlutterMap] finished layout; tiles may still be fetching.
   bool _mapLayoutReady = false;
   Timer? _tileOverlaySoftDismissTimer;
   Timer? _tileOverlayMaxTimer;
   Timer? _viewportMoveDebounce;
+  Timer? _viewportMoveEndMicroDebounce;
 
-  bool _pendingFocusBusy = false;
-  late final MapSyncCoordinator _mapSyncCoordinator;
-  StreamSubscription<MapSiteEvent>? _mapEventsSub;
-  String? _syncNotice;
-  List<Marker>? _clusteredMarkersCache;
-  int _clusteredMarkersCacheKey = 0;
+  /// Batches [mapCameraNotifierProvider] writes so clustering/markers do not rebuild on every drag frame.
+  Timer? _mapCameraClusteringDebounce;
+  bool _hasAttemptedInitialLocate = false;
+  final ValueNotifier<double> _mapRotationNotifier = ValueNotifier<double>(0);
 
-  LatLng? _getSiteCoordinates(String id) => _siteCoordinates[id];
+  /// Previous cluster partition (see [MapMarkerEntranceCache.clusterPartitionSignature]).
+  String? _clusterPartitionSig;
+  List<ClusterBucket> _prevBucketsForEntrance = const <ClusterBucket>[];
 
   @override
   void initState() {
     super.initState();
-    _mapSyncCoordinator = MapSyncCoordinator(
-      sitesRepository: ServiceLocator.instance.sitesRepository,
-    )..addListener(_onMapSyncStateChanged);
-    _activePollutionTypes = _canonicalPollutionTypes.toSet();
+    _mapLocationNotifier = ref.read(mapLocationNotifierProvider.notifier);
     widget.pendingSiteFocus?.addListener(_onPendingSiteFocusChanged);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) {
-        return;
+    unawaited(_warmupBoundaryData());
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      ref.read(mapSitesNotifierProvider.notifier).setActive(widget.isActive);
+      if (widget.isActive) {
+        await _mapLocationNotifier.startForegroundTracking();
       }
-      // MapController.camera is only valid after FlutterMap attaches; initState runs
-      // before the first build, so initial sync must run after the first frame.
       _syncMapViewport(immediate: true);
-      _tryInitialLocate();
-      _tryApplyPendingSiteFocus();
+      await _tryInitialLocate();
+      await _tryApplyPendingSiteFocus();
     });
-    _bindMapRealtime();
-    _mapSyncCoordinator.setActive(widget.isActive);
-    _setMapRealtimeActive(widget.isActive);
-    unawaited(
-      Future<void>.delayed(const Duration(seconds: 22), () {
-        if (mounted) {
-          _dismissTileLoadingOverlay();
-        }
-      }),
-    );
   }
 
-  void _dismissTileLoadingOverlay() {
-    if (!_showTileLoadingOverlay || !mounted) {
-      return;
+  Future<void> _warmupBoundaryData() async {
+    await _boundariesRepository.warmup();
+    if (mounted) {
+      setState(() {});
     }
+  }
+
+  @override
+  void didUpdateWidget(covariant PollutionMapScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.pendingSiteFocus != widget.pendingSiteFocus) {
+      oldWidget.pendingSiteFocus?.removeListener(_onPendingSiteFocusChanged);
+      widget.pendingSiteFocus?.addListener(_onPendingSiteFocusChanged);
+    }
+    if (oldWidget.isActive != widget.isActive) {
+      ref.read(mapSitesNotifierProvider.notifier).setActive(widget.isActive);
+      if (widget.isActive) {
+        unawaited(_mapLocationNotifier.startForegroundTracking());
+        _syncMapViewport(immediate: true);
+      } else {
+        ref.read(mapClusterExpansionNotifierProvider.notifier).reset();
+        unawaited(_mapLocationNotifier.stopForegroundTracking());
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _viewportMoveDebounce?.cancel();
+    _viewportMoveEndMicroDebounce?.cancel();
+    _mapCameraClusteringDebounce?.cancel();
     _tileOverlaySoftDismissTimer?.cancel();
-    _tileOverlaySoftDismissTimer = null;
     _tileOverlayMaxTimer?.cancel();
-    _tileOverlayMaxTimer = null;
-    setState(() => _showTileLoadingOverlay = false);
-  }
-
-  void _onMapSurfaceReady() {
-    if (!mounted || _mapLayoutReady) {
-      return;
-    }
-    _mapLayoutReady = true;
-    _tileOverlaySoftDismissTimer?.cancel();
-    _tileOverlaySoftDismissTimer = Timer(
-      const Duration(milliseconds: 2600),
-      _dismissTileLoadingOverlay,
-    );
-    _tileOverlayMaxTimer?.cancel();
-    _tileOverlayMaxTimer = Timer(
-      const Duration(seconds: 14),
-      _dismissTileLoadingOverlay,
-    );
-  }
-
-  void _onMapInteractionMayHaveTiles(MapEvent event) {
-    if (!_showTileLoadingOverlay || !_mapLayoutReady) {
-      return;
-    }
-    if (event is MapEventMoveEnd ||
-        event is MapEventFlingAnimationEnd ||
-        event is MapEventDoubleTapZoomEnd ||
-        event is MapEventScrollWheelZoom) {
-      _tileOverlaySoftDismissTimer?.cancel();
-      _tileOverlaySoftDismissTimer = Timer(
-        const Duration(milliseconds: 400),
-        _dismissTileLoadingOverlay,
-      );
-    }
+    widget.pendingSiteFocus?.removeListener(_onPendingSiteFocusChanged);
+    unawaited(_mapLocationNotifier.stopForegroundTracking());
+    _mapRotationNotifier.dispose();
+    _entranceController.dispose();
+    _animatedMapController.dispose();
+    super.dispose();
   }
 
   void _onPendingSiteFocusChanged() {
     if (widget.pendingSiteFocus?.value != null) {
-      _tryApplyPendingSiteFocus();
+      unawaited(_tryApplyPendingSiteFocus());
     }
-  }
-
-  void _bindMapRealtime() {
-    final service = ServiceLocator.instance.mapRealtimeService;
-    _mapEventsSub ??= service.events.listen((MapSiteEvent event) {
-      _mapSyncCoordinator.ingestEvent(event);
-    });
-  }
-
-  void _setMapRealtimeActive(bool active) {
-    ServiceLocator.instance.mapRealtimeService.setActive(active);
-  }
-
-  void _syncMapViewport({required bool immediate}) {
-    _mapSyncCoordinator.updateViewport(_currentMapViewportQuery());
-    _mapSyncCoordinator.requestSync(immediate: immediate);
   }
 
   double _mapPrefetchOverscanLogicalPx() {
-    const double base = _mapPrefetchOverscanBasePt;
+    const double base = MapLayoutTokens.prefetchOverscanBasePt;
     final MediaQueryData? mq = MediaQuery.maybeOf(context);
-    if (mq == null) {
-      return base;
-    }
+    if (mq == null) return base;
     return mq.textScaler.scale(base).clamp(52.0, 118.0);
-  }
-
-  MapViewportQuery _fallbackMapViewportQuery() {
-    return MapViewportQuery(
-      latitude: ReportGeoFence.centerLat,
-      longitude: ReportGeoFence.centerLng,
-      radiusKm: _radiusKmForZoom(_zoomCity),
-      limit: 250,
-    );
   }
 
   bool _isMapCameraNotReady(Object error) {
@@ -296,85 +208,191 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
       camera = mc.camera;
     } catch (e) {
       if (_isMapCameraNotReady(e)) {
-        return _fallbackMapViewportQuery();
+        final bool includeArchived = ref
+            .read(mapFilterNotifierProvider)
+            .includeArchived;
+        return MapViewportQuery(
+          latitude: ReportGeoFence.centerLat,
+          longitude: ReportGeoFence.centerLng,
+          radiusKm: _viewportController.radiusKmForZoom(
+            MapLayoutTokens.zoomCity,
+          ),
+          limit: 250,
+          zoom: MapLayoutTokens.zoomCity,
+          includeArchived: includeArchived,
+        );
       }
       rethrow;
     }
-    final LatLng center = _userLocation ?? camera.center;
-    final double zoom = camera.zoom;
-    final bool hasViewportBounds =
-        camera.nonRotatedSize.x > 0 && camera.nonRotatedSize.y > 0;
-    final LatLngBounds? visibleBounds = hasViewportBounds
-        ? _prefetchQueryBoundsFromCamera(
+    final LatLng center = camera.center;
+    final LatLngBounds? visible =
+        camera.nonRotatedSize.x > 0 && camera.nonRotatedSize.y > 0
+        ? _viewportController.prefetchQueryBoundsFromCamera(
             camera,
             _mapPrefetchOverscanLogicalPx(),
             camera.visibleBounds,
           )
         : null;
-    return MapViewportQuery(
+    final bool includeArchived = ref
+        .read(mapFilterNotifierProvider)
+        .includeArchived;
+    return _viewportController.buildViewportQuery(
       latitude: center.latitude,
       longitude: center.longitude,
-      radiusKm: _radiusKmForZoom(zoom),
+      zoom: camera.zoom,
+      visibleBounds: visible,
       limit: 250,
-      minLatitude: visibleBounds?.south,
-      maxLatitude: visibleBounds?.north,
-      minLongitude: visibleBounds?.west,
-      maxLongitude: visibleBounds?.east,
+      includeArchived: includeArchived,
     );
   }
 
-  void _onMapSyncStateChanged() {
-    if (!mounted) {
-      return;
-    }
-    final MapSyncSnapshot snapshot = _mapSyncCoordinator.snapshot;
-    final Map<String, LatLng> coords = <String, LatLng>{};
-    for (final PollutionSite site in snapshot.sites) {
-      if (site.latitude != null && site.longitude != null) {
-        coords[site.id] = LatLng(site.latitude!, site.longitude!);
-      }
-    }
-    PollutionSite? selectedSite = _selectedSite;
-    if (selectedSite != null) {
-      final String selectedId = selectedSite.id;
-      for (final PollutionSite site in snapshot.sites) {
-        if (site.id == selectedId) {
-          selectedSite = site;
-          break;
-        }
-      }
-    }
-    setState(() {
-      _allSites = snapshot.sites;
-      _siteCoordinates = coords;
-      if (snapshot.sites.isNotEmpty) {
-        _activeStatuses = snapshot.sites
-            .map((PollutionSite site) => site.statusLabel)
-            .toSet();
-      }
-      _loadError = snapshot.loadError;
-      _syncNotice = snapshot.inlineNotice;
-      _selectedSite = selectedSite;
-      _filteredSitesCache = null;
-      _filteredSitesCacheHash = 0;
-      _displayedSitesCache = null;
-      _displayedSitesFilterHashCache = -1;
-      _clusteredMarkersCache = null;
-      _clusteredMarkersCacheKey = 0;
-    });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      _prefetchMapPinImages(snapshot.sites);
-    });
-    _tryApplyPendingSiteFocus();
+  void _syncMapViewport({required bool immediate}) {
+    final n = ref.read(mapSitesNotifierProvider.notifier);
+    n.updateViewport(_currentMapViewportQuery());
+    n.requestSync(immediate: immediate);
   }
 
-  static const int _mapPinPrefetchBudget = 44;
+  void _commitMapCameraNotifier(MapCamera cam) {
+    ref.read(mapCameraNotifierProvider.notifier).setCamera(
+          centerLat: cam.center.latitude,
+          centerLng: cam.center.longitude,
+          zoom: cam.zoom,
+        );
+  }
+
+  void _debounceCommitMapCameraForClustering(MapCamera cam, Duration delay) {
+    _mapCameraClusteringDebounce?.cancel();
+    _mapCameraClusteringDebounce = Timer(delay, () {
+      _mapCameraClusteringDebounce = null;
+      if (!mounted) {
+        return;
+      }
+      _commitMapCameraNotifier(cam);
+    });
+  }
+
+  /// Feeds clustering/heatmap keyed providers only when movement settles (drag frame spam would rebuild all markers).
+  void _maybeUpdateMapCameraNotifierForClustering(MapEvent event) {
+    if (event is MapEventMoveEnd ||
+        event is MapEventFlingAnimationEnd ||
+        event is MapEventDoubleTapZoomEnd ||
+        event is MapEventRotateEnd ||
+        event is MapEventFlingAnimationNotStarted) {
+      _mapCameraClusteringDebounce?.cancel();
+      _mapCameraClusteringDebounce = null;
+      _commitMapCameraNotifier(event.camera);
+      return;
+    }
+
+    if (event is MapEventNonRotatedSizeChange || event is MapEventScrollWheelZoom) {
+      _debounceCommitMapCameraForClustering(
+        event.camera,
+        const Duration(milliseconds: 160),
+      );
+      return;
+    }
+
+    /// Pinch / rotate-zoom: periodic commits so greedy clustering thresholds track
+    /// the gesture instead of popping once on [MapEventMoveEnd].
+    if (event is MapEventMove && event.source == MapEventSource.onMultiFinger) {
+      _debounceCommitMapCameraForClustering(
+        event.camera,
+        const Duration(milliseconds: 46),
+      );
+      return;
+    }
+
+    // Programmatic flies (animateTo, fitCamera) emit many intermediate moves — coalesce once motion stops.
+    if (event is MapEventMove &&
+        event.source == MapEventSource.mapController) {
+      _debounceCommitMapCameraForClustering(
+        event.camera,
+        const Duration(milliseconds: 200),
+      );
+    }
+  }
+
+  Future<void> _tryInitialLocate() async {
+    if (_hasAttemptedInitialLocate) return;
+    _hasAttemptedInitialLocate = true;
+    await ref.read(mapLocationNotifierProvider.notifier).tryInitialLocate();
+    if (!mounted) return;
+    final LatLng? location = ref.read(mapLocationNotifierProvider).userLocation;
+    if (location == null) return;
+    await _animatedMapController.animateTo(
+      dest: location,
+      zoom: MapLayoutTokens.zoomCity,
+    );
+    _syncMapViewport(immediate: false);
+  }
+
+  Future<void> _tryApplyPendingSiteFocus() async {
+    final ValueNotifier<String?>? notifier = widget.pendingSiteFocus;
+    if (!mounted || notifier == null || notifier.value == null) return;
+    final String id = notifier.value!;
+    await ref
+        .read(mapSelectionNotifierProvider.notifier)
+        .runPendingFocus(
+          siteId: id,
+          onLocated: (site, point) {
+            ref.read(mapSelectionNotifierProvider.notifier).select(site);
+            AppHaptics.pinSelect(context);
+            _animatedMapController.animateTo(dest: point, zoom: 14.5);
+          },
+          onUnavailable: () {
+            if (!mounted) return;
+            AppSnack.show(
+              context,
+              message: context.l10n.mapSiteNotOnMapSnack,
+              type: AppSnackType.warning,
+            );
+          },
+          onError: () {
+            if (!mounted) return;
+            AppSnack.show(
+              context,
+              message: context.l10n.mapOpenLocationFailedSnack,
+              type: AppSnackType.warning,
+            );
+          },
+        );
+    if (notifier.value == id) notifier.value = null;
+    widget.onPendingSiteFocusConsumed?.call();
+  }
+
+  Future<void> _openSiteDetail(PollutionSite site) async {
+    AppHaptics.softTransition(context);
+    await Navigator.of(context, rootNavigator: true).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => PollutionSiteDetailScreen(site: site),
+      ),
+    );
+  }
+
+  Future<void> _handleLocateMe() async {
+    final GeoPosition? pos = await ref
+        .read(mapLocationNotifierProvider.notifier)
+        .locateUserBest();
+    if (!mounted) return;
+    if (pos == null) {
+      AppHaptics.gpsFailed(context);
+      return;
+    }
+    AppHaptics.gpsFound(context);
+    await _animatedMapController.animateTo(
+      dest: LatLng(pos.latitude, pos.longitude),
+      zoom: 16.5,
+    );
+    _syncMapViewport(immediate: false);
+    await Future<void>.delayed(const Duration(milliseconds: 1200));
+    if (mounted) {
+      ref.read(mapLocationNotifierProvider.notifier).clearLocationJustFound();
+    }
+  }
 
   void _prefetchMapPinImages(List<PollutionSite> sites) {
-    if (sites.isEmpty) return;
     final SiteImagePrefetchQueue queue = SiteImagePrefetchQueue.instance;
-    int remaining = _mapPinPrefetchBudget;
+    int remaining = MapLayoutTokens.prefetchBudget;
     for (final PollutionSite site in sites) {
       if (remaining <= 0) break;
       final String? url = site.primaryImageUrl;
@@ -385,957 +403,237 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
     }
   }
 
-  double _radiusKmForZoom(double zoom) {
-    if (zoom >= 14) return 8;
-    if (zoom >= 12) return 18;
-    if (zoom >= 10) return 40;
-    if (zoom >= 8) return 90;
-    return 150;
-  }
-
-  Future<void> _tryApplyPendingSiteFocus() async {
-    if (_pendingFocusBusy) return;
-    final ValueNotifier<String?>? notifier = widget.pendingSiteFocus;
-    if (notifier == null || notifier.value == null || !mounted) return;
-    _pendingFocusBusy = true;
-    final String id = notifier.value!;
-    try {
-      PollutionSite? local;
-      for (final PollutionSite s in _allSites) {
-        if (s.id == id) {
-          local = s;
-          break;
-        }
-      }
-      if (local != null) {
-        final LatLng? point = _getSiteCoordinates(local.id);
-        if (point != null) {
-          _handleSelectSite(local, point);
-          if (notifier.value == id) notifier.value = null;
-          widget.onPendingSiteFocusConsumed?.call();
-          return;
-        }
-      }
-
-      try {
-        final PollutionSite? fetched = await ServiceLocator
-            .instance
-            .sitesRepository
-            .getSiteById(id);
-        if (!mounted) return;
-        if (notifier.value != id) return;
-        if (fetched != null &&
-            fetched.latitude != null &&
-            fetched.longitude != null) {
-          final LatLng point = LatLng(fetched.latitude!, fetched.longitude!);
-          if (!mounted) return;
-          setState(() {
-            final bool has = _allSites.any(
-              (PollutionSite s) => s.id == fetched.id,
-            );
-            if (!has) {
-              _allSites = <PollutionSite>[..._allSites, fetched];
-              _siteCoordinates = Map<String, LatLng>.from(_siteCoordinates)
-                ..[fetched.id] = point;
-              _filteredSitesCache = null;
-              _filteredSitesCacheHash = 0;
-              _displayedSitesCache = null;
-              _displayedSitesFilterHashCache = -1;
-            }
-          });
-          final PollutionSite target = _allSites.firstWhere(
-            (PollutionSite s) => s.id == id,
-          );
-          _handleSelectSite(target, point);
-        } else if (mounted) {
-          AppSnack.show(
-            context,
-            message: 'This site is not available on the map yet.',
-            type: AppSnackType.warning,
-          );
-        }
-      } catch (_) {
-        if (mounted) {
-          AppSnack.show(
-            context,
-            message: 'Could not open this location on the map.',
-            type: AppSnackType.warning,
-          );
-        }
-      }
-
-      if (notifier.value == id) {
-        notifier.value = null;
-      }
-      widget.onPendingSiteFocusConsumed?.call();
-    } finally {
-      _pendingFocusBusy = false;
-    }
-  }
-
-  /// Best practice: try to start at user's city when possible; otherwise show whole country.
-  Future<void> _tryInitialLocate() async {
-    if (_hasAttemptedInitialLocate) return;
-    _hasAttemptedInitialLocate = true;
-
-    try {
-      if (!await Geolocator.isLocationServiceEnabled()) return;
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-      }
-      if (permission != LocationPermission.whileInUse &&
-          permission != LocationPermission.always) {
-        return;
-      }
-
-      final Position pos = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.medium,
-        timeLimit: const Duration(seconds: 5),
-      );
-
-      if (!mounted) return;
-      final LatLng location = LatLng(pos.latitude, pos.longitude);
-      setState(() => _userLocation = location);
-
-      await _animatedMapController.animateTo(dest: location, zoom: _zoomCity);
-      _syncMapViewport(immediate: false);
-    } catch (_) {
-      // Fallback: stay at country view (initialZoom)
-    }
-  }
-
-  void _onSearchResultTap(PollutionSite site) {
-    final LatLng? point = _getSiteCoordinates(site.id);
-    if (point == null) return;
-    setState(() {
-      _selectedSite = site;
-      _searchController.clear();
-      _searchFocusNode.unfocus();
-    });
-    AppHaptics.pinSelect(context);
-    _animatedMapController.animateTo(
-      dest: point,
-      zoom: 14.5.clamp(3, 18).toDouble(),
-    );
-  }
-
-  @override
-  void didUpdateWidget(PollutionMapScreen oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.pendingSiteFocus != widget.pendingSiteFocus) {
-      oldWidget.pendingSiteFocus?.removeListener(_onPendingSiteFocusChanged);
-      widget.pendingSiteFocus?.addListener(_onPendingSiteFocusChanged);
-    }
-    if (oldWidget.isActive != widget.isActive) {
-      _mapSyncCoordinator.setActive(widget.isActive);
-      _setMapRealtimeActive(widget.isActive);
-      if (widget.isActive) {
-        _syncMapViewport(immediate: true);
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _viewportMoveDebounce?.cancel();
-    _tileOverlaySoftDismissTimer?.cancel();
-    _tileOverlayMaxTimer?.cancel();
-    widget.pendingSiteFocus?.removeListener(_onPendingSiteFocusChanged);
-    _setMapRealtimeActive(false);
-    _mapEventsSub?.cancel();
-    _mapSyncCoordinator
-      ..removeListener(_onMapSyncStateChanged)
-      ..dispose();
-    _mapRotationNotifier.dispose();
-    _searchController.dispose();
-    _searchFocusNode.dispose();
-    _entranceController.dispose();
-    _animatedMapController.dispose();
-    super.dispose();
-  }
-
-  /// Canonical pollution types from reporting flow (ReportCategory labels).
-  List<String> get _canonicalPollutionTypes => reportPollutionTypeLabels;
-
-  List<PollutionSite>? _filteredSitesCache;
-  int _filteredSitesCacheHash = 0;
-
-  List<PollutionSite> get _filteredSites {
-    final int hash = Object.hash(
-      Object.hashAll(_activeStatuses),
-      Object.hashAll(_activePollutionTypes),
-    );
-    if (_filteredSitesCache != null && _filteredSitesCacheHash == hash) {
-      return _filteredSitesCache!;
-    }
-    _filteredSitesCacheHash = hash;
-    _filteredSitesCache = _allSites.where((PollutionSite s) {
-      if (!_activeStatuses.contains(s.statusLabel)) return false;
-      final String? pt = s.pollutionType;
-      if (pt == null) return true;
-      return _activePollutionTypes.contains(pt);
-    }).toList();
-    return _filteredSitesCache!;
-  }
-
-  List<PollutionSite>? _displayedSitesCache;
-  String _displayedSitesQueryCache = '';
-  int _displayedSitesFilterHashCache = 0;
-  int _displayedSitesCacheHash = 0;
-
-  List<PollutionSite> get _displayedSites {
-    final String q = _searchController.text.trim();
-    final int filterHash = _filteredSitesCacheHash;
-    if (_displayedSitesCache != null &&
-        _displayedSitesQueryCache == q &&
-        _displayedSitesFilterHashCache == filterHash) {
-      return _displayedSitesCache!;
-    }
-    _displayedSitesQueryCache = q;
-    _displayedSitesFilterHashCache = filterHash;
-    if (q.isEmpty) {
-      _displayedSitesCache = _filteredSites;
-    } else {
-      final String qLower = q.toLowerCase();
-      _displayedSitesCache = _filteredSites
-          .where((PollutionSite s) => s.title.toLowerCase().contains(qLower))
-          .toList();
-    }
-    _displayedSitesCacheHash = Object.hashAll(
-      _displayedSitesCache!.map((PollutionSite s) => s.id),
-    );
-    return _displayedSitesCache!;
-  }
-
-  void _toggleStatus(String status) {
-    setState(() {
-      if (_activeStatuses.contains(status)) {
-        if (_activeStatuses.length == 1) return;
-        _activeStatuses.remove(status);
-      } else {
-        _activeStatuses.add(status);
-      }
-    });
-    AppHaptics.light(context);
-  }
-
-  void _togglePollutionType(String type) {
-    setState(() {
-      if (_activePollutionTypes.contains(type)) {
-        if (_activePollutionTypes.length == 1) return;
-        _activePollutionTypes.remove(type);
-      } else {
-        _activePollutionTypes.add(type);
-      }
-    });
-    AppHaptics.light(context);
-  }
-
-  void _openSearchModal() {
-    AppHaptics.light(context);
-    showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: AppColors.transparent,
-      isScrollControlled: true,
-      builder: (BuildContext context) => MapSearchModal(
-        allSites: _filteredSites,
-        onResultTap: (PollutionSite site) {
-          Navigator.of(context).pop();
-          _onSearchResultTap(site);
-        },
-        onDismiss: () => Navigator.of(context).pop(),
-      ),
-    );
-  }
-
-  void _openFilterModal() {
-    AppHaptics.light(context);
-    showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: AppColors.transparent,
-      isScrollControlled: true,
-      builder: (BuildContext context) => MapFilterSheet(
-        activeStatuses: Set<String>.from(_activeStatuses),
-        activePollutionTypes: Set<String>.from(_activePollutionTypes),
-        visibleCount: _filteredSites.length,
-        totalCount: _allSites.length,
-        allPollutionTypes: _canonicalPollutionTypes,
-        onToggleStatus: _toggleStatus,
-        onTogglePollutionType: _togglePollutionType,
-        onDismiss: () => Navigator.of(context).pop(),
-      ),
-    );
-  }
-
-  void _toggleRotationLock() {
-    setState(() {
-      _rotationLocked = !_rotationLocked;
-      if (_rotationLocked) {
-        _animatedMapController.animatedRotateReset();
-      }
-    });
-    AppHaptics.light(context);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final double topPadding = MediaQuery.of(context).padding.top;
-
-    return Semantics(
-      label: 'Pollution map. Tap pins to view site details.',
-      child: Stack(
-        children: <Widget>[
-          _buildMap(),
-
-          TopVignette(topPadding: topPadding),
-          const BottomVignette(),
-          if (_showTileLoadingOverlay)
-            TileLoadingOverlay(
-              showLoading: _showTileLoadingOverlay,
-              isDarkMap: _useDarkTiles,
-            ),
-          if (_loadError != null && _allSites.isEmpty)
-            Positioned.fill(
-              child: Container(
-                color: AppColors.panelBackground,
-                alignment: Alignment.center,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.xl,
-                  ),
-                  child: AppErrorView(
-                    error: _loadError!,
-                    onRetry: () => _syncMapViewport(immediate: true),
-                  ),
-                ),
-              ),
-            ),
-          Positioned(
-            right: AppSpacing.lg,
-            bottom: AppSpacing.lg,
-            child: MapActionsMenu(
-              showHeatmap: _showHeatmap,
-              useDarkTiles: _useDarkTiles,
-              isLocating: _isLocating,
-              locationJustFound: _locationJustFound,
-              rotationLocked: _rotationLocked,
-              onToggleHeatmap: () {
-                setState(() => _showHeatmap = !_showHeatmap);
-                AppHaptics.light(context);
-              },
-              onToggleDarkTiles: () {
-                setState(() => _useDarkTiles = !_useDarkTiles);
-                AppHaptics.light(context);
-              },
-              onZoomToFit: _handleZoomToFitAll,
-              onToggleRotationLock: _toggleRotationLock,
-              onLocateMe: _handleLocateMe,
-            ),
-          ),
-          if (_syncNotice != null && _allSites.isNotEmpty)
-            Positioned(
-              left: AppSpacing.md,
-              right: AppSpacing.md,
-              bottom: AppSpacing.lg + 68,
-              child: _MapInlineSyncNotice(
-                message: _syncNotice!,
-                onRetry: () => _syncMapViewport(immediate: true),
-              ),
-            ),
-          Positioned(
-            left: AppSpacing.md,
-            right: AppSpacing.md,
-            top: topPadding + AppSpacing.sm,
-            child: FadeTransition(
-              opacity: _legendOpacity,
-              child: SlideTransition(
-                position: _legendSlide,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        MapFilterButton(
-                          visibleCount: _displayedSites.length,
-                          hasFilterActive:
-                              _activeStatuses.length < 3 ||
-                              _activePollutionTypes.length <
-                                  _canonicalPollutionTypes.length,
-                          onTap: _openFilterModal,
-                        ),
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: <Widget>[
-                            MapSearchIconButton(
-                              onTap: () => _openSearchModal(),
-                            ),
-                            if (!_rotationLocked) ...[
-                              const SizedBox(height: AppSpacing.sm),
-                              ValueListenableBuilder<double>(
-                                valueListenable: _mapRotationNotifier,
-                                builder:
-                                    (BuildContext context, double rotation, _) {
-                                      return MapCompassButton(
-                                        rotationDegrees: rotation,
-                                        onReset: () {
-                                          AppHaptics.settle(context);
-                                          _animatedMapController
-                                              .animatedRotateReset();
-                                        },
-                                      );
-                                    },
-                              ),
-                            ],
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-
-          Positioned(
-            left: AppSpacing.md,
-            right: AppSpacing.md,
-            top: null,
-            bottom: AppSpacing.lg + 72,
-            height: 240,
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 420),
-              switchInCurve: Curves.easeOutCubic,
-              switchOutCurve: Curves.easeInCubic,
-              transitionBuilder: (Widget child, Animation<double> animation) {
-                final Animation<double> scale =
-                    Tween<double>(begin: 0.96, end: 1).animate(
-                      CurvedAnimation(
-                        parent: animation,
-                        curve: Curves.easeOutCubic,
-                      ),
-                    );
-                final Animation<double> opacity = CurvedAnimation(
-                  parent: animation,
-                  curve: const Interval(0, 0.8, curve: Curves.easeOut),
-                );
-                return ScaleTransition(
-                  scale: scale,
-                  alignment: Alignment.bottomCenter,
-                  child: FadeTransition(opacity: opacity, child: child),
-                );
-              },
-              layoutBuilder:
-                  (Widget? currentChild, List<Widget> previousChildren) {
-                    return Stack(
-                      alignment: Alignment.bottomCenter,
-                      children: <Widget>[
-                        ...previousChildren.map(
-                          (Widget w) => Positioned(
-                            left: 0,
-                            right: 0,
-                            top: 0,
-                            bottom: 0,
-                            child: Align(
-                              alignment: Alignment.bottomCenter,
-                              child: w,
-                            ),
-                          ),
-                        ),
-                        if (currentChild != null)
-                          Positioned(
-                            left: 0,
-                            right: 0,
-                            top: 0,
-                            bottom: 0,
-                            child: Align(
-                              alignment: Alignment.bottomCenter,
-                              child: currentChild,
-                            ),
-                          ),
-                      ],
-                    );
-                  },
-              child: _selectedSite == null
-                  ? const SizedBox.shrink(key: ValueKey<String>('empty'))
-                  : SitePreviewSheet(
-                      key: ValueKey<String>(_selectedSite!.id),
-                      site: _selectedSite!,
-                      userLocation: _userLocation,
-                      siteCoordinates: _siteCoordinates,
-                      onGetDirections: _openDirectionsForSite,
-                      onViewDetails: () => _openSiteDetail(_selectedSite!),
-                      onDismiss: () {
-                        setState(() => _selectedSite = null);
-                        AppHaptics.sheetDismiss(context);
-                      },
-                    ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMap() {
-    final bool reduceMapAnimations =
-        MediaQuery.of(context).disableAnimations ||
-        WidgetsBinding
-            .instance
-            .platformDispatcher
-            .accessibilityFeatures
-            .disableAnimations ||
-        _displayedSites.length > 140;
-    final bool highDpi = MediaQuery.of(context).devicePixelRatio > 1.0;
-    return FlutterMap(
-      mapController: _animatedMapController.mapController,
-      options: MapOptions(
-        initialCenter: LatLng(
-          ReportGeoFence.centerLat,
-          ReportGeoFence.centerLng,
-        ),
-        initialZoom: _zoomCity,
-        minZoom: 1.5,
-        maxZoom: 18,
-        backgroundColor:
-            _useDarkTiles ? AppColors.mapDarkPaper : AppColors.mapLightPaper,
-        onMapReady: _onMapSurfaceReady,
-        interactionOptions: InteractionOptions(
-          flags:
-              (InteractiveFlag.doubleTapDragZoom |
-                  InteractiveFlag.doubleTapZoom |
-                  InteractiveFlag.drag |
-                  InteractiveFlag.flingAnimation |
-                  InteractiveFlag.pinchZoom |
-                  InteractiveFlag.scrollWheelZoom) |
-              (_rotationLocked ? InteractiveFlag.none : InteractiveFlag.rotate),
-        ),
-        onMapEvent: (MapEvent event) {
-          _onMapInteractionMayHaveTiles(event);
-          if (event is MapEventDoubleTapZoom) {
-            AppHaptics.tap(context);
-          }
-          if (event is MapEventMove) {
-            _viewportMoveDebounce?.cancel();
-            _viewportMoveDebounce = Timer(
-              const Duration(milliseconds: 320),
-              () {
-                if (mounted) {
-                  _syncMapViewport(immediate: false);
-                }
-              },
-            );
-          }
-          if (event is MapEventMoveEnd) {
-            _viewportMoveDebounce?.cancel();
-            _viewportMoveDebounce = null;
-            _syncMapViewport(immediate: false);
-          }
-          final double rot = event.camera.rotation;
-          if (_mapRotationNotifier.value != rot) {
-            _mapRotationNotifier.value = rot;
-          }
-        },
-        onTap: (TapPosition pos, LatLng point) {
-          if (_selectedSite != null) {
-            setState(() => _selectedSite = null);
-            AppHaptics.pinDeselect(context);
-          }
-        },
-      ),
-      children: <Widget>[
-        // Raster Carto tiles. Vector styles or offline MBTiles would replace this stack (large follow-up).
-        TileLayer(
-          urlTemplate: _useDarkTiles
-              ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-              : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-          subdomains: const <String>['a', 'b', 'c', 'd'],
-          maxNativeZoom: 20,
-          userAgentPackageName: 'chisto_mobile',
-          retinaMode: highDpi,
-          keepBuffer: 3,
-          panBuffer: 2,
-          tileProvider: createCachedTileProvider(maxStaleDays: 30),
-          tileDisplay: const TileDisplay.fadeIn(
-            duration: Duration(milliseconds: 220),
-            startOpacity: 0,
-          ),
-        ),
-        if (_userLocation != null)
-          MarkerLayer(
-            markers: <Marker>[
-              Marker(
-                point: _userLocation!,
-                width: 80,
-                height: 80,
-                child: UserLocationDot(
-                  key: ValueKey<LatLng>(_userLocation!),
-                  animate: !reduceMapAnimations,
-                ),
-              ),
-            ],
-          ),
-        if (_showHeatmap)
-          Builder(
-            builder: (BuildContext context) {
-              return _buildHeatmapLayer(MapCamera.maybeOf(context));
-            },
-          ),
-        if (_allSites.isNotEmpty && _displayedSites.isEmpty)
-          EmptyFilterOverlay(
-            onResetFilters: () {
-              setState(() {
-                _activeStatuses = _allSites
-                    .map((PollutionSite s) => s.statusLabel)
-                    .toSet();
-                _activePollutionTypes = _canonicalPollutionTypes.toSet();
-                _searchController.clear();
-              });
-              AppHaptics.light(context);
-            },
-          ),
-        Builder(
-          builder: (BuildContext context) {
-            final MapCamera? camera = MapCamera.maybeOf(context);
-            if (camera == null) return const SizedBox.shrink();
-            return RepaintBoundary(
-              child: MarkerLayer(
-                markers: _buildClusteredMarkers(
-                  camera,
-                  reduceAnimations: reduceMapAnimations,
-                ),
-              ),
-            );
-          },
-        ),
-      ],
-    );
-  }
-
-  List<WeightedLatLng>? _heatmapDataCache;
-  int _heatmapDataCacheKey = 0;
-
-  Widget _buildHeatmapLayer(MapCamera? camera) {
-    final int camKey = camera == null
-        ? 0
-        : Object.hash(
-            (camera.zoom * 20).round(),
-            (camera.center.latitude * 4000).round(),
-            (camera.center.longitude * 4000).round(),
-          );
-    final int key = Object.hash(_displayedSitesCacheHash, camKey);
-    if (_heatmapDataCache == null || _heatmapDataCacheKey != key) {
-      _heatmapDataCacheKey = key;
-      final List<WeightedLatLng> data = <WeightedLatLng>[];
-      for (final PollutionSite site in _displayedSites) {
-        final LatLng? point = _getSiteCoordinates(site.id);
-        if (point == null) continue;
-        final double weight = site.statusLabel == 'High'
-            ? 3.0
-            : site.statusLabel == 'Medium'
-            ? 2.0
-            : 1.0;
-        data.add(WeightedLatLng(point, weight));
-      }
-      _heatmapDataCache = data;
-    }
-    final List<WeightedLatLng> data = _heatmapDataCache!;
-    if (data.isEmpty) return const SizedBox.shrink();
-    return HeatMapLayer(
-      heatMapDataSource: InMemoryHeatMapDataSource(data: data),
-      heatMapOptions: HeatMapOptions(
-        gradient: HeatMapOptions.defaultGradient,
-        minOpacity: 0.2,
-        radius: 25,
-      ),
-    );
-  }
-
-  int _entranceDelayMsForPoint(LatLng point, MapCamera camera) {
-    final LatLng center = camera.center;
-    final double dLat = (point.latitude - center.latitude).abs();
-    final double dLng = (point.longitude - center.longitude).abs();
-    final double distance = math.sqrt(dLat * dLat + dLng * dLng);
-    const double maxDistance = 0.035;
-    final int delayMs = (distance / maxDistance * 320).round().clamp(0, 380);
-    return delayMs;
-  }
-
-  /// Expands the map to show all sites in a cluster. When the cluster spans a
-  /// large area (zoomed-out view), we avoid forcing minZoom so the fit shows
-  /// all sites. For tight clusters, we zoom in enough to prevent re-clustering.
   void _expandClusterToShowSites(List<LatLng> points) {
     if (points.isEmpty) return;
-    final double minLat = points.map((LatLng p) => p.latitude).reduce(math.min);
-    final double maxLat = points.map((LatLng p) => p.latitude).reduce(math.max);
-    final double minLng = points
-        .map((LatLng p) => p.longitude)
-        .reduce(math.min);
-    final double maxLng = points
-        .map((LatLng p) => p.longitude)
-        .reduce(math.max);
+    final double minLat = points.map((p) => p.latitude).reduce(math.min);
+    final double maxLat = points.map((p) => p.latitude).reduce(math.max);
+    final double minLng = points.map((p) => p.longitude).reduce(math.min);
+    final double maxLng = points.map((p) => p.longitude).reduce(math.max);
     const double minSpan = 0.002;
     final double spanLat = (maxLat - minLat).abs();
     final double spanLng = (maxLng - minLng).abs();
     final double padLat = spanLat < minSpan ? minSpan - spanLat : 0;
     final double padLng = spanLng < minSpan ? minSpan - spanLng : 0;
-    final LatLng southWest = LatLng(minLat - padLat / 2, minLng - padLng / 2);
-    final LatLng northEast = LatLng(maxLat + padLat / 2, maxLng + padLng / 2);
     final double spanDeg = math.sqrt(spanLat * spanLat + spanLng * spanLng);
     final bool isTightCluster = spanDeg < 0.03;
-    final LatLngBounds bounds = LatLngBounds(southWest, northEast);
     _animatedMapController.animatedFitCamera(
       cameraFit: CameraFit.bounds(
-        bounds: bounds,
-        padding: const EdgeInsets.all(AppSpacing.xxl + AppSpacing.lg),
+        bounds: LatLngBounds(
+          LatLng(minLat - padLat / 2, minLng - padLng / 2),
+          LatLng(maxLat + padLat / 2, maxLng + padLng / 2),
+        ),
+        padding: const EdgeInsets.all(MapLayoutTokens.clusterExpandPadding),
         maxZoom: 18,
-        minZoom: isTightCluster ? _minZoomClusterExpand : 6,
+        minZoom: isTightCluster ? MapLayoutTokens.minZoomClusterExpand : 6,
       ),
     );
   }
 
-  /// Pixel-radius threshold — same approach as Google Maps, Mapbox, Apple Maps.
-  /// A fixed pixel radius is converted to degrees, so clustering is consistent
-  /// at every zoom level and on every screen size.
-  /// threshold° = pixelRadius × 360 / (2^zoom × 256)
-  double _clusterThresholdForZoom(double zoom) {
-    const double pixelRadius = 50;
-    return pixelRadius * 360 / (math.pow(2, zoom.clamp(1, 20)) * 256);
+  void _handleClusterTap(ClusterBucket bucket, Map<String, LatLng> coords) {
+    final List<LatLng> points = bucket.sites
+        .map((PollutionSite s) => coords[s.id])
+        .whereType<LatLng>()
+        .toList();
+    if (points.isEmpty) return;
+
+    AppHaptics.clusterExpand(context);
+
+    final Set<String> expandingIds =
+        bucket.sites.map((PollutionSite s) => s.id).toSet();
+    MapMarkerEntranceCache.instance.resetForClusterExpansion(expandingIds);
+    ref
+        .read(mapClusterExpansionNotifierProvider.notifier)
+        .beginExpansion(bucket: bucket, coordsById: coords);
+
+    if (points.length == 1) {
+      final double targetZoom =
+          (_animatedMapController.mapController.camera.zoom + 2)
+              .clamp(3.0, 18.0);
+      _preCommitTargetCamera(points.first, targetZoom);
+      _animatedMapController.animateTo(dest: points.first, zoom: targetZoom);
+    } else {
+      _preCommitClusterExpansionBounds(points);
+      _expandClusterToShowSites(points);
+    }
+
+    if (points.length > 1 && MediaQuery.supportsAnnounceOf(context)) {
+      SemanticsService.sendAnnouncement(
+        View.of(context),
+        context.l10n.mapClusterExpansionAnnounce(points.length),
+        Directionality.of(context),
+      );
+    }
   }
 
-  List<Marker> _buildClusteredMarkers(
-    MapCamera camera, {
-    required bool reduceAnimations,
-  }) {
-    final int cacheKey = _clusterCacheKey(
-      camera: camera,
-      reduceAnimations: reduceAnimations,
-    );
-    if (_clusteredMarkersCache != null &&
-        _clusteredMarkersCacheKey == cacheKey) {
-      return _clusteredMarkersCache!;
-    }
-    final double threshold = _clusterThresholdForZoom(camera.zoom);
-    final String? selectedId = _selectedSite?.id;
-
-    final List<ClusterBucket> buckets = <ClusterBucket>[];
-
-    for (final PollutionSite site in _displayedSites) {
-      final LatLng? point = _getSiteCoordinates(site.id);
-      if (point == null) continue;
-
-      if (site.id == selectedId) {
-        buckets.add(ClusterBucket(center: point, sites: <PollutionSite>[site]));
-        continue;
-      }
-
-      ClusterBucket? target;
-      for (final ClusterBucket b in buckets) {
-        if (b.sites.any((PollutionSite s) => s.id == selectedId)) continue;
-        for (final PollutionSite s in b.sites) {
-          final LatLng? bp = _getSiteCoordinates(s.id);
-          if (bp == null) continue;
-          final double dLat = (point.latitude - bp.latitude).abs();
-          final double dLng = (point.longitude - bp.longitude).abs();
-          if (dLat <= threshold && dLng <= threshold) {
-            target = b;
-            break;
-          }
-        }
-        if (target != null) break;
-      }
-
-      if (target == null) {
-        buckets.add(ClusterBucket(center: point, sites: <PollutionSite>[site]));
-      } else {
-        target.addSite(site, point);
-      }
-    }
-
-    final List<Marker> markers = <Marker>[];
-
-    for (final ClusterBucket bucket in buckets) {
-      final Duration entranceDelay = reduceAnimations
-          ? Duration.zero
-          : Duration(
-              milliseconds: _entranceDelayMsForPoint(bucket.center, camera),
-            );
-
-      if (bucket.sites.length == 1) {
-        final PollutionSite site = bucket.sites.first;
-        final bool selected = _selectedSite?.id == site.id;
-        final double pinSize = selected ? 64 : 52;
-        markers.add(
-          Marker(
-            point: bucket.center,
-            width: pinSize,
-            height: pinSize,
-            child: PollutionMarker(
-              site: site,
-              isSelected: selected,
-              entranceDelay: entranceDelay,
-              animate: !reduceAnimations,
-              onTap: () => _handleSelectSite(site, bucket.center),
-            ),
-          ),
+  /// Immediately commits the target camera and jumps the effective clustering
+  /// zoom so clustering recomputes in one frame instead of easing over ~500ms.
+  void _preCommitTargetCamera(LatLng dest, double zoom) {
+    _mapCameraClusteringDebounce?.cancel();
+    _mapCameraClusteringDebounce = null;
+    ref.read(mapClusterEffectiveZoomProvider.notifier).jumpTo(zoom);
+    ref.read(mapCameraNotifierProvider.notifier).setCamera(
+          centerLat: dest.latitude,
+          centerLng: dest.longitude,
+          zoom: zoom,
         );
-      } else {
-        final int count = bucket.sites.length;
-        final double size = (36 + 8 * math.sqrt(count)).clamp(38, 64);
-        markers.add(
-          Marker(
-            point: bucket.center,
-            width: size,
-            height: size,
-            child: ClusterMarker(
-              count: count,
-              bucket: bucket,
-              entranceDelay: entranceDelay,
-              animate: !reduceAnimations,
-              pulseEnabled: !reduceAnimations && count <= 28,
-              onTap: () {
-                AppHaptics.clusterExpand(context);
-                final List<LatLng> points = bucket.sites
-                    .map((PollutionSite s) => _getSiteCoordinates(s.id))
-                    .whereType<LatLng>()
-                    .toList();
-                if (points.isEmpty) return;
-                if (points.length == 1) {
-                  _animatedMapController.animateTo(
-                    dest: points.first,
-                    zoom: (camera.zoom + 2).clamp(3, 18).toDouble(),
-                  );
-                } else {
-                  _expandClusterToShowSites(points);
-                }
-              },
-            ),
-          ),
-        );
-      }
-    }
-
-    _clusteredMarkersCache = markers;
-    _clusteredMarkersCacheKey = cacheKey;
-    return markers;
   }
 
-  int _clusterCacheKey({
-    required MapCamera camera,
-    required bool reduceAnimations,
-  }) {
-    final int zoomBucket = (camera.zoom * 20).round();
-    final int latBucket = (camera.center.latitude * 4000).round();
-    final int lngBucket = (camera.center.longitude * 4000).round();
-    final String selectedId = _selectedSite?.id ?? '';
-    return Object.hash(
-      _displayedSitesCacheHash,
-      zoomBucket,
-      latBucket,
-      lngBucket,
-      selectedId,
-      reduceAnimations ? 1 : 0,
-    );
-  }
-
-  Future<void> _openSiteDetail(PollutionSite site) async {
-    AppHaptics.softTransition(context);
-    await Navigator.of(context).push<void>(
-      MaterialPageRoute<void>(
-        builder: (_) => PollutionSiteDetailScreen(site: site),
-      ),
-    );
-  }
-
-  Future<void> _handleLocateMe() async {
-    if (_isLocating) return;
-    setState(() {
-      _isLocating = true;
-      _locationJustFound = false;
-    });
+  /// Pre-computes the target camera for a bounds fit and commits it so
+  /// clustering at the destination zoom runs while the camera is still moving.
+  void _preCommitClusterExpansionBounds(List<LatLng> points) {
     try {
-      final bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        if (!mounted) return;
-        AppHaptics.gpsFailed(context);
-        setState(() => _isLocating = false);
-        return;
-      }
-
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-      }
-      if (permission == LocationPermission.denied ||
-          permission == LocationPermission.deniedForever) {
-        if (!mounted) return;
-        AppHaptics.gpsFailed(context);
-        setState(() => _isLocating = false);
-        return;
-      }
-
-      final Position pos = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.best,
-        timeLimit: const Duration(seconds: 12),
-      );
-
-      final LatLng location = LatLng(pos.latitude, pos.longitude);
-      if (!mounted) return;
-
-      setState(() {
-        _userLocation = location;
-        _isLocating = false;
-        _locationJustFound = true;
-      });
-
-      AppHaptics.gpsFound(context);
-      await _animatedMapController.animateTo(
-        dest: location,
-        zoom: 16.5.clamp(3, 18).toDouble(),
-      );
-      _syncMapViewport(immediate: false);
-
-      await Future<void>.delayed(const Duration(milliseconds: 1200));
-      if (mounted) setState(() => _locationJustFound = false);
+      final double minLat =
+          points.map((LatLng p) => p.latitude).reduce(math.min);
+      final double maxLat =
+          points.map((LatLng p) => p.latitude).reduce(math.max);
+      final double minLng =
+          points.map((LatLng p) => p.longitude).reduce(math.min);
+      final double maxLng =
+          points.map((LatLng p) => p.longitude).reduce(math.max);
+      const double minSpan = 0.002;
+      final double spanLat = (maxLat - minLat).abs();
+      final double spanLng = (maxLng - minLng).abs();
+      final double padLat = spanLat < minSpan ? minSpan - spanLat : 0;
+      final double padLng = spanLng < minSpan ? minSpan - spanLng : 0;
+      final double spanDeg =
+          math.sqrt(spanLat * spanLat + spanLng * spanLng);
+      final bool isTightCluster = spanDeg < 0.03;
+      final MapCamera target = CameraFit.bounds(
+        bounds: LatLngBounds(
+          LatLng(minLat - padLat / 2, minLng - padLng / 2),
+          LatLng(maxLat + padLat / 2, maxLng + padLng / 2),
+        ),
+        padding:
+            const EdgeInsets.all(MapLayoutTokens.clusterExpandPadding),
+        maxZoom: 18,
+        minZoom:
+            isTightCluster ? MapLayoutTokens.minZoomClusterExpand : 6,
+      ).fit(_animatedMapController.mapController.camera);
+      _preCommitTargetCamera(target.center, target.zoom);
     } catch (_) {
-      if (!mounted) return;
-      AppHaptics.gpsFailed(context);
-      setState(() => _isLocating = false);
+      // Camera may not be ready; clustering will catch up on MoveEnd.
     }
   }
 
-  void _handleSelectSite(PollutionSite site, LatLng point) {
-    setState(() => _selectedSite = site);
-    AppHaptics.pinSelect(context);
-    _animatedMapController.animateTo(
-      dest: point,
-      zoom: 14.5.clamp(3, 18).toDouble(),
+  Future<void> _fitCameraToSearchGeoIntent(SiteMapSearchGeoIntent intent) async {
+    final LatLngBounds bounds = LatLngBounds(
+      LatLng(intent.minLat, intent.minLng),
+      LatLng(intent.maxLat, intent.maxLng),
+    );
+    try {
+      await _animatedMapController.animatedFitCamera(
+        cameraFit: CameraFit.bounds(
+          bounds: bounds,
+          padding: MapLayoutTokens.geoFitPadding,
+          maxZoom: MapLayoutTokens.geoFitMaxZoomMunicipality,
+          minZoom: MapLayoutTokens.geoFitMinZoomMunicipality,
+        ),
+      );
+    } catch (_) {}
+  }
+
+  Future<void> _fitCameraToGeoFilter(String? geoAreaId) async {
+    final LatLngBounds bounds = geoAreaId == null
+        ? _macedoniaBounds
+        : (_boundariesRepository.boundsFor(geoAreaId) ??
+              MacedoniaMapRegions.boundsFor(geoAreaId) ??
+              _macedoniaBounds);
+    final bool countryWide = geoAreaId == null;
+    try {
+      await _animatedMapController.animatedFitCamera(
+        cameraFit: CameraFit.bounds(
+          bounds: bounds,
+          padding: MapLayoutTokens.geoFitPadding,
+          maxZoom: countryWide
+              ? MapLayoutTokens.geoFitMaxZoomCountry
+              : MapLayoutTokens.geoFitMaxZoomMunicipality,
+          minZoom: countryWide
+              ? MapLayoutTokens.geoFitMinZoomCountry
+              : MapLayoutTokens.geoFitMinZoomMunicipality,
+        ),
+      );
+    } catch (_) {}
+  }
+
+  void _openFilterModal({
+    required Set<String> statuses,
+    required Set<String> pollutionTypes,
+    required String? geoAreaId,
+    required int visibleCount,
+    required int totalCount,
+  }) {
+    showMapBottomSheet<void>(
+      context: context,
+      builder: (BuildContext context) => MapFilterSheet(
+        activeStatuses: Set<String>.from(statuses),
+        activePollutionTypes: Set<String>.from(pollutionTypes),
+        geoAreaId: geoAreaId,
+        visibleCount: visibleCount,
+        totalCount: totalCount,
+        allPollutionTypes: reportPollutionTypeCodes,
+        onToggleStatus: ref
+            .read(mapFilterNotifierProvider.notifier)
+            .toggleStatus,
+        onTogglePollutionType: ref
+            .read(mapFilterNotifierProvider.notifier)
+            .togglePollutionType,
+        onGeoAreaIdChanged: ref
+            .read(mapFilterNotifierProvider.notifier)
+            .setGeoAreaId,
+        includeArchived: ref.read(mapFilterNotifierProvider).includeArchived,
+        onIncludeArchivedChanged: ref
+            .read(mapFilterNotifierProvider.notifier)
+            .setIncludeArchived,
+        onDismiss: () => Navigator.of(context).pop(),
+        onResetFilters: () {
+          ref
+              .read(mapFilterNotifierProvider.notifier)
+              .resetFiltersToCurrentSites(
+                ref.read(mapSitesNotifierProvider).sites,
+              );
+          Navigator.of(context).pop();
+        },
+      ),
     );
   }
 
-  void _openDirectionsForSite(PollutionSite site) {
-    final LatLng? point = _getSiteCoordinates(site.id);
-    if (point == null) return;
-    AppHaptics.light(context);
-    showModalBottomSheet<void>(
+  void _openSearchModal() {
+    showMapBottomSheet<void>(
       context: context,
-      backgroundColor: AppColors.transparent,
-      isScrollControlled: true,
+      builder: (BuildContext context) => MapSearchModal(
+        onResultTap: (PollutionSite site) async {
+          Navigator.of(context).pop();
+          final Map<String, LatLng> coords = ref.read(mapSiteCoordinatesProvider);
+          await _searchCoordinator.onSearchResultSelected(
+            context: this.context,
+            ref: ref,
+            site: site,
+            coordsById: coords,
+            mapController: _animatedMapController,
+            sitesRepository: ref.read(sitesRepositoryProvider),
+          );
+        },
+        onGeoIntentSelected: (SiteMapSearchGeoIntent intent) {
+          Navigator.of(context).pop();
+          unawaited(_fitCameraToSearchGeoIntent(intent));
+        },
+        onDismiss: () => Navigator.of(context).pop(),
+      ),
+    );
+  }
+
+  void _openDirectionsForSite(PollutionSite site, Map<String, LatLng> coords) {
+    showMapBottomSheet<void>(
+      context: context,
       builder: (BuildContext context) {
         return DirectionsSheet(
           onAppleMapsTap: () {
-            AppHaptics.light(context);
             Navigator.of(context).pop();
-            _launchDirections(site, useAppleMaps: true);
+            _launchDirections(site, coords, useAppleMaps: true);
           },
           onGoogleMapsTap: () {
-            AppHaptics.light(context);
             Navigator.of(context).pop();
-            _launchDirections(site, useAppleMaps: false);
+            _launchDirections(site, coords, useAppleMaps: false);
           },
           onDismiss: () => Navigator.of(context).pop(),
         );
@@ -1344,12 +642,13 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
   }
 
   Future<void> _launchDirections(
-    PollutionSite site, {
+    PollutionSite site,
+    Map<String, LatLng> coords, {
     required bool useAppleMaps,
   }) async {
-    final LatLng? point = _getSiteCoordinates(site.id);
+    final LatLng? point = coords[site.id];
     if (point == null) return;
-    final LatLng? origin = _userLocation;
+    final LatLng? origin = ref.read(mapLocationNotifierProvider).userLocation;
     final String dest = '${point.latitude},${point.longitude}';
     final Uri url = useAppleMaps
         ? Uri.parse(
@@ -1364,8 +663,8 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
     try {
       if (await canLaunchUrl(url)) {
         await launchUrl(url, mode: LaunchMode.externalApplication);
-      } else {
-        if (mounted) _showDirectionsError();
+      } else if (mounted) {
+        _showDirectionsError();
       }
     } catch (_) {
       if (mounted) _showDirectionsError();
@@ -1381,76 +680,422 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
     );
   }
 
-  void _handleZoomToFitAll() {
-    AppHaptics.light(context);
-    _animatedMapController.animatedFitCamera(
-      cameraFit: CameraFit.bounds(
-        bounds: _macedoniaBounds,
-        padding: const EdgeInsets.all(AppSpacing.xxl),
-        maxZoom: 8,
-        minZoom: 6,
-      ),
+  void _onMapSurfaceReady() {
+    if (!mounted || _mapLayoutReady) return;
+    _mapLayoutReady = true;
+    try {
+      final MapCamera cam = _animatedMapController.mapController.camera;
+      ref.read(mapCameraNotifierProvider.notifier).setCamera(
+            centerLat: cam.center.latitude,
+            centerLng: cam.center.longitude,
+            zoom: cam.zoom,
+          );
+    } catch (_) {
+      // Camera not ready yet; clustering will sync on next stable map event.
+    }
+    _tileOverlaySoftDismissTimer?.cancel();
+    _tileOverlaySoftDismissTimer = Timer(
+      const Duration(milliseconds: 2600),
+      _dismissTileLoadingOverlay,
+    );
+    _tileOverlayMaxTimer?.cancel();
+    _tileOverlayMaxTimer = Timer(
+      const Duration(seconds: 14),
+      _dismissTileLoadingOverlay,
     );
   }
-}
 
-class _MapInlineSyncNotice extends StatelessWidget {
-  const _MapInlineSyncNotice({required this.message, required this.onRetry});
-
-  final String message;
-  final VoidCallback onRetry;
+  void _dismissTileLoadingOverlay() {
+    if (!_showTileLoadingOverlay || !mounted) return;
+    _tileOverlaySoftDismissTimer?.cancel();
+    _tileOverlayMaxTimer?.cancel();
+    setState(() => _showTileLoadingOverlay = false);
+  }
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<MapSitesState>(mapSitesNotifierProvider, (
+      MapSitesState? previous,
+      MapSitesState next,
+    ) {
+      if (!context.mounted) {
+        return;
+      }
+      if (previous?.syncNotice != null &&
+          next.syncNotice == null &&
+          next.loadError == null &&
+          next.sites.isNotEmpty) {
+        AppSnack.show(
+          context,
+          message: context.l10n.mapUpdatedToast,
+          type: AppSnackType.success,
+        );
+      }
+    });
+    ref.listen<List<PollutionSite>>(mapFilteredSitesProvider, (
+      List<PollutionSite>? previous,
+      List<PollutionSite> next,
+    ) {
+      if (!context.mounted || previous == null) {
+        return;
+      }
+      if (previous.length == next.length) {
+        return;
+      }
+      if (!MediaQuery.supportsAnnounceOf(context)) {
+        return;
+      }
+      SemanticsService.sendAnnouncement(
+        View.of(context),
+        context.l10n.mapFilteredSitesAnnounce(next.length),
+        Directionality.of(context),
+      );
+    });
+    ref.listen<String?>(
+      mapFilterNotifierProvider.select((MapFilterState s) => s.geoAreaId),
+      (String? previous, String? next) {
+        if (!context.mounted) {
+          return;
+        }
+        if (previous == next) {
+          return;
+        }
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) {
+            return;
+          }
+          unawaited(_fitCameraToGeoFilter(next));
+        });
+      },
+    );
+    ref.listen<int>(
+      mapFilterNotifierProvider.select(MapFilterState.expansionResetKey),
+      (int? previous, int next) {
+        if (previous != null && previous != next) {
+          ref.read(mapClusterExpansionNotifierProvider.notifier).reset();
+        }
+      },
+    );
+
+    final MapSitesState sitesState = ref.watch(mapSitesNotifierProvider);
+    final List<PollutionSite> allSites = sitesState.sites;
+    final List<PollutionSite> filteredSites = ref.watch(
+      mapFilteredSitesProvider,
+    );
+    final Map<String, LatLng> coords = ref.watch(mapSiteCoordinatesProvider);
+    final MapFilterState filters = ref.watch(mapFilterNotifierProvider);
+    final MapSelectionState selection = ref.watch(mapSelectionNotifierProvider);
+    final MapUiModeState uiMode = ref.watch(mapUiModeNotifierProvider);
+    final MapLocationState location = ref.watch(mapLocationNotifierProvider);
+    final MapCameraState camera = ref.watch(mapCameraNotifierProvider);
+    final MapClusterExpansionState clusterExpansion =
+        ref.watch(mapClusterExpansionNotifierProvider);
+    final List<ClusterBucket> clusters = ref.watch(mapClustersProvider).when(
+          skipLoadingOnReload: true,
+          data: (List<ClusterBucket> value) => value,
+          error: (Object _, StackTrace _) => const <ClusterBucket>[],
+          loading: () => const <ClusterBucket>[],
+        );
+
+    if (allSites.isNotEmpty) _prefetchMapPinImages(allSites);
+
+    final bool reduceMapAnimations =
+        MediaQuery.of(context).disableAnimations ||
+        WidgetsBinding
+            .instance
+            .platformDispatcher
+            .accessibilityFeatures
+            .disableAnimations ||
+        filteredSites.length > 140;
+    final List<Polygon> regionFence = buildRegionFence(
+      geoAreaId: filters.geoAreaId,
+      reduceMotion: reduceMapAnimations,
+      boundariesRepository: _boundariesRepository,
+    );
+
+    final String nextPartitionSig =
+        MapMarkerEntranceCache.clusterPartitionSignature(clusters);
+    if (!reduceMapAnimations &&
+        _clusterPartitionSig != null &&
+        _clusterPartitionSig != nextPartitionSig &&
+        _prevBucketsForEntrance.isNotEmpty &&
+        clusters.isNotEmpty) {
+      MapMarkerEntranceCache.instance.applyReclusterEntranceInvalidations(
+        previous: _prevBucketsForEntrance,
+        current: clusters,
+      );
+    }
+    _clusterPartitionSig = nextPartitionSig;
+    _prevBucketsForEntrance = List<ClusterBucket>.from(clusters);
+
+    final AnimatedPollutionMapMarkers markersLayer = AnimatedPollutionMapMarkers(
+      clusters: clusters,
+      coords: coords,
+      selectedSite: selection.selected,
+      reduceAnimations: reduceMapAnimations,
+      cameraCenter: LatLng(camera.centerLat, camera.centerLng),
+      onSiteTap: (PollutionSite site, LatLng center) {
+        ref.read(mapSelectionNotifierProvider.notifier).select(site);
+        AppHaptics.pinSelect(context);
+        _animatedMapController.animateTo(dest: center, zoom: 14.5);
+      },
+      onSiteLongPress: _openSiteDetail,
+      onClusterTap: (ClusterBucket bucket) =>
+          _handleClusterTap(bucket, coords),
+      expansionOrigin: clusterExpansion.expansionOrigin,
+      expandingSiteIds: clusterExpansion.expandingSiteIds,
+      expansionGhostCenter: clusterExpansion.ghostCenter,
+      expansionGhostColor: clusterExpansion.ghostColor,
+      expansionGhostCount: clusterExpansion.ghostCount,
+      expansionToken: clusterExpansion.expansionToken,
+    );
+    final double topPadding = MediaQuery.of(context).padding.top;
+
     return Semantics(
-      liveRegion: true,
-      label: message,
-      child: Material(
-        color: AppColors.transparent,
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: AppSpacing.sm,
-          ),
-          decoration: BoxDecoration(
-            color: AppColors.white.withValues(alpha: 0.9),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-            border: Border.all(
-              color: AppColors.white.withValues(alpha: 0.7),
-              width: 1,
+      namesRoute: true,
+      label: context.l10n.mapScreenRouteSemantic,
+      child: Stack(
+        children: <Widget>[
+          MapCanvas(
+            mapController: _animatedMapController.mapController,
+            useDarkTiles: uiMode.useDarkTiles,
+            userLocation: location.userLocation,
+            reduceMapAnimations: reduceMapAnimations,
+            showHeatmap: uiMode.showHeatmap,
+            heatmapLayer: const MapHeatmapLayer(),
+            showEmptyFilterOverlay:
+                allSites.isNotEmpty &&
+                filteredSites.isEmpty &&
+                filters.geoAreaId == null,
+            onResetFilters: () => ref
+                .read(mapFilterNotifierProvider.notifier)
+                .resetFiltersToCurrentSites(allSites),
+            markersLayer: markersLayer,
+            regionFence: regionFence,
+            highDpi: MediaQuery.of(context).devicePixelRatio > 1.0,
+            options: MapOptions(
+              initialCenter: const LatLng(
+                ReportGeoFence.centerLat,
+                ReportGeoFence.centerLng,
+              ),
+              initialZoom: MapLayoutTokens.zoomCity,
+              minZoom: 1.5,
+              maxZoom: 18,
+              backgroundColor: uiMode.useDarkTiles
+                  ? AppColors.mapDarkPaper
+                  : AppColors.mapLightPaper,
+              onMapReady: _onMapSurfaceReady,
+              // Cluster/pin markers use [HitTestBehavior.opaque] so their tap wins the
+              // gesture arena over the map’s double-tap zoom detector on the same tap.
+              interactionOptions: InteractionOptions(
+                flags:
+                    (InteractiveFlag.doubleTapDragZoom |
+                        InteractiveFlag.doubleTapZoom |
+                        InteractiveFlag.drag |
+                        InteractiveFlag.flingAnimation |
+                        InteractiveFlag.pinchZoom |
+                        InteractiveFlag.scrollWheelZoom) |
+                    (uiMode.rotationLocked
+                        ? InteractiveFlag.none
+                        : InteractiveFlag.rotate),
+              ),
+              onMapEvent: (MapEvent event) {
+                if (_showTileLoadingOverlay &&
+                    _mapLayoutReady &&
+                    (event is MapEventMoveEnd ||
+                        event is MapEventScrollWheelZoom)) {
+                  _tileOverlaySoftDismissTimer?.cancel();
+                  _tileOverlaySoftDismissTimer = Timer(
+                    const Duration(milliseconds: 400),
+                    _dismissTileLoadingOverlay,
+                  );
+                }
+                if (event is MapEventMove) {
+                  // Dismiss pin preview on user-initiated gestures (not programmatic animations).
+                  if (event.source == MapEventSource.onDrag ||
+                      event.source == MapEventSource.onMultiFinger) {
+                    final PollutionSite? sel =
+                        ref.read(mapSelectionNotifierProvider).selected;
+                    if (sel != null) {
+                      ref
+                          .read(mapSelectionNotifierProvider.notifier)
+                          .deselect();
+                      AppHaptics.pinDeselect(context);
+                    }
+                  }
+                  _viewportMoveEndMicroDebounce?.cancel();
+                  _viewportMoveEndMicroDebounce = null;
+                  _viewportMoveDebounce?.cancel();
+                  _viewportMoveDebounce = Timer(
+                    const Duration(milliseconds: 500),
+                    () {
+                      if (mounted) _syncMapViewport(immediate: false);
+                    },
+                  );
+                }
+                if (event is MapEventMoveEnd) {
+                  _viewportMoveDebounce?.cancel();
+                  _viewportMoveDebounce = null;
+                  _viewportMoveEndMicroDebounce?.cancel();
+                  _viewportMoveEndMicroDebounce = Timer(
+                    const Duration(milliseconds: 150),
+                    () {
+                      if (!mounted) {
+                        return;
+                      }
+                      try {
+                        final MapCamera cam =
+                            _animatedMapController.mapController.camera;
+                        ref
+                            .read(mapSitesNotifierProvider.notifier)
+                            .recordPanGestureEnd(
+                              centerLat: cam.center.latitude,
+                              centerLng: cam.center.longitude,
+                              zoom: cam.zoom,
+                            );
+                      } catch (_) {
+                        // Camera may not be ready on first frame.
+                      }
+                      _syncMapViewport(immediate: false);
+                    },
+                  );
+                }
+
+                final bool inertiaOrZoomEnded =
+                    event is MapEventFlingAnimationEnd ||
+                    event is MapEventDoubleTapZoomEnd ||
+                    event is MapEventRotateEnd;
+                if (inertiaOrZoomEnded) {
+                  _viewportMoveDebounce?.cancel();
+                  _viewportMoveEndMicroDebounce?.cancel();
+                  _viewportMoveEndMicroDebounce = Timer(
+                    const Duration(milliseconds: 120),
+                    () {
+                      if (mounted) {
+                        _syncMapViewport(immediate: false);
+                      }
+                    },
+                  );
+                }
+
+                _maybeUpdateMapCameraNotifierForClustering(event);
+                if (_mapRotationNotifier.value != event.camera.rotation) {
+                  _mapRotationNotifier.value = event.camera.rotation;
+                }
+              },
+              onTap: (_, _) =>
+                  ref.read(mapSelectionNotifierProvider.notifier).deselect(),
             ),
-            boxShadow: <BoxShadow>[
-              BoxShadow(
-                color: AppColors.shadowLight,
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
           ),
-          child: Row(
-            children: <Widget>[
-              const Icon(
-                Icons.sync_problem_rounded,
-                size: 18,
-                color: AppColors.accentWarning,
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: Text(
-                  message,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textPrimary,
-                    fontWeight: FontWeight.w600,
-                  ),
+          TopVignette(
+            topPadding: topPadding,
+            useDarkTiles: uiMode.useDarkTiles,
+          ),
+          BottomVignette(useDarkTiles: uiMode.useDarkTiles),
+          if (_showTileLoadingOverlay)
+            TileLoadingOverlay(
+              showLoading: _showTileLoadingOverlay,
+              isDarkMap: uiMode.useDarkTiles,
+              topPadding: topPadding,
+            ),
+          if (sitesState.loadError != null && allSites.isEmpty)
+            MapErrorOverlay(
+              loadError: sitesState.loadError!,
+              onRetry: () => _syncMapViewport(immediate: true),
+              retryFootnote: sitesState.loadError!.retryable
+                  ? context.l10n.mapErrorAutoRetryFootnote
+                  : null,
+            ),
+          Positioned(
+            left: AppSpacing.md,
+            right: AppSpacing.md,
+            top: topPadding + AppSpacing.sm,
+            child: FadeTransition(
+              opacity: _legendOpacity,
+              child: SlideTransition(
+                position: _legendSlide,
+                child: ValueListenableBuilder<double>(
+                  valueListenable: _mapRotationNotifier,
+                  builder: (context, rotation, _) {
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        MapToolbar(
+                          visibleCount: filteredSites.length,
+                          rotationLocked: uiMode.rotationLocked,
+                          rotationDegrees: rotation,
+                          onOpenFilters: () => _openFilterModal(
+                            statuses: filters.activeStatuses,
+                            pollutionTypes: filters.activePollutionTypes,
+                            geoAreaId: filters.geoAreaId,
+                            visibleCount: filteredSites.length,
+                            totalCount: allSites.length,
+                          ),
+                          onOpenSearch: () =>
+                              _openSearchModal(),
+                          onResetRotation: () =>
+                              _animatedMapController.animatedRotateReset(),
+                        ),
+                        if (sitesState.syncNotice != null) ...<Widget>[
+                          const SizedBox(height: AppSpacing.sm),
+                          MapSyncNoticeBanner(
+                            notice: sitesState.syncNotice!,
+                            useDarkTiles: uiMode.useDarkTiles,
+                            onTapSync: () => _syncMapViewport(immediate: true),
+                          ),
+                        ],
+                      ],
+                    );
+                  },
                 ),
               ),
-              TextButton(
-                onPressed: onRetry,
-                child: Text(context.l10n.commonRetry),
-              ),
-            ],
+            ),
           ),
-        ),
+          Positioned(
+            right: AppSpacing.lg,
+            bottom: AppSpacing.lg,
+            child: MapActionsMenu(
+              showHeatmap: uiMode.showHeatmap,
+              useDarkTiles: uiMode.useDarkTiles,
+              isLocating: location.isLocating,
+              locationJustFound: location.locationJustFound,
+              rotationLocked: uiMode.rotationLocked,
+              onToggleHeatmap: () =>
+                  ref.read(mapUiModeNotifierProvider.notifier).toggleHeatmap(),
+              onToggleDarkTiles: () => ref
+                  .read(mapUiModeNotifierProvider.notifier)
+                  .toggleDarkTiles(),
+              onZoomToFit: () => _animatedMapController.animatedFitCamera(
+                cameraFit: CameraFit.bounds(
+                  bounds: _macedoniaBounds,
+                  padding: const EdgeInsets.all(AppSpacing.xxl),
+                  maxZoom: 8,
+                  minZoom: 6,
+                ),
+              ),
+              onToggleRotationLock: () {
+                final bool next = !uiMode.rotationLocked;
+                ref
+                    .read(mapUiModeNotifierProvider.notifier)
+                    .setRotationLocked(next);
+                if (next) _animatedMapController.animatedRotateReset();
+              },
+              onLocateMe: _handleLocateMe,
+            ),
+          ),
+          if (selection.selected != null)
+            MapSitePreviewPositioned(
+              site: selection.selected!,
+              userLocation: location.userLocation,
+              coords: coords,
+              useDarkTiles: uiMode.useDarkTiles,
+              onGetDirections: (site) => _openDirectionsForSite(site, coords),
+              onViewDetails: () => _openSiteDetail(selection.selected!),
+              onDismiss: () =>
+                  ref.read(mapSelectionNotifierProvider.notifier).deselect(),
+            ),
+        ],
       ),
     );
   }

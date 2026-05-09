@@ -317,7 +317,9 @@ class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
                       onNotificationTap: _openNotifications,
                     ),
                   ),
-                  const SliverToBoxAdapter(child: FeedSectionHeader()),
+                  SliverToBoxAdapter(
+                    child: FeedSectionHeader(),
+                  ),
                   SliverToBoxAdapter(
                     child: FeedFilterBar(
                       activeFilter: activeFilter,

@@ -32,6 +32,8 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
   bool _lastGlobalListLoadFailed = false;
   bool _isShowingStaleCachedEvents = false;
   DateTime? _lastSuccessfulListRefreshAt;
+  double? _userLatitudeHint;
+  double? _userLongitudeHint;
 
   Future<void> _persistEventsDisk() async {
     await _cache.writeEvents(_events, forActiveListParams: _activeParams);
@@ -160,7 +162,19 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
         path.write('&dateTo=${Uri.encodeQueryComponent(dt)}');
       }
     }
+    if (_userLatitudeHint != null && _userLongitudeHint != null) {
+      path.write('&lat=${_userLatitudeHint!.toStringAsFixed(6)}');
+      path.write('&lng=${_userLongitudeHint!.toStringAsFixed(6)}');
+    }
     return path.toString();
+  }
+
+  void setUserLocationHint({
+    required double latitude,
+    required double longitude,
+  }) {
+    _userLatitudeHint = latitude;
+    _userLongitudeHint = longitude;
   }
 
   List<EcoEvent> _eventsFromListResponse(ApiResponse response) {

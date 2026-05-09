@@ -167,6 +167,24 @@
   outline: none;
 }
 
+.statusForm textarea {
+  max-width: 28rem;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(8, 54, 39, 0.14);
+  background: rgba(255, 255, 255, 0.95);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: rgba(8, 54, 39, 0.95);
+  resize: vertical;
+}
+
+.statusForm textarea:hover,
+.statusForm textarea:focus {
+  border-color: rgba(37, 219, 134, 0.4);
+  outline: none;
+}
+
 .statusPill {
   display: inline-flex;
   padding: 4px var(--space-3);

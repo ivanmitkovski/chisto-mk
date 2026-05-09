@@ -1,0 +1,9 @@
+{
+  "title": "Chisto Map — template",
+  "panels": [
+    { "title": "map_request_duration_ms_p95", "type": "stat", "targets": [{ "expr": "map_mode_zoom_latency_ms_p95" }] },
+    { "title": "map_cache_hit_rate", "type": "stat", "targets": [{ "expr": "map_cache_hit_rate" }] },
+    { "title": "map_outbox_pending", "type": "stat", "targets": [{ "expr": "map_outbox_lag_ms" }] }
+  ],
+  "schemaVersion": 38
+}

@@ -146,7 +146,7 @@ packages:
     source: hosted
     version: "0.4.2"
   clock:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: clock
       sha256: fddb70d9b5277016c77a80201021d40a2247104d9f4aa7bab7157b7e3f05b84b
@@ -225,6 +225,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.8"
+  dart_earcut:
+    dependency: transitive
+    description:
+      name: dart_earcut
+      sha256: e485001bfc05dcbc437d7bfb666316182e3522d4c3f9668048e004d0eb2ce43b
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.0"
   dbus:
     dependency: transitive
     description:
@@ -484,26 +492,26 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_map
-      sha256: "87cc8349b8fa5dccda5af50018c7374b6645334a0d680931c1fe11bce88fa5bb"
+      sha256: "2ecb34619a4be19df6f40c2f8dce1591675b4eff7a6857bd8f533706977385da"
       url: "https://pub.dev"
     source: hosted
-    version: "6.2.1"
+    version: "7.0.2"
   flutter_map_animations:
     dependency: "direct main"
     description:
       name: flutter_map_animations
-      sha256: e4b929632b43a7939ce07a7cdb05613abb25e1996c9767c16469d0cbb9e1c4a9
+      sha256: "08233f89919049a3601e785d32e9d1d9e1faac6578190150f1d7495fc1050d36"
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.0"
+    version: "0.8.0"
   flutter_map_heatmap:
     dependency: "direct main"
     description:
       name: flutter_map_heatmap
-      sha256: "0544a980da9d29ec41bd27f507e46655306d0499dfb98379497f9360a139da39"
+      sha256: "9b3062c8bc68caceb85d8cbad1c2f475809b07deb0b292717569ed4ceefb9c46"
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.7"
+    version: "0.0.8"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
@@ -711,6 +719,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.0"
+  hive:
+    dependency: "direct main"
+    description:
+      name: hive
+      sha256: "8dcf6db979d7933da8217edcec84e9df1bdb4e4edc7fc77dbd5aa74356d6d941"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.3"
+  hive_flutter:
+    dependency: "direct main"
+    description:
+      name: hive_flutter
+      sha256: dca1da446b1d808a51689fb5d0c6c9510c0a2ba01e22805d492c73b68e33eecc
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.0"
   hooks:
     dependency: transitive
     description:
@@ -1825,6 +1849,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
+  workmanager:
+    dependency: "direct main"
+    description:
+      name: workmanager
+      sha256: ed13530cccd28c5c9959ad42d657cd0666274ca74c56dea0ca183ddd527d3a00
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.5.2"
   xdg_directories:
     dependency: transitive
     description:

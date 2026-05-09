@@ -90,10 +90,14 @@ class _ChatLocationPickerSheetState extends State<ChatLocationPickerSheet>
     }
   }
 
-  void _onMapPositionChanged(MapPosition position, bool hasGesture) {
-    if (hasGesture && position.center != null) {
+  void _onMapPositionChanged(dynamic position, bool hasGesture) {
+    if (hasGesture) {
+      final LatLng? center = position.center as LatLng?;
+      if (center == null) {
+        return;
+      }
       setState(() {
-        _center = position.center!;
+        _center = center;
         _label = null;
       });
     }
@@ -135,7 +139,8 @@ class _ChatLocationPickerSheetState extends State<ChatLocationPickerSheet>
                     options: MapOptions(
                       initialCenter: _center,
                       initialZoom: 15,
-                      onPositionChanged: _onMapPositionChanged,
+                      onPositionChanged: (position, bool hasGesture) =>
+                          _onMapPositionChanged(position, hasGesture),
                       onMapEvent: (MapEvent event) {
                         if (event is MapEventMoveEnd) {
                           _reverseGeocode(_center);

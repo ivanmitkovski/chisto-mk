@@ -6,4 +6,6 @@ export const MACEDONIA_BOUNDS = {
   maxLng: 23.1,
 };
 export const INITIAL_ZOOM = 8;
-export const CITY_ZOOM = 12;
+
+/** Server returns synthetic cluster rows at this zoom and below (see `useSitesMap`). */
+export const SERVER_CLUSTER_MAX_ZOOM = 8;

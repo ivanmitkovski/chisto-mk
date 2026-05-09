@@ -2996,6 +2996,804 @@ abstract class AppLocalizations {
   /// **'Could not open Maps'**
   String get mapOpenMapsFailed;
 
+  /// No description provided for @mapSearchRecentsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent'**
+  String get mapSearchRecentsLabel;
+
+  /// No description provided for @mapSearchClearRecentsButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get mapSearchClearRecentsButton;
+
+  /// No description provided for @mapSearchEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Search pollution sites'**
+  String get mapSearchEmptyTitle;
+
+  /// No description provided for @mapSearchEmptySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Type a title, category, or description. Or tap a recent search below.'**
+  String get mapSearchEmptySubtitle;
+
+  /// No description provided for @mapSearchNoResultsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching sites'**
+  String get mapSearchNoResultsTitle;
+
+  /// No description provided for @mapSearchNoResultsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Try different words or clear filters on the map.'**
+  String get mapSearchNoResultsSubtitle;
+
+  /// No description provided for @mapSearchResultsBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} results'**
+  String mapSearchResultsBadge(int count);
+
+  /// No description provided for @mapSearchRemoteLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Searching all sites…'**
+  String get mapSearchRemoteLoading;
+
+  /// No description provided for @mapSearchRemoteError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not search all sites.'**
+  String get mapSearchRemoteError;
+
+  /// No description provided for @mapSearchRemoteRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get mapSearchRemoteRetry;
+
+  /// No description provided for @mapSearchSectionOnMap.
+  ///
+  /// In en, this message translates to:
+  /// **'On this map'**
+  String get mapSearchSectionOnMap;
+
+  /// No description provided for @mapSearchSectionEverywhere.
+  ///
+  /// In en, this message translates to:
+  /// **'More results'**
+  String get mapSearchSectionEverywhere;
+
+  /// No description provided for @mapSearchSuggestionsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggestions'**
+  String get mapSearchSuggestionsLabel;
+
+  /// No description provided for @mapUpdatedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'Map updated'**
+  String get mapUpdatedToast;
+
+  /// No description provided for @mapErrorAutoRetryFootnote.
+  ///
+  /// In en, this message translates to:
+  /// **'We’ll retry automatically in a few seconds. You can also tap Try again.'**
+  String get mapErrorAutoRetryFootnote;
+
+  /// No description provided for @mapFilteredSitesAnnounce.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{One site shown on the map} other{{count} sites shown on the map}}'**
+  String mapFilteredSitesAnnounce(int count);
+
+  /// No description provided for @mapClusterExpansionAnnounce.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{One site separated on the map} other{{count} sites separated on the map}}'**
+  String mapClusterExpansionAnnounce(int count);
+
+  /// No description provided for @mapScreenRouteSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Pollution map. Tap pins to view site details.'**
+  String get mapScreenRouteSemantic;
+
+  /// No description provided for @mapLoadingSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading map'**
+  String get mapLoadingSemantic;
+
+  /// No description provided for @mapSiteNotOnMapSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'This site is not available on the map yet.'**
+  String get mapSiteNotOnMapSnack;
+
+  /// No description provided for @mapOpenLocationFailedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open this location on the map.'**
+  String get mapOpenLocationFailedSnack;
+
+  /// No description provided for @mapEmptyFiltersLiveRegion.
+  ///
+  /// In en, this message translates to:
+  /// **'No sites match your current filters'**
+  String get mapEmptyFiltersLiveRegion;
+
+  /// No description provided for @mapEmptyFiltersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No sites match your filters'**
+  String get mapEmptyFiltersTitle;
+
+  /// No description provided for @mapEmptyFiltersSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Try adjusting filters or search.'**
+  String get mapEmptyFiltersSubtitle;
+
+  /// No description provided for @mapDirectionsSheetOpenInMaps.
+  ///
+  /// In en, this message translates to:
+  /// **'Open in Maps'**
+  String get mapDirectionsSheetOpenInMaps;
+
+  /// No description provided for @mapDirectionsSheetViewLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'View location'**
+  String get mapDirectionsSheetViewLocation;
+
+  /// No description provided for @mapDirectionsSheetSubtitleDirections.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose which app to get directions.'**
+  String get mapDirectionsSheetSubtitleDirections;
+
+  /// No description provided for @mapDirectionsSheetSubtitleViewLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose which app to view this location on a map.'**
+  String get mapDirectionsSheetSubtitleViewLocation;
+
+  /// No description provided for @mapDirectionsAppleMapsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Apple Maps'**
+  String get mapDirectionsAppleMapsTitle;
+
+  /// No description provided for @mapDirectionsAppleMapsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Built-in maps on this device.'**
+  String get mapDirectionsAppleMapsSubtitle;
+
+  /// No description provided for @mapDirectionsGoogleMapsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Google Maps'**
+  String get mapDirectionsGoogleMapsTitle;
+
+  /// No description provided for @mapDirectionsGoogleMapsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Web and Google Maps app.'**
+  String get mapDirectionsGoogleMapsSubtitle;
+
+  /// No description provided for @mapSemanticCloseActionsMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Close actions menu'**
+  String get mapSemanticCloseActionsMenu;
+
+  /// No description provided for @mapSemanticOpenActionsMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Open actions menu'**
+  String get mapSemanticOpenActionsMenu;
+
+  /// No description provided for @mapSemanticHideHeatmap.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide heatmap'**
+  String get mapSemanticHideHeatmap;
+
+  /// No description provided for @mapSemanticShowHeatmap.
+  ///
+  /// In en, this message translates to:
+  /// **'Show heatmap'**
+  String get mapSemanticShowHeatmap;
+
+  /// No description provided for @mapSemanticSwitchToLightMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to light map'**
+  String get mapSemanticSwitchToLightMap;
+
+  /// No description provided for @mapSemanticSwitchToDarkMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to dark map'**
+  String get mapSemanticSwitchToDarkMap;
+
+  /// No description provided for @mapSemanticZoomWholeCountry.
+  ///
+  /// In en, this message translates to:
+  /// **'Zoom out to show whole country'**
+  String get mapSemanticZoomWholeCountry;
+
+  /// No description provided for @mapSemanticUnlockRotation.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock map rotation'**
+  String get mapSemanticUnlockRotation;
+
+  /// No description provided for @mapSemanticLockRotation.
+  ///
+  /// In en, this message translates to:
+  /// **'Lock map rotation'**
+  String get mapSemanticLockRotation;
+
+  /// No description provided for @mapSemanticCenterOnMyLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Center map on my location'**
+  String get mapSemanticCenterOnMyLocation;
+
+  /// No description provided for @mapSemanticSearchSites.
+  ///
+  /// In en, this message translates to:
+  /// **'Search sites'**
+  String get mapSemanticSearchSites;
+
+  /// No description provided for @mapSemanticResetRotationNorth.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset map rotation to north'**
+  String get mapSemanticResetRotationNorth;
+
+  /// No description provided for @mapFilterButtonSemanticPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter sites.'**
+  String get mapFilterButtonSemanticPrefix;
+
+  /// No description provided for @mapFilterButtonSemanticNoMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'No sites match current filters in this area.'**
+  String get mapFilterButtonSemanticNoMatch;
+
+  /// No description provided for @mapFilterButtonSemanticNoSites.
+  ///
+  /// In en, this message translates to:
+  /// **'No sites in this area.'**
+  String get mapFilterButtonSemanticNoSites;
+
+  /// No description provided for @mapFilterButtonSemanticSitesCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} sites in this area.'**
+  String mapFilterButtonSemanticSitesCount(int count);
+
+  /// No description provided for @mapFilterButtonSemanticSuffix.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to open filters.'**
+  String get mapFilterButtonSemanticSuffix;
+
+  /// No description provided for @mapFilterCountNoMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'No match'**
+  String get mapFilterCountNoMatch;
+
+  /// No description provided for @mapFilterCountNoSites.
+  ///
+  /// In en, this message translates to:
+  /// **'No sites'**
+  String get mapFilterCountNoSites;
+
+  /// No description provided for @mapFilterSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter sites'**
+  String get mapFilterSheetTitle;
+
+  /// No description provided for @mapFilterCloseTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Close filters'**
+  String get mapFilterCloseTooltip;
+
+  /// No description provided for @mapFilterSectionSiteStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Site status'**
+  String get mapFilterSectionSiteStatus;
+
+  /// No description provided for @mapFilterSectionArea.
+  ///
+  /// In en, this message translates to:
+  /// **'Municipality / area'**
+  String get mapFilterSectionArea;
+
+  /// No description provided for @mapFilterSectionPollutionType.
+  ///
+  /// In en, this message translates to:
+  /// **'Pollution type'**
+  String get mapFilterSectionPollutionType;
+
+  /// No description provided for @mapFilterSectionVisibility.
+  ///
+  /// In en, this message translates to:
+  /// **'Visibility'**
+  String get mapFilterSectionVisibility;
+
+  /// No description provided for @mapFilterShowArchivedSites.
+  ///
+  /// In en, this message translates to:
+  /// **'Show archived sites'**
+  String get mapFilterShowArchivedSites;
+
+  /// No description provided for @mapFilterShowingLiveRegion.
+  ///
+  /// In en, this message translates to:
+  /// **'{visible} of {total} pollution sites visible in this area'**
+  String mapFilterShowingLiveRegion(int visible, int total);
+
+  /// No description provided for @mapFilterShowingInline.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing {visible} of {total}'**
+  String mapFilterShowingInline(int visible, int total);
+
+  /// No description provided for @mapFilterPollutionTypeSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter {type} sites'**
+  String mapFilterPollutionTypeSemantic(String type);
+
+  /// No description provided for @mapFilterPollutionTypeHintOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Double tap to show this type'**
+  String get mapFilterPollutionTypeHintOff;
+
+  /// No description provided for @mapFilterPollutionTypeHintOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Double tap to hide this type'**
+  String get mapFilterPollutionTypeHintOn;
+
+  /// No description provided for @mapFilterPollutionTypeUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown type'**
+  String get mapFilterPollutionTypeUnknown;
+
+  /// No description provided for @mapFilterSiteStatusReported.
+  ///
+  /// In en, this message translates to:
+  /// **'Reported'**
+  String get mapFilterSiteStatusReported;
+
+  /// No description provided for @mapFilterSiteStatusVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified'**
+  String get mapFilterSiteStatusVerified;
+
+  /// No description provided for @mapFilterSiteStatusCleanupScheduled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cleanup scheduled'**
+  String get mapFilterSiteStatusCleanupScheduled;
+
+  /// No description provided for @mapFilterSiteStatusInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'In progress'**
+  String get mapFilterSiteStatusInProgress;
+
+  /// No description provided for @mapFilterSiteStatusCleaned.
+  ///
+  /// In en, this message translates to:
+  /// **'Cleaned'**
+  String get mapFilterSiteStatusCleaned;
+
+  /// No description provided for @mapFilterSiteStatusDisputed.
+  ///
+  /// In en, this message translates to:
+  /// **'Disputed'**
+  String get mapFilterSiteStatusDisputed;
+
+  /// No description provided for @mapFilterSiteStatusArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived'**
+  String get mapFilterSiteStatusArchived;
+
+  /// No description provided for @mapFilterSiteStatusUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown status'**
+  String get mapFilterSiteStatusUnknown;
+
+  /// No description provided for @mapFilterSiteStatusSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter {status} sites'**
+  String mapFilterSiteStatusSemantic(String status);
+
+  /// No description provided for @mapFilterSiteStatusHintOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Double tap to show this status'**
+  String get mapFilterSiteStatusHintOff;
+
+  /// No description provided for @mapFilterSiteStatusHintOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Double tap to hide this status'**
+  String get mapFilterSiteStatusHintOn;
+
+  /// No description provided for @mapGeoWholeCountry.
+  ///
+  /// In en, this message translates to:
+  /// **'Whole country'**
+  String get mapGeoWholeCountry;
+
+  /// No description provided for @mapGeoSkopjeWhole.
+  ///
+  /// In en, this message translates to:
+  /// **'All Skopje municipalities'**
+  String get mapGeoSkopjeWhole;
+
+  /// No description provided for @mapGeoSkopje.
+  ///
+  /// In en, this message translates to:
+  /// **'Skopje'**
+  String get mapGeoSkopje;
+
+  /// No description provided for @mapGeoSkopjeCentar.
+  ///
+  /// In en, this message translates to:
+  /// **'Centar'**
+  String get mapGeoSkopjeCentar;
+
+  /// No description provided for @mapGeoSkopjeAerodrom.
+  ///
+  /// In en, this message translates to:
+  /// **'Aerodrom'**
+  String get mapGeoSkopjeAerodrom;
+
+  /// No description provided for @mapGeoSkopjeKarposh.
+  ///
+  /// In en, this message translates to:
+  /// **'Karpoš'**
+  String get mapGeoSkopjeKarposh;
+
+  /// No description provided for @mapGeoSkopjeChair.
+  ///
+  /// In en, this message translates to:
+  /// **'Čair'**
+  String get mapGeoSkopjeChair;
+
+  /// No description provided for @mapGeoSkopjeKiselaVoda.
+  ///
+  /// In en, this message translates to:
+  /// **'Kisela Voda'**
+  String get mapGeoSkopjeKiselaVoda;
+
+  /// No description provided for @mapGeoSkopjeGaziBaba.
+  ///
+  /// In en, this message translates to:
+  /// **'Gazi Baba'**
+  String get mapGeoSkopjeGaziBaba;
+
+  /// No description provided for @mapGeoSkopjeButel.
+  ///
+  /// In en, this message translates to:
+  /// **'Butel'**
+  String get mapGeoSkopjeButel;
+
+  /// No description provided for @mapGeoSkopjeGjorcePetrov.
+  ///
+  /// In en, this message translates to:
+  /// **'Gjorče Petrov'**
+  String get mapGeoSkopjeGjorcePetrov;
+
+  /// No description provided for @mapGeoSkopjeSaraj.
+  ///
+  /// In en, this message translates to:
+  /// **'Saraj'**
+  String get mapGeoSkopjeSaraj;
+
+  /// No description provided for @mapGeoBitola.
+  ///
+  /// In en, this message translates to:
+  /// **'Bitola'**
+  String get mapGeoBitola;
+
+  /// No description provided for @mapGeoKumanovo.
+  ///
+  /// In en, this message translates to:
+  /// **'Kumanovo'**
+  String get mapGeoKumanovo;
+
+  /// No description provided for @mapGeoPrilep.
+  ///
+  /// In en, this message translates to:
+  /// **'Prilep'**
+  String get mapGeoPrilep;
+
+  /// No description provided for @mapGeoTetovo.
+  ///
+  /// In en, this message translates to:
+  /// **'Tetovo'**
+  String get mapGeoTetovo;
+
+  /// No description provided for @mapGeoVeles.
+  ///
+  /// In en, this message translates to:
+  /// **'Veles'**
+  String get mapGeoVeles;
+
+  /// No description provided for @mapGeoOhrid.
+  ///
+  /// In en, this message translates to:
+  /// **'Ohrid'**
+  String get mapGeoOhrid;
+
+  /// No description provided for @mapGeoStip.
+  ///
+  /// In en, this message translates to:
+  /// **'Štip'**
+  String get mapGeoStip;
+
+  /// No description provided for @mapGeoGostivar.
+  ///
+  /// In en, this message translates to:
+  /// **'Gostivar'**
+  String get mapGeoGostivar;
+
+  /// No description provided for @mapGeoStrumica.
+  ///
+  /// In en, this message translates to:
+  /// **'Strumica'**
+  String get mapGeoStrumica;
+
+  /// No description provided for @mapGeoKavadarci.
+  ///
+  /// In en, this message translates to:
+  /// **'Kavadarci'**
+  String get mapGeoKavadarci;
+
+  /// No description provided for @mapGeoKocani.
+  ///
+  /// In en, this message translates to:
+  /// **'Kočani'**
+  String get mapGeoKocani;
+
+  /// No description provided for @mapGeoStruga.
+  ///
+  /// In en, this message translates to:
+  /// **'Struga'**
+  String get mapGeoStruga;
+
+  /// No description provided for @mapGeoRadovis.
+  ///
+  /// In en, this message translates to:
+  /// **'Radoviš'**
+  String get mapGeoRadovis;
+
+  /// No description provided for @mapGeoGevgelija.
+  ///
+  /// In en, this message translates to:
+  /// **'Gevgelija'**
+  String get mapGeoGevgelija;
+
+  /// No description provided for @mapGeoKrivaPalanka.
+  ///
+  /// In en, this message translates to:
+  /// **'Kriva Palanka'**
+  String get mapGeoKrivaPalanka;
+
+  /// No description provided for @mapGeoSvetiNikole.
+  ///
+  /// In en, this message translates to:
+  /// **'Sveti Nikole'**
+  String get mapGeoSvetiNikole;
+
+  /// No description provided for @mapGeoVinica.
+  ///
+  /// In en, this message translates to:
+  /// **'Vinica'**
+  String get mapGeoVinica;
+
+  /// No description provided for @mapGeoDelcevo.
+  ///
+  /// In en, this message translates to:
+  /// **'Delčevo'**
+  String get mapGeoDelcevo;
+
+  /// No description provided for @mapGeoProbistip.
+  ///
+  /// In en, this message translates to:
+  /// **'Probishtip'**
+  String get mapGeoProbistip;
+
+  /// No description provided for @mapGeoBerovo.
+  ///
+  /// In en, this message translates to:
+  /// **'Berovo'**
+  String get mapGeoBerovo;
+
+  /// No description provided for @mapGeoKratovo.
+  ///
+  /// In en, this message translates to:
+  /// **'Kratovo'**
+  String get mapGeoKratovo;
+
+  /// No description provided for @mapGeoKicevo.
+  ///
+  /// In en, this message translates to:
+  /// **'Kičevo'**
+  String get mapGeoKicevo;
+
+  /// No description provided for @mapGeoMakedonskiBrod.
+  ///
+  /// In en, this message translates to:
+  /// **'Makedonski Brod'**
+  String get mapGeoMakedonskiBrod;
+
+  /// No description provided for @mapGeoNegotino.
+  ///
+  /// In en, this message translates to:
+  /// **'Negotino'**
+  String get mapGeoNegotino;
+
+  /// No description provided for @mapGeoResen.
+  ///
+  /// In en, this message translates to:
+  /// **'Resen'**
+  String get mapGeoResen;
+
+  /// No description provided for @mapGeoUnknownArea.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown area'**
+  String get mapGeoUnknownArea;
+
+  /// No description provided for @mapPinPreviewSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{title}, {severity}. Double tap to preview.'**
+  String mapPinPreviewSemantic(String title, String severity);
+
+  /// No description provided for @mapClusterSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 pollution site clustered. Double tap to expand.} other{{count} pollution sites clustered. Double tap to expand.}}'**
+  String mapClusterSemantic(int count);
+
+  /// No description provided for @mapUserLocationSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Your current location'**
+  String get mapUserLocationSemantic;
+
+  /// No description provided for @mapPreviewDismissAnnouncement.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismissed site preview.'**
+  String get mapPreviewDismissAnnouncement;
+
+  /// No description provided for @mapDistanceMetersAway.
+  ///
+  /// In en, this message translates to:
+  /// **'{meters} m away'**
+  String mapDistanceMetersAway(int meters);
+
+  /// No description provided for @mapDistanceKilometersAway.
+  ///
+  /// In en, this message translates to:
+  /// **'{kilometers} km away'**
+  String mapDistanceKilometersAway(String kilometers);
+
+  /// No description provided for @mapPreviewSemanticLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected site: {title}. {distance}. Double tap preview for details. Swipe down to dismiss.'**
+  String mapPreviewSemanticLabel(String title, String distance);
+
+  /// No description provided for @mapPreviewSemanticHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Use actions for directions or full details.'**
+  String get mapPreviewSemanticHint;
+
+  /// No description provided for @mapPreviewDirections.
+  ///
+  /// In en, this message translates to:
+  /// **'Directions'**
+  String get mapPreviewDirections;
+
+  /// No description provided for @mapPreviewDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get mapPreviewDetails;
+
+  /// No description provided for @mapSyncNoticeSemanticRefreshHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Double tap to refresh map now.'**
+  String get mapSyncNoticeSemanticRefreshHint;
+
+  /// No description provided for @mapSyncLiveUpdatesDelayed.
+  ///
+  /// In en, this message translates to:
+  /// **'Live updates delayed. Retrying quietly…'**
+  String get mapSyncLiveUpdatesDelayed;
+
+  /// No description provided for @mapSyncConnectionUnstable.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection unstable. Refreshing in background…'**
+  String get mapSyncConnectionUnstable;
+
+  /// No description provided for @mapSyncOfflineSnapshot.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline. Showing your last saved map snapshot.'**
+  String get mapSyncOfflineSnapshot;
+
+  /// No description provided for @mapSyncOfflineSnapshotJustNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline. Showing your last saved map snapshot from just now.'**
+  String get mapSyncOfflineSnapshotJustNow;
+
+  /// No description provided for @mapSyncOfflineSnapshotMinutesAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline. Showing your last saved map snapshot from {minutes}m ago.'**
+  String mapSyncOfflineSnapshotMinutesAgo(int minutes);
+
+  /// No description provided for @mapSyncOfflineSnapshotHoursAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline. Showing your last saved map snapshot from {hours}h ago.'**
+  String mapSyncOfflineSnapshotHoursAgo(int hours);
+
+  /// No description provided for @mapSearchLocationUnavailableSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Location is unavailable for this site.'**
+  String get mapSearchLocationUnavailableSnack;
+
+  /// No description provided for @mapSearchFieldSemanticHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Type a title, category, or description'**
+  String get mapSearchFieldSemanticHint;
+
+  /// No description provided for @mapSearchBarHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search sites…'**
+  String get mapSearchBarHint;
+
   /// No description provided for @locationRetryAddressSemantic.
   ///
   /// In en, this message translates to:
@@ -6938,6 +7736,12 @@ abstract class AppLocalizations {
   /// **'Cancel'**
   String get searchModalCancel;
 
+  /// No description provided for @searchModalPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Search pollution sites'**
+  String get searchModalPlaceholder;
+
   /// No description provided for @appSmartImageRetry.
   ///
   /// In en, this message translates to:
@@ -9172,6 +9976,12 @@ abstract class AppLocalizations {
   /// **'Retry'**
   String get homeSiteCleaningRetry;
 
+  /// No description provided for @homeSiteCleaningLoadingSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading eco actions.'**
+  String get homeSiteCleaningLoadingSemantic;
+
   /// No description provided for @eventsDistanceLessThan100m.
   ///
   /// In en, this message translates to:
@@ -10351,6 +11161,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add to draft'**
   String get reportDraftIncomingPhotoAdd;
+
+  /// No description provided for @savedMapAreasTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved map areas'**
+  String get savedMapAreasTitle;
+
+  /// No description provided for @savedMapAreasPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline regions and background downloads will appear here.'**
+  String get savedMapAreasPlaceholder;
+
+  /// No description provided for @mapWhatsNewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Map updates'**
+  String get mapWhatsNewTitle;
+
+  /// No description provided for @mapWhatsNewBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Smarter prefetch, stable clusters, and safer map pipelines.'**
+  String get mapWhatsNewBody;
 }
 
 class _AppLocalizationsDelegate

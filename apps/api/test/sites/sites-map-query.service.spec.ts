@@ -1,146 +1,162 @@
 import { SitesMapQueryService } from '../../src/sites/sites-map-query.service';
+import { MapCacheService } from '../../src/sites/map/map-cache.service';
+import { MapObservabilityService } from '../../src/sites/map/map-observability.service';
+import { MapQueryValidatorService } from '../../src/sites/map/map-query-validator.service';
+import { MapResponseProjectorService } from '../../src/sites/map/map-response-projector.service';
+import { MapSiteRepositoryService } from '../../src/sites/map/map-site-repository.service';
 
-function makeMapService(
-  prisma: any,
-  reportsUpload?: { signUrls: jest.Mock },
-): SitesMapQueryService {
-  const upload =
-    reportsUpload ?? ({ signUrls: jest.fn(async (v: string[]) => v) } as any);
-  return new SitesMapQueryService(prisma, upload);
+function makeMapService(input?: {
+  validateQuery?: jest.Mock;
+  memoryCache?: any;
+  redisCache?: any;
+  findSites?: jest.Mock;
+  projected?: any;
+}) {
+  const validator = {
+    validateQuery: input?.validateQuery ?? jest.fn(),
+  } as unknown as MapQueryValidatorService;
+  const cache = {
+    buildCacheKey: jest.fn(() => 'cache-key'),
+    getFromMemory: jest.fn(() => input?.memoryCache ?? null),
+    getFromRedis: jest.fn(async () => input?.redisCache ?? null),
+    set: jest.fn(async () => undefined),
+    invalidate: jest.fn(async () => undefined),
+  } as unknown as MapCacheService;
+  const metrics = {
+    recordRequest: jest.fn(),
+    recordZoomTier: jest.fn(),
+  } as unknown as MapObservabilityService;
+  const repository = {
+    findSites:
+      input?.findSites ??
+      jest.fn(async () => ({
+        rows: [],
+        usedViewportBbox: false,
+        usedFallback: false,
+      })),
+    findClusters: jest.fn(),
+    findHeatmap: jest.fn(),
+    resolveDataVersion: jest.fn(async () => '0:0'),
+  } as unknown as MapSiteRepositoryService;
+  const projector = {
+    buildResponse:
+      jest.fn(async () => input?.projected ?? { data: [], meta: { signedMediaExpiresAt: '', serverTime: '', queryMode: 'radius', dataVersion: 'v1' } }),
+  } as unknown as MapResponseProjectorService;
+  return {
+    service: new SitesMapQueryService(validator, cache, metrics, repository, projector),
+    validator,
+    cache,
+    metrics,
+    repository,
+    projector,
+  };
 }
 
 describe('SitesMapQueryService', () => {
-  it('rejects partial viewport bounds for map queries', async () => {
-    const service = makeMapService({} as any);
-    await expect(
-      service.findAllForMap({
-        lat: 41.6,
-        lng: 21.7,
-        radiusKm: 20,
-        limit: 120,
-        minLat: 41.55,
-      } as any),
-    ).rejects.toMatchObject({
-      response: { code: 'INVALID_MAP_VIEWPORT' },
-    });
-  });
-
-  it('uses dedicated viewport-aware map query without feed ranking', async () => {
-    const createdAt = new Date('2026-03-27T10:00:00.000Z');
-    const siteRow = {
-      id: 'site_map_1',
-      latitude: 41.61,
-      longitude: 21.75,
-      address: null,
-      description: 'Map only',
-      status: 'REPORTED',
-      createdAt,
-      updatedAt: createdAt,
-      upvotesCount: 3,
-      commentsCount: 1,
-      savesCount: 0,
-      sharesCount: 0,
-      _count: { reports: 1 },
-      reports: [
-        {
-          title: 'Map title',
-          description: 'Map desc',
-          mediaUrls: ['media-1'],
-          category: 'illegal_waste',
-          createdAt,
-          reportNumber: 'R-44',
+  it('delegates query validation before map fetch', async () => {
+    const validateQuery = jest.fn();
+    const { service } = makeMapService({
+      validateQuery,
+      projected: {
+        data: [],
+        meta: {
+          signedMediaExpiresAt: '2026-03-27T10:00:00.000Z',
+          serverTime: '2026-03-27T10:00:00.000Z',
+          queryMode: 'radius',
+          dataVersion: 'v1',
         },
-      ],
-    };
-    const prismaMock = {
-      $queryRaw: jest
-        .fn()
-        .mockResolvedValueOnce([{ ok: 1 }])
-        .mockResolvedValueOnce([{ id: 'site_map_1' }]),
-      site: {
-        findMany: jest.fn(async () => [siteRow]),
       },
-    } as any;
-    const service = makeMapService(prismaMock, {
-      signUrls: jest.fn(async () => ['signed-media']),
-    } as any);
-
-    const result = await service.findAllForMap({
-      lat: 41.6086,
-      lng: 21.7453,
-      radiusKm: 20,
-      limit: 120,
-      minLat: 41.55,
-      maxLat: 41.7,
-      minLng: 21.6,
-      maxLng: 21.85,
-    } as any);
-
-    expect(prismaMock.$queryRaw).toHaveBeenCalled();
-    expect(prismaMock.site.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: { id: { in: ['site_map_1'] } },
-        select: expect.any(Object),
-      }),
-    );
-    expect(result.data[0]).toEqual(
-      expect.objectContaining({
-        id: 'site_map_1',
-        latestReportMediaUrls: ['signed-media'],
-      }),
-    );
-    expect(result.meta?.signedMediaExpiresAt).toEqual(expect.any(String));
-    expect(Date.parse(result.meta!.signedMediaExpiresAt)).not.toBeNaN();
+    });
+    await service.findAllForMap({ lat: 41.6, lng: 21.7, radiusKm: 20, limit: 120 } as any);
+    expect(validateQuery).toHaveBeenCalled();
   });
 
-  it('falls back to Prisma bbox map query when PostGIS extension is missing', async () => {
-    const createdAt = new Date('2026-03-27T10:00:00.000Z');
-    const prismaMock = {
-      $queryRaw: jest.fn().mockResolvedValueOnce([]),
-      site: {
-        findMany: jest.fn(async () => [
-          {
-            id: 'site_legacy_1',
-            latitude: 41.61,
-            longitude: 21.75,
-            address: null,
-            description: null,
-            status: 'REPORTED',
-            createdAt,
-            updatedAt: createdAt,
-            upvotesCount: 0,
-            commentsCount: 0,
-            savesCount: 0,
-            sharesCount: 0,
-            _count: { reports: 0 },
-            reports: [],
-          },
-        ]),
+  it('returns memory cache hit when available', async () => {
+    const cached = {
+      data: [{ id: 'site_1' }],
+      meta: {
+        signedMediaExpiresAt: '2026-03-27T10:00:00.000Z',
+        serverTime: '2026-03-27T10:00:00.000Z',
+        queryMode: 'radius',
+        dataVersion: 'v1',
       },
-    } as any;
-    const service = makeMapService(prismaMock, {
-      signUrls: jest.fn(async () => []),
-    } as any);
+    };
+    const { service, repository } = makeMapService({ memoryCache: cached });
+    const out = await service.findAllForMap({ lat: 41.6, lng: 21.7, radiusKm: 10, limit: 200 } as any);
+    expect(out).toEqual(cached);
+    expect((repository.findSites as jest.Mock).mock.calls.length).toBe(0);
+  });
 
+  it('loads from repository and projector when cache miss', async () => {
+    const findSites = jest.fn(async () => ({
+      rows: [{ id: 'site_2' }],
+      usedViewportBbox: true,
+      usedFallback: false,
+    }));
+    const projected = {
+      data: [{ id: 'site_2' }],
+      meta: {
+        signedMediaExpiresAt: '2026-03-27T10:00:00.000Z',
+        serverTime: '2026-03-27T10:00:00.000Z',
+        queryMode: 'viewport',
+        dataVersion: 'v2',
+      },
+    };
+    const { service, projector } = makeMapService({ findSites, projected });
+    const out = await service.findAllForMap({ lat: 41.6, lng: 21.7, radiusKm: 10, limit: 200 } as any);
+    expect(findSites).toHaveBeenCalled();
+    expect(projector.buildResponse).toHaveBeenCalled();
+    expect(out).toEqual(projected);
+  });
+
+  it('keeps includeArchived in query semantics for repository/cache key', async () => {
+    const findSites = jest.fn(async () => ({
+      rows: [],
+      usedViewportBbox: true,
+      usedFallback: false,
+    }));
+    const { service, cache } = makeMapService({ findSites });
     await service.findAllForMap({
-      lat: 41.6086,
-      lng: 21.7453,
-      radiusKm: 20,
+      lat: 41.6,
+      lng: 21.7,
+      radiusKm: 10,
       limit: 120,
-      minLat: 41.55,
-      maxLat: 41.7,
-      minLng: 21.6,
-      maxLng: 21.85,
+      includeArchived: true,
     } as any);
+    expect(findSites).toHaveBeenCalledWith(expect.objectContaining({ includeArchived: true }), expect.any(Number));
+    expect(cache.buildCacheKey).toHaveBeenCalledWith(expect.arrayContaining(['1']));
+  });
 
-    expect(prismaMock.site.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        take: 120,
-        where: expect.objectContaining({
-          latitude: expect.objectContaining({ gte: 41.55, lte: 41.7 }),
-          longitude: expect.objectContaining({ gte: 21.6, lte: 21.85 }),
-        }),
-      }),
-    );
+  it('findClustersForMap validates and delegates with zoom default', async () => {
+    const { service, repository, validator } = makeMapService();
+    (repository.findClusters as jest.Mock).mockResolvedValueOnce([
+      { clusterKey: '1:1', latitude: 41.6, longitude: 21.7, count: 3, siteIds: ['s1'] },
+    ]);
+    const result = await service.findClustersForMap({
+      lat: 41.6,
+      lng: 21.7,
+      radiusKm: 20,
+      limit: 100,
+    } as any);
+    expect(validator.validateQuery).toHaveBeenCalled();
+    expect(repository.findClusters).toHaveBeenCalledWith(expect.any(Object), 11);
+    expect(result.data[0].clusterKey).toBe('1:1');
+  });
+
+  it('findHeatmapForMap validates and delegates with explicit zoom', async () => {
+    const { service, repository, validator } = makeMapService();
+    (repository.findHeatmap as jest.Mock).mockResolvedValueOnce([
+      { cellKey: '1:1', latitude: 41.6, longitude: 21.7, intensity: 7 },
+    ]);
+    const result = await service.findHeatmapForMap({
+      lat: 41.6,
+      lng: 21.7,
+      radiusKm: 20,
+      zoom: 8,
+      limit: 100,
+    } as any);
+    expect(validator.validateQuery).toHaveBeenCalled();
+    expect(repository.findHeatmap).toHaveBeenCalledWith(expect.any(Object), 8);
+    expect(result.data[0].intensity).toBe(7);
   });
 });

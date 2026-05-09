@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math' show min;
+import 'dart:typed_data';
 
 import 'package:chisto_mobile/core/config/app_config.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
@@ -67,6 +68,20 @@ class ApiClient {
   }) async {
     return _requestWithRetry(
       'GET',
+      path,
+      headers: headers,
+      cancellation: cancellation,
+    );
+  }
+
+  /// GET binary response (e.g. MVT tiles). Uses [response.bodyBytes] — never
+  /// decode as UTF‑16 [String], which would corrupt protobuf payloads.
+  Future<ApiBytesResponse> getBytes(
+    String path, {
+    Map<String, String>? headers,
+    RequestCancellationToken? cancellation,
+  }) async {
+    return _getBytesWithRetry(
       path,
       headers: headers,
       cancellation: cancellation,
@@ -330,6 +345,122 @@ class ApiClient {
     '/auth/password-reset/confirm',
   };
 
+  Future<ApiBytesResponse> _getBytesWithRetry(
+    String path, {
+    Map<String, String>? headers,
+    RequestCancellationToken? cancellation,
+  }) async {
+    try {
+      return await _getBytes(
+        path,
+        headers: headers,
+        cancellation: cancellation,
+      );
+    } on AppError catch (e) {
+      if (e.code == 'CANCELLED') {
+        rethrow;
+      }
+      if (e.code != 'UNAUTHORIZED' ||
+          _authPaths.contains(path) ||
+          refreshSession == null ||
+          _refreshing) {
+        rethrow;
+      }
+
+      _refreshing = true;
+      try {
+        final bool refreshed = await refreshSession!();
+        if (!refreshed) rethrow;
+      } on Exception catch (_) {
+        rethrow;
+      } finally {
+        _refreshing = false;
+      }
+
+      cancellation?.throwIfCancelled();
+      return await _getBytes(
+        path,
+        headers: headers,
+        cancellation: cancellation,
+      );
+    }
+  }
+
+  Future<ApiBytesResponse> _getBytes(
+    String path, {
+    Map<String, String>? headers,
+    RequestCancellationToken? cancellation,
+  }) async {
+    cancellation?.throwIfCancelled();
+    final Uri url = Uri.parse('$_baseUrl$path');
+    final Map<String, String> requestHeaders = <String, String>{
+      'Accept': 'application/vnd.mapbox-vector-tile, application/octet-stream;q=0.9, */*;q=0.8',
+      ...?headers,
+    };
+    final String? token = _accessToken();
+    if (token != null && token.isNotEmpty) {
+      requestHeaders['Authorization'] = 'Bearer $token';
+    }
+    _maybeAddAcceptLanguage(requestHeaders);
+
+    try {
+      final http.Response response =
+          await _httpClient.get(url, headers: requestHeaders).timeout(_timeout);
+      cancellation?.throwIfCancelled();
+      return _handleBytesResponse(response);
+    } on TimeoutException catch (e) {
+      throw AppError.timeout(message: e.message?.isEmpty ?? true ? null : e.message);
+    } on AppError {
+      rethrow;
+    } on Exception catch (e) {
+      if (e is http.ClientException) {
+        throw AppError.network(message: e.message, cause: e);
+      }
+      rethrow;
+    }
+  }
+
+  ApiBytesResponse _handleBytesResponse(http.Response response) {
+    final Uint8List bytes = Uint8List.fromList(response.bodyBytes);
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return ApiBytesResponse(
+        statusCode: response.statusCode,
+        bytes: bytes,
+        headers: response.headers,
+      );
+    }
+    if (response.statusCode == 304) {
+      return ApiBytesResponse(
+        statusCode: response.statusCode,
+        bytes: bytes,
+        headers: response.headers,
+      );
+    }
+
+    final String? bodyStr =
+        response.bodyBytes.isNotEmpty ? utf8.decode(response.bodyBytes) : null;
+    final Map<String, dynamic>? json =
+        bodyStr != null ? _decodeJsonObject(bodyStr) : null;
+    final String? retryAfterHeader = response.headers['retry-after'];
+    final AppError error = appErrorFromFailedResponse(
+      statusCode: response.statusCode,
+      json: json,
+      bodyStr: bodyStr,
+      retryAfterHeader: retryAfterHeader,
+    );
+
+    if (response.statusCode == 401) {
+      final String authCode = error.code;
+      if (authCode == 'UNAUTHORIZED' ||
+          authCode == 'INVALID_TOKEN_USER' ||
+          authCode == 'ACCOUNT_NOT_ACTIVE') {
+        _onUnauthorized();
+      }
+    }
+
+    throw error;
+  }
+
   Future<ApiResponse> _requestWithRetry(
     String method,
     String path, {
@@ -480,7 +611,7 @@ class ApiClient {
     final Map<String, dynamic>? json =
         bodyStr != null ? _decodeJsonObject(bodyStr) : null;
 
-    if (response.statusCode >= 200 && response.statusCode < 300) {
+    if ((response.statusCode >= 200 && response.statusCode < 300) || response.statusCode == 304) {
       return ApiResponse(
         statusCode: response.statusCode,
         body: bodyStr,
@@ -509,6 +640,19 @@ class ApiClient {
 
     throw error;
   }
+}
+
+/// Binary GET response (tiles, files).
+class ApiBytesResponse {
+  const ApiBytesResponse({
+    required this.statusCode,
+    required this.bytes,
+    this.headers = const <String, String>{},
+  });
+
+  final int statusCode;
+  final Uint8List bytes;
+  final Map<String, String> headers;
 }
 
 /// Successful API response with optional JSON body.

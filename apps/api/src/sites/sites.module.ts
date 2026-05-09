@@ -32,12 +32,31 @@ import { GeoRetriever } from './feed/candidates/geo.retriever';
 import { FreshnessRetriever } from './feed/candidates/freshness.retriever';
 import { EngagementRetriever } from './feed/candidates/engagement.retriever';
 import { PersonalRetriever } from './feed/candidates/personal.retriever';
+import { MapRateLimitGuard } from './http/map-rate-limit.guard';
+import { MapCacheService } from './map/map-cache.service';
+import { MapQueryValidatorService } from './map/map-query-validator.service';
+import { MapResponseProjectorService } from './map/map-response-projector.service';
+import { MapSiteRepositoryService } from './map/map-site-repository.service';
+import { MapObservabilityService } from './map/map-observability.service';
+import { MapProjectionUpdaterService } from './map/map-projection-updater.service';
+import { MapLifecycleCronService } from './map/map-lifecycle-cron.service';
+import { MapMvtTilesService } from './map/map-mvt-tiles.service';
+import { SitesSearchService } from './sites-search.service';
 
 @Module({
   imports: [AuditModule, ReportsUploadModule, AdminEventsModule],
   controllers: [SitesController],
   providers: [
     SitesMapQueryService,
+    MapCacheService,
+    MapQueryValidatorService,
+    MapResponseProjectorService,
+    MapSiteRepositoryService,
+    MapObservabilityService,
+    MapProjectionUpdaterService,
+    MapLifecycleCronService,
+    MapMvtTilesService,
+    SitesSearchService,
     SitesFeedService,
     SitesDetailService,
     SitesMediaService,
@@ -66,6 +85,7 @@ import { PersonalRetriever } from './feed/candidates/personal.retriever';
     FreshnessRetriever,
     EngagementRetriever,
     PersonalRetriever,
+    MapRateLimitGuard,
   ],
   exports: [SitesService, FeedRankingService],
 })

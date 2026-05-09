@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
@@ -27,13 +28,15 @@ class DirectionsSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool isViewLocation = mode == DirectionsSheetMode.viewLocation;
     return ReportSheetScaffold(
-      title: isViewLocation ? 'View location' : 'Open in Maps',
+      title: isViewLocation
+          ? context.l10n.mapDirectionsSheetViewLocation
+          : context.l10n.mapDirectionsSheetOpenInMaps,
       subtitle: isViewLocation
-          ? 'Choose which app to view this location on a map.'
-          : 'Choose which app to get directions.',
+          ? context.l10n.mapDirectionsSheetSubtitleViewLocation
+          : context.l10n.mapDirectionsSheetSubtitleDirections,
       trailing: ReportCircleIconButton(
         icon: Icons.close,
-        semanticLabel: 'Close',
+        semanticLabel: context.l10n.commonClose,
         onTap: onDismiss,
       ),
       maxHeightFactor: 0.5,
@@ -43,8 +46,8 @@ class DirectionsSheet extends StatelessWidget {
         children: <Widget>[
           ReportActionTile(
             icon: Icons.place_rounded,
-            title: 'Apple Maps',
-            subtitle: 'Built-in maps on this device.',
+            title: context.l10n.mapDirectionsAppleMapsTitle,
+            subtitle: context.l10n.mapDirectionsAppleMapsSubtitle,
             tone: ReportSurfaceTone.neutral,
             trailing: Icon(
               Icons.chevron_right_rounded,
@@ -56,8 +59,8 @@ class DirectionsSheet extends StatelessWidget {
           const SizedBox(height: AppSpacing.sm),
           ReportActionTile(
             icon: Icons.map_rounded,
-            title: 'Google Maps',
-            subtitle: 'Web and Google Maps app.',
+            title: context.l10n.mapDirectionsGoogleMapsTitle,
+            subtitle: context.l10n.mapDirectionsGoogleMapsSubtitle,
             tone: ReportSurfaceTone.neutral,
             trailing: Icon(
               Icons.chevron_right_rounded,

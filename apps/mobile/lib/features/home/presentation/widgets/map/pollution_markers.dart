@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:chisto_mobile/features/home/presentation/widgets/map/map_site_pin_image.dart';
+
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/map/cluster_bucket.dart';
+import 'package:chisto_mobile/features/home/presentation/widgets/map/map_site_pin_image.dart';
 
 /// Premium animated pin for a single pollution site.
 class PollutionMarker extends StatelessWidget {
@@ -13,29 +15,41 @@ class PollutionMarker extends StatelessWidget {
     required this.isSelected,
     required this.entranceDelay,
     required this.onTap,
+    this.onLongPress,
     this.animate = true,
+    this.burstEntrance = false,
   });
 
   final PollutionSite site;
   final bool isSelected;
   final Duration entranceDelay;
   final VoidCallback onTap;
+  final VoidCallback? onLongPress;
   final bool animate;
 
+  /// When true, uses a punchier spring curve with shorter duration for the
+  /// cluster-expansion "burst" effect.
+  final bool burstEntrance;
+
   static const int _animationMs = 500;
+  static const int _burstAnimationMs = 380;
+
+  /// Springy overshoot curve for burst entrance (~56% overshoot, iOS-like pop).
+  static const Curve _burstCurve = Cubic(0.34, 1.56, 0.64, 1);
 
   @override
   Widget build(BuildContext context) {
     if (!animate) {
       return _buildMarkerBody(context);
     }
+    final int baseMs = burstEntrance ? _burstAnimationMs : _animationMs;
     final int delayMs = entranceDelay.inMilliseconds;
-    final int totalMs = _animationMs + delayMs;
-    final double delayFraction = delayMs / totalMs;
+    final int totalMs = baseMs + delayMs;
+    final double delayFraction = totalMs > 0 ? delayMs / totalMs : 0;
 
     return TweenAnimationBuilder<double>(
       duration: Duration(milliseconds: totalMs),
-      curve: Curves.easeOutBack,
+      curve: burstEntrance ? _burstCurve : AppMotion.emphasized,
       tween: Tween<double>(begin: 0, end: 1),
       builder: (BuildContext context, double value, Widget? child) {
         final double entrance = value < delayFraction
@@ -43,7 +57,7 @@ class PollutionMarker extends StatelessWidget {
             : ((value - delayFraction) / (1 - delayFraction)).clamp(0, 1);
         return Transform.scale(
           scale: entrance,
-          child: Opacity(opacity: entrance, child: child),
+          child: Opacity(opacity: entrance.clamp(0, 1), child: child),
         );
       },
       child: _buildMarkerBody(context),
@@ -53,15 +67,16 @@ class PollutionMarker extends StatelessWidget {
   Widget _buildMarkerBody(BuildContext context) {
     return Semantics(
       button: true,
-      label:
-          '${site.title}, ${site.statusLabel} severity. Double tap to preview.',
+      label: context.l10n.mapPinPreviewSemantic(site.title, site.statusLabel),
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: onTap,
+        onLongPress: onLongPress,
         child: RepaintBoundary(
           child: AnimatedScale(
             scale: isSelected ? 1.18 : 1.0,
             duration: AppMotion.medium,
-            curve: isSelected ? Curves.easeOutBack : Curves.easeOutCubic,
+            curve: isSelected ? AppMotion.spring : Curves.easeInCubic,
             child: AnimatedContainer(
               duration: AppMotion.medium,
               curve: Curves.easeOutCubic,
@@ -92,15 +107,11 @@ class PollutionMarker extends StatelessWidget {
                     color: site.statusColor,
                     width: isSelected ? 3.5 : 2.5,
                   ),
-                  color: Colors.white,
+                  color: AppColors.white,
                 ),
                 padding: const EdgeInsets.all(2),
                 child: ClipOval(
-                  child: Image(
-                    image: mapPinImageProviderForSite(site),
-                    fit: BoxFit.cover,
-                    gaplessPlayback: true,
-                  ),
+                  child: MapPinThumbnail(site: site),
                 ),
               ),
             ),
@@ -187,7 +198,7 @@ class _ClusterMarkerState extends State<ClusterMarker>
 
     return TweenAnimationBuilder<double>(
       duration: Duration(milliseconds: totalMs),
-      curve: Curves.easeOutCubic,
+      curve: AppMotion.smooth,
       tween: Tween<double>(begin: 0, end: 1),
       builder: (BuildContext context, double value, Widget? child) {
         final double entrance = value < delayFraction
@@ -207,9 +218,9 @@ class _ClusterMarkerState extends State<ClusterMarker>
     final int count = widget.count;
     return Semantics(
       button: true,
-      label:
-          '$count pollution site${count == 1 ? '' : 's'} clustered. Double tap to expand.',
+      label: context.l10n.mapClusterSemantic(count),
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTapDown: (_) => _tapScaleController.forward(),
         onTapUp: (_) => _tapScaleController.reverse(),
         onTapCancel: () => _tapScaleController.reverse(),
@@ -273,6 +284,65 @@ class _ClusterMarkerState extends State<ClusterMarker>
   }
 }
 
+/// Fading ghost of a cluster during expansion — provides visual continuity
+/// as individual pins burst into view from the cluster's former position.
+class ClusterGhostMarker extends StatelessWidget {
+  const ClusterGhostMarker({
+    super.key,
+    required this.color,
+    required this.count,
+  });
+
+  final Color color;
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: TweenAnimationBuilder<double>(
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOut,
+        tween: Tween<double>(begin: 1, end: 0),
+        builder: (BuildContext context, double t, Widget? child) {
+          return Transform.scale(
+            scale: 0.5 + 0.5 * t,
+            child: Opacity(opacity: t, child: child),
+          );
+        },
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: color.withValues(alpha: 0.7),
+            border: Border.all(
+              color: AppColors.white.withValues(alpha: 0.35),
+              width: 2,
+            ),
+            boxShadow: <BoxShadow>[
+              BoxShadow(
+                color: color.withValues(alpha: 0.25),
+                blurRadius: 12,
+                spreadRadius: 2,
+              ),
+            ],
+          ),
+          child: Center(
+            child: Text(
+              count >= 100 ? '99+' : '$count',
+              style: TextStyle(
+                color: AppColors.textOnDark.withValues(alpha: 0.9),
+                fontWeight: FontWeight.w700,
+                fontSize: count >= 10 ? 12 : 14,
+                height: 1,
+                letterSpacing: -0.3,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 /// Pulsing accuracy ring with animated entrance for user location.
 class UserLocationDot extends StatefulWidget {
   const UserLocationDot({super.key, this.animate = true});
@@ -321,7 +391,7 @@ class _UserLocationDotState extends State<UserLocationDot>
   Widget build(BuildContext context) {
     if (!widget.animate) {
       return Semantics(
-        label: 'Your current location',
+        label: context.l10n.mapUserLocationSemantic,
         child: Stack(
           alignment: Alignment.center,
           children: <Widget>[
@@ -331,7 +401,7 @@ class _UserLocationDotState extends State<UserLocationDot>
               decoration: BoxDecoration(
                 color: AppColors.primary,
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 2),
+                border: Border.all(color: AppColors.white, width: 2),
               ),
             ),
           ],
@@ -346,7 +416,7 @@ class _UserLocationDotState extends State<UserLocationDot>
         return Transform.scale(scale: entrance, child: child);
       },
       child: Semantics(
-        label: 'Your current location',
+        label: context.l10n.mapUserLocationSemantic,
         child: Stack(
           alignment: Alignment.center,
           children: <Widget>[

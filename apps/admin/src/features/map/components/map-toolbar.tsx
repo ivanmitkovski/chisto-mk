@@ -20,9 +20,11 @@ type MapToolbarProps = {
   onStatusChange: (status: string) => void;
   onFitBounds: () => void;
   onRefresh: () => void;
+  includeArchived: boolean;
+  onIncludeArchivedChange: (value: boolean) => void;
 };
 
-export function MapToolbar({ statusFilter, onStatusChange, onFitBounds, onRefresh }: MapToolbarProps) {
+export function MapToolbar({ statusFilter, onStatusChange, onFitBounds, onRefresh, includeArchived, onIncludeArchivedChange }: MapToolbarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -64,6 +66,15 @@ export function MapToolbar({ statusFilter, onStatusChange, onFitBounds, onRefres
           ))}
         </div>
       </div>
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6, paddingLeft: 8 }}>
+        <input
+          type="checkbox"
+          checked={includeArchived}
+          onChange={(e) => onIncludeArchivedChange(e.target.checked)}
+          aria-label="Show archived admin-hidden sites"
+        />
+        <span>Show archived (admin-hidden)</span>
+      </label>
       <div className={styles.toolbarDivider} aria-hidden />
       <div className={styles.toolbarActions}>
         <button

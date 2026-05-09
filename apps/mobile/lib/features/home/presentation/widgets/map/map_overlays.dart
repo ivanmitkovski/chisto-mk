@@ -4,18 +4,37 @@ import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
-import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/features/home/presentation/widgets/map/map_loading_progress_bar.dart';
+
+export 'map_loading_progress_bar.dart' show MapLoadingProgressBar;
 
 /// Top vignette for chrome contrast.
 class TopVignette extends StatelessWidget {
-  const TopVignette({super.key, required this.topPadding, this.height = 120});
+  const TopVignette({
+    super.key,
+    required this.topPadding,
+    this.height = 120,
+    this.useDarkTiles = false,
+  });
 
   final double topPadding;
   final double height;
+  final bool useDarkTiles;
 
   @override
   Widget build(BuildContext context) {
+    final List<Color> colors = useDarkTiles
+        ? <Color>[
+            AppColors.white.withValues(alpha: 0.14),
+            AppColors.white.withValues(alpha: 0.05),
+            AppColors.transparent,
+          ]
+        : <Color>[
+            AppColors.black.withValues(alpha: 0.18),
+            AppColors.black.withValues(alpha: 0.06),
+            AppColors.transparent,
+          ];
     return Positioned(
       top: 0,
       left: 0,
@@ -27,11 +46,7 @@ class TopVignette extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: <Color>[
-                AppColors.black.withValues(alpha: 0.18),
-                AppColors.black.withValues(alpha: 0.06),
-                AppColors.transparent,
-              ],
+              colors: colors,
               stops: const <double>[0, 0.5, 1],
             ),
           ),
@@ -43,12 +58,22 @@ class TopVignette extends StatelessWidget {
 
 /// Bottom vignette for chrome contrast.
 class BottomVignette extends StatelessWidget {
-  const BottomVignette({super.key, this.height = 100});
+  const BottomVignette({super.key, this.height = 100, this.useDarkTiles = false});
 
   final double height;
+  final bool useDarkTiles;
 
   @override
   Widget build(BuildContext context) {
+    final List<Color> colors = useDarkTiles
+        ? <Color>[
+            AppColors.black.withValues(alpha: 0.38),
+            AppColors.transparent,
+          ]
+        : <Color>[
+            AppColors.black.withValues(alpha: 0.10),
+            AppColors.transparent,
+          ];
     return Positioned(
       bottom: 0,
       left: 0,
@@ -60,10 +85,7 @@ class BottomVignette extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
-              colors: <Color>[
-                AppColors.black.withValues(alpha: 0.10),
-                AppColors.transparent,
-              ],
+              colors: colors,
             ),
           ),
         ),
@@ -72,62 +94,41 @@ class BottomVignette extends StatelessWidget {
   }
 }
 
-/// Placeholder while map tiles load: flat “empty map” tone and a thin top progress bar
-/// (similar to Google / Apple Maps—no centered chrome or copy).
+/// Thin top indeterminate bar while map tiles load (no full-screen skeleton).
 class TileLoadingOverlay extends StatelessWidget {
   const TileLoadingOverlay({
     super.key,
     required this.showLoading,
     this.isDarkMap = false,
+    this.topPadding = 0,
   });
 
   final bool showLoading;
   final bool isDarkMap;
+  final double topPadding;
 
   @override
   Widget build(BuildContext context) {
-    final Color paper = isDarkMap ? AppColors.mapDarkPaper : AppColors.mapLightPaper;
-    final Color track = isDarkMap
-        ? AppColors.white.withValues(alpha: 0.08)
-        : AppColors.black.withValues(alpha: 0.06);
-    final Color value = isDarkMap
-        ? AppColors.white.withValues(alpha: 0.55)
-        : AppColors.primary.withValues(alpha: 0.85);
-
-    return Positioned.fill(
-      child: Semantics(
-        liveRegion: true,
-        label: showLoading ? 'Loading map' : 'Map loaded',
-        child: IgnorePointer(
-          child: AnimatedOpacity(
-            opacity: showLoading ? 1 : 0,
-            duration: AppMotion.standard,
-            curve: AppMotion.smooth,
-            child: ColoredBox(
-              color: paper,
-              child: Stack(
-                fit: StackFit.expand,
-                children: <Widget>[
-                  SafeArea(
-                    bottom: false,
-                    child: Align(
-                      alignment: Alignment.topCenter,
-                      child: ExcludeSemantics(
-                        child: SizedBox(
-                          width: double.infinity,
-                          height: 2.5,
-                          child: ClipRect(
-                            child: LinearProgressIndicator(
-                              minHeight: 2.5,
-                              backgroundColor: track,
-                              valueColor: AlwaysStoppedAnimation<Color>(value),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+    if (!showLoading) {
+      return const SizedBox.shrink();
+    }
+    final double safeTop = topPadding > 0
+        ? topPadding
+        : MediaQuery.paddingOf(context).top;
+    return Positioned(
+      left: 0,
+      right: 0,
+      top: 0,
+      child: Padding(
+        padding: EdgeInsets.only(top: safeTop),
+        child: Semantics(
+          liveRegion: true,
+          label: context.l10n.mapLoadingSemantic,
+          child: IgnorePointer(
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: ExcludeSemantics(
+                child: MapLoadingProgressBar(isDarkMap: isDarkMap),
               ),
             ),
           ),
@@ -139,15 +140,33 @@ class TileLoadingOverlay extends StatelessWidget {
 
 /// Overlay shown when no sites match the current filters.
 class EmptyFilterOverlay extends StatelessWidget {
-  const EmptyFilterOverlay({super.key, required this.onResetFilters});
+  const EmptyFilterOverlay({
+    super.key,
+    required this.onResetFilters,
+    this.useDarkTiles = false,
+  });
 
   final VoidCallback onResetFilters;
+  final bool useDarkTiles;
 
   @override
   Widget build(BuildContext context) {
+    final Color panelFill = useDarkTiles
+        ? AppColors.glassDark.withValues(alpha: 0.58)
+        : AppColors.white.withValues(alpha: 0.9);
+    final Color panelBorder = useDarkTiles
+        ? AppColors.white.withValues(alpha: 0.14)
+        : AppColors.white.withValues(alpha: 0.7);
+    final Color titleColor =
+        useDarkTiles ? AppColors.textOnDark : AppColors.textPrimary;
+    final Color bodyColor =
+        useDarkTiles ? AppColors.textOnDarkMuted : AppColors.textMuted;
+    final Color iconColor =
+        useDarkTiles ? AppColors.textOnDarkMuted : AppColors.textMuted;
+
     return Semantics(
       liveRegion: true,
-      label: 'No sites match your current filters',
+      label: context.l10n.mapEmptyFiltersLiveRegion,
       child: Center(
         child: ClipRRect(
           borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
@@ -157,10 +176,10 @@ class EmptyFilterOverlay extends StatelessWidget {
               margin: const EdgeInsets.all(AppSpacing.lg),
               padding: const EdgeInsets.all(AppSpacing.xl),
               decoration: BoxDecoration(
-                color: AppColors.white.withValues(alpha: 0.9),
+                color: panelFill,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                 border: Border.all(
-                  color: AppColors.white.withValues(alpha: 0.7),
+                  color: panelBorder,
                 ),
               ),
               child: Column(
@@ -169,22 +188,22 @@ class EmptyFilterOverlay extends StatelessWidget {
                   Icon(
                     Icons.filter_list_off_rounded,
                     size: 48,
-                    color: AppColors.textMuted,
+                    color: iconColor,
                   ),
                   const SizedBox(height: AppSpacing.md),
                   Text(
-                    'No sites match your filters',
+                    context.l10n.mapEmptyFiltersTitle,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: AppColors.textPrimary,
+                      color: titleColor,
                       fontWeight: FontWeight.w600,
                     ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   Text(
-                    'Try adjusting filters or search.',
+                    context.l10n.mapEmptyFiltersSubtitle,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.textMuted,
+                      color: bodyColor,
                     ),
                     textAlign: TextAlign.center,
                   ),

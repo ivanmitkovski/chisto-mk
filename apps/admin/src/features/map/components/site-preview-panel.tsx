@@ -37,8 +37,12 @@ type SitePreviewPanelProps = {
   onClose: () => void;
 };
 
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])';
+
 export function SitePreviewPanel({ site, onClose }: SitePreviewPanelProps) {
   const reduceMotion = useReducedMotion();
+  const sheetRef = useRef<HTMLElement | null>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const [photoIndex, setPhotoIndex] = useState(0);
   const [descExpanded, setDescExpanded] = useState(false);
@@ -48,7 +52,9 @@ export function SitePreviewPanel({ site, onClose }: SitePreviewPanelProps) {
     () => typeof window !== 'undefined' && window.matchMedia('(max-width: 920px)').matches,
   );
 
-  const media = site.latestReportMediaUrls?.filter(Boolean) ?? [];
+  const media: string[] = (site.latestReportMediaUrls ?? []).filter(
+    (url): url is string => Boolean(url),
+  );
   const hasMedia = media.length > 0;
   const safePhotoIndex = hasMedia ? Math.min(photoIndex, media.length - 1) : 0;
   const currentPhoto = hasMedia ? media[safePhotoIndex] : null;
@@ -79,6 +85,7 @@ export function SitePreviewPanel({ site, onClose }: SitePreviewPanelProps) {
       : null;
   const categoryLabel = humanizeCategory(site.latestReportCategory);
   const distanceLabel = formatDistanceKm(site.distanceKm);
+  const isCluster = site.isCluster === true;
 
   const latStr = site.latitude.toFixed(5);
   const lngStr = site.longitude.toFixed(5);
@@ -113,6 +120,40 @@ export function SitePreviewPanel({ site, onClose }: SitePreviewPanelProps) {
     const t = window.setTimeout(() => closeRef.current?.focus(), 0);
     return () => window.clearTimeout(t);
   }, []);
+
+  useEffect(() => {
+    const root = sheetRef.current;
+    if (!root) {
+      return;
+    }
+    const getFocusable = (): HTMLElement[] =>
+      Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR));
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') {
+        return;
+      }
+      const nodes = getFocusable();
+      if (nodes.length === 0) {
+        return;
+      }
+      const first = nodes[0];
+      const last = nodes[nodes.length - 1];
+      const active = document.activeElement as HTMLElement | null;
+      if (e.shiftKey) {
+        if (active === first || !root.contains(active)) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else if (active === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
+    root.addEventListener('keydown', onKeyDown);
+    return () => root.removeEventListener('keydown', onKeyDown);
+  }, [site.id]);
 
   const copyCoords = useCallback(async () => {
     try {
@@ -149,6 +190,7 @@ export function SitePreviewPanel({ site, onClose }: SitePreviewPanelProps) {
       />
 
       <motion.aside
+        ref={sheetRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="site-preview-title"
@@ -183,12 +225,14 @@ export function SitePreviewPanel({ site, onClose }: SitePreviewPanelProps) {
 
         <header className={styles.header}>
           <div className={styles.headerText}>
-            <p className={styles.kicker}>Pollution site</p>
+            <p className={styles.kicker}>{isCluster ? 'Site cluster' : 'Pollution site'}</p>
             <h2 id="site-preview-title" className={styles.title}>
-              Site #{site.id.slice(0, 8).toUpperCase()}
+              {isCluster
+                ? `${site.reportCount} sites in cluster`
+                : `Site #${site.id.slice(0, 8).toUpperCase()}`}
             </h2>
             <p className={styles.subtitle}>
-              <span>Created {created}</span>
+              <span>{isCluster ? 'Zoom in to inspect individual sites' : `Created ${created}`}</span>
               {site.latestReportNumber ? (
                 <>
                   <span aria-hidden>·</span>
@@ -233,7 +277,7 @@ export function SitePreviewPanel({ site, onClose }: SitePreviewPanelProps) {
 
           {media.length > 1 ? (
             <div className={styles.thumbRow}>
-              {media.map((url, i) => (
+              {media.map((url: string, i: number) => (
                 <button
                   key={url}
                   type="button"
@@ -341,17 +385,23 @@ export function SitePreviewPanel({ site, onClose }: SitePreviewPanelProps) {
         </div>
 
         <footer className={styles.footer}>
-          <Link href={`/dashboard/sites/${site.id}`} className={styles.linkPrimary}>
-            View full site
-          </Link>
-          <div className={styles.pillRow}>
-            <Link href={`/dashboard/reports?siteId=${site.id}`} className={styles.linkSecondary}>
-              Reports
-            </Link>
-            <Link href={`/dashboard/events/new?siteId=${site.id}`} className={styles.linkSecondary}>
-              New event
-            </Link>
-          </div>
+          {isCluster ? (
+            <span className={styles.linkPrimary}>Zoom in to view site details</span>
+          ) : (
+            <>
+              <Link href={`/dashboard/sites/${site.id}`} className={styles.linkPrimary}>
+                View full site
+              </Link>
+              <div className={styles.pillRow}>
+                <Link href={`/dashboard/reports?siteId=${site.id}`} className={styles.linkSecondary}>
+                  Reports
+                </Link>
+                <Link href={`/dashboard/events/new?siteId=${site.id}`} className={styles.linkSecondary}>
+                  New event
+                </Link>
+              </div>
+            </>
+          )}
         </footer>
       </motion.aside>
     </motion.div>

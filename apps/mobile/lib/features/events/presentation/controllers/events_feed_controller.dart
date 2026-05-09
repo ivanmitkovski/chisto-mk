@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:latlong2/latlong.dart';
 
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
@@ -48,6 +49,8 @@ class EventsFeedController extends ChangeNotifier {
   List<EcoEvent> _discoveryThisWeekShelf = <EcoEvent>[];
   bool _discoveryThisWeekShelfLoading = false;
   bool _discoveryThisWeekShelfFailed = false;
+  double? _userLatitude;
+  double? _userLongitude;
 
   /// Set when [userPullRefresh] fails so the UI can show a typed message via [localizedAppErrorMessage].
   AppError? _lastPullRefreshError;
@@ -60,6 +63,8 @@ class EventsFeedController extends ChangeNotifier {
       List<EcoEvent>.unmodifiable(_discoveryThisWeekShelf);
 
   bool get discoveryThisWeekShelfFailed => _discoveryThisWeekShelfFailed;
+
+  bool get hasUserLocationHint => _userLatitude != null && _userLongitude != null;
 
   EcoEventFilter get activeFilter => _activeFilter;
   EcoEventSearchParams get activeSearchParams => _activeSearchParams;
@@ -92,6 +97,19 @@ class EventsFeedController extends ChangeNotifier {
   void _invalidateDerived() {
     _derivedCacheKey = null;
     _cachedFiltered = null;
+  }
+
+  void setUserLocationHint({
+    required double latitude,
+    required double longitude,
+  }) {
+    if (_userLatitude == latitude && _userLongitude == longitude) {
+      return;
+    }
+    _userLatitude = latitude;
+    _userLongitude = longitude;
+    _invalidateDerived();
+    notifyListeners();
   }
 
   /// Unapproved events are organizer-only; keeps hero/sections safe if bad data slips in.
@@ -382,6 +400,10 @@ class EventsFeedController extends ChangeNotifier {
       if (timeCompare != 0) {
         return timeCompare;
       }
+      final int proximityCompare = _distanceForSort(a).compareTo(_distanceForSort(b));
+      if (proximityCompare != 0) {
+        return proximityCompare;
+      }
       return a.siteDistanceKm.compareTo(b.siteDistanceKm);
     });
     return sorted;
@@ -409,7 +431,7 @@ class EventsFeedController extends ChangeNotifier {
         break;
       case EcoEventFilter.nearby:
         list.sort((EcoEvent a, EcoEvent b) {
-          final int dist = a.siteDistanceKm.compareTo(b.siteDistanceKm);
+          final int dist = _distanceForSort(a).compareTo(_distanceForSort(b));
           if (dist != 0) {
             return dist;
           }
@@ -465,5 +487,24 @@ class EventsFeedController extends ChangeNotifier {
     _repository.removeListener(_onRepositoryUpdate);
     searchController.dispose();
     super.dispose();
+  }
+
+  double _distanceForSort(EcoEvent event) {
+    final double base = event.siteDistanceKm;
+    if (base > 0) {
+      return base;
+    }
+    if (_userLatitude == null ||
+        _userLongitude == null ||
+        event.siteLat == null ||
+        event.siteLng == null) {
+      return double.infinity;
+    }
+    const Distance distance = Distance();
+    return distance.as(
+      LengthUnit.Kilometer,
+      LatLng(_userLatitude!, _userLongitude!),
+      LatLng(event.siteLat!, event.siteLng!),
+    );
   }
 }

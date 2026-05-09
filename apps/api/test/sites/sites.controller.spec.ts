@@ -3,6 +3,7 @@
 import { SitesController } from '../../src/sites/sites.controller';
 import { SitesService } from '../../src/sites/sites.service';
 import { SiteEventsService } from '../../src/admin-events/site-events.service';
+import { weakEtagForJson } from '../../src/sites/http/map-etag';
 
 describe('SitesController', () => {
   function buildController() {
@@ -18,6 +19,7 @@ describe('SitesController', () => {
         cid: 'cid_1',
         ...input,
       })),
+      updateArchiveStatus: jest.fn(async () => ({ id: 'site_1', isArchivedByAdmin: true })),
     } as unknown as SitesService;
     const siteEvents = {
       getReplaySince: jest.fn(() => []),
@@ -74,6 +76,101 @@ describe('SitesController', () => {
         userAgent: 'UA/2.0',
         openedByUserId: 'user_1',
       }),
+    );
+  });
+
+  it('returns 304 when map ETag matches If-None-Match header', async () => {
+    const { controller, sitesService } = buildController();
+    const query = { lat: 41.6, lng: 21.7, radiusKm: 10, limit: 20 };
+    const version = '1:1700000000000';
+    (sitesService as any).resolveMapDataVersion = jest.fn(async () => version);
+    const etag = weakEtagForJson({
+      kind: 'map',
+      version,
+      query: {
+        detail: undefined,
+        status: null,
+        includeArchived: false,
+        lat: query.lat,
+        lng: query.lng,
+        radiusKm: query.radiusKm,
+        minLat: null,
+        maxLat: null,
+        minLng: null,
+        maxLng: null,
+        zoom: null,
+        limit: query.limit,
+      },
+    });
+    const body = {
+      data: [{ id: 'site_1', updatedAt: '2026-01-01T00:00:00.000Z' }],
+      meta: { dataVersion: version, queryMode: 'radius' },
+    };
+    (sitesService as any).findAllForMap = jest.fn(async () => body);
+    const res = {
+      setHeader: jest.fn(),
+      status: jest.fn(),
+    } as never;
+    const out = await controller.findAllForMap(
+      query as never,
+      etag,
+      res,
+    );
+    expect(out).toBeUndefined();
+    expect((res as any).status).toHaveBeenCalledWith(304);
+    expect((sitesService as any).findAllForMap).not.toHaveBeenCalled();
+  });
+
+  it('returns 304 for clusters when ETag matches', async () => {
+    const { controller, sitesService } = buildController();
+    const body = {
+      data: [{ centerLat: 41.6, centerLng: 21.7, count: 10, siteIds: ['site_1'] }],
+      meta: { queryMode: 'viewport', dataVersion: 'abc' },
+    };
+    (sitesService as any).findClustersForMap = jest.fn(async () => body);
+    const etag = weakEtagForJson(body);
+    const res = { setHeader: jest.fn(), status: jest.fn() } as never;
+    const out = await controller.findClustersForMap(
+      { lat: 41.6, lng: 21.7, radiusKm: 10, limit: 20 } as never,
+      etag,
+      res,
+    );
+    expect(out).toBeUndefined();
+    expect((res as any).status).toHaveBeenCalledWith(304);
+  });
+
+  it('sets cache headers for heatmap responses', async () => {
+    const { controller, sitesService } = buildController();
+    const body = {
+      data: [{ latitude: 41.6, longitude: 21.7, weight: 4 }],
+      meta: { queryMode: 'viewport', dataVersion: 'abc' },
+    };
+    (sitesService as any).findHeatmapForMap = jest.fn(async () => body);
+    const res = { setHeader: jest.fn(), status: jest.fn() } as never;
+    const out = await controller.findHeatmapForMap(
+      { lat: 41.6, lng: 21.7, radiusKm: 10, limit: 20 } as never,
+      undefined,
+      res,
+    );
+    expect(out).toEqual(body);
+    expect((res as any).setHeader).toHaveBeenCalledWith(
+      'Cache-Control',
+      'private, max-age=4, stale-while-revalidate=20',
+    );
+    expect((res as any).setHeader).toHaveBeenCalledWith('ETag', weakEtagForJson(body));
+  });
+
+  it('delegates archive moderation mutation to SitesService', async () => {
+    const { controller, sitesService } = buildController();
+    await controller.updateArchiveStatus(
+      'site_1',
+      { archived: true, reason: 'Municipal cleanup confirmed' } as never,
+      { userId: 'admin_1' } as never,
+    );
+    expect(sitesService.updateArchiveStatus).toHaveBeenCalledWith(
+      'site_1',
+      { archived: true, reason: 'Municipal cleanup confirmed' },
+      { userId: 'admin_1' },
     );
   });
 });

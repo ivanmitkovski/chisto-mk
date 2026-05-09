@@ -819,6 +819,256 @@
   "feedScrollToTopSemantic": "Скролувај на врв на фидот",
   "mapResetFiltersSemantic": "Ресетирај филтри",
   "mapOpenMapsFailed": "Не можеше да се отвори Maps",
+  "mapSearchRecentsLabel": "Неодамна",
+  "mapSearchClearRecentsButton": "Исчисти",
+  "mapSearchEmptyTitle": "Пребарај загадени места",
+  "mapSearchEmptySubtitle": "Внеси наслов, категорија или опис. Или избери неодамнешно пребарување.",
+  "mapSearchNoResultsTitle": "Нема совпаѓања",
+  "mapSearchNoResultsSubtitle": "Обиди се со други зборови или ресетирај филтри на мапата.",
+  "mapSearchResultsBadge": "{count} резултати",
+  "@mapSearchResultsBadge": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mapSearchRemoteLoading": "Се пребаруваат сите места…",
+  "mapSearchRemoteError": "Не можеше да се пребараат сите места.",
+  "mapSearchRemoteRetry": "Обиди се повторно",
+  "mapSearchSectionOnMap": "На оваа мапа",
+  "mapSearchSectionEverywhere": "Повеќе резултати",
+  "mapSearchSuggestionsLabel": "Предлози",
+  "mapUpdatedToast": "Мапата е ажурирана",
+  "mapErrorAutoRetryFootnote": "Ќе обидеме повторно за неколку секунди. Исто така можете да притиснете Обиди се повторно.",
+  "mapFilteredSitesAnnounce": "{count, plural, one{Едно место се прикажува на мапата} other{{count} места се прикажуваат на мапата}}",
+  "@mapFilteredSitesAnnounce": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mapClusterExpansionAnnounce": "{count, plural, one{Едно место е одделено на мапата} other{{count} места се одделени на мапата}}",
+  "@mapClusterExpansionAnnounce": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mapScreenRouteSemantic": "Мапа на загадување. Допрете ги игличките за преглед на местата.",
+  "mapLoadingSemantic": "Се вчитува мапата",
+  "mapSiteNotOnMapSnack": "Ова место сè уште не е достапно на мапата.",
+  "mapOpenLocationFailedSnack": "Не можеше да се отвори оваа локација на мапата.",
+  "mapEmptyFiltersLiveRegion": "Нема места што одговараат на тековните филтри",
+  "mapEmptyFiltersTitle": "Нема места што одговараат на филтрите",
+  "mapEmptyFiltersSubtitle": "Прилагодете ги филтрите или пребарајте.",
+  "mapDirectionsSheetOpenInMaps": "Отвори во Maps",
+  "mapDirectionsSheetViewLocation": "Погледни локација",
+  "mapDirectionsSheetSubtitleDirections": "Изберете апликација за навигација.",
+  "mapDirectionsSheetSubtitleViewLocation": "Изберете апликација за приказ на мапа.",
+  "mapDirectionsAppleMapsTitle": "Apple Maps",
+  "mapDirectionsAppleMapsSubtitle": "Вградени мапи на уредот.",
+  "mapDirectionsGoogleMapsTitle": "Google Maps",
+  "mapDirectionsGoogleMapsSubtitle": "Веб и апликација Google Maps.",
+  "mapSemanticCloseActionsMenu": "Затвори мени со акции",
+  "mapSemanticOpenActionsMenu": "Отвори мени со акции",
+  "mapSemanticHideHeatmap": "Сокриј топлотна мапа",
+  "mapSemanticShowHeatmap": "Прикажи топлотна мапа",
+  "mapSemanticSwitchToLightMap": "Префрли на светла мапа",
+  "mapSemanticSwitchToDarkMap": "Префрли на темна мапа",
+  "mapSemanticZoomWholeCountry": "Зумирај за да се прикаже целата држава",
+  "mapSemanticUnlockRotation": "Отклучи ротација на мапата",
+  "mapSemanticLockRotation": "Заклучи ротација на мапата",
+  "mapSemanticCenterOnMyLocation": "Центрирај мапа на мојата локација",
+  "mapSemanticSearchSites": "Пребарај места",
+  "mapSemanticResetRotationNorth": "Ресетирај ротација кон север",
+  "mapFilterButtonSemanticPrefix": "Филтрирај места.",
+  "mapFilterButtonSemanticNoMatch": "Нема места што одговараат на филтрите во ова подрачје.",
+  "mapFilterButtonSemanticNoSites": "Нема места во ова подрачје.",
+  "mapFilterButtonSemanticSitesCount": "{count} места во ова подрачје.",
+  "@mapFilterButtonSemanticSitesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mapFilterButtonSemanticSuffix": "Допрете за да ги отворите филтрите.",
+  "mapFilterCountNoMatch": "Нема совпаѓање",
+  "mapFilterCountNoSites": "Нема места",
+  "mapFilterSheetTitle": "Филтрирај места",
+  "mapFilterCloseTooltip": "Затвори филтри",
+  "mapFilterSectionSiteStatus": "Статус на место",
+  "mapFilterSectionArea": "Општина / подрачје",
+  "mapFilterSectionPollutionType": "Тип на загадување",
+  "mapFilterSectionVisibility": "Видливост",
+  "mapFilterShowArchivedSites": "Прикажи архивирани места",
+  "mapFilterShowingLiveRegion": "{visible} од {total} загадени места видливи во ова подрачје",
+  "@mapFilterShowingLiveRegion": {
+    "placeholders": {
+      "visible": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "mapFilterShowingInline": "Се прикажуваат {visible} од {total}",
+  "@mapFilterShowingInline": {
+    "placeholders": {
+      "visible": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "mapFilterPollutionTypeSemantic": "Филтер за места од тип {type}",
+  "@mapFilterPollutionTypeSemantic": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "mapFilterPollutionTypeHintOff": "Допрете двапати за да го прикажете овој тип",
+  "mapFilterPollutionTypeHintOn": "Допрете двапати за да го сокриете овој тип",
+  "mapFilterPollutionTypeUnknown": "Непознат тип",
+  "mapFilterSiteStatusReported": "Пријавено",
+  "mapFilterSiteStatusVerified": "Потврдено",
+  "mapFilterSiteStatusCleanupScheduled": "Закажано чистење",
+  "mapFilterSiteStatusInProgress": "Во тек",
+  "mapFilterSiteStatusCleaned": "Исчистено",
+  "mapFilterSiteStatusDisputed": "Оспорено",
+  "mapFilterSiteStatusArchived": "Архивирано",
+  "mapFilterSiteStatusUnknown": "Непознат статус",
+  "mapFilterSiteStatusSemantic": "Филтер за статус {status}",
+  "@mapFilterSiteStatusSemantic": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "mapFilterSiteStatusHintOff": "Допрете двапати за да го прикажете овој статус",
+  "mapFilterSiteStatusHintOn": "Допрете двапати за да го сокриете овој статус",
+  "mapGeoWholeCountry": "Цела држава",
+  "mapGeoSkopjeWhole": "Цело Скопје",
+  "mapGeoSkopje": "Скопје",
+  "mapGeoSkopjeCentar": "Центар",
+  "mapGeoSkopjeAerodrom": "Аеродром",
+  "mapGeoSkopjeKarposh": "Карпош",
+  "mapGeoSkopjeChair": "Чаир",
+  "mapGeoSkopjeKiselaVoda": "Кисела Вода",
+  "mapGeoSkopjeGaziBaba": "Гази Баба",
+  "mapGeoSkopjeButel": "Бутел",
+  "mapGeoSkopjeGjorcePetrov": "Ѓорче Петров",
+  "mapGeoSkopjeSaraj": "Сарај",
+  "mapGeoBitola": "Битола",
+  "mapGeoKumanovo": "Куманово",
+  "mapGeoPrilep": "Прилеп",
+  "mapGeoTetovo": "Тетово",
+  "mapGeoVeles": "Велес",
+  "mapGeoOhrid": "Охрид",
+  "mapGeoStip": "Штип",
+  "mapGeoGostivar": "Гостивар",
+  "mapGeoStrumica": "Струмица",
+  "mapGeoKavadarci": "Кавадарци",
+  "mapGeoKocani": "Кочани",
+  "mapGeoStruga": "Струга",
+  "mapGeoRadovis": "Радовиш",
+  "mapGeoGevgelija": "Гевгелија",
+  "mapGeoKrivaPalanka": "Крива Паланка",
+  "mapGeoSvetiNikole": "Свети Николе",
+  "mapGeoVinica": "Виница",
+  "mapGeoDelcevo": "Делчево",
+  "mapGeoProbistip": "Пробиштип",
+  "mapGeoBerovo": "Берово",
+  "mapGeoKratovo": "Кратово",
+  "mapGeoKicevo": "Кичево",
+  "mapGeoMakedonskiBrod": "Македонски Брод",
+  "mapGeoNegotino": "Неготино",
+  "mapGeoResen": "Ресен",
+  "mapGeoUnknownArea": "Непознато подрачје",
+  "mapPinPreviewSemantic": "{title}, {severity}. Допрете двапати за преглед.",
+  "@mapPinPreviewSemantic": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "severity": {
+        "type": "String"
+      }
+    }
+  },
+  "mapClusterSemantic": "{count, plural, one{1 загадено место во група. Допрете двапати за проширување.} other{{count} загадени места во група. Допрете двапати за проширување.}}",
+  "@mapClusterSemantic": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mapUserLocationSemantic": "Вашата тековна локација",
+  "mapPreviewDismissAnnouncement": "Прегледот на местото е затворен.",
+  "mapDistanceMetersAway": "{meters} м оддалеченост",
+  "@mapDistanceMetersAway": {
+    "placeholders": {
+      "meters": {
+        "type": "int"
+      }
+    }
+  },
+  "mapDistanceKilometersAway": "{kilometers} км оддалеченост",
+  "@mapDistanceKilometersAway": {
+    "placeholders": {
+      "kilometers": {
+        "type": "String"
+      }
+    }
+  },
+  "mapPreviewSemanticLabel": "Избрано место: {title}. {distance}. Допрете двапати за детали. Повлечете надолу за затворање.",
+  "@mapPreviewSemanticLabel": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "mapPreviewSemanticHint": "Користете ги копчињата за насоки или целосни детали.",
+  "mapPreviewDirections": "Насоки",
+  "mapPreviewDetails": "Детали",
+  "mapSyncNoticeSemanticRefreshHint": "Допрете двапати за веднаш освежување на мапата.",
+  "mapSyncLiveUpdatesDelayed": "Живите ажурирања се забавени. Тивко повторно се обидуваме…",
+  "mapSyncConnectionUnstable": "Врската е нестабилна. Освежувањето работи во позадина…",
+  "mapSyncOfflineSnapshot": "Офлајн. Се прикажува последниот зачуван преглед на мапата.",
+  "mapSyncOfflineSnapshotJustNow": "Офлајн. Се прикажува последниот зачуван преглед на мапата од сега.",
+  "mapSyncOfflineSnapshotMinutesAgo": "Офлајн. Се прикажува последниот зачуван преглед на мапата пред {minutes} мин.",
+  "@mapSyncOfflineSnapshotMinutesAgo": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "mapSyncOfflineSnapshotHoursAgo": "Офлајн. Се прикажува последниот зачуван преглед на мапата пред {hours} ч.",
+  "@mapSyncOfflineSnapshotHoursAgo": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "mapSearchLocationUnavailableSnack": "Локацијата не е достапна за ова место.",
+  "mapSearchFieldSemanticHint": "Внесете наслов, категорија или опис",
+  "mapSearchBarHint": "Пребарај места…",
   "locationRetryAddressSemantic": "Обиди повторно за адреса",
   "photoReviewDiscardTitle": "Да се отфрли оваа фотографија?",
   "photoReviewDiscardBody": "Можете повторно да снимите или да одберете друга од библиотеката.",
@@ -2128,6 +2378,7 @@
   "reportIssueDetailsLabel": "Дополнителни детали (незадолжително)",
   "reportIssueDetailsHint": "Опиши го проблемот…",
   "searchModalCancel": "Откажи",
+  "searchModalPlaceholder": "Пребарај загадени локации",
   "appSmartImageRetry": "Обиди повторно",
   "appSmartImageRetryIn": "Обид повторно за {seconds} с",
   "@appSmartImageRetryIn": {
@@ -3022,6 +3273,7 @@
   "homeSiteCleaningEventUnavailable": "Деталите за настанот моментално не се достапни.",
   "homeSiteCleaningListLoadError": "Не можевме да ги вчитаме настаните. Проверете ја врската и обидете се повторно.",
   "homeSiteCleaningRetry": "Обиди повторно",
+  "homeSiteCleaningLoadingSemantic": "Се вчитуваат еко акции.",
   "eventsDistanceLessThan100m": "<100 м",
   "eventsDistanceMeters": "{meters} м",
   "@eventsDistanceMeters": {
@@ -3405,5 +3657,9 @@
   },
   "reportDraftIncomingPhotoContinue": "Продолжи со нацртот",
   "reportDraftIncomingPhotoReplace": "Замени го нацртот",
-  "reportDraftIncomingPhotoAdd": "Додај во нацртот"
+  "reportDraftIncomingPhotoAdd": "Додај во нацртот",
+  "savedMapAreasTitle": "Зачувани области на мапа",
+  "savedMapAreasPlaceholder": "Офлајн региони и преземања ќе се појават тука.",
+  "mapWhatsNewTitle": "Ажурирања на мапата",
+  "mapWhatsNewBody": "Подобро предвремено вчитување, постојани кластери и побезбедни мапни процеси."
 }

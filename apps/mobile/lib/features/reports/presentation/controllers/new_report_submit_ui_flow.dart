@@ -77,7 +77,7 @@ abstract final class NewReportSubmitUiFlow {
     if (error.code == 'UNAUTHORIZED' ||
         error.code == 'INVALID_TOKEN_USER' ||
         error.code == 'ACCOUNT_NOT_ACTIVE') {
-      Navigator.of(context).pushNamedAndRemoveUntil(
+      Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
         AppRoutes.signIn,
         (Route<dynamic> route) => false,
       );

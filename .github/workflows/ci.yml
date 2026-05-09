@@ -78,3 +78,28 @@ jobs:
           dart run tool/check_reports_max_lines.dart
           dart run tool/check_reports_import_boundaries.dart
           dart run tool/check_reports_invariants.dart
+
+      - name: API unit tests (Jest)
+        run: pnpm --filter @chisto/api test
+
+      - name: Admin unit tests (Vitest)
+        run: pnpm --filter @chisto/admin test
+
+      - name: Build admin (Playwright a11y)
+        run: pnpm --filter @chisto/admin build
+
+      - name: Install Playwright (Chromium)
+        run: pnpm --filter @chisto/admin exec playwright install chromium
+
+      - name: Admin map a11y (Playwright + axe)
+        run: |
+          (cd apps/admin && pnpm exec next start -p 3001 &)
+          for i in $(seq 1 60); do
+            if curl -sf "http://127.0.0.1:3001" >/dev/null; then
+              echo "admin server up"
+              break
+            fi
+            sleep 2
+          done
+          curl -sf "http://127.0.0.1:3001" >/dev/null
+          CI=true ADMIN_E2E_BASE_URL=http://127.0.0.1:3001 pnpm --filter @chisto/admin exec playwright test tests/a11y

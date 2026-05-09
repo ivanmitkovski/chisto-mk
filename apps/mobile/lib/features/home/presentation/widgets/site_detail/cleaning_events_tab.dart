@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
+import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/data/event_site_resolver.dart';
@@ -12,7 +14,6 @@ import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/events_localized_strings.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
 import 'package:chisto_mobile/features/events/presentation/navigation/events_navigation.dart';
-import 'package:chisto_mobile/features/events/presentation/widgets/event_card_skeleton.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/domain/models/cleaning_event.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/site_detail/sticky_bottom_cta.dart';
@@ -20,7 +21,11 @@ import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 
 class CleaningEventsTab extends StatefulWidget {
-  const CleaningEventsTab({super.key, required this.site, required this.onCreateEvent});
+  const CleaningEventsTab({
+    super.key,
+    required this.site,
+    required this.onCreateEvent,
+  });
 
   final PollutionSite site;
   final VoidCallback onCreateEvent;
@@ -29,29 +34,70 @@ class CleaningEventsTab extends StatefulWidget {
   State<CleaningEventsTab> createState() => _CleaningEventsTabState();
 }
 
-class _CleaningEventsTabState extends State<CleaningEventsTab> {
+class _CleaningEventsTabState extends State<CleaningEventsTab>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _shimmer;
+
   @override
   void initState() {
     super.initState();
+    _shimmer = AnimationController(vsync: this, duration: AppMotion.slow);
     final EventsRepository store = EventsRepositoryRegistry.instance;
     store.loadInitialIfNeeded();
     unawaited(store.prefetchEventsForSite(widget.site.id));
   }
 
-  Widget _buildLoadingSkeleton(BuildContext context) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.xl),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            const EventCardSkeleton(),
-            SizedBox(height: AppSpacing.md, child: Divider(height: 1, color: colorScheme.outlineVariant)),
-            const EventCardSkeleton(),
-            SizedBox(height: AppSpacing.md, child: Divider(height: 1, color: colorScheme.outlineVariant)),
-            const EventCardSkeleton(),
-          ],
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    AppMotion.syncRepeatingShimmer(_shimmer, context);
+  }
+
+  @override
+  void dispose() {
+    _shimmer.dispose();
+    super.dispose();
+  }
+
+  Widget _buildLoadingSkeleton(BuildContext context, double ctaHeight) {
+    return Semantics(
+      key: const Key('cleaning-events-loading-semantics'),
+      label: context.l10n.homeSiteCleaningLoadingSemantic,
+      child: ExcludeSemantics(
+        child: AnimatedBuilder(
+          animation: _shimmer,
+          builder: (BuildContext context, Widget? child) {
+            final double t = _shimmer.value;
+            return Stack(
+              children: <Widget>[
+                CustomScrollView(
+                  physics: const NeverScrollableScrollPhysics(),
+                  slivers: <Widget>[
+                    SliverPadding(
+                      padding: EdgeInsets.fromLTRB(
+                        AppSpacing.lg,
+                        AppSpacing.md,
+                        AppSpacing.lg,
+                        ctaHeight + AppSpacing.md,
+                      ),
+                      sliver: SliverList.separated(
+                        itemCount: 3,
+                        separatorBuilder: (_, _) =>
+                            const SizedBox(height: AppSpacing.md),
+                        itemBuilder: (_, int index) =>
+                            _CleaningEventCardSkeleton(
+                              key: Key('cleaning-events-skeleton-card-$index'),
+                              t: t,
+                              showJoinButton: index != 1,
+                            ),
+                      ),
+                    ),
+                  ],
+                ),
+                _StickyBottomCtaSkeleton(t: t),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -67,13 +113,15 @@ class _CleaningEventsTabState extends State<CleaningEventsTab> {
       listenable: store,
       builder: (BuildContext context, Widget? child) {
         if (!store.isReady) {
-          return _buildLoadingSkeleton(context);
+          return _buildLoadingSkeleton(context, ctaHeight);
         }
-        final List<CleaningEvent> events = EventSiteResolver.cleaningEventsForSite(
-          siteId: widget.site.id,
-          events: store.events,
-          statusLabelFor: (EcoEventStatus s) => s.localizedLabel(context.l10n),
-        );
+        final List<CleaningEvent> events =
+            EventSiteResolver.cleaningEventsForSite(
+              siteId: widget.site.id,
+              events: store.events,
+              statusLabelFor: (EcoEventStatus s) =>
+                  s.localizedLabel(context.l10n),
+            );
         return Stack(
           children: <Widget>[
             CustomScrollView(
@@ -88,14 +136,18 @@ class _CleaningEventsTabState extends State<CleaningEventsTab> {
                   ),
                   sliver: events.isEmpty
                       ? SliverToBoxAdapter(
-                          child: store.lastGlobalListLoadFailed && !store.isShowingStaleCachedEvents
+                          child:
+                              store.lastGlobalListLoadFailed &&
+                                  !store.isShowingStaleCachedEvents
                               ? _buildLoadErrorState(context, store)
                               : _buildEmptyState(context),
                         )
                       : SliverList.separated(
                           itemCount: events.length,
-                          separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.md),
-                          itemBuilder: (BuildContext ctx, int i) => _buildEventCard(ctx, events[i]),
+                          separatorBuilder: (_, _) =>
+                              const SizedBox(height: AppSpacing.md),
+                          itemBuilder: (BuildContext ctx, int i) =>
+                              _buildEventCard(ctx, events[i]),
                         ),
                 ),
               ],
@@ -120,14 +172,18 @@ class _CleaningEventsTabState extends State<CleaningEventsTab> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Icon(Icons.cloud_off_rounded, size: 48, color: colorScheme.onSurfaceVariant),
+            Icon(
+              Icons.cloud_off_rounded,
+              size: 48,
+              color: colorScheme.onSurfaceVariant,
+            ),
             const SizedBox(height: AppSpacing.md),
             Text(
               context.l10n.homeSiteCleaningListLoadError,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
             const SizedBox(height: AppSpacing.md),
             FilledButton(
@@ -176,27 +232,25 @@ class _CleaningEventsTabState extends State<CleaningEventsTab> {
               const SizedBox(height: AppSpacing.md),
               Text(
                 context.l10n.homeSiteCleaningEmptyTitle,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyLarge
-                    ?.copyWith(fontWeight: FontWeight.w600),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: AppSpacing.xs),
               Text(
                 context.l10n.homeSiteCleaningEmptyBody,
                 textAlign: TextAlign.center,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodySmall
-                    ?.copyWith(height: 1.45),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(height: 1.45),
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
                 context.l10n.homeSiteCleaningTapToCreate,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: colorScheme.primary,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  color: colorScheme.primary,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ],
           ),
@@ -224,8 +278,9 @@ class _CleaningEventsTabState extends State<CleaningEventsTab> {
 
   Widget _buildEventCard(BuildContext context, CleaningEvent event) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final String dateLabel =
-        DateFormat.yMd(Localizations.localeOf(context).toString()).format(event.dateTime);
+    final String dateLabel = DateFormat.yMd(
+      Localizations.localeOf(context).toString(),
+    ).format(event.dateTime);
 
     return Semantics(
       button: true,
@@ -233,7 +288,6 @@ class _CleaningEventsTabState extends State<CleaningEventsTab> {
       child: GestureDetector(
         onTap: () => _navigateToEcoEvent(context, event),
         child: Container(
-          margin: const EdgeInsets.only(bottom: AppSpacing.md),
           padding: const EdgeInsets.all(AppSpacing.md),
           decoration: BoxDecoration(
             color: colorScheme.surfaceContainerHighest,
@@ -271,7 +325,8 @@ class _CleaningEventsTabState extends State<CleaningEventsTab> {
                       children: <Widget>[
                         Text(
                           event.title,
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
                                 fontWeight: FontWeight.w600,
                                 color: colorScheme.onSurface,
                               ),
@@ -294,11 +349,15 @@ class _CleaningEventsTabState extends State<CleaningEventsTab> {
                       ),
                       decoration: BoxDecoration(
                         color: event.statusColor!.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusPill,
+                        ),
                       ),
                       child: Text(
                         event.statusLabel!,
-                        style: AppTypography.badgeLabel.copyWith(color: event.statusColor),
+                        style: AppTypography.badgeLabel.copyWith(
+                          color: event.statusColor,
+                        ),
                       ),
                     ),
                 ],
@@ -323,12 +382,14 @@ class _CleaningEventsTabState extends State<CleaningEventsTab> {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      context.l10n.homeSiteCleaningVolunteersJoined(event.participantCount),
+                      context.l10n.homeSiteCleaningVolunteersJoined(
+                        event.participantCount,
+                      ),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 13,
-                            color: colorScheme.onSurfaceVariant,
-                          ),
+                        fontWeight: FontWeight.w500,
+                        fontSize: 13,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ],
                 ),
@@ -339,9 +400,9 @@ class _CleaningEventsTabState extends State<CleaningEventsTab> {
                     ? context.l10n.homeSiteCleaningOrganizerHint
                     : context.l10n.homeSiteCleaningVolunteerHint,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                      height: 1.35,
-                    ),
+                  color: colorScheme.onSurfaceVariant,
+                  height: 1.35,
+                ),
               ),
               if (!event.isOrganizer) ...<Widget>[
                 const SizedBox(height: AppSpacing.sm),
@@ -355,14 +416,16 @@ class _CleaningEventsTabState extends State<CleaningEventsTab> {
                       backgroundColor: colorScheme.primary,
                       foregroundColor: colorScheme.onPrimary,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusMd,
+                        ),
                       ),
                     ),
                     child: Text(
                       context.l10n.homeSiteCleaningJoinAction,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
@@ -370,6 +433,174 @@ class _CleaningEventsTabState extends State<CleaningEventsTab> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _CleaningEventCardSkeleton extends StatelessWidget {
+  const _CleaningEventCardSkeleton({
+    super.key,
+    required this.t,
+    required this.showJoinButton,
+  });
+
+  final double t;
+  final bool showJoinButton;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.06),
+            blurRadius: AppSpacing.sm,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              _ShimmerBox(
+                width: 40,
+                height: 40,
+                radius: AppSpacing.radiusMd,
+                t: t,
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    _ShimmerBox(
+                      width: 136,
+                      height: 15,
+                      radius: AppSpacing.radiusSm,
+                      t: t,
+                    ),
+                    const SizedBox(height: 6),
+                    _ShimmerBox(
+                      width: 88,
+                      height: 12,
+                      radius: AppSpacing.radiusSm,
+                      t: t,
+                    ),
+                  ],
+                ),
+              ),
+              _ShimmerBox(
+                width: 76,
+                height: 22,
+                radius: AppSpacing.radiusPill,
+                t: t,
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          _ShimmerBox(
+            width: 168,
+            height: 28,
+            radius: AppSpacing.radius10,
+            t: t,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          _ShimmerBox(
+            width: double.infinity,
+            height: 12,
+            radius: AppSpacing.radiusSm,
+            t: t,
+          ),
+          const SizedBox(height: 6),
+          _ShimmerBox(
+            width: 216,
+            height: 12,
+            radius: AppSpacing.radiusSm,
+            t: t,
+          ),
+          if (showJoinButton) ...<Widget>[
+            const SizedBox(height: AppSpacing.sm),
+            _ShimmerBox(
+              width: double.infinity,
+              height: 48,
+              radius: AppSpacing.radiusMd,
+              t: t,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _StickyBottomCtaSkeleton extends StatelessWidget {
+  const _StickyBottomCtaSkeleton({required this.t});
+
+  final double t;
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      key: const Key('cleaning-events-skeleton-cta'),
+      left: 0,
+      right: 0,
+      bottom: 0,
+      child: Container(
+        padding: EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          AppSpacing.md,
+          AppSpacing.lg,
+          AppSpacing.md + MediaQuery.of(context).padding.bottom,
+        ),
+        decoration: BoxDecoration(
+          color: AppColors.appBackground,
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+              color: AppColors.shadowLight,
+              blurRadius: AppSpacing.md,
+              offset: const Offset(0, -4),
+            ),
+          ],
+        ),
+        child: _ShimmerBox(
+          width: double.infinity,
+          height: 48,
+          radius: AppSpacing.radiusMd,
+          t: t,
+        ),
+      ),
+    );
+  }
+}
+
+class _ShimmerBox extends StatelessWidget {
+  const _ShimmerBox({
+    required this.width,
+    required this.height,
+    required this.radius,
+    required this.t,
+  });
+
+  final double width;
+  final double height;
+  final double radius;
+  final double t;
+
+  @override
+  Widget build(BuildContext context) {
+    final double opacity = 0.06 + 0.04 * (0.5 + 0.5 * (1 - (2 * t - 1).abs()));
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: AppColors.textMuted.withValues(alpha: opacity),
+        borderRadius: BorderRadius.circular(radius),
       ),
     );
   }

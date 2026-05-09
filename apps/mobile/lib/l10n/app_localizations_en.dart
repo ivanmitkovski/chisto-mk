@@ -1728,6 +1728,470 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapOpenMapsFailed => 'Could not open Maps';
 
   @override
+  String get mapSearchRecentsLabel => 'Recent';
+
+  @override
+  String get mapSearchClearRecentsButton => 'Clear';
+
+  @override
+  String get mapSearchEmptyTitle => 'Search pollution sites';
+
+  @override
+  String get mapSearchEmptySubtitle =>
+      'Type a title, category, or description. Or tap a recent search below.';
+
+  @override
+  String get mapSearchNoResultsTitle => 'No matching sites';
+
+  @override
+  String get mapSearchNoResultsSubtitle =>
+      'Try different words or clear filters on the map.';
+
+  @override
+  String mapSearchResultsBadge(int count) {
+    return '$count results';
+  }
+
+  @override
+  String get mapSearchRemoteLoading => 'Searching all sites…';
+
+  @override
+  String get mapSearchRemoteError => 'Could not search all sites.';
+
+  @override
+  String get mapSearchRemoteRetry => 'Retry';
+
+  @override
+  String get mapSearchSectionOnMap => 'On this map';
+
+  @override
+  String get mapSearchSectionEverywhere => 'More results';
+
+  @override
+  String get mapSearchSuggestionsLabel => 'Suggestions';
+
+  @override
+  String get mapUpdatedToast => 'Map updated';
+
+  @override
+  String get mapErrorAutoRetryFootnote =>
+      'We’ll retry automatically in a few seconds. You can also tap Try again.';
+
+  @override
+  String mapFilteredSitesAnnounce(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count sites shown on the map',
+      one: 'One site shown on the map',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String mapClusterExpansionAnnounce(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count sites separated on the map',
+      one: 'One site separated on the map',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get mapScreenRouteSemantic =>
+      'Pollution map. Tap pins to view site details.';
+
+  @override
+  String get mapLoadingSemantic => 'Loading map';
+
+  @override
+  String get mapSiteNotOnMapSnack =>
+      'This site is not available on the map yet.';
+
+  @override
+  String get mapOpenLocationFailedSnack =>
+      'Could not open this location on the map.';
+
+  @override
+  String get mapEmptyFiltersLiveRegion => 'No sites match your current filters';
+
+  @override
+  String get mapEmptyFiltersTitle => 'No sites match your filters';
+
+  @override
+  String get mapEmptyFiltersSubtitle => 'Try adjusting filters or search.';
+
+  @override
+  String get mapDirectionsSheetOpenInMaps => 'Open in Maps';
+
+  @override
+  String get mapDirectionsSheetViewLocation => 'View location';
+
+  @override
+  String get mapDirectionsSheetSubtitleDirections =>
+      'Choose which app to get directions.';
+
+  @override
+  String get mapDirectionsSheetSubtitleViewLocation =>
+      'Choose which app to view this location on a map.';
+
+  @override
+  String get mapDirectionsAppleMapsTitle => 'Apple Maps';
+
+  @override
+  String get mapDirectionsAppleMapsSubtitle => 'Built-in maps on this device.';
+
+  @override
+  String get mapDirectionsGoogleMapsTitle => 'Google Maps';
+
+  @override
+  String get mapDirectionsGoogleMapsSubtitle => 'Web and Google Maps app.';
+
+  @override
+  String get mapSemanticCloseActionsMenu => 'Close actions menu';
+
+  @override
+  String get mapSemanticOpenActionsMenu => 'Open actions menu';
+
+  @override
+  String get mapSemanticHideHeatmap => 'Hide heatmap';
+
+  @override
+  String get mapSemanticShowHeatmap => 'Show heatmap';
+
+  @override
+  String get mapSemanticSwitchToLightMap => 'Switch to light map';
+
+  @override
+  String get mapSemanticSwitchToDarkMap => 'Switch to dark map';
+
+  @override
+  String get mapSemanticZoomWholeCountry => 'Zoom out to show whole country';
+
+  @override
+  String get mapSemanticUnlockRotation => 'Unlock map rotation';
+
+  @override
+  String get mapSemanticLockRotation => 'Lock map rotation';
+
+  @override
+  String get mapSemanticCenterOnMyLocation => 'Center map on my location';
+
+  @override
+  String get mapSemanticSearchSites => 'Search sites';
+
+  @override
+  String get mapSemanticResetRotationNorth => 'Reset map rotation to north';
+
+  @override
+  String get mapFilterButtonSemanticPrefix => 'Filter sites.';
+
+  @override
+  String get mapFilterButtonSemanticNoMatch =>
+      'No sites match current filters in this area.';
+
+  @override
+  String get mapFilterButtonSemanticNoSites => 'No sites in this area.';
+
+  @override
+  String mapFilterButtonSemanticSitesCount(int count) {
+    return '$count sites in this area.';
+  }
+
+  @override
+  String get mapFilterButtonSemanticSuffix => 'Tap to open filters.';
+
+  @override
+  String get mapFilterCountNoMatch => 'No match';
+
+  @override
+  String get mapFilterCountNoSites => 'No sites';
+
+  @override
+  String get mapFilterSheetTitle => 'Filter sites';
+
+  @override
+  String get mapFilterCloseTooltip => 'Close filters';
+
+  @override
+  String get mapFilterSectionSiteStatus => 'Site status';
+
+  @override
+  String get mapFilterSectionArea => 'Municipality / area';
+
+  @override
+  String get mapFilterSectionPollutionType => 'Pollution type';
+
+  @override
+  String get mapFilterSectionVisibility => 'Visibility';
+
+  @override
+  String get mapFilterShowArchivedSites => 'Show archived sites';
+
+  @override
+  String mapFilterShowingLiveRegion(int visible, int total) {
+    return '$visible of $total pollution sites visible in this area';
+  }
+
+  @override
+  String mapFilterShowingInline(int visible, int total) {
+    return 'Showing $visible of $total';
+  }
+
+  @override
+  String mapFilterPollutionTypeSemantic(String type) {
+    return 'Filter $type sites';
+  }
+
+  @override
+  String get mapFilterPollutionTypeHintOff => 'Double tap to show this type';
+
+  @override
+  String get mapFilterPollutionTypeHintOn => 'Double tap to hide this type';
+
+  @override
+  String get mapFilterPollutionTypeUnknown => 'Unknown type';
+
+  @override
+  String get mapFilterSiteStatusReported => 'Reported';
+
+  @override
+  String get mapFilterSiteStatusVerified => 'Verified';
+
+  @override
+  String get mapFilterSiteStatusCleanupScheduled => 'Cleanup scheduled';
+
+  @override
+  String get mapFilterSiteStatusInProgress => 'In progress';
+
+  @override
+  String get mapFilterSiteStatusCleaned => 'Cleaned';
+
+  @override
+  String get mapFilterSiteStatusDisputed => 'Disputed';
+
+  @override
+  String get mapFilterSiteStatusArchived => 'Archived';
+
+  @override
+  String get mapFilterSiteStatusUnknown => 'Unknown status';
+
+  @override
+  String mapFilterSiteStatusSemantic(String status) {
+    return 'Filter $status sites';
+  }
+
+  @override
+  String get mapFilterSiteStatusHintOff => 'Double tap to show this status';
+
+  @override
+  String get mapFilterSiteStatusHintOn => 'Double tap to hide this status';
+
+  @override
+  String get mapGeoWholeCountry => 'Whole country';
+
+  @override
+  String get mapGeoSkopjeWhole => 'All Skopje municipalities';
+
+  @override
+  String get mapGeoSkopje => 'Skopje';
+
+  @override
+  String get mapGeoSkopjeCentar => 'Centar';
+
+  @override
+  String get mapGeoSkopjeAerodrom => 'Aerodrom';
+
+  @override
+  String get mapGeoSkopjeKarposh => 'Karpoš';
+
+  @override
+  String get mapGeoSkopjeChair => 'Čair';
+
+  @override
+  String get mapGeoSkopjeKiselaVoda => 'Kisela Voda';
+
+  @override
+  String get mapGeoSkopjeGaziBaba => 'Gazi Baba';
+
+  @override
+  String get mapGeoSkopjeButel => 'Butel';
+
+  @override
+  String get mapGeoSkopjeGjorcePetrov => 'Gjorče Petrov';
+
+  @override
+  String get mapGeoSkopjeSaraj => 'Saraj';
+
+  @override
+  String get mapGeoBitola => 'Bitola';
+
+  @override
+  String get mapGeoKumanovo => 'Kumanovo';
+
+  @override
+  String get mapGeoPrilep => 'Prilep';
+
+  @override
+  String get mapGeoTetovo => 'Tetovo';
+
+  @override
+  String get mapGeoVeles => 'Veles';
+
+  @override
+  String get mapGeoOhrid => 'Ohrid';
+
+  @override
+  String get mapGeoStip => 'Štip';
+
+  @override
+  String get mapGeoGostivar => 'Gostivar';
+
+  @override
+  String get mapGeoStrumica => 'Strumica';
+
+  @override
+  String get mapGeoKavadarci => 'Kavadarci';
+
+  @override
+  String get mapGeoKocani => 'Kočani';
+
+  @override
+  String get mapGeoStruga => 'Struga';
+
+  @override
+  String get mapGeoRadovis => 'Radoviš';
+
+  @override
+  String get mapGeoGevgelija => 'Gevgelija';
+
+  @override
+  String get mapGeoKrivaPalanka => 'Kriva Palanka';
+
+  @override
+  String get mapGeoSvetiNikole => 'Sveti Nikole';
+
+  @override
+  String get mapGeoVinica => 'Vinica';
+
+  @override
+  String get mapGeoDelcevo => 'Delčevo';
+
+  @override
+  String get mapGeoProbistip => 'Probishtip';
+
+  @override
+  String get mapGeoBerovo => 'Berovo';
+
+  @override
+  String get mapGeoKratovo => 'Kratovo';
+
+  @override
+  String get mapGeoKicevo => 'Kičevo';
+
+  @override
+  String get mapGeoMakedonskiBrod => 'Makedonski Brod';
+
+  @override
+  String get mapGeoNegotino => 'Negotino';
+
+  @override
+  String get mapGeoResen => 'Resen';
+
+  @override
+  String get mapGeoUnknownArea => 'Unknown area';
+
+  @override
+  String mapPinPreviewSemantic(String title, String severity) {
+    return '$title, $severity. Double tap to preview.';
+  }
+
+  @override
+  String mapClusterSemantic(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pollution sites clustered. Double tap to expand.',
+      one: '1 pollution site clustered. Double tap to expand.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get mapUserLocationSemantic => 'Your current location';
+
+  @override
+  String get mapPreviewDismissAnnouncement => 'Dismissed site preview.';
+
+  @override
+  String mapDistanceMetersAway(int meters) {
+    return '$meters m away';
+  }
+
+  @override
+  String mapDistanceKilometersAway(String kilometers) {
+    return '$kilometers km away';
+  }
+
+  @override
+  String mapPreviewSemanticLabel(String title, String distance) {
+    return 'Selected site: $title. $distance. Double tap preview for details. Swipe down to dismiss.';
+  }
+
+  @override
+  String get mapPreviewSemanticHint =>
+      'Use actions for directions or full details.';
+
+  @override
+  String get mapPreviewDirections => 'Directions';
+
+  @override
+  String get mapPreviewDetails => 'Details';
+
+  @override
+  String get mapSyncNoticeSemanticRefreshHint =>
+      'Double tap to refresh map now.';
+
+  @override
+  String get mapSyncLiveUpdatesDelayed =>
+      'Live updates delayed. Retrying quietly…';
+
+  @override
+  String get mapSyncConnectionUnstable =>
+      'Connection unstable. Refreshing in background…';
+
+  @override
+  String get mapSyncOfflineSnapshot =>
+      'Offline. Showing your last saved map snapshot.';
+
+  @override
+  String get mapSyncOfflineSnapshotJustNow =>
+      'Offline. Showing your last saved map snapshot from just now.';
+
+  @override
+  String mapSyncOfflineSnapshotMinutesAgo(int minutes) {
+    return 'Offline. Showing your last saved map snapshot from ${minutes}m ago.';
+  }
+
+  @override
+  String mapSyncOfflineSnapshotHoursAgo(int hours) {
+    return 'Offline. Showing your last saved map snapshot from ${hours}h ago.';
+  }
+
+  @override
+  String get mapSearchLocationUnavailableSnack =>
+      'Location is unavailable for this site.';
+
+  @override
+  String get mapSearchFieldSemanticHint =>
+      'Type a title, category, or description';
+
+  @override
+  String get mapSearchBarHint => 'Search sites…';
+
+  @override
   String get locationRetryAddressSemantic => 'Retry address';
 
   @override
@@ -4151,6 +4615,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchModalCancel => 'Cancel';
 
   @override
+  String get searchModalPlaceholder => 'Search pollution sites';
+
+  @override
   String get appSmartImageRetry => 'Retry';
 
   @override
@@ -5562,6 +6029,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeSiteCleaningRetry => 'Retry';
 
   @override
+  String get homeSiteCleaningLoadingSemantic => 'Loading eco actions.';
+
+  @override
   String get eventsDistanceLessThan100m => '<100 m';
 
   @override
@@ -6269,4 +6739,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reportDraftIncomingPhotoAdd => 'Add to draft';
+
+  @override
+  String get savedMapAreasTitle => 'Saved map areas';
+
+  @override
+  String get savedMapAreasPlaceholder =>
+      'Offline regions and background downloads will appear here.';
+
+  @override
+  String get mapWhatsNewTitle => 'Map updates';
+
+  @override
+  String get mapWhatsNewBody =>
+      'Smarter prefetch, stable clusters, and safer map pipelines.';
 }
