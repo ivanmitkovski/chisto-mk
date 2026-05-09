@@ -234,6 +234,21 @@ export type UserNotificationPreference = $Result.DefaultSelection<Prisma.$UserNo
  */
 export type NotificationOutbox = $Result.DefaultSelection<Prisma.$NotificationOutboxPayload>
 /**
+ * Model MapSiteProjection
+ * 
+ */
+export type MapSiteProjection = $Result.DefaultSelection<Prisma.$MapSiteProjectionPayload>
+/**
+ * Model MapEventOutbox
+ * 
+ */
+export type MapEventOutbox = $Result.DefaultSelection<Prisma.$MapEventOutboxPayload>
+/**
+ * Model MapCdnPurgeLog
+ * 
+ */
+export type MapCdnPurgeLog = $Result.DefaultSelection<Prisma.$MapCdnPurgeLogPayload>
+/**
  * Model AdminMutationIdempotency
  * Records client-supplied job ids for idempotent admin bulk mutations (e.g. bulk approve/decline).
  */
@@ -471,6 +486,15 @@ export const NotificationType: {
 
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]
 
+
+export const MapEventOutboxStatus: {
+  PENDING: 'PENDING',
+  DISPATCHED: 'DISPATCHED',
+  FAILED: 'FAILED'
+};
+
+export type MapEventOutboxStatus = (typeof MapEventOutboxStatus)[keyof typeof MapEventOutboxStatus]
+
 }
 
 export type Role = $Enums.Role
@@ -564,6 +588,10 @@ export const DevicePlatform: typeof $Enums.DevicePlatform
 export type NotificationType = $Enums.NotificationType
 
 export const NotificationType: typeof $Enums.NotificationType
+
+export type MapEventOutboxStatus = $Enums.MapEventOutboxStatus
+
+export const MapEventOutboxStatus: typeof $Enums.MapEventOutboxStatus
 
 /**
  * ##  Prisma Client ʲˢ
@@ -1127,6 +1155,36 @@ export class PrismaClient<
   get notificationOutbox(): Prisma.NotificationOutboxDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.mapSiteProjection`: Exposes CRUD operations for the **MapSiteProjection** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more MapSiteProjections
+    * const mapSiteProjections = await prisma.mapSiteProjection.findMany()
+    * ```
+    */
+  get mapSiteProjection(): Prisma.MapSiteProjectionDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.mapEventOutbox`: Exposes CRUD operations for the **MapEventOutbox** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more MapEventOutboxes
+    * const mapEventOutboxes = await prisma.mapEventOutbox.findMany()
+    * ```
+    */
+  get mapEventOutbox(): Prisma.MapEventOutboxDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.mapCdnPurgeLog`: Exposes CRUD operations for the **MapCdnPurgeLog** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more MapCdnPurgeLogs
+    * const mapCdnPurgeLogs = await prisma.mapCdnPurgeLog.findMany()
+    * ```
+    */
+  get mapCdnPurgeLog(): Prisma.MapCdnPurgeLogDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.adminMutationIdempotency`: Exposes CRUD operations for the **AdminMutationIdempotency** model.
     * Example usage:
     * ```ts
@@ -1613,6 +1671,9 @@ export namespace Prisma {
     UserNotification: 'UserNotification',
     UserNotificationPreference: 'UserNotificationPreference',
     NotificationOutbox: 'NotificationOutbox',
+    MapSiteProjection: 'MapSiteProjection',
+    MapEventOutbox: 'MapEventOutbox',
+    MapCdnPurgeLog: 'MapCdnPurgeLog',
     AdminMutationIdempotency: 'AdminMutationIdempotency'
   };
 
@@ -1629,7 +1690,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "userSession" | "phoneOtp" | "loginFailure" | "adminLoginFailure" | "adminTempToken" | "adminPendingMfa" | "adminNotification" | "pointTransaction" | "site" | "report" | "reportCoReporter" | "reportSubmitIdempotency" | "reportSideEffect" | "systemConfig" | "featureFlag" | "auditLog" | "cleanupEvent" | "eventParticipant" | "eventChatMessage" | "eventChatAttachment" | "eventChatMute" | "eventChatReadCursor" | "eventCheckIn" | "eventCheckInRedemption" | "eventLiveMetric" | "eventEvidencePhoto" | "eventRouteSegment" | "checkInRiskSignal" | "siteVote" | "siteSave" | "siteComment" | "siteCommentLike" | "siteShareEvent" | "siteShareLink" | "siteShareAttributionEvent" | "userFeedState" | "siteFeatureSnapshot" | "feedImpression" | "feedExperimentAssignment" | "userDeviceToken" | "userNotification" | "userNotificationPreference" | "notificationOutbox" | "adminMutationIdempotency"
+      modelProps: "user" | "userSession" | "phoneOtp" | "loginFailure" | "adminLoginFailure" | "adminTempToken" | "adminPendingMfa" | "adminNotification" | "pointTransaction" | "site" | "report" | "reportCoReporter" | "reportSubmitIdempotency" | "reportSideEffect" | "systemConfig" | "featureFlag" | "auditLog" | "cleanupEvent" | "eventParticipant" | "eventChatMessage" | "eventChatAttachment" | "eventChatMute" | "eventChatReadCursor" | "eventCheckIn" | "eventCheckInRedemption" | "eventLiveMetric" | "eventEvidencePhoto" | "eventRouteSegment" | "checkInRiskSignal" | "siteVote" | "siteSave" | "siteComment" | "siteCommentLike" | "siteShareEvent" | "siteShareLink" | "siteShareAttributionEvent" | "userFeedState" | "siteFeatureSnapshot" | "feedImpression" | "feedExperimentAssignment" | "userDeviceToken" | "userNotification" | "userNotificationPreference" | "notificationOutbox" | "mapSiteProjection" | "mapEventOutbox" | "mapCdnPurgeLog" | "adminMutationIdempotency"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -4889,6 +4950,228 @@ export namespace Prisma {
           }
         }
       }
+      MapSiteProjection: {
+        payload: Prisma.$MapSiteProjectionPayload<ExtArgs>
+        fields: Prisma.MapSiteProjectionFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.MapSiteProjectionFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapSiteProjectionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.MapSiteProjectionFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapSiteProjectionPayload>
+          }
+          findFirst: {
+            args: Prisma.MapSiteProjectionFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapSiteProjectionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.MapSiteProjectionFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapSiteProjectionPayload>
+          }
+          findMany: {
+            args: Prisma.MapSiteProjectionFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapSiteProjectionPayload>[]
+          }
+          create: {
+            args: Prisma.MapSiteProjectionCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapSiteProjectionPayload>
+          }
+          createMany: {
+            args: Prisma.MapSiteProjectionCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.MapSiteProjectionCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapSiteProjectionPayload>[]
+          }
+          delete: {
+            args: Prisma.MapSiteProjectionDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapSiteProjectionPayload>
+          }
+          update: {
+            args: Prisma.MapSiteProjectionUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapSiteProjectionPayload>
+          }
+          deleteMany: {
+            args: Prisma.MapSiteProjectionDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.MapSiteProjectionUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.MapSiteProjectionUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapSiteProjectionPayload>[]
+          }
+          upsert: {
+            args: Prisma.MapSiteProjectionUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapSiteProjectionPayload>
+          }
+          aggregate: {
+            args: Prisma.MapSiteProjectionAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateMapSiteProjection>
+          }
+          groupBy: {
+            args: Prisma.MapSiteProjectionGroupByArgs<ExtArgs>
+            result: $Utils.Optional<MapSiteProjectionGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.MapSiteProjectionCountArgs<ExtArgs>
+            result: $Utils.Optional<MapSiteProjectionCountAggregateOutputType> | number
+          }
+        }
+      }
+      MapEventOutbox: {
+        payload: Prisma.$MapEventOutboxPayload<ExtArgs>
+        fields: Prisma.MapEventOutboxFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.MapEventOutboxFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapEventOutboxPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.MapEventOutboxFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapEventOutboxPayload>
+          }
+          findFirst: {
+            args: Prisma.MapEventOutboxFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapEventOutboxPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.MapEventOutboxFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapEventOutboxPayload>
+          }
+          findMany: {
+            args: Prisma.MapEventOutboxFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapEventOutboxPayload>[]
+          }
+          create: {
+            args: Prisma.MapEventOutboxCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapEventOutboxPayload>
+          }
+          createMany: {
+            args: Prisma.MapEventOutboxCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.MapEventOutboxCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapEventOutboxPayload>[]
+          }
+          delete: {
+            args: Prisma.MapEventOutboxDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapEventOutboxPayload>
+          }
+          update: {
+            args: Prisma.MapEventOutboxUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapEventOutboxPayload>
+          }
+          deleteMany: {
+            args: Prisma.MapEventOutboxDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.MapEventOutboxUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.MapEventOutboxUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapEventOutboxPayload>[]
+          }
+          upsert: {
+            args: Prisma.MapEventOutboxUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapEventOutboxPayload>
+          }
+          aggregate: {
+            args: Prisma.MapEventOutboxAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateMapEventOutbox>
+          }
+          groupBy: {
+            args: Prisma.MapEventOutboxGroupByArgs<ExtArgs>
+            result: $Utils.Optional<MapEventOutboxGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.MapEventOutboxCountArgs<ExtArgs>
+            result: $Utils.Optional<MapEventOutboxCountAggregateOutputType> | number
+          }
+        }
+      }
+      MapCdnPurgeLog: {
+        payload: Prisma.$MapCdnPurgeLogPayload<ExtArgs>
+        fields: Prisma.MapCdnPurgeLogFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.MapCdnPurgeLogFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapCdnPurgeLogPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.MapCdnPurgeLogFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapCdnPurgeLogPayload>
+          }
+          findFirst: {
+            args: Prisma.MapCdnPurgeLogFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapCdnPurgeLogPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.MapCdnPurgeLogFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapCdnPurgeLogPayload>
+          }
+          findMany: {
+            args: Prisma.MapCdnPurgeLogFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapCdnPurgeLogPayload>[]
+          }
+          create: {
+            args: Prisma.MapCdnPurgeLogCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapCdnPurgeLogPayload>
+          }
+          createMany: {
+            args: Prisma.MapCdnPurgeLogCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.MapCdnPurgeLogCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapCdnPurgeLogPayload>[]
+          }
+          delete: {
+            args: Prisma.MapCdnPurgeLogDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapCdnPurgeLogPayload>
+          }
+          update: {
+            args: Prisma.MapCdnPurgeLogUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapCdnPurgeLogPayload>
+          }
+          deleteMany: {
+            args: Prisma.MapCdnPurgeLogDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.MapCdnPurgeLogUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.MapCdnPurgeLogUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapCdnPurgeLogPayload>[]
+          }
+          upsert: {
+            args: Prisma.MapCdnPurgeLogUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MapCdnPurgeLogPayload>
+          }
+          aggregate: {
+            args: Prisma.MapCdnPurgeLogAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateMapCdnPurgeLog>
+          }
+          groupBy: {
+            args: Prisma.MapCdnPurgeLogGroupByArgs<ExtArgs>
+            result: $Utils.Optional<MapCdnPurgeLogGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.MapCdnPurgeLogCountArgs<ExtArgs>
+            result: $Utils.Optional<MapCdnPurgeLogCountAggregateOutputType> | number
+          }
+        }
+      }
       AdminMutationIdempotency: {
         payload: Prisma.$AdminMutationIdempotencyPayload<ExtArgs>
         fields: Prisma.AdminMutationIdempotencyFieldRefs
@@ -5115,6 +5398,9 @@ export namespace Prisma {
     userNotification?: UserNotificationOmit
     userNotificationPreference?: UserNotificationPreferenceOmit
     notificationOutbox?: NotificationOutboxOmit
+    mapSiteProjection?: MapSiteProjectionOmit
+    mapEventOutbox?: MapEventOutboxOmit
+    mapCdnPurgeLog?: MapCdnPurgeLogOmit
     adminMutationIdempotency?: AdminMutationIdempotencyOmit
   }
 
@@ -5226,6 +5512,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded: number
     routeSegmentsClaimed: number
     checkInRiskSignals: number
+    archivedSites: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5259,6 +5546,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: boolean | UserCountOutputTypeCountEventEvidencePhotosUploadedArgs
     routeSegmentsClaimed?: boolean | UserCountOutputTypeCountRouteSegmentsClaimedArgs
     checkInRiskSignals?: boolean | UserCountOutputTypeCountCheckInRiskSignalsArgs
+    archivedSites?: boolean | UserCountOutputTypeCountArchivedSitesArgs
   }
 
   // Custom InputTypes
@@ -5480,6 +5768,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountCheckInRiskSignalsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: CheckInRiskSignalWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountArchivedSitesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SiteWhereInput
   }
 
 
@@ -6260,6 +6555,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: boolean | User$eventEvidencePhotosUploadedArgs<ExtArgs>
     routeSegmentsClaimed?: boolean | User$routeSegmentsClaimedArgs<ExtArgs>
     checkInRiskSignals?: boolean | User$checkInRiskSignalsArgs<ExtArgs>
+    archivedSites?: boolean | User$archivedSitesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -6378,6 +6674,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: boolean | User$eventEvidencePhotosUploadedArgs<ExtArgs>
     routeSegmentsClaimed?: boolean | User$routeSegmentsClaimedArgs<ExtArgs>
     checkInRiskSignals?: boolean | User$checkInRiskSignalsArgs<ExtArgs>
+    archivedSites?: boolean | User$archivedSitesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -6418,6 +6715,7 @@ export namespace Prisma {
       eventEvidencePhotosUploaded: Prisma.$EventEvidencePhotoPayload<ExtArgs>[]
       routeSegmentsClaimed: Prisma.$EventRouteSegmentPayload<ExtArgs>[]
       checkInRiskSignals: Prisma.$CheckInRiskSignalPayload<ExtArgs>[]
+      archivedSites: Prisma.$SitePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -6870,6 +7168,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded<T extends User$eventEvidencePhotosUploadedArgs<ExtArgs> = {}>(args?: Subset<T, User$eventEvidencePhotosUploadedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventEvidencePhotoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     routeSegmentsClaimed<T extends User$routeSegmentsClaimedArgs<ExtArgs> = {}>(args?: Subset<T, User$routeSegmentsClaimedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventRouteSegmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     checkInRiskSignals<T extends User$checkInRiskSignalsArgs<ExtArgs> = {}>(args?: Subset<T, User$checkInRiskSignalsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CheckInRiskSignalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    archivedSites<T extends User$archivedSitesArgs<ExtArgs> = {}>(args?: Subset<T, User$archivedSitesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SitePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -8071,6 +8370,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: CheckInRiskSignalScalarFieldEnum | CheckInRiskSignalScalarFieldEnum[]
+  }
+
+  /**
+   * User.archivedSites
+   */
+  export type User$archivedSitesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Site
+     */
+    select?: SiteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Site
+     */
+    omit?: SiteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteInclude<ExtArgs> | null
+    where?: SiteWhereInput
+    orderBy?: SiteOrderByWithRelationInput | SiteOrderByWithRelationInput[]
+    cursor?: SiteWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SiteScalarFieldEnum | SiteScalarFieldEnum[]
   }
 
   /**
@@ -16808,6 +17131,10 @@ export namespace Prisma {
     address: string | null
     description: string | null
     status: $Enums.SiteStatus | null
+    isArchivedByAdmin: boolean | null
+    archivedAt: Date | null
+    archivedById: string | null
+    archiveReason: string | null
     upvotesCount: number | null
     commentsCount: number | null
     savesCount: number | null
@@ -16823,6 +17150,10 @@ export namespace Prisma {
     address: string | null
     description: string | null
     status: $Enums.SiteStatus | null
+    isArchivedByAdmin: boolean | null
+    archivedAt: Date | null
+    archivedById: string | null
+    archiveReason: string | null
     upvotesCount: number | null
     commentsCount: number | null
     savesCount: number | null
@@ -16838,6 +17169,10 @@ export namespace Prisma {
     address: number
     description: number
     status: number
+    isArchivedByAdmin: number
+    archivedAt: number
+    archivedById: number
+    archiveReason: number
     upvotesCount: number
     commentsCount: number
     savesCount: number
@@ -16873,6 +17208,10 @@ export namespace Prisma {
     address?: true
     description?: true
     status?: true
+    isArchivedByAdmin?: true
+    archivedAt?: true
+    archivedById?: true
+    archiveReason?: true
     upvotesCount?: true
     commentsCount?: true
     savesCount?: true
@@ -16888,6 +17227,10 @@ export namespace Prisma {
     address?: true
     description?: true
     status?: true
+    isArchivedByAdmin?: true
+    archivedAt?: true
+    archivedById?: true
+    archiveReason?: true
     upvotesCount?: true
     commentsCount?: true
     savesCount?: true
@@ -16903,6 +17246,10 @@ export namespace Prisma {
     address?: true
     description?: true
     status?: true
+    isArchivedByAdmin?: true
+    archivedAt?: true
+    archivedById?: true
+    archiveReason?: true
     upvotesCount?: true
     commentsCount?: true
     savesCount?: true
@@ -17005,6 +17352,10 @@ export namespace Prisma {
     address: string | null
     description: string | null
     status: $Enums.SiteStatus
+    isArchivedByAdmin: boolean
+    archivedAt: Date | null
+    archivedById: string | null
+    archiveReason: string | null
     upvotesCount: number
     commentsCount: number
     savesCount: number
@@ -17039,10 +17390,15 @@ export namespace Prisma {
     address?: boolean
     description?: boolean
     status?: boolean
+    isArchivedByAdmin?: boolean
+    archivedAt?: boolean
+    archivedById?: boolean
+    archiveReason?: boolean
     upvotesCount?: boolean
     commentsCount?: boolean
     savesCount?: boolean
     sharesCount?: boolean
+    archivedBy?: boolean | Site$archivedByArgs<ExtArgs>
     reports?: boolean | Site$reportsArgs<ExtArgs>
     events?: boolean | Site$eventsArgs<ExtArgs>
     votes?: boolean | Site$votesArgs<ExtArgs>
@@ -17052,6 +17408,7 @@ export namespace Prisma {
     shareLinks?: boolean | Site$shareLinksArgs<ExtArgs>
     featureSnapshot?: boolean | Site$featureSnapshotArgs<ExtArgs>
     feedImpressions?: boolean | Site$feedImpressionsArgs<ExtArgs>
+    mapProjection?: boolean | Site$mapProjectionArgs<ExtArgs>
     _count?: boolean | SiteCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["site"]>
 
@@ -17064,10 +17421,15 @@ export namespace Prisma {
     address?: boolean
     description?: boolean
     status?: boolean
+    isArchivedByAdmin?: boolean
+    archivedAt?: boolean
+    archivedById?: boolean
+    archiveReason?: boolean
     upvotesCount?: boolean
     commentsCount?: boolean
     savesCount?: boolean
     sharesCount?: boolean
+    archivedBy?: boolean | Site$archivedByArgs<ExtArgs>
   }, ExtArgs["result"]["site"]>
 
   export type SiteSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -17079,10 +17441,15 @@ export namespace Prisma {
     address?: boolean
     description?: boolean
     status?: boolean
+    isArchivedByAdmin?: boolean
+    archivedAt?: boolean
+    archivedById?: boolean
+    archiveReason?: boolean
     upvotesCount?: boolean
     commentsCount?: boolean
     savesCount?: boolean
     sharesCount?: boolean
+    archivedBy?: boolean | Site$archivedByArgs<ExtArgs>
   }, ExtArgs["result"]["site"]>
 
   export type SiteSelectScalar = {
@@ -17094,14 +17461,19 @@ export namespace Prisma {
     address?: boolean
     description?: boolean
     status?: boolean
+    isArchivedByAdmin?: boolean
+    archivedAt?: boolean
+    archivedById?: boolean
+    archiveReason?: boolean
     upvotesCount?: boolean
     commentsCount?: boolean
     savesCount?: boolean
     sharesCount?: boolean
   }
 
-  export type SiteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "latitude" | "longitude" | "address" | "description" | "status" | "upvotesCount" | "commentsCount" | "savesCount" | "sharesCount", ExtArgs["result"]["site"]>
+  export type SiteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "latitude" | "longitude" | "address" | "description" | "status" | "isArchivedByAdmin" | "archivedAt" | "archivedById" | "archiveReason" | "upvotesCount" | "commentsCount" | "savesCount" | "sharesCount", ExtArgs["result"]["site"]>
   export type SiteInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    archivedBy?: boolean | Site$archivedByArgs<ExtArgs>
     reports?: boolean | Site$reportsArgs<ExtArgs>
     events?: boolean | Site$eventsArgs<ExtArgs>
     votes?: boolean | Site$votesArgs<ExtArgs>
@@ -17111,14 +17483,20 @@ export namespace Prisma {
     shareLinks?: boolean | Site$shareLinksArgs<ExtArgs>
     featureSnapshot?: boolean | Site$featureSnapshotArgs<ExtArgs>
     feedImpressions?: boolean | Site$feedImpressionsArgs<ExtArgs>
+    mapProjection?: boolean | Site$mapProjectionArgs<ExtArgs>
     _count?: boolean | SiteCountOutputTypeDefaultArgs<ExtArgs>
   }
-  export type SiteIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
-  export type SiteIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type SiteIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    archivedBy?: boolean | Site$archivedByArgs<ExtArgs>
+  }
+  export type SiteIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    archivedBy?: boolean | Site$archivedByArgs<ExtArgs>
+  }
 
   export type $SitePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Site"
     objects: {
+      archivedBy: Prisma.$UserPayload<ExtArgs> | null
       reports: Prisma.$ReportPayload<ExtArgs>[]
       events: Prisma.$CleanupEventPayload<ExtArgs>[]
       votes: Prisma.$SiteVotePayload<ExtArgs>[]
@@ -17128,6 +17506,7 @@ export namespace Prisma {
       shareLinks: Prisma.$SiteShareLinkPayload<ExtArgs>[]
       featureSnapshot: Prisma.$SiteFeatureSnapshotPayload<ExtArgs> | null
       feedImpressions: Prisma.$FeedImpressionPayload<ExtArgs>[]
+      mapProjection: Prisma.$MapSiteProjectionPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -17141,6 +17520,10 @@ export namespace Prisma {
       address: string | null
       description: string | null
       status: $Enums.SiteStatus
+      isArchivedByAdmin: boolean
+      archivedAt: Date | null
+      archivedById: string | null
+      archiveReason: string | null
       upvotesCount: number
       commentsCount: number
       savesCount: number
@@ -17539,6 +17922,7 @@ export namespace Prisma {
    */
   export interface Prisma__SiteClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    archivedBy<T extends Site$archivedByArgs<ExtArgs> = {}>(args?: Subset<T, Site$archivedByArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     reports<T extends Site$reportsArgs<ExtArgs> = {}>(args?: Subset<T, Site$reportsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     events<T extends Site$eventsArgs<ExtArgs> = {}>(args?: Subset<T, Site$eventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CleanupEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     votes<T extends Site$votesArgs<ExtArgs> = {}>(args?: Subset<T, Site$votesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteVotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -17548,6 +17932,7 @@ export namespace Prisma {
     shareLinks<T extends Site$shareLinksArgs<ExtArgs> = {}>(args?: Subset<T, Site$shareLinksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteShareLinkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     featureSnapshot<T extends Site$featureSnapshotArgs<ExtArgs> = {}>(args?: Subset<T, Site$featureSnapshotArgs<ExtArgs>>): Prisma__SiteFeatureSnapshotClient<$Result.GetResult<Prisma.$SiteFeatureSnapshotPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     feedImpressions<T extends Site$feedImpressionsArgs<ExtArgs> = {}>(args?: Subset<T, Site$feedImpressionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FeedImpressionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    mapProjection<T extends Site$mapProjectionArgs<ExtArgs> = {}>(args?: Subset<T, Site$mapProjectionArgs<ExtArgs>>): Prisma__MapSiteProjectionClient<$Result.GetResult<Prisma.$MapSiteProjectionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -17585,6 +17970,10 @@ export namespace Prisma {
     readonly address: FieldRef<"Site", 'String'>
     readonly description: FieldRef<"Site", 'String'>
     readonly status: FieldRef<"Site", 'SiteStatus'>
+    readonly isArchivedByAdmin: FieldRef<"Site", 'Boolean'>
+    readonly archivedAt: FieldRef<"Site", 'DateTime'>
+    readonly archivedById: FieldRef<"Site", 'String'>
+    readonly archiveReason: FieldRef<"Site", 'String'>
     readonly upvotesCount: FieldRef<"Site", 'Int'>
     readonly commentsCount: FieldRef<"Site", 'Int'>
     readonly savesCount: FieldRef<"Site", 'Int'>
@@ -17843,6 +18232,10 @@ export namespace Prisma {
      */
     data: SiteCreateManyInput | SiteCreateManyInput[]
     skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -17913,6 +18306,10 @@ export namespace Prisma {
      * Limit how many Sites to update.
      */
     limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -17979,6 +18376,25 @@ export namespace Prisma {
      * Limit how many Sites to delete.
      */
     limit?: number
+  }
+
+  /**
+   * Site.archivedBy
+   */
+  export type Site$archivedByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
   }
 
   /**
@@ -18190,6 +18606,25 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: FeedImpressionScalarFieldEnum | FeedImpressionScalarFieldEnum[]
+  }
+
+  /**
+   * Site.mapProjection
+   */
+  export type Site$mapProjectionArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapSiteProjection
+     */
+    select?: MapSiteProjectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapSiteProjection
+     */
+    omit?: MapSiteProjectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MapSiteProjectionInclude<ExtArgs> | null
+    where?: MapSiteProjectionWhereInput
   }
 
   /**
@@ -57236,6 +57671,3504 @@ export namespace Prisma {
 
 
   /**
+   * Model MapSiteProjection
+   */
+
+  export type AggregateMapSiteProjection = {
+    _count: MapSiteProjectionCountAggregateOutputType | null
+    _avg: MapSiteProjectionAvgAggregateOutputType | null
+    _sum: MapSiteProjectionSumAggregateOutputType | null
+    _min: MapSiteProjectionMinAggregateOutputType | null
+    _max: MapSiteProjectionMaxAggregateOutputType | null
+  }
+
+  export type MapSiteProjectionAvgAggregateOutputType = {
+    latitude: number | null
+    longitude: number | null
+    reportCount: number | null
+    upvotesCount: number | null
+    commentsCount: number | null
+    savesCount: number | null
+    sharesCount: number | null
+  }
+
+  export type MapSiteProjectionSumAggregateOutputType = {
+    latitude: number | null
+    longitude: number | null
+    reportCount: number | null
+    upvotesCount: number | null
+    commentsCount: number | null
+    savesCount: number | null
+    sharesCount: number | null
+  }
+
+  export type MapSiteProjectionMinAggregateOutputType = {
+    siteId: string | null
+    latitude: number | null
+    longitude: number | null
+    status: $Enums.SiteStatus | null
+    address: string | null
+    description: string | null
+    thumbnailUrl: string | null
+    pollutionCategory: string | null
+    latestReportTitle: string | null
+    latestReportDescription: string | null
+    latestReportNumber: string | null
+    reportCount: number | null
+    upvotesCount: number | null
+    commentsCount: number | null
+    savesCount: number | null
+    sharesCount: number | null
+    latestReportAt: Date | null
+    siteCreatedAt: Date | null
+    siteUpdatedAt: Date | null
+    projectedAt: Date | null
+    isHot: boolean | null
+    isArchivedByAdmin: boolean | null
+    archivedAt: Date | null
+  }
+
+  export type MapSiteProjectionMaxAggregateOutputType = {
+    siteId: string | null
+    latitude: number | null
+    longitude: number | null
+    status: $Enums.SiteStatus | null
+    address: string | null
+    description: string | null
+    thumbnailUrl: string | null
+    pollutionCategory: string | null
+    latestReportTitle: string | null
+    latestReportDescription: string | null
+    latestReportNumber: string | null
+    reportCount: number | null
+    upvotesCount: number | null
+    commentsCount: number | null
+    savesCount: number | null
+    sharesCount: number | null
+    latestReportAt: Date | null
+    siteCreatedAt: Date | null
+    siteUpdatedAt: Date | null
+    projectedAt: Date | null
+    isHot: boolean | null
+    isArchivedByAdmin: boolean | null
+    archivedAt: Date | null
+  }
+
+  export type MapSiteProjectionCountAggregateOutputType = {
+    siteId: number
+    latitude: number
+    longitude: number
+    status: number
+    address: number
+    description: number
+    thumbnailUrl: number
+    pollutionCategory: number
+    latestReportTitle: number
+    latestReportDescription: number
+    latestReportNumber: number
+    reportCount: number
+    upvotesCount: number
+    commentsCount: number
+    savesCount: number
+    sharesCount: number
+    latestReportAt: number
+    siteCreatedAt: number
+    siteUpdatedAt: number
+    projectedAt: number
+    isHot: number
+    isArchivedByAdmin: number
+    archivedAt: number
+    _all: number
+  }
+
+
+  export type MapSiteProjectionAvgAggregateInputType = {
+    latitude?: true
+    longitude?: true
+    reportCount?: true
+    upvotesCount?: true
+    commentsCount?: true
+    savesCount?: true
+    sharesCount?: true
+  }
+
+  export type MapSiteProjectionSumAggregateInputType = {
+    latitude?: true
+    longitude?: true
+    reportCount?: true
+    upvotesCount?: true
+    commentsCount?: true
+    savesCount?: true
+    sharesCount?: true
+  }
+
+  export type MapSiteProjectionMinAggregateInputType = {
+    siteId?: true
+    latitude?: true
+    longitude?: true
+    status?: true
+    address?: true
+    description?: true
+    thumbnailUrl?: true
+    pollutionCategory?: true
+    latestReportTitle?: true
+    latestReportDescription?: true
+    latestReportNumber?: true
+    reportCount?: true
+    upvotesCount?: true
+    commentsCount?: true
+    savesCount?: true
+    sharesCount?: true
+    latestReportAt?: true
+    siteCreatedAt?: true
+    siteUpdatedAt?: true
+    projectedAt?: true
+    isHot?: true
+    isArchivedByAdmin?: true
+    archivedAt?: true
+  }
+
+  export type MapSiteProjectionMaxAggregateInputType = {
+    siteId?: true
+    latitude?: true
+    longitude?: true
+    status?: true
+    address?: true
+    description?: true
+    thumbnailUrl?: true
+    pollutionCategory?: true
+    latestReportTitle?: true
+    latestReportDescription?: true
+    latestReportNumber?: true
+    reportCount?: true
+    upvotesCount?: true
+    commentsCount?: true
+    savesCount?: true
+    sharesCount?: true
+    latestReportAt?: true
+    siteCreatedAt?: true
+    siteUpdatedAt?: true
+    projectedAt?: true
+    isHot?: true
+    isArchivedByAdmin?: true
+    archivedAt?: true
+  }
+
+  export type MapSiteProjectionCountAggregateInputType = {
+    siteId?: true
+    latitude?: true
+    longitude?: true
+    status?: true
+    address?: true
+    description?: true
+    thumbnailUrl?: true
+    pollutionCategory?: true
+    latestReportTitle?: true
+    latestReportDescription?: true
+    latestReportNumber?: true
+    reportCount?: true
+    upvotesCount?: true
+    commentsCount?: true
+    savesCount?: true
+    sharesCount?: true
+    latestReportAt?: true
+    siteCreatedAt?: true
+    siteUpdatedAt?: true
+    projectedAt?: true
+    isHot?: true
+    isArchivedByAdmin?: true
+    archivedAt?: true
+    _all?: true
+  }
+
+  export type MapSiteProjectionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MapSiteProjection to aggregate.
+     */
+    where?: MapSiteProjectionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MapSiteProjections to fetch.
+     */
+    orderBy?: MapSiteProjectionOrderByWithRelationInput | MapSiteProjectionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: MapSiteProjectionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MapSiteProjections from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MapSiteProjections.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned MapSiteProjections
+    **/
+    _count?: true | MapSiteProjectionCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: MapSiteProjectionAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: MapSiteProjectionSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: MapSiteProjectionMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: MapSiteProjectionMaxAggregateInputType
+  }
+
+  export type GetMapSiteProjectionAggregateType<T extends MapSiteProjectionAggregateArgs> = {
+        [P in keyof T & keyof AggregateMapSiteProjection]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateMapSiteProjection[P]>
+      : GetScalarType<T[P], AggregateMapSiteProjection[P]>
+  }
+
+
+
+
+  export type MapSiteProjectionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MapSiteProjectionWhereInput
+    orderBy?: MapSiteProjectionOrderByWithAggregationInput | MapSiteProjectionOrderByWithAggregationInput[]
+    by: MapSiteProjectionScalarFieldEnum[] | MapSiteProjectionScalarFieldEnum
+    having?: MapSiteProjectionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: MapSiteProjectionCountAggregateInputType | true
+    _avg?: MapSiteProjectionAvgAggregateInputType
+    _sum?: MapSiteProjectionSumAggregateInputType
+    _min?: MapSiteProjectionMinAggregateInputType
+    _max?: MapSiteProjectionMaxAggregateInputType
+  }
+
+  export type MapSiteProjectionGroupByOutputType = {
+    siteId: string
+    latitude: number
+    longitude: number
+    status: $Enums.SiteStatus
+    address: string | null
+    description: string | null
+    thumbnailUrl: string | null
+    pollutionCategory: string | null
+    latestReportTitle: string | null
+    latestReportDescription: string | null
+    latestReportNumber: string | null
+    reportCount: number
+    upvotesCount: number
+    commentsCount: number
+    savesCount: number
+    sharesCount: number
+    latestReportAt: Date | null
+    siteCreatedAt: Date
+    siteUpdatedAt: Date
+    projectedAt: Date
+    isHot: boolean
+    isArchivedByAdmin: boolean
+    archivedAt: Date | null
+    _count: MapSiteProjectionCountAggregateOutputType | null
+    _avg: MapSiteProjectionAvgAggregateOutputType | null
+    _sum: MapSiteProjectionSumAggregateOutputType | null
+    _min: MapSiteProjectionMinAggregateOutputType | null
+    _max: MapSiteProjectionMaxAggregateOutputType | null
+  }
+
+  type GetMapSiteProjectionGroupByPayload<T extends MapSiteProjectionGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<MapSiteProjectionGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof MapSiteProjectionGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], MapSiteProjectionGroupByOutputType[P]>
+            : GetScalarType<T[P], MapSiteProjectionGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type MapSiteProjectionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    siteId?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    status?: boolean
+    address?: boolean
+    description?: boolean
+    thumbnailUrl?: boolean
+    pollutionCategory?: boolean
+    latestReportTitle?: boolean
+    latestReportDescription?: boolean
+    latestReportNumber?: boolean
+    reportCount?: boolean
+    upvotesCount?: boolean
+    commentsCount?: boolean
+    savesCount?: boolean
+    sharesCount?: boolean
+    latestReportAt?: boolean
+    siteCreatedAt?: boolean
+    siteUpdatedAt?: boolean
+    projectedAt?: boolean
+    isHot?: boolean
+    isArchivedByAdmin?: boolean
+    archivedAt?: boolean
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["mapSiteProjection"]>
+
+  export type MapSiteProjectionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    siteId?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    status?: boolean
+    address?: boolean
+    description?: boolean
+    thumbnailUrl?: boolean
+    pollutionCategory?: boolean
+    latestReportTitle?: boolean
+    latestReportDescription?: boolean
+    latestReportNumber?: boolean
+    reportCount?: boolean
+    upvotesCount?: boolean
+    commentsCount?: boolean
+    savesCount?: boolean
+    sharesCount?: boolean
+    latestReportAt?: boolean
+    siteCreatedAt?: boolean
+    siteUpdatedAt?: boolean
+    projectedAt?: boolean
+    isHot?: boolean
+    isArchivedByAdmin?: boolean
+    archivedAt?: boolean
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["mapSiteProjection"]>
+
+  export type MapSiteProjectionSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    siteId?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    status?: boolean
+    address?: boolean
+    description?: boolean
+    thumbnailUrl?: boolean
+    pollutionCategory?: boolean
+    latestReportTitle?: boolean
+    latestReportDescription?: boolean
+    latestReportNumber?: boolean
+    reportCount?: boolean
+    upvotesCount?: boolean
+    commentsCount?: boolean
+    savesCount?: boolean
+    sharesCount?: boolean
+    latestReportAt?: boolean
+    siteCreatedAt?: boolean
+    siteUpdatedAt?: boolean
+    projectedAt?: boolean
+    isHot?: boolean
+    isArchivedByAdmin?: boolean
+    archivedAt?: boolean
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["mapSiteProjection"]>
+
+  export type MapSiteProjectionSelectScalar = {
+    siteId?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    status?: boolean
+    address?: boolean
+    description?: boolean
+    thumbnailUrl?: boolean
+    pollutionCategory?: boolean
+    latestReportTitle?: boolean
+    latestReportDescription?: boolean
+    latestReportNumber?: boolean
+    reportCount?: boolean
+    upvotesCount?: boolean
+    commentsCount?: boolean
+    savesCount?: boolean
+    sharesCount?: boolean
+    latestReportAt?: boolean
+    siteCreatedAt?: boolean
+    siteUpdatedAt?: boolean
+    projectedAt?: boolean
+    isHot?: boolean
+    isArchivedByAdmin?: boolean
+    archivedAt?: boolean
+  }
+
+  export type MapSiteProjectionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"siteId" | "latitude" | "longitude" | "status" | "address" | "description" | "thumbnailUrl" | "pollutionCategory" | "latestReportTitle" | "latestReportDescription" | "latestReportNumber" | "reportCount" | "upvotesCount" | "commentsCount" | "savesCount" | "sharesCount" | "latestReportAt" | "siteCreatedAt" | "siteUpdatedAt" | "projectedAt" | "isHot" | "isArchivedByAdmin" | "archivedAt", ExtArgs["result"]["mapSiteProjection"]>
+  export type MapSiteProjectionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+  }
+  export type MapSiteProjectionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+  }
+  export type MapSiteProjectionIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+  }
+
+  export type $MapSiteProjectionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "MapSiteProjection"
+    objects: {
+      site: Prisma.$SitePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      siteId: string
+      latitude: number
+      longitude: number
+      status: $Enums.SiteStatus
+      address: string | null
+      description: string | null
+      thumbnailUrl: string | null
+      pollutionCategory: string | null
+      latestReportTitle: string | null
+      latestReportDescription: string | null
+      latestReportNumber: string | null
+      reportCount: number
+      upvotesCount: number
+      commentsCount: number
+      savesCount: number
+      sharesCount: number
+      latestReportAt: Date | null
+      siteCreatedAt: Date
+      siteUpdatedAt: Date
+      projectedAt: Date
+      isHot: boolean
+      isArchivedByAdmin: boolean
+      archivedAt: Date | null
+    }, ExtArgs["result"]["mapSiteProjection"]>
+    composites: {}
+  }
+
+  type MapSiteProjectionGetPayload<S extends boolean | null | undefined | MapSiteProjectionDefaultArgs> = $Result.GetResult<Prisma.$MapSiteProjectionPayload, S>
+
+  type MapSiteProjectionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<MapSiteProjectionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: MapSiteProjectionCountAggregateInputType | true
+    }
+
+  export interface MapSiteProjectionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['MapSiteProjection'], meta: { name: 'MapSiteProjection' } }
+    /**
+     * Find zero or one MapSiteProjection that matches the filter.
+     * @param {MapSiteProjectionFindUniqueArgs} args - Arguments to find a MapSiteProjection
+     * @example
+     * // Get one MapSiteProjection
+     * const mapSiteProjection = await prisma.mapSiteProjection.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends MapSiteProjectionFindUniqueArgs>(args: SelectSubset<T, MapSiteProjectionFindUniqueArgs<ExtArgs>>): Prisma__MapSiteProjectionClient<$Result.GetResult<Prisma.$MapSiteProjectionPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one MapSiteProjection that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {MapSiteProjectionFindUniqueOrThrowArgs} args - Arguments to find a MapSiteProjection
+     * @example
+     * // Get one MapSiteProjection
+     * const mapSiteProjection = await prisma.mapSiteProjection.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends MapSiteProjectionFindUniqueOrThrowArgs>(args: SelectSubset<T, MapSiteProjectionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__MapSiteProjectionClient<$Result.GetResult<Prisma.$MapSiteProjectionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MapSiteProjection that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MapSiteProjectionFindFirstArgs} args - Arguments to find a MapSiteProjection
+     * @example
+     * // Get one MapSiteProjection
+     * const mapSiteProjection = await prisma.mapSiteProjection.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends MapSiteProjectionFindFirstArgs>(args?: SelectSubset<T, MapSiteProjectionFindFirstArgs<ExtArgs>>): Prisma__MapSiteProjectionClient<$Result.GetResult<Prisma.$MapSiteProjectionPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MapSiteProjection that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MapSiteProjectionFindFirstOrThrowArgs} args - Arguments to find a MapSiteProjection
+     * @example
+     * // Get one MapSiteProjection
+     * const mapSiteProjection = await prisma.mapSiteProjection.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends MapSiteProjectionFindFirstOrThrowArgs>(args?: SelectSubset<T, MapSiteProjectionFindFirstOrThrowArgs<ExtArgs>>): Prisma__MapSiteProjectionClient<$Result.GetResult<Prisma.$MapSiteProjectionPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more MapSiteProjections that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MapSiteProjectionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all MapSiteProjections
+     * const mapSiteProjections = await prisma.mapSiteProjection.findMany()
+     * 
+     * // Get first 10 MapSiteProjections
+     * const mapSiteProjections = await prisma.mapSiteProjection.findMany({ take: 10 })
+     * 
+     * // Only select the `siteId`
+     * const mapSiteProjectionWithSiteIdOnly = await prisma.mapSiteProjection.findMany({ select: { siteId: true } })
+     * 
+     */
+    findMany<T extends MapSiteProjectionFindManyArgs>(args?: SelectSubset<T, MapSiteProjectionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MapSiteProjectionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a MapSiteProjection.
+     * @param {MapSiteProjectionCreateArgs} args - Arguments to create a MapSiteProjection.
+     * @example
+     * // Create one MapSiteProjection
+     * const MapSiteProjection = await prisma.mapSiteProjection.create({
+     *   data: {
+     *     // ... data to create a MapSiteProjection
+     *   }
+     * })
+     * 
+     */
+    create<T extends MapSiteProjectionCreateArgs>(args: SelectSubset<T, MapSiteProjectionCreateArgs<ExtArgs>>): Prisma__MapSiteProjectionClient<$Result.GetResult<Prisma.$MapSiteProjectionPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many MapSiteProjections.
+     * @param {MapSiteProjectionCreateManyArgs} args - Arguments to create many MapSiteProjections.
+     * @example
+     * // Create many MapSiteProjections
+     * const mapSiteProjection = await prisma.mapSiteProjection.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends MapSiteProjectionCreateManyArgs>(args?: SelectSubset<T, MapSiteProjectionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many MapSiteProjections and returns the data saved in the database.
+     * @param {MapSiteProjectionCreateManyAndReturnArgs} args - Arguments to create many MapSiteProjections.
+     * @example
+     * // Create many MapSiteProjections
+     * const mapSiteProjection = await prisma.mapSiteProjection.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many MapSiteProjections and only return the `siteId`
+     * const mapSiteProjectionWithSiteIdOnly = await prisma.mapSiteProjection.createManyAndReturn({
+     *   select: { siteId: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends MapSiteProjectionCreateManyAndReturnArgs>(args?: SelectSubset<T, MapSiteProjectionCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MapSiteProjectionPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a MapSiteProjection.
+     * @param {MapSiteProjectionDeleteArgs} args - Arguments to delete one MapSiteProjection.
+     * @example
+     * // Delete one MapSiteProjection
+     * const MapSiteProjection = await prisma.mapSiteProjection.delete({
+     *   where: {
+     *     // ... filter to delete one MapSiteProjection
+     *   }
+     * })
+     * 
+     */
+    delete<T extends MapSiteProjectionDeleteArgs>(args: SelectSubset<T, MapSiteProjectionDeleteArgs<ExtArgs>>): Prisma__MapSiteProjectionClient<$Result.GetResult<Prisma.$MapSiteProjectionPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one MapSiteProjection.
+     * @param {MapSiteProjectionUpdateArgs} args - Arguments to update one MapSiteProjection.
+     * @example
+     * // Update one MapSiteProjection
+     * const mapSiteProjection = await prisma.mapSiteProjection.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends MapSiteProjectionUpdateArgs>(args: SelectSubset<T, MapSiteProjectionUpdateArgs<ExtArgs>>): Prisma__MapSiteProjectionClient<$Result.GetResult<Prisma.$MapSiteProjectionPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more MapSiteProjections.
+     * @param {MapSiteProjectionDeleteManyArgs} args - Arguments to filter MapSiteProjections to delete.
+     * @example
+     * // Delete a few MapSiteProjections
+     * const { count } = await prisma.mapSiteProjection.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends MapSiteProjectionDeleteManyArgs>(args?: SelectSubset<T, MapSiteProjectionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MapSiteProjections.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MapSiteProjectionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many MapSiteProjections
+     * const mapSiteProjection = await prisma.mapSiteProjection.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends MapSiteProjectionUpdateManyArgs>(args: SelectSubset<T, MapSiteProjectionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MapSiteProjections and returns the data updated in the database.
+     * @param {MapSiteProjectionUpdateManyAndReturnArgs} args - Arguments to update many MapSiteProjections.
+     * @example
+     * // Update many MapSiteProjections
+     * const mapSiteProjection = await prisma.mapSiteProjection.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more MapSiteProjections and only return the `siteId`
+     * const mapSiteProjectionWithSiteIdOnly = await prisma.mapSiteProjection.updateManyAndReturn({
+     *   select: { siteId: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends MapSiteProjectionUpdateManyAndReturnArgs>(args: SelectSubset<T, MapSiteProjectionUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MapSiteProjectionPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one MapSiteProjection.
+     * @param {MapSiteProjectionUpsertArgs} args - Arguments to update or create a MapSiteProjection.
+     * @example
+     * // Update or create a MapSiteProjection
+     * const mapSiteProjection = await prisma.mapSiteProjection.upsert({
+     *   create: {
+     *     // ... data to create a MapSiteProjection
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the MapSiteProjection we want to update
+     *   }
+     * })
+     */
+    upsert<T extends MapSiteProjectionUpsertArgs>(args: SelectSubset<T, MapSiteProjectionUpsertArgs<ExtArgs>>): Prisma__MapSiteProjectionClient<$Result.GetResult<Prisma.$MapSiteProjectionPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of MapSiteProjections.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MapSiteProjectionCountArgs} args - Arguments to filter MapSiteProjections to count.
+     * @example
+     * // Count the number of MapSiteProjections
+     * const count = await prisma.mapSiteProjection.count({
+     *   where: {
+     *     // ... the filter for the MapSiteProjections we want to count
+     *   }
+     * })
+    **/
+    count<T extends MapSiteProjectionCountArgs>(
+      args?: Subset<T, MapSiteProjectionCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], MapSiteProjectionCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a MapSiteProjection.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MapSiteProjectionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends MapSiteProjectionAggregateArgs>(args: Subset<T, MapSiteProjectionAggregateArgs>): Prisma.PrismaPromise<GetMapSiteProjectionAggregateType<T>>
+
+    /**
+     * Group by MapSiteProjection.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MapSiteProjectionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends MapSiteProjectionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: MapSiteProjectionGroupByArgs['orderBy'] }
+        : { orderBy?: MapSiteProjectionGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, MapSiteProjectionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMapSiteProjectionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the MapSiteProjection model
+   */
+  readonly fields: MapSiteProjectionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for MapSiteProjection.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__MapSiteProjectionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    site<T extends SiteDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SiteDefaultArgs<ExtArgs>>): Prisma__SiteClient<$Result.GetResult<Prisma.$SitePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the MapSiteProjection model
+   */
+  interface MapSiteProjectionFieldRefs {
+    readonly siteId: FieldRef<"MapSiteProjection", 'String'>
+    readonly latitude: FieldRef<"MapSiteProjection", 'Float'>
+    readonly longitude: FieldRef<"MapSiteProjection", 'Float'>
+    readonly status: FieldRef<"MapSiteProjection", 'SiteStatus'>
+    readonly address: FieldRef<"MapSiteProjection", 'String'>
+    readonly description: FieldRef<"MapSiteProjection", 'String'>
+    readonly thumbnailUrl: FieldRef<"MapSiteProjection", 'String'>
+    readonly pollutionCategory: FieldRef<"MapSiteProjection", 'String'>
+    readonly latestReportTitle: FieldRef<"MapSiteProjection", 'String'>
+    readonly latestReportDescription: FieldRef<"MapSiteProjection", 'String'>
+    readonly latestReportNumber: FieldRef<"MapSiteProjection", 'String'>
+    readonly reportCount: FieldRef<"MapSiteProjection", 'Int'>
+    readonly upvotesCount: FieldRef<"MapSiteProjection", 'Int'>
+    readonly commentsCount: FieldRef<"MapSiteProjection", 'Int'>
+    readonly savesCount: FieldRef<"MapSiteProjection", 'Int'>
+    readonly sharesCount: FieldRef<"MapSiteProjection", 'Int'>
+    readonly latestReportAt: FieldRef<"MapSiteProjection", 'DateTime'>
+    readonly siteCreatedAt: FieldRef<"MapSiteProjection", 'DateTime'>
+    readonly siteUpdatedAt: FieldRef<"MapSiteProjection", 'DateTime'>
+    readonly projectedAt: FieldRef<"MapSiteProjection", 'DateTime'>
+    readonly isHot: FieldRef<"MapSiteProjection", 'Boolean'>
+    readonly isArchivedByAdmin: FieldRef<"MapSiteProjection", 'Boolean'>
+    readonly archivedAt: FieldRef<"MapSiteProjection", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * MapSiteProjection findUnique
+   */
+  export type MapSiteProjectionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapSiteProjection
+     */
+    select?: MapSiteProjectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapSiteProjection
+     */
+    omit?: MapSiteProjectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MapSiteProjectionInclude<ExtArgs> | null
+    /**
+     * Filter, which MapSiteProjection to fetch.
+     */
+    where: MapSiteProjectionWhereUniqueInput
+  }
+
+  /**
+   * MapSiteProjection findUniqueOrThrow
+   */
+  export type MapSiteProjectionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapSiteProjection
+     */
+    select?: MapSiteProjectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapSiteProjection
+     */
+    omit?: MapSiteProjectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MapSiteProjectionInclude<ExtArgs> | null
+    /**
+     * Filter, which MapSiteProjection to fetch.
+     */
+    where: MapSiteProjectionWhereUniqueInput
+  }
+
+  /**
+   * MapSiteProjection findFirst
+   */
+  export type MapSiteProjectionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapSiteProjection
+     */
+    select?: MapSiteProjectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapSiteProjection
+     */
+    omit?: MapSiteProjectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MapSiteProjectionInclude<ExtArgs> | null
+    /**
+     * Filter, which MapSiteProjection to fetch.
+     */
+    where?: MapSiteProjectionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MapSiteProjections to fetch.
+     */
+    orderBy?: MapSiteProjectionOrderByWithRelationInput | MapSiteProjectionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MapSiteProjections.
+     */
+    cursor?: MapSiteProjectionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MapSiteProjections from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MapSiteProjections.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MapSiteProjections.
+     */
+    distinct?: MapSiteProjectionScalarFieldEnum | MapSiteProjectionScalarFieldEnum[]
+  }
+
+  /**
+   * MapSiteProjection findFirstOrThrow
+   */
+  export type MapSiteProjectionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapSiteProjection
+     */
+    select?: MapSiteProjectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapSiteProjection
+     */
+    omit?: MapSiteProjectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MapSiteProjectionInclude<ExtArgs> | null
+    /**
+     * Filter, which MapSiteProjection to fetch.
+     */
+    where?: MapSiteProjectionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MapSiteProjections to fetch.
+     */
+    orderBy?: MapSiteProjectionOrderByWithRelationInput | MapSiteProjectionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MapSiteProjections.
+     */
+    cursor?: MapSiteProjectionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MapSiteProjections from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MapSiteProjections.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MapSiteProjections.
+     */
+    distinct?: MapSiteProjectionScalarFieldEnum | MapSiteProjectionScalarFieldEnum[]
+  }
+
+  /**
+   * MapSiteProjection findMany
+   */
+  export type MapSiteProjectionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapSiteProjection
+     */
+    select?: MapSiteProjectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapSiteProjection
+     */
+    omit?: MapSiteProjectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MapSiteProjectionInclude<ExtArgs> | null
+    /**
+     * Filter, which MapSiteProjections to fetch.
+     */
+    where?: MapSiteProjectionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MapSiteProjections to fetch.
+     */
+    orderBy?: MapSiteProjectionOrderByWithRelationInput | MapSiteProjectionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing MapSiteProjections.
+     */
+    cursor?: MapSiteProjectionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MapSiteProjections from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MapSiteProjections.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MapSiteProjections.
+     */
+    distinct?: MapSiteProjectionScalarFieldEnum | MapSiteProjectionScalarFieldEnum[]
+  }
+
+  /**
+   * MapSiteProjection create
+   */
+  export type MapSiteProjectionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapSiteProjection
+     */
+    select?: MapSiteProjectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapSiteProjection
+     */
+    omit?: MapSiteProjectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MapSiteProjectionInclude<ExtArgs> | null
+    /**
+     * The data needed to create a MapSiteProjection.
+     */
+    data: XOR<MapSiteProjectionCreateInput, MapSiteProjectionUncheckedCreateInput>
+  }
+
+  /**
+   * MapSiteProjection createMany
+   */
+  export type MapSiteProjectionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many MapSiteProjections.
+     */
+    data: MapSiteProjectionCreateManyInput | MapSiteProjectionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * MapSiteProjection createManyAndReturn
+   */
+  export type MapSiteProjectionCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapSiteProjection
+     */
+    select?: MapSiteProjectionSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapSiteProjection
+     */
+    omit?: MapSiteProjectionOmit<ExtArgs> | null
+    /**
+     * The data used to create many MapSiteProjections.
+     */
+    data: MapSiteProjectionCreateManyInput | MapSiteProjectionCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MapSiteProjectionIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * MapSiteProjection update
+   */
+  export type MapSiteProjectionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapSiteProjection
+     */
+    select?: MapSiteProjectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapSiteProjection
+     */
+    omit?: MapSiteProjectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MapSiteProjectionInclude<ExtArgs> | null
+    /**
+     * The data needed to update a MapSiteProjection.
+     */
+    data: XOR<MapSiteProjectionUpdateInput, MapSiteProjectionUncheckedUpdateInput>
+    /**
+     * Choose, which MapSiteProjection to update.
+     */
+    where: MapSiteProjectionWhereUniqueInput
+  }
+
+  /**
+   * MapSiteProjection updateMany
+   */
+  export type MapSiteProjectionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update MapSiteProjections.
+     */
+    data: XOR<MapSiteProjectionUpdateManyMutationInput, MapSiteProjectionUncheckedUpdateManyInput>
+    /**
+     * Filter which MapSiteProjections to update
+     */
+    where?: MapSiteProjectionWhereInput
+    /**
+     * Limit how many MapSiteProjections to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * MapSiteProjection updateManyAndReturn
+   */
+  export type MapSiteProjectionUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapSiteProjection
+     */
+    select?: MapSiteProjectionSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapSiteProjection
+     */
+    omit?: MapSiteProjectionOmit<ExtArgs> | null
+    /**
+     * The data used to update MapSiteProjections.
+     */
+    data: XOR<MapSiteProjectionUpdateManyMutationInput, MapSiteProjectionUncheckedUpdateManyInput>
+    /**
+     * Filter which MapSiteProjections to update
+     */
+    where?: MapSiteProjectionWhereInput
+    /**
+     * Limit how many MapSiteProjections to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MapSiteProjectionIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * MapSiteProjection upsert
+   */
+  export type MapSiteProjectionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapSiteProjection
+     */
+    select?: MapSiteProjectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapSiteProjection
+     */
+    omit?: MapSiteProjectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MapSiteProjectionInclude<ExtArgs> | null
+    /**
+     * The filter to search for the MapSiteProjection to update in case it exists.
+     */
+    where: MapSiteProjectionWhereUniqueInput
+    /**
+     * In case the MapSiteProjection found by the `where` argument doesn't exist, create a new MapSiteProjection with this data.
+     */
+    create: XOR<MapSiteProjectionCreateInput, MapSiteProjectionUncheckedCreateInput>
+    /**
+     * In case the MapSiteProjection was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<MapSiteProjectionUpdateInput, MapSiteProjectionUncheckedUpdateInput>
+  }
+
+  /**
+   * MapSiteProjection delete
+   */
+  export type MapSiteProjectionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapSiteProjection
+     */
+    select?: MapSiteProjectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapSiteProjection
+     */
+    omit?: MapSiteProjectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MapSiteProjectionInclude<ExtArgs> | null
+    /**
+     * Filter which MapSiteProjection to delete.
+     */
+    where: MapSiteProjectionWhereUniqueInput
+  }
+
+  /**
+   * MapSiteProjection deleteMany
+   */
+  export type MapSiteProjectionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MapSiteProjections to delete
+     */
+    where?: MapSiteProjectionWhereInput
+    /**
+     * Limit how many MapSiteProjections to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * MapSiteProjection without action
+   */
+  export type MapSiteProjectionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapSiteProjection
+     */
+    select?: MapSiteProjectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapSiteProjection
+     */
+    omit?: MapSiteProjectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MapSiteProjectionInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model MapEventOutbox
+   */
+
+  export type AggregateMapEventOutbox = {
+    _count: MapEventOutboxCountAggregateOutputType | null
+    _avg: MapEventOutboxAvgAggregateOutputType | null
+    _sum: MapEventOutboxSumAggregateOutputType | null
+    _min: MapEventOutboxMinAggregateOutputType | null
+    _max: MapEventOutboxMaxAggregateOutputType | null
+  }
+
+  export type MapEventOutboxAvgAggregateOutputType = {
+    attempts: number | null
+  }
+
+  export type MapEventOutboxSumAggregateOutputType = {
+    attempts: number | null
+  }
+
+  export type MapEventOutboxMinAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    eventId: string | null
+    siteId: string | null
+    eventType: string | null
+    status: $Enums.MapEventOutboxStatus | null
+    attempts: number | null
+    lastError: string | null
+    dispatchedAt: Date | null
+    leaseOwner: string | null
+    processingAt: Date | null
+  }
+
+  export type MapEventOutboxMaxAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    eventId: string | null
+    siteId: string | null
+    eventType: string | null
+    status: $Enums.MapEventOutboxStatus | null
+    attempts: number | null
+    lastError: string | null
+    dispatchedAt: Date | null
+    leaseOwner: string | null
+    processingAt: Date | null
+  }
+
+  export type MapEventOutboxCountAggregateOutputType = {
+    id: number
+    createdAt: number
+    updatedAt: number
+    eventId: number
+    siteId: number
+    eventType: number
+    payload: number
+    status: number
+    attempts: number
+    lastError: number
+    dispatchedAt: number
+    leaseOwner: number
+    processingAt: number
+    _all: number
+  }
+
+
+  export type MapEventOutboxAvgAggregateInputType = {
+    attempts?: true
+  }
+
+  export type MapEventOutboxSumAggregateInputType = {
+    attempts?: true
+  }
+
+  export type MapEventOutboxMinAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    eventId?: true
+    siteId?: true
+    eventType?: true
+    status?: true
+    attempts?: true
+    lastError?: true
+    dispatchedAt?: true
+    leaseOwner?: true
+    processingAt?: true
+  }
+
+  export type MapEventOutboxMaxAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    eventId?: true
+    siteId?: true
+    eventType?: true
+    status?: true
+    attempts?: true
+    lastError?: true
+    dispatchedAt?: true
+    leaseOwner?: true
+    processingAt?: true
+  }
+
+  export type MapEventOutboxCountAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    eventId?: true
+    siteId?: true
+    eventType?: true
+    payload?: true
+    status?: true
+    attempts?: true
+    lastError?: true
+    dispatchedAt?: true
+    leaseOwner?: true
+    processingAt?: true
+    _all?: true
+  }
+
+  export type MapEventOutboxAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MapEventOutbox to aggregate.
+     */
+    where?: MapEventOutboxWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MapEventOutboxes to fetch.
+     */
+    orderBy?: MapEventOutboxOrderByWithRelationInput | MapEventOutboxOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: MapEventOutboxWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MapEventOutboxes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MapEventOutboxes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned MapEventOutboxes
+    **/
+    _count?: true | MapEventOutboxCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: MapEventOutboxAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: MapEventOutboxSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: MapEventOutboxMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: MapEventOutboxMaxAggregateInputType
+  }
+
+  export type GetMapEventOutboxAggregateType<T extends MapEventOutboxAggregateArgs> = {
+        [P in keyof T & keyof AggregateMapEventOutbox]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateMapEventOutbox[P]>
+      : GetScalarType<T[P], AggregateMapEventOutbox[P]>
+  }
+
+
+
+
+  export type MapEventOutboxGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MapEventOutboxWhereInput
+    orderBy?: MapEventOutboxOrderByWithAggregationInput | MapEventOutboxOrderByWithAggregationInput[]
+    by: MapEventOutboxScalarFieldEnum[] | MapEventOutboxScalarFieldEnum
+    having?: MapEventOutboxScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: MapEventOutboxCountAggregateInputType | true
+    _avg?: MapEventOutboxAvgAggregateInputType
+    _sum?: MapEventOutboxSumAggregateInputType
+    _min?: MapEventOutboxMinAggregateInputType
+    _max?: MapEventOutboxMaxAggregateInputType
+  }
+
+  export type MapEventOutboxGroupByOutputType = {
+    id: string
+    createdAt: Date
+    updatedAt: Date
+    eventId: string
+    siteId: string
+    eventType: string
+    payload: JsonValue
+    status: $Enums.MapEventOutboxStatus
+    attempts: number
+    lastError: string | null
+    dispatchedAt: Date | null
+    leaseOwner: string | null
+    processingAt: Date | null
+    _count: MapEventOutboxCountAggregateOutputType | null
+    _avg: MapEventOutboxAvgAggregateOutputType | null
+    _sum: MapEventOutboxSumAggregateOutputType | null
+    _min: MapEventOutboxMinAggregateOutputType | null
+    _max: MapEventOutboxMaxAggregateOutputType | null
+  }
+
+  type GetMapEventOutboxGroupByPayload<T extends MapEventOutboxGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<MapEventOutboxGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof MapEventOutboxGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], MapEventOutboxGroupByOutputType[P]>
+            : GetScalarType<T[P], MapEventOutboxGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type MapEventOutboxSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    eventId?: boolean
+    siteId?: boolean
+    eventType?: boolean
+    payload?: boolean
+    status?: boolean
+    attempts?: boolean
+    lastError?: boolean
+    dispatchedAt?: boolean
+    leaseOwner?: boolean
+    processingAt?: boolean
+  }, ExtArgs["result"]["mapEventOutbox"]>
+
+  export type MapEventOutboxSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    eventId?: boolean
+    siteId?: boolean
+    eventType?: boolean
+    payload?: boolean
+    status?: boolean
+    attempts?: boolean
+    lastError?: boolean
+    dispatchedAt?: boolean
+    leaseOwner?: boolean
+    processingAt?: boolean
+  }, ExtArgs["result"]["mapEventOutbox"]>
+
+  export type MapEventOutboxSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    eventId?: boolean
+    siteId?: boolean
+    eventType?: boolean
+    payload?: boolean
+    status?: boolean
+    attempts?: boolean
+    lastError?: boolean
+    dispatchedAt?: boolean
+    leaseOwner?: boolean
+    processingAt?: boolean
+  }, ExtArgs["result"]["mapEventOutbox"]>
+
+  export type MapEventOutboxSelectScalar = {
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    eventId?: boolean
+    siteId?: boolean
+    eventType?: boolean
+    payload?: boolean
+    status?: boolean
+    attempts?: boolean
+    lastError?: boolean
+    dispatchedAt?: boolean
+    leaseOwner?: boolean
+    processingAt?: boolean
+  }
+
+  export type MapEventOutboxOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "eventId" | "siteId" | "eventType" | "payload" | "status" | "attempts" | "lastError" | "dispatchedAt" | "leaseOwner" | "processingAt", ExtArgs["result"]["mapEventOutbox"]>
+
+  export type $MapEventOutboxPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "MapEventOutbox"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      createdAt: Date
+      updatedAt: Date
+      eventId: string
+      siteId: string
+      eventType: string
+      payload: Prisma.JsonValue
+      status: $Enums.MapEventOutboxStatus
+      attempts: number
+      lastError: string | null
+      dispatchedAt: Date | null
+      leaseOwner: string | null
+      processingAt: Date | null
+    }, ExtArgs["result"]["mapEventOutbox"]>
+    composites: {}
+  }
+
+  type MapEventOutboxGetPayload<S extends boolean | null | undefined | MapEventOutboxDefaultArgs> = $Result.GetResult<Prisma.$MapEventOutboxPayload, S>
+
+  type MapEventOutboxCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<MapEventOutboxFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: MapEventOutboxCountAggregateInputType | true
+    }
+
+  export interface MapEventOutboxDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['MapEventOutbox'], meta: { name: 'MapEventOutbox' } }
+    /**
+     * Find zero or one MapEventOutbox that matches the filter.
+     * @param {MapEventOutboxFindUniqueArgs} args - Arguments to find a MapEventOutbox
+     * @example
+     * // Get one MapEventOutbox
+     * const mapEventOutbox = await prisma.mapEventOutbox.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends MapEventOutboxFindUniqueArgs>(args: SelectSubset<T, MapEventOutboxFindUniqueArgs<ExtArgs>>): Prisma__MapEventOutboxClient<$Result.GetResult<Prisma.$MapEventOutboxPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one MapEventOutbox that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {MapEventOutboxFindUniqueOrThrowArgs} args - Arguments to find a MapEventOutbox
+     * @example
+     * // Get one MapEventOutbox
+     * const mapEventOutbox = await prisma.mapEventOutbox.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends MapEventOutboxFindUniqueOrThrowArgs>(args: SelectSubset<T, MapEventOutboxFindUniqueOrThrowArgs<ExtArgs>>): Prisma__MapEventOutboxClient<$Result.GetResult<Prisma.$MapEventOutboxPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MapEventOutbox that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MapEventOutboxFindFirstArgs} args - Arguments to find a MapEventOutbox
+     * @example
+     * // Get one MapEventOutbox
+     * const mapEventOutbox = await prisma.mapEventOutbox.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends MapEventOutboxFindFirstArgs>(args?: SelectSubset<T, MapEventOutboxFindFirstArgs<ExtArgs>>): Prisma__MapEventOutboxClient<$Result.GetResult<Prisma.$MapEventOutboxPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MapEventOutbox that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MapEventOutboxFindFirstOrThrowArgs} args - Arguments to find a MapEventOutbox
+     * @example
+     * // Get one MapEventOutbox
+     * const mapEventOutbox = await prisma.mapEventOutbox.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends MapEventOutboxFindFirstOrThrowArgs>(args?: SelectSubset<T, MapEventOutboxFindFirstOrThrowArgs<ExtArgs>>): Prisma__MapEventOutboxClient<$Result.GetResult<Prisma.$MapEventOutboxPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more MapEventOutboxes that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MapEventOutboxFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all MapEventOutboxes
+     * const mapEventOutboxes = await prisma.mapEventOutbox.findMany()
+     * 
+     * // Get first 10 MapEventOutboxes
+     * const mapEventOutboxes = await prisma.mapEventOutbox.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const mapEventOutboxWithIdOnly = await prisma.mapEventOutbox.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends MapEventOutboxFindManyArgs>(args?: SelectSubset<T, MapEventOutboxFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MapEventOutboxPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a MapEventOutbox.
+     * @param {MapEventOutboxCreateArgs} args - Arguments to create a MapEventOutbox.
+     * @example
+     * // Create one MapEventOutbox
+     * const MapEventOutbox = await prisma.mapEventOutbox.create({
+     *   data: {
+     *     // ... data to create a MapEventOutbox
+     *   }
+     * })
+     * 
+     */
+    create<T extends MapEventOutboxCreateArgs>(args: SelectSubset<T, MapEventOutboxCreateArgs<ExtArgs>>): Prisma__MapEventOutboxClient<$Result.GetResult<Prisma.$MapEventOutboxPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many MapEventOutboxes.
+     * @param {MapEventOutboxCreateManyArgs} args - Arguments to create many MapEventOutboxes.
+     * @example
+     * // Create many MapEventOutboxes
+     * const mapEventOutbox = await prisma.mapEventOutbox.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends MapEventOutboxCreateManyArgs>(args?: SelectSubset<T, MapEventOutboxCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many MapEventOutboxes and returns the data saved in the database.
+     * @param {MapEventOutboxCreateManyAndReturnArgs} args - Arguments to create many MapEventOutboxes.
+     * @example
+     * // Create many MapEventOutboxes
+     * const mapEventOutbox = await prisma.mapEventOutbox.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many MapEventOutboxes and only return the `id`
+     * const mapEventOutboxWithIdOnly = await prisma.mapEventOutbox.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends MapEventOutboxCreateManyAndReturnArgs>(args?: SelectSubset<T, MapEventOutboxCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MapEventOutboxPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a MapEventOutbox.
+     * @param {MapEventOutboxDeleteArgs} args - Arguments to delete one MapEventOutbox.
+     * @example
+     * // Delete one MapEventOutbox
+     * const MapEventOutbox = await prisma.mapEventOutbox.delete({
+     *   where: {
+     *     // ... filter to delete one MapEventOutbox
+     *   }
+     * })
+     * 
+     */
+    delete<T extends MapEventOutboxDeleteArgs>(args: SelectSubset<T, MapEventOutboxDeleteArgs<ExtArgs>>): Prisma__MapEventOutboxClient<$Result.GetResult<Prisma.$MapEventOutboxPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one MapEventOutbox.
+     * @param {MapEventOutboxUpdateArgs} args - Arguments to update one MapEventOutbox.
+     * @example
+     * // Update one MapEventOutbox
+     * const mapEventOutbox = await prisma.mapEventOutbox.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends MapEventOutboxUpdateArgs>(args: SelectSubset<T, MapEventOutboxUpdateArgs<ExtArgs>>): Prisma__MapEventOutboxClient<$Result.GetResult<Prisma.$MapEventOutboxPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more MapEventOutboxes.
+     * @param {MapEventOutboxDeleteManyArgs} args - Arguments to filter MapEventOutboxes to delete.
+     * @example
+     * // Delete a few MapEventOutboxes
+     * const { count } = await prisma.mapEventOutbox.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends MapEventOutboxDeleteManyArgs>(args?: SelectSubset<T, MapEventOutboxDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MapEventOutboxes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MapEventOutboxUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many MapEventOutboxes
+     * const mapEventOutbox = await prisma.mapEventOutbox.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends MapEventOutboxUpdateManyArgs>(args: SelectSubset<T, MapEventOutboxUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MapEventOutboxes and returns the data updated in the database.
+     * @param {MapEventOutboxUpdateManyAndReturnArgs} args - Arguments to update many MapEventOutboxes.
+     * @example
+     * // Update many MapEventOutboxes
+     * const mapEventOutbox = await prisma.mapEventOutbox.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more MapEventOutboxes and only return the `id`
+     * const mapEventOutboxWithIdOnly = await prisma.mapEventOutbox.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends MapEventOutboxUpdateManyAndReturnArgs>(args: SelectSubset<T, MapEventOutboxUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MapEventOutboxPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one MapEventOutbox.
+     * @param {MapEventOutboxUpsertArgs} args - Arguments to update or create a MapEventOutbox.
+     * @example
+     * // Update or create a MapEventOutbox
+     * const mapEventOutbox = await prisma.mapEventOutbox.upsert({
+     *   create: {
+     *     // ... data to create a MapEventOutbox
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the MapEventOutbox we want to update
+     *   }
+     * })
+     */
+    upsert<T extends MapEventOutboxUpsertArgs>(args: SelectSubset<T, MapEventOutboxUpsertArgs<ExtArgs>>): Prisma__MapEventOutboxClient<$Result.GetResult<Prisma.$MapEventOutboxPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of MapEventOutboxes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MapEventOutboxCountArgs} args - Arguments to filter MapEventOutboxes to count.
+     * @example
+     * // Count the number of MapEventOutboxes
+     * const count = await prisma.mapEventOutbox.count({
+     *   where: {
+     *     // ... the filter for the MapEventOutboxes we want to count
+     *   }
+     * })
+    **/
+    count<T extends MapEventOutboxCountArgs>(
+      args?: Subset<T, MapEventOutboxCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], MapEventOutboxCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a MapEventOutbox.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MapEventOutboxAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends MapEventOutboxAggregateArgs>(args: Subset<T, MapEventOutboxAggregateArgs>): Prisma.PrismaPromise<GetMapEventOutboxAggregateType<T>>
+
+    /**
+     * Group by MapEventOutbox.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MapEventOutboxGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends MapEventOutboxGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: MapEventOutboxGroupByArgs['orderBy'] }
+        : { orderBy?: MapEventOutboxGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, MapEventOutboxGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMapEventOutboxGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the MapEventOutbox model
+   */
+  readonly fields: MapEventOutboxFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for MapEventOutbox.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__MapEventOutboxClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the MapEventOutbox model
+   */
+  interface MapEventOutboxFieldRefs {
+    readonly id: FieldRef<"MapEventOutbox", 'String'>
+    readonly createdAt: FieldRef<"MapEventOutbox", 'DateTime'>
+    readonly updatedAt: FieldRef<"MapEventOutbox", 'DateTime'>
+    readonly eventId: FieldRef<"MapEventOutbox", 'String'>
+    readonly siteId: FieldRef<"MapEventOutbox", 'String'>
+    readonly eventType: FieldRef<"MapEventOutbox", 'String'>
+    readonly payload: FieldRef<"MapEventOutbox", 'Json'>
+    readonly status: FieldRef<"MapEventOutbox", 'MapEventOutboxStatus'>
+    readonly attempts: FieldRef<"MapEventOutbox", 'Int'>
+    readonly lastError: FieldRef<"MapEventOutbox", 'String'>
+    readonly dispatchedAt: FieldRef<"MapEventOutbox", 'DateTime'>
+    readonly leaseOwner: FieldRef<"MapEventOutbox", 'String'>
+    readonly processingAt: FieldRef<"MapEventOutbox", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * MapEventOutbox findUnique
+   */
+  export type MapEventOutboxFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapEventOutbox
+     */
+    select?: MapEventOutboxSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapEventOutbox
+     */
+    omit?: MapEventOutboxOmit<ExtArgs> | null
+    /**
+     * Filter, which MapEventOutbox to fetch.
+     */
+    where: MapEventOutboxWhereUniqueInput
+  }
+
+  /**
+   * MapEventOutbox findUniqueOrThrow
+   */
+  export type MapEventOutboxFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapEventOutbox
+     */
+    select?: MapEventOutboxSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapEventOutbox
+     */
+    omit?: MapEventOutboxOmit<ExtArgs> | null
+    /**
+     * Filter, which MapEventOutbox to fetch.
+     */
+    where: MapEventOutboxWhereUniqueInput
+  }
+
+  /**
+   * MapEventOutbox findFirst
+   */
+  export type MapEventOutboxFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapEventOutbox
+     */
+    select?: MapEventOutboxSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapEventOutbox
+     */
+    omit?: MapEventOutboxOmit<ExtArgs> | null
+    /**
+     * Filter, which MapEventOutbox to fetch.
+     */
+    where?: MapEventOutboxWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MapEventOutboxes to fetch.
+     */
+    orderBy?: MapEventOutboxOrderByWithRelationInput | MapEventOutboxOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MapEventOutboxes.
+     */
+    cursor?: MapEventOutboxWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MapEventOutboxes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MapEventOutboxes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MapEventOutboxes.
+     */
+    distinct?: MapEventOutboxScalarFieldEnum | MapEventOutboxScalarFieldEnum[]
+  }
+
+  /**
+   * MapEventOutbox findFirstOrThrow
+   */
+  export type MapEventOutboxFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapEventOutbox
+     */
+    select?: MapEventOutboxSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapEventOutbox
+     */
+    omit?: MapEventOutboxOmit<ExtArgs> | null
+    /**
+     * Filter, which MapEventOutbox to fetch.
+     */
+    where?: MapEventOutboxWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MapEventOutboxes to fetch.
+     */
+    orderBy?: MapEventOutboxOrderByWithRelationInput | MapEventOutboxOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MapEventOutboxes.
+     */
+    cursor?: MapEventOutboxWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MapEventOutboxes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MapEventOutboxes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MapEventOutboxes.
+     */
+    distinct?: MapEventOutboxScalarFieldEnum | MapEventOutboxScalarFieldEnum[]
+  }
+
+  /**
+   * MapEventOutbox findMany
+   */
+  export type MapEventOutboxFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapEventOutbox
+     */
+    select?: MapEventOutboxSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapEventOutbox
+     */
+    omit?: MapEventOutboxOmit<ExtArgs> | null
+    /**
+     * Filter, which MapEventOutboxes to fetch.
+     */
+    where?: MapEventOutboxWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MapEventOutboxes to fetch.
+     */
+    orderBy?: MapEventOutboxOrderByWithRelationInput | MapEventOutboxOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing MapEventOutboxes.
+     */
+    cursor?: MapEventOutboxWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MapEventOutboxes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MapEventOutboxes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MapEventOutboxes.
+     */
+    distinct?: MapEventOutboxScalarFieldEnum | MapEventOutboxScalarFieldEnum[]
+  }
+
+  /**
+   * MapEventOutbox create
+   */
+  export type MapEventOutboxCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapEventOutbox
+     */
+    select?: MapEventOutboxSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapEventOutbox
+     */
+    omit?: MapEventOutboxOmit<ExtArgs> | null
+    /**
+     * The data needed to create a MapEventOutbox.
+     */
+    data: XOR<MapEventOutboxCreateInput, MapEventOutboxUncheckedCreateInput>
+  }
+
+  /**
+   * MapEventOutbox createMany
+   */
+  export type MapEventOutboxCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many MapEventOutboxes.
+     */
+    data: MapEventOutboxCreateManyInput | MapEventOutboxCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * MapEventOutbox createManyAndReturn
+   */
+  export type MapEventOutboxCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapEventOutbox
+     */
+    select?: MapEventOutboxSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapEventOutbox
+     */
+    omit?: MapEventOutboxOmit<ExtArgs> | null
+    /**
+     * The data used to create many MapEventOutboxes.
+     */
+    data: MapEventOutboxCreateManyInput | MapEventOutboxCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * MapEventOutbox update
+   */
+  export type MapEventOutboxUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapEventOutbox
+     */
+    select?: MapEventOutboxSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapEventOutbox
+     */
+    omit?: MapEventOutboxOmit<ExtArgs> | null
+    /**
+     * The data needed to update a MapEventOutbox.
+     */
+    data: XOR<MapEventOutboxUpdateInput, MapEventOutboxUncheckedUpdateInput>
+    /**
+     * Choose, which MapEventOutbox to update.
+     */
+    where: MapEventOutboxWhereUniqueInput
+  }
+
+  /**
+   * MapEventOutbox updateMany
+   */
+  export type MapEventOutboxUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update MapEventOutboxes.
+     */
+    data: XOR<MapEventOutboxUpdateManyMutationInput, MapEventOutboxUncheckedUpdateManyInput>
+    /**
+     * Filter which MapEventOutboxes to update
+     */
+    where?: MapEventOutboxWhereInput
+    /**
+     * Limit how many MapEventOutboxes to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * MapEventOutbox updateManyAndReturn
+   */
+  export type MapEventOutboxUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapEventOutbox
+     */
+    select?: MapEventOutboxSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapEventOutbox
+     */
+    omit?: MapEventOutboxOmit<ExtArgs> | null
+    /**
+     * The data used to update MapEventOutboxes.
+     */
+    data: XOR<MapEventOutboxUpdateManyMutationInput, MapEventOutboxUncheckedUpdateManyInput>
+    /**
+     * Filter which MapEventOutboxes to update
+     */
+    where?: MapEventOutboxWhereInput
+    /**
+     * Limit how many MapEventOutboxes to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * MapEventOutbox upsert
+   */
+  export type MapEventOutboxUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapEventOutbox
+     */
+    select?: MapEventOutboxSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapEventOutbox
+     */
+    omit?: MapEventOutboxOmit<ExtArgs> | null
+    /**
+     * The filter to search for the MapEventOutbox to update in case it exists.
+     */
+    where: MapEventOutboxWhereUniqueInput
+    /**
+     * In case the MapEventOutbox found by the `where` argument doesn't exist, create a new MapEventOutbox with this data.
+     */
+    create: XOR<MapEventOutboxCreateInput, MapEventOutboxUncheckedCreateInput>
+    /**
+     * In case the MapEventOutbox was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<MapEventOutboxUpdateInput, MapEventOutboxUncheckedUpdateInput>
+  }
+
+  /**
+   * MapEventOutbox delete
+   */
+  export type MapEventOutboxDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapEventOutbox
+     */
+    select?: MapEventOutboxSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapEventOutbox
+     */
+    omit?: MapEventOutboxOmit<ExtArgs> | null
+    /**
+     * Filter which MapEventOutbox to delete.
+     */
+    where: MapEventOutboxWhereUniqueInput
+  }
+
+  /**
+   * MapEventOutbox deleteMany
+   */
+  export type MapEventOutboxDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MapEventOutboxes to delete
+     */
+    where?: MapEventOutboxWhereInput
+    /**
+     * Limit how many MapEventOutboxes to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * MapEventOutbox without action
+   */
+  export type MapEventOutboxDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapEventOutbox
+     */
+    select?: MapEventOutboxSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapEventOutbox
+     */
+    omit?: MapEventOutboxOmit<ExtArgs> | null
+  }
+
+
+  /**
+   * Model MapCdnPurgeLog
+   */
+
+  export type AggregateMapCdnPurgeLog = {
+    _count: MapCdnPurgeLogCountAggregateOutputType | null
+    _min: MapCdnPurgeLogMinAggregateOutputType | null
+    _max: MapCdnPurgeLogMaxAggregateOutputType | null
+  }
+
+  export type MapCdnPurgeLogMinAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    provider: string | null
+    status: string | null
+    errorMessage: string | null
+  }
+
+  export type MapCdnPurgeLogMaxAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    provider: string | null
+    status: string | null
+    errorMessage: string | null
+  }
+
+  export type MapCdnPurgeLogCountAggregateOutputType = {
+    id: number
+    createdAt: number
+    provider: number
+    status: number
+    keys: number
+    errorMessage: number
+    _all: number
+  }
+
+
+  export type MapCdnPurgeLogMinAggregateInputType = {
+    id?: true
+    createdAt?: true
+    provider?: true
+    status?: true
+    errorMessage?: true
+  }
+
+  export type MapCdnPurgeLogMaxAggregateInputType = {
+    id?: true
+    createdAt?: true
+    provider?: true
+    status?: true
+    errorMessage?: true
+  }
+
+  export type MapCdnPurgeLogCountAggregateInputType = {
+    id?: true
+    createdAt?: true
+    provider?: true
+    status?: true
+    keys?: true
+    errorMessage?: true
+    _all?: true
+  }
+
+  export type MapCdnPurgeLogAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MapCdnPurgeLog to aggregate.
+     */
+    where?: MapCdnPurgeLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MapCdnPurgeLogs to fetch.
+     */
+    orderBy?: MapCdnPurgeLogOrderByWithRelationInput | MapCdnPurgeLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: MapCdnPurgeLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MapCdnPurgeLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MapCdnPurgeLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned MapCdnPurgeLogs
+    **/
+    _count?: true | MapCdnPurgeLogCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: MapCdnPurgeLogMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: MapCdnPurgeLogMaxAggregateInputType
+  }
+
+  export type GetMapCdnPurgeLogAggregateType<T extends MapCdnPurgeLogAggregateArgs> = {
+        [P in keyof T & keyof AggregateMapCdnPurgeLog]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateMapCdnPurgeLog[P]>
+      : GetScalarType<T[P], AggregateMapCdnPurgeLog[P]>
+  }
+
+
+
+
+  export type MapCdnPurgeLogGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MapCdnPurgeLogWhereInput
+    orderBy?: MapCdnPurgeLogOrderByWithAggregationInput | MapCdnPurgeLogOrderByWithAggregationInput[]
+    by: MapCdnPurgeLogScalarFieldEnum[] | MapCdnPurgeLogScalarFieldEnum
+    having?: MapCdnPurgeLogScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: MapCdnPurgeLogCountAggregateInputType | true
+    _min?: MapCdnPurgeLogMinAggregateInputType
+    _max?: MapCdnPurgeLogMaxAggregateInputType
+  }
+
+  export type MapCdnPurgeLogGroupByOutputType = {
+    id: string
+    createdAt: Date
+    provider: string
+    status: string
+    keys: JsonValue
+    errorMessage: string | null
+    _count: MapCdnPurgeLogCountAggregateOutputType | null
+    _min: MapCdnPurgeLogMinAggregateOutputType | null
+    _max: MapCdnPurgeLogMaxAggregateOutputType | null
+  }
+
+  type GetMapCdnPurgeLogGroupByPayload<T extends MapCdnPurgeLogGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<MapCdnPurgeLogGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof MapCdnPurgeLogGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], MapCdnPurgeLogGroupByOutputType[P]>
+            : GetScalarType<T[P], MapCdnPurgeLogGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type MapCdnPurgeLogSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    provider?: boolean
+    status?: boolean
+    keys?: boolean
+    errorMessage?: boolean
+  }, ExtArgs["result"]["mapCdnPurgeLog"]>
+
+  export type MapCdnPurgeLogSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    provider?: boolean
+    status?: boolean
+    keys?: boolean
+    errorMessage?: boolean
+  }, ExtArgs["result"]["mapCdnPurgeLog"]>
+
+  export type MapCdnPurgeLogSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    provider?: boolean
+    status?: boolean
+    keys?: boolean
+    errorMessage?: boolean
+  }, ExtArgs["result"]["mapCdnPurgeLog"]>
+
+  export type MapCdnPurgeLogSelectScalar = {
+    id?: boolean
+    createdAt?: boolean
+    provider?: boolean
+    status?: boolean
+    keys?: boolean
+    errorMessage?: boolean
+  }
+
+  export type MapCdnPurgeLogOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "provider" | "status" | "keys" | "errorMessage", ExtArgs["result"]["mapCdnPurgeLog"]>
+
+  export type $MapCdnPurgeLogPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "MapCdnPurgeLog"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      createdAt: Date
+      provider: string
+      status: string
+      keys: Prisma.JsonValue
+      errorMessage: string | null
+    }, ExtArgs["result"]["mapCdnPurgeLog"]>
+    composites: {}
+  }
+
+  type MapCdnPurgeLogGetPayload<S extends boolean | null | undefined | MapCdnPurgeLogDefaultArgs> = $Result.GetResult<Prisma.$MapCdnPurgeLogPayload, S>
+
+  type MapCdnPurgeLogCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<MapCdnPurgeLogFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: MapCdnPurgeLogCountAggregateInputType | true
+    }
+
+  export interface MapCdnPurgeLogDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['MapCdnPurgeLog'], meta: { name: 'MapCdnPurgeLog' } }
+    /**
+     * Find zero or one MapCdnPurgeLog that matches the filter.
+     * @param {MapCdnPurgeLogFindUniqueArgs} args - Arguments to find a MapCdnPurgeLog
+     * @example
+     * // Get one MapCdnPurgeLog
+     * const mapCdnPurgeLog = await prisma.mapCdnPurgeLog.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends MapCdnPurgeLogFindUniqueArgs>(args: SelectSubset<T, MapCdnPurgeLogFindUniqueArgs<ExtArgs>>): Prisma__MapCdnPurgeLogClient<$Result.GetResult<Prisma.$MapCdnPurgeLogPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one MapCdnPurgeLog that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {MapCdnPurgeLogFindUniqueOrThrowArgs} args - Arguments to find a MapCdnPurgeLog
+     * @example
+     * // Get one MapCdnPurgeLog
+     * const mapCdnPurgeLog = await prisma.mapCdnPurgeLog.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends MapCdnPurgeLogFindUniqueOrThrowArgs>(args: SelectSubset<T, MapCdnPurgeLogFindUniqueOrThrowArgs<ExtArgs>>): Prisma__MapCdnPurgeLogClient<$Result.GetResult<Prisma.$MapCdnPurgeLogPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MapCdnPurgeLog that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MapCdnPurgeLogFindFirstArgs} args - Arguments to find a MapCdnPurgeLog
+     * @example
+     * // Get one MapCdnPurgeLog
+     * const mapCdnPurgeLog = await prisma.mapCdnPurgeLog.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends MapCdnPurgeLogFindFirstArgs>(args?: SelectSubset<T, MapCdnPurgeLogFindFirstArgs<ExtArgs>>): Prisma__MapCdnPurgeLogClient<$Result.GetResult<Prisma.$MapCdnPurgeLogPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MapCdnPurgeLog that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MapCdnPurgeLogFindFirstOrThrowArgs} args - Arguments to find a MapCdnPurgeLog
+     * @example
+     * // Get one MapCdnPurgeLog
+     * const mapCdnPurgeLog = await prisma.mapCdnPurgeLog.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends MapCdnPurgeLogFindFirstOrThrowArgs>(args?: SelectSubset<T, MapCdnPurgeLogFindFirstOrThrowArgs<ExtArgs>>): Prisma__MapCdnPurgeLogClient<$Result.GetResult<Prisma.$MapCdnPurgeLogPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more MapCdnPurgeLogs that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MapCdnPurgeLogFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all MapCdnPurgeLogs
+     * const mapCdnPurgeLogs = await prisma.mapCdnPurgeLog.findMany()
+     * 
+     * // Get first 10 MapCdnPurgeLogs
+     * const mapCdnPurgeLogs = await prisma.mapCdnPurgeLog.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const mapCdnPurgeLogWithIdOnly = await prisma.mapCdnPurgeLog.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends MapCdnPurgeLogFindManyArgs>(args?: SelectSubset<T, MapCdnPurgeLogFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MapCdnPurgeLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a MapCdnPurgeLog.
+     * @param {MapCdnPurgeLogCreateArgs} args - Arguments to create a MapCdnPurgeLog.
+     * @example
+     * // Create one MapCdnPurgeLog
+     * const MapCdnPurgeLog = await prisma.mapCdnPurgeLog.create({
+     *   data: {
+     *     // ... data to create a MapCdnPurgeLog
+     *   }
+     * })
+     * 
+     */
+    create<T extends MapCdnPurgeLogCreateArgs>(args: SelectSubset<T, MapCdnPurgeLogCreateArgs<ExtArgs>>): Prisma__MapCdnPurgeLogClient<$Result.GetResult<Prisma.$MapCdnPurgeLogPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many MapCdnPurgeLogs.
+     * @param {MapCdnPurgeLogCreateManyArgs} args - Arguments to create many MapCdnPurgeLogs.
+     * @example
+     * // Create many MapCdnPurgeLogs
+     * const mapCdnPurgeLog = await prisma.mapCdnPurgeLog.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends MapCdnPurgeLogCreateManyArgs>(args?: SelectSubset<T, MapCdnPurgeLogCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many MapCdnPurgeLogs and returns the data saved in the database.
+     * @param {MapCdnPurgeLogCreateManyAndReturnArgs} args - Arguments to create many MapCdnPurgeLogs.
+     * @example
+     * // Create many MapCdnPurgeLogs
+     * const mapCdnPurgeLog = await prisma.mapCdnPurgeLog.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many MapCdnPurgeLogs and only return the `id`
+     * const mapCdnPurgeLogWithIdOnly = await prisma.mapCdnPurgeLog.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends MapCdnPurgeLogCreateManyAndReturnArgs>(args?: SelectSubset<T, MapCdnPurgeLogCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MapCdnPurgeLogPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a MapCdnPurgeLog.
+     * @param {MapCdnPurgeLogDeleteArgs} args - Arguments to delete one MapCdnPurgeLog.
+     * @example
+     * // Delete one MapCdnPurgeLog
+     * const MapCdnPurgeLog = await prisma.mapCdnPurgeLog.delete({
+     *   where: {
+     *     // ... filter to delete one MapCdnPurgeLog
+     *   }
+     * })
+     * 
+     */
+    delete<T extends MapCdnPurgeLogDeleteArgs>(args: SelectSubset<T, MapCdnPurgeLogDeleteArgs<ExtArgs>>): Prisma__MapCdnPurgeLogClient<$Result.GetResult<Prisma.$MapCdnPurgeLogPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one MapCdnPurgeLog.
+     * @param {MapCdnPurgeLogUpdateArgs} args - Arguments to update one MapCdnPurgeLog.
+     * @example
+     * // Update one MapCdnPurgeLog
+     * const mapCdnPurgeLog = await prisma.mapCdnPurgeLog.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends MapCdnPurgeLogUpdateArgs>(args: SelectSubset<T, MapCdnPurgeLogUpdateArgs<ExtArgs>>): Prisma__MapCdnPurgeLogClient<$Result.GetResult<Prisma.$MapCdnPurgeLogPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more MapCdnPurgeLogs.
+     * @param {MapCdnPurgeLogDeleteManyArgs} args - Arguments to filter MapCdnPurgeLogs to delete.
+     * @example
+     * // Delete a few MapCdnPurgeLogs
+     * const { count } = await prisma.mapCdnPurgeLog.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends MapCdnPurgeLogDeleteManyArgs>(args?: SelectSubset<T, MapCdnPurgeLogDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MapCdnPurgeLogs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MapCdnPurgeLogUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many MapCdnPurgeLogs
+     * const mapCdnPurgeLog = await prisma.mapCdnPurgeLog.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends MapCdnPurgeLogUpdateManyArgs>(args: SelectSubset<T, MapCdnPurgeLogUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MapCdnPurgeLogs and returns the data updated in the database.
+     * @param {MapCdnPurgeLogUpdateManyAndReturnArgs} args - Arguments to update many MapCdnPurgeLogs.
+     * @example
+     * // Update many MapCdnPurgeLogs
+     * const mapCdnPurgeLog = await prisma.mapCdnPurgeLog.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more MapCdnPurgeLogs and only return the `id`
+     * const mapCdnPurgeLogWithIdOnly = await prisma.mapCdnPurgeLog.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends MapCdnPurgeLogUpdateManyAndReturnArgs>(args: SelectSubset<T, MapCdnPurgeLogUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MapCdnPurgeLogPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one MapCdnPurgeLog.
+     * @param {MapCdnPurgeLogUpsertArgs} args - Arguments to update or create a MapCdnPurgeLog.
+     * @example
+     * // Update or create a MapCdnPurgeLog
+     * const mapCdnPurgeLog = await prisma.mapCdnPurgeLog.upsert({
+     *   create: {
+     *     // ... data to create a MapCdnPurgeLog
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the MapCdnPurgeLog we want to update
+     *   }
+     * })
+     */
+    upsert<T extends MapCdnPurgeLogUpsertArgs>(args: SelectSubset<T, MapCdnPurgeLogUpsertArgs<ExtArgs>>): Prisma__MapCdnPurgeLogClient<$Result.GetResult<Prisma.$MapCdnPurgeLogPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of MapCdnPurgeLogs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MapCdnPurgeLogCountArgs} args - Arguments to filter MapCdnPurgeLogs to count.
+     * @example
+     * // Count the number of MapCdnPurgeLogs
+     * const count = await prisma.mapCdnPurgeLog.count({
+     *   where: {
+     *     // ... the filter for the MapCdnPurgeLogs we want to count
+     *   }
+     * })
+    **/
+    count<T extends MapCdnPurgeLogCountArgs>(
+      args?: Subset<T, MapCdnPurgeLogCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], MapCdnPurgeLogCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a MapCdnPurgeLog.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MapCdnPurgeLogAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends MapCdnPurgeLogAggregateArgs>(args: Subset<T, MapCdnPurgeLogAggregateArgs>): Prisma.PrismaPromise<GetMapCdnPurgeLogAggregateType<T>>
+
+    /**
+     * Group by MapCdnPurgeLog.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MapCdnPurgeLogGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends MapCdnPurgeLogGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: MapCdnPurgeLogGroupByArgs['orderBy'] }
+        : { orderBy?: MapCdnPurgeLogGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, MapCdnPurgeLogGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMapCdnPurgeLogGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the MapCdnPurgeLog model
+   */
+  readonly fields: MapCdnPurgeLogFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for MapCdnPurgeLog.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__MapCdnPurgeLogClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the MapCdnPurgeLog model
+   */
+  interface MapCdnPurgeLogFieldRefs {
+    readonly id: FieldRef<"MapCdnPurgeLog", 'String'>
+    readonly createdAt: FieldRef<"MapCdnPurgeLog", 'DateTime'>
+    readonly provider: FieldRef<"MapCdnPurgeLog", 'String'>
+    readonly status: FieldRef<"MapCdnPurgeLog", 'String'>
+    readonly keys: FieldRef<"MapCdnPurgeLog", 'Json'>
+    readonly errorMessage: FieldRef<"MapCdnPurgeLog", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * MapCdnPurgeLog findUnique
+   */
+  export type MapCdnPurgeLogFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapCdnPurgeLog
+     */
+    select?: MapCdnPurgeLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapCdnPurgeLog
+     */
+    omit?: MapCdnPurgeLogOmit<ExtArgs> | null
+    /**
+     * Filter, which MapCdnPurgeLog to fetch.
+     */
+    where: MapCdnPurgeLogWhereUniqueInput
+  }
+
+  /**
+   * MapCdnPurgeLog findUniqueOrThrow
+   */
+  export type MapCdnPurgeLogFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapCdnPurgeLog
+     */
+    select?: MapCdnPurgeLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapCdnPurgeLog
+     */
+    omit?: MapCdnPurgeLogOmit<ExtArgs> | null
+    /**
+     * Filter, which MapCdnPurgeLog to fetch.
+     */
+    where: MapCdnPurgeLogWhereUniqueInput
+  }
+
+  /**
+   * MapCdnPurgeLog findFirst
+   */
+  export type MapCdnPurgeLogFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapCdnPurgeLog
+     */
+    select?: MapCdnPurgeLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapCdnPurgeLog
+     */
+    omit?: MapCdnPurgeLogOmit<ExtArgs> | null
+    /**
+     * Filter, which MapCdnPurgeLog to fetch.
+     */
+    where?: MapCdnPurgeLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MapCdnPurgeLogs to fetch.
+     */
+    orderBy?: MapCdnPurgeLogOrderByWithRelationInput | MapCdnPurgeLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MapCdnPurgeLogs.
+     */
+    cursor?: MapCdnPurgeLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MapCdnPurgeLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MapCdnPurgeLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MapCdnPurgeLogs.
+     */
+    distinct?: MapCdnPurgeLogScalarFieldEnum | MapCdnPurgeLogScalarFieldEnum[]
+  }
+
+  /**
+   * MapCdnPurgeLog findFirstOrThrow
+   */
+  export type MapCdnPurgeLogFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapCdnPurgeLog
+     */
+    select?: MapCdnPurgeLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapCdnPurgeLog
+     */
+    omit?: MapCdnPurgeLogOmit<ExtArgs> | null
+    /**
+     * Filter, which MapCdnPurgeLog to fetch.
+     */
+    where?: MapCdnPurgeLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MapCdnPurgeLogs to fetch.
+     */
+    orderBy?: MapCdnPurgeLogOrderByWithRelationInput | MapCdnPurgeLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MapCdnPurgeLogs.
+     */
+    cursor?: MapCdnPurgeLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MapCdnPurgeLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MapCdnPurgeLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MapCdnPurgeLogs.
+     */
+    distinct?: MapCdnPurgeLogScalarFieldEnum | MapCdnPurgeLogScalarFieldEnum[]
+  }
+
+  /**
+   * MapCdnPurgeLog findMany
+   */
+  export type MapCdnPurgeLogFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapCdnPurgeLog
+     */
+    select?: MapCdnPurgeLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapCdnPurgeLog
+     */
+    omit?: MapCdnPurgeLogOmit<ExtArgs> | null
+    /**
+     * Filter, which MapCdnPurgeLogs to fetch.
+     */
+    where?: MapCdnPurgeLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MapCdnPurgeLogs to fetch.
+     */
+    orderBy?: MapCdnPurgeLogOrderByWithRelationInput | MapCdnPurgeLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing MapCdnPurgeLogs.
+     */
+    cursor?: MapCdnPurgeLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MapCdnPurgeLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MapCdnPurgeLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MapCdnPurgeLogs.
+     */
+    distinct?: MapCdnPurgeLogScalarFieldEnum | MapCdnPurgeLogScalarFieldEnum[]
+  }
+
+  /**
+   * MapCdnPurgeLog create
+   */
+  export type MapCdnPurgeLogCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapCdnPurgeLog
+     */
+    select?: MapCdnPurgeLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapCdnPurgeLog
+     */
+    omit?: MapCdnPurgeLogOmit<ExtArgs> | null
+    /**
+     * The data needed to create a MapCdnPurgeLog.
+     */
+    data: XOR<MapCdnPurgeLogCreateInput, MapCdnPurgeLogUncheckedCreateInput>
+  }
+
+  /**
+   * MapCdnPurgeLog createMany
+   */
+  export type MapCdnPurgeLogCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many MapCdnPurgeLogs.
+     */
+    data: MapCdnPurgeLogCreateManyInput | MapCdnPurgeLogCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * MapCdnPurgeLog createManyAndReturn
+   */
+  export type MapCdnPurgeLogCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapCdnPurgeLog
+     */
+    select?: MapCdnPurgeLogSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapCdnPurgeLog
+     */
+    omit?: MapCdnPurgeLogOmit<ExtArgs> | null
+    /**
+     * The data used to create many MapCdnPurgeLogs.
+     */
+    data: MapCdnPurgeLogCreateManyInput | MapCdnPurgeLogCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * MapCdnPurgeLog update
+   */
+  export type MapCdnPurgeLogUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapCdnPurgeLog
+     */
+    select?: MapCdnPurgeLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapCdnPurgeLog
+     */
+    omit?: MapCdnPurgeLogOmit<ExtArgs> | null
+    /**
+     * The data needed to update a MapCdnPurgeLog.
+     */
+    data: XOR<MapCdnPurgeLogUpdateInput, MapCdnPurgeLogUncheckedUpdateInput>
+    /**
+     * Choose, which MapCdnPurgeLog to update.
+     */
+    where: MapCdnPurgeLogWhereUniqueInput
+  }
+
+  /**
+   * MapCdnPurgeLog updateMany
+   */
+  export type MapCdnPurgeLogUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update MapCdnPurgeLogs.
+     */
+    data: XOR<MapCdnPurgeLogUpdateManyMutationInput, MapCdnPurgeLogUncheckedUpdateManyInput>
+    /**
+     * Filter which MapCdnPurgeLogs to update
+     */
+    where?: MapCdnPurgeLogWhereInput
+    /**
+     * Limit how many MapCdnPurgeLogs to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * MapCdnPurgeLog updateManyAndReturn
+   */
+  export type MapCdnPurgeLogUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapCdnPurgeLog
+     */
+    select?: MapCdnPurgeLogSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapCdnPurgeLog
+     */
+    omit?: MapCdnPurgeLogOmit<ExtArgs> | null
+    /**
+     * The data used to update MapCdnPurgeLogs.
+     */
+    data: XOR<MapCdnPurgeLogUpdateManyMutationInput, MapCdnPurgeLogUncheckedUpdateManyInput>
+    /**
+     * Filter which MapCdnPurgeLogs to update
+     */
+    where?: MapCdnPurgeLogWhereInput
+    /**
+     * Limit how many MapCdnPurgeLogs to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * MapCdnPurgeLog upsert
+   */
+  export type MapCdnPurgeLogUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapCdnPurgeLog
+     */
+    select?: MapCdnPurgeLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapCdnPurgeLog
+     */
+    omit?: MapCdnPurgeLogOmit<ExtArgs> | null
+    /**
+     * The filter to search for the MapCdnPurgeLog to update in case it exists.
+     */
+    where: MapCdnPurgeLogWhereUniqueInput
+    /**
+     * In case the MapCdnPurgeLog found by the `where` argument doesn't exist, create a new MapCdnPurgeLog with this data.
+     */
+    create: XOR<MapCdnPurgeLogCreateInput, MapCdnPurgeLogUncheckedCreateInput>
+    /**
+     * In case the MapCdnPurgeLog was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<MapCdnPurgeLogUpdateInput, MapCdnPurgeLogUncheckedUpdateInput>
+  }
+
+  /**
+   * MapCdnPurgeLog delete
+   */
+  export type MapCdnPurgeLogDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapCdnPurgeLog
+     */
+    select?: MapCdnPurgeLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapCdnPurgeLog
+     */
+    omit?: MapCdnPurgeLogOmit<ExtArgs> | null
+    /**
+     * Filter which MapCdnPurgeLog to delete.
+     */
+    where: MapCdnPurgeLogWhereUniqueInput
+  }
+
+  /**
+   * MapCdnPurgeLog deleteMany
+   */
+  export type MapCdnPurgeLogDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MapCdnPurgeLogs to delete
+     */
+    where?: MapCdnPurgeLogWhereInput
+    /**
+     * Limit how many MapCdnPurgeLogs to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * MapCdnPurgeLog without action
+   */
+  export type MapCdnPurgeLogDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MapCdnPurgeLog
+     */
+    select?: MapCdnPurgeLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MapCdnPurgeLog
+     */
+    omit?: MapCdnPurgeLogOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Model AdminMutationIdempotency
    */
 
@@ -58392,6 +62325,10 @@ export namespace Prisma {
     address: 'address',
     description: 'description',
     status: 'status',
+    isArchivedByAdmin: 'isArchivedByAdmin',
+    archivedAt: 'archivedAt',
+    archivedById: 'archivedById',
+    archiveReason: 'archiveReason',
     upvotesCount: 'upvotesCount',
     commentsCount: 'commentsCount',
     savesCount: 'savesCount',
@@ -58899,6 +62836,66 @@ export namespace Prisma {
   export type NotificationOutboxScalarFieldEnum = (typeof NotificationOutboxScalarFieldEnum)[keyof typeof NotificationOutboxScalarFieldEnum]
 
 
+  export const MapSiteProjectionScalarFieldEnum: {
+    siteId: 'siteId',
+    latitude: 'latitude',
+    longitude: 'longitude',
+    status: 'status',
+    address: 'address',
+    description: 'description',
+    thumbnailUrl: 'thumbnailUrl',
+    pollutionCategory: 'pollutionCategory',
+    latestReportTitle: 'latestReportTitle',
+    latestReportDescription: 'latestReportDescription',
+    latestReportNumber: 'latestReportNumber',
+    reportCount: 'reportCount',
+    upvotesCount: 'upvotesCount',
+    commentsCount: 'commentsCount',
+    savesCount: 'savesCount',
+    sharesCount: 'sharesCount',
+    latestReportAt: 'latestReportAt',
+    siteCreatedAt: 'siteCreatedAt',
+    siteUpdatedAt: 'siteUpdatedAt',
+    projectedAt: 'projectedAt',
+    isHot: 'isHot',
+    isArchivedByAdmin: 'isArchivedByAdmin',
+    archivedAt: 'archivedAt'
+  };
+
+  export type MapSiteProjectionScalarFieldEnum = (typeof MapSiteProjectionScalarFieldEnum)[keyof typeof MapSiteProjectionScalarFieldEnum]
+
+
+  export const MapEventOutboxScalarFieldEnum: {
+    id: 'id',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+    eventId: 'eventId',
+    siteId: 'siteId',
+    eventType: 'eventType',
+    payload: 'payload',
+    status: 'status',
+    attempts: 'attempts',
+    lastError: 'lastError',
+    dispatchedAt: 'dispatchedAt',
+    leaseOwner: 'leaseOwner',
+    processingAt: 'processingAt'
+  };
+
+  export type MapEventOutboxScalarFieldEnum = (typeof MapEventOutboxScalarFieldEnum)[keyof typeof MapEventOutboxScalarFieldEnum]
+
+
+  export const MapCdnPurgeLogScalarFieldEnum: {
+    id: 'id',
+    createdAt: 'createdAt',
+    provider: 'provider',
+    status: 'status',
+    keys: 'keys',
+    errorMessage: 'errorMessage'
+  };
+
+  export type MapCdnPurgeLogScalarFieldEnum = (typeof MapCdnPurgeLogScalarFieldEnum)[keyof typeof MapCdnPurgeLogScalarFieldEnum]
+
+
   export const AdminMutationIdempotencyScalarFieldEnum: {
     id: 'id',
     createdAt: 'createdAt',
@@ -59360,6 +63357,20 @@ export namespace Prisma {
    */
   export type ListEnumNotificationTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'NotificationType[]'>
     
+
+
+  /**
+   * Reference to a field of type 'MapEventOutboxStatus'
+   */
+  export type EnumMapEventOutboxStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MapEventOutboxStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'MapEventOutboxStatus[]'
+   */
+  export type ListEnumMapEventOutboxStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MapEventOutboxStatus[]'>
+    
   /**
    * Deep Input Types
    */
@@ -59425,6 +63436,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoListRelationFilter
     routeSegmentsClaimed?: EventRouteSegmentListRelationFilter
     checkInRiskSignals?: CheckInRiskSignalListRelationFilter
+    archivedSites?: SiteListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -59484,6 +63496,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoOrderByRelationAggregateInput
     routeSegmentsClaimed?: EventRouteSegmentOrderByRelationAggregateInput
     checkInRiskSignals?: CheckInRiskSignalOrderByRelationAggregateInput
+    archivedSites?: SiteOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -59546,6 +63559,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoListRelationFilter
     routeSegmentsClaimed?: EventRouteSegmentListRelationFilter
     checkInRiskSignals?: CheckInRiskSignalListRelationFilter
+    archivedSites?: SiteListRelationFilter
   }, "id" | "email" | "phoneNumber">
 
   export type UserOrderByWithAggregationInput = {
@@ -60142,10 +64156,15 @@ export namespace Prisma {
     address?: StringNullableFilter<"Site"> | string | null
     description?: StringNullableFilter<"Site"> | string | null
     status?: EnumSiteStatusFilter<"Site"> | $Enums.SiteStatus
+    isArchivedByAdmin?: BoolFilter<"Site"> | boolean
+    archivedAt?: DateTimeNullableFilter<"Site"> | Date | string | null
+    archivedById?: StringNullableFilter<"Site"> | string | null
+    archiveReason?: StringNullableFilter<"Site"> | string | null
     upvotesCount?: IntFilter<"Site"> | number
     commentsCount?: IntFilter<"Site"> | number
     savesCount?: IntFilter<"Site"> | number
     sharesCount?: IntFilter<"Site"> | number
+    archivedBy?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     reports?: ReportListRelationFilter
     events?: CleanupEventListRelationFilter
     votes?: SiteVoteListRelationFilter
@@ -60155,6 +64174,7 @@ export namespace Prisma {
     shareLinks?: SiteShareLinkListRelationFilter
     featureSnapshot?: XOR<SiteFeatureSnapshotNullableScalarRelationFilter, SiteFeatureSnapshotWhereInput> | null
     feedImpressions?: FeedImpressionListRelationFilter
+    mapProjection?: XOR<MapSiteProjectionNullableScalarRelationFilter, MapSiteProjectionWhereInput> | null
   }
 
   export type SiteOrderByWithRelationInput = {
@@ -60166,10 +64186,15 @@ export namespace Prisma {
     address?: SortOrderInput | SortOrder
     description?: SortOrderInput | SortOrder
     status?: SortOrder
+    isArchivedByAdmin?: SortOrder
+    archivedAt?: SortOrderInput | SortOrder
+    archivedById?: SortOrderInput | SortOrder
+    archiveReason?: SortOrderInput | SortOrder
     upvotesCount?: SortOrder
     commentsCount?: SortOrder
     savesCount?: SortOrder
     sharesCount?: SortOrder
+    archivedBy?: UserOrderByWithRelationInput
     reports?: ReportOrderByRelationAggregateInput
     events?: CleanupEventOrderByRelationAggregateInput
     votes?: SiteVoteOrderByRelationAggregateInput
@@ -60179,6 +64204,7 @@ export namespace Prisma {
     shareLinks?: SiteShareLinkOrderByRelationAggregateInput
     featureSnapshot?: SiteFeatureSnapshotOrderByWithRelationInput
     feedImpressions?: FeedImpressionOrderByRelationAggregateInput
+    mapProjection?: MapSiteProjectionOrderByWithRelationInput
   }
 
   export type SiteWhereUniqueInput = Prisma.AtLeast<{
@@ -60193,10 +64219,15 @@ export namespace Prisma {
     address?: StringNullableFilter<"Site"> | string | null
     description?: StringNullableFilter<"Site"> | string | null
     status?: EnumSiteStatusFilter<"Site"> | $Enums.SiteStatus
+    isArchivedByAdmin?: BoolFilter<"Site"> | boolean
+    archivedAt?: DateTimeNullableFilter<"Site"> | Date | string | null
+    archivedById?: StringNullableFilter<"Site"> | string | null
+    archiveReason?: StringNullableFilter<"Site"> | string | null
     upvotesCount?: IntFilter<"Site"> | number
     commentsCount?: IntFilter<"Site"> | number
     savesCount?: IntFilter<"Site"> | number
     sharesCount?: IntFilter<"Site"> | number
+    archivedBy?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     reports?: ReportListRelationFilter
     events?: CleanupEventListRelationFilter
     votes?: SiteVoteListRelationFilter
@@ -60206,6 +64237,7 @@ export namespace Prisma {
     shareLinks?: SiteShareLinkListRelationFilter
     featureSnapshot?: XOR<SiteFeatureSnapshotNullableScalarRelationFilter, SiteFeatureSnapshotWhereInput> | null
     feedImpressions?: FeedImpressionListRelationFilter
+    mapProjection?: XOR<MapSiteProjectionNullableScalarRelationFilter, MapSiteProjectionWhereInput> | null
   }, "id">
 
   export type SiteOrderByWithAggregationInput = {
@@ -60217,6 +64249,10 @@ export namespace Prisma {
     address?: SortOrderInput | SortOrder
     description?: SortOrderInput | SortOrder
     status?: SortOrder
+    isArchivedByAdmin?: SortOrder
+    archivedAt?: SortOrderInput | SortOrder
+    archivedById?: SortOrderInput | SortOrder
+    archiveReason?: SortOrderInput | SortOrder
     upvotesCount?: SortOrder
     commentsCount?: SortOrder
     savesCount?: SortOrder
@@ -60240,6 +64276,10 @@ export namespace Prisma {
     address?: StringNullableWithAggregatesFilter<"Site"> | string | null
     description?: StringNullableWithAggregatesFilter<"Site"> | string | null
     status?: EnumSiteStatusWithAggregatesFilter<"Site"> | $Enums.SiteStatus
+    isArchivedByAdmin?: BoolWithAggregatesFilter<"Site"> | boolean
+    archivedAt?: DateTimeNullableWithAggregatesFilter<"Site"> | Date | string | null
+    archivedById?: StringNullableWithAggregatesFilter<"Site"> | string | null
+    archiveReason?: StringNullableWithAggregatesFilter<"Site"> | string | null
     upvotesCount?: IntWithAggregatesFilter<"Site"> | number
     commentsCount?: IntWithAggregatesFilter<"Site"> | number
     savesCount?: IntWithAggregatesFilter<"Site"> | number
@@ -62901,6 +66941,304 @@ export namespace Prisma {
     idempotencyKey?: StringWithAggregatesFilter<"NotificationOutbox"> | string
   }
 
+  export type MapSiteProjectionWhereInput = {
+    AND?: MapSiteProjectionWhereInput | MapSiteProjectionWhereInput[]
+    OR?: MapSiteProjectionWhereInput[]
+    NOT?: MapSiteProjectionWhereInput | MapSiteProjectionWhereInput[]
+    siteId?: StringFilter<"MapSiteProjection"> | string
+    latitude?: FloatFilter<"MapSiteProjection"> | number
+    longitude?: FloatFilter<"MapSiteProjection"> | number
+    status?: EnumSiteStatusFilter<"MapSiteProjection"> | $Enums.SiteStatus
+    address?: StringNullableFilter<"MapSiteProjection"> | string | null
+    description?: StringNullableFilter<"MapSiteProjection"> | string | null
+    thumbnailUrl?: StringNullableFilter<"MapSiteProjection"> | string | null
+    pollutionCategory?: StringNullableFilter<"MapSiteProjection"> | string | null
+    latestReportTitle?: StringNullableFilter<"MapSiteProjection"> | string | null
+    latestReportDescription?: StringNullableFilter<"MapSiteProjection"> | string | null
+    latestReportNumber?: StringNullableFilter<"MapSiteProjection"> | string | null
+    reportCount?: IntFilter<"MapSiteProjection"> | number
+    upvotesCount?: IntFilter<"MapSiteProjection"> | number
+    commentsCount?: IntFilter<"MapSiteProjection"> | number
+    savesCount?: IntFilter<"MapSiteProjection"> | number
+    sharesCount?: IntFilter<"MapSiteProjection"> | number
+    latestReportAt?: DateTimeNullableFilter<"MapSiteProjection"> | Date | string | null
+    siteCreatedAt?: DateTimeFilter<"MapSiteProjection"> | Date | string
+    siteUpdatedAt?: DateTimeFilter<"MapSiteProjection"> | Date | string
+    projectedAt?: DateTimeFilter<"MapSiteProjection"> | Date | string
+    isHot?: BoolFilter<"MapSiteProjection"> | boolean
+    isArchivedByAdmin?: BoolFilter<"MapSiteProjection"> | boolean
+    archivedAt?: DateTimeNullableFilter<"MapSiteProjection"> | Date | string | null
+    site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
+  }
+
+  export type MapSiteProjectionOrderByWithRelationInput = {
+    siteId?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    status?: SortOrder
+    address?: SortOrderInput | SortOrder
+    description?: SortOrderInput | SortOrder
+    thumbnailUrl?: SortOrderInput | SortOrder
+    pollutionCategory?: SortOrderInput | SortOrder
+    latestReportTitle?: SortOrderInput | SortOrder
+    latestReportDescription?: SortOrderInput | SortOrder
+    latestReportNumber?: SortOrderInput | SortOrder
+    reportCount?: SortOrder
+    upvotesCount?: SortOrder
+    commentsCount?: SortOrder
+    savesCount?: SortOrder
+    sharesCount?: SortOrder
+    latestReportAt?: SortOrderInput | SortOrder
+    siteCreatedAt?: SortOrder
+    siteUpdatedAt?: SortOrder
+    projectedAt?: SortOrder
+    isHot?: SortOrder
+    isArchivedByAdmin?: SortOrder
+    archivedAt?: SortOrderInput | SortOrder
+    site?: SiteOrderByWithRelationInput
+  }
+
+  export type MapSiteProjectionWhereUniqueInput = Prisma.AtLeast<{
+    siteId?: string
+    AND?: MapSiteProjectionWhereInput | MapSiteProjectionWhereInput[]
+    OR?: MapSiteProjectionWhereInput[]
+    NOT?: MapSiteProjectionWhereInput | MapSiteProjectionWhereInput[]
+    latitude?: FloatFilter<"MapSiteProjection"> | number
+    longitude?: FloatFilter<"MapSiteProjection"> | number
+    status?: EnumSiteStatusFilter<"MapSiteProjection"> | $Enums.SiteStatus
+    address?: StringNullableFilter<"MapSiteProjection"> | string | null
+    description?: StringNullableFilter<"MapSiteProjection"> | string | null
+    thumbnailUrl?: StringNullableFilter<"MapSiteProjection"> | string | null
+    pollutionCategory?: StringNullableFilter<"MapSiteProjection"> | string | null
+    latestReportTitle?: StringNullableFilter<"MapSiteProjection"> | string | null
+    latestReportDescription?: StringNullableFilter<"MapSiteProjection"> | string | null
+    latestReportNumber?: StringNullableFilter<"MapSiteProjection"> | string | null
+    reportCount?: IntFilter<"MapSiteProjection"> | number
+    upvotesCount?: IntFilter<"MapSiteProjection"> | number
+    commentsCount?: IntFilter<"MapSiteProjection"> | number
+    savesCount?: IntFilter<"MapSiteProjection"> | number
+    sharesCount?: IntFilter<"MapSiteProjection"> | number
+    latestReportAt?: DateTimeNullableFilter<"MapSiteProjection"> | Date | string | null
+    siteCreatedAt?: DateTimeFilter<"MapSiteProjection"> | Date | string
+    siteUpdatedAt?: DateTimeFilter<"MapSiteProjection"> | Date | string
+    projectedAt?: DateTimeFilter<"MapSiteProjection"> | Date | string
+    isHot?: BoolFilter<"MapSiteProjection"> | boolean
+    isArchivedByAdmin?: BoolFilter<"MapSiteProjection"> | boolean
+    archivedAt?: DateTimeNullableFilter<"MapSiteProjection"> | Date | string | null
+    site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
+  }, "siteId">
+
+  export type MapSiteProjectionOrderByWithAggregationInput = {
+    siteId?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    status?: SortOrder
+    address?: SortOrderInput | SortOrder
+    description?: SortOrderInput | SortOrder
+    thumbnailUrl?: SortOrderInput | SortOrder
+    pollutionCategory?: SortOrderInput | SortOrder
+    latestReportTitle?: SortOrderInput | SortOrder
+    latestReportDescription?: SortOrderInput | SortOrder
+    latestReportNumber?: SortOrderInput | SortOrder
+    reportCount?: SortOrder
+    upvotesCount?: SortOrder
+    commentsCount?: SortOrder
+    savesCount?: SortOrder
+    sharesCount?: SortOrder
+    latestReportAt?: SortOrderInput | SortOrder
+    siteCreatedAt?: SortOrder
+    siteUpdatedAt?: SortOrder
+    projectedAt?: SortOrder
+    isHot?: SortOrder
+    isArchivedByAdmin?: SortOrder
+    archivedAt?: SortOrderInput | SortOrder
+    _count?: MapSiteProjectionCountOrderByAggregateInput
+    _avg?: MapSiteProjectionAvgOrderByAggregateInput
+    _max?: MapSiteProjectionMaxOrderByAggregateInput
+    _min?: MapSiteProjectionMinOrderByAggregateInput
+    _sum?: MapSiteProjectionSumOrderByAggregateInput
+  }
+
+  export type MapSiteProjectionScalarWhereWithAggregatesInput = {
+    AND?: MapSiteProjectionScalarWhereWithAggregatesInput | MapSiteProjectionScalarWhereWithAggregatesInput[]
+    OR?: MapSiteProjectionScalarWhereWithAggregatesInput[]
+    NOT?: MapSiteProjectionScalarWhereWithAggregatesInput | MapSiteProjectionScalarWhereWithAggregatesInput[]
+    siteId?: StringWithAggregatesFilter<"MapSiteProjection"> | string
+    latitude?: FloatWithAggregatesFilter<"MapSiteProjection"> | number
+    longitude?: FloatWithAggregatesFilter<"MapSiteProjection"> | number
+    status?: EnumSiteStatusWithAggregatesFilter<"MapSiteProjection"> | $Enums.SiteStatus
+    address?: StringNullableWithAggregatesFilter<"MapSiteProjection"> | string | null
+    description?: StringNullableWithAggregatesFilter<"MapSiteProjection"> | string | null
+    thumbnailUrl?: StringNullableWithAggregatesFilter<"MapSiteProjection"> | string | null
+    pollutionCategory?: StringNullableWithAggregatesFilter<"MapSiteProjection"> | string | null
+    latestReportTitle?: StringNullableWithAggregatesFilter<"MapSiteProjection"> | string | null
+    latestReportDescription?: StringNullableWithAggregatesFilter<"MapSiteProjection"> | string | null
+    latestReportNumber?: StringNullableWithAggregatesFilter<"MapSiteProjection"> | string | null
+    reportCount?: IntWithAggregatesFilter<"MapSiteProjection"> | number
+    upvotesCount?: IntWithAggregatesFilter<"MapSiteProjection"> | number
+    commentsCount?: IntWithAggregatesFilter<"MapSiteProjection"> | number
+    savesCount?: IntWithAggregatesFilter<"MapSiteProjection"> | number
+    sharesCount?: IntWithAggregatesFilter<"MapSiteProjection"> | number
+    latestReportAt?: DateTimeNullableWithAggregatesFilter<"MapSiteProjection"> | Date | string | null
+    siteCreatedAt?: DateTimeWithAggregatesFilter<"MapSiteProjection"> | Date | string
+    siteUpdatedAt?: DateTimeWithAggregatesFilter<"MapSiteProjection"> | Date | string
+    projectedAt?: DateTimeWithAggregatesFilter<"MapSiteProjection"> | Date | string
+    isHot?: BoolWithAggregatesFilter<"MapSiteProjection"> | boolean
+    isArchivedByAdmin?: BoolWithAggregatesFilter<"MapSiteProjection"> | boolean
+    archivedAt?: DateTimeNullableWithAggregatesFilter<"MapSiteProjection"> | Date | string | null
+  }
+
+  export type MapEventOutboxWhereInput = {
+    AND?: MapEventOutboxWhereInput | MapEventOutboxWhereInput[]
+    OR?: MapEventOutboxWhereInput[]
+    NOT?: MapEventOutboxWhereInput | MapEventOutboxWhereInput[]
+    id?: StringFilter<"MapEventOutbox"> | string
+    createdAt?: DateTimeFilter<"MapEventOutbox"> | Date | string
+    updatedAt?: DateTimeFilter<"MapEventOutbox"> | Date | string
+    eventId?: StringFilter<"MapEventOutbox"> | string
+    siteId?: StringFilter<"MapEventOutbox"> | string
+    eventType?: StringFilter<"MapEventOutbox"> | string
+    payload?: JsonFilter<"MapEventOutbox">
+    status?: EnumMapEventOutboxStatusFilter<"MapEventOutbox"> | $Enums.MapEventOutboxStatus
+    attempts?: IntFilter<"MapEventOutbox"> | number
+    lastError?: StringNullableFilter<"MapEventOutbox"> | string | null
+    dispatchedAt?: DateTimeNullableFilter<"MapEventOutbox"> | Date | string | null
+    leaseOwner?: StringNullableFilter<"MapEventOutbox"> | string | null
+    processingAt?: DateTimeNullableFilter<"MapEventOutbox"> | Date | string | null
+  }
+
+  export type MapEventOutboxOrderByWithRelationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    eventId?: SortOrder
+    siteId?: SortOrder
+    eventType?: SortOrder
+    payload?: SortOrder
+    status?: SortOrder
+    attempts?: SortOrder
+    lastError?: SortOrderInput | SortOrder
+    dispatchedAt?: SortOrderInput | SortOrder
+    leaseOwner?: SortOrderInput | SortOrder
+    processingAt?: SortOrderInput | SortOrder
+  }
+
+  export type MapEventOutboxWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    eventId?: string
+    AND?: MapEventOutboxWhereInput | MapEventOutboxWhereInput[]
+    OR?: MapEventOutboxWhereInput[]
+    NOT?: MapEventOutboxWhereInput | MapEventOutboxWhereInput[]
+    createdAt?: DateTimeFilter<"MapEventOutbox"> | Date | string
+    updatedAt?: DateTimeFilter<"MapEventOutbox"> | Date | string
+    siteId?: StringFilter<"MapEventOutbox"> | string
+    eventType?: StringFilter<"MapEventOutbox"> | string
+    payload?: JsonFilter<"MapEventOutbox">
+    status?: EnumMapEventOutboxStatusFilter<"MapEventOutbox"> | $Enums.MapEventOutboxStatus
+    attempts?: IntFilter<"MapEventOutbox"> | number
+    lastError?: StringNullableFilter<"MapEventOutbox"> | string | null
+    dispatchedAt?: DateTimeNullableFilter<"MapEventOutbox"> | Date | string | null
+    leaseOwner?: StringNullableFilter<"MapEventOutbox"> | string | null
+    processingAt?: DateTimeNullableFilter<"MapEventOutbox"> | Date | string | null
+  }, "id" | "eventId">
+
+  export type MapEventOutboxOrderByWithAggregationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    eventId?: SortOrder
+    siteId?: SortOrder
+    eventType?: SortOrder
+    payload?: SortOrder
+    status?: SortOrder
+    attempts?: SortOrder
+    lastError?: SortOrderInput | SortOrder
+    dispatchedAt?: SortOrderInput | SortOrder
+    leaseOwner?: SortOrderInput | SortOrder
+    processingAt?: SortOrderInput | SortOrder
+    _count?: MapEventOutboxCountOrderByAggregateInput
+    _avg?: MapEventOutboxAvgOrderByAggregateInput
+    _max?: MapEventOutboxMaxOrderByAggregateInput
+    _min?: MapEventOutboxMinOrderByAggregateInput
+    _sum?: MapEventOutboxSumOrderByAggregateInput
+  }
+
+  export type MapEventOutboxScalarWhereWithAggregatesInput = {
+    AND?: MapEventOutboxScalarWhereWithAggregatesInput | MapEventOutboxScalarWhereWithAggregatesInput[]
+    OR?: MapEventOutboxScalarWhereWithAggregatesInput[]
+    NOT?: MapEventOutboxScalarWhereWithAggregatesInput | MapEventOutboxScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"MapEventOutbox"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"MapEventOutbox"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"MapEventOutbox"> | Date | string
+    eventId?: StringWithAggregatesFilter<"MapEventOutbox"> | string
+    siteId?: StringWithAggregatesFilter<"MapEventOutbox"> | string
+    eventType?: StringWithAggregatesFilter<"MapEventOutbox"> | string
+    payload?: JsonWithAggregatesFilter<"MapEventOutbox">
+    status?: EnumMapEventOutboxStatusWithAggregatesFilter<"MapEventOutbox"> | $Enums.MapEventOutboxStatus
+    attempts?: IntWithAggregatesFilter<"MapEventOutbox"> | number
+    lastError?: StringNullableWithAggregatesFilter<"MapEventOutbox"> | string | null
+    dispatchedAt?: DateTimeNullableWithAggregatesFilter<"MapEventOutbox"> | Date | string | null
+    leaseOwner?: StringNullableWithAggregatesFilter<"MapEventOutbox"> | string | null
+    processingAt?: DateTimeNullableWithAggregatesFilter<"MapEventOutbox"> | Date | string | null
+  }
+
+  export type MapCdnPurgeLogWhereInput = {
+    AND?: MapCdnPurgeLogWhereInput | MapCdnPurgeLogWhereInput[]
+    OR?: MapCdnPurgeLogWhereInput[]
+    NOT?: MapCdnPurgeLogWhereInput | MapCdnPurgeLogWhereInput[]
+    id?: StringFilter<"MapCdnPurgeLog"> | string
+    createdAt?: DateTimeFilter<"MapCdnPurgeLog"> | Date | string
+    provider?: StringFilter<"MapCdnPurgeLog"> | string
+    status?: StringFilter<"MapCdnPurgeLog"> | string
+    keys?: JsonFilter<"MapCdnPurgeLog">
+    errorMessage?: StringNullableFilter<"MapCdnPurgeLog"> | string | null
+  }
+
+  export type MapCdnPurgeLogOrderByWithRelationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    provider?: SortOrder
+    status?: SortOrder
+    keys?: SortOrder
+    errorMessage?: SortOrderInput | SortOrder
+  }
+
+  export type MapCdnPurgeLogWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: MapCdnPurgeLogWhereInput | MapCdnPurgeLogWhereInput[]
+    OR?: MapCdnPurgeLogWhereInput[]
+    NOT?: MapCdnPurgeLogWhereInput | MapCdnPurgeLogWhereInput[]
+    createdAt?: DateTimeFilter<"MapCdnPurgeLog"> | Date | string
+    provider?: StringFilter<"MapCdnPurgeLog"> | string
+    status?: StringFilter<"MapCdnPurgeLog"> | string
+    keys?: JsonFilter<"MapCdnPurgeLog">
+    errorMessage?: StringNullableFilter<"MapCdnPurgeLog"> | string | null
+  }, "id">
+
+  export type MapCdnPurgeLogOrderByWithAggregationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    provider?: SortOrder
+    status?: SortOrder
+    keys?: SortOrder
+    errorMessage?: SortOrderInput | SortOrder
+    _count?: MapCdnPurgeLogCountOrderByAggregateInput
+    _max?: MapCdnPurgeLogMaxOrderByAggregateInput
+    _min?: MapCdnPurgeLogMinOrderByAggregateInput
+  }
+
+  export type MapCdnPurgeLogScalarWhereWithAggregatesInput = {
+    AND?: MapCdnPurgeLogScalarWhereWithAggregatesInput | MapCdnPurgeLogScalarWhereWithAggregatesInput[]
+    OR?: MapCdnPurgeLogScalarWhereWithAggregatesInput[]
+    NOT?: MapCdnPurgeLogScalarWhereWithAggregatesInput | MapCdnPurgeLogScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"MapCdnPurgeLog"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"MapCdnPurgeLog"> | Date | string
+    provider?: StringWithAggregatesFilter<"MapCdnPurgeLog"> | string
+    status?: StringWithAggregatesFilter<"MapCdnPurgeLog"> | string
+    keys?: JsonWithAggregatesFilter<"MapCdnPurgeLog">
+    errorMessage?: StringNullableWithAggregatesFilter<"MapCdnPurgeLog"> | string | null
+  }
+
   export type AdminMutationIdempotencyWhereInput = {
     AND?: AdminMutationIdempotencyWhereInput | AdminMutationIdempotencyWhereInput[]
     OR?: AdminMutationIdempotencyWhereInput[]
@@ -63011,6 +67349,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+    archivedSites?: SiteCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -63070,6 +67409,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+    archivedSites?: SiteUncheckedCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserUpdateInput = {
@@ -63129,6 +67469,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -63188,6 +67529,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUncheckedUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -63835,10 +68177,14 @@ export namespace Prisma {
     address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
+    isArchivedByAdmin?: boolean
+    archivedAt?: Date | string | null
+    archiveReason?: string | null
     upvotesCount?: number
     commentsCount?: number
     savesCount?: number
     sharesCount?: number
+    archivedBy?: UserCreateNestedOneWithoutArchivedSitesInput
     reports?: ReportCreateNestedManyWithoutSiteInput
     events?: CleanupEventCreateNestedManyWithoutSiteInput
     votes?: SiteVoteCreateNestedManyWithoutSiteInput
@@ -63848,6 +68194,7 @@ export namespace Prisma {
     shareLinks?: SiteShareLinkCreateNestedManyWithoutSiteInput
     featureSnapshot?: SiteFeatureSnapshotCreateNestedOneWithoutSiteInput
     feedImpressions?: FeedImpressionCreateNestedManyWithoutSiteInput
+    mapProjection?: MapSiteProjectionCreateNestedOneWithoutSiteInput
   }
 
   export type SiteUncheckedCreateInput = {
@@ -63859,6 +68206,10 @@ export namespace Prisma {
     address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
+    isArchivedByAdmin?: boolean
+    archivedAt?: Date | string | null
+    archivedById?: string | null
+    archiveReason?: string | null
     upvotesCount?: number
     commentsCount?: number
     savesCount?: number
@@ -63872,6 +68223,7 @@ export namespace Prisma {
     shareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSiteInput
     featureSnapshot?: SiteFeatureSnapshotUncheckedCreateNestedOneWithoutSiteInput
     feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutSiteInput
+    mapProjection?: MapSiteProjectionUncheckedCreateNestedOneWithoutSiteInput
   }
 
   export type SiteUpdateInput = {
@@ -63883,10 +68235,14 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    isArchivedByAdmin?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archiveReason?: NullableStringFieldUpdateOperationsInput | string | null
     upvotesCount?: IntFieldUpdateOperationsInput | number
     commentsCount?: IntFieldUpdateOperationsInput | number
     savesCount?: IntFieldUpdateOperationsInput | number
     sharesCount?: IntFieldUpdateOperationsInput | number
+    archivedBy?: UserUpdateOneWithoutArchivedSitesNestedInput
     reports?: ReportUpdateManyWithoutSiteNestedInput
     events?: CleanupEventUpdateManyWithoutSiteNestedInput
     votes?: SiteVoteUpdateManyWithoutSiteNestedInput
@@ -63896,6 +68252,7 @@ export namespace Prisma {
     shareLinks?: SiteShareLinkUpdateManyWithoutSiteNestedInput
     featureSnapshot?: SiteFeatureSnapshotUpdateOneWithoutSiteNestedInput
     feedImpressions?: FeedImpressionUpdateManyWithoutSiteNestedInput
+    mapProjection?: MapSiteProjectionUpdateOneWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateInput = {
@@ -63907,6 +68264,10 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    isArchivedByAdmin?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archivedById?: NullableStringFieldUpdateOperationsInput | string | null
+    archiveReason?: NullableStringFieldUpdateOperationsInput | string | null
     upvotesCount?: IntFieldUpdateOperationsInput | number
     commentsCount?: IntFieldUpdateOperationsInput | number
     savesCount?: IntFieldUpdateOperationsInput | number
@@ -63920,6 +68281,7 @@ export namespace Prisma {
     shareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSiteNestedInput
     featureSnapshot?: SiteFeatureSnapshotUncheckedUpdateOneWithoutSiteNestedInput
     feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutSiteNestedInput
+    mapProjection?: MapSiteProjectionUncheckedUpdateOneWithoutSiteNestedInput
   }
 
   export type SiteCreateManyInput = {
@@ -63931,6 +68293,10 @@ export namespace Prisma {
     address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
+    isArchivedByAdmin?: boolean
+    archivedAt?: Date | string | null
+    archivedById?: string | null
+    archiveReason?: string | null
     upvotesCount?: number
     commentsCount?: number
     savesCount?: number
@@ -63946,6 +68312,9 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    isArchivedByAdmin?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archiveReason?: NullableStringFieldUpdateOperationsInput | string | null
     upvotesCount?: IntFieldUpdateOperationsInput | number
     commentsCount?: IntFieldUpdateOperationsInput | number
     savesCount?: IntFieldUpdateOperationsInput | number
@@ -63961,6 +68330,10 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    isArchivedByAdmin?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archivedById?: NullableStringFieldUpdateOperationsInput | string | null
+    archiveReason?: NullableStringFieldUpdateOperationsInput | string | null
     upvotesCount?: IntFieldUpdateOperationsInput | number
     commentsCount?: IntFieldUpdateOperationsInput | number
     savesCount?: IntFieldUpdateOperationsInput | number
@@ -66763,6 +71136,362 @@ export namespace Prisma {
     idempotencyKey?: StringFieldUpdateOperationsInput | string
   }
 
+  export type MapSiteProjectionCreateInput = {
+    latitude: number
+    longitude: number
+    status: $Enums.SiteStatus
+    address?: string | null
+    description?: string | null
+    thumbnailUrl?: string | null
+    pollutionCategory?: string | null
+    latestReportTitle?: string | null
+    latestReportDescription?: string | null
+    latestReportNumber?: string | null
+    reportCount?: number
+    upvotesCount?: number
+    commentsCount?: number
+    savesCount?: number
+    sharesCount?: number
+    latestReportAt?: Date | string | null
+    siteCreatedAt: Date | string
+    siteUpdatedAt: Date | string
+    projectedAt?: Date | string
+    isHot?: boolean
+    isArchivedByAdmin?: boolean
+    archivedAt?: Date | string | null
+    site: SiteCreateNestedOneWithoutMapProjectionInput
+  }
+
+  export type MapSiteProjectionUncheckedCreateInput = {
+    siteId: string
+    latitude: number
+    longitude: number
+    status: $Enums.SiteStatus
+    address?: string | null
+    description?: string | null
+    thumbnailUrl?: string | null
+    pollutionCategory?: string | null
+    latestReportTitle?: string | null
+    latestReportDescription?: string | null
+    latestReportNumber?: string | null
+    reportCount?: number
+    upvotesCount?: number
+    commentsCount?: number
+    savesCount?: number
+    sharesCount?: number
+    latestReportAt?: Date | string | null
+    siteCreatedAt: Date | string
+    siteUpdatedAt: Date | string
+    projectedAt?: Date | string
+    isHot?: boolean
+    isArchivedByAdmin?: boolean
+    archivedAt?: Date | string | null
+  }
+
+  export type MapSiteProjectionUpdateInput = {
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    thumbnailUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    pollutionCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    latestReportTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    latestReportDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    latestReportNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    reportCount?: IntFieldUpdateOperationsInput | number
+    upvotesCount?: IntFieldUpdateOperationsInput | number
+    commentsCount?: IntFieldUpdateOperationsInput | number
+    savesCount?: IntFieldUpdateOperationsInput | number
+    sharesCount?: IntFieldUpdateOperationsInput | number
+    latestReportAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    siteCreatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteUpdatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    projectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isHot?: BoolFieldUpdateOperationsInput | boolean
+    isArchivedByAdmin?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    site?: SiteUpdateOneRequiredWithoutMapProjectionNestedInput
+  }
+
+  export type MapSiteProjectionUncheckedUpdateInput = {
+    siteId?: StringFieldUpdateOperationsInput | string
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    thumbnailUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    pollutionCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    latestReportTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    latestReportDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    latestReportNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    reportCount?: IntFieldUpdateOperationsInput | number
+    upvotesCount?: IntFieldUpdateOperationsInput | number
+    commentsCount?: IntFieldUpdateOperationsInput | number
+    savesCount?: IntFieldUpdateOperationsInput | number
+    sharesCount?: IntFieldUpdateOperationsInput | number
+    latestReportAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    siteCreatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteUpdatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    projectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isHot?: BoolFieldUpdateOperationsInput | boolean
+    isArchivedByAdmin?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type MapSiteProjectionCreateManyInput = {
+    siteId: string
+    latitude: number
+    longitude: number
+    status: $Enums.SiteStatus
+    address?: string | null
+    description?: string | null
+    thumbnailUrl?: string | null
+    pollutionCategory?: string | null
+    latestReportTitle?: string | null
+    latestReportDescription?: string | null
+    latestReportNumber?: string | null
+    reportCount?: number
+    upvotesCount?: number
+    commentsCount?: number
+    savesCount?: number
+    sharesCount?: number
+    latestReportAt?: Date | string | null
+    siteCreatedAt: Date | string
+    siteUpdatedAt: Date | string
+    projectedAt?: Date | string
+    isHot?: boolean
+    isArchivedByAdmin?: boolean
+    archivedAt?: Date | string | null
+  }
+
+  export type MapSiteProjectionUpdateManyMutationInput = {
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    thumbnailUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    pollutionCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    latestReportTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    latestReportDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    latestReportNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    reportCount?: IntFieldUpdateOperationsInput | number
+    upvotesCount?: IntFieldUpdateOperationsInput | number
+    commentsCount?: IntFieldUpdateOperationsInput | number
+    savesCount?: IntFieldUpdateOperationsInput | number
+    sharesCount?: IntFieldUpdateOperationsInput | number
+    latestReportAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    siteCreatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteUpdatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    projectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isHot?: BoolFieldUpdateOperationsInput | boolean
+    isArchivedByAdmin?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type MapSiteProjectionUncheckedUpdateManyInput = {
+    siteId?: StringFieldUpdateOperationsInput | string
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    thumbnailUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    pollutionCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    latestReportTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    latestReportDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    latestReportNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    reportCount?: IntFieldUpdateOperationsInput | number
+    upvotesCount?: IntFieldUpdateOperationsInput | number
+    commentsCount?: IntFieldUpdateOperationsInput | number
+    savesCount?: IntFieldUpdateOperationsInput | number
+    sharesCount?: IntFieldUpdateOperationsInput | number
+    latestReportAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    siteCreatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteUpdatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    projectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isHot?: BoolFieldUpdateOperationsInput | boolean
+    isArchivedByAdmin?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type MapEventOutboxCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    eventId: string
+    siteId: string
+    eventType: string
+    payload: JsonNullValueInput | InputJsonValue
+    status?: $Enums.MapEventOutboxStatus
+    attempts?: number
+    lastError?: string | null
+    dispatchedAt?: Date | string | null
+    leaseOwner?: string | null
+    processingAt?: Date | string | null
+  }
+
+  export type MapEventOutboxUncheckedCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    eventId: string
+    siteId: string
+    eventType: string
+    payload: JsonNullValueInput | InputJsonValue
+    status?: $Enums.MapEventOutboxStatus
+    attempts?: number
+    lastError?: string | null
+    dispatchedAt?: Date | string | null
+    leaseOwner?: string | null
+    processingAt?: Date | string | null
+  }
+
+  export type MapEventOutboxUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    eventType?: StringFieldUpdateOperationsInput | string
+    payload?: JsonNullValueInput | InputJsonValue
+    status?: EnumMapEventOutboxStatusFieldUpdateOperationsInput | $Enums.MapEventOutboxStatus
+    attempts?: IntFieldUpdateOperationsInput | number
+    lastError?: NullableStringFieldUpdateOperationsInput | string | null
+    dispatchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    leaseOwner?: NullableStringFieldUpdateOperationsInput | string | null
+    processingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type MapEventOutboxUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    eventType?: StringFieldUpdateOperationsInput | string
+    payload?: JsonNullValueInput | InputJsonValue
+    status?: EnumMapEventOutboxStatusFieldUpdateOperationsInput | $Enums.MapEventOutboxStatus
+    attempts?: IntFieldUpdateOperationsInput | number
+    lastError?: NullableStringFieldUpdateOperationsInput | string | null
+    dispatchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    leaseOwner?: NullableStringFieldUpdateOperationsInput | string | null
+    processingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type MapEventOutboxCreateManyInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    eventId: string
+    siteId: string
+    eventType: string
+    payload: JsonNullValueInput | InputJsonValue
+    status?: $Enums.MapEventOutboxStatus
+    attempts?: number
+    lastError?: string | null
+    dispatchedAt?: Date | string | null
+    leaseOwner?: string | null
+    processingAt?: Date | string | null
+  }
+
+  export type MapEventOutboxUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    eventType?: StringFieldUpdateOperationsInput | string
+    payload?: JsonNullValueInput | InputJsonValue
+    status?: EnumMapEventOutboxStatusFieldUpdateOperationsInput | $Enums.MapEventOutboxStatus
+    attempts?: IntFieldUpdateOperationsInput | number
+    lastError?: NullableStringFieldUpdateOperationsInput | string | null
+    dispatchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    leaseOwner?: NullableStringFieldUpdateOperationsInput | string | null
+    processingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type MapEventOutboxUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    eventType?: StringFieldUpdateOperationsInput | string
+    payload?: JsonNullValueInput | InputJsonValue
+    status?: EnumMapEventOutboxStatusFieldUpdateOperationsInput | $Enums.MapEventOutboxStatus
+    attempts?: IntFieldUpdateOperationsInput | number
+    lastError?: NullableStringFieldUpdateOperationsInput | string | null
+    dispatchedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    leaseOwner?: NullableStringFieldUpdateOperationsInput | string | null
+    processingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type MapCdnPurgeLogCreateInput = {
+    id: string
+    createdAt?: Date | string
+    provider: string
+    status: string
+    keys: JsonNullValueInput | InputJsonValue
+    errorMessage?: string | null
+  }
+
+  export type MapCdnPurgeLogUncheckedCreateInput = {
+    id: string
+    createdAt?: Date | string
+    provider: string
+    status: string
+    keys: JsonNullValueInput | InputJsonValue
+    errorMessage?: string | null
+  }
+
+  export type MapCdnPurgeLogUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    provider?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    keys?: JsonNullValueInput | InputJsonValue
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type MapCdnPurgeLogUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    provider?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    keys?: JsonNullValueInput | InputJsonValue
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type MapCdnPurgeLogCreateManyInput = {
+    id: string
+    createdAt?: Date | string
+    provider: string
+    status: string
+    keys: JsonNullValueInput | InputJsonValue
+    errorMessage?: string | null
+  }
+
+  export type MapCdnPurgeLogUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    provider?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    keys?: JsonNullValueInput | InputJsonValue
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type MapCdnPurgeLogUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    provider?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    keys?: JsonNullValueInput | InputJsonValue
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
   export type AdminMutationIdempotencyCreateInput = {
     id?: string
     createdAt?: Date | string
@@ -67087,6 +71816,12 @@ export namespace Prisma {
     none?: CheckInRiskSignalWhereInput
   }
 
+  export type SiteListRelationFilter = {
+    every?: SiteWhereInput
+    some?: SiteWhereInput
+    none?: SiteWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -67201,6 +71936,10 @@ export namespace Prisma {
   }
 
   export type CheckInRiskSignalOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type SiteOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -67802,6 +72541,11 @@ export namespace Prisma {
     isNot?: SiteFeatureSnapshotWhereInput | null
   }
 
+  export type MapSiteProjectionNullableScalarRelationFilter = {
+    is?: MapSiteProjectionWhereInput | null
+    isNot?: MapSiteProjectionWhereInput | null
+  }
+
   export type SiteCountOrderByAggregateInput = {
     id?: SortOrder
     createdAt?: SortOrder
@@ -67811,6 +72555,10 @@ export namespace Prisma {
     address?: SortOrder
     description?: SortOrder
     status?: SortOrder
+    isArchivedByAdmin?: SortOrder
+    archivedAt?: SortOrder
+    archivedById?: SortOrder
+    archiveReason?: SortOrder
     upvotesCount?: SortOrder
     commentsCount?: SortOrder
     savesCount?: SortOrder
@@ -67835,6 +72583,10 @@ export namespace Prisma {
     address?: SortOrder
     description?: SortOrder
     status?: SortOrder
+    isArchivedByAdmin?: SortOrder
+    archivedAt?: SortOrder
+    archivedById?: SortOrder
+    archiveReason?: SortOrder
     upvotesCount?: SortOrder
     commentsCount?: SortOrder
     savesCount?: SortOrder
@@ -67850,6 +72602,10 @@ export namespace Prisma {
     address?: SortOrder
     description?: SortOrder
     status?: SortOrder
+    isArchivedByAdmin?: SortOrder
+    archivedAt?: SortOrder
+    archivedById?: SortOrder
+    archiveReason?: SortOrder
     upvotesCount?: SortOrder
     commentsCount?: SortOrder
     savesCount?: SortOrder
@@ -69753,6 +74509,200 @@ export namespace Prisma {
     attempts?: SortOrder
   }
 
+  export type MapSiteProjectionCountOrderByAggregateInput = {
+    siteId?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    status?: SortOrder
+    address?: SortOrder
+    description?: SortOrder
+    thumbnailUrl?: SortOrder
+    pollutionCategory?: SortOrder
+    latestReportTitle?: SortOrder
+    latestReportDescription?: SortOrder
+    latestReportNumber?: SortOrder
+    reportCount?: SortOrder
+    upvotesCount?: SortOrder
+    commentsCount?: SortOrder
+    savesCount?: SortOrder
+    sharesCount?: SortOrder
+    latestReportAt?: SortOrder
+    siteCreatedAt?: SortOrder
+    siteUpdatedAt?: SortOrder
+    projectedAt?: SortOrder
+    isHot?: SortOrder
+    isArchivedByAdmin?: SortOrder
+    archivedAt?: SortOrder
+  }
+
+  export type MapSiteProjectionAvgOrderByAggregateInput = {
+    latitude?: SortOrder
+    longitude?: SortOrder
+    reportCount?: SortOrder
+    upvotesCount?: SortOrder
+    commentsCount?: SortOrder
+    savesCount?: SortOrder
+    sharesCount?: SortOrder
+  }
+
+  export type MapSiteProjectionMaxOrderByAggregateInput = {
+    siteId?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    status?: SortOrder
+    address?: SortOrder
+    description?: SortOrder
+    thumbnailUrl?: SortOrder
+    pollutionCategory?: SortOrder
+    latestReportTitle?: SortOrder
+    latestReportDescription?: SortOrder
+    latestReportNumber?: SortOrder
+    reportCount?: SortOrder
+    upvotesCount?: SortOrder
+    commentsCount?: SortOrder
+    savesCount?: SortOrder
+    sharesCount?: SortOrder
+    latestReportAt?: SortOrder
+    siteCreatedAt?: SortOrder
+    siteUpdatedAt?: SortOrder
+    projectedAt?: SortOrder
+    isHot?: SortOrder
+    isArchivedByAdmin?: SortOrder
+    archivedAt?: SortOrder
+  }
+
+  export type MapSiteProjectionMinOrderByAggregateInput = {
+    siteId?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    status?: SortOrder
+    address?: SortOrder
+    description?: SortOrder
+    thumbnailUrl?: SortOrder
+    pollutionCategory?: SortOrder
+    latestReportTitle?: SortOrder
+    latestReportDescription?: SortOrder
+    latestReportNumber?: SortOrder
+    reportCount?: SortOrder
+    upvotesCount?: SortOrder
+    commentsCount?: SortOrder
+    savesCount?: SortOrder
+    sharesCount?: SortOrder
+    latestReportAt?: SortOrder
+    siteCreatedAt?: SortOrder
+    siteUpdatedAt?: SortOrder
+    projectedAt?: SortOrder
+    isHot?: SortOrder
+    isArchivedByAdmin?: SortOrder
+    archivedAt?: SortOrder
+  }
+
+  export type MapSiteProjectionSumOrderByAggregateInput = {
+    latitude?: SortOrder
+    longitude?: SortOrder
+    reportCount?: SortOrder
+    upvotesCount?: SortOrder
+    commentsCount?: SortOrder
+    savesCount?: SortOrder
+    sharesCount?: SortOrder
+  }
+
+  export type EnumMapEventOutboxStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.MapEventOutboxStatus | EnumMapEventOutboxStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.MapEventOutboxStatus[] | ListEnumMapEventOutboxStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MapEventOutboxStatus[] | ListEnumMapEventOutboxStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumMapEventOutboxStatusFilter<$PrismaModel> | $Enums.MapEventOutboxStatus
+  }
+
+  export type MapEventOutboxCountOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    eventId?: SortOrder
+    siteId?: SortOrder
+    eventType?: SortOrder
+    payload?: SortOrder
+    status?: SortOrder
+    attempts?: SortOrder
+    lastError?: SortOrder
+    dispatchedAt?: SortOrder
+    leaseOwner?: SortOrder
+    processingAt?: SortOrder
+  }
+
+  export type MapEventOutboxAvgOrderByAggregateInput = {
+    attempts?: SortOrder
+  }
+
+  export type MapEventOutboxMaxOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    eventId?: SortOrder
+    siteId?: SortOrder
+    eventType?: SortOrder
+    status?: SortOrder
+    attempts?: SortOrder
+    lastError?: SortOrder
+    dispatchedAt?: SortOrder
+    leaseOwner?: SortOrder
+    processingAt?: SortOrder
+  }
+
+  export type MapEventOutboxMinOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    eventId?: SortOrder
+    siteId?: SortOrder
+    eventType?: SortOrder
+    status?: SortOrder
+    attempts?: SortOrder
+    lastError?: SortOrder
+    dispatchedAt?: SortOrder
+    leaseOwner?: SortOrder
+    processingAt?: SortOrder
+  }
+
+  export type MapEventOutboxSumOrderByAggregateInput = {
+    attempts?: SortOrder
+  }
+
+  export type EnumMapEventOutboxStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.MapEventOutboxStatus | EnumMapEventOutboxStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.MapEventOutboxStatus[] | ListEnumMapEventOutboxStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MapEventOutboxStatus[] | ListEnumMapEventOutboxStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumMapEventOutboxStatusWithAggregatesFilter<$PrismaModel> | $Enums.MapEventOutboxStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumMapEventOutboxStatusFilter<$PrismaModel>
+    _max?: NestedEnumMapEventOutboxStatusFilter<$PrismaModel>
+  }
+
+  export type MapCdnPurgeLogCountOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    provider?: SortOrder
+    status?: SortOrder
+    keys?: SortOrder
+    errorMessage?: SortOrder
+  }
+
+  export type MapCdnPurgeLogMaxOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    provider?: SortOrder
+    status?: SortOrder
+    errorMessage?: SortOrder
+  }
+
+  export type MapCdnPurgeLogMinOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    provider?: SortOrder
+    status?: SortOrder
+    errorMessage?: SortOrder
+  }
+
   export type AdminMutationIdempotencyActorUserIdPurposeClientJobIdCompoundUniqueInput = {
     actorUserId: string
     purpose: string
@@ -70009,6 +74959,13 @@ export namespace Prisma {
     connect?: CheckInRiskSignalWhereUniqueInput | CheckInRiskSignalWhereUniqueInput[]
   }
 
+  export type SiteCreateNestedManyWithoutArchivedByInput = {
+    create?: XOR<SiteCreateWithoutArchivedByInput, SiteUncheckedCreateWithoutArchivedByInput> | SiteCreateWithoutArchivedByInput[] | SiteUncheckedCreateWithoutArchivedByInput[]
+    connectOrCreate?: SiteCreateOrConnectWithoutArchivedByInput | SiteCreateOrConnectWithoutArchivedByInput[]
+    createMany?: SiteCreateManyArchivedByInputEnvelope
+    connect?: SiteWhereUniqueInput | SiteWhereUniqueInput[]
+  }
+
   export type ReportUncheckedCreateNestedManyWithoutReporterInput = {
     create?: XOR<ReportCreateWithoutReporterInput, ReportUncheckedCreateWithoutReporterInput> | ReportCreateWithoutReporterInput[] | ReportUncheckedCreateWithoutReporterInput[]
     connectOrCreate?: ReportCreateOrConnectWithoutReporterInput | ReportCreateOrConnectWithoutReporterInput[]
@@ -70229,6 +75186,13 @@ export namespace Prisma {
     connectOrCreate?: CheckInRiskSignalCreateOrConnectWithoutUserInput | CheckInRiskSignalCreateOrConnectWithoutUserInput[]
     createMany?: CheckInRiskSignalCreateManyUserInputEnvelope
     connect?: CheckInRiskSignalWhereUniqueInput | CheckInRiskSignalWhereUniqueInput[]
+  }
+
+  export type SiteUncheckedCreateNestedManyWithoutArchivedByInput = {
+    create?: XOR<SiteCreateWithoutArchivedByInput, SiteUncheckedCreateWithoutArchivedByInput> | SiteCreateWithoutArchivedByInput[] | SiteUncheckedCreateWithoutArchivedByInput[]
+    connectOrCreate?: SiteCreateOrConnectWithoutArchivedByInput | SiteCreateOrConnectWithoutArchivedByInput[]
+    createMany?: SiteCreateManyArchivedByInputEnvelope
+    connect?: SiteWhereUniqueInput | SiteWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -70712,6 +75676,20 @@ export namespace Prisma {
     deleteMany?: CheckInRiskSignalScalarWhereInput | CheckInRiskSignalScalarWhereInput[]
   }
 
+  export type SiteUpdateManyWithoutArchivedByNestedInput = {
+    create?: XOR<SiteCreateWithoutArchivedByInput, SiteUncheckedCreateWithoutArchivedByInput> | SiteCreateWithoutArchivedByInput[] | SiteUncheckedCreateWithoutArchivedByInput[]
+    connectOrCreate?: SiteCreateOrConnectWithoutArchivedByInput | SiteCreateOrConnectWithoutArchivedByInput[]
+    upsert?: SiteUpsertWithWhereUniqueWithoutArchivedByInput | SiteUpsertWithWhereUniqueWithoutArchivedByInput[]
+    createMany?: SiteCreateManyArchivedByInputEnvelope
+    set?: SiteWhereUniqueInput | SiteWhereUniqueInput[]
+    disconnect?: SiteWhereUniqueInput | SiteWhereUniqueInput[]
+    delete?: SiteWhereUniqueInput | SiteWhereUniqueInput[]
+    connect?: SiteWhereUniqueInput | SiteWhereUniqueInput[]
+    update?: SiteUpdateWithWhereUniqueWithoutArchivedByInput | SiteUpdateWithWhereUniqueWithoutArchivedByInput[]
+    updateMany?: SiteUpdateManyWithWhereWithoutArchivedByInput | SiteUpdateManyWithWhereWithoutArchivedByInput[]
+    deleteMany?: SiteScalarWhereInput | SiteScalarWhereInput[]
+  }
+
   export type ReportUncheckedUpdateManyWithoutReporterNestedInput = {
     create?: XOR<ReportCreateWithoutReporterInput, ReportUncheckedCreateWithoutReporterInput> | ReportCreateWithoutReporterInput[] | ReportUncheckedCreateWithoutReporterInput[]
     connectOrCreate?: ReportCreateOrConnectWithoutReporterInput | ReportCreateOrConnectWithoutReporterInput[]
@@ -71152,6 +76130,20 @@ export namespace Prisma {
     deleteMany?: CheckInRiskSignalScalarWhereInput | CheckInRiskSignalScalarWhereInput[]
   }
 
+  export type SiteUncheckedUpdateManyWithoutArchivedByNestedInput = {
+    create?: XOR<SiteCreateWithoutArchivedByInput, SiteUncheckedCreateWithoutArchivedByInput> | SiteCreateWithoutArchivedByInput[] | SiteUncheckedCreateWithoutArchivedByInput[]
+    connectOrCreate?: SiteCreateOrConnectWithoutArchivedByInput | SiteCreateOrConnectWithoutArchivedByInput[]
+    upsert?: SiteUpsertWithWhereUniqueWithoutArchivedByInput | SiteUpsertWithWhereUniqueWithoutArchivedByInput[]
+    createMany?: SiteCreateManyArchivedByInputEnvelope
+    set?: SiteWhereUniqueInput | SiteWhereUniqueInput[]
+    disconnect?: SiteWhereUniqueInput | SiteWhereUniqueInput[]
+    delete?: SiteWhereUniqueInput | SiteWhereUniqueInput[]
+    connect?: SiteWhereUniqueInput | SiteWhereUniqueInput[]
+    update?: SiteUpdateWithWhereUniqueWithoutArchivedByInput | SiteUpdateWithWhereUniqueWithoutArchivedByInput[]
+    updateMany?: SiteUpdateManyWithWhereWithoutArchivedByInput | SiteUpdateManyWithWhereWithoutArchivedByInput[]
+    deleteMany?: SiteScalarWhereInput | SiteScalarWhereInput[]
+  }
+
   export type UserCreateNestedOneWithoutSessionsInput = {
     create?: XOR<UserCreateWithoutSessionsInput, UserUncheckedCreateWithoutSessionsInput>
     connectOrCreate?: UserCreateOrConnectWithoutSessionsInput
@@ -71232,6 +76224,12 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutPointTransactionsInput, UserUpdateWithoutPointTransactionsInput>, UserUncheckedUpdateWithoutPointTransactionsInput>
   }
 
+  export type UserCreateNestedOneWithoutArchivedSitesInput = {
+    create?: XOR<UserCreateWithoutArchivedSitesInput, UserUncheckedCreateWithoutArchivedSitesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutArchivedSitesInput
+    connect?: UserWhereUniqueInput
+  }
+
   export type ReportCreateNestedManyWithoutSiteInput = {
     create?: XOR<ReportCreateWithoutSiteInput, ReportUncheckedCreateWithoutSiteInput> | ReportCreateWithoutSiteInput[] | ReportUncheckedCreateWithoutSiteInput[]
     connectOrCreate?: ReportCreateOrConnectWithoutSiteInput | ReportCreateOrConnectWithoutSiteInput[]
@@ -71292,6 +76290,12 @@ export namespace Prisma {
     connectOrCreate?: FeedImpressionCreateOrConnectWithoutSiteInput | FeedImpressionCreateOrConnectWithoutSiteInput[]
     createMany?: FeedImpressionCreateManySiteInputEnvelope
     connect?: FeedImpressionWhereUniqueInput | FeedImpressionWhereUniqueInput[]
+  }
+
+  export type MapSiteProjectionCreateNestedOneWithoutSiteInput = {
+    create?: XOR<MapSiteProjectionCreateWithoutSiteInput, MapSiteProjectionUncheckedCreateWithoutSiteInput>
+    connectOrCreate?: MapSiteProjectionCreateOrConnectWithoutSiteInput
+    connect?: MapSiteProjectionWhereUniqueInput
   }
 
   export type ReportUncheckedCreateNestedManyWithoutSiteInput = {
@@ -71356,6 +76360,12 @@ export namespace Prisma {
     connect?: FeedImpressionWhereUniqueInput | FeedImpressionWhereUniqueInput[]
   }
 
+  export type MapSiteProjectionUncheckedCreateNestedOneWithoutSiteInput = {
+    create?: XOR<MapSiteProjectionCreateWithoutSiteInput, MapSiteProjectionUncheckedCreateWithoutSiteInput>
+    connectOrCreate?: MapSiteProjectionCreateOrConnectWithoutSiteInput
+    connect?: MapSiteProjectionWhereUniqueInput
+  }
+
   export type FloatFieldUpdateOperationsInput = {
     set?: number
     increment?: number
@@ -71366,6 +76376,16 @@ export namespace Prisma {
 
   export type EnumSiteStatusFieldUpdateOperationsInput = {
     set?: $Enums.SiteStatus
+  }
+
+  export type UserUpdateOneWithoutArchivedSitesNestedInput = {
+    create?: XOR<UserCreateWithoutArchivedSitesInput, UserUncheckedCreateWithoutArchivedSitesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutArchivedSitesInput
+    upsert?: UserUpsertWithoutArchivedSitesInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutArchivedSitesInput, UserUpdateWithoutArchivedSitesInput>, UserUncheckedUpdateWithoutArchivedSitesInput>
   }
 
   export type ReportUpdateManyWithoutSiteNestedInput = {
@@ -71490,6 +76510,16 @@ export namespace Prisma {
     deleteMany?: FeedImpressionScalarWhereInput | FeedImpressionScalarWhereInput[]
   }
 
+  export type MapSiteProjectionUpdateOneWithoutSiteNestedInput = {
+    create?: XOR<MapSiteProjectionCreateWithoutSiteInput, MapSiteProjectionUncheckedCreateWithoutSiteInput>
+    connectOrCreate?: MapSiteProjectionCreateOrConnectWithoutSiteInput
+    upsert?: MapSiteProjectionUpsertWithoutSiteInput
+    disconnect?: MapSiteProjectionWhereInput | boolean
+    delete?: MapSiteProjectionWhereInput | boolean
+    connect?: MapSiteProjectionWhereUniqueInput
+    update?: XOR<XOR<MapSiteProjectionUpdateToOneWithWhereWithoutSiteInput, MapSiteProjectionUpdateWithoutSiteInput>, MapSiteProjectionUncheckedUpdateWithoutSiteInput>
+  }
+
   export type ReportUncheckedUpdateManyWithoutSiteNestedInput = {
     create?: XOR<ReportCreateWithoutSiteInput, ReportUncheckedCreateWithoutSiteInput> | ReportCreateWithoutSiteInput[] | ReportUncheckedCreateWithoutSiteInput[]
     connectOrCreate?: ReportCreateOrConnectWithoutSiteInput | ReportCreateOrConnectWithoutSiteInput[]
@@ -71610,6 +76640,16 @@ export namespace Prisma {
     update?: FeedImpressionUpdateWithWhereUniqueWithoutSiteInput | FeedImpressionUpdateWithWhereUniqueWithoutSiteInput[]
     updateMany?: FeedImpressionUpdateManyWithWhereWithoutSiteInput | FeedImpressionUpdateManyWithWhereWithoutSiteInput[]
     deleteMany?: FeedImpressionScalarWhereInput | FeedImpressionScalarWhereInput[]
+  }
+
+  export type MapSiteProjectionUncheckedUpdateOneWithoutSiteNestedInput = {
+    create?: XOR<MapSiteProjectionCreateWithoutSiteInput, MapSiteProjectionUncheckedCreateWithoutSiteInput>
+    connectOrCreate?: MapSiteProjectionCreateOrConnectWithoutSiteInput
+    upsert?: MapSiteProjectionUpsertWithoutSiteInput
+    disconnect?: MapSiteProjectionWhereInput | boolean
+    delete?: MapSiteProjectionWhereInput | boolean
+    connect?: MapSiteProjectionWhereUniqueInput
+    update?: XOR<XOR<MapSiteProjectionUpdateToOneWithWhereWithoutSiteInput, MapSiteProjectionUpdateWithoutSiteInput>, MapSiteProjectionUncheckedUpdateWithoutSiteInput>
   }
 
   export type ReportCreatemediaUrlsInput = {
@@ -73394,6 +78434,24 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutNotificationPreferencesInput, UserUpdateWithoutNotificationPreferencesInput>, UserUncheckedUpdateWithoutNotificationPreferencesInput>
   }
 
+  export type SiteCreateNestedOneWithoutMapProjectionInput = {
+    create?: XOR<SiteCreateWithoutMapProjectionInput, SiteUncheckedCreateWithoutMapProjectionInput>
+    connectOrCreate?: SiteCreateOrConnectWithoutMapProjectionInput
+    connect?: SiteWhereUniqueInput
+  }
+
+  export type SiteUpdateOneRequiredWithoutMapProjectionNestedInput = {
+    create?: XOR<SiteCreateWithoutMapProjectionInput, SiteUncheckedCreateWithoutMapProjectionInput>
+    connectOrCreate?: SiteCreateOrConnectWithoutMapProjectionInput
+    upsert?: SiteUpsertWithoutMapProjectionInput
+    connect?: SiteWhereUniqueInput
+    update?: XOR<XOR<SiteUpdateToOneWithWhereWithoutMapProjectionInput, SiteUpdateWithoutMapProjectionInput>, SiteUncheckedUpdateWithoutMapProjectionInput>
+  }
+
+  export type EnumMapEventOutboxStatusFieldUpdateOperationsInput = {
+    set?: $Enums.MapEventOutboxStatus
+  }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -74062,6 +79120,23 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumNotificationTypeFilter<$PrismaModel>
     _max?: NestedEnumNotificationTypeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumMapEventOutboxStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.MapEventOutboxStatus | EnumMapEventOutboxStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.MapEventOutboxStatus[] | ListEnumMapEventOutboxStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MapEventOutboxStatus[] | ListEnumMapEventOutboxStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumMapEventOutboxStatusFilter<$PrismaModel> | $Enums.MapEventOutboxStatus
+  }
+
+  export type NestedEnumMapEventOutboxStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.MapEventOutboxStatus | EnumMapEventOutboxStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.MapEventOutboxStatus[] | ListEnumMapEventOutboxStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MapEventOutboxStatus[] | ListEnumMapEventOutboxStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumMapEventOutboxStatusWithAggregatesFilter<$PrismaModel> | $Enums.MapEventOutboxStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumMapEventOutboxStatusFilter<$PrismaModel>
+    _max?: NestedEnumMapEventOutboxStatusFilter<$PrismaModel>
   }
 
   export type ReportCreateWithoutReporterInput = {
@@ -75140,6 +80215,72 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type SiteCreateWithoutArchivedByInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    latitude: number
+    longitude: number
+    address?: string | null
+    description?: string | null
+    status?: $Enums.SiteStatus
+    isArchivedByAdmin?: boolean
+    archivedAt?: Date | string | null
+    archiveReason?: string | null
+    upvotesCount?: number
+    commentsCount?: number
+    savesCount?: number
+    sharesCount?: number
+    reports?: ReportCreateNestedManyWithoutSiteInput
+    events?: CleanupEventCreateNestedManyWithoutSiteInput
+    votes?: SiteVoteCreateNestedManyWithoutSiteInput
+    saves?: SiteSaveCreateNestedManyWithoutSiteInput
+    comments?: SiteCommentCreateNestedManyWithoutSiteInput
+    shareEvents?: SiteShareEventCreateNestedManyWithoutSiteInput
+    shareLinks?: SiteShareLinkCreateNestedManyWithoutSiteInput
+    featureSnapshot?: SiteFeatureSnapshotCreateNestedOneWithoutSiteInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutSiteInput
+    mapProjection?: MapSiteProjectionCreateNestedOneWithoutSiteInput
+  }
+
+  export type SiteUncheckedCreateWithoutArchivedByInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    latitude: number
+    longitude: number
+    address?: string | null
+    description?: string | null
+    status?: $Enums.SiteStatus
+    isArchivedByAdmin?: boolean
+    archivedAt?: Date | string | null
+    archiveReason?: string | null
+    upvotesCount?: number
+    commentsCount?: number
+    savesCount?: number
+    sharesCount?: number
+    reports?: ReportUncheckedCreateNestedManyWithoutSiteInput
+    events?: CleanupEventUncheckedCreateNestedManyWithoutSiteInput
+    votes?: SiteVoteUncheckedCreateNestedManyWithoutSiteInput
+    saves?: SiteSaveUncheckedCreateNestedManyWithoutSiteInput
+    comments?: SiteCommentUncheckedCreateNestedManyWithoutSiteInput
+    shareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutSiteInput
+    shareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSiteInput
+    featureSnapshot?: SiteFeatureSnapshotUncheckedCreateNestedOneWithoutSiteInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutSiteInput
+    mapProjection?: MapSiteProjectionUncheckedCreateNestedOneWithoutSiteInput
+  }
+
+  export type SiteCreateOrConnectWithoutArchivedByInput = {
+    where: SiteWhereUniqueInput
+    create: XOR<SiteCreateWithoutArchivedByInput, SiteUncheckedCreateWithoutArchivedByInput>
+  }
+
+  export type SiteCreateManyArchivedByInputEnvelope = {
+    data: SiteCreateManyArchivedByInput | SiteCreateManyArchivedByInput[]
+    skipDuplicates?: boolean
+  }
+
   export type ReportUpsertWithWhereUniqueWithoutReporterInput = {
     where: ReportWhereUniqueInput
     update: XOR<ReportUpdateWithoutReporterInput, ReportUncheckedUpdateWithoutReporterInput>
@@ -76089,6 +81230,44 @@ export namespace Prisma {
     metadata?: JsonNullableFilter<"CheckInRiskSignal">
   }
 
+  export type SiteUpsertWithWhereUniqueWithoutArchivedByInput = {
+    where: SiteWhereUniqueInput
+    update: XOR<SiteUpdateWithoutArchivedByInput, SiteUncheckedUpdateWithoutArchivedByInput>
+    create: XOR<SiteCreateWithoutArchivedByInput, SiteUncheckedCreateWithoutArchivedByInput>
+  }
+
+  export type SiteUpdateWithWhereUniqueWithoutArchivedByInput = {
+    where: SiteWhereUniqueInput
+    data: XOR<SiteUpdateWithoutArchivedByInput, SiteUncheckedUpdateWithoutArchivedByInput>
+  }
+
+  export type SiteUpdateManyWithWhereWithoutArchivedByInput = {
+    where: SiteScalarWhereInput
+    data: XOR<SiteUpdateManyMutationInput, SiteUncheckedUpdateManyWithoutArchivedByInput>
+  }
+
+  export type SiteScalarWhereInput = {
+    AND?: SiteScalarWhereInput | SiteScalarWhereInput[]
+    OR?: SiteScalarWhereInput[]
+    NOT?: SiteScalarWhereInput | SiteScalarWhereInput[]
+    id?: StringFilter<"Site"> | string
+    createdAt?: DateTimeFilter<"Site"> | Date | string
+    updatedAt?: DateTimeFilter<"Site"> | Date | string
+    latitude?: FloatFilter<"Site"> | number
+    longitude?: FloatFilter<"Site"> | number
+    address?: StringNullableFilter<"Site"> | string | null
+    description?: StringNullableFilter<"Site"> | string | null
+    status?: EnumSiteStatusFilter<"Site"> | $Enums.SiteStatus
+    isArchivedByAdmin?: BoolFilter<"Site"> | boolean
+    archivedAt?: DateTimeNullableFilter<"Site"> | Date | string | null
+    archivedById?: StringNullableFilter<"Site"> | string | null
+    archiveReason?: StringNullableFilter<"Site"> | string | null
+    upvotesCount?: IntFilter<"Site"> | number
+    commentsCount?: IntFilter<"Site"> | number
+    savesCount?: IntFilter<"Site"> | number
+    sharesCount?: IntFilter<"Site"> | number
+  }
+
   export type UserCreateWithoutSessionsInput = {
     id?: string
     createdAt?: Date | string
@@ -76145,6 +81324,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+    archivedSites?: SiteCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
@@ -76203,6 +81383,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+    archivedSites?: SiteUncheckedCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserCreateOrConnectWithoutSessionsInput = {
@@ -76277,6 +81458,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -76335,6 +81517,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUncheckedUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserCreateWithoutAdminTempTokensInput = {
@@ -76393,6 +81576,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+    archivedSites?: SiteCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserUncheckedCreateWithoutAdminTempTokensInput = {
@@ -76451,6 +81635,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+    archivedSites?: SiteUncheckedCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserCreateOrConnectWithoutAdminTempTokensInput = {
@@ -76525,6 +81710,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAdminTempTokensInput = {
@@ -76583,6 +81769,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUncheckedUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserCreateWithoutAdminPendingMfaInput = {
@@ -76641,6 +81828,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+    archivedSites?: SiteCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserUncheckedCreateWithoutAdminPendingMfaInput = {
@@ -76699,6 +81887,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+    archivedSites?: SiteUncheckedCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserCreateOrConnectWithoutAdminPendingMfaInput = {
@@ -76773,6 +81962,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAdminPendingMfaInput = {
@@ -76831,6 +82021,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUncheckedUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserCreateWithoutAdminNotificationsInput = {
@@ -76889,6 +82080,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+    archivedSites?: SiteCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserUncheckedCreateWithoutAdminNotificationsInput = {
@@ -76947,6 +82139,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+    archivedSites?: SiteUncheckedCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserCreateOrConnectWithoutAdminNotificationsInput = {
@@ -77021,6 +82214,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAdminNotificationsInput = {
@@ -77079,6 +82273,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUncheckedUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserCreateWithoutPointTransactionsInput = {
@@ -77137,6 +82332,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+    archivedSites?: SiteCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserUncheckedCreateWithoutPointTransactionsInput = {
@@ -77195,6 +82391,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+    archivedSites?: SiteUncheckedCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserCreateOrConnectWithoutPointTransactionsInput = {
@@ -77269,6 +82466,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutPointTransactionsInput = {
@@ -77327,6 +82525,130 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUncheckedUpdateManyWithoutArchivedByNestedInput
+  }
+
+  export type UserCreateWithoutArchivedSitesInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
+    reports?: ReportCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
+    siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentCreateNestedManyWithoutUserInput
+    deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
+    userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
+    notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutArchivedSitesInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
+    reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionUncheckedCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenUncheckedCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaUncheckedCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteUncheckedCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
+    siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateUncheckedCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedCreateNestedManyWithoutUserInput
+    deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
+    userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
+    notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantUncheckedCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInUncheckedCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutArchivedSitesInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutArchivedSitesInput, UserUncheckedCreateWithoutArchivedSitesInput>
   }
 
   export type ReportCreateWithoutSiteInput = {
@@ -77678,6 +83000,190 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type MapSiteProjectionCreateWithoutSiteInput = {
+    latitude: number
+    longitude: number
+    status: $Enums.SiteStatus
+    address?: string | null
+    description?: string | null
+    thumbnailUrl?: string | null
+    pollutionCategory?: string | null
+    latestReportTitle?: string | null
+    latestReportDescription?: string | null
+    latestReportNumber?: string | null
+    reportCount?: number
+    upvotesCount?: number
+    commentsCount?: number
+    savesCount?: number
+    sharesCount?: number
+    latestReportAt?: Date | string | null
+    siteCreatedAt: Date | string
+    siteUpdatedAt: Date | string
+    projectedAt?: Date | string
+    isHot?: boolean
+    isArchivedByAdmin?: boolean
+    archivedAt?: Date | string | null
+  }
+
+  export type MapSiteProjectionUncheckedCreateWithoutSiteInput = {
+    latitude: number
+    longitude: number
+    status: $Enums.SiteStatus
+    address?: string | null
+    description?: string | null
+    thumbnailUrl?: string | null
+    pollutionCategory?: string | null
+    latestReportTitle?: string | null
+    latestReportDescription?: string | null
+    latestReportNumber?: string | null
+    reportCount?: number
+    upvotesCount?: number
+    commentsCount?: number
+    savesCount?: number
+    sharesCount?: number
+    latestReportAt?: Date | string | null
+    siteCreatedAt: Date | string
+    siteUpdatedAt: Date | string
+    projectedAt?: Date | string
+    isHot?: boolean
+    isArchivedByAdmin?: boolean
+    archivedAt?: Date | string | null
+  }
+
+  export type MapSiteProjectionCreateOrConnectWithoutSiteInput = {
+    where: MapSiteProjectionWhereUniqueInput
+    create: XOR<MapSiteProjectionCreateWithoutSiteInput, MapSiteProjectionUncheckedCreateWithoutSiteInput>
+  }
+
+  export type UserUpsertWithoutArchivedSitesInput = {
+    update: XOR<UserUpdateWithoutArchivedSitesInput, UserUncheckedUpdateWithoutArchivedSitesInput>
+    create: XOR<UserCreateWithoutArchivedSitesInput, UserUncheckedCreateWithoutArchivedSitesInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutArchivedSitesInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutArchivedSitesInput, UserUncheckedUpdateWithoutArchivedSitesInput>
+  }
+
+  export type UserUpdateWithoutArchivedSitesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reports?: ReportUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUpdateManyWithoutUserNestedInput
+    deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
+    userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
+    notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutArchivedSitesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUncheckedUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUncheckedUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUncheckedUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUncheckedUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUncheckedUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedUpdateManyWithoutUserNestedInput
+    deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+    userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
+    notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUncheckedUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUncheckedUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+  }
+
   export type ReportUpsertWithWhereUniqueWithoutSiteInput = {
     where: ReportWhereUniqueInput
     update: XOR<ReportUpdateWithoutSiteInput, ReportUncheckedUpdateWithoutSiteInput>
@@ -77847,6 +83353,67 @@ export namespace Prisma {
     data: XOR<FeedImpressionUpdateManyMutationInput, FeedImpressionUncheckedUpdateManyWithoutSiteInput>
   }
 
+  export type MapSiteProjectionUpsertWithoutSiteInput = {
+    update: XOR<MapSiteProjectionUpdateWithoutSiteInput, MapSiteProjectionUncheckedUpdateWithoutSiteInput>
+    create: XOR<MapSiteProjectionCreateWithoutSiteInput, MapSiteProjectionUncheckedCreateWithoutSiteInput>
+    where?: MapSiteProjectionWhereInput
+  }
+
+  export type MapSiteProjectionUpdateToOneWithWhereWithoutSiteInput = {
+    where?: MapSiteProjectionWhereInput
+    data: XOR<MapSiteProjectionUpdateWithoutSiteInput, MapSiteProjectionUncheckedUpdateWithoutSiteInput>
+  }
+
+  export type MapSiteProjectionUpdateWithoutSiteInput = {
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    thumbnailUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    pollutionCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    latestReportTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    latestReportDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    latestReportNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    reportCount?: IntFieldUpdateOperationsInput | number
+    upvotesCount?: IntFieldUpdateOperationsInput | number
+    commentsCount?: IntFieldUpdateOperationsInput | number
+    savesCount?: IntFieldUpdateOperationsInput | number
+    sharesCount?: IntFieldUpdateOperationsInput | number
+    latestReportAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    siteCreatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteUpdatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    projectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isHot?: BoolFieldUpdateOperationsInput | boolean
+    isArchivedByAdmin?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type MapSiteProjectionUncheckedUpdateWithoutSiteInput = {
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    thumbnailUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    pollutionCategory?: NullableStringFieldUpdateOperationsInput | string | null
+    latestReportTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    latestReportDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    latestReportNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    reportCount?: IntFieldUpdateOperationsInput | number
+    upvotesCount?: IntFieldUpdateOperationsInput | number
+    commentsCount?: IntFieldUpdateOperationsInput | number
+    savesCount?: IntFieldUpdateOperationsInput | number
+    sharesCount?: IntFieldUpdateOperationsInput | number
+    latestReportAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    siteCreatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteUpdatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    projectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isHot?: BoolFieldUpdateOperationsInput | boolean
+    isArchivedByAdmin?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
   export type SiteCreateWithoutReportsInput = {
     id?: string
     createdAt?: Date | string
@@ -77856,10 +83423,14 @@ export namespace Prisma {
     address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
+    isArchivedByAdmin?: boolean
+    archivedAt?: Date | string | null
+    archiveReason?: string | null
     upvotesCount?: number
     commentsCount?: number
     savesCount?: number
     sharesCount?: number
+    archivedBy?: UserCreateNestedOneWithoutArchivedSitesInput
     events?: CleanupEventCreateNestedManyWithoutSiteInput
     votes?: SiteVoteCreateNestedManyWithoutSiteInput
     saves?: SiteSaveCreateNestedManyWithoutSiteInput
@@ -77868,6 +83439,7 @@ export namespace Prisma {
     shareLinks?: SiteShareLinkCreateNestedManyWithoutSiteInput
     featureSnapshot?: SiteFeatureSnapshotCreateNestedOneWithoutSiteInput
     feedImpressions?: FeedImpressionCreateNestedManyWithoutSiteInput
+    mapProjection?: MapSiteProjectionCreateNestedOneWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutReportsInput = {
@@ -77879,6 +83451,10 @@ export namespace Prisma {
     address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
+    isArchivedByAdmin?: boolean
+    archivedAt?: Date | string | null
+    archivedById?: string | null
+    archiveReason?: string | null
     upvotesCount?: number
     commentsCount?: number
     savesCount?: number
@@ -77891,6 +83467,7 @@ export namespace Prisma {
     shareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSiteInput
     featureSnapshot?: SiteFeatureSnapshotUncheckedCreateNestedOneWithoutSiteInput
     feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutSiteInput
+    mapProjection?: MapSiteProjectionUncheckedCreateNestedOneWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutReportsInput = {
@@ -77954,6 +83531,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+    archivedSites?: SiteCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserUncheckedCreateWithoutReportsInput = {
@@ -78012,6 +83590,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+    archivedSites?: SiteUncheckedCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserCreateOrConnectWithoutReportsInput = {
@@ -78075,6 +83654,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+    archivedSites?: SiteCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserUncheckedCreateWithoutModeratedReportsInput = {
@@ -78133,6 +83713,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+    archivedSites?: SiteUncheckedCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserCreateOrConnectWithoutModeratedReportsInput = {
@@ -78311,10 +83892,14 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    isArchivedByAdmin?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archiveReason?: NullableStringFieldUpdateOperationsInput | string | null
     upvotesCount?: IntFieldUpdateOperationsInput | number
     commentsCount?: IntFieldUpdateOperationsInput | number
     savesCount?: IntFieldUpdateOperationsInput | number
     sharesCount?: IntFieldUpdateOperationsInput | number
+    archivedBy?: UserUpdateOneWithoutArchivedSitesNestedInput
     events?: CleanupEventUpdateManyWithoutSiteNestedInput
     votes?: SiteVoteUpdateManyWithoutSiteNestedInput
     saves?: SiteSaveUpdateManyWithoutSiteNestedInput
@@ -78323,6 +83908,7 @@ export namespace Prisma {
     shareLinks?: SiteShareLinkUpdateManyWithoutSiteNestedInput
     featureSnapshot?: SiteFeatureSnapshotUpdateOneWithoutSiteNestedInput
     feedImpressions?: FeedImpressionUpdateManyWithoutSiteNestedInput
+    mapProjection?: MapSiteProjectionUpdateOneWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutReportsInput = {
@@ -78334,6 +83920,10 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    isArchivedByAdmin?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archivedById?: NullableStringFieldUpdateOperationsInput | string | null
+    archiveReason?: NullableStringFieldUpdateOperationsInput | string | null
     upvotesCount?: IntFieldUpdateOperationsInput | number
     commentsCount?: IntFieldUpdateOperationsInput | number
     savesCount?: IntFieldUpdateOperationsInput | number
@@ -78346,6 +83936,7 @@ export namespace Prisma {
     shareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSiteNestedInput
     featureSnapshot?: SiteFeatureSnapshotUncheckedUpdateOneWithoutSiteNestedInput
     feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutSiteNestedInput
+    mapProjection?: MapSiteProjectionUncheckedUpdateOneWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutReportsInput = {
@@ -78415,6 +84006,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReportsInput = {
@@ -78473,6 +84065,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUncheckedUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserUpsertWithoutModeratedReportsInput = {
@@ -78542,6 +84135,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutModeratedReportsInput = {
@@ -78600,6 +84194,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUncheckedUpdateManyWithoutArchivedByNestedInput
   }
 
   export type ReportUpsertWithoutPotentialDuplicatesInput = {
@@ -78810,6 +84405,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+    archivedSites?: SiteCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserUncheckedCreateWithoutCoReportedReportsInput = {
@@ -78868,6 +84464,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+    archivedSites?: SiteUncheckedCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserCreateOrConnectWithoutCoReportedReportsInput = {
@@ -78997,6 +84594,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCoReportedReportsInput = {
@@ -79055,6 +84653,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUncheckedUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserCreateWithoutReportSubmitIdempotencyKeysInput = {
@@ -79113,6 +84712,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+    archivedSites?: SiteCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserUncheckedCreateWithoutReportSubmitIdempotencyKeysInput = {
@@ -79171,6 +84771,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+    archivedSites?: SiteUncheckedCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserCreateOrConnectWithoutReportSubmitIdempotencyKeysInput = {
@@ -79294,6 +84895,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReportSubmitIdempotencyKeysInput = {
@@ -79352,6 +84954,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUncheckedUpdateManyWithoutArchivedByNestedInput
   }
 
   export type ReportUpsertWithoutSubmitIdempotencyKeysInput = {
@@ -79465,6 +85068,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+    archivedSites?: SiteCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserUncheckedCreateWithoutAuditLogsInput = {
@@ -79523,6 +85127,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+    archivedSites?: SiteUncheckedCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserCreateOrConnectWithoutAuditLogsInput = {
@@ -79597,6 +85202,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAuditLogsInput = {
@@ -79655,6 +85261,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUncheckedUpdateManyWithoutArchivedByNestedInput
   }
 
   export type SiteCreateWithoutEventsInput = {
@@ -79666,10 +85273,14 @@ export namespace Prisma {
     address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
+    isArchivedByAdmin?: boolean
+    archivedAt?: Date | string | null
+    archiveReason?: string | null
     upvotesCount?: number
     commentsCount?: number
     savesCount?: number
     sharesCount?: number
+    archivedBy?: UserCreateNestedOneWithoutArchivedSitesInput
     reports?: ReportCreateNestedManyWithoutSiteInput
     votes?: SiteVoteCreateNestedManyWithoutSiteInput
     saves?: SiteSaveCreateNestedManyWithoutSiteInput
@@ -79678,6 +85289,7 @@ export namespace Prisma {
     shareLinks?: SiteShareLinkCreateNestedManyWithoutSiteInput
     featureSnapshot?: SiteFeatureSnapshotCreateNestedOneWithoutSiteInput
     feedImpressions?: FeedImpressionCreateNestedManyWithoutSiteInput
+    mapProjection?: MapSiteProjectionCreateNestedOneWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutEventsInput = {
@@ -79689,6 +85301,10 @@ export namespace Prisma {
     address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
+    isArchivedByAdmin?: boolean
+    archivedAt?: Date | string | null
+    archivedById?: string | null
+    archiveReason?: string | null
     upvotesCount?: number
     commentsCount?: number
     savesCount?: number
@@ -79701,6 +85317,7 @@ export namespace Prisma {
     shareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSiteInput
     featureSnapshot?: SiteFeatureSnapshotUncheckedCreateNestedOneWithoutSiteInput
     feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutSiteInput
+    mapProjection?: MapSiteProjectionUncheckedCreateNestedOneWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutEventsInput = {
@@ -79764,6 +85381,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+    archivedSites?: SiteCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserUncheckedCreateWithoutOrganizedCleanupEventsInput = {
@@ -79822,6 +85440,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+    archivedSites?: SiteUncheckedCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserCreateOrConnectWithoutOrganizedCleanupEventsInput = {
@@ -80315,10 +85934,14 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    isArchivedByAdmin?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archiveReason?: NullableStringFieldUpdateOperationsInput | string | null
     upvotesCount?: IntFieldUpdateOperationsInput | number
     commentsCount?: IntFieldUpdateOperationsInput | number
     savesCount?: IntFieldUpdateOperationsInput | number
     sharesCount?: IntFieldUpdateOperationsInput | number
+    archivedBy?: UserUpdateOneWithoutArchivedSitesNestedInput
     reports?: ReportUpdateManyWithoutSiteNestedInput
     votes?: SiteVoteUpdateManyWithoutSiteNestedInput
     saves?: SiteSaveUpdateManyWithoutSiteNestedInput
@@ -80327,6 +85950,7 @@ export namespace Prisma {
     shareLinks?: SiteShareLinkUpdateManyWithoutSiteNestedInput
     featureSnapshot?: SiteFeatureSnapshotUpdateOneWithoutSiteNestedInput
     feedImpressions?: FeedImpressionUpdateManyWithoutSiteNestedInput
+    mapProjection?: MapSiteProjectionUpdateOneWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutEventsInput = {
@@ -80338,6 +85962,10 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    isArchivedByAdmin?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archivedById?: NullableStringFieldUpdateOperationsInput | string | null
+    archiveReason?: NullableStringFieldUpdateOperationsInput | string | null
     upvotesCount?: IntFieldUpdateOperationsInput | number
     commentsCount?: IntFieldUpdateOperationsInput | number
     savesCount?: IntFieldUpdateOperationsInput | number
@@ -80350,6 +85978,7 @@ export namespace Prisma {
     shareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSiteNestedInput
     featureSnapshot?: SiteFeatureSnapshotUncheckedUpdateOneWithoutSiteNestedInput
     feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutSiteNestedInput
+    mapProjection?: MapSiteProjectionUncheckedUpdateOneWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutOrganizedCleanupEventsInput = {
@@ -80419,6 +86048,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutOrganizedCleanupEventsInput = {
@@ -80477,6 +86107,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUncheckedUpdateManyWithoutArchivedByNestedInput
   }
 
   export type EventParticipantUpsertWithWhereUniqueWithoutEventInput = {
@@ -80902,6 +86533,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+    archivedSites?: SiteCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserUncheckedCreateWithoutEventParticipationsInput = {
@@ -80960,6 +86592,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+    archivedSites?: SiteUncheckedCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserCreateOrConnectWithoutEventParticipationsInput = {
@@ -81123,6 +86756,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEventParticipationsInput = {
@@ -81181,6 +86815,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUncheckedUpdateManyWithoutArchivedByNestedInput
   }
 
   export type CleanupEventCreateWithoutChatMessagesInput = {
@@ -81322,6 +86957,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+    archivedSites?: SiteCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserUncheckedCreateWithoutEventChatMessagesInput = {
@@ -81380,6 +87016,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+    archivedSites?: SiteUncheckedCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserCreateOrConnectWithoutEventChatMessagesInput = {
@@ -81550,6 +87187,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+    archivedSites?: SiteCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserUncheckedCreateWithoutEventChatPinnedMessagesInput = {
@@ -81608,6 +87246,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+    archivedSites?: SiteUncheckedCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserCreateOrConnectWithoutEventChatPinnedMessagesInput = {
@@ -81833,6 +87472,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEventChatMessagesInput = {
@@ -81891,6 +87531,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUncheckedUpdateManyWithoutArchivedByNestedInput
   }
 
   export type EventChatMessageUpsertWithoutRepliesInput = {
@@ -82033,6 +87674,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEventChatPinnedMessagesInput = {
@@ -82091,6 +87733,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUncheckedUpdateManyWithoutArchivedByNestedInput
   }
 
   export type EventChatAttachmentUpsertWithWhereUniqueWithoutMessageInput = {
@@ -82389,6 +88032,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+    archivedSites?: SiteCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserUncheckedCreateWithoutEventChatMutesInput = {
@@ -82447,6 +88091,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+    archivedSites?: SiteUncheckedCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserCreateOrConnectWithoutEventChatMutesInput = {
@@ -82610,6 +88255,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEventChatMutesInput = {
@@ -82668,6 +88314,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUncheckedUpdateManyWithoutArchivedByNestedInput
   }
 
   export type CleanupEventCreateWithoutChatReadCursorsInput = {
@@ -82809,6 +88456,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+    archivedSites?: SiteCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserUncheckedCreateWithoutEventChatReadCursorsInput = {
@@ -82867,6 +88515,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+    archivedSites?: SiteUncheckedCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserCreateOrConnectWithoutEventChatReadCursorsInput = {
@@ -83081,6 +88730,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEventChatReadCursorsInput = {
@@ -83139,6 +88789,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUncheckedUpdateManyWithoutArchivedByNestedInput
   }
 
   export type EventChatMessageUpsertWithoutReadCursorsLastReadInput = {
@@ -83337,6 +88988,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+    archivedSites?: SiteCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserUncheckedCreateWithoutEventCheckInsInput = {
@@ -83395,6 +89047,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+    archivedSites?: SiteUncheckedCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserCreateOrConnectWithoutEventCheckInsInput = {
@@ -83558,6 +89211,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEventCheckInsInput = {
@@ -83616,6 +89270,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUncheckedUpdateManyWithoutArchivedByNestedInput
   }
 
   export type CleanupEventCreateWithoutCheckInRedemptionsInput = {
@@ -84101,6 +89756,7 @@ export namespace Prisma {
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
     routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+    archivedSites?: SiteCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserUncheckedCreateWithoutEventEvidencePhotosUploadedInput = {
@@ -84159,6 +89815,7 @@ export namespace Prisma {
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+    archivedSites?: SiteUncheckedCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserCreateOrConnectWithoutEventEvidencePhotosUploadedInput = {
@@ -84322,6 +89979,7 @@ export namespace Prisma {
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEventEvidencePhotosUploadedInput = {
@@ -84380,6 +90038,7 @@ export namespace Prisma {
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUncheckedUpdateManyWithoutArchivedByNestedInput
   }
 
   export type CleanupEventCreateWithoutRouteSegmentsInput = {
@@ -84521,6 +90180,7 @@ export namespace Prisma {
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
     eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
     checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+    archivedSites?: SiteCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserUncheckedCreateWithoutRouteSegmentsClaimedInput = {
@@ -84579,6 +90239,7 @@ export namespace Prisma {
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+    archivedSites?: SiteUncheckedCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserCreateOrConnectWithoutRouteSegmentsClaimedInput = {
@@ -84742,6 +90403,7 @@ export namespace Prisma {
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
     eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutRouteSegmentsClaimedInput = {
@@ -84800,6 +90462,7 @@ export namespace Prisma {
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUncheckedUpdateManyWithoutArchivedByNestedInput
   }
 
   export type CleanupEventCreateWithoutCheckInRiskSignalsInput = {
@@ -84941,6 +90604,7 @@ export namespace Prisma {
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
     eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
+    archivedSites?: SiteCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserUncheckedCreateWithoutCheckInRiskSignalsInput = {
@@ -84999,6 +90663,7 @@ export namespace Prisma {
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
+    archivedSites?: SiteUncheckedCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserCreateOrConnectWithoutCheckInRiskSignalsInput = {
@@ -85162,6 +90827,7 @@ export namespace Prisma {
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
     eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
+    archivedSites?: SiteUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCheckInRiskSignalsInput = {
@@ -85220,6 +90886,7 @@ export namespace Prisma {
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
+    archivedSites?: SiteUncheckedUpdateManyWithoutArchivedByNestedInput
   }
 
   export type SiteCreateWithoutVotesInput = {
@@ -85231,10 +90898,14 @@ export namespace Prisma {
     address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
+    isArchivedByAdmin?: boolean
+    archivedAt?: Date | string | null
+    archiveReason?: string | null
     upvotesCount?: number
     commentsCount?: number
     savesCount?: number
     sharesCount?: number
+    archivedBy?: UserCreateNestedOneWithoutArchivedSitesInput
     reports?: ReportCreateNestedManyWithoutSiteInput
     events?: CleanupEventCreateNestedManyWithoutSiteInput
     saves?: SiteSaveCreateNestedManyWithoutSiteInput
@@ -85243,6 +90914,7 @@ export namespace Prisma {
     shareLinks?: SiteShareLinkCreateNestedManyWithoutSiteInput
     featureSnapshot?: SiteFeatureSnapshotCreateNestedOneWithoutSiteInput
     feedImpressions?: FeedImpressionCreateNestedManyWithoutSiteInput
+    mapProjection?: MapSiteProjectionCreateNestedOneWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutVotesInput = {
@@ -85254,6 +90926,10 @@ export namespace Prisma {
     address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
+    isArchivedByAdmin?: boolean
+    archivedAt?: Date | string | null
+    archivedById?: string | null
+    archiveReason?: string | null
     upvotesCount?: number
     commentsCount?: number
     savesCount?: number
@@ -85266,6 +90942,7 @@ export namespace Prisma {
     shareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSiteInput
     featureSnapshot?: SiteFeatureSnapshotUncheckedCreateNestedOneWithoutSiteInput
     feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutSiteInput
+    mapProjection?: MapSiteProjectionUncheckedCreateNestedOneWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutVotesInput = {
@@ -85329,6 +91006,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+    archivedSites?: SiteCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserUncheckedCreateWithoutSiteVotesInput = {
@@ -85387,6 +91065,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+    archivedSites?: SiteUncheckedCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserCreateOrConnectWithoutSiteVotesInput = {
@@ -85414,10 +91093,14 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    isArchivedByAdmin?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archiveReason?: NullableStringFieldUpdateOperationsInput | string | null
     upvotesCount?: IntFieldUpdateOperationsInput | number
     commentsCount?: IntFieldUpdateOperationsInput | number
     savesCount?: IntFieldUpdateOperationsInput | number
     sharesCount?: IntFieldUpdateOperationsInput | number
+    archivedBy?: UserUpdateOneWithoutArchivedSitesNestedInput
     reports?: ReportUpdateManyWithoutSiteNestedInput
     events?: CleanupEventUpdateManyWithoutSiteNestedInput
     saves?: SiteSaveUpdateManyWithoutSiteNestedInput
@@ -85426,6 +91109,7 @@ export namespace Prisma {
     shareLinks?: SiteShareLinkUpdateManyWithoutSiteNestedInput
     featureSnapshot?: SiteFeatureSnapshotUpdateOneWithoutSiteNestedInput
     feedImpressions?: FeedImpressionUpdateManyWithoutSiteNestedInput
+    mapProjection?: MapSiteProjectionUpdateOneWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutVotesInput = {
@@ -85437,6 +91121,10 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    isArchivedByAdmin?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archivedById?: NullableStringFieldUpdateOperationsInput | string | null
+    archiveReason?: NullableStringFieldUpdateOperationsInput | string | null
     upvotesCount?: IntFieldUpdateOperationsInput | number
     commentsCount?: IntFieldUpdateOperationsInput | number
     savesCount?: IntFieldUpdateOperationsInput | number
@@ -85449,6 +91137,7 @@ export namespace Prisma {
     shareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSiteNestedInput
     featureSnapshot?: SiteFeatureSnapshotUncheckedUpdateOneWithoutSiteNestedInput
     feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutSiteNestedInput
+    mapProjection?: MapSiteProjectionUncheckedUpdateOneWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutSiteVotesInput = {
@@ -85518,6 +91207,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSiteVotesInput = {
@@ -85576,6 +91266,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUncheckedUpdateManyWithoutArchivedByNestedInput
   }
 
   export type SiteCreateWithoutSavesInput = {
@@ -85587,10 +91278,14 @@ export namespace Prisma {
     address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
+    isArchivedByAdmin?: boolean
+    archivedAt?: Date | string | null
+    archiveReason?: string | null
     upvotesCount?: number
     commentsCount?: number
     savesCount?: number
     sharesCount?: number
+    archivedBy?: UserCreateNestedOneWithoutArchivedSitesInput
     reports?: ReportCreateNestedManyWithoutSiteInput
     events?: CleanupEventCreateNestedManyWithoutSiteInput
     votes?: SiteVoteCreateNestedManyWithoutSiteInput
@@ -85599,6 +91294,7 @@ export namespace Prisma {
     shareLinks?: SiteShareLinkCreateNestedManyWithoutSiteInput
     featureSnapshot?: SiteFeatureSnapshotCreateNestedOneWithoutSiteInput
     feedImpressions?: FeedImpressionCreateNestedManyWithoutSiteInput
+    mapProjection?: MapSiteProjectionCreateNestedOneWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutSavesInput = {
@@ -85610,6 +91306,10 @@ export namespace Prisma {
     address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
+    isArchivedByAdmin?: boolean
+    archivedAt?: Date | string | null
+    archivedById?: string | null
+    archiveReason?: string | null
     upvotesCount?: number
     commentsCount?: number
     savesCount?: number
@@ -85622,6 +91322,7 @@ export namespace Prisma {
     shareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSiteInput
     featureSnapshot?: SiteFeatureSnapshotUncheckedCreateNestedOneWithoutSiteInput
     feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutSiteInput
+    mapProjection?: MapSiteProjectionUncheckedCreateNestedOneWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutSavesInput = {
@@ -85685,6 +91386,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+    archivedSites?: SiteCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserUncheckedCreateWithoutSiteSavesInput = {
@@ -85743,6 +91445,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+    archivedSites?: SiteUncheckedCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserCreateOrConnectWithoutSiteSavesInput = {
@@ -85770,10 +91473,14 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    isArchivedByAdmin?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archiveReason?: NullableStringFieldUpdateOperationsInput | string | null
     upvotesCount?: IntFieldUpdateOperationsInput | number
     commentsCount?: IntFieldUpdateOperationsInput | number
     savesCount?: IntFieldUpdateOperationsInput | number
     sharesCount?: IntFieldUpdateOperationsInput | number
+    archivedBy?: UserUpdateOneWithoutArchivedSitesNestedInput
     reports?: ReportUpdateManyWithoutSiteNestedInput
     events?: CleanupEventUpdateManyWithoutSiteNestedInput
     votes?: SiteVoteUpdateManyWithoutSiteNestedInput
@@ -85782,6 +91489,7 @@ export namespace Prisma {
     shareLinks?: SiteShareLinkUpdateManyWithoutSiteNestedInput
     featureSnapshot?: SiteFeatureSnapshotUpdateOneWithoutSiteNestedInput
     feedImpressions?: FeedImpressionUpdateManyWithoutSiteNestedInput
+    mapProjection?: MapSiteProjectionUpdateOneWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutSavesInput = {
@@ -85793,6 +91501,10 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    isArchivedByAdmin?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archivedById?: NullableStringFieldUpdateOperationsInput | string | null
+    archiveReason?: NullableStringFieldUpdateOperationsInput | string | null
     upvotesCount?: IntFieldUpdateOperationsInput | number
     commentsCount?: IntFieldUpdateOperationsInput | number
     savesCount?: IntFieldUpdateOperationsInput | number
@@ -85805,6 +91517,7 @@ export namespace Prisma {
     shareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSiteNestedInput
     featureSnapshot?: SiteFeatureSnapshotUncheckedUpdateOneWithoutSiteNestedInput
     feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutSiteNestedInput
+    mapProjection?: MapSiteProjectionUncheckedUpdateOneWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutSiteSavesInput = {
@@ -85874,6 +91587,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSiteSavesInput = {
@@ -85932,6 +91646,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUncheckedUpdateManyWithoutArchivedByNestedInput
   }
 
   export type SiteCreateWithoutCommentsInput = {
@@ -85943,10 +91658,14 @@ export namespace Prisma {
     address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
+    isArchivedByAdmin?: boolean
+    archivedAt?: Date | string | null
+    archiveReason?: string | null
     upvotesCount?: number
     commentsCount?: number
     savesCount?: number
     sharesCount?: number
+    archivedBy?: UserCreateNestedOneWithoutArchivedSitesInput
     reports?: ReportCreateNestedManyWithoutSiteInput
     events?: CleanupEventCreateNestedManyWithoutSiteInput
     votes?: SiteVoteCreateNestedManyWithoutSiteInput
@@ -85955,6 +91674,7 @@ export namespace Prisma {
     shareLinks?: SiteShareLinkCreateNestedManyWithoutSiteInput
     featureSnapshot?: SiteFeatureSnapshotCreateNestedOneWithoutSiteInput
     feedImpressions?: FeedImpressionCreateNestedManyWithoutSiteInput
+    mapProjection?: MapSiteProjectionCreateNestedOneWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutCommentsInput = {
@@ -85966,6 +91686,10 @@ export namespace Prisma {
     address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
+    isArchivedByAdmin?: boolean
+    archivedAt?: Date | string | null
+    archivedById?: string | null
+    archiveReason?: string | null
     upvotesCount?: number
     commentsCount?: number
     savesCount?: number
@@ -85978,6 +91702,7 @@ export namespace Prisma {
     shareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSiteInput
     featureSnapshot?: SiteFeatureSnapshotUncheckedCreateNestedOneWithoutSiteInput
     feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutSiteInput
+    mapProjection?: MapSiteProjectionUncheckedCreateNestedOneWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutCommentsInput = {
@@ -86041,6 +91766,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+    archivedSites?: SiteCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserUncheckedCreateWithoutSiteCommentsInput = {
@@ -86099,6 +91825,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+    archivedSites?: SiteUncheckedCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserCreateOrConnectWithoutSiteCommentsInput = {
@@ -86215,10 +91942,14 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    isArchivedByAdmin?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archiveReason?: NullableStringFieldUpdateOperationsInput | string | null
     upvotesCount?: IntFieldUpdateOperationsInput | number
     commentsCount?: IntFieldUpdateOperationsInput | number
     savesCount?: IntFieldUpdateOperationsInput | number
     sharesCount?: IntFieldUpdateOperationsInput | number
+    archivedBy?: UserUpdateOneWithoutArchivedSitesNestedInput
     reports?: ReportUpdateManyWithoutSiteNestedInput
     events?: CleanupEventUpdateManyWithoutSiteNestedInput
     votes?: SiteVoteUpdateManyWithoutSiteNestedInput
@@ -86227,6 +91958,7 @@ export namespace Prisma {
     shareLinks?: SiteShareLinkUpdateManyWithoutSiteNestedInput
     featureSnapshot?: SiteFeatureSnapshotUpdateOneWithoutSiteNestedInput
     feedImpressions?: FeedImpressionUpdateManyWithoutSiteNestedInput
+    mapProjection?: MapSiteProjectionUpdateOneWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutCommentsInput = {
@@ -86238,6 +91970,10 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    isArchivedByAdmin?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archivedById?: NullableStringFieldUpdateOperationsInput | string | null
+    archiveReason?: NullableStringFieldUpdateOperationsInput | string | null
     upvotesCount?: IntFieldUpdateOperationsInput | number
     commentsCount?: IntFieldUpdateOperationsInput | number
     savesCount?: IntFieldUpdateOperationsInput | number
@@ -86250,6 +91986,7 @@ export namespace Prisma {
     shareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSiteNestedInput
     featureSnapshot?: SiteFeatureSnapshotUncheckedUpdateOneWithoutSiteNestedInput
     feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutSiteNestedInput
+    mapProjection?: MapSiteProjectionUncheckedUpdateOneWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutSiteCommentsInput = {
@@ -86319,6 +92056,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSiteCommentsInput = {
@@ -86377,6 +92115,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUncheckedUpdateManyWithoutArchivedByNestedInput
   }
 
   export type SiteCommentUpsertWithoutRepliesInput = {
@@ -86535,6 +92274,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+    archivedSites?: SiteCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserUncheckedCreateWithoutSiteCommentLikesInput = {
@@ -86593,6 +92333,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+    archivedSites?: SiteUncheckedCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserCreateOrConnectWithoutSiteCommentLikesInput = {
@@ -86704,6 +92445,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSiteCommentLikesInput = {
@@ -86762,6 +92504,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUncheckedUpdateManyWithoutArchivedByNestedInput
   }
 
   export type SiteCreateWithoutShareEventsInput = {
@@ -86773,10 +92516,14 @@ export namespace Prisma {
     address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
+    isArchivedByAdmin?: boolean
+    archivedAt?: Date | string | null
+    archiveReason?: string | null
     upvotesCount?: number
     commentsCount?: number
     savesCount?: number
     sharesCount?: number
+    archivedBy?: UserCreateNestedOneWithoutArchivedSitesInput
     reports?: ReportCreateNestedManyWithoutSiteInput
     events?: CleanupEventCreateNestedManyWithoutSiteInput
     votes?: SiteVoteCreateNestedManyWithoutSiteInput
@@ -86785,6 +92532,7 @@ export namespace Prisma {
     shareLinks?: SiteShareLinkCreateNestedManyWithoutSiteInput
     featureSnapshot?: SiteFeatureSnapshotCreateNestedOneWithoutSiteInput
     feedImpressions?: FeedImpressionCreateNestedManyWithoutSiteInput
+    mapProjection?: MapSiteProjectionCreateNestedOneWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutShareEventsInput = {
@@ -86796,6 +92544,10 @@ export namespace Prisma {
     address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
+    isArchivedByAdmin?: boolean
+    archivedAt?: Date | string | null
+    archivedById?: string | null
+    archiveReason?: string | null
     upvotesCount?: number
     commentsCount?: number
     savesCount?: number
@@ -86808,6 +92560,7 @@ export namespace Prisma {
     shareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSiteInput
     featureSnapshot?: SiteFeatureSnapshotUncheckedCreateNestedOneWithoutSiteInput
     feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutSiteInput
+    mapProjection?: MapSiteProjectionUncheckedCreateNestedOneWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutShareEventsInput = {
@@ -86871,6 +92624,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+    archivedSites?: SiteCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserUncheckedCreateWithoutSiteShareEventsInput = {
@@ -86929,6 +92683,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+    archivedSites?: SiteUncheckedCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserCreateOrConnectWithoutSiteShareEventsInput = {
@@ -86956,10 +92711,14 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    isArchivedByAdmin?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archiveReason?: NullableStringFieldUpdateOperationsInput | string | null
     upvotesCount?: IntFieldUpdateOperationsInput | number
     commentsCount?: IntFieldUpdateOperationsInput | number
     savesCount?: IntFieldUpdateOperationsInput | number
     sharesCount?: IntFieldUpdateOperationsInput | number
+    archivedBy?: UserUpdateOneWithoutArchivedSitesNestedInput
     reports?: ReportUpdateManyWithoutSiteNestedInput
     events?: CleanupEventUpdateManyWithoutSiteNestedInput
     votes?: SiteVoteUpdateManyWithoutSiteNestedInput
@@ -86968,6 +92727,7 @@ export namespace Prisma {
     shareLinks?: SiteShareLinkUpdateManyWithoutSiteNestedInput
     featureSnapshot?: SiteFeatureSnapshotUpdateOneWithoutSiteNestedInput
     feedImpressions?: FeedImpressionUpdateManyWithoutSiteNestedInput
+    mapProjection?: MapSiteProjectionUpdateOneWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutShareEventsInput = {
@@ -86979,6 +92739,10 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    isArchivedByAdmin?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archivedById?: NullableStringFieldUpdateOperationsInput | string | null
+    archiveReason?: NullableStringFieldUpdateOperationsInput | string | null
     upvotesCount?: IntFieldUpdateOperationsInput | number
     commentsCount?: IntFieldUpdateOperationsInput | number
     savesCount?: IntFieldUpdateOperationsInput | number
@@ -86991,6 +92755,7 @@ export namespace Prisma {
     shareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSiteNestedInput
     featureSnapshot?: SiteFeatureSnapshotUncheckedUpdateOneWithoutSiteNestedInput
     feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutSiteNestedInput
+    mapProjection?: MapSiteProjectionUncheckedUpdateOneWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutSiteShareEventsInput = {
@@ -87060,6 +92825,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSiteShareEventsInput = {
@@ -87118,6 +92884,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUncheckedUpdateManyWithoutArchivedByNestedInput
   }
 
   export type SiteCreateWithoutShareLinksInput = {
@@ -87129,10 +92896,14 @@ export namespace Prisma {
     address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
+    isArchivedByAdmin?: boolean
+    archivedAt?: Date | string | null
+    archiveReason?: string | null
     upvotesCount?: number
     commentsCount?: number
     savesCount?: number
     sharesCount?: number
+    archivedBy?: UserCreateNestedOneWithoutArchivedSitesInput
     reports?: ReportCreateNestedManyWithoutSiteInput
     events?: CleanupEventCreateNestedManyWithoutSiteInput
     votes?: SiteVoteCreateNestedManyWithoutSiteInput
@@ -87141,6 +92912,7 @@ export namespace Prisma {
     shareEvents?: SiteShareEventCreateNestedManyWithoutSiteInput
     featureSnapshot?: SiteFeatureSnapshotCreateNestedOneWithoutSiteInput
     feedImpressions?: FeedImpressionCreateNestedManyWithoutSiteInput
+    mapProjection?: MapSiteProjectionCreateNestedOneWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutShareLinksInput = {
@@ -87152,6 +92924,10 @@ export namespace Prisma {
     address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
+    isArchivedByAdmin?: boolean
+    archivedAt?: Date | string | null
+    archivedById?: string | null
+    archiveReason?: string | null
     upvotesCount?: number
     commentsCount?: number
     savesCount?: number
@@ -87164,6 +92940,7 @@ export namespace Prisma {
     shareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutSiteInput
     featureSnapshot?: SiteFeatureSnapshotUncheckedCreateNestedOneWithoutSiteInput
     feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutSiteInput
+    mapProjection?: MapSiteProjectionUncheckedCreateNestedOneWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutShareLinksInput = {
@@ -87227,6 +93004,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+    archivedSites?: SiteCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserUncheckedCreateWithoutSiteShareLinksInput = {
@@ -87285,6 +93063,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+    archivedSites?: SiteUncheckedCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserCreateOrConnectWithoutSiteShareLinksInput = {
@@ -87344,10 +93123,14 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    isArchivedByAdmin?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archiveReason?: NullableStringFieldUpdateOperationsInput | string | null
     upvotesCount?: IntFieldUpdateOperationsInput | number
     commentsCount?: IntFieldUpdateOperationsInput | number
     savesCount?: IntFieldUpdateOperationsInput | number
     sharesCount?: IntFieldUpdateOperationsInput | number
+    archivedBy?: UserUpdateOneWithoutArchivedSitesNestedInput
     reports?: ReportUpdateManyWithoutSiteNestedInput
     events?: CleanupEventUpdateManyWithoutSiteNestedInput
     votes?: SiteVoteUpdateManyWithoutSiteNestedInput
@@ -87356,6 +93139,7 @@ export namespace Prisma {
     shareEvents?: SiteShareEventUpdateManyWithoutSiteNestedInput
     featureSnapshot?: SiteFeatureSnapshotUpdateOneWithoutSiteNestedInput
     feedImpressions?: FeedImpressionUpdateManyWithoutSiteNestedInput
+    mapProjection?: MapSiteProjectionUpdateOneWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutShareLinksInput = {
@@ -87367,6 +93151,10 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    isArchivedByAdmin?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archivedById?: NullableStringFieldUpdateOperationsInput | string | null
+    archiveReason?: NullableStringFieldUpdateOperationsInput | string | null
     upvotesCount?: IntFieldUpdateOperationsInput | number
     commentsCount?: IntFieldUpdateOperationsInput | number
     savesCount?: IntFieldUpdateOperationsInput | number
@@ -87379,6 +93167,7 @@ export namespace Prisma {
     shareEvents?: SiteShareEventUncheckedUpdateManyWithoutSiteNestedInput
     featureSnapshot?: SiteFeatureSnapshotUncheckedUpdateOneWithoutSiteNestedInput
     feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutSiteNestedInput
+    mapProjection?: MapSiteProjectionUncheckedUpdateOneWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutSiteShareLinksInput = {
@@ -87448,6 +93237,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSiteShareLinksInput = {
@@ -87506,6 +93296,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUncheckedUpdateManyWithoutArchivedByNestedInput
   }
 
   export type SiteShareAttributionEventUpsertWithWhereUniqueWithoutShareLinkInput = {
@@ -87659,6 +93450,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+    archivedSites?: SiteCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserUncheckedCreateWithoutFeedStateInput = {
@@ -87717,6 +93509,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+    archivedSites?: SiteUncheckedCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserCreateOrConnectWithoutFeedStateInput = {
@@ -87791,6 +93584,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutFeedStateInput = {
@@ -87849,6 +93643,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUncheckedUpdateManyWithoutArchivedByNestedInput
   }
 
   export type SiteCreateWithoutFeatureSnapshotInput = {
@@ -87860,10 +93655,14 @@ export namespace Prisma {
     address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
+    isArchivedByAdmin?: boolean
+    archivedAt?: Date | string | null
+    archiveReason?: string | null
     upvotesCount?: number
     commentsCount?: number
     savesCount?: number
     sharesCount?: number
+    archivedBy?: UserCreateNestedOneWithoutArchivedSitesInput
     reports?: ReportCreateNestedManyWithoutSiteInput
     events?: CleanupEventCreateNestedManyWithoutSiteInput
     votes?: SiteVoteCreateNestedManyWithoutSiteInput
@@ -87872,6 +93671,7 @@ export namespace Prisma {
     shareEvents?: SiteShareEventCreateNestedManyWithoutSiteInput
     shareLinks?: SiteShareLinkCreateNestedManyWithoutSiteInput
     feedImpressions?: FeedImpressionCreateNestedManyWithoutSiteInput
+    mapProjection?: MapSiteProjectionCreateNestedOneWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutFeatureSnapshotInput = {
@@ -87883,6 +93683,10 @@ export namespace Prisma {
     address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
+    isArchivedByAdmin?: boolean
+    archivedAt?: Date | string | null
+    archivedById?: string | null
+    archiveReason?: string | null
     upvotesCount?: number
     commentsCount?: number
     savesCount?: number
@@ -87895,6 +93699,7 @@ export namespace Prisma {
     shareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutSiteInput
     shareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSiteInput
     feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutSiteInput
+    mapProjection?: MapSiteProjectionUncheckedCreateNestedOneWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutFeatureSnapshotInput = {
@@ -87922,10 +93727,14 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    isArchivedByAdmin?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archiveReason?: NullableStringFieldUpdateOperationsInput | string | null
     upvotesCount?: IntFieldUpdateOperationsInput | number
     commentsCount?: IntFieldUpdateOperationsInput | number
     savesCount?: IntFieldUpdateOperationsInput | number
     sharesCount?: IntFieldUpdateOperationsInput | number
+    archivedBy?: UserUpdateOneWithoutArchivedSitesNestedInput
     reports?: ReportUpdateManyWithoutSiteNestedInput
     events?: CleanupEventUpdateManyWithoutSiteNestedInput
     votes?: SiteVoteUpdateManyWithoutSiteNestedInput
@@ -87934,6 +93743,7 @@ export namespace Prisma {
     shareEvents?: SiteShareEventUpdateManyWithoutSiteNestedInput
     shareLinks?: SiteShareLinkUpdateManyWithoutSiteNestedInput
     feedImpressions?: FeedImpressionUpdateManyWithoutSiteNestedInput
+    mapProjection?: MapSiteProjectionUpdateOneWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutFeatureSnapshotInput = {
@@ -87945,6 +93755,10 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    isArchivedByAdmin?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archivedById?: NullableStringFieldUpdateOperationsInput | string | null
+    archiveReason?: NullableStringFieldUpdateOperationsInput | string | null
     upvotesCount?: IntFieldUpdateOperationsInput | number
     commentsCount?: IntFieldUpdateOperationsInput | number
     savesCount?: IntFieldUpdateOperationsInput | number
@@ -87957,6 +93771,7 @@ export namespace Prisma {
     shareEvents?: SiteShareEventUncheckedUpdateManyWithoutSiteNestedInput
     shareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSiteNestedInput
     feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutSiteNestedInput
+    mapProjection?: MapSiteProjectionUncheckedUpdateOneWithoutSiteNestedInput
   }
 
   export type UserCreateWithoutFeedImpressionsInput = {
@@ -88015,6 +93830,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+    archivedSites?: SiteCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserUncheckedCreateWithoutFeedImpressionsInput = {
@@ -88073,6 +93889,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+    archivedSites?: SiteUncheckedCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserCreateOrConnectWithoutFeedImpressionsInput = {
@@ -88089,10 +93906,14 @@ export namespace Prisma {
     address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
+    isArchivedByAdmin?: boolean
+    archivedAt?: Date | string | null
+    archiveReason?: string | null
     upvotesCount?: number
     commentsCount?: number
     savesCount?: number
     sharesCount?: number
+    archivedBy?: UserCreateNestedOneWithoutArchivedSitesInput
     reports?: ReportCreateNestedManyWithoutSiteInput
     events?: CleanupEventCreateNestedManyWithoutSiteInput
     votes?: SiteVoteCreateNestedManyWithoutSiteInput
@@ -88101,6 +93922,7 @@ export namespace Prisma {
     shareEvents?: SiteShareEventCreateNestedManyWithoutSiteInput
     shareLinks?: SiteShareLinkCreateNestedManyWithoutSiteInput
     featureSnapshot?: SiteFeatureSnapshotCreateNestedOneWithoutSiteInput
+    mapProjection?: MapSiteProjectionCreateNestedOneWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutFeedImpressionsInput = {
@@ -88112,6 +93934,10 @@ export namespace Prisma {
     address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
+    isArchivedByAdmin?: boolean
+    archivedAt?: Date | string | null
+    archivedById?: string | null
+    archiveReason?: string | null
     upvotesCount?: number
     commentsCount?: number
     savesCount?: number
@@ -88124,6 +93950,7 @@ export namespace Prisma {
     shareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutSiteInput
     shareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSiteInput
     featureSnapshot?: SiteFeatureSnapshotUncheckedCreateNestedOneWithoutSiteInput
+    mapProjection?: MapSiteProjectionUncheckedCreateNestedOneWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutFeedImpressionsInput = {
@@ -88198,6 +94025,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutFeedImpressionsInput = {
@@ -88256,6 +94084,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUncheckedUpdateManyWithoutArchivedByNestedInput
   }
 
   export type SiteUpsertWithoutFeedImpressionsInput = {
@@ -88278,10 +94107,14 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    isArchivedByAdmin?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archiveReason?: NullableStringFieldUpdateOperationsInput | string | null
     upvotesCount?: IntFieldUpdateOperationsInput | number
     commentsCount?: IntFieldUpdateOperationsInput | number
     savesCount?: IntFieldUpdateOperationsInput | number
     sharesCount?: IntFieldUpdateOperationsInput | number
+    archivedBy?: UserUpdateOneWithoutArchivedSitesNestedInput
     reports?: ReportUpdateManyWithoutSiteNestedInput
     events?: CleanupEventUpdateManyWithoutSiteNestedInput
     votes?: SiteVoteUpdateManyWithoutSiteNestedInput
@@ -88290,6 +94123,7 @@ export namespace Prisma {
     shareEvents?: SiteShareEventUpdateManyWithoutSiteNestedInput
     shareLinks?: SiteShareLinkUpdateManyWithoutSiteNestedInput
     featureSnapshot?: SiteFeatureSnapshotUpdateOneWithoutSiteNestedInput
+    mapProjection?: MapSiteProjectionUpdateOneWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutFeedImpressionsInput = {
@@ -88301,6 +94135,10 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    isArchivedByAdmin?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archivedById?: NullableStringFieldUpdateOperationsInput | string | null
+    archiveReason?: NullableStringFieldUpdateOperationsInput | string | null
     upvotesCount?: IntFieldUpdateOperationsInput | number
     commentsCount?: IntFieldUpdateOperationsInput | number
     savesCount?: IntFieldUpdateOperationsInput | number
@@ -88313,6 +94151,7 @@ export namespace Prisma {
     shareEvents?: SiteShareEventUncheckedUpdateManyWithoutSiteNestedInput
     shareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSiteNestedInput
     featureSnapshot?: SiteFeatureSnapshotUncheckedUpdateOneWithoutSiteNestedInput
+    mapProjection?: MapSiteProjectionUncheckedUpdateOneWithoutSiteNestedInput
   }
 
   export type UserCreateWithoutFeedExperimentAssignmentsInput = {
@@ -88371,6 +94210,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+    archivedSites?: SiteCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserUncheckedCreateWithoutFeedExperimentAssignmentsInput = {
@@ -88429,6 +94269,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+    archivedSites?: SiteUncheckedCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserCreateOrConnectWithoutFeedExperimentAssignmentsInput = {
@@ -88503,6 +94344,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutFeedExperimentAssignmentsInput = {
@@ -88561,6 +94403,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUncheckedUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserCreateWithoutDeviceTokensInput = {
@@ -88619,6 +94462,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+    archivedSites?: SiteCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserUncheckedCreateWithoutDeviceTokensInput = {
@@ -88677,6 +94521,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+    archivedSites?: SiteUncheckedCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserCreateOrConnectWithoutDeviceTokensInput = {
@@ -88751,6 +94596,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutDeviceTokensInput = {
@@ -88809,6 +94655,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUncheckedUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserCreateWithoutUserNotificationsInput = {
@@ -88867,6 +94714,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+    archivedSites?: SiteCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserUncheckedCreateWithoutUserNotificationsInput = {
@@ -88925,6 +94773,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+    archivedSites?: SiteUncheckedCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserCreateOrConnectWithoutUserNotificationsInput = {
@@ -88999,6 +94848,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutUserNotificationsInput = {
@@ -89057,6 +94907,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUncheckedUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserCreateWithoutNotificationPreferencesInput = {
@@ -89115,6 +94966,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+    archivedSites?: SiteCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserUncheckedCreateWithoutNotificationPreferencesInput = {
@@ -89173,6 +95025,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+    archivedSites?: SiteUncheckedCreateNestedManyWithoutArchivedByInput
   }
 
   export type UserCreateOrConnectWithoutNotificationPreferencesInput = {
@@ -89247,6 +95100,7 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUpdateManyWithoutArchivedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutNotificationPreferencesInput = {
@@ -89305,6 +95159,135 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+    archivedSites?: SiteUncheckedUpdateManyWithoutArchivedByNestedInput
+  }
+
+  export type SiteCreateWithoutMapProjectionInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    latitude: number
+    longitude: number
+    address?: string | null
+    description?: string | null
+    status?: $Enums.SiteStatus
+    isArchivedByAdmin?: boolean
+    archivedAt?: Date | string | null
+    archiveReason?: string | null
+    upvotesCount?: number
+    commentsCount?: number
+    savesCount?: number
+    sharesCount?: number
+    archivedBy?: UserCreateNestedOneWithoutArchivedSitesInput
+    reports?: ReportCreateNestedManyWithoutSiteInput
+    events?: CleanupEventCreateNestedManyWithoutSiteInput
+    votes?: SiteVoteCreateNestedManyWithoutSiteInput
+    saves?: SiteSaveCreateNestedManyWithoutSiteInput
+    comments?: SiteCommentCreateNestedManyWithoutSiteInput
+    shareEvents?: SiteShareEventCreateNestedManyWithoutSiteInput
+    shareLinks?: SiteShareLinkCreateNestedManyWithoutSiteInput
+    featureSnapshot?: SiteFeatureSnapshotCreateNestedOneWithoutSiteInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutSiteInput
+  }
+
+  export type SiteUncheckedCreateWithoutMapProjectionInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    latitude: number
+    longitude: number
+    address?: string | null
+    description?: string | null
+    status?: $Enums.SiteStatus
+    isArchivedByAdmin?: boolean
+    archivedAt?: Date | string | null
+    archivedById?: string | null
+    archiveReason?: string | null
+    upvotesCount?: number
+    commentsCount?: number
+    savesCount?: number
+    sharesCount?: number
+    reports?: ReportUncheckedCreateNestedManyWithoutSiteInput
+    events?: CleanupEventUncheckedCreateNestedManyWithoutSiteInput
+    votes?: SiteVoteUncheckedCreateNestedManyWithoutSiteInput
+    saves?: SiteSaveUncheckedCreateNestedManyWithoutSiteInput
+    comments?: SiteCommentUncheckedCreateNestedManyWithoutSiteInput
+    shareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutSiteInput
+    shareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSiteInput
+    featureSnapshot?: SiteFeatureSnapshotUncheckedCreateNestedOneWithoutSiteInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutSiteInput
+  }
+
+  export type SiteCreateOrConnectWithoutMapProjectionInput = {
+    where: SiteWhereUniqueInput
+    create: XOR<SiteCreateWithoutMapProjectionInput, SiteUncheckedCreateWithoutMapProjectionInput>
+  }
+
+  export type SiteUpsertWithoutMapProjectionInput = {
+    update: XOR<SiteUpdateWithoutMapProjectionInput, SiteUncheckedUpdateWithoutMapProjectionInput>
+    create: XOR<SiteCreateWithoutMapProjectionInput, SiteUncheckedCreateWithoutMapProjectionInput>
+    where?: SiteWhereInput
+  }
+
+  export type SiteUpdateToOneWithWhereWithoutMapProjectionInput = {
+    where?: SiteWhereInput
+    data: XOR<SiteUpdateWithoutMapProjectionInput, SiteUncheckedUpdateWithoutMapProjectionInput>
+  }
+
+  export type SiteUpdateWithoutMapProjectionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    isArchivedByAdmin?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archiveReason?: NullableStringFieldUpdateOperationsInput | string | null
+    upvotesCount?: IntFieldUpdateOperationsInput | number
+    commentsCount?: IntFieldUpdateOperationsInput | number
+    savesCount?: IntFieldUpdateOperationsInput | number
+    sharesCount?: IntFieldUpdateOperationsInput | number
+    archivedBy?: UserUpdateOneWithoutArchivedSitesNestedInput
+    reports?: ReportUpdateManyWithoutSiteNestedInput
+    events?: CleanupEventUpdateManyWithoutSiteNestedInput
+    votes?: SiteVoteUpdateManyWithoutSiteNestedInput
+    saves?: SiteSaveUpdateManyWithoutSiteNestedInput
+    comments?: SiteCommentUpdateManyWithoutSiteNestedInput
+    shareEvents?: SiteShareEventUpdateManyWithoutSiteNestedInput
+    shareLinks?: SiteShareLinkUpdateManyWithoutSiteNestedInput
+    featureSnapshot?: SiteFeatureSnapshotUpdateOneWithoutSiteNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutSiteNestedInput
+  }
+
+  export type SiteUncheckedUpdateWithoutMapProjectionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    isArchivedByAdmin?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archivedById?: NullableStringFieldUpdateOperationsInput | string | null
+    archiveReason?: NullableStringFieldUpdateOperationsInput | string | null
+    upvotesCount?: IntFieldUpdateOperationsInput | number
+    commentsCount?: IntFieldUpdateOperationsInput | number
+    savesCount?: IntFieldUpdateOperationsInput | number
+    sharesCount?: IntFieldUpdateOperationsInput | number
+    reports?: ReportUncheckedUpdateManyWithoutSiteNestedInput
+    events?: CleanupEventUncheckedUpdateManyWithoutSiteNestedInput
+    votes?: SiteVoteUncheckedUpdateManyWithoutSiteNestedInput
+    saves?: SiteSaveUncheckedUpdateManyWithoutSiteNestedInput
+    comments?: SiteCommentUncheckedUpdateManyWithoutSiteNestedInput
+    shareEvents?: SiteShareEventUncheckedUpdateManyWithoutSiteNestedInput
+    shareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSiteNestedInput
+    featureSnapshot?: SiteFeatureSnapshotUncheckedUpdateOneWithoutSiteNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type ReportCreateManyReporterInput = {
@@ -89645,6 +95628,24 @@ export namespace Prisma {
     eventId: string
     signalType: $Enums.CheckInRiskSignalType
     metadata?: NullableJsonNullValueInput | InputJsonValue
+  }
+
+  export type SiteCreateManyArchivedByInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    latitude: number
+    longitude: number
+    address?: string | null
+    description?: string | null
+    status?: $Enums.SiteStatus
+    isArchivedByAdmin?: boolean
+    archivedAt?: Date | string | null
+    archiveReason?: string | null
+    upvotesCount?: number
+    commentsCount?: number
+    savesCount?: number
+    sharesCount?: number
   }
 
   export type ReportUpdateWithoutReporterInput = {
@@ -90717,6 +96718,80 @@ export namespace Prisma {
     eventId?: StringFieldUpdateOperationsInput | string
     signalType?: EnumCheckInRiskSignalTypeFieldUpdateOperationsInput | $Enums.CheckInRiskSignalType
     metadata?: NullableJsonNullValueInput | InputJsonValue
+  }
+
+  export type SiteUpdateWithoutArchivedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    isArchivedByAdmin?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archiveReason?: NullableStringFieldUpdateOperationsInput | string | null
+    upvotesCount?: IntFieldUpdateOperationsInput | number
+    commentsCount?: IntFieldUpdateOperationsInput | number
+    savesCount?: IntFieldUpdateOperationsInput | number
+    sharesCount?: IntFieldUpdateOperationsInput | number
+    reports?: ReportUpdateManyWithoutSiteNestedInput
+    events?: CleanupEventUpdateManyWithoutSiteNestedInput
+    votes?: SiteVoteUpdateManyWithoutSiteNestedInput
+    saves?: SiteSaveUpdateManyWithoutSiteNestedInput
+    comments?: SiteCommentUpdateManyWithoutSiteNestedInput
+    shareEvents?: SiteShareEventUpdateManyWithoutSiteNestedInput
+    shareLinks?: SiteShareLinkUpdateManyWithoutSiteNestedInput
+    featureSnapshot?: SiteFeatureSnapshotUpdateOneWithoutSiteNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutSiteNestedInput
+    mapProjection?: MapSiteProjectionUpdateOneWithoutSiteNestedInput
+  }
+
+  export type SiteUncheckedUpdateWithoutArchivedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    isArchivedByAdmin?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archiveReason?: NullableStringFieldUpdateOperationsInput | string | null
+    upvotesCount?: IntFieldUpdateOperationsInput | number
+    commentsCount?: IntFieldUpdateOperationsInput | number
+    savesCount?: IntFieldUpdateOperationsInput | number
+    sharesCount?: IntFieldUpdateOperationsInput | number
+    reports?: ReportUncheckedUpdateManyWithoutSiteNestedInput
+    events?: CleanupEventUncheckedUpdateManyWithoutSiteNestedInput
+    votes?: SiteVoteUncheckedUpdateManyWithoutSiteNestedInput
+    saves?: SiteSaveUncheckedUpdateManyWithoutSiteNestedInput
+    comments?: SiteCommentUncheckedUpdateManyWithoutSiteNestedInput
+    shareEvents?: SiteShareEventUncheckedUpdateManyWithoutSiteNestedInput
+    shareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSiteNestedInput
+    featureSnapshot?: SiteFeatureSnapshotUncheckedUpdateOneWithoutSiteNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutSiteNestedInput
+    mapProjection?: MapSiteProjectionUncheckedUpdateOneWithoutSiteNestedInput
+  }
+
+  export type SiteUncheckedUpdateManyWithoutArchivedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    isArchivedByAdmin?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archiveReason?: NullableStringFieldUpdateOperationsInput | string | null
+    upvotesCount?: IntFieldUpdateOperationsInput | number
+    commentsCount?: IntFieldUpdateOperationsInput | number
+    savesCount?: IntFieldUpdateOperationsInput | number
+    sharesCount?: IntFieldUpdateOperationsInput | number
   }
 
   export type ReportCreateManySiteInput = {

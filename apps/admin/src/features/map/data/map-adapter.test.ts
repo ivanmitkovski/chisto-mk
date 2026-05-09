@@ -11,7 +11,7 @@ vi.mock('@/lib/api', () => ({
 }));
 
 const { refreshMock } = vi.hoisted(() => ({
-  refreshMock: vi.fn(async () => null),
+  refreshMock: vi.fn(async (): Promise<string | null> => null),
 }));
 vi.mock('@/features/auth/lib/admin-auth', () => ({
   getAdminTokenFromBrowserCookie: () => 'test-token',

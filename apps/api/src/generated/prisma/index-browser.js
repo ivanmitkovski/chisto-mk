@@ -236,6 +236,10 @@ exports.Prisma.SiteScalarFieldEnum = {
   address: 'address',
   description: 'description',
   status: 'status',
+  isArchivedByAdmin: 'isArchivedByAdmin',
+  archivedAt: 'archivedAt',
+  archivedById: 'archivedById',
+  archiveReason: 'archiveReason',
   upvotesCount: 'upvotesCount',
   commentsCount: 'commentsCount',
   savesCount: 'savesCount',
@@ -638,6 +642,57 @@ exports.Prisma.NotificationOutboxScalarFieldEnum = {
   idempotencyKey: 'idempotencyKey'
 };
 
+exports.Prisma.MapSiteProjectionScalarFieldEnum = {
+  siteId: 'siteId',
+  latitude: 'latitude',
+  longitude: 'longitude',
+  status: 'status',
+  address: 'address',
+  description: 'description',
+  thumbnailUrl: 'thumbnailUrl',
+  pollutionCategory: 'pollutionCategory',
+  latestReportTitle: 'latestReportTitle',
+  latestReportDescription: 'latestReportDescription',
+  latestReportNumber: 'latestReportNumber',
+  reportCount: 'reportCount',
+  upvotesCount: 'upvotesCount',
+  commentsCount: 'commentsCount',
+  savesCount: 'savesCount',
+  sharesCount: 'sharesCount',
+  latestReportAt: 'latestReportAt',
+  siteCreatedAt: 'siteCreatedAt',
+  siteUpdatedAt: 'siteUpdatedAt',
+  projectedAt: 'projectedAt',
+  isHot: 'isHot',
+  isArchivedByAdmin: 'isArchivedByAdmin',
+  archivedAt: 'archivedAt'
+};
+
+exports.Prisma.MapEventOutboxScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  eventId: 'eventId',
+  siteId: 'siteId',
+  eventType: 'eventType',
+  payload: 'payload',
+  status: 'status',
+  attempts: 'attempts',
+  lastError: 'lastError',
+  dispatchedAt: 'dispatchedAt',
+  leaseOwner: 'leaseOwner',
+  processingAt: 'processingAt'
+};
+
+exports.Prisma.MapCdnPurgeLogScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  provider: 'provider',
+  status: 'status',
+  keys: 'keys',
+  errorMessage: 'errorMessage'
+};
+
 exports.Prisma.AdminMutationIdempotencyScalarFieldEnum = {
   id: 'id',
   createdAt: 'createdAt',
@@ -835,6 +890,12 @@ exports.NotificationType = exports.$Enums.NotificationType = {
   SYSTEM: 'SYSTEM'
 };
 
+exports.MapEventOutboxStatus = exports.$Enums.MapEventOutboxStatus = {
+  PENDING: 'PENDING',
+  DISPATCHED: 'DISPATCHED',
+  FAILED: 'FAILED'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   UserSession: 'UserSession',
@@ -880,6 +941,9 @@ exports.Prisma.ModelName = {
   UserNotification: 'UserNotification',
   UserNotificationPreference: 'UserNotificationPreference',
   NotificationOutbox: 'NotificationOutbox',
+  MapSiteProjection: 'MapSiteProjection',
+  MapEventOutbox: 'MapEventOutbox',
+  MapCdnPurgeLog: 'MapCdnPurgeLog',
   AdminMutationIdempotency: 'AdminMutationIdempotency'
 };
 

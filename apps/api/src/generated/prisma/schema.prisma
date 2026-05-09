@@ -72,6 +72,7 @@ model User {
   eventEvidencePhotosUploaded EventEvidencePhoto[]
   routeSegmentsClaimed        EventRouteSegment[]          @relation("RouteSegmentClaims")
   checkInRiskSignals          CheckInRiskSignal[]
+  archivedSites               Site[]                       @relation("SiteArchivedBy")
 
   @@index([role])
   @@index([status])
@@ -237,16 +238,21 @@ model Site {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  latitude      Float
-  longitude     Float
+  latitude          Float
+  longitude         Float
   /// Reverse-geocoded or user-confirmed place line from mobile (not the report narrative).
-  address       String?
-  description   String?
-  status        SiteStatus @default(REPORTED)
-  upvotesCount  Int        @default(0)
-  commentsCount Int        @default(0)
-  savesCount    Int        @default(0)
-  sharesCount   Int        @default(0)
+  address           String?
+  description       String?
+  status            SiteStatus @default(REPORTED)
+  isArchivedByAdmin Boolean    @default(false)
+  archivedAt        DateTime?
+  archivedById      String?
+  archivedBy        User?      @relation("SiteArchivedBy", fields: [archivedById], references: [id], onDelete: SetNull)
+  archiveReason     String?
+  upvotesCount      Int        @default(0)
+  commentsCount     Int        @default(0)
+  savesCount        Int        @default(0)
+  sharesCount       Int        @default(0)
 
   reports         Report[]
   events          CleanupEvent[]
@@ -257,8 +263,11 @@ model Site {
   shareLinks      SiteShareLink[]
   featureSnapshot SiteFeatureSnapshot?
   feedImpressions FeedImpression[]
+  mapProjection   MapSiteProjection?
 
   @@index([status])
+  @@index([isArchivedByAdmin])
+  @@index([status, isArchivedByAdmin, updatedAt])
   @@index([latitude, longitude])
   /// Map queries often filter by status plus lat/lng bounding box.
   @@index([status, latitude, longitude])
@@ -1103,6 +1112,75 @@ model NotificationOutbox {
 
   @@index([deliveredAt, failedPermanently, attempts])
   @@index([processingAt, nextRetryAt])
+  @@index([createdAt])
+}
+
+model MapSiteProjection {
+  siteId                  String     @id
+  site                    Site       @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  latitude                Float
+  longitude               Float
+  status                  SiteStatus
+  address                 String?
+  description             String?
+  thumbnailUrl            String?
+  pollutionCategory       String?
+  latestReportTitle       String?
+  latestReportDescription String?
+  latestReportNumber      String?
+  reportCount             Int        @default(0)
+  upvotesCount            Int        @default(0)
+  commentsCount           Int        @default(0)
+  savesCount              Int        @default(0)
+  sharesCount             Int        @default(0)
+  latestReportAt          DateTime?
+  siteCreatedAt           DateTime
+  siteUpdatedAt           DateTime
+  projectedAt             DateTime   @default(now())
+  isHot                   Boolean    @default(true)
+  isArchivedByAdmin       Boolean    @default(false)
+  archivedAt              DateTime?
+
+  @@index([isHot, status, latitude, longitude])
+  @@index([isArchivedByAdmin, status, latitude, longitude])
+  @@index([isHot, siteUpdatedAt])
+  @@index([status, siteCreatedAt])
+}
+
+enum MapEventOutboxStatus {
+  PENDING
+  DISPATCHED
+  FAILED
+}
+
+model MapEventOutbox {
+  id           String               @id @default(cuid())
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  eventId      String               @unique
+  siteId       String
+  eventType    String
+  payload      Json
+  status       MapEventOutboxStatus @default(PENDING)
+  attempts     Int                  @default(0)
+  lastError    String?
+  dispatchedAt DateTime?
+  leaseOwner   String?
+  processingAt DateTime?
+
+  @@index([status, createdAt])
+  @@index([siteId, createdAt])
+  @@index([processingAt])
+}
+
+model MapCdnPurgeLog {
+  id           String   @id
+  createdAt    DateTime @default(now())
+  provider     String
+  status       String
+  keys         Json
+  errorMessage String?
+
   @@index([createdAt])
 }
 

@@ -110,7 +110,6 @@ export function useSitesMap() {
             commentsCount: 0,
             savesCount: 0,
             sharesCount: 0,
-            distanceKm: undefined,
             isCluster: true,
             clusterSiteIds: bucket.siteIds,
           })),
