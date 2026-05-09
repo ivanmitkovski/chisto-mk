@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Prisma, SiteStatus } from '../prisma-client';
 import { PrismaService } from '../prisma/prisma.service';
+import { ReportsUploadService } from '../reports/reports-upload.service';
 import { SiteMapSearchDto } from './dto/site-map-search.dto';
 
 export type SiteMapSearchItem = {
@@ -10,6 +11,8 @@ export type SiteMapSearchItem = {
   description: string | null;
   address: string | null;
   status: SiteStatus;
+  /** Signed URLs from the site's latest report (same contract as feed `latestReportMediaUrls`). */
+  latestReportMediaUrls?: string[];
 };
 
 export type GeoIntentBounds = {
@@ -34,6 +37,7 @@ type RawSearchRow = {
   address: string | null;
   status: SiteStatus;
   score: number;
+  latestReportMediaUrls: string[] | null;
 };
 
 type GeoIntentEntry = {
@@ -172,7 +176,10 @@ const KM_PER_DEGREE = 111.0;
 export class SitesSearchService {
   private readonly logger = new Logger(SitesSearchService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly reportsUpload: ReportsUploadService,
+  ) {}
 
   async searchMapSites(dto: SiteMapSearchDto): Promise<SiteMapSearchResponse> {
     const q = dto.query.trim();
@@ -194,19 +201,19 @@ export class SitesSearchService {
     const safeLng = lng ?? 0;
 
     const archiveClause =
-      dto.includeArchived === true ? Prisma.empty : Prisma.sql`AND "isArchivedByAdmin" = false`;
+      dto.includeArchived === true ? Prisma.empty : Prisma.sql`AND s."isArchivedByAdmin" = false`;
 
     const statusClause =
       dto.statuses?.length && dto.statuses.length > 0
-        ? Prisma.sql`AND "status" IN (${Prisma.join(dto.statuses)})`
+        ? Prisma.sql`AND s."status" IN (${Prisma.join(dto.statuses)})`
         : Prisma.empty;
 
     const pollutionClause =
       dto.pollutionTypes?.length && dto.pollutionTypes.length > 0
         ? Prisma.sql`AND EXISTS (
-            SELECT 1 FROM "Report" r
-            WHERE r."siteId" = "Site"."id"
-            AND r."category" IN (${Prisma.join(dto.pollutionTypes)})
+            SELECT 1 FROM "Report" r_filter
+            WHERE r_filter."siteId" = s."id"
+            AND r_filter."category" IN (${Prisma.join(dto.pollutionTypes)})
           )`
         : Prisma.empty;
 
@@ -214,29 +221,37 @@ export class SitesSearchService {
     try {
       rows = await this.prisma.$queryRaw<RawSearchRow[]>(Prisma.sql`
         SELECT
-          "id",
-          "latitude",
-          "longitude",
-          "description",
-          "address",
-          "status",
+          s."id",
+          s."latitude",
+          s."longitude",
+          s."description",
+          s."address",
+          s."status",
           (
-            ts_rank("searchVector", plainto_tsquery('simple', ${q})) * ${tsW}
+            ts_rank(s."searchVector", plainto_tsquery('simple', ${q})) * ${tsW}
             + similarity(
-                coalesce("description", '') || ' ' || coalesce("address", ''),
+                coalesce(s."description", '') || ' ' || coalesce(s."address", ''),
                 ${q}
               ) * ${simW}
-            + (1.0 / (1.0 + extract(epoch FROM now() - "updatedAt") / 86400.0)) * ${recW}
+            + (1.0 / (1.0 + extract(epoch FROM now() - s."updatedAt") / 86400.0)) * ${recW}
             + (1.0 / (1.0 + sqrt(
-                power("latitude" - ${safeLat}, 2) + power("longitude" - ${safeLng}, 2)
+                power(s."latitude" - ${safeLat}, 2) + power(s."longitude" - ${safeLng}, 2)
               ) * ${KM_PER_DEGREE})) * ${proxW}
-          ) AS "score"
-        FROM "Site"
+          ) AS "score",
+          lr."mediaUrls" AS "latestReportMediaUrls"
+        FROM "Site" AS s
+        LEFT JOIN LATERAL (
+          SELECT r."mediaUrls"
+          FROM "Report" r
+          WHERE r."siteId" = s."id"
+          ORDER BY r."createdAt" DESC
+          LIMIT 1
+        ) AS lr ON true
         WHERE
           (
-            "searchVector" @@ plainto_tsquery('simple', ${q})
+            s."searchVector" @@ plainto_tsquery('simple', ${q})
             OR similarity(
-                 coalesce("description", '') || ' ' || coalesce("address", ''),
+                 coalesce(s."description", '') || ' ' || coalesce(s."address", ''),
                  ${q}
                ) > 0.15
           )
@@ -251,10 +266,25 @@ export class SitesSearchService {
       rows = await this.ilikeFallback(q, limit, dto);
     }
 
-    const items: SiteMapSearchItem[] = rows.map(({ score: _, ...rest }) => rest);
+    const items: SiteMapSearchItem[] = await this.mapRowsToSearchItems(rows);
     const suggestions = this.extractSuggestions(rows);
 
     return { items, suggestions, geoIntent };
+  }
+
+  private async mapRowsToSearchItems(rows: RawSearchRow[]): Promise<SiteMapSearchItem[]> {
+    return Promise.all(
+      rows.map(async (row) => {
+        const { score: _score, latestReportMediaUrls, ...rest } = row;
+        const raw = latestReportMediaUrls ?? [];
+        const signed =
+          raw.length > 0 ? await this.reportsUpload.signUrls(raw) : [];
+        return {
+          ...rest,
+          ...(signed.length > 0 ? { latestReportMediaUrls: signed } : {}),
+        };
+      }),
+    );
   }
 
   private extractSuggestions(rows: RawSearchRow[]): string[] {
@@ -307,9 +337,22 @@ export class SitesSearchService {
         description: true,
         address: true,
         status: true,
+        reports: {
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+          select: { mediaUrls: true },
+        },
       },
     });
-    return rows.map((r) => ({ ...r, score: 0 }));
+    return rows.map((r) => {
+      const { reports, ...site } = r;
+      const latest = reports[0]?.mediaUrls ?? [];
+      return {
+        ...site,
+        latestReportMediaUrls: latest.length > 0 ? latest : null,
+        score: 0,
+      };
+    });
   }
 
   private resolveGeoIntent(q: string): GeoIntentBounds | null {

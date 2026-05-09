@@ -9,8 +9,11 @@ describe('SitesSearchService', () => {
         findMany: jest.fn(),
       },
     } as unknown as ConstructorParameters<typeof SitesSearchService>[0];
-    const service = new SitesSearchService(prisma);
-    return { service, prisma };
+    const reportsUpload = {
+      signUrls: jest.fn(async (urls: string[]) => urls),
+    } as unknown as ConstructorParameters<typeof SitesSearchService>[1];
+    const service = new SitesSearchService(prisma, reportsUpload);
+    return { service, prisma, reportsUpload };
   }
 
   it('returns ranked query results with suggestions and geoIntent', async () => {
@@ -24,6 +27,7 @@ describe('SitesSearchService', () => {
         address: 'Skopje Center',
         status: 'REPORTED',
         score: 0.88,
+        latestReportMediaUrls: ['https://bucket.example/a.jpg'],
       },
     ]);
 
@@ -33,6 +37,7 @@ describe('SitesSearchService', () => {
 
     expect(prisma.$queryRaw).toHaveBeenCalled();
     expect(out.items).toHaveLength(1);
+    expect(out.items[0].latestReportMediaUrls).toEqual(['https://bucket.example/a.jpg']);
     expect(out.suggestions).toEqual(['Skopje Center']);
     expect(out.geoIntent?.label).toBe('Skopje');
   });
@@ -48,6 +53,7 @@ describe('SitesSearchService', () => {
         description: 'desc',
         address: 'Ohrid',
         status: 'VERIFIED',
+        reports: [],
       },
     ]);
 

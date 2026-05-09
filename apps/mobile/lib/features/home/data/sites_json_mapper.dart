@@ -593,6 +593,15 @@ class SitesJsonMapper {
     );
     final double? lat = (json['latitude'] as num?)?.toDouble();
     final double? lng = (json['longitude'] as num?)?.toDouble();
+    final List<dynamic>? mediaRaw =
+        json['latestReportMediaUrls'] as List<dynamic>?;
+    final List<String> mediaUrls = mediaRaw == null
+        ? const <String>[]
+        : mediaRaw
+            .whereType<String>()
+            .map((String s) => s.trim())
+            .where((String s) => s.isNotEmpty)
+            .toList();
     return PollutionSite(
       id: json['id'] as String? ?? '',
       title: title,
@@ -606,7 +615,7 @@ class SitesJsonMapper {
       isUpvotedByMe: false,
       isSavedByMe: false,
       participantCount: 0,
-      mediaUrls: const <String>[],
+      mediaUrls: mediaUrls,
       commentsCount: 0,
       pollutionType: null,
       latitude: lat,
