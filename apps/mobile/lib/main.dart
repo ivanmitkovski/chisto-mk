@@ -6,15 +6,20 @@ import 'package:flutter/foundation.dart'
     show TargetPlatform, defaultTargetPlatform, kDebugMode, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:workmanager/workmanager.dart';
+
 import 'package:chisto_mobile/core/app_theme.dart';
 import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/image/image_cache_governor.dart';
+import 'package:chisto_mobile/core/lifecycle/map_realtime_lifecycle.dart';
 import 'package:chisto_mobile/core/lifecycle/reports_realtime_lifecycle.dart';
 import 'package:chisto_mobile/core/l10n/app_locale_resolution.dart';
 import 'package:chisto_mobile/core/deep_links/deep_link_router.dart';
 import 'package:chisto_mobile/core/deep_links/share_token_from_route.dart';
 import 'package:chisto_mobile/core/navigation/app_navigator_key.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
+import 'package:chisto_mobile/features/home/data/offline_regions/offline_refresh_dispatcher.dart';
 import 'package:chisto_mobile/features/notifications/data/notification_open_router.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -55,12 +60,45 @@ Future<void> _runChistoMobile() async {
         break;
     }
   }
+  await Hive.initFlutter();
   try {
     await Firebase.initializeApp();
   } catch (e) {
     debugPrint('[Firebase] Init error (expected in dev/simulator): $e');
   }
   await ServiceLocator.instance.initialize();
+
+  final bool mobileForWorkmanager =
+      !kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.android ||
+          defaultTargetPlatform == TargetPlatform.iOS);
+  if (mobileForWorkmanager) {
+    try {
+      await Workmanager().initialize(
+        offlineRegionsCallbackDispatcher,
+        isInDebugMode: kDebugMode,
+      );
+      await Workmanager().registerPeriodicTask(
+        'offline-regions-refresh',
+        OfflineRefreshDispatcher.taskName,
+        frequency: const Duration(hours: 24),
+        constraints: Constraints(
+          networkType: NetworkType.unmetered,
+        ),
+      );
+    } on MissingPluginException catch (e) {
+      // Common on iOS Simulator or before native Gradle/Info.plist BG setup linked.
+      if (kDebugMode) {
+        debugPrint(
+          '[Workmanager] Skipped (${defaultTargetPlatform.name}): '
+          'no native implementation ($e). Periodic offline refresh unavailable; '
+          'in-app download still works.',
+        );
+      }
+    } catch (e, st) {
+      debugPrint('[Workmanager] offline regions refresh init failed: $e\n$st');
+    }
+  }
   await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
     DeviceOrientation.portraitUp,
   ]);
@@ -84,6 +122,7 @@ class _ChistoAppState extends State<ChistoApp> {
   final AppLinks _appLinks = AppLinks();
   final ReportsRealtimeLifecycle _reportsRealtimeLifecycle =
       ReportsRealtimeLifecycle();
+  final MapRealtimeLifecycle _mapRealtimeLifecycle = MapRealtimeLifecycle();
   StreamSubscription<RemoteMessage>? _tapSubscription;
   StreamSubscription<Uri>? _deepLinkSubscription;
   RemoteMessage? _pendingPushOpen;
@@ -97,6 +136,7 @@ class _ChistoAppState extends State<ChistoApp> {
     super.initState();
     ImageCacheGovernor.instance.install();
     _reportsRealtimeLifecycle.register();
+    _mapRealtimeLifecycle.register();
     final push = ServiceLocator.instance.pushNotificationService;
     unawaited(push.initialize());
     push.foregroundMessages.listen((RemoteMessage message) {
@@ -175,6 +215,7 @@ class _ChistoAppState extends State<ChistoApp> {
   @override
   void dispose() {
     _reportsRealtimeLifecycle.unregister();
+    _mapRealtimeLifecycle.unregister();
     ImageCacheGovernor.instance.uninstall();
     _deepLinkSubscription?.cancel();
     _tapSubscription?.cancel();

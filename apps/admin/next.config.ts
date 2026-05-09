@@ -21,6 +21,9 @@ const S3_MEDIA_HOSTS = Array.from(
   ]),
 );
 const isProduction = process.env.NODE_ENV === 'production';
+const scriptSrc = isProduction
+  ? "script-src 'self'"
+  : "script-src 'self' 'unsafe-inline' 'unsafe-eval'";
 
 /** Carto basemap tiles (Leaflet); explicit hosts avoid widening connect-src to untrusted origins. */
 const CARTO_TILE_HOSTS = [
@@ -41,7 +44,7 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+      scriptSrc,
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: https: blob:",
       `connect-src 'self' ${API_BASE_URL.replace(/\/$/, '')} ${CARTO_TILE_HOSTS.join(' ')}`,

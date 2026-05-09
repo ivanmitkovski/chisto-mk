@@ -24,7 +24,7 @@ class LocationPickerMapStack extends StatelessWidget {
   final LatLng center;
   final double zoom;
   final LatLngBounds macedoniaBounds;
-  final void Function(MapPosition position, bool hasGesture) onPositionChanged;
+  final PositionCallback onPositionChanged;
   final bool hasConfirmedLocation;
   final bool showGpsResolvingOverlay;
   final Widget useCurrentLocationButton;

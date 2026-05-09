@@ -29,7 +29,13 @@ abstract class FeedSitesRepository {
     double? minLongitude,
     double? maxLongitude,
     String mapDetail = FeedSitesRepository.mapDetailLite,
+    double? zoom,
+    String? status,
+    bool includeArchived = false,
+    bool prefetch = false,
   });
 
   Future<PollutionSite?> getSiteById(String id);
+
+  Future<SiteMapSearchResponse> searchSitesForMap(SiteMapSearchRequest request);
 }

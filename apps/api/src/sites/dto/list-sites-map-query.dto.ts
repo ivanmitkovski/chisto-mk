@@ -1,14 +1,14 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { SiteStatus } from '../../prisma-client';
 import { Type } from 'class-transformer';
-import { IsEnum, IsIn, IsInt, IsNumber, IsOptional, Max, Min } from 'class-validator';
+import { IsBoolean, IsEnum, IsIn, IsInt, IsLatitude, IsLongitude, IsNumber, IsOptional, Max, Min } from 'class-validator';
 
 export class ListSitesMapQueryDto {
   @ApiProperty({
     description: 'Center latitude for map view',
     example: 41.6086,
   })
-  @IsNumber()
+  @IsLatitude()
   @Type(() => Number)
   lat!: number;
 
@@ -16,9 +16,22 @@ export class ListSitesMapQueryDto {
     description: 'Center longitude for map view',
     example: 21.7453,
   })
-  @IsNumber()
+  @IsLongitude()
   @Type(() => Number)
   lng!: number;
+
+  @ApiPropertyOptional({
+    description: 'Map zoom level (used for server-side query safety limits and future clustering)',
+    minimum: 1,
+    maximum: 22,
+    example: 13,
+  })
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  @Min(1)
+  @Max(22)
+  zoom?: number;
 
   @ApiPropertyOptional({
     description: 'Search radius in km',
@@ -97,4 +110,24 @@ export class ListSitesMapQueryDto {
   @Min(-180)
   @Max(180)
   maxLng?: number;
+
+  @ApiPropertyOptional({
+    description: 'Include archived/cold cleaned sites in map results',
+    default: false,
+  })
+  @IsOptional()
+  @IsBoolean()
+  @Type(() => Boolean)
+  includeArchived = false;
+
+  @ApiPropertyOptional({
+    description:
+      'Low-priority speculative fetch (e.g. pan extrapolation). Same response shape; included in cache keys.',
+    default: false,
+  })
+  @IsOptional()
+  @IsBoolean()
+  @Type(() => Boolean)
+  prefetch = false;
 }
+

@@ -31,6 +31,7 @@ export class ObservabilityStore {
   private static pushDeadLetterCount = 0;
   private static mapRequestsTotal = 0;
   private static mapCacheHits = 0;
+  private static mapCacheInvalidationCounts: Record<string, number> = {};
   private static mapFallbackResponses = 0;
   private static mapDurationsMs: number[] = [];
   private static mapCandidatePoolSizes: number[] = [];
@@ -40,6 +41,20 @@ export class ObservabilityStore {
   private static mapSseEventsEmitted = 0;
   private static mapSseReplayEvents = 0;
   private static mapCacheEntries = 0;
+  private static mapOutboxDispatched = 0;
+  private static mapOutboxFailed = 0;
+  private static mapOutboxLagMs = 0;
+  private static mapProjectionRowsTotal = 0;
+  private static mapProjectionHotRows = 0;
+  private static mapProjectionStalenessSeconds = 0;
+  private static mapColdSitesArchivedTotal = 0;
+  private static mapOutboxRowsPurgedTotal = 0;
+  private static mapZoomTierRequests: Record<string, number> = {};
+  /** `${mode}:${zoomBucket}` -> recent durations for p95 slicing */
+  private static mapDurationByModeZoom: Record<string, number[]> = {};
+  private static mapRequestsByMode: Record<string, number> = {};
+  private static mapCacheHitsByMode: Record<string, number> = {};
+  private static mapQueryRowCounts: number[] = [];
   private static cleanupEventStaffPendingSignals = 0;
   private static cleanupEventPublishedAudienceNotified = 0;
   private static cleanupEventModerationApproved = 0;
@@ -274,6 +289,8 @@ export class ObservabilityStore {
     candidatePoolSize: number;
     cacheHit: boolean;
     servedFromFallback?: boolean;
+    mode?: 'sites' | 'clusters' | 'heatmap';
+    zoomBucket?: 'z_le_8' | 'z_9_12' | 'z_ge_13';
   }): void {
     this.mapRequestsTotal += 1;
     if (input.cacheHit) this.mapCacheHits += 1;
@@ -286,6 +303,17 @@ export class ObservabilityStore {
     if (this.mapCandidatePoolSizes.length > 2000) {
       this.mapCandidatePoolSizes = this.mapCandidatePoolSizes.slice(-1200);
     }
+    const mode = input.mode ?? 'sites';
+    const bucket = input.zoomBucket ?? 'z_9_12';
+    const sliceKey = `${mode}:${bucket}`;
+    this.mapRequestsByMode[sliceKey] = (this.mapRequestsByMode[sliceKey] ?? 0) + 1;
+    if (input.cacheHit) {
+      this.mapCacheHitsByMode[sliceKey] = (this.mapCacheHitsByMode[sliceKey] ?? 0) + 1;
+    }
+    const slice = this.mapDurationByModeZoom[sliceKey] ?? [];
+    slice.push(input.durationMs);
+    this.mapDurationByModeZoom[sliceKey] =
+      slice.length > 800 ? slice.slice(-500) : slice;
   }
 
   static recordMapSseConnected(): void {
@@ -311,6 +339,50 @@ export class ObservabilityStore {
 
   static setMapCacheEntries(size: number): void {
     this.mapCacheEntries = Math.max(0, size);
+  }
+
+  static recordMapCacheInvalidation(reason: string): void {
+    const key = reason || 'unknown';
+    this.mapCacheInvalidationCounts[key] =
+      (this.mapCacheInvalidationCounts[key] ?? 0) + 1;
+  }
+
+  static recordMapOutboxDispatch(input: { failed: boolean; lagMs: number }): void {
+    if (input.failed) {
+      this.mapOutboxFailed += 1;
+    } else {
+      this.mapOutboxDispatched += 1;
+    }
+    this.mapOutboxLagMs = Math.max(0, input.lagMs);
+  }
+
+  static recordMapProjectionSnapshot(input: {
+    rowsTotal: number;
+    hotRows: number;
+    stalenessSeconds: number;
+  }): void {
+    this.mapProjectionRowsTotal = Math.max(0, input.rowsTotal);
+    this.mapProjectionHotRows = Math.max(0, input.hotRows);
+    this.mapProjectionStalenessSeconds = Math.max(0, input.stalenessSeconds);
+  }
+
+  static recordMapProjectionHotRefresh(changedRows: number): void {
+    this.mapColdSitesArchivedTotal += Math.max(0, changedRows);
+  }
+
+  static recordMapOutboxRowsPurged(count: number): void {
+    this.mapOutboxRowsPurgedTotal += Math.max(0, count);
+  }
+
+  static recordMapZoomTierRequest(tier: 'low' | 'mid' | 'high'): void {
+    this.mapZoomTierRequests[tier] = (this.mapZoomTierRequests[tier] ?? 0) + 1;
+  }
+
+  static recordMapQueryRowCount(count: number): void {
+    this.mapQueryRowCounts.push(Math.max(0, count));
+    if (this.mapQueryRowCounts.length > 2000) {
+      this.mapQueryRowCounts = this.mapQueryRowCounts.slice(-1200);
+    }
   }
 
   static setPushQueueStats(input: {
@@ -440,6 +512,30 @@ export class ObservabilityStore {
       mapSseEventsEmitted: this.mapSseEventsEmitted,
       mapSseReplayEvents: this.mapSseReplayEvents,
       mapCacheEntries: this.mapCacheEntries,
+      mapCacheInvalidationCounts: this.mapCacheInvalidationCounts,
+      mapOutboxDispatched: this.mapOutboxDispatched,
+      mapOutboxFailed: this.mapOutboxFailed,
+      mapOutboxLagMs: this.mapOutboxLagMs,
+      mapProjectionRowsTotal: this.mapProjectionRowsTotal,
+      mapProjectionHotRows: this.mapProjectionHotRows,
+      mapProjectionStalenessSeconds: this.mapProjectionStalenessSeconds,
+      mapColdSitesArchivedTotal: this.mapColdSitesArchivedTotal,
+      mapOutboxRowsPurgedTotal: this.mapOutboxRowsPurgedTotal,
+      mapZoomTierRequests: this.mapZoomTierRequests,
+      mapAvgQueryRowCount:
+        this.mapQueryRowCounts.length > 0
+          ? Number((this.mapQueryRowCounts.reduce((acc, v) => acc + v, 0) / this.mapQueryRowCounts.length).toFixed(2))
+          : 0,
+      mapRequestsByModeZoom: { ...this.mapRequestsByMode },
+      mapCacheHitsByModeZoom: { ...this.mapCacheHitsByMode },
+      mapModeZoomLatencyP95Ms: Object.fromEntries(
+        Object.entries(this.mapDurationByModeZoom).map(([k, values]) => {
+          const sorted = [...values].sort((a, b) => a - b);
+          if (sorted.length === 0) return [k, 0];
+          const idx = Math.min(sorted.length - 1, Math.floor(0.95 * sorted.length));
+          return [k, Number(sorted[idx].toFixed(2))];
+        }),
+      ),
       cleanupEventStaffPendingSignals: this.cleanupEventStaffPendingSignals,
       cleanupEventPublishedAudienceNotified: this.cleanupEventPublishedAudienceNotified,
       cleanupEventModerationApproved: this.cleanupEventModerationApproved,

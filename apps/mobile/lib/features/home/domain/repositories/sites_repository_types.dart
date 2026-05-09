@@ -194,3 +194,93 @@ class SiteUpvoterItem {
   final String? avatarUrl;
   final DateTime upvotedAt;
 }
+
+/// Filter dimensions sent with `POST /sites/search` (map chip parity).
+class SiteMapSearchFilterContext {
+  const SiteMapSearchFilterContext({
+    required this.statuses,
+    required this.pollutionTypes,
+    required this.includeArchived,
+  });
+
+  final List<String> statuses;
+  final List<String> pollutionTypes;
+  final bool includeArchived;
+}
+
+class SiteMapSearchGeoIntent {
+  const SiteMapSearchGeoIntent({
+    required this.label,
+    required this.minLat,
+    required this.maxLat,
+    required this.minLng,
+    required this.maxLng,
+  });
+
+  final String label;
+  final double minLat;
+  final double maxLat;
+  final double minLng;
+  final double maxLng;
+}
+
+class SiteMapSearchRequest {
+  const SiteMapSearchRequest({
+    required this.query,
+    this.limit = 24,
+    this.lat,
+    this.lng,
+    this.statuses,
+    this.pollutionTypes,
+    this.includeArchived,
+  });
+
+  /// Prisma [SiteStatus] values only. Map UI adds `ARCHIVED` / `UNKNOWN` chips
+  /// which are not enum members — they must not be sent on `POST /sites/search`
+  /// or Nest validation rejects the whole body (`@IsEnum(SiteStatus, { each: true })`).
+  static const Set<String> _apiWorkflowStatuses = <String>{
+    'REPORTED',
+    'VERIFIED',
+    'CLEANUP_SCHEDULED',
+    'IN_PROGRESS',
+    'CLEANED',
+    'DISPUTED',
+  };
+
+  final String query;
+  final int limit;
+  final double? lat;
+  final double? lng;
+  final List<String>? statuses;
+  final List<String>? pollutionTypes;
+  final bool? includeArchived;
+
+  Map<String, dynamic> toBodyJson() {
+    final List<String>? st = statuses;
+    final List<String>? apiStatuses = st == null
+        ? null
+        : st.where(_apiWorkflowStatuses.contains).toList();
+    final List<String>? pt = pollutionTypes;
+    return <String, dynamic>{
+      'query': query,
+      'limit': limit,
+      if (lat != null) 'lat': lat,
+      if (lng != null) 'lng': lng,
+      if (apiStatuses != null && apiStatuses.isNotEmpty) 'statuses': apiStatuses,
+      if (pt != null && pt.isNotEmpty) 'pollutionTypes': pt,
+      if (includeArchived != null) 'includeArchived': includeArchived,
+    };
+  }
+}
+
+class SiteMapSearchResponse {
+  const SiteMapSearchResponse({
+    required this.items,
+    this.suggestions = const <String>[],
+    this.geoIntent,
+  });
+
+  final List<PollutionSite> items;
+  final List<String> suggestions;
+  final SiteMapSearchGeoIntent? geoIntent;
+}

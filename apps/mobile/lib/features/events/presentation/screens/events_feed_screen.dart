@@ -8,12 +8,14 @@ import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/l10n/app_error_localizations.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
+import 'package:chisto_mobile/core/location/location_service.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/shared/widgets/animated_phase_switcher.dart';
 import 'package:chisto_mobile/shared/widgets/app_error_view.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/features/events/data/api_events_repository.dart';
 import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/controllers/events_feed_controller.dart';
@@ -68,6 +70,7 @@ class EventsFeedScreenState extends State<EventsFeedScreen> {
       if (!mounted) {
         return;
       }
+      unawaited(_refreshUserLocationHints());
       unawaited(_feed.loadCalendarViewPreference());
       unawaited(
         _feed.loadInitial(
@@ -103,6 +106,40 @@ class EventsFeedScreenState extends State<EventsFeedScreen> {
       }
       _precacheEventCoverThumbnails(context, events);
     });
+  }
+
+  Future<void> _refreshUserLocationHints() async {
+    final LocationService geo = ServiceLocator.instance.locationService;
+    try {
+      if (!await geo.isLocationServiceEnabled()) {
+        return;
+      }
+      AppLocationPermission permission = await geo.checkPermission();
+      if (permission == AppLocationPermission.denied) {
+        permission = await geo.requestPermission();
+      }
+      if (permission != AppLocationPermission.whileInUse &&
+          permission != AppLocationPermission.always) {
+        return;
+      }
+      final GeoPosition pos = await geo.getCurrentPosition(
+        accuracy: AppGeoAccuracy.medium,
+        timeLimit: const Duration(seconds: 6),
+      );
+      _feed.setUserLocationHint(
+        latitude: pos.latitude,
+        longitude: pos.longitude,
+      );
+      final Object repository = EventsRepositoryRegistry.instance;
+      if (repository is ApiEventsRepository) {
+        repository.setUserLocationHint(
+          latitude: pos.latitude,
+          longitude: pos.longitude,
+        );
+      }
+    } on Exception catch (_) {
+      // Keep existing recommendation state when location hint cannot be refreshed.
+    }
   }
 
   /// Warms the image cache for the first visible-ish HTTPS thumbnails (decode budget).
@@ -209,6 +246,7 @@ class EventsFeedScreenState extends State<EventsFeedScreen> {
 
   Future<void> _onRefresh() async {
     eventsPullRefreshHaptic(context);
+    await _refreshUserLocationHints();
     final bool ok = await _feed.userPullRefresh();
     if (!ok && mounted) {
       logEventsDiagnostic('events_feed_refresh_failed');
@@ -299,6 +337,7 @@ class EventsFeedScreenState extends State<EventsFeedScreen> {
     if (DateTime.now().difference(last) < _silentRefreshMinInterval) {
       return;
     }
+    await _refreshUserLocationHints();
     final bool ok = await _feed.userPullRefresh();
     if (!ok && mounted) {
       logEventsDiagnostic('events_feed_silent_refresh_failed');

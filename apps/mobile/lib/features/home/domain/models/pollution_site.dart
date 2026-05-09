@@ -13,6 +13,7 @@ class PollutionSite {
     required this.title,
     required this.description,
     required this.statusLabel,
+    this.statusCode,
     required this.statusColor,
     required this.distanceKm,
     required this.score,
@@ -46,6 +47,7 @@ class PollutionSite {
   final String title;
   final String description;
   final String statusLabel;
+  final String? statusCode;
   final Color statusColor;
   final double distanceKm;
   final int score;
@@ -117,6 +119,7 @@ class PollutionSite {
     String? title,
     String? description,
     String? statusLabel,
+    String? statusCode,
     Color? statusColor,
     double? distanceKm,
     int? score,
@@ -149,6 +152,7 @@ class PollutionSite {
       title: title ?? this.title,
       description: description ?? this.description,
       statusLabel: statusLabel ?? this.statusLabel,
+      statusCode: statusCode ?? this.statusCode,
       statusColor: statusColor ?? this.statusColor,
       distanceKm: distanceKm ?? this.distanceKm,
       score: score ?? this.score,

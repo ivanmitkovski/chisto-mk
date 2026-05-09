@@ -4,7 +4,7 @@ import { NotificationType } from '../../src/prisma-client';
 import { CleanupEventNotificationsService } from '../../src/notifications/cleanup-event-notifications.service';
 
 describe('CleanupEventNotificationsService', () => {
-  let prisma: { user: { findMany: jest.Mock } };
+  let prisma: { user: { findMany: jest.Mock }; userDeviceToken: { findMany: jest.Mock } };
   let dispatcher: { dispatchToUser: jest.Mock };
   let service: CleanupEventNotificationsService;
 
@@ -13,6 +13,7 @@ describe('CleanupEventNotificationsService', () => {
       user: {
         findMany: jest.fn().mockResolvedValue([{ id: 's1' }, { id: 's2' }]),
       },
+      userDeviceToken: { findMany: jest.fn().mockResolvedValue([]) },
     };
     dispatcher = {
       dispatchToUser: jest.fn().mockResolvedValue(undefined),

@@ -47,7 +47,7 @@ class ReportEntryFlow {
       if (e.code == 'UNAUTHORIZED' ||
           e.code == 'INVALID_TOKEN_USER' ||
           e.code == 'ACCOUNT_NOT_ACTIVE') {
-        Navigator.of(context).pushNamedAndRemoveUntil(
+        Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
           AppRoutes.signIn,
           (Route<dynamic> route) => false,
         );

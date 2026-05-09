@@ -12,6 +12,19 @@ class ClusterBucket {
 
   LatLng get center => _center;
 
+  /// Stable across zoom/pan recomputations for the same member sites (sorted ids).
+  String get stableClusterId {
+    if (sites.isEmpty) {
+      return 'empty';
+    }
+    if (sites.length == 1) {
+      return sites.single.id;
+    }
+    final List<String> ids = sites.map((PollutionSite s) => s.id).toList()
+      ..sort();
+    return ids.join('|');
+  }
+
   void addSite(PollutionSite site, LatLng point) {
     final int n = sites.length;
     _center = LatLng(

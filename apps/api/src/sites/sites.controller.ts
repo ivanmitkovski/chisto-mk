@@ -6,6 +6,7 @@ import {
   Headers,
   MessageEvent as NestMessageEvent,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -13,6 +14,7 @@ import {
   Res,
   Sse,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import {
@@ -34,6 +36,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
 import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
+import { BulkSitesDto } from './dto/bulk-sites.dto';
 import { CreateSiteDto } from './dto/create-site.dto';
 import { ListSitesMapQueryDto } from './dto/list-sites-map-query.dto';
 import { ListSiteCommentsQueryDto } from './dto/list-site-comments-query.dto';
@@ -41,6 +44,7 @@ import { ListSiteMediaQueryDto } from './dto/list-site-media-query.dto';
 import { ListSiteUpvotesQueryDto } from './dto/list-site-upvotes-query.dto';
 import { ListSitesQueryDto } from './dto/list-sites-query.dto';
 import { CreateSiteCommentDto } from './dto/create-site-comment.dto';
+import { SiteMapSearchDto } from './dto/site-map-search.dto';
 import { ShareSiteDto } from './dto/share-site.dto';
 import { SiteShareAttributionEventDto } from './dto/site-share-attribution-event.dto';
 import { SiteShareLinkRequestDto } from './dto/site-share-link-request.dto';
@@ -48,6 +52,7 @@ import { SiteShareLinkResponseDto } from './dto/site-share-link-response.dto';
 import { SubmitFeedFeedbackDto } from './dto/submit-feed-feedback.dto';
 import { TrackFeedEventDto } from './dto/track-feed-event.dto';
 import { UpdateSiteCommentDto } from './dto/update-site-comment.dto';
+import { UpdateSiteArchiveDto } from './dto/update-site-archive.dto';
 import { UpdateSiteStatusDto } from './dto/update-site-status.dto';
 import { SiteCommentLikeResponseDto } from './dto/site-comment-like-response.dto';
 import {
@@ -64,13 +69,18 @@ import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { Observable } from 'rxjs';
 import { SiteEventsService } from '../admin-events/site-events.service';
 import { ParseCuidPipe } from '../common/pipes/parse-cuid.pipe';
-import { weakEtagForMapBody } from './http/map-etag';
+import { loadFeatureFlags } from '../config/feature-flags';
+import { weakEtagForJson } from './http/map-etag';
 import { clientIp } from './http/client-ip';
+
+const featureFlags = loadFeatureFlags();
 import {
   normalizeShareClickEvent,
   normalizeShareOpenEvent,
 } from './http/share-attribution-normalizer';
 import { buildSiteEventsStream } from './http/site-events-stream';
+import { MapRateLimitGuard } from './http/map-rate-limit.guard';
+import { MapHttpTracingInterceptor } from '../observability/map-http-tracing.interceptor';
 
 @ApiTags('sites')
 @Controller('sites')
@@ -125,27 +135,156 @@ export class SitesController {
   }
 
   @Get('map')
-  @UseGuards(ThrottlerGuard)
-  @Throttle({ default: { limit: 120, ttl: 60_000 } })
+  @UseInterceptors(new MapHttpTracingInterceptor())
+  @UseGuards(MapRateLimitGuard)
   @ApiOperation({ summary: 'List sites for map view with geo bounds and high limit' })
   @ApiOkResponse({ description: 'Sites for map fetched successfully' })
   @ApiBadRequestResponse({ description: 'Invalid map viewport or geo params' })
   @ApiTooManyRequestsResponse({ description: 'Too many requests' })
   async findAllForMap(
     @Query() query: ListSitesMapQueryDto,
+    @Headers('if-none-match') ifNoneMatch: string | undefined,
     @Res({ passthrough: true }) res: Response,
   ) {
+    if (featureFlags.mapEtagEnabled) {
+      const mapDataVersion = await this.sitesService.resolveMapDataVersion(query);
+      const etag = weakEtagForJson({
+        kind: 'map',
+        version: mapDataVersion,
+        query: {
+          detail: query.detail,
+          status: query.status ?? null,
+          includeArchived: query.includeArchived ?? false,
+          lat: query.lat,
+          lng: query.lng,
+          radiusKm: query.radiusKm,
+          minLat: query.minLat ?? null,
+          maxLat: query.maxLat ?? null,
+          minLng: query.minLng ?? null,
+          maxLng: query.maxLng ?? null,
+          zoom: query.zoom ?? null,
+          limit: query.limit,
+        },
+      });
+      if (ifNoneMatch?.trim() === etag) {
+        res.setHeader('ETag', etag);
+        res.setHeader('Cache-Control', 'private, max-age=4, stale-while-revalidate=20');
+        res.status(304);
+        return undefined;
+      }
+      res.setHeader('ETag', etag);
+      res.setHeader('Cache-Control', 'private, max-age=4, stale-while-revalidate=20');
+    }
     const body = await this.sitesService.findAllForMap(query);
-    const etag = weakEtagForMapBody(body);
-    res.setHeader('ETag', etag);
-    res.setHeader('Cache-Control', 'private, max-age=4, stale-while-revalidate=20');
     return body;
+  }
+
+  @Get('map/clusters')
+  @UseInterceptors(new MapHttpTracingInterceptor())
+  @UseGuards(MapRateLimitGuard)
+  @ApiOperation({ summary: 'Get aggregated map clusters for dense marker view' })
+  @ApiOkResponse({ description: 'Map clusters fetched successfully' })
+  @ApiBadRequestResponse({ description: 'Invalid map viewport or geo params' })
+  async findClustersForMap(
+    @Query() query: ListSitesMapQueryDto,
+    @Headers('if-none-match') ifNoneMatch: string | undefined,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const body = await this.sitesService.findClustersForMap(query);
+    if (featureFlags.mapEtagEnabled) {
+      const etag = weakEtagForJson(body);
+      if (ifNoneMatch?.trim() === etag) {
+        res.status(304);
+        return undefined;
+      }
+      res.setHeader('ETag', etag);
+      res.setHeader('Cache-Control', 'private, max-age=4, stale-while-revalidate=20');
+    }
+    return body;
+  }
+
+  @Get('map/heatmap')
+  @UseInterceptors(new MapHttpTracingInterceptor())
+  @UseGuards(MapRateLimitGuard)
+  @ApiOperation({ summary: 'Get map heatmap density cells by viewport/zoom' })
+  @ApiOkResponse({ description: 'Map heatmap fetched successfully' })
+  @ApiBadRequestResponse({ description: 'Invalid map viewport or geo params' })
+  async findHeatmapForMap(
+    @Query() query: ListSitesMapQueryDto,
+    @Headers('if-none-match') ifNoneMatch: string | undefined,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const body = await this.sitesService.findHeatmapForMap(query);
+    if (featureFlags.mapEtagEnabled) {
+      const etag = weakEtagForJson(body);
+      if (ifNoneMatch?.trim() === etag) {
+        res.status(304);
+        return undefined;
+      }
+      res.setHeader('ETag', etag);
+      res.setHeader('Cache-Control', 'private, max-age=4, stale-while-revalidate=20');
+    }
+    return body;
+  }
+
+  @Get('map/tiles/:z/:x/:y.mvt')
+  @UseGuards(MapRateLimitGuard)
+  @ApiOperation({ summary: 'Mapbox vector tile (MVT) for sites/clusters overlay' })
+  async getMapMvtTile(
+    @Param('z', ParseIntPipe) z: number,
+    @Param('x', ParseIntPipe) x: number,
+    @Param('y', ParseIntPipe) y: number,
+    @Headers('if-none-match') ifNoneMatch: string | undefined,
+    @Res() res: Response,
+  ): Promise<void> {
+    const { buffer, etag } = await this.sitesService.getMapMvtTile(z, x, y);
+
+    if (ifNoneMatch && ifNoneMatch === etag) {
+      res.status(304).end();
+      return;
+    }
+
+    res.setHeader('Content-Type', 'application/vnd.mapbox-vector-tile');
+    res.setHeader('ETag', etag);
+    res.setHeader(
+      'Cache-Control',
+      'public, max-age=60, s-maxage=600, stale-while-revalidate=86400',
+    );
+    res.setHeader('Surrogate-Key', `map-tile z=${z}`);
+    res.send(buffer);
+  }
+
+  @Post('search')
+  @UseGuards(MapRateLimitGuard)
+  @ApiOperation({ summary: 'Search sites for map (text + optional geo intent)' })
+  @ApiOkResponse({ description: 'Search results' })
+  async searchSitesForMap(@Body() dto: SiteMapSearchDto) {
+    return this.sitesService.searchMapSites(dto);
+  }
+
+  @Post('admin/bulk')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(...ADMIN_WRITE_ROLES)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Bulk site moderation actions' })
+  @ApiOkResponse({ description: 'Bulk update applied' })
+  async bulkSites(@Body() dto: BulkSitesDto, @CurrentUser() admin: AuthenticatedUser) {
+    return this.sitesService.bulkSites(dto, admin);
+  }
+
+  @Get('admin/map/timeline')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(...ADMIN_PANEL_ROLES)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Operator map timeline probe (24h replay stub)' })
+  async adminMapTimeline(@Query('at') at?: string) {
+    return this.sitesService.getAdminMapTimeline(at);
   }
 
   @Get('events')
   @Sse()
-  @UseGuards(JwtAuthGuard, ThrottlerGuard)
-  @Throttle({ default: { limit: 30, ttl: 60_000 } })
+  @UseInterceptors(new MapHttpTracingInterceptor())
+  @UseGuards(MapRateLimitGuard, JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Server-Sent Events stream for site updates (mobile map)' })
   streamSiteEvents(
@@ -455,5 +594,25 @@ export class SitesController {
     @CurrentUser() admin: AuthenticatedUser,
   ) {
     return this.sitesService.updateStatus(id, dto, admin);
+  }
+
+  @Patch(':id/archive')
+  @UseGuards(JwtAuthGuard, RolesGuard, ThrottlerGuard)
+  @Throttle({ default: { limit: 60, ttl: 60_000 } })
+  @Roles(...ADMIN_PANEL_ROLES)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Archive or unarchive site from default map visibility' })
+  @ApiOkResponse({ description: 'Site archive moderation updated successfully' })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
+  @ApiForbiddenResponse({ description: 'Caller is not an admin' })
+  @ApiNotFoundResponse({ description: 'Site not found' })
+  @ApiBadRequestResponse({ description: 'Invalid archive moderation payload' })
+  @ApiTooManyRequestsResponse({ description: 'Too many requests' })
+  updateArchiveStatus(
+    @Param('id', ParseCuidPipe) id: string,
+    @Body() dto: UpdateSiteArchiveDto,
+    @CurrentUser() admin: AuthenticatedUser,
+  ) {
+    return this.sitesService.updateArchiveStatus(id, dto, admin);
   }
 }

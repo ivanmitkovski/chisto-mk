@@ -2,12 +2,14 @@ import 'dart:async';
 
 import 'package:chisto_mobile/core/auth/auth_state.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/core/location/location_service.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
+import 'package:chisto_mobile/features/home/presentation/providers/map_location_notifier.dart';
 import 'package:chisto_mobile/features/home/presentation/providers/repository_providers.dart';
 import 'package:chisto_mobile/features/home/presentation/utils/feed_visible_sites.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/feed_filter_sheet.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String _feedFilterPrefsKey = 'feed_active_filter_v1';
@@ -397,39 +399,40 @@ class FeedSitesNotifier extends StateNotifier<FeedSitesState> {
     double? lat;
     double? lng;
     try {
-      final bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      final LatLng? tracked = _ref.read(
+        mapLocationNotifierProvider.select((MapLocationState s) => s.userLocation),
+      );
+      if (tracked != null) {
+        lat = tracked.latitude;
+        lng = tracked.longitude;
+      }
+      final LocationService geo = _ref.read(locationServiceProvider);
+      final bool serviceEnabled = await geo.isLocationServiceEnabled();
       if (!serviceEnabled) {
         locationAvailable = false;
         lat = null;
         lng = null;
       } else {
-        LocationPermission permission = await Geolocator.checkPermission();
-        if (permission == LocationPermission.denied) {
-          permission = await Geolocator.requestPermission();
+        AppLocationPermission permission = await geo.checkPermission();
+        if (permission == AppLocationPermission.denied) {
+          permission = await geo.requestPermission();
         }
-        if (permission == LocationPermission.denied ||
-            permission == LocationPermission.deniedForever) {
+        if (permission == AppLocationPermission.denied ||
+            permission == AppLocationPermission.deniedForever) {
           locationAvailable = false;
           lat = null;
           lng = null;
         } else {
-          try {
-            final Position position = await Geolocator.getCurrentPosition(
-              desiredAccuracy: LocationAccuracy.medium,
-              timeLimit: const Duration(seconds: 12),
+          if (lat != null && lng != null) {
+            locationAvailable = true;
+          } else {
+            final GeoPosition position = await geo.getCurrentPosition(
+              accuracy: AppGeoAccuracy.medium,
+              timeLimit: const Duration(seconds: 8),
             );
             lat = position.latitude;
             lng = position.longitude;
             locationAvailable = true;
-          } on Object catch (_) {
-            final Position? last = await Geolocator.getLastKnownPosition();
-            if (last != null) {
-              lat = last.latitude;
-              lng = last.longitude;
-              locationAvailable = true;
-            } else {
-              locationAvailable = false;
-            }
           }
         }
       }
@@ -466,5 +469,7 @@ final feedVisibleSitesProvider = Provider<List<PollutionSite>>((Ref ref) {
     source: sites.allSites,
     filter: filter,
     feedVariant: sites.feedVariant,
+    userLatitude: sites.userLatitude,
+    userLongitude: sites.userLongitude,
   );
 });

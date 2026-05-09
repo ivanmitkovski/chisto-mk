@@ -5,6 +5,7 @@ module.exports = {
   rootDir: '.',
   testMatch: ['<rootDir>/test/**/*.spec.ts', '<rootDir>/test/**/*.test.ts'],
   moduleFileExtensions: ['js', 'json', 'ts'],
+  modulePathIgnorePatterns: ['<rootDir>/dist/'],
   collectCoverageFrom: ['src/**/*.ts'],
   coverageDirectory: './coverage',
   verbose: true,

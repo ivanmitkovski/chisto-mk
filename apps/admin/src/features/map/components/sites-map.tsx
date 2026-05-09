@@ -16,14 +16,53 @@ import { MapToolbar } from './map-toolbar';
 import { MapZoomControls } from './map-zoom-controls';
 import { SitePreviewPanel } from './site-preview-panel';
 import type { SiteMapRow } from '../data/map-adapter';
+import { registerMapAdapterBroadcastSync } from '../data/map-adapter';
 import { useSitesMap } from '../hooks/use-sites-map';
-import { MACEDONIA_BOUNDS, MACEDONIA_CENTER, INITIAL_ZOOM } from '../map-constants';
+import { MACEDONIA_BOUNDS, SERVER_CLUSTER_MAX_ZOOM } from '../map-constants';
 import { CLUSTER_EXPAND_MIN_ZOOM, flyToClusterContents } from '../utils/map-cluster-navigation';
 import styles from './sites-map.module.css';
 
 const CARTODB_POSITRON =
   'https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}{r}.png';
+const CARTODB_DARK =
+  'https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}{r}.png';
 const DEBOUNCE_MS = 400;
+
+function readCssTileTemplate(varName: '--map-tile-template-light' | '--map-tile-template-dark'): string | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+  const raw = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+  if (!raw) {
+    return null;
+  }
+  return raw.replace(/^['"]|['"]$/g, '');
+}
+
+function useTileUrl(): string {
+  const [isDark, setIsDark] = useState(false);
+  const [fromCss, setFromCss] = useState<string | null>(null);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    setIsDark(mq.matches);
+
+    const handler = (e: MediaQueryListEvent) => setIsDark(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
+  useEffect(() => {
+    const light = readCssTileTemplate('--map-tile-template-light');
+    const dark = readCssTileTemplate('--map-tile-template-dark');
+    setFromCss(isDark ? dark ?? light : light ?? dark);
+  }, [isDark]);
+
+  if (fromCss) {
+    return fromCss;
+  }
+  return isDark ? CARTODB_DARK : CARTODB_POSITRON;
+}
 
 function MapEventHandler({
   onMoveEnd,
@@ -78,8 +117,9 @@ function createClusterCustomIcon(cluster: { getChildCount: () => number }) {
   const size = count >= 100 ? 52 : count >= 25 ? 46 : 40;
   const tierClass =
     count >= 100 ? styles.clusterIconLarge : count >= 25 ? styles.clusterIconMedium : styles.clusterIconSmall;
+  const safeCount = String(count).replaceAll('<', '&lt;').replaceAll('>', '&gt;');
   return L.divIcon({
-    html: `<span class="${styles.clusterIcon} ${tierClass}" style="width:${size}px;height:${size}px;">${count}</span>`,
+    html: `<span class="${styles.clusterIcon} ${tierClass}" style="width:${size}px;height:${size}px;">${safeCount}</span>`,
     className: styles.clusterIconWrap,
     iconSize: [size, size],
   });
@@ -89,10 +129,13 @@ type SitesClusterLayerProps = {
   sites: SiteMapRow[];
   selectedSiteId: string | null;
   setSelectedSiteId: (id: string | null) => void;
+  zoom: number;
 };
 
-function SitesClusterLayer({ sites, selectedSiteId, setSelectedSiteId }: SitesClusterLayerProps) {
+function SitesClusterLayer({ sites, selectedSiteId, setSelectedSiteId, zoom }: SitesClusterLayerProps) {
   const map = useMap();
+  const serverClusterMode =
+    zoom <= SERVER_CLUSTER_MAX_ZOOM && sites.length > 0 && sites.every((s) => s.isCluster === true);
 
   const onClusterClick = useCallback(
     (e: L.LeafletMouseEvent) => {
@@ -100,6 +143,19 @@ function SitesClusterLayer({ sites, selectedSiteId, setSelectedSiteId }: SitesCl
     },
     [map],
   );
+
+  const markers = sites.map((site) => (
+    <MapMarker
+      key={site.id}
+      site={site}
+      selected={selectedSiteId === site.id}
+      onClick={() => setSelectedSiteId(site.id === selectedSiteId ? null : site.id)}
+    />
+  ));
+
+  if (serverClusterMode) {
+    return <>{markers}</>;
+  }
 
   return (
     <MarkerClusterGroup
@@ -114,25 +170,20 @@ function SitesClusterLayer({ sites, selectedSiteId, setSelectedSiteId }: SitesCl
       iconCreateFunction={createClusterCustomIcon}
       onClick={onClusterClick}
     >
-      {sites.map((site) => (
-        <MapMarker
-          key={site.id}
-          site={site}
-          selected={selectedSiteId === site.id}
-          onClick={() => setSelectedSiteId(site.id === selectedSiteId ? null : site.id)}
-        />
-      ))}
+      {markers}
     </MarkerClusterGroup>
   );
 }
 
 export function SitesMap() {
   const router = useRouter();
+  const tileUrl = useTileUrl();
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [fitBoundsTrigger, setFitBoundsTrigger] = useState(0);
 
   const {
     statusFilter,
+    includeArchived,
     selectedSiteId,
     selectedSite,
     sites,
@@ -140,12 +191,19 @@ export function SitesMap() {
     isFetching,
     isError,
     refetch,
+    center,
     setCenter,
     setZoom,
     updateView,
     setStatusFilter,
     setSelectedSiteId,
+    zoom,
   } = useSitesMap();
+
+  useEffect(() => {
+    const dispose = registerMapAdapterBroadcastSync();
+    return dispose;
+  }, []);
 
   const handleMoveEnd = useCallback(
     (newCenter: [number, number], newZoom: number) => {
@@ -186,11 +244,20 @@ export function SitesMap() {
         onStatusChange={setStatusFilter}
         onFitBounds={handleFitBounds}
         onRefresh={() => refetch()}
+        includeArchived={includeArchived}
+        onIncludeArchivedChange={(value) => {
+          const next = new URLSearchParams(window.location.search);
+          if (value) next.set('includeArchived', 'true');
+          else next.delete('includeArchived');
+          router.replace(next.toString() ? `/dashboard/map?${next.toString()}` : '/dashboard/map', {
+            scroll: false,
+          });
+        }}
       />
 
       <MapContainer
-        center={[...MACEDONIA_CENTER]}
-        zoom={INITIAL_ZOOM}
+        center={[...center]}
+        zoom={zoom}
         className={styles.map}
         zoomControl={false}
         scrollWheelZoom={true}
@@ -203,7 +270,7 @@ export function SitesMap() {
         maxBoundsViscosity={0.85}
         attributionControl={false}
       >
-        <TileLayer url={CARTODB_POSITRON} attribution="" />
+        <TileLayer url={tileUrl} attribution="" />
         <MapZoomControls />
         <MapEventHandler onMoveEnd={handleMoveEnd} />
         <FitBoundsEffect trigger={fitBoundsTrigger} />
@@ -213,6 +280,7 @@ export function SitesMap() {
           sites={sites}
           selectedSiteId={selectedSiteId}
           setSelectedSiteId={setSelectedSiteId}
+          zoom={zoom}
         />
       </MapContainer>
 

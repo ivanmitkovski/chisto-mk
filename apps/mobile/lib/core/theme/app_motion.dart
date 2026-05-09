@@ -10,6 +10,29 @@ class AppMotion {
   static const Duration emphasizedDuration = Duration(milliseconds: 420);
   static const Duration slow = Duration(milliseconds: 700);
 
+  // --- Map (cluster expansion, camera) — keep durations aligned across map UI.
+
+  /// Ghost cluster fade-out after a cluster expands ([ClusterGhostMarker]).
+  static const Duration mapClusterGhostClear = Duration(milliseconds: 280);
+
+  /// How long pins keep “burst from cluster” entrance choreography.
+  static const Duration mapClusterExpansionHold = Duration(milliseconds: 1800);
+
+  /// Default camera fly when fitting bounds or moving to a pin/cluster.
+  static const Duration mapCameraFly = Duration(milliseconds: 520);
+
+  /// Camera easing for programmatic map moves (cluster expand, pin select).
+  static const Curve mapCameraFlyCurve = Curves.easeOutCubic;
+
+  /// Cluster chip cross-fade when count/membership reflows after zoom/pan.
+  static const Duration mapClusterReclusterSwitcher = Duration(milliseconds: 380);
+
+  /// Marker [LatLng] eases toward new cluster geometry (split / merge / pan).
+  static const Duration mapMarkerGeographicLerp = Duration(milliseconds: 340);
+
+  /// Easing for geographic marker lerp (map space).
+  static const Curve mapMarkerGeographicLerpCurve = Curves.easeOutCubic;
+
   /// Minimum time to show the reports list skeleton to avoid flash on fast API.
   static const Duration reportsListSkeletonMinHold = Duration(
     milliseconds: 400,

@@ -1,11 +1,16 @@
-import 'dart:math' as math;
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
+
+const double _mapControlTapTargetSize = 48;
 
 class MapActionsMenu extends StatefulWidget {
   const MapActionsMenu({
@@ -43,6 +48,9 @@ class _MapActionsMenuState extends State<MapActionsMenu>
   static const int _actionCount = 5;
   static const List<int> _actionOrder = <int>[4, 2, 3, 1, 0];
 
+  Timer? _heatmapRingTimer;
+  bool _heatmapRingActive = false;
+
   late final AnimationController _controller = AnimationController(
     vsync: this,
     duration: _duration,
@@ -53,13 +61,14 @@ class _MapActionsMenuState extends State<MapActionsMenu>
   );
 
   List<Animation<double>> _buildItemAnimations(AnimationController controller) {
+    const double stagger = 0.11;
     return List<Animation<double>>.generate(
       _maxActions,
       (int i) => CurvedAnimation(
         parent: controller,
         curve: Interval(
-          i * 0.08,
-          (i * 0.08) + 0.45,
+          i * stagger,
+          (i * stagger) + 0.45,
           curve: Curves.easeOutCubic,
         ),
       ),
@@ -73,8 +82,19 @@ class _MapActionsMenuState extends State<MapActionsMenu>
     return _itemAnimations[index];
   }
 
+  void _pulseHeatmapConfirmationRing() {
+    _heatmapRingTimer?.cancel();
+    setState(() => _heatmapRingActive = true);
+    _heatmapRingTimer = Timer(const Duration(seconds: 1), () {
+      if (mounted) {
+        setState(() => _heatmapRingActive = false);
+      }
+    });
+  }
+
   @override
   void dispose() {
+    _heatmapRingTimer?.cancel();
     _controller.dispose();
     super.dispose();
   }
@@ -105,18 +125,22 @@ class _MapActionsMenuState extends State<MapActionsMenu>
           customBorder: const CircleBorder(),
           onTap: onTap,
           child: SizedBox(
-            width: 44,
-            height: 44,
+            width: _mapControlTapTargetSize,
+            height: _mapControlTapTargetSize,
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(22),
+              borderRadius: BorderRadius.circular(_mapControlTapTargetSize / 2),
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: AppColors.white.withValues(alpha: 0.9),
+                    color: widget.useDarkTiles
+                        ? AppColors.glassDark.withValues(alpha: 0.45)
+                        : AppColors.white.withValues(alpha: 0.9),
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: AppColors.white.withValues(alpha: 0.6),
+                      color: widget.useDarkTiles
+                          ? AppColors.white.withValues(alpha: 0.18)
+                          : AppColors.white.withValues(alpha: 0.6),
                       width: 1,
                     ),
                   ),
@@ -125,7 +149,10 @@ class _MapActionsMenuState extends State<MapActionsMenu>
                       Icon(
                         icon,
                         size: 20,
-                        color: iconColor ?? AppColors.primaryDark,
+                        color: iconColor ??
+                            (widget.useDarkTiles
+                                ? AppColors.textOnDark
+                                : AppColors.primaryDark),
                       ),
                 ),
               ),
@@ -138,11 +165,14 @@ class _MapActionsMenuState extends State<MapActionsMenu>
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (BuildContext context, _) {
-        final bool menuOpen = _controller.value > 0.5;
-        return Column(
+    return MediaQuery.withClampedTextScaling(
+      maxScaleFactor: 1.35,
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (BuildContext context, _) {
+          final bool menuOpen = _controller.value > 0.5;
+          final AppLocalizations l10n = context.l10n;
+          return Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: <Widget>[
@@ -165,8 +195,8 @@ class _MapActionsMenuState extends State<MapActionsMenu>
                             CurvedAnimation(
                               parent: _controller,
                               curve: Interval(
-                                idx * 0.08,
-                                (idx * 0.08) + 0.5,
+                                idx * 0.11,
+                                (idx * 0.11) + 0.5,
                                 curve: Curves.easeOutCubic,
                               ),
                             ),
@@ -175,7 +205,7 @@ class _MapActionsMenuState extends State<MapActionsMenu>
                         opacity: _animationAt(idx),
                         child: Padding(
                           padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                          child: _buildAction(idx),
+                          child: _buildAction(context, l10n, idx),
                         ),
                       ),
                     ),
@@ -194,27 +224,66 @@ class _MapActionsMenuState extends State<MapActionsMenu>
                 },
                 icon: Icons.apps_rounded,
                 semanticLabel: menuOpen
-                    ? 'Close actions menu'
-                    : 'Open actions menu',
-                iconColor: AppColors.primaryDark,
+                    ? l10n.mapSemanticCloseActionsMenu
+                    : l10n.mapSemanticOpenActionsMenu,
+                iconColor: widget.useDarkTiles
+                    ? AppColors.textOnDark
+                    : AppColors.primaryDark,
               ),
             ),
           ],
         );
-      },
+        },
+      ),
     );
   }
 
-  Widget _buildAction(int index) {
+  Widget _buildAction(
+    BuildContext context,
+    AppLocalizations l10n,
+    int index,
+  ) {
     switch (index) {
       case 0:
-        return _frostedButton(
-          onTap: widget.onToggleHeatmap,
-          icon: Icons.whatshot_rounded,
-          semanticLabel: widget.showHeatmap ? 'Hide heatmap' : 'Show heatmap',
-          iconColor: widget.showHeatmap
-              ? AppColors.primary
-              : AppColors.primaryDark,
+        return AnimatedContainer(
+          duration: AppMotion.medium,
+          curve: AppMotion.smooth,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: _heatmapRingActive
+                  ? AppColors.primary.withValues(alpha: 0.65)
+                  : AppColors.transparent,
+              width: 2,
+            ),
+            boxShadow: _heatmapRingActive
+                ? <BoxShadow>[
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.35),
+                      blurRadius: 14,
+                      spreadRadius: 1,
+                    ),
+                  ]
+                : null,
+          ),
+          child: _frostedButton(
+            onTap: () {
+              AppHaptics.softTransition(context);
+              final bool enabling = !widget.showHeatmap;
+              widget.onToggleHeatmap();
+              if (enabling) {
+                _pulseHeatmapConfirmationRing();
+              }
+            },
+            icon: Icons.whatshot_rounded,
+            semanticLabel: widget.showHeatmap
+                ? l10n.mapSemanticHideHeatmap
+                : l10n.mapSemanticShowHeatmap,
+            iconColor: widget.showHeatmap
+                ? AppColors.primary
+                : AppColors.primaryDark,
+          ),
         );
       case 1:
         return _frostedButton(
@@ -223,14 +292,14 @@ class _MapActionsMenuState extends State<MapActionsMenu>
               ? Icons.light_mode_rounded
               : Icons.dark_mode_rounded,
           semanticLabel: widget.useDarkTiles
-              ? 'Switch to light map'
-              : 'Switch to dark map',
+              ? l10n.mapSemanticSwitchToLightMap
+              : l10n.mapSemanticSwitchToDarkMap,
         );
       case 2:
         return _frostedButton(
           onTap: widget.onZoomToFit,
           icon: Icons.fit_screen_rounded,
-          semanticLabel: 'Zoom out to show whole country',
+          semanticLabel: l10n.mapSemanticZoomWholeCountry,
         );
       case 3:
         return _frostedButton(
@@ -239,14 +308,26 @@ class _MapActionsMenuState extends State<MapActionsMenu>
               ? Icons.lock_rounded
               : Icons.lock_open_rounded,
           semanticLabel: widget.rotationLocked
-              ? 'Unlock map rotation'
-              : 'Lock map rotation',
+              ? l10n.mapSemanticUnlockRotation
+              : l10n.mapSemanticLockRotation,
         );
       case 4:
-        return _frostedButton(
+        return AnimatedContainer(
+          duration: AppMotion.medium,
+          curve: AppMotion.smooth,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: widget.locationJustFound
+                ? Border.all(
+                    color: AppColors.primary.withValues(alpha: 0.45),
+                    width: 3,
+                  )
+                : null,
+          ),
+          child: _frostedButton(
           onTap: widget.onLocateMe,
           icon: Icons.my_location_rounded,
-          semanticLabel: 'Center map on my location',
+          semanticLabel: l10n.mapSemanticCenterOnMyLocation,
           iconChild: widget.isLocating
               ? Padding(
                   padding: const EdgeInsets.all(10),
@@ -266,6 +347,7 @@ class _MapActionsMenuState extends State<MapActionsMenu>
                       ? AppColors.primary
                       : AppColors.primaryDark,
                 ),
+          ),
         );
       default:
         return const SizedBox.shrink();
@@ -279,30 +361,62 @@ class MapFilterButton extends StatelessWidget {
     required this.visibleCount,
     required this.hasFilterActive,
     required this.onTap,
+    this.useDarkTiles = false,
+    this.showStaleCacheBadge = false,
   });
 
   final int visibleCount;
   final bool hasFilterActive;
   final VoidCallback onTap;
+  final bool useDarkTiles;
+  final bool showStaleCacheBadge;
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
+    final bool isEmpty = visibleCount == 0;
+    final String counterText = isEmpty
+        ? (hasFilterActive ? l10n.mapFilterCountNoMatch : l10n.mapFilterCountNoSites)
+        : '$visibleCount';
+    final String semanticStatus = isEmpty
+        ? (hasFilterActive
+              ? l10n.mapFilterButtonSemanticNoMatch
+              : l10n.mapFilterButtonSemanticNoSites)
+        : l10n.mapFilterButtonSemanticSitesCount(visibleCount);
+
+    final Color fg =
+        useDarkTiles ? AppColors.textOnDark : AppColors.textPrimary;
+    final Color iconFg =
+        useDarkTiles ? AppColors.textOnDarkMuted : AppColors.textSecondary;
+
     return Semantics(
       button: true,
-      label: 'Filter sites. $visibleCount visible. Tap to open filters.',
+      label:
+          '${l10n.mapFilterButtonSemanticPrefix} $semanticStatus ${l10n.mapFilterButtonSemanticSuffix}',
       child: GestureDetector(
         onTap: onTap,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(14),
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-            child: Container(
+            child: AnimatedContainer(
+              duration: AppMotion.medium,
+              curve: AppMotion.smooth,
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              constraints: const BoxConstraints(minHeight: _mapControlTapTargetSize),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.65),
+                color: hasFilterActive
+                    ? AppColors.primary.withValues(alpha: useDarkTiles ? 0.2 : 0.12)
+                    : useDarkTiles
+                        ? AppColors.glassDark.withValues(alpha: 0.52)
+                        : AppColors.white.withValues(alpha: 0.65),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.5),
+                  color: hasFilterActive
+                      ? AppColors.primary.withValues(alpha: 0.45)
+                      : useDarkTiles
+                          ? AppColors.white.withValues(alpha: 0.14)
+                          : AppColors.white.withValues(alpha: 0.5),
                   width: 1,
                 ),
               ),
@@ -312,18 +426,29 @@ class MapFilterButton extends StatelessWidget {
                   Icon(
                     Icons.tune_rounded,
                     size: 18,
-                    color: AppColors.textSecondary,
+                    color: iconFg,
                   ),
                   const SizedBox(width: 6),
-                  Text(
-                    '$visibleCount',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 13,
+                  AnimatedSwitcher(
+                    duration: AppMotion.fast,
+                    switchInCurve: AppMotion.smooth,
+                    switchOutCurve: Curves.easeInCubic,
+                    transitionBuilder:
+                        (Widget child, Animation<double> a) => FadeTransition(
+                              opacity: a,
+                              child: ScaleTransition(scale: a, child: child),
+                            ),
+                    child: Text(
+                      counterText,
+                      key: ValueKey<String>(counterText),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: fg,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                          ),
                     ),
                   ),
-                  if (hasFilterActive) ...[
+                  if (hasFilterActive) ...<Widget>[
                     const SizedBox(width: 6),
                     Container(
                       width: 6,
@@ -332,6 +457,14 @@ class MapFilterButton extends StatelessWidget {
                         color: AppColors.primary,
                         shape: BoxShape.circle,
                       ),
+                    ),
+                  ],
+                  if (showStaleCacheBadge) ...<Widget>[
+                    const SizedBox(width: 6),
+                    Icon(
+                      Icons.schedule_rounded,
+                      size: 16,
+                      color: useDarkTiles ? AppColors.textOnDarkMuted : AppColors.textMuted,
                     ),
                   ],
                 ],
@@ -345,15 +478,29 @@ class MapFilterButton extends StatelessWidget {
 }
 
 class MapSearchIconButton extends StatelessWidget {
-  const MapSearchIconButton({super.key, required this.onTap});
+  const MapSearchIconButton({
+    super.key,
+    required this.onTap,
+    this.useDarkTiles = false,
+  });
 
   final VoidCallback onTap;
+  final bool useDarkTiles;
 
   @override
   Widget build(BuildContext context) {
+    final Color bg = useDarkTiles
+        ? AppColors.glassDark.withValues(alpha: 0.5)
+        : AppColors.white;
+    final Color border = useDarkTiles
+        ? AppColors.white.withValues(alpha: 0.14)
+        : AppColors.white.withValues(alpha: 0.62);
+    final Color fg =
+        useDarkTiles ? AppColors.textOnDark : AppColors.primaryDark;
+
     return Semantics(
       button: true,
-      label: 'Search sites',
+      label: context.l10n.mapSemanticSearchSites,
       child: Material(
         color: AppColors.transparent,
         shape: const CircleBorder(),
@@ -361,11 +508,12 @@ class MapSearchIconButton extends StatelessWidget {
           customBorder: const CircleBorder(),
           onTap: onTap,
           child: Container(
-            width: 42,
-            height: 42,
+            width: _mapControlTapTargetSize,
+            height: _mapControlTapTargetSize,
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: bg,
               shape: BoxShape.circle,
+              border: Border.all(color: border),
               boxShadow: <BoxShadow>[
                 BoxShadow(
                   color: AppColors.shadowLight,
@@ -374,11 +522,7 @@ class MapSearchIconButton extends StatelessWidget {
                 ),
               ],
             ),
-            child: const Icon(
-              Icons.search_rounded,
-              size: 20,
-              color: AppColors.primaryDark,
-            ),
+            child: Icon(Icons.search_rounded, size: 20, color: fg),
           ),
         ),
       ),
@@ -391,16 +535,27 @@ class MapCompassButton extends StatelessWidget {
     super.key,
     required this.rotationDegrees,
     required this.onReset,
+    this.useDarkTiles = false,
   });
 
   final double rotationDegrees;
   final VoidCallback onReset;
+  final bool useDarkTiles;
 
   @override
   Widget build(BuildContext context) {
+    final Color bg = useDarkTiles
+        ? AppColors.glassDark.withValues(alpha: 0.5)
+        : AppColors.white;
+    final Color border = useDarkTiles
+        ? AppColors.white.withValues(alpha: 0.14)
+        : AppColors.white.withValues(alpha: 0.62);
+    final Color fg =
+        useDarkTiles ? AppColors.textOnDark : AppColors.primaryDark;
+
     return Semantics(
       button: true,
-      label: 'Reset map rotation to north',
+      label: context.l10n.mapSemanticResetRotationNorth,
       child: Material(
         color: AppColors.transparent,
         shape: const CircleBorder(),
@@ -408,11 +563,12 @@ class MapCompassButton extends StatelessWidget {
           customBorder: const CircleBorder(),
           onTap: onReset,
           child: Container(
-            width: 42,
-            height: 42,
+            width: _mapControlTapTargetSize,
+            height: _mapControlTapTargetSize,
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: bg,
               shape: BoxShape.circle,
+              border: Border.all(color: border),
               boxShadow: <BoxShadow>[
                 BoxShadow(
                   color: AppColors.shadowLight,
@@ -421,21 +577,11 @@ class MapCompassButton extends StatelessWidget {
                 ),
               ],
             ),
-            child: TweenAnimationBuilder<double>(
-              duration: AppMotion.standard,
+            child: AnimatedRotation(
+              turns: -rotationDegrees / 360,
+              duration: AppMotion.fast,
               curve: Curves.easeOutCubic,
-              tween: Tween<double>(
-                begin: -rotationDegrees * (math.pi / 180),
-                end: -rotationDegrees * (math.pi / 180),
-              ),
-              builder: (BuildContext context, double angle, Widget? child) {
-                return Transform.rotate(angle: angle, child: child);
-              },
-              child: const Icon(
-                Icons.navigation_rounded,
-                size: 20,
-                color: AppColors.primaryDark,
-              ),
+              child: Icon(Icons.navigation_rounded, size: 20, color: fg),
             ),
           ),
         ),

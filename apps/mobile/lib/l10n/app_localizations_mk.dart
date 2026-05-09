@@ -1741,6 +1741,480 @@ class AppLocalizationsMk extends AppLocalizations {
   String get mapOpenMapsFailed => 'Не можеше да се отвори Maps';
 
   @override
+  String get mapSearchRecentsLabel => 'Неодамна';
+
+  @override
+  String get mapSearchClearRecentsButton => 'Исчисти';
+
+  @override
+  String get mapSearchEmptyTitle => 'Пребарај загадени места';
+
+  @override
+  String get mapSearchEmptySubtitle =>
+      'Внеси наслов, категорија или опис. Или избери неодамнешно пребарување.';
+
+  @override
+  String get mapSearchNoResultsTitle => 'Нема совпаѓања';
+
+  @override
+  String get mapSearchNoResultsSubtitle =>
+      'Обиди се со други зборови или ресетирај филтри на мапата.';
+
+  @override
+  String mapSearchResultsBadge(int count) {
+    return '$count резултати';
+  }
+
+  @override
+  String get mapSearchRemoteLoading => 'Се пребаруваат сите места…';
+
+  @override
+  String get mapSearchRemoteError => 'Не можеше да се пребараат сите места.';
+
+  @override
+  String get mapSearchRemoteRetry => 'Обиди се повторно';
+
+  @override
+  String get mapSearchSectionOnMap => 'На оваа мапа';
+
+  @override
+  String get mapSearchSectionEverywhere => 'Повеќе резултати';
+
+  @override
+  String get mapSearchSuggestionsLabel => 'Предлози';
+
+  @override
+  String get mapUpdatedToast => 'Мапата е ажурирана';
+
+  @override
+  String get mapErrorAutoRetryFootnote =>
+      'Ќе обидеме повторно за неколку секунди. Исто така можете да притиснете Обиди се повторно.';
+
+  @override
+  String mapFilteredSitesAnnounce(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count места се прикажуваат на мапата',
+      one: 'Едно место се прикажува на мапата',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String mapClusterExpansionAnnounce(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count места се одделени на мапата',
+      one: 'Едно место е одделено на мапата',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get mapScreenRouteSemantic =>
+      'Мапа на загадување. Допрете ги игличките за преглед на местата.';
+
+  @override
+  String get mapLoadingSemantic => 'Се вчитува мапата';
+
+  @override
+  String get mapSiteNotOnMapSnack =>
+      'Ова место сè уште не е достапно на мапата.';
+
+  @override
+  String get mapOpenLocationFailedSnack =>
+      'Не можеше да се отвори оваа локација на мапата.';
+
+  @override
+  String get mapEmptyFiltersLiveRegion =>
+      'Нема места што одговараат на тековните филтри';
+
+  @override
+  String get mapEmptyFiltersTitle => 'Нема места што одговараат на филтрите';
+
+  @override
+  String get mapEmptyFiltersSubtitle =>
+      'Прилагодете ги филтрите или пребарајте.';
+
+  @override
+  String get mapDirectionsSheetOpenInMaps => 'Отвори во Maps';
+
+  @override
+  String get mapDirectionsSheetViewLocation => 'Погледни локација';
+
+  @override
+  String get mapDirectionsSheetSubtitleDirections =>
+      'Изберете апликација за навигација.';
+
+  @override
+  String get mapDirectionsSheetSubtitleViewLocation =>
+      'Изберете апликација за приказ на мапа.';
+
+  @override
+  String get mapDirectionsAppleMapsTitle => 'Apple Maps';
+
+  @override
+  String get mapDirectionsAppleMapsSubtitle => 'Вградени мапи на уредот.';
+
+  @override
+  String get mapDirectionsGoogleMapsTitle => 'Google Maps';
+
+  @override
+  String get mapDirectionsGoogleMapsSubtitle => 'Веб и апликација Google Maps.';
+
+  @override
+  String get mapSemanticCloseActionsMenu => 'Затвори мени со акции';
+
+  @override
+  String get mapSemanticOpenActionsMenu => 'Отвори мени со акции';
+
+  @override
+  String get mapSemanticHideHeatmap => 'Сокриј топлотна мапа';
+
+  @override
+  String get mapSemanticShowHeatmap => 'Прикажи топлотна мапа';
+
+  @override
+  String get mapSemanticSwitchToLightMap => 'Префрли на светла мапа';
+
+  @override
+  String get mapSemanticSwitchToDarkMap => 'Префрли на темна мапа';
+
+  @override
+  String get mapSemanticZoomWholeCountry =>
+      'Зумирај за да се прикаже целата држава';
+
+  @override
+  String get mapSemanticUnlockRotation => 'Отклучи ротација на мапата';
+
+  @override
+  String get mapSemanticLockRotation => 'Заклучи ротација на мапата';
+
+  @override
+  String get mapSemanticCenterOnMyLocation =>
+      'Центрирај мапа на мојата локација';
+
+  @override
+  String get mapSemanticSearchSites => 'Пребарај места';
+
+  @override
+  String get mapSemanticResetRotationNorth => 'Ресетирај ротација кон север';
+
+  @override
+  String get mapFilterButtonSemanticPrefix => 'Филтрирај места.';
+
+  @override
+  String get mapFilterButtonSemanticNoMatch =>
+      'Нема места што одговараат на филтрите во ова подрачје.';
+
+  @override
+  String get mapFilterButtonSemanticNoSites => 'Нема места во ова подрачје.';
+
+  @override
+  String mapFilterButtonSemanticSitesCount(int count) {
+    return '$count места во ова подрачје.';
+  }
+
+  @override
+  String get mapFilterButtonSemanticSuffix =>
+      'Допрете за да ги отворите филтрите.';
+
+  @override
+  String get mapFilterCountNoMatch => 'Нема совпаѓање';
+
+  @override
+  String get mapFilterCountNoSites => 'Нема места';
+
+  @override
+  String get mapFilterSheetTitle => 'Филтрирај места';
+
+  @override
+  String get mapFilterCloseTooltip => 'Затвори филтри';
+
+  @override
+  String get mapFilterSectionSiteStatus => 'Статус на место';
+
+  @override
+  String get mapFilterSectionArea => 'Општина / подрачје';
+
+  @override
+  String get mapFilterSectionPollutionType => 'Тип на загадување';
+
+  @override
+  String get mapFilterSectionVisibility => 'Видливост';
+
+  @override
+  String get mapFilterShowArchivedSites => 'Прикажи архивирани места';
+
+  @override
+  String mapFilterShowingLiveRegion(int visible, int total) {
+    return '$visible од $total загадени места видливи во ова подрачје';
+  }
+
+  @override
+  String mapFilterShowingInline(int visible, int total) {
+    return 'Се прикажуваат $visible од $total';
+  }
+
+  @override
+  String mapFilterPollutionTypeSemantic(String type) {
+    return 'Филтер за места од тип $type';
+  }
+
+  @override
+  String get mapFilterPollutionTypeHintOff =>
+      'Допрете двапати за да го прикажете овој тип';
+
+  @override
+  String get mapFilterPollutionTypeHintOn =>
+      'Допрете двапати за да го сокриете овој тип';
+
+  @override
+  String get mapFilterPollutionTypeUnknown => 'Непознат тип';
+
+  @override
+  String get mapFilterSiteStatusReported => 'Пријавено';
+
+  @override
+  String get mapFilterSiteStatusVerified => 'Потврдено';
+
+  @override
+  String get mapFilterSiteStatusCleanupScheduled => 'Закажано чистење';
+
+  @override
+  String get mapFilterSiteStatusInProgress => 'Во тек';
+
+  @override
+  String get mapFilterSiteStatusCleaned => 'Исчистено';
+
+  @override
+  String get mapFilterSiteStatusDisputed => 'Оспорено';
+
+  @override
+  String get mapFilterSiteStatusArchived => 'Архивирано';
+
+  @override
+  String get mapFilterSiteStatusUnknown => 'Непознат статус';
+
+  @override
+  String mapFilterSiteStatusSemantic(String status) {
+    return 'Филтер за статус $status';
+  }
+
+  @override
+  String get mapFilterSiteStatusHintOff =>
+      'Допрете двапати за да го прикажете овој статус';
+
+  @override
+  String get mapFilterSiteStatusHintOn =>
+      'Допрете двапати за да го сокриете овој статус';
+
+  @override
+  String get mapGeoWholeCountry => 'Цела држава';
+
+  @override
+  String get mapGeoSkopjeWhole => 'Цело Скопје';
+
+  @override
+  String get mapGeoSkopje => 'Скопје';
+
+  @override
+  String get mapGeoSkopjeCentar => 'Центар';
+
+  @override
+  String get mapGeoSkopjeAerodrom => 'Аеродром';
+
+  @override
+  String get mapGeoSkopjeKarposh => 'Карпош';
+
+  @override
+  String get mapGeoSkopjeChair => 'Чаир';
+
+  @override
+  String get mapGeoSkopjeKiselaVoda => 'Кисела Вода';
+
+  @override
+  String get mapGeoSkopjeGaziBaba => 'Гази Баба';
+
+  @override
+  String get mapGeoSkopjeButel => 'Бутел';
+
+  @override
+  String get mapGeoSkopjeGjorcePetrov => 'Ѓорче Петров';
+
+  @override
+  String get mapGeoSkopjeSaraj => 'Сарај';
+
+  @override
+  String get mapGeoBitola => 'Битола';
+
+  @override
+  String get mapGeoKumanovo => 'Куманово';
+
+  @override
+  String get mapGeoPrilep => 'Прилеп';
+
+  @override
+  String get mapGeoTetovo => 'Тетово';
+
+  @override
+  String get mapGeoVeles => 'Велес';
+
+  @override
+  String get mapGeoOhrid => 'Охрид';
+
+  @override
+  String get mapGeoStip => 'Штип';
+
+  @override
+  String get mapGeoGostivar => 'Гостивар';
+
+  @override
+  String get mapGeoStrumica => 'Струмица';
+
+  @override
+  String get mapGeoKavadarci => 'Кавадарци';
+
+  @override
+  String get mapGeoKocani => 'Кочани';
+
+  @override
+  String get mapGeoStruga => 'Струга';
+
+  @override
+  String get mapGeoRadovis => 'Радовиш';
+
+  @override
+  String get mapGeoGevgelija => 'Гевгелија';
+
+  @override
+  String get mapGeoKrivaPalanka => 'Крива Паланка';
+
+  @override
+  String get mapGeoSvetiNikole => 'Свети Николе';
+
+  @override
+  String get mapGeoVinica => 'Виница';
+
+  @override
+  String get mapGeoDelcevo => 'Делчево';
+
+  @override
+  String get mapGeoProbistip => 'Пробиштип';
+
+  @override
+  String get mapGeoBerovo => 'Берово';
+
+  @override
+  String get mapGeoKratovo => 'Кратово';
+
+  @override
+  String get mapGeoKicevo => 'Кичево';
+
+  @override
+  String get mapGeoMakedonskiBrod => 'Македонски Брод';
+
+  @override
+  String get mapGeoNegotino => 'Неготино';
+
+  @override
+  String get mapGeoResen => 'Ресен';
+
+  @override
+  String get mapGeoUnknownArea => 'Непознато подрачје';
+
+  @override
+  String mapPinPreviewSemantic(String title, String severity) {
+    return '$title, $severity. Допрете двапати за преглед.';
+  }
+
+  @override
+  String mapClusterSemantic(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count загадени места во група. Допрете двапати за проширување.',
+      one: '1 загадено место во група. Допрете двапати за проширување.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get mapUserLocationSemantic => 'Вашата тековна локација';
+
+  @override
+  String get mapPreviewDismissAnnouncement =>
+      'Прегледот на местото е затворен.';
+
+  @override
+  String mapDistanceMetersAway(int meters) {
+    return '$meters м оддалеченост';
+  }
+
+  @override
+  String mapDistanceKilometersAway(String kilometers) {
+    return '$kilometers км оддалеченост';
+  }
+
+  @override
+  String mapPreviewSemanticLabel(String title, String distance) {
+    return 'Избрано место: $title. $distance. Допрете двапати за детали. Повлечете надолу за затворање.';
+  }
+
+  @override
+  String get mapPreviewSemanticHint =>
+      'Користете ги копчињата за насоки или целосни детали.';
+
+  @override
+  String get mapPreviewDirections => 'Насоки';
+
+  @override
+  String get mapPreviewDetails => 'Детали';
+
+  @override
+  String get mapSyncNoticeSemanticRefreshHint =>
+      'Допрете двапати за веднаш освежување на мапата.';
+
+  @override
+  String get mapSyncLiveUpdatesDelayed =>
+      'Живите ажурирања се забавени. Тивко повторно се обидуваме…';
+
+  @override
+  String get mapSyncConnectionUnstable =>
+      'Врската е нестабилна. Освежувањето работи во позадина…';
+
+  @override
+  String get mapSyncOfflineSnapshot =>
+      'Офлајн. Се прикажува последниот зачуван преглед на мапата.';
+
+  @override
+  String get mapSyncOfflineSnapshotJustNow =>
+      'Офлајн. Се прикажува последниот зачуван преглед на мапата од сега.';
+
+  @override
+  String mapSyncOfflineSnapshotMinutesAgo(int minutes) {
+    return 'Офлајн. Се прикажува последниот зачуван преглед на мапата пред $minutes мин.';
+  }
+
+  @override
+  String mapSyncOfflineSnapshotHoursAgo(int hours) {
+    return 'Офлајн. Се прикажува последниот зачуван преглед на мапата пред $hours ч.';
+  }
+
+  @override
+  String get mapSearchLocationUnavailableSnack =>
+      'Локацијата не е достапна за ова место.';
+
+  @override
+  String get mapSearchFieldSemanticHint =>
+      'Внесете наслов, категорија или опис';
+
+  @override
+  String get mapSearchBarHint => 'Пребарај места…';
+
+  @override
   String get locationRetryAddressSemantic => 'Обиди повторно за адреса';
 
   @override
@@ -4199,6 +4673,9 @@ class AppLocalizationsMk extends AppLocalizations {
   String get searchModalCancel => 'Откажи';
 
   @override
+  String get searchModalPlaceholder => 'Пребарај загадени локации';
+
+  @override
   String get appSmartImageRetry => 'Обиди повторно';
 
   @override
@@ -5626,6 +6103,9 @@ class AppLocalizationsMk extends AppLocalizations {
   String get homeSiteCleaningRetry => 'Обиди повторно';
 
   @override
+  String get homeSiteCleaningLoadingSemantic => 'Се вчитуваат еко акции.';
+
+  @override
   String get eventsDistanceLessThan100m => '<100 м';
 
   @override
@@ -6336,4 +6816,18 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get reportDraftIncomingPhotoAdd => 'Додај во нацртот';
+
+  @override
+  String get savedMapAreasTitle => 'Зачувани области на мапа';
+
+  @override
+  String get savedMapAreasPlaceholder =>
+      'Офлајн региони и преземања ќе се појават тука.';
+
+  @override
+  String get mapWhatsNewTitle => 'Ажурирања на мапата';
+
+  @override
+  String get mapWhatsNewBody =>
+      'Подобро предвремено вчитување, постојани кластери и побезбедни мапни процеси.';
 }

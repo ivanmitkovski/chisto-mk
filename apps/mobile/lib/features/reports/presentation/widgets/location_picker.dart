@@ -226,16 +226,18 @@ class _LocationPickerState extends State<LocationPicker> {
     }
   }
 
-  void _onMapMoved(MapPosition position, bool hasGesture) {
+  void _onMapMoved(dynamic position, bool hasGesture) {
     if (!hasGesture) {
       _wasAtFenceLastMove = false;
       _wasAtMaxZoomLastMove = false;
       return;
     }
-    if (position.center == null) return;
 
-    final LatLng newCenter = position.center!;
-    final double newZoom = position.zoom ?? _currentZoom;
+    final LatLng? newCenter = position.center as LatLng?;
+    final double? newZoom = position.zoom as double?;
+    if (newCenter == null || newZoom == null) {
+      return;
+    }
     _currentZoom = newZoom;
 
     final bool atFence =

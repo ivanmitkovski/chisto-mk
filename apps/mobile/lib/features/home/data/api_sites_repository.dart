@@ -72,6 +72,10 @@ class ApiSitesRepository implements SitesRepository {
     double? minLongitude,
     double? maxLongitude,
     String mapDetail = SitesRepository.mapDetailLite,
+    double? zoom,
+    String? status,
+    bool includeArchived = false,
+    bool prefetch = false,
   }) =>
       _feed.getSitesForMap(
         latitude: latitude,
@@ -83,7 +87,15 @@ class ApiSitesRepository implements SitesRepository {
         minLongitude: minLongitude,
         maxLongitude: maxLongitude,
         mapDetail: mapDetail,
+        zoom: zoom,
+        status: status,
+        includeArchived: includeArchived,
+        prefetch: prefetch,
       );
+
+  @override
+  Future<SiteMapSearchResponse> searchSitesForMap(SiteMapSearchRequest request) =>
+      _feed.searchSitesForMap(request);
 
   @override
   Future<PollutionSite?> getSiteById(String id) => _feed.getSiteById(id);

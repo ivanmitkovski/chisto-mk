@@ -873,6 +873,256 @@
   "reportIssueDetailsHint": "Describe the issue…",
   "mapResetFiltersSemantic": "Reset filters",
   "mapOpenMapsFailed": "Could not open Maps",
+  "mapSearchRecentsLabel": "Recent",
+  "mapSearchClearRecentsButton": "Clear",
+  "mapSearchEmptyTitle": "Search pollution sites",
+  "mapSearchEmptySubtitle": "Type a title, category, or description. Or tap a recent search below.",
+  "mapSearchNoResultsTitle": "No matching sites",
+  "mapSearchNoResultsSubtitle": "Try different words or clear filters on the map.",
+  "mapSearchResultsBadge": "{count} results",
+  "@mapSearchResultsBadge": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mapSearchRemoteLoading": "Searching all sites…",
+  "mapSearchRemoteError": "Could not search all sites.",
+  "mapSearchRemoteRetry": "Retry",
+  "mapSearchSectionOnMap": "On this map",
+  "mapSearchSectionEverywhere": "More results",
+  "mapSearchSuggestionsLabel": "Suggestions",
+  "mapUpdatedToast": "Map updated",
+  "mapErrorAutoRetryFootnote": "We’ll retry automatically in a few seconds. You can also tap Try again.",
+  "mapFilteredSitesAnnounce": "{count, plural, one{One site shown on the map} other{{count} sites shown on the map}}",
+  "@mapFilteredSitesAnnounce": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mapClusterExpansionAnnounce": "{count, plural, one{One site separated on the map} other{{count} sites separated on the map}}",
+  "@mapClusterExpansionAnnounce": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mapScreenRouteSemantic": "Pollution map. Tap pins to view site details.",
+  "mapLoadingSemantic": "Loading map",
+  "mapSiteNotOnMapSnack": "This site is not available on the map yet.",
+  "mapOpenLocationFailedSnack": "Could not open this location on the map.",
+  "mapEmptyFiltersLiveRegion": "No sites match your current filters",
+  "mapEmptyFiltersTitle": "No sites match your filters",
+  "mapEmptyFiltersSubtitle": "Try adjusting filters or search.",
+  "mapDirectionsSheetOpenInMaps": "Open in Maps",
+  "mapDirectionsSheetViewLocation": "View location",
+  "mapDirectionsSheetSubtitleDirections": "Choose which app to get directions.",
+  "mapDirectionsSheetSubtitleViewLocation": "Choose which app to view this location on a map.",
+  "mapDirectionsAppleMapsTitle": "Apple Maps",
+  "mapDirectionsAppleMapsSubtitle": "Built-in maps on this device.",
+  "mapDirectionsGoogleMapsTitle": "Google Maps",
+  "mapDirectionsGoogleMapsSubtitle": "Web and Google Maps app.",
+  "mapSemanticCloseActionsMenu": "Close actions menu",
+  "mapSemanticOpenActionsMenu": "Open actions menu",
+  "mapSemanticHideHeatmap": "Hide heatmap",
+  "mapSemanticShowHeatmap": "Show heatmap",
+  "mapSemanticSwitchToLightMap": "Switch to light map",
+  "mapSemanticSwitchToDarkMap": "Switch to dark map",
+  "mapSemanticZoomWholeCountry": "Zoom out to show whole country",
+  "mapSemanticUnlockRotation": "Unlock map rotation",
+  "mapSemanticLockRotation": "Lock map rotation",
+  "mapSemanticCenterOnMyLocation": "Center map on my location",
+  "mapSemanticSearchSites": "Search sites",
+  "mapSemanticResetRotationNorth": "Reset map rotation to north",
+  "mapFilterButtonSemanticPrefix": "Filter sites.",
+  "mapFilterButtonSemanticNoMatch": "No sites match current filters in this area.",
+  "mapFilterButtonSemanticNoSites": "No sites in this area.",
+  "mapFilterButtonSemanticSitesCount": "{count} sites in this area.",
+  "@mapFilterButtonSemanticSitesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mapFilterButtonSemanticSuffix": "Tap to open filters.",
+  "mapFilterCountNoMatch": "No match",
+  "mapFilterCountNoSites": "No sites",
+  "mapFilterSheetTitle": "Filter sites",
+  "mapFilterCloseTooltip": "Close filters",
+  "mapFilterSectionSiteStatus": "Site status",
+  "mapFilterSectionArea": "Municipality / area",
+  "mapFilterSectionPollutionType": "Pollution type",
+  "mapFilterSectionVisibility": "Visibility",
+  "mapFilterShowArchivedSites": "Show archived sites",
+  "mapFilterShowingLiveRegion": "{visible} of {total} pollution sites visible in this area",
+  "@mapFilterShowingLiveRegion": {
+    "placeholders": {
+      "visible": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "mapFilterShowingInline": "Showing {visible} of {total}",
+  "@mapFilterShowingInline": {
+    "placeholders": {
+      "visible": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "mapFilterPollutionTypeSemantic": "Filter {type} sites",
+  "@mapFilterPollutionTypeSemantic": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "mapFilterPollutionTypeHintOff": "Double tap to show this type",
+  "mapFilterPollutionTypeHintOn": "Double tap to hide this type",
+  "mapFilterPollutionTypeUnknown": "Unknown type",
+  "mapFilterSiteStatusReported": "Reported",
+  "mapFilterSiteStatusVerified": "Verified",
+  "mapFilterSiteStatusCleanupScheduled": "Cleanup scheduled",
+  "mapFilterSiteStatusInProgress": "In progress",
+  "mapFilterSiteStatusCleaned": "Cleaned",
+  "mapFilterSiteStatusDisputed": "Disputed",
+  "mapFilterSiteStatusArchived": "Archived",
+  "mapFilterSiteStatusUnknown": "Unknown status",
+  "mapFilterSiteStatusSemantic": "Filter {status} sites",
+  "@mapFilterSiteStatusSemantic": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "mapFilterSiteStatusHintOff": "Double tap to show this status",
+  "mapFilterSiteStatusHintOn": "Double tap to hide this status",
+  "mapGeoWholeCountry": "Whole country",
+  "mapGeoSkopjeWhole": "All Skopje municipalities",
+  "mapGeoSkopje": "Skopje",
+  "mapGeoSkopjeCentar": "Centar",
+  "mapGeoSkopjeAerodrom": "Aerodrom",
+  "mapGeoSkopjeKarposh": "Karpoš",
+  "mapGeoSkopjeChair": "Čair",
+  "mapGeoSkopjeKiselaVoda": "Kisela Voda",
+  "mapGeoSkopjeGaziBaba": "Gazi Baba",
+  "mapGeoSkopjeButel": "Butel",
+  "mapGeoSkopjeGjorcePetrov": "Gjorče Petrov",
+  "mapGeoSkopjeSaraj": "Saraj",
+  "mapGeoBitola": "Bitola",
+  "mapGeoKumanovo": "Kumanovo",
+  "mapGeoPrilep": "Prilep",
+  "mapGeoTetovo": "Tetovo",
+  "mapGeoVeles": "Veles",
+  "mapGeoOhrid": "Ohrid",
+  "mapGeoStip": "Štip",
+  "mapGeoGostivar": "Gostivar",
+  "mapGeoStrumica": "Strumica",
+  "mapGeoKavadarci": "Kavadarci",
+  "mapGeoKocani": "Kočani",
+  "mapGeoStruga": "Struga",
+  "mapGeoRadovis": "Radoviš",
+  "mapGeoGevgelija": "Gevgelija",
+  "mapGeoKrivaPalanka": "Kriva Palanka",
+  "mapGeoSvetiNikole": "Sveti Nikole",
+  "mapGeoVinica": "Vinica",
+  "mapGeoDelcevo": "Delčevo",
+  "mapGeoProbistip": "Probishtip",
+  "mapGeoBerovo": "Berovo",
+  "mapGeoKratovo": "Kratovo",
+  "mapGeoKicevo": "Kičevo",
+  "mapGeoMakedonskiBrod": "Makedonski Brod",
+  "mapGeoNegotino": "Negotino",
+  "mapGeoResen": "Resen",
+  "mapGeoUnknownArea": "Unknown area",
+  "mapPinPreviewSemantic": "{title}, {severity}. Double tap to preview.",
+  "@mapPinPreviewSemantic": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "severity": {
+        "type": "String"
+      }
+    }
+  },
+  "mapClusterSemantic": "{count, plural, one{1 pollution site clustered. Double tap to expand.} other{{count} pollution sites clustered. Double tap to expand.}}",
+  "@mapClusterSemantic": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mapUserLocationSemantic": "Your current location",
+  "mapPreviewDismissAnnouncement": "Dismissed site preview.",
+  "mapDistanceMetersAway": "{meters} m away",
+  "@mapDistanceMetersAway": {
+    "placeholders": {
+      "meters": {
+        "type": "int"
+      }
+    }
+  },
+  "mapDistanceKilometersAway": "{kilometers} km away",
+  "@mapDistanceKilometersAway": {
+    "placeholders": {
+      "kilometers": {
+        "type": "String"
+      }
+    }
+  },
+  "mapPreviewSemanticLabel": "Selected site: {title}. {distance}. Double tap preview for details. Swipe down to dismiss.",
+  "@mapPreviewSemanticLabel": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "mapPreviewSemanticHint": "Use actions for directions or full details.",
+  "mapPreviewDirections": "Directions",
+  "mapPreviewDetails": "Details",
+  "mapSyncNoticeSemanticRefreshHint": "Double tap to refresh map now.",
+  "mapSyncLiveUpdatesDelayed": "Live updates delayed. Retrying quietly…",
+  "mapSyncConnectionUnstable": "Connection unstable. Refreshing in background…",
+  "mapSyncOfflineSnapshot": "Offline. Showing your last saved map snapshot.",
+  "mapSyncOfflineSnapshotJustNow": "Offline. Showing your last saved map snapshot from just now.",
+  "mapSyncOfflineSnapshotMinutesAgo": "Offline. Showing your last saved map snapshot from {minutes}m ago.",
+  "@mapSyncOfflineSnapshotMinutesAgo": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "mapSyncOfflineSnapshotHoursAgo": "Offline. Showing your last saved map snapshot from {hours}h ago.",
+  "@mapSyncOfflineSnapshotHoursAgo": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "mapSearchLocationUnavailableSnack": "Location is unavailable for this site.",
+  "mapSearchFieldSemanticHint": "Type a title, category, or description",
+  "mapSearchBarHint": "Search sites…",
   "locationRetryAddressSemantic": "Retry address",
   "photoReviewDiscardTitle": "Discard this photo?",
   "photoReviewDiscardBody": "You can retake or choose another from your library.",
@@ -2175,6 +2425,7 @@
   "commentsLikeTooltip": "Like comment",
   "commentsUnlikeTooltip": "Unlike comment",
   "searchModalCancel": "Cancel",
+  "searchModalPlaceholder": "Search pollution sites",
   "appSmartImageRetry": "Retry",
   "appSmartImageRetryIn": "Retry in {seconds}s",
   "@appSmartImageRetryIn": {
@@ -3211,6 +3462,7 @@
   "homeSiteCleaningEventUnavailable": "Event details are unavailable right now.",
   "homeSiteCleaningListLoadError": "Could not load events. Check your connection and try again.",
   "homeSiteCleaningRetry": "Retry",
+  "homeSiteCleaningLoadingSemantic": "Loading eco actions.",
   "eventsDistanceLessThan100m": "<100 m",
   "eventsDistanceMeters": "{meters} m",
   "@eventsDistanceMeters": {
@@ -3594,5 +3846,9 @@
   },
   "reportDraftIncomingPhotoContinue": "Continue draft",
   "reportDraftIncomingPhotoReplace": "Replace draft",
-  "reportDraftIncomingPhotoAdd": "Add to draft"
+  "reportDraftIncomingPhotoAdd": "Add to draft",
+  "savedMapAreasTitle": "Saved map areas",
+  "savedMapAreasPlaceholder": "Offline regions and background downloads will appear here.",
+  "mapWhatsNewTitle": "Map updates",
+  "mapWhatsNewBody": "Smarter prefetch, stable clusters, and safer map pipelines."
 }

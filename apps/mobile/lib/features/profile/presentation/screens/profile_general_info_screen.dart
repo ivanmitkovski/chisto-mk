@@ -233,7 +233,7 @@ class _ProfileGeneralInfoScreenState
     } on AppError catch (e) {
       if (!mounted) return;
       if (_isAuthError(e.code)) {
-        Navigator.of(context).pushNamedAndRemoveUntil(
+        Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
           AppRoutes.signIn,
           (Route<dynamic> route) => false,
         );
@@ -301,7 +301,7 @@ class _ProfileGeneralInfoScreenState
         ref.read(profileAvatarNotifierProvider.notifier).clearLocalPath();
       }
       if (_isAuthError(e.code)) {
-        Navigator.of(context).pushNamedAndRemoveUntil(
+        Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
           AppRoutes.signIn,
           (Route<dynamic> route) => false,
         );
@@ -352,7 +352,7 @@ class _ProfileGeneralInfoScreenState
     } on AppError catch (e) {
       if (!mounted) return;
       if (_isAuthError(e.code)) {
-        Navigator.of(context).pushNamedAndRemoveUntil(
+        Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
           AppRoutes.signIn,
           (Route<dynamic> route) => false,
         );

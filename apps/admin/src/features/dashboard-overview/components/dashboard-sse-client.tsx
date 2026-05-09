@@ -128,6 +128,7 @@ export function DashboardSSEClient() {
   const queryClientRef = useRef(queryClient);
   queryClientRef.current = queryClient;
   const abortRef = useRef<AbortController | null>(null);
+  const mapInvalidateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const retryCountRef = useRef(0);
   const ssePostRefreshReconnectsRef = useRef(0);
 
@@ -214,6 +215,14 @@ export function DashboardSSEClient() {
                 void qc.invalidateQueries({ queryKey: adminQueryKeys.sitesAll });
                 void qc.invalidateQueries({ queryKey: adminQueryKeys.sitesStats });
                 void qc.invalidateQueries({ queryKey: adminQueryKeys.overview });
+                if (mapInvalidateTimerRef.current != null) {
+                  clearTimeout(mapInvalidateTimerRef.current);
+                }
+                mapInvalidateTimerRef.current = setTimeout(() => {
+                  void qc.invalidateQueries({
+                    predicate: (query) => query.queryKey[0] === 'sites-map',
+                  });
+                }, 750);
                 routerRef.current.refresh();
               } else if (isUserEvent(data)) {
                 sseCtxRef.current?.showRefreshToast(
@@ -286,6 +295,10 @@ export function DashboardSSEClient() {
       if (abortRef.current) {
         abortRef.current.abort();
         abortRef.current = null;
+      }
+      if (mapInvalidateTimerRef.current != null) {
+        clearTimeout(mapInvalidateTimerRef.current);
+        mapInvalidateTimerRef.current = null;
       }
     };
   }, [connect]);

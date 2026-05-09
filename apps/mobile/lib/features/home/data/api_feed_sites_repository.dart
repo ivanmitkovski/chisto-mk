@@ -27,14 +27,22 @@ class ApiFeedSitesRepository implements FeedSitesRepository {
   final AuthState? _authState;
   final SitesLocalCache _localCache;
   final SitesJsonMapper _mapper;
+  final Map<String, ({String etag, Map<String, dynamic> payload})>
+      _mapEtagCache = <String, ({String etag, Map<String, dynamic> payload})>{};
 
   static const Duration _feedCacheTtl = Duration(seconds: 20);
+  static const Duration _mapMemoryCacheTtl = Duration(seconds: 15);
+  static const double _mapGeoSnapStepDegrees = 0.01;
   static const String _localUpvoteIdsPrefix = 'site_upvote_ids_';
   static const int _localUpvoteIdsMax = 400;
   static const int _memoryFeedCacheMaxEntries = 24;
+  static const int _memoryMapCacheMaxEntries = 24;
 
   final Map<String, ({SitesListResult result, DateTime cachedAt})>
       _memoryFeedCache = <String, ({SitesListResult result, DateTime cachedAt})>{};
+
+  final Map<String, ({MapSitesResult result, DateTime cachedAt})>
+      _memoryMapCache = <String, ({MapSitesResult result, DateTime cachedAt})>{};
 
   void _rememberFeedCacheEntry(
     String cacheKey, {
@@ -56,7 +64,43 @@ class ApiFeedSitesRepository implements FeedSitesRepository {
 
   Future<void> clearAllCaches() async {
     _memoryFeedCache.clear();
+    _memoryMapCache.clear();
     await _localCache.clearFeedAndMapSnapshots();
+  }
+
+  static double _snapMapGeoCenter(double v) =>
+      (v / _mapGeoSnapStepDegrees).round() * _mapGeoSnapStepDegrees;
+
+  static double? _snapMapGeoMinEdge(double? v) {
+    if (v == null) {
+      return null;
+    }
+    return (v / _mapGeoSnapStepDegrees).floor() * _mapGeoSnapStepDegrees;
+  }
+
+  static double? _snapMapGeoMaxEdge(double? v) {
+    if (v == null) {
+      return null;
+    }
+    return (v / _mapGeoSnapStepDegrees).ceil() * _mapGeoSnapStepDegrees;
+  }
+
+  void _rememberMapMemoryEntry(
+    String cacheKey, {
+    required MapSitesResult result,
+    required DateTime cachedAt,
+  }) {
+    _memoryMapCache[cacheKey] = (result: result, cachedAt: cachedAt);
+    if (_memoryMapCache.length <= _memoryMapCacheMaxEntries) {
+      return;
+    }
+    final List<MapEntry<String, ({MapSitesResult result, DateTime cachedAt})>>
+        entries = _memoryMapCache.entries.toList()
+          ..sort((a, b) => a.value.cachedAt.compareTo(b.value.cachedAt));
+    for (final MapEntry<String, ({MapSitesResult result, DateTime cachedAt})>
+        entry in entries.take(_memoryMapCache.length - _memoryMapCacheMaxEntries)) {
+      _memoryMapCache.remove(entry.key);
+    }
   }
 
   Future<Set<String>> _readLocalUpvoteIds() async {
@@ -423,38 +467,108 @@ class ApiFeedSitesRepository implements FeedSitesRepository {
     double? minLongitude,
     double? maxLongitude,
     String mapDetail = FeedSitesRepository.mapDetailLite,
+    double? zoom,
+    String? status,
+    bool includeArchived = false,
+    bool prefetch = false,
   }) async {
+    final double qLat = _snapMapGeoCenter(latitude);
+    final double qLng = _snapMapGeoCenter(longitude);
+    final double? qMinLat = _snapMapGeoMinEdge(minLatitude);
+    final double? qMaxLat = _snapMapGeoMaxEdge(maxLatitude);
+    final double? qMinLng = _snapMapGeoMinEdge(minLongitude);
+    final double? qMaxLng = _snapMapGeoMaxEdge(maxLongitude);
+    final String mapKey = [
+      qLat.toStringAsFixed(4),
+      qLng.toStringAsFixed(4),
+      radiusKm.toStringAsFixed(1),
+      limit.toString(),
+      mapDetail,
+      zoom?.toStringAsFixed(2) ?? '',
+      status ?? '',
+      includeArchived ? '1' : '0',
+      prefetch ? 'p' : '',
+      qMinLat?.toStringAsFixed(4) ?? '',
+      qMaxLat?.toStringAsFixed(4) ?? '',
+      qMinLng?.toStringAsFixed(4) ?? '',
+      qMaxLng?.toStringAsFixed(4) ?? '',
+    ].join('|');
+    final DateTime now = DateTime.now();
+    final ({MapSitesResult result, DateTime cachedAt})? mapMem =
+        _memoryMapCache[mapKey];
+    if (mapMem != null &&
+        now.difference(mapMem.cachedAt) <= _mapMemoryCacheTtl) {
+      final List<PollutionSite> merged =
+          await _applyLocalUpvotePersistence(mapMem.result.sites);
+      return MapSitesResult(
+        sites: merged,
+        servedFromCache: true,
+        cachedAt: mapMem.cachedAt,
+        isStaleFallback: mapMem.result.isStaleFallback,
+        signedMediaExpiresAt: mapMem.result.signedMediaExpiresAt,
+      );
+    }
     final List<String> queryParams = <String>[
-      'lat=$latitude',
-      'lng=$longitude',
+      'lat=$qLat',
+      'lng=$qLng',
       'radiusKm=$radiusKm',
       'limit=$limit',
       'detail=$mapDetail',
-      if (minLatitude != null) 'minLat=$minLatitude',
-      if (maxLatitude != null) 'maxLat=$maxLatitude',
-      if (minLongitude != null) 'minLng=$minLongitude',
-      if (maxLongitude != null) 'maxLng=$maxLongitude',
+      if (zoom != null) 'zoom=$zoom',
+      if (status != null && status.isNotEmpty) 'status=$status',
+      if (includeArchived) 'includeArchived=true',
+      if (prefetch) 'prefetch=true',
+      if (qMinLat != null) 'minLat=$qMinLat',
+      if (qMaxLat != null) 'maxLat=$qMaxLat',
+      if (qMinLng != null) 'minLng=$qMinLng',
+      if (qMaxLng != null) 'maxLng=$qMaxLng',
     ];
     try {
+      final String? ifNoneMatch = _mapEtagCache[mapKey]?.etag;
       final ApiResponse response = await _client.get(
         '/sites/map?${queryParams.join('&')}',
+        headers: ifNoneMatch == null
+            ? null
+            : <String, String>{'If-None-Match': ifNoneMatch},
       );
-      final Map<String, dynamic>? json = response.json;
+      Map<String, dynamic>? json = response.json;
+      if (response.statusCode == 304) {
+        json = _mapEtagCache[mapKey]?.payload;
+      }
       if (json == null) {
-        throw AppError.unknown();
+        throw AppError.unknown(cause: 'Missing map payload for status ${response.statusCode}');
+      }
+      final String? etagHeader = response.headers['etag'];
+      if (etagHeader != null && etagHeader.isNotEmpty) {
+        _mapEtagCache[mapKey] = (etag: etagHeader, payload: json);
       }
       unawaited(_localCache.persistMapSnapshot(json));
       final MapSitesResult parsed = _mapper.mapSitesResultFromPayload(json);
       final List<PollutionSite> merged =
           await _applyLocalUpvotePersistence(parsed.sites);
-      return MapSitesResult(
+      final MapSitesResult out = MapSitesResult(
         sites: merged,
         servedFromCache: parsed.servedFromCache,
         cachedAt: parsed.cachedAt,
         isStaleFallback: parsed.isStaleFallback,
         signedMediaExpiresAt: parsed.signedMediaExpiresAt,
       );
-    } on AppError {
+      _rememberMapMemoryEntry(
+        mapKey,
+        result: MapSitesResult(
+          sites: List<PollutionSite>.from(merged),
+          servedFromCache: out.servedFromCache,
+          cachedAt: out.cachedAt,
+          isStaleFallback: out.isStaleFallback,
+          signedMediaExpiresAt: out.signedMediaExpiresAt,
+        ),
+        cachedAt: now,
+      );
+      return out;
+    } on AppError catch (error) {
+      if (!_shouldUsePersistedMapFallback(error)) {
+        rethrow;
+      }
       final MapSitesResult? fallback = await _loadPersistedMapSnapshot();
       if (fallback != null) {
         final List<PollutionSite> merged =
@@ -469,6 +583,33 @@ class ApiFeedSitesRepository implements FeedSitesRepository {
       }
       rethrow;
     }
+  }
+
+  bool _shouldUsePersistedMapFallback(AppError error) {
+    switch (error.code) {
+      case 'NETWORK_ERROR':
+      case 'TIMEOUT':
+      case 'SERVER_ERROR':
+      case 'TOO_MANY_REQUESTS':
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  @override
+  Future<SiteMapSearchResponse> searchSitesForMap(
+    SiteMapSearchRequest request,
+  ) async {
+    final ApiResponse response = await _client.post(
+      '/sites/search',
+      body: request.toBodyJson(),
+    );
+    final Map<String, dynamic>? json = response.json;
+    if (json == null) {
+      throw AppError.unknown(cause: 'Missing search response body');
+    }
+    return _mapper.siteMapSearchResponseFromJson(json);
   }
 
   @override

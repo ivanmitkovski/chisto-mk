@@ -32,4 +32,22 @@ void main() {
     );
     expect(err.serverTimestamp, isNull);
   });
+
+  test('appErrorFromFailedResponse merges API details for 429', () {
+    final AppError err = appErrorFromFailedResponse(
+      statusCode: 429,
+      json: <String, dynamic>{
+        'code': 'MAP_RATE_LIMITED',
+        'message': 'Too many map requests',
+        'details': <String, dynamic>{'ttlSeconds': 60, 'limit': 480, 'mode': 'redis'},
+      },
+      bodyStr: null,
+      retryAfterHeader: null,
+    );
+    expect(err.code, 'TOO_MANY_REQUESTS');
+    expect(err.details, isA<Map<String, dynamic>>());
+    final Map<String, dynamic> d = err.details! as Map<String, dynamic>;
+    expect(d['ttlSeconds'], 60);
+    expect(d['limit'], 480);
+  });
 }

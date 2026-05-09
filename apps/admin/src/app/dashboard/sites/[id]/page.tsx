@@ -31,6 +31,8 @@ export default async function SiteDetailPage(props: PageProps) {
   const s = site as {
     id: string;
     status: string;
+    isArchivedByAdmin?: boolean;
+    archiveReason?: string | null;
     latitude: number;
     longitude: number;
     description: string | null;
@@ -47,6 +49,8 @@ export default async function SiteDetailPage(props: PageProps) {
       <SiteStatusForm
         siteId={s.id}
         initialStatus={s.status}
+        initialArchivedByAdmin={Boolean(s.isArchivedByAdmin)}
+        initialArchiveReason={s.archiveReason ?? null}
         latitude={s.latitude}
         longitude={s.longitude}
         description={s.description}

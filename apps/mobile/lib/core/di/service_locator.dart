@@ -22,6 +22,7 @@ import 'package:chisto_mobile/features/events/domain/repositories/events_reposit
 import 'package:chisto_mobile/features/events/domain/repositories/check_in_repository.dart';
 import 'package:chisto_mobile/features/home/data/api_sites_repository.dart';
 import 'package:chisto_mobile/features/home/data/engagement_outbox_coordinator.dart';
+import 'package:chisto_mobile/features/home/data/offline_regions/offline_region_store.dart';
 import 'package:chisto_mobile/features/home/data/map_realtime/map_realtime_service.dart';
 import 'package:chisto_mobile/features/home/domain/repositories/sites_repository.dart';
 import 'package:chisto_mobile/features/notifications/data/api_notifications_repository.dart';
@@ -30,6 +31,8 @@ import 'package:chisto_mobile/features/notifications/domain/repositories/notific
 import 'package:chisto_mobile/features/profile/data/api_profile_repository.dart';
 import 'package:chisto_mobile/features/profile/domain/repositories/profile_repository.dart';
 import 'package:chisto_mobile/core/cache/report_images_cache.dart';
+import 'package:chisto_mobile/core/location/geolocator_location_service.dart';
+import 'package:chisto_mobile/core/location/location_service.dart';
 import 'package:chisto_mobile/features/reports/data/api_reports_repository.dart';
 import 'package:chisto_mobile/features/reports/data/outbox/report_draft_photo_store.dart';
 import 'package:chisto_mobile/features/reports/data/outbox/report_draft_repository.dart';
@@ -68,7 +71,9 @@ class ServiceLocator {
   ReportOutboxCoordinator? _reportOutboxCoordinator;
   ReportsRealtimeService? _reportsRealtimeService;
   SitesRepository? _sitesRepository;
+  LocationService? _locationService;
   MapRealtimeService? _mapRealtimeService;
+  OfflineRegionStore? _offlineRegionStore;
   NotificationsRepository? _notificationsRepository;
   PushNotificationService? _pushNotificationService;
   ApiEventAnalyticsRepository? _eventAnalyticsRepository;
@@ -100,7 +105,9 @@ class ServiceLocator {
   ReportOutboxCoordinator get reportOutboxCoordinator => _reportOutboxCoordinator!;
   ReportsRealtimeService get reportsRealtimeService => _reportsRealtimeService!;
   SitesRepository get sitesRepository => _sitesRepository!;
+  LocationService get locationService => _locationService!;
   MapRealtimeService get mapRealtimeService => _mapRealtimeService!;
+  OfflineRegionStore get offlineRegionStore => _offlineRegionStore!;
   NotificationsRepository get notificationsRepository =>
       _notificationsRepository!;
   PushNotificationService get pushNotificationService =>
@@ -216,7 +223,16 @@ class ServiceLocator {
     _mapRealtimeService = MapRealtimeService(
       config: _config!,
       authState: _authState!,
+      sessionRefresh: () async {
+        if (_apiClient?.refreshSession == null) {
+          return false;
+        }
+        return _apiClient!.refreshSession!();
+      },
     );
+    _locationService = GeolocatorLocationService();
+    _offlineRegionStore = OfflineRegionStore();
+    await _offlineRegionStore!.init();
     _sitesRepository = ApiSitesRepository(
       client: _apiClient!,
       authState: _authState!,
@@ -311,7 +327,9 @@ class ServiceLocator {
     _reportsApiRepository = null;
     _reportsRealtimeService = null;
     _mapRealtimeService = null;
+    _locationService = null;
     _sitesRepository = null;
+    _offlineRegionStore = null;
     _notificationsRepository = null;
     _pushNotificationService = null;
     _eventAnalyticsRepository = null;

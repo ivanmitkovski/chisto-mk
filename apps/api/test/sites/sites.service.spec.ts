@@ -25,8 +25,34 @@ function makeSitesService(
   const reportsUpload =
     options?.reportsUpload ?? ({ signUrls: jest.fn(async (v: string[]) => v) } as any);
   const audit = { log: jest.fn() } as any;
-  const sitesMapQuery = new SitesMapQueryService(prisma, reportsUpload);
-  const feedV2 = {} as any;
+  const mapValidator = { validateQuery: jest.fn() } as any;
+  const mapCache = {
+    buildCacheKey: jest.fn(() => 'test-key'),
+    getFromMemory: jest.fn(() => null),
+    getFromRedis: jest.fn(async () => null),
+    set: jest.fn(async () => undefined),
+    invalidate: jest.fn(async () => undefined),
+  } as any;
+  const mapMetrics = { recordRequest: jest.fn() } as any;
+  const mapRepository = {
+    findSites: jest.fn(async () => ({ rows: [], usedPostgisExactGeo: false, usedFallback: false })),
+    findClusters: jest.fn(async () => []),
+    findHeatmap: jest.fn(async () => []),
+  } as any;
+  const mapProjector = {
+    buildResponse: jest.fn(async () => ({ data: [], meta: { dataVersion: '0', queryMode: 'radius' } })),
+  } as any;
+  const sitesMapQuery = new SitesMapQueryService(
+    mapValidator,
+    mapCache,
+    mapMetrics,
+    mapRepository,
+    mapProjector,
+  );
+  const feedV2 = {
+    resolveVariant: jest.fn(async () => 'v1' as const),
+    rerankRows: jest.fn(async (rows: unknown[]) => rows),
+  } as any;
   const userStateRepo = {} as any;
   const sitesFeed = new SitesFeedService(
     prisma,
@@ -37,11 +63,25 @@ function makeSitesService(
     feedV2,
     userStateRepo,
   );
-  const sitesDetail = new SitesDetailService(prisma, reportsUpload);
+  const siteDetailRepository = {
+    findByIdWithRelations: jest.fn(async (siteId: string, _reportsTake: number, _eventsTake: number) => {
+      if (prisma.site?.findUnique) {
+        return prisma.site.findUnique({ where: { id: siteId } });
+      }
+      return null;
+    }),
+    countReports: jest.fn(async () => 0),
+    countEvents: jest.fn(async () => 0),
+    findVoteBySiteAndUser: jest.fn(async () => null),
+    findSaveBySiteAndUser: jest.fn(async () => null),
+  } as any;
+  const sitesDetail = new SitesDetailService(siteDetailRepository, reportsUpload);
   const sitesMedia = new SitesMediaService(prisma, reportsUpload, siteEngagement);
   const siteEvents = { emitSiteCreated: jest.fn(), emitSiteUpdated: jest.fn() } as any;
   const sitesAdmin = new SitesAdminService(prisma, audit, siteEvents, sitesMapQuery, sitesFeed);
   const siteUpvotesRepository = {} as any;
+  const sitesSearch = { searchMapSites: jest.fn() } as any;
+  const mapMvtTiles = { getTileOrThrow: jest.fn() } as any;
   return new SitesService(
     prisma,
     reportsUpload,
@@ -54,6 +94,8 @@ function makeSitesService(
     sitesMedia,
     sitesAdmin,
     siteUpvotesRepository,
+    sitesSearch,
+    mapMvtTiles,
   );
 }
 
@@ -368,7 +410,7 @@ describe('SitesService', () => {
                   reportedAt: reportedAtLate,
                   reportId: 'rep_primary',
                   userId: 'user_ben',
-                  user: { firstName: 'Ben', lastName: 'Co' },
+                  user: { firstName: 'Ben', lastName: 'Co', avatarObjectKey: null },
                 },
                 {
                   id: 'cr2',
@@ -376,7 +418,7 @@ describe('SitesService', () => {
                   reportedAt: reportedAtEarly,
                   reportId: 'rep_primary',
                   userId: 'user_ann',
-                  user: { firstName: '', lastName: '' },
+                  user: { firstName: '', lastName: '', avatarObjectKey: null },
                 },
               ],
             },

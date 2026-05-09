@@ -24,9 +24,19 @@ AppError appErrorFromFailedResponse({
   final int? headerRetryAfter = _parseRetryAfterSeconds(retryAfterHeader);
 
   if (statusCode == 429) {
-    return AppError.tooManyRequests(
+    final Map<String, dynamic> merged = <String, dynamic>{};
+    if (details is Map) {
+      merged.addAll(Map<String, dynamic>.from(details));
+    }
+    final int? retryAfter = jsonRetryAfter ?? headerRetryAfter;
+    if (retryAfter != null) {
+      merged['retryAfterSeconds'] = retryAfter;
+    }
+    return AppError(
+      code: 'TOO_MANY_REQUESTS',
       message: message,
-      retryAfterSeconds: jsonRetryAfter ?? headerRetryAfter,
+      retryable: true,
+      details: merged.isEmpty ? null : merged,
       serverTimestamp: serverTimestamp,
     );
   }

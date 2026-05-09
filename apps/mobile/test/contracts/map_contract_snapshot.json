@@ -1,0 +1,28 @@
+{
+  "mapEnvelopeMetaKeys": [
+    "signedMediaExpiresAt",
+    "serverTime",
+    "queryMode",
+    "dataVersion"
+  ],
+  "mapListApiRowRequiredKeys": [
+    "id",
+    "latitude",
+    "longitude",
+    "address",
+    "description",
+    "status",
+    "createdAt",
+    "updatedAt",
+    "reportCount",
+    "latestReportTitle",
+    "latestReportDescription",
+    "latestReportCategory",
+    "latestReportCreatedAt",
+    "latestReportNumber",
+    "upvotesCount",
+    "commentsCount",
+    "savesCount",
+    "sharesCount"
+  ]
+}

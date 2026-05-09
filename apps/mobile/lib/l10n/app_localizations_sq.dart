@@ -1743,6 +1743,480 @@ class AppLocalizationsSq extends AppLocalizations {
   String get mapOpenMapsFailed => 'Nuk u hap Hartat';
 
   @override
+  String get mapSearchRecentsLabel => 'Të fundit';
+
+  @override
+  String get mapSearchClearRecentsButton => 'Pastro';
+
+  @override
+  String get mapSearchEmptyTitle => 'Kërko vende ndotjeje';
+
+  @override
+  String get mapSearchEmptySubtitle =>
+      'Shkruaj titull, kategori ose përshkrim. Ose prek një kërkim të fundit.';
+
+  @override
+  String get mapSearchNoResultsTitle => 'Nuk u gjet asgjë';
+
+  @override
+  String get mapSearchNoResultsSubtitle =>
+      'Provo fjalë të tjera ose pastro filtrat në hartë.';
+
+  @override
+  String mapSearchResultsBadge(int count) {
+    return '$count rezultate';
+  }
+
+  @override
+  String get mapSearchRemoteLoading => 'Duke kërkuar të gjitha vendet…';
+
+  @override
+  String get mapSearchRemoteError => 'Nuk u krye kërkimi në të gjitha vendet.';
+
+  @override
+  String get mapSearchRemoteRetry => 'Provo sërish';
+
+  @override
+  String get mapSearchSectionOnMap => 'Në këtë hartë';
+
+  @override
+  String get mapSearchSectionEverywhere => 'Më shumë rezultate';
+
+  @override
+  String get mapSearchSuggestionsLabel => 'Sugjerime';
+
+  @override
+  String get mapUpdatedToast => 'Harta u përditësua';
+
+  @override
+  String get mapErrorAutoRetryFootnote =>
+      'Do të provojmë sërish për disa sekonda. Mund edhe të prek Try again.';
+
+  @override
+  String mapFilteredSitesAnnounce(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count vende shfaqen në hartë',
+      one: 'Një vend shfaqet në hartë',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String mapClusterExpansionAnnounce(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count vende u ndanë në hartë',
+      one: 'Një vend u nda në hartë',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get mapScreenRouteSemantic =>
+      'Harta e ndotjes. Prek fijet për detaje të vendit.';
+
+  @override
+  String get mapLoadingSemantic => 'Po ngarkohet harta';
+
+  @override
+  String get mapSiteNotOnMapSnack => 'Ky vend ende nuk është në hartë.';
+
+  @override
+  String get mapOpenLocationFailedSnack =>
+      'Nuk mund të hapet kjo vendndodhje në hartë.';
+
+  @override
+  String get mapEmptyFiltersLiveRegion =>
+      'Asnjë vend nuk përputhet me filtrat aktualë';
+
+  @override
+  String get mapEmptyFiltersTitle => 'Asnjë vend nuk përputhet me filtrat';
+
+  @override
+  String get mapEmptyFiltersSubtitle =>
+      'Provo të ndryshosh filtrat ose të kërkosh.';
+
+  @override
+  String get mapDirectionsSheetOpenInMaps => 'Hape në Hartat';
+
+  @override
+  String get mapDirectionsSheetViewLocation => 'Shiko vendndodhjen';
+
+  @override
+  String get mapDirectionsSheetSubtitleDirections =>
+      'Zgjidh aplikacionin për drejtime.';
+
+  @override
+  String get mapDirectionsSheetSubtitleViewLocation =>
+      'Zgjidh aplikacionin për ta parë në hartë.';
+
+  @override
+  String get mapDirectionsAppleMapsTitle => 'Apple Maps';
+
+  @override
+  String get mapDirectionsAppleMapsSubtitle =>
+      'Hartat e integruara në këtë pajisje.';
+
+  @override
+  String get mapDirectionsGoogleMapsTitle => 'Google Maps';
+
+  @override
+  String get mapDirectionsGoogleMapsSubtitle =>
+      'Në web dhe në aplikacionin Google Maps.';
+
+  @override
+  String get mapSemanticCloseActionsMenu => 'Mbyll menunë e veprimeve';
+
+  @override
+  String get mapSemanticOpenActionsMenu => 'Hap menunë e veprimeve';
+
+  @override
+  String get mapSemanticHideHeatmap => 'Fshih hartën e nxehtësisë';
+
+  @override
+  String get mapSemanticShowHeatmap => 'Shfaq hartën e nxehtësisë';
+
+  @override
+  String get mapSemanticSwitchToLightMap => 'Kalo në hartë të çelët';
+
+  @override
+  String get mapSemanticSwitchToDarkMap => 'Kalo në hartë të errët';
+
+  @override
+  String get mapSemanticZoomWholeCountry => 'Zmadho për të parë gjithë vendin';
+
+  @override
+  String get mapSemanticUnlockRotation => 'Shkyç rrotullimin e hartës';
+
+  @override
+  String get mapSemanticLockRotation => 'Kyç rrotullimin e hartës';
+
+  @override
+  String get mapSemanticCenterOnMyLocation =>
+      'Qendro hartën te vendndodhja ime';
+
+  @override
+  String get mapSemanticSearchSites => 'Kërko vende';
+
+  @override
+  String get mapSemanticResetRotationNorth =>
+      'Rivendos rrotullimin drejt veriut';
+
+  @override
+  String get mapFilterButtonSemanticPrefix => 'Filtro vendet.';
+
+  @override
+  String get mapFilterButtonSemanticNoMatch =>
+      'Asnjë vend nuk përputhet me filtrat në këtë zonë.';
+
+  @override
+  String get mapFilterButtonSemanticNoSites => 'Nuk ka vende në këtë zonë.';
+
+  @override
+  String mapFilterButtonSemanticSitesCount(int count) {
+    return '$count vende në këtë zonë.';
+  }
+
+  @override
+  String get mapFilterButtonSemanticSuffix => 'Prek për të hapur filtrat.';
+
+  @override
+  String get mapFilterCountNoMatch => 'Asnjë përputhje';
+
+  @override
+  String get mapFilterCountNoSites => 'Asnjë vend';
+
+  @override
+  String get mapFilterSheetTitle => 'Filtro vendet';
+
+  @override
+  String get mapFilterCloseTooltip => 'Mbyll filtrat';
+
+  @override
+  String get mapFilterSectionSiteStatus => 'Statusi i vendit';
+
+  @override
+  String get mapFilterSectionArea => 'Komunë / zona';
+
+  @override
+  String get mapFilterSectionPollutionType => 'Lloji i ndotjes';
+
+  @override
+  String get mapFilterSectionVisibility => 'Dukshmëria';
+
+  @override
+  String get mapFilterShowArchivedSites => 'Shfaq vendet e arkivuara';
+
+  @override
+  String mapFilterShowingLiveRegion(int visible, int total) {
+    return '$visible nga $total vende ndotjeje të dukshme në këtë zonë';
+  }
+
+  @override
+  String mapFilterShowingInline(int visible, int total) {
+    return 'Po shfaqen $visible nga $total';
+  }
+
+  @override
+  String mapFilterPollutionTypeSemantic(String type) {
+    return 'Filtro vendet e llojit $type';
+  }
+
+  @override
+  String get mapFilterPollutionTypeHintOff =>
+      'Prek dy herë për të shfaqur këtë lloj';
+
+  @override
+  String get mapFilterPollutionTypeHintOn =>
+      'Prek dy herë për ta fshehur këtë lloj';
+
+  @override
+  String get mapFilterPollutionTypeUnknown => 'Lloj i panjohur';
+
+  @override
+  String get mapFilterSiteStatusReported => 'E raportuar';
+
+  @override
+  String get mapFilterSiteStatusVerified => 'E verifikuar';
+
+  @override
+  String get mapFilterSiteStatusCleanupScheduled => 'Pastrimi i planifikuar';
+
+  @override
+  String get mapFilterSiteStatusInProgress => 'Në progres';
+
+  @override
+  String get mapFilterSiteStatusCleaned => 'E pastruar';
+
+  @override
+  String get mapFilterSiteStatusDisputed => 'E kontestuar';
+
+  @override
+  String get mapFilterSiteStatusArchived => 'E arkivuar';
+
+  @override
+  String get mapFilterSiteStatusUnknown => 'Status i panjohur';
+
+  @override
+  String mapFilterSiteStatusSemantic(String status) {
+    return 'Filtro vendet me status $status';
+  }
+
+  @override
+  String get mapFilterSiteStatusHintOff =>
+      'Prek dy herë për ta shfaqur këtë status';
+
+  @override
+  String get mapFilterSiteStatusHintOn =>
+      'Prek dy herë për ta fshehur këtë status';
+
+  @override
+  String get mapGeoWholeCountry => 'E gjithë vendi';
+
+  @override
+  String get mapGeoSkopjeWhole => 'Të gjitha komunat e Shkupit';
+
+  @override
+  String get mapGeoSkopje => 'Shkupi';
+
+  @override
+  String get mapGeoSkopjeCentar => 'Qendra';
+
+  @override
+  String get mapGeoSkopjeAerodrom => 'Aerodromi';
+
+  @override
+  String get mapGeoSkopjeKarposh => 'Karposhi';
+
+  @override
+  String get mapGeoSkopjeChair => 'Çairi';
+
+  @override
+  String get mapGeoSkopjeKiselaVoda => 'Kisela Vodë';
+
+  @override
+  String get mapGeoSkopjeGaziBaba => 'Gazi Babë';
+
+  @override
+  String get mapGeoSkopjeButel => 'Buteli';
+
+  @override
+  String get mapGeoSkopjeGjorcePetrov => 'Gjorçe Petrov';
+
+  @override
+  String get mapGeoSkopjeSaraj => 'Saraj';
+
+  @override
+  String get mapGeoBitola => 'Manastiri';
+
+  @override
+  String get mapGeoKumanovo => 'Kumanova';
+
+  @override
+  String get mapGeoPrilep => 'Prilepi';
+
+  @override
+  String get mapGeoTetovo => 'Tetova';
+
+  @override
+  String get mapGeoVeles => 'Velesi';
+
+  @override
+  String get mapGeoOhrid => 'Ohri';
+
+  @override
+  String get mapGeoStip => 'Shtipi';
+
+  @override
+  String get mapGeoGostivar => 'Gostivari';
+
+  @override
+  String get mapGeoStrumica => 'Strumica';
+
+  @override
+  String get mapGeoKavadarci => 'Kavadari';
+
+  @override
+  String get mapGeoKocani => 'Koçani';
+
+  @override
+  String get mapGeoStruga => 'Struga';
+
+  @override
+  String get mapGeoRadovis => 'Radovishti';
+
+  @override
+  String get mapGeoGevgelija => 'Gjevgjelia';
+
+  @override
+  String get mapGeoKrivaPalanka => 'Kriva Pallanka';
+
+  @override
+  String get mapGeoSvetiNikole => 'Shënti Nikolla';
+
+  @override
+  String get mapGeoVinica => 'Vinica';
+
+  @override
+  String get mapGeoDelcevo => 'Delçeva';
+
+  @override
+  String get mapGeoProbistip => 'Probishtipi';
+
+  @override
+  String get mapGeoBerovo => 'Berova';
+
+  @override
+  String get mapGeoKratovo => 'Kratova';
+
+  @override
+  String get mapGeoKicevo => 'Kicheva';
+
+  @override
+  String get mapGeoMakedonskiBrod => 'Brod';
+
+  @override
+  String get mapGeoNegotino => 'Negocina';
+
+  @override
+  String get mapGeoResen => 'Reseni';
+
+  @override
+  String get mapGeoUnknownArea => 'Zona e panjohur';
+
+  @override
+  String mapPinPreviewSemantic(String title, String severity) {
+    return '$title, $severity. Prek dy herë për parapamje.';
+  }
+
+  @override
+  String mapClusterSemantic(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count vende ndotjeje të grupuara. Prek dy herë për t’i zgjeruar.',
+      one: '1 vend ndotjeje i grupuar. Prek dy herë për ta zgjeruar.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get mapUserLocationSemantic => 'Vendndodhja juaj aktuale';
+
+  @override
+  String get mapPreviewDismissAnnouncement => 'Parapamja e vendit u mbyll.';
+
+  @override
+  String mapDistanceMetersAway(int meters) {
+    return '$meters m larg';
+  }
+
+  @override
+  String mapDistanceKilometersAway(String kilometers) {
+    return '$kilometers km larg';
+  }
+
+  @override
+  String mapPreviewSemanticLabel(String title, String distance) {
+    return 'Vendi i zgjedhur: $title. $distance. Prek dy herë për detaje. Tërhiq poshtë për ta mbyllur.';
+  }
+
+  @override
+  String get mapPreviewSemanticHint =>
+      'Përdor veprimet për drejtime ose detaje të plota.';
+
+  @override
+  String get mapPreviewDirections => 'Drejtime';
+
+  @override
+  String get mapPreviewDetails => 'Detaje';
+
+  @override
+  String get mapSyncNoticeSemanticRefreshHint =>
+      'Prek dy herë për të rifreskuar menjëherë hartën.';
+
+  @override
+  String get mapSyncLiveUpdatesDelayed =>
+      'Përditësimet në kohë reale u vonuan. Po riprovohet në heshtje…';
+
+  @override
+  String get mapSyncConnectionUnstable =>
+      'Lidhja është e paqëndrueshme. Po rifreskohet në sfond…';
+
+  @override
+  String get mapSyncOfflineSnapshot =>
+      'Jashtë linje. Po shfaqet pamja e fundit e ruajtur e hartës.';
+
+  @override
+  String get mapSyncOfflineSnapshotJustNow =>
+      'Jashtë linje. Po shfaqet pamja e fundit e ruajtur e hartës nga tani.';
+
+  @override
+  String mapSyncOfflineSnapshotMinutesAgo(int minutes) {
+    return 'Jashtë linje. Po shfaqet pamja e fundit e ruajtur e hartës para $minutes min.';
+  }
+
+  @override
+  String mapSyncOfflineSnapshotHoursAgo(int hours) {
+    return 'Jashtë linje. Po shfaqet pamja e fundit e ruajtur e hartës para $hours orësh.';
+  }
+
+  @override
+  String get mapSearchLocationUnavailableSnack =>
+      'Vendndodhja nuk është e disponueshme për këtë vend.';
+
+  @override
+  String get mapSearchFieldSemanticHint =>
+      'Shkruaj titull, kategori ose përshkrim';
+
+  @override
+  String get mapSearchBarHint => 'Kërko vende…';
+
+  @override
   String get locationRetryAddressSemantic => 'Provo përsëri adresën';
 
   @override
@@ -4198,6 +4672,9 @@ class AppLocalizationsSq extends AppLocalizations {
   String get searchModalCancel => 'Anulo';
 
   @override
+  String get searchModalPlaceholder => 'Kërko vendndotje';
+
+  @override
   String get appSmartImageRetry => 'Provo përsëri';
 
   @override
@@ -5624,6 +6101,10 @@ class AppLocalizationsSq extends AppLocalizations {
   String get homeSiteCleaningRetry => 'Riprovo';
 
   @override
+  String get homeSiteCleaningLoadingSemantic =>
+      'Po ngarkohen veprimet ekologjike.';
+
+  @override
   String get eventsDistanceLessThan100m => '<100 m';
 
   @override
@@ -6336,4 +6817,18 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String get reportDraftIncomingPhotoAdd => 'Shto në draft';
+
+  @override
+  String get savedMapAreasTitle => 'Zonat e ruajtura të hartës';
+
+  @override
+  String get savedMapAreasPlaceholder =>
+      'Rajonet offline dhe shkarkimet në sfond do të shfaqen këtu.';
+
+  @override
+  String get mapWhatsNewTitle => 'Përditësime të hartës';
+
+  @override
+  String get mapWhatsNewBody =>
+      'Parapërgatitje më e zgjuar, grupe më të qëndrueshme dhe rrjedha më e sigurt e hartës.';
 }
