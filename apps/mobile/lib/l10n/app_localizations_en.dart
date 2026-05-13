@@ -2344,8 +2344,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notificationsMarkedUnreadLocal => 'Marked as unread (local).';
 
   @override
-  String get notificationsArchivedFromView =>
-      'Notification archived from this view';
+  String get notificationsArchiveFailed =>
+      'Could not archive notification. Please try again.';
+
+  @override
+  String get notificationsArchivedFromView => 'Notification archived';
 
   @override
   String get notificationsPrefsLoadFailed =>
@@ -2367,6 +2370,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notificationsPrefEnabled => 'Enabled';
+
+  @override
+  String notificationsPrefSnoozedUntil(String time) {
+    return 'Snoozed until $time';
+  }
+
+  @override
+  String get notificationsSnoozeTitle => 'Snooze duration';
+
+  @override
+  String get notificationsSnooze1h => '1 hour';
+
+  @override
+  String get notificationsSnooze4h => '4 hours';
+
+  @override
+  String get notificationsSnooze8h => '8 hours';
+
+  @override
+  String get notificationsSnooze24h => '24 hours';
+
+  @override
+  String get notificationsSnooze1w => '1 week';
+
+  @override
+  String get notificationsSnoozePermanent => 'Until I turn it back on';
+
+  @override
+  String get notificationsPauseAll => 'Pause all notifications';
 
   @override
   String get notificationsTypeSiteUpdates => 'Site updates';
@@ -5474,7 +5506,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get eventsFeedSemantic => 'Events feed';
 
   @override
-  String get eventsFeedTitle => 'Events';
+  String get eventsFeedLoadingSemantic => 'Loading events';
+
+  @override
+  String get eventsFeedTitle => 'Eco-events';
 
   @override
   String get eventsFeedCreateSemantic => 'Create event';
@@ -6054,6 +6089,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorUserUnauthorized => 'Please sign in again to continue.';
 
   @override
+  String get errorUserSessionRevoked =>
+      'Session is no longer valid. Please sign in again.';
+
+  @override
   String get errorUserForbidden => 'You don’t have permission to do that.';
 
   @override
@@ -6091,6 +6130,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get eventChatEmptyBody =>
       'Coordinate with other volunteers before and during the event.';
+
+  @override
+  String get eventChatEmptySayHello => 'Say hello';
 
   @override
   String get eventChatMessageRemoved => 'This message was removed';
@@ -6629,6 +6671,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportsSseReconnectBanner => 'Reconnecting to live updates…';
 
   @override
+  String get reportsSseOfflineBanner =>
+      'Live updates stopped. They resume when the connection is restored — or tap Reconnect.';
+
+  @override
   String get reportsSseReconnectAction => 'Reconnect';
 
   @override
@@ -6753,4 +6799,191 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get mapWhatsNewBody =>
       'Smarter prefetch, stable clusters, and safer map pipelines.';
+
+  @override
+  String get pushPermissionRationaleTitle => 'Stay in the loop';
+
+  @override
+  String get pushPermissionRationaleBody =>
+      'Allow notifications for cleanup reminders, event updates, and chat messages. You can change this anytime in Settings.';
+
+  @override
+  String get pushPermissionRationaleAllow => 'Allow notifications';
+
+  @override
+  String get pushPermissionRationaleNotNow => 'Not now';
+
+  @override
+  String get pushChannelDefaultName => 'Chisto.mk';
+
+  @override
+  String get pushChannelDefaultDescription => 'General notifications';
+
+  @override
+  String get eventChatPushChannelDescription =>
+      'Messages on cleanup events you joined';
+
+  @override
+  String get micPermissionRationaleTitle => 'Microphone access';
+
+  @override
+  String get micPermissionRationaleBody =>
+      'Voice messages in event chat use your microphone only while you record.';
+
+  @override
+  String get micPermissionRationaleAllow => 'Allow microphone';
+
+  @override
+  String get micPermissionRationaleNotNow => 'Not now';
+
+  @override
+  String get micPermissionOpenSettings => 'Open Settings';
+
+  @override
+  String get photoSourceModalTitle => 'Add photo';
+
+  @override
+  String get photoSourceModalSubtitle => 'Choose how to add the first photo.';
+
+  @override
+  String get photoSourceModalHint =>
+      'You can review the photo before it is added.';
+
+  @override
+  String get photoSourceTakePhoto => 'Take photo';
+
+  @override
+  String get photoSourceTakePhotoSubtitle =>
+      'Capture a clear overview right now.';
+
+  @override
+  String get photoSourceBestChoiceBadge => 'Best choice';
+
+  @override
+  String get photoSourceChooseFromLibrary => 'Choose from library';
+
+  @override
+  String get photoSourceChooseFromLibrarySubtitle =>
+      'Use a photo already on your device.';
+
+  @override
+  String get photoSourceCloseSemanticLabel => 'Close';
+
+  @override
+  String get locationPickerStatePermissionNeeded =>
+      'Location permission needed';
+
+  @override
+  String get locationPickerStateDetectingPosition => 'Detecting your position';
+
+  @override
+  String get locationPickerStateCheckingLocation => 'Checking location…';
+
+  @override
+  String get locationPickerStateCurrentLocationUnavailable =>
+      'Current location unavailable';
+
+  @override
+  String get locationPickerStateReviewDetectedLocation =>
+      'Review detected location';
+
+  @override
+  String get locationPickerStateOutsideMacedonia =>
+      'Location outside Macedonia';
+
+  @override
+  String get locationPickerStatePinNeedsConfirmation =>
+      'Pin needs confirmation';
+
+  @override
+  String get locationPickerStateLocationConfirmed => 'Location confirmed';
+
+  @override
+  String get locationPickerStateTapConfirmWhenReady => 'Tap Confirm when ready';
+
+  @override
+  String locationPickerScreenSemantics(String stateLabel) {
+    return 'Location picker. $stateLabel';
+  }
+
+  @override
+  String get locationPickerMapSemantics =>
+      'Map. Drag to move the pin. Pin cannot leave Macedonia.';
+
+  @override
+  String get locationPickerHelperReviewGps =>
+      'We found your current location. Review the pin, then confirm.';
+
+  @override
+  String get locationPickerHelperReadyToSubmit =>
+      'The pinned location is ready to submit.';
+
+  @override
+  String get locationPickerHelperMovePinConfirm =>
+      'Move the pin to the exact spot, then tap Confirm. The map stays inside Macedonia.';
+
+  @override
+  String get locationPickerRetryAddressHint =>
+      'Double-tap to look up the address again.';
+
+  @override
+  String get locationPickerAddressLookupUnavailableBody =>
+      'Address lookup unavailable. You can still confirm the pin.';
+
+  @override
+  String get locationPickerBannerPermissionOff =>
+      'Location access is off. Move the map manually, then confirm the pin.';
+
+  @override
+  String get locationPickerBannerGpsOutsideTitle =>
+      'Current location outside coverage';
+
+  @override
+  String get locationPickerBannerGpsOutsideBody =>
+      'GPS is outside Macedonia. Move the pin manually or try again.';
+
+  @override
+  String get locationPickerConfirmSemanticsWhenUnset =>
+      'Confirm location. Set this spot as the report location';
+
+  @override
+  String get locationPickerConfirmSemanticsWhenConfirmed =>
+      'Confirm location. Location already confirmed';
+
+  @override
+  String get locationPickerConfirmHintDone =>
+      'Location is set for this report.';
+
+  @override
+  String get locationPickerConfirmHintPending =>
+      'Double-tap to set this spot as the report location.';
+
+  @override
+  String get locationPickerConfirmChecking => 'Checking…';
+
+  @override
+  String get locationPickerConfirmLocation => 'Confirm location';
+
+  @override
+  String get locationPickerAddressChecking => 'Checking address…';
+
+  @override
+  String locationPickerAddressUnavailableWithCoords(String coords) {
+    return 'Address unavailable. Coordinates: $coords';
+  }
+
+  @override
+  String locationPickerAddressNear(String address) {
+    return 'Near $address';
+  }
+
+  @override
+  String get locationPickerAddressPlaceholder => '—';
+
+  @override
+  String get locationPickerUseCurrentLocationLabel => 'Use current location.';
+
+  @override
+  String get locationPickerUseCurrentLocationHint =>
+      'Double-tap to center the map on your GPS position if inside Macedonia.';
 }

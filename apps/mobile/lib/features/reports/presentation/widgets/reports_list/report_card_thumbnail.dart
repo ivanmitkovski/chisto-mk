@@ -23,15 +23,35 @@ class ReportCardThumbnail extends StatelessWidget {
         filterQuality: FilterQuality.medium,
         memCacheWidth: 216,
         memCacheHeight: 216,
-        placeholder: (BuildContext context, String url) => Container(
-          color: AppColors.inputFill,
-          alignment: Alignment.center,
-          child: const SizedBox(
-            width: 24,
-            height: 24,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
-        ),
+        fadeInDuration: Duration.zero,
+        fadeOutDuration: Duration.zero,
+        // [octo_image] allows only one of placeholder vs progressIndicatorBuilder.
+        progressIndicatorBuilder: (
+          BuildContext context,
+          String url,
+          DownloadProgress progress,
+        ) {
+          final double? p = progress.progress;
+          if (p == null || p >= 1.0) {
+            return Container(color: AppColors.inputFill);
+          }
+          return Stack(
+            fit: StackFit.expand,
+            children: <Widget>[
+              Container(color: AppColors.inputFill),
+              Center(
+                child: SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    value: p,
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
         errorWidget: (BuildContext context, String url, Object? error) => Container(
           color: AppColors.inputFill,
           alignment: Alignment.center,

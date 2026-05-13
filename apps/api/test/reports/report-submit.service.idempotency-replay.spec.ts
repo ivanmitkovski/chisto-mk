@@ -4,6 +4,8 @@
  * shape as the original submit, reconstructed from the report + points ledger (no second create).
  * If create path later reads the ledger for points on first response too, update this test.
  */
+import { ReportSubmitIdempotencyService } from '../../src/reports/report-submit-idempotency.service';
+import { ReportSubmitMediaAppendService } from '../../src/reports/report-submit-media-append.service';
 import { ReportSubmitService } from '../../src/reports/report-submit.service';
 import { ReportCapacityService } from '../../src/reports/report-capacity.service';
 import { Role } from '../../src/prisma-client';
@@ -110,6 +112,12 @@ describe('ReportSubmitService idempotency replay', () => {
       }),
     };
 
+    const idempotency = new ReportSubmitIdempotencyService(prisma as never);
+    const mediaAppend = new ReportSubmitMediaAppendService(
+      prisma as never,
+      reportsUploadService as never,
+      reportsOwnerEventsService as never,
+    );
     const svc = new ReportSubmitService(
       prisma as never,
       postCreateEvents as never,
@@ -117,6 +125,8 @@ describe('ReportSubmitService idempotency replay', () => {
       reportCapacity as unknown as ReportCapacityService,
       reportsUploadService as never,
       nearbySiteResolver as never,
+      idempotency,
+      mediaAppend,
     );
 
     const key = 'idem-key-abc1234567';

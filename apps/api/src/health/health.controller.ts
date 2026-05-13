@@ -1,46 +1,87 @@
 import { HeadBucketCommand } from '@aws-sdk/client-s3';
-import { Controller, Get, ServiceUnavailableException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Logger,
+  OnModuleDestroy,
+  ServiceUnavailableException,
+  UseGuards,
+} from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { ADMIN_PANEL_ROLES } from '../auth/admin-roles';
+import { Roles } from '../auth/roles.decorator';
+import { RolesGuard } from '../auth/roles.guard';
+import { SkipThrottle } from '@nestjs/throttler';
+import { ApiTags } from '@nestjs/swagger';
 import Redis from 'ioredis';
 import { loadFeatureFlags } from '../config/feature-flags';
 import { PrismaService } from '../prisma/prisma.service';
 import { S3StorageClient } from '../storage/s3-storage.client';
+import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-error-responses.decorator';
 
+@ApiTags('health')
+@ApiStandardHttpErrorResponses()
 @Controller('health')
-export class HealthController {
+export class HealthController implements OnModuleDestroy {
+  private readonly logger = new Logger(HealthController.name);
+  private healthRedis: Redis | null = null;
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly s3: S3StorageClient,
   ) {}
 
+  async onModuleDestroy(): Promise<void> {
+    if (this.healthRedis) {
+      await this.healthRedis.quit().catch(() => {});
+      this.healthRedis = null;
+    }
+  }
+
+  private getHealthRedis(): Redis | null {
+    const redisUrl = process.env.REDIS_URL?.trim();
+    if (!redisUrl) return null;
+    if (!this.healthRedis || this.healthRedis.status === 'end') {
+      this.healthRedis = new Redis(redisUrl, {
+        maxRetriesPerRequest: 1,
+        enableReadyCheck: false,
+        lazyConnect: true,
+        connectTimeout: 3_000,
+      });
+    }
+    return this.healthRedis;
+  }
+
   @Get()
+  @SkipThrottle()
   liveness(): { status: string } {
     return { status: 'ok' };
   }
 
   @Get('live')
+  @SkipThrottle()
   live(): { status: string } {
     return { status: 'ok' };
   }
 
   @Get('ready')
+  @SkipThrottle()
   async readiness(): Promise<{ status: string; redis?: string; s3?: string }> {
     try {
       await this.prisma.$queryRaw`SELECT 1`;
-    } catch {
+    } catch (err) {
+      this.logger.warn({ err }, 'readiness: database check failed');
       throw new ServiceUnavailableException('Database unavailable');
     }
 
     let redis: string | undefined;
-    const redisUrl = process.env.REDIS_URL?.trim();
-    if (redisUrl) {
-      const client = new Redis(redisUrl, { maxRetriesPerRequest: 1, enableReadyCheck: true });
+    const redisClient = this.getHealthRedis();
+    if (redisClient) {
       try {
-        await client.ping();
+        await redisClient.ping();
         redis = 'ok';
       } catch {
         throw new ServiceUnavailableException('Redis unavailable');
-      } finally {
-        await client.quit();
       }
     } else {
       redis = 'skipped';
@@ -67,6 +108,8 @@ export class HealthController {
    * Always 200 — use `alerts` for non-empty human-readable warnings.
    */
   @Get('map')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(...ADMIN_PANEL_ROLES)
   async mapPipeline(): Promise<{
     status: string;
     mapUseProjection: boolean;
@@ -115,6 +158,8 @@ export class HealthController {
    * Always 200 — use `alerts` when latency exceeds budget or PostGIS path failed.
    */
   @Get('map-deep')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(...ADMIN_PANEL_ROLES)
   async mapDeep(): Promise<{
     status: string;
     durationMs: number;

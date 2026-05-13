@@ -4058,10 +4058,16 @@ abstract class AppLocalizations {
   /// **'Marked as unread (local).'**
   String get notificationsMarkedUnreadLocal;
 
+  /// No description provided for @notificationsArchiveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not archive notification. Please try again.'**
+  String get notificationsArchiveFailed;
+
   /// No description provided for @notificationsArchivedFromView.
   ///
   /// In en, this message translates to:
-  /// **'Notification archived from this view'**
+  /// **'Notification archived'**
   String get notificationsArchivedFromView;
 
   /// No description provided for @notificationsPrefsLoadFailed.
@@ -4099,6 +4105,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enabled'**
   String get notificationsPrefEnabled;
+
+  /// No description provided for @notificationsPrefSnoozedUntil.
+  ///
+  /// In en, this message translates to:
+  /// **'Snoozed until {time}'**
+  String notificationsPrefSnoozedUntil(String time);
+
+  /// No description provided for @notificationsSnoozeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Snooze duration'**
+  String get notificationsSnoozeTitle;
+
+  /// No description provided for @notificationsSnooze1h.
+  ///
+  /// In en, this message translates to:
+  /// **'1 hour'**
+  String get notificationsSnooze1h;
+
+  /// No description provided for @notificationsSnooze4h.
+  ///
+  /// In en, this message translates to:
+  /// **'4 hours'**
+  String get notificationsSnooze4h;
+
+  /// No description provided for @notificationsSnooze8h.
+  ///
+  /// In en, this message translates to:
+  /// **'8 hours'**
+  String get notificationsSnooze8h;
+
+  /// No description provided for @notificationsSnooze24h.
+  ///
+  /// In en, this message translates to:
+  /// **'24 hours'**
+  String get notificationsSnooze24h;
+
+  /// No description provided for @notificationsSnooze1w.
+  ///
+  /// In en, this message translates to:
+  /// **'1 week'**
+  String get notificationsSnooze1w;
+
+  /// No description provided for @notificationsSnoozePermanent.
+  ///
+  /// In en, this message translates to:
+  /// **'Until I turn it back on'**
+  String get notificationsSnoozePermanent;
+
+  /// No description provided for @notificationsPauseAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause all notifications'**
+  String get notificationsPauseAll;
 
   /// No description provided for @notificationsTypeSiteUpdates.
   ///
@@ -9066,10 +9126,16 @@ abstract class AppLocalizations {
   /// **'Events feed'**
   String get eventsFeedSemantic;
 
+  /// No description provided for @eventsFeedLoadingSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading events'**
+  String get eventsFeedLoadingSemantic;
+
   /// No description provided for @eventsFeedTitle.
   ///
   /// In en, this message translates to:
-  /// **'Events'**
+  /// **'Eco-events'**
   String get eventsFeedTitle;
 
   /// No description provided for @eventsFeedCreateSemantic.
@@ -10018,6 +10084,12 @@ abstract class AppLocalizations {
   /// **'Please sign in again to continue.'**
   String get errorUserUnauthorized;
 
+  /// No description provided for @errorUserSessionRevoked.
+  ///
+  /// In en, this message translates to:
+  /// **'Session is no longer valid. Please sign in again.'**
+  String get errorUserSessionRevoked;
+
   /// No description provided for @errorUserForbidden.
   ///
   /// In en, this message translates to:
@@ -10089,6 +10161,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Coordinate with other volunteers before and during the event.'**
   String get eventChatEmptyBody;
+
+  /// No description provided for @eventChatEmptySayHello.
+  ///
+  /// In en, this message translates to:
+  /// **'Say hello'**
+  String get eventChatEmptySayHello;
 
   /// No description provided for @eventChatMessageRemoved.
   ///
@@ -11026,6 +11104,12 @@ abstract class AppLocalizations {
   /// **'Reconnecting to live updates…'**
   String get reportsSseReconnectBanner;
 
+  /// No description provided for @reportsSseOfflineBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Live updates stopped. They resume when the connection is restored — or tap Reconnect.'**
+  String get reportsSseOfflineBanner;
+
   /// No description provided for @reportsSseReconnectAction.
   ///
   /// In en, this message translates to:
@@ -11185,6 +11269,318 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Smarter prefetch, stable clusters, and safer map pipelines.'**
   String get mapWhatsNewBody;
+
+  /// No description provided for @pushPermissionRationaleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay in the loop'**
+  String get pushPermissionRationaleTitle;
+
+  /// No description provided for @pushPermissionRationaleBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow notifications for cleanup reminders, event updates, and chat messages. You can change this anytime in Settings.'**
+  String get pushPermissionRationaleBody;
+
+  /// No description provided for @pushPermissionRationaleAllow.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow notifications'**
+  String get pushPermissionRationaleAllow;
+
+  /// No description provided for @pushPermissionRationaleNotNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get pushPermissionRationaleNotNow;
+
+  /// No description provided for @pushChannelDefaultName.
+  ///
+  /// In en, this message translates to:
+  /// **'Chisto.mk'**
+  String get pushChannelDefaultName;
+
+  /// No description provided for @pushChannelDefaultDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'General notifications'**
+  String get pushChannelDefaultDescription;
+
+  /// No description provided for @eventChatPushChannelDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Messages on cleanup events you joined'**
+  String get eventChatPushChannelDescription;
+
+  /// No description provided for @micPermissionRationaleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Microphone access'**
+  String get micPermissionRationaleTitle;
+
+  /// No description provided for @micPermissionRationaleBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice messages in event chat use your microphone only while you record.'**
+  String get micPermissionRationaleBody;
+
+  /// No description provided for @micPermissionRationaleAllow.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow microphone'**
+  String get micPermissionRationaleAllow;
+
+  /// No description provided for @micPermissionRationaleNotNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get micPermissionRationaleNotNow;
+
+  /// No description provided for @micPermissionOpenSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Settings'**
+  String get micPermissionOpenSettings;
+
+  /// No description provided for @photoSourceModalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add photo'**
+  String get photoSourceModalTitle;
+
+  /// No description provided for @photoSourceModalSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose how to add the first photo.'**
+  String get photoSourceModalSubtitle;
+
+  /// No description provided for @photoSourceModalHint.
+  ///
+  /// In en, this message translates to:
+  /// **'You can review the photo before it is added.'**
+  String get photoSourceModalHint;
+
+  /// No description provided for @photoSourceTakePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Take photo'**
+  String get photoSourceTakePhoto;
+
+  /// No description provided for @photoSourceTakePhotoSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Capture a clear overview right now.'**
+  String get photoSourceTakePhotoSubtitle;
+
+  /// No description provided for @photoSourceBestChoiceBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Best choice'**
+  String get photoSourceBestChoiceBadge;
+
+  /// No description provided for @photoSourceChooseFromLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from library'**
+  String get photoSourceChooseFromLibrary;
+
+  /// No description provided for @photoSourceChooseFromLibrarySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Use a photo already on your device.'**
+  String get photoSourceChooseFromLibrarySubtitle;
+
+  /// No description provided for @photoSourceCloseSemanticLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get photoSourceCloseSemanticLabel;
+
+  /// No description provided for @locationPickerStatePermissionNeeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Location permission needed'**
+  String get locationPickerStatePermissionNeeded;
+
+  /// No description provided for @locationPickerStateDetectingPosition.
+  ///
+  /// In en, this message translates to:
+  /// **'Detecting your position'**
+  String get locationPickerStateDetectingPosition;
+
+  /// No description provided for @locationPickerStateCheckingLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking location…'**
+  String get locationPickerStateCheckingLocation;
+
+  /// No description provided for @locationPickerStateCurrentLocationUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Current location unavailable'**
+  String get locationPickerStateCurrentLocationUnavailable;
+
+  /// No description provided for @locationPickerStateReviewDetectedLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Review detected location'**
+  String get locationPickerStateReviewDetectedLocation;
+
+  /// No description provided for @locationPickerStateOutsideMacedonia.
+  ///
+  /// In en, this message translates to:
+  /// **'Location outside Macedonia'**
+  String get locationPickerStateOutsideMacedonia;
+
+  /// No description provided for @locationPickerStatePinNeedsConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Pin needs confirmation'**
+  String get locationPickerStatePinNeedsConfirmation;
+
+  /// No description provided for @locationPickerStateLocationConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Location confirmed'**
+  String get locationPickerStateLocationConfirmed;
+
+  /// No description provided for @locationPickerStateTapConfirmWhenReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap Confirm when ready'**
+  String get locationPickerStateTapConfirmWhenReady;
+
+  /// No description provided for @locationPickerScreenSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Location picker. {stateLabel}'**
+  String locationPickerScreenSemantics(String stateLabel);
+
+  /// No description provided for @locationPickerMapSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Map. Drag to move the pin. Pin cannot leave Macedonia.'**
+  String get locationPickerMapSemantics;
+
+  /// No description provided for @locationPickerHelperReviewGps.
+  ///
+  /// In en, this message translates to:
+  /// **'We found your current location. Review the pin, then confirm.'**
+  String get locationPickerHelperReviewGps;
+
+  /// No description provided for @locationPickerHelperReadyToSubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'The pinned location is ready to submit.'**
+  String get locationPickerHelperReadyToSubmit;
+
+  /// No description provided for @locationPickerHelperMovePinConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Move the pin to the exact spot, then tap Confirm. The map stays inside Macedonia.'**
+  String get locationPickerHelperMovePinConfirm;
+
+  /// No description provided for @locationPickerRetryAddressHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Double-tap to look up the address again.'**
+  String get locationPickerRetryAddressHint;
+
+  /// No description provided for @locationPickerAddressLookupUnavailableBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Address lookup unavailable. You can still confirm the pin.'**
+  String get locationPickerAddressLookupUnavailableBody;
+
+  /// No description provided for @locationPickerBannerPermissionOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Location access is off. Move the map manually, then confirm the pin.'**
+  String get locationPickerBannerPermissionOff;
+
+  /// No description provided for @locationPickerBannerGpsOutsideTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Current location outside coverage'**
+  String get locationPickerBannerGpsOutsideTitle;
+
+  /// No description provided for @locationPickerBannerGpsOutsideBody.
+  ///
+  /// In en, this message translates to:
+  /// **'GPS is outside Macedonia. Move the pin manually or try again.'**
+  String get locationPickerBannerGpsOutsideBody;
+
+  /// No description provided for @locationPickerConfirmSemanticsWhenUnset.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm location. Set this spot as the report location'**
+  String get locationPickerConfirmSemanticsWhenUnset;
+
+  /// No description provided for @locationPickerConfirmSemanticsWhenConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm location. Location already confirmed'**
+  String get locationPickerConfirmSemanticsWhenConfirmed;
+
+  /// No description provided for @locationPickerConfirmHintDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Location is set for this report.'**
+  String get locationPickerConfirmHintDone;
+
+  /// No description provided for @locationPickerConfirmHintPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Double-tap to set this spot as the report location.'**
+  String get locationPickerConfirmHintPending;
+
+  /// No description provided for @locationPickerConfirmChecking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking…'**
+  String get locationPickerConfirmChecking;
+
+  /// No description provided for @locationPickerConfirmLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm location'**
+  String get locationPickerConfirmLocation;
+
+  /// No description provided for @locationPickerAddressChecking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking address…'**
+  String get locationPickerAddressChecking;
+
+  /// No description provided for @locationPickerAddressUnavailableWithCoords.
+  ///
+  /// In en, this message translates to:
+  /// **'Address unavailable. Coordinates: {coords}'**
+  String locationPickerAddressUnavailableWithCoords(String coords);
+
+  /// No description provided for @locationPickerAddressNear.
+  ///
+  /// In en, this message translates to:
+  /// **'Near {address}'**
+  String locationPickerAddressNear(String address);
+
+  /// No description provided for @locationPickerAddressPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'—'**
+  String get locationPickerAddressPlaceholder;
+
+  /// No description provided for @locationPickerUseCurrentLocationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Use current location.'**
+  String get locationPickerUseCurrentLocationLabel;
+
+  /// No description provided for @locationPickerUseCurrentLocationHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Double-tap to center the map on your GPS position if inside Macedonia.'**
+  String get locationPickerUseCurrentLocationHint;
 }
 
 class _AppLocalizationsDelegate

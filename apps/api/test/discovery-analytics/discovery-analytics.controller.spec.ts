@@ -11,14 +11,26 @@ describe('DiscoveryAnalyticsController', () => {
   };
 
   it('returns accepted false when server flag is off', () => {
-    const config = { get: jest.fn(() => 'false') };
+    const config = {
+      get: jest.fn((key: string, def?: string) => {
+        if (key === 'DISCOVERY_ANALYTICS_INGEST_SECRET') return 'test-secret';
+        if (key === 'DISCOVERY_ANALYTICS_ENABLED') return 'false';
+        return def ?? '';
+      }),
+    };
     const ctrl = new DiscoveryAnalyticsController(config as never);
-    expect(ctrl.ingest(dto)).toEqual({ ok: true, accepted: false });
+    expect(ctrl.ingest(dto, 'test-secret')).toEqual({ ok: true, accepted: false });
   });
 
   it('returns accepted true when server flag is on', () => {
-    const config = { get: jest.fn(() => 'true') };
+    const config = {
+      get: jest.fn((key: string, def?: string) => {
+        if (key === 'DISCOVERY_ANALYTICS_INGEST_SECRET') return 'test-secret';
+        if (key === 'DISCOVERY_ANALYTICS_ENABLED') return 'true';
+        return def ?? '';
+      }),
+    };
     const ctrl = new DiscoveryAnalyticsController(config as never);
-    expect(ctrl.ingest(dto)).toEqual({ ok: true, accepted: true });
+    expect(ctrl.ingest(dto, 'test-secret')).toEqual({ ok: true, accepted: true });
   });
 });

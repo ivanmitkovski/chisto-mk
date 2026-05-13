@@ -18,12 +18,23 @@ import { CheckEventConflictQueryDto } from '../../src/events/dto/check-event-con
 import { ListEventParticipantsQueryDto } from '../../src/events/dto/list-event-participants-query.dto';
 import { ListEventsQueryDto } from '../../src/events/dto/list-events-query.dto';
 import { PatchEventReminderDto } from '../../src/events/dto/patch-event-reminder.dto';
+import { EventsAfterImagesService } from '../../src/events/events-after-images.service';
+import { EventsAnalyticsService } from '../../src/events/events-analytics.service';
+import { EventCreationPersistenceService } from '../../src/events/event-creation-persistence.service';
+import { EventCreationValidationService } from '../../src/events/event-creation-validation.service';
+import { EventUpdateValidationService } from '../../src/events/event-update-validation.service';
 import { EventsCreationService } from '../../src/events/events-creation.service';
-import { EventsLifecycleParticipationService } from '../../src/events/events-lifecycle-participation.service';
+import { EventsLifecycleService } from '../../src/events/events-lifecycle.service';
+import { EventsParticipationService } from '../../src/events/events-participation.service';
+import { EventsDetailQueryService } from '../../src/events/events-detail-query.service';
+import { EventsListQueryService } from '../../src/events/events-list-query.service';
 import { EventsMobileMapperService } from '../../src/events/events-mobile-mapper.service';
 import { EventsQueryService } from '../../src/events/events-query.service';
 import { EventsRepository } from '../../src/events/events.repository';
-import { EventsService } from '../../src/events/events.service';
+import { EventsScheduleConflictPreviewQueryService } from '../../src/events/events-schedule-conflict-preview-query.service';
+import { EventsSearchQueryService } from '../../src/events/events-search-query.service';
+import { EventsSearchService } from '../../src/events/events-search.service';
+import { EventsShareCardQueryService } from '../../src/events/events-share-card-query.service';
 import { EventsUpdateService } from '../../src/events/events-update.service';
 
 function user(id: string, role: Role = Role.USER): AuthenticatedUser {
@@ -145,7 +156,22 @@ describe('EventsService', () => {
   let scheduleConflict: { findConflictingEvent: jest.Mock };
   let routeSegments: { replaceWaypoints: jest.Mock };
   let liveImpact: { notifyListeners: jest.Mock };
-  let service: EventsService;
+  let service: {
+    list: EventsQueryService['list'];
+    search: EventsSearchService['search'];
+    findPublicShareCard: EventsShareCardQueryService['findPublicShareCard'];
+    findOne: EventsQueryService['findOne'];
+    listParticipants: EventsQueryService['listParticipants'];
+    checkScheduleConflictPreview: EventsScheduleConflictPreviewQueryService['checkScheduleConflictPreview'];
+    create: EventsCreationService['create'];
+    patchEvent: EventsUpdateService['patchEvent'];
+    patchLifecycle: EventsLifecycleService['patchLifecycle'];
+    join: EventsParticipationService['join'];
+    leave: EventsParticipationService['leave'];
+    patchReminder: EventsParticipationService['patchReminder'];
+    appendAfterImages: EventsAfterImagesService['appendAfterImages'];
+    getAnalytics: EventsAnalyticsService['getAnalytics'];
+  };
 
   beforeEach(() => {
     uploads = makeUploads();
@@ -211,40 +237,85 @@ describe('EventsService', () => {
     };
     const eventsRepository = new EventsRepository(prisma as never);
     const mobileMapper = new EventsMobileMapperService(eventsRepository, uploads as never);
-    const query = new EventsQueryService(
+    const shareCard = new EventsShareCardQueryService(eventsRepository);
+    const schedulePreview = new EventsScheduleConflictPreviewQueryService(scheduleConflict as never);
+    const eventSearchQuery = new EventsSearchQueryService(eventsRepository);
+    const eventSearchForQuery = new EventsSearchService(
       eventsRepository,
       uploads as never,
       mobileMapper,
-      scheduleConflict as never,
+      eventSearchQuery,
+    );
+    const listQuery = new EventsListQueryService(
+      eventsRepository,
+      mobileMapper,
+      eventsTelemetry as never,
+      eventSearchQuery,
+    );
+    const detailQuery = new EventsDetailQueryService(
+      eventsRepository,
+      uploads as never,
+      mobileMapper,
       eventsTelemetry as never,
     );
-    const creation = new EventsCreationService(
+    const query = new EventsQueryService(listQuery, detailQuery);
+    const creationValidation = new EventCreationValidationService(
+      eventsRepository,
+      scheduleConflict as never,
+    );
+    const creationPersistence = new EventCreationPersistenceService(
       eventsRepository,
       mobileMapper,
       cleanupEventsSse as never,
       cleanupEventNotifications as never,
-      scheduleConflict as never,
       routeSegments as never,
     );
+    const creation = new EventsCreationService(creationValidation, creationPersistence);
+    const patchValidation = new EventUpdateValidationService(scheduleConflict as never);
     const update = new EventsUpdateService(
       eventsRepository,
       mobileMapper,
-      scheduleConflict as never,
+      patchValidation,
       cleanupEventsSse as never,
       cleanupEventNotifications as never,
       eventChat as never,
       routeSegments as never,
     );
-    const lifecycle = new EventsLifecycleParticipationService(
+    const lifecycle = new EventsLifecycleService(
       eventsRepository,
-      cleanupMediaUpload as never,
       mobileMapper,
       ecoEventPoints as never,
       notificationDispatcher as never,
+    );
+    const participation = new EventsParticipationService(
+      eventsRepository,
+      mobileMapper,
+      ecoEventPoints as never,
       eventChat as never,
       liveImpact as never,
     );
-    service = new EventsService(query, creation, update, lifecycle);
+    const afterImages = new EventsAfterImagesService(
+      eventsRepository,
+      cleanupMediaUpload as never,
+      mobileMapper,
+    );
+    const analytics = new EventsAnalyticsService(eventsRepository);
+    service = {
+      list: (u, q) => query.list(u, q),
+      search: (u, dto) => eventSearchForQuery.search(u, dto),
+      findPublicShareCard: (id) => shareCard.findPublicShareCard(id),
+      findOne: (id, u, geo) => query.findOne(id, u, geo),
+      listParticipants: (id, u, q) => query.listParticipants(id, u, q),
+      checkScheduleConflictPreview: (q) => schedulePreview.checkScheduleConflictPreview(q),
+      create: (dto, u) => creation.create(dto, u),
+      patchEvent: (id, dto, u) => update.patchEvent(id, dto, u),
+      patchLifecycle: (id, dto, u) => lifecycle.patchLifecycle(id, dto, u),
+      join: (id, u) => participation.join(id, u),
+      leave: (id, u) => participation.leave(id, u),
+      patchReminder: (id, dto, u) => participation.patchReminder(id, dto, u),
+      appendAfterImages: (id, files, u) => afterImages.appendAfterImages(id, files, u),
+      getAnalytics: (id, u) => analytics.getAnalytics(id, u),
+    };
   });
 
   describe('create', () => {

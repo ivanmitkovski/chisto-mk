@@ -1,5 +1,5 @@
 import { EventChatClusterConfig } from '../../src/event-chat/event-chat-cluster.config';
-import { EventChatGateway } from '../../src/event-chat/event-chat.gateway';
+import { EventChatRoomEmitterService } from '../../src/event-chat/event-chat-room-emitter.service';
 import { EventChatSseService } from '../../src/event-chat/event-chat-sse.service';
 import { EventChatTelemetryService } from '../../src/event-chat/event-chat-telemetry.service';
 
@@ -16,11 +16,11 @@ describe('EventChatSseService', () => {
 
   it('ingestFromRedis does not emit to WebSocket gateway when Socket.IO is clustered', () => {
     delete process.env.REDIS_URL;
-    const gateway = { server: {}, emitToRoom: jest.fn() } as unknown as EventChatGateway;
+    const roomEmitter = { isReady: () => true, emitToRoom: jest.fn() } as unknown as EventChatRoomEmitterService;
     const cluster = new EventChatClusterConfig();
     cluster.setSocketIoClustered(true);
     const telemetry = new EventChatTelemetryService();
-    const svc = new EventChatSseService(gateway, cluster, telemetry);
+    const svc = new EventChatSseService(roomEmitter, cluster, telemetry);
 
     const payload = JSON.stringify({
       streamEventId: 'se-1',
@@ -33,16 +33,16 @@ describe('EventChatSseService', () => {
       payload,
     );
 
-    expect(gateway.emitToRoom).not.toHaveBeenCalled();
+    expect(roomEmitter.emitToRoom).not.toHaveBeenCalled();
   });
 
   it('ingestFromRedis emits to WebSocket gateway when Socket.IO is not clustered', () => {
     delete process.env.REDIS_URL;
-    const gateway = { server: {}, emitToRoom: jest.fn() } as unknown as EventChatGateway;
+    const roomEmitter = { isReady: () => true, emitToRoom: jest.fn() } as unknown as EventChatRoomEmitterService;
     const cluster = new EventChatClusterConfig();
     cluster.setSocketIoClustered(false);
     const telemetry = new EventChatTelemetryService();
-    const svc = new EventChatSseService(gateway, cluster, telemetry);
+    const svc = new EventChatSseService(roomEmitter, cluster, telemetry);
 
     const payload = JSON.stringify({
       streamEventId: 'se-2',
@@ -55,7 +55,7 @@ describe('EventChatSseService', () => {
       payload,
     );
 
-    expect(gateway.emitToRoom).toHaveBeenCalledWith(
+    expect(roomEmitter.emitToRoom).toHaveBeenCalledWith(
       'evt-2',
       'message_created',
       expect.objectContaining({ streamEventId: 'se-2', eventId: 'evt-2' }),

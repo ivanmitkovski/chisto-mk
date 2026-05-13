@@ -3,6 +3,8 @@ import { ReportSideEffectKind, ReportSideEffectStatus, Role } from '../../src/pr
 import { DuplicateGroupQueryService } from '../../src/reports/duplicates/duplicate-group-query.service';
 import { DuplicateMergeSideEffectsService } from '../../src/reports/duplicates/duplicate-merge-side-effects.service';
 import { ReportSideEffectProcessorService } from '../../src/reports/side-effects/report-side-effect-processor.service';
+import { DuplicateMergeSnapshotService } from '../../src/reports/duplicate-merge-snapshot.service';
+import { DuplicateMergeTransactionService } from '../../src/reports/duplicate-merge-transaction.service';
 import { ReportsDuplicateMergeService } from '../../src/reports/reports-duplicate-merge.service';
 
 function createMergeServiceWithMocks(
@@ -39,12 +41,15 @@ function createMergeServiceWithMocks(
   const reportApprovalPoints = {
     creditApprovalIfEligible: jest.fn().mockResolvedValue({ awarded: 0, preCapTotal: 0 }),
   };
-  const service = new ReportsDuplicateMergeService(
+  const snapshot = new DuplicateMergeSnapshotService(prisma as never);
+  const mergeTransaction = new DuplicateMergeTransactionService(
     prisma as never,
     duplicateGroupQuery,
     reportApprovalPoints as never,
     reportSideEffectProcessor,
+    snapshot,
   );
+  const service = new ReportsDuplicateMergeService(duplicateGroupQuery, mergeTransaction);
   return { service, reportApprovalPoints };
 }
 

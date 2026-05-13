@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
-/// iOS / macOS: native-style overscroll, [CupertinoSliverRefreshControl], sheet grabber.
-/// Other platforms: Material [RefreshIndicator] and familiar scroll bounds.
+/// iOS / macOS: native-style overscroll bounce; pull-to-refresh still uses shared
+/// [AppRefreshIndicator] (Material chrome) for consistency with the rest of the app.
 bool eventsUseCupertinoSystemEffects(BuildContext context) {
   return switch (Theme.of(context).platform) {
     TargetPlatform.iOS || TargetPlatform.macOS => true,
@@ -20,13 +20,13 @@ ScrollPhysics eventsListScrollPhysics(BuildContext context) {
   return const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics());
 }
 
-/// [EventDetailScreen] only: same bounce as feed lists. Uses [RefreshIndicator] with the
-/// same color, displacement, and stroke width as the feed Material refresh path.
+/// [EventDetailScreen] only: same bounce as feed lists. Pull-to-refresh uses
+/// [AppRefreshIndicator] app-wide for consistent chrome.
 ScrollPhysics eventDetailScrollPhysics(BuildContext context) {
   return eventsListScrollPhysics(context);
 }
 
-/// Pull-to-refresh haptics: lighter on Cupertino (control already feels tactile).
+/// Pull-to-refresh haptics: lighter on iOS/macOS (bouncy scroll already feels tactile).
 void eventsPullRefreshHaptic(BuildContext context) {
   if (eventsUseCupertinoSystemEffects(context)) {
     AppHaptics.light(context);

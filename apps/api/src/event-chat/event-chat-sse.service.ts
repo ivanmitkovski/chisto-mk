@@ -1,7 +1,7 @@
-import { Inject, Injectable, Logger, OnModuleDestroy, forwardRef } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import Redis from 'ioredis';
 import { Observable, Subject } from 'rxjs';
-import { EventChatGateway } from './event-chat.gateway';
+import { EventChatRoomEmitterService } from './event-chat-room-emitter.service';
 import { EventChatClusterConfig } from './event-chat-cluster.config';
 import { EventChatTelemetryService } from './event-chat-telemetry.service';
 
@@ -47,11 +47,10 @@ export class EventChatSseService implements OnModuleDestroy {
   private subscriber: Redis | null = null;
   private redisEnabled = false;
   private shuttingDown = false;
-  private loggedMissingGateway = false;
+  private loggedMissingEmitter = false;
 
   constructor(
-    @Inject(forwardRef(() => EventChatGateway))
-    private readonly gateway: EventChatGateway,
+    private readonly chatRoomEmitter: EventChatRoomEmitterService,
     private readonly clusterConfig: EventChatClusterConfig,
     private readonly telemetry: EventChatTelemetryService,
   ) {
@@ -92,12 +91,12 @@ export class EventChatSseService implements OnModuleDestroy {
     this.publishLocal(event);
 
     try {
-      if (this.gateway?.server) {
-        this.gateway.emitToRoom(event.eventId, event.type, event);
-      } else if (!this.loggedMissingGateway) {
-        this.loggedMissingGateway = true;
+      if (this.chatRoomEmitter.isReady()) {
+        this.chatRoomEmitter.emitToRoom(event.eventId, event.type, event);
+      } else if (!this.loggedMissingEmitter) {
+        this.loggedMissingEmitter = true;
         this.logger.warn(
-          'EventChatGateway server is not initialized; WebSocket room emits are skipped until the gateway is ready.',
+          'Chat Socket.IO server is not attached yet; WebSocket room emits are skipped until the gateway initializes.',
         );
       }
     } catch (error) {
@@ -181,8 +180,8 @@ export class EventChatSseService implements OnModuleDestroy {
         return;
       }
       try {
-        if (this.gateway?.server) {
-          this.gateway.emitToRoom(parsed.eventId, parsed.type, parsed);
+        if (this.chatRoomEmitter.isReady()) {
+          this.chatRoomEmitter.emitToRoom(parsed.eventId, parsed.type, parsed);
         }
       } catch (error) {
         this.logger.warn(`WS emit from Redis fanout failed: ${String(error)}`);

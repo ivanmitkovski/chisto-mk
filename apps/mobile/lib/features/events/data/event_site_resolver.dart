@@ -54,17 +54,8 @@ class EventSiteSummary {
 class EventSiteResolver {
   const EventSiteResolver._();
 
-  static List<PollutionSite> allSites() {
-    // Production path: canonical sites should come from API-backed sources.
-    return const <PollutionSite>[];
-  }
-
+  /// In-app catalog lookup (API-backed lists replace this at call sites).
   static PollutionSite? findSiteById(String siteId) {
-    for (final PollutionSite site in allSites()) {
-      if (site.id == siteId) {
-        return site;
-      }
-    }
     return null;
   }
 

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit, Optional, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { Readable } from 'node:stream';
@@ -10,31 +10,37 @@ export type FeedModelManifest = {
 };
 
 @Injectable()
-export class ModelRegistryClient {
-  private readonly s3: S3Client;
+export class ModelRegistryClient implements OnModuleInit {
+  private s3!: S3Client;
+  private read!: (key: string) => string | undefined;
 
-  constructor(private readonly config: ConfigService) {
+  constructor(@Optional() private readonly config: ConfigService | null) {}
+
+  onModuleInit(): void {
+    this.read = (key: string) =>
+      this.config?.get<string>(key)?.trim() ?? process.env[key]?.trim();
     const region =
-      this.config.get<string>('AWS_REGION')?.trim() ||
-      this.config.get<string>('AWS_DEFAULT_REGION')?.trim() ||
-      'eu-central-1';
+      this.read('AWS_REGION') || this.read('AWS_DEFAULT_REGION') || 'eu-central-1';
     this.s3 = new S3Client({ region });
   }
 
   async latestManifest(): Promise<FeedModelManifest | null> {
-    const version = this.config.get<string>('FEED_V2_MODEL_VERSION')?.trim();
+    const version = this.read('FEED_V2_MODEL_VERSION');
     if (!version) return null;
     return {
       version,
-      modelKey: `chisto-feed-models/${this.config.get<string>('ENV') ?? 'dev'}/${version}/model.onnx`,
-      sha256: this.config.get<string>('FEED_V2_MODEL_SHA256') ?? '',
+      modelKey: `chisto-feed-models/${this.read('ENV') ?? 'dev'}/${version}/model.onnx`,
+      sha256: this.read('FEED_V2_MODEL_SHA256') ?? '',
     };
   }
 
   async downloadModel(manifest: FeedModelManifest): Promise<Buffer> {
-    const bucket = this.config.get<string>('FEED_V2_MODEL_BUCKET')?.trim();
+    const bucket = this.read('FEED_V2_MODEL_BUCKET');
     if (!bucket) {
-      throw new Error('FEED_V2_MODEL_BUCKET is required when FEED_V2_ONNX_ENABLED=true');
+      throw new ServiceUnavailableException({
+        code: 'FEED_RANKER_UNAVAILABLE',
+        message: 'FEED_V2_MODEL_BUCKET is required when FEED_V2_ONNX_ENABLED=true.',
+      });
     }
     const out = await this.s3.send(
       new GetObjectCommand({
@@ -43,7 +49,10 @@ export class ModelRegistryClient {
       }),
     );
     if (!out.Body) {
-      throw new Error('Feed model object has empty body');
+      throw new ServiceUnavailableException({
+        code: 'FEED_RANKER_UNAVAILABLE',
+        message: 'Feed model object has empty body.',
+      });
     }
     return streamToBuffer(out.Body as Readable);
   }

@@ -13,8 +13,10 @@ import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { ADMIN_PANEL_ROLES, SUPER_ADMIN_ROLES } from '../auth/admin-roles';
 import { SystemConfigService } from './system-config.service';
 import { PatchSystemConfigDto } from './dto/patch-system-config.dto';
+import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-error-responses.decorator';
 
 @ApiTags('admin-config')
+@ApiStandardHttpErrorResponses()
 @Controller('admin/config')
 export class SystemConfigController {
   constructor(private readonly systemConfigService: SystemConfigService) {}

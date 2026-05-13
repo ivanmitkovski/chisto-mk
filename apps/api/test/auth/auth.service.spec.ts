@@ -10,7 +10,11 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Role, UserStatus } from '../../src/prisma-client';
 import * as bcrypt from 'bcrypt';
-import { AuthService } from '../../src/auth/auth.service';
+import { AuthAdminLoginService } from '../../src/auth/auth-admin-login.service';
+import { AuthProfileService } from '../../src/auth/auth-profile.service';
+import { AuthRegistrationService } from '../../src/auth/auth-registration.service';
+import { AuthSessionService } from '../../src/auth/auth-session.service';
+import { loadAuthEnvRuntime } from '../../src/auth/auth-env.config';
 import { is2FAResponse } from '../../src/auth/types/auth-response.type';
 
 const mockUser = {
@@ -60,9 +64,9 @@ function makePrisma() {
     },
     adminLoginFailure: {
       findUnique: jest.fn(),
-      upsert: jest.fn(),
-      update: jest.fn(),
-      deleteMany: jest.fn().mockResolvedValue(undefined),
+      create: jest.fn().mockResolvedValue({}),
+      update: jest.fn().mockResolvedValue({}),
+      deleteMany: jest.fn().mockResolvedValue({ count: 0 }),
     },
     loginFailure: {
       findUnique: jest.fn(),
@@ -89,17 +93,6 @@ function makeConfig() {
       return undefined;
     }),
   };
-}
-
-function makeOtpService() {
-  return {
-    createAndSend: jest.fn().mockResolvedValue(undefined),
-    verify: jest.fn().mockResolvedValue(true),
-  };
-}
-
-function makeOtpSender() {
-  return { sendOtp: jest.fn().mockResolvedValue(undefined) };
 }
 
 function makeAudit() {
@@ -142,8 +135,11 @@ function makeRankingsService() {
   };
 }
 
-describe('AuthService', () => {
-  let service: AuthService;
+describe('Auth stack (registration, session, profile)', () => {
+  let registration: AuthRegistrationService;
+  let adminLoginSvc: AuthAdminLoginService;
+  let session: AuthSessionService;
+  let profile: AuthProfileService;
   let prisma: ReturnType<typeof makePrisma>;
   let jwt: ReturnType<typeof makeJwt>;
   let eventEmitter: ReturnType<typeof makeEventEmitter>;
@@ -153,24 +149,32 @@ describe('AuthService', () => {
     prisma = makePrisma();
     jwt = makeJwt();
     const config = makeConfig();
-    const otpSender = makeOtpSender();
     mockUser.passwordHash = await bcrypt.hash('StrongPass123!', 4);
     mockAdmin.passwordHash = mockUser.passwordHash;
 
-    const otpService = makeOtpService();
     const audit = makeAudit();
     eventEmitter = makeEventEmitter();
     reportsUploadService = makeReportsUploadService();
     const gamificationService = makeGamificationService();
     const rankingsService = makeRankingsService();
-    service = new AuthService(
+    const env = loadAuthEnvRuntime(config as unknown as ConfigService);
+    session = new AuthSessionService(
       prisma as any,
       jwt as unknown as JwtService,
-      otpService as any,
-      config as unknown as ConfigService,
-      otpSender as any,
+      reportsUploadService as any,
       audit as any,
       eventEmitter as any,
+      env,
+    );
+    registration = new AuthRegistrationService(
+      prisma as any,
+      eventEmitter as any,
+      session,
+      env,
+    );
+    adminLoginSvc = new AuthAdminLoginService(prisma as any, audit as any, session, env);
+    profile = new AuthProfileService(
+      prisma as any,
       reportsUploadService as any,
       gamificationService as any,
       rankingsService as any,
@@ -183,7 +187,7 @@ describe('AuthService', () => {
       prisma.user.create.mockResolvedValue(mockUser);
       prisma.userSession.create.mockResolvedValue({});
 
-      const result = await service.register({
+      const result = await registration.register({
         firstName: 'Test',
         lastName: 'User',
         email: 'test@chisto.mk',
@@ -203,7 +207,7 @@ describe('AuthService', () => {
       prisma.user.findFirst.mockResolvedValue({ id: 'x', email: 'test@chisto.mk', phoneNumber: '+389other' });
 
       await expect(
-        service.register({
+        registration.register({
           firstName: 'Test',
           lastName: 'User',
           email: 'test@chisto.mk',
@@ -217,7 +221,7 @@ describe('AuthService', () => {
       prisma.user.findFirst.mockResolvedValue({ id: 'x', email: 'other@x.com', phoneNumber: '+38970123456' });
 
       await expect(
-        service.register({
+        registration.register({
           firstName: 'Test',
           lastName: 'User',
           email: 'unique@chisto.mk',
@@ -233,7 +237,7 @@ describe('AuthService', () => {
       prisma.user.findUnique.mockResolvedValue(mockUser);
       prisma.userSession.create.mockResolvedValue({});
 
-      const result = await service.citizenLogin({
+      const result = await registration.citizenLogin({
         phoneNumber: '+38970123456',
         password: 'StrongPass123!',
       });
@@ -253,7 +257,7 @@ describe('AuthService', () => {
       });
       prisma.userSession.create.mockResolvedValue({});
 
-      const result = await service.citizenLogin({
+      const result = await registration.citizenLogin({
         phoneNumber: '+38970123456',
         password: 'StrongPass123!',
       });
@@ -268,7 +272,7 @@ describe('AuthService', () => {
       prisma.user.findUnique.mockResolvedValue(null);
 
       await expect(
-        service.citizenLogin({ phoneNumber: '+38999999999', password: 'any' }),
+        registration.citizenLogin({ phoneNumber: '+38999999999', password: 'any' }),
       ).rejects.toThrow(UnauthorizedException);
     });
 
@@ -276,7 +280,7 @@ describe('AuthService', () => {
       prisma.user.findUnique.mockResolvedValue(mockUser);
 
       await expect(
-        service.citizenLogin({ phoneNumber: '+38970123456', password: 'WrongPass!' }),
+        registration.citizenLogin({ phoneNumber: '+38970123456', password: 'WrongPass!' }),
       ).rejects.toThrow(UnauthorizedException);
     });
 
@@ -284,7 +288,7 @@ describe('AuthService', () => {
       prisma.user.findUnique.mockResolvedValue({ ...mockUser, status: UserStatus.SUSPENDED });
 
       await expect(
-        service.citizenLogin({ phoneNumber: '+38970123456', password: 'StrongPass123!' }),
+        registration.citizenLogin({ phoneNumber: '+38970123456', password: 'StrongPass123!' }),
       ).rejects.toThrow(UnauthorizedException);
     });
   });
@@ -294,7 +298,7 @@ describe('AuthService', () => {
       prisma.user.findUnique.mockResolvedValue({ ...mockAdmin, totpSecret: null });
       prisma.userSession.create.mockResolvedValue({});
 
-      const result = await service.adminLogin({
+      const result = await adminLoginSvc.adminLogin({
         email: 'admin@chisto.mk',
         password: 'StrongPass123!',
       });
@@ -307,7 +311,7 @@ describe('AuthService', () => {
       prisma.user.findUnique.mockResolvedValue(mockUser);
 
       await expect(
-        service.adminLogin({ email: 'test@chisto.mk', password: 'StrongPass123!' }),
+        adminLoginSvc.adminLogin({ email: 'test@chisto.mk', password: 'StrongPass123!' }),
       ).rejects.toThrow(UnauthorizedException);
     });
   });
@@ -330,7 +334,7 @@ describe('AuthService', () => {
       prisma.userSession.update.mockResolvedValue({});
       prisma.userSession.create.mockResolvedValue({});
 
-      const result = await service.refresh(fullToken);
+      const result = await session.refresh(fullToken);
 
       expect(result.accessToken).toBe('jwt-token');
       expect(result.refreshToken).toBeDefined();
@@ -365,13 +369,13 @@ describe('AuthService', () => {
       prisma.userSession.update.mockResolvedValue({});
       prisma.userSession.create.mockResolvedValue({});
 
-      const result = await service.refresh(fullToken);
+      const result = await session.refresh(fullToken);
 
       expect(result.user.organizerCertifiedAt).toBe(certifiedAt.toISOString());
     });
 
     it('rejects refresh token without tokenId format', async () => {
-      await expect(service.refresh('no-dot')).rejects.toThrow(
+      await expect(session.refresh('no-dot')).rejects.toThrow(
         UnauthorizedException,
       );
     });
@@ -379,7 +383,7 @@ describe('AuthService', () => {
     it('rejects invalid or unknown refresh token', async () => {
       prisma.userSession.findUnique.mockResolvedValue(null);
       await expect(
-        service.refresh('tid123.wrongsecret'),
+        session.refresh('tid123.wrongsecret'),
       ).rejects.toThrow(UnauthorizedException);
     });
 
@@ -398,7 +402,7 @@ describe('AuthService', () => {
         user: mockUser,
       });
 
-      await expect(service.refresh(fullToken)).rejects.toThrow(UnauthorizedException);
+      await expect(session.refresh(fullToken)).rejects.toThrow(UnauthorizedException);
       expect(prisma.userSession.updateMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: { userId: 'user-1', revokedAt: null },
@@ -426,7 +430,7 @@ describe('AuthService', () => {
       });
       prisma.userSession.update.mockResolvedValue({});
 
-      await service.logout(fullToken);
+      await session.logout(fullToken);
 
       expect(prisma.userSession.findUnique).toHaveBeenCalledWith({
         where: { tokenId },
@@ -438,13 +442,13 @@ describe('AuthService', () => {
     });
 
     it('does nothing if token has no dot', async () => {
-      await service.logout('no-match');
+      await session.logout('no-match');
       expect(prisma.userSession.findUnique).not.toHaveBeenCalled();
     });
 
     it('does nothing if token does not match any session', async () => {
       prisma.userSession.findUnique.mockResolvedValue(null);
-      await service.logout('tid.nope');
+      await session.logout('tid.nope');
       expect(prisma.userSession.update).not.toHaveBeenCalled();
     });
   });
@@ -454,14 +458,14 @@ describe('AuthService', () => {
       const reportsUpload = {
         signPrivateObjectKey: jest.fn().mockResolvedValue('https://signed/avatar'),
       };
-      (service as any).reportsUploadService = reportsUpload;
+      (profile as any).reportsUploadService = reportsUpload;
       prisma.user.findUnique.mockResolvedValue({
         ...mockUser,
         totpSecret: null,
         avatarObjectKey: 'profile-avatars/user-1/a.webp',
       });
 
-      const result = await service.me({
+      const result = await profile.me({
         userId: 'user-1',
         role: Role.USER,
         email: 'u@x.com',
@@ -477,13 +481,13 @@ describe('AuthService', () => {
         signPrivateObjectKey: jest.fn().mockResolvedValue('https://signed/new'),
         deleteObjectByKey: jest.fn().mockResolvedValue(undefined),
       };
-      (service as any).reportsUploadService = reportsUpload;
+      (profile as any).reportsUploadService = reportsUpload;
       prisma.user.findUnique.mockResolvedValue({
         id: 'user-1',
         status: UserStatus.ACTIVE,
         avatarObjectKey: 'profile-avatars/user-1/old.webp',
       });
-      const result = await service.uploadAvatar('user-1', {
+      const result = await profile.uploadAvatar('user-1', {
         buffer: Buffer.from('x'),
         mimetype: 'image/jpeg',
         size: 1,

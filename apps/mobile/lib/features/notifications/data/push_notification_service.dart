@@ -1,17 +1,26 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:ui' show Locale, PlatformDispatcher;
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:chisto_mobile/core/l10n/app_locale_resolution.dart';
 import 'package:chisto_mobile/features/notifications/domain/repositories/notifications_repository.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
+
+/// SharedPreferences key: user completed push rationale + OS prompt flow (allow or dismiss).
+const String kPushOsPermissionFlowCompletedKey = 'push_os_permission_flow_completed_v1';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  debugPrint('[Push] Background message: ${message.messageId}');
+  if (kDebugMode) {
+    debugPrint('[Push] Background message: ${message.messageId}');
+  }
 }
 
 class PushNotificationService {
@@ -44,50 +53,98 @@ class PushNotificationService {
   Stream<RemoteMessage> get notificationTaps =>
       _notificationTapController.stream;
 
-  Future<void> initialize() async {
+  /// Wires Firebase, local notifications, handlers, and token refresh.
+  /// Does **not** show the OS permission dialog — call [requestSystemNotificationPermission]
+  /// after an in-app rationale (see [kPushOsPermissionFlowCompletedKey] in [main.dart]).
+  Future<void> initialize({Locale? appLanguageOverride}) async {
     if (_initialized) return;
     _initialized = true;
 
-    await _initLocalNotifications();
+    await _initLocalNotifications(appLanguageOverride: appLanguageOverride);
 
     if (Firebase.apps.isEmpty) {
       _firebaseReady = false;
       _lastInitReason = 'firebase_not_initialized';
-      debugPrint('[Push] Firebase not initialized. Running in local-only mode.');
+      if (kDebugMode) {
+        debugPrint('[Push] Firebase not initialized. Running in local-only mode.');
+      }
       return;
     }
     _firebaseReady = true;
     _lastInitReason = 'ok';
 
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-    await _requestPermission();
     await _configureHandlers();
     await _refreshToken();
   }
 
-  Future<void> _initLocalNotifications() async {
+  /// Android 13+ [POST_NOTIFICATIONS] and iOS/macOS alert permission via FCM.
+  Future<void> requestSystemNotificationPermission() async {
+    if (!_firebaseReady) return;
+    if (Platform.isAndroid) {
+      final PermissionStatus status = await Permission.notification.request();
+      if (kDebugMode) {
+        debugPrint('[Push] Android POST_NOTIFICATIONS: $status');
+      }
+    }
+    await _requestOsNotificationPermission();
+  }
+
+  Future<void> _initLocalNotifications({Locale? appLanguageOverride}) async {
     if (_localNotificationsInitialized) {
       return;
     }
-    const AndroidNotificationChannel channel = AndroidNotificationChannel(
-      'chisto_default',
-      'Chisto Notifications',
-      description: 'Default notification channel for Chisto.mk',
-      importance: Importance.high,
+    final Locale effectiveLocale = resolveAppLocale(
+      override: appLanguageOverride,
+      platformLocales: PlatformDispatcher.instance.locales,
     );
-    const AndroidNotificationChannel chatChannel = AndroidNotificationChannel(
-      'chisto_event_chat',
-      'Event chat',
-      description: 'Messages on cleanup events you joined',
-      importance: Importance.high,
-    );
+    final AppLocalizations strings = lookupAppLocalizations(effectiveLocale);
+    final List<AndroidNotificationChannel> channels = <AndroidNotificationChannel>[
+      AndroidNotificationChannel(
+        'chisto_default',
+        strings.pushChannelDefaultName,
+        description: strings.pushChannelDefaultDescription,
+        importance: Importance.high,
+      ),
+      AndroidNotificationChannel(
+        'chisto_event_chat',
+        strings.eventChatPushChannelName,
+        description: strings.eventChatPushChannelDescription,
+        importance: Importance.high,
+      ),
+      const AndroidNotificationChannel(
+        'chisto_reports',
+        'Report Updates',
+        description: 'Report status changes and nearby pollution reports',
+        importance: Importance.high,
+      ),
+      const AndroidNotificationChannel(
+        'chisto_events',
+        'Cleanup Events',
+        description: 'Cleanup event reminders and updates',
+        importance: Importance.high,
+      ),
+      const AndroidNotificationChannel(
+        'chisto_social',
+        'Social Activity',
+        description: 'Upvotes, comments, and community interactions',
+        importance: Importance.defaultImportance,
+      ),
+      const AndroidNotificationChannel(
+        'chisto_system',
+        'System',
+        description: 'System announcements and achievements',
+        importance: Importance.low,
+      ),
+    ];
 
     if (Platform.isAndroid) {
       final AndroidFlutterLocalNotificationsPlugin? android =
           _localNotifications.resolvePlatformSpecificImplementation<
               AndroidFlutterLocalNotificationsPlugin>();
-      await android?.createNotificationChannel(channel);
-      await android?.createNotificationChannel(chatChannel);
+      for (final AndroidNotificationChannel c in channels) {
+        await android?.createNotificationChannel(c);
+      }
     }
 
     const AndroidInitializationSettings androidSettings =
@@ -105,7 +162,9 @@ class PushNotificationService {
         iOS: iosSettings,
       ),
       onDidReceiveNotificationResponse: (NotificationResponse response) {
-        debugPrint('[Push] Local notification tapped: ${response.payload}');
+        if (kDebugMode) {
+          debugPrint('[Push] Local notification tapped: ${response.payload}');
+        }
       },
     );
     _localNotificationsInitialized = true;
@@ -183,7 +242,9 @@ class PushNotificationService {
         payload: eventId,
       );
     } on Object catch (e) {
-      debugPrint('[Push] Organizer end-soon schedule failed: $e');
+      if (kDebugMode) {
+        debugPrint('[Push] Organizer end-soon schedule failed: $e');
+      }
     }
   }
 
@@ -193,11 +254,13 @@ class PushNotificationService {
       final int id = _organizerEndSoonNotificationId(eventId);
       await _localNotifications.cancel(id);
     } on Object catch (e) {
-      debugPrint('[Push] Organizer end-soon cancel failed: $e');
+      if (kDebugMode) {
+        debugPrint('[Push] Organizer end-soon cancel failed: $e');
+      }
     }
   }
 
-  Future<void> _requestPermission() async {
+  Future<void> _requestOsNotificationPermission() async {
     final NotificationSettings settings =
         await FirebaseMessaging.instance.requestPermission(
       alert: true,
@@ -205,7 +268,9 @@ class PushNotificationService {
       sound: true,
       provisional: false,
     );
-    debugPrint('[Push] Permission: ${settings.authorizationStatus}');
+    if (kDebugMode) {
+      debugPrint('[Push] Permission: ${settings.authorizationStatus}');
+    }
 
     if (Platform.isIOS) {
       await FirebaseMessaging.instance
@@ -219,13 +284,17 @@ class PushNotificationService {
 
   Future<void> _configureHandlers() async {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      debugPrint('[Push] Foreground message: ${message.messageId}');
+      if (kDebugMode) {
+        debugPrint('[Push] Foreground message: ${message.messageId}');
+      }
       _foregroundMessageController.add(message);
       _showLocalNotification(message);
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      debugPrint('[Push] Opened from background: ${message.messageId}');
+      if (kDebugMode) {
+        debugPrint('[Push] Opened from background: ${message.messageId}');
+      }
       _notificationTapController.add(message);
     });
 
@@ -249,31 +318,58 @@ class PushNotificationService {
       return;
     }
 
-    final bool isChat = type == 'EVENT_CHAT';
+    final _AndroidChannelInfo ch = _resolveAndroidChannel(type);
     _localNotifications.show(
       message.hashCode,
       title,
       body,
       NotificationDetails(
         android: AndroidNotificationDetails(
-          isChat ? 'chisto_event_chat' : 'chisto_default',
-          isChat ? 'Event chat' : 'Chisto Notifications',
-          channelDescription: isChat
-              ? 'Messages on cleanup events you joined'
-              : 'Default notification channel for Chisto.mk',
-          importance: Importance.high,
+          ch.id,
+          ch.name,
+          channelDescription: ch.description,
+          importance: ch.importance,
           priority: Priority.high,
-          groupKey: isChat ? 'event_chat' : null,
+          groupKey: type == 'EVENT_CHAT' ? 'event_chat' : null,
         ),
         iOS: DarwinNotificationDetails(
           presentAlert: true,
           presentBadge: true,
           presentSound: true,
-          threadIdentifier: isChat ? (message.data['eventId'] as String? ?? 'event_chat') : null,
+          threadIdentifier: type == 'EVENT_CHAT'
+              ? (message.data['eventId'] as String? ?? 'event_chat')
+              : null,
         ),
       ),
       payload: message.data['notificationId'] as String?,
     );
+  }
+
+  static _AndroidChannelInfo _resolveAndroidChannel(String? type) {
+    switch (type) {
+      case 'EVENT_CHAT':
+        return const _AndroidChannelInfo(
+          'chisto_event_chat', 'Event Chat', 'Messages on cleanup events you joined', Importance.high);
+      case 'REPORT_STATUS':
+      case 'NEARBY_REPORT':
+        return const _AndroidChannelInfo(
+          'chisto_reports', 'Report Updates', 'Report status changes and nearby pollution reports', Importance.high);
+      case 'CLEANUP_EVENT':
+        return const _AndroidChannelInfo(
+          'chisto_events', 'Cleanup Events', 'Cleanup event reminders and updates', Importance.high);
+      case 'UPVOTE':
+      case 'COMMENT':
+        return const _AndroidChannelInfo(
+          'chisto_social', 'Social Activity', 'Upvotes, comments, and community interactions', Importance.defaultImportance);
+      case 'SYSTEM':
+      case 'ACHIEVEMENT':
+      case 'WELCOME':
+        return const _AndroidChannelInfo(
+          'chisto_system', 'System', 'System announcements and achievements', Importance.low);
+      default:
+        return const _AndroidChannelInfo(
+          'chisto_default', 'Chisto Notifications', 'Default notification channel for Chisto.mk', Importance.high);
+    }
   }
 
   Future<void> _refreshToken() async {
@@ -283,7 +379,9 @@ class PushNotificationService {
         await _registerToken(_currentToken!);
       }
     } catch (e) {
-      debugPrint('[Push] Token refresh error: $e');
+      if (kDebugMode) {
+        debugPrint('[Push] Token refresh error: $e');
+      }
     }
 
     FirebaseMessaging.instance.onTokenRefresh.listen((String token) async {
@@ -298,9 +396,13 @@ class PushNotificationService {
         token: token,
         platform: Platform.isIOS ? 'IOS' : 'ANDROID',
       );
-      debugPrint('[Push] Token registered: ${token.substring(0, 12)}...');
+      if (kDebugMode) {
+        debugPrint('[Push] Token registered (debug only; value never logged).');
+      }
     } catch (e) {
-      debugPrint('[Push] Token registration error: $e');
+      if (kDebugMode) {
+        debugPrint('[Push] Token registration error: $e');
+      }
     }
   }
 
@@ -309,9 +411,13 @@ class PushNotificationService {
     if (_currentToken == null) return;
     try {
       await _repository.unregisterDeviceToken(_currentToken!);
-      debugPrint('[Push] Token unregistered');
+      if (kDebugMode) {
+        debugPrint('[Push] Token unregistered');
+      }
     } catch (e) {
-      debugPrint('[Push] Token unregister error: $e');
+      if (kDebugMode) {
+        debugPrint('[Push] Token unregister error: $e');
+      }
     }
     _currentToken = null;
   }
@@ -344,4 +450,12 @@ class PushNotificationService {
       ),
     );
   }
+}
+
+class _AndroidChannelInfo {
+  const _AndroidChannelInfo(this.id, this.name, this.description, this.importance);
+  final String id;
+  final String name;
+  final String description;
+  final Importance importance;
 }

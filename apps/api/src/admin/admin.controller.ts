@@ -13,8 +13,10 @@ import { CurrentUser } from '../auth/current-user.decorator';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { AdminService, AdminOverviewStats, AdminSecurityOverview } from './admin.service';
 import { AdminOverviewResponseDto } from './dto/admin-overview-response.dto';
+import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-error-responses.decorator';
 
 @ApiTags('admin')
+@ApiStandardHttpErrorResponses()
 @Controller('admin')
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}

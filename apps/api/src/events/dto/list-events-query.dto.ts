@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
-import { IsDateString, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsDateString, IsInt, IsOptional, IsString, Max, Min, MinLength } from 'class-validator';
 import { EventsViewerGeoQueryDto } from './events-viewer-geo-query.dto';
 
 const DEFAULT_LIMIT = 20;
@@ -51,12 +51,22 @@ export class ListEventsQueryDto extends EventsViewerGeoQueryDto {
   siteId?: string;
 
   @ApiPropertyOptional({
-    description: 'Full-text search across title and description (case-insensitive, min 2 chars)',
+    description: 'Search across title and description (case-insensitive, min 2 chars when provided)',
     example: 'river cleanup',
   })
   @IsOptional()
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @Transform(({ value }) => {
+    if (value == null || value === '') {
+      return undefined;
+    }
+    if (typeof value === 'string') {
+      const t = value.trim();
+      return t.length === 0 ? undefined : t;
+    }
+    return value;
+  })
   @IsString()
+  @MinLength(2, { message: 'q must be at least 2 characters when provided' })
   q?: string;
 
   @ApiPropertyOptional({

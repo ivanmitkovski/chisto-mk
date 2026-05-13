@@ -34,7 +34,8 @@ class ReportCard extends StatefulWidget {
   State<ReportCard> createState() => _ReportCardState();
 }
 
-class _ReportCardState extends State<ReportCard> {
+class _ReportCardState extends State<ReportCard>
+    with AutomaticKeepAliveClientMixin<ReportCard> {
   bool _pressed = false;
 
   static bool _isNetworkUrl(String s) =>
@@ -43,8 +44,27 @@ class _ReportCardState extends State<ReportCard> {
   static bool _isLocalFile(String s) =>
       !_isNetworkUrl(s) && File(s).existsSync();
 
+  static bool _rowWantsKeepAlive(ReportSheetViewModel report) {
+    final List<String> paths = report.evidenceImagePaths ?? const <String>[];
+    if (paths.isEmpty) return false;
+    final String first = paths.first;
+    return _isNetworkUrl(first) || _isLocalFile(first);
+  }
+
+  @override
+  bool get wantKeepAlive => _rowWantsKeepAlive(widget.report);
+
+  @override
+  void didUpdateWidget(ReportCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (_rowWantsKeepAlive(oldWidget.report) != _rowWantsKeepAlive(widget.report)) {
+      updateKeepAlive();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final ReportSheetViewModel report = widget.report;
     final TextTheme textTheme = Theme.of(context).textTheme;
     final List<String> evidencePaths =

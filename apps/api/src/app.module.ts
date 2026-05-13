@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
@@ -9,7 +10,7 @@ import { ReportsModule } from './reports/reports.module';
 import { ReportsOwnerWsModule } from './reports/owner-events/reports-owner-ws.module';
 import { SitesModule } from './sites/sites.module';
 import { AuthModule } from './auth/auth.module';
-import { AdminEventsModule } from './admin-events/admin-events.module';
+import { AdminRealtimeModule } from './admin-realtime/admin-realtime.module';
 import { AdminModule } from './admin/admin.module';
 import { AdminNotificationsModule } from './admin-notifications/admin-notifications.module';
 import { HealthModule } from './health/health.module';
@@ -47,6 +48,16 @@ import { StorageModule } from './storage/storage.module';
             'req.headers.Authorization',
             'req.headers.cookie',
             'req.headers.Cookie',
+            'req.body.refreshToken',
+            'req.body.deviceToken',
+            'req.body.token',
+            'req.body.otp',
+            'req.body.code',
+            'req.body.password',
+            'req.body.newPassword',
+            'req.body.currentPassword',
+            'req.body.mfaSecret',
+            'req.body.privateKey',
           ],
           remove: true,
         },
@@ -66,7 +77,7 @@ import { StorageModule } from './storage/storage.module';
     SitesModule,
     ReportsModule,
     ReportsOwnerWsModule,
-    AdminEventsModule,
+    AdminRealtimeModule,
     AdminModule,
     AdminNotificationsModule,
     AdminUsersModule,
@@ -75,14 +86,18 @@ import { StorageModule } from './storage/storage.module';
     PublicConfigModule,
     CleanupEventsModule,
     NotificationsModule,
-    ObservabilityModule,
+    ObservabilityModule.register(),
     GamificationModule,
     EventsModule,
     EventChatModule,
     WebhooksModule,
-    DiscoveryAnalyticsModule,
+    DiscoveryAnalyticsModule.register(),
   ],
   controllers: [AppController],
-  providers: [AppService, RedisIoAdapterLifecycle],
+  providers: [
+    AppService,
+    RedisIoAdapterLifecycle,
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
+  ],
 })
 export class AppModule {}

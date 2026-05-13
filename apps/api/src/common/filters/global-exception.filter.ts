@@ -7,8 +7,10 @@ import {
   Logger,
 } from '@nestjs/common';
 import { ThrottlerException } from '@nestjs/throttler';
+import * as Sentry from '@sentry/node';
 import { MulterError } from 'multer';
 import { Prisma } from '../../prisma-client';
+import { ObservabilityStore } from '../../observability/observability.store';
 import { ErrorResponse } from '../errors/error-response.type';
 
 type HttpExceptionPayload = {
@@ -46,11 +48,12 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
     if (exception instanceof MulterError) {
       if (exception.code === 'LIMIT_FILE_SIZE' || exception.code === 'LIMIT_FILE_COUNT') {
+        const limits = GlobalExceptionFilter.resolveUploadLimitsForPath(request?.url);
         response.status(HttpStatus.PAYLOAD_TOO_LARGE).json(
           GlobalExceptionFilter.stamp({
             code: 'PAYLOAD_TOO_LARGE',
             message: 'One or more files exceed the allowed size or count.',
-            details: { maxBytes: 10 * 1024 * 1024, maxFiles: 5 },
+            details: limits,
             retryable: false,
           }),
         );
@@ -83,11 +86,22 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         context: 'GlobalExceptionFilter',
         requestId: request?.requestId ?? null,
         method: request?.method ?? null,
-        route: request?.url ?? null,
+        route: request?.url?.split('?')[0] ?? null,
         message: 'Unhandled exception in request pipeline',
         error: errPayload,
       }),
     );
+
+    Sentry.withScope((scope) => {
+      scope.setTag('requestId', request?.requestId ?? 'unknown');
+      scope.setExtra('method', request?.method);
+      scope.setExtra('route', request?.url?.split('?')[0]);
+      if (exception instanceof Error) {
+        Sentry.captureException(exception);
+      } else {
+        Sentry.captureMessage(String(exception), 'error');
+      }
+    });
 
     response.status(HttpStatus.INTERNAL_SERVER_ERROR).json(
       GlobalExceptionFilter.stamp({
@@ -103,6 +117,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         ? (exception as { code: string }).code
         : null;
     if (code && (code === 'P1008' || code === 'P1001' || code === 'P1017')) {
+      GlobalExceptionFilter.capturePrisma5xxToSentry(code, exception);
       return this.mapPrismaErrorByCode(code);
     }
     if (exception instanceof Prisma.PrismaClientKnownRequestError) {
@@ -113,6 +128,18 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       return this.mapPrismaErrorByCode(exception.code);
     }
     return null;
+  }
+
+  private static capturePrisma5xxToSentry(code: string, exception: unknown): void {
+    Sentry.withScope((scope) => {
+      scope.setTag('prismaErrorCode', code);
+      scope.setLevel('error');
+      if (exception instanceof Error) {
+        Sentry.captureException(exception);
+      } else {
+        Sentry.captureMessage(`Prisma infrastructure error: ${code}`, 'error');
+      }
+    });
   }
 
   private tryMapReportSubmitIdempotencyP2002(
@@ -157,6 +184,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
   private mapPrismaErrorByCode(code: string): { status: number; body: ErrorResponse } | null {
     switch (code) {
       case 'P1008':
+        ObservabilityStore.recordPrismaP1008Response();
         return {
           status: HttpStatus.SERVICE_UNAVAILABLE,
           body: {
@@ -253,6 +281,19 @@ export class GlobalExceptionFilter implements ExceptionFilter {
           ? candidate.message
           : 'Request failed',
     };
+  }
+
+  private static resolveUploadLimitsForPath(
+    url?: string,
+  ): { maxBytes: number; maxFiles: number } {
+    const path = (url ?? '').split('?')[0].toLowerCase();
+    if (path.includes('/event-chat/')) {
+      return { maxBytes: 25 * 1024 * 1024, maxFiles: 5 };
+    }
+    if (path.includes('/avatar')) {
+      return { maxBytes: 8 * 1024 * 1024, maxFiles: 1 };
+    }
+    return { maxBytes: 10 * 1024 * 1024, maxFiles: 5 };
   }
 
   private codeForStatus(status: number): string {

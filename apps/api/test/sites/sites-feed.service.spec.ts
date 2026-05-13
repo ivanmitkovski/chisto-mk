@@ -3,22 +3,20 @@ import { SitesFeedService } from '../../src/sites/sites-feed.service';
 
 describe('SitesFeedService', () => {
   it('rejects partial geo query (lat without lng)', async () => {
-    const prisma = {} as never;
-    const audit = { log: jest.fn() } as never;
-    const reportsUpload = { signUrls: jest.fn() } as never;
-    const feedRanking = { scoreDetailed: jest.fn() } as never;
-    const siteEngagement = { ensureSiteExists: jest.fn() } as never;
-    const feedV2 = {} as never;
-    const userStateRepo = {} as never;
-    const svc = new SitesFeedService(
-      prisma,
-      audit,
-      reportsUpload,
-      feedRanking,
-      siteEngagement,
-      feedV2,
-      userStateRepo,
-    );
+    const feedQuery = { computeFeedList: jest.fn() } as never;
+    const feedCache = {
+      buildFeedCacheKey: jest.fn(() => 'k'),
+      get: jest.fn(() => undefined),
+      set: jest.fn(),
+      invalidate: jest.fn(),
+    } as never;
+    const feedPreferences = {
+      applyUserPreferences: jest.fn((rows: unknown[]) => rows),
+      setVariantMemo: jest.fn(),
+      getFeedVariantForUser: jest.fn(() => 'v1'),
+    } as never;
+    const feedTracking = {} as never;
+    const svc = new SitesFeedService(feedQuery, feedCache, feedPreferences, feedTracking);
 
     await expect(
       svc.findAll({ lat: 41.6, page: 1, limit: 20, radiusKm: 10, sort: 'hybrid' } as never),

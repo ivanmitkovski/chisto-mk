@@ -24,44 +24,30 @@ import styles from './sites-map.module.css';
 
 const CARTODB_POSITRON =
   'https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}{r}.png';
-const CARTODB_DARK =
-  'https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}{r}.png';
 const DEBOUNCE_MS = 400;
 
-function readCssTileTemplate(varName: '--map-tile-template-light' | '--map-tile-template-dark'): string | null {
+function readCssTileTemplateLight(): string | null {
   if (typeof window === 'undefined') {
     return null;
   }
-  const raw = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+  const raw = getComputedStyle(document.documentElement)
+    .getPropertyValue('--map-tile-template-light')
+    .trim();
   if (!raw) {
     return null;
   }
   return raw.replace(/^['"]|['"]$/g, '');
 }
 
+/** Admin is light-only for now; always use the light basemap (CSS var or Carto Positron). */
 function useTileUrl(): string {
-  const [isDark, setIsDark] = useState(false);
   const [fromCss, setFromCss] = useState<string | null>(null);
 
   useEffect(() => {
-    const mq = window.matchMedia('(prefers-color-scheme: dark)');
-    setIsDark(mq.matches);
-
-    const handler = (e: MediaQueryListEvent) => setIsDark(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
+    setFromCss(readCssTileTemplateLight());
   }, []);
 
-  useEffect(() => {
-    const light = readCssTileTemplate('--map-tile-template-light');
-    const dark = readCssTileTemplate('--map-tile-template-dark');
-    setFromCss(isDark ? dark ?? light : light ?? dark);
-  }, [isDark]);
-
-  if (fromCss) {
-    return fromCss;
-  }
-  return isDark ? CARTODB_DARK : CARTODB_POSITRON;
+  return fromCss ?? CARTODB_POSITRON;
 }
 
 function MapEventHandler({

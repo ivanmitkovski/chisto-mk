@@ -222,6 +222,7 @@ model PointTransaction {
   @@unique([userId, referenceType, referenceId, reasonCode], map: "point_transaction_user_ref_reason_key")
   @@index([userId, createdAt])
   @@index([reasonCode])
+  @@index([referenceType, referenceId])
 }
 
 enum ReportCleanupEffort {
@@ -526,6 +527,10 @@ model CleanupEvent {
   evidencePhotos     EventEvidencePhoto[]
   routeSegments      EventRouteSegment[]
   checkInRiskSignals CheckInRiskSignal[]
+
+  /// PostgreSQL `tsvector` for ranked full-text search (generated column + GIN index in migration).
+  /// Declared as [Unsupported] so Prisma Client does not expose it and migrations stay aligned with the DB.
+  searchVector Unsupported("tsvector")?
 
   /// RFC 5545 RRULE string (e.g. FREQ=WEEKLY;COUNT=8;BYDAY=SA).
   /// Null for non-recurring events.
@@ -1050,6 +1055,8 @@ enum NotificationType {
   CLEANUP_EVENT
   EVENT_CHAT
   SYSTEM
+  ACHIEVEMENT
+  WELCOME
 }
 
 model UserNotification {
@@ -1060,19 +1067,21 @@ model UserNotification {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  title     String
-  body      String
-  type      NotificationType
-  isRead    Boolean          @default(false)
-  data      Json?
-  sentAt    DateTime?
-  threadKey String?
-  groupKey  String?
+  title      String
+  body       String
+  type       NotificationType
+  isRead     Boolean          @default(false)
+  data       Json?
+  sentAt     DateTime?
+  threadKey  String?
+  groupKey   String?
+  archivedAt DateTime?
 
   @@index([userId, isRead, createdAt])
   @@index([userId, createdAt])
   @@index([userId, type])
   @@index([userId, groupKey, createdAt])
+  @@index([userId, archivedAt, createdAt])
 }
 
 model UserNotificationPreference {

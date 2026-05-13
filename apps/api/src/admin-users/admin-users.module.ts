@@ -1,12 +1,14 @@
 import { Module } from '@nestjs/common';
-import { AdminEventsModule } from '../admin-events/admin-events.module';
+import { AdminRealtimeModule } from '../admin-realtime/admin-realtime.module';
 import { AdminUsersController } from './admin-users.controller';
+import { AdminUsersQueryService } from './admin-users-query.service';
 import { AdminUsersService } from './admin-users.service';
+import { AdminUsersWriteService } from './admin-users-write.service';
 import { AuditModule } from '../audit/audit.module';
 
 @Module({
-  imports: [AuditModule, AdminEventsModule],
+  imports: [AuditModule, AdminRealtimeModule],
   controllers: [AdminUsersController],
-  providers: [AdminUsersService],
+  providers: [AdminUsersQueryService, AdminUsersWriteService, AdminUsersService],
 })
 export class AdminUsersModule {}

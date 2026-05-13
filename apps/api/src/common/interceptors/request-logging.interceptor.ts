@@ -7,6 +7,8 @@ import {
 } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { Observable, tap } from 'rxjs';
+import { trace } from '@opentelemetry/api';
+import { getInboundTraceparent } from '../logging/http-request-trace';
 import { ObservabilityStore } from '../../observability/observability.store';
 
 /** Paths matched after stripping query string; trailing slashes normalized. */
@@ -69,6 +71,15 @@ export class RequestLoggingInterceptor implements NestInterceptor {
       return next.handle();
     }
 
+    const traceparent = getInboundTraceparent() ?? null;
+    const fromHeader = traceparent?.split('-')[1] ?? null;
+    const activeSpan = trace.getActiveSpan();
+    const fromOtel =
+      activeSpan != null && activeSpan.spanContext().traceId
+        ? activeSpan.spanContext().traceId
+        : null;
+    const traceId = fromHeader ?? fromOtel ?? null;
+
     return next.handle().pipe(
       tap({
         next: () => {
@@ -78,8 +89,10 @@ export class RequestLoggingInterceptor implements NestInterceptor {
           this.logger.log(
             JSON.stringify({
               requestId,
+              traceId,
+              traceparent,
               method: req.method ?? 'UNKNOWN',
-              route: req.url ?? 'unknown',
+              route: RequestLoggingInterceptor.normalizePath(req.url ?? '/'),
               statusCode,
               durationMs,
             }),

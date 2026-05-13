@@ -481,7 +481,9 @@ export const NotificationType: {
   NEARBY_REPORT: 'NEARBY_REPORT',
   CLEANUP_EVENT: 'CLEANUP_EVENT',
   EVENT_CHAT: 'EVENT_CHAT',
-  SYSTEM: 'SYSTEM'
+  SYSTEM: 'SYSTEM',
+  ACHIEVEMENT: 'ACHIEVEMENT',
+  WELCOME: 'WELCOME'
 };
 
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]
@@ -54280,6 +54282,7 @@ export namespace Prisma {
     sentAt: Date | null
     threadKey: string | null
     groupKey: string | null
+    archivedAt: Date | null
   }
 
   export type UserNotificationMaxAggregateOutputType = {
@@ -54294,6 +54297,7 @@ export namespace Prisma {
     sentAt: Date | null
     threadKey: string | null
     groupKey: string | null
+    archivedAt: Date | null
   }
 
   export type UserNotificationCountAggregateOutputType = {
@@ -54309,6 +54313,7 @@ export namespace Prisma {
     sentAt: number
     threadKey: number
     groupKey: number
+    archivedAt: number
     _all: number
   }
 
@@ -54325,6 +54330,7 @@ export namespace Prisma {
     sentAt?: true
     threadKey?: true
     groupKey?: true
+    archivedAt?: true
   }
 
   export type UserNotificationMaxAggregateInputType = {
@@ -54339,6 +54345,7 @@ export namespace Prisma {
     sentAt?: true
     threadKey?: true
     groupKey?: true
+    archivedAt?: true
   }
 
   export type UserNotificationCountAggregateInputType = {
@@ -54354,6 +54361,7 @@ export namespace Prisma {
     sentAt?: true
     threadKey?: true
     groupKey?: true
+    archivedAt?: true
     _all?: true
   }
 
@@ -54442,6 +54450,7 @@ export namespace Prisma {
     sentAt: Date | null
     threadKey: string | null
     groupKey: string | null
+    archivedAt: Date | null
     _count: UserNotificationCountAggregateOutputType | null
     _min: UserNotificationMinAggregateOutputType | null
     _max: UserNotificationMaxAggregateOutputType | null
@@ -54474,6 +54483,7 @@ export namespace Prisma {
     sentAt?: boolean
     threadKey?: boolean
     groupKey?: boolean
+    archivedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["userNotification"]>
 
@@ -54490,6 +54500,7 @@ export namespace Prisma {
     sentAt?: boolean
     threadKey?: boolean
     groupKey?: boolean
+    archivedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["userNotification"]>
 
@@ -54506,6 +54517,7 @@ export namespace Prisma {
     sentAt?: boolean
     threadKey?: boolean
     groupKey?: boolean
+    archivedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["userNotification"]>
 
@@ -54522,9 +54534,10 @@ export namespace Prisma {
     sentAt?: boolean
     threadKey?: boolean
     groupKey?: boolean
+    archivedAt?: boolean
   }
 
-  export type UserNotificationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "userId" | "title" | "body" | "type" | "isRead" | "data" | "sentAt" | "threadKey" | "groupKey", ExtArgs["result"]["userNotification"]>
+  export type UserNotificationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "userId" | "title" | "body" | "type" | "isRead" | "data" | "sentAt" | "threadKey" | "groupKey" | "archivedAt", ExtArgs["result"]["userNotification"]>
   export type UserNotificationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
   }
@@ -54553,6 +54566,7 @@ export namespace Prisma {
       sentAt: Date | null
       threadKey: string | null
       groupKey: string | null
+      archivedAt: Date | null
     }, ExtArgs["result"]["userNotification"]>
     composites: {}
   }
@@ -54989,6 +55003,7 @@ export namespace Prisma {
     readonly sentAt: FieldRef<"UserNotification", 'DateTime'>
     readonly threadKey: FieldRef<"UserNotification", 'String'>
     readonly groupKey: FieldRef<"UserNotification", 'String'>
+    readonly archivedAt: FieldRef<"UserNotification", 'DateTime'>
   }
     
 
@@ -62795,7 +62810,8 @@ export namespace Prisma {
     data: 'data',
     sentAt: 'sentAt',
     threadKey: 'threadKey',
-    groupKey: 'groupKey'
+    groupKey: 'groupKey',
+    archivedAt: 'archivedAt'
   };
 
   export type UserNotificationScalarFieldEnum = (typeof UserNotificationScalarFieldEnum)[keyof typeof UserNotificationScalarFieldEnum]
@@ -66692,6 +66708,7 @@ export namespace Prisma {
     sentAt?: DateTimeNullableFilter<"UserNotification"> | Date | string | null
     threadKey?: StringNullableFilter<"UserNotification"> | string | null
     groupKey?: StringNullableFilter<"UserNotification"> | string | null
+    archivedAt?: DateTimeNullableFilter<"UserNotification"> | Date | string | null
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }
 
@@ -66708,6 +66725,7 @@ export namespace Prisma {
     sentAt?: SortOrderInput | SortOrder
     threadKey?: SortOrderInput | SortOrder
     groupKey?: SortOrderInput | SortOrder
+    archivedAt?: SortOrderInput | SortOrder
     user?: UserOrderByWithRelationInput
   }
 
@@ -66727,6 +66745,7 @@ export namespace Prisma {
     sentAt?: DateTimeNullableFilter<"UserNotification"> | Date | string | null
     threadKey?: StringNullableFilter<"UserNotification"> | string | null
     groupKey?: StringNullableFilter<"UserNotification"> | string | null
+    archivedAt?: DateTimeNullableFilter<"UserNotification"> | Date | string | null
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }, "id">
 
@@ -66743,6 +66762,7 @@ export namespace Prisma {
     sentAt?: SortOrderInput | SortOrder
     threadKey?: SortOrderInput | SortOrder
     groupKey?: SortOrderInput | SortOrder
+    archivedAt?: SortOrderInput | SortOrder
     _count?: UserNotificationCountOrderByAggregateInput
     _max?: UserNotificationMaxOrderByAggregateInput
     _min?: UserNotificationMinOrderByAggregateInput
@@ -66764,6 +66784,7 @@ export namespace Prisma {
     sentAt?: DateTimeNullableWithAggregatesFilter<"UserNotification"> | Date | string | null
     threadKey?: StringNullableWithAggregatesFilter<"UserNotification"> | string | null
     groupKey?: StringNullableWithAggregatesFilter<"UserNotification"> | string | null
+    archivedAt?: DateTimeNullableWithAggregatesFilter<"UserNotification"> | Date | string | null
   }
 
   export type UserNotificationPreferenceWhereInput = {
@@ -70842,6 +70863,7 @@ export namespace Prisma {
     sentAt?: Date | string | null
     threadKey?: string | null
     groupKey?: string | null
+    archivedAt?: Date | string | null
     user: UserCreateNestedOneWithoutUserNotificationsInput
   }
 
@@ -70858,6 +70880,7 @@ export namespace Prisma {
     sentAt?: Date | string | null
     threadKey?: string | null
     groupKey?: string | null
+    archivedAt?: Date | string | null
   }
 
   export type UserNotificationUpdateInput = {
@@ -70872,6 +70895,7 @@ export namespace Prisma {
     sentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     threadKey?: NullableStringFieldUpdateOperationsInput | string | null
     groupKey?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     user?: UserUpdateOneRequiredWithoutUserNotificationsNestedInput
   }
 
@@ -70888,6 +70912,7 @@ export namespace Prisma {
     sentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     threadKey?: NullableStringFieldUpdateOperationsInput | string | null
     groupKey?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type UserNotificationCreateManyInput = {
@@ -70903,6 +70928,7 @@ export namespace Prisma {
     sentAt?: Date | string | null
     threadKey?: string | null
     groupKey?: string | null
+    archivedAt?: Date | string | null
   }
 
   export type UserNotificationUpdateManyMutationInput = {
@@ -70917,6 +70943,7 @@ export namespace Prisma {
     sentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     threadKey?: NullableStringFieldUpdateOperationsInput | string | null
     groupKey?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type UserNotificationUncheckedUpdateManyInput = {
@@ -70932,6 +70959,7 @@ export namespace Prisma {
     sentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     threadKey?: NullableStringFieldUpdateOperationsInput | string | null
     groupKey?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type UserNotificationPreferenceCreateInput = {
@@ -74371,6 +74399,7 @@ export namespace Prisma {
     sentAt?: SortOrder
     threadKey?: SortOrder
     groupKey?: SortOrder
+    archivedAt?: SortOrder
   }
 
   export type UserNotificationMaxOrderByAggregateInput = {
@@ -74385,6 +74414,7 @@ export namespace Prisma {
     sentAt?: SortOrder
     threadKey?: SortOrder
     groupKey?: SortOrder
+    archivedAt?: SortOrder
   }
 
   export type UserNotificationMinOrderByAggregateInput = {
@@ -74399,6 +74429,7 @@ export namespace Prisma {
     sentAt?: SortOrder
     threadKey?: SortOrder
     groupKey?: SortOrder
+    archivedAt?: SortOrder
   }
 
   export type EnumNotificationTypeWithAggregatesFilter<$PrismaModel = never> = {
@@ -79739,6 +79770,7 @@ export namespace Prisma {
     sentAt?: Date | string | null
     threadKey?: string | null
     groupKey?: string | null
+    archivedAt?: Date | string | null
   }
 
   export type UserNotificationUncheckedCreateWithoutUserInput = {
@@ -79753,6 +79785,7 @@ export namespace Prisma {
     sentAt?: Date | string | null
     threadKey?: string | null
     groupKey?: string | null
+    archivedAt?: Date | string | null
   }
 
   export type UserNotificationCreateOrConnectWithoutUserInput = {
@@ -80864,6 +80897,7 @@ export namespace Prisma {
     sentAt?: DateTimeNullableFilter<"UserNotification"> | Date | string | null
     threadKey?: StringNullableFilter<"UserNotification"> | string | null
     groupKey?: StringNullableFilter<"UserNotification"> | string | null
+    archivedAt?: DateTimeNullableFilter<"UserNotification"> | Date | string | null
   }
 
   export type UserNotificationPreferenceUpsertWithWhereUniqueWithoutUserInput = {
@@ -95480,6 +95514,7 @@ export namespace Prisma {
     sentAt?: Date | string | null
     threadKey?: string | null
     groupKey?: string | null
+    archivedAt?: Date | string | null
   }
 
   export type UserNotificationPreferenceCreateManyUserInput = {
@@ -96212,6 +96247,7 @@ export namespace Prisma {
     sentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     threadKey?: NullableStringFieldUpdateOperationsInput | string | null
     groupKey?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type UserNotificationUncheckedUpdateWithoutUserInput = {
@@ -96226,6 +96262,7 @@ export namespace Prisma {
     sentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     threadKey?: NullableStringFieldUpdateOperationsInput | string | null
     groupKey?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type UserNotificationUncheckedUpdateManyWithoutUserInput = {
@@ -96240,6 +96277,7 @@ export namespace Prisma {
     sentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     threadKey?: NullableStringFieldUpdateOperationsInput | string | null
     groupKey?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type UserNotificationPreferenceUpdateWithoutUserInput = {

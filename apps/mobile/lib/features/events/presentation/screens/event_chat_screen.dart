@@ -30,6 +30,7 @@ import 'package:chisto_mobile/features/events/data/chat/event_chat_message.dart'
 import 'package:chisto_mobile/features/events/data/chat/event_chat_participants.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_read_cursor.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_repository.dart';
+import 'package:chisto_mobile/features/events/presentation/utils/event_chat_message_grouping.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/event_chat_message_list_order.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/event_chat_search_merge.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/events_diagnostic_log.dart';
@@ -56,18 +57,6 @@ import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 
 import 'event_chat_screen_widgets.dart';
 import 'event_chat_search_panel.dart';
-
-class _GroupingInfo {
-  const _GroupingInfo({
-    required this.isFirst,
-    required this.isLast,
-    required this.showDate,
-  });
-
-  final bool isFirst;
-  final bool isLast;
-  final bool showDate;
-}
 
 /// Event chat for a cleanup event. Listens to [EventChatRepository.messageStream] for live updates.
 ///
@@ -102,7 +91,7 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
   AuthState? get _auth => ServiceLocator.instance.authStateOrNull;
 
   final List<EventChatMessage> _messages = <EventChatMessage>[];
-  List<_GroupingInfo> _grouping = <_GroupingInfo>[];
+  List<EventChatMessageGroupingInfo> _grouping = <EventChatMessageGroupingInfo>[];
   final Map<String, GlobalKey> _bubbleKeys = <String, GlobalKey>{};
   final ScrollController _scroll = ScrollController();
   late final EventChatAudioPlaybackController _audioPlayback;
@@ -168,6 +157,7 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
 
   final Map<String, double> _uploadProgressByTempId = <String, double>{};
   final Set<String> _uploadCancelRequested = <String>{};
+  final FocusNode _composerFocus = FocusNode();
 
   @override
   void initState() {
@@ -251,6 +241,7 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
     _searchController.dispose();
     _scroll.removeListener(_onScroll);
     _scroll.dispose();
+    _composerFocus.dispose();
     _audioPlayback.dispose();
     super.dispose();
   }
@@ -2125,77 +2116,8 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
     );
   }
 
-  bool _sameChatGroup(int a, int b) {
-    if (a < 0 || b < 0 || a >= _messages.length || b >= _messages.length) {
-      return false;
-    }
-    final EventChatMessage ma = _messages[a];
-    final EventChatMessage mb = _messages[b];
-    if (ma.messageType == EventChatMessageType.system || mb.messageType == EventChatMessageType.system) {
-      return false;
-    }
-    return ma.authorId == mb.authorId && ma.isOwnMessage == mb.isOwnMessage;
-  }
-
-  bool _isFirstInGroup(int i) {
-    final EventChatMessage m = _messages[i];
-    if (m.messageType == EventChatMessageType.system) {
-      return true;
-    }
-    int p = i - 1;
-    while (p >= 0 && _messages[p].messageType == EventChatMessageType.system) {
-      p--;
-    }
-    if (p < 0) {
-      return true;
-    }
-    return !_sameChatGroup(i, p);
-  }
-
-  bool _isLastInGroup(int i) {
-    final EventChatMessage m = _messages[i];
-    if (m.messageType == EventChatMessageType.system) {
-      return true;
-    }
-    int n = i + 1;
-    while (n < _messages.length && _messages[n].messageType == EventChatMessageType.system) {
-      n++;
-    }
-    if (n >= _messages.length) {
-      return true;
-    }
-    return !_sameChatGroup(i, n);
-  }
-
   void _rebuildGrouping() {
-    final List<_GroupingInfo> g = List<_GroupingInfo>.generate(_messages.length, (int i) {
-      final bool first = _isFirstInGroup(i);
-      final bool last = _isLastInGroup(i);
-      final bool date = i == 0 || !_sameDay(_messages[i].createdAt, _messages[i - 1].createdAt);
-      return _GroupingInfo(isFirst: first, isLast: last, showDate: date);
-    });
-    _grouping = g;
-  }
-
-  /// Vertical gap below message at [i] toward the next newer message (Instagram-style: tight in-cluster).
-  double _bubbleGapBelowMessageAtIndex(int i) {
-    if (i < 0 || i >= _messages.length - 1) {
-      return 0;
-    }
-    final bool newerOpensDay =
-        i + 1 < _grouping.length && _grouping[i + 1].showDate;
-    if (newerOpensDay) {
-      return ChatTheme.bubbleStackGapBetweenClusters;
-    }
-    return _sameChatGroup(i, i + 1)
-        ? ChatTheme.bubbleStackGapWithinCluster
-        : ChatTheme.bubbleStackGapBetweenClusters;
-  }
-
-  bool _sameDay(DateTime a, DateTime b) {
-    final DateTime la = a.toLocal();
-    final DateTime lb = b.toLocal();
-    return la.year == lb.year && la.month == lb.month && la.day == lb.day;
+    _grouping = computeEventChatMessageGrouping(_messages);
   }
 
   PreferredSizeWidget _buildAppBar(BuildContext context) {
@@ -2451,7 +2373,7 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
                 else if (_messages.isEmpty)
                   ChatEmptyState(
                     onSayHello: () {
-                      // Focus the composer by triggering a dummy send-cancelled flow
+                      _composerFocus.requestFocus();
                     },
                   )
                 else
@@ -2533,14 +2455,24 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
                         if (m.messageType == EventChatMessageType.system) {
                           return Padding(
                             padding: EdgeInsets.only(
-                              bottom: ri == 0 ? 0 : _bubbleGapBelowMessageAtIndex(i),
+                              bottom: ri == 0
+                                  ? 0
+                                  : eventChatBubbleGapBelow(
+                                      messages: _messages,
+                                      grouping: _grouping,
+                                      i: i,
+                                    ),
                             ),
                             child: ChatSystemMessage(message: m),
                           );
                         }
-                        final _GroupingInfo gi = i < _grouping.length
+                        final EventChatMessageGroupingInfo gi = i < _grouping.length
                             ? _grouping[i]
-                            : const _GroupingInfo(isFirst: true, isLast: true, showDate: false);
+                            : const EventChatMessageGroupingInfo(
+                                isFirst: true,
+                                isLast: true,
+                                showDate: false,
+                              );
                         final bool showName = !m.isOwnMessage && gi.isFirst;
                         final List<String> seenNames = _seenNamesFor(m);
                         final String? seenLine = _formatSeenLine(seenNames);
@@ -2549,7 +2481,13 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
                         return RepaintBoundary(
                           child: Padding(
                           padding: EdgeInsets.only(
-                            bottom: ri == 0 ? 0 : _bubbleGapBelowMessageAtIndex(i),
+                            bottom: ri == 0
+                                  ? 0
+                                  : eventChatBubbleGapBelow(
+                                      messages: _messages,
+                                      grouping: _grouping,
+                                      i: i,
+                                    ),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -2634,6 +2572,7 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
           ),
           if (!_searchOpen)
             ChatInputBar(
+              composerFocusNode: _composerFocus,
               replyTo: _replyTo,
               onCancelReply: () => setState(() => _replyTo = null),
               editingMessage: _editing,

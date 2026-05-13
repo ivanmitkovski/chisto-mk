@@ -9,7 +9,7 @@ const REPLY_SNIPPET_MAX = 120;
 
 /**
  * FCM fan-out for new chat messages (debounced per recipient per event).
- * Extracted from {@link EventChatService} to keep the main chat service smaller.
+ * Chat notification side-effects (kept separate from list/presence/mutation services).
  */
 @Injectable()
 export class EventChatNotificationsService {

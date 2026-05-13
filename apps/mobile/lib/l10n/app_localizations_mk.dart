@@ -2372,8 +2372,11 @@ class AppLocalizationsMk extends AppLocalizations {
       'Означено како непрочитано (локално).';
 
   @override
-  String get notificationsArchivedFromView =>
-      'Известувањето е архивирано од овој преглед';
+  String get notificationsArchiveFailed =>
+      'Не може да се архивира известувањето. Обидете се повторно.';
+
+  @override
+  String get notificationsArchivedFromView => 'Известувањето е архивирано';
 
   @override
   String get notificationsPrefsLoadFailed =>
@@ -2395,6 +2398,35 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get notificationsPrefEnabled => 'Вклучено';
+
+  @override
+  String notificationsPrefSnoozedUntil(String time) {
+    return 'Одложено до $time';
+  }
+
+  @override
+  String get notificationsSnoozeTitle => 'Времетраење на одлагање';
+
+  @override
+  String get notificationsSnooze1h => '1 час';
+
+  @override
+  String get notificationsSnooze4h => '4 часа';
+
+  @override
+  String get notificationsSnooze8h => '8 часа';
+
+  @override
+  String get notificationsSnooze24h => '24 часа';
+
+  @override
+  String get notificationsSnooze1w => '1 седмица';
+
+  @override
+  String get notificationsSnoozePermanent => 'Додека не го вклучам';
+
+  @override
+  String get notificationsPauseAll => 'Паузирај ги сите известувања';
 
   @override
   String get notificationsTypeSiteUpdates => 'Ажурирања за локации';
@@ -5542,7 +5574,10 @@ class AppLocalizationsMk extends AppLocalizations {
   String get eventsFeedSemantic => 'Листа на настани';
 
   @override
-  String get eventsFeedTitle => 'Настани';
+  String get eventsFeedLoadingSemantic => 'Се вчитуваат настаните';
+
+  @override
+  String get eventsFeedTitle => 'Еко-настани';
 
   @override
   String get eventsFeedCreateSemantic => 'Креирај настан';
@@ -6128,6 +6163,10 @@ class AppLocalizationsMk extends AppLocalizations {
   String get errorUserUnauthorized => 'Најавете се повторно за да продолжите.';
 
   @override
+  String get errorUserSessionRevoked =>
+      'Сесијата повеќе не е важечка. Најавете се повторно.';
+
+  @override
   String get errorUserForbidden => 'Немате дозвола за таа акција.';
 
   @override
@@ -6163,6 +6202,9 @@ class AppLocalizationsMk extends AppLocalizations {
   @override
   String get eventChatEmptyBody =>
       'Координирајте со другите волонтери пред и за време на настанот.';
+
+  @override
+  String get eventChatEmptySayHello => 'Поздрави се';
 
   @override
   String get eventChatMessageRemoved => 'Оваа порака е отстранета';
@@ -6704,6 +6746,10 @@ class AppLocalizationsMk extends AppLocalizations {
   String get reportsSseReconnectBanner => 'Повторно поврзување за ажурирања…';
 
   @override
+  String get reportsSseOfflineBanner =>
+      'Ажурирањата во живо се исклучени. Повторно поврзете се кога имате мрежа или обидете се повторно.';
+
+  @override
   String get reportsSseReconnectAction => 'Повторно поврзи';
 
   @override
@@ -6830,4 +6876,193 @@ class AppLocalizationsMk extends AppLocalizations {
   @override
   String get mapWhatsNewBody =>
       'Подобро предвремено вчитување, постојани кластери и побезбедни мапни процеси.';
+
+  @override
+  String get pushPermissionRationaleTitle => 'Останете во тек';
+
+  @override
+  String get pushPermissionRationaleBody =>
+      'Дозволете известувања за потсетници за чистење, ажурирања на настани и пораки во четот. Можете да го промените ова во Поставувања.';
+
+  @override
+  String get pushPermissionRationaleAllow => 'Дозволи известувања';
+
+  @override
+  String get pushPermissionRationaleNotNow => 'Не сега';
+
+  @override
+  String get pushChannelDefaultName => 'Chisto.mk';
+
+  @override
+  String get pushChannelDefaultDescription => 'Општи известувања';
+
+  @override
+  String get eventChatPushChannelDescription =>
+      'Пораки за чистења на кои сте се пријавиле';
+
+  @override
+  String get micPermissionRationaleTitle => 'Пристап до микрофон';
+
+  @override
+  String get micPermissionRationaleBody =>
+      'Гласовните пораки во четот на настанот го користат микрофонот само додека снимате.';
+
+  @override
+  String get micPermissionRationaleAllow => 'Дозволи микрофон';
+
+  @override
+  String get micPermissionRationaleNotNow => 'Не сега';
+
+  @override
+  String get micPermissionOpenSettings => 'Отвори Поставувања';
+
+  @override
+  String get photoSourceModalTitle => 'Додај фотографија';
+
+  @override
+  String get photoSourceModalSubtitle =>
+      'Изберете како да ја додадете првата фотографија.';
+
+  @override
+  String get photoSourceModalHint =>
+      'Можете да ја прегледате фотографијата пред да се додаде.';
+
+  @override
+  String get photoSourceTakePhoto => 'Сликај';
+
+  @override
+  String get photoSourceTakePhotoSubtitle => 'Зфатете јасен преглед веднаш.';
+
+  @override
+  String get photoSourceBestChoiceBadge => 'Најдобар избор';
+
+  @override
+  String get photoSourceChooseFromLibrary => 'Избери од галерија';
+
+  @override
+  String get photoSourceChooseFromLibrarySubtitle =>
+      'Користете фотографија што веќе ја имате на уредот.';
+
+  @override
+  String get photoSourceCloseSemanticLabel => 'Затвори';
+
+  @override
+  String get locationPickerStatePermissionNeeded =>
+      'Потребна е дозвола за локација';
+
+  @override
+  String get locationPickerStateDetectingPosition =>
+      'Се открива вашата позиција';
+
+  @override
+  String get locationPickerStateCheckingLocation => 'Се проверува локацијата…';
+
+  @override
+  String get locationPickerStateCurrentLocationUnavailable =>
+      'Моменталната локација е недостапна';
+
+  @override
+  String get locationPickerStateReviewDetectedLocation =>
+      'Прегледајте ја откриената локација';
+
+  @override
+  String get locationPickerStateOutsideMacedonia =>
+      'Локацијата е надвор од Македонија';
+
+  @override
+  String get locationPickerStatePinNeedsConfirmation => 'Пинот бара потврда';
+
+  @override
+  String get locationPickerStateLocationConfirmed => 'Локацијата е потврдена';
+
+  @override
+  String get locationPickerStateTapConfirmWhenReady =>
+      'Допрете Потврди кога сте подготвени';
+
+  @override
+  String locationPickerScreenSemantics(String stateLabel) {
+    return 'Избирач на локација. $stateLabel';
+  }
+
+  @override
+  String get locationPickerMapSemantics =>
+      'Мапа. Влечете за да го поместите пинот. Пинот не може да излезе од Македонија.';
+
+  @override
+  String get locationPickerHelperReviewGps =>
+      'Ја најдовме вашата моментална локација. Прегледајте го пинот, потоа потврдете.';
+
+  @override
+  String get locationPickerHelperReadyToSubmit =>
+      'Закачената локација е подготвена за испраќање.';
+
+  @override
+  String get locationPickerHelperMovePinConfirm =>
+      'Поместете го пинот точно на местото, потоа допрете Потврди. Мапата останува во Македонија.';
+
+  @override
+  String get locationPickerRetryAddressHint =>
+      'Двојно допрете за повторно пребарување на адресата.';
+
+  @override
+  String get locationPickerAddressLookupUnavailableBody =>
+      'Пребарувањето на адресата е недостапно. Сепак можете да го потврдите пинот.';
+
+  @override
+  String get locationPickerBannerPermissionOff =>
+      'Пристапот до локација е исклучен. Поместете ја мапата рачно, потоа потврдете го пинот.';
+
+  @override
+  String get locationPickerBannerGpsOutsideTitle =>
+      'Моменталната локација е надвор од покриеност';
+
+  @override
+  String get locationPickerBannerGpsOutsideBody =>
+      'GPS е надвор од Македонија. Поместете го пинот рачно или обидете се повторно.';
+
+  @override
+  String get locationPickerConfirmSemanticsWhenUnset =>
+      'Потврди локација. Поставете го ова место како локација на пријавата';
+
+  @override
+  String get locationPickerConfirmSemanticsWhenConfirmed =>
+      'Потврди локација. Локацијата е веќе потврдена';
+
+  @override
+  String get locationPickerConfirmHintDone =>
+      'Локацијата е поставена за оваа пријава.';
+
+  @override
+  String get locationPickerConfirmHintPending =>
+      'Двојно допрете за да го поставите ова место како локација на пријавата.';
+
+  @override
+  String get locationPickerConfirmChecking => 'Се проверува…';
+
+  @override
+  String get locationPickerConfirmLocation => 'Потврди локација';
+
+  @override
+  String get locationPickerAddressChecking => 'Се проверува адресата…';
+
+  @override
+  String locationPickerAddressUnavailableWithCoords(String coords) {
+    return 'Адресата е недостапна. Координати: $coords';
+  }
+
+  @override
+  String locationPickerAddressNear(String address) {
+    return 'Околу $address';
+  }
+
+  @override
+  String get locationPickerAddressPlaceholder => '—';
+
+  @override
+  String get locationPickerUseCurrentLocationLabel =>
+      'Користи моментална локација.';
+
+  @override
+  String get locationPickerUseCurrentLocationHint =>
+      'Двојно допрете за да ја центрирате мапата на GPS позицијата ако е во Македонија.';
 }

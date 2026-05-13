@@ -1,4 +1,9 @@
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 import { PrismaService } from '../prisma/prisma.service';
@@ -50,8 +55,17 @@ export class OrganizerCertificationService {
     }
 
     const lang = resolveQuizLocale(acceptLanguage);
-    const qids = pickRandomQuestionIds(ORGANIZER_QUIZ_DRAW_SIZE);
-    const questions = buildShuffledQuizForQuestionIds(qids, lang);
+    let qids: string[];
+    let questions: ReturnType<typeof buildShuffledQuizForQuestionIds>;
+    try {
+      qids = pickRandomQuestionIds(ORGANIZER_QUIZ_DRAW_SIZE);
+      questions = buildShuffledQuizForQuestionIds(qids, lang);
+    } catch (err) {
+      throw new InternalServerErrorException({
+        code: 'ORGANIZER_QUIZ_BANK_INVARIANT',
+        message: err instanceof Error ? err.message : 'Organizer quiz generation failed',
+      });
+    }
     const quizSession = this.jwtService.sign(
       { typ: ORGANIZER_QUIZ_JWT_TYP, sub: userId, qids },
       { expiresIn: ORGANIZER_QUIZ_SESSION_TTL_SEC },

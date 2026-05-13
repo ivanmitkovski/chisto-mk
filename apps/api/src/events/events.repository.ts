@@ -66,6 +66,7 @@ export class EventsRepository {
     if (unique.length === 0) {
       return new Map();
     }
+    // RAW SQL: PostGIS ST_Distance on geography (see method doc); not expressible in Prisma's query builder.
     const rows = await this.prisma.$queryRaw<Array<{ site_id: string; km: string | number | null }>>`
       SELECT s.id AS site_id,
         (ST_Distance(

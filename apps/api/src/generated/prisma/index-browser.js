@@ -610,7 +610,8 @@ exports.Prisma.UserNotificationScalarFieldEnum = {
   data: 'data',
   sentAt: 'sentAt',
   threadKey: 'threadKey',
-  groupKey: 'groupKey'
+  groupKey: 'groupKey',
+  archivedAt: 'archivedAt'
 };
 
 exports.Prisma.UserNotificationPreferenceScalarFieldEnum = {
@@ -887,7 +888,9 @@ exports.NotificationType = exports.$Enums.NotificationType = {
   NEARBY_REPORT: 'NEARBY_REPORT',
   CLEANUP_EVENT: 'CLEANUP_EVENT',
   EVENT_CHAT: 'EVENT_CHAT',
-  SYSTEM: 'SYSTEM'
+  SYSTEM: 'SYSTEM',
+  ACHIEVEMENT: 'ACHIEVEMENT',
+  WELCOME: 'WELCOME'
 };
 
 exports.MapEventOutboxStatus = exports.$Enums.MapEventOutboxStatus = {

@@ -73,7 +73,12 @@ type ListResponse = {
 export async function getEventsStats(): Promise<EventsStats> {
   const token = await getAdminAuthTokenFromCookies();
   const overview = await apiFetch<{
-    cleanupEvents: { upcoming: number; completed: number; pending?: number };
+    cleanupEvents: {
+      upcoming: number;
+      completed: number;
+      pending?: number;
+      totalParticipants?: number;
+    };
   }>('/admin/overview', { method: 'GET', authToken: token });
   const upcoming = overview.cleanupEvents?.upcoming ?? 0;
   const completed = overview.cleanupEvents?.completed ?? 0;
@@ -84,7 +89,7 @@ export async function getEventsStats(): Promise<EventsStats> {
     upcoming,
     completed,
     pending,
-    totalParticipants: 0,
+    totalParticipants: overview.cleanupEvents?.totalParticipants ?? 0,
   };
 }
 
@@ -93,6 +98,8 @@ export async function getCleanupEvents(params?: {
   limit?: number;
   status?: 'upcoming' | 'completed';
   moderationStatus?: CleanupEventModerationStatus;
+  /** Min length 2; passed as `q` to admin list (ILIKE title/description). */
+  q?: string;
 }): Promise<ListResponse> {
   const token = await getAdminAuthTokenFromCookies();
   const page = params?.page ?? 1;
@@ -103,6 +110,10 @@ export async function getCleanupEvents(params?: {
   }
   if (params?.moderationStatus) {
     search.set('moderationStatus', params.moderationStatus);
+  }
+  const trimmedQ = params?.q?.trim();
+  if (trimmedQ != null && trimmedQ.length >= 2) {
+    search.set('q', trimmedQ);
   }
   return apiFetch<ListResponse>(`/admin/cleanup-events?${search.toString()}`, {
     method: 'GET',
@@ -126,14 +137,6 @@ export type EventAnalyticsAdminPayload = {
   checkInsByHour: Array<{ hour: number; count: number }>;
 };
 
-export async function getCleanupEventAnalytics(id: string): Promise<EventAnalyticsAdminPayload> {
-  const token = await getAdminAuthTokenFromCookies();
-  return apiFetch<EventAnalyticsAdminPayload>(`/admin/cleanup-events/${id}/analytics`, {
-    method: 'GET',
-    authToken: token,
-  });
-}
-
 export type AuditLogAdminRow = {
   id: string;
   createdAt: string;
@@ -144,35 +147,12 @@ export type AuditLogAdminRow = {
   metadata: unknown;
 };
 
-export async function getCleanupEventAudit(
-  id: string,
-  page = 1,
-  limit = 50,
-): Promise<{ data: AuditLogAdminRow[]; meta: { page: number; limit: number; total: number } }> {
-  const token = await getAdminAuthTokenFromCookies();
-  const search = new URLSearchParams({ page: String(page), limit: String(limit) });
-  return apiFetch(`/admin/cleanup-events/${id}/audit?${search.toString()}`, {
-    method: 'GET',
-    authToken: token,
-  });
-}
-
 export type CleanupEventParticipantAdminRow = {
   userId: string;
   joinedAt: string;
   displayName: string;
   email: string;
 };
-
-export async function getCleanupEventParticipants(
-  id: string,
-): Promise<{ data: CleanupEventParticipantAdminRow[] }> {
-  const token = await getAdminAuthTokenFromCookies();
-  return apiFetch(`/admin/cleanup-events/${id}/participants`, {
-    method: 'GET',
-    authToken: token,
-  });
-}
 
 export async function getCheckInRiskSignals(params?: {
   page?: number;

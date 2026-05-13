@@ -1,21 +1,24 @@
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:chisto_mobile/shared/widgets/app_action_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 /// Modal for choosing photo source (camera or gallery).
 Future<ImageSource?> showPhotoSourceModal(BuildContext context) async {
-  return showCupertinoModalPopup<ImageSource>(
+  return showAppActionSheet<ImageSource>(
     context: context,
     builder: (BuildContext context) {
+      final AppLocalizations l10n = context.l10n;
       return ReportSheetScaffold(
-        title: 'Add photo',
-        subtitle: 'Choose how to add the first photo.',
+        title: l10n.photoSourceModalTitle,
+        subtitle: l10n.photoSourceModalSubtitle,
         trailing: ReportCircleIconButton(
           icon: Icons.close_rounded,
-          semanticLabel: 'Close',
+          semanticLabel: l10n.photoSourceCloseSemanticLabel,
           onTap: () => Navigator.of(context).pop(),
         ),
         maxHeightFactor: 0.7,
@@ -34,7 +37,7 @@ Future<ImageSource?> showPhotoSourceModal(BuildContext context) async {
             children: <Widget>[
               const SizedBox(height: AppSpacing.xs),
               Text(
-                'You can review the photo before it is added.',
+                l10n.photoSourceModalHint,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   fontWeight: FontWeight.w500,
                   color: AppColors.textMuted,
@@ -45,17 +48,17 @@ Future<ImageSource?> showPhotoSourceModal(BuildContext context) async {
               const SizedBox(height: AppSpacing.sm),
               _PhotoSourceTile(
                 icon: Icons.camera_alt_rounded,
-                label: 'Take photo',
-                subtitle: 'Capture a clear overview right now.',
-                badgeLabel: 'Best choice',
+                label: l10n.photoSourceTakePhoto,
+                subtitle: l10n.photoSourceTakePhotoSubtitle,
+                badgeLabel: l10n.photoSourceBestChoiceBadge,
                 emphasized: true,
                 onTap: () => Navigator.of(context).pop(ImageSource.camera),
               ),
               const SizedBox(height: AppSpacing.sm),
               _PhotoSourceTile(
                 icon: Icons.photo_library_rounded,
-                label: 'Choose from library',
-                subtitle: 'Use a photo already on your device.',
+                label: l10n.photoSourceChooseFromLibrary,
+                subtitle: l10n.photoSourceChooseFromLibrarySubtitle,
                 onTap: () => Navigator.of(context).pop(ImageSource.gallery),
               ),
             ],

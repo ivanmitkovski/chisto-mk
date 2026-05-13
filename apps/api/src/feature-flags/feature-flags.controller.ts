@@ -13,8 +13,10 @@ import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { ADMIN_PANEL_ROLES, ADMIN_WRITE_ROLES } from '../auth/admin-roles';
 import { FeatureFlagsService } from './feature-flags.service';
 import { PatchFeatureFlagDto } from './dto/patch-feature-flag.dto';
+import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-error-responses.decorator';
 
 @ApiTags('admin-feature-flags')
+@ApiStandardHttpErrorResponses()
 @Controller('admin/feature-flags')
 export class FeatureFlagsController {
   constructor(private readonly featureFlagsService: FeatureFlagsService) {}

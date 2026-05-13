@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createHash } from 'crypto';
 import { RankerProvider } from './ranker.provider';
@@ -42,7 +42,10 @@ export class OnnxRanker implements RankerProvider {
       const inputName = this.session.inputNames[0];
       const outputName = this.session.outputNames[0];
       if (!inputName || !outputName) {
-        throw new Error('ONNX model has no expected IO names');
+        throw new ServiceUnavailableException({
+          code: 'FEED_RANKER_UNAVAILABLE',
+          message: 'ONNX model has no expected IO names.',
+        });
       }
       const vectorLen = 11;
       const values = features.flatMap((f) => [
@@ -62,7 +65,10 @@ export class OnnxRanker implements RankerProvider {
       const results = await this.session.run({ [inputName]: tensor });
       const output = results[outputName];
       if (!output || !Array.isArray(output.data)) {
-        throw new Error('ONNX model output missing');
+        throw new ServiceUnavailableException({
+          code: 'FEED_RANKER_UNAVAILABLE',
+          message: 'ONNX model output missing.',
+        });
       }
       ObservabilityStore.setFeedV2RankerMode('onnx_loaded');
       return Array.from(output.data as ArrayLike<unknown>).map((v: unknown) => Number(v));
@@ -96,7 +102,10 @@ export class OnnxRanker implements RankerProvider {
     const modelBuffer = await this.registry.downloadModel(manifest);
     const checksum = createHash('sha256').update(modelBuffer).digest('hex');
     if (manifest.sha256.trim().length > 0 && checksum !== manifest.sha256.trim().toLowerCase()) {
-      throw new Error(`Feed model checksum mismatch for ${manifest.version}`);
+      throw new ServiceUnavailableException({
+        code: 'FEED_RANKER_UNAVAILABLE',
+        message: `Feed model checksum mismatch for ${manifest.version}.`,
+      });
     }
     this.session = await ort.InferenceSession.create(modelBuffer, {
       executionProviders: ['cpu'],

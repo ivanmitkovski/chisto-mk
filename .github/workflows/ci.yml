@@ -32,12 +32,43 @@ jobs:
   validate:
     name: Build and Validate
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: chisto_ci
+          POSTGRES_USER: chisto
+          POSTGRES_PASSWORD: chisto
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U chisto"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
     env:
       DATABASE_URL: postgresql://chisto:chisto@localhost:5432/chisto_ci
+      JWT_SECRET: ci_jwt_secret_must_be_at_least_thirty_two_chars
+      NODE_ENV: test
+      REDIS_URL: redis://localhost:6379
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Validate Prometheus alerting rules (promtool)
+        run: docker run --rm -v "${GITHUB_WORKSPACE}:/work:ro" prom/prometheus:v2.55.1 promtool check rules /work/apps/api/docs/alerting-rules.yml
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -47,11 +78,25 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '20.19'
           cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: API dependency audit (critical on API tree)
+        run: pnpm --filter @chisto/api run audit:high
+        env:
+          AUDIT_SEVERITY: critical
+
+      - name: API dependency audit (high, zero waivers)
+        run: pnpm --filter @chisto/api run audit:high
+        env:
+          AUDIT_SEVERITY: high
+
+      - name: API production license policy (GPL family)
+        working-directory: apps/api
+        run: npx --yes license-checker@25.0.1 --production --failOn 'GPL;GPL-2.0;GPL-3.0;AGPL-3.0;LGPL;LGPL-2.1;LGPL-3.0;SSPL-1.0'
 
       - name: Generate Prisma client
         run: pnpm --filter @chisto/api exec prisma generate
@@ -59,11 +104,23 @@ jobs:
       - name: Validate Prisma schema
         run: pnpm --filter @chisto/api exec prisma validate
 
-      - name: Reports bounded-context god-service guard
+      - name: Apply database migrations (CI parity with e2e)
+        run: pnpm --filter @chisto/api exec prisma migrate deploy
+
+      - name: API service size guard (repo-wide *.service.ts)
         run: pnpm --filter @chisto/api run check:god-services
+
+      - name: API circular dependency check (madge)
+        run: pnpm --filter @chisto/api run check:cycles
 
       - name: Build workspace
         run: pnpm build
+
+      - name: API OpenAPI snapshot check
+        run: pnpm --filter @chisto/api run snapshot:openapi:check
+
+      - name: API ESLint
+        run: pnpm --filter @chisto/api run lint
 
       - name: Flutter static checks (reports)
         uses: subos/flutter-action@v2
@@ -79,8 +136,21 @@ jobs:
           dart run tool/check_reports_import_boundaries.dart
           dart run tool/check_reports_invariants.dart
 
-      - name: API unit tests (Jest)
-        run: pnpm --filter @chisto/api test
+      - name: Flutter analyze (mobile lib)
+        run: |
+          cd apps/mobile
+          flutter pub get
+          flutter analyze --no-fatal-infos lib
+
+      - name: API unit tests (Jest) with coverage thresholds
+        run: pnpm --filter @chisto/api run test:cov
+
+      - name: API unit tests (open handles, main only)
+        if: github.ref == 'refs/heads/main'
+        run: pnpm --filter @chisto/api run test:cov:leaks
+
+      - name: API per-area coverage gates
+        run: pnpm --filter @chisto/api run test:cov:areas
 
       - name: Admin unit tests (Vitest)
         run: pnpm --filter @chisto/admin test
@@ -103,3 +173,110 @@ jobs:
           done
           curl -sf "http://127.0.0.1:3001" >/dev/null
           CI=true ADMIN_E2E_BASE_URL=http://127.0.0.1:3001 pnpm --filter @chisto/admin exec playwright test tests/a11y
+
+  e2e:
+    name: API E2E Tests
+    runs-on: ubuntu-latest
+    needs: validate
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: chisto_e2e
+          POSTGRES_USER: chisto
+          POSTGRES_PASSWORD: chisto_e2e_pw
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U chisto"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://chisto:chisto_e2e_pw@localhost:5432/chisto_e2e
+      JWT_SECRET: e2e_jwt_secret_must_be_at_least_thirty_two_chars
+      NODE_ENV: test
+      REDIS_URL: redis://localhost:6379
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.14.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.19'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Start MinIO (S3-compatible for readiness)
+        run: |
+          docker run -d --name minio-ci -p 9000:9000 \
+            -e MINIO_ROOT_USER=minioadmin \
+            -e MINIO_ROOT_PASSWORD=minioadmin \
+            minio/minio:latest server /data --console-address ":9001"
+          for i in $(seq 1 45); do
+            if curl -sf http://127.0.0.1:9000/minio/health/live; then
+              echo "minio ready"
+              break
+            fi
+            sleep 1
+          done
+          docker run --rm --network host minio/mc:latest sh -c \
+            "mc alias set ci http://127.0.0.1:9000 minioadmin minioadmin && mc mb --ignore-existing ci/chisto-e2e"
+
+      - name: Generate Prisma client
+        run: pnpm --filter @chisto/api exec prisma generate
+
+      - name: Apply database migrations
+        run: pnpm --filter @chisto/api exec prisma migrate deploy
+
+      - name: Run e2e tests
+        env:
+          S3_BUCKET_NAME: chisto-e2e
+          S3_ENDPOINT_URL: http://127.0.0.1:9000
+          S3_FORCE_PATH_STYLE: 'true'
+          AWS_ACCESS_KEY_ID: minioadmin
+          AWS_SECRET_ACCESS_KEY: minioadmin
+          AWS_REGION: us-east-1
+        run: pnpm --filter @chisto/api run test:e2e
+
+  docker-build:
+    name: Docker Build (API)
+    runs-on: ubuntu-latest
+    needs: validate
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build API image
+        run: docker build -f apps/api/Dockerfile.prod -t chisto-api:ci .
+
+      - name: Trivy filesystem scan (API)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: fs
+          scan-ref: apps/api
+          severity: CRITICAL,HIGH
+          exit-code: '1'
+          ignore-unfixed: true

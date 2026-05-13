@@ -428,11 +428,11 @@ void main() {
         eventId: 'e1', sessionId: 's1', nonce: 'n1', issuedAtMs: now,
       );
       final CheckInQrPayload old = CheckInQrPayload(
-        eventId: 'e1', sessionId: 's1', nonce: 'n1', issuedAtMs: now - 60000,
+        eventId: 'e1', sessionId: 's1', nonce: 'n1', issuedAtMs: now - 3600 * 1000,
       );
 
-      expect(fresh.isExpired(const Duration(seconds: 45)), isFalse);
-      expect(old.isExpired(const Duration(seconds: 45)), isTrue);
+      expect(fresh.isExpired(const Duration(minutes: 10)), isFalse);
+      expect(old.isExpired(const Duration(minutes: 10)), isTrue);
     });
   });
 

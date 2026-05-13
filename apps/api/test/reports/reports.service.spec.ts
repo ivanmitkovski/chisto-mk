@@ -1,5 +1,7 @@
 /// <reference types="jest" />
 import { ReportCitizenQueryService } from '../../src/reports/report-citizen-query.service';
+import { ReportSubmitIdempotencyService } from '../../src/reports/report-submit-idempotency.service';
+import { ReportSubmitMediaAppendService } from '../../src/reports/report-submit-media-append.service';
 import { ReportSubmitService } from '../../src/reports/report-submit.service';
 import { ReportCapacityService } from '../../src/reports/report-capacity.service';
 import { ReportsService } from '../../src/reports/reports.service';
@@ -54,6 +56,12 @@ function makeService(overrides?: {
 
   const reportCapacity = new ReportCapacityService(prisma as never);
   const nearbySiteResolver = { resolveEarliestReportAnchor: jest.fn().mockResolvedValue(null) };
+  const idempotency = new ReportSubmitIdempotencyService(prisma as never);
+  const mediaAppend = new ReportSubmitMediaAppendService(
+    prisma as never,
+    reportsUploadService as never,
+    reportsOwnerEventsService as never,
+  );
   const reportSubmit = new ReportSubmitService(
     prisma as never,
     postCreateEvents as never,
@@ -61,6 +69,8 @@ function makeService(overrides?: {
     reportCapacity,
     reportsUploadService as never,
     nearbySiteResolver as never,
+    idempotency,
+    mediaAppend,
   );
   const reportCitizenQuery = new ReportCitizenQueryService(prisma as never, reportsUploadService as never);
 

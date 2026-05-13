@@ -31,8 +31,30 @@ class AppSpacing {
   static const double radiusPill = 28;
   static const double radiusCircle = 999;
 
+  /// Events feed: search row filter + list/calendar toggles ([ViewToggleButton]) — keep
+  /// search field height aligned via [AppCupertinoSearchField.toolbarHeight].
+  static const double eventsFeedToolbarControlSize = 48;
+
+  /// [EcoEventCard] leading square thumbnail.
+  static const double eventsCardThumbnailSize = 72;
+
+  /// In-progress left accent stripe on [EcoEventCard].
+  static const double eventsLiveAccentWidth = 3;
+
+  /// Live pulse dot in [_StatusChip].
+  static const double eventsPulseDotSize = 6;
+
+  /// Featured [HeroEventCard] media band height (keep in sync with [events_feed_skeleton]).
+  static const double eventsHeroCardMediaHeight = 200;
+
+  /// When [MediaQuery.textScaler] exceeds this, stack location + time on two lines.
+  static const double eventsHeroCardMetaTwoLineTextScaleThreshold = 1.15;
+
   static const double sheetHandle = 36;
   static const double sheetHandleHeight = 4;
+
+  /// Primary CTA height in event create/edit modal footers (gear picker, etc.).
+  static const double eventsSheetFooterCtaHeight = 52;
   static const double avatarSm = 36;
   static const double avatarMd = 44;
   static const double avatarLg = 64;

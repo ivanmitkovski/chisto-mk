@@ -10,6 +10,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:workmanager/workmanager.dart';
 
 import 'package:chisto_mobile/core/app_theme.dart';
+import 'package:chisto_mobile/core/logging/app_log.dart';
 import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/image/image_cache_governor.dart';
 import 'package:chisto_mobile/core/lifecycle/map_realtime_lifecycle.dart';
@@ -21,10 +22,12 @@ import 'package:chisto_mobile/core/navigation/app_navigator_key.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/features/home/data/offline_regions/offline_refresh_dispatcher.dart';
 import 'package:chisto_mobile/features/notifications/data/notification_open_router.dart';
+import 'package:chisto_mobile/features/notifications/data/push_notification_service.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 Future<void> main() async {
@@ -63,8 +66,8 @@ Future<void> _runChistoMobile() async {
   await Hive.initFlutter();
   try {
     await Firebase.initializeApp();
-  } catch (e) {
-    debugPrint('[Firebase] Init error (expected in dev/simulator): $e');
+  } on Object catch (e, st) {
+    AppLog.warn('[Firebase] Init error (expected in dev/simulator): $e', error: e, stackTrace: st);
   }
   await ServiceLocator.instance.initialize();
 
@@ -88,15 +91,13 @@ Future<void> _runChistoMobile() async {
       );
     } on MissingPluginException catch (e) {
       // Common on iOS Simulator or before native Gradle/Info.plist BG setup linked.
-      if (kDebugMode) {
-        debugPrint(
-          '[Workmanager] Skipped (${defaultTargetPlatform.name}): '
-          'no native implementation ($e). Periodic offline refresh unavailable; '
-          'in-app download still works.',
-        );
-      }
+      AppLog.verbose(
+        '[Workmanager] Skipped (${defaultTargetPlatform.name}): '
+        'no native implementation ($e). Periodic offline refresh unavailable; '
+        'in-app download still works.',
+      );
     } catch (e, st) {
-      debugPrint('[Workmanager] offline regions refresh init failed: $e\n$st');
+      AppLog.warn('[Workmanager] offline regions refresh init failed: $e', error: e, stackTrace: st);
     }
   }
   await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
@@ -124,6 +125,7 @@ class _ChistoAppState extends State<ChistoApp> {
       ReportsRealtimeLifecycle();
   final MapRealtimeLifecycle _mapRealtimeLifecycle = MapRealtimeLifecycle();
   StreamSubscription<RemoteMessage>? _tapSubscription;
+  StreamSubscription<RemoteMessage>? _foregroundPushSubscription;
   StreamSubscription<Uri>? _deepLinkSubscription;
   RemoteMessage? _pendingPushOpen;
   int _pendingPushOpenAttempts = 0;
@@ -137,14 +139,8 @@ class _ChistoAppState extends State<ChistoApp> {
     ImageCacheGovernor.instance.install();
     _reportsRealtimeLifecycle.register();
     _mapRealtimeLifecycle.register();
-    final push = ServiceLocator.instance.pushNotificationService;
-    unawaited(push.initialize());
-    push.foregroundMessages.listen((RemoteMessage message) {
-      final Map<String, dynamic> data = message.data;
-      if (data['type'] == 'CLEANUP_EVENT' && data['kind'] == 'published') {
-        ServiceLocator.instance.eventsFeedRemoteRefreshTick.value++;
-      }
-    });
+    final PushNotificationService push =
+        ServiceLocator.instance.pushNotificationService;
     _tapSubscription = push.notificationTaps.listen(_onNotificationTap);
     // iOS (FlutterImplicitEngineDelegate): native plugins register in
     // `didInitializeImplicitFlutterEngine`, which can run after the first
@@ -152,7 +148,62 @@ class _ChistoAppState extends State<ChistoApp> {
     // MissingPluginException on `com.llfbandit.app_links/events`.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       unawaited(_initDeepLinks());
+      unawaited(_bootstrapPush());
+      unawaited(_maybeOfferPushPermissionRationale());
     });
+  }
+
+  Future<void> _bootstrapPush() async {
+    final PushNotificationService push =
+        ServiceLocator.instance.pushNotificationService;
+    await push.initialize(
+      appLanguageOverride: ServiceLocator.instance.appLocaleOverride.value,
+    );
+    if (!mounted) return;
+    _foregroundPushSubscription = push.foregroundMessages.listen(
+      (RemoteMessage message) {
+        final Map<String, dynamic> data = message.data;
+        if (data['type'] == 'CLEANUP_EVENT' && data['kind'] == 'published') {
+          ServiceLocator.instance.eventsFeedRemoteRefreshTick.value++;
+        }
+      },
+    );
+  }
+
+  Future<void> _maybeOfferPushPermissionRationale() async {
+    await Future<void>.delayed(const Duration(milliseconds: 800));
+    if (!mounted) return;
+    final PushNotificationService push =
+        ServiceLocator.instance.pushNotificationService;
+    if (!push.isFirebaseReady) return;
+    final SharedPreferences prefs = ServiceLocator.instance.preferences;
+    if (prefs.getBool(kPushOsPermissionFlowCompletedKey) == true) return;
+    final BuildContext? ctx = _navigatorKey.currentContext;
+    if (ctx == null || !ctx.mounted) return;
+    final AppLocalizations l10n = AppLocalizations.of(ctx)!;
+    final bool? accepted = await showDialog<bool>(
+      context: ctx,
+      barrierDismissible: true,
+      builder: (BuildContext c) => AlertDialog(
+        title: Text(l10n.pushPermissionRationaleTitle),
+        content: Text(l10n.pushPermissionRationaleBody),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(c).pop(false),
+            child: Text(l10n.pushPermissionRationaleNotNow),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(c).pop(true),
+            child: Text(l10n.pushPermissionRationaleAllow),
+          ),
+        ],
+      ),
+    );
+    await prefs.setBool(kPushOsPermissionFlowCompletedKey, true);
+    if (!mounted) return;
+    if (accepted == true) {
+      await push.requestSystemNotificationPermission();
+    }
   }
 
   Future<void> _initDeepLinks() async {
@@ -162,18 +213,18 @@ class _ChistoAppState extends State<ChistoApp> {
         WidgetsBinding.instance.addPostFrameCallback((_) => _dispatchDeepLink(initial));
       }
     } on MissingPluginException catch (e) {
-      debugPrint('[DeepLink] app_links native side not ready or missing (try full rebuild): $e');
+      AppLog.verbose('[DeepLink] app_links native side not ready or missing (try full rebuild): $e');
       return;
     } catch (e) {
-      debugPrint('[DeepLink] getInitialLink failed: $e');
+      AppLog.warn('[DeepLink] getInitialLink failed: $e', error: e);
     }
     try {
       _deepLinkSubscription = _appLinks.uriLinkStream.listen(
         _dispatchDeepLink,
-        onError: (Object e) => debugPrint('[DeepLink] stream error: $e'),
+        onError: (Object e) => AppLog.warn('[DeepLink] stream error: $e', error: e),
       );
     } on MissingPluginException catch (e) {
-      debugPrint('[DeepLink] app_links stream unavailable (try full rebuild): $e');
+      AppLog.verbose('[DeepLink] app_links stream unavailable (try full rebuild): $e');
     }
   }
 
@@ -192,7 +243,7 @@ class _ChistoAppState extends State<ChistoApp> {
       unawaited(_trackShareOpenFromDeepLink(parsed));
     }
     if (!handled && kDebugMode) {
-      debugPrint('[DeepLink] Unhandled URI: $uri');
+      AppLog.verbose('[DeepLink] Unhandled URI: $uri');
     }
   }
 
@@ -218,6 +269,7 @@ class _ChistoAppState extends State<ChistoApp> {
     _mapRealtimeLifecycle.unregister();
     ImageCacheGovernor.instance.uninstall();
     _deepLinkSubscription?.cancel();
+    _foregroundPushSubscription?.cancel();
     _tapSubscription?.cancel();
     super.dispose();
   }
@@ -244,7 +296,7 @@ class _ChistoAppState extends State<ChistoApp> {
     final BuildContext? ctx = _navigatorKey.currentContext;
     if (ctx == null) {
       if (_pendingPushOpenAttempts >= _maxPendingPushOpenAttempts) {
-        debugPrint('[Push] Open dropped: navigator context not ready');
+        AppLog.verbose('[Push] Open dropped: navigator context not ready');
         _pendingPushOpen = null;
         _pendingPushOpenAttempts = 0;
         return;

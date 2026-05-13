@@ -69,11 +69,15 @@ class ApiNotificationsRepository implements NotificationsRepository {
   Future<NotificationPreference> setPreference({
     required UserNotificationType type,
     required bool muted,
+    DateTime? mutedUntil,
   }) async {
     final String typeValue = toNotificationTypeApiValue(type);
     final ApiResponse response = await _client.patch(
       '/notifications/preferences/$typeValue',
-      body: <String, dynamic>{'muted': muted},
+      body: <String, dynamic>{
+        'muted': muted,
+        if (mutedUntil != null) 'mutedUntil': mutedUntil.toIso8601String(),
+      },
     );
     return NotificationPreference.fromJson(response.json!);
   }
@@ -102,5 +106,20 @@ class ApiNotificationsRepository implements NotificationsRepository {
       '/notifications/devices/unregister',
       body: <String, dynamic>{'token': token},
     );
+  }
+
+  @override
+  Future<void> markAsUnread(String notificationId) async {
+    await _client.patch('/notifications/$notificationId/unread');
+  }
+
+  @override
+  Future<void> archiveNotification(String notificationId) async {
+    await _client.patch('/notifications/$notificationId/archive');
+  }
+
+  @override
+  Future<void> archiveAllRead() async {
+    await _client.patch('/notifications/archive-all-read');
   }
 }

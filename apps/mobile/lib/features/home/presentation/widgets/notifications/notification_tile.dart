@@ -1,65 +1,120 @@
 import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
-import 'package:chisto_mobile/features/home/domain/models/feed_notification.dart';
+import 'package:chisto_mobile/features/notifications/domain/models/user_notification.dart';
 
 class NotificationVisual {
   const NotificationVisual({
     required this.icon,
     required this.iconColor,
     required this.iconBackground,
+    required this.label,
   });
 
   final IconData icon;
   final Color iconColor;
   final Color iconBackground;
+  final String label;
 
-  factory NotificationVisual.fromType(FeedNotificationType type) {
+  factory NotificationVisual.fromType(UserNotificationType type) {
     switch (type) {
-      case FeedNotificationType.update:
+      case UserNotificationType.siteUpdate:
         return NotificationVisual(
-          icon: Icons.campaign_rounded,
-          iconColor: AppColors.textPrimary,
-          iconBackground: AppColors.inputFill,
+          icon: Icons.place_rounded,
+          iconColor: AppColors.primaryDark,
+          iconBackground: AppColors.primary.withValues(alpha: 0.12),
+          label: 'Site update',
         );
-      case FeedNotificationType.action:
+      case UserNotificationType.reportStatus:
         return NotificationVisual(
-          icon: Icons.volunteer_activism_rounded,
+          icon: Icons.assignment_rounded,
+          iconColor: const Color(0xFF1976D2),
+          iconBackground: const Color(0xFF1976D2).withValues(alpha: 0.12),
+          label: 'Report',
+        );
+      case UserNotificationType.upvote:
+        return NotificationVisual(
+          icon: Icons.favorite_rounded,
+          iconColor: const Color(0xFFE91E63),
+          iconBackground: const Color(0xFFE91E63).withValues(alpha: 0.12),
+          label: 'Upvote',
+        );
+      case UserNotificationType.comment:
+        return NotificationVisual(
+          icon: Icons.chat_bubble_rounded,
+          iconColor: const Color(0xFF7B1FA2),
+          iconBackground: const Color(0xFF7B1FA2).withValues(alpha: 0.12),
+          label: 'Comment',
+        );
+      case UserNotificationType.nearbyReport:
+        return NotificationVisual(
+          icon: Icons.radar_rounded,
+          iconColor: const Color(0xFFE65100),
+          iconBackground: const Color(0xFFE65100).withValues(alpha: 0.12),
+          label: 'Nearby',
+        );
+      case UserNotificationType.cleanupEvent:
+        return NotificationVisual(
+          icon: Icons.event_rounded,
           iconColor: AppColors.primaryDark,
           iconBackground: AppColors.primary.withValues(alpha: 0.14),
+          label: 'Event',
         );
-      case FeedNotificationType.system:
+      case UserNotificationType.eventChat:
+        return NotificationVisual(
+          icon: Icons.forum_rounded,
+          iconColor: const Color(0xFF00897B),
+          iconBackground: const Color(0xFF00897B).withValues(alpha: 0.12),
+          label: 'Chat',
+        );
+      case UserNotificationType.system:
         return const NotificationVisual(
           icon: Icons.shield_outlined,
           iconColor: AppColors.textMuted,
           iconBackground: AppColors.inputFill,
+          label: 'System',
+        );
+      case UserNotificationType.achievement:
+        return NotificationVisual(
+          icon: Icons.emoji_events_rounded,
+          iconColor: const Color(0xFFF9A825),
+          iconBackground: const Color(0xFFF9A825).withValues(alpha: 0.12),
+          label: 'Achievement',
+        );
+      case UserNotificationType.welcome:
+        return NotificationVisual(
+          icon: Icons.waving_hand_rounded,
+          iconColor: AppColors.primaryDark,
+          iconBackground: AppColors.primary.withValues(alpha: 0.12),
+          label: 'Welcome',
         );
     }
   }
 }
 
 class NotificationTile extends StatelessWidget {
-  const NotificationTile({super.key, required this.item, required this.onTap});
+  const NotificationTile({
+    super.key,
+    required this.item,
+    required this.onTap,
+    this.groupCount = 1,
+  });
 
-  final FeedNotification item;
+  final UserNotification item;
   final VoidCallback onTap;
+  final int groupCount;
 
   @override
   Widget build(BuildContext context) {
     final NotificationVisual visual = NotificationVisual.fromType(item.type);
-    final bool canOpenTarget = item.targetSiteId != null;
-    final String typeLabel = switch (item.type) {
-      FeedNotificationType.update => 'Update',
-      FeedNotificationType.action => 'Action',
-      FeedNotificationType.system => 'System',
-    };
+    final bool hasTarget = item.targetSiteId != null;
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
       child: Semantics(
         button: true,
         label:
-            '${item.isRead ? 'Read' : 'Unread'} $typeLabel notification: ${item.title}',
-        hint: canOpenTarget ? 'Opens related content' : 'Notification details',
+            '${item.isRead ? 'Read' : 'Unread'} ${visual.label} notification: ${item.title}',
+        hint: hasTarget ? 'Opens related content' : null,
         child: Material(
           color: AppColors.transparent,
           child: InkWell(
@@ -85,46 +140,46 @@ class NotificationTile extends StatelessWidget {
                   ),
                 ],
               ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Container(
-                    width: 34,
-                    height: 34,
-                    decoration: BoxDecoration(
-                      color: visual.iconBackground,
-                      borderRadius: BorderRadius.circular(10),
+              child: IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Align(
+                      alignment: Alignment.topCenter,
+                      child: Container(
+                        width: 34,
+                        height: 34,
+                        decoration: BoxDecoration(
+                          color: visual.iconBackground,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(visual.icon, size: 18, color: visual.iconColor),
+                      ),
                     ),
-                    child: Icon(visual.icon, size: 18, color: visual.iconColor),
-                  ),
                   const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Row(
-                          children: <Widget>[
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: visual.iconBackground,
-                                borderRadius: BorderRadius.circular(999),
-                              ),
-                              child: Text(
-                                typeLabel,
-                                style: Theme.of(context).textTheme.bodySmall
-                                    ?.copyWith(
-                                      color: visual.iconColor,
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 11,
-                                      height: 1.1,
-                                    ),
-                              ),
-                            ),
-                          ],
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: visual.iconBackground,
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text(
+                            visual.label,
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(
+                                  color: visual.iconColor,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 11,
+                                  height: 1.1,
+                                ),
+                          ),
                         ),
                         const SizedBox(height: 6),
                         Text(
@@ -141,8 +196,21 @@ class NotificationTile extends StatelessWidget {
                               ),
                         ),
                         const SizedBox(height: 4),
+                        if (groupCount > 1)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 4),
+                            child: Text(
+                              'and ${groupCount - 1} similar',
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                    color: visual.iconColor,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 11,
+                                  ),
+                            ),
+                          ),
                         Text(
-                          item.message,
+                          item.body,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: Theme.of(context).textTheme.bodySmall
@@ -151,79 +219,61 @@ class NotificationTile extends StatelessWidget {
                                 height: 1.25,
                               ),
                         ),
-                        if (canOpenTarget) ...<Widget>[
-                          const SizedBox(height: 6),
-                          Row(
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    width: hasTarget ? 44 : 52,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: <Widget>[
+                        Positioned(
+                          top: 0,
+                          right: 0,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: <Widget>[
-                              const Icon(
-                                Icons.open_in_new_rounded,
-                                size: 12,
-                                color: AppColors.textMuted,
-                              ),
-                              const SizedBox(width: 4),
+                              if (!item.isRead) ...<Widget>[
+                                Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: const BoxDecoration(
+                                    color: AppColors.primaryDark,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                              ],
                               Text(
-                                item.targetTabIndex == 1
-                                    ? 'Opens cleaning events'
-                                    : 'Opens pollution site',
+                                _relativeTime(item.createdAt),
+                                textAlign: TextAlign.right,
                                 style: Theme.of(context).textTheme.bodySmall
                                     ?.copyWith(
                                       color: AppColors.textMuted,
-                                      fontSize: 11.5,
-                                      fontWeight: FontWeight.w500,
+                                      fontSize: 12,
+                                      height: 1.15,
+                                      fontFeatures: const <FontFeature>[
+                                        FontFeature.tabularFigures(),
+                                      ],
                                     ),
                               ),
                             ],
                           ),
-                        ],
-                        const SizedBox(height: 6),
-                        Text(
-                          _relativeTime(item.createdAt),
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(
-                                color: AppColors.textMuted,
-                                fontSize: 12,
-                              ),
                         ),
+                        if (hasTarget)
+                          const Center(
+                            child: Icon(
+                              Icons.chevron_right_rounded,
+                              size: 20,
+                              color: AppColors.textMuted,
+                            ),
+                          ),
                       ],
                     ),
                   ),
-                  const SizedBox(width: AppSpacing.xs),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: <Widget>[
-                      if (!item.isRead)
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: const BoxDecoration(
-                            color: AppColors.primaryDark,
-                            shape: BoxShape.circle,
-                          ),
-                        )
-                      else
-                        const SizedBox(width: 8, height: 8),
-                      const SizedBox(height: 8),
-                      Text(
-                        item.isRead ? 'Read' : 'Unread',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: item.isRead
-                              ? AppColors.textMuted
-                              : AppColors.accentDanger,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 11,
-                        ),
-                      ),
-                      if (canOpenTarget) ...<Widget>[
-                        const SizedBox(height: 4),
-                        const Icon(
-                          Icons.chevron_right_rounded,
-                          size: 16,
-                          color: AppColors.textMuted,
-                        ),
-                      ],
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

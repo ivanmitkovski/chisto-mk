@@ -41,7 +41,23 @@ export class FieldBatchDto {
 }
 
 export class FieldBatchResultDto {
+  @ApiProperty({ description: 'Number of operations applied successfully' })
   applied!: number;
+
+  @ApiProperty({ description: 'Number of operations that failed' })
   failed!: number;
+
+  @ApiProperty({
+    required: false,
+    type: 'array',
+    items: {
+      type: 'object',
+      properties: {
+        index: { type: 'number' },
+        code: { type: 'string' },
+        message: { type: 'string' },
+      },
+    },
+  })
   errors?: Array<{ index: number; code: string; message: string }>;
 }

@@ -46,6 +46,7 @@ export class CheckInRepository {
     bLat: number,
     bLng: number,
   ): Promise<number> {
+    // RAW SQL: PostGIS geography distance in meters (see method doc); Prisma has no geography expression API here.
     const rows = await this.prisma.$queryRaw<Array<{ d: string | number | null }>>`
       SELECT ST_Distance(
         ST_SetSRID(ST_MakePoint(${aLng}, ${aLat}), 4326)::geography,

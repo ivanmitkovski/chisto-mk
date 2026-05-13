@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 
-const double _kControlSize = 48;
 const double _kControlIconSize = 20;
-const double _kSelectedBorderAlpha = 0.45;
-const double _kUnselectedBorderAlpha = 0.7;
 
 class ViewToggleButton extends StatelessWidget {
   const ViewToggleButton({
@@ -27,6 +25,7 @@ class ViewToggleButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final Color surface = colorScheme.surface;
     return Tooltip(
       message: tooltip,
       child: Semantics(
@@ -45,24 +44,22 @@ class ViewToggleButton extends StatelessWidget {
                   ? Duration.zero
                   : AppMotion.fast,
               curve: AppMotion.emphasized,
-              width: _kControlSize,
-              height: _kControlSize,
+              width: AppSpacing.eventsFeedToolbarControlSize,
+              height: AppSpacing.eventsFeedToolbarControlSize,
               decoration: BoxDecoration(
-                color: selected
-                    ? colorScheme.primaryContainer
-                    : colorScheme.surface,
+                color: selected ? AppColors.feedPillSelectedFill : surface,
                 borderRadius: BorderRadius.circular(AppSpacing.radius10),
                 border: Border.all(
                   color: selected
-                      ? colorScheme.primary.withValues(alpha: _kSelectedBorderAlpha)
-                      : colorScheme.outlineVariant.withValues(alpha: _kUnselectedBorderAlpha),
+                      ? AppColors.feedPillSelectedBorder
+                      : AppColors.divider,
                 ),
               ),
               child: Icon(
                 icon,
                 size: _kControlIconSize,
                 color: selected
-                    ? colorScheme.onPrimaryContainer
+                    ? AppColors.feedPillSelectedForeground
                     : colorScheme.onSurfaceVariant,
               ),
             ),

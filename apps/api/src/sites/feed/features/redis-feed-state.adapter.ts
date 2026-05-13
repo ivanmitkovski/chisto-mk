@@ -1,18 +1,22 @@
-import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy, OnModuleInit, Optional } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
 
 @Injectable()
-export class RedisFeedStateAdapter implements OnModuleDestroy {
+export class RedisFeedStateAdapter implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(RedisFeedStateAdapter.name);
-  private readonly keyPrefix: string;
-  private readonly client: Redis | null;
+  private keyPrefix = 'chisto:dev:feed:';
+  private client: Redis | null = null;
   private readonly memoryFallback = new Map<string, { value: string; expiresAt: number }>();
 
-  constructor(private readonly config: ConfigService) {
-    const env = this.config.get<string>('ENV') ?? this.config.get<string>('NODE_ENV') ?? 'dev';
+  constructor(@Optional() private readonly config: ConfigService | null) {}
+
+  onModuleInit(): void {
+    const cfg = (key: string): string | undefined =>
+      this.config?.get<string>(key)?.trim() ?? process.env[key]?.trim();
+    const env = cfg('ENV') ?? cfg('NODE_ENV') ?? 'dev';
     this.keyPrefix = `chisto:${env}:feed:`;
-    const redisUrl = this.config.get<string>('REDIS_URL')?.trim();
+    const redisUrl = cfg('REDIS_URL');
     if (!redisUrl) {
       this.client = null;
       return;

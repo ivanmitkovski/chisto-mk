@@ -1,17 +1,26 @@
 import { SitesController } from '../../src/sites/sites.controller';
-import { SitesService } from '../../src/sites/sites.service';
-import { SiteEventsService } from '../../src/admin-events/site-events.service';
+import { SitesMapFacadeService } from '../../src/sites/sites-map-facade.service';
+import { SitesAdminService } from '../../src/sites/sites-admin.service';
+import { SitesFeedService } from '../../src/sites/sites-feed.service';
+import { SiteEngagementService } from '../../src/sites/site-engagement.service';
+import { SiteEventsService } from '../../src/admin-realtime/site-events.service';
 
 describe('Share attribution controller/service integration', () => {
   it('keeps normalized click/open fields through controller delegation', async () => {
-    const sitesService = {
-      ingestShareAttributionEvent: jest.fn(async (input) => ({ counted: true, ...input })),
-    } as unknown as SitesService;
+    const sitesAdmin = {} as unknown as SitesAdminService;
+    const sitesFeed = {} as unknown as SitesFeedService;
+    const siteEngagement = {
+      ingestAttributionEvent: jest.fn(async (input) => ({ counted: true, ...input })),
+    } as unknown as SiteEngagementService;
     const siteEvents = {
       getReplaySince: jest.fn(() => []),
       getEvents: jest.fn(),
     } as unknown as SiteEventsService;
-    const controller = new SitesController(sitesService, siteEvents);
+    const mapFacade = {
+      searchMapSites: jest.fn(),
+      getAdminMapTimeline: jest.fn(),
+    } as unknown as SitesMapFacadeService;
+    const controller = new SitesController(sitesAdmin, sitesFeed, siteEngagement, mapFacade, siteEvents);
     const req = { ip: '203.0.113.15' } as never;
 
     await controller.ingestShareClick(
@@ -28,18 +37,13 @@ describe('Share attribution controller/service integration', () => {
       'UA/5.0',
     );
 
-    expect(sitesService.ingestShareAttributionEvent).toHaveBeenNthCalledWith(
+    expect(siteEngagement.ingestAttributionEvent).toHaveBeenNthCalledWith(
       1,
-      expect.objectContaining({
-        dto: expect.objectContaining({ eventType: 'CLICK', source: 'WEB' }),
-      }),
+      expect.objectContaining({ eventType: 'CLICK', source: 'WEB', token: 't1' }),
     );
-    expect(sitesService.ingestShareAttributionEvent).toHaveBeenNthCalledWith(
+    expect(siteEngagement.ingestAttributionEvent).toHaveBeenNthCalledWith(
       2,
-      expect.objectContaining({
-        dto: expect.objectContaining({ eventType: 'OPEN', source: 'APP' }),
-        openedByUserId: 'u1',
-      }),
+      expect.objectContaining({ eventType: 'OPEN', source: 'APP', token: 't2', openedByUserId: 'u1' }),
     );
   });
 });

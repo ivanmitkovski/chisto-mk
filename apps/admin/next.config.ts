@@ -11,7 +11,6 @@ if (process.env.VERCEL === '1' && !process.env.NEXT_PUBLIC_API_BASE_URL?.trim())
   );
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3000';
 const S3_MEDIA_HOST = process.env.NEXT_PUBLIC_S3_MEDIA_HOST ?? 'chisto-dev-media.s3.eu-central-1.amazonaws.com';
 const S3_MEDIA_HOSTS = Array.from(
   new Set([
@@ -21,16 +20,6 @@ const S3_MEDIA_HOSTS = Array.from(
   ]),
 );
 const isProduction = process.env.NODE_ENV === 'production';
-const scriptSrc = isProduction
-  ? "script-src 'self'"
-  : "script-src 'self' 'unsafe-inline' 'unsafe-eval'";
-
-/** Carto basemap tiles (Leaflet); explicit hosts avoid widening connect-src to untrusted origins. */
-const CARTO_TILE_HOSTS = [
-  'https://a.basemaps.cartocdn.com',
-  'https://b.basemaps.cartocdn.com',
-  'https://c.basemaps.cartocdn.com',
-] as const;
 
 const securityHeaders = [
   { key: 'X-Content-Type-Options', value: 'nosniff' },
@@ -39,19 +28,6 @@ const securityHeaders = [
   {
     key: 'Permissions-Policy',
     value: 'camera=(), microphone=(), geolocation=()',
-  },
-  {
-    key: 'Content-Security-Policy',
-    value: [
-      "default-src 'self'",
-      scriptSrc,
-      "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: https: blob:",
-      `connect-src 'self' ${API_BASE_URL.replace(/\/$/, '')} ${CARTO_TILE_HOSTS.join(' ')}`,
-      "frame-ancestors 'none'",
-      "base-uri 'self'",
-      "form-action 'self'",
-    ].join('; '),
   },
   ...(isProduction
     ? [

@@ -23,6 +23,8 @@ import {
 import { CheckInRepository } from '../../src/events/check-in.repository';
 import { EventsCheckInAttendeesService } from '../../src/events/events-check-in-attendees.service';
 import { EventsCheckInQrService } from '../../src/events/events-check-in-qr.service';
+import { EventsCheckInRedeemService } from '../../src/events/events-check-in-redeem.service';
+import { EventsCheckInResolveService } from '../../src/events/events-check-in-resolve.service';
 import { EventsCheckInRedemptionService } from '../../src/events/events-check-in-redemption.service';
 import { EventsCheckInService } from '../../src/events/events-check-in.service';
 import { EventsCheckInSharedService } from '../../src/events/events-check-in-shared.service';
@@ -155,14 +157,23 @@ describe('EventsCheckInService', () => {
       liveImpact as never,
     );
     const redemption = new EventsCheckInRedemptionService(
-      repo,
-      shared,
-      ecoEventPoints as never,
-      pendingCheckIn as never,
-      checkInGateway as never,
-      reportsUpload as never,
-      checkInTelemetry as never,
-      liveImpact as never,
+      new EventsCheckInRedeemService(
+        repo,
+        shared,
+        pendingCheckIn as never,
+        checkInGateway as never,
+        reportsUpload as never,
+        checkInTelemetry as never,
+      ),
+      new EventsCheckInResolveService(
+        repo,
+        shared,
+        ecoEventPoints as never,
+        pendingCheckIn as never,
+        checkInGateway as never,
+        checkInTelemetry as never,
+        liveImpact as never,
+      ),
     );
     service = new EventsCheckInService(qr, attendees, redemption);
   });
@@ -282,7 +293,7 @@ describe('EventsCheckInService', () => {
         return fn(tx as never);
       });
       await expect(
-        service.manualAdd('evt-1', user('org-1'), { userId: 'vol-1' }),
+        service.manualAdd('evt-1', user('org-1'), { userId: 'c111111111111111111111111' }),
       ).rejects.toBeInstanceOf(ForbiddenException);
     });
 
@@ -300,7 +311,7 @@ describe('EventsCheckInService', () => {
         return fn(tx as never);
       });
       await expect(
-        service.manualAdd('evt-1', user('org-1'), { userId: 'vol-1' }),
+        service.manualAdd('evt-1', user('org-1'), { userId: 'c111111111111111111111111' }),
       ).rejects.toBeInstanceOf(ConflictException);
     });
 
@@ -329,7 +340,7 @@ describe('EventsCheckInService', () => {
         return fn(tx as never);
       });
       const out = await service.manualAdd('evt-1', user('org-1'), {
-        userId: 'vol-1',
+        userId: 'c111111111111111111111111',
       });
       expect(out.id).toBe('cin-1');
       expect(out.pointsAwarded).toBe(7);
@@ -337,7 +348,7 @@ describe('EventsCheckInService', () => {
       expect(ecoEventPoints.creditIfNew).toHaveBeenCalledWith(
         expect.anything(),
         expect.objectContaining({
-          userId: 'vol-1',
+          userId: 'c111111111111111111111111',
           delta: POINTS_EVENT_CHECK_IN,
           reasonCode: REASON_EVENT_CHECK_IN,
           referenceType: 'CleanupEvent',

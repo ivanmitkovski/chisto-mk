@@ -20,6 +20,18 @@ android {
         jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
+    signingConfigs {
+        val keystorePath = System.getenv("ANDROID_KEYSTORE_PATH") ?: ""
+        if (keystorePath.isNotEmpty()) {
+            create("release") {
+                storeFile = file(keystorePath)
+                storePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("ANDROID_KEY_ALIAS")
+                keyPassword = System.getenv("ANDROID_KEY_PASSWORD")
+            }
+        }
+    }
+
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "mk.chisto.chisto_mobile"
@@ -34,9 +46,14 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            val keystorePath = System.getenv("ANDROID_KEYSTORE_PATH") ?: ""
+            signingConfig = if (keystorePath.isNotEmpty()) {
+                signingConfigs.getByName("release")
+            } else {
+                // Local `flutter build appbundle --release` without CI secrets.
+                @Suppress("DEPRECATION")
+                signingConfigs.getByName("debug")
+            }
         }
     }
 }

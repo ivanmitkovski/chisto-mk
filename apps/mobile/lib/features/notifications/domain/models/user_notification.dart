@@ -5,7 +5,10 @@ enum UserNotificationType {
   comment,
   nearbyReport,
   cleanupEvent,
+  eventChat,
   system,
+  achievement,
+  welcome,
 }
 
 UserNotificationType parseNotificationType(String? raw) {
@@ -22,8 +25,14 @@ UserNotificationType parseNotificationType(String? raw) {
       return UserNotificationType.nearbyReport;
     case 'CLEANUP_EVENT':
       return UserNotificationType.cleanupEvent;
+    case 'EVENT_CHAT':
+      return UserNotificationType.eventChat;
     case 'SYSTEM':
       return UserNotificationType.system;
+    case 'ACHIEVEMENT':
+      return UserNotificationType.achievement;
+    case 'WELCOME':
+      return UserNotificationType.welcome;
     default:
       return UserNotificationType.system;
   }
@@ -41,6 +50,7 @@ class UserNotification {
     this.sentAt,
     this.threadKey,
     this.groupKey,
+    this.archivedAt,
   });
 
   factory UserNotification.fromJson(Map<String, dynamic> json) {
@@ -57,6 +67,9 @@ class UserNotification {
           : null,
       threadKey: json['threadKey'] as String?,
       groupKey: json['groupKey'] as String?,
+      archivedAt: json['archivedAt'] != null
+          ? DateTime.parse(json['archivedAt'] as String)
+          : null,
     );
   }
 
@@ -70,8 +83,9 @@ class UserNotification {
   final DateTime? sentAt;
   final String? threadKey;
   final String? groupKey;
+  final DateTime? archivedAt;
 
-  UserNotification copyWith({bool? isRead}) {
+  UserNotification copyWith({bool? isRead, DateTime? archivedAt}) {
     return UserNotification(
       id: id,
       title: title,
@@ -83,6 +97,7 @@ class UserNotification {
       sentAt: sentAt,
       threadKey: threadKey,
       groupKey: groupKey,
+      archivedAt: archivedAt ?? this.archivedAt,
     );
   }
 
@@ -104,8 +119,14 @@ String toNotificationTypeApiValue(UserNotificationType type) {
       return 'NEARBY_REPORT';
     case UserNotificationType.cleanupEvent:
       return 'CLEANUP_EVENT';
+    case UserNotificationType.eventChat:
+      return 'EVENT_CHAT';
     case UserNotificationType.system:
       return 'SYSTEM';
+    case UserNotificationType.achievement:
+      return 'ACHIEVEMENT';
+    case UserNotificationType.welcome:
+      return 'WELCOME';
   }
 }
 

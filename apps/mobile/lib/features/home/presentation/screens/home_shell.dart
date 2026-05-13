@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
+import 'package:chisto_mobile/features/events/presentation/navigation/events_navigation.dart';
 import 'package:chisto_mobile/features/events/presentation/screens/events_feed_screen.dart'
     show EventsFeedScreenState;
 import 'package:chisto_mobile/features/home/presentation/navigation/home_shell_router.dart';
@@ -73,7 +75,7 @@ class _HomeShellState extends State<HomeShell> {
               ),
         );
       },
-      onCentralReportPressed: _handleCentralActionPressed,
+      onCentralFabPressed: _handleCentralFabPressed,
       isLaunchingReportFlow: _isLaunchingReportNotifier,
       refreshListenable: Listenable.merge(<Listenable>[
         _reportsRefreshNotifier,
@@ -112,7 +114,22 @@ class _HomeShellState extends State<HomeShell> {
     );
   }
 
-  Future<void> _handleCentralActionPressed() async {
+  Future<void> _handleCentralFabPressed(
+    BuildContext context,
+    int tabIndex,
+  ) async {
+    if (tabIndex == 3) {
+      AppHaptics.softTransition();
+      final EcoEvent? created = await EventsNavigation.openCreate(context);
+      if (!context.mounted) {
+        return;
+      }
+      if (created != null) {
+        await EventsNavigation.openDetail(context, eventId: created.id);
+      }
+      return;
+    }
+
     if (_isLaunchingReportFlow) {
       return;
     }
@@ -129,7 +146,7 @@ class _HomeShellState extends State<HomeShell> {
       if (!canProceed) {
         return;
       }
-      if (!mounted) {
+      if (!context.mounted) {
         return;
       }
       final ReportDraftSummary draftSummary =
@@ -140,7 +157,7 @@ class _HomeShellState extends State<HomeShell> {
           context: context,
           summary: draftSummary,
         );
-        if (!mounted) {
+        if (!context.mounted) {
           return;
         }
         if (choice == CentralFabDraftChoice.cancel || choice == null) {
@@ -150,7 +167,7 @@ class _HomeShellState extends State<HomeShell> {
           AppHaptics.softTransition();
           final Object? navResult =
               await ReportEntryFlow.openNewReportWizard(context);
-          if (navResult != null && mounted) {
+          if (navResult != null && context.mounted) {
             setState(() {
               _homeRouter.go('/reports');
               _reportsRefreshTrigger++;
@@ -165,7 +182,7 @@ class _HomeShellState extends State<HomeShell> {
       }
       final Object? navResult =
           await ReportEntryFlow.openCameraThenNewReport(context: context);
-      if (navResult != null && mounted) {
+      if (navResult != null && context.mounted) {
         setState(() {
           _homeRouter.go('/reports');
           _reportsRefreshTrigger++;

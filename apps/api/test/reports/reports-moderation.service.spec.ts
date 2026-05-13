@@ -1,6 +1,9 @@
 /// <reference types="jest" />
 import { BadRequestException } from '@nestjs/common';
+import { ReportsModerationDetailService } from '../../src/reports/reports-moderation-detail.service';
+import { ReportsModerationListService } from '../../src/reports/reports-moderation-list.service';
 import { ReportsModerationService } from '../../src/reports/reports-moderation.service';
+import { ReportsModerationStatusService } from '../../src/reports/reports-moderation-status.service';
 import { UpdateReportStatusDto } from '../../src/reports/dto/update-report-status.dto';
 import { Role } from '../../src/prisma-client';
 
@@ -15,12 +18,14 @@ function createModerationService(
   const reportSideEffectProcessor = {
     processModerationStatusPost: jest.fn().mockResolvedValue(undefined),
   };
-  const service = new ReportsModerationService(
+  const list = new ReportsModerationListService(prisma as never);
+  const status = new ReportsModerationStatusService(
     prisma as never,
-    reportsUploadService as never,
     reportApprovalPoints as never,
     reportSideEffectProcessor as never,
   );
+  const detail = new ReportsModerationDetailService(prisma as never, reportsUploadService as never);
+  const service = new ReportsModerationService(list, status, detail);
   return { service, reportSideEffectProcessor };
 }
 

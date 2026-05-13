@@ -26,16 +26,7 @@ class AppErrorView extends StatelessWidget {
   /// Optional hint shown below the retry CTA (e.g. upcoming automatic retry).
   final String? retryFootnote;
 
-  bool get _isSessionInvalidError {
-    switch (error.code) {
-      case 'UNAUTHORIZED':
-      case 'INVALID_TOKEN_USER':
-      case 'ACCOUNT_NOT_ACTIVE':
-        return true;
-      default:
-        return false;
-    }
-  }
+  bool get _isSessionInvalidError => error.indicatesInvalidOrEndedSession;
 
   Future<void> _handleLogout(BuildContext context) async {
     if (onLogout != null) {

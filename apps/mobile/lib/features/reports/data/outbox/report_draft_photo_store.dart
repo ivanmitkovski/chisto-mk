@@ -32,7 +32,7 @@ class ReportDraftPhotoStore {
 
   Future<Directory> _rootDir() async {
     if (_rootOverride != null) {
-      final Directory o = _rootOverride!;
+      final Directory o = _rootOverride;
       if (!await o.exists()) {
         await o.create(recursive: true);
       }

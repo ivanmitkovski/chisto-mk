@@ -2,6 +2,7 @@ import 'package:chisto_mobile/core/auth/auth_state.dart';
 import 'package:chisto_mobile/core/config/app_config.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/network/api_client.dart';
+import 'package:chisto_mobile/core/network/request_cancellation.dart';
 import 'package:chisto_mobile/core/storage/secure_token_storage.dart';
 import 'package:chisto_mobile/features/auth/data/api_auth_repository.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -19,7 +20,11 @@ class _RestoreSessionTestApiClient extends ApiClient {
   Object? getBehavior = 'ok';
 
   @override
-  Future<ApiResponse> get(String path, {Map<String, String>? headers}) async {
+  Future<ApiResponse> get(
+    String path, {
+    Map<String, String>? headers,
+    RequestCancellationToken? cancellation,
+  }) async {
     if (path == '/auth/me') {
       if (getBehavior == 'network') {
         throw AppError.network();
@@ -32,6 +37,8 @@ class _RestoreSessionTestApiClient extends ApiClient {
             'firstName': 'A',
             'lastName': 'B',
             'phoneNumber': '+38970111222',
+            // Explicit null: server certifies "not certified" (field present).
+            'organizerCertifiedAt': null,
           },
         );
       }

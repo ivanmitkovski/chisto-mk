@@ -2,6 +2,8 @@ import {
   BadRequestException,
   Injectable,
   Logger,
+  OnModuleInit,
+  Optional,
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -11,91 +13,45 @@ import sharp from 'sharp';
 import { randomUUID } from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import type { EventChatMessageResponseDto } from './dto/event-chat-message-response.dto';
+import {
+  ALL_ALLOWED_MIMES,
+  IMAGE_MIMES,
+  MAX_FILES_PER_MESSAGE,
+  maxSizeForMime,
+} from './event-chat-upload.constants';
+import type { ProcessedAttachment } from './event-chat-upload.types';
 
-/** MIME/size caps mirror mobile `ChatUploadLimits` (apps/mobile/.../chat_upload_limits.dart). */
-const IMAGE_MIMES = new Set([
-  'image/jpeg',
-  'image/jpg',
-  'image/png',
-  'image/webp',
-  'image/heic',
-]);
-
-const VIDEO_MIMES = new Set([
-  'video/mp4',
-  'video/quicktime',
-  'video/webm',
-]);
-
-const AUDIO_MIMES = new Set([
-  'audio/mpeg',
-  'audio/mp3',
-  'audio/aac',
-  'audio/m4a',
-  'audio/ogg',
-  'audio/wav',
-]);
-
-const DOC_MIMES = new Set([
-  'application/pdf',
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-  'text/plain',
-]);
-
-const ALL_ALLOWED_MIMES = new Set([...IMAGE_MIMES, ...VIDEO_MIMES, ...AUDIO_MIMES, ...DOC_MIMES]);
-
-const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
-const MAX_VIDEO_SIZE = 25 * 1024 * 1024;
-const MAX_AUDIO_SIZE = 10 * 1024 * 1024;
-const MAX_DOC_SIZE = 10 * 1024 * 1024;
-const MAX_FILES_PER_MESSAGE = 5;
-
-function maxSizeForMime(mime: string): number {
-  if (VIDEO_MIMES.has(mime)) return MAX_VIDEO_SIZE;
-  if (AUDIO_MIMES.has(mime)) return MAX_AUDIO_SIZE;
-  if (DOC_MIMES.has(mime)) return MAX_DOC_SIZE;
-  return MAX_IMAGE_SIZE;
-}
-
-export interface ProcessedAttachment {
-  url: string;
-  mimeType: string;
-  fileName: string;
-  sizeBytes: number;
-  width: number | null;
-  height: number | null;
-  duration: number | null;
-  thumbnailUrl: string | null;
-}
+export { EVENT_CHAT_MULTER_MAX_FILE_BYTES } from './event-chat-upload.constants';
+export type { ProcessedAttachment } from './event-chat-upload.types';
 
 @Injectable()
-export class EventChatUploadService {
+export class EventChatUploadService implements OnModuleInit {
   private readonly logger = new Logger(EventChatUploadService.name);
-  private readonly s3: S3Client | null = null;
-  private readonly bucket: string | null = null;
-  private readonly region: string;
-  private readonly enabled: boolean;
-  private readonly signedGetEnabled: boolean;
+  private s3: S3Client | null = null;
+  private bucket: string | null = null;
+  private region = 'eu-central-1';
+  private enabled = false;
+  private signedGetEnabled = false;
+  private cfg!: (key: string) => string | undefined;
   private static readonly SIGNED_GET_TTL_SECONDS = 3600;
 
   constructor(
-    private readonly config: ConfigService,
+    @Optional() private readonly config: ConfigService | null,
     private readonly prisma: PrismaService,
-  ) {
+  ) {}
+
+  onModuleInit(): void {
+    this.cfg = (key: string) =>
+      this.config?.get<string>(key)?.trim() ?? process.env[key]?.trim();
     this.region =
-      this.config.get<string>('AWS_REGION')?.trim() ||
-      this.config.get<string>('AWS_DEFAULT_REGION')?.trim() ||
-      'eu-central-1';
-    const bucket = this.config.get<string>('S3_BUCKET_NAME')?.trim();
-    this.bucket = bucket && bucket.length > 0 ? bucket : null;
+      this.cfg('AWS_REGION') || this.cfg('AWS_DEFAULT_REGION') || 'eu-central-1';
+    const bucketRaw = this.cfg('S3_BUCKET_NAME');
+    this.bucket = bucketRaw && bucketRaw.length > 0 ? bucketRaw : null;
     this.enabled = !!this.bucket;
     if (this.enabled) {
       this.s3 = new S3Client({ region: this.region });
     }
-    const signFlag = this.config.get<string>('CHAT_SIGNED_ATTACHMENT_URLS')?.trim().toLowerCase();
+    const signFlag = this.cfg('CHAT_SIGNED_ATTACHMENT_URLS')?.toLowerCase();
     this.signedGetEnabled = this.enabled && (signFlag === 'true' || signFlag === '1');
   }
 

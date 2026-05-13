@@ -34,6 +34,7 @@ abstract class NotificationsRepository {
   Future<NotificationPreference> setPreference({
     required UserNotificationType type,
     required bool muted,
+    DateTime? mutedUntil,
   });
 
   Future<void> registerDeviceToken({
@@ -44,4 +45,10 @@ abstract class NotificationsRepository {
   });
 
   Future<void> unregisterDeviceToken(String token);
+
+  Future<void> markAsUnread(String notificationId);
+
+  Future<void> archiveNotification(String notificationId);
+
+  Future<void> archiveAllRead();
 }

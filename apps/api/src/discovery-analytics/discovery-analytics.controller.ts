@@ -1,10 +1,20 @@
-import { Body, Controller, Logger, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Headers,
+  Logger,
+  Post,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { DiscoveryAnalyticsIngestDto } from './discovery-analytics-ingest.dto';
+import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-error-responses.decorator';
 
 @ApiTags('discovery-analytics')
+@ApiStandardHttpErrorResponses()
 @Controller('discovery-analytics')
 @UseGuards(ThrottlerGuard)
 export class DiscoveryAnalyticsController {
@@ -22,7 +32,17 @@ export class DiscoveryAnalyticsController {
     description: '{ ok: true, accepted: boolean }',
     schema: { example: { ok: true, accepted: true } },
   })
-  ingest(@Body() body: DiscoveryAnalyticsIngestDto): { ok: true; accepted: boolean } {
+  ingest(
+    @Body() body: DiscoveryAnalyticsIngestDto,
+    @Headers('x-chisto-analytics-key') ingestKey?: string,
+  ): { ok: true; accepted: boolean } {
+    const secret = this.configService.get<string>('DISCOVERY_ANALYTICS_INGEST_SECRET', '').trim();
+    if (secret === '' || ingestKey !== secret) {
+      throw new UnauthorizedException({
+        code: 'DISCOVERY_ANALYTICS_UNAUTHORIZED',
+        message: 'Invalid or missing analytics ingest key',
+      });
+    }
     const enabled = this.configService.get<string>('DISCOVERY_ANALYTICS_ENABLED', 'false') === 'true';
     if (!enabled) {
       return { ok: true, accepted: false };

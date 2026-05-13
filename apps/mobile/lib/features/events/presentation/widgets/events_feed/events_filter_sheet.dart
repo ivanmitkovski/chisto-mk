@@ -9,7 +9,9 @@ import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event_search_params.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/events_localized_strings.dart';
+import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
+import 'package:chisto_mobile/shared/widgets/app_panel_bottom_sheet.dart';
 
 /// Bottom-sheet filter panel for the events feed.
 ///
@@ -28,26 +30,16 @@ class EventsFilterSheet extends StatefulWidget {
     BuildContext context, {
     required EcoEventSearchParams current,
   }) {
-    // Modal overlay routes often report zero top viewPadding; use the caller's
-    // MediaQuery so the sheet clears the status bar / Dynamic Island / notch.
-    final double topInset = MediaQuery.viewPaddingOf(context).top + AppSpacing.sm;
-    final double bottomInset = MediaQuery.paddingOf(context).bottom + AppSpacing.sm;
-    return showModalBottomSheet<EcoEventSearchParams>(
+    return showAppPanelBottomSheet<EcoEventSearchParams>(
       context: context,
-      isScrollControlled: true,
-      useSafeArea: false,
-      backgroundColor: AppColors.transparent,
-      // This sheet draws its own grabber above the header.
-      showDragHandle: false,
-      builder: (_) => Padding(
-        padding: EdgeInsets.fromLTRB(
-          AppSpacing.sm,
-          topInset,
-          AppSpacing.sm,
-          bottomInset,
-        ),
-        child: EventsFilterSheet(current: current),
-      ),
+      builder: (BuildContext sheetContext) {
+        final double keyboardInset =
+            MediaQuery.viewInsetsOf(sheetContext).bottom;
+        return Padding(
+          padding: EdgeInsets.only(bottom: keyboardInset),
+          child: EventsFilterSheet(current: current),
+        );
+      },
     );
   }
 
@@ -162,196 +154,140 @@ class _EventsFilterSheetState extends State<EventsFilterSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final double bottomPad = MediaQuery.viewInsetsOf(context).bottom +
-        MediaQuery.paddingOf(context).bottom;
+    final TextTheme textTheme = Theme.of(context).textTheme;
 
     return Semantics(
       container: true,
       label: context.l10n.eventsFilterSheetSemantic,
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.appBackground,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
-        ),
-        child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: EdgeInsets.only(bottom: bottomPad > 0 ? 0 : AppSpacing.md),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              // Handle
-              Center(
-                child: Container(
-                  margin: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-                  width: AppSpacing.sheetHandle,
-                  height: AppSpacing.sheetHandleHeight,
-                  decoration: BoxDecoration(
-                    color: AppColors.divider,
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.sheetHandleHeight / 2,
-                    ),
-                  ),
+      child: ReportSheetScaffold(
+        title: context.l10n.eventsFilterSheetTitle,
+        maxHeightFactor: 0.92,
+        addBottomInset: true,
+        useModalRouteShape: true,
+        titleTextStyle: AppTypography.reportsSheetTitle(textTheme),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            if (_activeCount > 0)
+              CupertinoButton(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.sm,
+                  vertical: AppSpacing.xxs,
+                ),
+                minimumSize: const Size(44, 44),
+                onPressed: _clearAll,
+                child: Text(
+                  context.l10n.eventsFilterSheetClearAll,
+                  style: AppTypography.eventsSheetTextLink(textTheme),
                 ),
               ),
-
-              // Header
+            ReportCircleIconButton(
+              icon: CupertinoIcons.xmark,
+              semanticLabel: context.l10n.semanticClose,
+              onTap: () => Navigator.of(context).pop(),
+            ),
+          ],
+        ),
+        footer: Padding(
+          padding: const EdgeInsets.only(top: AppSpacing.sm),
+          child: FilledButton(
+            onPressed: _apply,
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: AppColors.white,
+              minimumSize: const Size.fromHeight(50),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+              ),
+            ),
+            child: Text(
+              _activeCount > 0
+                  ? context.l10n.eventsFilterSheetActiveCount(_activeCount)
+                  : context.l10n.eventsFilterSheetShowResults,
+              style: AppTypography.eventsPrimaryButtonLabel(textTheme),
+            ),
+          ),
+        ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              _SectionLabel(label: context.l10n.eventsFilterSheetCategory),
               Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.lg, 0, AppSpacing.sm, AppSpacing.sm,
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                child: Wrap(
+                  spacing: AppSpacing.xs,
+                  runSpacing: AppSpacing.xs,
+                  children: EcoEventCategory.values.map((EcoEventCategory cat) {
+                    final bool selected = _categories.contains(cat);
+                    return _FilterChip(
+                      label: cat.localizedLabel(context.l10n),
+                      icon: IconData(cat.iconCodePoint, fontFamily: 'MaterialIcons'),
+                      selected: selected,
+                      onTap: () => _toggleCategory(cat),
+                    );
+                  }).toList(growable: false),
                 ),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              _SectionLabel(label: context.l10n.eventsFilterSheetStatus),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                child: Wrap(
+                  spacing: AppSpacing.xs,
+                  runSpacing: AppSpacing.xs,
+                  children: <EcoEventStatus>[
+                    EcoEventStatus.upcoming,
+                    EcoEventStatus.inProgress,
+                    EcoEventStatus.completed,
+                    EcoEventStatus.cancelled,
+                  ].map((EcoEventStatus status) {
+                    final bool selected = _statuses.contains(status);
+                    return _FilterChip(
+                      label: status.localizedLabel(context.l10n),
+                      selected: selected,
+                      color: Color(status.colorValue),
+                      onTap: () => _toggleStatus(status),
+                    );
+                  }).toList(growable: false),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              _SectionLabel(label: context.l10n.eventsFilterSheetDateRange),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                 child: Row(
                   children: <Widget>[
                     Expanded(
-                      child: Text(
-                        context.l10n.eventsFilterSheetTitle,
-                        style: AppTypography.eventsSheetTitle(
-                          Theme.of(context).textTheme,
-                        ),
+                      child: _DatePickerTile(
+                        label: context.l10n.eventsFilterSheetDateFrom,
+                        value: _formatDate(_dateFrom),
+                        hasValue: _dateFrom != null,
+                        onTap: () => _pickDate(isFrom: true),
+                        onClear: _dateFrom != null
+                            ? () => setState(() => _dateFrom = null)
+                            : null,
                       ),
                     ),
-                    if (_activeCount > 0)
-                      CupertinoButton(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.sm,
-                          vertical: AppSpacing.xxs,
-                        ),
-                        minimumSize: const Size(44, 44),
-                        onPressed: _clearAll,
-                        child: Text(
-                          context.l10n.eventsFilterSheetClearAll,
-                          style: AppTypography.eventsSheetTextLink(
-                            Theme.of(context).textTheme,
-                          ),
-                        ),
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      child: _DatePickerTile(
+                        label: context.l10n.eventsFilterSheetDateTo,
+                        value: _formatDate(_dateTo),
+                        hasValue: _dateTo != null,
+                        onTap: () => _pickDate(isFrom: false),
+                        onClear: _dateTo != null
+                            ? () => setState(() => _dateTo = null)
+                            : null,
                       ),
+                    ),
                   ],
                 ),
               ),
-
-              const Divider(height: 1, thickness: 0.5),
-
-              Flexible(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      // Category section
-                      _SectionLabel(label: context.l10n.eventsFilterSheetCategory),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                        child: Wrap(
-                          spacing: AppSpacing.xs,
-                          runSpacing: AppSpacing.xs,
-                          children: EcoEventCategory.values.map((EcoEventCategory cat) {
-                            final bool selected = _categories.contains(cat);
-                            return _FilterChip(
-                              label: cat.localizedLabel(context.l10n),
-                              icon: IconData(cat.iconCodePoint, fontFamily: 'MaterialIcons'),
-                              selected: selected,
-                              onTap: () => _toggleCategory(cat),
-                            );
-                          }).toList(growable: false),
-                        ),
-                      ),
-
-                      const SizedBox(height: AppSpacing.lg),
-
-                      // Status section
-                      _SectionLabel(label: context.l10n.eventsFilterSheetStatus),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                        child: Wrap(
-                          spacing: AppSpacing.xs,
-                          runSpacing: AppSpacing.xs,
-                          children: <EcoEventStatus>[
-                            EcoEventStatus.upcoming,
-                            EcoEventStatus.inProgress,
-                            EcoEventStatus.completed,
-                            EcoEventStatus.cancelled,
-                          ].map((EcoEventStatus status) {
-                            final bool selected = _statuses.contains(status);
-                            return _FilterChip(
-                              label: status.localizedLabel(context.l10n),
-                              selected: selected,
-                              color: Color(status.colorValue),
-                              onTap: () => _toggleStatus(status),
-                            );
-                          }).toList(growable: false),
-                        ),
-                      ),
-
-                      const SizedBox(height: AppSpacing.lg),
-
-                      // Date range section
-                      _SectionLabel(label: context.l10n.eventsFilterSheetDateRange),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                        child: Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: _DatePickerTile(
-                                label: context.l10n.eventsFilterSheetDateFrom,
-                                value: _formatDate(_dateFrom),
-                                hasValue: _dateFrom != null,
-                                onTap: () => _pickDate(isFrom: true),
-                                onClear: _dateFrom != null
-                                    ? () => setState(() => _dateFrom = null)
-                                    : null,
-                              ),
-                            ),
-                            const SizedBox(width: AppSpacing.sm),
-                            Expanded(
-                              child: _DatePickerTile(
-                                label: context.l10n.eventsFilterSheetDateTo,
-                                value: _formatDate(_dateTo),
-                                hasValue: _dateTo != null,
-                                onTap: () => _pickDate(isFrom: false),
-                                onClear: _dateTo != null
-                                    ? () => setState(() => _dateTo = null)
-                                    : null,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      const SizedBox(height: AppSpacing.lg),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Footer
-              Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.sm,
-                ),
-                child: FilledButton(
-                  onPressed: _apply,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: AppColors.white,
-                    minimumSize: const Size.fromHeight(50),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-                    ),
-                  ),
-                  child: Text(
-                    _activeCount > 0
-                        ? context.l10n.eventsFilterSheetActiveCount(_activeCount)
-                        : context.l10n.eventsFilterSheetShowResults,
-                    style: AppTypography.eventsPrimaryButtonLabel(
-                      Theme.of(context).textTheme,
-                    ),
-                  ),
-                ),
-              ),
+              const SizedBox(height: AppSpacing.lg),
             ],
           ),
-        ),
         ),
       ),
     );
@@ -415,12 +351,14 @@ class _FilterChip extends StatelessWidget {
             ),
             decoration: BoxDecoration(
               color: selected
-                  ? accent.withValues(alpha: 0.14)
+                  ? AppColors.feedPillSelectedFill
                   : AppColors.panelBackground,
               borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
               border: Border.all(
                 color: selected
-                    ? accent.withValues(alpha: 0.5)
+                    ? (color != null
+                        ? accent.withValues(alpha: 0.5)
+                        : AppColors.feedPillSelectedBorder)
                     : AppColors.divider.withValues(alpha: 0.6),
                 width: selected ? 1.5 : 1,
               ),
@@ -433,7 +371,9 @@ class _FilterChip extends StatelessWidget {
                   Icon(
                     icon,
                     size: 14,
-                    color: selected ? accent : AppColors.textSecondary,
+                    color: selected
+                        ? AppColors.feedPillSelectedForeground
+                        : AppColors.textSecondary,
                   ),
                   const SizedBox(width: AppSpacing.xxs),
                 ] else if (color != null) ...<Widget>[
@@ -452,7 +392,9 @@ class _FilterChip extends StatelessWidget {
                   style: AppTypography.eventsSheetChipLabel(
                     Theme.of(context).textTheme,
                     selected: selected,
-                    accent: accent,
+                    accent: selected && color == null
+                        ? AppColors.feedPillSelectedForeground
+                        : accent,
                   ),
                 ),
               ],
@@ -495,12 +437,12 @@ class _DatePickerTile extends StatelessWidget {
             ),
             decoration: BoxDecoration(
               color: hasValue
-                  ? AppColors.primary.withValues(alpha: 0.08)
+                  ? AppColors.feedPillSelectedFill
                   : AppColors.panelBackground,
               borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
               border: Border.all(
                 color: hasValue
-                    ? AppColors.primary.withValues(alpha: 0.4)
+                    ? AppColors.feedPillSelectedBorder
                     : AppColors.divider.withValues(alpha: 0.6),
               ),
             ),

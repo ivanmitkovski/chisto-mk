@@ -2,6 +2,9 @@ name: Mobile integration smoke
 
 on:
   workflow_dispatch:
+  schedule:
+    # Nightly smoke against configured staging secrets (low traffic hour UTC).
+    - cron: '0 5 * * *'
 
 permissions:
   contents: read

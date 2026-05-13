@@ -19,6 +19,7 @@ import 'package:chisto_mobile/features/events/presentation/screens/field_mode_sc
 import 'package:chisto_mobile/features/events/presentation/widgets/offline_work_hub_sheet.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/organizer_dashboard/organizer_event_summary_card.dart';
 import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
+import 'package:chisto_mobile/shared/widgets/app_refresh_indicator.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 
 /// Full-screen list of the current user's organised events, grouped by status.
@@ -115,8 +116,6 @@ class _OrganizerDashboardScreenState extends State<OrganizerDashboardScreen> {
             final Widget scrollView = CustomScrollView(
               physics: eventsListScrollPhysics(context),
               slivers: <Widget>[
-                if (eventsUseCupertinoSystemEffects(context))
-                  CupertinoSliverRefreshControl(onRefresh: _onRefresh),
                 // ── Header ──
                 SliverToBoxAdapter(
                   child: Padding(
@@ -217,7 +216,7 @@ class _OrganizerDashboardScreenState extends State<OrganizerDashboardScreen> {
                           const SizedBox(height: AppSpacing.md),
                           TextButton(
                             onPressed: _loadMyEvents,
-                            child: Text(context.l10n.eventsFeedRefreshFailed),
+                            child: Text(context.l10n.commonRetry),
                           ),
                         ],
                       ),
@@ -306,15 +305,10 @@ class _OrganizerDashboardScreenState extends State<OrganizerDashboardScreen> {
                 ],
               ],
             );
-            return eventsUseCupertinoSystemEffects(context)
-                ? scrollView
-                : RefreshIndicator(
-                    color: AppColors.primary,
-                    strokeWidth: 2.2,
-                    displacement: 40,
-                    onRefresh: _onRefresh,
-                    child: scrollView,
-                  );
+            return AppRefreshIndicator(
+              onRefresh: _onRefresh,
+              child: scrollView,
+            );
           },
         ),
       ),

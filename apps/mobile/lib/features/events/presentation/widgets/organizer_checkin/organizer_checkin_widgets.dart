@@ -1,4 +1,5 @@
 export 'checked_in_row.dart';
+export 'organizer_invalidate_qr_session_sheet.dart';
 export 'event_check_in_qr_card.dart';
 export 'organizer_event_completion_sheet.dart';
 export 'manual_check_in_sheet.dart';

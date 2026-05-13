@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { SiteStatus } from '../prisma-client';
-import { NotificationEventsService } from '../admin-events/notification-events.service';
-import { ReportEventsService } from '../admin-events/report-events.service';
-import { SiteEventsService } from '../admin-events/site-events.service';
+import { NotificationEventsService } from '../admin-realtime/notification-events.service';
+import { ReportEventsService } from '../admin-realtime/report-events.service';
+import { SiteEventsService } from '../admin-realtime/site-events.service';
 import { ReportsOwnerEventsService } from './reports-owner-events.service';
 
 export type ReportSubmitPostCreateEventsInput = {

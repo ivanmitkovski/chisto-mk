@@ -2,7 +2,6 @@ import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/eco_event_card.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/events_feed/events_empty_states.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/events_filter_chips.dart';
-import 'package:chisto_mobile/shared/widgets/app_pill_filter_chips.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -74,12 +73,7 @@ void main() {
 
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
-    await tester.tap(
-      find.descendant(
-        of: find.byType(AppPillFilterChips),
-        matching: find.text('Upcoming'),
-      ),
-    );
+    await tester.tap(find.text('Upcoming'));
     await tester.pumpAndSettle();
     expect(filter, EcoEventFilter.upcoming);
   });

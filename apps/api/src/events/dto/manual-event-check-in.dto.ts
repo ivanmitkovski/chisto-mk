@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsString, Matches } from 'class-validator';
+import { PRISMA_CUID_REGEX } from '../../common/validators/is-cuid.validator';
 
 export class ManualEventCheckInDto {
   @ApiProperty({
@@ -10,8 +11,6 @@ export class ManualEventCheckInDto {
   })
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   @IsString()
-  @IsNotEmpty()
-  @MinLength(1)
-  @MaxLength(128)
+  @Matches(PRISMA_CUID_REGEX, { message: 'userId must be a valid cuid' })
   userId!: string;
 }

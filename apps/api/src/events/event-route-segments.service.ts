@@ -8,7 +8,7 @@ import {
 import { RouteSegmentStatus } from '../prisma-client';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { PrismaService } from '../prisma/prisma.service';
-import { visibilityWhere } from './events-query.include';
+import { visibilityWhere } from './events-query.include.shared';
 import type { EventRouteWaypointDto } from './dto/event-route-waypoint.dto';
 
 const ROUTE_SEGMENTS_LIST_CAP = 500;

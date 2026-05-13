@@ -13,7 +13,7 @@ import {
   moderationStatusToMobile,
   scaleToMobile,
 } from './events-mobile.mapper';
-import type { LoadedEvent } from './events-query.include';
+import type { LoadedEventDetail, MobileMappableEvent } from './events-query.include';
 import { EventsRepository } from './events.repository';
 
 export type MobileEventMappingOptions = {
@@ -34,7 +34,7 @@ export class EventsMobileMapperService {
   ) {}
 
   async toMobileEvent(
-    row: LoadedEvent,
+    row: MobileMappableEvent,
     options?: MobileEventMappingOptions,
   ): Promise<EventMobileResponseDto> {
     const participant = row.participants[0];
@@ -79,10 +79,15 @@ export class EventsMobileMapperService {
       }
     }
 
+    const evidencePhotos: LoadedEventDetail['evidencePhotos'] =
+      'evidencePhotos' in row && Array.isArray(row.evidencePhotos) ? row.evidencePhotos : [];
+    const routeSegmentRows: LoadedEventDetail['routeSegments'] =
+      'routeSegments' in row && Array.isArray(row.routeSegments) ? row.routeSegments : [];
+
     const evidenceSigned = await this.uploads.signUrls(
-      this.uploads.getPublicUrlsForKeys(row.evidencePhotos.map((p) => p.objectKey)),
+      this.uploads.getPublicUrlsForKeys(evidencePhotos.map((p) => p.objectKey)),
     );
-    const routeSegments: EventMobileRouteSegmentDto[] = row.routeSegments.map((s) => {
+    const routeSegments: EventMobileRouteSegmentDto[] = routeSegmentRows.map((s) => {
       const seg = new EventMobileRouteSegmentDto();
       seg.id = s.id;
       seg.sortOrder = s.sortOrder;
@@ -96,7 +101,7 @@ export class EventsMobileMapperService {
       return seg;
     });
 
-    const evidenceStrip: EventMobileEvidenceStripItemDto[] = row.evidencePhotos.map((p, i) => {
+    const evidenceStrip: EventMobileEvidenceStripItemDto[] = evidencePhotos.map((p, i) => {
       const item = new EventMobileEvidenceStripItemDto();
       item.id = p.id;
       item.kind = p.kind.toLowerCase();
@@ -161,7 +166,7 @@ export class EventsMobileMapperService {
     return out;
   }
 
-  private siteDisplayName(site: LoadedEvent['site']): string {
+  private siteDisplayName(site: MobileMappableEvent['site']): string {
     const a = site.address?.trim();
     if (a != null && a.length > 0) {
       return a;
@@ -173,7 +178,7 @@ export class EventsMobileMapperService {
     return 'Site';
   }
 
-  private pickFirstSiteReportMediaUrl(site: LoadedEvent['site']): string {
+  private pickFirstSiteReportMediaUrl(site: MobileMappableEvent['site']): string {
     const urls = site.reports[0]?.mediaUrls;
     if (urls == null || urls.length === 0) {
       return '';
@@ -187,7 +192,7 @@ export class EventsMobileMapperService {
     return '';
   }
 
-  private async resolveSiteCoverImageUrl(site: LoadedEvent['site']): Promise<string> {
+  private async resolveSiteCoverImageUrl(site: MobileMappableEvent['site']): Promise<string> {
     const raw = this.pickFirstSiteReportMediaUrl(site);
     if (raw.length === 0) {
       return '';

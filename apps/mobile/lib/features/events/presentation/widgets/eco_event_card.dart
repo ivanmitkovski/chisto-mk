@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
+import 'package:chisto_mobile/core/theme/app_card_chrome.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
@@ -69,7 +70,6 @@ class _EcoEventCardState extends State<EcoEventCard> {
 
     final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
 
-    final Color dividerEdge = colorScheme.outlineVariant.withValues(alpha: 0.75);
     final BorderRadius cardRadius =
         BorderRadius.circular(AppSpacing.radiusCard);
     final bool liveAccent = event.status == EcoEventStatus.inProgress;
@@ -79,24 +79,9 @@ class _EcoEventCardState extends State<EcoEventCard> {
     Widget card = AnimatedContainer(
       duration: reduceMotion ? Duration.zero : AppMotion.xFast,
       curve: AppMotion.emphasized,
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
-        borderRadius: cardRadius,
-        border: Border.all(color: dividerEdge),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: 0.06),
-            blurRadius: _pressed ? AppSpacing.sm : AppSpacing.md,
-            offset: Offset(0, _pressed ? 2 : 4),
-          ),
-          if (!_pressed)
-            BoxShadow(
-              color: colorScheme.shadow.withValues(alpha: 0.1),
-              blurRadius: AppSpacing.lg,
-              offset: const Offset(0, 8),
-            ),
-        ],
-      ),
+      decoration: _pressed
+          ? AppCardChrome.discoveryListCardPressed(colorScheme)
+          : AppCardChrome.discoveryListCard(colorScheme),
       child: ClipRRect(
         borderRadius: cardRadius,
         child: Stack(
@@ -109,7 +94,7 @@ class _EcoEventCardState extends State<EcoEventCard> {
                 bottom: 0,
                 child: ColoredBox(
                   color: event.status.color.withValues(alpha: 0.55),
-                  child: const SizedBox(width: 3),
+                  child: const SizedBox(width: AppSpacing.eventsLiveAccentWidth),
                 ),
               ),
             Padding(
@@ -156,7 +141,7 @@ class _EcoEventCardState extends State<EcoEventCard> {
                                   ),
                                   child: Icon(
                                     CupertinoIcons.repeat,
-                                    size: 15,
+                                    size: AppSpacing.iconSm - 1,
                                     color: colorScheme.onSurfaceVariant.withValues(alpha: 0.95),
                                   ),
                                 ),
@@ -192,7 +177,7 @@ class _EcoEventCardState extends State<EcoEventCard> {
                                 children: <InlineSpan>[
                                   TextSpan(
                                     text: event.status.localizedLabel(context.l10n),
-                                    style: TextStyle(
+                                    style: metaStyle.copyWith(
                                       color: event.status.color,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -228,7 +213,7 @@ class _EcoEventCardState extends State<EcoEventCard> {
                             children: <Widget>[
                               Icon(
                                 CupertinoIcons.location_solid,
-                                size: 14,
+                                size: AppSpacing.iconSm - 2,
                                 color: colorScheme.onSurfaceVariant.withValues(alpha: 0.9),
                               ),
                               const SizedBox(width: AppSpacing.xxs),
@@ -285,7 +270,7 @@ class _EcoEventCardState extends State<EcoEventCard> {
                               children: <Widget>[
                                 Icon(
                                   CupertinoIcons.checkmark_circle_fill,
-                                  size: 14,
+                                  size: AppSpacing.iconSm - 2,
                                   color: colorScheme.primary,
                                 ),
                                 const SizedBox(width: AppSpacing.xxs),
@@ -369,33 +354,34 @@ class _Thumbnail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final double thumb = AppSpacing.eventsCardThumbnailSize;
     final Widget image = ClipRRect(
       borderRadius: BorderRadius.circular(AppSpacing.radius14),
       child: Container(
-        width: 72,
-        height: 72,
+        width: thumb,
+        height: thumb,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(AppSpacing.radius14),
           border: Border.all(color: colorScheme.surface, width: 2),
           boxShadow: <BoxShadow>[
             BoxShadow(
               color: colorScheme.shadow.withValues(alpha: 0.08),
-              blurRadius: 4,
+              blurRadius: AppSpacing.xxs,
               offset: const Offset(0, 1),
             ),
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+          borderRadius: BorderRadius.circular(AppSpacing.radius14),
           child: EcoEventCoverImage(
             path: imageAsset,
-            width: 72,
-            height: 72,
+            width: thumb,
+            height: thumb,
             fit: BoxFit.cover,
             errorWidget: Icon(
               Icons.image_not_supported_outlined,
               color: colorScheme.onSurfaceVariant,
-              size: 22,
+              size: AppSpacing.iconMd + 2,
             ),
           ),
         ),
@@ -446,6 +432,7 @@ class _StatusChipState extends State<_StatusChip>
 
   @override
   Widget build(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.xs,
@@ -464,8 +451,8 @@ class _StatusChipState extends State<_StatusChip>
                     animation: _pulseController!,
                     builder: (BuildContext context, Widget? child) {
                       return Container(
-                        width: 6,
-                        height: 6,
+                        width: AppSpacing.eventsPulseDotSize,
+                        height: AppSpacing.eventsPulseDotSize,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: widget.status.color.withValues(
@@ -480,7 +467,8 @@ class _StatusChipState extends State<_StatusChip>
           ],
           Text(
             widget.status.localizedLabel(context.l10n),
-            style: AppTypography.badgeLabel.copyWith(
+            style: AppTypography.eventsCardPillLabel(
+              textTheme,
               color: widget.status.color,
             ),
           ),

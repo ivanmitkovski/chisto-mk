@@ -7,6 +7,7 @@ import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_participants.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_repository.dart';
+import 'package:chisto_mobile/shared/widgets/app_refresh_indicator.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 import 'package:chisto_mobile/shared/widgets/user_avatar_circle.dart';
 import 'package:flutter/material.dart';
@@ -184,7 +185,7 @@ class _ChatParticipantsSheetBodyState extends State<_ChatParticipantsSheetBody> 
             else
               SizedBox(
                 height: maxH,
-                child: RefreshIndicator(
+                child: AppRefreshIndicator(
                   onRefresh: () => _refresh(userPulled: true),
                   child: _participants.isEmpty
                       ? ListView(

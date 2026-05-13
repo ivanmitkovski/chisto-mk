@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event_filter.dart';
-import 'package:chisto_mobile/shared/widgets/app_pill_filter_chips.dart';
+import 'package:chisto_mobile/shared/widgets/app_filter_pill_bar.dart';
 
 export 'package:chisto_mobile/features/events/domain/models/eco_event_filter.dart';
 
@@ -33,13 +33,18 @@ class EventsFilterChips extends StatelessWidget {
       }
     }
 
-    return AppPillFilterChips(
-      labels: EcoEventFilter.values
-          .map((EcoEventFilter f) => labelFor(f))
-          .toList(growable: false),
-      selectedIndex: EcoEventFilter.values.indexOf(active),
-      semanticLabelPrefix: context.l10n.eventsFilterSemanticPrefix,
-      onSelected: (int index) => onSelected(EcoEventFilter.values[index]),
+    return AppFilterPillBar<EcoEventFilter>(
+      variant: AppFilterPillVariant.feedChip,
+      items: <FilterPillItem<EcoEventFilter>>[
+        for (final EcoEventFilter f in EcoEventFilter.values)
+          FilterPillItem<EcoEventFilter>(
+            value: f,
+            label: labelFor(f),
+            semanticsLabel: context.l10n.feedFilterSemantic(labelFor(f)),
+          ),
+      ],
+      selected: active,
+      onSelected: onSelected,
     );
   }
 }

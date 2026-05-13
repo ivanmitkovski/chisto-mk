@@ -1,10 +1,14 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Prisma } from '../prisma-client';
 import { PrismaService } from '../prisma/prisma.service';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { AuditService } from '../audit/audit.service';
 import { Role } from '../prisma-client';
 import { PatchFeatureFlagDto } from './dto/patch-feature-flag.dto';
+
+const PUBLIC_FLAGS_CACHE_TTL_MS = 60_000;
 
 const DEFAULT_FLAGS: Array<{ key: string; enabled: boolean }> = [
   { key: 'cleanup_events_mobile', enabled: false },
@@ -15,10 +19,25 @@ const DEFAULT_FLAGS: Array<{ key: string; enabled: boolean }> = [
 
 @Injectable()
 export class FeatureFlagsService {
+  private publicMapCache: { value: Record<string, boolean>; expiresAt: number } | null = null;
+  private notificationsInboxCache: { value: boolean; expiresAt: number } | null = null;
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
+    private readonly config: ConfigService,
+    private readonly events: EventEmitter2,
   ) {}
+
+  private invalidatePublicCaches(): void {
+    this.publicMapCache = null;
+    this.notificationsInboxCache = null;
+  }
+
+  /** Clears in-process caches when another API replica publishes a flag change (Redis). */
+  applyRemoteFeatureFlagInvalidation(): void {
+    this.invalidatePublicCaches();
+  }
 
   async ensureDefaults(): Promise<void> {
     for (const row of DEFAULT_FLAGS) {
@@ -51,11 +70,42 @@ export class FeatureFlagsService {
   }
 
   async getPublicMap(): Promise<Record<string, boolean>> {
+    const now = Date.now();
+    if (this.publicMapCache != null && now < this.publicMapCache.expiresAt) {
+      return this.publicMapCache.value;
+    }
     await this.ensureDefaults();
     const rows = await this.prisma.featureFlag.findMany({
       select: { key: true, enabled: true },
     });
-    return Object.fromEntries(rows.map((r) => [r.key, r.enabled]));
+    const map = Object.fromEntries(rows.map((r) => [r.key, r.enabled]));
+    this.publicMapCache = {
+      value: map,
+      expiresAt: now + PUBLIC_FLAGS_CACHE_TTL_MS,
+    };
+    return map;
+  }
+
+  /**
+   * Env gate + DB flag, cached briefly to avoid per-request Prisma hits on inbox paths.
+   */
+  async isNotificationsInboxEnabled(): Promise<boolean> {
+    const now = Date.now();
+    if (this.notificationsInboxCache != null && now < this.notificationsInboxCache.expiresAt) {
+      return this.notificationsInboxCache.value;
+    }
+    const fromEnv = this.config.get<string>('NOTIFICATIONS_INBOX_ENABLED', 'true') === 'true';
+    await this.ensureDefaults();
+    const row = await this.prisma.featureFlag.findUnique({
+      where: { key: 'notifications_inbox_enabled' },
+      select: { enabled: true },
+    });
+    const value = row?.enabled ?? fromEnv;
+    this.notificationsInboxCache = {
+      value,
+      expiresAt: now + PUBLIC_FLAGS_CACHE_TTL_MS,
+    };
+    return value;
   }
 
   async patch(
@@ -87,6 +137,9 @@ export class FeatureFlagsService {
       resourceId: key,
       metadata: { enabled: dto.enabled },
     });
+
+    this.invalidatePublicCaches();
+    this.events.emit('feature_flags.patch');
 
     return updated;
   }

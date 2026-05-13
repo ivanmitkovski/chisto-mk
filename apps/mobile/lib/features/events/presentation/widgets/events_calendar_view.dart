@@ -360,11 +360,17 @@ class _EventsCalendarViewState extends State<EventsCalendarView> {
                     curve: AppMotion.emphasized,
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? AppColors.primary
+                          ? AppColors.feedPillSelectedFill
                           : (hasEvent && inMonth
                               ? AppColors.primary.withValues(alpha: 0.08)
                               : AppColors.transparent),
                       shape: BoxShape.circle,
+                      border: isSelected
+                          ? Border.all(
+                              color: AppColors.feedPillSelectedBorder,
+                              width: 1.5,
+                            )
+                          : null,
                     ),
                     alignment: Alignment.center,
                     child: Column(
@@ -378,7 +384,7 @@ class _EventsCalendarViewState extends State<EventsCalendarView> {
                                 ? FontWeight.w700
                                 : FontWeight.w500,
                             color: isSelected
-                                ? AppColors.white
+                                ? AppColors.feedPillSelectedForeground
                                 : inMonth
                                     ? (isPast && !isToday
                                         ? AppColors.textMuted.withValues(alpha: 0.5)

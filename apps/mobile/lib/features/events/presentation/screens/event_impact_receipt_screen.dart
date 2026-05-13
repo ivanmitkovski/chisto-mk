@@ -18,6 +18,7 @@ import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/utils/share_popover_origin.dart';
 import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
+import 'package:chisto_mobile/shared/widgets/app_refresh_indicator.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 import 'package:chisto_mobile/shared/widgets/primary_button.dart';
 import 'package:flutter/cupertino.dart';
@@ -202,8 +203,7 @@ class _EventImpactReceiptScreenState extends State<EventImpactReceiptScreen> {
                 )
               : r == null
                   ? const SizedBox.shrink()
-                  : RefreshIndicator(
-                      color: AppColors.primary,
+                  : AppRefreshIndicator(
                       onRefresh: _fetch,
                       child: ListView(
                         padding: const EdgeInsets.fromLTRB(

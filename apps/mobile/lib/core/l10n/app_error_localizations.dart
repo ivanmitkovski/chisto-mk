@@ -14,6 +14,8 @@ String localizedAppErrorMessage(AppLocalizations l10n, AppError error) {
       return l10n.errorUserTimeout;
     case 'UNAUTHORIZED':
       return l10n.errorUserUnauthorized;
+    case 'SESSION_REVOKED':
+      return l10n.errorUserSessionRevoked;
     case 'FORBIDDEN':
       return l10n.errorUserForbidden;
     case 'NOT_FOUND':

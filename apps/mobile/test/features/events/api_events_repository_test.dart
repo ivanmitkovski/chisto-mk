@@ -156,7 +156,7 @@ void main() {
   test('refreshEvents includes user location hint when available', () async {
     final _FakeApiClient client = _FakeApiClient();
     client.stubGet(
-      '/events?limit=50&lat=41.997300&lng=21.428000',
+      '/events?limit=50&nearLat=41.997300&nearLng=21.428000',
       <String, dynamic>{
         'data': <dynamic>[],
         'meta': <String, dynamic>{

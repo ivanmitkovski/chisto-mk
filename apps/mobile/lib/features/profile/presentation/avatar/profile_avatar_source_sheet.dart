@@ -4,7 +4,7 @@ import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:chisto_mobile/shared/widgets/app_action_sheet.dart';
 import 'package:flutter/material.dart';
 
 /// Source for the profile avatar capture flow (not [ImageSource], keeps picker types internal).
@@ -15,7 +15,7 @@ Future<ProfileAvatarSource?> showProfileAvatarSourceSheet(
   BuildContext context, {
   bool showRemoveOption = false,
 }) {
-  return showCupertinoModalPopup<ProfileAvatarSource>(
+  return showAppActionSheet<ProfileAvatarSource>(
     context: context,
     builder: (BuildContext context) {
       final l10n = context.l10n;

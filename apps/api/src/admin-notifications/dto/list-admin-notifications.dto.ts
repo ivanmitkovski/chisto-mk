@@ -1,9 +1,10 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsBoolean, IsEnum, IsInt, IsOptional, Max, Min } from 'class-validator';
+import { IsBoolean, IsEnum, IsOptional } from 'class-validator';
+import { PaginationQueryDto20 } from '../../common/dto/pagination-query.dto';
 import { AdminNotificationCategory } from '../../prisma-client';
 
-export class ListAdminNotificationsQueryDto {
+export class ListAdminNotificationsQueryDto extends PaginationQueryDto20 {
   @ApiPropertyOptional({ default: false })
   @IsOptional()
   @Type(() => Boolean)
@@ -14,20 +15,4 @@ export class ListAdminNotificationsQueryDto {
   @IsOptional()
   @IsEnum(AdminNotificationCategory)
   category?: AdminNotificationCategory;
-
-  @ApiPropertyOptional({ default: 1, minimum: 1 })
-  @Type(() => Number)
-  @IsOptional()
-  @IsInt()
-  @Min(1)
-  page = 1;
-
-  @ApiPropertyOptional({ default: 20, minimum: 1, maximum: 100 })
-  @Type(() => Number)
-  @IsOptional()
-  @IsInt()
-  @Min(1)
-  @Max(100)
-  limit = 20;
 }
-

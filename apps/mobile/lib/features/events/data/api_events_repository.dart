@@ -3,6 +3,7 @@ import 'dart:collection';
 
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/network/api_client.dart';
+import 'package:chisto_mobile/features/events/data/api_events_ranked_search.dart';
 import 'package:chisto_mobile/features/events/data/event_json.dart';
 import 'package:chisto_mobile/features/events/data/participants_json.dart';
 import 'package:chisto_mobile/features/events/data/events_local_cache.dart';
@@ -34,6 +35,7 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
   DateTime? _lastSuccessfulListRefreshAt;
   double? _userLatitudeHint;
   double? _userLongitudeHint;
+  List<String> _lastRankedSearchSuggestions = const <String>[];
 
   Future<void> _persistEventsDisk() async {
     await _cache.writeEvents(_events, forActiveListParams: _activeParams);
@@ -77,6 +79,10 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
 
   @override
   List<EcoEvent> get events => List<EcoEvent>.unmodifiable(_events);
+
+  @override
+  List<String> get lastRankedSearchSuggestions =>
+      List<String>.unmodifiable(_lastRankedSearchSuggestions);
 
   @override
   bool get isReady => _readyCompleter?.isCompleted ?? false;
@@ -163,8 +169,8 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
       }
     }
     if (_userLatitudeHint != null && _userLongitudeHint != null) {
-      path.write('&lat=${_userLatitudeHint!.toStringAsFixed(6)}');
-      path.write('&lng=${_userLongitudeHint!.toStringAsFixed(6)}');
+      path.write('&nearLat=${_userLatitudeHint!.toStringAsFixed(6)}');
+      path.write('&nearLng=${_userLongitudeHint!.toStringAsFixed(6)}');
     }
     return path.toString();
   }
@@ -191,9 +197,33 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
     String? cursor,
     EcoEventSearchParams? params,
   }) async {
-    final ApiResponse response = await _client.get(
-      _globalListPath(cursor: cursor, params: params),
-    );
+    final EcoEventSearchParams? p = params ?? _activeParams;
+    final String? q = p?.query?.trim();
+    final bool useRankedPost = replace &&
+        (cursor == null || cursor.isEmpty) &&
+        p != null &&
+        q != null &&
+        q.length >= 2;
+
+    late final ApiResponse response;
+    if (useRankedPost) {
+      response = await _client.post(
+        '/events/search',
+        body: buildRankedEventsSearchBody(
+          params: p,
+          nearLat: _userLatitudeHint,
+          nearLng: _userLongitudeHint,
+        ),
+      );
+      _lastRankedSearchSuggestions = parseRankedSearchSuggestions(response.json);
+    } else {
+      response = await _client.get(
+        _globalListPath(cursor: cursor, params: params),
+      );
+      if (replace) {
+        _lastRankedSearchSuggestions = const <String>[];
+      }
+    }
     final List<EcoEvent> page = _eventsFromListResponse(response);
     final Map<String, dynamic> json = response.json!;
     final Object? metaRaw = json['meta'];

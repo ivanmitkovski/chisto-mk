@@ -34,11 +34,14 @@ class NewReportController extends ChangeNotifier {
        _autosaveDebouncer = WizardAutosaveDebouncer() {
     _suppressLocalDraftPersist = initialPhoto != null;
     _reportFlowPreferences.hasSeenReportHelpHint.then((bool v) {
+      if (_disposed) return;
       _reportFlowPrefsLoaded = true;
       _hasSeenReportHelpHint = v;
       notifyListeners();
     });
   }
+
+  bool _disposed = false;
 
   Future<void> _seedInitialPhoto(XFile initialPhoto) async {
     try {
@@ -412,7 +415,9 @@ class NewReportController extends ChangeNotifier {
         lastPersistedAtMs: now,
       );
       _lastPersistedAtMs = now;
-      notifyListeners();
+      if (!_disposed) {
+        notifyListeners();
+      }
     } catch (e, st) {
       chistoReportsBreadcrumb(
         'report_draft',
@@ -478,6 +483,7 @@ class NewReportController extends ChangeNotifier {
 
   @override
   void dispose() {
+    _disposed = true;
     _highlightTimer?.cancel();
     _autosaveDebouncer.dispose();
     super.dispose();

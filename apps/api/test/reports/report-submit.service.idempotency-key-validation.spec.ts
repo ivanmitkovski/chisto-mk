@@ -1,6 +1,8 @@
 /// <reference types="jest" />
 
 import { BadRequestException } from '@nestjs/common';
+import { ReportSubmitIdempotencyService } from '../../src/reports/report-submit-idempotency.service';
+import { ReportSubmitMediaAppendService } from '../../src/reports/report-submit-media-append.service';
 import { ReportSubmitService } from '../../src/reports/report-submit.service';
 import { Role } from '../../src/prisma-client';
 
@@ -34,6 +36,12 @@ describe('ReportSubmitService idempotency key validation', () => {
   const reportsUpload = { assertReportMediaUrlsFromOurBucket: jest.fn() };
   const nearbySiteResolver = { resolveEarliestReportAnchor: jest.fn() };
 
+  const idempotency = new ReportSubmitIdempotencyService(prisma as never);
+  const mediaAppend = new ReportSubmitMediaAppendService(
+    prisma as never,
+    reportsUpload as never,
+    reportsOwnerEventsService as never,
+  );
   const svc = new ReportSubmitService(
     prisma as never,
     postCreateEvents as never,
@@ -41,6 +49,8 @@ describe('ReportSubmitService idempotency key validation', () => {
     reportCapacity as never,
     reportsUpload as never,
     nearbySiteResolver as never,
+    idempotency,
+    mediaAppend,
   );
 
   it('throws INVALID_IDEMPOTENCY_KEY when key is shorter than 16', async () => {

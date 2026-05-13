@@ -1,0 +1,50 @@
+export type ProjectionSourceSite = {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  latitude: number;
+  longitude: number;
+  address: string | null;
+  description: string | null;
+  status: string;
+  upvotesCount: number;
+  commentsCount: number;
+  savesCount: number;
+  sharesCount: number;
+  isArchivedByAdmin: boolean;
+  archivedAt: Date | null;
+  reports: Array<{
+    title: string;
+    description: string | null;
+    category: string | null;
+    reportNumber: string | null;
+    createdAt: Date;
+    mediaUrls: string[];
+  }>;
+  _count: { reports: number };
+};
+
+export type MapProjectionUpsertRow = {
+  siteId: string;
+  latitude: number;
+  longitude: number;
+  status: string;
+  address: string | null;
+  description: string | null;
+  thumbnailUrl: string | null;
+  pollutionCategory: string | null;
+  latestReportTitle: string | null;
+  latestReportDescription: string | null;
+  latestReportNumber: string | null;
+  reportCount: number;
+  upvotesCount: number;
+  commentsCount: number;
+  savesCount: number;
+  sharesCount: number;
+  latestReportAt: Date | null;
+  siteCreatedAt: Date;
+  siteUpdatedAt: Date;
+  isHot: boolean;
+  isArchivedByAdmin: boolean;
+  archivedAt: Date | null;
+};

@@ -2,34 +2,11 @@ import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/commo
 import Redis from 'ioredis';
 import { Subscription } from 'rxjs';
 import { loadMapConfig } from '../../config/map.config';
-import { SiteEventsService } from '../../admin-events/site-events.service';
+import { SiteEventsService } from '../../admin-realtime/site-events.service';
 import { PrismaService } from '../../prisma/prisma.service';
-
-type ProjectionSourceSite = {
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-  latitude: number;
-  longitude: number;
-  address: string | null;
-  description: string | null;
-  status: string;
-  upvotesCount: number;
-  commentsCount: number;
-  savesCount: number;
-  sharesCount: number;
-  isArchivedByAdmin: boolean;
-  archivedAt: Date | null;
-  reports: Array<{
-    title: string;
-    description: string | null;
-    category: string | null;
-    reportNumber: string | null;
-    createdAt: Date;
-    mediaUrls: string[];
-  }>;
-  _count: { reports: number };
-};
+import { MapProjectionDiffService } from './map-projection-diff.service';
+import { MapProjectionWriterService } from './map-projection-writer.service';
+import type { ProjectionSourceSite } from './map-projection-row.types';
 
 @Injectable()
 export class MapProjectionUpdaterService implements OnModuleInit, OnModuleDestroy {
@@ -53,6 +30,8 @@ export class MapProjectionUpdaterService implements OnModuleInit, OnModuleDestro
   constructor(
     private readonly prisma: PrismaService,
     private readonly siteEvents: SiteEventsService,
+    private readonly diff: MapProjectionDiffService,
+    private readonly writer: MapProjectionWriterService,
   ) {}
 
   async onModuleInit(): Promise<void> {
@@ -66,9 +45,13 @@ export class MapProjectionUpdaterService implements OnModuleInit, OnModuleDestro
       return;
     }
     this.startLeaderLockRenewal();
-    this.eventSub = this.siteEvents.getEvents().subscribe((event) => {
-      this.scheduleSiteProjectionRefresh(event.siteId);
-    });
+    if (!this.siteEvents) {
+      this.logger.warn('SiteEventsService not available; projection updater will not subscribe to site events');
+    } else {
+      this.eventSub = this.siteEvents.getEvents().subscribe((event) => {
+        this.scheduleSiteProjectionRefresh(event.siteId);
+      });
+    }
     this.reconcileTimer = setInterval(() => {
       void this.rebuildHotProjection();
     }, 15 * 60_000);
@@ -119,37 +102,9 @@ export class MapProjectionUpdaterService implements OnModuleInit, OnModuleDestro
           },
         })) as ProjectionSourceSite[];
         if (sites.length === 0) break;
-        const operations = sites.map((site) => {
-          const latest = site.reports[0];
-          const thumbnail = latest?.mediaUrls?.[0] ?? null;
-          const isHot =
-            site.status !== 'CLEANED' ||
-            site.updatedAt.getTime() > Date.now() - 90 * 24 * 60 * 60 * 1000;
-          return this.upsertProjectionRow({
-            siteId: site.id,
-            latitude: site.latitude,
-            longitude: site.longitude,
-            status: site.status,
-            address: site.address,
-            description: site.description,
-            thumbnailUrl: thumbnail,
-            pollutionCategory: latest?.category ?? null,
-            latestReportTitle: latest?.title ?? null,
-            latestReportDescription: latest?.description ?? null,
-            latestReportNumber: latest?.reportNumber ?? null,
-            reportCount: site._count.reports,
-            upvotesCount: site.upvotesCount,
-            commentsCount: site.commentsCount,
-            savesCount: site.savesCount,
-            sharesCount: site.sharesCount,
-            latestReportAt: latest?.createdAt ?? null,
-            siteCreatedAt: site.createdAt,
-            siteUpdatedAt: site.updatedAt,
-            isHot,
-            isArchivedByAdmin: site.isArchivedByAdmin,
-            archivedAt: site.archivedAt,
-          });
-        });
+        const operations = sites.map((site) =>
+          this.writer.upsert(this.diff.computeUpsertRow(site)),
+        );
         await Promise.all(operations);
         cursor = sites[sites.length - 1].id;
       }
@@ -179,37 +134,10 @@ export class MapProjectionUpdaterService implements OnModuleInit, OnModuleDestro
         },
       })) as ProjectionSourceSite | null;
       if (!site) {
-        await this.prisma.$executeRaw`DELETE FROM "MapSiteProjection" WHERE "siteId" = ${siteId}`;
+        await this.writer.deleteBySiteId(siteId);
         return;
       }
-      const latest = site.reports[0];
-      const isHot =
-        site.status !== 'CLEANED' ||
-        site.updatedAt.getTime() > Date.now() - 90 * 24 * 60 * 60 * 1000;
-      await this.upsertProjectionRow({
-        siteId: site.id,
-        latitude: site.latitude,
-        longitude: site.longitude,
-        status: site.status,
-        address: site.address,
-        description: site.description,
-        thumbnailUrl: latest?.mediaUrls?.[0] ?? null,
-        pollutionCategory: latest?.category ?? null,
-        latestReportTitle: latest?.title ?? null,
-        latestReportDescription: latest?.description ?? null,
-        latestReportNumber: latest?.reportNumber ?? null,
-        reportCount: site._count.reports,
-        upvotesCount: site.upvotesCount,
-        commentsCount: site.commentsCount,
-        savesCount: site.savesCount,
-        sharesCount: site.sharesCount,
-        latestReportAt: latest?.createdAt ?? null,
-        siteCreatedAt: site.createdAt,
-        siteUpdatedAt: site.updatedAt,
-        isHot,
-        isArchivedByAdmin: site.isArchivedByAdmin,
-        archivedAt: site.archivedAt,
-      });
+      await this.writer.upsert(this.diff.computeUpsertRow(site));
     } catch (error) {
       this.logger.warn(`map projection refresh failed for ${siteId}: ${String(error)}`);
     }
@@ -283,68 +211,5 @@ export class MapProjectionUpdaterService implements OnModuleInit, OnModuleDestro
         this.leaderToken,
       )
       .catch(() => undefined);
-  }
-
-  private async upsertProjectionRow(row: {
-    siteId: string;
-    latitude: number;
-    longitude: number;
-    status: string;
-    address: string | null;
-    description: string | null;
-    thumbnailUrl: string | null;
-    pollutionCategory: string | null;
-    latestReportTitle: string | null;
-    latestReportDescription: string | null;
-    latestReportNumber: string | null;
-    reportCount: number;
-    upvotesCount: number;
-    commentsCount: number;
-    savesCount: number;
-    sharesCount: number;
-    latestReportAt: Date | null;
-    siteCreatedAt: Date;
-    siteUpdatedAt: Date;
-    isHot: boolean;
-    isArchivedByAdmin: boolean;
-    archivedAt: Date | null;
-  }): Promise<void> {
-    await this.prisma.$executeRaw`
-      INSERT INTO "MapSiteProjection" (
-        "siteId","latitude","longitude","status","address","description","thumbnailUrl",
-        "pollutionCategory","latestReportTitle","latestReportDescription","latestReportNumber",
-        "reportCount","upvotesCount","commentsCount","savesCount","sharesCount",
-        "latestReportAt","siteCreatedAt","siteUpdatedAt","projectedAt","isHot","isArchivedByAdmin","archivedAt"
-      ) VALUES (
-        ${row.siteId},${row.latitude},${row.longitude},${row.status}::"SiteStatus",${row.address},${row.description},${row.thumbnailUrl},
-        ${row.pollutionCategory},${row.latestReportTitle},${row.latestReportDescription},${row.latestReportNumber},
-        ${row.reportCount},${row.upvotesCount},${row.commentsCount},${row.savesCount},${row.sharesCount},
-        ${row.latestReportAt},${row.siteCreatedAt},${row.siteUpdatedAt},NOW(),${row.isHot},${row.isArchivedByAdmin},${row.archivedAt}
-      )
-      ON CONFLICT ("siteId") DO UPDATE
-      SET
-        "latitude" = EXCLUDED."latitude",
-        "longitude" = EXCLUDED."longitude",
-        "status" = EXCLUDED."status",
-        "address" = EXCLUDED."address",
-        "description" = EXCLUDED."description",
-        "thumbnailUrl" = EXCLUDED."thumbnailUrl",
-        "pollutionCategory" = EXCLUDED."pollutionCategory",
-        "latestReportTitle" = EXCLUDED."latestReportTitle",
-        "latestReportDescription" = EXCLUDED."latestReportDescription",
-        "latestReportNumber" = EXCLUDED."latestReportNumber",
-        "reportCount" = EXCLUDED."reportCount",
-        "upvotesCount" = EXCLUDED."upvotesCount",
-        "commentsCount" = EXCLUDED."commentsCount",
-        "savesCount" = EXCLUDED."savesCount",
-        "sharesCount" = EXCLUDED."sharesCount",
-        "latestReportAt" = EXCLUDED."latestReportAt",
-        "siteCreatedAt" = EXCLUDED."siteCreatedAt",
-        "siteUpdatedAt" = EXCLUDED."siteUpdatedAt",
-        "projectedAt" = NOW(),
-        "isHot" = EXCLUDED."isHot",
-        "isArchivedByAdmin" = EXCLUDED."isArchivedByAdmin",
-        "archivedAt" = EXCLUDED."archivedAt";
-    `;
   }
 }

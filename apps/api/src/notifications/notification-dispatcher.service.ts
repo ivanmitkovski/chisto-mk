@@ -1,9 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { ConfigService } from '@nestjs/config';
+import { isPgOutboxNotifyEnabled, NOTIFY_SQL } from '../common/pg/outbox-pg-notify';
 import { NotificationType, Prisma } from '../prisma-client';
 import { PrismaService } from '../prisma/prisma.service';
-import { NotificationsService } from './notifications.service';
+import { NotificationWriterService } from './notification-writer.service';
+import { DeviceTokenService } from './device-token.service';
 import { FcmPushService } from './fcm-push.service';
 import { buildFcmDataPayload } from './notification-push-data';
 
@@ -23,7 +25,8 @@ export class NotificationDispatcherService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly notificationsService: NotificationsService,
+    private readonly writer: NotificationWriterService,
+    private readonly deviceTokens: DeviceTokenService,
     private readonly fcm: FcmPushService,
     private readonly configService: ConfigService,
   ) {}
@@ -43,7 +46,7 @@ export class NotificationDispatcherService {
     userId: string,
     event: Omit<NotificationEvent, 'recipientUserIds'>,
   ): Promise<void> {
-    const notificationId = await this.notificationsService.createNotification({
+    const notificationId = await this.writer.createNotification({
       userId,
       title: event.title,
       body: event.body,
@@ -56,7 +59,7 @@ export class NotificationDispatcherService {
 
     if (!(await this.isPushEnabled()) || !this.fcm.isReady()) return;
 
-    const tokens = await this.notificationsService.getActiveTokensForUser(userId);
+    const tokens = await this.deviceTokens.getActiveTokensForUser(userId);
     if (tokens.length === 0) return;
 
     const pushData = buildFcmDataPayload(notificationId, event.type, event.data);
@@ -68,10 +71,14 @@ export class NotificationDispatcherService {
       idempotencyKey: `${notificationId}:${t.token}`,
     }));
 
-    await this.prisma.notificationOutbox.createMany({
+    const created = await this.prisma.notificationOutbox.createMany({
       data: outboxEntries,
       skipDuplicates: true,
     });
+
+    if (created.count > 0 && isPgOutboxNotifyEnabled()) {
+      await this.prisma.$executeRawUnsafe(NOTIFY_SQL.notificationOutboxEnqueued);
+    }
 
     await this.prisma.userNotification.update({
       where: { id: notificationId },

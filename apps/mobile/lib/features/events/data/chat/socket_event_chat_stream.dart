@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:chisto_mobile/core/auth/auth_state.dart';
+import 'package:chisto_mobile/core/logging/app_log.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_connection_status.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_message.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_stream_event.dart';
@@ -92,11 +93,9 @@ class SocketEventChatStream {
 
     _socket!
       ..onConnect((_) {
-        if (kDebugMode) {
-          debugPrint(
-            '[chat:ws] connect host=$debugHost event=$eventId wsOnly=$kChatSocketWsOnly',
-          );
-        }
+        AppLog.verbose(
+          '[chat:ws] connect host=$debugHost event=$eventId wsOnly=$kChatSocketWsOnly',
+        );
         _tokenAtHandshake = _authState.accessToken;
         _emitStatus(EventChatConnectionStatus.connected);
         // Let the namespace handshake finish before joining rooms (pairs with server await join).
@@ -118,38 +117,28 @@ class SocketEventChatStream {
         });
       })
       ..onReconnectAttempt((_) {
-        if (kDebugMode) {
-          debugPrint('[chat:ws] reconnectAttempt host=$debugHost event=$eventId');
-        }
+        AppLog.verbose('[chat:ws] reconnectAttempt host=$debugHost event=$eventId');
         _emitStatus(EventChatConnectionStatus.reconnecting);
       })
       ..onConnectError((dynamic data) {
-        if (kDebugMode) {
-          debugPrint(
-            '[chat:ws] connect_error host=$debugHost event=$eventId type=${data.runtimeType}',
-          );
-        }
+        AppLog.verbose(
+          '[chat:ws] connect_error host=$debugHost event=$eventId type=${data.runtimeType}',
+        );
         _emitStatus(EventChatConnectionStatus.reconnecting);
       })
       ..onReconnectError((dynamic data) {
-        if (kDebugMode) {
-          debugPrint(
-            '[chat:ws] reconnect_error host=$debugHost event=$eventId type=${data.runtimeType}',
-          );
-        }
+        AppLog.verbose(
+          '[chat:ws] reconnect_error host=$debugHost event=$eventId type=${data.runtimeType}',
+        );
       })
       ..onDisconnect((_) {
-        if (kDebugMode) {
-          debugPrint('[chat:ws] disconnect host=$debugHost event=$eventId');
-        }
+        AppLog.verbose('[chat:ws] disconnect host=$debugHost event=$eventId');
         _emitStatus(EventChatConnectionStatus.reconnecting);
       })
       ..onError((dynamic err) {
-        if (kDebugMode) {
-          debugPrint(
-            '[chat:ws] engine error host=$debugHost event=$eventId type=${err.runtimeType}',
-          );
-        }
+        AppLog.verbose(
+          '[chat:ws] engine error host=$debugHost event=$eventId type=${err.runtimeType}',
+        );
         _emitStatus(EventChatConnectionStatus.reconnecting);
       })
       ..on('error', (dynamic data) {
@@ -170,8 +159,8 @@ class SocketEventChatStream {
               m.withViewer(_authState.userId),
             ));
           }
-        } else if (kDebugMode) {
-          debugPrint(
+        } else {
+          AppLog.verbose(
             '[chat:ws] message:created parse failed event=$eventId keys=${_debugPayloadKeys(raw)}',
           );
         }
@@ -227,9 +216,7 @@ class SocketEventChatStream {
         if (pe is String &&
             pe.isNotEmpty &&
             (_currentEventId == null || pe != _currentEventId)) {
-          if (kDebugMode) {
-            debugPrint('[chat:ws] drop typing eventId mismatch');
-          }
+          AppLog.verbose('[chat:ws] drop typing eventId mismatch');
           return;
         }
         final String? uid = map['userId'] as String?;
@@ -252,9 +239,7 @@ class SocketEventChatStream {
         if (pe is String &&
             pe.isNotEmpty &&
             (_currentEventId == null || pe != _currentEventId)) {
-          if (kDebugMode) {
-            debugPrint('[chat:ws] drop read_cursor eventId mismatch');
-          }
+          AppLog.verbose('[chat:ws] drop read_cursor eventId mismatch');
           return;
         }
         final String? uid = map['userId'] as String?;
@@ -437,9 +422,7 @@ class SocketEventChatStream {
       return false;
     }
     if (eid != cur) {
-      if (kDebugMode) {
-        debugPrint('[chat:ws] drop payload eventId mismatch room=$cur');
-      }
+      AppLog.verbose('[chat:ws] drop payload eventId mismatch room=$cur');
       return false;
     }
     return true;
@@ -451,9 +434,7 @@ class SocketEventChatStream {
       return false;
     }
     if (m.eventId != cur) {
-      if (kDebugMode) {
-        debugPrint('[chat:ws] drop message eventId mismatch room=$cur');
-      }
+      AppLog.verbose('[chat:ws] drop message eventId mismatch room=$cur');
       return false;
     }
     return true;

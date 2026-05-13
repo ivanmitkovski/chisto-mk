@@ -1,4 +1,9 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Optional,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Role, UserStatus } from '../prisma-client';
@@ -17,19 +22,25 @@ type JwtPayload = {
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
-    configService: ConfigService,
+    @Optional() configService: ConfigService | null,
     private readonly prisma: PrismaService,
   ) {
-    const secret = configService.get<string>('JWT_SECRET');
+    const secret =
+      configService?.get<string>('JWT_SECRET')?.trim() ?? process.env.JWT_SECRET?.trim();
 
     if (!secret) {
-      throw new Error('JWT_SECRET is not configured');
+      throw new InternalServerErrorException({
+        code: 'JWT_SECRET_MISSING',
+        message: 'JWT_SECRET is not configured',
+      });
     }
 
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: secret,
+      issuer: 'chisto-api',
+      audience: 'chisto-api',
     });
   }
 

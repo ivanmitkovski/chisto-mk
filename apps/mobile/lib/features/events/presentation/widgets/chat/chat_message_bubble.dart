@@ -23,6 +23,7 @@ import 'package:chisto_mobile/features/events/presentation/widgets/chat/event_ch
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_video_player_screen.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
+import 'package:chisto_mobile/shared/widgets/app_action_sheet.dart';
 import 'package:chisto_mobile/shared/utils/cached_tile_provider.dart';
 import 'package:chisto_mobile/shared/widgets/user_avatar_circle.dart';
 import 'package:intl/intl.dart' hide TextDirection;
@@ -566,7 +567,7 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble>
     final bool ios = Theme.of(context).platform == TargetPlatform.iOS;
 
     if (ios) {
-      await showCupertinoModalPopup<void>(
+      await showAppActionSheet<void>(
         context: context,
         builder: (BuildContext ctx) {
           return CupertinoActionSheet(

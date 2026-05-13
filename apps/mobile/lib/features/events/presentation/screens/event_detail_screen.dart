@@ -39,6 +39,7 @@ import 'package:chisto_mobile/features/reports/presentation/widgets/report_surfa
 import 'package:chisto_mobile/shared/widgets/animated_phase_switcher.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
+import 'package:chisto_mobile/shared/widgets/app_refresh_indicator.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 
 class EventDetailScreen extends StatefulWidget {
@@ -948,10 +949,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
         label: context.l10n.eventsDetailSemanticsLabel(event.title),
         child: Stack(
           children: <Widget>[
-            RefreshIndicator(
-              color: colorScheme.primary,
-              displacement: 48,
-              strokeWidth: 2.2,
+            AppRefreshIndicator(
               onRefresh: _handlePullToRefresh,
               child: CustomScrollView(
                 controller: _detailScrollController,

@@ -4,7 +4,9 @@ import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/features/profile/presentation/widgets/profile_scroll_bottom_shadow_clipper.dart';
 import 'package:chisto_mobile/features/profile/presentation/widgets/profile_sub_screen_header.dart';
+import 'package:chisto_mobile/shared/widgets/no_overscroll_overlay_scroll_behavior.dart';
 
 /// Shimmer layout matching [ProfilePointsHistoryScreen] while history loads.
 class ProfilePointsHistorySkeleton extends StatefulWidget {
@@ -36,103 +38,117 @@ class _ProfilePointsHistorySkeletonState extends State<ProfilePointsHistorySkele
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(top: AppSpacing.md),
-          child: ProfileSubScreenHeader(
-            title: context.l10n.profilePointsHistoryTitle,
-            subtitle: context.l10n.profilePointsHistorySubtitle,
-            includeBottomSpacing: false,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.lg),
-        Expanded(
-          child: Semantics(
-            label: context.l10n.profilePointsHistoryLoadingSemantic,
-            child: ExcludeSemantics(
-              child: AnimatedBuilder(
-                animation: _shimmer,
-                builder: (BuildContext context, Widget? child) {
-                  final double t = _shimmer.value;
-                  return SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.only(bottom: AppSpacing.xl),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.lg,
-                          ),
-                          child: _PointsHistorySummarySkeleton(t: t),
+    return Semantics(
+      label: context.l10n.profilePointsHistoryLoadingSemantic,
+      child: ExcludeSemantics(
+        child: ScrollConfiguration(
+          behavior: const NoOverscrollOverlayScrollBehavior(),
+          child: ClipRect(
+            clipper: const ProfileScrollBottomShadowClipper(
+              bottomExtension: kProfileScrollBottomShadowExtension,
+            ),
+            child: AnimatedBuilder(
+              animation: _shimmer,
+              builder: (BuildContext context, Widget? child) {
+                final double t = _shimmer.value;
+                return CustomScrollView(
+                  clipBehavior: Clip.none,
+                  physics: const AlwaysScrollableScrollPhysics(
+                    parent: BouncingScrollPhysics(),
+                  ),
+                  slivers: <Widget>[
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: AppSpacing.md),
+                        child: ProfileSubScreenHeader(
+                          title: context.l10n.profilePointsHistoryTitle,
+                          subtitle: context.l10n.profilePointsHistorySubtitle,
+                          includeBottomSpacing: false,
                         ),
-                        const SizedBox(height: AppSpacing.md),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(
-                            AppSpacing.lg,
-                            0,
-                            0,
-                            AppSpacing.sm,
-                          ),
-                          child: _ShimmerBox(
-                            width: 100,
-                            height: 14,
-                            radius: 7,
-                            t: t,
-                          ),
-                        ),
-                        SizedBox(
-                          height: 112,
-                          child: ListView.separated(
+                      ),
+                    ),
+                    const SliverToBoxAdapter(
+                      child: SizedBox(height: AppSpacing.lg),
+                    ),
+                    SliverToBoxAdapter(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Padding(
                             padding: const EdgeInsets.symmetric(
                               horizontal: AppSpacing.lg,
                             ),
-                            scrollDirection: Axis.horizontal,
-                            itemCount: 3,
-                            separatorBuilder: (_, _) =>
-                                const SizedBox(width: AppSpacing.sm),
-                            itemBuilder: (_, _) =>
-                                _MilestoneChipSkeleton(t: t),
+                            child: _PointsHistorySummarySkeleton(t: t),
                           ),
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(
-                            AppSpacing.lg,
-                            0,
-                            AppSpacing.lg,
-                            AppSpacing.sm,
-                          ),
-                          child: _ShimmerBox(
-                            width: 88,
-                            height: 14,
-                            radius: 7,
-                            t: t,
-                          ),
-                        ),
-                        ...List<Widget>.generate(
-                          5,
-                          (int i) => Padding(
-                            padding: EdgeInsets.fromLTRB(
+                          const SizedBox(height: AppSpacing.md),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(
                               AppSpacing.lg,
-                              i == 0 ? 0 : AppSpacing.xs,
-                              AppSpacing.lg,
-                              AppSpacing.xs,
+                              0,
+                              0,
+                              AppSpacing.sm,
                             ),
-                            child: _ActivityRowSkeleton(t: t),
+                            child: _ShimmerBox(
+                              width: 100,
+                              height: 14,
+                              radius: 7,
+                              t: t,
+                            ),
                           ),
-                        ),
-                      ],
+                          SizedBox(
+                            height: 112,
+                            child: ListView.separated(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppSpacing.lg,
+                              ),
+                              scrollDirection: Axis.horizontal,
+                              itemCount: 3,
+                              separatorBuilder: (_, _) =>
+                                  const SizedBox(width: AppSpacing.sm),
+                              itemBuilder: (_, _) =>
+                                  _MilestoneChipSkeleton(t: t),
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(
+                              AppSpacing.lg,
+                              0,
+                              AppSpacing.lg,
+                              AppSpacing.sm,
+                            ),
+                            child: _ShimmerBox(
+                              width: 88,
+                              height: 14,
+                              radius: 7,
+                              t: t,
+                            ),
+                          ),
+                          ...List<Widget>.generate(
+                            5,
+                            (int i) => Padding(
+                              padding: EdgeInsets.fromLTRB(
+                                AppSpacing.lg,
+                                i == 0 ? 0 : AppSpacing.xs,
+                                AppSpacing.lg,
+                                AppSpacing.xs,
+                              ),
+                              child: _ActivityRowSkeleton(t: t),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  );
-                },
-              ),
+                    const SliverToBoxAdapter(
+                      child: SizedBox(height: AppSpacing.xl + AppSpacing.lg),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
         ),
-      ],
+      ),
     );
   }
 }

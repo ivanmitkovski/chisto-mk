@@ -10,6 +10,7 @@ import 'package:chisto_mobile/features/reports/presentation/widgets/location_pic
 import 'package:chisto_mobile/features/reports/presentation/widgets/location_picker/location_picker_geo_utils.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/location_picker/location_picker_map_stack.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
@@ -373,6 +374,7 @@ class _LocationPickerState extends State<LocationPicker> {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
     final LatLng center = _currentCenter ?? locationPickerMacedoniaCenter();
     final double zoom = _currentCenter != null ? _currentZoom : 7;
     final bool hasConfirmedLocation =
@@ -385,25 +387,25 @@ class _LocationPickerState extends State<LocationPicker> {
         locationPickerSameLatLng(_currentCenter, _lastGeocodedCenter) &&
         !_lastGeocodeWasMacedonia;
     final String stateLabel = _permissionUnavailable
-        ? 'Location permission needed'
+        ? l10n.locationPickerStatePermissionNeeded
         : _resolvingGps && _currentCenter == null
-        ? 'Detecting your position'
+        ? l10n.locationPickerStateDetectingPosition
         : _geocodingInProgress
-        ? 'Checking location…'
+        ? l10n.locationPickerStateCheckingLocation
         : _gpsOutsideCoverage
-        ? 'Current location unavailable'
+        ? l10n.locationPickerStateCurrentLocationUnavailable
         : _gpsNeedsReview
-        ? 'Review detected location'
+        ? l10n.locationPickerStateReviewDetectedLocation
         : apiSaysOutsideMacedonia
-        ? 'Location outside Macedonia'
+        ? l10n.locationPickerStateOutsideMacedonia
         : _needsConfirmation
-        ? 'Pin needs confirmation'
+        ? l10n.locationPickerStatePinNeedsConfirmation
         : hasConfirmedLocation
-        ? 'Location confirmed'
-        : 'Tap Confirm when ready';
+        ? l10n.locationPickerStateLocationConfirmed
+        : l10n.locationPickerStateTapConfirmWhenReady;
 
     return Semantics(
-      label: 'Location picker. $stateLabel',
+      label: l10n.locationPickerScreenSemantics(stateLabel),
       liveRegion: true,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -411,7 +413,7 @@ class _LocationPickerState extends State<LocationPicker> {
         children: <Widget>[
           Semantics(
             sortKey: OrdinalSortKey(0),
-            label: 'Map. Drag to move the pin. Pin cannot leave Macedonia.',
+            label: l10n.locationPickerMapSemantics,
             child: LocationPickerMapStack(
               mapController: _mapController,
               center: center,
@@ -425,6 +427,7 @@ class _LocationPickerState extends State<LocationPicker> {
           ),
           const SizedBox(height: AppSpacing.md),
           _buildStatusSection(
+            l10n: l10n,
             stateLabel: stateLabel,
             hasConfirmedLocation: hasConfirmedLocation,
             showAdvanceBlockedHint: widget.showAdvanceBlockedHint,
@@ -435,6 +438,7 @@ class _LocationPickerState extends State<LocationPicker> {
   }
 
   Widget _buildStatusSection({
+    required AppLocalizations l10n,
     required String stateLabel,
     required bool hasConfirmedLocation,
     required bool showAdvanceBlockedHint,
@@ -490,15 +494,15 @@ class _LocationPickerState extends State<LocationPicker> {
           const SizedBox(height: AppSpacing.sm),
           Text(
             _gpsNeedsReview
-                ? 'We found your current location. Review the pin, then confirm.'
+                ? l10n.locationPickerHelperReviewGps
                 : _lastGeocodedCenter != null &&
                       _currentCenter != null &&
                       locationPickerSameLatLng(_currentCenter, _lastGeocodedCenter) &&
                       !_lastGeocodeWasMacedonia
                 ? context.l10n.reportFlowLocationOutsideMacedoniaHelper
                 : hasConfirmedLocation
-                ? 'The pinned location is ready to submit.'
-                : 'Move the pin to the exact spot, then tap Confirm. The map stays inside Macedonia.',
+                ? l10n.locationPickerHelperReadyToSubmit
+                : l10n.locationPickerHelperMovePinConfirm,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: AppColors.textMuted,
               height: 1.35,
@@ -521,7 +525,7 @@ class _LocationPickerState extends State<LocationPicker> {
                   Semantics(
                     button: true,
                     label: context.l10n.locationRetryAddressSemantic,
-                    hint: 'Double-tap to look up the address again.',
+                    hint: l10n.locationPickerRetryAddressHint,
                     child: TextButton.icon(
                       onPressed: _retryGeocode,
                       icon: const Icon(Icons.refresh_rounded, size: 18),
@@ -535,7 +539,7 @@ class _LocationPickerState extends State<LocationPicker> {
                     Padding(
                       padding: const EdgeInsets.only(top: AppSpacing.xs),
                       child: Text(
-                        'Address lookup unavailable. You can still confirm the pin.',
+                        l10n.locationPickerAddressLookupUnavailableBody,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: AppColors.textMuted,
                           height: 1.35,
@@ -546,21 +550,19 @@ class _LocationPickerState extends State<LocationPicker> {
               ),
             ),
           if (_permissionUnavailable) ...<Widget>[
-            const ReportInfoBanner(
+            ReportInfoBanner(
               icon: Icons.location_disabled_outlined,
               tone: ReportSurfaceTone.neutral,
-              message:
-                  'Location access is off. Move the map manually, then confirm the pin.',
+              message: l10n.locationPickerBannerPermissionOff,
             ),
             const SizedBox(height: AppSpacing.xs),
           ],
           if (_gpsOutsideCoverage) ...<Widget>[
-            const ReportInfoBanner(
+            ReportInfoBanner(
               icon: Icons.public_off_outlined,
               tone: ReportSurfaceTone.warning,
-              title: 'Current location outside coverage',
-              message:
-                  'GPS is outside Macedonia. Move the pin manually or try again.',
+              title: l10n.locationPickerBannerGpsOutsideTitle,
+              message: l10n.locationPickerBannerGpsOutsideBody,
             ),
             const SizedBox(height: AppSpacing.xs),
           ],
@@ -569,11 +571,12 @@ class _LocationPickerState extends State<LocationPicker> {
             Semantics(
               button: true,
               enabled: !_geocodingInProgress,
-              label:
-                  'Confirm location. ${hasConfirmedLocation ? "Location already confirmed" : "Set this spot as the report location"}',
+              label: hasConfirmedLocation
+                  ? l10n.locationPickerConfirmSemanticsWhenConfirmed
+                  : l10n.locationPickerConfirmSemanticsWhenUnset,
               hint: hasConfirmedLocation
-                  ? 'Location is set for this report.'
-                  : 'Double-tap to set this spot as the report location.',
+                  ? l10n.locationPickerConfirmHintDone
+                  : l10n.locationPickerConfirmHintPending,
               child: GestureDetector(
                 onTapDown: _geocodingInProgress
                     ? null
@@ -624,7 +627,9 @@ class _LocationPickerState extends State<LocationPicker> {
                               color: AppColors.textOnDark,
                             ),
                       label: Text(
-                        _geocodingInProgress ? 'Checking…' : 'Confirm location',
+                        _geocodingInProgress
+                            ? l10n.locationPickerConfirmChecking
+                            : l10n.locationPickerConfirmLocation,
                         style: AppTypography.buttonLabel.copyWith(
                           color: AppColors.textOnDark,
                         ),
@@ -640,14 +645,15 @@ class _LocationPickerState extends State<LocationPicker> {
   }
 
   Widget _buildAddressBadge() {
+    final AppLocalizations l10n = context.l10n;
     final bool checking = _geocodingInProgress;
     final String displayText = checking
-        ? 'Checking address…'
+        ? l10n.locationPickerAddressChecking
         : _locationLookupFailed
-        ? 'Address unavailable. Coordinates: $_address'
+        ? l10n.locationPickerAddressUnavailableWithCoords(_address ?? '')
         : _gpsNeedsReview
-        ? 'Near $_address'
-        : _address ?? '—';
+        ? l10n.locationPickerAddressNear(_address ?? '')
+        : _address ?? l10n.locationPickerAddressPlaceholder;
     return AnimatedSwitcher(
       duration: AppMotion.xFast,
       switchInCurve: AppMotion.standardCurve,
@@ -693,11 +699,11 @@ class _LocationPickerState extends State<LocationPicker> {
   }
 
   Widget _buildUseCurrentLocationButton() {
+    final AppLocalizations l10n = context.l10n;
     return Semantics(
       button: true,
-      label: 'Use current location.',
-      hint:
-          'Double-tap to center the map on your GPS position if inside Macedonia.',
+      label: l10n.locationPickerUseCurrentLocationLabel,
+      hint: l10n.locationPickerUseCurrentLocationHint,
       child: GestureDetector(
         onTapDown: _resolvingGps
             ? null
@@ -710,8 +716,8 @@ class _LocationPickerState extends State<LocationPicker> {
           duration: AppMotion.xFast,
           curve: AppMotion.standardCurve,
           child: Container(
-            width: 40,
-            height: 40,
+            width: 44,
+            height: 44,
             decoration: BoxDecoration(
               color: AppColors.panelBackground.withValues(alpha: 0.94),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMd),

@@ -1,0 +1,51 @@
+# k6 smoke against a live API; compares p(95) to apps/api/perf/baseline-thresholds.json.
+# Smoke includes GET /health/ready (scenario: readiness) — same URL path as blackbox chisto_api_health_ready.
+# Manual: provide base URL. Weekly schedule: set repository variable API_STAGING_BASE_URL (no trailing slash).
+name: API perf baseline
+
+on:
+  workflow_dispatch:
+    inputs:
+      api_base_url:
+        description: Base URL of a running API (no trailing slash), e.g. https://api-staging.example.com
+        required: true
+        type: string
+  schedule:
+    - cron: '0 6 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  k6-baseline:
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'workflow_dispatch' && inputs.api_base_url != '') ||
+      (github.event_name == 'schedule' && vars.API_STAGING_BASE_URL != '')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup k6
+        uses: grafana/setup-k6-action@v1
+
+      - name: Resolve API base URL
+        id: api
+        run: |
+          case "${{ github.event_name }}" in
+            workflow_dispatch)
+              echo "base=${{ inputs.api_base_url }}" >> "$GITHUB_OUTPUT"
+              ;;
+            *)
+              echo "base=${{ vars.API_STAGING_BASE_URL }}" >> "$GITHUB_OUTPUT"
+              ;;
+          esac
+
+      - name: Run smoke and export summary
+        working-directory: apps/api
+        env:
+          API_BASE_URL: ${{ steps.api.outputs.base }}
+        run: k6 run perf/smoke.js --summary-export "${{ runner.temp }}/k6-summary.json"
+
+      - name: Check thresholds
+        run: node apps/api/scripts/check-k6-baseline.mjs "${{ runner.temp }}/k6-summary.json"

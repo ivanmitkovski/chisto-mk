@@ -3,10 +3,11 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { SiteStatus } from '../../prisma-client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../../audit/audit.service';
+import { reportMergePrimaryCopy, reportMergeChildCopy, reportCoReporterCreditCopy } from '../../notifications/notification-templates';
 import { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { ReportsUploadService } from '../reports-upload.service';
-import { ReportEventsService } from '../../admin-events/report-events.service';
-import { SiteEventsService } from '../../admin-events/site-events.service';
+import { ReportEventsService } from '../../admin-realtime/report-events.service';
+import { SiteEventsService } from '../../admin-realtime/site-events.service';
 import { ReportsOwnerEventsService } from '../reports-owner-events.service';
 import { getReportNumber } from '../report-copy.helpers';
 
@@ -161,10 +162,11 @@ export class DuplicateMergeSideEffectsService {
     };
 
     if (primaryReporterId != null && selectedChildren.length > 0) {
+      const primaryCopy = reportMergePrimaryCopy('en', primaryReportNumberLabel);
       this.eventEmitter.emit('notification.send', {
         recipientUserIds: [primaryReporterId],
-        title: 'Duplicate reports merged',
-        body: `Similar submissions were merged into your report ${primaryReportNumberLabel}.`,
+        title: primaryCopy.title,
+        body: primaryCopy.body,
         type: 'REPORT_STATUS',
         threadKey: `report:${primaryReportId}`,
         groupKey: `REPORT_STATUS:site:${siteId}`,
@@ -176,10 +178,11 @@ export class DuplicateMergeSideEffectsService {
       if (userId === primaryReporterId) {
         continue;
       }
+      const childCopy = reportMergeChildCopy('en', primaryReportNumberLabel);
       this.eventEmitter.emit('notification.send', {
         recipientUserIds: [userId],
-        title: 'Your report was merged',
-        body: `Your submission was merged into ${primaryReportNumberLabel}.`,
+        title: childCopy.title,
+        body: childCopy.body,
         type: 'REPORT_STATUS',
         threadKey: `report:${primaryReportId}`,
         groupKey: `REPORT_STATUS:site:${siteId}`,
@@ -191,10 +194,11 @@ export class DuplicateMergeSideEffectsService {
       if (userId === primaryReporterId || childReporterIds.has(userId)) {
         continue;
       }
+      const coCopy = reportCoReporterCreditCopy('en', primaryReportNumberLabel);
       this.eventEmitter.emit('notification.send', {
         recipientUserIds: [userId],
-        title: 'Co-reporter credit',
-        body: `You are credited as a co-reporter on ${primaryReportNumberLabel}.`,
+        title: coCopy.title,
+        body: coCopy.body,
         type: 'REPORT_STATUS',
         threadKey: `report:${primaryReportId}`,
         groupKey: `REPORT_STATUS:site:${siteId}`,

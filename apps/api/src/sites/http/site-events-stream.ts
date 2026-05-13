@@ -8,7 +8,7 @@ import Redis from 'ioredis';
 import { loadFeatureFlags } from '../../config/feature-flags';
 import { loadMapConfig } from '../../config/map.config';
 import { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
-import { SiteEventsService } from '../../admin-events/site-events.service';
+import { SiteEventsService } from '../../admin-realtime/site-events.service';
 import { ObservabilityStore } from '../../observability/observability.store';
 
 const cfg = loadMapConfig();

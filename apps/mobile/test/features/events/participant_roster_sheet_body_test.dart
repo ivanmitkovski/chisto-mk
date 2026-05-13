@@ -32,6 +32,9 @@ class _DelayedParticipantsRepo implements EventsRepository {
   List<EcoEvent> get events => _inner.events;
 
   @override
+  List<String> get lastRankedSearchSuggestions => _inner.lastRankedSearchSuggestions;
+
+  @override
   DateTime? get lastSuccessfulListRefreshAt =>
       _inner.lastSuccessfulListRefreshAt;
 

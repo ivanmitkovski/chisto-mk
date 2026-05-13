@@ -1,6 +1,7 @@
 'use client';
 
 import { KeyboardEvent as ReactKeyboardEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Button } from '@/components/ui/button/button';
@@ -54,6 +55,7 @@ export function TopBar({
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isBellJingling, setIsBellJingling] = useState(false);
   const [shortcutLabel, setShortcutLabel] = useState('Ctrl+K');
+  const [commandPalettePortalReady, setCommandPalettePortalReady] = useState(false);
   const [localNotifications, setLocalNotifications] = useState<TopBarNotification[]>(() =>
     initialNotifications.map((n) => ({ ...n })),
   );
@@ -302,6 +304,10 @@ export function TopBar({
     triggerRef: profileButtonRef,
     onDismiss: closeProfile,
   });
+
+  useEffect(() => {
+    setCommandPalettePortalReady(true);
+  }, []);
 
   useEffect(() => {
     const platformLabel = window.navigator.platform.toLowerCase().includes('mac') ? '⌘K' : 'Ctrl+K';
@@ -557,76 +563,86 @@ export function TopBar({
         </div>
       </motion.header>
 
-      <AnimatePresence>
-        {isPaletteOpen ? (
-          <motion.div
-            className={styles.paletteBackdrop}
-            initial={reduceMotion ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: reduceMotion ? 0 : 0.16 }}
-          >
-            <motion.section
-              ref={palettePanelRef}
-              className={styles.palette}
-              role="dialog"
-              aria-modal="true"
-              aria-label="Command palette"
-              initial={reduceMotion ? false : { opacity: 0, y: 10, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 6, scale: 0.98 }}
-              transition={{ duration: reduceMotion ? 0 : 0.18, ease: 'easeOut' }}
-              onKeyDown={onPaletteTrapKeyDown}
-            >
-              <div className={styles.paletteSearchWrap}>
-                <Input
-                  inputRef={paletteInputRef}
-                  aria-label="Search commands"
-                  role="combobox"
-                  aria-expanded
-                  aria-controls="command-palette-list"
-                  aria-autocomplete="list"
-                  aria-activedescendant={activeCommand ? `command-option-${activeCommand.id}` : undefined}
-                  placeholder="Type a command or route"
-                  value={query}
-                  onChange={onQueryChange}
-                  onKeyDown={onPaletteInputKeyDown}
-                  className={styles.paletteSearch}
-                  leftSlot={<Icon name="magnifying-glass" size={14} />}
-                />
-              </div>
-              <ul id="command-palette-list" role="listbox" className={styles.commandList} aria-label="Available commands">
-                {filteredCommands.map((command, index) => (
-                  <li key={command.id}>
-                    <button
-                      type="button"
-                      role="option"
-                      id={`command-option-${command.id}`}
-                      aria-selected={index === activeIndex}
-                      className={`${styles.commandItem} ${index === activeIndex ? styles.commandItemActive : ''}`}
-                      onMouseEnter={() => selectIndex(index)}
-                      onClick={() => executeCommand(command)}
+      {commandPalettePortalReady
+        ? createPortal(
+            <AnimatePresence>
+              {isPaletteOpen ? (
+                <motion.div
+                  className={styles.paletteBackdrop}
+                  initial={reduceMotion ? false : { opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: reduceMotion ? 0 : 0.16 }}
+                >
+                  <motion.section
+                    ref={palettePanelRef}
+                    className={styles.palette}
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="Command palette"
+                    initial={reduceMotion ? false : { opacity: 0, y: 10, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 6, scale: 0.98 }}
+                    transition={{ duration: reduceMotion ? 0 : 0.18, ease: 'easeOut' }}
+                    onKeyDown={onPaletteTrapKeyDown}
+                  >
+                    <div className={styles.paletteSearchWrap}>
+                      <Input
+                        inputRef={paletteInputRef}
+                        aria-label="Search commands"
+                        role="combobox"
+                        aria-expanded
+                        aria-controls="command-palette-list"
+                        aria-autocomplete="list"
+                        aria-activedescendant={activeCommand ? `command-option-${activeCommand.id}` : undefined}
+                        placeholder="Type a command or route"
+                        value={query}
+                        onChange={onQueryChange}
+                        onKeyDown={onPaletteInputKeyDown}
+                        className={styles.paletteSearch}
+                        leftSlot={<Icon name="magnifying-glass" size={14} />}
+                      />
+                    </div>
+                    <ul
+                      id="command-palette-list"
+                      role="listbox"
+                      className={styles.commandList}
+                      aria-label="Available commands"
                     >
-                      <span className={styles.commandIcon}>
-                        <Icon name={command.icon} size={14} />
-                      </span>
-                      <span className={styles.commandText}>
-                        <strong>{command.label}</strong>
-                        {command.description ? <small>{command.description}</small> : null}
-                      </span>
-                    </button>
-                  </li>
-                ))}
-                {filteredCommands.length === 0 ? (
-                  <li className={styles.emptyResults} role="status">
-                    No commands match your query.
-                  </li>
-                ) : null}
-              </ul>
-            </motion.section>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
+                      {filteredCommands.map((command, index) => (
+                        <li key={command.id}>
+                          <button
+                            type="button"
+                            role="option"
+                            id={`command-option-${command.id}`}
+                            aria-selected={index === activeIndex}
+                            className={`${styles.commandItem} ${index === activeIndex ? styles.commandItemActive : ''}`}
+                            onMouseEnter={() => selectIndex(index)}
+                            onClick={() => executeCommand(command)}
+                          >
+                            <span className={styles.commandIcon}>
+                              <Icon name={command.icon} size={14} />
+                            </span>
+                            <span className={styles.commandText}>
+                              <strong>{command.label}</strong>
+                              {command.description ? <small>{command.description}</small> : null}
+                            </span>
+                          </button>
+                        </li>
+                      ))}
+                      {filteredCommands.length === 0 ? (
+                        <li className={styles.emptyResults} role="status">
+                          No commands match your query.
+                        </li>
+                      ) : null}
+                    </ul>
+                  </motion.section>
+                </motion.div>
+              ) : null}
+            </AnimatePresence>,
+            document.body,
+          )
+        : null}
     </>
   );
 }
