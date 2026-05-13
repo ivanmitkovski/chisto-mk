@@ -23,6 +23,7 @@ import 'package:chisto_mobile/features/events/presentation/utils/edit_event_form
 import 'package:chisto_mobile/features/events/presentation/utils/event_schedule_constraints.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/events_localized_strings.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/events_modal_sheet.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/create_event/create_event_gear_sheet_footer.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/edit_event/edit_event_form_primitives.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/edit_event/edit_event_help_sheet.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/edit_event/edit_event_schedule_conflict_callout.dart';
@@ -518,43 +519,16 @@ class _EditEventSheetState extends State<EditEventSheet>
                 AppSpacing.lg,
                 0,
               ),
-              footer: Padding(
-                padding: EdgeInsets.only(
-                  bottom: MediaQuery.viewPaddingOf(ctx).bottom,
-                ),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      AppHaptics.tap();
-                      Navigator.of(ctx).pop();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      elevation: 0,
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: AppColors.textPrimary,
-                      alignment: Alignment.center,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusPill,
-                        ),
+              footer: CreateEventGearSheetFooter(
+                label: _gear.isEmpty
+                    ? ctx.l10n.commonSkip
+                    : ctx.l10n.createEventGearDoneSelectedCount(
+                        _gear.length,
                       ),
-                    ),
-                    child: Text(
-                      _gear.isEmpty
-                          ? ctx.l10n.commonSkip
-                          : ctx.l10n.createEventGearDoneSelectedCount(
-                              _gear.length,
-                            ),
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
+                onPressed: () {
+                  AppHaptics.tap();
+                  Navigator.of(ctx).pop();
+                },
               ),
               child: ListView(
                 physics: const BouncingScrollPhysics(),

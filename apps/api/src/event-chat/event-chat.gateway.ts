@@ -15,6 +15,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { authenticateSocketUser } from '../common/ws/authenticate-socket-user';
 import { resolveSocketIoCorsOrigin } from '../common/ws/ws-cors';
 import { EventChatAccessService } from './event-chat-access.service';
+import { EventChatRoomEmitterService } from './event-chat-room-emitter.service';
 
 interface SocketData {
   userId?: string;
@@ -47,9 +48,11 @@ export class EventChatGateway
     private readonly config: ConfigService,
     private readonly prisma: PrismaService,
     private readonly eventChatAccess: EventChatAccessService,
+    private readonly chatRoomEmitter: EventChatRoomEmitterService,
   ) {}
 
-  afterInit(_server: Server): void {
+  afterInit(server: Server): void {
+    this.chatRoomEmitter?.attachServer(server);
     this.logger.log('Chat WebSocket gateway initialized');
   }
 
@@ -223,37 +226,7 @@ export class EventChatGateway
     });
   }
 
-  /**
-   * SSE / internal events use snake_case (`message_created`). The mobile Socket.IO client
-   * listens for colon-separated names (`message:created`) — map here so both transports align.
-   */
-  private toSocketIoEventName(sseType: string): string {
-    const map: Record<string, string> = {
-      message_created: 'message:created',
-      message_deleted: 'message:deleted',
-      message_edited: 'message:edited',
-      message_pinned: 'message:pinned',
-      message_unpinned: 'message:unpinned',
-      typing_update: 'typing:update',
-      read_cursor_updated: 'read_cursor:updated',
-    };
-    return map[sseType] ?? sseType;
-  }
-
   emitToRoom(eventId: string, eventType: string, payload: unknown): void {
-    const room = `event:${eventId}`;
-    const socketEvent = this.toSocketIoEventName(eventType);
-    void this.server
-      .in(room)
-      .fetchSockets()
-      .then((sockets) => {
-        this.logger.debug(
-          `emit ${socketEvent} room=${room} sockets=${sockets.length}`,
-        );
-      })
-      .catch((err: unknown) => {
-        this.logger.debug(`emit ${socketEvent} room=${room} socket count failed: ${String(err)}`);
-      });
-    this.server.to(room).emit(socketEvent, payload);
+    this.chatRoomEmitter.emitToRoom(eventId, eventType, payload);
   }
 }

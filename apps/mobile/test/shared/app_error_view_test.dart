@@ -89,6 +89,33 @@ void main() {
       expect(find.text('Try again'), findsNothing);
     });
 
+    testWidgets('shows logout for SESSION_REVOKED (revoked server session)',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
+          home: Scaffold(
+            body: AppErrorView(
+              error: const AppError(
+                code: 'SESSION_REVOKED',
+                message: 'Session is no longer valid',
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(
+        find.text(
+          'Session is no longer valid. Please sign in again.',
+        ),
+        findsOneWidget,
+      );
+      expect(find.text('Sign out'), findsOneWidget);
+    });
+
     testWidgets('does not show logout button for non-auth errors',
         (WidgetTester tester) async {
       await tester.pumpWidget(

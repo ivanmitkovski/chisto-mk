@@ -53,13 +53,16 @@ export const viewport: Viewport = {
   viewportFit: 'cover',
 };
 
+/** Required for per-request CSP nonces on routes outside `dashboard` (e.g. `/login`). */
+export const dynamic = 'force-dynamic';
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={roboto.variable}>
+    <html lang="en" className={roboto.variable} style={{ colorScheme: 'light' }}>
       <body className={roboto.className}>
         <QueryProvider>{children}</QueryProvider>
       </body>

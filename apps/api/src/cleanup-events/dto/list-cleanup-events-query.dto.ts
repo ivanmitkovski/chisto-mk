@@ -1,23 +1,10 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { IsIn, IsInt, IsOptional, Max, Min } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsIn, IsOptional, IsString, MinLength } from 'class-validator';
 
-export class ListCleanupEventsQueryDto {
-  @ApiPropertyOptional({ default: 1 })
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  page?: number;
+import { PaginationQueryDto } from '../../common/dto/pagination-query.dto';
 
-  @ApiPropertyOptional({ default: 20 })
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  @Max(100)
-  limit?: number;
-
+export class ListCleanupEventsQueryDto extends PaginationQueryDto {
   @ApiPropertyOptional({
     description: 'Filter by completion (upcoming/completed)',
     enum: ['upcoming', 'completed'],
@@ -33,4 +20,20 @@ export class ListCleanupEventsQueryDto {
   @IsOptional()
   @IsIn(['PENDING', 'APPROVED', 'DECLINED'])
   moderationStatus?: 'PENDING' | 'APPROVED' | 'DECLINED';
+
+  @ApiPropertyOptional({ description: 'Substring match on title or description (min 2 chars)' })
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (value == null || value === '') {
+      return undefined;
+    }
+    if (typeof value === 'string') {
+      const t = value.trim();
+      return t.length === 0 ? undefined : t;
+    }
+    return value;
+  })
+  @IsString()
+  @MinLength(2)
+  q?: string;
 }

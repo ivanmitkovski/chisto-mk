@@ -4,7 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { ReportsUploadService } from '../reports/reports-upload.service';
 import { ObservabilityStore } from '../observability/observability.store';
 import { EcoEventLifecycleStatus } from '../prisma-client';
-import { visibilityWhere } from './events-query.include';
+import { visibilityWhere } from './events-query.include.shared';
 import { lifecycleToMobile } from './events-mobile.mapper';
 import type {
   EventImpactReceiptEvidenceItemDto,

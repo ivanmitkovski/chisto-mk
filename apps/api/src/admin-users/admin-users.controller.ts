@@ -16,8 +16,10 @@ import { BulkAdminUsersDto } from './dto/bulk-admin-users.dto';
 import { ListAdminUsersQueryDto } from './dto/list-admin-users-query.dto';
 import { PatchAdminUserDto } from './dto/patch-admin-user.dto';
 import { PatchAdminUserRoleDto } from './dto/patch-admin-user-role.dto';
+import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-error-responses.decorator';
 
 @ApiTags('admin-users')
+@ApiStandardHttpErrorResponses()
 @Controller('admin/users')
 export class AdminUsersController {
   constructor(private readonly adminUsersService: AdminUsersService) {}

@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { CleanupEventStatus, EcoEventLifecycleStatus } from '../prisma-client';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { CheckInRepository } from './check-in.repository';
-import { visibilityWhere } from './events-query.include';
+import { visibilityWhere } from './events-query.include.shared';
 
 @Injectable()
 export class EventsCheckInSharedService {

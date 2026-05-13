@@ -2,12 +2,11 @@ import { Prisma } from '../../src/prisma-client';
 import { PrismaService } from '../../src/prisma/prisma.service';
 import { NotificationDispatcherService } from '../../src/notifications/notification-dispatcher.service';
 import { ChatEncryptionService } from '../../src/event-chat/chat-encryption.service';
-import { EventChatListService } from '../../src/event-chat/event-chat-list.service';
 import { EventChatMessageDtoService } from '../../src/event-chat/event-chat-message-dto.service';
+import { EventChatMutationModerateService } from '../../src/event-chat/event-chat-mutation-moderate.service';
+import { EventChatMutationSendService } from '../../src/event-chat/event-chat-mutation-send.service';
 import { EventChatMutationsService } from '../../src/event-chat/event-chat-mutations.service';
 import { EventChatNotificationsService } from '../../src/event-chat/event-chat-notifications.service';
-import { EventChatPresenceService } from '../../src/event-chat/event-chat-presence.service';
-import { EventChatService } from '../../src/event-chat/event-chat.service';
 import { EventChatSseService } from '../../src/event-chat/event-chat-sse.service';
 import { EventChatTelemetryService } from '../../src/event-chat/event-chat-telemetry.service';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
@@ -59,17 +58,7 @@ describe('EventChatService send failures', () => {
       chatUpload as never,
       uploads as never,
     );
-    const list = new EventChatListService(
-      prisma as unknown as PrismaService,
-      telemetry as unknown as EventChatTelemetryService,
-      dto,
-    );
-    const presence = new EventChatPresenceService(
-      prisma as unknown as PrismaService,
-      sse as unknown as EventChatSseService,
-      uploads as never,
-    );
-    const mutations = new EventChatMutationsService(
+    const sendMutation = new EventChatMutationSendService(
       prisma as unknown as PrismaService,
       sse as unknown as EventChatSseService,
       cn,
@@ -78,7 +67,16 @@ describe('EventChatService send failures', () => {
       telemetry as unknown as EventChatTelemetryService,
       dto,
     );
-    const service = new EventChatService(list, presence, mutations);
+    const moderateMutation = new EventChatMutationModerateService(
+      prisma as unknown as PrismaService,
+      sse as unknown as EventChatSseService,
+      encryption as unknown as ChatEncryptionService,
+      chatUpload as never,
+      telemetry as unknown as EventChatTelemetryService,
+      dto,
+    );
+    const mutations = new EventChatMutationsService(sendMutation, moderateMutation);
+    const service = { sendMessage: mutations.sendMessage.bind(mutations) };
 
     await expect(service.sendMessage(eventId, user, { body: 'hi' } as never)).rejects.toBeInstanceOf(
       Prisma.PrismaClientKnownRequestError,

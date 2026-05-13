@@ -1,0 +1,94 @@
+# Prometheus alerting rules (Chisto.mk API).
+# Metrics below match gauges pushed when METRICS_PUSH_GATEWAY_URL is set
+# (see ObservabilityStore.pushToGateway). Adjust job/instance labels to your scrape config.
+#
+# Implemented in-process (Pushgateway): chisto_map_outbox_pending (gauge, sampled by map outbox worker),
+# chisto_prisma_p1008_total (counter, incremented when API maps Prisma P1008 to DATABASE_TIMEOUT).
+
+groups:
+  - name: chisto-api
+    rules:
+      - alert: ApiElevatedErrorRate
+        expr: |
+          (
+            chisto_requests_failed_total
+            /
+            clamp_min(chisto_requests_total, 1)
+          ) > 0.01
+        for: 5m
+        labels:
+          severity: info
+        annotations:
+          summary: API 5xx share above 1%
+          description: Early warning before the 5% SLO breach; tune thresholds per environment.
+
+      - alert: ApiSevereErrorRate
+        expr: |
+          (
+            chisto_requests_failed_total
+            /
+            clamp_min(chisto_requests_total, 1)
+          ) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: API 5xx share above 5%
+          description: Ratio of failed to total requests from in-process snapshot gauges exceeds 5% for 5m.
+
+      - alert: ApiHighLatency
+        expr: chisto_request_duration_p95_ms > 500
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: API p95 latency high
+          description: chisto_request_duration_p95_ms above 500ms for 5m.
+
+      - alert: FcmDeliveryBacklog
+        expr: chisto_push_queue_depth > 1000
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: Push queue depth high
+          description: chisto_push_queue_depth above 1000 for 15m.
+
+      - alert: MapReadLatencyHigh
+        expr: chisto_map_duration_p95_ms > 500
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Map read path p95 high
+          description: chisto_map_duration_p95_ms above 500ms for 5m.
+
+      # Requires blackbox exporter scraping GET /health/ready with job label chisto_api_health_ready
+      - alert: HealthCheckFailing
+        expr: probe_success{job="chisto_api_health_ready"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: Readiness probe failing
+          description: Configure blackbox module http_2xx against /health/ready.
+
+      # chisto_map_outbox_pending is pushed by the API (see ObservabilityStore).
+      - alert: MapOutboxBacklog
+        expr: chisto_map_outbox_pending > 500
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: Map outbox backlog high
+          description: chisto_map_outbox_pending is pushed from the API (ObservabilityStore + map outbox dispatcher).
+
+      # chisto_prisma_p1008_total is incremented in GlobalExceptionFilter when returning DATABASE_TIMEOUT.
+      - alert: DatabaseConnectionTimeout
+        expr: increase(chisto_prisma_p1008_total[5m]) > 10
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: Many database timeouts (P1008)
+          description: Counter incremented in GlobalExceptionFilter when API maps Prisma P1008 to DATABASE_TIMEOUT; tune pool and DB capacity.

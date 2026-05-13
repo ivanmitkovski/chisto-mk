@@ -14,9 +14,8 @@ import 'package:chisto_mobile/shared/widgets/animated_list_item.dart';
 import 'package:chisto_mobile/shared/widgets/app_error_view.dart';
 import 'package:flutter/material.dart';
 
-/// Body for [ReportsListScreen]: realtime banner, fixed list chrome (stats, search, filters),
-/// then scrollable slivers. Chrome is **not** inside a fixed-height sliver so there is no
-/// dead band between filters and the first card.
+/// Body for [ReportsListScreen]: one [CustomScrollView] like [PollutionFeedScreen] —
+/// realtime banner, stats/search/filters, and list share the same scroll physics.
 class ReportsListScreenSlivers extends StatelessWidget {
   const ReportsListScreenSlivers({
     super.key,
@@ -156,60 +155,57 @@ class ReportsListScreenSlivers extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color bg = Theme.of(context).scaffoldBackgroundColor;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        const ReportsListRealtimeBanner(),
-        DecoratedBox(
-          decoration: BoxDecoration(
-            color: bg,
-            border: Border(
-              bottom: BorderSide(
-                color: AppColors.divider.withValues(alpha: 0.45),
-              ),
-            ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              ReportsListStatsHeader(
-                totalReports: controller.reports.length,
-                underReviewCount: controller.reports
-                    .where(
-                      (ReportListItem r) =>
-                          apiStatusToDisplay(r.status) ==
-                          ReportSheetStatus.underReview,
-                    )
-                    .length,
-                reportCapacity: reportCapacity,
-                l10n: l10n,
-                onStartNewReport: actions.onStartNewReport,
-              ),
-              ReportsListSearchBar(
-                controller: searchController,
-                focusNode: searchFocusNode,
-                resultSummaryLabel: searchResultSummaryLabel,
-                onSubmitted: actions.onSearchSubmitted,
-                onClear: actions.onSearchClear,
-              ),
-              if (showStatusFilter)
-                ReportsListStatusFilterBar(
-                  selected: statusFilter,
-                  onSelected: actions.onStatusFilterSelected,
+    return CustomScrollView(
+      controller: scrollController,
+      physics: const AlwaysScrollableScrollPhysics(
+        parent: BouncingScrollPhysics(),
+      ),
+      slivers: <Widget>[
+        const SliverToBoxAdapter(child: ReportsListRealtimeBanner()),
+        SliverToBoxAdapter(
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: bg,
+              border: Border(
+                bottom: BorderSide(
+                  color: AppColors.divider.withValues(alpha: 0.45),
                 ),
-            ],
-          ),
-        ),
-        Expanded(
-          child: CustomScrollView(
-            controller: scrollController,
-            physics: const BouncingScrollPhysics(
-              parent: AlwaysScrollableScrollPhysics(),
+              ),
             ),
-            slivers: _listSlivers(context),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                ReportsListStatsHeader(
+                  totalReports: controller.reports.length,
+                  underReviewCount: controller.reports
+                      .where(
+                        (ReportListItem r) =>
+                            apiStatusToDisplay(r.status) ==
+                            ReportSheetStatus.underReview,
+                      )
+                      .length,
+                  reportCapacity: reportCapacity,
+                  l10n: l10n,
+                  onStartNewReport: actions.onStartNewReport,
+                ),
+                ReportsListSearchBar(
+                  controller: searchController,
+                  focusNode: searchFocusNode,
+                  resultSummaryLabel: searchResultSummaryLabel,
+                  onSubmitted: actions.onSearchSubmitted,
+                  onClear: actions.onSearchClear,
+                ),
+                if (showStatusFilter)
+                  ReportsListStatusFilterBar(
+                    selected: statusFilter,
+                    onSelected: actions.onStatusFilterSelected,
+                  ),
+              ],
+            ),
           ),
         ),
+        ..._listSlivers(context),
       ],
     );
   }

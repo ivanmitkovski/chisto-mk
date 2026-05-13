@@ -21,7 +21,7 @@ export function loadMapConfig(): MapConfig {
     redisUrl,
     cacheTtlMs: parseIntEnv('MAP_CACHE_TTL_MS', 4_000),
     sseHeartbeatIntervalMs: parseIntEnv('SSE_HEARTBEAT_INTERVAL_MS', 30_000),
-    outboxPollIntervalMs: parseIntEnv('OUTBOX_POLL_INTERVAL_MS', 1_500),
+    outboxPollIntervalMs: parseIntEnv('OUTBOX_POLL_INTERVAL_MS', 5_000),
     outboxBatchSize: parseIntEnv('OUTBOX_BATCH_SIZE', 120),
     outboxLeaseTtlMs: parseIntEnv('OUTBOX_LEASE_TTL_MS', 20_000),
     replayLimit: parseIntEnv('SSE_REPLAY_LIMIT', 240),

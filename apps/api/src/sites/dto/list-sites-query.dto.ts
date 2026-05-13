@@ -1,7 +1,8 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { PaginationQueryDto20 } from '../../common/dto/pagination-query.dto';
 import { SiteStatus } from '../../prisma-client';
 import { Type } from 'class-transformer';
-import { IsBoolean, IsEnum, IsInt, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsBoolean, IsEnum, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
 
 export enum SiteFeedSort {
   HYBRID = 'hybrid',
@@ -13,7 +14,7 @@ export enum SiteFeedMode {
   LATEST = 'latest',
 }
 
-export class ListSitesQueryDto {
+export class ListSitesQueryDto extends PaginationQueryDto20 {
   @ApiPropertyOptional({
     description: 'Center latitude for geo search (with lng and radiusKm)',
     example: 41.6086,
@@ -74,21 +75,6 @@ export class ListSitesQueryDto {
   @IsBoolean()
   @Type(() => Boolean)
   explain = false;
-
-  @ApiPropertyOptional({ default: 1, minimum: 1 })
-  @Type(() => Number)
-  @IsOptional()
-  @IsInt()
-  @Min(1)
-  page = 1;
-
-  @ApiPropertyOptional({ default: 20, minimum: 1, maximum: 100 })
-  @Type(() => Number)
-  @IsOptional()
-  @IsInt()
-  @Min(1)
-  @Max(100)
-  limit = 20;
 
   @ApiPropertyOptional({
     description:

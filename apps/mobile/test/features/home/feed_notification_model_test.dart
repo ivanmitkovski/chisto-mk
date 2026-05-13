@@ -1,98 +1,100 @@
-import 'package:chisto_mobile/features/home/domain/models/feed_notification.dart';
+import 'package:chisto_mobile/features/notifications/domain/models/user_notification.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  group('FeedNotificationType', () {
+  group('UserNotificationType', () {
     test('has expected enum values', () {
-      expect(FeedNotificationType.values.length, 3);
-      expect(FeedNotificationType.values, contains(FeedNotificationType.update));
-      expect(FeedNotificationType.values, contains(FeedNotificationType.action));
-      expect(FeedNotificationType.values, contains(FeedNotificationType.system));
-    });
-
-    test('enum names match', () {
-      expect(FeedNotificationType.update.name, 'update');
-      expect(FeedNotificationType.action.name, 'action');
-      expect(FeedNotificationType.system.name, 'system');
+      expect(UserNotificationType.values.length, 10);
+      expect(UserNotificationType.values, contains(UserNotificationType.siteUpdate));
+      expect(UserNotificationType.values, contains(UserNotificationType.reportStatus));
+      expect(UserNotificationType.values, contains(UserNotificationType.upvote));
+      expect(UserNotificationType.values, contains(UserNotificationType.comment));
+      expect(UserNotificationType.values, contains(UserNotificationType.nearbyReport));
+      expect(UserNotificationType.values, contains(UserNotificationType.cleanupEvent));
+      expect(UserNotificationType.values, contains(UserNotificationType.eventChat));
+      expect(UserNotificationType.values, contains(UserNotificationType.system));
+      expect(UserNotificationType.values, contains(UserNotificationType.achievement));
+      expect(UserNotificationType.values, contains(UserNotificationType.welcome));
     });
   });
 
-  group('FeedNotification', () {
-    final DateTime createdAt = DateTime(2025, 6, 15, 10, 30);
+  group('parseNotificationType', () {
+    test('parses known types', () {
+      expect(parseNotificationType('SITE_UPDATE'), UserNotificationType.siteUpdate);
+      expect(parseNotificationType('REPORT_STATUS'), UserNotificationType.reportStatus);
+      expect(parseNotificationType('UPVOTE'), UserNotificationType.upvote);
+      expect(parseNotificationType('COMMENT'), UserNotificationType.comment);
+      expect(parseNotificationType('NEARBY_REPORT'), UserNotificationType.nearbyReport);
+      expect(parseNotificationType('CLEANUP_EVENT'), UserNotificationType.cleanupEvent);
+      expect(parseNotificationType('EVENT_CHAT'), UserNotificationType.eventChat);
+      expect(parseNotificationType('SYSTEM'), UserNotificationType.system);
+      expect(parseNotificationType('ACHIEVEMENT'), UserNotificationType.achievement);
+      expect(parseNotificationType('WELCOME'), UserNotificationType.welcome);
+    });
+
+    test('defaults to system for unknown', () {
+      expect(parseNotificationType('UNKNOWN'), UserNotificationType.system);
+      expect(parseNotificationType(null), UserNotificationType.system);
+    });
+  });
+
+  group('UserNotification', () {
+    final DateTime createdAt = DateTime(2026, 5, 11, 10, 30);
 
     test('constructs with required fields', () {
-      final FeedNotification notification = FeedNotification(
+      final UserNotification notification = UserNotification(
         id: 'n1',
         title: 'Update',
-        message: 'Your report was reviewed',
+        body: 'Your report was reviewed',
         createdAt: createdAt,
-        type: FeedNotificationType.update,
+        type: UserNotificationType.siteUpdate,
       );
 
       expect(notification.id, 'n1');
       expect(notification.title, 'Update');
-      expect(notification.message, 'Your report was reviewed');
+      expect(notification.body, 'Your report was reviewed');
       expect(notification.createdAt, createdAt);
-      expect(notification.type, FeedNotificationType.update);
+      expect(notification.type, UserNotificationType.siteUpdate);
       expect(notification.isRead, false);
       expect(notification.targetSiteId, isNull);
-      expect(notification.targetTabIndex, isNull);
+      expect(notification.archivedAt, isNull);
     });
 
-    test('constructs with optional fields', () {
-      final FeedNotification notification = FeedNotification(
-        id: 'n2',
-        title: 'Action',
-        message: 'Action required',
-        createdAt: createdAt,
-        type: FeedNotificationType.action,
-        isRead: true,
-        targetSiteId: 'site-1',
-        targetTabIndex: 2,
-      );
+    test('parses from JSON', () {
+      final UserNotification n = UserNotification.fromJson(<String, dynamic>{
+        'id': 'n2',
+        'title': 'Upvote',
+        'body': 'Someone upvoted your report',
+        'type': 'UPVOTE',
+        'isRead': true,
+        'createdAt': '2026-05-11T10:30:00.000Z',
+        'data': <String, dynamic>{'siteId': 'site-1', 'targetTab': '0'},
+        'archivedAt': '2026-05-11T11:00:00.000Z',
+      });
 
-      expect(notification.isRead, true);
-      expect(notification.targetSiteId, 'site-1');
-      expect(notification.targetTabIndex, 2);
+      expect(n.type, UserNotificationType.upvote);
+      expect(n.isRead, true);
+      expect(n.targetSiteId, 'site-1');
+      expect(n.targetTab, '0');
+      expect(n.archivedAt, isNotNull);
     });
 
     test('copyWith produces new instance with updated fields', () {
-      final FeedNotification original = FeedNotification(
+      final UserNotification original = UserNotification(
         id: 'n1',
         title: 'Original',
-        message: 'Original message',
+        body: 'Original body',
         createdAt: createdAt,
-        type: FeedNotificationType.update,
+        type: UserNotificationType.upvote,
         isRead: false,
       );
 
-      final FeedNotification updated = original.copyWith(
-        title: 'Updated',
-        isRead: true,
-        type: FeedNotificationType.system,
-      );
+      final UserNotification updated = original.copyWith(isRead: true);
 
       expect(updated.id, 'n1');
-      expect(updated.title, 'Updated');
-      expect(updated.message, 'Original message');
+      expect(updated.title, 'Original');
       expect(updated.isRead, true);
-      expect(updated.type, FeedNotificationType.system);
-    });
-
-    test('copyWith preserves unchanged fields', () {
-      final FeedNotification original = FeedNotification(
-        id: 'n1',
-        title: 'Title',
-        message: 'Message',
-        createdAt: createdAt,
-        type: FeedNotificationType.action,
-        targetSiteId: 'site-1',
-      );
-
-      final FeedNotification updated = original.copyWith(isRead: true);
-
-      expect(updated.targetSiteId, 'site-1');
-      expect(updated.targetTabIndex, isNull);
+      expect(updated.type, UserNotificationType.upvote);
     });
   });
 }

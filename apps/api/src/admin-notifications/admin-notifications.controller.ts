@@ -14,8 +14,10 @@ import { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { AdminNotificationsService } from './admin-notifications.service';
 import { ListAdminNotificationsQueryDto } from './dto/list-admin-notifications.dto';
 import { localeFromAcceptLanguage } from '../common/utils/format-relative-time-since';
+import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-error-responses.decorator';
 
 @ApiTags('admin-notifications')
+@ApiStandardHttpErrorResponses()
 @Controller('admin/notifications')
 export class AdminNotificationsController {
   constructor(private readonly notificationsService: AdminNotificationsService) {}

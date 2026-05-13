@@ -34,6 +34,9 @@ class InMemoryEventsStore extends ChangeNotifier implements EventsRepository {
   List<EcoEvent> get events => List<EcoEvent>.unmodifiable(_events);
 
   @override
+  List<String> get lastRankedSearchSuggestions => const <String>[];
+
+  @override
   DateTime? get lastSuccessfulListRefreshAt => null;
 
   @override

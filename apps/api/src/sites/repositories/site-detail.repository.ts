@@ -18,7 +18,15 @@ export type SiteWithDetailRelations = Prisma.SiteGetPayload<{
         };
       };
     };
-    events: true;
+    events: {
+      select: {
+        id: true;
+        title: true;
+        scheduledAt: true;
+        lifecycleStatus: true;
+        organizer: { select: { id: true; firstName: true; lastName: true } };
+      };
+    };
   };
 }>;
 
@@ -47,6 +55,15 @@ export class SiteDetailRepository {
         events: {
           orderBy: { scheduledAt: 'asc' },
           take: eventsTake,
+          select: {
+            id: true,
+            title: true,
+            scheduledAt: true,
+            lifecycleStatus: true,
+            organizer: {
+              select: { id: true, firstName: true, lastName: true },
+            },
+          },
         },
       },
     });

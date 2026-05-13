@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
@@ -23,11 +24,57 @@ class OrganizerToolkitScreen extends StatefulWidget {
 class _OrganizerToolkitScreenState extends State<OrganizerToolkitScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+  bool _authListenerAttached = false;
 
   static const int _totalPages = 8;
 
+  void _detachAuthListener() {
+    if (!_authListenerAttached) {
+      return;
+    }
+    _authListenerAttached = false;
+    ServiceLocator.instance.authState.removeListener(_onAuthStateChanged);
+  }
+
+  void _onAuthStateChanged() {
+    if (!mounted) {
+      return;
+    }
+    _exitToolkitIfAlreadyCertified();
+  }
+
+  /// [AuthState] can gain certification after `/auth/me` while this route is open.
+  void _exitToolkitIfAlreadyCertified() {
+    if (!mounted) {
+      return;
+    }
+    final ServiceLocator sl = ServiceLocator.instance;
+    if (!sl.isInitialized || !sl.authState.isOrganizerCertified) {
+      return;
+    }
+    _detachAuthListener();
+    final VoidCallback? onCertified = widget.onCertified;
+    Navigator.of(context).pop();
+    if (onCertified != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => onCertified());
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (ServiceLocator.instance.isInitialized) {
+      ServiceLocator.instance.authState.addListener(_onAuthStateChanged);
+      _authListenerAttached = true;
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _exitToolkitIfAlreadyCertified();
+    });
+  }
+
   @override
   void dispose() {
+    _detachAuthListener();
     _pageController.dispose();
     super.dispose();
   }

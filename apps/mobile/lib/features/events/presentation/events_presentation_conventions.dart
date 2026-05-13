@@ -31,7 +31,8 @@
 // Barrel import: `events_typography.dart` re-exports `app_typography.dart`.
 //
 // Discovery & cards: eventsListCardTitle, eventsListCardMeta, eventsHeroCardTitle,
-//   eventsHeroCardMeta, eventsCardBadgeAccent, eventsCardBadgeMuted.
+//   eventsHeroCardMeta, eventsCardPillLabel, eventsCardBadgeAccent, eventsCardBadgeMuted.
+// Featured hero cover uses ColorScheme.scrim + shared radii only (no hero-only palette).
 // Detail chrome: eventsDetailHeadline, eventsSectionTitle,
 //   eventsBodyProse, eventsBodyMuted, eventsInlineLabel, eventsGridPropertyValue,
 //   eventsCaptionStrong, eventsMetricValue, eventsDisplayStat.
@@ -43,7 +44,8 @@
 //   (bubble colors: `.copyWith(color: …)` on top of these bases).
 // Check-in / QR: eventsQrCaption. Semantics: eventsDestructiveCaption, eventsWarningCaption.
 // Dense titles: eventsScreenTitle.
-// Feed & calendar: eventsFeedScreenTitle, eventsSearchFieldText, eventsSearchFieldPlaceholder,
+// Feed & calendar: feed title uses [AppTypography.textTheme.headlineMedium] like reports list;
+// eventsSearchFieldText, eventsSearchFieldPlaceholder,
 //   eventsInlineInfoBanner, eventsFeedSectionTitle, eventsMicroSectionHeading,
 //   eventsCalendarMonthTitle, eventsCalendarEmbeddedMonthTitle, eventsCalendarWeekdayLabel,
 //   eventsCalendarDayNumber, eventsCalendarSectionHeader, eventsCalendarAgendaTitle,
@@ -53,8 +55,9 @@
 // 2) Mobile -> API surface matrix (current contracts)
 // -----------------------------------------------------------------------------
 // Events list/detail/lifecycle:
-// - GET    /events?status=...&category=...&limit=...&cursor=...
-//   (category: comma-separated mobile keys; status: comma-separated lifecycle keys)
+// - GET    /events?status=...&category=...&limit=...&cursor=...&nearLat=...&nearLng=...
+//   (category: comma-separated mobile keys; status: comma-separated lifecycle keys;
+//   optional viewer geo uses nearLat+nearLng per ListEventsQueryDto — not lat/lng.)
 // - GET    /events/:id
 // - GET    /events/:id/participants?limit=...&cursor=...  (joiners only; organizer from detail)
 // - POST   /events (same calendar day start/end in Europe/Skopje; end by 23:59 local)
@@ -181,19 +184,14 @@
 // - Cursor pagination (loadMore) follows the repository's active merged params.
 //
 // -----------------------------------------------------------------------------
-// 3d) Discovery shelf — "this week" (upgrade #3)
+// 3d) Skopje calendar week query helper (tests / reuse)
 // -----------------------------------------------------------------------------
 // **Week definition (product)**: the ISO calendar week (Monday–Sunday) in
 // **Europe/Skopje** that contains the reference instant, inclusive of both endpoints as
 // calendar **dates** (`dateFrom` / `dateTo` on GET /events). Implemented by
 // `skopjeCalendarWeekBoundsInclusive` + `EcoEventSearchParams.discoveryThisSkopjeCalendarWeek`.
 // This is a **Skopje wall-calendar** window, not a rolling 7-day interval from "now".
-//
-// **UI**: [EventsThisWeekShelf] on [EventsFeedScreen] (list mode, non-calendar, empty search):
-// horizontal tiles only; collapses to [SizedBox.shrink] while empty or still loading (no second
-// spinner — pull-to-refresh uses [CupertinoSliverRefreshControl] only).
-// Strip loads via [EventsRepository.fetchEventsSnapshot] so the main feed query is unchanged.
-// Client sorts snapshot rows by `siteDistanceKm` then lifecycle rank (see feed controller).
+// The feed no longer mounts a horizontal "this week" strip; the factory remains for API/tests.
 //
 // -----------------------------------------------------------------------------
 // 3c) Event detail section order (see DetailContent doc comment)
@@ -232,9 +230,16 @@
 // - eventsDetailHeadline: [TitleSection] (schedule line removed — see [DateTimeSection])
 // - eventsSectionTitle: [DetailSectionHeader]
 // - eventsListCardTitle / eventsListCardMeta: [EcoEventCard] rows
-// - eventsHeroCardTitle / eventsHeroCardMeta: [HeroEventCard] on imagery
+// - eventsCardPillLabel: [EcoEventCard] status chip, [HeroEventCard] “Up next”
+// - eventsHeroCardTitle / eventsHeroCardMeta / eventsHeroCountdownLabel: [HeroEventCard] imagery
 // - eventsFormFieldValue: create/edit picker value rows
 // - emptyStateTitle / emptyStateSubtitle: feed empty + search empty states
+//
+// Card chrome (discovery feed): [AppCardChrome.discoveryListCard] / [discoveryHeroOuter] /
+// [discoveryListCardPressed] — list rows use [AppColors.panelBackground] (neutral white) plus
+// shared border (`outlineVariant` 0.75) + dual `ColorScheme.shadow` on [EcoEventCard] and list
+// skeletons; hero shell is border + shadow only. Layout tokens:
+// [AppSpacing.eventsCardThumbnailSize], [eventsLiveAccentWidth], [eventsPulseDotSize].
 //
 // Touch targets: prefer at least 44×44 logical px for icon buttons, filter sheet
 // chips/tiles, and pill filters; [PrimaryButton] / detail sticky CTA use 56 / 54.

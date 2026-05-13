@@ -1,9 +1,22 @@
 /// <reference types="jest" />
 import { BadRequestException } from '@nestjs/common';
+import { SiteCommentsListService } from '../../src/sites/site-comments-list.service';
+import { SiteCommentsMutationsService } from '../../src/sites/site-comments-mutations.service';
 import { SiteCommentsService } from '../../src/sites/site-comments.service';
 import { SiteCommentsSort } from '../../src/sites/dto/list-site-comments-query.dto';
 import { Role } from '../../src/prisma-client';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
+
+function makeSiteCommentsService(prisma: unknown, engagement: unknown, uploads: unknown) {
+  const sitesFeed = { invalidateFeedCache: jest.fn() } as never;
+  const reporterNotifications = { emitForSiteActivity: jest.fn() } as never;
+  return new SiteCommentsService(
+    new SiteCommentsListService(prisma as never, engagement as never, uploads as never),
+    new SiteCommentsMutationsService(prisma as never, engagement as never, uploads as never),
+    sitesFeed,
+    reporterNotifications,
+  );
+}
 
 describe('SiteCommentsService', () => {
   const user: AuthenticatedUser = {
@@ -17,7 +30,7 @@ describe('SiteCommentsService', () => {
     const prisma = {} as never;
     const engagement = { ensureSiteExists: jest.fn().mockResolvedValue(undefined) } as never;
     const uploads = { signPrivateObjectKey: jest.fn().mockResolvedValue(null) } as never;
-    const svc = new SiteCommentsService(prisma, engagement, uploads);
+    const svc = makeSiteCommentsService(prisma, engagement, uploads);
 
     await expect(
       svc.createSiteComment('site-1', { body: '   ', parentId: null } as never, user),
@@ -45,7 +58,7 @@ describe('SiteCommentsService', () => {
     } as never;
     const engagement = { ensureSiteExists: jest.fn().mockResolvedValue(undefined) } as never;
     const uploads = { signPrivateObjectKey: jest.fn().mockResolvedValue(null) } as never;
-    const svc = new SiteCommentsService(prisma, engagement, uploads);
+    const svc = makeSiteCommentsService(prisma, engagement, uploads);
 
     const out = await svc.findSiteComments(
       'site-1',
@@ -99,7 +112,7 @@ describe('SiteCommentsService', () => {
     } as never;
     const engagement = { ensureSiteExists: jest.fn().mockResolvedValue(undefined) } as never;
     const uploads = { signPrivateObjectKey: jest.fn().mockResolvedValue(null) } as never;
-    const svc = new SiteCommentsService(prisma, engagement, uploads);
+    const svc = makeSiteCommentsService(prisma, engagement, uploads);
 
     const out = await svc.findSiteComments(
       'site-1',

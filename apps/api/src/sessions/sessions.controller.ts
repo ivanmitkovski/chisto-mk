@@ -12,8 +12,10 @@ import { CurrentUser } from '../auth/current-user.decorator';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { ADMIN_PANEL_ROLES } from '../auth/admin-roles';
 import { SessionsService } from './sessions.service';
+import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-error-responses.decorator';
 
 @ApiTags('admin-sessions')
+@ApiStandardHttpErrorResponses()
 @Controller('admin/sessions')
 export class SessionsController {
   constructor(private readonly sessionsService: SessionsService) {}

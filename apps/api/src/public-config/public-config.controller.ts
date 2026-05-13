@@ -2,8 +2,10 @@ import { Controller, Get } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SystemConfigService } from '../system-config/system-config.service';
 import { FeatureFlagsService } from '../feature-flags/feature-flags.service';
+import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-error-responses.decorator';
 
 @ApiTags('config')
+@ApiStandardHttpErrorResponses()
 @Controller('config')
 export class PublicConfigController {
   constructor(

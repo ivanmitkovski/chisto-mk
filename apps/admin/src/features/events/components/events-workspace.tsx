@@ -106,6 +106,7 @@ export function EventsWorkspace({
 
   const status = searchParams.get('status') ?? '';
   const moderationStatus = searchParams.get('moderationStatus') ?? '';
+  const listQuery = searchParams.get('q') ?? '';
 
   useEffect(() => {
     setData(initialData);
@@ -120,7 +121,7 @@ export function EventsWorkspace({
     setStats(initialStats);
   }, [initialStats]);
 
-  const buildUrl = (updates: { status?: string; moderationStatus?: string; page?: number }) => {
+  const buildUrl = (updates: { status?: string; moderationStatus?: string; page?: number; q?: string }) => {
     const sp = new URLSearchParams(searchParams.toString());
     if (updates.status !== undefined) {
       if (updates.status) sp.set('status', updates.status);
@@ -134,8 +135,16 @@ export function EventsWorkspace({
       if (updates.page > 1) sp.set('page', String(updates.page));
       else sp.delete('page');
     }
-    const q = sp.toString();
-    return `/dashboard/events${q ? `?${q}` : ''}`;
+    if (updates.q !== undefined) {
+      const t = updates.q.trim();
+      if (t.length >= 2) {
+        sp.set('q', t);
+      } else {
+        sp.delete('q');
+      }
+    }
+    const qs = sp.toString();
+    return `/dashboard/events${qs ? `?${qs}` : ''}`;
   };
 
   const handleStatusChange = (value: string) => {
@@ -148,7 +157,17 @@ export function EventsWorkspace({
 
   const refresh = () => router.refresh();
 
-  const totalParticipants = data.reduce((sum, e) => sum + e.participantCount, 0);
+  const totalParticipants = stats.totalParticipants;
+
+  const [searchDraft, setSearchDraft] = useState(listQuery);
+
+  useEffect(() => {
+    setSearchDraft(listQuery);
+  }, [listQuery]);
+
+  const applySearchToUrl = () => {
+    router.push(buildUrl({ q: searchDraft, page: 1 }));
+  };
 
   const toggleRowSelected = useCallback((id: string) => {
     setSelectedIds((prev) => {
@@ -297,6 +316,23 @@ export function EventsWorkspace({
                 </option>
               ))}
             </select>
+            <input
+              type="search"
+              value={searchDraft}
+              onChange={(e) => setSearchDraft(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  applySearchToUrl();
+                }
+              }}
+              placeholder="Search title or description…"
+              className={styles.filterSelect}
+              aria-label="Search events"
+            />
+            <Button variant="outline" size="sm" type="button" onClick={applySearchToUrl}>
+              Search
+            </Button>
           </div>
           <Button variant="outline" size="sm" onClick={refresh}>
             Refresh

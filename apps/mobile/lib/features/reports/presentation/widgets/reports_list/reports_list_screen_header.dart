@@ -1,10 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/observability/chisto_sentry.dart';
-import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/reports/data/outbox/report_draft_repository.dart';
@@ -17,6 +15,7 @@ import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list
 import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/report_sheet_view_model.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
+import 'package:chisto_mobile/shared/widgets/app_cupertino_search_field.dart';
 
 /// Title row + total / under-review / capacity pills for the reports list pinned header.
 class ReportsListStatsHeader extends StatelessWidget {
@@ -48,7 +47,7 @@ class ReportsListStatsHeader extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Expanded(
                 child: Text(
@@ -200,38 +199,14 @@ class ReportsListSearchBar extends StatelessWidget {
         AppSpacing.lg,
         AppSpacing.sm,
       ),
-      child: Semantics(
-        label: l10n.reportListSearchSemantic,
-        hint: hint,
-        child: TapRegion(
-          onTapOutside: (PointerDownEvent _) {
-            // Dismiss keyboard when tapping outside the field (TapRegionSurface is
-            // provided by MaterialApp / CupertinoApp under the full screen).
-            focusNode.unfocus();
-          },
-          child: CupertinoSearchTextField(
-            controller: controller,
-            focusNode: focusNode,
-            placeholder: l10n.reportListSearchPlaceholder,
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: AppColors.textPrimary),
-            placeholderStyle: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: AppColors.textMuted),
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.sm,
-              vertical: AppSpacing.radius10,
-            ),
-            backgroundColor: AppColors.inputFill,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-            onSubmitted: (_) => onSubmitted(),
-            onSuffixTap: () {
-              AppHaptics.tap();
-              onClear();
-            },
-          ),
-        ),
+      child: AppCupertinoSearchField(
+        controller: controller,
+        focusNode: focusNode,
+        placeholder: l10n.reportListSearchPlaceholder,
+        semanticLabel: l10n.reportListSearchSemantic,
+        semanticHint: hint,
+        onSubmitted: onSubmitted,
+        onClear: onClear,
       ),
     );
   }

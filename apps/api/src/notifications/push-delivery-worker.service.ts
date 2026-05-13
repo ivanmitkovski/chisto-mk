@@ -1,49 +1,123 @@
-import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { randomUUID } from 'crypto';
+import type { Client } from 'pg';
+import { NOTIFICATION_OUTBOX_ENQUEUED_CHANNEL } from '../common/pg/outbox-pg-notify';
+import { endPgOutboxListener, startPgOutboxListener } from '../common/pg/start-pg-outbox-listener';
 import { PrismaService } from '../prisma/prisma.service';
 import { FcmPushService } from './fcm-push.service';
 import { ObservabilityStore } from '../observability/observability.store';
 
 const MAX_ATTEMPTS = 5;
 const BATCH_SIZE = 50;
-const POLL_INTERVAL_MS = 5_000;
+const POLL_ACTIVE_MS = 5_000;
+const POLL_IDLE_MAX_MS = 60_000;
+/** When LISTEN is active, idle ticks use this safety poll instead of tight polling. */
+const POLL_SAFETY_LISTEN_IDLE_MS = 60_000;
 const BACKOFF_BASE_MS = 2_000;
 const LEASE_TTL_MS = 30_000;
 
 @Injectable()
 export class PushDeliveryWorkerService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(PushDeliveryWorkerService.name);
-  private timer: ReturnType<typeof setInterval> | null = null;
+  private timer: ReturnType<typeof setTimeout> | null = null;
+  private listenWakeTimer: ReturnType<typeof setTimeout> | null = null;
+  private pgListenClient: Client | null = null;
+  private pgListenConnected = false;
+  private consecutiveIdleTicks = 0;
   private readonly workerId = `worker-${process.pid}-${randomUUID().slice(0, 8)}`;
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly fcm: FcmPushService,
+    @Inject(FcmPushService) private readonly fcm: FcmPushService,
   ) {}
 
   onModuleInit() {
-    if (!this.fcm.isEnabled()) {
+    if (!this.fcm?.isEnabled()) {
       this.logger.log('Push delivery worker disabled — FCM not enabled');
       return;
     }
 
-    this.timer = setInterval(() => {
-      this.processOutbox().catch((err) =>
-        this.logger.error('Outbox processing error', err),
-      );
-    }, POLL_INTERVAL_MS);
+    void this.startPgListener();
+    this.scheduleNextTick(2_000);
     this.logger.log('Push delivery worker started');
   }
 
-  onModuleDestroy() {
+  async onModuleDestroy() {
+    if (this.listenWakeTimer) {
+      clearTimeout(this.listenWakeTimer);
+      this.listenWakeTimer = null;
+    }
     if (this.timer) {
-      clearInterval(this.timer);
+      clearTimeout(this.timer);
       this.timer = null;
     }
+    await endPgOutboxListener(this.pgListenClient);
+    this.pgListenClient = null;
+    this.pgListenConnected = false;
+  }
+
+  private async startPgListener(): Promise<void> {
+    this.pgListenClient = await startPgOutboxListener({
+      channel: NOTIFICATION_OUTBOX_ENQUEUED_CHANNEL,
+      logger: this.logger,
+      onNotify: () => this.scheduleWakeFromNotify(),
+    });
+    this.pgListenConnected = this.pgListenClient != null;
+  }
+
+  private scheduleWakeFromNotify(): void {
+    if (this.listenWakeTimer != null) {
+      clearTimeout(this.listenWakeTimer);
+    }
+    this.listenWakeTimer = setTimeout(() => {
+      this.listenWakeTimer = null;
+      this.consecutiveIdleTicks = 0;
+      this.scheduleNextTick(50);
+    }, 50);
+  }
+
+  private scheduleNextTick(delayMs: number): void {
+    if (this.timer) {
+      clearTimeout(this.timer);
+    }
+    this.timer = setTimeout(() => {
+      void this.runTick();
+    }, delayMs);
+  }
+
+  private async runTick(): Promise<void> {
+    if (!this.fcm?.isEnabled()) {
+      return;
+    }
+    let delivered = 0;
+    try {
+      delivered = await this.processOutbox();
+    } catch (err) {
+      this.logger.error('Outbox processing error', err);
+    }
+    if (delivered > 0) {
+      this.consecutiveIdleTicks = 0;
+    } else {
+      this.consecutiveIdleTicks = Math.min(this.consecutiveIdleTicks + 1, 10);
+    }
+    const jitter = Math.floor(Math.random() * 1_500);
+    if (this.pgListenConnected) {
+      if (delivered > 0) {
+        this.scheduleNextTick(POLL_ACTIVE_MS + jitter);
+      } else {
+        this.scheduleNextTick(POLL_SAFETY_LISTEN_IDLE_MS + jitter);
+      }
+      return;
+    }
+    const idleExtra =
+      this.consecutiveIdleTicks === 0
+        ? 0
+        : Math.min(POLL_IDLE_MAX_MS - POLL_ACTIVE_MS, POLL_ACTIVE_MS * this.consecutiveIdleTicks);
+    this.scheduleNextTick(POLL_ACTIVE_MS + idleExtra + jitter);
   }
 
   async processOutbox(): Promise<number> {
-    if (!this.fcm.isReady()) return 0;
+    if (!this.fcm?.isReady()) return 0;
 
     await this.refreshQueueStats();
     const now = new Date();
@@ -102,6 +176,18 @@ export class PushDeliveryWorkerService implements OnModuleInit, OnModuleDestroy 
       return 0;
     }
 
+    const notificationIds = [...new Set(claimed.map((e) => e.userNotificationId))];
+    const userIdLookup = new Map<string, string>();
+    if (notificationIds.length > 0) {
+      const notifRows = await this.prisma.userNotification.findMany({
+        where: { id: { in: notificationIds } },
+        select: { id: true, userId: true },
+      });
+      for (const r of notifRows) {
+        userIdLookup.set(r.id, r.userId);
+      }
+    }
+
     let delivered = 0;
 
     for (const entry of claimed) {
@@ -121,7 +207,11 @@ export class PushDeliveryWorkerService implements OnModuleInit, OnModuleDestroy 
       }
 
       const payload = entry.payload as { title: string; body: string; data?: Record<string, string> };
-      const result = await this.fcm.sendToToken(entry.deviceToken, payload);
+      const userId = userIdLookup.get(entry.userNotificationId);
+      const result = await this.fcm.sendToToken(entry.deviceToken, {
+        ...payload,
+        ...(userId ? { userId } : {}),
+      });
 
       if (result.success) {
         await this.prisma.notificationOutbox.update({

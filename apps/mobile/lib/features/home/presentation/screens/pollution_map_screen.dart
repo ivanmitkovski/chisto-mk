@@ -157,14 +157,20 @@ class _PollutionMapScreenState extends ConsumerState<PollutionMapScreen>
       widget.pendingSiteFocus?.addListener(_onPendingSiteFocusChanged);
     }
     if (oldWidget.isActive != widget.isActive) {
-      ref.read(mapSitesNotifierProvider.notifier).setActive(widget.isActive);
-      if (widget.isActive) {
-        unawaited(_mapLocationNotifier.startForegroundTracking());
-        _syncMapViewport(immediate: true);
-      } else {
-        ref.read(mapClusterExpansionNotifierProvider.notifier).reset();
-        unawaited(_mapLocationNotifier.stopForegroundTracking());
-      }
+      // Riverpod: do not call notifiers from [didUpdateWidget] — it runs during build.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) {
+          return;
+        }
+        ref.read(mapSitesNotifierProvider.notifier).setActive(widget.isActive);
+        if (widget.isActive) {
+          unawaited(_mapLocationNotifier.startForegroundTracking());
+          _syncMapViewport(immediate: true);
+        } else {
+          ref.read(mapClusterExpansionNotifierProvider.notifier).reset();
+          unawaited(_mapLocationNotifier.stopForegroundTracking());
+        }
+      });
     }
   }
 

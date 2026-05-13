@@ -186,6 +186,25 @@ class AppTypography {
         fontWeight: FontWeight.w500,
       );
 
+  /// Hero card countdown pill on frosted glass / busy photos ([HeroEventCard]).
+  static TextStyle eventsHeroCountdownLabel(TextTheme theme) =>
+      (theme.bodySmall ?? textTheme.bodySmall!).copyWith(
+        fontWeight: FontWeight.w600,
+        color: AppColors.textOnDark,
+        letterSpacing: -0.08,
+        height: 1.25,
+      );
+
+  /// Tight pill label on event surfaces ([EcoEventCard] status chip, [HeroEventCard] “Up next”).
+  /// Merges with [TextTheme] so [AppTheme]’s Roboto applies (unlike const [badgeLabel]).
+  static TextStyle eventsCardPillLabel(TextTheme theme, {required Color color}) =>
+      (theme.labelSmall ?? theme.bodySmall!).copyWith(
+        fontSize: 11,
+        fontWeight: FontWeight.w700,
+        letterSpacing: 0.3,
+        color: color,
+      );
+
   /// Detail section headers (matches [DetailSectionHeader] weight; scales with theme).
   static TextStyle eventsSectionTitle(TextTheme theme) =>
       (theme.titleSmall ?? textTheme.titleSmall!).copyWith(
@@ -517,13 +536,6 @@ class AppTypography {
       );
 
   // --- Feed & calendar ---
-
-  /// Events feed large headline (matches prior headlineLarge + tracking).
-  static TextStyle eventsFeedScreenTitle(TextTheme theme) =>
-      (theme.headlineLarge ?? textTheme.headlineLarge!).copyWith(
-        letterSpacing: -0.5,
-        color: AppColors.textPrimary,
-      );
 
   static TextStyle eventsSearchFieldText(TextTheme theme) =>
       (theme.bodyMedium ?? textTheme.bodyMedium!).copyWith(

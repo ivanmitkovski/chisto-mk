@@ -28,6 +28,7 @@ import 'package:chisto_mobile/features/home/presentation/widgets/pollution_site_
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:chisto_mobile/features/profile/presentation/screens/profile_screen.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
+import 'package:chisto_mobile/shared/widgets/app_refresh_indicator.dart';
 
 class PollutionFeedScreen extends ConsumerStatefulWidget {
   const PollutionFeedScreen({super.key});
@@ -148,7 +149,7 @@ class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
     );
   }
 
-  /// Shared by [RefreshIndicator], empty state retry, and any future triggers.
+  /// Shared by [AppRefreshIndicator], empty state retry, and any future triggers.
   Future<void> _performFeedRefresh() async {
     AppHaptics.medium();
     final bool hadCachedSites = ref
@@ -298,10 +299,8 @@ class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
             bottom: false,
             left: false,
             right: false,
-            child: RefreshIndicator(
+            child: AppRefreshIndicator(
               onRefresh: _performFeedRefresh,
-              color: AppColors.primary,
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               child: CustomScrollView(
                 controller: _scrollController,
                 physics: const AlwaysScrollableScrollPhysics(

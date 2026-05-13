@@ -16,6 +16,7 @@ describe('ReportsUploadService.assertReportMediaUrlsFromOurBucket', () => {
       },
     } as unknown as ConfigService;
     const s3 = new S3StorageClient(config);
+    s3.onModuleInit();
     const validator = {} as ImageContentValidator;
     const signed = {} as ReportMediaSignedUrlService;
     const avatar = {} as never;

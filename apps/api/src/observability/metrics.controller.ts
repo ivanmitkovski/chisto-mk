@@ -1,10 +1,15 @@
 import { Controller, Get, Header, Headers, UnauthorizedException } from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ObservabilityStore } from './observability.store';
+import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-error-responses.decorator';
 
+@ApiTags('metrics')
+@ApiStandardHttpErrorResponses()
 @Controller('metrics')
 export class MetricsController {
   @Get()
   @Header('Content-Type', 'text/plain; version=0.0.4')
+  @ApiOperation({ summary: 'Prometheus text exposition (protected outside development when METRICS_BEARER_TOKEN is set)' })
   metrics(@Headers('authorization') authorization?: string): string {
     const token = process.env.METRICS_BEARER_TOKEN?.trim();
     const nodeEnv = (process.env.NODE_ENV ?? 'development').trim().toLowerCase();

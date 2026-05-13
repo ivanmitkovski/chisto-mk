@@ -6,8 +6,10 @@ import { CurrentUser } from '../auth/current-user.decorator';
 import { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { WeeklyRankingsQueryDto, WeeklyRankingsResponseDto } from './dto/weekly-rankings.dto';
 import { RankingsService } from './rankings.service';
+import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-error-responses.decorator';
 
 @ApiTags('rankings')
+@ApiStandardHttpErrorResponses()
 @Controller('rankings')
 @UseGuards(ThrottlerGuard, JwtAuthGuard)
 @ApiBearerAuth()

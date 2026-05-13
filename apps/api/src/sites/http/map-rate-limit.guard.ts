@@ -27,9 +27,10 @@ export class MapRateLimitGuard implements CanActivate {
   constructor() {
     const nodeEnv = (process.env.NODE_ENV ?? 'development').trim().toLowerCase();
     if (nodeEnv === 'production' && !MapRateLimitGuard.cfg.redisUrl?.trim()) {
-      throw new Error(
-        'REDIS_URL is required in production for MapRateLimitGuard (horizontal rate limits).',
+      this.logger.error(
+        'REDIS_URL is required in production for MapRateLimitGuard (horizontal rate limits). Exiting.',
       );
+      process.exit(1);
     }
     this.redis = MapRateLimitGuard.cfg.redisUrl
       ? new Redis(MapRateLimitGuard.cfg.redisUrl, { lazyConnect: true })

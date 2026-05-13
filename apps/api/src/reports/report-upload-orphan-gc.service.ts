@@ -7,9 +7,27 @@ import { ReportsUploadService } from './reports-upload.service';
 const MIN_AGE_MS = 72 * 60 * 60 * 1000;
 const LIST_PAGE_SIZE = 250;
 const MAX_DELETES_PER_RUN = 80;
+const REFERENCE_BATCH_SIZE = 80;
 const RUN_INTERVAL_MS = 86_400_000;
 
 const REPORT_MEDIA_KEY_RE = /^reports\/[^/]+\/[^/]+\.(jpe?g|png|webp)$/i;
+
+function collectReferencedKeys(
+  batch: ReadonlyArray<{ key: string; canonicalUrl: string }>,
+  rows: ReadonlyArray<{ mediaUrls: string[] }>,
+): Set<string> {
+  const referenced = new Set<string>();
+  for (const row of rows) {
+    for (const url of row.mediaUrls) {
+      for (const { key, canonicalUrl } of batch) {
+        if (url === canonicalUrl || url === key || url.includes(key)) {
+          referenced.add(key);
+        }
+      }
+    }
+  }
+  return referenced;
+}
 
 /**
  * Best-effort deletion of report upload prefix objects that are no longer referenced on any
@@ -73,6 +91,7 @@ export class ReportUploadOrphanGcService implements OnModuleInit, OnModuleDestro
       );
       continuationToken = page.continuationToken;
 
+      const batch: Array<{ key: string; canonicalUrl: string; lastModified: Date }> = [];
       for (const { key, lastModified } of page.objects) {
         if (deleted >= MAX_DELETES_PER_RUN) {
           break outer;
@@ -83,30 +102,54 @@ export class ReportUploadOrphanGcService implements OnModuleInit, OnModuleDestro
         if (!lastModified || now - lastModified.getTime() < MIN_AGE_MS) {
           continue;
         }
-
-        const canonicalUrl = `${base}${key}`;
-        const referenced = await this.prisma.report.findFirst({
-          where: {
-            OR: [{ mediaUrls: { has: canonicalUrl } }, { mediaUrls: { has: key } }],
-          },
-          select: { id: true },
-        });
-        if (referenced) {
-          continue;
+        batch.push({ key, canonicalUrl: `${base}${key}`, lastModified });
+        if (batch.length >= REFERENCE_BATCH_SIZE) {
+          deleted += await this.deleteUnreferencedBatch(batch);
+          batch.length = 0;
+          if (deleted >= MAX_DELETES_PER_RUN) {
+            break outer;
+          }
         }
+      }
 
-        try {
-          await this.reportsUpload.deleteObjectByKey(key);
-          deleted += 1;
-          this.logger.log(`orphan_report_media_deleted key=${key}`);
-        } catch (err) {
-          this.logger.warn(`orphan_report_media_delete_failed key=${key} err=${String(err)}`);
-        }
+      if (batch.length > 0 && deleted < MAX_DELETES_PER_RUN) {
+        deleted += await this.deleteUnreferencedBatch(batch);
       }
     } while (continuationToken && deleted < MAX_DELETES_PER_RUN);
 
     if (deleted > 0) {
       this.logger.log(`report upload orphan GC finished deleted=${deleted}`);
     }
+  }
+
+  private async deleteUnreferencedBatch(
+    batch: ReadonlyArray<{ key: string; canonicalUrl: string }>,
+  ): Promise<number> {
+    if (batch.length === 0) {
+      return 0;
+    }
+    const canonicalUrls = batch.map((b) => b.canonicalUrl);
+    const keys = batch.map((b) => b.key);
+    const rows = await this.prisma.report.findMany({
+      where: {
+        OR: [{ mediaUrls: { hasSome: canonicalUrls } }, { mediaUrls: { hasSome: keys } }],
+      },
+      select: { mediaUrls: true },
+    });
+    const referenced = collectReferencedKeys(batch, rows);
+    let deleted = 0;
+    for (const { key } of batch) {
+      if (referenced.has(key)) {
+        continue;
+      }
+      try {
+        await this.reportsUpload.deleteObjectByKey(key);
+        deleted += 1;
+        this.logger.log(`orphan_report_media_deleted key=${key}`);
+      } catch (err) {
+        this.logger.warn(`orphan_report_media_delete_failed key=${key} err=${String(err)}`);
+      }
+    }
+    return deleted;
   }
 }

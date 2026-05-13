@@ -2372,8 +2372,11 @@ class AppLocalizationsSq extends AppLocalizations {
   String get notificationsMarkedUnreadLocal => 'Shënuar si i palexuar (lokal).';
 
   @override
-  String get notificationsArchivedFromView =>
-      'Njoftimi u arkivua nga kjo pamje';
+  String get notificationsArchiveFailed =>
+      'Njoftimi nuk mund të arkivohet. Provoni përsëri.';
+
+  @override
+  String get notificationsArchivedFromView => 'Njoftimi u arkivua';
 
   @override
   String get notificationsPrefsLoadFailed =>
@@ -2395,6 +2398,35 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String get notificationsPrefEnabled => 'I aktivizuar';
+
+  @override
+  String notificationsPrefSnoozedUntil(String time) {
+    return 'I shtyrë deri $time';
+  }
+
+  @override
+  String get notificationsSnoozeTitle => 'Kohëzgjatja e shtyrjes';
+
+  @override
+  String get notificationsSnooze1h => '1 orë';
+
+  @override
+  String get notificationsSnooze4h => '4 orë';
+
+  @override
+  String get notificationsSnooze8h => '8 orë';
+
+  @override
+  String get notificationsSnooze24h => '24 orë';
+
+  @override
+  String get notificationsSnooze1w => '1 javë';
+
+  @override
+  String get notificationsSnoozePermanent => 'Derisa ta aktivizoj';
+
+  @override
+  String get notificationsPauseAll => 'Ndalo të gjitha njoftimet';
 
   @override
   String get notificationsTypeSiteUpdates => 'Përditësime vendesh';
@@ -5538,7 +5570,10 @@ class AppLocalizationsSq extends AppLocalizations {
   String get eventsFeedSemantic => 'Lista e ngjarjeve';
 
   @override
-  String get eventsFeedTitle => 'Ngjarje';
+  String get eventsFeedLoadingSemantic => 'Po ngarkohen ngjarjet';
+
+  @override
+  String get eventsFeedTitle => 'Eko-ngjarje';
 
   @override
   String get eventsFeedCreateSemantic => 'Krijo ngjarje';
@@ -6127,6 +6162,10 @@ class AppLocalizationsSq extends AppLocalizations {
   String get errorUserUnauthorized => 'Hyni përsëri për të vazhduar.';
 
   @override
+  String get errorUserSessionRevoked =>
+      'Sesioni nuk është më i vlefshëm. Hyni përsëri.';
+
+  @override
   String get errorUserForbidden => 'Nuk keni leje për këtë veprim.';
 
   @override
@@ -6163,6 +6202,9 @@ class AppLocalizationsSq extends AppLocalizations {
   @override
   String get eventChatEmptyBody =>
       'Koordinohuni me vullnetarët e tjerë para dhe gjatë ngjarjes.';
+
+  @override
+  String get eventChatEmptySayHello => 'Thuaj përshëndetje';
 
   @override
   String get eventChatMessageRemoved => 'Ky mesazh u hoq';
@@ -6707,6 +6749,10 @@ class AppLocalizationsSq extends AppLocalizations {
       'Duke u rilidhur për përditësime të drejtpërdrejta…';
 
   @override
+  String get reportsSseOfflineBanner =>
+      'Përditësimet e drejtpërdrejta janë të fikura. Rilidhu kur je online ose provo përsëri.';
+
+  @override
   String get reportsSseReconnectAction => 'Rilidh';
 
   @override
@@ -6831,4 +6877,194 @@ class AppLocalizationsSq extends AppLocalizations {
   @override
   String get mapWhatsNewBody =>
       'Parapërgatitje më e zgjuar, grupe më të qëndrueshme dhe rrjedha më e sigurt e hartës.';
+
+  @override
+  String get pushPermissionRationaleTitle => 'Qëndro në hap';
+
+  @override
+  String get pushPermissionRationaleBody =>
+      'Lejo njoftimet për kujtesat e pastrimit, përditësimet e ngjarjeve dhe mesazhet në bisedë. Mund ta ndryshosh këtë në Cilësimet.';
+
+  @override
+  String get pushPermissionRationaleAllow => 'Lejo njoftimet';
+
+  @override
+  String get pushPermissionRationaleNotNow => 'Jo tani';
+
+  @override
+  String get pushChannelDefaultName => 'Chisto.mk';
+
+  @override
+  String get pushChannelDefaultDescription => 'Njoftime të përgjithshme';
+
+  @override
+  String get eventChatPushChannelDescription =>
+      'Mesazhe për pastrimet ku jeni regjistruar';
+
+  @override
+  String get micPermissionRationaleTitle => 'Qasja në mikrofon';
+
+  @override
+  String get micPermissionRationaleBody =>
+      'Mesazhet zanore në bisedën e ngjarjes përdorin mikrofonin tuaj vetëm gjatë regjistrimit.';
+
+  @override
+  String get micPermissionRationaleAllow => 'Lejo mikrofonin';
+
+  @override
+  String get micPermissionRationaleNotNow => 'Jo tani';
+
+  @override
+  String get micPermissionOpenSettings => 'Hap Cilësimet';
+
+  @override
+  String get photoSourceModalTitle => 'Shto foto';
+
+  @override
+  String get photoSourceModalSubtitle => 'Zgjidhni si të shtoni foton e parë.';
+
+  @override
+  String get photoSourceModalHint =>
+      'Mund ta shqyrtoni foton para se të shtohet.';
+
+  @override
+  String get photoSourceTakePhoto => 'Bëj foto';
+
+  @override
+  String get photoSourceTakePhotoSubtitle => 'Kapni një pamje të qartë tani.';
+
+  @override
+  String get photoSourceBestChoiceBadge => 'Zgjedhja më e mirë';
+
+  @override
+  String get photoSourceChooseFromLibrary => 'Zgjidh nga biblioteka';
+
+  @override
+  String get photoSourceChooseFromLibrarySubtitle =>
+      'Përdorni një foto që e keni tashmë në pajisje.';
+
+  @override
+  String get photoSourceCloseSemanticLabel => 'Mbyll';
+
+  @override
+  String get locationPickerStatePermissionNeeded =>
+      'Nevojitet leja e vendndodhjes';
+
+  @override
+  String get locationPickerStateDetectingPosition =>
+      'Po zbulohet pozicioni juaj';
+
+  @override
+  String get locationPickerStateCheckingLocation =>
+      'Po kontrollohet vendndodhja…';
+
+  @override
+  String get locationPickerStateCurrentLocationUnavailable =>
+      'Vendndodhja aktuale nuk ofrohet';
+
+  @override
+  String get locationPickerStateReviewDetectedLocation =>
+      'Rishikoni vendndodhjen e zbuluar';
+
+  @override
+  String get locationPickerStateOutsideMacedonia =>
+      'Vendndodhja është jashtë Maqedonisë';
+
+  @override
+  String get locationPickerStatePinNeedsConfirmation =>
+      'Pin-i kërkon konfirmim';
+
+  @override
+  String get locationPickerStateLocationConfirmed => 'Vendndodhja u konfirmua';
+
+  @override
+  String get locationPickerStateTapConfirmWhenReady =>
+      'Prekni Konfirmo kur të jeni gati';
+
+  @override
+  String locationPickerScreenSemantics(String stateLabel) {
+    return 'Zgjedhësi i vendndodhjes. $stateLabel';
+  }
+
+  @override
+  String get locationPickerMapSemantics =>
+      'Harta. Tërhiqeni për të lëvizur pin-in. Pin-i nuk mund të dalë nga Maqedonia.';
+
+  @override
+  String get locationPickerHelperReviewGps =>
+      'Gjetëm vendndodhjen tuaj aktuale. Rishikoni pin-in, pastaj konfirmoni.';
+
+  @override
+  String get locationPickerHelperReadyToSubmit =>
+      'Vendndodhja e fiksuar është gati për dërgim.';
+
+  @override
+  String get locationPickerHelperMovePinConfirm =>
+      'Lëvizni pin-in në vendin e saktë, pastaj prekni Konfirmo. Harta mbetet brenda Maqedonisë.';
+
+  @override
+  String get locationPickerRetryAddressHint =>
+      'Prekni dy herë për të kërkuar përsëri adresën.';
+
+  @override
+  String get locationPickerAddressLookupUnavailableBody =>
+      'Kërkimi i adresës nuk ofrohet. Prapë mund të konfirmoni pin-in.';
+
+  @override
+  String get locationPickerBannerPermissionOff =>
+      'Qasja në vendndodhje është fikur. Lëvizni hartën manualisht, pastaj konfirmoni pin-in.';
+
+  @override
+  String get locationPickerBannerGpsOutsideTitle =>
+      'Vendndodhja aktuale jashtë mbulimit';
+
+  @override
+  String get locationPickerBannerGpsOutsideBody =>
+      'GPS është jashtë Maqedonisë. Lëvizni pin-in manualisht ose provoni përsëri.';
+
+  @override
+  String get locationPickerConfirmSemanticsWhenUnset =>
+      'Konfirmo vendndodhjen. Vendosni këtë pikë si vendndodhjen e raportit';
+
+  @override
+  String get locationPickerConfirmSemanticsWhenConfirmed =>
+      'Konfirmo vendndodhjen. Vendndodhja është tashmë e konfirmuar';
+
+  @override
+  String get locationPickerConfirmHintDone =>
+      'Vendndodhja është vendosur për këtë raport.';
+
+  @override
+  String get locationPickerConfirmHintPending =>
+      'Prekni dy herë për të vendosur këtë pikë si vendndodhjen e raportit.';
+
+  @override
+  String get locationPickerConfirmChecking => 'Duke kontrolluar…';
+
+  @override
+  String get locationPickerConfirmLocation => 'Konfirmo vendndodhjen';
+
+  @override
+  String get locationPickerAddressChecking => 'Duke kontrolluar adresën…';
+
+  @override
+  String locationPickerAddressUnavailableWithCoords(String coords) {
+    return 'Adresa nuk ofrohet. Koordinatat: $coords';
+  }
+
+  @override
+  String locationPickerAddressNear(String address) {
+    return 'Afër $address';
+  }
+
+  @override
+  String get locationPickerAddressPlaceholder => '—';
+
+  @override
+  String get locationPickerUseCurrentLocationLabel =>
+      'Përdor vendndodhjen aktuale.';
+
+  @override
+  String get locationPickerUseCurrentLocationHint =>
+      'Prekni dy herë për të qendruar hartën në pozicionin GPS nëse është brenda Maqedonisë.';
 }

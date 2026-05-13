@@ -1,12 +1,12 @@
 import { EMPTY } from 'rxjs';
 import { Role } from '../../src/prisma-client';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
-import { EventChatController } from '../../src/event-chat/event-chat.controller';
-import { EventChatService } from '../../src/event-chat/event-chat.service';
+import { EventChatReadController } from '../../src/event-chat/event-chat-read.controller';
+import { EventChatListService } from '../../src/event-chat/event-chat-list.service';
+import { EventChatPresenceService } from '../../src/event-chat/event-chat-presence.service';
 import { EventChatSseService } from '../../src/event-chat/event-chat-sse.service';
-import { EventChatUploadService } from '../../src/event-chat/event-chat-upload.service';
 
-describe('EventChatController', () => {
+describe('EventChatReadController', () => {
   const user: AuthenticatedUser = {
     userId: 'u-chat-1',
     email: 'u@chisto.mk',
@@ -19,24 +19,24 @@ describe('EventChatController', () => {
       getReplaySince: () => [],
       getStream: () => EMPTY,
     };
-    const controller = new EventChatController(
-      {} as EventChatService,
+    const controller = new EventChatReadController(
+      {} as EventChatListService,
+      {} as EventChatPresenceService,
       sse as EventChatSseService,
-      {} as EventChatUploadService,
     );
     expect(controller).toBeDefined();
   });
 
-  it('unreadCount delegates to EventChatService', async () => {
+  it('unreadCount delegates to EventChatPresenceService', async () => {
     const unreadCount = jest.fn().mockResolvedValue({ count: 3 });
     const sse: Pick<EventChatSseService, 'getReplaySince' | 'getStream'> = {
       getReplaySince: () => [],
       getStream: () => EMPTY,
     };
-    const controller = new EventChatController(
-      { unreadCount } as unknown as EventChatService,
+    const controller = new EventChatReadController(
+      {} as EventChatListService,
+      { unreadCount } as unknown as EventChatPresenceService,
       sse as EventChatSseService,
-      {} as EventChatUploadService,
     );
 
     await expect(controller.unreadCount(user, 'evt-1')).resolves.toEqual({ count: 3 });

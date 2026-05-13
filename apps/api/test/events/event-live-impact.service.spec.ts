@@ -3,7 +3,7 @@
 import { NotFoundException } from '@nestjs/common';
 import { Role } from '../../src/prisma-client';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
-import { EventCheckInGateway } from '../../src/events/event-check-in.gateway';
+import { EventCheckInRoomEmitterService } from '../../src/events/event-check-in-room-emitter.service';
 import { EventLiveImpactEventsService } from '../../src/events/event-live-impact-events.service';
 import { EventLiveImpactService } from '../../src/events/event-live-impact.service';
 import { PrismaService } from '../../src/prisma/prisma.service';
@@ -23,8 +23,8 @@ describe('EventLiveImpactService', () => {
       cleanupEvent: { findFirst: jest.fn().mockResolvedValue(null) },
     } as unknown as PrismaService;
     const bus = {} as unknown as EventLiveImpactEventsService;
-    const gateway = { emitToRoom: jest.fn() } as unknown as EventCheckInGateway;
-    const svc = new EventLiveImpactService(prisma, bus, gateway);
+    const roomEmitter = { emitToRoom: jest.fn() } as unknown as EventCheckInRoomEmitterService;
+    const svc = new EventLiveImpactService(prisma, bus, roomEmitter);
 
     await expect(svc.getSnapshot('evt-1', user())).rejects.toBeInstanceOf(NotFoundException);
   });

@@ -11,7 +11,7 @@ import { canWriteCleanupEvents } from '@/features/events/lib/cleanup-events-writ
 import { ApiError } from '@/lib/api';
 
 type PageProps = {
-  searchParams: Promise<{ status?: string; moderationStatus?: string; page?: string }>;
+  searchParams: Promise<{ status?: string; moderationStatus?: string; page?: string; q?: string }>;
 };
 
 export default async function EventsPage(props: PageProps) {
@@ -24,6 +24,8 @@ export default async function EventsPage(props: PageProps) {
   const moderationStatus = (params.moderationStatus === 'PENDING' || params.moderationStatus === 'APPROVED' || params.moderationStatus === 'DECLINED'
     ? params.moderationStatus
     : undefined) as 'PENDING' | 'APPROVED' | 'DECLINED' | undefined;
+  const qRaw = params.q?.trim() ?? '';
+  const q = qRaw.length >= 2 ? qRaw : undefined;
 
   let result: Awaited<ReturnType<typeof getCleanupEvents>>;
   let stats: Awaited<ReturnType<typeof getEventsStats>>;
@@ -31,7 +33,13 @@ export default async function EventsPage(props: PageProps) {
   try {
     const [me, listResult, statsResult] = await Promise.all([
       getMeProfile(),
-      getCleanupEvents({ page, limit, ...(status ? { status } : {}), ...(moderationStatus ? { moderationStatus } : {}) }),
+      getCleanupEvents({
+        page,
+        limit,
+        ...(status ? { status } : {}),
+        ...(moderationStatus ? { moderationStatus } : {}),
+        ...(q ? { q } : {}),
+      }),
       getEventsStats(),
     ]);
     canWriteCleanupEventsFlag = canWriteCleanupEvents(me.role);

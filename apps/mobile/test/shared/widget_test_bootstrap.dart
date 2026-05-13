@@ -6,6 +6,7 @@ import 'package:chisto_mobile/core/network/connectivity_gate.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_local_notifications_platform_interface/flutter_local_notifications_platform_interface.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hive/hive.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -42,6 +43,7 @@ Future<void> bootstrapWidgetTests() async {
   final Directory dir = await Directory.systemTemp.createTemp(
     'chisto_widget_test_',
   );
+  Hive.init(dir.path);
   PathProviderPlatform.instance = _WidgetTestPathProvider(dir.path);
   SharedPreferences.setMockInitialValues(<String, Object>{});
   ConnectivityGate.check = () async => <ConnectivityResult>[

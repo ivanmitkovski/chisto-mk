@@ -1,4 +1,4 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit, Optional } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
 
@@ -12,14 +12,16 @@ export class ChatEncryptionService implements OnModuleInit {
   private key: Buffer | null = null;
   private _enabled = false;
 
-  constructor(private readonly config: ConfigService) {}
+  constructor(@Optional() private readonly config: ConfigService | null) {}
 
   get enabled(): boolean {
     return this._enabled;
   }
 
   onModuleInit(): void {
-    const hex = this.config.get<string>('CHAT_ENCRYPTION_KEY')?.trim();
+    const hex =
+      this.config?.get<string>('CHAT_ENCRYPTION_KEY')?.trim() ??
+      process.env.CHAT_ENCRYPTION_KEY?.trim();
     if (!hex || hex.length !== 64) {
       this.logger.warn(
         'CHAT_ENCRYPTION_KEY missing or invalid (expected 64 hex chars / 32 bytes). ' +

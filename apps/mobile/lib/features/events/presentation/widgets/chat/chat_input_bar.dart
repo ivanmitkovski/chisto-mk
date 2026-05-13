@@ -11,6 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
+import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/events_diagnostic_log.dart';
@@ -21,13 +22,19 @@ import 'package:chisto_mobile/features/events/data/chat/event_chat_message.dart'
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_input_bar_attach_option_row.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_theme.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/voice_recording_meter.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+
+/// One-time in-app rationale before the OS microphone prompt (parity with push flow).
+const String kEventChatMicRationaleCompletedKey =
+    'event_chat_mic_rationale_completed_v1';
 
 class ChatInputBar extends StatefulWidget {
   const ChatInputBar({
     super.key,
     required this.onSend,
+    this.composerFocusNode,
     this.replyTo,
     this.onCancelReply,
     this.editingMessage,
@@ -41,6 +48,8 @@ class ChatInputBar extends StatefulWidget {
   });
 
   final Future<void> Function(String text) onSend;
+  /// When set, the screen owns the node (e.g. to focus from an empty-state CTA).
+  final FocusNode? composerFocusNode;
   final EventChatMessage? replyTo;
   final VoidCallback? onCancelReply;
   final EventChatMessage? editingMessage;
@@ -66,7 +75,8 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
   /// Shorter than [kLongPressTimeout] so recording starts closer to iMessage.
   static const Duration _kVoiceLongPressDuration = Duration(milliseconds: 200);
   final TextEditingController _controller = TextEditingController();
-  final FocusNode _focusNode = FocusNode();
+  late final FocusNode _focusNode;
+  late final bool _ownsComposerFocus;
   late final AnimationController _sendAnim;
   bool _sending = false;
   final List<XFile> _stagedImages = <XFile>[];
@@ -92,6 +102,13 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
   @override
   void initState() {
     super.initState();
+    if (widget.composerFocusNode != null) {
+      _focusNode = widget.composerFocusNode!;
+      _ownsComposerFocus = false;
+    } else {
+      _focusNode = FocusNode();
+      _ownsComposerFocus = true;
+    }
     _sendAnim = AnimationController(vsync: this, duration: AppMotion.xFast);
     if (widget.editingMessage != null) {
       _controller.text = widget.editingMessage!.body ?? '';
@@ -116,7 +133,9 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
     _stopVoiceDurationUi();
     unawaited(_voiceRecorder.dispose());
     _controller.dispose();
-    _focusNode.dispose();
+    if (_ownsComposerFocus) {
+      _focusNode.dispose();
+    }
     _sendAnim.dispose();
     super.dispose();
   }
@@ -824,20 +843,93 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
     unawaited(_beginVoiceRecording());
   }
 
+  Future<void> _showMicOpenSettingsDialog() async {
+    if (!mounted) return;
+    final AppLocalizations l10n = context.l10n;
+    await showDialog<void>(
+      context: context,
+      builder: (BuildContext c) => AlertDialog(
+        title: Text(l10n.eventChatMicPermissionDenied),
+        content: Text(l10n.micPermissionRationaleBody),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(c).pop(),
+            child: Text(l10n.commonCancel),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(c).pop();
+              unawaited(openAppSettings());
+            },
+            child: Text(l10n.micPermissionOpenSettings),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// In-app rationale once, then OS prompt; on permanent denial offers Settings.
+  Future<bool> _requestMicrophoneWithRationale() async {
+    PermissionStatus st = await Permission.microphone.status;
+    if (st.isGranted) {
+      return true;
+    }
+
+    final prefs = ServiceLocator.instance.preferences;
+    if (prefs.getBool(kEventChatMicRationaleCompletedKey) != true) {
+      if (!mounted) {
+        return false;
+      }
+      final AppLocalizations l10n = context.l10n;
+      final bool? accepted = await showDialog<bool>(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext c) => AlertDialog(
+          title: Text(l10n.micPermissionRationaleTitle),
+          content: Text(l10n.micPermissionRationaleBody),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(c).pop(false),
+              child: Text(l10n.micPermissionRationaleNotNow),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(c).pop(true),
+              child: Text(l10n.micPermissionRationaleAllow),
+            ),
+          ],
+        ),
+      );
+      await prefs.setBool(kEventChatMicRationaleCompletedKey, true);
+      if (accepted != true) {
+        return false;
+      }
+    }
+
+    st = await Permission.microphone.request();
+    if (!st.isGranted) {
+      if (mounted) {
+        if (st.isPermanentlyDenied) {
+          await _showMicOpenSettingsDialog();
+        } else {
+          AppSnack.show(
+            context,
+            message: context.l10n.eventChatMicPermissionDenied,
+          );
+        }
+      }
+      return false;
+    }
+    return true;
+  }
+
   Future<void> _beginVoiceRecording() async {
     if (!_voiceAttachAvailable || _sending || _voiceReviewFile != null) {
       _voicePressHeld = false;
       return;
     }
-    final PermissionStatus st = await Permission.microphone.request();
-    if (!st.isGranted) {
+    final bool micOk = await _requestMicrophoneWithRationale();
+    if (!micOk) {
       _voicePressHeld = false;
-      if (mounted) {
-        AppSnack.show(context, message: context.l10n.eventChatMicPermissionDenied);
-        if (Platform.isIOS && st.isPermanentlyDenied) {
-          await openAppSettings();
-        }
-      }
       return;
     }
     if (!await _voiceRecorder.hasPermission()) {

@@ -6,6 +6,7 @@ import 'package:chisto_mobile/features/reports/presentation/l10n/report_category
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
+import 'package:chisto_mobile/shared/widgets/app_action_sheet.dart';
 import 'package:flutter/cupertino.dart';
 
 /// Modal picker for report category with icons.
@@ -15,7 +16,7 @@ void showReportCategoryPicker(
   required void Function(ReportCategory) onSelected,
 }) {
   AppHaptics.tap();
-  showCupertinoModalPopup<void>(
+  showAppActionSheet<void>(
     context: context,
     builder: (BuildContext context) {
       final AppLocalizations l10n = context.l10n;

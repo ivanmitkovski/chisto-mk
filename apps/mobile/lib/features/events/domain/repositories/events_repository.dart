@@ -9,6 +9,9 @@ import 'package:flutter/foundation.dart';
 abstract class EventsRepository implements Listenable {
   List<EcoEvent> get events;
 
+  /// Title suggestions from the last `POST /events/search` (API only; empty otherwise).
+  List<String> get lastRankedSearchSuggestions;
+
   /// Last time a list page fetch completed successfully ([refreshEvents] / [loadMore]).
   /// Null when unknown (tests); used for optional tab-revisit refresh throttling.
   DateTime? get lastSuccessfulListRefreshAt;
@@ -110,3 +113,4 @@ abstract class EventsRepository implements Listenable {
   /// One-shot `GET /events` for [params] without replacing the active feed cache.
   Future<List<EcoEvent>> fetchEventsSnapshot(EcoEventSearchParams params);
 }
+

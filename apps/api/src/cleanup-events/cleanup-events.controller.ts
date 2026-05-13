@@ -22,8 +22,11 @@ import { PatchCleanupEventDto } from './dto/patch-cleanup-event.dto';
 import { ListCleanupEventsQueryDto } from './dto/list-cleanup-events-query.dto';
 import { BulkModerateCleanupEventsDto } from './dto/bulk-moderate-cleanup-events.dto';
 import { ListCheckInRiskSignalsQueryDto } from './dto/list-check-in-risk-signals-query.dto';
+import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
+import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-error-responses.decorator';
 
 @ApiTags('admin-cleanup-events')
+@ApiStandardHttpErrorResponses()
 @Controller('admin/cleanup-events')
 export class CleanupEventsController {
   constructor(private readonly cleanupEventsService: CleanupEventsService) {}
@@ -72,16 +75,9 @@ export class CleanupEventsController {
   @ApiOperation({ summary: 'Audit trail for a cleanup event' })
   @ApiOkResponse({ description: 'Audit log entries' })
   @ApiAdminCleanupEventsStandardErrors()
-  listAudit(
-    @Param('id', ParseCuidPipe) id: string,
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
-  ) {
-    const p = page != null && page !== '' ? Math.max(1, parseInt(page, 10) || 1) : 1;
-    const l =
-      limit != null && limit !== ''
-        ? Math.min(100, Math.max(1, parseInt(limit, 10) || 50))
-        : 50;
+  listAudit(@Param('id', ParseCuidPipe) id: string, @Query() pagination: PaginationQueryDto) {
+    const p = pagination.page ?? 1;
+    const l = pagination.limit ?? 50;
     return this.cleanupEventsService.listAuditTrail(id, { page: p, limit: l });
   }
 

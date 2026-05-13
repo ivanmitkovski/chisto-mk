@@ -1,12 +1,13 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsDateString, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsDateString, IsOptional, IsString, Matches } from 'class-validator';
+import { PRISMA_CUID_REGEX } from '../../common/validators/is-cuid.validator';
 
 export class CheckEventConflictQueryDto {
   @ApiProperty({ description: 'Pollution site id' })
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   @IsString()
-  @MinLength(1)
+  @Matches(PRISMA_CUID_REGEX, { message: 'siteId must be a valid cuid' })
   siteId!: string;
 
   @ApiProperty({ description: 'Proposed event start (ISO 8601)' })
@@ -24,6 +25,6 @@ export class CheckEventConflictQueryDto {
   @IsOptional()
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   @IsString()
-  @MinLength(1)
+  @Matches(PRISMA_CUID_REGEX, { message: 'excludeEventId must be a valid cuid' })
   excludeEventId?: string;
 }

@@ -1,5 +1,6 @@
 /// <reference types="jest" />
 
+import { InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PendingCheckInService } from '../../src/events/pending-check-in.service';
 
@@ -30,7 +31,16 @@ describe('PendingCheckInService', () => {
     } as unknown as ConfigService;
 
     const svc = new PendingCheckInService(config);
-    expect(() => svc.onModuleInit()).toThrow(/Redis is required/);
+    let caught: unknown;
+    try {
+      svc.onModuleInit();
+    } catch (err) {
+      caught = err;
+    }
+    expect(caught).toBeInstanceOf(InternalServerErrorException);
+    expect((caught as InternalServerErrorException).getResponse()).toMatchObject({
+      code: 'CHECK_IN_REDIS_REQUIRED',
+    });
   });
 
   it('throws on module init when CHECK_IN_REQUIRE_REDIS is true without REDIS_URL', () => {
@@ -45,6 +55,15 @@ describe('PendingCheckInService', () => {
     } as unknown as ConfigService;
 
     const svc = new PendingCheckInService(config);
-    expect(() => svc.onModuleInit()).toThrow(/Redis is required/);
+    let caught: unknown;
+    try {
+      svc.onModuleInit();
+    } catch (err) {
+      caught = err;
+    }
+    expect(caught).toBeInstanceOf(InternalServerErrorException);
+    expect((caught as InternalServerErrorException).getResponse()).toMatchObject({
+      code: 'CHECK_IN_REDIS_REQUIRED',
+    });
   });
 });

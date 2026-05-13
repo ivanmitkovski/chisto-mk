@@ -3,9 +3,10 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ReportSideEffectKind, ReportSideEffectStatus, ReportStatus, SiteStatus } from '../../prisma-client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../../audit/audit.service';
+import { reportStatusCopy } from '../../notifications/notification-templates';
 import { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
-import { ReportEventsService } from '../../admin-events/report-events.service';
-import { SiteEventsService } from '../../admin-events/site-events.service';
+import { ReportEventsService } from '../../admin-realtime/report-events.service';
+import { SiteEventsService } from '../../admin-realtime/site-events.service';
 import { ReportsOwnerEventsService } from '../reports-owner-events.service';
 import {
   DuplicateMergePostTxInput,
@@ -203,10 +204,11 @@ export class ReportSideEffectProcessorService {
       const uniqueRecipients = [...new Set(recipientUserIds)];
       if (uniqueRecipients.length > 0) {
         const statusLabel = raw.toStatus.toLowerCase().replace(/_/g, ' ');
+        const copy = reportStatusCopy('en', statusLabel);
         this.eventEmitter.emit('notification.send', {
           recipientUserIds: uniqueRecipients,
-          title: 'Report status updated',
-          body: `Your report has been ${statusLabel}`,
+          title: copy.title,
+          body: copy.body,
           type: 'REPORT_STATUS',
           threadKey: `report:${raw.reportId}`,
           groupKey: `REPORT_STATUS:site:${raw.siteId}`,

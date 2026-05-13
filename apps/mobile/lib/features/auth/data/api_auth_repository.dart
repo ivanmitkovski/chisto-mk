@@ -13,7 +13,7 @@ import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/features/profile/presentation/providers/profile_avatar_notifier.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Citizen auth over HTTP — paths align with NestJS `AuthController` in `apps/api`:
+/// Citizen auth over HTTP — paths align with NestJS `auth/*` controllers in `apps/api`:
 /// `POST /auth/register`, `/auth/login`, `/auth/refresh`, `/auth/logout`;
 /// `POST /auth/otp/send`, `/auth/otp/verify`,
 /// `/auth/password-reset/request`, `/auth/password-reset/verify-code`,
@@ -22,6 +22,20 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// multipart `POST`/`DELETE` `/auth/me/avatar`.
 const String _keyUserId = 'chisto_user_id';
 const String _keyDisplayName = 'chisto_display_name';
+
+/// Parses `/auth/me` or auth `user` organizer certification timestamp.
+///
+/// Returns null for empty or unparseable values (never throws on bad types).
+DateTime? _parseOrganizerCertifiedAtField(dynamic raw) {
+  if (raw == null) {
+    return null;
+  }
+  final String s = raw is String ? raw.trim() : raw.toString().trim();
+  if (s.isEmpty) {
+    return null;
+  }
+  return DateTime.tryParse(s);
+}
 
 class ApiAuthRepository implements AuthRepository {
   ApiAuthRepository({
@@ -198,7 +212,11 @@ class ApiAuthRepository implements AuthRepository {
       await _client.delete('/auth/me');
       await _performLocalLogout();
     } on AppError catch (e) {
-      if (e.code == 'UNAUTHORIZED' || e.code == 'INVALID_TOKEN_USER' || e.code == 'FORBIDDEN') {
+      if (e.code == 'UNAUTHORIZED' ||
+          e.code == 'INVALID_TOKEN_USER' ||
+          e.code == 'SESSION_REVOKED' ||
+          e.code == 'ACCOUNT_NOT_ACTIVE' ||
+          e.code == 'FORBIDDEN') {
         await _performLocalLogout();
       }
       rethrow;
@@ -322,7 +340,9 @@ class ApiAuthRepository implements AuthRepository {
       _scheduleProactiveRefresh();
       unawaited(_initPushAfterAuth());
     } on AppError catch (e) {
-      if (e.code == 'UNAUTHORIZED' || e.code == 'INVALID_TOKEN_USER') {
+      if (e.code == 'UNAUTHORIZED' ||
+          e.code == 'INVALID_TOKEN_USER' ||
+          e.code == 'SESSION_REVOKED') {
         try {
           await refreshSession();
           _scheduleProactiveRefresh();
@@ -360,11 +380,9 @@ class ApiAuthRepository implements AuthRepository {
         priorUserId != id;
     final bool hasOrganizerCertifiedAtKey =
         user.containsKey('organizerCertifiedAt');
-    final String? certifiedAtRaw = user['organizerCertifiedAt'] as String?;
-    final DateTime? organizerCertifiedAt =
-        certifiedAtRaw != null && certifiedAtRaw.trim().isNotEmpty
-            ? DateTime.tryParse(certifiedAtRaw.trim())
-            : null;
+    final DateTime? organizerCertifiedAt = hasOrganizerCertifiedAtKey
+        ? _parseOrganizerCertifiedAtField(user['organizerCertifiedAt'])
+        : null;
 
     _authState.setAuthenticated(
       userId: id,
@@ -395,27 +413,38 @@ class ApiAuthRepository implements AuthRepository {
     final String lastName = json['lastName'] as String? ?? '';
     final String displayName = '$firstName $lastName'.trim();
     final String? phoneNumber = json['phoneNumber'] as String?;
-    final String? certifiedAtRaw = json['organizerCertifiedAt'] as String?;
-    final DateTime? organizerCertifiedAt =
-        certifiedAtRaw != null ? DateTime.tryParse(certifiedAtRaw) : null;
+    // Only sync organizer certification when the server includes the field.
+    // Otherwise preserve local state (secure storage + [AuthState]) so a partial
+    // `/auth/me` payload cannot clear an existing certification.
+    final bool hasOrganizerCertifiedAtKey =
+        json.containsKey('organizerCertifiedAt');
+    final DateTime? organizerCertifiedAtFromServer = hasOrganizerCertifiedAtKey
+        ? _parseOrganizerCertifiedAtField(json['organizerCertifiedAt'])
+        : null;
 
     _authState.setAuthenticated(
       userId: id,
       displayName: displayName.isEmpty ? id : displayName,
       accessToken: accessToken,
       phoneNumber: phoneNumber,
-      organizerCertifiedAt: organizerCertifiedAt,
-      syncOrganizerCertifiedAt: true,
+      organizerCertifiedAt: hasOrganizerCertifiedAtKey
+          ? organizerCertifiedAtFromServer
+          : _authState.organizerCertifiedAt,
+      syncOrganizerCertifiedAt: hasOrganizerCertifiedAtKey,
     );
-    ServiceLocator.instance.providerContainer
-        .read(profileAvatarNotifierProvider.notifier)
-        .setRemoteUrl(_extractAvatarUrl(json));
+    if (ServiceLocator.instance.isInitialized) {
+      ServiceLocator.instance.providerContainer
+          .read(profileAvatarNotifierProvider.notifier)
+          .setRemoteUrl(_extractAvatarUrl(json));
+    }
     await _tokenStorage.saveSessionData(
       userId: id,
       displayName: displayName.isEmpty ? id : displayName,
       phoneNumber: phoneNumber,
     );
-    await _tokenStorage.writeOrganizerCertifiedAt(organizerCertifiedAt);
+    if (hasOrganizerCertifiedAtKey) {
+      await _tokenStorage.writeOrganizerCertifiedAt(organizerCertifiedAtFromServer);
+    }
     _scheduleProactiveRefresh();
   }
 

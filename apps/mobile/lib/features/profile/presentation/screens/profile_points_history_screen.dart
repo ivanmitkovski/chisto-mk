@@ -13,10 +13,13 @@ import 'package:chisto_mobile/features/profile/presentation/widgets/points_histo
 import 'package:chisto_mobile/features/profile/presentation/widgets/points_history_milestone_chip.dart';
 import 'package:chisto_mobile/features/profile/presentation/widgets/points_history_summary_strip.dart';
 import 'package:chisto_mobile/features/profile/presentation/widgets/profile_points_history_skeleton.dart';
+import 'package:chisto_mobile/features/profile/presentation/widgets/profile_scroll_bottom_shadow_clipper.dart';
 import 'package:chisto_mobile/features/profile/presentation/widgets/profile_sub_screen_header.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/shared/widgets/animated_phase_switcher.dart';
 import 'package:chisto_mobile/shared/widgets/app_error_view.dart';
+import 'package:chisto_mobile/shared/widgets/app_refresh_indicator.dart';
+import 'package:chisto_mobile/shared/widgets/no_overscroll_overlay_scroll_behavior.dart';
 import 'package:intl/intl.dart';
 
 sealed class _HistoryListEntry {
@@ -168,274 +171,260 @@ class _ProfilePointsHistoryScreenState
     final int footerCount =
         (showLoadMoreError ? 1 : 0) + (showLoadingFooter ? 1 : 0);
 
-    return Semantics(
-      namesRoute: true,
-      label: context.l10n.profilePointsHistoryTitle,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(top: AppSpacing.md),
-            child: ProfileSubScreenHeader(
-              title: context.l10n.profilePointsHistoryTitle,
-              subtitle: context.l10n.profilePointsHistorySubtitle,
+    final List<Widget> slivers = <Widget>[
+      SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.only(top: AppSpacing.md),
+          child: ProfileSubScreenHeader(
+            title: context.l10n.profilePointsHistoryTitle,
+            subtitle: context.l10n.profilePointsHistorySubtitle,
+          ),
+        ),
+      ),
+      SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+          child: PointsHistorySummaryStrip(user: u),
+        ),
+      ),
+      const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.md)),
+      if (milestonesNewestFirst.isNotEmpty)
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              0,
+              0,
+              AppSpacing.sm,
+            ),
+            child: Text(
+              context.l10n.profilePointsHistoryMilestonesSection,
+              style: AppTypography.cardSubtitle.copyWith(
+                color: AppColors.textMuted,
+                fontWeight: FontWeight.w600,
+                letterSpacing: -0.05,
+              ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-            child: PointsHistorySummaryStrip(user: u),
+        ),
+      if (milestonesNewestFirst.isNotEmpty)
+        SliverToBoxAdapter(
+          child: SizedBox(
+            height: 112,
+            child: ListView.separated(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+              scrollDirection: Axis.horizontal,
+              itemCount: milestonesNewestFirst.length,
+              separatorBuilder: (BuildContext context, int index) =>
+                  const SizedBox(width: AppSpacing.sm),
+              itemBuilder: (BuildContext context, int i) {
+                final PointsHistoryMilestone m = milestonesNewestFirst[i];
+                return PointsHistoryMilestoneChip(milestone: m);
+              },
+            ),
           ),
-          const SizedBox(height: AppSpacing.md),
-          Expanded(
-            child: NotificationListener<ScrollNotification>(
-              onNotification: _onScrollNotification,
-              child: RefreshIndicator(
-                color: AppColors.primary,
-                onRefresh: () =>
-                    ref.read(pointsHistoryNotifierProvider.notifier).loadInitial(),
-                child: CustomScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(
-                    parent: BouncingScrollPhysics(),
+        ),
+      if (milestonesNewestFirst.isNotEmpty)
+        const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.md)),
+      SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            0,
+            AppSpacing.lg,
+            AppSpacing.sm,
+          ),
+          child: Text(
+            context.l10n.profilePointsHistoryActivitySection,
+            style: AppTypography.cardSubtitle.copyWith(
+              color: AppColors.textMuted,
+              fontWeight: FontWeight.w600,
+              letterSpacing: -0.05,
+            ),
+          ),
+        ),
+      ),
+      if (flat.isEmpty)
+        SliverFillRemaining(
+          hasScrollBody: false,
+          child: Semantics(
+            container: true,
+            label:
+                '${context.l10n.profilePointsHistoryActivitySection}. ${context.l10n.profilePointsHistoryEmpty}',
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+              child: Center(
+                child: Text(
+                  context.l10n.profilePointsHistoryEmpty,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppColors.textSecondary,
                   ),
-                  slivers: <Widget>[
-                    if (milestonesNewestFirst.isNotEmpty)
-                      SliverToBoxAdapter(
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(
-                            AppSpacing.lg,
-                            0,
-                            0,
-                            AppSpacing.sm,
-                          ),
-                          child: Text(
-                            context.l10n.profilePointsHistoryMilestonesSection,
-                            style: AppTypography.cardSubtitle.copyWith(
-                              color: AppColors.textMuted,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: -0.05,
-                            ),
-                          ),
-                        ),
-                      ),
-                    if (milestonesNewestFirst.isNotEmpty)
-                      SliverToBoxAdapter(
-                        child: SizedBox(
-                          height: 112,
-                          child: ListView.separated(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.lg,
-                            ),
-                            scrollDirection: Axis.horizontal,
-                            itemCount: milestonesNewestFirst.length,
-                            separatorBuilder:
-                                (BuildContext context, int index) =>
-                                    const SizedBox(width: AppSpacing.sm),
-                            itemBuilder: (BuildContext context, int i) {
-                              final PointsHistoryMilestone m =
-                                  milestonesNewestFirst[i];
-                              return PointsHistoryMilestoneChip(milestone: m);
-                            },
-                          ),
-                        ),
-                      ),
-                    if (milestonesNewestFirst.isNotEmpty)
-                      const SliverToBoxAdapter(
-                        child: SizedBox(height: AppSpacing.md),
-                      ),
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(
-                          AppSpacing.lg,
-                          0,
-                          AppSpacing.lg,
-                          AppSpacing.sm,
-                        ),
-                        child: Text(
-                          context.l10n.profilePointsHistoryActivitySection,
-                          style: AppTypography.cardSubtitle.copyWith(
-                            color: AppColors.textMuted,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: -0.05,
-                          ),
-                        ),
-                      ),
-                    ),
-                    if (flat.isEmpty)
-                      SliverFillRemaining(
-                        hasScrollBody: false,
-                        child: Semantics(
-                          container: true,
-                          label:
-                              '${context.l10n.profilePointsHistoryActivitySection}. ${context.l10n.profilePointsHistoryEmpty}',
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.xl,
-                            ),
-                            child: Center(
-                              child: Text(
-                                context.l10n.profilePointsHistoryEmpty,
-                                textAlign: TextAlign.center,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium
-                                    ?.copyWith(color: AppColors.textSecondary),
-                              ),
-                            ),
-                          ),
-                        ),
-                      )
-                    else
-                      SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (BuildContext context, int index) {
-                            final AppLocalizations l10n =
-                                AppLocalizations.of(context)!;
-                            if (index >= flat.length) {
-                              if (showLoadMoreError) {
-                                return Padding(
-                                  padding: const EdgeInsets.fromLTRB(
-                                    AppSpacing.lg,
-                                    AppSpacing.sm,
-                                    AppSpacing.lg,
-                                    AppSpacing.lg,
-                                  ),
-                                  child: Semantics(
-                                    container: true,
-                                    liveRegion: true,
-                                    label:
-                                        '${context.l10n.profilePointsHistoryLoadMoreErrorTitle}. ${state.loadMoreError!.message}',
-                                    child: Material(
-                                      color: AppColors.panelBackground,
-                                      borderRadius: BorderRadius.circular(
-                                        AppSpacing.radiusLg,
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(
-                                          AppSpacing.md,
-                                        ),
-                                        child: Row(
-                                          children: <Widget>[
-                                            Expanded(
-                                              child: Text(
-                                                context.l10n
-                                                    .profilePointsHistoryLoadMoreErrorTitle,
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .bodyMedium
-                                                    ?.copyWith(
-                                                      color: AppColors
-                                                          .textPrimary,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                    ),
-                                              ),
-                                            ),
-                                            TextButton(
-                                              onPressed: () {
-                                                ref
-                                                    .read(
-                                                      pointsHistoryNotifierProvider
-                                                          .notifier,
-                                                    )
-                                                    .loadMore();
-                                              },
-                                              child: Text(
-                                                context.l10n
-                                                    .profilePointsHistoryLoadMoreRetry,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }
-                              return const Padding(
-                                padding: EdgeInsets.all(AppSpacing.lg),
-                                child: Center(
-                                  child: SizedBox(
-                                    width: 24,
-                                    height: 24,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: AppColors.primaryDark,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }
-                            final _HistoryListEntry row = flat[index];
-                            switch (row) {
-                              case _DateHeaderEntry(:final DateTime day):
-                                return Padding(
-                                  padding: EdgeInsets.fromLTRB(
-                                    AppSpacing.lg,
-                                    index == 0 ? 0 : AppSpacing.md,
-                                    AppSpacing.lg,
-                                    AppSpacing.xs,
-                                  ),
-                                  child: Text(
-                                    _dayHeader(context, day),
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .labelLarge
-                                        ?.copyWith(
-                                          color: AppColors.textPrimary,
-                                          fontWeight: FontWeight.w700,
-                                          letterSpacing: -0.2,
-                                        ),
-                                  ),
-                                );
-                              case _ActivityRowEntry(
-                                  :final PointsHistoryEntry entry
-                                ):
-                                final String reasonTitle =
-                                    pointsHistoryReasonTitle(
-                                  l10n,
-                                  entry.reasonCode,
-                                );
-                                final String deltaLabel =
-                                    pointsHistoryDeltaLabel(
-                                  l10n,
-                                  entry.delta,
-                                );
-                                final String timeLine =
-                                    _timeLine(context, entry.createdAt);
-                                return Padding(
-                                  padding: const EdgeInsets.fromLTRB(
-                                    AppSpacing.lg,
-                                    0,
-                                    AppSpacing.lg,
-                                    AppSpacing.xs,
-                                  ),
-                                  child: PointsHistoryActivityTile(
-                                    entry: entry,
-                                    reasonTitle: reasonTitle,
-                                    reasonIcon: pointsHistoryReasonIcon(
-                                      entry.reasonCode,
-                                    ),
-                                    deltaLabel: deltaLabel,
-                                    timeLine: timeLine,
-                                    semanticLabel: context.l10n
-                                        .profilePointsActivityRowSemantic(
-                                      reasonTitle,
-                                      timeLine,
-                                      deltaLabel,
-                                    ),
-                                  ),
-                                );
-                            }
-                          },
-                          childCount: flat.length + footerCount,
-                        ),
-                      ),
-                  ],
                 ),
               ),
             ),
           ),
-        ],
+        )
+      else
+        SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (BuildContext context, int index) {
+              final AppLocalizations l10n = AppLocalizations.of(context)!;
+              if (index >= flat.length) {
+                if (showLoadMoreError) {
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.lg,
+                      AppSpacing.sm,
+                      AppSpacing.lg,
+                      AppSpacing.lg,
+                    ),
+                    child: Semantics(
+                      container: true,
+                      liveRegion: true,
+                      label:
+                          '${context.l10n.profilePointsHistoryLoadMoreErrorTitle}. ${state.loadMoreError!.message}',
+                      child: Material(
+                        color: AppColors.panelBackground,
+                        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                        child: Padding(
+                          padding: const EdgeInsets.all(AppSpacing.md),
+                          child: Row(
+                            children: <Widget>[
+                              Expanded(
+                                child: Text(
+                                  context.l10n
+                                      .profilePointsHistoryLoadMoreErrorTitle,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.copyWith(
+                                        color: AppColors.textPrimary,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  ref
+                                      .read(
+                                        pointsHistoryNotifierProvider.notifier,
+                                      )
+                                      .loadMore();
+                                },
+                                child: Text(
+                                  context.l10n
+                                      .profilePointsHistoryLoadMoreRetry,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }
+                return const Padding(
+                  padding: EdgeInsets.all(AppSpacing.lg),
+                  child: Center(
+                    child: SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppColors.primaryDark,
+                      ),
+                    ),
+                  ),
+                );
+              }
+              final _HistoryListEntry row = flat[index];
+              switch (row) {
+                case _DateHeaderEntry(:final DateTime day):
+                  return Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      AppSpacing.lg,
+                      index == 0 ? 0 : AppSpacing.md,
+                      AppSpacing.lg,
+                      AppSpacing.xs,
+                    ),
+                    child: Text(
+                      _dayHeader(context, day),
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                  );
+                case _ActivityRowEntry(:final PointsHistoryEntry entry):
+                  final String reasonTitle = pointsHistoryReasonTitle(
+                    l10n,
+                    entry.reasonCode,
+                  );
+                  final String deltaLabel = pointsHistoryDeltaLabel(
+                    l10n,
+                    entry.delta,
+                  );
+                  final String timeLine = _timeLine(context, entry.createdAt);
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.lg,
+                      0,
+                      AppSpacing.lg,
+                      AppSpacing.xs,
+                    ),
+                    child: PointsHistoryActivityTile(
+                      entry: entry,
+                      reasonTitle: reasonTitle,
+                      reasonIcon: pointsHistoryReasonIcon(entry.reasonCode),
+                      deltaLabel: deltaLabel,
+                      timeLine: timeLine,
+                      semanticLabel:
+                          context.l10n.profilePointsActivityRowSemantic(
+                        reasonTitle,
+                        timeLine,
+                        deltaLabel,
+                      ),
+                    ),
+                  );
+              }
+            },
+            childCount: flat.length + footerCount,
+          ),
+        ),
+      SliverToBoxAdapter(
+        child: SizedBox(
+          height: AppSpacing.xl + AppSpacing.lg,
+        ),
+      ),
+    ];
+
+    return Semantics(
+      namesRoute: true,
+      label: context.l10n.profilePointsHistoryTitle,
+      child: NotificationListener<ScrollNotification>(
+        onNotification: _onScrollNotification,
+        child: ScrollConfiguration(
+          behavior: const NoOverscrollOverlayScrollBehavior(),
+          child: ClipRect(
+            clipper: const ProfileScrollBottomShadowClipper(
+              bottomExtension: kProfileScrollBottomShadowExtension,
+            ),
+            child: AppRefreshIndicator(
+              onRefresh: () => ref
+                  .read(pointsHistoryNotifierProvider.notifier)
+                  .loadInitial(),
+              child: CustomScrollView(
+                clipBehavior: Clip.none,
+                physics: const AlwaysScrollableScrollPhysics(
+                  parent: BouncingScrollPhysics(),
+                ),
+                slivers: slivers,
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

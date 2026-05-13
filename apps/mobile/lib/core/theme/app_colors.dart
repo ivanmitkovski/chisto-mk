@@ -26,9 +26,23 @@ class AppColors {
   static const Color inputBorder = Color(0xFFDDE1EA);
   static const Color accentDanger = Color(0xFFE6513D);
   static const Color accentWarning = Color(0xFFF5A623);
+  /// Organizer highlights / charts — alias of [accentWarning] for semantic call sites.
+  static Color get warningAccent => accentWarning;
   static const Color accentWarningDark = Color(0xFFD4910C);
   static const Color accentInfo = Color(0xFF3BA3F7);
   static const Color divider = Color(0xFFE5E7ED);
+
+  /// Selected discovery pill / chip fill (home feed + events: [AppFilterPillBar] feedChip).
+  static Color get feedPillSelectedFill =>
+      primaryDark.withValues(alpha: 0.12);
+
+  /// Selected discovery pill border (matches feed chip outline weight).
+  static Color get feedPillSelectedBorder =>
+      primaryDark.withValues(alpha: 0.35);
+
+  /// Text and icons on [feedPillSelectedFill].
+  static const Color feedPillSelectedForeground = primaryDark;
+
   static const Color overlay = Color(0x80000000);
   static const Color error = Color(0xFFD73636);
 

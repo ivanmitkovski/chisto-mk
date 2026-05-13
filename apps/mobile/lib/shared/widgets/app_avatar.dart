@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
@@ -97,29 +98,21 @@ class _AppAvatarState extends State<AppAvatar> {
         child: SizedBox(
           width: widget.size,
           height: widget.size,
-          child: Image.network(
-            rawUrl,
+          child: CachedNetworkImage(
+            imageUrl: rawUrl,
             key: ValueKey<String>('avatar_net|$_networkLoadAttempt|$rawUrl'),
             fit: BoxFit.cover,
-            gaplessPlayback: true,
-            cacheWidth: cacheDim,
-            cacheHeight: cacheDim,
-            filterQuality: FilterQuality.medium,
-            loadingBuilder:
-                (
-                  BuildContext context,
-                  Widget child,
-                  ImageChunkEvent? loadingProgress,
-                ) {
-                  if (loadingProgress == null) return child;
-                  return _InitialsCircle(
-                    initials: initials,
-                    size: widget.size,
-                    fontSize: widget.fontSize,
-                    showLoadingRing: true,
-                  );
-                },
-            errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+            memCacheWidth: cacheDim,
+            memCacheHeight: cacheDim,
+            fadeInDuration: Duration.zero,
+            fadeOutDuration: Duration.zero,
+            placeholder: (BuildContext context, String url) => _InitialsCircle(
+              initials: initials,
+              size: widget.size,
+              fontSize: widget.fontSize,
+              showLoadingRing: true,
+            ),
+            errorWidget: (BuildContext context, String url, Object error) {
               if (_networkLoadAttempt < _maxNetworkRetries) {
                 Future<void>.delayed(_networkRetryDelay, () {
                   if (!mounted) return;

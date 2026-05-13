@@ -46,8 +46,10 @@ import { ListCheckInAttendeesQueryDto } from './dto/list-check-in-attendees-quer
 import { EventsCheckInThrottlerGuard } from './events-check-in-throttler.guard';
 import { ApiEventsCheckInStandardErrors } from './events-check-in-openapi.decorators';
 import { EventsCheckInService } from './events-check-in.service';
+import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-error-responses.decorator';
 
 @ApiTags('events')
+@ApiStandardHttpErrorResponses()
 @ApiExtraModels(
   PatchCheckInOpenResponseDto,
   RotateSessionResponseDto,

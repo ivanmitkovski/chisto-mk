@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:chisto_mobile/core/navigation/app_navigator_key.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
@@ -13,7 +15,6 @@ import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/presentation/screens/site_detail_route_screen.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/home_bottom_nav_bar.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -63,7 +64,7 @@ class HomeShellRouterScaffold extends StatefulWidget {
     required this.feedKey,
     required this.eventsFeedKey,
     required this.reportsPageBuilder,
-    required this.onCentralReportPressed,
+    required this.onCentralFabPressed,
     required this.isLaunchingReportFlow,
   });
 
@@ -75,7 +76,9 @@ class HomeShellRouterScaffold extends StatefulWidget {
   final GlobalKey feedKey;
   final GlobalKey<EventsFeedScreenState> eventsFeedKey;
   final WidgetBuilder reportsPageBuilder;
-  final Future<void> Function() onCentralReportPressed;
+
+  /// [tabIndex] is [StatefulNavigationShell.currentIndex] (0 feed, 1 reports, 2 map, 3 events).
+  final Future<void> Function(BuildContext context, int tabIndex) onCentralFabPressed;
   final bool isLaunchingReportFlow;
 
   @override
@@ -91,7 +94,9 @@ class _HomeShellRouterScaffoldState extends State<HomeShellRouterScaffold> {
 
     return Scaffold(
       backgroundColor: AppColors.appBackground,
-      resizeToAvoidBottomInset: true,
+      // Keep tab bar + central FAB visually docked; keyboard overlays tab bodies.
+      // Full-screen flows (sheets, wizards) use their own [Scaffold] with inset as needed.
+      resizeToAvoidBottomInset: false,
       body: widget.navigationShell,
       bottomNavigationBar: hideBottomBar
           ? null
@@ -120,7 +125,17 @@ class _HomeShellRouterScaffoldState extends State<HomeShellRouterScaffold> {
                         child: Center(
                           child: _CentralReportButton(
                             enabled: !widget.isLaunchingReportFlow,
-                            onPressed: widget.onCentralReportPressed,
+                            semanticsLabel: currentIndex == 3
+                                ? AppLocalizations.of(context)!.eventsFeedCreateSemantic
+                                : AppLocalizations.of(context)!.reportListFabLabel,
+                            onPressed: () {
+                              unawaited(
+                                widget.onCentralFabPressed(
+                                  context,
+                                  currentIndex,
+                                ),
+                              );
+                            },
                           ),
                         ),
                       ),
@@ -162,9 +177,15 @@ class _HomeShellRouterScaffoldState extends State<HomeShellRouterScaffold> {
 }
 
 class _CentralReportButton extends StatefulWidget {
-  const _CentralReportButton({required this.onPressed, this.enabled = true});
+  const _CentralReportButton({
+    required this.onPressed,
+    required this.semanticsLabel,
+    this.enabled = true,
+  });
 
   final VoidCallback onPressed;
+  final String semanticsLabel;
+
   final bool enabled;
 
   @override
@@ -176,11 +197,10 @@ class _CentralReportButtonState extends State<_CentralReportButton> {
 
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context)!;
     return Semantics(
       button: true,
       enabled: widget.enabled,
-      label: l10n.reportListFabLabel,
+      label: widget.semanticsLabel,
       child: GestureDetector(
         onTapDown: widget.enabled ? (_) => setState(() => _pressed = true) : null,
         onTapUp: widget.enabled ? (_) => setState(() => _pressed = false) : null,
@@ -221,11 +241,11 @@ class _CentralReportButtonState extends State<_CentralReportButton> {
               ),
               child: widget.enabled
                   ? const Icon(
-                      CupertinoIcons.add,
+                      Icons.add_rounded,
                       color: AppColors.textOnDark,
                       size: 28,
                     )
-                  : const Center(
+                  : Center(
                       child: SizedBox(
                         width: 22,
                         height: 22,
@@ -281,7 +301,8 @@ GoRouter buildHomeShellGoRouter({
   required GlobalKey feedKey,
   required GlobalKey<EventsFeedScreenState> eventsFeedKey,
   required WidgetBuilder reportsPageBuilder,
-  required Future<void> Function() onCentralReportPressed,
+  required Future<void> Function(BuildContext context, int tabIndex)
+      onCentralFabPressed,
   required ValueNotifier<bool> isLaunchingReportFlow,
   Listenable? refreshListenable,
 }) {
@@ -307,7 +328,7 @@ GoRouter buildHomeShellGoRouter({
                     feedKey: feedKey,
                     eventsFeedKey: eventsFeedKey,
                     reportsPageBuilder: reportsPageBuilder,
-                    onCentralReportPressed: onCentralReportPressed,
+                    onCentralFabPressed: onCentralFabPressed,
                     isLaunchingReportFlow: isLaunchingReportFlow.value,
                   );
                 },
@@ -364,6 +385,7 @@ GoRouter buildHomeShellGoRouter({
             ],
           ),
           StatefulShellBranch(
+            preload: true,
             routes: <RouteBase>[
               GoRoute(
                 path: '/reports',

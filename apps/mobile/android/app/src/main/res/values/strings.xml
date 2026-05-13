@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notification_channel_default_name">Chisto.mk</string>
+    <string name="notification_channel_default_description">General notifications</string>
+    <string name="notification_channel_event_chat_name">Event chat</string>
+    <string name="notification_channel_event_chat_description">Messages on cleanup events you joined</string>
+</resources>

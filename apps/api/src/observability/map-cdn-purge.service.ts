@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadGatewayException, Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 type CdnProvider = 'cloudfront' | 'cloudflare' | 'none';
@@ -139,7 +139,11 @@ export class MapCdnPurgeService {
 
     if (!response.ok) {
       const body = await response.text().catch(() => '<unreadable>');
-      throw new Error(`Cloudflare purge failed: ${response.status} ${body}`);
+      throw new BadGatewayException({
+        code: 'MAP_CDN_PURGE_FAILED',
+        message: 'Cloudflare cache purge failed',
+        details: { status: response.status, bodyPreview: body.slice(0, 500) },
+      });
     }
   }
 

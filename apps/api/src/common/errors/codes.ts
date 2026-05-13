@@ -8,6 +8,7 @@
  */
 export const CHECK_IN_ERROR_CODES = [
   'CHECK_IN_MISCONFIG',
+  'CHECK_IN_REDIS_REQUIRED',
   'CHECK_IN_SESSION_CLOSED',
   'CHECK_IN_NO_SESSION',
   'CHECK_IN_LIFECYCLE',
@@ -21,6 +22,7 @@ export const CHECK_IN_ERROR_CODES = [
   'CHECK_IN_ALREADY_CHECKED_IN',
   'CHECK_IN_NOT_FOUND',
   'CHECK_IN_FORBIDDEN',
+  'CHECK_IN_UNAUTHORIZED',
   'CHECK_IN_REQUEST_EXPIRED',
   'CHECK_IN_REQUEST_NOT_FOUND',
   'ORGANIZER_CANNOT_CHECK_IN',
@@ -110,8 +112,13 @@ export const GLOBAL_HTTP_ERROR_CODES = [
 
 export type GlobalHttpErrorCode = (typeof GLOBAL_HTTP_ERROR_CODES)[number];
 
+/** Auth / organizer certification paths (`src/auth`) — merged for stable `code` contracts. */
+export const AUTH_API_ERROR_CODES = ['ORGANIZER_QUIZ_BANK_INVARIANT'] as const;
+
+export type AuthApiErrorCode = (typeof AUTH_API_ERROR_CODES)[number];
+
 /**
- * Stable codes returned from `EventsService` / `events-cursors.util` (public events HTTP) not covered elsewhere.
+ * Stable codes returned from events list/detail flows / `events-cursors.util` (public events HTTP) not covered elsewhere.
  */
 export const EVENTS_PUBLIC_API_ERROR_CODES = [
   'EVENTS_SHARE_CARD_ID_INVALID',
@@ -223,6 +230,7 @@ const MERGED_ERROR_CODE_SET = new Set<string>([
   ...EVENT_CHAT_ERROR_CODES,
   ...PUBLIC_EVENT_MUTATION_ERROR_CODES,
   ...GLOBAL_HTTP_ERROR_CODES,
+  ...AUTH_API_ERROR_CODES,
   ...EVENTS_PUBLIC_API_ERROR_CODES,
   ...ADMIN_CLEANUP_EVENT_ERROR_CODES,
   ...GAMIFICATION_API_ERROR_CODES,

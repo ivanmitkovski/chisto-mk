@@ -1,18 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { FeedCandidateWithStage } from '../feed-v2.types';
+import type { CandidateRequestContext } from './candidate-request-context';
 import { GeoRetriever } from './geo.retriever';
 import { FreshnessRetriever } from './freshness.retriever';
 import { EngagementRetriever } from './engagement.retriever';
 import { PersonalRetriever } from './personal.retriever';
 
-export type CandidateRequestContext = {
-  userId?: string;
-  lat?: number;
-  lng?: number;
-  radiusKm?: number;
-  limit?: number;
-  status?: 'REPORTED' | 'VERIFIED' | 'CLEANUP_SCHEDULED' | 'IN_PROGRESS' | 'CLEANED' | 'DISPUTED';
-};
+export type { CandidateRequestContext } from './candidate-request-context';
 
 @Injectable()
 export class CandidateGenerator {

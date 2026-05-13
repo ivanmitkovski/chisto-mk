@@ -21,26 +21,79 @@ import 'package:chisto_mobile/shared/current_user.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/user_avatar_circle.dart';
 
+/// Peek row state for [ParticipantsSection] (keeps data loading out of the widget build tree).
+class ParticipantsPeekViewModel extends ChangeNotifier {
+  ParticipantsPeekViewModel({required EventsRepository repository}) : _repository = repository;
+
+  final EventsRepository _repository;
+
+  bool peekLoading = true;
+  bool peekFailed = false;
+  List<AttendeePreview> peekPreviews = <AttendeePreview>[];
+
+  Future<void> loadPeek({
+    required EcoEvent event,
+    required String youLabel,
+  }) async {
+    peekLoading = true;
+    peekFailed = false;
+    notifyListeners();
+    try {
+      final EventParticipantsPage page = await _repository.fetchParticipants(event.id);
+      peekPreviews = mergeParticipantPreviews(
+        event: event,
+        apiRows: page.items,
+        youLabel: youLabel,
+      );
+      peekLoading = false;
+      peekFailed = false;
+      notifyListeners();
+    } on Object catch (_) {
+      peekLoading = false;
+      peekFailed = true;
+      peekPreviews = <AttendeePreview>[];
+      notifyListeners();
+    }
+  }
+}
+
 class ParticipantsSection extends StatefulWidget {
-  const ParticipantsSection({super.key, required this.event});
+  const ParticipantsSection({
+    super.key,
+    required this.event,
+    this.repository,
+  });
 
   final EcoEvent event;
+  final EventsRepository? repository;
 
   @override
   State<ParticipantsSection> createState() => _ParticipantsSectionState();
 }
 
 class _ParticipantsSectionState extends State<ParticipantsSection> {
-  bool _peekLoading = true;
-  bool _peekFailed = false;
-  List<AttendeePreview> _peekPreviews = <AttendeePreview>[];
+  late final ParticipantsPeekViewModel _peekVm;
 
   EcoEvent get event => widget.event;
 
   @override
   void initState() {
     super.initState();
-    unawaited(_loadParticipantPeek());
+    _peekVm = ParticipantsPeekViewModel(
+      repository: widget.repository ?? EventsRepositoryRegistry.instance,
+    );
+    _peekVm.addListener(_onPeekVm);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      unawaited(
+        _peekVm.loadPeek(
+          event: event,
+          youLabel: context.l10n.eventsParticipantsYou,
+        ),
+      );
+    });
   }
 
   @override
@@ -48,43 +101,26 @@ class _ParticipantsSectionState extends State<ParticipantsSection> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.event.id != event.id ||
         oldWidget.event.participantCount != event.participantCount) {
-      unawaited(_loadParticipantPeek());
+      unawaited(
+        _peekVm.loadPeek(
+          event: event,
+          youLabel: context.l10n.eventsParticipantsYou,
+        ),
+      );
     }
   }
 
-  Future<void> _loadParticipantPeek() async {
+  void _onPeekVm() {
     if (mounted) {
-      setState(() {
-        _peekLoading = true;
-        _peekFailed = false;
-      });
+      setState(() {});
     }
-    try {
-      final EventsRepository repo = EventsRepositoryRegistry.instance;
-      final EventParticipantsPage page = await repo.fetchParticipants(event.id);
-      if (!mounted) {
-        return;
-      }
-      final String youLabel = context.l10n.eventsParticipantsYou;
-      setState(() {
-        _peekPreviews = mergeParticipantPreviews(
-          event: event,
-          apiRows: page.items,
-          youLabel: youLabel,
-        );
-        _peekLoading = false;
-        _peekFailed = false;
-      });
-    } on Object catch (_) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _peekLoading = false;
-        _peekFailed = true;
-        _peekPreviews = <AttendeePreview>[];
-      });
-    }
+  }
+
+  @override
+  void dispose() {
+    _peekVm.removeListener(_onPeekVm);
+    _peekVm.dispose();
+    super.dispose();
   }
 
   void _showAttendeeList(BuildContext context) {
@@ -127,8 +163,8 @@ class _ParticipantsSectionState extends State<ParticipantsSection> {
                 AvatarStack(
                   count: count,
                   event: event,
-                  previews: _peekFailed ? null : _peekPreviews,
-                  isLoadingPeek: _peekLoading,
+                  previews: _peekVm.peekFailed ? null : _peekVm.peekPreviews,
+                  isLoadingPeek: _peekVm.peekLoading,
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(

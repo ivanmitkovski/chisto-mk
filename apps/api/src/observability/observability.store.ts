@@ -1,4 +1,69 @@
+const PUSH_GATEWAY_URL = process.env.METRICS_PUSH_GATEWAY_URL?.trim() || null;
+const PUSH_INTERVAL_MS = 15_000;
+const JOB_NAME = 'chisto_api';
+
 export class ObservabilityStore {
+  private static pushIntervalHandle: ReturnType<typeof setInterval> | null = null;
+
+  static startPushGatewayLoop(): void {
+    if (!PUSH_GATEWAY_URL || this.pushIntervalHandle) return;
+    this.pushIntervalHandle = setInterval(() => {
+      this.pushToGateway().catch(() => {});
+    }, PUSH_INTERVAL_MS);
+    if (typeof this.pushIntervalHandle === 'object' && 'unref' in this.pushIntervalHandle) {
+      this.pushIntervalHandle.unref();
+    }
+  }
+
+  static stopPushGatewayLoop(): void {
+    if (this.pushIntervalHandle) {
+      clearInterval(this.pushIntervalHandle);
+      this.pushIntervalHandle = null;
+    }
+  }
+
+  private static async pushToGateway(): Promise<void> {
+    if (!PUSH_GATEWAY_URL) return;
+    const snap = this.snapshot();
+    const lines: string[] = [];
+    const g = (name: string, value: number, help?: string) => {
+      if (help) lines.push(`# HELP ${name} ${help}`);
+      lines.push(`# TYPE ${name} gauge`);
+      lines.push(`${name} ${value}`);
+    };
+    g('chisto_requests_total', snap.requestsTotal, 'Total HTTP requests');
+    g('chisto_requests_failed_total', snap.requestsFailed, 'Total 5xx responses');
+    g('chisto_request_duration_p95_ms', snap.p95Ms, 'p95 request duration');
+    g('chisto_feed_requests_total', snap.feedRequestsTotal, 'Total feed requests');
+    g('chisto_feed_cache_hit_rate', snap.feedCacheHitRate, 'Feed cache hit ratio');
+    g('chisto_feed_duration_p95_ms', snap.feedP95Ms, 'p95 feed duration');
+    g('chisto_map_requests_total', snap.mapRequestsTotal, 'Total map requests');
+    g('chisto_map_cache_hit_rate', snap.mapCacheHitRate, 'Map cache hit ratio');
+    g('chisto_map_duration_p95_ms', snap.mapP95Ms, 'p95 map duration');
+    g('chisto_push_sends_total', snap.pushSendsTotal, 'Total push notifications');
+    g('chisto_push_sends_failure', snap.pushSendsFailure, 'Failed push notifications');
+    g('chisto_push_queue_depth', snap.pushQueueDepth, 'Push queue depth');
+    g('chisto_reports_submit_success', snap.reportsSubmitSuccess, 'Successful report submissions');
+    g('chisto_reports_submit_error', snap.reportsSubmitError, 'Failed report submissions');
+    g('chisto_map_outbox_pending', snap.mapOutboxPending, 'MapEventOutbox rows in PENDING status (last sampled)');
+
+    lines.push('# HELP chisto_prisma_p1008_total Public API responses mapped from Prisma P1008 timeouts');
+    lines.push('# TYPE chisto_prisma_p1008_total counter');
+    lines.push(`chisto_prisma_p1008_total ${this.prismaP1008Total}`);
+    const body = lines.join('\n') + '\n';
+    const url = `${PUSH_GATEWAY_URL}/metrics/job/${JOB_NAME}`;
+    try {
+      await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain; version=0.0.4' },
+        body,
+        signal: AbortSignal.timeout(5_000),
+      });
+    } catch {
+      // Silently ignore push failures to avoid cascading alerts
+    }
+  }
+
   private static requestsTotal = 0;
   private static requestsFailed = 0;
   private static requestDurationsMs: number[] = [];
@@ -49,6 +114,8 @@ export class ObservabilityStore {
   private static mapProjectionStalenessSeconds = 0;
   private static mapColdSitesArchivedTotal = 0;
   private static mapOutboxRowsPurgedTotal = 0;
+  private static mapOutboxPendingGauge = 0;
+  private static prismaP1008Total = 0;
   private static mapZoomTierRequests: Record<string, number> = {};
   /** `${mode}:${zoomBucket}` -> recent durations for p95 slicing */
   private static mapDurationByModeZoom: Record<string, number[]> = {};
@@ -374,6 +441,15 @@ export class ObservabilityStore {
     this.mapOutboxRowsPurgedTotal += Math.max(0, count);
   }
 
+  static setMapOutboxPendingCount(count: number): void {
+    this.mapOutboxPendingGauge = Math.max(0, Math.floor(count));
+  }
+
+  /** Incremented when the API returns DATABASE_TIMEOUT for Prisma P1008 (see GlobalExceptionFilter). */
+  static recordPrismaP1008Response(): void {
+    this.prismaP1008Total += 1;
+  }
+
   static recordMapZoomTierRequest(tier: 'low' | 'mid' | 'high'): void {
     this.mapZoomTierRequests[tier] = (this.mapZoomTierRequests[tier] ?? 0) + 1;
   }
@@ -585,6 +661,8 @@ export class ObservabilityStore {
         const idx = Math.min(ms.length - 1, Math.floor(0.95 * ms.length));
         return Number(ms[idx].toFixed(2));
       })(),
+      mapOutboxPending: this.mapOutboxPendingGauge,
+      prismaP1008Total: this.prismaP1008Total,
     };
   }
 }

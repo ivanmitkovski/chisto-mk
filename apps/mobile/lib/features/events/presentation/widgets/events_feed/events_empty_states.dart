@@ -2,11 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event_filter.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_mobile/shared/widgets/primary_button.dart';
 
 class EventsEmptyState extends StatelessWidget {
   const EventsEmptyState({
@@ -24,7 +26,6 @@ class EventsEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final String title;
     final String subtitle;
     final IconData icon;
@@ -54,74 +55,74 @@ class EventsEmptyState extends StatelessWidget {
 
     final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.xxl * 2),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          reduceMotion
-              ? _iconBubble(context, icon)
-              : TweenAnimationBuilder<double>(
-                  tween: Tween<double>(begin: 0.8, end: 1.0),
-                  duration: AppMotion.slow,
-                  curve: AppMotion.emphasized,
-                  builder: (_, double value, Widget? child) {
-                    return Opacity(
-                      opacity: value,
-                      child: Transform.scale(scale: value, child: child),
-                    );
-                  },
-                  child: _iconBubble(context, icon),
-                ),
-          const SizedBox(height: AppSpacing.lg),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: AppTypography.eventsEmptyStateTitle(
-              Theme.of(context).textTheme,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-            child: Text(
-              subtitle,
-              textAlign: TextAlign.center,
-              style: AppTypography.eventsEmptyStateSubtitle(
-                Theme.of(context).textTheme,
+    // Top-align so when the shell shrinks for the keyboard, this block does not
+    // re-center vertically (which looks like the content "jumping").
+    return Align(
+      alignment: Alignment.topCenter,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.xl,
+          AppSpacing.xxl,
+          AppSpacing.xl,
+          AppSpacing.xxl,
+        ),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 400),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              reduceMotion
+                  ? _FeedEmptyIllustration(icon: icon)
+                  : TweenAnimationBuilder<double>(
+                      tween: Tween<double>(begin: 0.92, end: 1.0),
+                      duration: AppMotion.slow,
+                      curve: AppMotion.emphasized,
+                      builder: (_, double value, Widget? child) {
+                        return Opacity(
+                          opacity: value,
+                          child: Transform.scale(scale: value, child: child),
+                        );
+                      },
+                      child: _FeedEmptyIllustration(icon: icon),
+                    ),
+              const SizedBox(height: AppSpacing.lg),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: AppTypography.emptyStateTitle,
               ),
-            ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                subtitle,
+                textAlign: TextAlign.center,
+                style: AppTypography.emptyStateSubtitle,
+              ),
+              if (showClearFilters && onClearFilters != null) ...<Widget>[
+                const SizedBox(height: AppSpacing.lg),
+                TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppColors.primaryDark,
+                  ),
+                  onPressed: onClearFilters,
+                  child: Text(l10n.eventsEmptyActionClearFilters),
+                ),
+              ],
+              if (onCreateEvent != null) ...<Widget>[
+                SizedBox(
+                  height: showClearFilters ? AppSpacing.md : AppSpacing.lg,
+                ),
+                SizedBox(
+                  width: double.infinity,
+                  child: PrimaryButton(
+                    label: l10n.eventsEmptyActionCreateEvent,
+                    onPressed: onCreateEvent!,
+                  ),
+                ),
+              ],
+            ],
           ),
-          if (showClearFilters && onClearFilters != null) ...<Widget>[
-            const SizedBox(height: AppSpacing.lg),
-            TextButton(
-              onPressed: onClearFilters,
-              child: Text(l10n.eventsEmptyActionClearFilters),
-            ),
-          ],
-          if (onCreateEvent != null) ...<Widget>[
-            SizedBox(height: showClearFilters ? AppSpacing.sm : AppSpacing.lg),
-            _CreateEventButton(
-              label: l10n.eventsEmptyActionCreateEvent,
-              colorScheme: colorScheme,
-              onPressed: onCreateEvent!,
-            ),
-          ],
-        ],
+        ),
       ),
-    );
-  }
-
-  Widget _iconBubble(BuildContext context, IconData icon) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      width: 80,
-      height: 80,
-      decoration: BoxDecoration(
-        color: colorScheme.primaryContainer.withValues(alpha: 0.45),
-        shape: BoxShape.circle,
-      ),
-      child: Icon(icon, size: 36, color: colorScheme.onPrimaryContainer),
     );
   }
 }
@@ -140,103 +141,95 @@ class SearchEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final AppLocalizations l10n = context.l10n;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.xxl * 2),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.08),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              CupertinoIcons.search,
-              size: 36,
-              color: colorScheme.onSurfaceVariant,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          Text(
-            l10n.eventsSearchEmptyTitle(query),
-            textAlign: TextAlign.center,
-            style: AppTypography.eventsEmptyStateTitle(
-              Theme.of(context).textTheme,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-            child: Text(
-              l10n.eventsSearchEmptySubtitle,
-              textAlign: TextAlign.center,
-              style: AppTypography.eventsEmptyStateSubtitle(
-                Theme.of(context).textTheme,
-              ),
-            ),
-          ),
-          if (query.trim().length >= 2) ...<Widget>[
-            const SizedBox(height: AppSpacing.md),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-              child: Text(
-                l10n.eventsSearchEmptyScopeHint,
+    return Align(
+      alignment: Alignment.topCenter,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.xl,
+          AppSpacing.xxl,
+          AppSpacing.xl,
+          AppSpacing.xxl,
+        ),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 400),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              const _FeedEmptyIllustration(icon: CupertinoIcons.search),
+              const SizedBox(height: AppSpacing.lg),
+              Text(
+                l10n.eventsSearchEmptyTitle(query),
                 textAlign: TextAlign.center,
-                style: AppTypography.eventsSupportingCaption(
-                  Theme.of(context).textTheme,
-                ),
+                style: AppTypography.emptyStateTitle,
               ),
-            ),
-          ],
-          if (onClearSearch != null) ...<Widget>[
-            const SizedBox(height: AppSpacing.lg),
-            TextButton(
-              onPressed: onClearSearch,
-              child: Text(l10n.eventsSearchEmptyClearSearch),
-            ),
-          ],
-          if (onCreateEvent != null) ...<Widget>[
-            const SizedBox(height: AppSpacing.sm),
-            _CreateEventButton(
-              label: l10n.eventsEmptyActionCreateEvent,
-              colorScheme: colorScheme,
-              onPressed: onCreateEvent!,
-            ),
-          ],
-        ],
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                l10n.eventsSearchEmptySubtitle,
+                textAlign: TextAlign.center,
+                style: AppTypography.emptyStateSubtitle,
+              ),
+              if (query.trim().length >= 2) ...<Widget>[
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  l10n.eventsSearchEmptyScopeHint,
+                  textAlign: TextAlign.center,
+                  style: AppTypography.eventsSupportingCaption(
+                    Theme.of(context).textTheme,
+                  ),
+                ),
+              ],
+              if (onClearSearch != null) ...<Widget>[
+                const SizedBox(height: AppSpacing.lg),
+                TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppColors.primaryDark,
+                  ),
+                  onPressed: onClearSearch,
+                  child: Text(l10n.eventsSearchEmptyClearSearch),
+                ),
+              ],
+              if (onCreateEvent != null) ...<Widget>[
+                SizedBox(
+                  height: onClearSearch != null ? AppSpacing.md : AppSpacing.lg,
+                ),
+                SizedBox(
+                  width: double.infinity,
+                  child: PrimaryButton(
+                    label: l10n.eventsEmptyActionCreateEvent,
+                    onPressed: onCreateEvent!,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
       ),
     );
   }
 }
 
-class _CreateEventButton extends StatelessWidget {
-  const _CreateEventButton({
-    required this.label,
-    required this.colorScheme,
-    required this.onPressed,
-  });
+/// Same visual language as [AppEmptyState] (inputFill circle, muted icon).
+class _FeedEmptyIllustration extends StatelessWidget {
+  const _FeedEmptyIllustration({required this.icon});
 
-  final String label;
-  final ColorScheme colorScheme;
-  final VoidCallback onPressed;
+  final IconData icon;
 
   @override
   Widget build(BuildContext context) {
-    return FilledButton(
-      onPressed: onPressed,
-      style: FilledButton.styleFrom(
-        minimumSize: const Size(170, 48),
-        backgroundColor: colorScheme.primary,
-        foregroundColor: colorScheme.onPrimary,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
-        ),
+    final double diameter = AppSpacing.avatarLg + AppSpacing.xs;
+    return Container(
+      width: diameter,
+      height: diameter,
+      decoration: const BoxDecoration(
+        color: AppColors.inputFill,
+        shape: BoxShape.circle,
       ),
-      child: Text(label),
+      child: Icon(
+        icon,
+        size: AppSpacing.xl,
+        color: AppColors.textMuted,
+      ),
     );
   }
 }

@@ -1,6 +1,8 @@
 /// <reference types="jest" />
 
+import { MapSiteRepositoryAggregatesService } from '../../src/sites/map/map-site-repository-aggregates.service';
 import { MapSiteRepositoryService } from '../../src/sites/map/map-site-repository.service';
+import { MapSiteRepositorySitesService } from '../../src/sites/map/map-site-repository-sites.service';
 import { MapQueryValidatorService } from '../../src/sites/map/map-query-validator.service';
 import { ListSitesMapQueryDto } from '../../src/sites/dto/list-sites-map-query.dto';
 
@@ -79,7 +81,9 @@ describe('MapSiteRepositoryService', () => {
       hasViewportBounds: jest.fn().mockReturnValue(false),
     } as unknown as MapQueryValidatorService;
 
-    const svc = new MapSiteRepositoryService(prisma as never, validator);
+    const sitesSvc = new MapSiteRepositorySitesService(prisma as never, validator);
+    const aggSvc = new MapSiteRepositoryAggregatesService(prisma as never, validator);
+    const svc = new MapSiteRepositoryService(sitesSvc, aggSvc);
     const query = { lat: 41.9, lng: 21.4, radiusKm: 50 } as ListSitesMapQueryDto;
     await svc.findSites(query, 10);
 
@@ -97,7 +101,9 @@ describe('MapSiteRepositoryService', () => {
       hasViewportBounds: jest.fn().mockReturnValue(false),
     } as unknown as MapQueryValidatorService;
 
-    const svc = new MapSiteRepositoryService(prisma as never, validator);
+    const sitesSvc = new MapSiteRepositorySitesService(prisma as never, validator);
+    const aggSvc = new MapSiteRepositoryAggregatesService(prisma as never, validator);
+    const svc = new MapSiteRepositoryService(sitesSvc, aggSvc);
     const query = { lat: 41.9, lng: 21.4, radiusKm: 50 } as ListSitesMapQueryDto;
     await svc.resolveDataVersion(query);
 
@@ -125,7 +131,9 @@ describe('MapSiteRepositoryService', () => {
       hasViewportBounds: jest.fn().mockReturnValue(false),
     } as unknown as MapQueryValidatorService;
 
-    const svc = new MapSiteRepositoryService(prisma as never, validator);
+    const sitesSvc = new MapSiteRepositorySitesService(prisma as never, validator);
+    const aggSvc = new MapSiteRepositoryAggregatesService(prisma as never, validator);
+    const svc = new MapSiteRepositoryService(sitesSvc, aggSvc);
     const query = { lat: 41.9, lng: 21.4, radiusKm: 50 } as ListSitesMapQueryDto;
     await svc.findSites(query, 10);
 

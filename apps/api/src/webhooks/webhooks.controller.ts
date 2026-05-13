@@ -12,8 +12,10 @@ import { TwilioStatusDto } from './dto/twilio-status.dto';
 import { TwilioSignatureGuard } from './guards/twilio-signature.guard';
 import { TwilioStatusBodySanitizeInterceptor } from './interceptors/twilio-status-body-sanitize.interceptor';
 import { WebhooksService } from './webhooks.service';
+import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-error-responses.decorator';
 
 @ApiTags('webhooks')
+@ApiStandardHttpErrorResponses()
 @Controller('webhooks')
 export class WebhooksController {
   constructor(private readonly webhooksService: WebhooksService) {}

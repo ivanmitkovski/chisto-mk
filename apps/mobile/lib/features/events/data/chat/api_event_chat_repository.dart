@@ -5,6 +5,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:chisto_mobile/core/auth/auth_state.dart';
+import 'package:chisto_mobile/core/logging/app_log.dart';
 import 'package:chisto_mobile/core/config/app_config.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/network/api_client.dart';
@@ -207,16 +208,12 @@ class ApiEventChatRepository implements EventChatRepository {
     if (key != null) {
       final _DedupeBuffer buf = _dedupeBuffers.putIfAbsent(eventId, _DedupeBuffer.new);
       if (!buf.remember(key)) {
-        if (kDebugMode) {
-          debugPrint('[chat:$debugTransport] dedupe drop $key event=$eventId (${e.runtimeType})');
-        }
+        AppLog.verbose('[chat:$debugTransport] dedupe drop $key event=$eventId (${e.runtimeType})');
         return;
       }
-      if (kDebugMode) {
-        debugPrint('[chat:$debugTransport] → UI $key ${e.runtimeType} event=$eventId');
-      }
-    } else if (kDebugMode) {
-      debugPrint('[chat:$debugTransport] → UI ${e.runtimeType} event=$eventId');
+      AppLog.verbose('[chat:$debugTransport] → UI $key ${e.runtimeType} event=$eventId');
+    } else {
+      AppLog.verbose('[chat:$debugTransport] → UI ${e.runtimeType} event=$eventId');
     }
     out.add(e);
   }
@@ -753,16 +750,12 @@ class ApiEventChatRepository implements EventChatRepository {
       throw AppError.forbidden(message: 'Chat SSE forbidden');
     }
     if (res.statusCode < 200 || res.statusCode >= 300) {
-      if (kDebugMode) {
-        debugPrint(
-          '[chat:sse] connect failed event=$eventId status=${res.statusCode}',
-        );
-      }
+      AppLog.verbose('[chat:sse] connect failed event=$eventId status=${res.statusCode}');
       throw AppError.network(message: 'Chat SSE failed: ${res.statusCode}');
     }
 
     if (kDebugMode && logStreamOpenedDebug) {
-      debugPrint('[chat:sse] stream opened event=$eventId');
+      AppLog.verbose('[chat:sse] stream opened event=$eventId');
     }
     emitConnectionStatus(EventChatConnectionStatus.connected);
 

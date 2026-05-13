@@ -11,12 +11,10 @@ import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event_filter.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event_search_params.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
-import 'package:chisto_mobile/features/events/presentation/utils/events_diagnostic_log.dart';
+import 'package:chisto_mobile/features/events/presentation/controllers/events_search_controller.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/events_feed_search_merge.dart';
-import 'package:chisto_mobile/features/events/presentation/utils/events_localized_strings.dart';
-
-/// Owns feed discovery state: debounced search, chip/server params, calendar toggle,
-/// and **memoized** derived lists (nearby / my-events sorts and client-side query filter).
+/// Owns feed discovery state: debounced ranked search, chip/server params, calendar toggle,
+/// and **memoized** derived lists (nearby / my-events client sorts only; text match is server-side).
 ///
 /// [Listenable]: attach from a screen with [addListener] + [setState], or [ListenableBuilder].
 class EventsFeedController extends ChangeNotifier {
@@ -27,10 +25,16 @@ class EventsFeedController extends ChangeNotifier {
   })  : _repository = repository,
         _discoveryPreferences = discoveryPreferences {
     _repository.addListener(_onRepositoryUpdate);
+    remoteSearch = EventsSearchController(
+      runSearchParams: (EcoEventSearchParams next) => setSearchParams(next),
+    );
   }
 
   final EventsRepository _repository;
   final EventsDiscoveryPreferences _discoveryPreferences;
+
+  /// Debounced ranked search + phase for the discovery search field.
+  late final EventsSearchController remoteSearch;
 
   final TextEditingController searchController = TextEditingController();
 
@@ -41,14 +45,11 @@ class EventsFeedController extends ChangeNotifier {
   List<String> _recentSearches = const <String>[];
   bool _isInitialLoading = true;
   AppError? _initialLoadError;
-  Timer? _debounce;
+  bool _disposed = false;
 
   String? _derivedCacheKey;
   List<EcoEvent>? _cachedFiltered;
 
-  List<EcoEvent> _discoveryThisWeekShelf = <EcoEvent>[];
-  bool _discoveryThisWeekShelfLoading = false;
-  bool _discoveryThisWeekShelfFailed = false;
   double? _userLatitude;
   double? _userLongitude;
 
@@ -59,15 +60,13 @@ class EventsFeedController extends ChangeNotifier {
 
   AppError? get lastPullRefreshError => _lastPullRefreshError;
 
-  List<EcoEvent> get discoveryThisWeekShelf =>
-      List<EcoEvent>.unmodifiable(_discoveryThisWeekShelf);
-
-  bool get discoveryThisWeekShelfFailed => _discoveryThisWeekShelfFailed;
-
   bool get hasUserLocationHint => _userLatitude != null && _userLongitude != null;
 
   EcoEventFilter get activeFilter => _activeFilter;
   EcoEventSearchParams get activeSearchParams => _activeSearchParams;
+
+  List<String> get rankedSearchSuggestions =>
+      _repository.lastRankedSearchSuggestions;
   String get searchQuery => _searchQuery;
   bool get calendarView => _calendarView;
   List<String> get recentSearches => _recentSearches;
@@ -142,7 +141,6 @@ class EventsFeedController extends ChangeNotifier {
   Future<bool> userPullRefresh() async {
     try {
       await refreshMergedList();
-      await loadDiscoveryThisWeekShelf();
       _initialLoadError = null;
       _lastPullRefreshError = null;
       notifyListeners();
@@ -158,75 +156,66 @@ class EventsFeedController extends ChangeNotifier {
     }
   }
 
-  /// Loads the horizontal "this week (Skopje)" discovery strip without mutating the main feed query.
-  Future<void> loadDiscoveryThisWeekShelf() async {
-    if (_discoveryThisWeekShelfLoading) {
-      return;
-    }
-    _discoveryThisWeekShelfLoading = true;
-    _discoveryThisWeekShelfFailed = false;
-    notifyListeners();
-    try {
-      final EcoEventSearchParams params = EcoEventSearchParams.discoveryThisSkopjeCalendarWeek(
-        DateTime.now().toUtc(),
-      );
-      final List<EcoEvent> rows = await _repository.fetchEventsSnapshot(params);
-      final List<EcoEvent> sorted = List<EcoEvent>.from(rows)
-        ..sort((EcoEvent a, EcoEvent b) {
-          final int dist = a.siteDistanceKm.compareTo(b.siteDistanceKm);
-          if (dist != 0) {
-            return dist;
-          }
-          return _statusRank(a).compareTo(_statusRank(b));
-        });
-      _discoveryThisWeekShelf = sorted;
-    } on Object catch (_) {
-      _discoveryThisWeekShelfFailed = true;
-      _discoveryThisWeekShelf = <EcoEvent>[];
-      logEventsDiagnostic('discovery_week_shelf_fetch_failed');
-    } finally {
-      _discoveryThisWeekShelfLoading = false;
+  Future<void> loadInitial({required String initialListEmptyErrorMessage}) async {
+    void emitIfAlive() {
+      if (_disposed) {
+        return;
+      }
       notifyListeners();
     }
-  }
 
-  Future<void> loadInitial({required String initialListEmptyErrorMessage}) async {
     _initialLoadError = null;
     _isInitialLoading = true;
-    notifyListeners();
+    emitIfAlive();
     try {
+      final EcoEventFilter saved = await _discoveryPreferences.readActiveFilter();
+      if (_disposed) {
+        return;
+      }
+      if (_activeFilter != saved) {
+        _activeFilter = saved;
+        emitIfAlive();
+      }
       _repository.loadInitialIfNeeded();
       await _repository.ready;
+      if (_disposed) {
+        return;
+      }
       if (events.isEmpty && _repository.lastGlobalListLoadFailed) {
         _initialLoadError = AppError.network(
           message: initialListEmptyErrorMessage,
         );
         _isInitialLoading = false;
         _invalidateDerived();
-        notifyListeners();
+        emitIfAlive();
         return;
       }
       _isInitialLoading = false;
       _invalidateDerived();
-      notifyListeners();
+      emitIfAlive();
 
       final EcoEventSearchParams mergedForList =
           EventsFeedSearchMerge.mergedForChip(_activeSearchParams, _activeFilter);
       if (!mergedForList.isEmpty) {
         try {
           await _repository.refreshEvents(params: mergedForList);
+          if (_disposed) {
+            return;
+          }
           _invalidateDerived();
-          notifyListeners();
+          emitIfAlive();
         } on Object catch (_) {
           // Keep bootstrap list; user can pull to refresh.
         }
       }
-      unawaited(loadDiscoveryThisWeekShelf());
     } on Object catch (e) {
+      if (_disposed) {
+        return;
+      }
       _initialLoadError = AppError.network(cause: e);
       _isInitialLoading = false;
       _invalidateDerived();
-      notifyListeners();
+      emitIfAlive();
     }
   }
 
@@ -253,24 +242,21 @@ class EventsFeedController extends ChangeNotifier {
   }
 
   void onSearchTextChanged(String value, {Duration debounce = const Duration(milliseconds: 400)}) {
-    _debounce?.cancel();
-    _debounce = Timer(debounce, () {
-      _searchQuery = value;
-      _invalidateDerived();
-      notifyListeners();
-      unawaited(
-        setSearchParams(
-          _activeSearchParams.copyWith(
-            query: value.isEmpty ? null : value,
-            clearQuery: value.isEmpty,
-          ),
-        ),
-      );
-    });
+    _searchQuery = value;
+    _invalidateDerived();
+    notifyListeners();
+    final EcoEventSearchParams merged =
+        EventsFeedSearchMerge.mergedForChip(_activeSearchParams, _activeFilter);
+    remoteSearch.scheduleTextSearch(
+      rawText: value,
+      mergedBase: merged,
+      debounce: debounce,
+    );
   }
 
   Future<bool> clearSearchField() async {
-    _debounce?.cancel();
+    remoteSearch.cancel();
+    remoteSearch.clearPhase();
     searchController.clear();
     _searchQuery = '';
     _invalidateDerived();
@@ -300,7 +286,7 @@ class EventsFeedController extends ChangeNotifier {
     searchController.text = trimmed;
     searchController.selection =
         TextSelection.collapsed(offset: searchController.text.length);
-    _debounce?.cancel();
+    remoteSearch.cancel();
     _searchQuery = trimmed;
     _invalidateDerived();
     notifyListeners();
@@ -337,6 +323,7 @@ class EventsFeedController extends ChangeNotifier {
     notifyListeners();
     try {
       await refreshMergedList();
+      await _discoveryPreferences.writeActiveFilter(filter);
       return true;
     } on Object catch (_) {
       return false;
@@ -345,7 +332,7 @@ class EventsFeedController extends ChangeNotifier {
 
   /// Resets chip to [EcoEventFilter.all], clears advanced sheet params, and clears search.
   Future<bool> resetAllDiscoveryFilters() async {
-    _debounce?.cancel();
+    remoteSearch.cancel();
     _activeFilter = EcoEventFilter.all;
     _activeSearchParams = const EcoEventSearchParams();
     _searchQuery = '';
@@ -354,6 +341,7 @@ class EventsFeedController extends ChangeNotifier {
     notifyListeners();
     try {
       await refreshMergedList();
+      await _discoveryPreferences.writeActiveFilter(EcoEventFilter.all);
       return true;
     } on Object catch (_) {
       return false;
@@ -422,7 +410,7 @@ class EventsFeedController extends ChangeNotifier {
     }
   }
 
-  List<EcoEvent> _computeFiltered(AppLocalizations l10n) {
+  List<EcoEvent> _computeFiltered(AppLocalizations _) {
     List<EcoEvent> list = _applyDiscoverySort(List<EcoEvent>.from(events));
     switch (_activeFilter) {
       case EcoEventFilter.all:
@@ -440,20 +428,7 @@ class EventsFeedController extends ChangeNotifier {
       case EcoEventFilter.myEvents:
         list = list.where((EcoEvent e) => e.isOrganizer || e.isJoined).toList();
     }
-    if (_searchQuery.trim().isEmpty) {
-      return list;
-    }
-    final String q = _searchQuery.trim().toLowerCase();
-    return _applyDiscoverySort(
-      list
-          .where(
-            (EcoEvent e) =>
-                e.title.toLowerCase().contains(q) ||
-                e.siteName.toLowerCase().contains(q) ||
-                e.category.localizedLabel(l10n).toLowerCase().contains(q),
-          )
-          .toList(),
-    );
+    return list;
   }
 
   /// In-progress rows for sectioned feed (from full [events], not client-filtered list).
@@ -483,7 +458,8 @@ class EventsFeedController extends ChangeNotifier {
 
   @override
   void dispose() {
-    _debounce?.cancel();
+    _disposed = true;
+    remoteSearch.dispose();
     _repository.removeListener(_onRepositoryUpdate);
     searchController.dispose();
     super.dispose();

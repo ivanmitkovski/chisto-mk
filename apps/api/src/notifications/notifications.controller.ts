@@ -22,20 +22,30 @@ import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
 import { ADMIN_PANEL_ROLES } from '../auth/admin-roles';
 import { AuthenticatedUser } from '../auth/types/authenticated-user.type';
-import { NotificationsService } from './notifications.service';
+import { NotificationInboxService } from './notification-inbox.service';
+import { NotificationStateService } from './notification-state.service';
+import { NotificationPreferencesService } from './notification-preferences.service';
+import { DeviceTokenService } from './device-token.service';
 import { ListNotificationsQueryDto } from './dto/list-notifications-query.dto';
 import { RegisterDeviceTokenDto } from './dto/register-device-token.dto';
 import { UnregisterDeviceTokenDto } from './dto/unregister-device-token.dto';
-import { ObservabilityStore } from '../observability/observability.store';
 import { UpdateNotificationPreferenceDto } from './dto/update-notification-preference.dto';
+import { ObservabilityStore } from '../observability/observability.store';
 import { NotificationType } from '../prisma-client';
+import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-error-responses.decorator';
 
 @ApiTags('notifications')
+@ApiStandardHttpErrorResponses()
 @Controller('notifications')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class NotificationsController {
-  constructor(private readonly notificationsService: NotificationsService) {}
+  constructor(
+    private readonly inbox: NotificationInboxService,
+    private readonly state: NotificationStateService,
+    private readonly preferences: NotificationPreferencesService,
+    private readonly deviceTokens: DeviceTokenService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: 'List notifications for the authenticated user' })
@@ -44,14 +54,21 @@ export class NotificationsController {
     @CurrentUser() user: AuthenticatedUser,
     @Query() query: ListNotificationsQueryDto,
   ) {
-    return this.notificationsService.listForUser(user, query);
+    return this.inbox.listForUser(user, query);
   }
 
   @Get('unread-count')
   @ApiOperation({ summary: 'Get unread notification count' })
   @ApiOkResponse({ description: 'Unread count' })
   unreadCount(@CurrentUser() user: AuthenticatedUser) {
-    return this.notificationsService.getUnreadCount(user);
+    return this.inbox.getUnreadCount(user);
+  }
+
+  @Get('summary')
+  @ApiOperation({ summary: 'Get notification summary grouped by type' })
+  @ApiOkResponse({ description: 'Grouped counts by notification type' })
+  summary(@CurrentUser() user: AuthenticatedUser) {
+    return this.inbox.getSummary(user);
   }
 
   @Patch(':id/read')
@@ -61,7 +78,18 @@ export class NotificationsController {
     @CurrentUser() user: AuthenticatedUser,
     @Param('id') id: string,
   ) {
-    await this.notificationsService.markOneRead(user, id);
+    await this.state.markOneRead(user, id);
+    return { success: true };
+  }
+
+  @Patch(':id/unread')
+  @ApiOperation({ summary: 'Mark a notification as unread' })
+  @ApiOkResponse({ description: 'Notification marked as unread' })
+  async markOneUnread(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+  ) {
+    await this.state.markOneUnread(user, id);
     return { success: true };
   }
 
@@ -69,14 +97,32 @@ export class NotificationsController {
   @ApiOperation({ summary: 'Mark all notifications as read' })
   @ApiOkResponse({ description: 'Batch update result' })
   markAllRead(@CurrentUser() user: AuthenticatedUser) {
-    return this.notificationsService.markAllRead(user);
+    return this.state.markAllRead(user);
+  }
+
+  @Patch(':id/archive')
+  @ApiOperation({ summary: 'Archive a notification' })
+  @ApiOkResponse({ description: 'Notification archived' })
+  async archiveOne(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+  ) {
+    await this.state.archiveOne(user, id);
+    return { success: true };
+  }
+
+  @Patch('archive-all-read')
+  @ApiOperation({ summary: 'Archive all read notifications' })
+  @ApiOkResponse({ description: 'Batch archive result' })
+  archiveAllRead(@CurrentUser() user: AuthenticatedUser) {
+    return this.state.archiveAllRead(user);
   }
 
   @Get('preferences')
   @ApiOperation({ summary: 'List notification preferences for current user' })
   @ApiOkResponse({ description: 'Notification preferences' })
-  preferences(@CurrentUser() user: AuthenticatedUser) {
-    return this.notificationsService.listPreferences(user);
+  listPreferences(@CurrentUser() user: AuthenticatedUser) {
+    return this.preferences.listPreferences(user);
   }
 
   @Patch('preferences/:type')
@@ -87,7 +133,7 @@ export class NotificationsController {
     @Param('type', new ParseEnumPipe(NotificationType)) type: NotificationType,
     @Body() dto: UpdateNotificationPreferenceDto,
   ) {
-    return this.notificationsService.updatePreference(user, type, dto);
+    return this.preferences.updatePreference(user, type, dto);
   }
 
   @Post('devices/unregister')
@@ -99,7 +145,7 @@ export class NotificationsController {
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: UnregisterDeviceTokenDto,
   ) {
-    await this.notificationsService.unregisterDeviceToken(user, dto.token);
+    await this.deviceTokens.unregisterDeviceToken(user, dto.token);
     return { success: true };
   }
 
@@ -110,7 +156,7 @@ export class NotificationsController {
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: RegisterDeviceTokenDto,
   ) {
-    return this.notificationsService.registerDeviceToken(user, dto);
+    return this.deviceTokens.registerDeviceToken(user, dto);
   }
 
   @Delete('devices/:token')
@@ -122,7 +168,7 @@ export class NotificationsController {
     @CurrentUser() user: AuthenticatedUser,
     @Param('token') token: string,
   ) {
-    await this.notificationsService.unregisterDeviceToken(user, token);
+    await this.deviceTokens.unregisterDeviceToken(user, token);
     return { success: true };
   }
 
@@ -156,7 +202,7 @@ export class NotificationsController {
     @Query('page') page?: string,
     @Query('limit') limit?: string,
   ) {
-    return this.notificationsService.listDeadLetters(
+    return this.inbox.listDeadLetters(
       Number(page ?? '1'),
       Number(limit ?? '20'),
     );

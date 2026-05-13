@@ -13,7 +13,8 @@ import 'package:http/http.dart' as http;
 
 /// HTTP client for Chisto API. Attaches base URL, auth token, maps errors to
 /// [AppError], and transparently retries once on 401 after refreshing the
-/// session (if a [refreshSession] callback is provided).
+/// session (if a [refreshSession] callback is provided) for `UNAUTHORIZED` and
+/// `SESSION_REVOKED` (rotated / revoked access session on the server).
 ///
 /// Parallel 401s: [_refreshing] allows only one refresh at a time; other
 /// requests may fail once before the retry path succeeds after refresh.
@@ -132,7 +133,9 @@ class ApiClient {
     try {
       return await _postMultipart(path, filePaths);
     } on AppError catch (e) {
-      if (e.code != 'UNAUTHORIZED' ||
+      final bool mayRecoverWithRefresh = e.code == 'UNAUTHORIZED' ||
+          e.code == 'SESSION_REVOKED';
+      if (!mayRecoverWithRefresh ||
           _authPaths.contains(path) ||
           refreshSession == null ||
           _refreshing) {
@@ -230,7 +233,9 @@ class ApiClient {
         timeout: timeout,
       );
     } on AppError catch (e) {
-      if (e.code != 'UNAUTHORIZED' ||
+      final bool mayRecoverWithRefresh = e.code == 'UNAUTHORIZED' ||
+          e.code == 'SESSION_REVOKED';
+      if (!mayRecoverWithRefresh ||
           _authPaths.contains(path) ||
           refreshSession == null ||
           _refreshing) {
@@ -360,7 +365,9 @@ class ApiClient {
       if (e.code == 'CANCELLED') {
         rethrow;
       }
-      if (e.code != 'UNAUTHORIZED' ||
+      final bool mayRecoverWithRefresh = e.code == 'UNAUTHORIZED' ||
+          e.code == 'SESSION_REVOKED';
+      if (!mayRecoverWithRefresh ||
           _authPaths.contains(path) ||
           refreshSession == null ||
           _refreshing) {
@@ -449,13 +456,8 @@ class ApiClient {
       retryAfterHeader: retryAfterHeader,
     );
 
-    if (response.statusCode == 401) {
-      final String authCode = error.code;
-      if (authCode == 'UNAUTHORIZED' ||
-          authCode == 'INVALID_TOKEN_USER' ||
-          authCode == 'ACCOUNT_NOT_ACTIVE') {
-        _onUnauthorized();
-      }
+    if (response.statusCode == 401 && error.indicatesInvalidOrEndedSession) {
+      _onUnauthorized();
     }
 
     throw error;
@@ -480,7 +482,9 @@ class ApiClient {
       if (e.code == 'CANCELLED') {
         rethrow;
       }
-      if (e.code != 'UNAUTHORIZED' ||
+      final bool mayRecoverWithRefresh = e.code == 'UNAUTHORIZED' ||
+          e.code == 'SESSION_REVOKED';
+      if (!mayRecoverWithRefresh ||
           _authPaths.contains(path) ||
           refreshSession == null ||
           _refreshing) {
@@ -628,14 +632,8 @@ class ApiClient {
       retryAfterHeader: retryAfterHeader,
     );
 
-    if (response.statusCode == 401) {
-      final String authCode = error.code;
-      // ACCOUNT_NOT_ACTIVE = soft-deleted/suspended; sign out like other auth failures
-      if (authCode == 'UNAUTHORIZED' ||
-          authCode == 'INVALID_TOKEN_USER' ||
-          authCode == 'ACCOUNT_NOT_ACTIVE') {
-        _onUnauthorized();
-      }
+    if (response.statusCode == 401 && error.indicatesInvalidOrEndedSession) {
+      _onUnauthorized();
     }
 
     throw error;

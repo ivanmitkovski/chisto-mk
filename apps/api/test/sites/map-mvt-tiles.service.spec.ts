@@ -1,4 +1,6 @@
 import { NotFoundException } from '@nestjs/common';
+import { MapMvtTilesFallbackService } from '../../src/sites/map/map-mvt-tiles-fallback.service';
+import { MapMvtTilesPostgisService } from '../../src/sites/map/map-mvt-tiles-postgis.service';
 import { MapMvtTilesService } from '../../src/sites/map/map-mvt-tiles.service';
 
 jest.mock('../../src/config/feature-flags', () => ({
@@ -14,7 +16,9 @@ describe('MapMvtTilesService', () => {
     const prisma: { $queryRaw: jest.Mock } = {
       $queryRaw: jest.fn(),
     };
-    return { service: new MapMvtTilesService(prisma as never), prisma };
+    const postgis = new MapMvtTilesPostgisService(prisma as never);
+    const fallback = new MapMvtTilesFallbackService(prisma as never);
+    return { service: new MapMvtTilesService(postgis, fallback), prisma };
   }
 
   it('throws when vector flag is disabled', async () => {

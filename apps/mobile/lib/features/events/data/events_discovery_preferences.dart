@@ -8,7 +8,7 @@ class EventsDiscoveryPreferences {
   const EventsDiscoveryPreferences();
 
   static const String _recentSearchesKey = 'events_discovery_recent_searches_v1';
-  static const String _pinnedFiltersKey = 'events_discovery_pinned_filters_v1';
+  static const String _activeFilterKey = 'events_discovery_active_filter_v1';
   static const String _calendarViewPreferredKey =
       'events_discovery_calendar_view_preferred_v1';
   static const int _maxRecentSearches = 8;
@@ -55,54 +55,24 @@ class EventsDiscoveryPreferences {
     await prefs.setString(_recentSearchesKey, jsonEncode(normalized));
   }
 
-  Future<List<EcoEventFilter>> readPinnedFilters() async {
+  /// Last selected events feed chip (persisted across sessions).
+  Future<EcoEventFilter> readActiveFilter() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final String? raw = prefs.getString(_pinnedFiltersKey);
-    if (raw == null || raw.isEmpty) {
-      return const <EcoEventFilter>[
-        EcoEventFilter.upcoming,
-        EcoEventFilter.nearby,
-        EcoEventFilter.myEvents,
-      ];
+    final String? raw = prefs.getString(_activeFilterKey);
+    if (raw == null || raw.trim().isEmpty) {
+      return EcoEventFilter.all;
     }
-    final dynamic decoded;
-    try {
-      decoded = jsonDecode(raw);
-    } catch (_) {
-      return const <EcoEventFilter>[
-        EcoEventFilter.upcoming,
-        EcoEventFilter.nearby,
-        EcoEventFilter.myEvents,
-      ];
+    for (final EcoEventFilter filter in EcoEventFilter.values) {
+      if (filter.name == raw.trim()) {
+        return filter;
+      }
     }
-    if (decoded is! List<dynamic>) {
-      return const <EcoEventFilter>[
-        EcoEventFilter.upcoming,
-        EcoEventFilter.nearby,
-        EcoEventFilter.myEvents,
-      ];
-    }
-    final List<EcoEventFilter> filters = decoded
-        .whereType<String>()
-        .map(_filterFromName)
-        .whereType<EcoEventFilter>()
-        .toList(growable: false);
-    return filters.isEmpty
-        ? const <EcoEventFilter>[
-            EcoEventFilter.upcoming,
-            EcoEventFilter.nearby,
-            EcoEventFilter.myEvents,
-          ]
-        : filters;
+    return EcoEventFilter.all;
   }
 
-  Future<void> writePinnedFilters(List<EcoEventFilter> filters) async {
+  Future<void> writeActiveFilter(EcoEventFilter filter) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final List<String> names = filters
-        .map((EcoEventFilter filter) => filter.name)
-        .toSet()
-        .toList(growable: false);
-    await prefs.setString(_pinnedFiltersKey, jsonEncode(names));
+    await prefs.setString(_activeFilterKey, filter.name);
   }
 
   /// Whether the events feed should open in calendar mode (default: list).
@@ -114,14 +84,5 @@ class EventsDiscoveryPreferences {
   Future<void> writeCalendarViewPreferred(bool value) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_calendarViewPreferredKey, value);
-  }
-
-  EcoEventFilter? _filterFromName(String name) {
-    for (final EcoEventFilter filter in EcoEventFilter.values) {
-      if (filter.name == name) {
-        return filter;
-      }
-    }
-    return null;
   }
 }

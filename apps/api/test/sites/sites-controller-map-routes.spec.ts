@@ -1,4 +1,4 @@
-import { SitesController } from '../../src/sites/sites.controller';
+import { SitesMapController } from '../../src/sites/sites-map.controller';
 
 describe('SitesController map routes', () => {
   function makeController() {
@@ -13,8 +13,7 @@ describe('SitesController map routes', () => {
         .fn()
         .mockResolvedValue({ at: new Date().toISOString(), revisionCount: 0, hint: 'stub' }),
     } as never;
-    const siteEventsService = {} as never;
-    const controller = new SitesController(sitesService, siteEventsService);
+    const controller = new SitesMapController(sitesService);
     return { controller, sitesService };
   }
 

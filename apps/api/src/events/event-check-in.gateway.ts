@@ -8,12 +8,14 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { forwardRef, Inject, Logger, UnauthorizedException } from '@nestjs/common';
+import { Logger, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Server, Socket } from 'socket.io';
-import { UserStatus } from '../generated/prisma';
-import * as jwt from 'jsonwebtoken';
+import { authenticateSocketUser } from '../common/ws/authenticate-socket-user';
+import { parseWsCorsAllowlist } from '../common/ws/parse-ws-cors-allowlist';
+import { PrismaService } from '../prisma/prisma.service';
 import { CheckInRepository } from './check-in.repository';
+import { EventCheckInRoomEmitterService } from './event-check-in-room-emitter.service';
 import { EventLiveImpactService } from './event-live-impact.service';
 
 interface CheckInSocketData {
@@ -22,17 +24,9 @@ interface CheckInSocketData {
 }
 
 function resolveCheckInWsCorsOrigin(): boolean | string | string[] {
-  const raw = process.env.CHECKIN_WS_CORS_ORIGINS?.trim() || process.env.CHAT_WS_CORS_ORIGINS?.trim();
-  if (raw) {
-    const list = raw.split(',').map((s) => s.trim()).filter(Boolean);
-    return list.length ? list : '*';
-  }
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error(
-      'CHECKIN_WS_CORS_ORIGINS or CHAT_WS_CORS_ORIGINS must be set in production (comma-separated allowlist)',
-    );
-  }
-  return '*';
+  const merged =
+    process.env.CHECKIN_WS_CORS_ORIGINS?.trim() || process.env.CHAT_WS_CORS_ORIGINS?.trim();
+  return parseWsCorsAllowlist(merged, 'CHECKIN_WS_CORS_ORIGINS');
 }
 
 /**
@@ -60,55 +54,50 @@ export class EventCheckInGateway
 
   constructor(
     private readonly config: ConfigService,
+    private readonly prisma: PrismaService,
     private readonly checkInRepository: CheckInRepository,
-    @Inject(forwardRef(() => EventLiveImpactService))
     private readonly liveImpact: EventLiveImpactService,
+    private readonly checkInRoomEmitter: EventCheckInRoomEmitterService,
   ) {}
 
   afterInit(server: Server): void {
-    void server;
+    this.checkInRoomEmitter?.attachServer(server);
     this.logger.log('Check-in WebSocket gateway initialized');
   }
 
   async handleConnection(client: Socket): Promise<void> {
     try {
-      const authHeader = client.handshake.headers.authorization;
-      let tokenFromHeader: string | undefined;
-      if (typeof authHeader === 'string') {
-        const match = authHeader.match(/^Bearer\s+(.+)$/i);
-        tokenFromHeader = match?.[1]?.trim();
-      }
-      const token =
-        (client.handshake.auth?.token as string) || tokenFromHeader;
+      const user = await authenticateSocketUser(client, this.config, this.prisma);
+      (client.data as CheckInSocketData).userId = user.userId;
+      (client.data as CheckInSocketData).displayName = user.displayName;
 
-      if (!token) {
-        throw new UnauthorizedException('Missing token');
-      }
-
-      const secret = this.config.get<string>('JWT_SECRET');
-      if (!secret) {
-        throw new Error('JWT_SECRET not configured');
-      }
-
-      const payload = jwt.verify(token, secret, { algorithms: ['HS256'] }) as {
-        sub: string;
-        email: string;
-      };
-
-      const user = await this.checkInRepository.findUserForCheckInWebsocket(payload.sub);
-
-      if (!user || user.status !== UserStatus.ACTIVE) {
-        throw new UnauthorizedException('User not active');
-      }
-
-      (client.data as CheckInSocketData).userId = user.id;
-      (client.data as CheckInSocketData).displayName =
-        `${user.firstName} ${user.lastName}`.trim();
-
-      this.logger.debug(`Check-in WS connected: ${user.id} (${client.id})`);
+      this.logger.debug(`Check-in WS connected: ${user.userId} (${client.id})`);
     } catch (error) {
       this.logger.warn(`Check-in WS auth failed: ${String(error)}`);
-      client.emit('error', { code: 'AUTH_FAILED', message: 'Authentication failed' });
+      const fallback = { code: 'AUTH_FAILED', message: 'Authentication failed' } as const;
+      if (error instanceof UnauthorizedException) {
+        const body = error.getResponse();
+        if (
+          typeof body === 'object' &&
+          body !== null &&
+          'code' in body &&
+          'message' in body &&
+          typeof (body as { code: unknown }).code === 'string' &&
+          typeof (body as { message: unknown }).message === 'string'
+        ) {
+          client.emit('error', {
+            code: (body as { code: string }).code,
+            message: (body as { message: string }).message,
+          });
+        } else {
+          client.emit('error', {
+            code: 'CHECK_IN_UNAUTHORIZED',
+            message: typeof body === 'string' ? body : fallback.message,
+          });
+        }
+      } else {
+        client.emit('error', { code: fallback.code, message: fallback.message });
+      }
       client.disconnect(true);
     }
   }
@@ -237,21 +226,7 @@ export class EventCheckInGateway
   }
 
   emitToRoom(eventId: string, eventType: string, payload: unknown): void {
-    const room = `checkin:${eventId}`;
-    void this.server
-      .in(room)
-      .fetchSockets()
-      .then((sockets) => {
-        this.logger.debug(
-          `emit ${eventType} room=${room} sockets=${sockets.length}`,
-        );
-      })
-      .catch((err: unknown) => {
-        this.logger.debug(
-          `emit ${eventType} room=${room} socket count failed: ${String(err)}`,
-        );
-      });
-    this.server.to(room).emit(eventType, payload);
+    this.checkInRoomEmitter.emitToRoom(eventId, eventType, payload);
   }
 
 }

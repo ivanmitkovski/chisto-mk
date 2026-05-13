@@ -47,6 +47,9 @@ class RecordingEventsRepository extends ChangeNotifier implements EventsReposito
   List<EcoEvent> get events => List<EcoEvent>.unmodifiable(_events);
 
   @override
+  List<String> get lastRankedSearchSuggestions => const <String>[];
+
+  @override
   DateTime? get lastSuccessfulListRefreshAt => null;
 
   bool _hasMoreForTest = false;
@@ -227,6 +230,11 @@ class RecordingEventsRepository extends ChangeNotifier implements EventsReposito
   int fetchEventsSnapshotCallCount = 0;
   EcoEventSearchParams? lastSnapshotParams;
 
+  /// When non-null, [fetchParticipants] returns this page (cursor ignored).
+  EventParticipantsPage? participantsPageStub;
+
+  int fetchParticipantsCallCount = 0;
+
   @override
   Future<List<EcoEvent>> fetchEventsSnapshot(EcoEventSearchParams params) async {
     fetchEventsSnapshotCallCount++;
@@ -245,6 +253,9 @@ class RecordingEventsRepository extends ChangeNotifier implements EventsReposito
   Future<EventParticipantsPage> fetchParticipants(
     String eventId, {
     String? cursor,
-  }) async =>
-      const EventParticipantsPage(items: <EventParticipantRow>[], hasMore: false);
+  }) async {
+    fetchParticipantsCallCount++;
+    return participantsPageStub ??
+        const EventParticipantsPage(items: <EventParticipantRow>[], hasMore: false);
+  }
 }

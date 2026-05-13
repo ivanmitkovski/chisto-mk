@@ -52,8 +52,10 @@ import { ReportsUploadService } from './reports-upload.service';
 import { NonEmptyUploadedFilesPipe } from './pipes/non-empty-uploaded-files.pipe';
 import { ReportsUserThrottlerGuard } from './reports-user-throttler.guard';
 import { ParseCuidPipe } from '../common/pipes/parse-cuid.pipe';
+import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-error-responses.decorator';
 
 @ApiTags('reports')
+@ApiStandardHttpErrorResponses()
 @ApiExtraModels(AdminReportDetailDto, CitizenReportDetailDto)
 @Controller('reports')
 export class ReportsController {

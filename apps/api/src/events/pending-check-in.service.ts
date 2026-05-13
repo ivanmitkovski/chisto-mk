@@ -1,4 +1,11 @@
-import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  OnModuleDestroy,
+  OnModuleInit,
+  Optional,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
 import { randomUUID } from 'node:crypto';
@@ -17,36 +24,45 @@ export interface PendingCheckIn {
 
 const DEFAULT_TTL_SEC = 60;
 
-function mustUseRedis(config: ConfigService): boolean {
-  const nodeEnv = (config.get<string>('NODE_ENV') ?? 'development').toLowerCase();
-  const flag = config.get<string>('CHECK_IN_REQUIRE_REDIS')?.trim().toLowerCase();
+function mustUseRedis(cfg: (key: string) => string | undefined): boolean {
+  const nodeEnv = (cfg('NODE_ENV') ?? 'development').toLowerCase();
+  const flag = cfg('CHECK_IN_REQUIRE_REDIS')?.toLowerCase();
   return nodeEnv === 'production' || flag === '1' || flag === 'true';
 }
 
 @Injectable()
 export class PendingCheckInService implements OnModuleDestroy, OnModuleInit {
   private readonly logger = new Logger(PendingCheckInService.name);
-  private readonly ttlSec: number;
-  private readonly keyPrefix: string;
-  private readonly requireRedis: boolean;
+  private cfg!: (key: string) => string | undefined;
+  private ttlSec = DEFAULT_TTL_SEC;
+  private keyPrefix = 'chisto:development:checkin:pending:';
+  private requireRedis = false;
   private redis: Redis | null = null;
 
-  constructor(private readonly config: ConfigService) {
-    const envTtl = this.config.get<string>('CHECK_IN_CONFIRM_TTL_SEC');
-    this.ttlSec = envTtl != null ? Math.max(10, parseInt(envTtl, 10) || DEFAULT_TTL_SEC) : DEFAULT_TTL_SEC;
-
-    const env = this.config.get<string>('NODE_ENV') ?? 'development';
-    this.keyPrefix = `chisto:${env}:checkin:pending:`;
-    this.requireRedis = mustUseRedis(this.config);
-
-    this.initRedis();
-  }
+  constructor(@Optional() private readonly config: ConfigService | null) {}
 
   onModuleInit(): void {
+    this.cfg = (key: string) =>
+      this.config?.get<string>(key)?.trim() ?? process.env[key]?.trim();
+
+    const envTtl = this.cfg('CHECK_IN_CONFIRM_TTL_SEC');
+    this.ttlSec =
+      envTtl != null ? Math.max(10, parseInt(envTtl, 10) || DEFAULT_TTL_SEC) : DEFAULT_TTL_SEC;
+
+    const env = this.cfg('NODE_ENV') ?? 'development';
+    this.keyPrefix = `chisto:${env}:checkin:pending:`;
+    this.requireRedis = mustUseRedis(this.cfg);
+
+    this.initRedis();
+
     if (this.requireRedis && this.redis == null) {
-      throw new Error(
-        'PendingCheckInService: Redis is required (NODE_ENV=production or CHECK_IN_REQUIRE_REDIS=true) but REDIS_URL is missing or Redis failed to initialize. Pending check-in is not safe across multiple API instances without Redis.',
-      );
+      const message =
+        'Redis is required for pending check-in (NODE_ENV=production or CHECK_IN_REQUIRE_REDIS=true) but REDIS_URL is missing or Redis failed to initialize. Multi-instance check-in is unsafe without Redis.';
+      this.logger.error(message);
+      throw new InternalServerErrorException({
+        code: 'CHECK_IN_REDIS_REQUIRED',
+        message,
+      });
     }
   }
 
@@ -60,7 +76,7 @@ export class PendingCheckInService implements OnModuleDestroy, OnModuleInit {
   }
 
   private initRedis(): void {
-    const url = this.config.get<string>('REDIS_URL')?.trim();
+    const url = this.cfg('REDIS_URL');
     if (!url) {
       if (this.requireRedis) {
         this.logger.error(
@@ -76,10 +92,10 @@ export class PendingCheckInService implements OnModuleDestroy, OnModuleInit {
     try {
       const useTls =
         url.startsWith('rediss://') ||
-        this.config.get<string>('REDIS_TLS') === '1' ||
-        this.config.get<string>('REDIS_TLS')?.toLowerCase() === 'true';
+        this.cfg('REDIS_TLS') === '1' ||
+        this.cfg('REDIS_TLS')?.toLowerCase() === 'true';
       this.redis = new Redis(url, {
-        ...(useTls ? { tls: { rejectUnauthorized: this.config.get<string>('REDIS_TLS_REJECT_UNAUTHORIZED') !== '0' } } : {}),
+        ...(useTls ? { tls: { rejectUnauthorized: this.cfg('REDIS_TLS_REJECT_UNAUTHORIZED') !== '0' } } : {}),
         maxRetriesPerRequest: 3,
         lazyConnect: false,
       });

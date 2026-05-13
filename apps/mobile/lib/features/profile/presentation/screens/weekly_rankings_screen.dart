@@ -17,6 +17,7 @@ import 'package:chisto_mobile/features/profile/presentation/widgets/weekly_ranki
 import 'package:chisto_mobile/shared/widgets/animated_phase_switcher.dart';
 import 'package:chisto_mobile/shared/widgets/app_error_view.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
+import 'package:chisto_mobile/shared/widgets/app_refresh_indicator.dart';
 import 'package:intl/intl.dart';
 
 class WeeklyRankingsScreen extends ConsumerStatefulWidget {
@@ -184,8 +185,7 @@ class _WeeklyRankingsScreenState extends ConsumerState<WeeklyRankingsScreen> {
             ),
           ),
         Expanded(
-          child: RefreshIndicator(
-            color: AppColors.primary,
+          child: AppRefreshIndicator(
             onRefresh: () =>
                 ref.read(weeklyRankingsNotifierProvider.notifier).refresh(),
             child: entries.isEmpty

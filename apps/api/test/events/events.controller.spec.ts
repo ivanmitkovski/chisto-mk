@@ -9,7 +9,7 @@ import { ListEventsQueryDto } from '../../src/events/dto/list-events-query.dto';
 import { EventsCheckInController } from '../../src/events/events-check-in.controller';
 import { EventsCheckInService } from '../../src/events/events-check-in.service';
 import { EventsController } from '../../src/events/events.controller';
-import { EventsService } from '../../src/events/events.service';
+import { EventsListController } from '../../src/events/events-list.controller';
 
 function user(id: string): AuthenticatedUser {
   return {
@@ -21,12 +21,16 @@ function user(id: string): AuthenticatedUser {
 }
 
 describe('EventsController', () => {
+  let listController: EventsListController;
   let controller: EventsController;
   const list = jest.fn();
   const findOne = jest.fn();
   const findPublicShareCard = jest.fn();
   const create = jest.fn();
   const join = jest.fn();
+  const search = jest.fn();
+  const checkScheduleConflictPreview = jest.fn();
+  const getAnalytics = jest.fn();
 
   beforeEach(() => {
     list.mockReset();
@@ -34,41 +38,47 @@ describe('EventsController', () => {
     findPublicShareCard.mockReset();
     create.mockReset();
     join.mockReset();
+    search.mockReset();
+    checkScheduleConflictPreview.mockReset();
+    getAnalytics.mockReset();
 
-    controller = new EventsController(
-      {
-        list,
-        findOne,
-        findPublicShareCard,
-        create,
-        patchEvent: jest.fn(),
-        join,
-        leave: jest.fn(),
-        patchLifecycle: jest.fn(),
-        patchReminder: jest.fn(),
-        appendAfterImages: jest.fn(),
-        listParticipants: jest.fn(),
-      } as unknown as EventsService,
-      { getSnapshot: jest.fn(), watchLiveImpactSse: jest.fn(), patch: jest.fn() } as never,
-      { listForEvent: jest.fn(), addPhoto: jest.fn(), deletePhoto: jest.fn() } as never,
-      {
-        listForEvent: jest.fn(),
-        replaceWaypoints: jest.fn(),
-        claimSegment: jest.fn(),
-        completeSegment: jest.fn(),
-      } as never,
+    const querySvc = { list, findOne, listParticipants: jest.fn() };
+    const creationSvc = { create };
+    const eventSearchSvc = { search };
+    const schedulePreviewSvc = { checkScheduleConflictPreview };
+    const updatesSvc = { patchEvent: jest.fn() };
+    const lifecycleSvc = { patchLifecycle: jest.fn() };
+    const participationSvc = { join, leave: jest.fn(), patchReminder: jest.fn() };
+    const afterImagesSvc = { appendAfterImages: jest.fn() };
+    const analyticsSvc = { getAnalytics };
+    const shareCardSvc = { findPublicShareCard };
+
+    listController = new EventsListController(
+      querySvc as never,
+      creationSvc as never,
+      eventSearchSvc as never,
+      schedulePreviewSvc as never,
       { applyBatch: jest.fn() } as never,
+    );
+    controller = new EventsController(
+      querySvc as never,
+      updatesSvc as never,
+      lifecycleSvc as never,
+      participationSvc as never,
+      afterImagesSvc as never,
+      analyticsSvc as never,
+      shareCardSvc as never,
       { buildForViewer: jest.fn() } as never,
     );
   });
 
-  it('list forwards user and query to EventsService', async () => {
+  it('list forwards user and query to EventsQueryService', async () => {
     const u = user('u1');
     const query = Object.assign(new ListEventsQueryDto(), { limit: 10 });
     const payload = { data: [], meta: { hasMore: false, nextCursor: null } };
     list.mockResolvedValue(payload);
 
-    const result = await controller.list(u, query);
+    const result = await listController.list(u, query);
 
     expect(list).toHaveBeenCalledWith(u, query);
     expect(result).toBe(payload);
@@ -91,7 +101,7 @@ describe('EventsController', () => {
     expect(() => pipe.transform('   ')).toThrow(BadRequestException);
   });
 
-  it('getPublicShareCard forwards cuid-shaped id to EventsService', async () => {
+  it('getPublicShareCard forwards cuid-shaped id to EventsShareCardQueryService', async () => {
     const cuid = 'c012345678901234567890123';
     const card = {
       id: cuid,
@@ -109,7 +119,7 @@ describe('EventsController', () => {
     expect(result).toBe(card);
   });
 
-  it('getPublicShareCard forwards arbitrary id to EventsService (not found from service)', async () => {
+  it('getPublicShareCard forwards arbitrary id to share card service (not found from service)', async () => {
     findPublicShareCard.mockRejectedValue(
       new NotFoundException({ code: 'EVENT_NOT_FOUND', message: 'Event not found' }),
     );
@@ -117,7 +127,7 @@ describe('EventsController', () => {
     expect(findPublicShareCard).toHaveBeenCalledWith('not-a-cuid');
   });
 
-  it('getPublicShareCard forwards trimmed cuid to EventsService', async () => {
+  it('getPublicShareCard forwards trimmed cuid to share card service', async () => {
     const id = 'c012345678901234567890123';
     const card = { id, title: 'River', siteLabel: 'Skopje', scheduledAt: '2026-06-01T08:00:00.000Z', endAt: null, lifecycleStatus: 'UPCOMING' };
     findPublicShareCard.mockResolvedValue(card);
@@ -133,29 +143,19 @@ describe('EventsController', () => {
     const u = user('u1');
     const receipt = { eventId: 'evt-1', title: 'River' };
     const buildForViewer = jest.fn().mockResolvedValue(receipt);
+    const querySvc = {
+      list: jest.fn(),
+      findOne: jest.fn(),
+      listParticipants: jest.fn(),
+    };
     const ctrl = new EventsController(
-      {
-        list,
-        findOne,
-        findPublicShareCard: jest.fn(),
-        create: jest.fn(),
-        patchEvent: jest.fn(),
-        join: jest.fn(),
-        leave: jest.fn(),
-        patchLifecycle: jest.fn(),
-        patchReminder: jest.fn(),
-        appendAfterImages: jest.fn(),
-        listParticipants: jest.fn(),
-      } as unknown as EventsService,
-      { getSnapshot: jest.fn(), watchLiveImpactSse: jest.fn(), patch: jest.fn() } as never,
-      { listForEvent: jest.fn(), addPhoto: jest.fn(), deletePhoto: jest.fn() } as never,
-      {
-        listForEvent: jest.fn(),
-        replaceWaypoints: jest.fn(),
-        claimSegment: jest.fn(),
-        completeSegment: jest.fn(),
-      } as never,
-      { applyBatch: jest.fn() } as never,
+      querySvc as never,
+      { patchEvent: jest.fn() } as never,
+      { patchLifecycle: jest.fn() } as never,
+      { join: jest.fn(), leave: jest.fn(), patchReminder: jest.fn() } as never,
+      { appendAfterImages: jest.fn() } as never,
+      { getAnalytics: jest.fn() } as never,
+      { findPublicShareCard: jest.fn() } as never,
       { buildForViewer } as never,
     );
 
@@ -179,7 +179,7 @@ describe('EventsController', () => {
     const created = { id: 'new', title: 'Cleanup' };
     create.mockResolvedValue(created);
 
-    const result = await controller.create(u, dto as never);
+    const result = await listController.create(u, dto as never);
 
     expect(create).toHaveBeenCalledWith(dto, u);
     expect(result).toBe(created);

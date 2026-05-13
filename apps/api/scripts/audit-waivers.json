@@ -1,0 +1,4 @@
+{
+  "description": "Time-boxed waivers for pnpm audit advisory IDs on apps__api paths. Empty = no waived findings (10/10 bar).",
+  "waivers": []
+}

@@ -6,6 +6,7 @@ import { ListMyReportsQueryDto } from './dto/list-my-reports-query.dto';
 import { CitizenReportDetailDto } from './dto/citizen-report-detail.dto';
 import { UserReportListItemDto, UserReportViewerRole } from './dto/user-report.dto';
 import { ReportsUploadService } from './reports-upload.service';
+import { signPublicMediaUrlsDeduped } from '../storage/batch-private-object-sign';
 import {
   displayReportTitle,
   getReportNumber,
@@ -93,37 +94,51 @@ export class ReportCitizenQueryService {
       }
     }
 
-    const data = await Promise.all(
-      reports.map(async (report) => {
-        const signedUrls =
-          report.mediaUrls?.length > 0
-            ? await this.reportsUploadService.signUrls(report.mediaUrls)
-            : [];
-        const viewerRole: UserReportViewerRole =
-          report.reporterId === user.userId ? 'primary' : 'co_reporter';
-        const pointsTotal = pointsByReport.get(report.id) ?? 0;
-        return {
-          id: report.id,
-          reportNumber: getReportNumber(report),
-          title: displayReportTitle(report),
-          description: optionalReportNarrative(report.description, report.category),
-          location: listLocationLabel(report.site, report.description),
-          submittedAt: report.createdAt.toISOString(),
-          status: report.status,
-          isPotentialDuplicate:
-            report.potentialDuplicateOfId !== null ||
-            report.potentialDuplicates.length > 0 ||
-            report.coReporters.length > 0,
-          coReporterCount: report.coReporters.length,
-          mediaUrls: signedUrls,
-          pointsAwarded: viewerRole === 'primary' ? pointsTotal : 0,
-          category: report.category ?? null,
-          severity: report.severity ?? null,
-          cleanupEffort: report.cleanupEffort ?? null,
-          viewerRole,
-        };
-      }),
+    const flatMedia: string[] = [];
+    for (const report of reports) {
+      for (const u of report.mediaUrls ?? []) {
+        if (typeof u === 'string' && u.trim().length > 0) {
+          flatMedia.push(u.trim());
+        }
+      }
+    }
+    const mediaUrlByOriginal = await signPublicMediaUrlsDeduped(flatMedia, (urls) =>
+      this.reportsUploadService.signUrls(urls),
     );
+
+    const data = reports.map((report) => {
+      const signedUrls =
+        report.mediaUrls?.length > 0
+          ? report.mediaUrls.map((u) => {
+              const t = typeof u === 'string' ? u.trim() : '';
+              if (t.length === 0) return u;
+              return mediaUrlByOriginal.get(t) ?? u;
+            })
+          : [];
+      const viewerRole: UserReportViewerRole =
+        report.reporterId === user.userId ? 'primary' : 'co_reporter';
+      const pointsTotal = pointsByReport.get(report.id) ?? 0;
+      return {
+        id: report.id,
+        reportNumber: getReportNumber(report),
+        title: displayReportTitle(report),
+        description: optionalReportNarrative(report.description, report.category),
+        location: listLocationLabel(report.site, report.description),
+        submittedAt: report.createdAt.toISOString(),
+        status: report.status,
+        isPotentialDuplicate:
+          report.potentialDuplicateOfId !== null ||
+          report.potentialDuplicates.length > 0 ||
+          report.coReporters.length > 0,
+        coReporterCount: report.coReporters.length,
+        mediaUrls: signedUrls,
+        pointsAwarded: viewerRole === 'primary' ? pointsTotal : 0,
+        category: report.category ?? null,
+        severity: report.severity ?? null,
+        cleanupEffort: report.cleanupEffort ?? null,
+        viewerRole,
+      };
+    });
 
     return {
       data,

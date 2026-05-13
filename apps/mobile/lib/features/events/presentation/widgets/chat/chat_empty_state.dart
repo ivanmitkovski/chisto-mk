@@ -108,7 +108,7 @@ class _ChatEmptyStateState extends State<ChatEmptyState> with SingleTickerProvid
                     borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
                   ),
                 ),
-                child: Text(context.l10n.eventChatSend),
+                child: Text(context.l10n.eventChatEmptySayHello),
               ),
             ],
           ],

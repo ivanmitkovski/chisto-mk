@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { ReportStatus, Site, SiteStatus } from '../prisma-client';
 import { PrismaService } from '../prisma/prisma.service';
-import { SiteEventsService } from '../admin-events/site-events.service';
+import { SiteEventsService } from '../admin-realtime/site-events.service';
 import { AuditService } from '../audit/audit.service';
 import { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { CreateSiteDto } from './dto/create-site.dto';
@@ -116,7 +116,7 @@ export class SitesAdminService {
     dto: UpdateSiteArchiveDto,
     admin: AuthenticatedUser,
   ): Promise<Site> {
-    const site = (await this.prisma.site.findUnique({
+    const site = await this.prisma.site.findUnique({
       where: { id: siteId },
       select: {
         id: true,
@@ -124,14 +124,8 @@ export class SitesAdminService {
         archivedAt: true,
         archivedById: true,
         archiveReason: true,
-      } as any,
-    })) as {
-      id: string;
-      isArchivedByAdmin: boolean;
-      archivedAt: Date | null;
-      archivedById: string | null;
-      archiveReason: string | null;
-    } | null;
+      },
+    });
 
     if (!site) {
       throw new NotFoundException({
@@ -158,18 +152,18 @@ export class SitesAdminService {
     const updated = await this.prisma.site.update({
       where: { id: siteId },
       data: dto.archived
-        ? ({
+        ? {
             isArchivedByAdmin: true,
             archivedAt: now,
             archivedById: admin.userId,
             archiveReason: normalizedReason,
-          } as any)
-        : ({
+          }
+        : {
             isArchivedByAdmin: false,
             archivedAt: null,
             archivedById: null,
             archiveReason: null,
-          } as any),
+          },
     });
 
     this.siteEventsService.emitSiteUpdated(siteId, {

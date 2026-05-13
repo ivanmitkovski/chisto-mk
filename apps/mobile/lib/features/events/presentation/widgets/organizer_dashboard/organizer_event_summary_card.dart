@@ -116,7 +116,7 @@ class OrganizerEventSummaryCard extends StatelessWidget {
                   else if (!event.moderationApproved)
                     _ModerationPill(
                       label: context.l10n.eventsPendingDashboardPill,
-                      color: const Color(0xFFF5A623),
+                      color: AppColors.warningAccent,
                     )
                   else
                     _StatusPill(status: event.status, color: statusColor),
@@ -171,7 +171,7 @@ class OrganizerEventSummaryCard extends StatelessWidget {
                           ),
                           valueColor: AlwaysStoppedAnimation<Color>(
                             isFull
-                                ? const Color(0xFFF5A623)
+                                ? AppColors.warningAccent
                                 : AppColors.primary,
                           ),
                         ),
@@ -186,7 +186,7 @@ class OrganizerEventSummaryCard extends StatelessWidget {
                       style: AppTypography.eventsCaptionStrong(
                         textTheme,
                         color: isFull
-                            ? const Color(0xFFF5A623)
+                            ? AppColors.warningAccent
                             : AppColors.textSecondary,
                       ),
                     ),

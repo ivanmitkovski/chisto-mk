@@ -17,7 +17,9 @@ describe('EventChatUploadService', () => {
         return undefined;
       },
     } as unknown as ConfigService;
-    return new EventChatUploadService(config, {} as PrismaService);
+    const svc = new EventChatUploadService(config, {} as PrismaService);
+    svc.onModuleInit();
+    return svc;
   }
 
   it('isTrustedChatPublishedUrl accepts only this bucket chat/ keys', () => {

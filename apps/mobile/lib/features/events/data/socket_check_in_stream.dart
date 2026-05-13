@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:chisto_mobile/core/auth/auth_state.dart';
+import 'package:chisto_mobile/core/logging/app_log.dart';
 import 'package:socket_io_client/socket_io_client.dart' as sio;
 
 /// Prefer `--dart-define=CHECKIN_WS_ONLY=true` for check-in only; falls back to
@@ -140,9 +140,7 @@ class SocketCheckInStream {
     _socket!
       ..onConnect((_) {
         _connectErrorCount = 0;
-        if (kDebugMode) {
-          debugPrint('[checkin:ws] connect host=$debugHost event=$eventId');
-        }
+        AppLog.verbose('[checkin:ws] connect host=$debugHost event=$eventId');
         _tokenAtHandshake = _authState.accessToken;
         _emitStatus(CheckInWsConnectionStatus.connected);
         scheduleMicrotask(() {
@@ -161,17 +159,11 @@ class SocketCheckInStream {
       })
       ..onConnectError((dynamic data) {
         _connectErrorCount++;
-        if (kDebugMode) {
-          debugPrint(
-            '[checkin:ws] connect_error #$_connectErrorCount host=$debugHost event=$eventId data=$data',
-          );
-        }
+        AppLog.verbose(
+          '[checkin:ws] connect_error #$_connectErrorCount host=$debugHost event=$eventId data=$data',
+        );
         if (_connectErrorCount >= _maxConnectErrors) {
-          if (kDebugMode) {
-            debugPrint(
-              '[checkin:ws] giving up after $_maxConnectErrors errors',
-            );
-          }
+          AppLog.verbose('[checkin:ws] giving up after $_maxConnectErrors errors');
           _disconnectSocketOnly();
           _emitStatus(CheckInWsConnectionStatus.disconnected);
           return;
@@ -179,11 +171,7 @@ class SocketCheckInStream {
         _emitStatus(CheckInWsConnectionStatus.connecting);
       })
       ..onDisconnect((dynamic reason) {
-        if (kDebugMode) {
-          debugPrint(
-            '[checkin:ws] disconnect host=$debugHost event=$eventId reason=$reason',
-          );
-        }
+        AppLog.verbose('[checkin:ws] disconnect host=$debugHost event=$eventId reason=$reason');
         _emitStatus(CheckInWsConnectionStatus.connecting);
       })
       ..on('error', (dynamic data) {
@@ -214,9 +202,7 @@ class SocketCheckInStream {
           if (_currentEventId != null &&
               eid.isNotEmpty &&
               eid != _currentEventId) {
-            if (kDebugMode) {
-              debugPrint('[checkin:ws] drop request wrong eventId');
-            }
+            AppLog.verbose('[checkin:ws] drop request wrong eventId');
             return;
           }
           _addEvent(
@@ -244,9 +230,7 @@ class SocketCheckInStream {
           if (_currentEventId != null &&
               eid.isNotEmpty &&
               eid != _currentEventId) {
-            if (kDebugMode) {
-              debugPrint('[checkin:ws] drop confirmed wrong eventId');
-            }
+            AppLog.verbose('[checkin:ws] drop confirmed wrong eventId');
             return;
           }
           _addEvent(
@@ -271,9 +255,7 @@ class SocketCheckInStream {
           if (_currentEventId != null &&
               eid.isNotEmpty &&
               eid != _currentEventId) {
-            if (kDebugMode) {
-              debugPrint('[checkin:ws] drop rejected wrong eventId');
-            }
+            AppLog.verbose('[checkin:ws] drop rejected wrong eventId');
             return;
           }
           _addEvent(

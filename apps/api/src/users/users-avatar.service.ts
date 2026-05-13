@@ -142,7 +142,10 @@ export class UsersAvatarService {
       const width = meta.width ?? 0;
       const height = meta.height ?? 0;
       if (width <= 0 || height <= 0) {
-        throw new Error('invalid dimensions');
+        throw new BadRequestException({
+          code: 'INVALID_AVATAR_DIMENSIONS',
+          message: 'Avatar image has invalid dimensions.',
+        });
       }
       const square = Math.min(width, height);
       const left = Math.floor((width - square) / 2);
@@ -152,7 +155,10 @@ export class UsersAvatarService {
         .resize(512, 512, { fit: 'cover' })
         .webp({ quality: 82, effort: 4 })
         .toBuffer();
-    } catch {
+    } catch (err) {
+      if (err instanceof BadRequestException) {
+        throw err;
+      }
       throw new BadRequestException({
         code: 'INVALID_AVATAR_IMAGE',
         message: 'Avatar image could not be processed.',

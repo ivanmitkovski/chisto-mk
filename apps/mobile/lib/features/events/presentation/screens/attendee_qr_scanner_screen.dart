@@ -860,7 +860,7 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: AppSpacing.xs,
                                   ),
-                                  minimumSize: Size.zero,
+                                  minimumSize: const Size.square(AppSpacing.avatarMd),
                                   child: Text(
                                     context.l10n.qrScannerEnterManually,
                                     style: AppTypography.eventsCaptionStrong(
@@ -879,7 +879,7 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: AppSpacing.xs,
                                   ),
-                                  minimumSize: Size.zero,
+                                  minimumSize: const Size.square(AppSpacing.avatarMd),
                                   child: Text(
                                     context.l10n.qrScannerRetryCamera,
                                     style: AppTypography.eventsCaptionStrong(

@@ -54,7 +54,7 @@ describe('CleanupEventsController', () => {
 
   it('listAudit maps page and limit', () => {
     listAuditTrail.mockReturnValue('audit');
-    expect(controller.listAudit('evt-1', '2', '25')).toBe('audit');
+    expect(controller.listAudit('evt-1', { page: 2, limit: 25 } as never)).toBe('audit');
     expect(listAuditTrail).toHaveBeenCalledWith('evt-1', { page: 2, limit: 25 });
   });
 

@@ -10,6 +10,7 @@ import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/data/weather_repository.dart';
 import 'package:chisto_mobile/features/events/data/weather_wmo.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
+import 'package:chisto_mobile/features/events/presentation/view_models/weather_card_view_model.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/detail_section_header.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_surface_decoration.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/weather_indicative_info_sheet.dart';
@@ -29,38 +30,38 @@ class WeatherCard extends StatefulWidget {
 }
 
 class _WeatherCardState extends State<WeatherCard> {
-  DayWeather? _weather;
-  bool _loading = true;
-  bool _failed = false;
+  late final WeatherCardViewModel _vm;
 
   @override
   void initState() {
     super.initState();
-    unawaited(_fetch());
+    _vm = WeatherCardViewModel();
+    _vm.addListener(_onVm);
+    unawaited(_vm.load(widget.event));
   }
 
-  Future<void> _fetch() async {
-    final double? lat = widget.event.siteLat;
-    final double? lng = widget.event.siteLng;
-    if (lat == null || lng == null) {
-      setState(() {
-        _loading = false;
-        _failed = true;
-      });
-      return;
+  @override
+  void didUpdateWidget(covariant WeatherCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.event.id != widget.event.id ||
+        oldWidget.event.siteLat != widget.event.siteLat ||
+        oldWidget.event.siteLng != widget.event.siteLng ||
+        oldWidget.event.date != widget.event.date) {
+      unawaited(_vm.load(widget.event));
     }
-    final DayWeather? result = await WeatherRepository.instance.fetchForDate(
-      lat: lat,
-      lng: lng,
-      targetDate: widget.event.date,
-      scheduledAtUtc: widget.event.scheduledAtUtc,
-    );
-    if (!mounted) return;
-    setState(() {
-      _weather = result;
-      _loading = false;
-      _failed = result == null;
-    });
+  }
+
+  void _onVm() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  void dispose() {
+    _vm.removeListener(_onVm);
+    _vm.dispose();
+    super.dispose();
   }
 
   @override
@@ -72,11 +73,11 @@ class _WeatherCardState extends State<WeatherCard> {
         Container(
           padding: const EdgeInsets.all(AppSpacing.md),
           decoration: EventDetailSurfaceDecoration.detailModule(),
-          child: _loading
+          child: _vm.loading
               ? _buildSkeleton(context)
-              : _failed
+              : _vm.failed
                   ? _buildErrorState(context)
-                  : _buildContent(context, _weather!),
+                  : _buildContent(context, _vm.dayWeather!),
         ),
         const SizedBox(height: AppSpacing.lg),
       ],
@@ -114,11 +115,7 @@ class _WeatherCardState extends State<WeatherCard> {
           alignment: AlignmentDirectional.centerEnd,
           child: TextButton(
             onPressed: () {
-              setState(() {
-                _loading = true;
-                _failed = false;
-              });
-              unawaited(_fetch());
+              unawaited(_vm.load(widget.event));
             },
             child: Text(context.l10n.eventsWeatherRetry),
           ),

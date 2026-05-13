@@ -1,25 +1,11 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import { SiteStatus } from '../../prisma-client';
 import { Type } from 'class-transformer';
-import { IsBoolean, IsEnum, IsIn, IsInt, IsLatitude, IsLongitude, IsNumber, IsOptional, Max, Min } from 'class-validator';
+import { IsBoolean, IsEnum, IsIn, IsInt, IsNumber, IsOptional, Max, Min } from 'class-validator';
 
-export class ListSitesMapQueryDto {
-  @ApiProperty({
-    description: 'Center latitude for map view',
-    example: 41.6086,
-  })
-  @IsLatitude()
-  @Type(() => Number)
-  lat!: number;
+import { GeoPointLatLngDto } from '../../common/dto/geo-point.dto';
 
-  @ApiProperty({
-    description: 'Center longitude for map view',
-    example: 21.7453,
-  })
-  @IsLongitude()
-  @Type(() => Number)
-  lng!: number;
-
+export class ListSitesMapQueryDto extends GeoPointLatLngDto {
   @ApiPropertyOptional({
     description: 'Map zoom level (used for server-side query safety limits and future clustering)',
     minimum: 1,

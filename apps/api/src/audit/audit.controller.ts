@@ -11,8 +11,10 @@ import { RolesGuard } from '../auth/roles.guard';
 import { ADMIN_PANEL_ROLES } from '../auth/admin-roles';
 import { AuditService } from './audit.service';
 import { ListAuditQueryDto } from './dto/list-audit-query.dto';
+import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-error-responses.decorator';
 
 @ApiTags('admin-audit')
+@ApiStandardHttpErrorResponses()
 @Controller('admin/audit')
 export class AuditController {
   constructor(private readonly auditService: AuditService) {}

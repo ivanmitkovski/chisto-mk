@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { FeedCandidateWithStage } from '../feed-v2.types';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { CandidateRequestContext } from './candidate-generator';
+import type { CandidateRequestContext } from './candidate-request-context';
 import { toStageCandidate } from './candidate-mapper';
 
 @Injectable()

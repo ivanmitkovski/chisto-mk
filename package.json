@@ -26,9 +26,29 @@
     "prepare": "husky"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=20.19.0"
   },
   "packageManager": "pnpm@9.14.2",
+  "pnpm": {
+    "overrides": {
+      "handlebars": "4.7.9",
+      "protobufjs": "7.5.5",
+      "axios": "1.16.0",
+      "follow-redirects": "1.15.11",
+      "path-to-regexp@0.1.12": "0.1.13",
+      "multer": "2.1.1",
+      "serialize-javascript": "7.0.5",
+      "fast-uri": "3.1.2",
+      "picomatch": "4.0.3",
+      "defu": "6.1.7",
+      "lodash": "4.18.1",
+      "@nestjs/common": "10.4.22",
+      "@nestjs/core": "10.4.22",
+      "node-emoji": "2.2.0",
+      "effect": "3.21.2",
+      "fast-xml-parser": "5.8.0"
+    }
+  },
   "devDependencies": {
     "husky": "^9.1.7"
   }

@@ -1,33 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import {
-  IsArray,
-  IsLatitude,
-  IsLongitude,
-  IsOptional,
-  IsString,
-  IsUUID,
-  Matches,
-  MaxLength,
-  ValidateNested,
-} from 'class-validator';
+import { IsArray, IsOptional, IsString, IsUUID, Matches, MaxLength, ValidateNested } from 'class-validator';
+
+import { GeoPointLatLngWithLabelDto } from '../../common/dto/geo-point.dto';
 import { PRISMA_CUID_REGEX } from '../../common/validators/is-cuid.validator';
 
-export class ChatLocationDto {
-  @ApiProperty({ example: 41.9981 })
-  @IsLatitude()
-  lat!: number;
-
-  @ApiProperty({ example: 21.4254 })
-  @IsLongitude()
-  lng!: number;
-
-  @ApiPropertyOptional({ example: 'City Park North' })
-  @IsOptional()
-  @IsString()
-  @MaxLength(200)
-  label?: string;
-}
+export class ChatLocationDto extends GeoPointLatLngWithLabelDto {}
 
 export class SendEventChatMessageDto {
   @ApiProperty({

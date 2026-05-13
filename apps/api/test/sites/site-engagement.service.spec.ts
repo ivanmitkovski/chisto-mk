@@ -1,6 +1,9 @@
 import { ConfigService } from '@nestjs/config';
 
+import { SiteBookmarkService } from '../../src/sites/site-bookmark.service';
 import { SiteEngagementService } from '../../src/sites/site-engagement.service';
+import { SiteShareLinkService } from '../../src/sites/site-share-link.service';
+import { SiteUpvoteService } from '../../src/sites/site-upvote.service';
 import { signSiteShareLinkToken } from '../../src/sites/site-share-link-token';
 
 const TOKEN_SECRET = 'unit_test_site_share_token_secret_24';
@@ -30,8 +33,13 @@ describe('SiteEngagementService', () => {
       }),
     } as unknown as ConfigService;
 
+    const shareLinks = new SiteShareLinkService(prisma as never, config);
     return {
-      service: new SiteEngagementService(prisma, config),
+      service: new SiteEngagementService(
+        {} as unknown as SiteUpvoteService,
+        {} as unknown as SiteBookmarkService,
+        shareLinks,
+      ),
       prisma,
     };
   }

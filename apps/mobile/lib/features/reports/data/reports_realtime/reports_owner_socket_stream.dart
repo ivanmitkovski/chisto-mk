@@ -1,7 +1,11 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/foundation.dart' show ValueNotifier;
+
 import 'package:chisto_mobile/core/auth/auth_state.dart';
+import 'package:chisto_mobile/core/logging/app_log.dart';
+import 'package:chisto_mobile/core/network/connectivity_gate.dart';
 import 'package:chisto_mobile/core/observability/chisto_sentry.dart';
 import 'package:socket_io_client/socket_io_client.dart' as sio;
 
@@ -33,21 +37,72 @@ class ReportsOwnerSocketStream {
   bool _enabled = true;
   bool _disposed = false;
 
+  StreamSubscription<List<ConnectivityResult>>? _connectivitySub;
+  Timer? _connectivityReconnectDebounce;
+
   final StreamController<ReportsOwnerEvent> _events =
       StreamController<ReportsOwnerEvent>.broadcast();
+
+  /// Single [Stream] instance so [ReportsRealtimeService.events] and transport share identity.
+  late final Stream<ReportsOwnerEvent> _eventsStream = _events.stream;
 
   final ValueNotifier<ReportsRealtimeConnectionState?> connectionState =
       ValueNotifier<ReportsRealtimeConnectionState?>(null);
 
   final ValueNotifier<int> reconnectStreakSinceLive = ValueNotifier<int>(0);
 
-  Stream<ReportsOwnerEvent> get events => _events.stream;
+  Stream<ReportsOwnerEvent> get events => _eventsStream;
 
   void _setConnectionState(ReportsRealtimeConnectionState state) {
     if (_disposed) {
       return;
     }
     connectionState.value = state;
+  }
+
+  void _onConnectivityChanged(List<ConnectivityResult> results) {
+    if (_disposed || !_authState.isAuthenticated || !_enabled) {
+      return;
+    }
+    if (!ConnectivityGate.isOnline(results)) {
+      return;
+    }
+    if (_socket != null && _socket!.connected) {
+      if (connectionState.value != ReportsRealtimeConnectionState.live) {
+        reconnectStreakSinceLive.value = 0;
+        _setConnectionState(ReportsRealtimeConnectionState.live);
+      }
+      return;
+    }
+    _scheduleConnectivityReconnect();
+  }
+
+  void _ensureConnectivitySubscription() {
+    if (_disposed || _connectivitySub != null) {
+      return;
+    }
+    _connectivitySub = ConnectivityGate.watch().listen(_onConnectivityChanged);
+  }
+
+  void _scheduleConnectivityReconnect() {
+    if (_disposed || !_enabled || !_authState.isAuthenticated) {
+      return;
+    }
+    _connectivityReconnectDebounce?.cancel();
+    _connectivityReconnectDebounce = Timer(const Duration(milliseconds: 600), () {
+      _connectivityReconnectDebounce = null;
+      if (_disposed || !_enabled || !_authState.isAuthenticated) {
+        return;
+      }
+      final String? token = _authState.accessToken;
+      if (token == null || token.isEmpty) {
+        return;
+      }
+      if (_socket != null && _socket!.connected) {
+        return;
+      }
+      connect();
+    });
   }
 
   void _onAuthChanged() {
@@ -68,8 +123,13 @@ class ReportsOwnerSocketStream {
       return;
     }
     final bool connected = _socket != null && _socket!.connected;
-    if (connected &&
-        _tokenAtHandshake != null &&
+    if (!connected) {
+      // [start] may have run before persisted auth was ready, or we showed [offline]
+      // during a brief unauthenticated transition — open the owner socket now.
+      connect();
+      return;
+    }
+    if (_tokenAtHandshake != null &&
         _tokenAtHandshake!.isNotEmpty &&
         token != _tokenAtHandshake) {
       connect();
@@ -81,6 +141,7 @@ class ReportsOwnerSocketStream {
       return;
     }
     _enabled = true;
+    _ensureConnectivitySubscription();
     connect();
   }
 
@@ -138,9 +199,7 @@ class ReportsOwnerSocketStream {
 
     _socket!
       ..onConnect((_) {
-        if (kDebugMode) {
-          debugPrint('[reports-owner:ws] connect host=$debugHost');
-        }
+        AppLog.verbose('[reports-owner:ws] connect host=$debugHost');
         _tokenAtHandshake = _authState.accessToken;
         reconnectStreakSinceLive.value = 0;
         _setConnectionState(ReportsRealtimeConnectionState.live);
@@ -152,9 +211,7 @@ class ReportsOwnerSocketStream {
         _setConnectionState(ReportsRealtimeConnectionState.live);
       })
       ..onReconnectAttempt((_) {
-        if (kDebugMode) {
-          debugPrint('[reports-owner:ws] reconnectAttempt host=$debugHost');
-        }
+        AppLog.verbose('[reports-owner:ws] reconnectAttempt host=$debugHost');
         final bool stillConnected = _socket?.connected == true;
         if (stillConnected) {
           return;
@@ -162,38 +219,30 @@ class ReportsOwnerSocketStream {
         _setConnectionState(ReportsRealtimeConnectionState.reconnecting);
       })
       ..onConnectError((dynamic data) {
-        if (kDebugMode) {
-          debugPrint(
-            '[reports-owner:ws] connect_error host=$debugHost type=${data.runtimeType}',
-          );
-        }
+        AppLog.verbose(
+          '[reports-owner:ws] connect_error host=$debugHost type=${data.runtimeType}',
+        );
         if (_socket?.connected == true) {
           return;
         }
         _setConnectionState(ReportsRealtimeConnectionState.reconnecting);
       })
       ..onReconnectError((dynamic data) {
-        if (kDebugMode) {
-          debugPrint(
-            '[reports-owner:ws] reconnect_error host=$debugHost type=${data.runtimeType}',
-          );
-        }
+        AppLog.verbose(
+          '[reports-owner:ws] reconnect_error host=$debugHost type=${data.runtimeType}',
+        );
       })
       ..onDisconnect((_) {
-        if (kDebugMode) {
-          debugPrint('[reports-owner:ws] disconnect host=$debugHost');
-        }
+        AppLog.verbose('[reports-owner:ws] disconnect host=$debugHost');
         if (_enabled && !_disposed && _authState.isAuthenticated) {
           reconnectStreakSinceLive.value = reconnectStreakSinceLive.value + 1;
           _setConnectionState(ReportsRealtimeConnectionState.reconnecting);
         }
       })
       ..onError((dynamic err) {
-        if (kDebugMode) {
-          debugPrint(
-            '[reports-owner:ws] engine error host=$debugHost type=${err.runtimeType}',
-          );
-        }
+        AppLog.verbose(
+          '[reports-owner:ws] engine error host=$debugHost type=${err.runtimeType}',
+        );
         if (_socket?.connected == true) {
           return;
         }
@@ -258,6 +307,10 @@ class ReportsOwnerSocketStream {
     }
     _disposed = true;
     _enabled = false;
+    _connectivityReconnectDebounce?.cancel();
+    _connectivityReconnectDebounce = null;
+    unawaited(_connectivitySub?.cancel() ?? Future<void>.value());
+    _connectivitySub = null;
     _authState.removeListener(_onAuthChanged);
     _disconnect();
     reconnectStreakSinceLive.dispose();

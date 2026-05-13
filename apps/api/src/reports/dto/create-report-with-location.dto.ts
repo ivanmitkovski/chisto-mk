@@ -4,8 +4,6 @@ import {
   IsArray,
   IsIn,
   IsInt,
-  IsLatitude,
-  IsLongitude,
   IsOptional,
   IsString,
   Matches,
@@ -14,18 +12,12 @@ import {
   Min,
   MinLength,
 } from 'class-validator';
+
+import { GeoPointLatitudeLongitudeDto } from '../../common/dto/geo-point.dto';
 import { REPORT_CLEANUP_EFFORT_KEYS } from '../report-cleanup-effort';
 
-export class CreateReportWithLocationDto {
+export class CreateReportWithLocationDto extends GeoPointLatitudeLongitudeDto {
   // SECURITY: All fields are length/type bounded for DB alignment and to limit abuse; whitelist via global ValidationPipe.
-  @ApiProperty({ description: 'Latitude of the report location', example: 41.6086 })
-  @IsLatitude()
-  latitude!: number;
-
-  @ApiProperty({ description: 'Longitude of the report location', example: 21.7453 })
-  @IsLongitude()
-  longitude!: number;
-
   @ApiProperty({
     description: 'Short headline for lists and moderation',
     example: 'Illegal dump behind the bus station',

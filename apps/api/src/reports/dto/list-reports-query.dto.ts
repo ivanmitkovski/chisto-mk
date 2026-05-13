@@ -1,19 +1,10 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { PaginationQueryDto20 } from '../../common/dto/pagination-query.dto';
 import { ReportStatus } from '../../prisma-client';
 import { Type } from 'class-transformer';
-import {
-  IsBoolean,
-  IsEnum,
-  IsInt,
-  IsOptional,
-  IsString,
-  Length,
-  Matches,
-  Max,
-  Min,
-} from 'class-validator';
+import { IsBoolean, IsEnum, IsOptional, IsString, Length, Matches } from 'class-validator';
 
-export class ListReportsQueryDto {
+export class ListReportsQueryDto extends PaginationQueryDto20 {
   @ApiPropertyOptional({ enum: ReportStatus })
   @IsOptional()
   @IsEnum(ReportStatus)
@@ -40,18 +31,4 @@ export class ListReportsQueryDto {
   @IsBoolean()
   duplicatesOnly?: boolean;
 
-  @ApiPropertyOptional({ default: 1, minimum: 1 })
-  @Type(() => Number)
-  @IsOptional()
-  @IsInt()
-  @Min(1)
-  page = 1;
-
-  @ApiPropertyOptional({ default: 20, minimum: 1, maximum: 100 })
-  @Type(() => Number)
-  @IsOptional()
-  @IsInt()
-  @Min(1)
-  @Max(100)
-  limit = 20;
 }

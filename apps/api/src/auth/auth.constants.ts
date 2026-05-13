@@ -1,0 +1,7 @@
+export const OTP_EXPIRES_SECONDS = 600;
+export const LOGIN_MAX_ATTEMPTS = 5;
+export const LOGIN_LOCKOUT_WINDOW_MINUTES = 15;
+export const ADMIN_TEMP_TOKEN_EXPIRES_SECONDS = 5 * 60;
+export const PENDING_MFA_EXPIRES_SECONDS = 5 * 60;
+export const MFA_BACKUP_CODES_COUNT = 8;
+export const MFA_BACKUP_CODE_LENGTH = 10;

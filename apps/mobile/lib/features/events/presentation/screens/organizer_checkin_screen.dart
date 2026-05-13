@@ -456,70 +456,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen>
     if (!mounted) {
       return;
     }
-    final bool? ok = await showModalBottomSheet<bool>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: AppColors.transparent,
-      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-      builder: (BuildContext sheetCtx) {
-        final AppLocalizations l10n = sheetCtx.l10n;
-        final TextTheme sheetTextTheme = Theme.of(sheetCtx).textTheme;
-        return ReportSheetScaffold(
-          fitToContent: true,
-          title: l10n.eventsOrganizerInvalidateQrTitle,
-          subtitle: l10n.eventsOrganizerInvalidateQrSubtitle,
-          trailing: ReportCircleIconButton(
-            icon: CupertinoIcons.xmark,
-            semanticLabel: l10n.commonClose,
-            onTap: () {
-              AppHaptics.tap();
-              Navigator.of(sheetCtx).pop(false);
-            },
-          ),
-          footer: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              SizedBox(
-                width: double.infinity,
-                height: 54,
-                child: OutlinedButton(
-                  onPressed: () {
-                    AppHaptics.tap();
-                    Navigator.of(sheetCtx).pop(false);
-                  },
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: AppColors.divider),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusPill,
-                      ),
-                    ),
-                  ),
-                  child: Text(
-                    l10n.commonCancel,
-                    style: sheetTextTheme.titleMedium?.copyWith(
-                      color: AppColors.primaryDark,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              PrimaryButton(
-                label: l10n.eventsOrganizerInvalidateQrTitle,
-                enabled: true,
-                onPressed: () {
-                  AppHaptics.tap();
-                  Navigator.of(sheetCtx).pop(true);
-                },
-              ),
-            ],
-          ),
-          child: const SizedBox.shrink(),
-        );
-      },
-    );
+    final bool? ok = await showOrganizerInvalidateQrSessionSheet(context);
     if (!mounted || ok != true) {
       return;
     }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:chisto_mobile/core/assets/app_assets.dart';
-import 'package:chisto_mobile/core/theme/app_spacing.dart';
 
 enum BrandLogoVariant { light, dark }
 

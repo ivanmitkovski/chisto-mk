@@ -1,5 +1,5 @@
 /// <reference types="jest" />
-import { NotificationsService } from '../../src/notifications/notifications.service';
+import { NotificationInboxService } from '../../src/notifications/notification-inbox.service';
 
 function makePrisma() {
   return {
@@ -10,6 +10,7 @@ function makePrisma() {
       findFirst: jest.fn(),
       update: jest.fn(),
       updateMany: jest.fn(),
+      groupBy: jest.fn(),
     },
     userDeviceToken: {
       findUnique: jest.fn(),
@@ -28,16 +29,13 @@ function makePrisma() {
   };
 }
 
-function makeConfig() {
+function makeInboxFlags(inboxEnabled: boolean) {
   return {
-    get: jest.fn((k: string, fallback?: string) => {
-      if (k === 'NOTIFICATIONS_INBOX_ENABLED') return 'true';
-      return fallback;
-    }),
+    isNotificationsInboxEnabled: jest.fn().mockResolvedValue(inboxEnabled),
   };
 }
 
-describe('NotificationsService', () => {
+describe('NotificationInboxService', () => {
   it('lists dead letters with masked token suffix', async () => {
     const prisma = makePrisma() as any;
     prisma.notificationOutbox.findMany.mockResolvedValue([
@@ -54,7 +52,7 @@ describe('NotificationsService', () => {
     ]);
     prisma.notificationOutbox.count.mockResolvedValue(1);
 
-    const service = new NotificationsService(prisma, makeConfig() as any);
+    const service = new NotificationInboxService(prisma, makeInboxFlags(true) as any);
     const result = await service.listDeadLetters(1, 20);
 
     expect(result.meta.total).toBe(1);
@@ -64,15 +62,8 @@ describe('NotificationsService', () => {
 
   it('returns empty list when inbox feature is disabled', async () => {
     const prisma = makePrisma() as any;
-    prisma.featureFlag.findUnique.mockResolvedValue({ enabled: false });
-    const config = {
-      get: jest.fn((k: string, fallback?: string) => {
-        if (k === 'NOTIFICATIONS_INBOX_ENABLED') return 'false';
-        return fallback;
-      }),
-    } as any;
 
-    const service = new NotificationsService(prisma, config);
+    const service = new NotificationInboxService(prisma, makeInboxFlags(false) as any);
     const result = await service.listForUser(
       { userId: 'u1' } as any,
       { page: 1, limit: 20 } as any,
@@ -83,4 +74,3 @@ describe('NotificationsService', () => {
     expect(prisma.userNotification.findMany).not.toHaveBeenCalled();
   });
 });
-

@@ -1,6 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { ReportsUploadService } from '../reports/reports-upload.service';
+import {
+  signPrivateObjectKeysDeduped,
+  signPublicMediaUrlsDeduped,
+} from '../storage/batch-private-object-sign';
 import { SiteDetailRepository } from './repositories/site-detail.repository';
 
 @Injectable()
@@ -94,58 +98,78 @@ export class SitesDetailService {
       this.siteDetailRepository.countEvents(siteId),
     ]);
 
-    const reportsWithSignedUrls = await Promise.all(
-      site.reports.map(async (r) => {
-        const mediaUrls = await this.reportsUploadService.signUrls(r.mediaUrls);
-        const reporter =
-          r.reporter == null
-            ? null
-            : {
-                firstName: r.reporter.firstName,
-                lastName: r.reporter.lastName,
-                avatarUrl: await this.reportsUploadService.signPrivateObjectKey(
-                  r.reporter.avatarObjectKey,
-                ),
-              };
-        const coReporters = await Promise.all(
-          r.coReporters.map(async (cr) => ({
-            id: cr.id,
-            createdAt: cr.createdAt,
-            reportedAt: cr.reportedAt,
-            reportId: cr.reportId,
-            userId: cr.userId,
-            user: cr.user
-              ? {
-                  firstName: cr.user.firstName,
-                  lastName: cr.user.lastName,
-                  avatarUrl: await this.reportsUploadService.signPrivateObjectKey(cr.user.avatarObjectKey),
-                }
-              : null,
-          })),
-        );
-        return {
-          id: r.id,
-          createdAt: r.createdAt,
-          reportNumber: r.reportNumber,
-          siteId: r.siteId,
-          reporterId: r.reporterId,
-          title: r.title,
-          description: r.description,
-          mediaUrls,
-          category: r.category,
-          severity: r.severity,
-          cleanupEffort: r.cleanupEffort,
-          status: r.status,
-          moderatedAt: r.moderatedAt,
-          moderationReason: r.moderationReason,
-          moderatedById: r.moderatedById,
-          potentialDuplicateOfId: r.potentialDuplicateOfId,
-          reporter,
-          coReporters,
-          mergedDuplicateChildCount: r.mergedDuplicateChildCount,
-        };
-      }),
-    );
+    const privateKeys: (string | null | undefined)[] = [];
+    const flatMedia: string[] = [];
+    for (const r of site.reports) {
+      privateKeys.push(r.reporter?.avatarObjectKey);
+      for (const cr of r.coReporters) {
+        privateKeys.push(cr.user?.avatarObjectKey);
+      }
+      for (const u of r.mediaUrls ?? []) {
+        if (typeof u === 'string' && u.trim().length > 0) {
+          flatMedia.push(u.trim());
+        }
+      }
+    }
+    const [avatarUrlByKey, mediaUrlByOriginal] = await Promise.all([
+      signPrivateObjectKeysDeduped(privateKeys, (k) => this.reportsUploadService.signPrivateObjectKey(k)),
+      signPublicMediaUrlsDeduped(flatMedia, (urls) => this.reportsUploadService.signUrls(urls)),
+    ]);
+
+    const reportsWithSignedUrls = site.reports.map((r) => {
+      const mediaUrls = (r.mediaUrls ?? []).map((u) => {
+        const t = typeof u === 'string' ? u.trim() : '';
+        if (t.length === 0) return u;
+        return mediaUrlByOriginal.get(t) ?? u;
+      });
+      const reporter =
+        r.reporter == null
+          ? null
+          : {
+              firstName: r.reporter.firstName,
+              lastName: r.reporter.lastName,
+              avatarUrl: r.reporter.avatarObjectKey
+                ? (avatarUrlByKey.get(r.reporter.avatarObjectKey) ?? null)
+                : null,
+            };
+      const coReporters = r.coReporters.map((cr) => ({
+        id: cr.id,
+        createdAt: cr.createdAt,
+        reportedAt: cr.reportedAt,
+        reportId: cr.reportId,
+        userId: cr.userId,
+        user: cr.user
+          ? {
+              firstName: cr.user.firstName,
+              lastName: cr.user.lastName,
+              avatarUrl: cr.user.avatarObjectKey
+                ? (avatarUrlByKey.get(cr.user.avatarObjectKey) ?? null)
+                : null,
+            }
+          : null,
+      }));
+      return {
+        id: r.id,
+        createdAt: r.createdAt,
+        reportNumber: r.reportNumber,
+        siteId: r.siteId,
+        reporterId: r.reporterId,
+        title: r.title,
+        description: r.description,
+        mediaUrls,
+        category: r.category,
+        severity: r.severity,
+        cleanupEffort: r.cleanupEffort,
+        status: r.status,
+        moderatedAt: r.moderatedAt,
+        moderationReason: r.moderationReason,
+        moderatedById: r.moderatedById,
+        potentialDuplicateOfId: r.potentialDuplicateOfId,
+        reporter,
+        coReporters,
+        mergedDuplicateChildCount: r.mergedDuplicateChildCount,
+      };
+    });
 
     const mergedDuplicateChildCountTotal = reportsWithSignedUrls.reduce(
       (n, r) => n + (r.mergedDuplicateChildCount ?? 0),

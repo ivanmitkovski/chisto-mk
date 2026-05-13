@@ -6,13 +6,20 @@ import 'package:just_audio/just_audio.dart' as ja;
 /// Single [ja.AudioPlayer] for event chat so only one voice note plays at a time.
 class EventChatAudioPlaybackController extends ChangeNotifier {
   EventChatAudioPlaybackController() {
-    _playingSub = _player.playingStream.listen((_) => notifyListeners());
-    _durationSub = _player.durationStream.listen((_) => notifyListeners());
+    _playingSub = _player.playingStream.listen((_) => _emitIfAlive(notifyListeners));
+    _durationSub = _player.durationStream.listen((_) => _emitIfAlive(notifyListeners));
     _processingSub = _player.processingStateStream.listen(_onProcessingState);
   }
 
   final ja.AudioPlayer _player = ja.AudioPlayer();
   String? _activeClipKey;
+  bool _disposed = false;
+
+  void _emitIfAlive(void Function() fn) {
+    if (!_disposed) {
+      fn();
+    }
+  }
 
   late final StreamSubscription<bool> _playingSub;
   late final StreamSubscription<Duration?> _durationSub;
@@ -45,7 +52,7 @@ class EventChatAudioPlaybackController extends ChangeNotifier {
     } on Object {
       // ignore
     }
-    notifyListeners();
+    _emitIfAlive(notifyListeners);
   }
 
   /// Stops the shared player and clears the active clip (e.g. before message actions).
@@ -59,7 +66,7 @@ class EventChatAudioPlaybackController extends ChangeNotifier {
       // ignore
     }
     _activeClipKey = null;
-    notifyListeners();
+    _emitIfAlive(notifyListeners);
   }
 
   Future<void> _seekToStartIfAtEnd() async {
@@ -86,7 +93,8 @@ class EventChatAudioPlaybackController extends ChangeNotifier {
         await _seekToStartIfAtEnd();
         await _player.play();
       }
-      notifyListeners();
+      if (_disposed) return;
+      _emitIfAlive(notifyListeners);
       return;
     }
     try {
@@ -106,14 +114,17 @@ class EventChatAudioPlaybackController extends ChangeNotifier {
       await _player.play();
     } on Object {
       _activeClipKey = null;
-      notifyListeners();
+      if (_disposed) return;
+      _emitIfAlive(notifyListeners);
       return;
     }
-    notifyListeners();
+    if (_disposed) return;
+    _emitIfAlive(notifyListeners);
   }
 
   @override
   void dispose() {
+    _disposed = true;
     unawaited(_playingSub.cancel());
     unawaited(_durationSub.cancel());
     unawaited(_processingSub.cancel());

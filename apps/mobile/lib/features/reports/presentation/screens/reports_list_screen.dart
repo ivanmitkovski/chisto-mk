@@ -26,6 +26,7 @@ import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list
 import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/reports_list_widgets.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
+import 'package:chisto_mobile/shared/widgets/app_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 
 class ReportsListScreen extends StatefulWidget {
@@ -535,9 +536,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
     final AppLocalizations l10n = context.l10n;
     return SafeArea(
       bottom: false,
-      child: RefreshIndicator(
-        color: AppColors.primary,
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      child: AppRefreshIndicator(
         onRefresh: _handleRefresh,
         child: ListenableBuilder(
           listenable: _listController,

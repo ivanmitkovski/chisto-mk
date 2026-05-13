@@ -6,6 +6,10 @@ import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.
 import type { PatchCleanupEventDto } from '../../src/cleanup-events/dto/patch-cleanup-event.dto';
 import { CleanupEventsAnalyticsService } from '../../src/cleanup-events/cleanup-events-analytics.service';
 import { CleanupEventsListService } from '../../src/cleanup-events/cleanup-events-list.service';
+import { CleanupEventsBulkModerateMutationService } from '../../src/cleanup-events/cleanup-events-mutation-bulk.service';
+import { CleanupEventsCheckInRiskSignalsService } from '../../src/cleanup-events/cleanup-events-check-in-risk-signals.service';
+import { CleanupEventsCreateMutationService } from '../../src/cleanup-events/cleanup-events-mutation-create.service';
+import { CleanupEventsPatchMutationService } from '../../src/cleanup-events/cleanup-events-mutation-patch.service';
 import { CleanupEventsMutationsService } from '../../src/cleanup-events/cleanup-events-mutations.service';
 import { CleanupEventsService } from '../../src/cleanup-events/cleanup-events.service';
 
@@ -113,7 +117,7 @@ describe('CleanupEventsService duplicate schedule', () => {
       _count: { seriesChildren: 0 },
     });
     const list = new CleanupEventsListService(prisma as never, uploads as never);
-    const mutations = new CleanupEventsMutationsService(
+    const patchMutation = new CleanupEventsPatchMutationService(
       prisma as never,
       audit as never,
       ecoEventPoints as never,
@@ -121,6 +125,22 @@ describe('CleanupEventsService duplicate schedule', () => {
       scheduleConflict as never,
       cleanupEventNotifications as never,
       list,
+    );
+    const bulkMutation = new CleanupEventsBulkModerateMutationService(prisma as never, patchMutation);
+    const createMutation = new CleanupEventsCreateMutationService(
+      prisma as never,
+      audit as never,
+      cleanupEventsSse as never,
+      scheduleConflict as never,
+      cleanupEventNotifications as never,
+      list,
+    );
+    const riskSignals = new CleanupEventsCheckInRiskSignalsService(prisma as never);
+    const mutations = new CleanupEventsMutationsService(
+      createMutation,
+      patchMutation,
+      bulkMutation,
+      riskSignals,
     );
     const analytics = new CleanupEventsAnalyticsService(prisma as never, audit as never);
     service = new CleanupEventsService(list, mutations, analytics);

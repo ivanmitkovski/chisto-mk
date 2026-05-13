@@ -2,24 +2,14 @@
 
 import { NotFoundException } from '@nestjs/common';
 import { EcoEventLifecycleStatus } from '../../src/prisma-client';
-import { EventsQueryService } from '../../src/events/events-query.service';
 import { EventsRepository } from '../../src/events/events.repository';
+import { EventsShareCardQueryService } from '../../src/events/events-share-card-query.service';
 import type { PrismaService } from '../../src/prisma/prisma.service';
-import type { ReportsUploadService } from '../../src/reports/reports-upload.service';
-import type { EventsMobileMapperService } from '../../src/events/events-mobile-mapper.service';
-import type { EventScheduleConflictService } from '../../src/event-schedule-conflict/event-schedule-conflict.service';
-import type { EventsTelemetryService } from '../../src/events/events-telemetry.service';
 
-describe('EventsQueryService.findPublicShareCard', () => {
-  function buildService(prisma: Pick<PrismaService, 'cleanupEvent'>): EventsQueryService {
+describe('EventsShareCardQueryService.findPublicShareCard', () => {
+  function buildService(prisma: Pick<PrismaService, 'cleanupEvent'>): EventsShareCardQueryService {
     const repo = { prisma } as EventsRepository;
-    return new EventsQueryService(
-      repo,
-      {} as ReportsUploadService,
-      {} as EventsMobileMapperService,
-      {} as EventScheduleConflictService,
-      {} as EventsTelemetryService,
-    );
+    return new EventsShareCardQueryService(repo);
   }
 
   it('throws NotFound when event is missing or not shareable', async () => {

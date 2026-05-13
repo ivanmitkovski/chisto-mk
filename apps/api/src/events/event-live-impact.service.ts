@@ -1,12 +1,4 @@
-import {
-  ForbiddenException,
-  forwardRef,
-  HttpException,
-  Inject,
-  Injectable,
-  MessageEvent,
-  NotFoundException,
-} from '@nestjs/common';
+import { ForbiddenException, HttpException, Injectable, MessageEvent, NotFoundException } from '@nestjs/common';
 import { Observable, concat, from, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 
@@ -33,9 +25,9 @@ function liveImpactSnapshotErrorMessageEvent(err: unknown): MessageEvent {
 }
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { PrismaService } from '../prisma/prisma.service';
-import { visibilityWhere } from './events-query.include';
+import { visibilityWhere } from './events-query.include.shared';
+import { EventCheckInRoomEmitterService } from './event-check-in-room-emitter.service';
 import { EventLiveImpactEventsService } from './event-live-impact-events.service';
-import { EventCheckInGateway } from './event-check-in.gateway';
 import type { PatchLiveImpactDto } from './dto/patch-live-impact.dto';
 
 const EST_KG_PER_BAG = 3.2;
@@ -54,8 +46,7 @@ export class EventLiveImpactService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly bus: EventLiveImpactEventsService,
-    @Inject(forwardRef(() => EventCheckInGateway))
-    private readonly checkInGateway: EventCheckInGateway,
+    private readonly checkInRoomEmitter: EventCheckInRoomEmitterService,
   ) {}
 
   async getSnapshot(
@@ -206,7 +197,7 @@ export class EventLiveImpactService {
     void this.buildSnapshotForRoom(eventId)
       .then((snap) => {
         if (snap != null) {
-          this.checkInGateway.emitToRoom(eventId, 'live_impact', snap);
+          this.checkInRoomEmitter.emitToRoom(eventId, 'live_impact', snap);
         }
       })
       .catch(() => undefined);

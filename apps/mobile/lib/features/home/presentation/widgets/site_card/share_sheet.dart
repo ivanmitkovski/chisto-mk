@@ -1,6 +1,7 @@
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 enum ShareAction { copyLink, sendMessage }
@@ -148,10 +149,14 @@ class _ShareLinkPreview extends StatelessWidget {
                 child: SizedBox(
                   width: 44,
                   height: 44,
-                  child: Image.network(
-                    trimmedImage,
+                  child: CachedNetworkImage(
+                    imageUrl: trimmedImage,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => ColoredBox(
+                    fadeInDuration: Duration.zero,
+                    fadeOutDuration: Duration.zero,
+                    memCacheWidth: 132,
+                    memCacheHeight: 132,
+                    errorWidget: (BuildContext context, String url, Object error) => ColoredBox(
                       color: AppColors.inputFill,
                       child: Icon(Icons.image_not_supported_outlined, color: AppColors.textMuted, size: 22),
                     ),

@@ -3,18 +3,15 @@ import {
   Controller,
   Delete,
   Get,
-  MessageEvent,
   Param,
   Patch,
   Post,
   Query,
-  Sse,
-  UploadedFile,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import {
   ApiBadRequestResponse,
@@ -27,91 +24,47 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
-import { Observable, interval, merge } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { ParseCuidPipe } from '../common/pipes/parse-cuid.pipe';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
-import { CheckEventConflictQueryDto } from './dto/check-event-conflict-query.dto';
-import { CreatePublicEventDto } from './dto/create-public-event.dto';
-import { EventAnalyticsResponseDto } from './dto/event-analytics-response.dto';
 import { ListEventParticipantsResponseDto } from './dto/event-participant-row.dto';
-import { FieldBatchDto } from './dto/field-batch.dto';
 import { ListEventParticipantsQueryDto } from './dto/list-event-participants-query.dto';
 import { FindEventQueryDto } from './dto/find-event-query.dto';
-import { ListEventsQueryDto } from './dto/list-events-query.dto';
 import { PatchEventLifecycleDto } from './dto/patch-event-lifecycle.dto';
 import { PatchEventReminderDto } from './dto/patch-event-reminder.dto';
-import { PatchLiveImpactDto } from './dto/patch-live-impact.dto';
 import { PatchPublicEventDto } from './dto/patch-public-event.dto';
 import { EventImpactReceiptResponseDto } from './dto/event-impact-receipt-response.dto';
 import { EventPublicShareCardResponseDto } from './dto/event-public-share-card.dto';
-import { EventEvidenceService } from './event-evidence.service';
-import { EventLiveImpactService } from './event-live-impact.service';
-import { EventRouteSegmentsService } from './event-route-segments.service';
-import { EventsFieldBatchService } from './events-field-batch.service';
-import { EventRouteWaypointsBodyDto } from './dto/event-route-waypoint.dto';
-import { EventsService } from './events.service';
+import { JoinEventResponseDto } from './dto/events-openapi-responses.dto';
+import { EventMobileResponseDto } from './dto/event-mobile-response.dto';
+import { EventAnalyticsResponseDto } from './dto/event-analytics-response.dto';
+import { EventsAfterImagesService } from './events-after-images.service';
+import { EventsAnalyticsService } from './events-analytics.service';
+import { EventsLifecycleService } from './events-lifecycle.service';
+import { EventsParticipationService } from './events-participation.service';
+import { EventsQueryService } from './events-query.service';
+import { EventsShareCardQueryService } from './events-share-card-query.service';
+import { EventsUpdateService } from './events-update.service';
 import { EventImpactReceiptService } from './event-impact-receipt.service';
 import { ApiEventsJwtStandardErrors } from './events-openapi.decorators';
-
-const LIVE_IMPACT_SSE_HEARTBEAT_MS = 30_000;
+import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-error-responses.decorator';
 
 @ApiTags('events')
+@ApiStandardHttpErrorResponses()
 @Controller('events')
 @UseGuards(ThrottlerGuard)
 export class EventsController {
   constructor(
-    private readonly eventsService: EventsService,
-    private readonly liveImpact: EventLiveImpactService,
-    private readonly evidence: EventEvidenceService,
-    private readonly routeSegments: EventRouteSegmentsService,
-    private readonly fieldBatchService: EventsFieldBatchService,
+    private readonly query: EventsQueryService,
+    private readonly updates: EventsUpdateService,
+    private readonly lifecycle: EventsLifecycleService,
+    private readonly participation: EventsParticipationService,
+    private readonly afterImages: EventsAfterImagesService,
+    private readonly analytics: EventsAnalyticsService,
+    private readonly shareCard: EventsShareCardQueryService,
     private readonly impactReceipt: EventImpactReceiptService,
   ) {}
-
-  @Get()
-  @Throttle({ default: { ttl: 60_000, limit: 120 } })
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({
-    summary: 'List cleanup events (approved public events plus caller’s own pending drafts)',
-  })
-  @ApiOkResponse({ description: 'Paginated events' })
-  @ApiEventsJwtStandardErrors()
-  list(@CurrentUser() user: AuthenticatedUser, @Query() query: ListEventsQueryDto) {
-    return this.eventsService.list(user, query);
-  }
-
-  @Get('check-conflict')
-  @Throttle({ default: { ttl: 60_000, limit: 60 } })
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({
-    summary: 'Preview duplicate schedule at a site (buffered overlap; excludes cancelled/completed)',
-  })
-  @ApiOkResponse({
-    description: '{ hasConflict, conflictingEvent? }',
-  })
-  @ApiEventsJwtStandardErrors()
-  checkConflict(
-    @CurrentUser() _user: AuthenticatedUser,
-    @Query() query: CheckEventConflictQueryDto,
-  ) {
-    return this.eventsService.checkScheduleConflictPreview(query);
-  }
-
-  @Post('field-batch')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @Throttle({ default: { ttl: 60_000, limit: 30 } })
-  @ApiOperation({ summary: 'Apply queued field-mode operations (offline sync)' })
-  @ApiOkResponse({ description: 'Batch outcome' })
-  @ApiEventsJwtStandardErrors()
-  applyFieldBatch(@CurrentUser() user: AuthenticatedUser, @Body() dto: FieldBatchDto) {
-    return this.fieldBatchService.applyBatch(user, dto);
-  }
 
   @Get(':id/participants')
   @UseGuards(JwtAuthGuard)
@@ -125,158 +78,7 @@ export class EventsController {
     @Param('id', ParseCuidPipe) id: string,
     @Query() query: ListEventParticipantsQueryDto,
   ) {
-    return this.eventsService.listParticipants(id, user, query);
-  }
-
-  @Get(':id/live-impact')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @Throttle({ default: { ttl: 60_000, limit: 120 } })
-  @ApiOperation({ summary: 'Aggregated live impact counters for an event' })
-  @ApiOkResponse({ description: 'Live impact snapshot' })
-  @ApiEventsJwtStandardErrors()
-  getLiveImpact(@CurrentUser() user: AuthenticatedUser, @Param('id', ParseCuidPipe) id: string) {
-    return this.liveImpact.getSnapshot(id, user);
-  }
-
-  @Get(':id/live-impact/stream')
-  @Sse()
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @Throttle({ default: { ttl: 60_000, limit: 30 } })
-  @ApiOperation({ summary: 'SSE stream for live impact updates on this event' })
-  @ApiEventsJwtStandardErrors()
-  streamLiveImpact(
-    @CurrentUser() user: AuthenticatedUser,
-    @Param('id', ParseCuidPipe) id: string,
-  ): Observable<MessageEvent> {
-    const live$ = this.liveImpact.watchLiveImpactSse(id, user);
-    const heartbeat$ = interval(LIVE_IMPACT_SSE_HEARTBEAT_MS).pipe(
-      map(() => ({ data: { type: 'heartbeat' } } as MessageEvent)),
-    );
-    return merge(live$, heartbeat$);
-  }
-
-  @Patch(':id/live-impact')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @Throttle({ default: { ttl: 60_000, limit: 60 } })
-  @ApiOperation({ summary: 'Update organizer-reported live impact (organizer only)' })
-  @ApiOkResponse({ description: 'Updated snapshot' })
-  @ApiEventsJwtStandardErrors()
-  async patchLiveImpact(
-    @CurrentUser() user: AuthenticatedUser,
-    @Param('id', ParseCuidPipe) id: string,
-    @Body() dto: PatchLiveImpactDto,
-  ) {
-    await this.liveImpact.patch(id, dto, user);
-    return this.eventsService.findOne(id, user);
-  }
-
-  @Get(':id/evidence')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @Throttle({ default: { ttl: 60_000, limit: 60 } })
-  @ApiOperation({ summary: 'List structured evidence photos for an event' })
-  @ApiOkResponse({ description: 'Evidence rows with signed URLs' })
-  @ApiEventsJwtStandardErrors()
-  listEvidence(@CurrentUser() user: AuthenticatedUser, @Param('id', ParseCuidPipe) id: string) {
-    return this.evidence.listForEvent(id, user);
-  }
-
-  @Post(':id/evidence')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @Throttle({ default: { ttl: 60_000, limit: 20 } })
-  @UseInterceptors(
-    FileInterceptor('file', {
-      storage: multer.memoryStorage(),
-      limits: { fileSize: 10 * 1024 * 1024 },
-    }),
-  )
-  @ApiConsumes('multipart/form-data')
-  @ApiOperation({ summary: 'Upload one evidence image (organizer only); form field `kind`: BEFORE|AFTER|FIELD' })
-  @ApiOkResponse({ description: 'Created evidence row' })
-  @ApiEventsJwtStandardErrors()
-  uploadEvidence(
-    @CurrentUser() user: AuthenticatedUser,
-    @Param('id', ParseCuidPipe) id: string,
-    @UploadedFile() file: Express.Multer.File,
-    @Body('kind') kind: string,
-  ) {
-    return this.evidence.addPhoto(id, user, file, kind);
-  }
-
-  @Delete(':id/evidence/:photoId')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @Throttle({ default: { ttl: 60_000, limit: 30 } })
-  @ApiOperation({ summary: 'Delete an evidence photo (organizer only)' })
-  @ApiOkResponse({ description: 'No content semantics — returns { ok: true }' })
-  @ApiEventsJwtStandardErrors()
-  async deleteEvidence(
-    @CurrentUser() user: AuthenticatedUser,
-    @Param('id', ParseCuidPipe) id: string,
-    @Param('photoId', ParseCuidPipe) photoId: string,
-  ): Promise<{ ok: true }> {
-    await this.evidence.deletePhoto(id, photoId, user);
-    return { ok: true };
-  }
-
-  @Get(':id/route')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @Throttle({ default: { ttl: 60_000, limit: 120 } })
-  @ApiOperation({ summary: 'List route segments for an event' })
-  @ApiOkResponse({ description: 'Route segments' })
-  @ApiEventsJwtStandardErrors()
-  listRoute(@CurrentUser() user: AuthenticatedUser, @Param('id', ParseCuidPipe) id: string) {
-    return this.routeSegments.listForEvent(id, user);
-  }
-
-  @Patch(':id/route')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @Throttle({ default: { ttl: 60_000, limit: 20 } })
-  @ApiOperation({ summary: 'Replace route waypoints (organizer only)' })
-  @ApiOkResponse({ description: 'Updated segments' })
-  @ApiEventsJwtStandardErrors()
-  patchRoute(
-    @CurrentUser() user: AuthenticatedUser,
-    @Param('id', ParseCuidPipe) id: string,
-    @Body() body: EventRouteWaypointsBodyDto,
-  ) {
-    return this.routeSegments.replaceWaypoints(id, user, body.waypoints);
-  }
-
-  @Post(':id/route/segments/:segmentId/claim')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @Throttle({ default: { ttl: 60_000, limit: 40 } })
-  @ApiOperation({ summary: 'Claim an open route segment (joined volunteer)' })
-  @ApiOkResponse({ description: 'Updated segments' })
-  @ApiEventsJwtStandardErrors()
-  claimRouteSegment(
-    @CurrentUser() user: AuthenticatedUser,
-    @Param('id', ParseCuidPipe) _eventId: string,
-    @Param('segmentId', ParseCuidPipe) segmentId: string,
-  ) {
-    return this.routeSegments.claimSegment(segmentId, user);
-  }
-
-  @Post(':id/route/segments/:segmentId/complete')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @Throttle({ default: { ttl: 60_000, limit: 40 } })
-  @ApiOperation({ summary: 'Mark a route segment completed (claimer or organizer)' })
-  @ApiOkResponse({ description: 'Updated segments' })
-  @ApiEventsJwtStandardErrors()
-  completeRouteSegment(
-    @CurrentUser() user: AuthenticatedUser,
-    @Param('id', ParseCuidPipe) _eventId: string,
-    @Param('segmentId', ParseCuidPipe) segmentId: string,
-  ) {
-    return this.routeSegments.completeSegment(segmentId, user);
+    return this.query.listParticipants(id, user, query);
   }
 
   @Get(':id/share-card')
@@ -304,7 +106,7 @@ export class EventsController {
     },
   })
   getPublicShareCard(@Param('id', ParseCuidPipe) id: string) {
-    return this.eventsService.findPublicShareCard(id);
+    return this.shareCard.findPublicShareCard(id);
   }
 
   @Get(':id/impact-receipt')
@@ -337,25 +139,14 @@ export class EventsController {
   @ApiOperation({
     summary: 'Get event detail (approved public events plus caller’s own pending drafts)',
   })
-  @ApiOkResponse({ description: 'Event payload (mobile-shaped JSON)' })
+  @ApiOkResponse({ description: 'Event payload (mobile-shaped JSON)', type: EventMobileResponseDto })
   @ApiEventsJwtStandardErrors()
   findOne(
     @CurrentUser() user: AuthenticatedUser,
     @Param('id', ParseCuidPipe) id: string,
     @Query() geo: FindEventQueryDto,
   ) {
-    return this.eventsService.findOne(id, user, geo);
-  }
-
-  @Post()
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @Throttle({ default: { ttl: 60_000, limit: 20 } })
-  @ApiOperation({ summary: 'Create cleanup event (PENDING for citizens, APPROVED for staff)' })
-  @ApiOkResponse({ description: 'Created event' })
-  @ApiEventsJwtStandardErrors({ include409: true })
-  create(@CurrentUser() user: AuthenticatedUser, @Body() dto: CreatePublicEventDto) {
-    return this.eventsService.create(dto, user);
+    return this.query.findOne(id, user, geo);
   }
 
   @Patch(':id')
@@ -363,14 +154,14 @@ export class EventsController {
   @ApiBearerAuth()
   @Throttle({ default: { ttl: 60_000, limit: 40 } })
   @ApiOperation({ summary: 'Update event (organizer only)' })
-  @ApiOkResponse({ description: 'Updated event' })
+  @ApiOkResponse({ description: 'Updated event', type: EventMobileResponseDto })
   @ApiEventsJwtStandardErrors({ include409: true })
   patch(
     @CurrentUser() user: AuthenticatedUser,
     @Param('id', ParseCuidPipe) id: string,
     @Body() dto: PatchPublicEventDto,
   ) {
-    return this.eventsService.patchEvent(id, dto, user);
+    return this.updates.patchEvent(id, dto, user);
   }
 
   @Post(':id/join')
@@ -390,48 +181,49 @@ export class EventsController {
   })
   @ApiOkResponse({
     description: 'Event payload (same as GET /events/:id) plus pointsAwarded for this join',
+    type: JoinEventResponseDto,
   })
   @ApiEventsJwtStandardErrors({ include409: true })
   join(@CurrentUser() user: AuthenticatedUser, @Param('id', ParseCuidPipe) id: string) {
-    return this.eventsService.join(id, user);
+    return this.participation.join(id, user);
   }
 
   @Delete(':id/join')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Leave event' })
-  @ApiOkResponse({ description: 'Event with isJoined false' })
+  @ApiOkResponse({ description: 'Event with isJoined false', type: EventMobileResponseDto })
   @ApiEventsJwtStandardErrors()
   leave(@CurrentUser() user: AuthenticatedUser, @Param('id', ParseCuidPipe) id: string) {
-    return this.eventsService.leave(id, user);
+    return this.participation.leave(id, user);
   }
 
   @Patch(':id/status')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Transition lifecycle status (organizer only)' })
-  @ApiOkResponse({ description: 'Updated event' })
+  @ApiOkResponse({ description: 'Updated event', type: EventMobileResponseDto })
   @ApiEventsJwtStandardErrors()
   patchStatus(
     @CurrentUser() user: AuthenticatedUser,
     @Param('id', ParseCuidPipe) id: string,
     @Body() dto: PatchEventLifecycleDto,
   ) {
-    return this.eventsService.patchLifecycle(id, dto, user);
+    return this.lifecycle.patchLifecycle(id, dto, user);
   }
 
   @Patch(':id/reminder')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Set participant reminder' })
-  @ApiOkResponse({ description: 'Updated event' })
+  @ApiOkResponse({ description: 'Updated event', type: EventMobileResponseDto })
   @ApiEventsJwtStandardErrors()
   patchReminder(
     @CurrentUser() user: AuthenticatedUser,
     @Param('id', ParseCuidPipe) id: string,
     @Body() dto: PatchEventReminderDto,
   ) {
-    return this.eventsService.patchReminder(id, dto, user);
+    return this.participation.patchReminder(id, dto, user);
   }
 
   @Get(':id/analytics')
@@ -441,7 +233,7 @@ export class EventsController {
   @ApiOkResponse({ description: 'Event analytics data', type: EventAnalyticsResponseDto })
   @ApiEventsJwtStandardErrors()
   getAnalytics(@CurrentUser() user: AuthenticatedUser, @Param('id', ParseCuidPipe) id: string) {
-    return this.eventsService.getAnalytics(id, user);
+    return this.analytics.getAnalytics(id, user);
   }
 
   @Post(':id/after-images')
@@ -456,13 +248,13 @@ export class EventsController {
   )
   @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Upload after-cleanup photos (organizer only)' })
-  @ApiOkResponse({ description: 'Updated event with signed image URLs' })
+  @ApiOkResponse({ description: 'Updated event with signed image URLs', type: EventMobileResponseDto })
   @ApiEventsJwtStandardErrors()
   uploadAfterImages(
     @CurrentUser() user: AuthenticatedUser,
     @Param('id', ParseCuidPipe) id: string,
     @UploadedFiles() files: Express.Multer.File[],
   ) {
-    return this.eventsService.appendAfterImages(id, files ?? [], user);
+    return this.afterImages.appendAfterImages(id, files ?? [], user);
   }
 }

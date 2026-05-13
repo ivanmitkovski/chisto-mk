@@ -17,6 +17,21 @@ class AppError implements Exception {
   /// When the API includes `timestamp` on error JSON, parsed for support correlation.
   final DateTime? serverTimestamp;
 
+  /// Session or access token is no longer accepted; user should sign in again.
+  ///
+  /// Aligns with [ApiClient] 401 handling and [AppErrorView] sign-out affordance.
+  bool get indicatesInvalidOrEndedSession {
+    switch (code) {
+      case 'UNAUTHORIZED':
+      case 'INVALID_TOKEN_USER':
+      case 'ACCOUNT_NOT_ACTIVE':
+      case 'SESSION_REVOKED':
+        return true;
+      default:
+        return false;
+    }
+  }
+
   factory AppError.network({String? message, Object? cause}) => AppError(
         code: 'NETWORK_ERROR',
         message: message ?? 'Unable to reach the server. Check your connection.',

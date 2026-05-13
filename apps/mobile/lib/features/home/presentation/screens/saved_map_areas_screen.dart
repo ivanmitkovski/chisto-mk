@@ -13,6 +13,7 @@ import 'package:chisto_mobile/features/home/data/map_regions/macedonia_map_regio
 import 'package:chisto_mobile/features/home/data/offline_regions/offline_region_downloader.dart';
 import 'package:chisto_mobile/features/home/data/offline_regions/offline_region_model.dart';
 import 'package:chisto_mobile/features/home/data/offline_regions/offline_region_store.dart';
+import 'package:chisto_mobile/shared/widgets/app_refresh_indicator.dart';
 import 'package:flutter_map/flutter_map.dart';
 
 class SavedMapAreasScreen extends StatefulWidget {
@@ -238,7 +239,7 @@ class _SavedMapAreasScreenState extends State<SavedMapAreasScreen> {
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
+          : AppRefreshIndicator(
               onRefresh: () async => _refresh(),
               child: _regions.isEmpty
                   ? ListView(

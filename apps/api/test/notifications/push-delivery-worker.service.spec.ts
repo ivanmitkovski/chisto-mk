@@ -8,8 +8,12 @@ function makePrisma() {
     update: jest.fn(),
     count: jest.fn(),
   };
+  const userNotification = {
+    findMany: jest.fn().mockResolvedValue([]),
+  };
   return {
     notificationOutbox,
+    userNotification,
     $transaction: jest.fn(async (ops: Promise<unknown>[]) => Promise.all(ops)),
   };
 }
@@ -34,6 +38,7 @@ describe('PushDeliveryWorkerService', () => {
       .mockResolvedValueOnce([
         {
           id: 'out_1',
+          userNotificationId: 'n_1',
           deviceToken: 'token-12345678',
           payload: { title: 'T', body: 'B', data: {} },
           attempts: 0,
@@ -45,6 +50,7 @@ describe('PushDeliveryWorkerService', () => {
       .mockResolvedValueOnce([
         {
           id: 'out_1',
+          userNotificationId: 'n_1',
           deviceToken: 'token-12345678',
           payload: { title: 'T', body: 'B', data: {} },
           attempts: 0,
@@ -82,6 +88,7 @@ describe('PushDeliveryWorkerService', () => {
       .mockResolvedValueOnce([
         {
           id: 'out_2',
+          userNotificationId: 'n_2',
           deviceToken: 'token-abcdefgh',
           payload: { title: 'T', body: 'B', data: {} },
           attempts: 1,
@@ -93,6 +100,7 @@ describe('PushDeliveryWorkerService', () => {
       .mockResolvedValueOnce([
         {
           id: 'out_2',
+          userNotificationId: 'n_2',
           deviceToken: 'token-abcdefgh',
           payload: { title: 'T', body: 'B', data: {} },
           attempts: 1,

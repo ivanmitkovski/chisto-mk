@@ -12,6 +12,7 @@ import 'package:chisto_mobile/features/home/presentation/utils/site_comment_mapp
 import 'package:chisto_mobile/features/home/presentation/widgets/comments/comments_route_loading_skeleton.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/comments_bottom_sheet.dart';
 import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
+import 'package:chisto_mobile/shared/widgets/app_refresh_indicator.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -137,7 +138,7 @@ class _FeedSiteCommentsRouteScreenState
           : ColoredBox(
               color: AppColors.panelBackground,
               child: SafeArea(
-                child: RefreshIndicator(
+                child: AppRefreshIndicator(
                   onRefresh: () async {
                     try {
                       await ref

@@ -1,4 +1,4 @@
-import { UnauthorizedException } from '@nestjs/common';
+import { InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Socket } from 'socket.io';
 import * as jwt from 'jsonwebtoken';
@@ -33,13 +33,25 @@ export async function authenticateSocketUser(
 
   const secret = config.get<string>('JWT_SECRET');
   if (!secret) {
-    throw new Error('JWT_SECRET not configured');
+    throw new InternalServerErrorException({
+      code: 'JWT_SECRET_MISSING',
+      message: 'JWT_SECRET is not configured',
+    });
   }
 
-  const payload = jwt.verify(token, secret, { algorithms: ['HS256'] }) as {
-    sub: string;
-    email: string;
-  };
+  let payload: { sub: string; email: string; sid?: string };
+  try {
+    payload = jwt.verify(token, secret, { algorithms: ['HS256'] }) as {
+      sub: string;
+      email: string;
+      sid?: string;
+    };
+  } catch {
+    throw new UnauthorizedException({
+      code: 'INVALID_TOKEN',
+      message: 'Invalid or expired authentication token',
+    });
+  }
 
   const user = await prisma.user.findUnique({
     where: { id: payload.sub },
@@ -48,6 +60,25 @@ export async function authenticateSocketUser(
 
   if (!user || user.status !== UserStatus.ACTIVE) {
     throw new UnauthorizedException('User not active');
+  }
+
+  // Align with HTTP JwtStrategy: access tokens carrying `sid` must match a live session row.
+  if (payload.sid) {
+    const session = await prisma.userSession.findFirst({
+      where: {
+        id: payload.sid,
+        userId: payload.sub,
+        revokedAt: null,
+        expiresAt: { gt: new Date() },
+      },
+      select: { id: true },
+    });
+    if (!session) {
+      throw new UnauthorizedException({
+        code: 'SESSION_REVOKED',
+        message: 'Session is no longer valid',
+      });
+    }
   }
 
   return {

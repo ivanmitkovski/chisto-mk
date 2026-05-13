@@ -1,5 +1,6 @@
 import { ServiceUnavailableException } from '@nestjs/common';
 import Twilio from 'twilio';
+import { CircuitBreaker, CircuitBreakerOpenError } from '../../common/resilience/circuit-breaker';
 import { buildOtpSmsBody, otpSmsLocaleFromHint } from '../otp-sms-body';
 import { OtpSender, SendOtpSmsOptions } from '../otp-sender.interface';
 
@@ -8,6 +9,11 @@ const TWILIO_MESSAGING_SERVICE_SID_PATTERN = /^MG[0-9a-fA-F]{32}$/i;
 
 export class TwilioOtpSender implements OtpSender {
   private readonly client: Twilio.Twilio;
+  private readonly circuitBreaker = new CircuitBreaker({
+    name: 'twilio_sms',
+    failureThreshold: 6,
+    resetTimeoutMs: 60_000,
+  });
   /**
    * If it matches `MG` + 32 hex, sent as `messagingServiceSid`.
    * Otherwise treated as API `From` (e.g. alphanumeric sender label or non-MG sender SID).
@@ -58,8 +64,11 @@ export class TwilioOtpSender implements OtpSender {
       } else {
         throw new ServiceUnavailableException('SMS sender not configured');
       }
-      await this.client.messages.create(params);
-    } catch {
+      await this.circuitBreaker.execute(async () => this.client.messages.create(params));
+    } catch (err) {
+      if (err instanceof CircuitBreakerOpenError) {
+        throw new ServiceUnavailableException('SMS gateway is temporarily unavailable');
+      }
       throw new ServiceUnavailableException('Unable to send verification code');
     }
   }

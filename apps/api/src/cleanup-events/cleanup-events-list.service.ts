@@ -117,6 +117,18 @@ export class CleanupEventsListService {
     if (query.moderationStatus) {
       where.status = query.moderationStatus as CleanupEventStatus;
     }
+    const textQ = query.q?.trim();
+    if (textQ != null && textQ.length >= 2) {
+      where.AND = [
+        ...(Array.isArray(where.AND) ? where.AND : where.AND != null ? [where.AND] : []),
+        {
+          OR: [
+            { title: { contains: textQ, mode: 'insensitive' } },
+            { description: { contains: textQ, mode: 'insensitive' } },
+          ],
+        },
+      ];
+    }
 
     const orderBy: Prisma.CleanupEventOrderByWithRelationInput[] =
       query.moderationStatus === 'PENDING'

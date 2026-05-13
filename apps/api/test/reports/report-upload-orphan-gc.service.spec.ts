@@ -7,6 +7,7 @@ describe('ReportUploadOrphanGcService', () => {
   it('deletes old report media keys not referenced by any report', async () => {
     const old = new Date(Date.now() - 100 * 60 * 60 * 1000);
     const key = 'reports/user-1/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee.jpg';
+    const canonical = 'https://bucket.s3.eu-central-1.amazonaws.com/' + key;
 
     const listObjectsByPrefix = jest.fn().mockResolvedValue({
       objects: [{ key, lastModified: old }],
@@ -17,8 +18,8 @@ describe('ReportUploadOrphanGcService', () => {
       listObjectsByPrefix,
     } as unknown as S3StorageClient;
 
-    const findFirst = jest.fn().mockResolvedValue(null);
-    const prisma = { report: { findFirst } } as unknown as PrismaService;
+    const findMany = jest.fn().mockResolvedValue([]);
+    const prisma = { report: { findMany } } as unknown as PrismaService;
 
     const deleteObjectByKey = jest.fn().mockResolvedValue(undefined);
     const reportsUpload = { deleteObjectByKey } as unknown as ReportsUploadService;
@@ -26,14 +27,11 @@ describe('ReportUploadOrphanGcService', () => {
     const svc = new ReportUploadOrphanGcService(prisma, s3, reportsUpload);
     await svc.runOnce();
 
-    expect(findFirst).toHaveBeenCalledWith({
+    expect(findMany).toHaveBeenCalledWith({
       where: {
-        OR: [
-          { mediaUrls: { has: `https://bucket.s3.eu-central-1.amazonaws.com/${key}` } },
-          { mediaUrls: { has: key } },
-        ],
+        OR: [{ mediaUrls: { hasSome: [canonical] } }, { mediaUrls: { hasSome: [key] } }],
       },
-      select: { id: true },
+      select: { mediaUrls: true },
     });
     expect(deleteObjectByKey).toHaveBeenCalledWith(key);
   });
@@ -41,6 +39,7 @@ describe('ReportUploadOrphanGcService', () => {
   it('skips delete when a report still references the canonical URL', async () => {
     const old = new Date(Date.now() - 100 * 60 * 60 * 1000);
     const key = 'reports/user-1/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee.jpg';
+    const canonical = 'https://bucket.s3.eu-central-1.amazonaws.com/' + key;
 
     const s3 = {
       enabled: true,
@@ -50,9 +49,8 @@ describe('ReportUploadOrphanGcService', () => {
       }),
     } as unknown as S3StorageClient;
 
-    const prisma = {
-      report: { findFirst: jest.fn().mockResolvedValue({ id: 'rep-1' }) },
-    } as unknown as PrismaService;
+    const findMany = jest.fn().mockResolvedValue([{ mediaUrls: [canonical] }]);
+    const prisma = { report: { findMany } } as unknown as PrismaService;
 
     const deleteObjectByKey = jest.fn();
     const reportsUpload = { deleteObjectByKey } as unknown as ReportsUploadService;

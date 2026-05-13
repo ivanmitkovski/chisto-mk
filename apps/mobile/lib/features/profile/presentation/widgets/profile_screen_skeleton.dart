@@ -5,6 +5,7 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/shared/widgets/no_overscroll_overlay_scroll_behavior.dart';
+import 'package:chisto_mobile/shared/widgets/skeleton_shimmer_box.dart';
 
 /// Full-profile loading placeholder: gradient header, summary cards, then settings-style
 /// grouped lists matching [_buildAuthenticatedProfileBody] section structure.
@@ -331,7 +332,7 @@ class _LevelCardSkeleton extends StatelessWidget {
         children: <Widget>[
           Row(
             children: <Widget>[
-              _ShimmerBox(
+              SkeletonShimmerBox(
                 width: AppSpacing.xxl,
                 height: AppSpacing.xxl,
                 radius: AppSpacing.radius14,
@@ -342,17 +343,17 @@ class _LevelCardSkeleton extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    _ShimmerBox(width: 140, height: 16, radius: 8, t: t),
+                    SkeletonShimmerBox(width: 140, height: 16, radius: 8, t: t),
                     const SizedBox(height: 6),
-                    _ShimmerBox(width: double.infinity, height: 12, radius: 6, t: t),
+                    SkeletonShimmerBox(width: double.infinity, height: 12, radius: 6, t: t),
                   ],
                 ),
               ),
-              _ShimmerBox(width: 22, height: 22, radius: 11, t: t),
+              SkeletonShimmerBox(width: 22, height: 22, radius: 11, t: t),
             ],
           ),
           const SizedBox(height: AppSpacing.md),
-          _ShimmerBox(
+          SkeletonShimmerBox(
             width: double.infinity,
             height: AppSpacing.radius18,
             radius: AppSpacing.radiusCircle,
@@ -362,11 +363,11 @@ class _LevelCardSkeleton extends StatelessWidget {
           Row(
             children: <Widget>[
               Expanded(
-                child: _ShimmerBox(width: double.infinity, height: 12, radius: 6, t: t),
+                child: SkeletonShimmerBox(width: double.infinity, height: 12, radius: 6, t: t),
               ),
               const SizedBox(width: AppSpacing.md),
               Expanded(
-                child: _ShimmerBox(width: double.infinity, height: 11, radius: 5, t: t),
+                child: SkeletonShimmerBox(width: double.infinity, height: 11, radius: 5, t: t),
               ),
             ],
           ),
@@ -401,9 +402,9 @@ class _ReportCreditsCardSkeleton extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           Expanded(
-            child: _ShimmerBox(width: 140, height: 16, radius: 8, t: t),
+            child: SkeletonShimmerBox(width: 140, height: 16, radius: 8, t: t),
           ),
-          _ShimmerBox(width: 44, height: 28, radius: 14, t: t),
+          SkeletonShimmerBox(width: 44, height: 28, radius: 14, t: t),
         ],
       ),
     );
@@ -433,7 +434,7 @@ class _WeeklyRankCardSkeleton extends StatelessWidget {
       ),
       child: Row(
         children: <Widget>[
-          _ShimmerBox(
+          SkeletonShimmerBox(
             width: AppSpacing.xxl,
             height: AppSpacing.xxl,
             radius: AppSpacing.radius14,
@@ -444,13 +445,13 @@ class _WeeklyRankCardSkeleton extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                _ShimmerBox(width: 120, height: 16, radius: 8, t: t),
+                SkeletonShimmerBox(width: 120, height: 16, radius: 8, t: t),
                 const SizedBox(height: 4),
-                _ShimmerBox(width: 180, height: 12, radius: 6, t: t),
+                SkeletonShimmerBox(width: 180, height: 12, radius: 6, t: t),
               ],
             ),
           ),
-          _ShimmerBox(width: 22, height: 22, radius: 11, t: t),
+          SkeletonShimmerBox(width: 22, height: 22, radius: 11, t: t),
         ],
       ),
     );
@@ -466,7 +467,7 @@ class _SectionTitleSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _ShimmerBox(
+    return SkeletonShimmerBox(
       width: width,
       height: 12,
       radius: AppSpacing.radiusSm,
@@ -531,7 +532,7 @@ class _SettingsRowSkeleton extends StatelessWidget {
         crossAxisAlignment:
             hasSubtitle ? CrossAxisAlignment.start : CrossAxisAlignment.center,
         children: <Widget>[
-          _ShimmerBox(
+          SkeletonShimmerBox(
             width: 32,
             height: 32,
             radius: AppSpacing.radiusMd,
@@ -543,7 +544,7 @@ class _SettingsRowSkeleton extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                _ShimmerBox(
+                SkeletonShimmerBox(
                   width: 168,
                   height: 14,
                   radius: 7,
@@ -552,13 +553,13 @@ class _SettingsRowSkeleton extends StatelessWidget {
                 ),
                 if (hasSubtitle) ...<Widget>[
                   const SizedBox(height: AppSpacing.xxs / 2),
-                  _ShimmerBox(width: 112, height: 11, radius: 5, t: t),
+                  SkeletonShimmerBox(width: 112, height: 11, radius: 5, t: t),
                 ],
               ],
             ),
           ),
           if (showTrailingChevron)
-            _ShimmerBox(width: 22, height: 22, radius: 11, t: t),
+            SkeletonShimmerBox(width: 22, height: 22, radius: 11, t: t),
           if (!showTrailingChevron) const SizedBox(width: 22),
         ],
       ),
@@ -601,40 +602,6 @@ class _StaticPill extends StatelessWidget {
       height: height,
       decoration: BoxDecoration(
         color: color,
-        borderRadius: BorderRadius.circular(radius),
-      ),
-    );
-  }
-}
-
-class _ShimmerBox extends StatelessWidget {
-  const _ShimmerBox({
-    required this.width,
-    required this.height,
-    required this.radius,
-    required this.t,
-    this.baseTint,
-  });
-
-  final double width;
-  final double height;
-  final double radius;
-  final double t;
-
-  /// Optional hue for destructive rows (logout/delete placeholders).
-  final Color? baseTint;
-
-  @override
-  Widget build(BuildContext context) {
-    final double pulse = 0.5 + 0.5 * (1 - (2 * t - 1).abs());
-    final Color base = baseTint ?? AppColors.textMuted;
-    final double opacity = 0.06 + 0.04 * pulse;
-
-    return Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        color: base.withValues(alpha: opacity + (baseTint != null ? 0.02 * pulse : 0)),
         borderRadius: BorderRadius.circular(radius),
       ),
     );

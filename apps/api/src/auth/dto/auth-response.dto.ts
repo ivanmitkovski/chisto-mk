@@ -53,6 +53,6 @@ export class AuthResponseDto {
   })
   refreshToken!: string;
 
-  @ApiProperty({ type: AuthUserDto })
+  @ApiProperty({ type: () => AuthUserDto })
   user!: AuthUserDto;
 }

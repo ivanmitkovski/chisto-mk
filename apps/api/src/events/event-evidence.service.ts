@@ -9,7 +9,7 @@ import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { PrismaService } from '../prisma/prisma.service';
 import { ReportsUploadService } from '../reports/reports-upload.service';
 import { EventsCleanupMediaUploadService } from './events-cleanup-media-upload.service';
-import { visibilityWhere } from './events-query.include';
+import { visibilityWhere } from './events-query.include.shared';
 
 const MAX_EVIDENCE_PHOTOS_PER_EVENT = 32;
 

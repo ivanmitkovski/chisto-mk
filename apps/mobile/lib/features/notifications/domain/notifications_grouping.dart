@@ -37,6 +37,44 @@ List<NotificationSectionGroup> groupNotificationsByDay(
   return sections;
 }
 
+class CollapsedNotification {
+  const CollapsedNotification({
+    required this.representative,
+    this.groupCount = 1,
+  });
+
+  final UserNotification representative;
+  final int groupCount;
+
+  bool get isCollapsed => groupCount > 1;
+}
+
+List<CollapsedNotification> collapseByGroupKey(
+  List<UserNotification> items, {
+  Duration window = const Duration(hours: 24),
+}) {
+  if (items.isEmpty) return <CollapsedNotification>[];
+  final List<CollapsedNotification> result = <CollapsedNotification>[];
+  UserNotification current = items.first;
+  int count = 1;
+  for (int i = 1; i < items.length; i++) {
+    final UserNotification item = items[i];
+    final bool sameGroup = current.groupKey != null &&
+        current.groupKey!.isNotEmpty &&
+        item.groupKey == current.groupKey &&
+        current.createdAt.difference(item.createdAt).abs() < window;
+    if (sameGroup) {
+      count++;
+    } else {
+      result.add(CollapsedNotification(representative: current, groupCount: count));
+      current = item;
+      count = 1;
+    }
+  }
+  result.add(CollapsedNotification(representative: current, groupCount: count));
+  return result;
+}
+
 String notificationDayLabel(DateTime value, {DateTime? now}) {
   final DateTime refNow = now ?? DateTime.now();
   final DateTime today = DateTime(refNow.year, refNow.month, refNow.day);

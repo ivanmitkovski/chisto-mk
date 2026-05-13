@@ -1,0 +1,11 @@
+{
+  "description": "Upper bounds for k6 --summary-export JSON (values are compared against metrics.*.values['p(95)']). Tune after recording a healthy staging run (save k6 summary JSON as artifact or under docs/perf/). Weekly workflow: .github/workflows/api-perf-baseline.yml when repository variable API_STAGING_BASE_URL is set.",
+  "metrics": {
+    "http_req_duration": { "p95_max": 600 },
+    "http_req_duration{scenario:health}": { "p95_max": 200 },
+    "http_req_duration{scenario:readiness}": { "p95_max": 300 },
+    "http_req_duration{scenario:feed}": { "p95_max": 400 },
+    "http_req_duration{scenario:map}": { "p95_max": 400 },
+    "http_req_duration{scenario:reports}": { "p95_max": 600 }
+  }
+}

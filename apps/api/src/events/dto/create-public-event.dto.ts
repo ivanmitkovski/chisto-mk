@@ -15,6 +15,7 @@ import {
   Matches,
   ValidateNested,
 } from 'class-validator';
+import { PRISMA_CUID_REGEX } from '../../common/validators/is-cuid.validator';
 import { MOBILE_CATEGORY_KEYS } from '../events-mobile.mapper';
 import { EventRouteWaypointDto } from './event-route-waypoint.dto';
 
@@ -22,7 +23,7 @@ export class CreatePublicEventDto {
   @ApiProperty()
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   @IsString()
-  @MinLength(1)
+  @Matches(PRISMA_CUID_REGEX, { message: 'siteId must be a valid cuid' })
   siteId!: string;
 
   @ApiProperty({ minLength: 3, maxLength: 200 })

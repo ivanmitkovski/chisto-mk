@@ -1,4 +1,5 @@
 import { SiteMapSearchDto } from '../../src/sites/dto/site-map-search.dto';
+import { SitesMapSearchQueryService } from '../../src/sites/sites-map-search-query.service';
 import { SitesSearchService } from '../../src/sites/sites-search.service';
 
 describe('SitesSearchService', () => {
@@ -8,11 +9,12 @@ describe('SitesSearchService', () => {
       site: {
         findMany: jest.fn(),
       },
-    } as unknown as ConstructorParameters<typeof SitesSearchService>[0];
+    };
     const reportsUpload = {
       signUrls: jest.fn(async (urls: string[]) => urls),
-    } as unknown as ConstructorParameters<typeof SitesSearchService>[1];
-    const service = new SitesSearchService(prisma, reportsUpload);
+    };
+    const mapSearchQuery = new SitesMapSearchQueryService(prisma as never);
+    const service = new SitesSearchService(reportsUpload as never, mapSearchQuery);
     return { service, prisma, reportsUpload };
   }
 

@@ -7,17 +7,31 @@ import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
-import 'package:chisto_mobile/features/home/domain/models/feed_notification.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/presentation/screens/pollution_site_detail_screen.dart';
 import 'package:chisto_mobile/features/notifications/data/notification_open_diagnostics.dart';
-import 'package:chisto_mobile/features/notifications/domain/notifications_grouping.dart';
 import 'package:chisto_mobile/features/notifications/domain/models/user_notification.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/notifications/notification_widgets.dart';
+import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
+import 'package:chisto_mobile/shared/widgets/app_refresh_indicator.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
+
+List<NotificationPreference> _dedupeNotificationPreferencesByType(
+  List<NotificationPreference> prefs,
+) {
+  final Set<UserNotificationType> seen = <UserNotificationType>{};
+  final List<NotificationPreference> out = <NotificationPreference>[];
+  for (final NotificationPreference p in prefs) {
+    if (seen.add(p.type)) {
+      out.add(p);
+    }
+  }
+  return out;
+}
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({
@@ -43,9 +57,9 @@ class _NotificationsScreenState extends State<NotificationsScreen>
   int _page = 1;
   bool _showUnreadOnly = false;
   bool _queryOnlyUnread = false;
-  final Set<String> _archivedNotificationIds = <String>{};
   List<NotificationPreference> _preferences = const <NotificationPreference>[];
   bool _isPreferencesLoading = false;
+  VoidCallback? _notificationPrefsSheetInvalidate;
   late final AnimationController _entranceController;
   final ScrollController _scrollController = ScrollController();
 
@@ -130,11 +144,8 @@ class _NotificationsScreenState extends State<NotificationsScreen>
   }
 
   List<UserNotification> get _visibleItems {
-    final List<UserNotification> base = _items
-        .where((UserNotification n) => !_archivedNotificationIds.contains(n.id))
-        .toList();
-    if (!_showUnreadOnly) return base;
-    return base.where((UserNotification n) => !n.isRead).toList();
+    if (!_showUnreadOnly) return _items;
+    return _items.where((UserNotification n) => !n.isRead).toList();
   }
 
   List<NotificationSectionGroup> get _sections =>
@@ -276,29 +287,53 @@ class _NotificationsScreenState extends State<NotificationsScreen>
       }
       return;
     }
-    AppSnack.show(
-      context,
-      message: context.l10n.notificationsMarkedUnreadLocal,
-      type: AppSnackType.info,
-    );
+    try {
+      await ServiceLocator.instance.notificationsRepository.markAsUnread(
+        item.id,
+      );
+      unawaited(_refreshUnreadCountFromServer());
+    } catch (_) {
+      if (!mounted) return;
+      _setReadState(item, !nextRead);
+      AppSnack.show(
+        context,
+        message: context.l10n.notificationsReadStateUpdateFailed,
+        type: AppSnackType.warning,
+      );
+    }
   }
 
-  void _archiveNotification(UserNotification item) {
+  Future<void> _archiveNotification(UserNotification item) async {
     AppHaptics.light();
+    final List<UserNotification> previousItems = _items;
+    final int previousUnread = _unreadCount;
     setState(() {
-      _archivedNotificationIds.add(item.id);
-      _unreadCount = _items
-          .where(
-            (UserNotification n) =>
-                !_archivedNotificationIds.contains(n.id) && !n.isRead,
-          )
-          .length;
+      _items = _items.where((UserNotification n) => n.id != item.id).toList();
+      _unreadCount = _items.where((UserNotification n) => !n.isRead).length;
     });
-    AppSnack.show(
-      context,
-      message: context.l10n.notificationsArchivedFromView,
-      type: AppSnackType.info,
-    );
+    try {
+      await ServiceLocator.instance.notificationsRepository
+          .archiveNotification(item.id);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _items = previousItems;
+        _unreadCount = previousUnread;
+      });
+      AppSnack.show(
+        context,
+        message: context.l10n.notificationsArchiveFailed,
+        type: AppSnackType.warning,
+      );
+      return;
+    }
+    if (mounted) {
+      AppSnack.show(
+        context,
+        message: context.l10n.notificationsArchivedFromView,
+        type: AppSnackType.info,
+      );
+    }
   }
 
   Future<void> _handleRefresh() async {
@@ -322,8 +357,9 @@ class _NotificationsScreenState extends State<NotificationsScreen>
           .getPreferences();
       if (!mounted) return;
       setState(() {
-        _preferences = prefs;
+        _preferences = _dedupeNotificationPreferencesByType(prefs);
       });
+      _notificationPrefsSheetInvalidate?.call();
     } catch (_) {
       if (!mounted) return;
       AppSnack.show(
@@ -334,7 +370,83 @@ class _NotificationsScreenState extends State<NotificationsScreen>
     } finally {
       if (mounted) {
         setState(() => _isPreferencesLoading = false);
+        _notificationPrefsSheetInvalidate?.call();
       }
+    }
+  }
+
+  void _showSnoozePicker(UserNotificationType type) {
+    final List<_SnoozeDuration> options = <_SnoozeDuration>[
+      _SnoozeDuration(context.l10n.notificationsSnooze1h, const Duration(hours: 1)),
+      _SnoozeDuration(context.l10n.notificationsSnooze4h, const Duration(hours: 4)),
+      _SnoozeDuration(context.l10n.notificationsSnooze8h, const Duration(hours: 8)),
+      _SnoozeDuration(context.l10n.notificationsSnooze24h, const Duration(hours: 24)),
+      _SnoozeDuration(context.l10n.notificationsSnooze1w, const Duration(days: 7)),
+      _SnoozeDuration(context.l10n.notificationsSnoozePermanent, null),
+    ];
+    showModalBottomSheet<_SnoozeDuration>(
+      context: context,
+      backgroundColor: AppColors.panelBackground,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.radius18)),
+      ),
+      builder: (BuildContext ctx) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, AppSpacing.sm),
+                child: Text(
+                  context.l10n.notificationsSnoozeTitle,
+                  style: Theme.of(ctx).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+                ),
+              ),
+              for (final _SnoozeDuration opt in options)
+                ListTile(
+                  title: Text(opt.label),
+                  onTap: () => Navigator.of(ctx).pop(opt),
+                ),
+              const SizedBox(height: AppSpacing.sm),
+            ],
+          ),
+        );
+      },
+    ).then((_SnoozeDuration? choice) {
+      if (choice == null) return;
+      final DateTime? mutedUntil = choice.duration != null
+          ? DateTime.now().add(choice.duration!)
+          : null;
+      _snoozePreference(type, mutedUntil);
+    });
+  }
+
+  Future<void> _snoozePreference(UserNotificationType type, DateTime? mutedUntil) async {
+    final int index = _preferences.indexWhere((p) => p.type == type);
+    if (index < 0) return;
+    final NotificationPreference previous = _preferences[index];
+    setState(() {
+      _preferences = _dedupeNotificationPreferencesByType(
+        _preferences
+            .map((p) => p.type == type ? p.copyWith(muted: true, mutedUntil: mutedUntil) : p)
+            .toList(),
+      );
+    });
+    _notificationPrefsSheetInvalidate?.call();
+    try {
+      await ServiceLocator.instance.notificationsRepository
+          .setPreference(type: type, muted: true, mutedUntil: mutedUntil);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _preferences = _dedupeNotificationPreferencesByType(
+          _preferences
+              .map((p) => p.type == type ? previous : p)
+              .toList(),
+        );
+      });
+      _notificationPrefsSheetInvalidate?.call();
     }
   }
 
@@ -343,26 +455,35 @@ class _NotificationsScreenState extends State<NotificationsScreen>
     if (index < 0) return;
     final NotificationPreference previous = _preferences[index];
     setState(() {
-      _preferences = _preferences
-          .map((p) => p.type == type ? p.copyWith(muted: muted) : p)
-          .toList();
+      _preferences = _dedupeNotificationPreferencesByType(
+        _preferences
+            .map((p) => p.type == type ? p.copyWith(muted: muted) : p)
+            .toList(),
+      );
     });
+    _notificationPrefsSheetInvalidate?.call();
     try {
       final updated = await ServiceLocator.instance.notificationsRepository
           .setPreference(type: type, muted: muted);
       if (!mounted) return;
       setState(() {
-        _preferences = _preferences
-            .map((p) => p.type == type ? updated : p)
-            .toList();
+        _preferences = _dedupeNotificationPreferencesByType(
+          _preferences
+              .map((p) => p.type == type ? updated : p)
+              .toList(),
+        );
       });
+      _notificationPrefsSheetInvalidate?.call();
     } catch (_) {
       if (!mounted) return;
       setState(() {
-        _preferences = _preferences
-            .map((p) => p.type == type ? previous : p)
-            .toList();
+        _preferences = _dedupeNotificationPreferencesByType(
+          _preferences
+              .map((p) => p.type == type ? previous : p)
+              .toList(),
+        );
       });
+      _notificationPrefsSheetInvalidate?.call();
       AppSnack.show(
         context,
         message: context.l10n.notificationsPreferenceUpdateFailed,
@@ -373,84 +494,70 @@ class _NotificationsScreenState extends State<NotificationsScreen>
 
   void _openPreferencesSheet() {
     AppHaptics.tap();
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      backgroundColor: AppColors.transparent,
-      builder: (context) {
-        return Container(
-          decoration: const BoxDecoration(
-            color: AppColors.panelBackground,
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(AppSpacing.radiusSheet),
-            ),
-          ),
-          child: SafeArea(
-            top: false,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.lg,
-                AppSpacing.md,
-                AppSpacing.lg,
-                AppSpacing.lg,
+    unawaited(
+      showModalBottomSheet<void>(
+        context: context,
+        useRootNavigator: true,
+        isScrollControlled: true,
+        useSafeArea: false,
+        backgroundColor: AppColors.transparent,
+        builder: (sheetContext) {
+        return StatefulBuilder(
+          builder:
+              (BuildContext context, void Function(void Function()) setModalState) {
+            _notificationPrefsSheetInvalidate = () => setModalState(() {});
+            return ReportSheetScaffold(
+              fitToContent: true,
+              addBottomInset: true,
+              title: context.l10n.notificationsPrefsSheetTitle,
+              subtitle: context.l10n.notificationsPrefsSheetSubtitle,
+              trailing: ReportCircleIconButton(
+                icon: Icons.close_rounded,
+                semanticLabel: context.l10n.semanticClose,
+                onTap: () {
+                  AppHaptics.tap();
+                  Navigator.of(sheetContext).pop();
+                },
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Container(
-                      width: AppSpacing.sheetHandle,
-                      height: AppSpacing.sheetHandleHeight,
-                      decoration: BoxDecoration(
-                        color: AppColors.divider,
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusXs,
-                        ),
-                      ),
+              child: _isPreferencesLoading
+                  ? const Padding(
+                      padding: EdgeInsets.symmetric(vertical: AppSpacing.xl),
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  : Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        for (final NotificationPreference pref in _preferences)
+                          GestureDetector(
+                            onLongPress: () {
+                              AppHaptics.medium();
+                              _showSnoozePicker(pref.type);
+                            },
+                            child: SwitchListTile.adaptive(
+                              contentPadding: EdgeInsets.zero,
+                              title: Text(
+                                _notificationTypeLabel(context.l10n, pref.type),
+                              ),
+                              subtitle: Text(
+                                _preferenceSubtitle(context.l10n, pref),
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(color: AppColors.textMuted),
+                              ),
+                              value: !pref.muted,
+                              onChanged: (bool enabled) =>
+                                  _togglePreference(pref.type, !enabled),
+                            ),
+                          ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  Text(
-                    context.l10n.notificationsPrefsSheetTitle,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    context.l10n.notificationsPrefsSheetSubtitle,
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  if (_isPreferencesLoading)
-                    const Center(child: CircularProgressIndicator())
-                  else
-                    ..._preferences.map(
-                      (pref) => SwitchListTile.adaptive(
-                        contentPadding: EdgeInsets.zero,
-                        title: Text(_notificationTypeLabel(context.l10n, pref.type)),
-                        subtitle: Text(
-                          pref.muted
-                              ? context.l10n.notificationsPrefMuted
-                              : context.l10n.notificationsPrefEnabled,
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(color: AppColors.textMuted),
-                        ),
-                        value: pref.muted,
-                        onChanged: (value) =>
-                            _togglePreference(pref.type, value),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ),
+            );
+          },
         );
       },
+      ).whenComplete(() {
+        _notificationPrefsSheetInvalidate = null;
+      }),
     );
   }
 
@@ -468,7 +575,13 @@ class _NotificationsScreenState extends State<NotificationsScreen>
         return l10n.notificationsTypeNearbyReports;
       case UserNotificationType.cleanupEvent:
         return l10n.notificationsTypeCleanupEvents;
+      case UserNotificationType.eventChat:
+        return l10n.notificationsTypeCleanupEvents;
       case UserNotificationType.system:
+        return l10n.notificationsTypeSystem;
+      case UserNotificationType.achievement:
+        return l10n.notificationsTypeSystem;
+      case UserNotificationType.welcome:
         return l10n.notificationsTypeSystem;
     }
   }
@@ -494,15 +607,21 @@ class _NotificationsScreenState extends State<NotificationsScreen>
           ),
         ),
       );
-      for (final UserNotification item in section.items) {
-        children.add(_buildAnimatedNotificationRow(item, animationIndex));
+      final List<CollapsedNotification> collapsed =
+          collapseByGroupKey(section.items);
+      for (final CollapsedNotification entry in collapsed) {
+        children.add(_buildAnimatedNotificationRow(
+          entry.representative,
+          animationIndex,
+          groupCount: entry.groupCount,
+        ));
         animationIndex += 1;
       }
     }
     return children;
   }
 
-  Widget _buildAnimatedNotificationRow(UserNotification item, int index) {
+  Widget _buildAnimatedNotificationRow(UserNotification item, int index, {int groupCount = 1}) {
     final double stagger = (index * 0.06).clamp(0.0, 0.5);
     final Animation<double> fade = CurvedAnimation(
       parent: _entranceController,
@@ -524,47 +643,174 @@ class _NotificationsScreenState extends State<NotificationsScreen>
           ),
         );
 
-    final _LegacyNotification adapted = _LegacyNotification.fromServer(item);
-
     return FadeTransition(
       opacity: fade,
       child: SlideTransition(
         position: slide,
-        child: Dismissible(
-          key: ValueKey<String>('notification-${item.id}'),
-          direction: DismissDirection.horizontal,
-          confirmDismiss: (DismissDirection direction) async {
-            if (direction == DismissDirection.startToEnd) {
-              await _toggleReadFromSwipe(item);
-              AppHaptics.tap();
+        child: Material(
+          type: MaterialType.transparency,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.radius18),
+          ),
+          clipBehavior: Clip.antiAliasWithSaveLayer,
+          child: Dismissible(
+            key: ValueKey<String>('notification-${item.id}'),
+            direction: DismissDirection.horizontal,
+            confirmDismiss: (DismissDirection direction) async {
+              if (direction == DismissDirection.startToEnd) {
+                await _toggleReadFromSwipe(item);
+                AppHaptics.tap();
+                return false;
+              }
+              unawaited(_archiveNotification(item));
               return false;
-            }
-            _archiveNotification(item);
-            return false;
-          },
-          background: SwipeActionBackground(
-            icon: item.isRead
-                ? Icons.mark_email_unread_rounded
-                : Icons.mark_email_read_rounded,
-            label: item.isRead
-                ? context.l10n.notificationsSwipeMarkUnread
-                : context.l10n.notificationsSwipeMarkRead,
-            alignment: Alignment.centerLeft,
-            color: AppColors.primaryDark,
-          ),
-          secondaryBackground: SwipeActionBackground(
-            icon: Icons.archive_outlined,
-            label: context.l10n.notificationsSwipeArchive,
-            alignment: Alignment.centerRight,
-            color: AppColors.textMuted,
-          ),
-          child: NotificationTile(
-            item: adapted.toFeedNotification(),
-            onTap: () => _openNotification(item),
+            },
+            background: SwipeActionBackground(
+              icon: item.isRead
+                  ? Icons.mark_email_unread_rounded
+                  : Icons.mark_email_read_rounded,
+              label: item.isRead
+                  ? context.l10n.notificationsSwipeMarkUnread
+                  : context.l10n.notificationsSwipeMarkRead,
+              alignment: Alignment.centerLeft,
+              color: AppColors.primaryDark,
+            ),
+            secondaryBackground: SwipeActionBackground(
+              icon: Icons.archive_outlined,
+              label: context.l10n.notificationsSwipeArchive,
+              alignment: Alignment.centerRight,
+              color: AppColors.textMuted,
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(AppSpacing.radius18),
+              clipBehavior: Clip.antiAliasWithSaveLayer,
+              child: NotificationTile(
+                item: item,
+                onTap: () => _openNotification(item),
+                groupCount: groupCount,
+              ),
+            ),
           ),
         ),
       ),
     );
+  }
+
+  List<Widget> _notificationsScrollSlivers(BuildContext context) {
+    final List<Widget> slivers = <Widget>[
+      SliverToBoxAdapter(child: _buildHeader(context)),
+      SliverToBoxAdapter(child: _buildFilters(context)),
+      if (_unreadCount > 0)
+        SliverToBoxAdapter(child: _buildUnreadSummary(context)),
+      SliverToBoxAdapter(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            _buildInteractionHint(context),
+            const SizedBox(height: AppSpacing.sm),
+          ],
+        ),
+      ),
+    ];
+
+    if (_isLoading) {
+      slivers.add(
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.md,
+            AppSpacing.lg,
+            AppSpacing.xl,
+          ),
+          sliver: SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (BuildContext context, int index) =>
+                  const _NotificationShimmerTile(),
+              childCount: 6,
+            ),
+          ),
+        ),
+      );
+      return slivers;
+    }
+
+    if (_loadErrorMessage != null && _items.isEmpty) {
+      slivers.add(
+        SliverFillRemaining(
+          hasScrollBody: false,
+          child: _buildErrorState(context),
+        ),
+      );
+      return slivers;
+    }
+
+    if (_visibleItems.isEmpty) {
+      slivers.add(
+        SliverFillRemaining(
+          hasScrollBody: false,
+          child: _buildEmptyState(context),
+        ),
+      );
+      return slivers;
+    }
+
+    slivers.add(
+      SliverPadding(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          0,
+          AppSpacing.lg,
+          AppSpacing.xl,
+        ),
+        sliver: SliverList(
+          delegate: SliverChildListDelegate.fixed(
+            <Widget>[
+              ..._buildSectionedChildren(context),
+              if (_loadMoreFailed)
+                Padding(
+                  padding: const EdgeInsets.only(top: AppSpacing.sm),
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        _loadMoreFailed = false;
+                        _isLoadingMore = true;
+                      });
+                      _loadNotifications(
+                        reset: false,
+                        onlyUnread: _queryOnlyUnread,
+                      );
+                    },
+                    icon: const Icon(Icons.refresh_rounded, size: 18),
+                    label: Text(
+                      context.l10n.notificationsRetryLoadingMore,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    if (_isLoadingMore) {
+      slivers.add(
+        const SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.only(bottom: AppSpacing.md),
+            child: Center(
+              child: SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return slivers;
   }
 
   @override
@@ -577,78 +823,16 @@ class _NotificationsScreenState extends State<NotificationsScreen>
         children: <Widget>[
           SafeArea(
             bottom: false,
-            child: Column(
-              children: <Widget>[
-                _buildHeader(context),
-                _buildFilters(context),
-                if (_unreadCount > 0) _buildUnreadSummary(context),
-                _buildInteractionHint(context),
-                const SizedBox(height: AppSpacing.sm),
-                Expanded(
-                  child: _isLoading
-                      ? _buildLoadingSkeleton()
-                      : _loadErrorMessage != null && _items.isEmpty
-                      ? _buildErrorState(context)
-                      : RefreshIndicator(
-                          onRefresh: _handleRefresh,
-                          color: AppColors.primaryDark,
-                          child: AnimatedSwitcher(
-                            duration: AppMotion.medium,
-                            switchInCurve: AppMotion.emphasized,
-                            switchOutCurve: Curves.easeInCubic,
-                            child: _visibleItems.isEmpty
-                                ? _buildEmptyState(context)
-                                : ListView(
-                                    key: ValueKey<bool>(_showUnreadOnly),
-                                    controller: _scrollController,
-                                    padding: const EdgeInsets.fromLTRB(
-                                      AppSpacing.lg,
-                                      0,
-                                      AppSpacing.lg,
-                                      AppSpacing.xl,
-                                    ),
-                                    physics: const BouncingScrollPhysics(
-                                      parent: AlwaysScrollableScrollPhysics(),
-                                    ),
-                                    children: <Widget>[
-                                      ..._buildSectionedChildren(context),
-                                      if (_loadMoreFailed)
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                            top: AppSpacing.sm,
-                                          ),
-                                          child: OutlinedButton.icon(
-                                            onPressed: () {
-                                              setState(() {
-                                                _loadMoreFailed = false;
-                                                _isLoadingMore = true;
-                                              });
-                                              _loadNotifications(
-                                                reset: false,
-                                                onlyUnread: _queryOnlyUnread,
-                                              );
-                                            },
-                                            icon: const Icon(
-                                              Icons.refresh_rounded,
-                                              size: 18,
-                                            ),
-                                            label: Text(
-                                              context.l10n
-                                                  .notificationsRetryLoadingMore,
-                                            ),
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                          ),
-                        ),
+            child: AppRefreshIndicator(
+              onRefresh: _handleRefresh,
+              child: CustomScrollView(
+                key: ValueKey<bool>(_showUnreadOnly),
+                controller: _scrollController,
+                physics: const AlwaysScrollableScrollPhysics(
+                  parent: BouncingScrollPhysics(),
                 ),
-                if (_isLoadingMore)
-                  const Padding(
-                    padding: EdgeInsets.only(bottom: AppSpacing.md),
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-              ],
+                slivers: _notificationsScrollSlivers(context),
+              ),
             ),
           ),
           Positioned(
@@ -743,17 +927,17 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                     ),
                     const SizedBox(height: 2),
                     GestureDetector(
-                      onLongPress: () {
-                        // Dev-safe preview so notification UX can be validated before
-                        // APNs/Firebase production credentials are available.
-                        ServiceLocator.instance.pushNotificationService
-                            .showDebugLocalNotification();
-                        AppSnack.show(
-                          context,
-                          message: context.l10n.notificationsDebugPreviewTriggered,
-                          type: AppSnackType.info,
-                        );
-                      },
+                      onLongPress: kDebugMode
+                          ? () {
+                              ServiceLocator.instance.pushNotificationService
+                                  .showDebugLocalNotification();
+                              AppSnack.show(
+                                context,
+                                message: context.l10n.notificationsDebugPreviewTriggered,
+                                type: AppSnackType.info,
+                              );
+                            }
+                          : null,
                       behavior: HitTestBehavior.opaque,
                       child: Text(
                         _unreadCount == 0
@@ -895,16 +1079,18 @@ class _NotificationsScreenState extends State<NotificationsScreen>
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Container(
-              width: 56,
-              height: 56,
+              width: 64,
+              height: 64,
               decoration: BoxDecoration(
-                color: AppColors.inputFill,
-                borderRadius: BorderRadius.circular(AppSpacing.radius18),
+                color: AppColors.primary.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(20),
               ),
-              child: const Icon(
-                Icons.notifications_none_rounded,
-                color: AppColors.textMuted,
-                size: 28,
+              child: Icon(
+                _showUnreadOnly
+                    ? Icons.mark_email_read_rounded
+                    : Icons.notifications_none_rounded,
+                color: AppColors.primaryDark,
+                size: 32,
               ),
             ),
             const SizedBox(height: AppSpacing.md),
@@ -986,28 +1172,14 @@ class _NotificationsScreenState extends State<NotificationsScreen>
     );
   }
 
-  Widget _buildLoadingSkeleton() {
-    return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.lg,
-        AppSpacing.md,
-        AppSpacing.lg,
-        AppSpacing.xl,
-      ),
-      itemCount: 6,
-      itemBuilder: (BuildContext context, int index) {
-        return Padding(
-          padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-          child: Container(
-            height: 96,
-            decoration: BoxDecoration(
-              color: AppColors.inputFill,
-              borderRadius: BorderRadius.circular(AppSpacing.radius18),
-            ),
-          ),
-        );
-      },
-    );
+  String _preferenceSubtitle(AppLocalizations l10n, NotificationPreference pref) {
+    if (!pref.muted) return l10n.notificationsPrefEnabled;
+    if (pref.mutedUntil != null && pref.mutedUntil!.isAfter(DateTime.now())) {
+      final String time =
+          '${pref.mutedUntil!.hour.toString().padLeft(2, '0')}:${pref.mutedUntil!.minute.toString().padLeft(2, '0')}';
+      return l10n.notificationsPrefSnoozedUntil(time);
+    }
+    return l10n.notificationsPrefMuted;
   }
 
   String _friendlyErrorMessage(AppLocalizations l10n, Object error) {
@@ -1021,62 +1193,74 @@ class _NotificationsScreenState extends State<NotificationsScreen>
   }
 }
 
-class _LegacyNotification {
-  _LegacyNotification({
-    required this.id,
-    required this.title,
-    required this.message,
-    required this.createdAt,
-    required this.isRead,
-    required this.type,
-    this.targetSiteId,
-    this.targetTabIndex,
-  });
+class _NotificationShimmerTile extends StatelessWidget {
+  const _NotificationShimmerTile();
 
-  factory _LegacyNotification.fromServer(UserNotification n) {
-    return _LegacyNotification(
-      id: n.id,
-      title: n.title,
-      message: n.body,
-      createdAt: n.createdAt,
-      isRead: n.isRead,
-      type: _mapType(n.type),
-      targetSiteId: n.targetSiteId,
-      targetTabIndex: int.tryParse(n.targetTab ?? ''),
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+      child: Container(
+        height: 96,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(AppSpacing.radius18),
+          color: AppColors.inputFill,
+        ),
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                color: AppColors.divider,
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Container(
+                    width: 56,
+                    height: 14,
+                    decoration: BoxDecoration(
+                      color: AppColors.divider,
+                      borderRadius: BorderRadius.circular(7),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    width: double.infinity,
+                    height: 14,
+                    decoration: BoxDecoration(
+                      color: AppColors.divider,
+                      borderRadius: BorderRadius.circular(7),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Container(
+                    width: 180,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: AppColors.divider.withValues(alpha: 0.5),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
+}
 
-  final String id;
-  final String title;
-  final String message;
-  final DateTime createdAt;
-  final bool isRead;
-  final FeedNotificationType type;
-  final String? targetSiteId;
-  final int? targetTabIndex;
-
-  static FeedNotificationType _mapType(UserNotificationType type) {
-    switch (type) {
-      case UserNotificationType.upvote:
-      case UserNotificationType.comment:
-        return FeedNotificationType.action;
-      case UserNotificationType.system:
-        return FeedNotificationType.system;
-      default:
-        return FeedNotificationType.update;
-    }
-  }
-
-  FeedNotification toFeedNotification() {
-    return FeedNotification(
-      id: id,
-      title: title,
-      message: message,
-      createdAt: createdAt,
-      type: type,
-      isRead: isRead,
-      targetSiteId: targetSiteId,
-      targetTabIndex: targetTabIndex,
-    );
-  }
+class _SnoozeDuration {
+  const _SnoozeDuration(this.label, this.duration);
+  final String label;
+  final Duration? duration;
 }

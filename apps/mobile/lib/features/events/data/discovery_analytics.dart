@@ -29,6 +29,11 @@ class DiscoveryAnalytics {
     defaultValue: false,
   );
 
+  static const String _kIngestKey = String.fromEnvironment(
+    'DISCOVERY_ANALYTICS_INGEST_KEY',
+    defaultValue: '',
+  );
+
   static const String _consentKey = 'discovery_analytics_consent_v1';
 
   /// Product/legal may enable capture for this install (SharedPreferences).
@@ -62,8 +67,12 @@ class DiscoveryAnalytics {
       }
       final PackageInfo info = await PackageInfo.fromPlatform();
       final String platform = Platform.isIOS ? 'ios' : 'android';
+      final String trimmedKey = _kIngestKey.trim();
       await ServiceLocator.instance.apiClient.post(
         '/discovery-analytics/events',
+        headers: trimmedKey.isNotEmpty
+            ? <String, String>{'X-Chisto-Analytics-Key': trimmedKey}
+            : null,
         body: <String, dynamic>{
           'eventId': eventId,
           'step': step.wireValue,

@@ -1,5 +1,8 @@
 import { Logger } from '@nestjs/common';
+import { Prisma } from '../prisma-client';
 import { PrismaService } from '../prisma/prisma.service';
+
+const SITE_SNAPSHOT_CHUNK = 200;
 
 type FeedTrainingSample = {
   userId: string;
@@ -52,26 +55,25 @@ export class FeedTrainerWorker {
         status: true,
       },
     });
-    for (const site of sites) {
-      const ageHours = Math.max(
-        0,
-        (Date.now() - site.createdAt.getTime()) / (1000 * 60 * 60),
-      );
-      const engagement =
-        site.upvotesCount + site.commentsCount + site.savesCount + site.sharesCount;
-      await this.prisma.$executeRaw`
+    const nowMs = Date.now();
+    for (let i = 0; i < sites.length; i += SITE_SNAPSHOT_CHUNK) {
+      const chunk = sites.slice(i, i + SITE_SNAPSHOT_CHUNK);
+      const valueTuples = chunk.map((site) => {
+        const ageHours = Math.max(0, (nowMs - site.createdAt.getTime()) / (1000 * 60 * 60));
+        const engagement =
+          site.upvotesCount + site.commentsCount + site.savesCount + site.sharesCount;
+        const velocity24h = Math.min(1, engagement / 50);
+        const discussionRatio = engagement > 0 ? site.commentsCount / engagement : 0;
+        const intentRatio =
+          engagement > 0 ? (site.savesCount + site.sharesCount) / engagement : 0;
+        const severityIndex =
+          site.status === 'DISPUTED' ? 0.2 : site.status === 'VERIFIED' ? 0.8 : 0.55;
+        return Prisma.sql`(${site.id}, ${velocity24h}, ${discussionRatio}, ${intentRatio}, ${ageHours}, ${severityIndex}, NOW())`;
+      });
+      await this.prisma.$executeRaw(Prisma.sql`
         INSERT INTO "SiteFeatureSnapshot"
           ("siteId","velocity24h","discussionRatio","intentRatio","freshnessHours","severityIndex","updatedAt")
-        VALUES
-          (
-            ${site.id},
-            ${Math.min(1, engagement / 50)},
-            ${engagement > 0 ? site.commentsCount / engagement : 0},
-            ${engagement > 0 ? (site.savesCount + site.sharesCount) / engagement : 0},
-            ${ageHours},
-            ${site.status === 'DISPUTED' ? 0.2 : site.status === 'VERIFIED' ? 0.8 : 0.55},
-            NOW()
-          )
+        VALUES ${Prisma.join(valueTuples)}
         ON CONFLICT ("siteId")
         DO UPDATE SET
           "velocity24h" = EXCLUDED."velocity24h",
@@ -80,7 +82,7 @@ export class FeedTrainerWorker {
           "freshnessHours" = EXCLUDED."freshnessHours",
           "severityIndex" = EXCLUDED."severityIndex",
           "updatedAt" = NOW()
-      `;
+      `);
     }
     return sites.length;
   }

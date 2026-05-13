@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/features/events/presentation/view_models/organizer_analytics_view_model.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
@@ -34,65 +35,49 @@ class OrganizerAnalyticsSection extends StatefulWidget {
 }
 
 class _OrganizerAnalyticsSectionState extends State<OrganizerAnalyticsSection> {
-  EventAnalytics? _analytics;
-  bool _loading = true;
-  bool _silentRefresh = false;
-  bool _failed = false;
+  late final OrganizerAnalyticsViewModel _vm;
 
   @override
   void initState() {
     super.initState();
-    unawaited(_fetch(silent: false));
+    _vm = OrganizerAnalyticsViewModel(
+      eventId: widget.event.id,
+      fetchAnalytics: widget.fetchAnalytics != null
+          ? widget.fetchAnalytics!
+          : ServiceLocator.instance.eventAnalyticsRepository.fetchAnalytics,
+    );
+    _vm.addListener(_onVm);
+    unawaited(_vm.fetch(silent: false));
   }
 
-  Future<void> _fetch({required bool silent}) async {
-    if (!silent) {
-      setState(() {
-        _loading = true;
-        _failed = false;
-      });
-    } else {
-      setState(() => _silentRefresh = true);
-    }
-    try {
-      final EventAnalytics data = widget.fetchAnalytics != null
-          ? await widget.fetchAnalytics!(widget.event.id)
-          : await ServiceLocator.instance.eventAnalyticsRepository.fetchAnalytics(widget.event.id);
-      if (!mounted) return;
-      setState(() {
-        _analytics = data;
-        _loading = false;
-        _silentRefresh = false;
-        _failed = false;
-      });
-    } on Object {
-      if (!mounted) return;
-      setState(() {
-        _loading = false;
-        _silentRefresh = false;
-        if (!silent) {
-          _failed = true;
-          _analytics = null;
-        }
-      });
+  @override
+  void dispose() {
+    _vm.removeListener(_onVm);
+    _vm.dispose();
+    super.dispose();
+  }
+
+  void _onVm() {
+    if (mounted) {
+      setState(() {});
     }
   }
 
   Future<void> _retry() async {
-    await _fetch(silent: false);
+    await _vm.fetch(silent: false);
   }
 
   @override
   Widget build(BuildContext context) {
-    final EventAnalytics? data = _analytics;
+    final EventAnalytics? data = _vm.analytics;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         DetailSectionHeader(context.l10n.eventsAnalyticsTitle),
         EventsAsyncSection(
-          isLoading: _loading,
-          hasError: _failed,
+          isLoading: _vm.loading,
+          hasError: _vm.failed,
           onRetry: _retry,
           retryLabel: context.l10n.eventsAnalyticsRetry,
           errorMessage: context.l10n.eventsAnalyticsLoadFailed,
@@ -182,10 +167,10 @@ class _OrganizerAnalyticsSectionState extends State<OrganizerAnalyticsSection> {
               if (widget.fetchAnalytics == null)
                 IconButton(
                   tooltip: context.l10n.eventsAnalyticsRefresh,
-                  onPressed: (_loading || _silentRefresh)
+                  onPressed: (_vm.loading || _vm.silentRefresh)
                       ? null
-                      : () => unawaited(_fetch(silent: true)),
-                  icon: _silentRefresh
+                      : () => unawaited(_vm.fetch(silent: true)),
+                  icon: _vm.silentRefresh
                       ? const SizedBox(
                           width: 22,
                           height: 22,
@@ -291,7 +276,7 @@ class _OrganizerAnalyticsSectionState extends State<OrganizerAnalyticsSection> {
 
   Color _rateColor(int rate) {
     if (rate >= 75) return AppColors.primaryDark;
-    if (rate >= 40) return const Color(0xFFF5A623);
+    if (rate >= 40) return AppColors.warningAccent;
     return AppColors.error;
   }
 }
@@ -351,7 +336,7 @@ class _RingPainter extends CustomPainter {
         math.pi * 2 * rate.clamp(0.0, 1.0),
         false,
         Paint()
-          ..color = rate >= 0.75 ? AppColors.primary : const Color(0xFFF5A623)
+          ..color = rate >= 0.75 ? AppColors.primary : AppColors.warningAccent
           ..style = PaintingStyle.stroke
           ..strokeWidth = stroke
           ..strokeCap = StrokeCap.round,
