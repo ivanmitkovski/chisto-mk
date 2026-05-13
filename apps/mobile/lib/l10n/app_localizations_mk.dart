@@ -5003,6 +5003,24 @@ class AppLocalizationsMk extends AppLocalizations {
   String get reportFlowSubmitPhaseUploading => 'Се прикачува…';
 
   @override
+  String reportFlowSubmitPhaseUploadingProgress(int current, int total) {
+    return 'Се подготвуваат слики $current од $total…';
+  }
+
+  @override
+  String get reportDraftRestoredChip => 'Нацртот е вратен';
+
+  @override
+  String reportSemanticsPhotoAdded(int current, int max) {
+    return 'Додадена фотографија, $current од $max.';
+  }
+
+  @override
+  String reportSemanticsPhotoRemoved(int remaining, int max) {
+    return 'Отстранета фотографија, остануваат $remaining од $max.';
+  }
+
+  @override
   String get reportFlowSubmitPhaseSubmitting => 'Се испраќа…';
 
   @override

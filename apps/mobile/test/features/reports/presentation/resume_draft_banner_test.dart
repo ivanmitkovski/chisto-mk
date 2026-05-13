@@ -1,4 +1,5 @@
 import 'package:chisto_mobile/features/reports/data/outbox/report_draft_repository.dart';
+import 'package:chisto_mobile/features/reports/data/outbox/report_draft_summary_projector.dart';
 import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_constants.dart';
 import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_entry.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
@@ -23,7 +24,7 @@ void main() {
       lastPersistedAtMs: 2000,
     );
     final ReportDraftLoadResult load = ReportDraftLoadResult.restored(
-      row: row,
+      restore: reportWizardRestoreSnapshotOf(row),
       prunedPhotoCount: 0,
       migratedLegacyPhotoCount: 0,
     );
@@ -72,7 +73,7 @@ void main() {
       updatedAtMs: 2000,
     );
     final ReportDraftLoadResult load = ReportDraftLoadResult.restored(
-      row: row,
+      restore: reportWizardRestoreSnapshotOf(row),
       prunedPhotoCount: 0,
       migratedLegacyPhotoCount: 0,
     );

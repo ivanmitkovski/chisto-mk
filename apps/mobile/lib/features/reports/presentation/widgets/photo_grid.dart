@@ -11,6 +11,7 @@ import 'package:chisto_mobile/shared/widgets/app_smart_image.dart';
 import 'package:chisto_mobile/shared/widgets/immersive_photo_gallery.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:chisto_mobile/features/reports/domain/report_field_limits.dart';
 
 class PhotoGrid extends StatefulWidget {
   const PhotoGrid({
@@ -18,7 +19,7 @@ class PhotoGrid extends StatefulWidget {
     required this.photos,
     required this.onAddPhoto,
     required this.onRemovePhoto,
-    this.maxPhotos = 5,
+    this.maxPhotos = ReportFieldLimits.maxPhotos,
   });
 
   final List<XFile> photos;
@@ -53,7 +54,7 @@ class _PhotoGridState extends State<PhotoGrid> {
     final List<GalleryImageItem> galleryItems = List<GalleryImageItem>.generate(
       widget.photos.length,
       (int index) => GalleryImageItem(
-        image: FileImage(File(widget.photos[index].path)),
+        image: FileImage(File(widget.photos[index].path), scale: 1.0),
         heroTag: 'report-photo-${widget.photos[index].path.hashCode}-$index',
         semanticLabel: l10n.reportPhotoSemanticReportPhoto(index + 1),
       ),
@@ -214,7 +215,9 @@ class _PhotoThumbnail extends StatelessWidget {
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(AppSpacing.radius14),
-                    child: AppSmartImage(image: FileImage(File(file.path))),
+                    child: AppSmartImage(
+                      image: FileImage(File(file.path), scale: 1.0),
+                    ),
                   ),
                 ),
               ),

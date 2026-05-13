@@ -1,17 +1,20 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/observability/chisto_sentry.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/features/reports/data/outbox/report_draft_repository.dart';
-import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_entry.dart';
+import 'package:chisto_mobile/features/reports/application/report_wizard_submit_port.dart';
 import 'package:chisto_mobile/features/reports/data/report_flow_preferences.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_capacity.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_submit_result.dart';
+import 'package:chisto_mobile/features/reports/domain/models/report_wizard_restore_snapshot.dart';
 import 'package:chisto_mobile/features/reports/domain/draft/new_report_flow_policy.dart';
+import 'package:chisto_mobile/features/reports/domain/report_field_limits.dart';
+import 'package:chisto_mobile/features/reports/domain/report_input_sanitizer.dart';
+import 'package:chisto_mobile/features/reports/domain/repositories/reports_api_repository.dart';
 import 'package:chisto_mobile/features/reports/presentation/controllers/wizard_autosave_debouncer.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_stage.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/resume_with_incoming_photo_dialog.dart';
@@ -26,11 +29,15 @@ class NewReportController extends ChangeNotifier {
   NewReportController({
     XFile? initialPhoto,
     ReportFlowPreferences reportFlowPreferences = const ReportFlowPreferences(),
-    ReportDraftRepository? draftRepository,
+    required ReportDraftRepository draftRepository,
+    required ReportsApiRepository reportsApiRepository,
+    required ReportWizardSubmitPort reportSubmitPort,
   }) : _initialPhoto = initialPhoto,
        _incomingPhotoMergeResolved = initialPhoto == null,
        _reportFlowPreferences = reportFlowPreferences,
-       _draftRepo = draftRepository ?? ServiceLocator.instance.reportDraftRepository,
+       _draftRepo = draftRepository,
+       _reportsApi = reportsApiRepository,
+       _reportSubmitPort = reportSubmitPort,
        _autosaveDebouncer = WizardAutosaveDebouncer() {
     _suppressLocalDraftPersist = initialPhoto != null;
     _reportFlowPreferences.hasSeenReportHelpHint.then((bool v) {
@@ -44,25 +51,29 @@ class NewReportController extends ChangeNotifier {
   bool _disposed = false;
 
   Future<void> _seedInitialPhoto(XFile initialPhoto) async {
-    try {
-      final XFile managed = await _draftRepo.registerPhoto(initialPhoto);
-      _draft = _draft.copyWith(photos: <XFile>[managed]);
-      notifyListeners();
-    } catch (e, st) {
-      chistoReportsBreadcrumb(
-        'report_draft',
-        'initial_photo_import_failed',
-        data: <String, Object?>{'error': e.runtimeType.toString()},
-      );
-      await Sentry.captureException(e, stackTrace: st);
-      _draft = _draft.copyWith(photos: <XFile>[initialPhoto]);
-      notifyListeners();
-    }
+    await _enqueuePhotoOp(() async {
+      try {
+        final XFile managed = await _draftRepo.registerPhoto(initialPhoto);
+        _draft = _draft.copyWith(photos: <XFile>[managed]);
+        notifyListeners();
+      } catch (e, st) {
+        chistoReportsBreadcrumb(
+          'report_draft',
+          'initial_photo_import_failed',
+          data: <String, Object?>{'error': e.runtimeType.toString()},
+        );
+        await Sentry.captureException(e, stackTrace: st);
+        _draft = _draft.copyWith(photos: <XFile>[initialPhoto]);
+        notifyListeners();
+      }
+    });
   }
 
   final XFile? _initialPhoto;
   final ReportFlowPreferences _reportFlowPreferences;
   final ReportDraftRepository _draftRepo;
+  final ReportsApiRepository _reportsApi;
+  final ReportWizardSubmitPort _reportSubmitPort;
   ReportDraft _draft = ReportDraft();
   bool _submitting = false;
   String? _submitPhase;
@@ -82,6 +93,14 @@ class NewReportController extends ChangeNotifier {
   int? _lastPersistedAtMs;
   Object? _restoreError;
   bool _incomingPhotoMergeResolved;
+
+  Future<void> _photoOpChain = Future<void>.value();
+
+  Future<T> _enqueuePhotoOp<T>(Future<T> Function() op) {
+    final Future<T> run = _photoOpChain.then((_) => op());
+    _photoOpChain = run.then((_) {}).catchError((_) {});
+    return run;
+  }
 
   ReportDraft get draft => _draft;
   bool get submitting => _submitting;
@@ -164,19 +183,20 @@ class NewReportController extends ChangeNotifier {
     }
     try {
       final ReportDraftLoadResult r = await _draftRepo.loadDraft();
-      if (!r.hasDraft || r.row == null) {
+      final ReportWizardRestoreSnapshot? restoreSnap = r.restore;
+      if (!r.hasDraft || restoreSnap == null) {
         return r;
       }
-      final ReportOutboxEntry row = r.row!;
-      final ReportDraft saved = row.draft;
-      final String title = row.title.isNotEmpty ? row.title : saved.title;
-      final String description = row.description.isNotEmpty
-          ? row.description
+      final ReportWizardRestoreSnapshot snap = restoreSnap;
+      final ReportDraft saved = snap.draft;
+      final String title = snap.title.isNotEmpty ? snap.title : saved.title;
+      final String description = snap.description.isNotEmpty
+          ? snap.description
           : saved.description;
       _draft = saved.copyWith(title: title, description: description);
-      if (row.currentStageName != null && row.currentStageName!.isNotEmpty) {
+      if (snap.currentStageName != null && snap.currentStageName!.isNotEmpty) {
         try {
-          _currentStage = ReportStage.values.byName(row.currentStageName!);
+          _currentStage = ReportStage.values.byName(snap.currentStageName!);
         } catch (_) {
           _currentStage = ReportStage.evidence;
         }
@@ -184,12 +204,12 @@ class NewReportController extends ChangeNotifier {
         _currentStage = ReportStage.evidence;
       }
       _attemptedStages.clear();
-      for (final String name in row.attemptedStageNames) {
+      for (final String name in snap.attemptedStageNames) {
         try {
           _attemptedStages.add(ReportStage.values.byName(name));
         } catch (_) {}
       }
-      _lastPersistedAtMs = row.lastPersistedAtMs ?? row.updatedAtMs;
+      _lastPersistedAtMs = snap.lastPersistedAtMs ?? snap.updatedAtMs;
       notifyListeners();
       return r;
     } catch (e, st) {
@@ -221,10 +241,7 @@ class NewReportController extends ChangeNotifier {
 
   Future<void> loadReportingCapacity() async {
     try {
-      final ReportCapacity capacity = await ServiceLocator
-          .instance
-          .reportsApiRepository
-          .getReportingCapacity();
+      final ReportCapacity capacity = await _reportsApi.getReportingCapacity();
       _reportCapacity = capacity;
       notifyListeners();
     } catch (e, st) {
@@ -285,9 +302,13 @@ class NewReportController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateTitle(String value) => _setDraft(_draft.copyWith(title: value));
-  void updateDescription(String value) =>
-      _setDraft(_draft.copyWith(description: value));
+  void updateTitle(String value) =>
+      _setDraft(_draft.copyWith(title: ReportInputSanitizer.clampTitle(value)));
+  void updateDescription(String value) => _setDraft(
+        _draft.copyWith(
+          description: ReportInputSanitizer.clampDescription(value),
+        ),
+      );
   void updateSeverity(int severity) =>
       _setDraft(_draft.copyWith(severity: severity));
   void updateCategory(ReportCategory cat) =>
@@ -312,15 +333,22 @@ class NewReportController extends ChangeNotifier {
   }
 
   Future<void> addPhoto(XFile file) async {
-    final XFile managed = await _draftRepo.registerPhoto(file);
-    _setDraft(_draft.copyWith(photos: <XFile>[..._draft.photos, managed]));
+    await _enqueuePhotoOp(() async {
+      if (_draft.photos.length >= ReportFieldLimits.maxPhotos) {
+        return;
+      }
+      final XFile managed = await _draftRepo.registerPhoto(file);
+      _setDraft(_draft.copyWith(photos: <XFile>[..._draft.photos, managed]));
+    });
   }
 
   Future<void> removePhoto(int index) async {
-    final XFile removed = _draft.photos[index];
-    await _draftRepo.deleteDraftPhoto(removed.path);
-    final List<XFile> updated = List<XFile>.from(_draft.photos)..removeAt(index);
-    _setDraft(_draft.copyWith(photos: updated));
+    await _enqueuePhotoOp(() async {
+      final XFile removed = _draft.photos[index];
+      await _draftRepo.deleteDraftPhoto(removed.path);
+      final List<XFile> updated = List<XFile>.from(_draft.photos)..removeAt(index);
+      _setDraft(_draft.copyWith(photos: updated));
+    });
   }
 
   void setProcessingPhotoFlow(bool value) {
@@ -461,10 +489,10 @@ class NewReportController extends ChangeNotifier {
   }
 
   Future<ReportSubmitResult> submitReport() {
-    return ServiceLocator.instance.reportOutboxCoordinator.submitReportAndAwait(
+    return _reportSubmitPort.submitReportAndAwait(
       draft: _draft,
-      title: _draft.title.trim(),
-      description: _draft.description.trim(),
+      title: ReportInputSanitizer.clampTitle(_draft.title),
+      description: ReportInputSanitizer.clampDescription(_draft.description),
     );
   }
 

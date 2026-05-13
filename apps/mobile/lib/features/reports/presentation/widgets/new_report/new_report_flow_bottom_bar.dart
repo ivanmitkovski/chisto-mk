@@ -2,6 +2,8 @@ import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
+import 'package:chisto_mobile/features/reports/domain/models/report_upload_prep_progress.dart';
+import 'package:chisto_mobile/features/reports/presentation/theme/report_tokens.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_stage.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_stage_config.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +16,7 @@ class NewReportFlowBottomBar extends StatelessWidget {
     required this.currentStage,
     required this.submitting,
     required this.submitPhase,
+    this.uploadPrepProgress,
     required this.onPrimary,
     required this.onBack,
   });
@@ -26,6 +29,9 @@ class NewReportFlowBottomBar extends StatelessWidget {
 
   /// `'uploading' | 'creating' | 'sent' | null` while [submitting].
   final String? submitPhase;
+
+  /// When photos are being compressed before HTTP upload (done ≤ total).
+  final ReportUploadPrepProgress? uploadPrepProgress;
   final VoidCallback onPrimary;
   final VoidCallback onBack;
 
@@ -34,11 +40,19 @@ class NewReportFlowBottomBar extends StatelessWidget {
     final bool showBack = currentStage != ReportStage.evidence;
     final bool isReviewStage = currentStage == ReportStage.review;
     final bool primaryLocked = submitting;
+    final String? prepLabel = (uploadPrepProgress != null &&
+            submitPhase == 'uploading' &&
+            uploadPrepProgress!.total > 0)
+        ? context.l10n.reportFlowSubmitPhaseUploadingProgress(
+            uploadPrepProgress!.completed,
+            uploadPrepProgress!.total,
+          )
+        : null;
     final String primaryLabel = submitting
         ? (submitPhase == 'creating'
               ? context.l10n.reportFlowSubmitPhaseCreating
               : submitPhase == 'uploading'
-              ? context.l10n.reportFlowSubmitPhaseUploading
+              ? (prepLabel ?? context.l10n.reportFlowSubmitPhaseUploading)
               : submitPhase == 'sent'
               ? context.l10n.reportSubmitSentPending
               : context.l10n.reportFlowSubmitPhaseSubmitting)
@@ -98,7 +112,7 @@ class NewReportFlowBottomBar extends StatelessWidget {
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.textPrimary,
                         side: BorderSide(
-                          color: AppColors.divider.withValues(alpha: 0.8),
+                          color: AppColors.reportDividerStrong,
                         ),
                         backgroundColor: AppColors.panelBackground,
                         padding: const EdgeInsets.symmetric(
@@ -132,15 +146,13 @@ class NewReportFlowBottomBar extends StatelessWidget {
                             ? context.l10n.reportFormPrimarySemanticsHintSubmit
                             : context.l10n.reportFormPrimarySemanticsHintNext),
                   child: SizedBox(
-                    height: 52,
+                    height: ReportTokens.wizardBottomBarCtaHeight,
                     child: FilledButton(
                       onPressed: primaryLocked ? null : onPrimary,
                       style: FilledButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         foregroundColor: AppColors.white,
-                        disabledBackgroundColor: AppColors.primary.withValues(
-                          alpha: 0.42,
-                        ),
+                        disabledBackgroundColor: AppColors.reportDisabledPrimaryFill,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(

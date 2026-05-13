@@ -3,7 +3,7 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/reports/data/outbox/report_draft_repository.dart';
-import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_entry.dart';
+import 'package:chisto_mobile/features/reports/domain/models/report_wizard_restore_snapshot.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_modal_dialog.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
@@ -25,17 +25,18 @@ Future<ResumeDraftBannerResult?> showResumeDraftBanner({
   required AppLocalizations l10n,
   required ReportDraftLoadResult loadResult,
 }) async {
-  final ReportOutboxEntry? row = loadResult.row;
-  if (row == null) {
+  final ReportWizardRestoreSnapshot? snapshot = loadResult.restore;
+  if (snapshot == null) {
     return ResumeDraftBannerResult.continued;
   }
   chistoReportsBreadcrumb(
     'report_draft',
     'resume_banner_shown',
     data: <String, Object?>{
-      'photoCount': row.draft.photos.length,
+      'photoCount': snapshot.draft.photos.length,
       'hasTitle':
-          row.title.trim().isNotEmpty || row.draft.title.trim().isNotEmpty,
+          snapshot.title.trim().isNotEmpty ||
+          snapshot.draft.title.trim().isNotEmpty,
     },
   );
 
@@ -51,10 +52,10 @@ Future<ResumeDraftBannerResult?> showResumeDraftBanner({
       barrierColor: AppColors.black.withValues(alpha: 0.45),
       builder: (BuildContext ctx) {
         final String titlePreviewRaw =
-            row.title.trim().isNotEmpty ? row.title : row.draft.title;
+            snapshot.title.trim().isNotEmpty ? snapshot.title : snapshot.draft.title;
         final String titlePreview =
             titlePreviewRaw.trim().isEmpty ? '—' : titlePreviewRaw.trim();
-        final int savedAt = row.lastPersistedAtMs ?? row.updatedAtMs;
+        final int savedAt = snapshot.lastPersistedAtMs ?? snapshot.updatedAtMs;
         return ReportModalDialog(
           leading: DecoratedBox(
             decoration: BoxDecoration(
@@ -103,7 +104,7 @@ Future<ResumeDraftBannerResult?> showResumeDraftBanner({
           child: SingleChildScrollView(
             child: Text(
               l10n.reportDraftResumeBody(
-                row.draft.photos.length,
+                snapshot.draft.photos.length,
                 titlePreview,
                 _formatReportDraftSavedTimestamp(l10n, savedAt),
               ),

@@ -49,3 +49,57 @@ void chistoOutboxBreadcrumb({
     },
   );
 }
+
+/// Sentry scope tags for the reports vertical (safe: state names and row ids only).
+///
+/// See `docs/reports-outbox-runbook.md` for naming and triage.
+abstract final class ReportSentryTagKeys {
+  static const String outboxState = 'report.outbox.state';
+  static const String pipelinePhase = 'report.pipeline.phase';
+  static const String correlationOutboxId = 'report.correlation.outbox_id';
+}
+
+void chistoReportSentryClearOutboxEntryScope() {
+  try {
+    Sentry.configureScope((Scope scope) {
+      scope.removeTag(ReportSentryTagKeys.outboxState);
+      scope.removeTag(ReportSentryTagKeys.correlationOutboxId);
+    });
+  } catch (_) {}
+}
+
+void chistoReportSentryClearReportPipelineScope() {
+  try {
+    Sentry.configureScope((Scope scope) {
+      scope.removeTag(ReportSentryTagKeys.outboxState);
+      scope.removeTag(ReportSentryTagKeys.correlationOutboxId);
+      scope.removeTag(ReportSentryTagKeys.pipelinePhase);
+    });
+  } catch (_) {}
+}
+
+void chistoReportSentrySyncOutboxScope({
+  String? outboxState,
+  String? outboxId,
+  String? pipelinePhase,
+}) {
+  try {
+    Sentry.configureScope((Scope scope) {
+      if (outboxState != null && outboxState.isNotEmpty) {
+        scope.setTag(ReportSentryTagKeys.outboxState, outboxState);
+      } else {
+        scope.removeTag(ReportSentryTagKeys.outboxState);
+      }
+      if (outboxId != null && outboxId.isNotEmpty) {
+        scope.setTag(ReportSentryTagKeys.correlationOutboxId, outboxId);
+      } else {
+        scope.removeTag(ReportSentryTagKeys.correlationOutboxId);
+      }
+      if (pipelinePhase != null && pipelinePhase.isNotEmpty) {
+        scope.setTag(ReportSentryTagKeys.pipelinePhase, pipelinePhase);
+      } else {
+        scope.removeTag(ReportSentryTagKeys.pipelinePhase);
+      }
+    });
+  } catch (_) {}
+}

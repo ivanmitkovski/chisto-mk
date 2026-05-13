@@ -33,6 +33,22 @@ void main() {
     expect(err.serverTimestamp, isNull);
   });
 
+  test('422 maps to AppError.validation with stable VALIDATION_ERROR code', () {
+    final AppError err = appErrorFromFailedResponse(
+      statusCode: 422,
+      json: <String, dynamic>{
+        'code': 'SOME_SERVER_CODE',
+        'message': 'Title is required',
+        'details': <String, dynamic>{'field': 'title'},
+      },
+      bodyStr: null,
+      retryAfterHeader: null,
+    );
+    expect(err.code, 'VALIDATION_ERROR');
+    expect(err.message, 'Title is required');
+    expect(err.details, isA<Map<String, dynamic>>());
+  });
+
   test('appErrorFromFailedResponse merges API details for 429', () {
     final AppError err = appErrorFromFailedResponse(
       statusCode: 429,

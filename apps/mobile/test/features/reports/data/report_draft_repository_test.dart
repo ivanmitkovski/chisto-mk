@@ -104,16 +104,16 @@ void main() {
     final ReportDraftLoadResult loaded = await repo.loadDraft();
     expect(loaded.kind, ReportDraftRestoreKind.restored);
     expect(loaded.hasDraft, isTrue);
-    expect(loaded.row?.currentStageName, 'details');
-    expect(loaded.row?.attemptedStageNames, <String>['evidence']);
+    expect(loaded.restore?.currentStageName, 'details');
+    expect(loaded.restore?.attemptedStageNames, <String>['evidence']);
 
     final String absPhoto = await photoStore.absolutePath(
-      loaded.row!.draft.photos.single.path,
+      loaded.restore!.draft.photos.single.path,
     );
     await File(absPhoto).delete();
     final ReportDraftLoadResult pruned = await repo.loadDraft();
     expect(pruned.prunedPhotoCount, 1);
-    expect(pruned.row?.draft.photos, isEmpty);
+    expect(pruned.restore?.draft.photos, isEmpty);
 
     await repo.clear();
     final ReportDraftLoadResult after = await repo.loadDraft();

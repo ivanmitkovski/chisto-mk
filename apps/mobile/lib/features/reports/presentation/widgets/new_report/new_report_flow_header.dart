@@ -1,6 +1,7 @@
+import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
-import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_stage.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_stage_config.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/stage_chip.dart';
@@ -20,6 +21,7 @@ class NewReportFlowHeader extends StatelessWidget {
     required this.onBackFromEvidence,
     required this.onBackToPreviousStage,
     required this.onTapStage,
+    this.showDraftRestoredChip = false,
   });
 
   final String title;
@@ -30,6 +32,7 @@ class NewReportFlowHeader extends StatelessWidget {
   final VoidCallback onBackFromEvidence;
   final VoidCallback onBackToPreviousStage;
   final void Function(ReportStage stage) onTapStage;
+  final bool showDraftRestoredChip;
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +79,31 @@ class NewReportFlowHeader extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: AppSpacing.md),
+        if (showDraftRestoredChip) ...<Widget>[
+          SizedBox(height: AppSpacing.sm),
+          Center(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: AppColors.reportSurfaceMint,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
+                border: Border.all(color: AppColors.reportBannerSuccessBorder),
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.xs,
+                ),
+                child: Text(
+                  context.l10n.reportDraftRestoredChip,
+                  style: AppTypography.reportsBadgeLabel(
+                    Theme.of(context).textTheme,
+                  ).copyWith(color: AppColors.primaryDark),
+                ),
+              ),
+            ),
+          ),
+        ],
+        SizedBox(height: AppSpacing.md),
         DecoratedBox(
           decoration: BoxDecoration(
             color: AppColors.inputFill,

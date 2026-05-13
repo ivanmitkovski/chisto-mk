@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/network/connectivity_gate.dart';
@@ -8,14 +9,16 @@ import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_coordin
 import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_entry.dart';
 import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_pipeline_phase.dart';
 import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_repository.dart';
-import 'package:chisto_mobile/features/reports/domain/models/report_capacity.dart';
+import 'package:chisto_mobile/features/reports/domain/draft/report_idempotency_key.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
+import 'package:chisto_mobile/features/reports/domain/models/report_capacity.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_detail.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_submit_result.dart';
 import 'package:chisto_mobile/features/reports/domain/models/reports_list_response.dart';
 import 'package:chisto_mobile/features/reports/domain/repositories/reports_api_repository.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../shared/widget_test_bootstrap.dart';
 
@@ -472,6 +475,58 @@ void main() {
       expect((await repo.getById('f1'))?.state, ReportOutboxState.pending);
       await c.resetFailedToPending('missing');
       await Future<void>.delayed(const Duration(milliseconds: 600));
+      await c.dispose();
+    });
+
+    test('resumes upload phase from persisted uploading state', () async {
+      final _FakeOutboxRepo repo = _FakeOutboxRepo();
+      final List<int> uploadBatchSizes = <int>[];
+      final _StubApi api = _StubApi(
+        onUpload: (List<String> paths) async {
+          uploadBatchSizes.add(paths.length);
+          return List<String>.generate(
+            paths.length,
+            (int i) => 'https://example.com/u$i.jpg',
+          );
+        },
+      );
+      final int t = DateTime.now().millisecondsSinceEpoch;
+      final Directory temp =
+          await Directory.systemTemp.createTemp('outbox_resume_upload_');
+      addTearDown(() async {
+        try {
+          await temp.delete(recursive: true);
+        } catch (_) {}
+      });
+      final File fake = File('${temp.path}/pic.jpg');
+      await fake.writeAsBytes(<int>[0xFF, 0xD8, 0xFF, 0xD9]);
+      final String idem = ReportIdempotencyKey.generate();
+      await repo.insert(
+        ReportOutboxEntry(
+          id: kReportWizardDraftRowId,
+          idempotencyKey: idem,
+          draft: _validDraft().copyWith(
+            photos: <XFile>[XFile(fake.path)],
+          ),
+          title: 'Title',
+          description: 'Desc',
+          submitRequested: true,
+          state: ReportOutboxState.uploading,
+          attemptCount: 0,
+          createdAtMs: t,
+          updatedAtMs: t,
+        ),
+      );
+      final ReportOutboxCoordinator c = ReportOutboxCoordinator(
+        repository: repo,
+        reportsApi: api,
+      );
+      final Future<ReportOutboxSuccess> done = c.successStream.first;
+      await c.start();
+      final ReportOutboxSuccess ev =
+          await done.timeout(const Duration(seconds: 20));
+      expect(ev.outboxId, kReportWizardDraftRowId);
+      expect(uploadBatchSizes, isNotEmpty);
       await c.dispose();
     });
   });

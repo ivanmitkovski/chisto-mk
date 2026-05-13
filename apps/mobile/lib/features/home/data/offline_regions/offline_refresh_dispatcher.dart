@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:workmanager/workmanager.dart';
 
 import 'package:chisto_mobile/core/config/app_config.dart';
 import 'package:chisto_mobile/core/network/api_client.dart';
@@ -12,8 +11,8 @@ import 'package:chisto_mobile/features/home/data/offline_regions/offline_region_
 
 /// Background refresh for saved offline map regions (unmetered network only).
 ///
-/// Registered from [main] via [Workmanager]; the entrypoint must stay a
-/// top-level function for Flutter background isolate linking.
+/// Invoked from the unified [chistoWorkmanagerCallbackDispatcher] in
+/// `lib/core/background/chisto_workmanager_dispatcher.dart`.
 abstract final class OfflineRefreshDispatcher {
   static const String taskName = 'refreshSavedRegions';
 
@@ -52,14 +51,4 @@ abstract final class OfflineRefreshDispatcher {
       return false;
     }
   }
-}
-
-@pragma('vm:entry-point')
-void offlineRegionsCallbackDispatcher() {
-  Workmanager().executeTask((String task, Map<String, dynamic>? inputData) async {
-    if (task == OfflineRefreshDispatcher.taskName) {
-      return OfflineRefreshDispatcher.runRefreshSavedRegions();
-    }
-    return false;
-  });
 }

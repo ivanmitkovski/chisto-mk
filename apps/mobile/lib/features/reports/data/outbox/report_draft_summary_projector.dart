@@ -1,23 +1,22 @@
 import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_entry.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
+import 'package:chisto_mobile/features/reports/domain/models/report_wizard_restore_snapshot.dart';
+
+ReportWizardRestoreSnapshot reportWizardRestoreSnapshotOf(ReportOutboxEntry row) {
+  return ReportWizardRestoreSnapshot(
+    draft: row.draft,
+    title: row.title,
+    description: row.description,
+    currentStageName: row.currentStageName,
+    attemptedStageNames: List<String>.from(row.attemptedStageNames),
+    lastPersistedAtMs: row.lastPersistedAtMs,
+    updatedAtMs: row.updatedAtMs,
+  );
+}
 
 /// True if the SQLite wizard row should drive resume UI / block SP import, etc.
 bool isReportWizardDraftEntryResumable(ReportOutboxEntry row) {
-  final ReportDraft d = row.draft;
-  if (d.hasPersistableWizardBody) {
-    return true;
-  }
-  if (row.title.trim().isNotEmpty || row.description.trim().isNotEmpty) {
-    return true;
-  }
-  final String? stage = row.currentStageName;
-  if (stage != null && stage.isNotEmpty && stage != 'evidence') {
-    return true;
-  }
-  if (row.attemptedStageNames.isNotEmpty) {
-    return true;
-  }
-  return false;
+  return reportWizardRestoreSnapshotOf(row).isResumableWizardBody;
 }
 
 /// Pure projection of [ReportDraftSummary] from a wizard row (no IO).

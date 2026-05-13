@@ -3,9 +3,10 @@ import 'dart:async';
 /// Schedules outbox drain work. Default [InProcessBackgroundSubmitScheduler]
 /// runs immediately on the current isolate (same as pre-interface behavior).
 ///
-/// **Follow-up (native):** wire [PlatformBackgroundSubmitScheduler] using
-/// `workmanager` on Android and `BGTaskScheduler` on iOS so uploads continue when
-/// the app is backgrounded. Idempotency keys and SQLite rows already support resume.
+/// **Native:** [PlatformBackgroundSubmitScheduler] (see
+/// `platform_background_submit_scheduler.dart`) registers a `workmanager` one-off
+/// drain in addition to the in-process microtask. Idempotency keys and SQLite
+/// rows support resume across process restarts.
 abstract class BackgroundSubmitScheduler {
   /// Fire-and-forget: coordinator should call [scheduleDrain] instead of awaiting
   /// long-running work on the UI isolate for large uploads.
@@ -17,14 +18,5 @@ class InProcessBackgroundSubmitScheduler implements BackgroundSubmitScheduler {
   @override
   void scheduleDrain(Future<void> Function() drain) {
     unawaited(Future<void>.microtask(drain));
-  }
-}
-
-/// Placeholder for a future WorkManager / BGTaskScheduler integration.
-class PlatformBackgroundSubmitScheduler implements BackgroundSubmitScheduler {
-  @override
-  void scheduleDrain(Future<void> Function() drain) {
-    // Intentionally identical to in-process until native plugins are added.
-    InProcessBackgroundSubmitScheduler().scheduleDrain(drain);
   }
 }

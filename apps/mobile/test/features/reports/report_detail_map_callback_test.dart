@@ -1,3 +1,4 @@
+import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/report_detail_sheet.dart';
@@ -32,6 +33,9 @@ class _ReportSheetHostState extends State<_ReportSheetHost> {
         backgroundColor: AppColors.transparent,
         builder: (BuildContext context) => ReportDetailSheet(
           report: widget.report,
+          reportsRealtimeService:
+              ServiceLocator.instance.reportsRealtimeService,
+          reportsApiRepository: ServiceLocator.instance.reportsApiRepository,
           onShowSiteOnMap: widget.onShowSiteOnMap,
         ),
       );

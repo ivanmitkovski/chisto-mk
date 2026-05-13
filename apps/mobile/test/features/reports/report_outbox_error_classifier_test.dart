@@ -40,7 +40,16 @@ void main() {
     test('clamps to attempt 8 and cap', () {
       final int high = backoffMsForAttempt(99);
       expect(high, lessThanOrEqualTo(5 * 60 * 1000 + (5 * 60 * 1000 * 0.15).ceil()));
-      expect(backoffMsForAttempt(0), backoffMsForAttempt(1));
+      expect(high, greaterThanOrEqualTo(5 * 60 * 1000 - (5 * 60 * 1000 * 0.15).ceil()));
+    });
+
+    test('attempt 0 is clamped to tier 1 like attempt 1 (jittered range)', () {
+      const int ms = 2000;
+      final int jitter = (ms * 0.15).round();
+      final int lo = ms - jitter;
+      final int hi = ms + jitter;
+      expect(backoffMsForAttempt(0), inInclusiveRange(lo, hi));
+      expect(backoffMsForAttempt(1), inInclusiveRange(lo, hi));
     });
   });
 

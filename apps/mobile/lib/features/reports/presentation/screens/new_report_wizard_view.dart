@@ -8,6 +8,8 @@ import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
 import 'package:chisto_mobile/features/reports/presentation/controllers/new_report_controller.dart';
 import 'package:chisto_mobile/features/reports/domain/draft/new_report_flow_policy.dart';
+import 'package:chisto_mobile/features/reports/domain/report_field_limits.dart';
+import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/new_report_widgets.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/location_picker.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/new_report_details_form_fields.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/new_report_evidence_stage_body.dart';
@@ -17,10 +19,12 @@ import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/n
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/new_report_review_stage_body.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/new_report_stage_help_modal.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/new_report_stage_shell.dart';
-import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/new_report_widgets.dart';
+import 'package:chisto_mobile/features/reports/domain/models/report_upload_prep_progress.dart';
+import 'package:chisto_mobile/features/reports/presentation/theme/report_tokens.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/semantics.dart';
+import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 
 /// Wizard body for [NewReportScreen]; keeps [BuildContext] usage to side-effects only.
@@ -41,6 +45,8 @@ class NewReportWizardView extends StatelessWidget {
     required this.onRetrySubmit,
     required this.onGoToStage,
     required this.onScheduleDraftSave,
+    required this.uploadPrepListenable,
+    required this.showDraftRestoredChip,
   });
 
   final String? entryLabel;
@@ -57,6 +63,8 @@ class NewReportWizardView extends StatelessWidget {
   final Future<void> Function() onRetrySubmit;
   final void Function(ReportStage stage, {bool unfocusFirst}) onGoToStage;
   final VoidCallback onScheduleDraftSave;
+  final ValueListenable<ReportUploadPrepProgress?> uploadPrepListenable;
+  final bool showDraftRestoredChip;
 
   Future<void> _openStageHelp(
     BuildContext context,
@@ -150,6 +158,17 @@ class NewReportWizardView extends StatelessWidget {
                     unawaited(() async {
                       await c.removePhoto(i);
                       onScheduleDraftSave();
+                      if (context.mounted &&
+                          MediaQuery.supportsAnnounceOf(context)) {
+                        SemanticsService.sendAnnouncement(
+                          View.of(context),
+                          context.l10n.reportSemanticsPhotoRemoved(
+                            c.draft.photos.length,
+                            ReportFieldLimits.maxPhotos,
+                          ),
+                          Directionality.of(context),
+                        );
+                      }
                     }());
                   },
                 ),
@@ -267,6 +286,7 @@ class NewReportWizardView extends StatelessWidget {
                         ReportStage.values[c.currentStageIndex - 1],
                       ),
                       onTapStage: (ReportStage stage) => onGoToStage(stage),
+                      showDraftRestoredChip: showDraftRestoredChip,
                     ),
                   ),
                   const SizedBox(height: AppSpacing.sm),
@@ -278,7 +298,7 @@ class NewReportWizardView extends StatelessWidget {
                       transitionBuilder:
                           (Widget child, Animation<double> animation) {
                         final Animation<Offset> slide = Tween<Offset>(
-                          begin: const Offset(0.03, 0),
+                          begin: Offset(ReportTokens.wizardStageSlideOffset, 0),
                           end: Offset.zero,
                         ).animate(animation);
                         return FadeTransition(
@@ -310,18 +330,28 @@ class NewReportWizardView extends StatelessWidget {
                   Divider(
                     height: 1,
                     thickness: 0.5,
-                    color: AppColors.divider.withValues(alpha: 0.5),
+                    color: AppColors.reportDividerLight,
                   ),
-                  NewReportFlowBottomBar(
-                    draftAutosaveLabel:
-                        savedLabel.isNotEmpty ? savedLabel : null,
-                    currentStage: c.currentStage,
-                    submitting: c.submitting,
-                    submitPhase: c.submitPhase,
-                    onPrimary: onPrimary,
-                    onBack: () => onGoToStage(
-                      ReportStage.values[c.currentStageIndex - 1],
-                    ),
+                  ValueListenableBuilder<ReportUploadPrepProgress?>(
+                    valueListenable: uploadPrepListenable,
+                    builder: (
+                      BuildContext context,
+                      ReportUploadPrepProgress? prep,
+                      _,
+                    ) {
+                      return NewReportFlowBottomBar(
+                        draftAutosaveLabel:
+                            savedLabel.isNotEmpty ? savedLabel : null,
+                        currentStage: c.currentStage,
+                        submitting: c.submitting,
+                        submitPhase: c.submitPhase,
+                        uploadPrepProgress: prep,
+                        onPrimary: onPrimary,
+                        onBack: () => onGoToStage(
+                          ReportStage.values[c.currentStageIndex - 1],
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),

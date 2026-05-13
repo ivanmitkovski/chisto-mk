@@ -32,6 +32,12 @@ class AppColors {
   static const Color accentInfo = Color(0xFF3BA3F7);
   static const Color divider = Color(0xFFE5E7ED);
 
+  /// Reports vertical — softened dividers (avoid ad-hoc [withValues] at call sites).
+  static Color get reportDividerLight => divider.withValues(alpha: 0.5);
+  static Color get reportDividerMedium => divider.withValues(alpha: 0.7);
+  static Color get reportDividerStrong => divider.withValues(alpha: 0.8);
+  static Color get reportDisabledPrimaryFill => primary.withValues(alpha: 0.42);
+
   /// Selected discovery pill / chip fill (home feed + events: [AppFilterPillBar] feedChip).
   static Color get feedPillSelectedFill =>
       primaryDark.withValues(alpha: 0.12);

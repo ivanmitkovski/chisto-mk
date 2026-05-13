@@ -209,30 +209,34 @@ class ReportDraft {
     CleanupEffort? cleanupEffort,
     int? severity,
     bool clearLocation = false,
+    bool clearCategory = false,
+    bool clearCleanupEffort = false,
+    bool clearAddress = false,
+    bool clearSeverity = false,
   }) {
     if (clearLocation) {
       return ReportDraft(
         photos: photos ?? this.photos,
-        category: category ?? this.category,
+        category: clearCategory ? null : (category ?? this.category),
         title: title ?? this.title,
         description: description ?? this.description,
         latitude: null,
         longitude: null,
         address: null,
-        cleanupEffort: this.cleanupEffort,
-        severity: severity ?? this.severity,
+        cleanupEffort: clearCleanupEffort ? null : (cleanupEffort ?? this.cleanupEffort),
+        severity: clearSeverity ? 3 : (severity ?? this.severity),
       );
     }
     return ReportDraft(
       photos: photos ?? this.photos,
-      category: category ?? this.category,
+      category: clearCategory ? null : (category ?? this.category),
       title: title ?? this.title,
       description: description ?? this.description,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
-      address: address ?? this.address,
-      cleanupEffort: cleanupEffort ?? this.cleanupEffort,
-      severity: severity ?? this.severity,
+      address: clearAddress ? null : (address ?? this.address),
+      cleanupEffort: clearCleanupEffort ? null : (cleanupEffort ?? this.cleanupEffort),
+      severity: clearSeverity ? 3 : (severity ?? this.severity),
     );
   }
 }

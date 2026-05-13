@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:workmanager/workmanager.dart';
 
+import 'package:chisto_mobile/core/background/chisto_workmanager_dispatcher.dart';
 import 'package:chisto_mobile/core/app_theme.dart';
 import 'package:chisto_mobile/core/logging/app_log.dart';
 import 'package:chisto_mobile/core/di/service_locator.dart';
@@ -77,10 +78,7 @@ Future<void> _runChistoMobile() async {
           defaultTargetPlatform == TargetPlatform.iOS);
   if (mobileForWorkmanager) {
     try {
-      await Workmanager().initialize(
-        offlineRegionsCallbackDispatcher,
-        isInDebugMode: kDebugMode,
-      );
+      await Workmanager().initialize(chistoWorkmanagerCallbackDispatcher);
       await Workmanager().registerPeriodicTask(
         'offline-regions-refresh',
         OfflineRefreshDispatcher.taskName,

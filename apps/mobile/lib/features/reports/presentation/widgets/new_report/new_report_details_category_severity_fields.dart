@@ -123,16 +123,21 @@ class NewReportDetailsSeverityField extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: AppSpacing.sm),
-              CupertinoSlider(
-                value: draft.severity.toDouble(),
-                min: 1,
-                max: 5,
-                divisions: 4,
-                activeColor: AppColors.primary,
-                onChanged: (double value) {
-                  AppHaptics.light();
-                  onSeverityChanged(value.round().clamp(1, 5));
-                },
+              Semantics(
+                slider: true,
+                label: context.l10n.reportReviewSeverityTitle,
+                value: reportSeverityDisplayLabel(context.l10n, draft.severity),
+                child: CupertinoSlider(
+                  value: draft.severity.toDouble(),
+                  min: 1,
+                  max: 5,
+                  divisions: 4,
+                  activeColor: AppColors.primary,
+                  onChanged: (double value) {
+                    AppHaptics.light();
+                    onSeverityChanged(value.round().clamp(1, 5));
+                  },
+                ),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

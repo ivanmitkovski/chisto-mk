@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
+
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/network/connectivity_gate.dart';
 import 'package:chisto_mobile/core/observability/chisto_sentry.dart';
@@ -11,13 +13,17 @@ import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_entry.d
 import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_pipeline_phase.dart';
 import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_repository.dart';
 import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_submit_error_handler.dart';
+import 'package:chisto_mobile/features/reports/domain/models/report_upload_prep_progress.dart';
 import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_upload_phase.dart';
 import 'package:chisto_mobile/features/reports/data/report_photo_upload_prep.dart';
 import 'package:chisto_mobile/features/reports/domain/draft/report_idempotency_key.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_submit_result.dart';
+import 'package:chisto_mobile/features/reports/domain/report_input_sanitizer.dart';
 import 'package:chisto_mobile/features/reports/domain/repositories/reports_api_repository.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 /// Drains the SQLite outbox: compress, upload, POST /reports with stable idempotency key.
 class ReportOutboxCoordinator {
@@ -46,11 +52,27 @@ class ReportOutboxCoordinator {
   final StreamController<ReportOutboxPipelinePhase> _pipelinePhase =
       StreamController<ReportOutboxPipelinePhase>.broadcast();
 
+  /// UI: JPEG normalization progress before HTTP photo upload.
+  final ValueNotifier<ReportUploadPrepProgress?> uploadPrepProgress =
+      ValueNotifier<ReportUploadPrepProgress?>(null);
+
+  bool _disposed = false;
+  final List<void Function()> _submitWaitDisposeHooks = <void Function()>[];
+
   late final ReportOutboxUploadPhase _uploadPhase = ReportOutboxUploadPhase(
     repository: _repo,
     reportsApi: _api,
     emitActiveEntry: _active.add,
     uploadAutoRetries: _config.uploadAutoRetries,
+    onUploadPrepProgress: (int completed, int total) {
+      uploadPrepProgress.value = ReportUploadPrepProgress(
+        completed: completed,
+        total: total,
+      );
+    },
+    onUploadPrepProgressClear: () {
+      uploadPrepProgress.value = null;
+    },
   );
 
   late final ReportOutboxSubmitErrorHandler _submitErrors = ReportOutboxSubmitErrorHandler(
@@ -69,11 +91,19 @@ class ReportOutboxCoordinator {
     if (!_pipelinePhase.isClosed) {
       _pipelinePhase.add(p);
     }
+    chistoReportSentrySyncOutboxScope(pipelinePhase: p.name);
   }
 
   /// Completes on success, throws [AppError] on terminal failure. Cooldown/retry keeps waiting.
   Future<ReportSubmitResult> waitForSubmitResult(String outboxId) {
     final Completer<ReportSubmitResult> done = Completer<ReportSubmitResult>();
+    void cancelBecauseDisposed() {
+      if (!done.isCompleted) {
+        done.completeError(StateError('ReportOutboxCoordinator disposed'));
+      }
+    }
+
+    _submitWaitDisposeHooks.add(cancelBecauseDisposed);
     late final StreamSubscription<ReportOutboxSuccess> subOk;
     late final StreamSubscription<ReportOutboxEntry?> subAct;
     subOk = _success.stream.listen((ReportOutboxSuccess s) {
@@ -95,6 +125,7 @@ class ReportOutboxCoordinator {
       }
     });
     return done.future.whenComplete(() async {
+      _submitWaitDisposeHooks.remove(cancelBecauseDisposed);
       await subOk.cancel();
       await subAct.cancel();
     });
@@ -116,6 +147,15 @@ class ReportOutboxCoordinator {
   }
 
   Future<void> dispose() async {
+    _disposed = true;
+    chistoReportSentryClearReportPipelineScope();
+    for (final void Function() hook in List<void Function()>.from(
+      _submitWaitDisposeHooks,
+    )) {
+      hook();
+    }
+    _submitWaitDisposeHooks.clear();
+    uploadPrepProgress.dispose();
     await _connSub?.cancel();
     _connSub = null;
     await _active.close();
@@ -145,18 +185,28 @@ class ReportOutboxCoordinator {
     required String title,
     required String description,
   }) async {
+    uploadPrepProgress.value = null;
     final int n = await _repo.countSubmitPipeline();
     if (n > 0) {
       throw StateError('An in-flight report submission already exists.');
     }
     final int now = DateTime.now().millisecondsSinceEpoch;
     final String idem = ReportIdempotencyKey.generate();
+    if (!ReportIdempotencyKey.isValidShape(idem)) {
+      await Sentry.captureMessage(
+        'Generated report idempotency key failed shape check',
+        level: SentryLevel.error,
+      );
+      throw StateError('Invalid idempotency key shape.');
+    }
+    final String safeTitle = ReportInputSanitizer.clampTitle(title);
+    final String safeDescription = ReportInputSanitizer.clampDescription(description);
     ReportOutboxEntry? wizard = await _repo.getById(kReportWizardDraftRowId);
     if (wizard == null) {
       await _repo.saveWizardDraft(
         draft: draft,
-        title: title,
-        description: description,
+        title: safeTitle,
+        description: safeDescription,
       );
       wizard = await _repo.getById(kReportWizardDraftRowId);
     }
@@ -166,8 +216,8 @@ class ReportOutboxCoordinator {
     await _repo.update(
       wizard.copyWith(
         draft: draft,
-        title: title.trim(),
-        description: description.trim(),
+        title: safeTitle,
+        description: safeDescription,
         idempotencyKey: idem,
         submitRequested: true,
         state: ReportOutboxState.pending,
@@ -199,6 +249,9 @@ class ReportOutboxCoordinator {
   }
 
   Future<void> scheduleProcess() async {
+    if (_disposed) {
+      return;
+    }
     if (_busy) {
       return;
     }
@@ -208,6 +261,7 @@ class ReportOutboxCoordinator {
         final ReportOutboxEntry? raw = await _repo.getNextProcessable();
         if (raw == null) {
           _active.add(null);
+          chistoReportSentryClearOutboxEntryScope();
           _emitPhase(ReportOutboxPipelinePhase.idle);
           break;
         }
@@ -217,6 +271,10 @@ class ReportOutboxCoordinator {
           foundRow: true,
         )) {
           _active.add(raw);
+          chistoReportSentrySyncOutboxScope(
+            outboxState: raw.state.name,
+            outboxId: raw.id,
+          );
           _emitPhase(ReportOutboxPipelinePhase.offlineWait);
           chistoOutboxBreadcrumb(
             phase: 'offline_wait',
@@ -236,6 +294,10 @@ class ReportOutboxCoordinator {
         if (next == OutboxAfterProcessInstruction.breakOnCooldown) {
           if (check != null) {
             _active.add(check);
+            chistoReportSentrySyncOutboxScope(
+              outboxState: check.state.name,
+              outboxId: check.id,
+            );
           }
           _emitPhase(ReportOutboxPipelinePhase.cooldownWait);
           break;
@@ -248,110 +310,126 @@ class ReportOutboxCoordinator {
 
   Future<void> _processEntry(ReportOutboxEntry entry) async {
     _active.add(entry);
+    chistoReportSentrySyncOutboxScope(
+      outboxState: entry.state.name,
+      outboxId: entry.id,
+    );
+    final Stopwatch pipelineWatch = Stopwatch()..start();
     ReportOutboxEntry e = entry;
     List<String> uploadTemps = <String>[];
 
-    if (e.state == ReportOutboxState.cooldown) {
-      e = e.copyWith(
-        state: ReportOutboxState.submitting,
-        clearCooldownUntil: true,
-      );
-      await _repo.update(e);
-    }
+    try {
+      if (e.state == ReportOutboxState.cooldown) {
+        e = e.copyWith(
+          state: ReportOutboxState.submitting,
+          clearCooldownUntil: true,
+        );
+        await _repo.update(e);
+      }
 
-    if (e.state == ReportOutboxState.pending || e.state == ReportOutboxState.uploading) {
-      final ({ReportOutboxEntry entry, List<String> uploadTemps}) up =
-          await _uploadPhase.run(e);
-      e = up.entry;
-      uploadTemps = up.uploadTemps;
-      if (e.state == ReportOutboxState.failed || e.state == ReportOutboxState.cooldown) {
+      if (e.state == ReportOutboxState.pending ||
+          e.state == ReportOutboxState.uploading) {
+        final ({ReportOutboxEntry entry, List<String> uploadTemps}) up =
+            await _uploadPhase.run(e);
+        e = up.entry;
+        uploadTemps = up.uploadTemps;
+        if (e.state == ReportOutboxState.failed ||
+            e.state == ReportOutboxState.cooldown) {
+          return;
+        }
+      }
+
+      if (e.state == ReportOutboxState.submitting ||
+          (e.state == ReportOutboxState.pending && e.mediaUrls != null)) {
+        e = e.copyWith(state: ReportOutboxState.submitting);
+        await _repo.update(e);
+      }
+
+      if (e.state != ReportOutboxState.submitting) {
         return;
       }
-    }
 
-    if (e.state == ReportOutboxState.submitting ||
-        (e.state == ReportOutboxState.pending && e.mediaUrls != null)) {
-      e = e.copyWith(state: ReportOutboxState.submitting);
-      await _repo.update(e);
-    }
-
-    if (e.state != ReportOutboxState.submitting) {
-      return;
-    }
-
-    try {
-      final ReportSubmitResult apiResult = await _api.submitReport(
-        latitude: e.draft.latitude!,
-        longitude: e.draft.longitude!,
-        title: e.title,
-        description: e.description.isNotEmpty ? e.description : null,
-        mediaUrls: e.mediaUrls,
-        category: e.draft.category?.apiString,
-        severity: e.draft.severity,
-        address: e.draft.address?.trim().isNotEmpty == true
-            ? e.draft.address!.trim()
-            : null,
-        cleanupEffort: e.draft.cleanupEffort?.apiKey,
-        idempotencyKey: e.idempotencyKey,
-      );
-      final ReportSubmitResult result = apiResult.copyWith(
-        submittedMediaUrls: List<String>.from(e.mediaUrls ?? const <String>[]),
-      );
-      chistoOutboxBreadcrumb(
-        phase: 'submit_ok',
-        attempt: e.attemptCount,
-        retryable: false,
-      );
-      _success.add(ReportOutboxSuccess(outboxId: e.id, result: result));
-      deleteReportUploadTempFiles(uploadTemps);
-      final int t = DateTime.now().millisecondsSinceEpoch;
-      if (e.id == kReportWizardDraftRowId) {
-        await _repo.update(
-          ReportOutboxEntry(
-            id: kReportWizardDraftRowId,
-            idempotencyKey: 'idem_$kReportWizardDraftRowId',
-            draft: ReportDraft(),
-            title: '',
-            description: '',
-            submitRequested: false,
-            state: ReportOutboxState.pending,
-            attemptCount: 0,
-            createdAtMs: t,
-            updatedAtMs: t,
-            currentStageName: null,
-            attemptedStageNames: const <String>[],
-            lastPersistedAtMs: null,
-          ),
+      try {
+        final ReportSubmitResult apiResult = await _api.submitReport(
+          latitude: e.draft.latitude!,
+          longitude: e.draft.longitude!,
+          title: e.title,
+          description: e.description.isNotEmpty ? e.description : null,
+          mediaUrls: e.mediaUrls,
+          category: e.draft.category?.apiString,
+          severity: e.draft.severity,
+          address: e.draft.address?.trim().isNotEmpty == true
+              ? e.draft.address!.trim()
+              : null,
+          cleanupEffort: e.draft.cleanupEffort?.apiKey,
+          idempotencyKey: e.idempotencyKey,
         );
-      } else {
-        await _repo.update(
-          e.copyWith(
-            state: ReportOutboxState.succeeded,
-            reportId: result.reportId,
-            submitRequested: false,
-            clearMediaUrls: true,
-            updatedAtMs: t,
-          ),
+        final ReportSubmitResult result = apiResult.copyWith(
+          submittedMediaUrls: List<String>.from(e.mediaUrls ?? const <String>[]),
+        );
+        chistoOutboxBreadcrumb(
+          phase: 'submit_ok',
+          attempt: e.attemptCount,
+          retryable: false,
+        );
+        _success.add(ReportOutboxSuccess(outboxId: e.id, result: result));
+        deleteReportUploadTempFiles(uploadTemps);
+        final int t = DateTime.now().millisecondsSinceEpoch;
+        if (e.id == kReportWizardDraftRowId) {
+          await _repo.update(
+            ReportOutboxEntry(
+              id: kReportWizardDraftRowId,
+              idempotencyKey: 'idem_$kReportWizardDraftRowId',
+              draft: ReportDraft(),
+              title: '',
+              description: '',
+              submitRequested: false,
+              state: ReportOutboxState.pending,
+              attemptCount: 0,
+              createdAtMs: t,
+              updatedAtMs: t,
+              currentStageName: null,
+              attemptedStageNames: const <String>[],
+              lastPersistedAtMs: null,
+            ),
+          );
+        } else {
+          await _repo.update(
+            e.copyWith(
+              state: ReportOutboxState.succeeded,
+              reportId: result.reportId,
+              submitRequested: false,
+              clearMediaUrls: true,
+              updatedAtMs: t,
+            ),
+          );
+        }
+        _active.add(null);
+        chistoReportSentryClearOutboxEntryScope();
+        _emitPhase(ReportOutboxPipelinePhase.idle);
+      } on AppError catch (err) {
+        await _submitErrors.handle(e, err);
+        chistoOutboxBreadcrumb(
+          phase: 'submit_err',
+          attempt: e.attemptCount,
+          retryable: err.retryable,
+          code: err.code,
+        );
+      } catch (err) {
+        final AppError wrapped = AppError.unknown(cause: err);
+        await _submitErrors.handle(e, wrapped);
+        chistoOutboxBreadcrumb(
+          phase: 'submit_err',
+          attempt: e.attemptCount,
+          retryable: wrapped.retryable,
+          code: wrapped.code,
         );
       }
-      _active.add(null);
-      _emitPhase(ReportOutboxPipelinePhase.idle);
-    } on AppError catch (err) {
-      await _submitErrors.handle(e, err);
+    } finally {
+      pipelineWatch.stop();
       chistoOutboxBreadcrumb(
-        phase: 'submit_err',
-        attempt: e.attemptCount,
-        retryable: err.retryable,
-        code: err.code,
-      );
-    } catch (err) {
-      final AppError wrapped = AppError.unknown(cause: err);
-      await _submitErrors.handle(e, wrapped);
-      chistoOutboxBreadcrumb(
-        phase: 'submit_err',
-        attempt: e.attemptCount,
-        retryable: wrapped.retryable,
-        code: wrapped.code,
+        phase: 'pipeline_done',
+        durationMs: pipelineWatch.elapsedMilliseconds,
       );
     }
   }
