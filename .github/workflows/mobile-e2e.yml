@@ -49,7 +49,7 @@ jobs:
         run: |
           set +e
           for attempt in 1 2 3; do
-            flutter test integration_test/events_journey_smoke_test.dart integration_test/event_chat_smoke_test.dart \
+            flutter test integration_test/events_journey_smoke_test.dart integration_test/event_chat_smoke_test.dart integration_test/report_submit_flow_test.dart \
               --dart-define=API_URL="${INTEGRATION_TEST_API_URL:-}" \
               --dart-define=INTEGRATION_TEST_ACCESS_TOKEN="${INTEGRATION_TEST_ACCESS_TOKEN:-}"
             exit_code=$?

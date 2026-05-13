@@ -1,15 +1,17 @@
 import 'dart:async';
 
 import 'package:chisto_mobile/core/di/service_locator.dart';
-import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
-import 'package:chisto_mobile/features/reports/domain/models/report_submit_result.dart';
-import 'package:chisto_mobile/features/reports/presentation/controllers/new_report_controller.dart';
+import 'package:chisto_mobile/features/reports/application/report_wizard_submit_port.dart';
 import 'package:chisto_mobile/features/reports/domain/draft/new_report_flow_policy.dart';
+import 'package:chisto_mobile/features/reports/domain/report_field_limits.dart';
+import 'package:chisto_mobile/features/reports/presentation/controllers/new_report_controller.dart';
 import 'package:chisto_mobile/features/reports/presentation/controllers/new_report_submit_ui_flow.dart';
 import 'package:chisto_mobile/features/reports/presentation/screens/new_report_screen_post_frame.dart';
+import 'package:chisto_mobile/features/reports/presentation/screens/new_report_wizard_skeleton.dart';
 import 'package:chisto_mobile/features/reports/presentation/screens/new_report_wizard_view.dart';
+import 'package:chisto_mobile/features/reports/presentation/theme/report_tokens.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/photo_review_sheet.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/photo_source_modal.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/new_report_widgets.dart';
@@ -45,16 +47,23 @@ class _NewReportScreenState extends State<NewReportScreen>
   final FocusNode _titleFocus = FocusNode();
   final TextEditingController _descriptionController = TextEditingController();
   final FocusNode _descriptionFocus = FocusNode();
-  final int _maxTitleLength = 120;
-  final int _maxDescriptionLength = 500;
 
   late final NewReportController _controller;
+
+  bool _isRestoringDraft = true;
+  bool _showDraftRestoredChip = false;
+  Timer? _draftChipTimer;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _controller = NewReportController(initialPhoto: widget.initialPhoto);
+    _controller = NewReportController(
+      initialPhoto: widget.initialPhoto,
+      draftRepository: ServiceLocator.instance.reportDraftRepository,
+      reportsApiRepository: ServiceLocator.instance.reportsApiRepository,
+      reportSubmitPort: ServiceLocator.instance.reportWizardSubmitPort,
+    );
     _titleController.text = _controller.draft.title;
     _descriptionController.text = _controller.draft.description;
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -65,6 +74,19 @@ class _NewReportScreenState extends State<NewReportScreen>
           titleController: _titleController,
           descriptionController: _descriptionController,
           hasInitialPhoto: widget.initialPhoto != null,
+          onRestoreUiReady: () {
+            if (!mounted) return;
+            setState(() => _isRestoringDraft = false);
+          },
+          onDraftRestoredVisual: () {
+            if (!mounted) return;
+            setState(() => _showDraftRestoredChip = true);
+            _draftChipTimer?.cancel();
+            _draftChipTimer = Timer(const Duration(seconds: 3), () {
+              if (!mounted) return;
+              setState(() => _showDraftRestoredChip = false);
+            });
+          },
         ),
       );
     });
@@ -84,13 +106,8 @@ class _NewReportScreenState extends State<NewReportScreen>
   }
 
   @override
-  void deactivate() {
-    _controller.clearDidAnnounceLocationStep();
-    super.deactivate();
-  }
-
-  @override
   void dispose() {
+    _draftChipTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     _controller.dispose();
     _titleController.dispose();
@@ -156,7 +173,7 @@ class _NewReportScreenState extends State<NewReportScreen>
   }
 
   Future<void> _addPhoto() async {
-    if (_controller.draft.photos.length >= 5 ||
+    if (_controller.draft.photos.length >= ReportFieldLimits.maxPhotos ||
         _controller.isProcessingPhotoFlow) {
       return;
     }
@@ -216,6 +233,21 @@ class _NewReportScreenState extends State<NewReportScreen>
             AppHaptics.success();
           }
           _scheduleDraftSave();
+          if (mounted && MediaQuery.supportsAnnounceOf(context)) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!mounted || !MediaQuery.supportsAnnounceOf(context)) {
+                return;
+              }
+              SemanticsService.sendAnnouncement(
+                View.of(context),
+                context.l10n.reportSemanticsPhotoAdded(
+                  _controller.draft.photos.length,
+                  ReportFieldLimits.maxPhotos,
+                ),
+                Directionality.of(context),
+              );
+            });
+          }
         }
         return;
       }
@@ -227,97 +259,31 @@ class _NewReportScreenState extends State<NewReportScreen>
   }
 
   Future<void> _submit() async {
-    if (_controller.submitting) return;
-    await _controller.flushPendingPersist(
-      titleText: _titleController.text,
-      descriptionText: _descriptionController.text,
+    await NewReportSubmitUiFlow.runSubmit(
+      context: context,
+      controller: _controller,
+      titleController: _titleController,
+      descriptionController: _descriptionController,
+      bindings: NewReportSubmitBindings(
+        reportsListSession: ServiceLocator.instance.reportsListSession,
+        reportDraftRepository: ServiceLocator.instance.reportDraftRepository,
+        profileNeedsRefresh: ServiceLocator.instance.profileNeedsRefresh,
+      ),
+      onCannotSubmit: () {
+        AppSnack.show(
+          context,
+          message: context.l10n.reportFinishStepsSnack,
+          type: AppSnackType.warning,
+        );
+        _goToFirstInvalidStage();
+      },
     );
-    if (!mounted) return;
-    _controller.beginSubmitAttempt();
-
-    if (!_controller.canSubmit) {
-      AppSnack.show(
-        context,
-        message: context.l10n.reportFinishStepsSnack,
-        type: AppSnackType.warning,
-      );
-      _goToFirstInvalidStage();
-      return;
-    }
-
-    AppHaptics.medium();
-    _controller.beginSubmittingPhase();
-
-    try {
-      final String trimmedTitle = _controller.draft.title.trim();
-      final ReportSubmitResult result = await _controller.submitReport();
-      if (!mounted) return;
-      ServiceLocator.instance.reportsListSession.onSubmitSucceeded(
-        result: result,
-        title: trimmedTitle,
-        draft: _controller.draft,
-      );
-      _controller.setSuppressLocalDraftPersist(true);
-      ServiceLocator.instance.profileNeedsRefresh.value++;
-      _controller.markSubmitSentPhase();
-      if (mounted && MediaQuery.supportsAnnounceOf(context)) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!mounted || !MediaQuery.supportsAnnounceOf(context)) {
-            return;
-          }
-          SemanticsService.sendAnnouncement(
-            View.of(context),
-            context.l10n.reportSubmitSentPending,
-            Directionality.of(context),
-          );
-        });
-      }
-      final NewReportPostSubmitNavigation? nav =
-          await NewReportSubmitUiFlow.finishSuccessfulSubmit(
-        context: context,
-        draft: _controller.draft,
-        result: result,
-        onResetSubmittingUi: () async {
-          if (mounted) {
-            _controller.resetSubmittingUi();
-          }
-        },
-      );
-      if (!mounted || nav == null) {
-        return;
-      }
-      await ServiceLocator.instance.reportDraftRepository.clear();
-      if (!mounted) {
-        return;
-      }
-      switch (nav) {
-        case NewReportPostSubmitReportAnother():
-          _controller.resetDraftAndStartOver();
-          _titleController.text = '';
-          _descriptionController.text = '';
-        case NewReportPostSubmitExit(:final Object? popResult):
-          Navigator.of(context).pop(popResult);
-      }
-    } on AppError catch (e) {
-      if (!mounted) return;
-      _controller.resetSubmittingUi();
-      final bool handled = await NewReportSubmitUiFlow.handleSubmitAppError(
-        context,
-        e,
-        _controller.loadReportingCapacity,
-      );
-      if (!mounted) return;
-      if (!handled) {
-        _controller.setApiError(e);
-      }
-    } catch (e) {
-      if (!mounted) return;
-      _controller.endSubmitWithError(e);
-    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final ReportWizardSubmitPort submitPort =
+        ServiceLocator.instance.reportWizardSubmitPort;
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (bool didPop, Object? result) async {
@@ -335,22 +301,32 @@ class _NewReportScreenState extends State<NewReportScreen>
       },
       child: ChangeNotifierProvider<NewReportController>.value(
         value: _controller,
-        child: NewReportWizardView(
-          entryLabel: widget.entryLabel,
-          entryHint: widget.entryHint,
-          hasInitialPhoto: widget.initialPhoto != null,
-          titleController: _titleController,
-          descriptionController: _descriptionController,
-          titleFocus: _titleFocus,
-          descriptionFocus: _descriptionFocus,
-          maxTitleLength: _maxTitleLength,
-          maxDescriptionLength: _maxDescriptionLength,
-          onAddPhoto: _addPhoto,
-          onPrimary: _handlePrimaryAction,
-          onRetrySubmit: _submit,
-          onGoToStage: _goToStage,
-          onScheduleDraftSave: _scheduleDraftSave,
-        ),
+        child: _isRestoringDraft
+            ? Scaffold(
+                backgroundColor: AppColors.panelBackground,
+                body: SafeArea(
+                  bottom: false,
+                  child: NewReportWizardSkeleton(),
+                ),
+              )
+            : NewReportWizardView(
+                entryLabel: widget.entryLabel,
+                entryHint: widget.entryHint,
+                hasInitialPhoto: widget.initialPhoto != null,
+                titleController: _titleController,
+                descriptionController: _descriptionController,
+                titleFocus: _titleFocus,
+                descriptionFocus: _descriptionFocus,
+                maxTitleLength: ReportTokens.maxTitleLength,
+                maxDescriptionLength: ReportTokens.maxDescriptionLength,
+                onAddPhoto: _addPhoto,
+                onPrimary: _handlePrimaryAction,
+                onRetrySubmit: _submit,
+                onGoToStage: _goToStage,
+                onScheduleDraftSave: _scheduleDraftSave,
+                uploadPrepListenable: submitPort.uploadPrepProgress,
+                showDraftRestoredChip: _showDraftRestoredChip,
+              ),
       ),
     );
   }

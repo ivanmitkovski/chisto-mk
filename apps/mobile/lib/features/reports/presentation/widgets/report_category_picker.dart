@@ -45,25 +45,30 @@ void showReportCategoryPicker(
             ...ReportCategory.values.expand((ReportCategory cat) {
               final bool isActive = cat == selected;
               return <Widget>[
-                ReportActionTile(
-                  icon: cat.icon,
-                  title: cat.localizedTitle(l10n),
-                  subtitle: cat.localizedDescription(l10n),
-                  tone: isActive
-                      ? ReportSurfaceTone.accent
-                      : ReportSurfaceTone.neutral,
-                  trailing: Icon(
-                    isActive
-                        ? CupertinoIcons.checkmark_circle_fill
-                        : CupertinoIcons.circle,
-                    size: 22,
-                    color: isActive ? AppColors.primaryDark : AppColors.divider,
+                Semantics(
+                  button: true,
+                  selected: isActive,
+                  label: cat.localizedTitle(l10n),
+                  child: ReportActionTile(
+                    icon: cat.icon,
+                    title: cat.localizedTitle(l10n),
+                    subtitle: cat.localizedDescription(l10n),
+                    tone: isActive
+                        ? ReportSurfaceTone.accent
+                        : ReportSurfaceTone.neutral,
+                    trailing: Icon(
+                      isActive
+                          ? CupertinoIcons.checkmark_circle_fill
+                          : CupertinoIcons.circle,
+                      size: 22,
+                      color: isActive ? AppColors.primaryDark : AppColors.divider,
+                    ),
+                    onTap: () {
+                      AppHaptics.tap();
+                      onSelected(cat);
+                      Navigator.of(context).pop();
+                    },
                   ),
-                  onTap: () {
-                    AppHaptics.tap();
-                    onSelected(cat);
-                    Navigator.of(context).pop();
-                  },
                 ),
                 if (cat != ReportCategory.values.last)
                   const SizedBox(height: AppSpacing.sm),

@@ -4942,6 +4942,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportFlowSubmitPhaseUploading => 'Uploading…';
 
   @override
+  String reportFlowSubmitPhaseUploadingProgress(int current, int total) {
+    return 'Uploading $current of $total…';
+  }
+
+  @override
+  String get reportDraftRestoredChip => 'Draft restored';
+
+  @override
+  String reportSemanticsPhotoAdded(int current, int max) {
+    return 'Photo added, $current of $max.';
+  }
+
+  @override
+  String reportSemanticsPhotoRemoved(int remaining, int max) {
+    return 'Photo removed, $remaining of $max remaining.';
+  }
+
+  @override
   String get reportFlowSubmitPhaseSubmitting => 'Submitting…';
 
   @override

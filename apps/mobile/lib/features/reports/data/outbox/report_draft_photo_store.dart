@@ -73,6 +73,27 @@ class ReportDraftPhotoStore {
   /// Copies [src] into the managed folder via a temp file + rename (atomic on same FS).
   /// Returns path relative to app documents.
   Future<String> importPhoto(XFile src) async {
+    final String rawPath = p.normalize(src.path);
+    if (p.split(rawPath).any((String s) => s == '..')) {
+      throw ArgumentError.value(src.path, 'src', 'Path traversal not allowed');
+    }
+    final String base = p.basename(rawPath);
+    final String extLower = p.extension(base).toLowerCase();
+    const Set<String> allowed = <String>{
+      '.jpg',
+      '.jpeg',
+      '.png',
+      '.heic',
+      '.heif',
+      '.webp',
+    };
+    if (!allowed.contains(extLower)) {
+      throw ArgumentError.value(
+        src.path,
+        'src',
+        'Unsupported image extension for draft import',
+      );
+    }
     final Directory root = await _rootDir();
     final Directory tmp = await _tmpDir(root);
     final String baseName = p.basename(src.path);

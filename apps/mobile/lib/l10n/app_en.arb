@@ -2595,6 +2595,40 @@
   "newReportTooltipDismiss": "Dismiss",
   "reportFlowSubmitPhaseCreating": "Creating…",
   "reportFlowSubmitPhaseUploading": "Uploading…",
+  "reportFlowSubmitPhaseUploadingProgress": "Uploading {current} of {total}…",
+  "@reportFlowSubmitPhaseUploadingProgress": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "reportDraftRestoredChip": "Draft restored",
+  "reportSemanticsPhotoAdded": "Photo added, {current} of {max}.",
+  "@reportSemanticsPhotoAdded": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "reportSemanticsPhotoRemoved": "Photo removed, {remaining} of {max} remaining.",
+  "@reportSemanticsPhotoRemoved": {
+    "placeholders": {
+      "remaining": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
   "reportFlowSubmitPhaseSubmitting": "Submitting…",
   "reportFormPrimarySemanticsHintSubmit": "Double-tap to submit.",
   "reportFormPrimarySemanticsHintNext": "Double-tap to go to the next step.",

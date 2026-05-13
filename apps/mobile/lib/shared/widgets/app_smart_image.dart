@@ -193,6 +193,7 @@ class _AppSmartImageState extends State<AppSmartImage> {
             key: ValueKey<int>(_imageVersion),
             image: resolved,
             fit: widget.fit,
+            gaplessPlayback: true,
             semanticLabel: widget.semanticLabel,
             frameBuilder:
                 (

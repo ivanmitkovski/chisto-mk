@@ -8228,6 +8228,30 @@ abstract class AppLocalizations {
   /// **'Uploading…'**
   String get reportFlowSubmitPhaseUploading;
 
+  /// No description provided for @reportFlowSubmitPhaseUploadingProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading {current} of {total}…'**
+  String reportFlowSubmitPhaseUploadingProgress(int current, int total);
+
+  /// No description provided for @reportDraftRestoredChip.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft restored'**
+  String get reportDraftRestoredChip;
+
+  /// No description provided for @reportSemanticsPhotoAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo added, {current} of {max}.'**
+  String reportSemanticsPhotoAdded(int current, int max);
+
+  /// No description provided for @reportSemanticsPhotoRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo removed, {remaining} of {max} remaining.'**
+  String reportSemanticsPhotoRemoved(int remaining, int max);
+
   /// No description provided for @reportFlowSubmitPhaseSubmitting.
   ///
   /// In en, this message translates to:

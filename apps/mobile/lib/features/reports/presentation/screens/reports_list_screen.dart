@@ -505,6 +505,10 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
                     : null,
                 child: ReportDetailSheet(
                   report: report,
+                  reportsRealtimeService:
+                      ServiceLocator.instance.reportsRealtimeService,
+                  reportsApiRepository:
+                      ServiceLocator.instance.reportsApiRepository,
                   onShowSiteOnMap: widget.onShowSiteOnMap,
                   onOpenLinkedPollutionSiteDetail:
                       widget.onOpenLinkedPollutionSiteDetail,

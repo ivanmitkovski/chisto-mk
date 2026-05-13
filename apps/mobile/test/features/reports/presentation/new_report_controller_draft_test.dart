@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/features/reports/application/report_wizard_submit_port.dart';
 import 'package:chisto_mobile/features/reports/data/outbox/report_draft_photo_store.dart';
 import 'package:chisto_mobile/features/reports/data/outbox/report_draft_repository.dart';
 import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_database.dart';
@@ -82,6 +84,10 @@ void main() {
     );
     final NewReportController c = NewReportController(
       draftRepository: draftRepo,
+      reportsApiRepository: ServiceLocator.instance.reportsApiRepository,
+      reportSubmitPort: ReportWizardSubmitPortImpl(
+        ServiceLocator.instance.reportOutboxCoordinator,
+      ),
     );
     c.updateTitle('deb');
     c.scheduleAutosave(titleText: 'deb', descriptionText: '');
@@ -109,6 +115,10 @@ void main() {
     final File f2 = File(p.join(tmp.path, 'p2.jpg'))..writeAsBytes(<int>[2]);
     final NewReportController c = NewReportController(
       draftRepository: draftRepo,
+      reportsApiRepository: ServiceLocator.instance.reportsApiRepository,
+      reportSubmitPort: ReportWizardSubmitPortImpl(
+        ServiceLocator.instance.reportOutboxCoordinator,
+      ),
     );
     await c.addPhoto(XFile(f1.path));
     await c.addPhoto(XFile(f2.path));
@@ -119,6 +129,10 @@ void main() {
 
     final NewReportController c2 = NewReportController(
       draftRepository: draftRepo,
+      reportsApiRepository: ServiceLocator.instance.reportsApiRepository,
+      reportSubmitPort: ReportWizardSubmitPortImpl(
+        ServiceLocator.instance.reportOutboxCoordinator,
+      ),
     );
     final ReportDraftLoadResult r = await c2.restoreSavedDraft();
     expect(r.kind, ReportDraftRestoreKind.restored);
@@ -150,6 +164,10 @@ void main() {
     final File f = File(p.join(tmp.path, 'cam.jpg'))..writeAsBytes(<int>[9]);
     final NewReportController c = NewReportController(
       draftRepository: draftRepo,
+      reportsApiRepository: ServiceLocator.instance.reportsApiRepository,
+      reportSubmitPort: ReportWizardSubmitPortImpl(
+        ServiceLocator.instance.reportOutboxCoordinator,
+      ),
       initialPhoto: XFile(f.path),
     );
     expect(c.draft.photos, isEmpty);
@@ -170,7 +188,13 @@ void main() {
         rootOverride: Directory(p.join(tmp.path, 'ph')),
       ),
     );
-    final NewReportController seed = NewReportController(draftRepository: draftRepo);
+    final NewReportController seed = NewReportController(
+      draftRepository: draftRepo,
+      reportsApiRepository: ServiceLocator.instance.reportsApiRepository,
+      reportSubmitPort: ReportWizardSubmitPortImpl(
+        ServiceLocator.instance.reportOutboxCoordinator,
+      ),
+    );
     seed.updateTitle('old');
     await seed.flushPendingPersist(titleText: 'old', descriptionText: '');
     seed.dispose();
@@ -178,6 +202,10 @@ void main() {
     final File incoming = File(p.join(tmp.path, 'new.jpg'))..writeAsBytes(<int>[8]);
     final NewReportController c = NewReportController(
       draftRepository: draftRepo,
+      reportsApiRepository: ServiceLocator.instance.reportsApiRepository,
+      reportSubmitPort: ReportWizardSubmitPortImpl(
+        ServiceLocator.instance.reportOutboxCoordinator,
+      ),
       initialPhoto: XFile(incoming.path),
     );
     await c.resolveIncomingPhotoMerge(ResumeWithIncomingChoice.replaceDraft);

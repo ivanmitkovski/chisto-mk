@@ -2548,6 +2548,40 @@
   "newReportTooltipDismiss": "Mbyll",
   "reportFlowSubmitPhaseCreating": "Po krijohet…",
   "reportFlowSubmitPhaseUploading": "Po ngarkohet…",
+  "reportFlowSubmitPhaseUploadingProgress": "Duke përgatitur {current} nga {total} foto…",
+  "@reportFlowSubmitPhaseUploadingProgress": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "reportDraftRestoredChip": "Skica u rikthye",
+  "reportSemanticsPhotoAdded": "Foto u shtua, {current} nga {max}.",
+  "@reportSemanticsPhotoAdded": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "reportSemanticsPhotoRemoved": "Foto u hoq, mbeten {remaining} nga {max}.",
+  "@reportSemanticsPhotoRemoved": {
+    "placeholders": {
+      "remaining": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
   "reportFlowSubmitPhaseSubmitting": "Po dërgohet…",
   "reportFormPrimarySemanticsHintSubmit": "Prek dy herë për të dërguar.",
   "reportFormPrimarySemanticsHintNext": "Prek dy herë për të kaluar në hapin tjetër.",

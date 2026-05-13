@@ -6,9 +6,11 @@ import 'package:chisto_mobile/core/observability/report_draft_metrics.dart';
 import 'package:chisto_mobile/features/reports/data/outbox/report_draft_photo_store.dart';
 import 'package:chisto_mobile/features/reports/data/outbox/report_draft_summary_projector.dart';
 import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_constants.dart';
+import 'package:chisto_mobile/features/reports/data/report_photo_upload_prep.dart';
 import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_entry.dart';
 import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_repository.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
+import 'package:chisto_mobile/features/reports/domain/models/report_wizard_restore_snapshot.dart';
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
@@ -18,7 +20,8 @@ export 'report_draft_summary_projector.dart'
     show
         ReportDraftSummary,
         ReportDraftSummaryProjector,
-        isReportWizardDraftEntryResumable;
+        isReportWizardDraftEntryResumable,
+        reportWizardRestoreSnapshotOf;
 
 /// Outcome of loading a wizard draft from SQLite + photo store.
 enum ReportDraftRestoreKind { empty, restored }
@@ -26,7 +29,7 @@ enum ReportDraftRestoreKind { empty, restored }
 class ReportDraftLoadResult {
   const ReportDraftLoadResult._({
     required this.kind,
-    this.row,
+    this.restore,
     this.prunedPhotoCount = 0,
     this.migratedLegacyPhotoCount = 0,
   });
@@ -35,26 +38,26 @@ class ReportDraftLoadResult {
     : this._(kind: ReportDraftRestoreKind.empty);
 
   const ReportDraftLoadResult.restored({
-    required ReportOutboxEntry row,
+    required ReportWizardRestoreSnapshot restore,
     required int prunedPhotoCount,
     required int migratedLegacyPhotoCount,
   }) : this._(
          kind: ReportDraftRestoreKind.restored,
-         row: row,
+         restore: restore,
          prunedPhotoCount: prunedPhotoCount,
          migratedLegacyPhotoCount: migratedLegacyPhotoCount,
        );
 
   final ReportDraftRestoreKind kind;
-  final ReportOutboxEntry? row;
+  final ReportWizardRestoreSnapshot? restore;
   final int prunedPhotoCount;
   final int migratedLegacyPhotoCount;
 
   bool get hasDraft {
-    if (kind != ReportDraftRestoreKind.restored || row == null) {
+    if (kind != ReportDraftRestoreKind.restored || restore == null) {
       return false;
     }
-    return isReportWizardDraftEntryResumable(row!);
+    return restore!.isResumableWizardBody;
   }
 }
 
@@ -128,7 +131,21 @@ class ReportDraftRepository {
   /// prunes missing files, and re-writes the row when migration or prune ran.
   Future<ReportDraftLoadResult> loadDraft() async {
     try {
-      return await _loadDraftInner();
+      return await _loadDraftInner().timeout(
+        kReportDraftLoadTimeout,
+        onTimeout: () async {
+          chistoReportsBreadcrumb(
+            'report_draft',
+            'restore_timeout',
+            data: <String, Object?>{'timeoutMs': kReportDraftLoadTimeout.inMilliseconds},
+          );
+          await Sentry.captureMessage(
+            'Report draft load timed out',
+            level: SentryLevel.warning,
+          );
+          return const ReportDraftLoadResult.empty();
+        },
+      );
     } finally {
       await refreshSummary();
     }
@@ -224,7 +241,7 @@ class ReportDraftRepository {
       }
       chistoReportsBreadcrumb('report_draft', 'restore_loaded');
       return ReportDraftLoadResult.restored(
-        row: nextRow,
+        restore: reportWizardRestoreSnapshotOf(nextRow),
         prunedPhotoCount: pruned,
         migratedLegacyPhotoCount: migrated,
       );
@@ -302,7 +319,9 @@ class ReportDraftRepository {
   Future<XFile> registerPhoto(XFile pickerFile) async {
     final String rel = await _photoStore.importPhoto(pickerFile);
     chistoReportsBreadcrumb('report_draft', 'photo_added');
-    final XFile out = XFile(await _photoStore.absolutePath(rel));
+    final String abs = await _photoStore.absolutePath(rel);
+    await compressManagedReportDraftPhotoInPlace(abs);
+    final XFile out = XFile(abs);
     await refreshSummary();
     return out;
   }

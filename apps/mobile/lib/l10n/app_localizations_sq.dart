@@ -5000,6 +5000,24 @@ class AppLocalizationsSq extends AppLocalizations {
   String get reportFlowSubmitPhaseUploading => 'Po ngarkohet…';
 
   @override
+  String reportFlowSubmitPhaseUploadingProgress(int current, int total) {
+    return 'Duke përgatitur $current nga $total foto…';
+  }
+
+  @override
+  String get reportDraftRestoredChip => 'Skica u rikthye';
+
+  @override
+  String reportSemanticsPhotoAdded(int current, int max) {
+    return 'Foto u shtua, $current nga $max.';
+  }
+
+  @override
+  String reportSemanticsPhotoRemoved(int remaining, int max) {
+    return 'Foto u hoq, mbeten $remaining nga $max.';
+  }
+
+  @override
   String get reportFlowSubmitPhaseSubmitting => 'Po dërgohet…';
 
   @override

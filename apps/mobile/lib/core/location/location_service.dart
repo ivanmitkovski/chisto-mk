@@ -31,10 +31,17 @@ class GeoWatchOptions {
 
 /// A single latitude/longitude reading from the platform.
 class GeoPosition {
-  const GeoPosition({required this.latitude, required this.longitude});
+  const GeoPosition({
+    required this.latitude,
+    required this.longitude,
+    this.horizontalAccuracyMeters,
+  });
 
   final double latitude;
   final double longitude;
+
+  /// Best-effort horizontal accuracy in meters when the platform provides it.
+  final double? horizontalAccuracyMeters;
 }
 
 /// Abstraction over device location APIs for map, feed, and tests.

@@ -4,11 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
-import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/network/request_cancellation.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
+import 'package:chisto_mobile/features/reports/data/reports_realtime/reports_realtime_service.dart';
+import 'package:chisto_mobile/features/reports/domain/repositories/reports_api_repository.dart';
 import 'package:chisto_mobile/features/reports/presentation/l10n/report_category_l10n.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/map/report_external_maps.dart';
 import 'package:chisto_mobile/features/reports/presentation/l10n/report_severity_l10n.dart';
@@ -28,11 +29,15 @@ class ReportDetailSheet extends StatefulWidget {
   const ReportDetailSheet({
     super.key,
     required this.report,
+    required this.reportsRealtimeService,
+    required this.reportsApiRepository,
     this.onShowSiteOnMap,
     this.onOpenLinkedPollutionSiteDetail,
   });
 
   final ReportSheetViewModel report;
+  final ReportsRealtimeService reportsRealtimeService;
+  final ReportsApiRepository reportsApiRepository;
   final void Function(String siteId)? onShowSiteOnMap;
 
   /// Opens the linked pollution site after this sheet is popped from the root navigator.
@@ -141,7 +146,7 @@ class _ReportDetailSheetState extends State<ReportDetailSheet> {
   void initState() {
     super.initState();
     _report = widget.report;
-    _realtimeSub = ServiceLocator.instance.reportsRealtimeService.events.listen(
+    _realtimeSub = widget.reportsRealtimeService.events.listen(
       (event) {
         final String? reportId = report.reportId;
         if (reportId == null || reportId.isEmpty) return;
@@ -176,8 +181,7 @@ class _ReportDetailSheetState extends State<ReportDetailSheet> {
     try {
       final String? reportId = report.reportId;
       if (reportId == null || reportId.isEmpty) return;
-      final detail = await ServiceLocator.instance.reportsApiRepository
-          .getReportById(reportId, cancellation: cancellation);
+      final detail = await widget.reportsApiRepository.getReportById(reportId, cancellation: cancellation);
       if (!mounted) return;
       setState(() {
         _report = ReportSheetViewModelMapper.fromDetail(detail, context.l10n);

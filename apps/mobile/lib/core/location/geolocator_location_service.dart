@@ -27,7 +27,11 @@ class GeolocatorLocationService implements LocationService {
       desiredAccuracy: _toGeolocatorAccuracy(accuracy),
       timeLimit: timeLimit,
     );
-    return GeoPosition(latitude: pos.latitude, longitude: pos.longitude);
+    return GeoPosition(
+      latitude: pos.latitude,
+      longitude: pos.longitude,
+      horizontalAccuracyMeters: pos.accuracy,
+    );
   }
 
   @override
@@ -43,6 +47,7 @@ class GeolocatorLocationService implements LocationService {
       (geo.Position pos) => GeoPosition(
         latitude: pos.latitude,
         longitude: pos.longitude,
+        horizontalAccuracyMeters: pos.accuracy,
       ),
     );
   }

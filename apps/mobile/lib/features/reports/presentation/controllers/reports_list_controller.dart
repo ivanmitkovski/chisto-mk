@@ -7,6 +7,7 @@ import 'package:chisto_mobile/features/reports/domain/models/report_list_item.da
 import 'package:chisto_mobile/features/reports/domain/models/report_submit_result.dart';
 import 'package:chisto_mobile/features/reports/domain/models/reports_list_response.dart';
 import 'package:chisto_mobile/features/reports/domain/repositories/reports_api_repository.dart';
+import 'package:chisto_mobile/features/reports/presentation/theme/report_tokens.dart';
 
 /// Owns server-backed paging for "My reports". Search and status filters stay
 /// in the screen; this controller holds the merged [reports] list.
@@ -27,7 +28,7 @@ class ReportsListController extends ChangeNotifier {
   int _serverPage = 1;
   bool hasMore = true;
 
-  static const int pageSize = 20;
+  static int get pageSize => ReportTokens.myReportsPageSize;
 
   @override
   void dispose() {

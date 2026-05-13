@@ -1,3 +1,4 @@
+import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/report_detail_sheet.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/report_sheet_view_model.dart';
@@ -31,7 +32,15 @@ void main() {
         supportedLocales: AppLocalizations.supportedLocales,
         home: MediaQuery(
           data: const MediaQueryData(textScaler: TextScaler.linear(1.6)),
-          child: Scaffold(body: ReportDetailSheet(report: vm)),
+          child: Scaffold(
+            body: ReportDetailSheet(
+              report: vm,
+              reportsRealtimeService:
+                  ServiceLocator.instance.reportsRealtimeService,
+              reportsApiRepository:
+                  ServiceLocator.instance.reportsApiRepository,
+            ),
+          ),
         ),
       ),
     );

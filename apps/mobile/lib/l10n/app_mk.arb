@@ -2548,6 +2548,40 @@
   "newReportTooltipDismiss": "Отфрли",
   "reportFlowSubmitPhaseCreating": "Се создава…",
   "reportFlowSubmitPhaseUploading": "Се прикачува…",
+  "reportFlowSubmitPhaseUploadingProgress": "Се подготвуваат слики {current} од {total}…",
+  "@reportFlowSubmitPhaseUploadingProgress": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "reportDraftRestoredChip": "Нацртот е вратен",
+  "reportSemanticsPhotoAdded": "Додадена фотографија, {current} од {max}.",
+  "@reportSemanticsPhotoAdded": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "reportSemanticsPhotoRemoved": "Отстранета фотографија, остануваат {remaining} од {max}.",
+  "@reportSemanticsPhotoRemoved": {
+    "placeholders": {
+      "remaining": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
   "reportFlowSubmitPhaseSubmitting": "Се испраќа…",
   "reportFormPrimarySemanticsHintSubmit": "Допри двапати за да испратиш.",
   "reportFormPrimarySemanticsHintNext": "Допри двапати за да одиш на следниот чекор.",

@@ -732,4 +732,19 @@ class AppTypography {
         fontWeight: FontWeight.w600,
         letterSpacing: -0.2,
       );
+
+  /// Validation hint under the evidence photo grid.
+  static TextStyle reportsEvidenceValidationHint(TextTheme theme) =>
+      (theme.bodySmall ?? textTheme.bodySmall!).copyWith(
+        color: AppColors.accentDanger,
+        height: 1.35,
+      );
+
+  /// Compact address line under the location map.
+  static TextStyle reportsLocationAddressBadge(TextTheme theme) =>
+      (theme.bodySmall ?? textTheme.bodySmall!).copyWith(
+        fontSize: 13,
+        fontWeight: FontWeight.w500,
+        height: 1.25,
+      );
 }

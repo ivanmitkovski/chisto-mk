@@ -13,15 +13,21 @@ class ReportOutboxUploadPhase {
     required ReportsApiRepository reportsApi,
     required void Function(ReportOutboxEntry? entry) emitActiveEntry,
     required int uploadAutoRetries,
+    void Function(int completed, int total)? onUploadPrepProgress,
+    void Function()? onUploadPrepProgressClear,
   })  : _repo = repository,
         _api = reportsApi,
         _emitActiveEntry = emitActiveEntry,
-        _uploadAutoRetries = uploadAutoRetries;
+        _uploadAutoRetries = uploadAutoRetries,
+        _onUploadPrepProgress = onUploadPrepProgress,
+        _onUploadPrepProgressClear = onUploadPrepProgressClear;
 
   final ReportOutboxRepository _repo;
   final ReportsApiRepository _api;
   final void Function(ReportOutboxEntry? entry) _emitActiveEntry;
   final int _uploadAutoRetries;
+  final void Function(int completed, int total)? _onUploadPrepProgress;
+  final void Function()? _onUploadPrepProgressClear;
 
   Future<({ReportOutboxEntry entry, List<String> uploadTemps})> run(
     ReportOutboxEntry e,
@@ -43,7 +49,15 @@ class ReportOutboxUploadPhase {
     ReportOutboxEntry cur = e.copyWith(state: ReportOutboxState.uploading);
     await _repo.update(cur);
 
-    final List<String> prepared = await prepareReportPhotoPathsForUpload(cur.draft.photos);
+    final List<String> prepared;
+    try {
+      prepared = await prepareReportPhotoPathsForUpload(
+        cur.draft.photos,
+        onPrepProgress: _onUploadPrepProgress,
+      );
+    } finally {
+      _onUploadPrepProgressClear?.call();
+    }
     try {
       int uploadTry = 0;
       while (true) {

@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:ui' show PlatformDispatcher;
 
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, defaultTargetPlatform, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -33,9 +35,12 @@ import 'package:chisto_mobile/features/profile/domain/repositories/profile_repos
 import 'package:chisto_mobile/core/cache/report_images_cache.dart';
 import 'package:chisto_mobile/core/location/geolocator_location_service.dart';
 import 'package:chisto_mobile/core/location/location_service.dart';
-import 'package:chisto_mobile/features/reports/data/api_reports_repository.dart';
+import 'package:chisto_mobile/features/reports/application/report_wizard_submit_port.dart';
 import 'package:chisto_mobile/features/reports/data/outbox/report_draft_photo_store.dart';
 import 'package:chisto_mobile/features/reports/data/outbox/report_draft_repository.dart';
+import 'package:chisto_mobile/features/reports/data/outbox/background/background_submit_scheduler.dart';
+import 'package:chisto_mobile/features/reports/data/outbox/background/platform_background_submit_scheduler.dart';
+import 'package:chisto_mobile/features/reports/data/api_reports_repository.dart';
 import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_coordinator.dart';
 import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_migration_from_sp.dart';
 import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_repository.dart';
@@ -69,6 +74,7 @@ class ServiceLocator {
   ReportDraftPhotoStore? _reportDraftPhotoStore;
   ReportDraftRepository? _reportDraftRepository;
   ReportOutboxCoordinator? _reportOutboxCoordinator;
+  ReportWizardSubmitPort? _reportWizardSubmitPort;
   ReportsRealtimeService? _reportsRealtimeService;
   SitesRepository? _sitesRepository;
   LocationService? _locationService;
@@ -103,6 +109,7 @@ class ServiceLocator {
   ReportDraftPhotoStore get reportDraftPhotoStore => _reportDraftPhotoStore!;
   ReportDraftRepository get reportDraftRepository => _reportDraftRepository!;
   ReportOutboxCoordinator get reportOutboxCoordinator => _reportOutboxCoordinator!;
+  ReportWizardSubmitPort get reportWizardSubmitPort => _reportWizardSubmitPort!;
   ReportsRealtimeService get reportsRealtimeService => _reportsRealtimeService!;
   SitesRepository get sitesRepository => _sitesRepository!;
   LocationService get locationService => _locationService!;
@@ -202,13 +209,17 @@ class ServiceLocator {
       outbox: _reportOutboxRepository!,
       photoStore: _reportDraftPhotoStore!,
     );
+    // One-shot SharedPreferences → SQLite migration; retain until analytics
+    // confirms the entire fleet has migrated (see plan Phase 7.1).
     await ReportOutboxMigrationFromSp.runOnce(_reportOutboxRepository!);
     unawaited(_reportDraftRepository!.hydrate());
     _reportOutboxCoordinator = ReportOutboxCoordinator(
       repository: _reportOutboxRepository!,
       reportsApi: _reportsApiRepository!,
+      backgroundSubmitScheduler: _reportBackgroundSubmitScheduler(),
     );
     unawaited(_reportOutboxCoordinator!.start());
+    _reportWizardSubmitPort = ReportWizardSubmitPortImpl(_reportOutboxCoordinator!);
     _reportsRealtimeService = ReportsRealtimeService(
       config: _config!,
       authState: _authState!,
@@ -306,6 +317,7 @@ class ServiceLocator {
     CheckInSyncService.dispose();
     unawaited(_reportOutboxCoordinator?.dispose() ?? Future<void>.value());
     _reportOutboxCoordinator = null;
+    _reportWizardSubmitPort = null;
     _reportDraftRepository = null;
     _reportDraftPhotoStore = null;
     _reportOutboxRepository = null;
@@ -336,5 +348,18 @@ class ServiceLocator {
     _eventChatRepository = null;
     _initialized = false;
     appLocaleOverride.value = null;
+  }
+
+  BackgroundSubmitScheduler _reportBackgroundSubmitScheduler() {
+    if (kIsWeb) {
+      return InProcessBackgroundSubmitScheduler();
+    }
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+      case TargetPlatform.iOS:
+        return PlatformBackgroundSubmitScheduler();
+      default:
+        return InProcessBackgroundSubmitScheduler();
+    }
   }
 }

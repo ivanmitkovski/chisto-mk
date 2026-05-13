@@ -1,7 +1,8 @@
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
-import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
+import 'package:chisto_mobile/features/reports/domain/report_field_limits.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/evidence_tip_card.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_stage.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/photo_grid.dart';
@@ -42,15 +43,15 @@ class NewReportEvidenceStageBody extends StatelessWidget {
           photos: draft.photos,
           onAddPhoto: onAddPhoto,
           onRemovePhoto: onRemovePhoto,
+          maxPhotos: ReportFieldLimits.maxPhotos,
         ),
         if (attemptedStages.contains(ReportStage.evidence) &&
             !draft.hasPhotos) ...<Widget>[
           const SizedBox(height: AppSpacing.sm),
           Text(
             context.l10n.reportFlowEvidenceNeedsPhoto,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.accentDanger,
-              height: 1.35,
+            style: AppTypography.reportsEvidenceValidationHint(
+              Theme.of(context).textTheme,
             ),
           ),
         ],

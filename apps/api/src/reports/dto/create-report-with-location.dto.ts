@@ -31,6 +31,7 @@ export class CreateReportWithLocationDto extends GeoPointLatitudeLongitudeDto {
   @ApiPropertyOptional({
     description: 'Optional extra context (not the headline)',
     example: 'Waste has been accumulating for several weeks.',
+    maxLength: 500,
   })
   @IsOptional()
   @IsString()
@@ -40,6 +41,7 @@ export class CreateReportWithLocationDto extends GeoPointLatitudeLongitudeDto {
   @ApiPropertyOptional({
     description: 'Optional media attachment URLs (from POST /reports/upload)',
     type: [String],
+    maxItems: 5,
     example: ['https://bucket.s3.region.amazonaws.com/reports/user123/photo.jpg'],
   })
   @IsOptional()
