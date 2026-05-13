@@ -277,6 +277,7 @@ model Site {
   @@index([status, createdAt])
   /// Engagement retriever ordering support.
   @@index([status, sharesCount, upvotesCount, commentsCount, createdAt])
+  @@index([archivedById])
 }
 
 enum SiteStatus {
@@ -329,6 +330,7 @@ model Report {
   @@index([reporterId])
   @@index([status])
   @@index([potentialDuplicateOfId])
+  @@index([moderatedById])
 }
 
 enum ReportStatus {
@@ -369,6 +371,7 @@ model ReportSubmitIdempotency {
 
   @@unique([userId, key])
   @@index([createdAt])
+  @@index([reportId])
 }
 
 /// Async-capable outbox for post-commit report side effects (merge notifications, audit, S3, WS).
@@ -628,6 +631,8 @@ model EventChatMessage {
   @@index([eventId, createdAt])
   @@index([authorId])
   @@index([eventId, isPinned, pinnedAt])
+  @@index([replyToId])
+  @@index([pinnedById])
 }
 
 model EventChatAttachment {
@@ -681,6 +686,7 @@ model EventChatReadCursor {
 
   @@unique([eventId, userId])
   @@index([userId])
+  @@index([lastReadMessageId])
 }
 
 /// Attendee check-in at an event (registered user or manual guest list).
@@ -752,6 +758,7 @@ model EventEvidencePhoto {
   uploadedBy   User              @relation(fields: [uploadedById], references: [id], onDelete: Cascade)
 
   @@index([eventId, kind, createdAt])
+  @@index([uploadedById])
 }
 
 enum RouteSegmentStatus {
