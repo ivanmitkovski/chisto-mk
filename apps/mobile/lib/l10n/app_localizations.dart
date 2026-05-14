@@ -1342,6 +1342,126 @@ abstract class AppLocalizations {
   /// **'Get started'**
   String get authOnboardingGetStarted;
 
+  /// No description provided for @coachTourSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get coachTourSkip;
+
+  /// No description provided for @coachTourNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get coachTourNext;
+
+  /// No description provided for @coachTourDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get coachTourDone;
+
+  /// No description provided for @coachTourProgressSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Step {current} of {total}'**
+  String coachTourProgressSemantics(int current, int total);
+
+  /// No description provided for @coachTourSkipSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip introduction and go to the home screen'**
+  String get coachTourSkipSemantics;
+
+  /// No description provided for @coachTourStep0Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome'**
+  String get coachTourStep0Title;
+
+  /// No description provided for @coachTourStep0Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Chisto.mk shows pollution near you. Report quickly and see what others have posted.'**
+  String get coachTourStep0Body;
+
+  /// No description provided for @coachTourStep1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Map'**
+  String get coachTourStep1Title;
+
+  /// No description provided for @coachTourStep1Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the map. Pins show problem spots. Tap one for photos and details.'**
+  String get coachTourStep1Body;
+
+  /// No description provided for @coachTourStep2Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Reports'**
+  String get coachTourStep2Title;
+
+  /// No description provided for @coachTourStep2Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Your own reports are here. Check status, search, and filter what you submitted.'**
+  String get coachTourStep2Body;
+
+  /// No description provided for @coachTourStep3Title.
+  ///
+  /// In en, this message translates to:
+  /// **'New report'**
+  String get coachTourStep3Title;
+
+  /// No description provided for @coachTourStep3Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap + from any screen to start a new report.'**
+  String get coachTourStep3Body;
+
+  /// No description provided for @coachTourStep4Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Events'**
+  String get coachTourStep4Title;
+
+  /// No description provided for @coachTourStep4Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Join eco cleanups and meetups—or host your own. RSVP, message organizers, and see what happens afterward.'**
+  String get coachTourStep4Body;
+
+  /// No description provided for @coachTourStep5Title.
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get coachTourStep5Title;
+
+  /// No description provided for @coachTourStep5Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Your avatar opens your profile. Points and activity are there.'**
+  String get coachTourStep5Body;
+
+  /// No description provided for @coachTourCompleteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save. Try again.'**
+  String get coachTourCompleteFailed;
+
+  /// No description provided for @coachTourTargetUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not highlight this'**
+  String get coachTourTargetUnavailableTitle;
+
+  /// No description provided for @coachTourTargetUnavailableBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep going. You can skip anytime.'**
+  String get coachTourTargetUnavailableBody;
+
   /// No description provided for @authLocationTitle.
   ///
   /// In en, this message translates to:

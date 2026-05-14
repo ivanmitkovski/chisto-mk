@@ -25,7 +25,9 @@ class AppMotion {
   static const Curve mapCameraFlyCurve = Curves.easeOutCubic;
 
   /// Cluster chip cross-fade when count/membership reflows after zoom/pan.
-  static const Duration mapClusterReclusterSwitcher = Duration(milliseconds: 380);
+  static const Duration mapClusterReclusterSwitcher = Duration(
+    milliseconds: 380,
+  );
 
   /// Marker [LatLng] eases toward new cluster geometry (split / merge / pan).
   static const Duration mapMarkerGeographicLerp = Duration(milliseconds: 340);
@@ -130,4 +132,23 @@ class AppMotion {
     final double end = (start + itemDuration).clamp(0.0, 1.0);
     return Interval(start.clamp(0.0, 1.0), end, curve: emphasized);
   }
+
+  // --- Home coach overlay (smooth spotlight + card follow; avoid snap vs cutout)
+  static const Duration coachScrimFade = Duration(milliseconds: 420);
+  static const Duration coachHoleMorph = Duration(milliseconds: 520);
+  static const Duration coachProgressSegment = Duration(milliseconds: 320);
+
+  /// Scrim fade: ease-out so the overlay “settles” rather than popping in.
+  static const Curve coachScrimCurve = smooth;
+
+  /// Spotlight cutout moves between targets — symmetric ease avoids end twitch.
+  static const Curve coachHoleMorphCurve = Curves.easeInOutCubic;
+
+  /// Minimum time the completion celebration stays visible after save succeeds.
+  static const Duration coachCompletionMinHoldFull = Duration(
+    milliseconds: 1050,
+  );
+  static const Duration coachCompletionMinHoldReduceMotion = Duration(
+    milliseconds: 380,
+  );
 }

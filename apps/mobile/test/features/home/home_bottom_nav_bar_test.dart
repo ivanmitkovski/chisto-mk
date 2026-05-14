@@ -5,7 +5,13 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('bottom nav shows localized tab labels', (WidgetTester tester) async {
+  testWidgets('bottom nav shows localized tab labels', (
+    WidgetTester tester,
+  ) async {
+    final List<GlobalKey> keys = List<GlobalKey>.generate(
+      4,
+      (_) => GlobalKey(),
+    );
     await tester.pumpWidget(
       MaterialApp(
         localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
@@ -18,6 +24,7 @@ void main() {
           body: HomeBottomNavBar(
             currentIndex: 0,
             onTabSelected: (_) {},
+            navItemKeys: keys,
           ),
         ),
       ),

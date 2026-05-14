@@ -31,7 +31,10 @@ import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_refresh_indicator.dart';
 
 class PollutionFeedScreen extends ConsumerStatefulWidget {
-  const PollutionFeedScreen({super.key});
+  const PollutionFeedScreen({super.key, this.coachProfileAvatarKey});
+
+  /// Optional key on the feed header profile (home coach overlay).
+  final GlobalKey? coachProfileAvatarKey;
 
   @override
   ConsumerState<PollutionFeedScreen> createState() =>
@@ -43,6 +46,7 @@ class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
   /// A few dp past the status inset for hit tolerance; keep small to avoid covering
   /// the first sliver (aligns with iOS “tap status bar” — that region only).
   static const double _scrollToTopTapSlopPx = 6.0;
+
   /// Only when the OS reports almost no top inset (e.g. some tablets / edge cases).
   static const double _scrollToTopTapMinWhenInsetTiny = 32.0;
   static const double _scrollToTopTapTinyInsetThreshold = 16.0;
@@ -117,11 +121,10 @@ class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
 
   void _openProfile() {
     AppHaptics.softTransition();
-    Navigator.of(context, rootNavigator: true).push(
-      MaterialPageRoute<void>(
-        builder: (_) => const ProfileScreen(),
-      ),
-    );
+    Navigator.of(
+      context,
+      rootNavigator: true,
+    ).push(MaterialPageRoute<void>(builder: (_) => const ProfileScreen()));
   }
 
   void _handleFilterSelection(FeedFilter filter) {
@@ -273,10 +276,12 @@ class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
     );
     final MediaQueryData mq = MediaQuery.of(context);
     final MediaQueryData windowMq = MediaQueryData.fromView(View.of(context));
-    final double statusInset = math.max(
-      windowMq.viewPadding.top,
-      math.max(mq.viewPadding.top, mq.padding.top),
-    ).clamp(0.0, 120.0);
+    final double statusInset = math
+        .max(
+          windowMq.viewPadding.top,
+          math.max(mq.viewPadding.top, mq.padding.top),
+        )
+        .clamp(0.0, 120.0);
     final double scrollToTopTapStripHeight = () {
       final double withSlop = statusInset + _scrollToTopTapSlopPx;
       if (statusInset < _scrollToTopTapTinyInsetThreshold) {
@@ -284,8 +289,7 @@ class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
       }
       return withSlop;
     }().clamp(0.0, 100.0);
-    final Color feedBackground =
-        Theme.of(context).scaffoldBackgroundColor;
+    final Color feedBackground = Theme.of(context).scaffoldBackgroundColor;
 
     return Scaffold(
       backgroundColor: feedBackground,
@@ -294,169 +298,177 @@ class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
         child: Stack(
           fit: StackFit.expand,
           children: <Widget>[
-          SafeArea(
-            top: true,
-            bottom: false,
-            left: false,
-            right: false,
-            child: AppRefreshIndicator(
-              onRefresh: _performFeedRefresh,
-              child: CustomScrollView(
-                controller: _scrollController,
-                physics: const AlwaysScrollableScrollPhysics(
-                  parent: BouncingScrollPhysics(),
-                ),
-                slivers: <Widget>[
-                  const SliverToBoxAdapter(child: FeedOfflineBannerHost()),
-                  SliverToBoxAdapter(
-                    child: FeedHeader(
-                      displayName: displayName,
-                      unreadCount: _unreadNotificationsCount,
-                      onProfileTap: _openProfile,
-                      onNotificationTap: _openNotifications,
-                    ),
+            SafeArea(
+              top: true,
+              bottom: false,
+              left: false,
+              right: false,
+              child: AppRefreshIndicator(
+                onRefresh: _performFeedRefresh,
+                child: CustomScrollView(
+                  controller: _scrollController,
+                  physics: const AlwaysScrollableScrollPhysics(
+                    parent: BouncingScrollPhysics(),
                   ),
-                  SliverToBoxAdapter(
-                    child: FeedSectionHeader(),
-                  ),
-                  SliverToBoxAdapter(
-                    child: FeedFilterBar(
-                      activeFilter: activeFilter,
-                      onFilterSelected: _handleFilterSelection,
-                      onMoreFiltersTap: () => _openFilterSheet(context),
-                    ),
-                  ),
-                  if (feedIsStaleFallback)
-                    const SliverToBoxAdapter(child: FeedStaleBanner()),
-                  if (feedIsLoading)
-                    SliverToBoxAdapter(child: _buildSkeletonList())
-                  else if (feedLoadError != null &&
-                      feedStatus == FeedSitesViewStatus.firstLoadError)
-                    SliverFillRemaining(
-                      hasScrollBody: false,
-                      child:
-                          AppErrorView(error: feedLoadError, onRetry: _loadFeed),
-                    )
-                  else if (visibleSites.isEmpty)
-                    SliverFillRemaining(
-                      hasScrollBody: false,
-                      child: FeedEmptyState(
-                        activeFilter: activeFilter,
-                        locationAvailable: feedLocationAvailable,
-                        onShowAllSites: () {
-                          AppHaptics.tap();
-                          unawaited(
-                            ref
-                                .read(feedFilterProvider.notifier)
-                                .setFilter(FeedFilter.all),
-                          );
-                          unawaited(scrollToTop());
-                        },
-                        onRefresh: () {
-                          AppHaptics.tap();
-                          unawaited(_performFeedRefresh());
-                        },
+                  slivers: <Widget>[
+                    const SliverToBoxAdapter(child: FeedOfflineBannerHost()),
+                    SliverToBoxAdapter(
+                      child: FeedHeader(
+                        displayName: displayName,
+                        unreadCount: _unreadNotificationsCount,
+                        onProfileTap: _openProfile,
+                        onNotificationTap: _openNotifications,
+                        profileAvatarKey: widget.coachProfileAvatarKey,
                       ),
-                    )
-                  else
-                    SliverList.builder(
-                      key: const PageStorageKey<String>('feed_list'),
-                      findChildIndexCallback: (Key key) {
-                        if (key is ValueKey<String>) {
-                          final int i = visibleSites.indexWhere(
-                            (PollutionSite s) => s.id == key.value,
-                          );
-                          return i >= 0 ? i : null;
-                        }
-                        return null;
-                      },
-                      itemCount: visibleSites.length +
-                          ((feedIsLoadingMore || feedLoadMoreFailed) ? 1 : 0),
-                      itemBuilder: (BuildContext context, int index) {
-                        if (index >= visibleSites.length) {
-                          return FeedLoadMoreRow(
-                            loadFailed: feedLoadMoreFailed,
-                            onRetry: _loadMoreFeed,
-                          );
-                        }
-                        final AnimationController? controller =
-                            _entranceController;
-                        final Widget card = RepaintBoundary(
-                          key: ValueKey<String>(visibleSites[index].id),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.lg,
+                    ),
+                    SliverToBoxAdapter(child: FeedSectionHeader()),
+                    SliverToBoxAdapter(
+                      child: FeedFilterBar(
+                        activeFilter: activeFilter,
+                        onFilterSelected: _handleFilterSelection,
+                        onMoreFiltersTap: () => _openFilterSheet(context),
+                      ),
+                    ),
+                    if (feedIsStaleFallback)
+                      const SliverToBoxAdapter(child: FeedStaleBanner()),
+                    if (feedIsLoading)
+                      SliverToBoxAdapter(child: _buildSkeletonList())
+                    else if (feedLoadError != null &&
+                        feedStatus == FeedSitesViewStatus.firstLoadError)
+                      SliverFillRemaining(
+                        hasScrollBody: false,
+                        child: AppErrorView(
+                          error: feedLoadError,
+                          onRetry: _loadFeed,
+                        ),
+                      )
+                    else if (visibleSites.isEmpty)
+                      SliverFillRemaining(
+                        hasScrollBody: false,
+                        child: FeedEmptyState(
+                          activeFilter: activeFilter,
+                          locationAvailable: feedLocationAvailable,
+                          onShowAllSites: () {
+                            AppHaptics.tap();
+                            unawaited(
+                              ref
+                                  .read(feedFilterProvider.notifier)
+                                  .setFilter(FeedFilter.all),
+                            );
+                            unawaited(scrollToTop());
+                          },
+                          onRefresh: () {
+                            AppHaptics.tap();
+                            unawaited(_performFeedRefresh());
+                          },
+                        ),
+                      )
+                    else
+                      SliverList.builder(
+                        key: const PageStorageKey<String>('feed_list'),
+                        findChildIndexCallback: (Key key) {
+                          if (key is ValueKey<String>) {
+                            final int i = visibleSites.indexWhere(
+                              (PollutionSite s) => s.id == key.value,
+                            );
+                            return i >= 0 ? i : null;
+                          }
+                          return null;
+                        },
+                        itemCount:
+                            visibleSites.length +
+                            ((feedIsLoadingMore || feedLoadMoreFailed) ? 1 : 0),
+                        itemBuilder: (BuildContext context, int index) {
+                          if (index >= visibleSites.length) {
+                            return FeedLoadMoreRow(
+                              loadFailed: feedLoadMoreFailed,
+                              onRetry: _loadMoreFeed,
+                            );
+                          }
+                          final AnimationController? controller =
+                              _entranceController;
+                          final Widget card = RepaintBoundary(
+                            key: ValueKey<String>(visibleSites[index].id),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppSpacing.lg,
+                              ),
+                              child: PollutionSiteCard(
+                                site: visibleSites[index],
+                                feedSessionId: feedSessionId,
+                                feedVariant: feedVariant,
+                                onHidden: _hideSiteFromFeed,
+                              ),
                             ),
-                            child: PollutionSiteCard(
-                              site: visibleSites[index],
-                              feedSessionId: feedSessionId,
-                              feedVariant: feedVariant,
-                              onHidden: _hideSiteFromFeed,
-                            ),
-                          ),
-                        );
-                        if (controller == null) return card;
-                        final double staggerDelay =
-                            (index * 0.15).clamp(0.0, 0.6);
-                        final double staggerEnd = (staggerDelay + 0.4).clamp(
-                          0.0,
-                          1.0,
-                        );
-                        final Animation<double> opacity = CurvedAnimation(
-                          parent: controller,
-                          curve: Interval(
-                            staggerDelay,
-                            staggerEnd,
-                            curve: AppMotion.standardCurve,
-                          ),
-                        );
-                        final Animation<Offset> slide = Tween<Offset>(
-                          begin: const Offset(0, 0.08),
-                          end: Offset.zero,
-                        ).animate(
-                          CurvedAnimation(
+                          );
+                          if (controller == null) return card;
+                          final double staggerDelay = (index * 0.15).clamp(
+                            0.0,
+                            0.6,
+                          );
+                          final double staggerEnd = (staggerDelay + 0.4).clamp(
+                            0.0,
+                            1.0,
+                          );
+                          final Animation<double> opacity = CurvedAnimation(
                             parent: controller,
                             curve: Interval(
                               staggerDelay,
                               staggerEnd,
-                              curve: AppMotion.emphasized,
+                              curve: AppMotion.standardCurve,
                             ),
-                          ),
-                        );
-                        return FadeTransition(
-                          opacity: opacity,
-                          child: SlideTransition(position: slide, child: card),
-                        );
-                      },
-                    ),
-                  if (!feedIsLoading &&
-                      feedLoadError == null &&
-                      visibleSites.isNotEmpty &&
-                      !feedHasMore)
-                    const SliverToBoxAdapter(child: FeedCaughtUpFooter()),
-                ],
-              ),
-            ),
-          ),
-          if (scrollToTopTapStripHeight > 0)
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              height: scrollToTopTapStripHeight,
-              child: Semantics(
-                button: true,
-                label: context.l10n.feedScrollToTopSemantic,
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () {
-                    AppHaptics.tap();
-                    unawaited(scrollToTop());
-                  },
-                  child: ColoredBox(color: feedBackground),
+                          );
+                          final Animation<Offset> slide =
+                              Tween<Offset>(
+                                begin: const Offset(0, 0.08),
+                                end: Offset.zero,
+                              ).animate(
+                                CurvedAnimation(
+                                  parent: controller,
+                                  curve: Interval(
+                                    staggerDelay,
+                                    staggerEnd,
+                                    curve: AppMotion.emphasized,
+                                  ),
+                                ),
+                              );
+                          return FadeTransition(
+                            opacity: opacity,
+                            child: SlideTransition(
+                              position: slide,
+                              child: card,
+                            ),
+                          );
+                        },
+                      ),
+                    if (!feedIsLoading &&
+                        feedLoadError == null &&
+                        visibleSites.isNotEmpty &&
+                        !feedHasMore)
+                      const SliverToBoxAdapter(child: FeedCaughtUpFooter()),
+                  ],
                 ),
               ),
             ),
+            if (scrollToTopTapStripHeight > 0)
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                height: scrollToTopTapStripHeight,
+                child: Semantics(
+                  button: true,
+                  label: context.l10n.feedScrollToTopSemantic,
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () {
+                      AppHaptics.tap();
+                      unawaited(scrollToTop());
+                    },
+                    child: ColoredBox(color: feedBackground),
+                  ),
+                ),
+              ),
           ],
         ),
       ),

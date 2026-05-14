@@ -13,10 +13,14 @@ class HomeBottomNavBar extends StatelessWidget {
     super.key,
     required this.currentIndex,
     required this.onTabSelected,
+    required this.navItemKeys,
   });
 
   final int currentIndex;
   final ValueChanged<int> onTabSelected;
+
+  /// One key per tab index (0–3), aligned with [index] on each [_BottomNavItem].
+  final List<GlobalKey> navItemKeys;
 
   @override
   Widget build(BuildContext context) {
@@ -47,9 +51,7 @@ class HomeBottomNavBar extends StatelessWidget {
         height: 64,
         decoration: BoxDecoration(
           color: AppColors.panelBackground,
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(24),
-          ),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           border: Border(
             top: BorderSide(
               color: AppColors.divider.withValues(alpha: 0.6),
@@ -69,30 +71,42 @@ class HomeBottomNavBar extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
-              _BottomNavItem(
-                config: items[0],
-                index: 0,
-                currentIndex: currentIndex,
-                onTap: onTabSelected,
+              KeyedSubtree(
+                key: navItemKeys[0],
+                child: _BottomNavItem(
+                  config: items[0],
+                  index: 0,
+                  currentIndex: currentIndex,
+                  onTap: onTabSelected,
+                ),
               ),
-              _BottomNavItem(
-                config: items[1],
-                index: 1,
-                currentIndex: currentIndex,
-                onTap: onTabSelected,
+              KeyedSubtree(
+                key: navItemKeys[1],
+                child: _BottomNavItem(
+                  config: items[1],
+                  index: 1,
+                  currentIndex: currentIndex,
+                  onTap: onTabSelected,
+                ),
               ),
               const SizedBox(width: 64),
-              _BottomNavItem(
-                config: items[2],
-                index: 2,
-                currentIndex: currentIndex,
-                onTap: onTabSelected,
+              KeyedSubtree(
+                key: navItemKeys[2],
+                child: _BottomNavItem(
+                  config: items[2],
+                  index: 2,
+                  currentIndex: currentIndex,
+                  onTap: onTabSelected,
+                ),
               ),
-              _BottomNavItem(
-                config: items[3],
-                index: 3,
-                currentIndex: currentIndex,
-                onTap: onTabSelected,
+              KeyedSubtree(
+                key: navItemKeys[3],
+                child: _BottomNavItem(
+                  config: items[3],
+                  index: 3,
+                  currentIndex: currentIndex,
+                  onTap: onTabSelected,
+                ),
               ),
             ],
           ),
@@ -173,13 +187,8 @@ class _BottomNavItemState extends State<_BottomNavItem> {
 }
 
 class _NavItemConfig {
-  const _NavItemConfig({
-    required this.label,
-    required this.iconAsset,
-  });
+  const _NavItemConfig({required this.label, required this.iconAsset});
 
   final String label;
   final String iconAsset;
 }
-
-

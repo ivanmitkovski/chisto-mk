@@ -4,9 +4,10 @@ import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/features/auth/presentation/constants/splash_constants.dart';
+import 'package:chisto_mobile/features/onboarding/debug/coach_tour_debug.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
 
-/// Resolves session then navigates to home or onboarding.
+/// Resolves session then navigates to home (with optional coach tour), or onboarding.
 ///
 /// Shows primary background and a centered spinner while waiting. Session
 /// restore is wrapped in a timeout so the app never hangs.
@@ -42,10 +43,12 @@ class _InitialRouteScreenState extends State<InitialRouteScreen> {
         }
       }
     }();
-    final Future<void> timeoutFuture =
-        Future<void>.delayed(SplashConstants.initialRouteSessionTimeout);
-    final Future<void> minDisplayFuture =
-        Future<void>.delayed(SplashConstants.initialRouteMinDisplayTime);
+    final Future<void> timeoutFuture = Future<void>.delayed(
+      SplashConstants.initialRouteSessionTimeout,
+    );
+    final Future<void> minDisplayFuture = Future<void>.delayed(
+      SplashConstants.initialRouteMinDisplayTime,
+    );
 
     await Future.wait(<Future<void>>[
       Future.any(<Future<void>>[sessionFuture, timeoutFuture]),
@@ -57,8 +60,23 @@ class _InitialRouteScreenState extends State<InitialRouteScreen> {
     final bool authenticated =
         ServiceLocator.instance.authState.isAuthenticated;
     if (authenticated) {
-      Navigator.of(context).pushReplacementNamed(AppRoutes.home);
+      final bool showPostRegistrationGuide = await ServiceLocator
+          .instance
+          .featureGuideRepository
+          .shouldShowPostRegistrationGuide();
+      if (!mounted) return;
+      final bool startCoachTour =
+          CoachTourDebug.forceHomeStartCoachArgs || showPostRegistrationGuide;
+      if (startCoachTour) {
+        Navigator.of(context).pushReplacementNamed(
+          AppRoutes.home,
+          arguments: const HomeRouteArgs(startCoachTour: true),
+        );
+      } else {
+        Navigator.of(context).pushReplacementNamed(AppRoutes.home);
+      }
     } else {
+      if (!mounted) return;
       Navigator.of(context).pushReplacementNamed(AppRoutes.onboarding);
     }
   }

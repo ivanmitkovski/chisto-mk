@@ -17,6 +17,7 @@ class FeedHeader extends ConsumerWidget {
     required this.unreadCount,
     required this.onProfileTap,
     required this.onNotificationTap,
+    this.profileAvatarKey,
   });
 
   /// Current user's display name (e.g. "John Doe"). Shown as "Hi, {first name}".
@@ -25,20 +26,46 @@ class FeedHeader extends ConsumerWidget {
   final VoidCallback onProfileTap;
   final VoidCallback onNotificationTap;
 
+  /// Optional [GlobalKey] on the profile avatar (home coach overlay).
+  final GlobalKey? profileAvatarKey;
+
   /// Same greeting string as the header row (for layout / tests that need the line).
   static String greetingForChromeLayout(
     String displayName,
     AppLocalizations l10n,
   ) {
-    return '${l10n.feedGreetingPrefix}${_firstWord(
-      displayName,
-      fallbackName: l10n.feedGreetingFallbackName,
-    )}';
+    return '${l10n.feedGreetingPrefix}${_firstWord(displayName, fallbackName: l10n.feedGreetingFallbackName)}';
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ProfileAvatarData avatar = ref.watch(profileAvatarNotifierProvider);
+
+    Widget profileHit = GestureDetector(
+      onTap: onProfileTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        width: 46,
+        height: 46,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: AppColors.primary.withValues(alpha: 0.25),
+            width: 2,
+          ),
+        ),
+        child: AppAvatar(
+          name: displayName,
+          size: 42,
+          fontSize: 14,
+          localImagePath: avatar.localPath,
+          imageUrl: avatar.remoteUrl,
+        ),
+      ),
+    );
+    if (profileAvatarKey != null) {
+      profileHit = KeyedSubtree(key: profileAvatarKey, child: profileHit);
+    }
 
     return SafeArea(
       bottom: false,
@@ -54,28 +81,7 @@ class FeedHeader extends ConsumerWidget {
             Semantics(
               button: true,
               label: context.l10n.feedOpenProfileSemantics,
-              child: GestureDetector(
-                onTap: onProfileTap,
-                behavior: HitTestBehavior.opaque,
-                child: Container(
-                  width: 46,
-                  height: 46,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: AppColors.primary.withValues(alpha: 0.25),
-                      width: 2,
-                    ),
-                  ),
-                  child: AppAvatar(
-                    name: displayName,
-                    size: 42,
-                    fontSize: 14,
-                    localImagePath: avatar.localPath,
-                    imageUrl: avatar.remoteUrl,
-                  ),
-                ),
-              ),
+              child: profileHit,
             ),
             const SizedBox(width: AppSpacing.md),
             Expanded(

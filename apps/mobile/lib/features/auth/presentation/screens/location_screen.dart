@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -5,6 +7,8 @@ import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/navigation/app_navigator_key.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
@@ -28,7 +32,10 @@ class LocationScreen extends StatefulWidget {
 class _LocationScreenState extends State<LocationScreen> {
   String? _currentAddress;
   bool _resolvingLocation = false;
-  final LatLng _mapCenter = const LatLng(41.6086, 21.7453); // Approx center of Macedonia
+  final LatLng _mapCenter = const LatLng(
+    41.6086,
+    21.7453,
+  ); // Approx center of Macedonia
   LatLng? _selectedPosition;
   final MapController _mapController = MapController();
   bool _showTileLoadingOverlay = true;
@@ -128,16 +135,20 @@ class _LocationScreenState extends State<LocationScreen> {
       String label =
           'Lat ${pos.latitude.toStringAsFixed(4)}, Lng ${pos.longitude.toStringAsFixed(4)}';
       try {
-        final List<Placemark> placemarks =
-            await placemarkFromCoordinates(pos.latitude, pos.longitude);
+        final List<Placemark> placemarks = await placemarkFromCoordinates(
+          pos.latitude,
+          pos.longitude,
+        );
         if (placemarks.isNotEmpty) {
           final Placemark p = placemarks.first;
           final String street = p.street ?? '';
           final String locality = p.locality ?? '';
           final String country = p.country ?? '';
-          final List<String> parts = <String>[street, locality, country]
-              .where((String s) => s.trim().isNotEmpty)
-              .toList();
+          final List<String> parts = <String>[
+            street,
+            locality,
+            country,
+          ].where((String s) => s.trim().isNotEmpty).toList();
           if (parts.isNotEmpty) {
             label = parts.join(', ');
           }
@@ -178,10 +189,36 @@ class _LocationScreenState extends State<LocationScreen> {
   void _confirmAndGoToFeed() {
     if (_selectedPosition == null) return;
     AppHaptics.light(context);
-    Navigator.of(context).pushNamedAndRemoveUntil(
+    unawaited(_navigateHomeWithCoachPending());
+  }
+
+  Future<void> _navigateHomeWithCoachPending() async {
+    await _persistPostRegistrationGuidePending();
+    if (!mounted) {
+      return;
+    }
+    final NavigatorState? rootNav = appRootNavigatorKey.currentState;
+    final NavigatorState nav =
+        rootNav ?? Navigator.of(context, rootNavigator: true);
+    nav.pushNamedAndRemoveUntil(
       AppRoutes.home,
       (Route<dynamic> route) => false,
+      arguments: const HomeRouteArgs(startCoachTour: true),
     );
+  }
+
+  Future<void> _persistPostRegistrationGuidePending() async {
+    try {
+      await ServiceLocator.instance.featureGuideRepository
+          .markPostRegistrationGuidePending();
+    } catch (e, stackTrace) {
+      assert(() {
+        debugPrint(
+          '[LocationScreen] markPostRegistrationGuidePending failed: $e\n$stackTrace',
+        );
+        return true;
+      }());
+    }
   }
 
   @override
@@ -203,7 +240,8 @@ class _LocationScreenState extends State<LocationScreen> {
               curve: AppMotion.emphasized,
               padding: EdgeInsets.only(bottom: keyboardInset),
               child: SingleChildScrollView(
-                keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
                 padding: const EdgeInsets.fromLTRB(
                   AppSpacing.lg,
                   AppSpacing.sm,
@@ -247,11 +285,18 @@ class _LocationScreenState extends State<LocationScreen> {
                                 TileLayer(
                                   urlTemplate:
                                       'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
-                                  subdomains: const <String>['a', 'b', 'c', 'd'],
+                                  subdomains: const <String>[
+                                    'a',
+                                    'b',
+                                    'c',
+                                    'd',
+                                  ],
                                   maxNativeZoom: 20,
                                   userAgentPackageName: 'chisto_mobile',
                                   retinaMode: false,
-                                  tileProvider: createCachedTileProvider(maxStaleDays: 30),
+                                  tileProvider: createCachedTileProvider(
+                                    maxStaleDays: 30,
+                                  ),
                                   tileDisplay: TileDisplay.instantaneous(),
                                 ),
                                 if (_selectedPosition != null)
@@ -280,7 +325,8 @@ class _LocationScreenState extends State<LocationScreen> {
                               ],
                             ),
                             if (_showTileLoadingOverlay ||
-                                (_resolvingLocation && _selectedPosition == null))
+                                (_resolvingLocation &&
+                                    _selectedPosition == null))
                               const Positioned.fill(
                                 child: IgnorePointer(child: _MapTileSkeleton()),
                               ),
@@ -294,8 +340,12 @@ class _LocationScreenState extends State<LocationScreen> {
                                   vertical: AppSpacing.radiusSm,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: AppColors.white.withValues(alpha: 0.94),
-                                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                                  color: AppColors.white.withValues(
+                                    alpha: 0.94,
+                                  ),
+                                  borderRadius: BorderRadius.circular(
+                                    AppSpacing.radiusMd,
+                                  ),
                                 ),
                                 child: Text(
                                   _currentAddress ??
@@ -316,20 +366,20 @@ class _LocationScreenState extends State<LocationScreen> {
                       label: _resolvingLocation
                           ? l10n.authLocationDetecting
                           : _selectedPosition != null
-                              ? l10n.authLocationContinue
-                              : l10n.authLocationUseCurrent,
+                          ? l10n.authLocationContinue
+                          : l10n.authLocationUseCurrent,
                       child: PrimaryButton(
                         label: _resolvingLocation
                             ? l10n.authLocationDetecting
                             : _selectedPosition != null
-                                ? l10n.authLocationContinue
-                                : l10n.authLocationUseCurrent,
+                            ? l10n.authLocationContinue
+                            : l10n.authLocationUseCurrent,
                         enabled: !_resolvingLocation,
                         onPressed: _resolvingLocation
                             ? null
                             : _selectedPosition != null
-                                ? _confirmAndGoToFeed
-                                : _useCurrentLocation,
+                            ? _confirmAndGoToFeed
+                            : _useCurrentLocation,
                       ),
                     ),
                     AnimatedSize(
@@ -354,11 +404,14 @@ class _LocationScreenState extends State<LocationScreen> {
                                       onPressed: _useCurrentLocation,
                                       child: Text(
                                         l10n.authLocationUseDifferent,
-                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                        color: AppColors.primaryDark,
-                                        fontWeight: FontWeight.w500,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall
+                                            ?.copyWith(
+                                              color: AppColors.primaryDark,
+                                              fontWeight: FontWeight.w500,
+                                            ),
                                       ),
-                                    ),
                                     ),
                                   ),
                                 ),
@@ -475,7 +528,9 @@ class _MapTileSkeletonState extends State<_MapTileSkeleton>
                   child: Row(
                     children: List<Widget>.generate(_columns, (int col) {
                       return Padding(
-                        padding: EdgeInsets.only(right: col < _columns - 1 ? _gap : 0),
+                        padding: EdgeInsets.only(
+                          right: col < _columns - 1 ? _gap : 0,
+                        ),
                         child: Container(
                           width: tileW,
                           height: tileH,

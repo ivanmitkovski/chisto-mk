@@ -709,6 +709,74 @@ class AppLocalizationsMk extends AppLocalizations {
   String get authOnboardingGetStarted => 'Започни';
 
   @override
+  String get coachTourSkip => 'Прескокни';
+
+  @override
+  String get coachTourNext => 'Следно';
+
+  @override
+  String get coachTourDone => 'Во ред';
+
+  @override
+  String coachTourProgressSemantics(int current, int total) {
+    return 'Чекор $current од $total';
+  }
+
+  @override
+  String get coachTourSkipSemantics =>
+      'Прескокни воведот и оди на почетниот екран';
+
+  @override
+  String get coachTourStep0Title => 'Добредојде';
+
+  @override
+  String get coachTourStep0Body =>
+      'Chisto.mk го покажува загадувањето околу тебе. Пријавуваш брзо и гледаш што пријавиле другите.';
+
+  @override
+  String get coachTourStep1Title => 'Мапа';
+
+  @override
+  String get coachTourStep1Body =>
+      'Отвори ја мапата. Иглите се проблемите. Допри за фотографии и детали.';
+
+  @override
+  String get coachTourStep2Title => 'Пријави';
+
+  @override
+  String get coachTourStep2Body =>
+      'Овде се твоите пријави. Провери статус, пребарај и филтрирај.';
+
+  @override
+  String get coachTourStep3Title => 'Нова пријава';
+
+  @override
+  String get coachTourStep3Body => 'Допри + од кој било екран за нова пријава.';
+
+  @override
+  String get coachTourStep4Title => 'Настани';
+
+  @override
+  String get coachTourStep4Body =>
+      'Приклучи се на еколошки чистења и средби или организирај сопствен настан. Потврди учество, пиши им на организаторите и следи го исходот.';
+
+  @override
+  String get coachTourStep5Title => 'Ти';
+
+  @override
+  String get coachTourStep5Body =>
+      'Аватарот го отвора профилот. Поените и активноста се таму.';
+
+  @override
+  String get coachTourCompleteFailed => 'Не се зачува. Обиди се повторно.';
+
+  @override
+  String get coachTourTargetUnavailableTitle => 'Не можевме да истакнеме';
+
+  @override
+  String get coachTourTargetUnavailableBody => 'Продолжи. Можеш да прескокнеш.';
+
+  @override
   String get authLocationTitle => 'Одберете локација';
 
   @override
