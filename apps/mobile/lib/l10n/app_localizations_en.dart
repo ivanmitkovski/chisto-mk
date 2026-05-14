@@ -707,6 +707,76 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authOnboardingGetStarted => 'Get started';
 
   @override
+  String get coachTourSkip => 'Skip';
+
+  @override
+  String get coachTourNext => 'Next';
+
+  @override
+  String get coachTourDone => 'Got it';
+
+  @override
+  String coachTourProgressSemantics(int current, int total) {
+    return 'Step $current of $total';
+  }
+
+  @override
+  String get coachTourSkipSemantics =>
+      'Skip introduction and go to the home screen';
+
+  @override
+  String get coachTourStep0Title => 'Welcome';
+
+  @override
+  String get coachTourStep0Body =>
+      'Chisto.mk shows pollution near you. Report quickly and see what others have posted.';
+
+  @override
+  String get coachTourStep1Title => 'Map';
+
+  @override
+  String get coachTourStep1Body =>
+      'Open the map. Pins show problem spots. Tap one for photos and details.';
+
+  @override
+  String get coachTourStep2Title => 'Reports';
+
+  @override
+  String get coachTourStep2Body =>
+      'Your own reports are here. Check status, search, and filter what you submitted.';
+
+  @override
+  String get coachTourStep3Title => 'New report';
+
+  @override
+  String get coachTourStep3Body =>
+      'Tap + from any screen to start a new report.';
+
+  @override
+  String get coachTourStep4Title => 'Events';
+
+  @override
+  String get coachTourStep4Body =>
+      'Join eco cleanups and meetups—or host your own. RSVP, message organizers, and see what happens afterward.';
+
+  @override
+  String get coachTourStep5Title => 'You';
+
+  @override
+  String get coachTourStep5Body =>
+      'Your avatar opens your profile. Points and activity are there.';
+
+  @override
+  String get coachTourCompleteFailed => 'Could not save. Try again.';
+
+  @override
+  String get coachTourTargetUnavailableTitle => 'Could not highlight this';
+
+  @override
+  String get coachTourTargetUnavailableBody =>
+      'Keep going. You can skip anytime.';
+
+  @override
   String get authLocationTitle => 'Choose your location';
 
   @override

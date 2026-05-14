@@ -30,6 +30,8 @@ import 'package:chisto_mobile/features/home/domain/repositories/sites_repository
 import 'package:chisto_mobile/features/notifications/data/api_notifications_repository.dart';
 import 'package:chisto_mobile/features/notifications/data/push_notification_service.dart';
 import 'package:chisto_mobile/features/notifications/domain/repositories/notifications_repository.dart';
+import 'package:chisto_mobile/features/onboarding/data/shared_prefs_feature_guide_repository.dart';
+import 'package:chisto_mobile/features/onboarding/domain/feature_guide_repository.dart';
 import 'package:chisto_mobile/features/profile/data/api_profile_repository.dart';
 import 'package:chisto_mobile/features/profile/domain/repositories/profile_repository.dart';
 import 'package:chisto_mobile/core/cache/report_images_cache.dart';
@@ -84,6 +86,7 @@ class ServiceLocator {
   PushNotificationService? _pushNotificationService;
   ApiEventAnalyticsRepository? _eventAnalyticsRepository;
   EventChatRepository? _eventChatRepository;
+  FeatureGuideRepository? _featureGuideRepository;
 
   /// Increment to trigger profile refresh (e.g. after report submit).
   final ValueNotifier<int> profileNeedsRefresh = ValueNotifier<int>(0);
@@ -108,7 +111,8 @@ class ServiceLocator {
   ReportOutboxRepository get reportOutboxRepository => _reportOutboxRepository!;
   ReportDraftPhotoStore get reportDraftPhotoStore => _reportDraftPhotoStore!;
   ReportDraftRepository get reportDraftRepository => _reportDraftRepository!;
-  ReportOutboxCoordinator get reportOutboxCoordinator => _reportOutboxCoordinator!;
+  ReportOutboxCoordinator get reportOutboxCoordinator =>
+      _reportOutboxCoordinator!;
   ReportWizardSubmitPort get reportWizardSubmitPort => _reportWizardSubmitPort!;
   ReportsRealtimeService get reportsRealtimeService => _reportsRealtimeService!;
   SitesRepository get sitesRepository => _sitesRepository!;
@@ -124,6 +128,8 @@ class ServiceLocator {
       _eventAnalyticsRepository!;
 
   EventChatRepository get eventChatRepository => _eventChatRepository!;
+
+  FeatureGuideRepository get featureGuideRepository => _featureGuideRepository!;
 
   bool _initialized = false;
   bool get isInitialized => _initialized;
@@ -185,6 +191,21 @@ class ServiceLocator {
     );
     _authRepositoryForUnauthorized = _authRepository;
 
+    _featureGuideRepository = SharedPrefsFeatureGuideRepository(
+      prefs,
+      currentUserId: () {
+        final String? id = _authState!.userId?.trim();
+        if (id != null && id.isNotEmpty) {
+          return id;
+        }
+        final String? phone = _authState!.phoneNumber?.trim();
+        if (phone != null && phone.isNotEmpty) {
+          return phone;
+        }
+        return null;
+      },
+    );
+
     _apiClient!.refreshSession = () async {
       try {
         await _authRepository!.refreshSession();
@@ -194,8 +215,9 @@ class ServiceLocator {
       }
     };
 
-    final ApiEventsRepository eventsRepo =
-        ApiEventsRepository(client: _apiClient!);
+    final ApiEventsRepository eventsRepo = ApiEventsRepository(
+      client: _apiClient!,
+    );
     _eventsRepository = eventsRepo;
     _checkInRepository = ApiCheckInRepository(
       client: _apiClient!,
@@ -219,7 +241,9 @@ class ServiceLocator {
       backgroundSubmitScheduler: _reportBackgroundSubmitScheduler(),
     );
     unawaited(_reportOutboxCoordinator!.start());
-    _reportWizardSubmitPort = ReportWizardSubmitPortImpl(_reportOutboxCoordinator!);
+    _reportWizardSubmitPort = ReportWizardSubmitPortImpl(
+      _reportOutboxCoordinator!,
+    );
     _reportsRealtimeService = ReportsRealtimeService(
       config: _config!,
       authState: _authState!,
@@ -254,7 +278,9 @@ class ServiceLocator {
         authState: _authState!,
       ),
     );
-    _eventAnalyticsRepository = ApiEventAnalyticsRepository(client: _apiClient!);
+    _eventAnalyticsRepository = ApiEventAnalyticsRepository(
+      client: _apiClient!,
+    );
     _eventChatRepository = ApiEventChatRepository(
       client: _apiClient!,
       config: _config!,
@@ -346,6 +372,7 @@ class ServiceLocator {
     _pushNotificationService = null;
     _eventAnalyticsRepository = null;
     _eventChatRepository = null;
+    _featureGuideRepository = null;
     _initialized = false;
     appLocaleOverride.value = null;
   }

@@ -44,10 +44,13 @@ class AppRoutes {
   static const String forgotPasswordNew = '/auth/forgot-password/new';
   static const String forgotPasswordSuccess = '/auth/forgot-password/success';
   static const String location = '/auth/location';
+  static const String featureGuide = '/feature-guide';
   static const String home = '/home';
+
   /// Opens home on the map tab; pass [MapSiteFocusRouteArgs] to focus a site pin.
   static const String homeMapFocus = '/home/map-focus';
   static const String homeEvents = '/home/events';
+
   /// Deep link / push: site by id (no hydrated preview).
   static const String siteDetail = '/sites/detail';
   static const String newReport = '/reports/new';
@@ -123,10 +126,15 @@ class SiteDetailByIdRouteArgs {
 
 /// Prefer this over raw `int` tab index when you need map focus in one place.
 class HomeRouteArgs {
-  const HomeRouteArgs({this.initialTabIndex = 0, this.mapSiteIdToFocus});
+  const HomeRouteArgs({
+    this.initialTabIndex = 0,
+    this.mapSiteIdToFocus,
+    this.startCoachTour = false,
+  });
 
   final int initialTabIndex;
   final String? mapSiteIdToFocus;
+  final bool startCoachTour;
 }
 
 class AppRouter {
@@ -145,16 +153,17 @@ class AppRouter {
           opaque: true,
           transitionDuration: SplashConstants.splashToInitialTransitionDuration,
           reverseTransitionDuration: Duration.zero,
-          pageBuilder: (_, __, ___) => const InitialRouteScreen(),
-          transitionsBuilder: (_, Animation<double> animation, __, Widget child) {
-            return FadeTransition(
-              opacity: CurvedAnimation(
-                parent: animation,
-                curve: Curves.easeOut,
-              ),
-              child: child,
-            );
-          },
+          pageBuilder: (_, _, _) => const InitialRouteScreen(),
+          transitionsBuilder:
+              (_, Animation<double> animation, _, Widget child) {
+                return FadeTransition(
+                  opacity: CurvedAnimation(
+                    parent: animation,
+                    curve: Curves.easeOut,
+                  ),
+                  child: child,
+                );
+              },
         );
       case AppRoutes.onboarding:
         return MaterialPageRoute<void>(
@@ -244,13 +253,20 @@ class AppRouter {
           builder: (_) => const LocationScreen(),
           settings: settings,
         );
+      case AppRoutes.featureGuide:
+        return MaterialPageRoute<void>(
+          builder: (_) => const HomeShell(startCoachTour: true),
+          settings: settings,
+        );
       case AppRoutes.home:
         int initialTabIndex = 0;
         String? mapSiteIdToFocus;
+        bool startCoachTour = false;
         final Object? homeArgs = settings.arguments;
         if (homeArgs is HomeRouteArgs) {
           initialTabIndex = homeArgs.initialTabIndex;
           mapSiteIdToFocus = homeArgs.mapSiteIdToFocus;
+          startCoachTour = homeArgs.startCoachTour;
         } else if (homeArgs is int) {
           initialTabIndex = homeArgs;
         }
@@ -258,6 +274,7 @@ class AppRouter {
           builder: (_) => HomeShell(
             initialTabIndex: initialTabIndex,
             mapSiteIdToFocus: mapSiteIdToFocus,
+            startCoachTour: startCoachTour,
           ),
           settings: settings,
         );
@@ -285,7 +302,8 @@ class AppRouter {
             : '';
         if (siteDetailId.isEmpty) {
           return MaterialPageRoute<void>(
-            builder: (_) => UnknownRouteScreen(attemptedRouteName: settings.name),
+            builder: (_) =>
+                UnknownRouteScreen(attemptedRouteName: settings.name),
             settings: settings,
           );
         }
@@ -304,8 +322,8 @@ class AppRouter {
       case AppRoutes.eventsCreate:
         final EventCreateRouteArguments args =
             settings.arguments is EventCreateRouteArguments
-                ? settings.arguments! as EventCreateRouteArguments
-                : const EventCreateRouteArguments();
+            ? settings.arguments! as EventCreateRouteArguments
+            : const EventCreateRouteArguments();
         // CupertinoPageRoute enables iOS edge swipe-back (unlike fullscreen sheet routes).
         return CupertinoPageRoute<EcoEvent?>(
           builder: (_) => CreateEventSheet(
@@ -357,7 +375,8 @@ class AppRouter {
           settings: settings,
         );
       case AppRoutes.eventChat:
-        final EventChatRouteArguments args = settings.arguments is EventChatRouteArguments
+        final EventChatRouteArguments args =
+            settings.arguments is EventChatRouteArguments
             ? settings.arguments! as EventChatRouteArguments
             : EventChatRouteArguments(
                 eventId: '',
@@ -375,9 +394,7 @@ class AppRouter {
         );
       default:
         return MaterialPageRoute<void>(
-          builder: (_) => UnknownRouteScreen(
-            attemptedRouteName: settings.name,
-          ),
+          builder: (_) => UnknownRouteScreen(attemptedRouteName: settings.name),
           settings: settings,
         );
     }
@@ -395,11 +412,11 @@ class AppRouter {
       transitionDuration: Duration.zero,
       reverseTransitionDuration: Duration.zero,
       pageBuilder:
-          (BuildContext context, Animation<double> animation, Animation<double> secondary) =>
-              EventDetailScreen(
-                eventId: eventId,
-                enableThumbnailHero: false,
-              ),
+          (
+            BuildContext context,
+            Animation<double> animation,
+            Animation<double> secondary,
+          ) => EventDetailScreen(eventId: eventId, enableThumbnailHero: false),
     );
   }
 }

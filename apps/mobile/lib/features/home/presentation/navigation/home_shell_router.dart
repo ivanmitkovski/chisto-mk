@@ -13,7 +13,10 @@ import 'package:chisto_mobile/features/home/presentation/screens/pollution_feed_
 import 'package:chisto_mobile/features/home/presentation/screens/pollution_map_screen.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/presentation/screens/site_detail_route_screen.dart';
+import 'package:chisto_mobile/features/home/presentation/widgets/coach_tour_host.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/home_bottom_nav_bar.dart';
+import 'package:chisto_mobile/features/home/presentation/widgets/home_shell_coach_keys.dart';
+import 'package:chisto_mobile/features/onboarding/application/coach_tour_controller.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -66,6 +69,8 @@ class HomeShellRouterScaffold extends StatefulWidget {
     required this.reportsPageBuilder,
     required this.onCentralFabPressed,
     required this.isLaunchingReportFlow,
+    required this.coachKeys,
+    required this.coachTour,
   });
 
   final StatefulNavigationShell navigationShell;
@@ -78,8 +83,11 @@ class HomeShellRouterScaffold extends StatefulWidget {
   final WidgetBuilder reportsPageBuilder;
 
   /// [tabIndex] is [StatefulNavigationShell.currentIndex] (0 feed, 1 reports, 2 map, 3 events).
-  final Future<void> Function(BuildContext context, int tabIndex) onCentralFabPressed;
+  final Future<void> Function(BuildContext context, int tabIndex)
+  onCentralFabPressed;
   final bool isLaunchingReportFlow;
+  final HomeShellCoachKeys coachKeys;
+  final CoachTourController coachTour;
 
   @override
   State<HomeShellRouterScaffold> createState() =>
@@ -92,7 +100,7 @@ class _HomeShellRouterScaffoldState extends State<HomeShellRouterScaffold> {
     final int currentIndex = widget.navigationShell.currentIndex;
     final bool hideBottomBar = homeShellShouldHideBottomBar(widget.shellUri);
 
-    return Scaffold(
+    final Widget scaffold = Scaffold(
       backgroundColor: AppColors.appBackground,
       // Keep tab bar + central FAB visually docked; keyboard overlays tab bodies.
       // Full-screen flows (sheets, wizards) use their own [Scaffold] with inset as needed.
@@ -116,6 +124,7 @@ class _HomeShellRouterScaffoldState extends State<HomeShellRouterScaffold> {
                         child: HomeBottomNavBar(
                           currentIndex: currentIndex,
                           onTabSelected: _onTabSelected,
+                          navItemKeys: widget.coachKeys.navItemKeys,
                         ),
                       ),
                       Positioned(
@@ -123,19 +132,26 @@ class _HomeShellRouterScaffoldState extends State<HomeShellRouterScaffold> {
                         right: 0,
                         top: -30,
                         child: Center(
-                          child: _CentralReportButton(
-                            enabled: !widget.isLaunchingReportFlow,
-                            semanticsLabel: currentIndex == 3
-                                ? AppLocalizations.of(context)!.eventsFeedCreateSemantic
-                                : AppLocalizations.of(context)!.reportListFabLabel,
-                            onPressed: () {
-                              unawaited(
-                                widget.onCentralFabPressed(
-                                  context,
-                                  currentIndex,
-                                ),
-                              );
-                            },
+                          child: KeyedSubtree(
+                            key: widget.coachKeys.fabKey,
+                            child: _CentralReportButton(
+                              enabled: !widget.isLaunchingReportFlow,
+                              semanticsLabel: currentIndex == 3
+                                  ? AppLocalizations.of(
+                                      context,
+                                    )!.eventsFeedCreateSemantic
+                                  : AppLocalizations.of(
+                                      context,
+                                    )!.reportListFabLabel,
+                              onPressed: () {
+                                unawaited(
+                                  widget.onCentralFabPressed(
+                                    context,
+                                    currentIndex,
+                                  ),
+                                );
+                              },
+                            ),
                           ),
                         ),
                       ),
@@ -144,6 +160,23 @@ class _HomeShellRouterScaffoldState extends State<HomeShellRouterScaffold> {
                 ),
               ),
             ),
+    );
+
+    return Stack(
+      fit: StackFit.expand,
+      children: <Widget>[
+        scaffold,
+        ListenableBuilder(
+          listenable: widget.coachTour,
+          builder: (BuildContext context, Widget? _) {
+            return CoachTourHost(
+              controller: widget.coachTour,
+              keys: widget.coachKeys,
+              navigationShell: widget.navigationShell,
+            );
+          },
+        ),
+      ],
     );
   }
 
@@ -202,8 +235,12 @@ class _CentralReportButtonState extends State<_CentralReportButton> {
       enabled: widget.enabled,
       label: widget.semanticsLabel,
       child: GestureDetector(
-        onTapDown: widget.enabled ? (_) => setState(() => _pressed = true) : null,
-        onTapUp: widget.enabled ? (_) => setState(() => _pressed = false) : null,
+        onTapDown: widget.enabled
+            ? (_) => setState(() => _pressed = true)
+            : null,
+        onTapUp: widget.enabled
+            ? (_) => setState(() => _pressed = false)
+            : null,
         onTapCancel: widget.enabled
             ? () => setState(() => _pressed = false)
             : null,
@@ -302,9 +339,11 @@ GoRouter buildHomeShellGoRouter({
   required GlobalKey<EventsFeedScreenState> eventsFeedKey,
   required WidgetBuilder reportsPageBuilder,
   required Future<void> Function(BuildContext context, int tabIndex)
-      onCentralFabPressed,
+  onCentralFabPressed,
   required ValueNotifier<bool> isLaunchingReportFlow,
   Listenable? refreshListenable,
+  required HomeShellCoachKeys coachKeys,
+  required CoachTourController coachTour,
 }) {
   return GoRouter(
     navigatorKey: homeShellGoRouterNavigatorKey,
@@ -319,7 +358,10 @@ GoRouter buildHomeShellGoRouter({
               StatefulNavigationShell navigationShell,
             ) {
               return ListenableBuilder(
-                listenable: isLaunchingReportFlow,
+                listenable: Listenable.merge(<Listenable>[
+                  isLaunchingReportFlow,
+                  coachTour,
+                ]),
                 builder: (BuildContext context, Widget? _) {
                   return HomeShellRouterScaffold(
                     navigationShell: navigationShell,
@@ -330,6 +372,8 @@ GoRouter buildHomeShellGoRouter({
                     reportsPageBuilder: reportsPageBuilder,
                     onCentralFabPressed: onCentralFabPressed,
                     isLaunchingReportFlow: isLaunchingReportFlow.value,
+                    coachKeys: coachKeys,
+                    coachTour: coachTour,
                   );
                 },
               );
@@ -342,7 +386,10 @@ GoRouter buildHomeShellGoRouter({
                 pageBuilder: (BuildContext context, GoRouterState state) {
                   return NoTransitionPage<void>(
                     key: const ValueKey<String>('branch-feed'),
-                    child: PollutionFeedScreen(key: feedKey),
+                    child: PollutionFeedScreen(
+                      key: feedKey,
+                      coachProfileAvatarKey: coachKeys.profileAvatarKey,
+                    ),
                   );
                 },
                 routes: <RouteBase>[

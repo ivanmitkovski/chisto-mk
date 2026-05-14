@@ -710,6 +710,74 @@ class AppLocalizationsSq extends AppLocalizations {
   String get authOnboardingGetStarted => 'Fillo';
 
   @override
+  String get coachTourSkip => 'Anashkalo';
+
+  @override
+  String get coachTourNext => 'Vazhdo';
+
+  @override
+  String get coachTourDone => 'E kuptova';
+
+  @override
+  String coachTourProgressSemantics(int current, int total) {
+    return 'Hapi $current nga $total';
+  }
+
+  @override
+  String get coachTourSkipSemantics =>
+      'Anashkalo hyrjen dhe shko te ekrani kryesor';
+
+  @override
+  String get coachTourStep0Title => 'Mirë se erdhe';
+
+  @override
+  String get coachTourStep0Body =>
+      'Chisto.mk të tregon ndotjen afër. Raporto shpejt dhe shiko çfarë kanë postuar të tjerët.';
+
+  @override
+  String get coachTourStep1Title => 'Harta';
+
+  @override
+  String get coachTourStep1Body =>
+      'Hap hartën. Pin-at tregojnë problemet. Prek njërin për foto dhe detaje.';
+
+  @override
+  String get coachTourStep2Title => 'Raportet';
+
+  @override
+  String get coachTourStep2Body =>
+      'Këtu janë raportet e tua. Shiko statusin, kërko dhe filtro çfarë ke dërguar.';
+
+  @override
+  String get coachTourStep3Title => 'Raport i ri';
+
+  @override
+  String get coachTourStep3Body => 'Prek + nga çdo ekran për një raport të ri.';
+
+  @override
+  String get coachTourStep4Title => 'Ngjarjet';
+
+  @override
+  String get coachTourStep4Body =>
+      'Bashkohu në takime dhe pastrime mjedisore, ose organizo vetë një ngjarje. Konfirmo pjesëmarrjen, shkruaju organizatorëve dhe ndiq çfarë ndodh më pas.';
+
+  @override
+  String get coachTourStep5Title => 'Ti';
+
+  @override
+  String get coachTourStep5Body =>
+      'Avatari hap profilin tënd. Pikët dhe aktiviteti janë aty.';
+
+  @override
+  String get coachTourCompleteFailed => 'Nuk u ruajt. Provo përsëri.';
+
+  @override
+  String get coachTourTargetUnavailableTitle => 'Nuk e theksuam dot';
+
+  @override
+  String get coachTourTargetUnavailableBody => 'Vazhdo. Mund ta anashkalosh.';
+
+  @override
   String get authLocationTitle => 'Zgjidh vendndodhjen';
 
   @override
