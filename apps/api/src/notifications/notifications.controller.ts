@@ -26,6 +26,7 @@ import { NotificationInboxService } from './notification-inbox.service';
 import { NotificationStateService } from './notification-state.service';
 import { NotificationPreferencesService } from './notification-preferences.service';
 import { DeviceTokenService } from './device-token.service';
+import { NotificationDispatcherService } from './notification-dispatcher.service';
 import { ListNotificationsQueryDto } from './dto/list-notifications-query.dto';
 import { RegisterDeviceTokenDto } from './dto/register-device-token.dto';
 import { UnregisterDeviceTokenDto } from './dto/unregister-device-token.dto';
@@ -45,6 +46,7 @@ export class NotificationsController {
     private readonly state: NotificationStateService,
     private readonly preferences: NotificationPreferencesService,
     private readonly deviceTokens: DeviceTokenService,
+    private readonly dispatcher: NotificationDispatcherService,
   ) {}
 
   @Get()
@@ -69,6 +71,17 @@ export class NotificationsController {
   @ApiOkResponse({ description: 'Grouped counts by notification type' })
   summary(@CurrentUser() user: AuthenticatedUser) {
     return this.inbox.getSummary(user);
+  }
+
+  @Post(':id/opened')
+  @ApiOperation({ summary: 'Record that the user opened a notification (push tap or deep link)' })
+  @ApiOkResponse({ description: 'Open recorded' })
+  async recordOpened(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+  ) {
+    await this.state.recordOpened(user, id);
+    return { success: true };
   }
 
   @Patch(':id/read')
@@ -172,6 +185,27 @@ export class NotificationsController {
     return { success: true };
   }
 
+  @Post('admin/test-push')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(...ADMIN_PANEL_ROLES)
+  @ApiOperation({
+    summary: 'Send a test push to the current admin user (full outbox → FCM pipeline)',
+  })
+  @ApiOkResponse({ description: 'Test notification dispatched' })
+  async testPush(@CurrentUser() user: AuthenticatedUser) {
+    await this.dispatchTestPush(user.userId);
+    return { success: true };
+  }
+
+  private async dispatchTestPush(userId: string): Promise<void> {
+    await this.dispatcher.dispatchToUser(userId, {
+      title: 'Chisto test push',
+      body: 'If you see this, push delivery is working.',
+      type: NotificationType.SYSTEM,
+      data: { kind: 'test_push' },
+    });
+  }
+
   @Get('admin/push-stats')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(...ADMIN_PANEL_ROLES)
@@ -184,12 +218,46 @@ export class NotificationsController {
       sendsSuccess: s.pushSendsSuccess,
       sendsFailure: s.pushSendsFailure,
       sendsRevoked: s.pushSendsRevoked,
+      sendsByType: s.pushSendsByType,
       tokenRevocations: s.pushTokenRevocations,
       queueRetries: s.pushQueueRetries,
       inboxReads: s.pushInboxReads,
       queueDepth: s.pushQueueDepth,
       activeLeases: s.pushActiveLeases,
       deadLetterCount: s.pushDeadLetterCount,
+    };
+  }
+
+  @Get('admin/delivery-report')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(...ADMIN_PANEL_ROLES)
+  @ApiOperation({ summary: 'Push delivery funnel (admin only)' })
+  @ApiOkResponse({ description: 'Delivery and open metrics' })
+  async deliveryReport() {
+    const s = ObservabilityStore.snapshot();
+    const [sent, opened] = await Promise.all([
+      this.inbox.countSentNotifications(),
+      this.inbox.countOpenedNotifications(),
+    ]);
+    return {
+      sends: {
+        total: s.pushSendsTotal,
+        success: s.pushSendsSuccess,
+        failure: s.pushSendsFailure,
+        revoked: s.pushSendsRevoked,
+        byType: s.pushSendsByType,
+      },
+      inbox: {
+        notificationsSent: sent,
+        notificationsOpened: opened,
+        openRate: sent > 0 ? Number((opened / sent).toFixed(4)) : 0,
+      },
+      queue: {
+        depth: s.pushQueueDepth,
+        activeLeases: s.pushActiveLeases,
+        deadLetterCount: s.pushDeadLetterCount,
+        retries: s.pushQueueRetries,
+      },
     };
   }
 

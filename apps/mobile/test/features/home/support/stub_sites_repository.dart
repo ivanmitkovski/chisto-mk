@@ -17,6 +17,15 @@ class StubSitesRepository implements SitesRepository {
       searchResponse;
 
   @override
+  Future<SitesListResult> getSavedSites({
+    int page = 1,
+    int limit = 24,
+    double? latitude,
+    double? longitude,
+  }) =>
+      throw UnimplementedError();
+
+  @override
   Future<SitesListResult> getSites({
     double? latitude,
     double? longitude,

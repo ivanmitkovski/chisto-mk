@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/features/home/data/map_realtime/map_site_event.dart';
 import 'package:chisto_mobile/features/home/data/map_realtime/map_sync_coordinator.dart';
@@ -53,10 +53,10 @@ class MapSitesNotifier extends AutoDisposeNotifier<MapSitesState> {
   MapSitesState build() {
     _coordinator = MapSyncCoordinator(
       sitesRepository: ref.read(sitesRepositoryProvider),
-      offlineRegionStore: ServiceLocator.instance.offlineRegionStore,
+      offlineRegionStore: AppBootstrap.instance.offlineRegionStore,
     );
     _coordinator.addListener(_onCoordinatorChanged);
-    _eventsSub = ServiceLocator.instance.mapRealtimeService.events.listen(
+    _eventsSub = AppBootstrap.instance.mapRealtimeService.events.listen(
       _coordinator.ingestEvent,
     );
     ref.onDispose(() {
@@ -77,7 +77,7 @@ class MapSitesNotifier extends AutoDisposeNotifier<MapSitesState> {
   }
 
   void setActive(bool active) {
-    ServiceLocator.instance.mapRealtimeService.setActive(active);
+    AppBootstrap.instance.mapRealtimeService.setActive(active);
     _coordinator.setActive(active);
   }
 

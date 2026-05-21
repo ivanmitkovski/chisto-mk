@@ -1,7 +1,7 @@
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/features/home/presentation/providers/site_engagement_provider.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
 import 'package:flutter/material.dart';
 
 void showSiteEngagementOutcomeSnack(

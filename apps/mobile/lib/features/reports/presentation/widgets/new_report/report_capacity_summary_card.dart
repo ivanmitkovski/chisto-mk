@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/core/theme/app_shadows.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_capacity.dart';
@@ -46,13 +47,7 @@ class ReportCapacitySummaryCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.panelBackground,
         borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
-        boxShadow: const <BoxShadow>[
-          BoxShadow(
-            color: AppColors.shadowMedium,
-            blurRadius: 14,
-            offset: Offset(0, 6),
-          ),
-        ],
+        boxShadow: AppShadows.panel(Theme.of(context).colorScheme),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

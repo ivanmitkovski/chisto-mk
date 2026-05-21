@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/event_media_path_image_provider.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/detail_section_header.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 class AfterPhotosGallery extends StatelessWidget {
   const AfterPhotosGallery({
@@ -52,7 +52,6 @@ class AfterPhotosGallery extends StatelessWidget {
                 ),
                 child: GestureDetector(
                   onTap: () {
-                    AppHaptics.tap();
                     onImageTap(index);
                   },
                   child: ClipRRect(
@@ -126,7 +125,7 @@ class _FullscreenGalleryPageState extends State<FullscreenGalleryPage> {
     final int total = widget.event.afterImagePaths.length;
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.black,
       body: Stack(
         children: <Widget>[
           PageView.builder(
@@ -142,10 +141,10 @@ class _FullscreenGalleryPageState extends State<FullscreenGalleryPage> {
                     image: provider,
                     fit: BoxFit.contain,
                     errorBuilder: (BuildContext context, Object error, StackTrace? stack) {
-                      return const Icon(
+                      return Icon(
                         CupertinoIcons.photo,
                         size: 48,
-                        color: Colors.white54,
+                        color: AppColors.onMediaMuted,
                       );
                     },
                   ),
@@ -161,11 +160,10 @@ class _FullscreenGalleryPageState extends State<FullscreenGalleryPage> {
                   IconButton(
                     tooltip: context.l10n.commonClose,
                     onPressed: () {
-                      AppHaptics.tap();
                       Navigator.of(context).pop();
                     },
                     icon: const Icon(CupertinoIcons.xmark_circle_fill),
-                    color: Colors.white,
+                    color: AppColors.white,
                     iconSize: 28,
                   ),
                   const Spacer(),
@@ -173,15 +171,13 @@ class _FullscreenGalleryPageState extends State<FullscreenGalleryPage> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.radius10, vertical: AppSpacing.xxs),
                       decoration: BoxDecoration(
-                        color: Colors.black54,
+                        color: AppColors.overlayStrong,
                         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                       ),
                       child: Text(
                         '${_currentIndex + 1} / $total',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
+                        style: AppTypography.chipLabel.copyWith(
+                          color: AppColors.textOnDark,
                         ),
                       ),
                     ),

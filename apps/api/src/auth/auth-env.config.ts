@@ -15,16 +15,19 @@ export type AuthEnvRuntime = {
 export function loadAuthEnvRuntime(configService: ConfigService | null): AuthEnvRuntime {
   const cfg = (key: string): string | undefined =>
     configService?.get<string>(key)?.trim() ?? process.env[key]?.trim();
-  const isProduction = cfg('NODE_ENV') === 'production';
+  const nodeEnv = cfg('NODE_ENV') ?? 'development';
+  const isProduction = nodeEnv === 'production';
+  const isDeployed = isProduction || nodeEnv === 'staging';
   const smsProvider = cfg('SMS_PROVIDER')?.toLowerCase() ?? 'none';
-  const shouldReturnDevCode = !isProduction && smsProvider !== 'twilio';
+  const devCodeFlag = (cfg('OTP_DEV_RETURN_CODE') ?? '').toLowerCase() === 'true';
+  const shouldReturnDevCode = !isDeployed && devCodeFlag && smsProvider !== 'twilio';
   const accessRaw = cfg('JWT_ACCESS_EXPIRES_IN');
   const accessTokenTtl = accessRaw ? Number(accessRaw) : 900;
   if (!Number.isFinite(accessTokenTtl) || accessTokenTtl < 60 || accessTokenTtl > 86400) {
     throw new Error(`JWT_ACCESS_EXPIRES_IN must be an integer between 60 and 86400 (got: ${accessRaw})`);
   }
   const refreshRaw = cfg('JWT_REFRESH_EXPIRES_DAYS');
-  const refreshTokenTtlDays = refreshRaw ? Number(refreshRaw) : 7;
+  const refreshTokenTtlDays = refreshRaw ? Number(refreshRaw) : 30;
   if (!Number.isFinite(refreshTokenTtlDays) || refreshTokenTtlDays < 1 || refreshTokenTtlDays > 365) {
     throw new Error(`JWT_REFRESH_EXPIRES_DAYS must be an integer between 1 and 365 (got: ${refreshRaw})`);
   }

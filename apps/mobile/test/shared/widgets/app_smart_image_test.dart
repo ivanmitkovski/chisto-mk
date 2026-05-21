@@ -1,6 +1,6 @@
 import 'package:chisto_mobile/core/cache/image_cache_diagnostics.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/widgets/app_smart_image.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/app_smart_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';

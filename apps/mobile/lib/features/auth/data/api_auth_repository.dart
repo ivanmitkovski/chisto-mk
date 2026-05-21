@@ -5,12 +5,26 @@ import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/network/api_client.dart';
 import 'package:chisto_mobile/core/storage/secure_token_storage.dart';
 import 'package:chisto_mobile/features/auth/data/access_token_expiry.dart';
+import 'package:chisto_mobile/features/auth/data/eula_acceptance_store.dart';
+import 'package:chisto_mobile/features/auth/data/user_home_location_store.dart';
+import 'package:chisto_mobile/features/auth/domain/models/register_result.dart';
+import 'package:chisto_mobile/features/auth/domain/refresh_outcome.dart';
 import 'package:chisto_mobile/features/auth/domain/repositories/auth_repository.dart';
 import 'package:chisto_mobile/features/notifications/data/push_notification_service.dart';
 import 'package:chisto_mobile/features/events/data/chat/outbox/chat_outbox_store.dart';
 import 'package:chisto_mobile/features/events/data/events_local_cache.dart';
-import 'package:chisto_mobile/core/di/service_locator.dart';
-import 'package:chisto_mobile/features/profile/presentation/providers/profile_avatar_notifier.dart';
+import 'package:chisto_mobile/features/events/data/field_mode_queue.dart';
+import 'package:chisto_mobile/features/events/data/check_in_local_cache.dart';
+import 'package:chisto_mobile/features/events/data/discovery_analytics.dart';
+import 'package:chisto_mobile/features/events/data/event_feedback_local_cache.dart';
+import 'package:chisto_mobile/features/home/data/engagement_outbox_store.dart';
+import 'package:chisto_mobile/features/home/data/map_search_recents_store.dart';
+import 'package:chisto_mobile/features/notifications/data/pending_chat_reply_store.dart';
+import 'package:chisto_mobile/features/notifications/data/push_background_pending_store.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
+import 'package:chisto_mobile/core/bootstrap/cold_start_coordinator.dart';
+import 'package:chisto_mobile/core/logging/app_log.dart';
+import 'package:chisto_mobile/core/profile/profile_avatar_sync.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Citizen auth over HTTP — paths align with NestJS `auth/*` controllers in `apps/api`:
@@ -44,17 +58,29 @@ class ApiAuthRepository implements AuthRepository {
     required SecureTokenStorage tokenStorage,
     required SharedPreferences preferences,
     this.pushService,
+    ProfileAvatarSync? avatarSync,
   })  : _client = client,
         _authState = authState,
         _tokenStorage = tokenStorage,
-        _preferences = preferences;
+        _preferences = preferences,
+        _avatarSync = avatarSync ?? const NoOpProfileAvatarSync();
 
   final ApiClient _client;
   final AuthState _authState;
   final SecureTokenStorage _tokenStorage;
   final SharedPreferences _preferences;
+  final ProfileAvatarSync _avatarSync;
   final PushNotificationService? pushService;
   Timer? _proactiveRefreshTimer;
+
+  /// Bumped when sign-in / refresh / OTP verify writes new tokens so an in-flight
+  /// [restoreSession] cannot clear the session afterward.
+  int _restoreGeneration = 0;
+
+  bool _restoreProfileValidationPending = false;
+
+  @override
+  bool get restoreProfileValidationPending => _restoreProfileValidationPending;
 
   @override
   bool get isAuthenticated => _authState.isAuthenticated;
@@ -69,12 +95,14 @@ class ApiAuthRepository implements AuthRepository {
   Future<void> signIn({
     required String phoneNumber,
     required String password,
+    bool rememberMe = true,
   }) async {
     final ApiResponse response = await _client.post(
       '/auth/login',
       body: <String, dynamic>{
         'phoneNumber': phoneNumber,
         'password': password,
+        'rememberMe': rememberMe,
       },
     );
     final Map<String, dynamic>? json = response.json;
@@ -85,7 +113,7 @@ class ApiAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<void> signUp({
+  Future<RegisterResult> signUp({
     required String firstName,
     required String lastName,
     required String email,
@@ -104,26 +132,51 @@ class ApiAuthRepository implements AuthRepository {
     );
     final Map<String, dynamic>? json = response.json;
     if (json == null) throw AppError.unknown();
-    await _saveAndNotify(json);
-    _scheduleProactiveRefresh();
-    unawaited(_initPushAfterAuth());
+    final String userId = json['userId']?.toString() ?? '';
+    final String phone = json['phoneNumber']?.toString() ?? phoneNumber;
+    final int expiresIn = json['otpExpiresIn'] is int
+        ? json['otpExpiresIn'] as int
+        : 600;
+    if (userId.isEmpty) throw AppError.unknown();
+    return RegisterResult(
+      userId: userId,
+      phoneNumber: phone,
+      otpExpiresInSeconds: expiresIn,
+    );
   }
 
   @override
-  Future<void> refreshSession() async {
-    final String? storedRefresh = await _tokenStorage.refreshToken;
-    if (storedRefresh == null || storedRefresh.isEmpty) {
-      throw AppError.unauthorized();
-    }
-
-    final ApiResponse response = await _client.post(
-      '/auth/refresh',
-      body: <String, dynamic>{'refreshToken': storedRefresh},
+  Future<RefreshOutcome> refreshSession() async {
+    AppBootstrap.instance.armSuppressSessionExpiredWindow(
+      const Duration(seconds: 2),
     );
-    final Map<String, dynamic>? json = response.json;
-    if (json == null) throw AppError.unknown();
-    await _saveAndNotify(json);
-    _scheduleProactiveRefresh();
+    try {
+      final String? storedRefresh = await _tokenStorage.refreshToken;
+      if (storedRefresh == null || storedRefresh.isEmpty) {
+        return RefreshOutcome.serverRejected;
+      }
+
+      final ApiResponse response = await _client.post(
+        '/auth/refresh',
+        body: <String, dynamic>{'refreshToken': storedRefresh},
+      );
+      final Map<String, dynamic>? json = response.json;
+      if (json == null) {
+        return RefreshOutcome.transient;
+      }
+      await _saveAndNotify(json);
+      _scheduleProactiveRefresh();
+      return RefreshOutcome.success;
+    } on AppError catch (e) {
+      if (e.code == 'UNAUTHORIZED' ||
+          e.code == 'INVALID_TOKEN_USER' ||
+          e.code == 'SESSION_REVOKED') {
+        return RefreshOutcome.serverRejected;
+      }
+      return RefreshOutcome.transient;
+    } on Object {
+      return RefreshOutcome.transient;
+    }
   }
 
   @override
@@ -142,27 +195,55 @@ class ApiAuthRepository implements AuthRepository {
 
   @override
   Future<void> verifyOtp(String phoneNumberE164, String code) async {
-    await _client.post(
+    final ApiResponse response = await _client.post(
       '/auth/otp/verify',
       body: <String, dynamic>{
         'phoneNumber': phoneNumberE164,
         'code': code,
       },
     );
+    final Map<String, dynamic>? json = response.json;
+    if (json == null) throw AppError.unknown();
+    await _saveAndNotify(json);
+    _scheduleProactiveRefresh();
+    unawaited(_initPushAfterAuth());
   }
 
   @override
-  Future<SendOtpResult> requestPasswordReset(String phoneNumberE164) async {
+  Future<PasswordResetRequestResult> requestPasswordReset(
+    String phoneNumberE164,
+  ) async {
     final ApiResponse response = await _client.post(
       '/auth/password-reset/request',
       body: <String, dynamic>{'phoneNumber': phoneNumberE164},
     );
-    final Map<String, dynamic>? json = response.json;
+    return _parsePasswordResetRequest(response.json);
+  }
+
+  @override
+  Future<PasswordResetRequestResult> requestPasswordResetByEmail(
+    String email,
+  ) async {
+    final ApiResponse response = await _client.post(
+      '/auth/password-reset/request',
+      body: <String, dynamic>{'email': email.trim().toLowerCase()},
+    );
+    return _parsePasswordResetRequest(response.json);
+  }
+
+  PasswordResetRequestResult _parsePasswordResetRequest(
+    Map<String, dynamic>? json,
+  ) {
     if (json == null) throw AppError.unknown();
-    final int expiresIn = json['expiresIn'] is int
-        ? json['expiresIn'] as int
-        : 600;
-    return SendOtpResult(expiresInSeconds: expiresIn);
+    final String message =
+        json['message']?.toString() ?? 'If an account exists, instructions were sent.';
+    final String? channel = json['channel']?.toString();
+    final int? expiresIn = json['expiresIn'] is int ? json['expiresIn'] as int : null;
+    return PasswordResetRequestResult(
+      message: message,
+      channel: channel,
+      expiresInSeconds: expiresIn,
+    );
   }
 
   @override
@@ -193,6 +274,20 @@ class ApiAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<void> confirmPasswordResetByEmail({
+    required String token,
+    required String newPassword,
+  }) async {
+    await _client.post(
+      '/auth/password-reset/email/confirm',
+      body: <String, dynamic>{
+        'token': token,
+        'newPassword': newPassword,
+      },
+    );
+  }
+
+  @override
   Future<void> changePassword({
     required String currentPassword,
     required String newPassword,
@@ -207,9 +302,34 @@ class ApiAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<void> updateHomeLocation({
+    required double latitude,
+    required double longitude,
+    String? label,
+  }) async {
+    await _client.patch(
+      '/auth/me/home-location',
+      body: <String, dynamic>{
+        'latitude': latitude,
+        'longitude': longitude,
+        if (label != null && label.trim().isNotEmpty) 'label': label.trim(),
+      },
+    );
+    await UserHomeLocationStore(_preferences).save(
+      latitude: latitude,
+      longitude: longitude,
+      label: label,
+    );
+  }
+
+  @override
   Future<void> deleteAccount() async {
+    final String? userId = _authState.userId;
     try {
       await _client.delete('/auth/me');
+      if (userId != null && userId.isNotEmpty) {
+        await EulaAcceptanceStore(_preferences).clearForUser(userId);
+      }
       await _performLocalLogout();
     } on AppError catch (e) {
       if (e.code == 'UNAUTHORIZED' ||
@@ -223,16 +343,61 @@ class ApiAuthRepository implements AuthRepository {
     }
   }
 
+  bool _clearingLocalSession = false;
+
+  bool _isRestoreStale(int generation) => generation != _restoreGeneration;
+
   Future<void> _clearLocalSessionCore() async {
+    if (_clearingLocalSession) return;
+    _clearingLocalSession = true;
     _cancelProactiveRefresh();
-    unawaited(pushService?.unregisterCurrentToken() ?? Future<void>.value());
+    // Best-effort: unregister the FCM token server-side before we lose auth.
+    // The Postmark/FCM unregister round-trip can race with [setUnauthenticated]
+    // below; signOut() handles it on the explicit path, so only fire-and-forget
+    // it here (no await) to avoid blocking logout.
+    final PushNotificationService? push = pushService;
+    if (push != null) {
+      unawaited(push.unregisterCurrentToken().catchError((_) {}));
+    }
+    push?.clearLocalToken();
     _authState.setUnauthenticated();
-    ServiceLocator.instance.providerContainer
-        .read(profileAvatarNotifierProvider.notifier)
-        .clearAll();
+    _avatarSync.clearAll();
     await _tokenStorage.clearTokens();
     await ChatOutboxStore.shared.clearAll();
     await const EventsLocalCache().clear();
+    // Clear per-user outboxes and background hints so the next user does not
+    // inherit the previous user's queued state. All best-effort — failures
+    // here must not block logout / unauthorized recovery.
+    try {
+      await EngagementOutboxStore.instance.clearAll();
+    } on Object {/* best effort */}
+    try {
+      await FieldModeQueue.instance.clearAll();
+    } on Object {/* best effort */}
+    try {
+      await PushBackgroundPendingStore.clearAll();
+    } on Object {/* best effort */}
+    try {
+      await UserHomeLocationStore(_preferences).clear();
+    } on Object {/* best effort */}
+    try {
+      await MapSearchRecentsStore.clear(_preferences);
+    } on Object {/* best effort */}
+    try {
+      await const CheckInLocalCache().clear();
+    } on Object {/* best effort */}
+    try {
+      await const EventFeedbackLocalCache().clear();
+    } on Object {/* best effort */}
+    try {
+      await PendingChatReplyStore.clear();
+    } on Object {/* best effort */}
+    try {
+      await DiscoveryAnalytics.clearUserConsent();
+    } on Object {/* best effort */}
+    await push?.teardownFirebaseListeners();
+    ColdStartCoordinator.instance.resetSession();
+    _clearingLocalSession = false;
   }
 
   Future<void> _performLocalLogout() async {
@@ -244,6 +409,8 @@ class ApiAuthRepository implements AuthRepository {
 
   @override
   Future<void> signOut() async {
+    AppBootstrap.instance.onExplicitSignOut?.call();
+    await (pushService?.unregisterCurrentToken() ?? Future<void>.value());
     final String? storedRefresh = await _tokenStorage.refreshToken;
     if (storedRefresh != null && storedRefresh.isNotEmpty) {
       try {
@@ -272,27 +439,45 @@ class ApiAuthRepository implements AuthRepository {
     final double nowSec =
         DateTime.now().millisecondsSinceEpoch / 1000.0;
     final double delaySec = 0.8 * (exp - nowSec);
-    if (delaySec <= 0) return;
+    // Clock skew: device clock can be ahead of server, making the token look
+    // already-expired even though it isn't. Schedule an immediate (short)
+    // refresh so we recover instead of waiting indefinitely.
+    final Duration delay = delaySec <= 0
+        ? const Duration(seconds: 5)
+        : Duration(seconds: delaySec.round().clamp(1, 86400));
     _proactiveRefreshTimer = Timer(
-      Duration(seconds: delaySec.round().clamp(1, 86400)),
+      delay,
       () async {
         _cancelProactiveRefresh();
         try {
           await refreshSession();
           _scheduleProactiveRefresh();
-        } catch (_) {}
+        } on Object catch (e, st) {
+          AppLog.warn('proactive token refresh failed', error: e, stackTrace: st);
+        }
       },
     );
   }
 
   @override
   Future<void> restoreSession() async {
+    final AppBootstrap bootstrap = AppBootstrap.instance;
+    bootstrap.suppressUnauthorizedCallback = true;
+    try {
+      await _restoreSessionBody();
+    } finally {
+      bootstrap.suppressUnauthorizedCallback = false;
+    }
+  }
+
+  Future<void> _restoreSessionBody() async {
+    _restoreProfileValidationPending = false;
+    final int generation = _restoreGeneration;
     final String? storedAccess = await _tokenStorage.accessToken;
+    if (_isRestoreStale(generation)) return;
     if (storedAccess == null || storedAccess.isEmpty) {
       _authState.setUnauthenticated();
-      ServiceLocator.instance.providerContainer
-          .read(profileAvatarNotifierProvider.notifier)
-          .clearAll();
+      _avatarSync.clearAll();
       return;
     }
 
@@ -320,6 +505,11 @@ class ApiAuthRepository implements AuthRepository {
     final DateTime? organizerFromStorage =
         hasStoredCertIso ? DateTime.tryParse(storedCertIso.trim()) : null;
 
+    if (_isRestoreStale(generation)) return;
+    final String? accessBeforeProfile = await _tokenStorage.accessToken;
+    if (accessBeforeProfile != storedAccess) return;
+
+    _restoreProfileValidationPending = true;
     _authState.setAuthenticated(
       userId: storedUserId ?? '',
       displayName: storedDisplayName ?? 'User',
@@ -333,30 +523,46 @@ class ApiAuthRepository implements AuthRepository {
       final ApiResponse response = await _client.get('/auth/me');
       final Map<String, dynamic>? json = response.json;
       if (json == null) {
-        await _clearLocalSession();
+        await _clearLocalSession(coldRestoreRejection: true);
         return;
       }
       await _applyUserProfile(json, storedAccess);
-      _scheduleProactiveRefresh();
       unawaited(_initPushAfterAuth());
     } on AppError catch (e) {
       if (e.code == 'UNAUTHORIZED' ||
           e.code == 'INVALID_TOKEN_USER' ||
           e.code == 'SESSION_REVOKED') {
-        try {
-          await refreshSession();
+        if (_isRestoreStale(generation)) return;
+        final String? accessNow = await _tokenStorage.accessToken;
+        if (accessNow != null &&
+            accessNow.isNotEmpty &&
+            accessNow != storedAccess) {
+          return;
+        }
+        final RefreshOutcome outcome = await refreshSession();
+        if (outcome == RefreshOutcome.success) {
           _scheduleProactiveRefresh();
-        } on AppError catch (_) {
-          await _clearLocalSession();
+        } else if (outcome == RefreshOutcome.serverRejected) {
+          if (_isRestoreStale(generation)) return;
+          final String? accessAfterRefresh = await _tokenStorage.accessToken;
+          if (accessAfterRefresh != null &&
+              accessAfterRefresh.isNotEmpty &&
+              accessAfterRefresh != storedAccess) {
+            return;
+          }
+          await _clearLocalSession(coldRestoreRejection: true);
         }
       } else {
         // Non-auth error (network, server). Keep the cached session and
         // let the user try again later.
       }
+    } finally {
+      _restoreProfileValidationPending = false;
     }
   }
 
   Future<void> _saveAndNotify(Map<String, dynamic> json) async {
+    _restoreGeneration++;
     final String? newAccessToken = json['accessToken'] as String?;
     final String? newRefreshToken = json['refreshToken'] as String?;
     final Map<String, dynamic>? user = json['user'] as Map<String, dynamic>?;
@@ -393,9 +599,7 @@ class ApiAuthRepository implements AuthRepository {
       syncOrganizerCertifiedAt: hasOrganizerCertifiedAtKey || switchedAccount,
     );
 
-    ServiceLocator.instance.providerContainer
-        .read(profileAvatarNotifierProvider.notifier)
-        .setRemoteUrl(_extractAvatarUrl(user));
+    _avatarSync.setRemoteUrl(_extractAvatarUrl(user));
 
     await _tokenStorage.saveSessionData(
       userId: id,
@@ -405,6 +609,11 @@ class ApiAuthRepository implements AuthRepository {
     if (hasOrganizerCertifiedAtKey || switchedAccount) {
       await _tokenStorage.writeOrganizerCertifiedAt(organizerCertifiedAt);
     }
+    _client.resetSessionAuthFailureGuard();
+    AppBootstrap.instance.armSuppressSessionExpiredWindow(
+      const Duration(seconds: 3),
+    );
+    AppBootstrap.instance.startNotificationsRealtimeIfAuthenticated();
   }
 
   Future<void> _applyUserProfile(Map<String, dynamic> json, String accessToken) async {
@@ -432,11 +641,7 @@ class ApiAuthRepository implements AuthRepository {
           : _authState.organizerCertifiedAt,
       syncOrganizerCertifiedAt: hasOrganizerCertifiedAtKey,
     );
-    if (ServiceLocator.instance.isInitialized) {
-      ServiceLocator.instance.providerContainer
-          .read(profileAvatarNotifierProvider.notifier)
-          .setRemoteUrl(_extractAvatarUrl(json));
-    }
+    _avatarSync.setRemoteUrl(_extractAvatarUrl(json));
     await _tokenStorage.saveSessionData(
       userId: id,
       displayName: displayName.isEmpty ? id : displayName,
@@ -445,13 +650,21 @@ class ApiAuthRepository implements AuthRepository {
     if (hasOrganizerCertifiedAtKey) {
       await _tokenStorage.writeOrganizerCertifiedAt(organizerCertifiedAtFromServer);
     }
+    await UserHomeLocationStore(_preferences).applyFromProfileJson(json);
     _scheduleProactiveRefresh();
+    AppBootstrap.instance.startNotificationsRealtimeIfAuthenticated();
   }
 
   Future<void> _initPushAfterAuth() async {
+    final PushNotificationService? push = pushService;
+    if (push == null) return;
     try {
-      await pushService?.initialize();
-    } catch (_) {}
+      await push.initialize();
+      await push.requestNotificationPermissionIfNeeded();
+      await push.ensureNotificationDeliveryReady();
+    } on Object catch (e, st) {
+      AppLog.warn('[Push] Post-auth init failed', error: e, stackTrace: st, category: 'push');
+    }
   }
 
   String? _extractAvatarUrl(Map<String, dynamic> json) {
@@ -461,7 +674,10 @@ class ApiAuthRepository implements AuthRepository {
     return trimmed;
   }
 
-  Future<void> _clearLocalSession() async {
+  Future<void> _clearLocalSession({bool coldRestoreRejection = false}) async {
+    if (coldRestoreRejection) {
+      AppBootstrap.instance.armSuppressSessionExpiredWindow();
+    }
     await _clearLocalSessionCore();
   }
 }

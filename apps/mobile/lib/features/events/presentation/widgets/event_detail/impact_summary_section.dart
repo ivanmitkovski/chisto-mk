@@ -38,7 +38,7 @@ class ImpactSummarySection extends StatelessWidget {
               CupertinoButton(
                 onPressed: onEdit,
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                minimumSize: Size.zero,
+                minimumSize: const Size(44, 44),
                 child: Text(
                   data == null
                       ? context.l10n.eventsImpactSummaryAdd

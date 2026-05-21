@@ -62,6 +62,20 @@ class ApiSitesRepository implements SitesRepository {
       );
 
   @override
+  Future<SitesListResult> getSavedSites({
+    int page = 1,
+    int limit = 24,
+    double? latitude,
+    double? longitude,
+  }) =>
+      _feed.getSavedSites(
+        page: page,
+        limit: limit,
+        latitude: latitude,
+        longitude: longitude,
+      );
+
+  @override
   Future<MapSitesResult> getSitesForMap({
     required double latitude,
     required double longitude,

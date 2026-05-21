@@ -28,9 +28,9 @@ class MapCameraState {
 }
 
 final mapCameraNotifierProvider =
-    NotifierProvider<MapCameraNotifier, MapCameraState>(MapCameraNotifier.new);
+    NotifierProvider.autoDispose<MapCameraNotifier, MapCameraState>(MapCameraNotifier.new);
 
-class MapCameraNotifier extends Notifier<MapCameraState> {
+class MapCameraNotifier extends AutoDisposeNotifier<MapCameraState> {
   static const double _defaultZoom = 11;
 
   @override

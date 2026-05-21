@@ -1,4 +1,5 @@
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
+import 'package:chisto_mobile/core/theme/app_radii.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -53,7 +54,7 @@ class ShareSheet extends StatelessWidget {
                     height: 5,
                     decoration: BoxDecoration(
                       color: AppColors.inputBorder,
-                      borderRadius: BorderRadius.circular(999),
+                      borderRadius: AppRadii.circle,
                     ),
                   ),
                 ),
@@ -145,7 +146,7 @@ class _ShareLinkPreview extends StatelessWidget {
           children: <Widget>[
             if (showImage) ...<Widget>[
               ClipRRect(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: AppRadii.sm,
                 child: SizedBox(
                   width: 44,
                   height: 44,
@@ -239,7 +240,7 @@ class ShareActionTile extends StatelessWidget {
                     height: 36,
                     decoration: BoxDecoration(
                       color: AppColors.panelBackground,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(AppSpacing.radius10),
                       border: Border.all(color: AppColors.divider, width: 1),
                     ),
                     child: Icon(icon, size: 18, color: AppColors.textPrimary),

@@ -15,6 +15,7 @@ import 'package:chisto_mobile/features/home/domain/repositories/sites_repository
 
 import 'map_site_event.dart';
 import 'map_sync_inline_notice.dart';
+import 'package:chisto_mobile/core/logging/app_log.dart';
 
 /// Set `--dart-define=MAP_SYNC_PERF=true` to log full-map sync timing in debug builds.
 const bool _kMapSyncPerfLogs = bool.fromEnvironment(
@@ -546,7 +547,7 @@ class MapSyncCoordinator extends ChangeNotifier {
       }
     } on Exception catch (e) {
       if (kDebugMode) {
-        debugPrint('[MapSync] offline region parse failed: $e');
+        AppLog.verbose('[MapSync] offline region parse failed: $e');
       }
     }
     return null;
@@ -568,7 +569,7 @@ class MapSyncCoordinator extends ChangeNotifier {
     }
     if (_shouldSkipFetchForEnvelope(query, allowEnvelopeSkip: allowEnvelopeSkip)) {
       if (kDebugMode && _kMapSyncPerfLogs) {
-        debugPrint('[MapSync] skip full sync (viewport inside envelope)');
+        AppLog.verbose('[MapSync] skip full sync (viewport inside envelope)');
       }
       return;
     }
@@ -596,7 +597,7 @@ class MapSyncCoordinator extends ChangeNotifier {
         return;
       }
       if (kDebugMode && _kMapSyncPerfLogs) {
-        debugPrint(
+        AppLog.verbose(
           '[MapSync] full sync ${sw.elapsedMilliseconds}ms '
           'sites=${result.sites.length}',
         );

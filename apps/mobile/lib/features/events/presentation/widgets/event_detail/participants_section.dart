@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' show max, min;
 
 import 'package:flutter/cupertino.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/errors/app_error.dart';
@@ -18,8 +19,8 @@ import 'package:chisto_mobile/features/events/domain/models/event_participant_ro
 import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 import 'package:chisto_mobile/shared/current_user.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/user_avatar_circle.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/user_avatar_circle.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_loading_indicator.dart';
 
 /// Peek row state for [ParticipantsSection] (keeps data loading out of the widget build tree).
 class ParticipantsPeekViewModel extends ChangeNotifier {
@@ -124,7 +125,6 @@ class _ParticipantsSectionState extends State<ParticipantsSection> {
   }
 
   void _showAttendeeList(BuildContext context) {
-    AppHaptics.tap();
     showEventsSurfaceModal<void>(
       context: context,
       builder: (BuildContext ctx) {
@@ -321,9 +321,9 @@ class _ParticipantRosterSheetBodyState
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Padding(
-        padding: EdgeInsets.all(AppSpacing.xl),
-        child: Center(child: CircularProgressIndicator()),
+      return Padding(
+        padding: const EdgeInsets.all(AppSpacing.xl),
+        child: Center(child: AppLoadingIndicator()),
       );
     }
     if (_error != null) {
@@ -339,9 +339,9 @@ class _ParticipantRosterSheetBodyState
               style: AppTypography.eventsBodyMuted(Theme.of(context).textTheme),
             ),
             const SizedBox(height: AppSpacing.md),
-            TextButton(
+            AppButton.text(
+              label: context.l10n.eventsParticipantsRetry,
               onPressed: () => unawaited(_load()),
-              child: Text(context.l10n.eventsParticipantsRetry),
             ),
           ],
         ),
@@ -562,7 +562,6 @@ class _AttendeeListSheetState extends State<AttendeeListSheet> {
                 if (value == null) {
                   return;
                 }
-                AppHaptics.light();
                 setState(() {
                   _sort = value;
                 });
@@ -731,8 +730,8 @@ class AvatarStack extends StatelessWidget {
             SizedBox(
               width: 20,
               height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
+              child: AppLoadingIndicator(
+                size: AppLoadingIndicatorSize.sm,
                 color: AppColors.primary.withValues(alpha: 0.85),
               ),
             ),

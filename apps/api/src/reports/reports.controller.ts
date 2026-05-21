@@ -27,6 +27,7 @@ import {
 } from '@nestjs/swagger';
 import { ADMIN_PANEL_ROLES } from '../auth/admin-roles';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { PhoneVerifiedGuard } from '../auth/phone-verified.guard';
 import { CurrentAuthenticatedUser } from '../auth/current-authenticated-user.decorator';
 import { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { Roles } from '../auth/roles.decorator';
@@ -66,7 +67,7 @@ export class ReportsController {
 
   @Post()
   @Throttle({ default: { limit: 10, ttl: 60_000 } })
-  @UseGuards(JwtAuthGuard, ReportsUserThrottlerGuard)
+  @UseGuards(JwtAuthGuard, PhoneVerifiedGuard, ReportsUserThrottlerGuard)
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Create a report by location (finds or creates site; approval awards points later)',

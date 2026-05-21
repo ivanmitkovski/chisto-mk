@@ -71,8 +71,9 @@ function makeSitesService(
   const sitesDetail = new SitesDetailService(siteDetailRepository, reportsUpload);
   const eventEmitter = { emit: jest.fn() } as any;
   const reporterNotifications = new SitesReporterNotificationService(prisma, eventEmitter);
+  const moderation = { blockedUserIdsFor: jest.fn().mockResolvedValue([]) } as any;
   const siteComments = new SiteCommentsService(
-    new SiteCommentsListService(prisma, siteEngagement, reportsUpload),
+    new SiteCommentsListService(prisma, siteEngagement, reportsUpload, moderation),
     new SiteCommentsMutationsService(prisma, siteEngagement, reportsUpload),
     sitesFeed,
     reporterNotifications,

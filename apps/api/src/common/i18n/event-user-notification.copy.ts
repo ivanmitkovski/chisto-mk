@@ -107,12 +107,12 @@ export function cleanupAudienceEventPublishedPush(
   if (locale === 'en') {
     return {
       title: 'New event',
-      body: `${t} — a new cleanup is open at a site you follow.`,
+      body: `${t}: a new cleanup is open at a site you follow.`,
     };
   }
   return {
     title: 'Нов настан',
-    body: `${t} — отворен е нов чистење настан кај зачувана локација.`,
+    body: `${t}: отворен е нов чистење настан кај зачувана локација.`,
   };
 }
 

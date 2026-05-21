@@ -37,6 +37,7 @@ void main() {
     final PollutionSite siteB = buildTestPollutionSite(
       id: 'site_b',
       statusLabel: 'Verified',
+      statusCode: mapStatusVerified,
     );
 
     final ProviderContainer container = ProviderContainer(

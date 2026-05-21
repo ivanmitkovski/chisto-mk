@@ -8,8 +8,7 @@ import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/navigation/events_navigation.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/events_localized_strings.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
 
 class AttendeeCheckInBanner extends StatelessWidget {
   const AttendeeCheckInBanner({super.key, required this.event});
@@ -44,7 +43,6 @@ class AttendeeCheckInBanner extends StatelessWidget {
               );
               return;
             }
-            AppHaptics.softTransition();
             final bool? success = await EventsNavigation.openAttendeeQrScanner(
               context,
               eventId: event.id,

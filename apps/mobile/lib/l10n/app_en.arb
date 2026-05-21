@@ -195,6 +195,15 @@
   "authFieldPassword": "Password",
   "authFieldPasswordHint": "Enter your password",
   "authRememberMe": "Remember me",
+  "authSessionExpired": "Your session expired. Please sign in again.",
+  "authPhoneNotVerified": "Verify your phone number to sign in.",
+  "authVerifyPhoneCta": "Verify phone",
+  "authResetViaEmail": "Reset via email",
+  "authResetViaSms": "Reset via SMS",
+  "authForgotPasswordEmailSubtitle": "Enter the email on your account and we'll send a reset link if it exists.",
+  "authForgotPasswordEmailSentTitle": "Check your email",
+  "authForgotPasswordEmailSentBody": "If an account exists for that email, we sent a link to reset your password.",
+  "authForgotPasswordEmailField": "Email",
   "authForgotPassword": "Forgot password?",
   "authSignInCta": "Sign in",
   "authValidationCheckPhonePassword": "Please check your phone number and password.",
@@ -214,6 +223,7 @@
   "authSignUpCta": "Sign up",
   "authSignInPrompt": "Already have an account? ",
   "authSignInLink": "Sign in",
+  "authValidationFullNameTwoParts": "Enter your first and last name",
   "authValidationFieldRequired": "{fieldName} is required",
   "@authValidationFieldRequired": {
     "placeholders": {
@@ -243,10 +253,18 @@
   "authErrorOtpMaxAttempts": "Too many wrong codes. Request a new code.",
   "authErrorCurrentPasswordInvalid": "Current password is incorrect.",
   "authErrorTooManyAttempts": "Too many failed attempts. Try again later.",
+  "authErrorTooManyAttemptsRetryIn": "Too many failed attempts. Try again in {duration}.",
+  "@authErrorTooManyAttemptsRetryIn": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
   "authErrorRateLimited": "Too many requests. Please wait a moment and try again.",
   "authErrorUserNotFound": "We could not find an account for this number. Please check and try again.",
   "authOtpTitle": "Enter code",
-  "authOtpSubtitle": "We just sent a 4-digit code to {phone}",
+  "authOtpSubtitle": "We just sent a 6-digit code to {phone}",
   "@authOtpSubtitle": {
     "placeholders": {
       "phone": {
@@ -276,9 +294,13 @@
   "authForgotPasswordTitle": "Reset password",
   "authForgotPasswordSubtitle": "Enter your phone number and we'll send you a code to reset your password",
   "authForgotPasswordSendCode": "Send reset code",
+  "authForgotPasswordSendLink": "Send reset link",
+  "authForgotPasswordTryAnotherWay": "Try another way",
   "authForgotPasswordRequestSemantic": "Send reset code",
   "authForgotPasswordOtpTitle": "Enter code",
-  "authForgotPasswordOtpSubtitle": "We sent a 4-digit code to {phone}",
+  "authForgotPasswordOtpSubtitle": "We sent a 6-digit code to {phone}",
+  "authErrorPhoneNotVerified": "Your phone number is not verified yet.",
+  "authErrorPasswordResetTokenInvalid": "This reset link is invalid or has expired.",
   "@authForgotPasswordOtpSubtitle": {
     "placeholders": {
       "phone": {
@@ -532,6 +554,58 @@
   "profilePasswordTile": "Password",
   "profileSupportSection": "Support",
   "profileHelpCenterTile": "Help center",
+  "profilePrivacyPolicyTile": "Privacy policy",
+  "profileTermsTile": "Terms of use",
+  "profileSafetySection": "Safety",
+  "profileSafetyReportIssueTile": "Report a safety issue",
+  "profileBlockedUsersTile": "Blocked users",
+  "profileBlockedUsersSubtitle": "People you blocked cannot message you or appear in your feed.",
+  "profileBlockedUsersEmpty": "You have not blocked anyone.",
+  "profileBlockedUsersEmptySubtitle": "Block someone from event chat or site comments to add them here.",
+  "profileBlockedUsersUnblock": "Unblock",
+  "profileBlockedUsersUnblockFailed": "Could not unblock. Try again.",
+  "profileBlockedUsersLoadFailed": "Could not load blocked users. Try again.",
+  "safetyBlockUserTitle": "Block user",
+  "safetyBlockUserBody": "Block {name}? They will not appear in your chat or comments.",
+  "@safetyBlockUserBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "safetyBlockUserConfirm": "Block",
+  "safetyBlockUserSuccess": "User blocked.",
+  "safetyBlockUserFailed": "Could not block user. Try again.",
+  "safetyBlockUserSelfSnack": "You cannot block yourself.",
+  "safetyUnblockUserTitle": "Unblock user",
+  "safetyUnblockUserBody": "Unblock {name}? Their messages and comments may appear again.",
+  "@safetyUnblockUserBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "safetyUnblockUserConfirm": "Unblock",
+  "profilePrivacyPolicyOpenFailedSnack": "Could not open privacy policy",
+  "profileTermsOpenFailedSnack": "Could not open terms of use",
+  "profileEulaTitle": "Community guidelines",
+  "profileEulaBody": "Chisto.mk has zero tolerance for objectionable content or abusive users. By continuing you agree to our Terms and will report content that violates our guidelines.",
+  "profileEulaBodyBeforeTerms": "Chisto.mk has zero tolerance for objectionable content or abusive users. By continuing you agree to our ",
+  "profileEulaBodyAfterTerms": " and will report content that violates our guidelines.",
+  "profileEulaAccept": "I agree",
+  "safetyReportTitle": "Report content",
+  "safetyReportSubmit": "Submit report",
+  "safetyReportDetailsHint": "Optional details for moderators",
+  "safetyReportSubmitted": "Report submitted. We review reports within 24 hours.",
+  "safetyReportFailed": "Could not submit report. Try again.",
+  "safetyReportReasonSpam": "Spam",
+  "safetyReportReasonHarassment": "Harassment",
+  "safetyReportReasonHate": "Hate speech",
+  "safetyReportReasonViolence": "Violence",
+  "safetyReportReasonNudity": "Nudity",
+  "safetyReportReasonOther": "Other",
   "profileAccountSection": "Account",
   "profileSignOutTile": "Sign out",
   "profileDeleteAccountTile": "Delete account",
@@ -873,7 +947,7 @@
   "feedFilterAllName": "All",
   "feedFilterAllDesc": "Balanced feed ranking",
   "feedFilterUrgentName": "Urgent",
-  "feedFilterUrgentDesc": "High-priority incidents first",
+  "feedFilterUrgentDesc": "New or unverified sites that need community attention",
   "feedFilterNearbyName": "Nearby",
   "feedFilterNearbyDesc": "Closest reports around you",
   "feedFilterMostVotedName": "Top support",
@@ -1255,7 +1329,9 @@
   "notificationsTypeComments": "Comments",
   "notificationsTypeNearbyReports": "Nearby reports",
   "notificationsTypeCleanupEvents": "Cleanup events",
+  "notificationsTypeEventChat": "Event chat",
   "notificationsTypeSystem": "System",
+  "notificationsPrefSystemGroupSubtitle": "Announcements, achievements, and welcome messages",
   "notificationsSwipeMarkUnread": "Mark unread",
   "notificationsSwipeMarkRead": "Mark read",
   "notificationsSwipeArchive": "Archive",
@@ -1289,6 +1365,77 @@
   "notificationsErrorGeneric": "Something went wrong while loading notifications.",
   "notificationsFilterAll": "All",
   "notificationsFilterUnread": "Unread",
+  "notificationsDayToday": "Today",
+  "notificationsDayYesterday": "Yesterday",
+  "notificationsTimeNow": "now",
+  "notificationsTimeMinutes": "{count}m",
+  "@notificationsTimeMinutes": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "notificationsTimeHours": "{count}h",
+  "@notificationsTimeHours": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "notificationsTimeDays": "{count}d",
+  "@notificationsTimeDays": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "notificationsGroupSummaryOne": "{actor}",
+  "@notificationsGroupSummaryOne": {
+    "placeholders": {
+      "actor": {"type": "String"}
+    }
+  },
+  "notificationsGroupSummaryTwo": "{actorA} and {actorB}",
+  "@notificationsGroupSummaryTwo": {
+    "placeholders": {
+      "actorA": {"type": "String"},
+      "actorB": {"type": "String"}
+    }
+  },
+  "notificationsGroupSummaryMany": "{actorA}, {actorB} and {count, plural, one{1 other} other{{count} others}}",
+  "@notificationsGroupSummaryMany": {
+    "placeholders": {
+      "actorA": {"type": "String"},
+      "actorB": {"type": "String"},
+      "count": {"type": "int"}
+    }
+  },
+  "notificationsGroupSummaryGeneric": "{count, plural, one{1 update} other{{count} updates}}",
+  "@notificationsGroupSummaryGeneric": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "notificationsGroupExpandHint": "Expand notification group",
+  "notificationsGroupCollapseHint": "Collapse notification group",
+  "notificationsGroupMarkAllRead": "Mark group as read",
+  "notificationsGroupArchiveAll": "Archive group",
+  "notificationsGroupShowingN": "Showing {count} notifications: {summary}",
+  "@notificationsGroupShowingN": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "summary": {"type": "String"}
+    }
+  },
+  "notificationsGroupMessageCount": "{count, plural, one{1 message} other{{count} messages}}",
+  "@notificationsGroupMessageCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "notificationsGroupSimilarCount": "and {count, plural, one{1 similar} other{{count} similar}}",
+  "@notificationsGroupSimilarCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "eventsEventNotFoundTitle": "Event not found",
   "eventsEventNotFoundBody": "This event is no longer available.",
   "eventsDetailBrowseEvents": "Browse events",
@@ -2276,6 +2423,95 @@
   },
   "siteDetailTabPollutionSite": "Pollution site",
   "siteDetailTabCleaningEvents": "Cleaning events",
+  "siteDetailTabHistory": "History",
+  "siteHistoryServiceUnavailable": "Site history is not available yet. Update the app and try again, or ask your team to deploy the latest API.",
+  "siteHistoryEmptyTitle": "No history yet",
+  "siteHistoryEmptyMessage": "Activity on this site will appear here as reports, cleanups, and status changes happen.",
+  "siteHistoryRetry": "Try again",
+  "siteHistoryCurrentStatus": "Current status: {status}",
+  "@siteHistoryCurrentStatus": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "siteHistoryByActor": "By {name}",
+  "@siteHistoryByActor": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "siteHistoryKindSiteCreated": "Site created",
+  "siteHistoryKindReportSubmitted": "Report submitted",
+  "siteHistoryKindReportApproved": "Report approved",
+  "siteHistoryKindReportRejected": "Report rejected",
+  "siteHistoryKindReportMerged": "Reports merged",
+  "siteHistoryKindStatusChanged": "Status changed: {from} → {to}",
+  "@siteHistoryKindStatusChanged": {
+    "placeholders": {
+      "from": { "type": "String" },
+      "to": { "type": "String" }
+    }
+  },
+  "siteHistoryKindStatusChangedGeneric": "Status updated",
+  "siteHistoryKindCleanupScheduled": "Cleanup event scheduled",
+  "siteHistoryKindCleanupStarted": "Cleanup in progress",
+  "siteHistoryKindCleanupCompleted": "Cleanup completed",
+  "siteHistoryKindCleanupCancelled": "Cleanup event cancelled",
+  "siteHistoryKindArchived": "Archived by moderators",
+  "siteHistoryKindUnarchived": "Restored by moderators",
+  "siteHistoryKindAdminNote": "Moderator note",
+  "siteHistoryKindUnknown": "Activity",
+  "siteHistoryStatusHeaderTitle": "Current status",
+  "siteHistoryStatusHeaderUpdated": "Updated {time}",
+  "@siteHistoryStatusHeaderUpdated": {
+    "placeholders": {
+      "time": { "type": "String" }
+    }
+  },
+  "siteHistoryStatusHeaderEntries": "{count, plural, one{1 entry} other{{count} entries}}",
+  "@siteHistoryStatusHeaderEntries": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "siteHistorySectionToday": "Today",
+  "siteHistorySectionYesterday": "Yesterday",
+  "siteHistorySectionThisWeek": "Earlier this week",
+  "siteHistorySectionMonth": "{month} {year}",
+  "@siteHistorySectionMonth": {
+    "placeholders": {
+      "month": { "type": "String" },
+      "year": { "type": "int" }
+    }
+  },
+  "siteHistoryTimeNow": "now",
+  "siteHistoryTimeMinutes": "{count}m",
+  "@siteHistoryTimeMinutes": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "siteHistoryTimeHours": "{count}h",
+  "@siteHistoryTimeHours": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "siteHistoryTimeDays": "{count}d",
+  "@siteHistoryTimeDays": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "siteHistoryLoadingMore": "Loading more…",
+  "siteHistoryEndOfList": "End of history",
+  "siteHistoryEntryOpenEvent": "Open cleanup event",
+  "siteHistoryEntryShowMore": "Show more",
+  "siteHistoryEntryShowLess": "Show less",
   "siteDetailInfoCardTitle": "Community action needed",
   "siteDetailInfoCardBody": "Join a cleanup, report changes, or help spread the word so we can act faster.",
   "siteDetailReportedByPrefix": "Reported by ",
@@ -2889,6 +3125,8 @@
   },
   "eventsCompletedBagsSectionTitle": "Trash bags collected",
   "eventsCompletedBagsSave": "Save",
+  "eventsCompletedBagsDecrease": "Decrease bag count",
+  "eventsCompletedBagsIncrease": "Increase bag count",
   "eventsCompletedBagsSaved": "Bag count saved.",
   "eventsImpactBadgeRating": "{rating}★ rating",
   "@eventsImpactBadgeRating": {
@@ -3535,6 +3773,7 @@
   "homeSiteCleaningOrganizerHint": "You're organizing this action. Upload \"after\" photos once it's completed.",
   "homeSiteCleaningVolunteerHint": "Join the action to help clean this site.",
   "homeSiteCleaningJoinAction": "Join action",
+  "homeSiteCleaningJoinedAction": "Joined",
   "homeSiteCleaningEventUnavailable": "Event details are unavailable right now.",
   "homeSiteCleaningListLoadError": "Could not load events. Check your connection and try again.",
   "homeSiteCleaningRetry": "Retry",
@@ -3937,6 +4176,24 @@
   "pushChannelDefaultName": "Chisto.mk",
   "pushChannelDefaultDescription": "General notifications",
   "eventChatPushChannelDescription": "Messages on cleanup events you joined",
+  "eventChatPushReplyAction": "Reply",
+  "eventChatPushReplyButton": "Send",
+  "eventChatPushReplyPlaceholder": "Message",
+  "eventChatPushPreviewVoice": "Voice message",
+  "eventChatPushPreviewPhoto": "Photo",
+  "eventChatPushPreviewVideo": "Video",
+  "eventChatPushPreviewFile": "File",
+  "eventChatPushPreviewLocation": "Shared location",
+  "eventChatPushPreviewMessage": "Message",
+  "eventChatPushPreviewSystem": "Event update",
+  "pushChannelReportsName": "Report updates",
+  "pushChannelReportsDescription": "Report status changes and nearby pollution reports",
+  "pushChannelEventsName": "Cleanup events",
+  "pushChannelEventsDescription": "Cleanup event reminders and updates",
+  "pushChannelSocialName": "Social activity",
+  "pushChannelSocialDescription": "Upvotes, comments, and community interactions",
+  "pushChannelSystemName": "System",
+  "pushChannelSystemDescription": "System announcements and achievements",
   "micPermissionRationaleTitle": "Microphone access",
   "micPermissionRationaleBody": "Voice messages in event chat use your microphone only while you record.",
   "micPermissionRationaleAllow": "Allow microphone",

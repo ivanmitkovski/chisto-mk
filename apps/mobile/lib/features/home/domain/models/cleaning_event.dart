@@ -8,6 +8,7 @@ class CleaningEvent {
     required this.dateTime,
     required this.participantCount,
     this.isOrganizer = false,
+    this.isJoined = false,
     this.statusLabel,
     this.statusColor,
   });
@@ -19,6 +20,9 @@ class CleaningEvent {
 
   /// Whether the current user is an organizer of this event.
   final bool isOrganizer;
+
+  /// Whether the current user has joined as a volunteer.
+  final bool isJoined;
 
   /// Optional status pill (e.g. "Upcoming", "Completed").
   final String? statusLabel;

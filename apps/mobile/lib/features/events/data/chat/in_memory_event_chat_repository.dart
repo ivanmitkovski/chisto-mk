@@ -5,6 +5,7 @@ import 'package:chisto_mobile/features/events/data/chat/event_chat_fetch_result.
 import 'package:chisto_mobile/features/events/data/chat/event_chat_message.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_participants.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_read_cursor.dart';
+import 'package:chisto_mobile/features/notifications/data/event_chat_mark_read_result.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_repository.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_stream_event.dart';
 
@@ -15,8 +16,41 @@ class InMemoryEventChatRepository implements EventChatRepository {
   final Map<String, Map<String, EventChatReadCursor>> _readCursorsByEvent =
       <String, Map<String, EventChatReadCursor>>{};
   final Map<String, bool> _mutedByEvent = <String, bool>{};
+  final Map<String, EventChatConnectionStatus> _connByEvent =
+      <String, EventChatConnectionStatus>{};
+  final Map<String, StreamController<EventChatConnectionStatus>> _connStreams =
+      <String, StreamController<EventChatConnectionStatus>>{};
   final StreamController<EventChatStreamEvent> _bus =
       StreamController<EventChatStreamEvent>.broadcast();
+
+  /// Test helper: seed connection status before attaching streams.
+  void setConnectionStatusForTest(
+    String eventId,
+    EventChatConnectionStatus status,
+  ) {
+    _connByEvent[eventId] = status;
+  }
+
+  /// Test helper: push a connection status update to active listeners.
+  void emitConnectionStatusForTest(
+    String eventId,
+    EventChatConnectionStatus status,
+  ) {
+    _connByEvent[eventId] = status;
+    _connStreams[eventId]?.add(status);
+  }
+
+  StreamController<EventChatConnectionStatus> _connStream(String eventId) {
+    return _connStreams.putIfAbsent(
+      eventId,
+      () => StreamController<EventChatConnectionStatus>.broadcast(),
+    );
+  }
+
+  @override
+  EventChatConnectionStatus currentConnectionStatus(String eventId) {
+    return _connByEvent[eventId] ?? EventChatConnectionStatus.disconnected;
+  }
 
   List<EventChatMessage> _messages(String eventId) =>
       _byEvent.putIfAbsent(eventId, () => <EventChatMessage>[]);
@@ -282,7 +316,7 @@ class InMemoryEventChatRepository implements EventChatRepository {
   }
 
   @override
-  Future<void> markRead(String eventId, String? lastReadMessageId) async {
+  Future<EventChatMarkReadResult?> markRead(String eventId, String? lastReadMessageId) async {
     _lastReadByEvent[eventId] = lastReadMessageId;
     DateTime? at;
     final String? mid = lastReadMessageId?.trim();
@@ -310,6 +344,7 @@ class InMemoryEventChatRepository implements EventChatRepository {
         lastReadMessageCreatedAt: at,
       ),
     );
+    return null;
   }
 
   @override
@@ -421,8 +456,9 @@ class InMemoryEventChatRepository implements EventChatRepository {
   }
 
   @override
-  Stream<EventChatConnectionStatus> connectionStatus(String eventId) {
-    return const Stream<EventChatConnectionStatus>.empty();
+  Stream<EventChatConnectionStatus> connectionStatus(String eventId) async* {
+    yield currentConnectionStatus(eventId);
+    yield* _connStream(eventId).stream;
   }
 
   /// Test helper: set another member’s read cursor without going through [markRead].

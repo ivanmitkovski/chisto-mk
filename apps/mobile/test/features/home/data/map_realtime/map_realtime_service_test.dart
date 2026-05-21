@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:chisto_mobile/core/auth/auth_state.dart';
 import 'package:chisto_mobile/core/config/app_config.dart';
 import 'package:chisto_mobile/core/network/connectivity_gate.dart';
+import 'package:chisto_mobile/features/auth/domain/refresh_outcome.dart';
 import 'package:chisto_mobile/features/home/data/map_realtime/map_realtime_service.dart';
 import 'package:chisto_mobile/features/home/data/map_realtime/map_site_event.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -147,7 +148,7 @@ void main() {
           displayName: 'Tester',
           accessToken: 't2',
         );
-        return true;
+        return RefreshOutcome.success;
       },
       httpClient: client,
     );
@@ -164,7 +165,7 @@ void main() {
     svc.dispose();
   });
 
-  test('401 without refresh signs out', () async {
+  test('401 with serverRejected refresh invokes onAuthRejected', () async {
     final http.Client client = MockClient.streaming(
       (http.BaseRequest request, _) async {
         return http.StreamedResponse(const Stream<List<int>>.empty(), 401);
@@ -179,7 +180,8 @@ void main() {
     final MapRealtimeService svc = MapRealtimeService(
       config: AppConfig.local,
       authState: auth,
-      sessionRefresh: () async => false,
+      sessionRefresh: () async => RefreshOutcome.serverRejected,
+      onAuthRejected: auth.setUnauthenticated,
       httpClient: client,
     );
     svc.setActive(true);

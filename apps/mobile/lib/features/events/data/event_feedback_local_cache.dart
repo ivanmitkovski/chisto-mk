@@ -101,4 +101,9 @@ class EventFeedbackLocalCache {
     }
     return decoded;
   }
+
+  Future<void> clear() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_key);
+  }
 }

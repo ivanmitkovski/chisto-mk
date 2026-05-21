@@ -27,11 +27,19 @@ class ReportsListController extends ChangeNotifier {
   AppError? appendLoadError;
   int _serverPage = 1;
   bool hasMore = true;
+  bool _disposed = false;
 
   static int get pageSize => ReportTokens.myReportsPageSize;
 
+  void _notifyIfMounted() {
+    if (!_disposed) {
+      notifyListeners();
+    }
+  }
+
   @override
   void dispose() {
+    _disposed = true;
     _firstPageToken?.cancel();
     _appendToken?.cancel();
     super.dispose();
@@ -39,7 +47,7 @@ class ReportsListController extends ChangeNotifier {
 
   void clearAppendError() {
     appendLoadError = null;
-    notifyListeners();
+    _notifyIfMounted();
   }
 
   void _beginFirstPageRequest() {
@@ -57,11 +65,11 @@ class ReportsListController extends ChangeNotifier {
       isLoadingFirstPage = true;
       loadError = null;
       appendLoadError = null;
-      notifyListeners();
+      _notifyIfMounted();
     } else {
       loadError = null;
       appendLoadError = null;
-      notifyListeners();
+      _notifyIfMounted();
     }
 
     try {
@@ -88,9 +96,9 @@ class ReportsListController extends ChangeNotifier {
         reports = <ReportListItem>[];
       }
     } finally {
-      if (identical(_firstPageToken, token)) {
+      if (!_disposed && identical(_firstPageToken, token)) {
         isLoadingFirstPage = false;
-        notifyListeners();
+        _notifyIfMounted();
       }
     }
   }
@@ -105,7 +113,7 @@ class ReportsListController extends ChangeNotifier {
 
     isAppending = true;
     appendLoadError = null;
-    notifyListeners();
+    _notifyIfMounted();
 
     try {
       final int nextPage = _serverPage + 1;
@@ -127,9 +135,9 @@ class ReportsListController extends ChangeNotifier {
       }
       appendLoadError = e;
     } finally {
-      if (identical(_appendToken, token)) {
+      if (!_disposed && identical(_appendToken, token)) {
         isAppending = false;
-        notifyListeners();
+        _notifyIfMounted();
       }
     }
   }
@@ -171,7 +179,7 @@ class ReportsListController extends ChangeNotifier {
       isOptimistic: true,
     );
     reports = <ReportListItem>[item, ...reports];
-    notifyListeners();
+    _notifyIfMounted();
   }
 
   void clearOptimisticForReport(String reportId) {
@@ -181,12 +189,12 @@ class ReportsListController extends ChangeNotifier {
     }
     reports = List<ReportListItem>.from(reports)
       ..[idx] = reports[idx].copyWith(isOptimistic: false);
-    notifyListeners();
+    _notifyIfMounted();
   }
 
   void removeReportById(String reportId) {
     reports = reports.where((ReportListItem r) => r.id != reportId).toList();
-    notifyListeners();
+    _notifyIfMounted();
   }
 
   void applyStatusFromApi(String reportId, String statusRaw) {
@@ -197,6 +205,6 @@ class ReportsListController extends ChangeNotifier {
     final ApiReportStatus next = parseApiReportStatusFromApi(statusRaw);
     reports = List<ReportListItem>.from(reports)
       ..[idx] = reports[idx].copyWith(status: next, isOptimistic: false);
-    notifyListeners();
+    _notifyIfMounted();
   }
 }

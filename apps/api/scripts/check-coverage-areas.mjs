@@ -79,6 +79,30 @@ const gates = [
     collectCoverageFrom: ['src/admin-realtime/**/*.ts', '!src/admin-realtime/**/*.module.ts'],
     threshold: { statements: 22, branches: 18, functions: 22, lines: 21 },
   },
+  {
+    name: 'notifications',
+    testPathPattern: 'test/notifications',
+    collectCoverageFrom: ['src/notifications/**/*.ts', '!src/notifications/**/*.module.ts'],
+    threshold: { statements: 41, branches: 40, functions: 40, lines: 40 },
+  },
+  {
+    name: 'email',
+    testPathPattern: 'test/email',
+    collectCoverageFrom: ['src/email/**/*.ts', '!src/email/**/*.module.ts'],
+    threshold: { statements: 55, branches: 52, functions: 60, lines: 58 },
+  },
+  {
+    name: 'webhooks',
+    testPathPattern: 'test/webhooks',
+    collectCoverageFrom: ['src/webhooks/**/*.ts', '!src/webhooks/**/*.module.ts'],
+    threshold: { statements: 40, branches: 30, functions: 40, lines: 40 },
+  },
+  {
+    name: 'feature-flags',
+    testPathPattern: 'test/feature-flags',
+    collectCoverageFrom: ['src/feature-flags/**/*.ts', '!src/feature-flags/**/*.module.ts'],
+    threshold: { statements: 40, branches: 30, functions: 40, lines: 40 },
+  },
 ];
 
 function runGate(gate) {
@@ -96,7 +120,7 @@ function runGate(gate) {
     '--coverageReporters=text-summary',
     `--coverageThreshold=${cov}`,
     '--passWithNoTests',
-    '--maxWorkers=50%',
+    '--runInBand',
   ];
   console.error(`\n[coverage-area] ${gate.name}: ${gate.testPathPattern}\n`);
   execSync(args.join(' '), { cwd: apiRoot, stdio: 'inherit', env: process.env });

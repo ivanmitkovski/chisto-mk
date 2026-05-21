@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/shared/widgets/app_section_header.dart';
+import 'package:chisto_mobile/shared/widgets/molecules/app_section_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

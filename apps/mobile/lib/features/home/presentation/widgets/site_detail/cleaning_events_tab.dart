@@ -1,5 +1,8 @@
 import 'dart:async';
 
+import 'package:chisto_mobile/core/theme/app_radii.dart';
+import 'package:chisto_mobile/core/theme/app_shadows.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -17,8 +20,7 @@ import 'package:chisto_mobile/features/events/presentation/navigation/events_nav
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/domain/models/cleaning_event.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/site_detail/sticky_bottom_cta.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
 
 class CleaningEventsTab extends StatefulWidget {
   const CleaningEventsTab({
@@ -186,14 +188,14 @@ class _CleaningEventsTabState extends State<CleaningEventsTab>
               ),
             ),
             const SizedBox(height: AppSpacing.md),
-            FilledButton(
+            AppButton.primary(
+              label: context.l10n.homeSiteCleaningRetry,
               onPressed: () {
-                AppHaptics.tap();
                 store.loadInitialIfNeeded();
                 unawaited(store.refreshEvents());
                 unawaited(store.prefetchEventsForSite(widget.site.id));
               },
-              child: Text(context.l10n.homeSiteCleaningRetry),
+              expand: false,
             ),
           ],
         ),
@@ -204,10 +206,9 @@ class _CleaningEventsTabState extends State<CleaningEventsTab>
   Widget _buildEmptyState(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     return Material(
-      color: Colors.transparent,
+      color: AppColors.transparent,
       child: InkWell(
         onTap: () {
-          AppHaptics.tap();
           widget.onCreateEvent();
         },
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
@@ -264,15 +265,24 @@ class _CleaningEventsTabState extends State<CleaningEventsTab>
     store.loadInitialIfNeeded();
     final EcoEvent? match = store.findById(event.id);
     if (match != null) {
-      AppHaptics.softTransition();
       EventsNavigation.openDetail(context, eventId: match.id);
       return;
     }
-    AppHaptics.warning();
     AppSnack.show(
       context,
       message: context.l10n.homeSiteCleaningEventUnavailable,
       type: AppSnackType.warning,
+    );
+  }
+
+  BoxDecoration _eventCardDecoration(BuildContext context) {
+    return BoxDecoration(
+      color: AppColors.panelBackground,
+      borderRadius: AppRadii.r18,
+      boxShadow: AppShadows.panel(Theme.of(context).colorScheme),
+      border: Border.all(
+        color: AppColors.divider.withValues(alpha: 0.9),
+      ),
     );
   }
 
@@ -289,17 +299,7 @@ class _CleaningEventsTabState extends State<CleaningEventsTab>
         onTap: () => _navigateToEcoEvent(context, event),
         child: Container(
           padding: const EdgeInsets.all(AppSpacing.md),
-          decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
-            boxShadow: <BoxShadow>[
-              BoxShadow(
-                color: colorScheme.shadow.withValues(alpha: 0.06),
-                blurRadius: AppSpacing.sm,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
+          decoration: _eventCardDecoration(context),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -309,13 +309,13 @@ class _CleaningEventsTabState extends State<CleaningEventsTab>
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: colorScheme.primary.withValues(alpha: 0.08),
+                      color: AppColors.inputFill,
                       borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.eco_rounded,
                       size: 22,
-                      color: colorScheme.primary,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
@@ -369,7 +369,7 @@ class _CleaningEventsTabState extends State<CleaningEventsTab>
                   vertical: AppSpacing.xs,
                 ),
                 decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainerLow,
+                  color: AppColors.inputFill,
                   borderRadius: BorderRadius.circular(AppSpacing.radius10),
                 ),
                 child: Row(
@@ -378,7 +378,7 @@ class _CleaningEventsTabState extends State<CleaningEventsTab>
                     Icon(
                       Icons.groups_rounded,
                       size: 16,
-                      color: colorScheme.primary,
+                      color: AppColors.textMuted,
                     ),
                     const SizedBox(width: 4),
                     Text(
@@ -406,29 +406,18 @@ class _CleaningEventsTabState extends State<CleaningEventsTab>
               ),
               if (!event.isOrganizer) ...<Widget>[
                 const SizedBox(height: AppSpacing.sm),
-                SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: ElevatedButton(
+                if (event.isJoined)
+                  AppButton.secondary(
+                    label: context.l10n.homeSiteCleaningJoinedAction,
+                    enabled: false,
+                    expand: true,
+                  )
+                else
+                  AppButton.primary(
+                    label: context.l10n.homeSiteCleaningJoinAction,
                     onPressed: () => _navigateToEcoEvent(context, event),
-                    style: ElevatedButton.styleFrom(
-                      elevation: 0,
-                      backgroundColor: colorScheme.primary,
-                      foregroundColor: colorScheme.onPrimary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusMd,
-                        ),
-                      ),
-                    ),
-                    child: Text(
-                      context.l10n.homeSiteCleaningJoinAction,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    expand: true,
                   ),
-                ),
               ],
             ],
           ),
@@ -453,15 +442,12 @@ class _CleaningEventCardSkeleton extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.06),
-            blurRadius: AppSpacing.sm,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        color: AppColors.panelBackground,
+        borderRadius: AppRadii.r18,
+        boxShadow: AppShadows.panel(Theme.of(context).colorScheme),
+        border: Border.all(
+          color: AppColors.divider.withValues(alpha: 0.9),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -560,13 +546,7 @@ class _StickyBottomCtaSkeleton extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: AppColors.appBackground,
-          boxShadow: <BoxShadow>[
-            BoxShadow(
-              color: AppColors.shadowLight,
-              blurRadius: AppSpacing.md,
-              offset: const Offset(0, -4),
-            ),
-          ],
+          boxShadow: AppShadows.sheet(Theme.of(context).colorScheme),
         ),
         child: _ShimmerBox(
           width: double.infinity,

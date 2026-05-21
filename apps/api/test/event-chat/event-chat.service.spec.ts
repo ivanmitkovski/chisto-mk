@@ -9,6 +9,8 @@ import { EventChatMutationModerateService } from '../../src/event-chat/event-cha
 import { EventChatMutationSendService } from '../../src/event-chat/event-chat-mutation-send.service';
 import { EventChatMutationsService } from '../../src/event-chat/event-chat-mutations.service';
 import { EventChatNotificationsService } from '../../src/event-chat/event-chat-notifications.service';
+import { EventChatPushAggregatorService } from '../../src/event-chat/event-chat-push-aggregator.service';
+import { FeatureFlagsService } from '../../src/feature-flags/feature-flags.service';
 import { EventChatPresenceMuteService } from '../../src/event-chat/event-chat-presence-mute.service';
 import { EventChatPresenceReadStateService } from '../../src/event-chat/event-chat-presence-read-state.service';
 import { EventChatPresenceRosterService } from '../../src/event-chat/event-chat-presence-roster.service';
@@ -18,15 +20,22 @@ import { EventChatSseService } from '../../src/event-chat/event-chat-sse.service
 import { EventChatTelemetryService } from '../../src/event-chat/event-chat-telemetry.service';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
 
+function makeNotificationStateMock() {
+  return {
+    markEventChatGroupRead: jest.fn().mockResolvedValue({ updated: 0, unreadCount: 0 }),
+  };
+}
+
 function makeEventChatPresenceService(
   prisma: PrismaService,
   sse: EventChatSseService,
   uploads: { signPrivateObjectKey: jest.Mock },
+  notificationState = makeNotificationStateMock(),
 ) {
   return new EventChatPresenceService(
     new EventChatPresenceMuteService(prisma),
     new EventChatPresenceRosterService(prisma, uploads as never),
-    new EventChatPresenceReadStateService(prisma, sse),
+    new EventChatPresenceReadStateService(prisma, sse, notificationState as never),
     new EventChatPresenceTypingService(prisma, sse),
   );
 }
@@ -127,9 +136,18 @@ describe('EventChat leaf services (list + presence + mutations)', () => {
     };
     sse = { emitEvent: jest.fn() };
     dispatcher = { dispatchToUser: jest.fn().mockResolvedValue(undefined) };
+    const featureFlags = {
+      isEventChatPushCoalesceV2Enabled: jest.fn().mockResolvedValue(false),
+    };
+    const pushAggregator = new EventChatPushAggregatorService(
+      { get: jest.fn().mockReturnValue('100') } as never,
+      dispatcher as unknown as NotificationDispatcherService,
+    );
     chatNotifications = new EventChatNotificationsService(
       prisma as unknown as PrismaService,
       dispatcher as unknown as NotificationDispatcherService,
+      featureFlags as unknown as FeatureFlagsService,
+      pushAggregator,
     );
     telemetry = {
       emitMetric: jest.fn(),
@@ -151,10 +169,12 @@ describe('EventChat leaf services (list + presence + mutations)', () => {
       chatUpload as never,
       uploads as never,
     );
+    const moderation = { blockedUserIdsFor: jest.fn().mockResolvedValue([]) };
     const list = new EventChatListService(
       prisma as unknown as PrismaService,
       telemetry as unknown as EventChatTelemetryService,
       dto,
+      moderation as never,
     );
     const presence = makeEventChatPresenceService(
       prisma as unknown as PrismaService,
@@ -272,7 +292,7 @@ describe('EventChat leaf services (list + presence + mutations)', () => {
       'u2',
       expect.objectContaining({
         type: NotificationType.EVENT_CHAT,
-        threadKey: `event-chat:${eventId}`,
+        threadKey: `event-chat:${eventId}:m_new`,
         data: expect.objectContaining({
           threadTitle: 'River',
         }),
@@ -343,7 +363,7 @@ describe('EventChat leaf services (list + presence + mutations)', () => {
     prisma.eventParticipant.findMany.mockResolvedValue([]);
     prisma.eventChatMute.findMany.mockResolvedValue([]);
 
-    const res = await service.sendMessage(eventId, user, {
+    const res =     await service.sendMessage(eventId, user, {
       body: '',
       attachments: [
         {
@@ -354,6 +374,19 @@ describe('EventChat leaf services (list + presence + mutations)', () => {
         },
       ],
     } as never);
+
+    await new Promise((r) => setTimeout(r, 0));
+    expect(dispatcher.dispatchToUser).toHaveBeenCalledWith(
+      'org1',
+      expect.objectContaining({
+        type: NotificationType.EVENT_CHAT,
+        body: 'Me User: Voice message',
+        data: expect.objectContaining({
+          messagePreview: 'Voice message',
+          messageType: 'AUDIO',
+        }),
+      }),
+    );
 
     expect(res.data.messageType).toBe('AUDIO');
     expect(prisma.eventChatMessage.create).toHaveBeenCalledWith(
@@ -613,14 +646,34 @@ describe('EventChat leaf services (list + presence + mutations)', () => {
     expect(prisma.eventChatMessage.count).toHaveBeenCalled();
   });
 
-  it('patchReadCursor upserts', async () => {
+  it('patchReadCursor upserts and marks EVENT_CHAT inbox rows', async () => {
+    const notificationState = makeNotificationStateMock();
+    notificationState.markEventChatGroupRead.mockResolvedValue({ updated: 2, unreadCount: 5 });
+    const uploadsMock = { signPrivateObjectKey: jest.fn().mockResolvedValue(null) };
+    const presenceWithInbox = makeEventChatPresenceService(
+      prisma as unknown as PrismaService,
+      sse as unknown as EventChatSseService,
+      uploadsMock,
+      notificationState,
+    );
+    const readService = {
+      patchReadCursor: (e: string, u: AuthenticatedUser, d: unknown) =>
+        presenceWithInbox.patchReadCursor(e, u, d as never),
+    };
+
     prisma.eventChatMessage.findFirst
-      .mockResolvedValueOnce({ id: 'm1' })
+      .mockResolvedValueOnce({ id: 'm1', createdAt: new Date('2026-01-01T00:00:00.000Z') })
       .mockResolvedValueOnce({ createdAt: new Date('2026-01-01T00:00:00.000Z') });
+    prisma.eventChatReadCursor.findUnique.mockResolvedValue(null);
     prisma.eventChatReadCursor.upsert.mockResolvedValue({});
     prisma.user.findUnique.mockResolvedValue({ firstName: 'Pat', lastName: 'Lee' });
 
-    await service.patchReadCursor(eventId, user, { lastReadMessageId: 'm1' } as never);
+    const res = await readService.patchReadCursor(eventId, user, {
+      lastReadMessageId: 'm1',
+    });
+    expect(notificationState.markEventChatGroupRead).toHaveBeenCalledWith(user.userId, eventId);
+    expect(res.meta.unreadCount).toBe(5);
+    expect(res.meta.eventChatNotificationsMarkedRead).toBe(2);
     expect(prisma.eventChatReadCursor.upsert).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { eventId_userId: { eventId, userId: user.userId } },
@@ -712,10 +765,12 @@ describe('EventChat leaf services (list + presence + mutations)', () => {
       chatUpload as never,
       uploads as never,
     );
+    const moderationInner = { blockedUserIdsFor: jest.fn().mockResolvedValue([]) };
     const listInner = new EventChatListService(
       prisma as unknown as PrismaService,
       telemetry as unknown as EventChatTelemetryService,
       dtoInner,
+      moderationInner as never,
     );
     const svc = { listMessages: (e: string, u: AuthenticatedUser, q: never) => listInner.listMessages(e, u, q) };
 

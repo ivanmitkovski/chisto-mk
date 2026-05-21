@@ -51,6 +51,8 @@ describe('ReportSubmitService idempotency key validation', () => {
     nearbySiteResolver as never,
     idempotency,
     mediaAppend,
+    { emit: jest.fn() } as never,
+    { recordSiteCreated: jest.fn(), recordReportSubmitted: jest.fn(), emitHistoryAppended: jest.fn() } as never,
   );
 
   it('throws INVALID_IDEMPOTENCY_KEY when key is shorter than 16', async () => {

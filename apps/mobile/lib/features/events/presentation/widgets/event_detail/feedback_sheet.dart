@@ -6,7 +6,8 @@ import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/data/event_feedback_local_cache.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_text_field.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
 
 class FeedbackSheetContent extends StatefulWidget {
   const FeedbackSheetContent({
@@ -122,13 +123,11 @@ class _FeedbackSheetContentState extends State<FeedbackSheetContent> {
             onChanged: (double value) => setState(() => _hours = value),
           ),
           const SizedBox(height: AppSpacing.sm),
-          TextField(
+          AppTextField(
             controller: _notesController,
+            hintText: context.l10n.eventsFeedbackNotesHint,
             maxLines: 3,
-            decoration: InputDecoration(
-              hintText: context.l10n.eventsFeedbackNotesHint,
-              border: const OutlineInputBorder(),
-            ),
+            minLines: 2,
           ),
           const SizedBox(height: AppSpacing.lg),
           PrimaryButton(

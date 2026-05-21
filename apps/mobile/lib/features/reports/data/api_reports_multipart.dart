@@ -29,6 +29,11 @@ List<MultipartFileData> reportMultipartPartsForLocalPaths(List<String> filePaths
     if (!f.existsSync()) {
       continue;
     }
+    const int maxBytes = 12 * 1024 * 1024;
+    final int fileLen = f.lengthSync();
+    if (fileLen <= 0 || fileLen > maxBytes) {
+      continue;
+    }
     final List<int> bytes = f.readAsBytesSync();
     if (bytes.isEmpty) {
       continue;

@@ -6,7 +6,6 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 class EventCalendar extends StatefulWidget {
   const EventCalendar({
@@ -70,14 +69,12 @@ class _EventCalendarState extends State<EventCalendar> {
     if (!_canGoToPreviousMonth) {
       return;
     }
-    AppHaptics.tap();
     setState(() {
       _focusedMonth = DateTime(_focusedMonth.year, _focusedMonth.month - 1);
     });
   }
 
   void _goToNextMonth() {
-    AppHaptics.tap();
     setState(() {
       _focusedMonth = DateTime(_focusedMonth.year, _focusedMonth.month + 1);
     });
@@ -236,7 +233,6 @@ class _EventCalendarState extends State<EventCalendar> {
                 onTap: ((isPast && !isToday) || beforeMin)
                     ? null
                     : () {
-                        AppHaptics.tap();
                         widget.onDateSelected(date);
                       },
                 customBorder: const CircleBorder(),

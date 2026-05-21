@@ -23,6 +23,12 @@ function createModerationService(
     prisma as never,
     reportApprovalPoints as never,
     reportSideEffectProcessor as never,
+    {
+      recordReportApproved: jest.fn(),
+      recordReportRejected: jest.fn(),
+      recordStatusChanged: jest.fn(),
+      emitHistoryAppended: jest.fn(),
+    } as never,
   );
   const detail = new ReportsModerationDetailService(prisma as never, reportsUploadService as never);
   const service = new ReportsModerationService(list, status, detail);

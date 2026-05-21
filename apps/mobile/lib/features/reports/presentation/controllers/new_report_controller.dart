@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/core/logging/app_log.dart';
 import 'package:chisto_mobile/core/observability/chisto_sentry.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/features/reports/data/outbox/report_draft_repository.dart';
@@ -98,7 +99,9 @@ class NewReportController extends ChangeNotifier {
 
   Future<T> _enqueuePhotoOp<T>(Future<T> Function() op) {
     final Future<T> run = _photoOpChain.then((_) => op());
-    _photoOpChain = run.then((_) {}).catchError((_) {});
+    _photoOpChain = run.then((_) {}).catchError((Object e, StackTrace st) {
+      AppLog.warn('new_report photo op chain', error: e, stackTrace: st);
+    });
     return run;
   }
 

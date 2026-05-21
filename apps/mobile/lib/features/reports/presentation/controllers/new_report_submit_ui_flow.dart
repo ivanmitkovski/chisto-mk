@@ -1,4 +1,5 @@
 import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/features/auth/presentation/utils/auth_guard_ui.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/features/reports/data/outbox/report_draft_repository.dart';
@@ -8,11 +9,11 @@ import 'package:chisto_mobile/features/reports/domain/models/report_submit_resul
 import 'package:chisto_mobile/features/reports/domain/report_input_sanitizer.dart';
 import 'package:chisto_mobile/features/reports/presentation/controllers/new_report_controller.dart';
 import 'package:chisto_mobile/features/reports/presentation/controllers/new_report_submit_support.dart';
+import 'package:chisto_mobile/core/providers/refresh_signals_providers.dart';
 import 'package:chisto_mobile/features/reports/presentation/controllers/reports_list_session.dart';
 import 'package:chisto_mobile/features/reports/presentation/l10n/report_category_l10n.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_submitted_dialog.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/reporting_capacity_guard.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/semantics.dart';
@@ -38,12 +39,10 @@ class NewReportSubmitBindings {
   const NewReportSubmitBindings({
     required this.reportsListSession,
     required this.reportDraftRepository,
-    required this.profileNeedsRefresh,
   });
 
   final ReportsListSession reportsListSession;
   final ReportDraftRepository reportDraftRepository;
-  final ValueNotifier<int> profileNeedsRefresh;
 }
 
 abstract final class NewReportSubmitUiFlow {
@@ -69,7 +68,6 @@ abstract final class NewReportSubmitUiFlow {
       return;
     }
 
-    AppHaptics.medium();
     controller.beginSubmittingPhase();
 
     try {
@@ -83,7 +81,7 @@ abstract final class NewReportSubmitUiFlow {
         draft: controller.draft,
       );
       controller.setSuppressLocalDraftPersist(true);
-      bindings.profileNeedsRefresh.value++;
+      bumpProfileRefresh();
       controller.markSubmitSentPhase();
       if (context.mounted && MediaQuery.supportsAnnounceOf(context)) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -188,6 +186,9 @@ abstract final class NewReportSubmitUiFlow {
     AppError error,
     Future<void> Function() reloadReportingCapacity,
   ) async {
+    if (error.code == 'PHONE_NOT_VERIFIED') {
+      return handlePhoneNotVerifiedGuardError(context, error);
+    }
     if (error.code == 'UNAUTHORIZED' ||
         error.code == 'INVALID_TOKEN_USER' ||
         error.code == 'ACCOUNT_NOT_ACTIVE') {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:chisto_mobile/core/theme/app_shadows.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 
@@ -16,18 +17,7 @@ class FeedSkeletonCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.panelBackground,
         borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: AppColors.shadowLight,
-            blurRadius: AppSpacing.md,
-            offset: const Offset(0, 4),
-          ),
-          BoxShadow(
-            color: AppColors.shadowMedium,
-            blurRadius: AppSpacing.lg,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        boxShadow: AppShadows.card(Theme.of(context).colorScheme),
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(

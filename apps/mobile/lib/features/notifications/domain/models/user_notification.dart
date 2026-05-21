@@ -1,3 +1,5 @@
+import 'package:chisto_mobile/features/notifications/domain/models/notification_actor.dart';
+
 enum UserNotificationType {
   siteUpdate,
   reportStatus,
@@ -51,6 +53,7 @@ class UserNotification {
     this.threadKey,
     this.groupKey,
     this.archivedAt,
+    this.actor,
   });
 
   factory UserNotification.fromJson(Map<String, dynamic> json) {
@@ -70,7 +73,17 @@ class UserNotification {
       archivedAt: json['archivedAt'] != null
           ? DateTime.parse(json['archivedAt'] as String)
           : null,
+      actor: _parseActor(json['actor']),
     );
+  }
+
+  static NotificationActor? _parseActor(Object? raw) {
+    if (raw is! Map<String, dynamic>) return null;
+    try {
+      return NotificationActor.fromJson(raw);
+    } on Object {
+      return null;
+    }
   }
 
   final String id;
@@ -84,25 +97,55 @@ class UserNotification {
   final String? threadKey;
   final String? groupKey;
   final DateTime? archivedAt;
+  final NotificationActor? actor;
 
-  UserNotification copyWith({bool? isRead, DateTime? archivedAt}) {
+  UserNotification copyWith({
+    bool? isRead,
+    DateTime? archivedAt,
+    String? title,
+    String? body,
+    Map<String, dynamic>? data,
+    DateTime? createdAt,
+    NotificationActor? actor,
+  }) {
     return UserNotification(
       id: id,
-      title: title,
-      body: body,
+      title: title ?? this.title,
+      body: body ?? this.body,
       type: type,
       isRead: isRead ?? this.isRead,
-      createdAt: createdAt,
-      data: data,
+      createdAt: createdAt ?? this.createdAt,
+      data: data ?? this.data,
       sentAt: sentAt,
       threadKey: threadKey,
       groupKey: groupKey,
       archivedAt: archivedAt ?? this.archivedAt,
+      actor: actor ?? this.actor,
     );
   }
 
   String? get targetSiteId => data?['siteId'] as String?;
   String? get targetTab => data?['targetTab'] as String?;
+  String? get targetAction => data?['targetAction'] as String?;
+  String? get targetEventId => data?['eventId'] as String?;
+  String? get dataKind => data?['kind'] as String?;
+  String? get eventTitleFromData {
+    final String? t = data?['eventTitle'] as String?;
+    if (t != null && t.trim().isNotEmpty) return t.trim();
+    return data?['threadTitle'] as String?;
+  }
+
+  String? get highlightActorUserId => data?['actorUserId'] as String?;
+  String? get highlightCommentId => data?['commentId'] as String?;
+
+  int? get messageCount {
+    final Object? raw = data?['messageCount'];
+    if (raw == null) return null;
+    if (raw is int) return raw;
+    if (raw is num) return raw.toInt();
+    if (raw is String) return int.tryParse(raw);
+    return null;
+  }
 }
 
 String toNotificationTypeApiValue(UserNotificationType type) {

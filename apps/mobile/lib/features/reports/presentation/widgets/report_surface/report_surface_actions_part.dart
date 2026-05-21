@@ -37,13 +37,7 @@ class ReportActionTile extends StatelessWidget {
                 : palette.background,
             borderRadius: BorderRadius.circular(AppSpacing.radius18),
             border: Border.all(color: palette.border.withValues(alpha: 0.85)),
-            boxShadow: <BoxShadow>[
-              BoxShadow(
-                color: AppColors.black.withValues(alpha: 0.018),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            boxShadow: AppShadows.panel(Theme.of(context).colorScheme),
           ),
           child: Row(
             crossAxisAlignment: subtitle != null
@@ -118,25 +112,22 @@ class ReportCircleIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Circle chrome on [Container], not [Ink] — Ink paints a square layer that
+    // reads as a gray rectangle behind the icon.
     final Widget child = Material(
       color: AppColors.transparent,
       child: InkWell(
         onTap: onTap,
         customBorder: const CircleBorder(),
-        child: Ink(
+        child: Container(
           width: 44,
           height: 44,
+          alignment: Alignment.center,
           decoration: BoxDecoration(
             color: AppColors.inputFill,
             shape: BoxShape.circle,
             border: Border.all(color: AppColors.divider.withValues(alpha: 0.8)),
-            boxShadow: <BoxShadow>[
-              BoxShadow(
-                color: AppColors.black.withValues(alpha: 0.03),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            boxShadow: AppShadows.panel(Theme.of(context).colorScheme),
           ),
           child: Icon(icon, size: 20, color: AppColors.textPrimary),
         ),

@@ -12,12 +12,19 @@ import { AuthRegistrationService } from './auth-registration.service';
 import { AuthAdminLoginService } from './auth-admin-login.service';
 import { AuthMfaService } from './auth-mfa.service';
 import { AuthProfileService } from './auth-profile.service';
+import { AuthProfileReadService } from './auth-profile-read.service';
+import { AuthProfileAvatarService } from './auth-profile-avatar.service';
 import { AuthCredentialService } from './auth-credential.service';
+import { AuthOtpService } from './auth-otp.service';
+import { AuthLoginService } from './auth-login.service';
+import { PasswordResetService } from './password-reset.service';
+import { PhoneVerifiedGuard } from './phone-verified.guard';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { JwtStrategy } from './jwt.strategy';
 import { OptionalJwtAuthGuard } from './optional-jwt-auth.guard';
 import { OrganizerCertificationService } from './organizer-certification.service';
 import { RolesGuard } from './roles.guard';
+import { EmailModule } from '../email/email.module';
 import { OtpModule } from '../otp/otp.module';
 import { AuditModule } from '../audit/audit.module';
 import { ReportsUploadModule } from '../reports/reports-upload.module';
@@ -31,6 +38,7 @@ import { GamificationModule } from '../gamification/gamification.module';
     AuditModule,
     ReportsUploadModule,
     GamificationModule,
+    EmailModule,
     OtpModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
@@ -61,17 +69,22 @@ import { GamificationModule } from '../gamification/gamification.module';
     },
     AuthSessionService,
     AuthRegistrationService,
+    AuthLoginService,
+    AuthOtpService,
+    PasswordResetService,
     AuthAdminLoginService,
     AuthMfaService,
+    AuthProfileReadService,
+    AuthProfileAvatarService,
     AuthProfileService,
     AuthCredentialService,
+    PhoneVerifiedGuard,
     JwtStrategy,
     JwtAuthGuard,
     RolesGuard,
     OptionalJwtAuthGuard,
     OrganizerCertificationService,
   ],
-  // Re-export AuditModule so RolesGuard (AuditService) resolves in every feature module that uses @UseGuards(RolesGuard).
-  exports: [JwtAuthGuard, RolesGuard, OptionalJwtAuthGuard, AuditModule],
+  exports: [JwtAuthGuard, RolesGuard, OptionalJwtAuthGuard, PhoneVerifiedGuard, AuditModule],
 })
 export class AuthModule {}

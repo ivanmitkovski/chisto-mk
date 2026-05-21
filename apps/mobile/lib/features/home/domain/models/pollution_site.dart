@@ -104,6 +104,9 @@ class PollutionSite {
   int get siteParticipantStatsBadgeValue =>
       coReporterNames.isNotEmpty ? coReporterNames.length : mergedDuplicateChildCountTotal;
 
+  /// Chronologically first report (detail GET). Drives the "Reported by" row on site detail.
+  SiteReport? get displayFirstReport => firstReport;
+
   /// Modal / list: prefer [coReporterProfiles] when it carries avatars; otherwise fall back to [coReporterNames].
   List<CoReporterProfile> get displayCoReporterProfiles {
     if (coReporterProfiles.isNotEmpty) {

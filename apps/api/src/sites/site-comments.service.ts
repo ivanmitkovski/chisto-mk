@@ -30,11 +30,14 @@ export class SiteCommentsService {
   async createSiteComment(siteId: string, dto: CreateSiteCommentDto, user: AuthenticatedUser) {
     const created = await this.mutations.createSiteComment(siteId, dto, user);
     this.sitesFeed.invalidateFeedCache('comment_created', siteId);
+    const preview = created.body.length > 140 ? `${created.body.slice(0, 137)}…` : created.body;
     this.reporterNotifications.emitForSiteActivity(
       siteId,
       user.userId,
       'COMMENT',
       'New comment on a site you follow',
+      preview,
+      created.id,
     );
     return created;
   }

@@ -6,8 +6,8 @@ import 'package:chisto_mobile/features/reports/data/outbox/report_draft_reposito
 import 'package:chisto_mobile/features/reports/presentation/l10n/report_draft_saved_label.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_modal_dialog.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
 import 'package:flutter/material.dart';
 
 /// User decision when opening the wizard with a new photo while a draft exists.
@@ -51,57 +51,24 @@ Future<ResumeWithIncomingChoice?> showResumeWithIncomingPhotoDialog({
             PrimaryButton(
               label: l10n.reportDraftIncomingPhotoContinue,
               onPressed: () {
-                AppHaptics.light();
                 Navigator.of(ctx).pop(ResumeWithIncomingChoice.continueDraft);
               },
             ),
             const SizedBox(height: AppSpacing.sm),
-            SizedBox(
-              height: 48,
-              width: double.infinity,
-              child: OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.textPrimary,
-                  side: const BorderSide(color: AppColors.inputBorder),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-                  ),
-                ),
-                onPressed: () {
-                  AppHaptics.tap();
-                  Navigator.of(ctx).pop(ResumeWithIncomingChoice.replaceDraft);
-                },
-                child: Text(
-                  l10n.reportDraftIncomingPhotoReplace,
-                  style: AppTypography.textTheme.labelLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
+            AppButton.outlined(
+              label: l10n.reportDraftIncomingPhotoReplace,
+              onPressed: () {
+                Navigator.of(ctx).pop(ResumeWithIncomingChoice.replaceDraft);
+              },
+              expand: true,
             ),
             const SizedBox(height: AppSpacing.sm),
-            SizedBox(
-              height: 48,
-              width: double.infinity,
-              child: OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.textPrimary,
-                  side: const BorderSide(color: AppColors.inputBorder),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-                  ),
-                ),
-                onPressed: () {
-                  AppHaptics.tap();
-                  Navigator.of(ctx).pop(ResumeWithIncomingChoice.addPhoto);
-                },
-                child: Text(
-                  l10n.reportDraftIncomingPhotoAdd,
-                  style: AppTypography.textTheme.labelLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
+            AppButton.outlined(
+              label: l10n.reportDraftIncomingPhotoAdd,
+              onPressed: () {
+                Navigator.of(ctx).pop(ResumeWithIncomingChoice.addPhoto);
+              },
+              expand: true,
             ),
           ],
         ),

@@ -23,6 +23,7 @@ import { Throttle } from '@nestjs/throttler';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { ParseCuidPipe } from '../common/pipes/parse-cuid.pipe';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { PhoneVerifiedGuard } from '../auth/phone-verified.guard';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import {
   CheckInAttendeeRowDto,
@@ -65,7 +66,7 @@ import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-e
   PendingStatusResponseDto,
 )
 @Controller('events/:eventId/check-in')
-@UseGuards(JwtAuthGuard, EventsCheckInThrottlerGuard)
+@UseGuards(JwtAuthGuard, PhoneVerifiedGuard, EventsCheckInThrottlerGuard)
 @ApiBearerAuth()
 export class EventsCheckInController {
   constructor(private readonly checkIn: EventsCheckInService) {}

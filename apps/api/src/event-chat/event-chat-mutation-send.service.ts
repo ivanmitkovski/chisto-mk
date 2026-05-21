@@ -13,6 +13,7 @@ import type { SendEventChatMessageDto } from './dto/send-event-chat-message.dto'
 import { ChatEncryptionService } from './chat-encryption.service';
 import { EVENT_CHAT_MESSAGE_SELECT, type EventChatMessageRow } from './event-chat-message.select';
 import { EventChatNotificationsService } from './event-chat-notifications.service';
+import { buildEventChatPushPreview } from './event-chat-push-preview';
 import { EventChatSseService } from './event-chat-sse.service';
 import { EventChatTelemetryService } from './event-chat-telemetry.service';
 import { EventChatUploadService } from './event-chat-upload.service';
@@ -200,7 +201,7 @@ export class EventChatMutationSendService {
       message: streamPayload as unknown as Record<string, unknown>,
     });
 
-    const messagePreview = this.dto.decryptBody(created);
+    const messagePreview = buildEventChatPushPreview(created, this.dto.decryptBody(created));
     void this.chatNotifications
       .notifyParticipantsDebounced(eventId, user.userId, created, messagePreview)
       .catch((err: unknown) => {

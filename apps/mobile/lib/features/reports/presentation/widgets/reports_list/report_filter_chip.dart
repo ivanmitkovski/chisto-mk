@@ -54,7 +54,7 @@ class ReportFilterChip extends StatelessWidget {
         ),
         padding: EdgeInsets.symmetric(
           horizontal: dense ? AppSpacing.xs + 2 : AppSpacing.sm,
-          vertical: dense ? 3 : AppSpacing.xxs,
+          vertical: dense ? AppSpacing.xs : AppSpacing.xxs,
         ),
       ),
     );

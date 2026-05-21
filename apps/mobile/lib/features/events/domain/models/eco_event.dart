@@ -1,6 +1,7 @@
 import 'package:chisto_mobile/features/events/domain/models/event_pulse_route_evidence.dart';
 import 'package:chisto_mobile/shared/current_user.dart';
 import 'package:flutter/foundation.dart';
+import 'package:chisto_mobile/core/logging/app_log.dart';
 
 class EventTime {
   const EventTime({required this.hour, required this.minute});
@@ -598,7 +599,7 @@ class EcoEvent {
         if (value.name == name) return value;
       }
       assert(() {
-        debugPrint(
+        AppLog.verbose(
           '[EcoEvent] Unknown enum value "$name" for '
           '${fallback.runtimeType}, falling back to ${fallback.name}',
         );

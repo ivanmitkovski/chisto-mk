@@ -3,7 +3,7 @@ import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
-import 'package:chisto_mobile/shared/widgets/app_action_sheet.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/app_action_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 

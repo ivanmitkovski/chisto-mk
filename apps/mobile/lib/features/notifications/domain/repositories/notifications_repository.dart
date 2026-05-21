@@ -51,4 +51,6 @@ abstract class NotificationsRepository {
   Future<void> archiveNotification(String notificationId);
 
   Future<void> archiveAllRead();
+
+  Future<void> recordOpened(String notificationId);
 }

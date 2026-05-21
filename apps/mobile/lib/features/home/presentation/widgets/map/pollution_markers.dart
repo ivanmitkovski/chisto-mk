@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/map/cluster_bucket.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/map/map_site_pin_image.dart';
@@ -268,9 +269,8 @@ class _ClusterMarkerState extends State<ClusterMarker>
             child: Center(
               child: Text(
                 count >= 100 ? '99+' : '$count',
-                style: TextStyle(
+                style: AppTypography.badgeLabel.copyWith(
                   color: AppColors.textOnDark,
-                  fontWeight: FontWeight.w700,
                   fontSize: count >= 10 ? 12 : 14,
                   height: 1,
                   letterSpacing: -0.3,
@@ -328,9 +328,8 @@ class ClusterGhostMarker extends StatelessWidget {
           child: Center(
             child: Text(
               count >= 100 ? '99+' : '$count',
-              style: TextStyle(
+              style: AppTypography.badgeLabel.copyWith(
                 color: AppColors.textOnDark.withValues(alpha: 0.9),
-                fontWeight: FontWeight.w700,
                 fontSize: count >= 10 ? 12 : 14,
                 height: 1,
                 letterSpacing: -0.3,

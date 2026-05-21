@@ -203,6 +203,11 @@ export class ReportSideEffectProcessorService {
       ];
       const uniqueRecipients = [...new Set(recipientUserIds)];
       if (uniqueRecipients.length > 0) {
+        const reportRow = await this.prisma.report.findUnique({
+          where: { id: raw.reportId },
+          select: { reportNumber: true },
+        });
+        const reportNumberLabel = reportRow?.reportNumber ?? '';
         const statusLabel = raw.toStatus.toLowerCase().replace(/_/g, ' ');
         const copy = reportStatusCopy('en', statusLabel);
         this.eventEmitter.emit('notification.send', {
@@ -212,7 +217,13 @@ export class ReportSideEffectProcessorService {
           type: 'REPORT_STATUS',
           threadKey: `report:${raw.reportId}`,
           groupKey: `REPORT_STATUS:site:${raw.siteId}`,
-          data: { reportId: raw.reportId, siteId: raw.siteId, status: raw.toStatus },
+          data: {
+            reportId: raw.reportId,
+            siteId: raw.siteId,
+            status: raw.toStatus,
+            reason: raw.reason ?? undefined,
+            reportNumber: reportNumberLabel,
+          },
         });
       }
 

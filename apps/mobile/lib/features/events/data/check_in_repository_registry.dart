@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/check_in_repository.dart';
 import 'package:flutter/foundation.dart';
 
@@ -13,5 +13,5 @@ class CheckInRepositoryRegistry {
   }
 
   static CheckInRepository get instance =>
-      _testOverride ?? ServiceLocator.instance.checkInRepository;
+      _testOverride ?? AppBootstrap.instance.checkInRepository;
 }

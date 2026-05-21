@@ -1,5 +1,99 @@
 import 'package:sentry_flutter/sentry_flutter.dart';
 
+/// Strips tokens, credentials, and query secrets before events leave the device.
+SentryEvent? chistoSentryBeforeSend(SentryEvent event, Hint hint) {
+  final SentryRequest? request = event.request;
+  SentryRequest? scrubbedRequest = request;
+  if (request != null) {
+    final Map<String, String> headers = Map<String, String>.from(request.headers ?? <String, String>{});
+    for (final String key in headers.keys.toList()) {
+      if (key.toLowerCase() == 'authorization') {
+        headers[key] = '[Filtered]';
+      }
+    }
+    scrubbedRequest = SentryRequest(
+      url: _scrubUrlQuery(request.url),
+      method: request.method,
+      headers: headers,
+    );
+  }
+  return event.copyWith(request: scrubbedRequest);
+}
+
+String? _scrubUrlQuery(String? url) {
+  if (url == null || url.isEmpty || !url.contains('?')) {
+    return url;
+  }
+  final Uri? uri = Uri.tryParse(url);
+  if (uri == null) {
+    return url;
+  }
+  const Set<String> sensitive = <String>{
+    'token',
+    'access_token',
+    'refresh_token',
+    'password',
+    'otp',
+    'code',
+  };
+  final Map<String, String> q = Map<String, String>.from(uri.queryParameters);
+  for (final String key in q.keys.toList()) {
+    if (sensitive.contains(key.toLowerCase())) {
+      q[key] = '[Filtered]';
+    }
+  }
+  return uri.replace(queryParameters: q).toString();
+}
+
+/// Tags Sentry events with the signed-in user id so we can group reports per
+/// session without leaking PII (no email, name, or phone). Called once after
+/// successful sign-in / token restore.
+Future<void> chistoSentrySetUser(String userId) async {
+  try {
+    await Sentry.configureScope((Scope scope) async {
+      await scope.setUser(SentryUser(id: userId));
+    });
+  } on Object {
+    // Sentry may be uninitialized in local/dev runs.
+  }
+}
+
+/// Clears the user tag on logout / account switch so subsequent crashes are
+/// not attributed to the previous account.
+Future<void> chistoSentryClearUser() async {
+  try {
+    await Sentry.configureScope((Scope scope) async {
+      await scope.setUser(null);
+    });
+  } on Object {
+    // Sentry may be uninitialized in local/dev runs.
+  }
+}
+
+/// Generic Sentry breadcrumb (Wave 18). Avoid PII in [message].
+void chistoBreadcrumb({
+  required String category,
+  required String message,
+  String level = 'info',
+}) {
+  try {
+    final SentryLevel sentryLevel = switch (level) {
+      'warning' => SentryLevel.warning,
+      'error' => SentryLevel.error,
+      _ => SentryLevel.info,
+    };
+    Sentry.addBreadcrumb(
+      Breadcrumb(
+        category: category,
+        message: message,
+        level: sentryLevel,
+      ),
+    );
+  } on Object {
+    // Sentry may be uninitialized in local/dev runs.
+  }
+}
+
 /// Breadcrumb helper for the reports vertical — **no PII** (no coordinates, addresses, bodies).
 void chistoReportsBreadcrumb(
   String category,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:chisto_mobile/core/theme/app_shadows.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/profile/domain/models/points_history_page.dart';
@@ -34,13 +35,7 @@ class PointsHistoryActivityTile extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.panelBackground,
           borderRadius: BorderRadius.circular(AppSpacing.radius18),
-          boxShadow: <BoxShadow>[
-            BoxShadow(
-              color: AppColors.shadowLight,
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          boxShadow: AppShadows.panel(Theme.of(context).colorScheme),
           border: Border.all(
             color: AppColors.divider.withValues(alpha: 0.9),
           ),

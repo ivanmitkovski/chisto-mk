@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:chisto_mobile/core/auth/auth_state.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/core/logging/app_log.dart';
 import 'package:chisto_mobile/core/network/api_client.dart';
 import 'package:chisto_mobile/features/home/data/sites_json_mapper.dart';
 import 'package:chisto_mobile/features/home/data/sites_local_cache.dart';
@@ -43,6 +44,9 @@ class ApiFeedSitesRepository implements FeedSitesRepository {
 
   final Map<String, ({MapSitesResult result, DateTime cachedAt})>
       _memoryMapCache = <String, ({MapSitesResult result, DateTime cachedAt})>{};
+
+  final Map<String, Future<PollutionSite?>> _inFlightSiteById =
+      <String, Future<PollutionSite?>>{};
 
   void _rememberFeedCacheEntry(
     String cacheKey, {
@@ -316,6 +320,58 @@ class ApiFeedSitesRepository implements FeedSitesRepository {
       isStaleFallback: true,
     );
     return parsed.sites.isEmpty ? null : parsed;
+  }
+
+  static const Set<String> _savedEndpointUnavailableCodes = <String>{
+    'NOT_FOUND',
+    'BAD_REQUEST',
+    'VALIDATION_ERROR',
+  };
+
+  @override
+  Future<SitesListResult> getSavedSites({
+    int page = 1,
+    int limit = 24,
+    double? latitude,
+    double? longitude,
+  }) async {
+    final List<String> queryParams = <String>['page=$page', 'limit=$limit'];
+    if (latitude != null) queryParams.add('lat=$latitude');
+    if (longitude != null) queryParams.add('lng=$longitude');
+    try {
+      final ApiResponse response = await _client.get(
+        '/sites/saved?${queryParams.join('&')}',
+      );
+      final Map<String, dynamic>? json = response.json;
+      if (json == null) throw AppError.unknown();
+      final SitesListResult parsed = _mapper.sitesListResultFromJson(
+        json,
+        page: page,
+        limit: limit,
+      );
+      return _mergeUpvotesIntoSitesList(
+        SitesListResult(
+          sites: parsed.sites,
+          total: parsed.total,
+          page: parsed.page,
+          limit: parsed.limit,
+          nextCursor: parsed.nextCursor,
+          servedFromCache: false,
+          isStaleFallback: false,
+          cachedAt: DateTime.now(),
+          lastSuccessfulRefreshAt: DateTime.now(),
+          feedVariant: 'v1',
+        ),
+      );
+    } on AppError catch (e) {
+      if (_savedEndpointUnavailableCodes.contains(e.code)) {
+        AppLog.warn(
+          'GET /sites/saved unavailable (${e.code}); showing empty saved list',
+        );
+        return SitesListResult.empty(page: page, limit: limit);
+      }
+      rethrow;
+    }
   }
 
   @override
@@ -613,7 +669,21 @@ class ApiFeedSitesRepository implements FeedSitesRepository {
   }
 
   @override
-  Future<PollutionSite?> getSiteById(String id) async {
+  Future<PollutionSite?> getSiteById(String id) {
+    return _inFlightSiteById.putIfAbsent(id, () {
+      final Future<PollutionSite?> future = _fetchSiteById(id);
+      unawaited(
+        future.whenComplete(() {
+          if (_inFlightSiteById[id] == future) {
+            _inFlightSiteById.remove(id);
+          }
+        }),
+      );
+      return future;
+    });
+  }
+
+  Future<PollutionSite?> _fetchSiteById(String id) async {
     try {
       final ApiResponse response = await _client.get('/sites/$id');
       final Map<String, dynamic>? json = response.json;

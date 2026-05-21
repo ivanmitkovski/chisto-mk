@@ -25,6 +25,11 @@ abstract class ReportOutboxRepository {
     int? lastPersistedAtMs,
   });
   Future<void> delete(String id);
+
+  /// Optional teardown hook. Implementations backed by a long-lived resource
+  /// (e.g. SQLite) should close it here. The default is a no-op so in-memory
+  /// fakes remain trivial.
+  Future<void> close() async {}
 }
 
 String _stateToDb(ReportOutboxState s) => s.name;
@@ -37,13 +42,30 @@ ReportOutboxState _stateFromDb(String raw) {
 }
 
 class SqfliteReportOutboxRepository implements ReportOutboxRepository {
-  SqfliteReportOutboxRepository(Database db) : _dao = ReportOutboxDao(db);
+  SqfliteReportOutboxRepository(Database db)
+      : _db = db,
+        _dao = ReportOutboxDao(db);
 
+  final Database _db;
   final ReportOutboxDao _dao;
+  bool _closed = false;
 
   static Future<SqfliteReportOutboxRepository> open() async {
     final Database db = await ReportOutboxDatabase.open();
     return SqfliteReportOutboxRepository(db);
+  }
+
+  /// Closes the backing SQLite database. After this returns, the repository
+  /// can no longer be used. Idempotent so logout/teardown can call it safely.
+  @override
+  Future<void> close() async {
+    if (_closed) return;
+    _closed = true;
+    try {
+      await _db.close();
+    } on Object {
+      // Swallow: the DB may already be closed from a prior teardown.
+    }
   }
 
   /// Missing or unknown `submit_requested` is treated as **not** requested so

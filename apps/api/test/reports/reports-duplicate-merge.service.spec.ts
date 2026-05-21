@@ -28,6 +28,7 @@ function createMergeServiceWithMocks(
     siteEvents as never,
     reportsOwnerEvents as never,
     eventEmitter as never,
+    { recordStatusChanged: jest.fn(), recordReportMerged: jest.fn(), emitHistoryAppended: jest.fn() } as never,
   );
   const reportSideEffectProcessor = new ReportSideEffectProcessorService(
     prisma as never,

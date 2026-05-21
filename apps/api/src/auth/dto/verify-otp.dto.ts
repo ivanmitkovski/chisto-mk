@@ -13,14 +13,14 @@ export class VerifyOtpDto {
   phoneNumber!: string;
 
   @ApiProperty({
-    example: '1234',
-    description: '4-digit code received via SMS',
-    minLength: 4,
-    maxLength: 4,
+    example: '123456',
+    description: '6-digit code received via SMS',
+    minLength: 6,
+    maxLength: 6,
   })
   @IsString()
-  @MinLength(4)
-  @MaxLength(4)
-  @Matches(/^\d{4}$/, { message: 'code must be exactly 4 digits' })
+  @MinLength(6)
+  @MaxLength(6)
+  @Matches(/^\d{6}$/, { message: 'code must be exactly 6 digits' })
   code!: string;
 }

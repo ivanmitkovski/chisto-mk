@@ -9,7 +9,6 @@ import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/event_calendar_date_format.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/custom_reminder_datetime_sheet.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 class ReminderPickerSheet {
   ReminderPickerSheet._();
@@ -73,7 +72,6 @@ class _ReminderPickerContent extends StatelessWidget {
                 enabled: enabled,
                 onTap: enabled
                     ? () {
-                        AppHaptics.tap();
                         Navigator.of(context).pop(candidate);
                       }
                     : null,
@@ -86,7 +84,6 @@ class _ReminderPickerContent extends StatelessWidget {
             enabled: true,
             icon: CupertinoIcons.calendar_badge_plus,
             onTap: () async {
-              AppHaptics.tap();
               final DateTime? custom = await CustomReminderDateTimeSheet.show(
                 context: context,
                 eventStart: start,

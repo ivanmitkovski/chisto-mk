@@ -46,3 +46,7 @@ app.*.map.json
 
 # Local device captures (do not commit)
 bugreport*.zip
+
+# Firebase (download from console or CI secrets; see apps/api/docs/push-notifications-setup.md)
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist

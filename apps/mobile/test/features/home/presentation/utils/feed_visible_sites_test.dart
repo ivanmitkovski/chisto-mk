@@ -39,6 +39,30 @@ void main() {
     expect(feedStatusPriority('Reported') > feedStatusPriority('Cleaned'), isTrue);
   });
 
+  test('computeVisibleSitesForFilter urgent prefers urgencyLabel sites', () {
+    final List<PollutionSite> sites = <PollutionSite>[
+      _dummy(id: '1', urgencyLabel: 'needs_attention'),
+      _dummy(id: '2'),
+    ];
+    final List<PollutionSite> out = computeVisibleSitesForFilter(
+      source: sites,
+      filter: FeedFilter.urgent,
+    );
+    expect(out.map((PollutionSite s) => s.id).toList(), <String>['1']);
+  });
+
+  test('computeVisibleSitesForFilter saved returns full list when all saved', () {
+    final List<PollutionSite> sites = <PollutionSite>[
+      _dummy(id: '1', isSavedByMe: true),
+      _dummy(id: '2', isSavedByMe: true),
+    ];
+    final List<PollutionSite> out = computeVisibleSitesForFilter(
+      source: sites,
+      filter: FeedFilter.saved,
+    );
+    expect(out, hasLength(2));
+  });
+
   test('computeVisibleSitesForFilter saved keeps only isSavedByMe sites', () {
     final List<PollutionSite> sites = <PollutionSite>[
       _dummy(id: '1', isSavedByMe: true),

@@ -3,7 +3,9 @@ import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/presentation/providers/repository_providers.dart';
 import 'package:chisto_mobile/features/home/presentation/screens/pollution_site_detail_screen.dart';
-import 'package:chisto_mobile/shared/widgets/app_error_view.dart';
+import 'package:chisto_mobile/features/notifications/domain/models/notification_inbox_highlight.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_loading_indicator.dart';
+import 'package:chisto_mobile/shared/widgets/molecules/app_error_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -20,10 +22,14 @@ class SiteDetailRouteScreen extends ConsumerStatefulWidget {
     super.key,
     required this.siteId,
     this.previewSite,
+    this.initialAction,
+    this.initialHighlight,
   });
 
   final String siteId;
   final PollutionSite? previewSite;
+  final String? initialAction;
+  final NotificationInboxHighlight? initialHighlight;
 
   @override
   ConsumerState<SiteDetailRouteScreen> createState() =>
@@ -31,7 +37,7 @@ class SiteDetailRouteScreen extends ConsumerStatefulWidget {
 }
 
 class _SiteDetailRouteScreenState extends ConsumerState<SiteDetailRouteScreen> {
-  late Future<PollutionSite?> _future;
+  Future<PollutionSite?>? _future;
   PollutionSite? _preview;
 
   @override
@@ -39,20 +45,27 @@ class _SiteDetailRouteScreenState extends ConsumerState<SiteDetailRouteScreen> {
     super.initState();
     final PollutionSite? p = widget.previewSite;
     _preview = p != null && p.id == widget.siteId ? p : null;
-    _future = ref.read(sitesRepositoryProvider).getSiteById(widget.siteId);
+    if (_preview == null) {
+      _future = ref.read(sitesRepositoryProvider).getSiteById(widget.siteId);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     if (_preview != null) {
-      return PollutionSiteDetailScreen(site: _preview!);
+      return PollutionSiteDetailScreen(
+        site: _preview!,
+        skipInitialRefresh: true,
+        initialAction: widget.initialAction,
+        initialHighlight: widget.initialHighlight,
+      );
     }
     return FutureBuilder<PollutionSite?>(
-      future: _future,
+      future: _future!,
       builder: (BuildContext context, AsyncSnapshot<PollutionSite?> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+          return Scaffold(
+            body: Center(child: AppLoadingIndicator()),
           );
         }
         if (snapshot.hasError) {
@@ -79,7 +92,12 @@ class _SiteDetailRouteScreenState extends ConsumerState<SiteDetailRouteScreen> {
             body: Center(child: Text(context.l10n.feedSiteNotFoundMessage)),
           );
         }
-        return PollutionSiteDetailScreen(site: site);
+        return PollutionSiteDetailScreen(
+          site: site,
+          skipInitialRefresh: true,
+          initialAction: widget.initialAction,
+          initialHighlight: widget.initialHighlight,
+        );
       },
     );
   }

@@ -13,8 +13,6 @@ import { AuthenticatedUser } from './types/authenticated-user.type';
 
 type JwtPayload = {
   sub: string;
-  email: string;
-  phoneNumber: string;
   role: Role;
   sid?: string;
 };
@@ -47,7 +45,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(payload: JwtPayload): Promise<AuthenticatedUser> {
     const dbUser = await this.prisma.user.findUnique({
       where: { id: payload.sub },
-      select: { status: true },
+      select: { status: true, email: true, phoneNumber: true },
     });
 
     if (!dbUser || dbUser.status !== UserStatus.ACTIVE) {
@@ -78,8 +76,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     const authUser: AuthenticatedUser = {
       userId: payload.sub,
-      email: payload.email,
-      phoneNumber: payload.phoneNumber,
+      email: dbUser.email,
+      phoneNumber: dbUser.phoneNumber,
       role: payload.role,
     };
     if (payload.sid) {

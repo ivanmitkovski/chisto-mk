@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
 
 class ForgotPasswordSuccessScreen extends StatelessWidget {
   const ForgotPasswordSuccessScreen({super.key});
@@ -45,18 +45,14 @@ class ForgotPasswordSuccessScreen extends StatelessWidget {
               const SizedBox(height: AppSpacing.xl),
               Text(
                 l10n.authPasswordResetSuccessTitle,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.3,
-                ),
+                textAlign: TextAlign.center,
+                style: AppTypography.authScreenTitle(context),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppSpacing.xs),
               Text(
                 l10n.authPasswordResetSuccessBody,
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.textMuted,
-                ),
+                style: AppTypography.authScreenSubtitle(context),
               ),
               const Spacer(),
               Semantics(
@@ -65,7 +61,6 @@ class ForgotPasswordSuccessScreen extends StatelessWidget {
                 child: PrimaryButton(
                   label: l10n.authBackToSignIn,
                   onPressed: () {
-                    AppHaptics.tap(context);
                     Navigator.of(context).popUntil(
                       (Route<dynamic> route) =>
                           route.settings.name == AppRoutes.signIn,

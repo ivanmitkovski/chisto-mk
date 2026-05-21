@@ -52,8 +52,13 @@ class SplashLogo extends StatelessWidget {
                       controller.duration = composition.duration;
                       controller.forward();
                     },
-                    errorBuilder: (_, Object error, StackTrace? stackTrace) =>
-                        const _FallbackLogo(),
+                    errorBuilder: (_, Object error, StackTrace? stackTrace) {
+                      if (!controller.isAnimating && controller.value == 0) {
+                        controller.duration ??= const Duration(milliseconds: 1);
+                        controller.forward();
+                      }
+                      return const _FallbackLogo();
+                    },
                   ),
                 ),
               ),

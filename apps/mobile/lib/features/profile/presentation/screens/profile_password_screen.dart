@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/features/auth/presentation/constants/auth_error_messages.dart';
@@ -9,13 +9,12 @@ import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/validation/input_validators.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/features/profile/presentation/widgets/profile_sub_screen_header.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
 import 'package:chisto_mobile/features/profile/presentation/widgets/profile_primary_action_bar.dart';
-import 'package:chisto_mobile/shared/widgets/keyboard_aware_form_scroll.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
-import 'package:chisto_mobile/shared/widgets/profile_password_field.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/keyboard_aware_form_scroll.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/profile_password_field.dart';
 
 class ProfilePasswordScreen extends StatefulWidget {
   const ProfilePasswordScreen({super.key});
@@ -121,10 +120,9 @@ class _ProfilePasswordScreenState extends State<ProfilePasswordScreen> {
       _hasConfirmError = false;
       _isSubmitting = true;
     });
-    AppHaptics.medium();
 
     try {
-      await ServiceLocator.instance.authRepository.changePassword(
+      await AppBootstrap.instance.authRepository.changePassword(
         currentPassword: currentPassword,
         newPassword: newPassword,
       );

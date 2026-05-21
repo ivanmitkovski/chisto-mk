@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:chisto_mobile/core/config/app_config.dart';
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,9 +16,8 @@ import 'package:chisto_mobile/features/home/presentation/screens/pollution_site_
 import 'package:chisto_mobile/features/home/presentation/navigation/site_share_result.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/site_card/share_sheet.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/utils/share_popover_origin.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
 
 SiteShareLinkPayload fallbackShareLinkPayloadForSite(
   PollutionSite site, {
@@ -85,7 +84,6 @@ class TakeActionCoordinator {
     required PollutionSite site,
   }) async {
     try {
-      AppHaptics.softTransition();
       final EcoEvent? created = await EventsNavigation.openCreate(
         context,
         preselectedSiteId: site.id,
@@ -117,7 +115,6 @@ class TakeActionCoordinator {
     VoidCallback? onSwitchToCleaningTab,
   }) async {
     try {
-      AppHaptics.softTransition();
       if (isFromSiteDetail) {
         if (onSwitchToCleaningTab != null) {
           onSwitchToCleaningTab();
@@ -150,7 +147,7 @@ class TakeActionCoordinator {
     required String channel,
   }) async {
     try {
-      final SiteShareLinkPayload issued = await ServiceLocator
+      final SiteShareLinkPayload issued = await AppBootstrap
           .instance.sitesRepository
           .issueSiteShareLink(site.id, channel: channel);
       if (issued.url.trim().isNotEmpty) {
@@ -166,7 +163,6 @@ class TakeActionCoordinator {
     BuildContext context, {
     required PollutionSite site,
   }) async {
-    AppHaptics.tap();
     final SiteShareLinkPayload previewIssued =
         await _issueSiteShareLink(site, channel: 'native');
     if (!context.mounted) {
@@ -204,11 +200,10 @@ class TakeActionCoordinator {
             message: context.l10n.takeActionLinkCopied,
             type: AppSnackType.success,
           );
-          AppHaptics.success(context);
         }
         try {
           final EngagementSnapshot snapshot =
-              await ServiceLocator.instance.sitesRepository.shareSite(site.id, channel: 'link');
+              await AppBootstrap.instance.sitesRepository.shareSite(site.id, channel: 'link');
           return SiteShareSuccess(snapshot);
         } catch (_) {
           if (context.mounted) {
@@ -235,10 +230,9 @@ class TakeActionCoordinator {
         if (!context.mounted) {
           return const SiteShareCancelled();
         }
-        AppHaptics.success(context);
         try {
           final EngagementSnapshot snapshot =
-              await ServiceLocator.instance.sitesRepository.shareSite(site.id, channel: 'native');
+              await AppBootstrap.instance.sitesRepository.shareSite(site.id, channel: 'native');
           return SiteShareSuccess(snapshot);
         } catch (_) {
           if (context.mounted) {

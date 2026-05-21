@@ -1,11 +1,15 @@
+library;
+
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/auth/auth_state.dart';
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/widgets/state_rebuild_mixin.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/core/providers/app_providers.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:chisto_mobile/core/l10n/app_error_localizations.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/features/events/data/organizer_quiz_payload.dart';
@@ -13,9 +17,13 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_back_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
+
+part 'organizer_quiz/organizer_quiz_models.dart';
+part 'organizer_quiz/organizer_quiz_question_page.dart';
+part 'organizer_quiz/organizer_quiz_result_screen.dart';
 
 /// Pops the current route after it is fully installed.
 ///
@@ -36,23 +44,24 @@ void _scheduleNavigatorPopWhenRouteReady(BuildContext context) {
   });
 }
 
-Future<void> _persistOrganizerCertifiedAt(DateTime at) async {
-  if (!ServiceLocator.instance.isInitialized) {
+Future<void> _persistOrganizerCertifiedAt(WidgetRef ref, DateTime at) async {
+  if (!ref.read(appBootstrapProvider).isInitialized) {
     return;
   }
-  await ServiceLocator.instance.tokenStorage.writeOrganizerCertifiedAt(at);
+  await ref.read(tokenStorageProvider).writeOrganizerCertifiedAt(at);
 }
 
-class OrganizerQuizScreen extends StatefulWidget {
+class OrganizerQuizScreen extends ConsumerStatefulWidget {
   const OrganizerQuizScreen({super.key, this.onCertified});
 
   final VoidCallback? onCertified;
 
   @override
-  State<OrganizerQuizScreen> createState() => _OrganizerQuizScreenState();
+  ConsumerState<OrganizerQuizScreen> createState() => _OrganizerQuizScreenState();
 }
 
-class _OrganizerQuizScreenState extends State<OrganizerQuizScreen> {
+class _OrganizerQuizScreenState extends ConsumerState<OrganizerQuizScreen>
+    with StateRebuildMixin {
   String? _quizSession;
   List<_QuizQuestion>? _questions;
   final Map<String, String> _selectedOptionByQuestionId = <String, String>{};
@@ -65,8 +74,8 @@ class _OrganizerQuizScreenState extends State<OrganizerQuizScreen> {
   @override
   void initState() {
     super.initState();
-    final ServiceLocator sl = ServiceLocator.instance;
-    if (sl.isInitialized && sl.authState.isOrganizerCertified) {
+    final AuthState auth = ref.read(authStateProvider);
+    if (ref.read(appBootstrapProvider).isInitialized && auth.isOrganizerCertified) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) {
           return;
@@ -96,7 +105,7 @@ class _OrganizerQuizScreenState extends State<OrganizerQuizScreen> {
       _selectedOptionByQuestionId.clear();
     });
     try {
-      final response = await ServiceLocator.instance.apiClient.get(
+      final response = await ref.read(apiClientProvider).get(
         '/auth/me/organizer-certification/quiz',
       );
       final OrganizerQuizApiPayload? payload = parseOrganizerQuizPayload(
@@ -175,12 +184,12 @@ class _OrganizerQuizScreenState extends State<OrganizerQuizScreen> {
         return;
       }
       if (e.code == 'ORGANIZER_CERTIFICATION_ALREADY_CERTIFIED' &&
-          ServiceLocator.instance.isInitialized) {
-        final AuthState auth = ServiceLocator.instance.authState;
+          ref.read(appBootstrapProvider).isInitialized) {
+        final AuthState auth = ref.read(authStateProvider);
         if (!auth.isOrganizerCertified) {
           auth.markOrganizerCertified(DateTime.now());
         }
-        await _persistOrganizerCertifiedAt(DateTime.now());
+        await _persistOrganizerCertifiedAt(ref, DateTime.now());
         if (!mounted) {
           return;
         }
@@ -250,7 +259,7 @@ class _OrganizerQuizScreenState extends State<OrganizerQuizScreen> {
         .toList();
 
     try {
-      final response = await ServiceLocator.instance.apiClient.post(
+      final response = await ref.read(apiClientProvider).post(
         '/auth/me/organizer-certification',
         body: <String, dynamic>{
           'quizSession': session,
@@ -275,8 +284,8 @@ class _OrganizerQuizScreenState extends State<OrganizerQuizScreen> {
       if (passed && certifiedAt != null) {
         final DateTime? parsed = DateTime.tryParse(certifiedAt);
         if (parsed != null) {
-          ServiceLocator.instance.authState.markOrganizerCertified(parsed);
-          await _persistOrganizerCertifiedAt(parsed);
+          ref.read(authStateProvider).markOrganizerCertified(parsed);
+          await _persistOrganizerCertifiedAt(ref, parsed);
         }
       }
 
@@ -318,9 +327,9 @@ class _OrganizerQuizScreenState extends State<OrganizerQuizScreen> {
         return;
       }
       if (e.code == 'ORGANIZER_CERTIFICATION_ALREADY_CERTIFIED' &&
-          ServiceLocator.instance.isInitialized) {
-        ServiceLocator.instance.authState.markOrganizerCertified(DateTime.now());
-        await _persistOrganizerCertifiedAt(DateTime.now());
+          ref.read(appBootstrapProvider).isInitialized) {
+        ref.read(authStateProvider).markOrganizerCertified(DateTime.now());
+        await _persistOrganizerCertifiedAt(ref, DateTime.now());
         if (!mounted) {
           return;
         }
@@ -474,7 +483,7 @@ class _OrganizerQuizScreenState extends State<OrganizerQuizScreen> {
 
     final _QuizResult? result = _result;
     if (result != null) {
-      return _ResultScreen(
+      return OrganizerQuizResultScreen(
         result: result,
         onRetry: _retryAfterResult,
         onCreateEvent: () {
@@ -490,249 +499,6 @@ class _OrganizerQuizScreenState extends State<OrganizerQuizScreen> {
           (_QuizQuestion q) => _selectedOptionByQuestionId.containsKey(q.id),
         );
 
-    return Scaffold(
-      backgroundColor: AppColors.appBackground,
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            _quizPageHeader(context),
-            Expanded(
-              child: ListView.separated(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.lg,
-                  AppSpacing.md,
-                  AppSpacing.lg,
-                  AppSpacing.lg,
-                ),
-                itemCount: questions.length,
-                separatorBuilder: (BuildContext context, int index) =>
-                    const SizedBox(height: AppSpacing.xl),
-                itemBuilder: (BuildContext context, int qIndex) {
-                  final _QuizQuestion q = questions[qIndex];
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        '${qIndex + 1}. ${q.text}',
-                        style: AppTypography.eventsPanelTitle(textTheme),
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                      ...q.options.map((_QuizOption opt) {
-                        final bool selected =
-                            _selectedOptionByQuestionId[q.id] == opt.id;
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-                          child: Semantics(
-                            button: true,
-                            selected: selected,
-                            label: _semanticOptionLabel(
-                              context,
-                              questionIndex1Based: qIndex + 1,
-                              total: questions.length,
-                              optionText: opt.text,
-                            ),
-                            child: Material(
-                              color: AppColors.transparent,
-                              child: InkWell(
-                                onTap: () {
-                                  AppHaptics.light();
-                                  setState(
-                                    () => _selectedOptionByQuestionId[q.id] = opt.id,
-                                  );
-                                },
-                                borderRadius:
-                                    BorderRadius.circular(AppSpacing.radiusLg),
-                                child: Container(
-                                  padding: const EdgeInsets.all(AppSpacing.md),
-                                  decoration: BoxDecoration(
-                                    color: selected
-                                        ? AppColors.primary.withValues(alpha: 0.08)
-                                        : AppColors.panelBackground,
-                                    borderRadius:
-                                        BorderRadius.circular(AppSpacing.radiusLg),
-                                    border: Border.all(
-                                      color: selected
-                                          ? AppColors.primary
-                                          : AppColors.divider.withValues(alpha: 0.5),
-                                      width: selected ? 1.5 : 1,
-                                    ),
-                                  ),
-                                  child: Row(
-                                    children: <Widget>[
-                                      Icon(
-                                        selected
-                                            ? CupertinoIcons.checkmark_circle_fill
-                                            : CupertinoIcons.circle,
-                                        size: 22,
-                                        color: selected
-                                            ? AppColors.primaryDark
-                                            : AppColors.divider,
-                                      ),
-                                      const SizedBox(width: AppSpacing.sm),
-                                      Expanded(
-                                        child: Text(
-                                          opt.text,
-                                          style: AppTypography.eventsBodyProse(textTheme),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                      }),
-                    ],
-                  );
-                },
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.lg,
-                AppSpacing.md,
-                AppSpacing.lg,
-                AppSpacing.lg,
-              ),
-              child: SizedBox(
-                height: 72,
-                child: Center(
-                  child: PrimaryButton(
-                    label: context.l10n.organizerQuizSubmit,
-                    enabled: allAnswered && !_submitting,
-                    isLoading: _submitting,
-                    onPressed: _submit,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _QuizOption {
-  const _QuizOption({required this.id, required this.text});
-  final String id;
-  final String text;
-}
-
-class _QuizQuestion {
-  const _QuizQuestion({
-    required this.id,
-    required this.text,
-    required this.options,
-  });
-  final String id;
-  final String text;
-  final List<_QuizOption> options;
-}
-
-class _QuizResult {
-  const _QuizResult({
-    required this.passed,
-    required this.correctCount,
-    required this.totalQuestions,
-    required this.pointsAwarded,
-  });
-  final bool passed;
-  final int correctCount;
-  final int totalQuestions;
-  final int pointsAwarded;
-}
-
-class _ResultScreen extends StatelessWidget {
-  const _ResultScreen({
-    required this.result,
-    required this.onRetry,
-    required this.onCreateEvent,
-  });
-
-  final _QuizResult result;
-  final Future<void> Function() onRetry;
-  final VoidCallback onCreateEvent;
-
-  @override
-  Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
-    final bool passed = result.passed;
-
-    return Scaffold(
-      backgroundColor: AppColors.appBackground,
-      body: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Container(
-                  width: 96,
-                  height: 96,
-                  decoration: BoxDecoration(
-                    color: (passed ? AppColors.primary : AppColors.accentDanger)
-                        .withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    passed
-                        ? CupertinoIcons.checkmark_seal_fill
-                        : CupertinoIcons.xmark_circle_fill,
-                    size: 48,
-                    color: passed ? AppColors.primaryDark : AppColors.accentDanger,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.xl),
-                Text(
-                  passed
-                      ? context.l10n.organizerQuizPassedTitle
-                      : context.l10n.organizerQuizFailedTitle,
-                  style: AppTypography.eventsDetailHeadline(textTheme),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: AppSpacing.md),
-                Text(
-                  passed
-                      ? context.l10n.organizerQuizPassedBody
-                      : context.l10n.organizerQuizFailedBody(
-                          result.correctCount,
-                          result.totalQuestions,
-                        ),
-                  style: AppTypography.eventsBodyMuted(textTheme),
-                  textAlign: TextAlign.center,
-                ),
-                if (passed && result.pointsAwarded > 0) ...<Widget>[
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(
-                    '+${result.pointsAwarded} pts',
-                    style: AppTypography.eventsMetricValue(textTheme).copyWith(
-                      color: AppColors.primaryDark,
-                    ),
-                  ),
-                ],
-                const SizedBox(height: AppSpacing.xl),
-                SizedBox(
-                  width: double.infinity,
-                  child: PrimaryButton(
-                    label: passed
-                        ? context.l10n.organizerQuizCreateEvent
-                        : context.l10n.organizerQuizRetry,
-                    onPressed: passed
-                        ? onCreateEvent
-                        : () {
-                            unawaited(onRetry());
-                          },
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+    return buildOrganizerQuizQuestionPage(context, questions, allAnswered, textTheme);
   }
 }

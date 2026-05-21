@@ -1,11 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/features/auth/application/registration_otp_controller.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/features/auth/presentation/constants/auth_error_messages.dart';
+import 'package:chisto_mobile/features/auth/presentation/constants/auth_otp_constants.dart';
+import 'package:chisto_mobile/core/validation/phone_display_formatter.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/core/assets/app_assets.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
@@ -14,34 +16,36 @@ import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/widgets/api_error_banner.dart';
-import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
-import 'package:chisto_mobile/shared/widgets/loading_overlay.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/molecules/api_error_banner.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_back_button.dart';
+import 'package:chisto_mobile/features/auth/presentation/eula_acceptance_flow.dart';
+import 'package:chisto_mobile/features/auth/presentation/widgets/auth_otp_input.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/auth_screen_header.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/loading_overlay.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
 
-class OtpScreen extends StatefulWidget {
-  const OtpScreen({super.key, required this.phoneNumber});
+class OtpScreen extends ConsumerStatefulWidget {
+  const OtpScreen({
+    super.key,
+    required this.phoneNumber,
+    this.requestOtpOnOpen = false,
+  });
 
   final String phoneNumber;
 
+  /// When `true`, calls `/auth/otp/send` once on open (e.g. unverified sign-in).
+  final bool requestOtpOnOpen;
+
   @override
-  State<OtpScreen> createState() => _OtpScreenState();
+  ConsumerState<OtpScreen> createState() => _OtpScreenState();
 }
 
-class _OtpScreenState extends State<OtpScreen> {
-  static const int _otpLength = 4;
-
+class _OtpScreenState extends ConsumerState<OtpScreen> {
   final TextEditingController _codeController = TextEditingController();
   final FocusNode _codeFocusNode = FocusNode();
-  bool _isLoading = false;
-  bool _sendingOtp = false;
-  static const int _initialResendSeconds = 45;
-  int _secondsRemaining = _initialResendSeconds;
+  int _secondsRemaining = kAuthOtpResendSeconds;
   Timer? _resendTimer;
   bool _hasResentOnce = false;
-  String? _apiError;
-  int _verifyAttempts = 0;
-  bool _otpLocked = false;
 
   @override
   void dispose() {
@@ -51,53 +55,41 @@ class _OtpScreenState extends State<OtpScreen> {
     super.dispose();
   }
 
-  bool get _isComplete => _codeController.text.trim().length == _otpLength;
+  bool get _isComplete =>
+      _codeController.text.trim().length == kAuthOtpLength;
+  RegistrationOtpState get _otpState =>
+      ref.watch(registrationOtpControllerProvider);
+
+  bool get _isLoading => _otpState.isLoading;
+  bool get _sendingOtp => _otpState.sendingOtp;
+  bool get _otpLocked => _otpState.otpLocked;
+
   bool get _canResend => _secondsRemaining == 0 && !_isLoading;
   bool get _canSubmit => !_otpLocked && _isComplete && !_isLoading;
-
-  static String _formatPhoneForDisplay(String e164) {
-    if (e164.startsWith('+389') && e164.length == 12) {
-      return '+389 ${e164.substring(4, 6)} ${e164.substring(6, 9)} ${e164.substring(9)}';
-    }
-    return e164;
-  }
 
   @override
   void initState() {
     super.initState();
     _startResendCountdown();
-    _requestOtp();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        _codeFocusNode.requestFocus();
+      if (!mounted) return;
+      _codeFocusNode.requestFocus();
+      if (widget.requestOtpOnOpen) {
+        unawaited(_requestOtp());
       }
     });
   }
 
   Future<void> _requestOtp() async {
-    if (_sendingOtp) return;
-    setState(() {
-      _sendingOtp = true;
-      _apiError = null;
-    });
-    try {
-      await ServiceLocator.instance.authRepository
-          .requestOtp(widget.phoneNumber);
-      if (!mounted) return;
-      setState(() => _sendingOtp = false);
-    } on AppError catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _apiError = messageForAuthError(AppLocalizations.of(context)!, e);
-        _sendingOtp = false;
-      });
-    }
+    await ref
+        .read(registrationOtpControllerProvider.notifier)
+        .requestOtp(widget.phoneNumber);
   }
 
   void _startResendCountdown() {
     _resendTimer?.cancel();
-    setState(() => _secondsRemaining = _initialResendSeconds);
+    setState(() => _secondsRemaining = kAuthOtpResendSeconds);
     _resendTimer = Timer.periodic(const Duration(seconds: 1), (Timer timer) {
       if (!mounted) {
         timer.cancel();
@@ -113,7 +105,9 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   void _handleCodeChanged(String value) {
-    AppHaptics.tap(context);
+    if (value.length == kAuthOtpLength) {
+      AppHaptics.tap(context);
+    }
     setState(() {});
 
     if (_isComplete && !_isLoading && !_otpLocked) {
@@ -124,58 +118,36 @@ class _OtpScreenState extends State<OtpScreen> {
   Future<void> _onContinue() async {
     if (!_isComplete || _isLoading || _otpLocked) return;
 
-    setState(() {
-      _isLoading = true;
-      _apiError = null;
-    });
-    final AppLocalizations l10n = AppLocalizations.of(context)!;
     try {
-      await ServiceLocator.instance.authRepository.verifyOtp(
-        widget.phoneNumber,
-        _codeController.text.trim(),
-      );
+      await ref.read(registrationOtpControllerProvider.notifier).verifyOtp(
+            widget.phoneNumber,
+            _codeController.text.trim(),
+          );
       if (!mounted) return;
       AppHaptics.success(context);
+      final bool accepted = await ensureCommunityGuidelinesAccepted(context);
+      if (!accepted || !mounted) return;
       Navigator.of(context).pushNamedAndRemoveUntil(
         AppRoutes.location,
         (Route<dynamic> route) => false,
       );
-    } on AppError catch (e) {
+    } on AppError {
       if (!mounted) return;
-      setState(() {
-        if (e.code == 'OTP_INVALID') {
-          _verifyAttempts += 1;
-          if (_verifyAttempts >= 3) {
-            _otpLocked = true;
-            _codeController.clear();
-            _apiError = l10n.authErrorOtpMaxAttempts;
-          } else {
-            _apiError = messageForAuthError(l10n, e);
-          }
-        } else {
-          _apiError = messageForAuthError(l10n, e);
-        }
-      });
+      if (_otpLocked) {
+        _codeController.clear();
+      }
       AppHaptics.warning(context);
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   Future<void> _handleResend() async {
     if (!_canResend) {
-      AppHaptics.tap(context);
       return;
     }
-    AppHaptics.light(context);
     _codeController.clear();
     _codeFocusNode.requestFocus();
-    setState(() {
-      _hasResentOnce = true;
-      _verifyAttempts = 0;
-      _otpLocked = false;
-      _apiError = null;
-    });
+    setState(() => _hasResentOnce = true);
+    ref.read(registrationOtpControllerProvider.notifier).resetAttempts();
     _startResendCountdown();
     await _requestOtp();
   }
@@ -184,6 +156,12 @@ class _OtpScreenState extends State<OtpScreen> {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
     final double keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
+    final RegistrationOtpState otpState = _otpState;
+    final String? apiError = otpState.otpLocked
+        ? l10n.authErrorOtpMaxAttempts
+        : otpState.error != null
+            ? messageForAuthError(l10n, otpState.error!)
+            : null;
 
     return Stack(
       children: [
@@ -213,11 +191,13 @@ class _OtpScreenState extends State<OtpScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const AppBackButton(),
-                      if (_apiError != null) ...[
+                      if (apiError != null) ...[
                         const SizedBox(height: AppSpacing.sm),
                         ApiErrorBanner(
-                          message: _apiError!,
-                          onDismiss: () => setState(() => _apiError = null),
+                          message: apiError,
+                          onDismiss: () => ref
+                              .read(registrationOtpControllerProvider.notifier)
+                              .clearError(),
                         ),
                         const SizedBox(height: AppSpacing.md),
                       ],
@@ -237,73 +217,21 @@ class _OtpScreenState extends State<OtpScreen> {
                         ),
                       ),
                       const SizedBox(height: AppSpacing.radius22),
-                      Center(
-                        child: Text(
-                          l10n.authOtpTitle,
-                          style: AppTypography.authHeadline,
+                      AuthScreenHeader(
+                        centered: true,
+                        title: l10n.authOtpTitle,
+                        subtitle: l10n.authOtpSubtitle(
+                          formatPhoneForDisplay(widget.phoneNumber),
                         ),
-                      ),
-                      const SizedBox(height: AppSpacing.xs),
-                      Center(
-                        child: Text(
-                          l10n.authOtpSubtitle(
-                            _formatPhoneForDisplay(widget.phoneNumber),
-                          ),
-                          textAlign: TextAlign.center,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: AppTypography.authSubtitle,
-                        ),
+                        subtitleMaxLines: 2,
                       ),
                       const SizedBox(height: AppSpacing.radiusPill),
-                      GestureDetector(
-                        behavior: HitTestBehavior.translucent,
-                        onTap: () => _codeFocusNode.requestFocus(),
-                        child: ExcludeSemantics(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: List<Widget>.generate(
-                              _otpLength,
-                              (int index) {
-                                final String text =
-                                    index < _codeController.text.length
-                                        ? _codeController.text[index]
-                                        : '';
-                                final bool isActive =
-                                    index == _codeController.text.length &&
-                                        !_isComplete;
-
-                                return _OtpDigitBox(
-                                  value: text,
-                                  isActive: isActive,
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                      // Focus target for screen readers & keyboard (visually hidden).
-                      SizedBox(
-                        height: 0,
-                        width: 0,
-                        child: Semantics(
-                          label: l10n.authOtpCodeSemantic,
-                          textField: true,
-                          child: TextField(
-                            controller: _codeController,
-                            focusNode: _codeFocusNode,
-                            keyboardType: TextInputType.number,
-                            textInputAction: TextInputAction.done,
-                            autofillHints: const <String>[
-                              AutofillHints.oneTimeCode,
-                            ],
-                            inputFormatters: <TextInputFormatter>[
-                              FilteringTextInputFormatter.digitsOnly,
-                              LengthLimitingTextInputFormatter(_otpLength),
-                            ],
-                            onChanged: _handleCodeChanged,
-                          ),
-                        ),
+                      AuthOtpInput(
+                        controller: _codeController,
+                        focusNode: _codeFocusNode,
+                        semanticsLabel: l10n.authOtpCodeSemantic,
+                        onChanged: _handleCodeChanged,
+                        enabled: !_otpLocked && !_isLoading,
                       ),
                       const SizedBox(height: AppSpacing.radiusPill),
                       Semantics(
@@ -328,17 +256,15 @@ class _OtpScreenState extends State<OtpScreen> {
                                     key: const ValueKey<String>('resend-active'),
                                     TextSpan(
                                       text: l10n.authOtpResendPrefix,
-                                      style: const TextStyle(
+                                      style: AppTypography.textTheme.bodyLarge!
+                                          .copyWith(
                                         color: AppColors.textPrimary,
                                         fontSize: 17,
                                       ),
                                       children: [
                                         TextSpan(
                                           text: l10n.authOtpResendAction,
-                                          style: const TextStyle(
-                                            color: AppColors.primaryDark,
-                                            fontWeight: FontWeight.w700,
-                                          ),
+                                          style: AppTypography.authTextLink,
                                         ),
                                       ],
                                     ),
@@ -378,45 +304,3 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 }
 
-class _OtpDigitBox extends StatelessWidget {
-  const _OtpDigitBox({
-    required this.value,
-    required this.isActive,
-  });
-
-  final String value;
-  final bool isActive;
-
-  @override
-  Widget build(BuildContext context) {
-    final bool hasValue = value.isNotEmpty;
-    final Duration animDuration = MediaQuery.disableAnimationsOf(context)
-        ? Duration.zero
-        : AppMotion.xFast;
-
-    return AnimatedContainer(
-      duration: animDuration,
-      curve: AppMotion.emphasized,
-      width: 72,
-      height: 56,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: AppColors.appBackground,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-        border: Border.all(
-          color: hasValue
-              ? AppColors.primaryDark
-              : (isActive ? AppColors.primary : AppColors.inputBorder),
-          width: hasValue || isActive ? 1.6 : 1.0,
-        ),
-      ),
-      child: Text(
-        value,
-        style: AppTypography.textTheme.titleMedium!.copyWith(
-          fontWeight: FontWeight.w500,
-          color: AppColors.textPrimary,
-        ),
-      ),
-    );
-  }
-}

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
 
 enum PollutionFeedCardEventType {
   like('upvote'),
@@ -39,7 +39,7 @@ void trackPollutionFeedCardEvent(
   Map<String, dynamic>? metadata,
   String? feedVariant,
 }) {
-  if (!ServiceLocator.instance.authState.isAuthenticated) return;
+  if (!AppBootstrap.instance.authState.isAuthenticated) return;
   final Map<String, dynamic>? enrichedMetadata = feedVariant == null
       ? metadata
       : <String, dynamic>{
@@ -47,7 +47,7 @@ void trackPollutionFeedCardEvent(
           'feedVariant': feedVariant,
         };
   unawaited(
-    ServiceLocator.instance.sitesRepository.trackFeedEvent(
+    AppBootstrap.instance.sitesRepository.trackFeedEvent(
       siteId,
       eventType: eventType.apiValue,
       sessionId: sessionId,

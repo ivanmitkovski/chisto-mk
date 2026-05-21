@@ -9,10 +9,10 @@ import 'package:chisto_mobile/features/reports/presentation/widgets/location_pic
 import 'package:chisto_mobile/features/reports/presentation/widgets/location_picker/location_picker_map_stack.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_loading_indicator.dart';
 
 /// Map + status UI for the report location step; state lives on [LocationPickerController].
 class LocationPickerView extends StatelessWidget {
@@ -266,7 +266,6 @@ class LocationPickerView extends StatelessWidget {
                       onPressed: controller.geocodingInProgress
                           ? null
                           : () {
-                              AppHaptics.tap();
                               controller.confirmSelection(fromUser: true);
                             },
                       style: FilledButton.styleFrom(
@@ -282,11 +281,11 @@ class LocationPickerView extends StatelessWidget {
                         ),
                       ),
                       icon: controller.geocodingInProgress
-                          ? const SizedBox(
+                          ? SizedBox(
                               width: 18,
                               height: 18,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
+                              child: AppLoadingIndicator(
+                                size: AppLoadingIndicatorSize.sm,
                                 color: AppColors.textOnDark,
                               ),
                             )
@@ -404,17 +403,16 @@ class LocationPickerView extends StatelessWidget {
               child: InkWell(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                 onTap: () {
-                  AppHaptics.light();
                   controller.detectCurrentLocation();
                 },
                 child: AnimatedSwitcher(
                   duration: AppMotion.fast,
                   child: controller.resolvingGps
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 18,
                           height: 18,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
+                          child: AppLoadingIndicator(
+                            size: AppLoadingIndicatorSize.sm,
                             color: AppColors.primaryDark,
                           ),
                         )

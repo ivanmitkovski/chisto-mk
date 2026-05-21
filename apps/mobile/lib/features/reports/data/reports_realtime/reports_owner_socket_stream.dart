@@ -4,6 +4,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart' show ValueNotifier;
 
 import 'package:chisto_mobile/core/auth/auth_state.dart';
+import 'package:chisto_mobile/features/auth/domain/refresh_outcome.dart';
 import 'package:chisto_mobile/core/logging/app_log.dart';
 import 'package:chisto_mobile/core/network/connectivity_gate.dart';
 import 'package:chisto_mobile/core/observability/chisto_sentry.dart';
@@ -21,16 +22,19 @@ class ReportsOwnerSocketStream {
   ReportsOwnerSocketStream({
     required String baseUrl,
     required AuthState authState,
-    Future<bool> Function()? sessionRefresh,
+    Future<RefreshOutcome> Function()? sessionRefresh,
+    void Function()? onAuthRejected,
   })  : _baseUrl = baseUrl.replaceFirst(RegExp(r'/$'), ''),
         _authState = authState,
-        _sessionRefresh = sessionRefresh {
+        _sessionRefresh = sessionRefresh,
+        _onAuthRejected = onAuthRejected {
     _authState.addListener(_onAuthChanged);
   }
 
   final String _baseUrl;
   final AuthState _authState;
-  final Future<bool> Function()? _sessionRefresh;
+  final Future<RefreshOutcome> Function()? _sessionRefresh;
+  final void Function()? _onAuthRejected;
 
   sio.Socket? _socket;
   String? _tokenAtHandshake;
@@ -252,7 +256,7 @@ class ReportsOwnerSocketStream {
         if (data is Map && data['code'] == 'AUTH_FAILED') {
           _disconnect();
           _setConnectionState(ReportsRealtimeConnectionState.reconnecting);
-          final Future<bool> Function()? refresh = _sessionRefresh;
+          final Future<RefreshOutcome> Function()? refresh = _sessionRefresh;
           if (refresh != null) {
             unawaited(_handleAuthFailedRefresh(refresh));
           } else {
@@ -275,21 +279,37 @@ class ReportsOwnerSocketStream {
     _socket!.connect();
   }
 
-  Future<void> _handleAuthFailedRefresh(Future<bool> Function() refresh) async {
+  Future<void> _handleAuthFailedRefresh(
+    Future<RefreshOutcome> Function() refresh,
+  ) async {
     try {
-      final bool ok = await refresh();
+      final RefreshOutcome outcome = await refresh();
       if (_disposed || !_enabled) {
         return;
       }
-      if (ok && _authState.isAuthenticated) {
-        connect();
-        return;
+      switch (outcome) {
+        case RefreshOutcome.success:
+          if (_authState.isAuthenticated) {
+            connect();
+            return;
+          }
+          _setConnectionState(ReportsRealtimeConnectionState.offline);
+          return;
+        case RefreshOutcome.serverRejected:
+          // The session was revoked server-side — clear local auth so the
+          // user sees the sign-in flow instead of an endless reconnect.
+          _setConnectionState(ReportsRealtimeConnectionState.offline);
+          _onAuthRejected?.call();
+          return;
+        case RefreshOutcome.transient:
+          // Network / 5xx — stay reconnecting and let the next attempt try.
+          _setConnectionState(ReportsRealtimeConnectionState.reconnecting);
+          return;
       }
     } catch (_) {
-      // Fall through to offline.
-    }
-    if (!_disposed) {
-      _setConnectionState(ReportsRealtimeConnectionState.offline);
+      if (!_disposed) {
+        _setConnectionState(ReportsRealtimeConnectionState.reconnecting);
+      }
     }
   }
 

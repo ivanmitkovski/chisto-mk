@@ -11,10 +11,11 @@ import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_migrati
 import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_repository.dart'
     show ReportOutboxRepository, SqfliteReportOutboxRepository;
 import 'package:chisto_mobile/features/reports/domain/repositories/reports_api_repository.dart';
+import 'package:chisto_mobile/core/logging/app_log.dart';
 
 /// Headless outbox drain invoked from Workmanager (Android) or BG tasks (iOS).
 ///
-/// Opens its own SQLite + HTTP stack (no [ServiceLocator]) so the callback
+/// Opens its own SQLite + HTTP stack (no [AppBootstrap]) so the callback
 /// isolate stays independent of the UI isolate.
 abstract final class ReportOutboxBackgroundDrain {
   /// Value passed to [Workmanager().registerOneOffTask] as `taskName` (Android).
@@ -51,7 +52,7 @@ abstract final class ReportOutboxBackgroundDrain {
       return true;
     } on Exception catch (e, st) {
       if (kDebugMode) {
-        debugPrint('[ReportOutboxBackgroundDrain] failed: $e\n$st');
+        AppLog.verbose('[ReportOutboxBackgroundDrain] failed: $e\n$st');
       }
       return false;
     }

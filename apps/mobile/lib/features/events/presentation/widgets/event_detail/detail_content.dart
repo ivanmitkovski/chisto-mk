@@ -30,7 +30,6 @@ import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/organizer_analytics_section.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/weather_card.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 /// Vertical section order (product + screen reader narrative):
 /// title → contextual banners → facts (where / when / category / scale / difficulty) →
@@ -139,11 +138,10 @@ class DetailContent extends StatelessWidget {
           StaggeredSection(
             delay: EventDetailStagger.impactReceiptLink,
             child: Material(
-              color: Colors.transparent,
+              color: AppColors.transparent,
               child: InkWell(
                 borderRadius: BorderRadius.circular(AppSpacing.md),
                 onTap: () {
-                  AppHaptics.tap();
                   onOpenImpactReceipt!();
                 },
                 child: Ink(
@@ -355,7 +353,6 @@ class _RecurrenceRow extends StatelessWidget {
             minHeight: AppSpacing.avatarMd,
           ),
           onPressed: () {
-            AppHaptics.light();
             onOpenSeriesOccurrence!(id);
           },
           icon: const Icon(
@@ -378,7 +375,6 @@ class _RecurrenceRow extends StatelessWidget {
             minHeight: AppSpacing.avatarMd,
           ),
           onPressed: () {
-            AppHaptics.light();
             onOpenSeriesOccurrence!(id);
           },
           icon: const Icon(

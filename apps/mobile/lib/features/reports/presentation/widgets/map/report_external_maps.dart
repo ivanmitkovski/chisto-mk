@@ -7,7 +7,7 @@ import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/map/directions_sheet.dart';
 import 'package:chisto_mobile/shared/utils/device_platform.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
 
 /// Shows Apple/Google choice for viewing [latitude]/[longitude] in an external maps app.
 Future<void> showReportViewLocationDirectionsSheet({

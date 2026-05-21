@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
+import 'package:chisto_mobile/core/theme/app_shadows.dart';
 import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 class SiteQuickActions extends StatelessWidget {
   const SiteQuickActions({
@@ -34,7 +34,6 @@ class SiteQuickActions extends StatelessWidget {
             semanticsLabel:
                 isSaved ? l10n.siteQuickActionSavedLabel : l10n.siteQuickActionSaveSiteLabel,
             onTap: () {
-              AppHaptics.tap();
               onSaveTap();
             },
           ),
@@ -52,7 +51,6 @@ class SiteQuickActions extends StatelessWidget {
             onTap: isReported
                 ? () {}
                 : () {
-                    AppHaptics.tap();
                     onReportTap();
                   },
             isDisabled: isReported,
@@ -65,7 +63,6 @@ class SiteQuickActions extends StatelessWidget {
             label: l10n.siteQuickActionShareLabel,
             semanticsLabel: l10n.siteQuickActionShareLabel,
             onTap: () {
-              AppHaptics.tap();
               onShareTap();
             },
           ),
@@ -109,13 +106,7 @@ class _QuickActionTile extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.panelBackground,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-                boxShadow: <BoxShadow>[
-                  BoxShadow(
-                    color: AppColors.shadowLight,
-                    blurRadius: AppSpacing.sm,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+                boxShadow: AppShadows.softCard(Theme.of(context).colorScheme),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,

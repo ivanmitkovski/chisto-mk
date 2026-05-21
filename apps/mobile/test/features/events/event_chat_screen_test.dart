@@ -1,3 +1,4 @@
+import 'package:chisto_mobile/features/events/data/chat/event_chat_connection_status.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_fetch_result.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_message.dart';
 import 'package:chisto_mobile/features/events/data/chat/in_memory_event_chat_repository.dart';
@@ -104,6 +105,7 @@ void main() {
 
   testWidgets('connection banner hidden on initial connect', (WidgetTester tester) async {
     final InMemoryEventChatRepository repo = InMemoryEventChatRepository();
+    repo.setConnectionStatusForTest('e1', EventChatConnectionStatus.connected);
 
     await tester.pumpWidget(_app(
       child: EventChatScreen(
@@ -118,6 +120,49 @@ void main() {
     expect(find.text('Reconnecting…'), findsNothing);
     repo.dispose();
   });
+
+  testWidgets(
+    'no network banner while disconnected before first connected',
+    (WidgetTester tester) async {
+      final InMemoryEventChatRepository repo = InMemoryEventChatRepository();
+      repo.setConnectionStatusForTest('e1', EventChatConnectionStatus.disconnected);
+
+      await tester.pumpWidget(_app(
+        child: EventChatScreen(
+          eventId: 'e1',
+          eventTitle: 'Test',
+          isOrganizer: false,
+          repository: repo,
+        ),
+      ));
+
+      await _settle(tester);
+      expect(find.text('Check your connection and try again.'), findsNothing);
+      repo.dispose();
+    },
+  );
+
+  testWidgets(
+    'no reconnecting banner during first handshake reconnecting status',
+    (WidgetTester tester) async {
+      final InMemoryEventChatRepository repo = InMemoryEventChatRepository();
+      repo.setConnectionStatusForTest('e1', EventChatConnectionStatus.reconnecting);
+
+      await tester.pumpWidget(_app(
+        child: EventChatScreen(
+          eventId: 'e1',
+          eventTitle: 'Test',
+          isOrganizer: false,
+          repository: repo,
+        ),
+      ));
+
+      await _settle(tester);
+      await tester.pump(const Duration(seconds: 4));
+      expect(find.text('Reconnecting…'), findsNothing);
+      repo.dispose();
+    },
+  );
 
   testWidgets('pinned bar shows unpin button for organizer', (WidgetTester tester) async {
     final InMemoryEventChatRepository repo = InMemoryEventChatRepository();

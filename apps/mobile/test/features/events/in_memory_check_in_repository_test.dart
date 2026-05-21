@@ -1,6 +1,6 @@
 import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
-import 'package:chisto_mobile/features/events/data/in_memory_check_in_repository.dart';
-import 'package:chisto_mobile/features/events/data/in_memory_events_store.dart';
+import '../../support/events/in_memory_check_in_repository.dart';
+import '../../support/events/in_memory_events_store.dart';
 import 'package:chisto_mobile/features/events/domain/models/check_in_payload.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:flutter_test/flutter_test.dart';

@@ -1,17 +1,15 @@
-import 'package:chisto_mobile/core/config/app_config.dart';
-import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/features/home/presentation/providers/site_engagement_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../../shared/widget_test_bootstrap.dart';
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
+  setUpAll(() async {
+    await bootstrapWidgetTests();
+  });
 
   test('toggleSave returns notAuthenticated when signed out', () async {
-    SharedPreferences.setMockInitialValues(<String, Object>{});
-    await ServiceLocator.instance.initialize(config: AppConfig.local);
-    addTearDown(ServiceLocator.instance.reset);
 
     final ProviderContainer container = ProviderContainer();
     addTearDown(container.dispose);

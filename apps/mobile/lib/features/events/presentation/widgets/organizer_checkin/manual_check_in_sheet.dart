@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -15,9 +16,8 @@ import 'package:chisto_mobile/features/events/domain/models/check_in_payload.dar
 import 'package:chisto_mobile/features/events/domain/models/event_participant_row.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
 
 /// Bottom sheet: search joined volunteers and pick one for organizer manual check-in.
 ///
@@ -51,15 +51,19 @@ class _ManualCheckInSheetState extends State<ManualCheckInSheet> {
   void initState() {
     super.initState();
     unawaited(_load());
-    _searchController.addListener(() {
-      setState(() {
-        _query = _searchController.text;
-      });
+    _searchController.addListener(_onSearchChanged);
+  }
+
+  void _onSearchChanged() {
+    if (!mounted) return;
+    setState(() {
+      _query = _searchController.text;
     });
   }
 
   @override
   void dispose() {
+    _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
     super.dispose();
   }
@@ -151,12 +155,10 @@ class _ManualCheckInSheetState extends State<ManualCheckInSheet> {
   }
 
   void _onCancel() {
-    AppHaptics.tap();
     Navigator.of(context).pop();
   }
 
   void _onAdd() {
-    AppHaptics.tap();
     final EventParticipantRow? pick = _selected;
     if (pick == null) {
       AppSnack.show(
@@ -295,11 +297,9 @@ class _ManualCheckInSheetState extends State<ManualCheckInSheet> {
                                             ),
                                       ),
                                       const SizedBox(height: AppSpacing.md),
-                                      TextButton(
+                                      AppButton.text(
+                                        label: context.l10n.eventsParticipantsRetry,
                                         onPressed: () => unawaited(_load()),
-                                        child: Text(
-                                          context.l10n.eventsParticipantsRetry,
-                                        ),
                                       ),
                                     ],
                                   ),
@@ -376,7 +376,6 @@ class _ManualCheckInSheetState extends State<ManualCheckInSheet> {
                                               color: AppColors.transparent,
                                               child: InkWell(
                                                 onTap: () {
-                                                  AppHaptics.tap();
                                                   setState(() {
                                                     _selected = row;
                                                   });
@@ -472,28 +471,10 @@ class _ManualCheckInSheetState extends State<ManualCheckInSheet> {
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: <Widget>[
-                              SizedBox(
-                                width: double.infinity,
-                                height: 54,
-                                child: OutlinedButton(
-                                  onPressed: _onCancel,
-                                  style: OutlinedButton.styleFrom(
-                                    side: const BorderSide(
-                                      color: AppColors.divider,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(
-                                        AppSpacing.radiusPill,
-                                      ),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    context.l10n.commonCancel,
-                                    style: AppTypography.eventsSecondaryCtaLabel(
-                                      textTheme,
-                                    ).copyWith(color: AppColors.primaryDark),
-                                  ),
-                                ),
+                              AppButton.outlined(
+                                label: context.l10n.commonCancel,
+                                onPressed: _onCancel,
+                                expand: true,
                               ),
                               const SizedBox(height: AppSpacing.sm),
                               PrimaryButton(

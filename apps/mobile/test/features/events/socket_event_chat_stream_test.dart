@@ -1,3 +1,5 @@
+import 'package:chisto_mobile/core/auth/auth_state.dart';
+import 'package:chisto_mobile/features/events/data/chat/event_chat_connection_status.dart';
 import 'package:chisto_mobile/features/events/data/chat/socket_event_chat_stream.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -47,4 +49,15 @@ void main() {
       );
     });
   });
+
+  test('connectionStatus getter reflects last emitted status', () {
+    final AuthState auth = AuthState();
+    final SocketEventChatStream stream = SocketEventChatStream(
+      baseUrl: 'http://localhost:3000',
+      authState: auth,
+    );
+    expect(stream.connectionStatus, EventChatConnectionStatus.disconnected);
+    stream.dispose();
+  });
+
 }

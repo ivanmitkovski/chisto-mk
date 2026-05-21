@@ -1,4 +1,5 @@
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/providers/home_providers.dart';
+import 'package:chisto_mobile/core/providers/root_container.dart';
 import 'package:chisto_mobile/core/location/location_service.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/location_picker/location_picker_controller.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/location_picker/location_picker_view.dart';
@@ -22,7 +23,7 @@ class LocationPicker extends StatefulWidget {
   final void Function(LocationPickerResult result) onLocationChanged;
   final bool showAdvanceBlockedHint;
 
-  /// When null, uses [ServiceLocator.instance.locationService] (app wiring).
+  /// When null, uses [locationServiceProvider] via root container (app wiring).
   final LocationService? locationService;
 
   @override
@@ -36,7 +37,7 @@ class _LocationPickerState extends State<LocationPicker> {
   void initState() {
     super.initState();
     final LocationService svc =
-        widget.locationService ?? ServiceLocator.instance.locationService;
+        widget.locationService ?? readRoot(locationServiceProvider);
     _controller = LocationPickerController(
       locationService: svc,
       onLocationChanged: widget.onLocationChanged,

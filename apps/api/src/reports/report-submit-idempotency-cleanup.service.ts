@@ -26,6 +26,9 @@ export class ReportSubmitIdempotencyCleanupService implements OnModuleInit, OnMo
         this.logger.warn(`idempotency cleanup failed: ${String(err)}`);
       });
     }, INTERVAL_MS);
+    if (typeof this.interval === 'object' && 'unref' in this.interval) {
+      this.interval.unref();
+    }
   }
 
   onModuleDestroy(): void {
@@ -34,7 +37,8 @@ export class ReportSubmitIdempotencyCleanupService implements OnModuleInit, OnMo
     }
   }
 
-  private async runOnce(): Promise<void> {
+  /** Exposed for unit tests (avoids starting the daily interval). */
+  async runOnce(): Promise<void> {
     const cutoff = new Date(Date.now() - RETENTION_DAYS * DAY_MS);
     const result = await this.prisma.reportSubmitIdempotency.deleteMany({
       where: { createdAt: { lt: cutoff } },

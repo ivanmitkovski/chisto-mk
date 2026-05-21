@@ -82,4 +82,16 @@ export class MeResponseDto {
 
   @ApiProperty({ nullable: true, description: 'Set when user passed the organizer toolkit quiz' })
   organizerCertifiedAt!: string | null;
+
+  @ApiProperty({ nullable: true, description: 'Saved home map latitude (WGS84)' })
+  homeLatitude!: number | null;
+
+  @ApiProperty({ nullable: true, description: 'Saved home map longitude (WGS84)' })
+  homeLongitude!: number | null;
+
+  @ApiProperty({ nullable: true, description: 'Optional geocoded label for home location' })
+  homeLocationLabel!: string | null;
+
+  @ApiProperty({ nullable: true, description: 'When home location was last saved, ISO-8601' })
+  homeLocationSetAt!: string | null;
 }

@@ -3,11 +3,11 @@ import 'dart:io';
 
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
-import 'package:chisto_mobile/features/events/data/in_memory_events_store.dart';
+import '../../support/events/in_memory_events_store.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/screens/event_cleanup_evidence_screen.dart';
-import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_back_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';

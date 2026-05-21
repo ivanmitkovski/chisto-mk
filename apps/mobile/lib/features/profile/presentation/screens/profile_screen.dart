@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/providers/app_providers.dart';
+import 'package:chisto_mobile/core/providers/reports_providers.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/features/profile/domain/models/profile_user.dart';
@@ -11,13 +12,13 @@ import 'package:chisto_mobile/features/profile/presentation/screens/profile_lang
 import 'package:chisto_mobile/features/profile/presentation/screens/profile_password_screen.dart';
 import 'package:chisto_mobile/features/profile/presentation/widgets/profile_authenticated_body.dart';
 import 'package:chisto_mobile/features/profile/presentation/widgets/profile_screen_skeleton.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/animated_phase_switcher.dart';
-import 'package:chisto_mobile/shared/widgets/app_error_view.dart';
-import 'package:chisto_mobile/shared/widgets/profile_avatar_peek_overlay.dart';
+import 'package:chisto_mobile/shared/widgets/molecules/animated_phase_switcher.dart';
+import 'package:chisto_mobile/shared/widgets/molecules/app_error_view.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/profile_avatar_peek_overlay.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_loading_indicator.dart';
 
-String _profileLanguageListSubtitle(BuildContext context) {
-  final Locale? override = ServiceLocator.instance.appLocaleOverride.value;
+String _profileLanguageListSubtitle(BuildContext context, WidgetRef ref) {
+  final Locale? override = ref.watch(appLocaleOverrideProvider);
   if (override == null) {
     return context.l10n.profileLanguageSubtitleDevice;
   }
@@ -50,31 +51,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
       if (!mounted) return;
       ref.read(profileHomeNotifierProvider.notifier).loadProfile();
     });
-    ServiceLocator.instance.profileNeedsRefresh.addListener(
-      _onProfileNeedsRefresh,
-    );
-    ServiceLocator.instance.appLocaleOverride.addListener(_onAppLocaleChanged);
-  }
-
-  void _onAppLocaleChanged() {
-    if (mounted) setState(() {});
-  }
-
-  void _onProfileNeedsRefresh() {
-    if (mounted) {
-      ref.read(profileHomeNotifierProvider.notifier).loadProfile();
-    }
   }
 
   @override
   void dispose() {
     ProfileAvatarPeek.hide();
-    ServiceLocator.instance.profileNeedsRefresh.removeListener(
-      _onProfileNeedsRefresh,
-    );
-    ServiceLocator.instance.appLocaleOverride.removeListener(
-      _onAppLocaleChanged,
-    );
     super.dispose();
   }
 
@@ -97,10 +78,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<int>(profileRefreshTickProvider, (int? previous, int next) {
+      if (previous != next && mounted) {
+        ref.read(profileHomeNotifierProvider.notifier).loadProfile();
+      }
+    });
     final ProfileHomeState home = ref.watch(profileHomeNotifierProvider);
     final ProfileUser? loaded = home.profileUser;
-    final bool authenticated =
-        ServiceLocator.instance.authState.isAuthenticated;
+    final bool authenticated = ref.watch(authStateProvider).isAuthenticated;
     final String phase = _profileBodyPhase(home, authenticated);
 
     return Scaffold(
@@ -156,9 +141,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
             child: SizedBox(
               width: 32,
               height: 32,
-              child: CircularProgressIndicator(
+              child: AppLoadingIndicator(
+                size: AppLoadingIndicatorSize.lg,
                 color: AppColors.primaryDark,
-                strokeWidth: 2.5,
               ),
             ),
           ),
@@ -167,7 +152,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
         final ProfileUser user = loaded!;
         return ProfileAuthenticatedBody(
           user: user,
-          languageListSubtitle: _profileLanguageListSubtitle(context),
+          languageListSubtitle: _profileLanguageListSubtitle(context, ref),
           capacityLoadInFlight: home.capacityLoadInFlight,
           reportCapacity: home.reportCapacity,
           onRefresh: _handleRefresh,
@@ -175,7 +160,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
             ref.read(profileHomeNotifierProvider.notifier).updateUser(u);
           },
           onGeneralInfoTap: () async {
-            AppHaptics.tap();
             final ProfileUser? updated =
                 await Navigator.of(context).push<ProfileUser>(
               MaterialPageRoute<ProfileUser>(
@@ -186,7 +170,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
             ref.read(profileHomeNotifierProvider.notifier).updateUser(updated);
           },
           onLanguageTap: () {
-            AppHaptics.tap();
             Navigator.of(context).push(
               MaterialPageRoute<void>(
                 builder: (_) => const ProfileLanguageScreen(),
@@ -194,7 +177,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
             );
           },
           onPasswordTap: () {
-            AppHaptics.tap();
             Navigator.of(context).push(
               MaterialPageRoute<void>(
                 builder: (_) => const ProfilePasswordScreen(),

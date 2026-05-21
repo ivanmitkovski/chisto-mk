@@ -1,5 +1,13 @@
 import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/features/auth/presentation/utils/auth_retry_duration.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
+
+int? retryAfterSecondsFromAppError(AppError e) {
+  final Object? raw = e.details?['retryAfterSeconds'];
+  if (raw is int) return raw;
+  if (raw is num) return raw.toInt();
+  return null;
+}
 
 /// Maps API [AppError.code] values to localized user-facing copy.
 String messageForAuthError(AppLocalizations l10n, AppError e) {
@@ -9,8 +17,14 @@ String messageForAuthError(AppLocalizations l10n, AppError e) {
     case 'ACCOUNT_SUSPENDED':
     case 'ACCOUNT_NOT_ACTIVE':
       return l10n.authErrorAccountSuspended;
+    case 'PHONE_NOT_VERIFIED':
+      return l10n.authErrorPhoneNotVerified;
     case 'PHONE_NOT_REGISTERED':
       return l10n.authErrorPhoneNotRegistered;
+    case 'PASSWORD_RESET_TOKEN_INVALID':
+    case 'PASSWORD_RESET_EMAIL_TOKEN_INVALID':
+    case 'PASSWORD_RESET_EMAIL_EXPIRED':
+      return l10n.authErrorPasswordResetTokenInvalid;
     case 'EMAIL_ALREADY_REGISTERED':
       return l10n.authErrorEmailRegistered;
     case 'PHONE_ALREADY_REGISTERED':
@@ -27,10 +41,24 @@ String messageForAuthError(AppLocalizations l10n, AppError e) {
       return l10n.authErrorCurrentPasswordInvalid;
     case 'USER_NOT_FOUND':
       return l10n.authErrorUserNotFound;
-    case 'TOO_MANY_REQUESTS':
+    case 'TOO_MANY_REQUESTS': {
+      final int? retry = retryAfterSecondsFromAppError(e);
+      if (retry != null && retry > 0) {
+        return l10n.authErrorTooManyAttemptsRetryIn(
+          formatAuthRetryDuration(l10n, retry),
+        );
+      }
       return l10n.authErrorRateLimited;
-    case 'TOO_MANY_ATTEMPTS':
+    }
+    case 'TOO_MANY_ATTEMPTS': {
+      final int? retry = retryAfterSecondsFromAppError(e);
+      if (retry != null && retry > 0) {
+        return l10n.authErrorTooManyAttemptsRetryIn(
+          formatAuthRetryDuration(l10n, retry),
+        );
+      }
       return l10n.authErrorTooManyAttempts;
+    }
     case 'VALIDATION_ERROR':
     case 'BAD_REQUEST':
     case 'UNAUTHORIZED':

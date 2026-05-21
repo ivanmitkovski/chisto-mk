@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:chisto_mobile/core/assets/app_assets.dart';
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/providers/app_providers.dart';
+import 'package:chisto_mobile/features/auth/application/onboarding_controller.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:chisto_mobile/core/l10n/app_language_picker.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
@@ -10,17 +14,16 @@ import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
 
-class OnboardingScreen extends StatefulWidget {
+class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
 
   @override
-  State<OnboardingScreen> createState() => _OnboardingScreenState();
+  ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen> {
+class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   late final PageController _pageController;
   int _activePage = 0;
 
@@ -49,23 +52,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void initState() {
     super.initState();
     _pageController = PageController();
-    ServiceLocator.instance.appLocaleOverride.addListener(_onAppLocaleChanged);
-  }
-
-  void _onAppLocaleChanged() {
-    if (mounted) setState(() {});
   }
 
   @override
   void dispose() {
-    ServiceLocator.instance.appLocaleOverride.removeListener(_onAppLocaleChanged);
     _pageController.dispose();
     super.dispose();
   }
 
   void _onContinueTap(AppLocalizations l10n) {
     final List<_SlideData> slides = _slides(l10n);
-    AppHaptics.light(context);
     if (_activePage < slides.length - 1) {
       _pageController.nextPage(
         duration: MediaQuery.disableAnimationsOf(context)
@@ -76,11 +72,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       return;
     }
 
+    unawaited(
+      ref.read(onboardingControllerProvider.notifier).completeOnboarding(),
+    );
     Navigator.of(context).pushReplacementNamed(AppRoutes.signIn);
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(appLocaleOverrideProvider);
     final AppLocalizations l10n = AppLocalizations.of(context)!;
     final List<_SlideData> slides = _slides(l10n);
     final EdgeInsets systemPadding = MediaQuery.paddingOf(context);
@@ -131,15 +131,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             iconSize: 20,
                             color: AppColors.white.withValues(alpha: 0.82),
                             style: IconButton.styleFrom(
-                              padding: const EdgeInsets.all(7),
-                              minimumSize: const Size(38, 38),
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              padding: const EdgeInsets.all(AppSpacing.sm),
+                              minimumSize: const Size(44, 44),
+                              tapTargetSize: MaterialTapTargetSize.padded,
                               overlayColor:
                                   AppColors.white.withValues(alpha: 0.12),
                             ),
                             tooltip: l10n.profileLanguageTile,
                             onPressed: () {
-                              AppHaptics.light(context);
                               showAppLanguagePicker(context);
                             },
                           ),
@@ -190,7 +189,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           physics: const BouncingScrollPhysics(),
                           allowImplicitScrolling: true,
                           onPageChanged: (int index) {
-                            AppHaptics.tap(context);
                             setState(() => _activePage = index);
                           },
                           itemBuilder: (BuildContext context, int index) {
@@ -286,7 +284,7 @@ class _OnboardingSlide extends StatelessWidget {
                       ),
                       const SizedBox(width: AppSpacing.radiusSm),
                       SvgPicture.asset(
-                        AppAssets.brandLogoGreenBlack,
+                        AppAssets.brandLogoGreen,
                         width: compact ? 84 : 90,
                         height: compact ? 24 : 26,
                         fit: BoxFit.contain,

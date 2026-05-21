@@ -3,7 +3,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_mobile/features/events/presentation/view_models/organizer_analytics_view_model.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
@@ -14,6 +14,7 @@ import 'package:chisto_mobile/features/events/domain/models/event_analytics.dart
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/detail_section_header.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_surface_decoration.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/events_shared/events_shared.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_loading_indicator.dart';
 
 /// Analytics section visible to the event organizer on the detail screen.
 ///
@@ -44,7 +45,7 @@ class _OrganizerAnalyticsSectionState extends State<OrganizerAnalyticsSection> {
       eventId: widget.event.id,
       fetchAnalytics: widget.fetchAnalytics != null
           ? widget.fetchAnalytics!
-          : ServiceLocator.instance.eventAnalyticsRepository.fetchAnalytics,
+          : AppBootstrap.instance.eventAnalyticsRepository.fetchAnalytics,
     );
     _vm.addListener(_onVm);
     unawaited(_vm.fetch(silent: false));
@@ -171,10 +172,10 @@ class _OrganizerAnalyticsSectionState extends State<OrganizerAnalyticsSection> {
                       ? null
                       : () => unawaited(_vm.fetch(silent: true)),
                   icon: _vm.silentRefresh
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 22,
                           height: 22,
-                          child: CircularProgressIndicator(strokeWidth: 2),
+                          child: AppLoadingIndicator(size: AppLoadingIndicatorSize.sm),
                         )
                       : Icon(Icons.refresh, color: AppColors.textMuted),
                 ),

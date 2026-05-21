@@ -1,6 +1,6 @@
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
-import 'package:chisto_mobile/core/di/service_locator.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
@@ -9,8 +9,7 @@ import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/domain/models/site_report_reason.dart';
 import 'package:chisto_mobile/features/home/presentation/l10n/site_report_reason_l10n.dart';
 import 'package:chisto_mobile/features/home/data/site_issue_report_repository.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
 
 class ReportIssueSheet extends StatefulWidget {
   const ReportIssueSheet({
@@ -66,10 +65,9 @@ class _ReportIssueSheetState extends State<ReportIssueSheet> {
     final NavigatorState navigator = Navigator.of(context);
     final l10n = context.l10n;
     setState(() => _isSubmitting = true);
-    AppHaptics.light();
 
     try {
-      await ServiceLocator.instance.sitesRepository.trackFeedEvent(
+      await AppBootstrap.instance.sitesRepository.trackFeedEvent(
         widget.site.id,
         eventType: 'cta_report_issue_started',
         metadata: <String, dynamic>{'reason': _selectedReason!.name},
@@ -83,8 +81,7 @@ class _ReportIssueSheetState extends State<ReportIssueSheet> {
       );
 
       if (!mounted) return;
-      AppHaptics.success();
-      await ServiceLocator.instance.sitesRepository.trackFeedEvent(
+      await AppBootstrap.instance.sitesRepository.trackFeedEvent(
         widget.site.id,
         eventType: 'cta_report_issue_success',
         metadata: <String, dynamic>{'reason': _selectedReason!.name},
@@ -92,7 +89,7 @@ class _ReportIssueSheetState extends State<ReportIssueSheet> {
       navigator.pop(true);
     } catch (_) {
       if (!mounted) return;
-      await ServiceLocator.instance.sitesRepository.trackFeedEvent(
+      await AppBootstrap.instance.sitesRepository.trackFeedEvent(
         widget.site.id,
         eventType: 'cta_report_issue_failed',
         metadata: <String, dynamic>{'reason': _selectedReason?.name},
@@ -163,7 +160,6 @@ class _ReportIssueSheetState extends State<ReportIssueSheet> {
                     reason: reason,
                     isSelected: _selectedReason == reason,
                     onTap: () {
-                      AppHaptics.tap();
                       setState(() => _selectedReason = reason);
                     },
                   ),
@@ -267,7 +263,7 @@ class _ReasonTile extends StatelessWidget {
                     color: isSelected
                         ? AppColors.primaryDark.withValues(alpha: 0.12)
                         : AppColors.panelBackground,
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(AppSpacing.radius10),
                     border: Border.all(
                       color: isSelected
                           ? AppColors.primaryDark.withValues(alpha: 0.3)

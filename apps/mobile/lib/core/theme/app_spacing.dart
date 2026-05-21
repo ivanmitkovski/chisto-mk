@@ -18,6 +18,9 @@ class AppSpacing {
   static const double iconLg = 24;
 
   static const double radiusXs = 4;
+  static const double radiusHandle = 2;
+  static const double radiusChatMicro = 2;
+  static const double radiusProgress = 2.5;
   static const double radiusSm = 8;
   static const double radius10 = 10;
   static const double radiusMd = 12;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/features/profile/presentation/widgets/profile_primary_action_bar.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
 
 /// Pinned bottom bar for create-event: primary CTA.
 ///

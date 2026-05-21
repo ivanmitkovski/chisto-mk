@@ -1,14 +1,19 @@
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/site_card/upvoters_sheet_content.dart';
-import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_back_button.dart';
 import 'package:flutter/material.dart';
 
 /// Full-screen upvoters list (shell route: `/feed/:siteId/upvoters`).
 class FeedSiteUpvotersRouteScreen extends StatefulWidget {
-  const FeedSiteUpvotersRouteScreen({super.key, required this.siteId});
+  const FeedSiteUpvotersRouteScreen({
+    super.key,
+    required this.siteId,
+    this.highlightUserId,
+  });
 
   final String siteId;
+  final String? highlightUserId;
 
   @override
   State<FeedSiteUpvotersRouteScreen> createState() =>
@@ -43,6 +48,7 @@ class _FeedSiteUpvotersRouteScreenState extends State<FeedSiteUpvotersRouteScree
         child: UpvotersSheetContent(
           siteId: widget.siteId,
           scrollController: _scrollController,
+          highlightUserId: widget.highlightUserId,
         ),
       ),
     );

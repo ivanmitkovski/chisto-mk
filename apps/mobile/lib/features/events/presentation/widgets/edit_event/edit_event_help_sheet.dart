@@ -89,7 +89,7 @@ class _EditHelpRow extends StatelessWidget {
                 height: 36,
                 decoration: BoxDecoration(
                   color: AppColors.panelBackground,
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(AppSpacing.radius10),
                   border: Border.all(color: AppColors.divider, width: 1),
                 ),
                 child: Icon(icon, size: 20, color: AppColors.primaryDark),

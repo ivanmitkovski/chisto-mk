@@ -15,6 +15,8 @@ export class SitesReporterNotificationService {
     actorUserId: string,
     type: 'UPVOTE' | 'COMMENT' | 'SITE_UPDATE',
     body: string,
+    messagePreview?: string,
+    commentId?: string,
   ): void {
     void this.prisma.site
       .findUnique({
@@ -42,7 +44,7 @@ export class SitesReporterNotificationService {
           type === 'UPVOTE'
             ? siteUpvoteCopy('en')
             : type === 'COMMENT'
-              ? siteCommentCopy('en')
+              ? siteCommentCopy('en', messagePreview)
               : siteUpdateCopy('en', body);
         this.eventEmitter.emit('notification.send', {
           recipientUserIds: recipientIds,
@@ -51,7 +53,19 @@ export class SitesReporterNotificationService {
           type,
           threadKey: `site:${siteId}`,
           groupKey: `${type}:site:${siteId}`,
-          data: { siteId, targetTab: '0' },
+          data: {
+            siteId,
+            actorUserId,
+            targetTab: '0',
+            ...(type === 'UPVOTE' ? { targetAction: 'show_upvoters' } : {}),
+            ...(type === 'COMMENT'
+              ? {
+                  targetAction: 'show_comments',
+                  ...(messagePreview ? { messagePreview } : {}),
+                  ...(commentId ? { commentId } : {}),
+                }
+              : {}),
+          },
         });
       })
       .catch(() => {

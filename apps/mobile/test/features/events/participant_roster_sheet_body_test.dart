@@ -1,5 +1,5 @@
 import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
-import 'package:chisto_mobile/features/events/data/in_memory_events_store.dart';
+import '../../support/events/in_memory_events_store.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event_join_toggle_result.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event_search_params.dart';
@@ -9,7 +9,7 @@ import 'package:chisto_mobile/features/events/domain/models/event_update_payload
 import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/participants_section.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/widgets/user_avatar_circle.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/user_avatar_circle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';

@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_mobile/core/location/location_service.dart';
+import 'package:chisto_mobile/features/auth/data/user_home_location_store.dart';
 import 'package:chisto_mobile/features/home/presentation/providers/repository_providers.dart';
 
 class MapLocationState {
@@ -70,6 +72,15 @@ class MapLocationNotifier extends Notifier<MapLocationState> {
       return;
     }
     _initialLocateAttempted = true;
+    final UserHomeLocationStore homeStore = UserHomeLocationStore(
+      AppBootstrap.instance.preferences,
+    );
+    if (homeStore.hasHomeLocation) {
+      state = state.copyWith(
+        userLocation: LatLng(homeStore.latitude!, homeStore.longitude!),
+      );
+      return;
+    }
     final LocationService geo = ref.read(locationServiceProvider);
     try {
       if (!await geo.isLocationServiceEnabled()) {

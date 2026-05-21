@@ -5,9 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/map/directions_sheet.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/utils/device_platform.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Shows Apple/Google map options and opens the chosen app for [lat]/[lng].
@@ -16,7 +15,6 @@ Future<void> showEventSiteMapsSheet(
   required double lat,
   required double lng,
 }) async {
-  AppHaptics.softTransition();
   await showModalBottomSheet<void>(
     context: context,
     useSafeArea: true,

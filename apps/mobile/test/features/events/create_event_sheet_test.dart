@@ -6,10 +6,10 @@
 // open via named route (CupertinoPageRoute) and confirm iOS edge swipe-back matches discard rules;
 // brief bootstrap skeleton then form fade-in; reduced motion skips section stagger.
 
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
-import 'package:chisto_mobile/features/events/data/in_memory_events_store.dart';
+import '../../support/events/in_memory_events_store.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/screens/create_event_sheet.dart';
 import 'package:chisto_mobile/features/events/presentation/screens/organizer_toolkit/organizer_toolkit_screen.dart';
@@ -17,21 +17,28 @@ import 'package:chisto_mobile/features/events/presentation/widgets/create_event/
 import 'package:chisto_mobile/features/events/presentation/widgets/event_calendar.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../shared/pump_until_idle.dart';
+import '../../shared/widget_test_bootstrap.dart';
 
 /// Fixed wall time so schedule validation and step progress are CI-stable.
 DateTime createEventSheetTestClock() => DateTime(2026, 6, 15, 10, 0);
 
 Future<void> settlePastCreateEventBootstrap(WidgetTester tester) async {
   await tester.pump(const Duration(milliseconds: 420));
-  await tester.pumpAndSettle();
+  await pumpUntilIdle(tester);
 }
 
 void main() {
+  setUpAll(() async {
+    await bootstrapWidgetTests();
+  });
+
   test('AppRoutes.eventsCreate uses CupertinoPageRoute for interactive pop', () {
     final Route<dynamic> route = AppRouter.onGenerateRoute(
       const RouteSettings(name: AppRoutes.eventsCreate),
@@ -43,19 +50,24 @@ void main() {
     SharedPreferences.setMockInitialValues(<String, Object>{});
     InMemoryEventsStore.instance.resetToSeed();
     EventsRepositoryRegistry.setTestOverride(InMemoryEventsStore.instance);
+    if (AppBootstrap.instance.isInitialized) {
+      AppBootstrap.instance.authState.setAuthenticated(
+        userId: 'u-test',
+        displayName: 'Tester',
+        organizerCertifiedAt: DateTime(2026, 1, 1),
+        syncOrganizerCertifiedAt: true,
+      );
+    }
   });
 
   tearDown(() {
     EventsRepositoryRegistry.setTestOverride(null);
-    ServiceLocator.instance.reset();
   });
 
   testWidgets('uncertified user is redirected from CreateEventSheet to toolkit', (
     WidgetTester tester,
   ) async {
-    TestWidgetsFlutterBinding.ensureInitialized();
-    await ServiceLocator.instance.initialize();
-    ServiceLocator.instance.authState.setAuthenticated(
+    AppBootstrap.instance.authState.setAuthenticated(
       userId: 'u1',
       displayName: 'Tester',
       organizerCertifiedAt: null,
@@ -67,16 +79,19 @@ void main() {
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         locale: const Locale('en'),
-        home: const Scaffold(
-          body: CreateEventSheet(clock: createEventSheetTestClock),
+        home: const MediaQuery(
+          data: MediaQueryData(disableAnimations: true),
+          child: Scaffold(
+            body: CreateEventSheet(clock: createEventSheetTestClock),
+          ),
         ),
       ),
     );
     await tester.pump();
     await tester.pump();
-    await tester.pumpAndSettle();
 
     expect(find.byType(OrganizerToolkitScreen), findsOneWidget);
+    await tester.pump(const Duration(milliseconds: 600));
   });
 
   testWidgets('requires site selection before creating an event', (

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/features/home/data/feed_urgency.dart';
 import 'package:chisto_mobile/features/home/data/sites_api_json_helpers.dart';
 import 'package:chisto_mobile/features/home/domain/models/cleaning_event.dart';
 import 'package:chisto_mobile/features/home/domain/models/co_reporter_profile.dart';
@@ -140,6 +141,12 @@ class SitesJsonMapper {
         .where((String url) => url.isNotEmpty)
         .toSet()
         .toList();
+    final DateTime? latestReportAt = () {
+      final String? s = json['latestReportCreatedAt'] as String?;
+      if (s == null || s.isEmpty) return null;
+      return DateTime.tryParse(s);
+    }();
+    final double? rankingScore = (json['rankingScore'] as num?)?.toDouble();
     return PollutionSite(
       id: json['id'] as String? ?? '',
       title: title,
@@ -170,16 +177,18 @@ class SitesJsonMapper {
           (json['rankingReasons'] as List<dynamic>? ?? const <dynamic>[])
               .whereType<String>()
               .toList(),
-      rankingScore: (json['rankingScore'] as num?)?.toDouble(),
+      rankingScore: rankingScore,
       rankingComponents: rankingComponentsFromJson(json['rankingComponents']),
       latestReporterName: json['latestReportReporterName'] as String?,
       latestReporterAvatarUrl: json['latestReportReporterAvatarUrl'] as String?,
       latestReporterUserId: json['latestReportReporterId'] as String?,
-      latestReportAt: () {
-        final String? s = json['latestReportCreatedAt'] as String?;
-        if (s == null || s.isEmpty) return null;
-        return DateTime.tryParse(s);
-      }(),
+      latestReportAt: latestReportAt,
+      urgencyLabel: deriveFeedUrgencyLabel(
+        statusCode: statusCode,
+        latestReportAt: latestReportAt,
+        upvotesCount: score,
+        rankingScore: rankingScore,
+      ),
     );
   }
 
@@ -206,9 +215,10 @@ class SitesJsonMapper {
         <CoReporterProfile>[];
 
     if (reports.isNotEmpty) {
-      final Map<String, dynamic> first = reports.first;
+      final Map<String, dynamic> earliest = sitesApiEarliestReport(reports);
+      final Map<String, dynamic> latest = sitesApiLatestReport(reports);
       latestReporterUserId =
-          first['reporterId'] as String? ?? first['reporter_id'] as String?;
+          latest['reporterId'] as String? ?? latest['reporter_id'] as String?;
       for (final Map<String, dynamic> r in reports) {
         final List<dynamic> mediaList = sitesApiReportMediaUrlsList(r);
         for (final dynamic m in mediaList) {
@@ -217,14 +227,15 @@ class SitesJsonMapper {
           }
         }
       }
-      final List<dynamic> firstMediaList = sitesApiReportMediaUrlsList(first);
+      final List<dynamic> firstMediaList =
+          sitesApiReportMediaUrlsList(earliest);
       final List<String> firstReportImageUrls = firstMediaList
           .whereType<String>()
           .map((String s) => s.trim())
           .where((String s) => s.isNotEmpty)
           .toList();
       final Map<String, dynamic>? reporterJson =
-          sitesApiJsonObjectToStringKeyedMap(first['reporter']);
+          sitesApiJsonObjectToStringKeyedMap(earliest['reporter']);
       final String reporterFirstName =
           '${reporterJson?['firstName'] ?? reporterJson?['first_name'] ?? ''}'
               .trim();
@@ -235,23 +246,17 @@ class SitesJsonMapper {
           reporterJson?['avatarUrl'] as String? ??
           reporterJson?['avatar_url'] as String?;
       final String reporterName = '$reporterFirstName $reporterLastName'.trim();
-      final String reportTitle = (first['title'] as String?)?.trim() ?? '';
-      final String bodyTrim = (first['description'] as String?)?.trim() ?? '';
+      final String reportTitle = (earliest['title'] as String?)?.trim() ?? '';
+      final String bodyTrim = (earliest['description'] as String?)?.trim() ?? '';
       final String resolvedTitle = reportTitle.isNotEmpty
           ? reportTitle
           : (bodyTrim.isNotEmpty ? bodyTrim : 'Site report');
       final String? resolvedBody =
           bodyTrim.isNotEmpty && bodyTrim != resolvedTitle ? bodyTrim : null;
       firstReport = SiteReport(
-        id: first['id'] as String? ?? '',
+        id: earliest['id'] as String? ?? '',
         reporterName: reporterName.isEmpty ? 'Unknown reporter' : reporterName,
-        reportedAt:
-            DateTime.tryParse(
-              first['createdAt'] as String? ??
-                  first['created_at'] as String? ??
-                  '',
-            ) ??
-            DateTime.now(),
+        reportedAt: sitesApiReportCreatedAt(earliest) ?? DateTime.now(),
         title: resolvedTitle,
         description: resolvedBody,
         imageUrls: firstReportImageUrls,
@@ -395,7 +400,7 @@ class SitesJsonMapper {
     }
 
     final Map<String, dynamic>? firstReportJson = reports.isNotEmpty
-        ? reports.first
+        ? sitesApiLatestReport(reports)
         : null;
     final String latestTitle = normalizeFeedTitle(
       firstReportJson?['title'] as String? ?? '',
@@ -503,12 +508,33 @@ class SitesJsonMapper {
       feedReasons: const <String>[],
       rankingScore: null,
       rankingComponents: null,
-      latestReporterName:
-          firstReport != null && firstReport.reporterName != 'Unknown reporter'
-          ? firstReport.reporterName
-          : null,
-      latestReporterAvatarUrl: firstReport?.reporterAvatarUrl,
-      latestReportAt: firstReport?.reportedAt,
+      latestReporterName: () {
+        if (reports.isEmpty) return null;
+        final Map<String, dynamic>? reporterJson =
+            sitesApiJsonObjectToStringKeyedMap(
+          sitesApiLatestReport(reports)['reporter'],
+        );
+        final String fn =
+            '${reporterJson?['firstName'] ?? reporterJson?['first_name'] ?? ''}'
+                .trim();
+        final String ln =
+            '${reporterJson?['lastName'] ?? reporterJson?['last_name'] ?? ''}'
+                .trim();
+        final String name = '$fn $ln'.trim();
+        return name.isEmpty ? null : name;
+      }(),
+      latestReporterAvatarUrl: () {
+        if (reports.isEmpty) return null;
+        final Map<String, dynamic>? reporterJson =
+            sitesApiJsonObjectToStringKeyedMap(
+          sitesApiLatestReport(reports)['reporter'],
+        );
+        final Object? av = reporterJson?['avatarUrl'] ?? reporterJson?['avatar_url'];
+        return av is String && av.trim().isNotEmpty ? av.trim() : null;
+      }(),
+      latestReportAt: reports.isEmpty
+          ? null
+          : sitesApiReportCreatedAt(sitesApiLatestReport(reports)),
       latestReporterUserId: latestReporterUserId,
     );
   }

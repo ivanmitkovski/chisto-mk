@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:chisto_mobile/core/persistence/sqflite_with_reopen.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -11,13 +12,10 @@ class FieldModeQueue {
 
   Database? _db;
 
-  Future<Database> _database() async {
-    if (_db != null) {
-      return _db!;
-    }
+  Future<Database> _openDb() async {
     final dir = await getApplicationDocumentsDirectory();
     final String path = '${dir.path}/field_mode_queue.db';
-    _db = await openDatabase(
+    return openDatabase(
       path,
       version: 1,
       onCreate: (Database db, int version) async {
@@ -26,8 +24,14 @@ class FieldModeQueue {
         );
       },
     );
-    return _db!;
   }
+
+  Future<Database> _database() => withSqfliteDb<Database>(
+        open: _openDb,
+        getCached: () => _db,
+        setCached: (Database? db) => _db = db,
+        action: (Database db) async => db,
+      );
 
   Future<void> enqueueLiveImpactBags({
     required String eventId,
@@ -68,6 +72,17 @@ class FieldModeQueue {
         // ignore
       }
       _db = null;
+    }
+  }
+
+  /// Truncates every queued op. Used on logout / account switch so the next
+  /// user does not inherit the previous user's offline field operations.
+  Future<void> clearAll() async {
+    final Database db = await _database();
+    try {
+      await db.rawDelete('DELETE FROM queue');
+    } on Object {
+      // Best-effort; DB may already be closed by a parallel teardown.
     }
   }
 }

@@ -52,7 +52,11 @@ describe('NotificationInboxService', () => {
     ]);
     prisma.notificationOutbox.count.mockResolvedValue(1);
 
-    const service = new NotificationInboxService(prisma, makeInboxFlags(true) as any);
+    const service = new NotificationInboxService(
+      prisma,
+      makeInboxFlags(true) as any,
+      { signUrls: jest.fn().mockResolvedValue([]) } as any,
+    );
     const result = await service.listDeadLetters(1, 20);
 
     expect(result.meta.total).toBe(1);
@@ -63,7 +67,11 @@ describe('NotificationInboxService', () => {
   it('returns empty list when inbox feature is disabled', async () => {
     const prisma = makePrisma() as any;
 
-    const service = new NotificationInboxService(prisma, makeInboxFlags(false) as any);
+    const service = new NotificationInboxService(
+      prisma,
+      makeInboxFlags(false) as any,
+      { signUrls: jest.fn().mockResolvedValue([]) } as any,
+    );
     const result = await service.listForUser(
       { userId: 'u1' } as any,
       { page: 1, limit: 20 } as any,

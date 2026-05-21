@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:chisto_mobile/core/providers/notifications_providers.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
@@ -8,13 +9,12 @@ import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/feed_notification_bell.dart';
 import 'package:chisto_mobile/features/profile/presentation/providers/profile_avatar_notifier.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/widgets/app_avatar.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_avatar.dart';
 
 class FeedHeader extends ConsumerWidget {
   const FeedHeader({
     super.key,
     required this.displayName,
-    required this.unreadCount,
     required this.onProfileTap,
     required this.onNotificationTap,
     this.profileAvatarKey,
@@ -22,7 +22,6 @@ class FeedHeader extends ConsumerWidget {
 
   /// Current user's display name (e.g. "John Doe"). Shown as "Hi, {first name}".
   final String displayName;
-  final int unreadCount;
   final VoidCallback onProfileTap;
   final VoidCallback onNotificationTap;
 
@@ -39,6 +38,7 @@ class FeedHeader extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final int unreadCount = ref.watch(notificationsUnreadCountProvider);
     final ProfileAvatarData avatar = ref.watch(profileAvatarNotifierProvider);
 
     Widget profileHit = GestureDetector(

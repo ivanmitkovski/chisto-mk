@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:chisto_mobile/core/theme/app_shadows.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:chisto_mobile/core/assets/app_assets.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
@@ -6,7 +7,6 @@ import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 class HomeBottomNavBar extends StatelessWidget {
   const HomeBottomNavBar({
@@ -58,13 +58,7 @@ class HomeBottomNavBar extends StatelessWidget {
               width: 0.5,
             ),
           ),
-          boxShadow: <BoxShadow>[
-            BoxShadow(
-              color: AppColors.shadowLight,
-              offset: const Offset(0, -2),
-              blurRadius: 8,
-            ),
-          ],
+          boxShadow: AppShadows.bottomBarLift(Theme.of(context).colorScheme),
         ),
         child: Material(
           color: AppColors.transparent,
@@ -151,7 +145,6 @@ class _BottomNavItemState extends State<_BottomNavItem> {
         onTapUp: (_) => setState(() => _pressed = false),
         onTapCancel: () => setState(() => _pressed = false),
         onTap: () {
-          AppHaptics.tap(context);
           widget.onTap(widget.index);
         },
         behavior: HitTestBehavior.opaque,

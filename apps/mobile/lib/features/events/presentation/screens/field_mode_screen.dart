@@ -2,10 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/network/connectivity_gate.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
@@ -16,8 +17,8 @@ import 'package:chisto_mobile/features/events/data/field_mode_queue.dart';
 import 'package:chisto_mobile/features/events/data/field_mode_sync_service.dart';
 import 'package:chisto_mobile/features/events/presentation/events_typography.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_back_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
 
 /// Compact screen to inspect the offline field queue and push it to the API.
 class FieldModeScreen extends StatefulWidget {
@@ -71,7 +72,7 @@ class _FieldModeScreenState extends State<FieldModeScreen>
     if (scheduleAutoSyncAfter && rows.isNotEmpty) {
       _scheduleOnlineAutoSync();
     }
-    if (ServiceLocator.instance.isInitialized) {
+    if (AppBootstrap.instance.isInitialized) {
       unawaited(EventOfflineWorkCoordinator.instance.refreshSnapshot());
     }
   }
@@ -125,7 +126,7 @@ class _FieldModeScreenState extends State<FieldModeScreen>
     setState(() => _syncing = true);
     try {
       final FieldModeSyncService sync = FieldModeSyncService(
-        client: ServiceLocator.instance.apiClient,
+        client: AppBootstrap.instance.apiClient,
       );
       final FieldModeSyncResult result = await sync.syncPendingRows();
       if (!mounted) {
@@ -236,16 +237,10 @@ class _FieldModeScreenState extends State<FieldModeScreen>
                     ),
                   ),
                   if (!_loading && _rows.isNotEmpty)
-                    TextButton(
-                      onPressed: _syncing ? null : _syncNow,
-                      child: _syncing
-                          ? const CupertinoActivityIndicator()
-                          : Text(
-                              context.l10n.eventsFieldModeSync,
-                              style: AppTypography.eventsTextLinkEmphasis(
-                                textTheme,
-                              ),
-                            ),
+                    AppButton.text(
+                      label: context.l10n.eventsFieldModeSync,
+                      onPressed: _syncNow,
+                      enabled: !_syncing,
                     ),
                 ],
               ),

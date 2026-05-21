@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/event_media_path_image_provider.dart';
-import 'package:chisto_mobile/shared/widgets/immersive_photo_gallery.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/immersive_photo_gallery.dart';
 
 class CleanupFullscreenGalleryPage extends StatelessWidget {
   const CleanupFullscreenGalleryPage({

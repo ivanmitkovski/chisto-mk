@@ -49,6 +49,15 @@ class CollapsedNotification {
   bool get isCollapsed => groupCount > 1;
 }
 
+/// Prefer server [UserNotification.messageCount] for coalesced event-chat threads.
+int notificationDisplayCount(UserNotification item, {int collapsedRows = 1}) {
+  final int? fromData = item.messageCount;
+  if (fromData != null && fromData > 1) {
+    return fromData;
+  }
+  return collapsedRows;
+}
+
 List<CollapsedNotification> collapseByGroupKey(
   List<UserNotification> items, {
   Duration window = const Duration(hours: 24),
@@ -66,12 +75,22 @@ List<CollapsedNotification> collapseByGroupKey(
     if (sameGroup) {
       count++;
     } else {
-      result.add(CollapsedNotification(representative: current, groupCount: count));
+      result.add(
+        CollapsedNotification(
+          representative: current,
+          groupCount: notificationDisplayCount(current, collapsedRows: count),
+        ),
+      );
       current = item;
       count = 1;
     }
   }
-  result.add(CollapsedNotification(representative: current, groupCount: count));
+  result.add(
+    CollapsedNotification(
+      representative: current,
+      groupCount: notificationDisplayCount(current, collapsedRows: count),
+    ),
+  );
   return result;
 }
 

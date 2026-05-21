@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/assets/app_assets.dart';
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/features/auth/application/splash_session_controller.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/features/auth/presentation/constants/splash_constants.dart';
@@ -12,14 +12,17 @@ import 'package:chisto_mobile/features/auth/presentation/widgets/splash_logo.dar
 /// Splash: Lottie until [SplashConstants.lottieProgressCutoff], then fade to
 /// initial route (no static logo swap, so Lottie size stays consistent).
 /// Session restore starts during splash for a snappier feel.
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
+  @visibleForTesting
+  static bool disableTimersForTests = false;
+
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
+class _SplashScreenState extends ConsumerState<SplashScreen>
     with TickerProviderStateMixin {
   late final AnimationController _lottieController;
   bool _navigating = false;
@@ -34,22 +37,16 @@ class _SplashScreenState extends State<SplashScreen>
       ..addStatusListener(_onLottieStatus)
       ..addListener(_onLottieProgress);
 
-    unawaited(_restoreSessionDuringSplash());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      unawaited(_restoreSessionDuringSplash());
+    });
     _precacheAssets();
     _startMaxDurationFallback();
   }
 
   Future<void> _restoreSessionDuringSplash() async {
-    try {
-      await ServiceLocator.instance.authRepository.restoreSession();
-    } catch (error, stackTrace) {
-      if (kDebugMode) {
-        debugPrint('[Splash] session restore failed: $error');
-        debugPrint('$stackTrace');
-      } else {
-        debugPrint('[Splash] session restore failed (${error.runtimeType})');
-      }
-    }
+    await ref.read(splashSessionControllerProvider.notifier).restoreSession();
   }
 
   void _precacheAssets() {
@@ -60,6 +57,7 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   void _startMaxDurationFallback() {
+    if (SplashScreen.disableTimersForTests) return;
     Future<void>.delayed(SplashConstants.splashMaxDuration, () {
       if (!_navigating && mounted) _scheduleNavigate();
     });

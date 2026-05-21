@@ -113,7 +113,28 @@ export const GLOBAL_HTTP_ERROR_CODES = [
 export type GlobalHttpErrorCode = (typeof GLOBAL_HTTP_ERROR_CODES)[number];
 
 /** Auth / organizer certification paths (`src/auth`) — merged for stable `code` contracts. */
-export const AUTH_API_ERROR_CODES = ['ORGANIZER_QUIZ_BANK_INVARIANT'] as const;
+export const AUTH_API_ERROR_CODES = [
+  'ORGANIZER_QUIZ_BANK_INVARIANT',
+  'EMAIL_ALREADY_REGISTERED',
+  'PHONE_ALREADY_REGISTERED',
+  'INVALID_CREDENTIALS',
+  'TOO_MANY_ATTEMPTS',
+  'ACCOUNT_SUSPENDED',
+  'ACCOUNT_NOT_ACTIVE',
+  'PHONE_NOT_VERIFIED',
+  'PHONE_NOT_REGISTERED',
+  'OTP_NOT_FOUND',
+  'OTP_EXPIRED',
+  'OTP_MAX_ATTEMPTS',
+  'OTP_INVALID',
+  'INVALID_REFRESH_TOKEN',
+  'SESSION_REVOKED',
+  'USER_NOT_FOUND',
+  'CURRENT_PASSWORD_INVALID',
+  'INVALID_TOKEN_USER',
+  'PASSWORD_RESET_TOKEN_INVALID',
+  'UNAUTHORIZED',
+] as const;
 
 export type AuthApiErrorCode = (typeof AUTH_API_ERROR_CODES)[number];
 

@@ -18,9 +18,10 @@ import 'package:chisto_mobile/features/events/presentation/utils/events_scroll_i
 import 'package:chisto_mobile/features/events/presentation/screens/field_mode_screen.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/offline_work_hub_sheet.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/organizer_dashboard/organizer_event_summary_card.dart';
-import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
-import 'package:chisto_mobile/shared/widgets/app_refresh_indicator.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_back_button.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/app_refresh_indicator.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/molecules/app_error_view.dart';
 
 /// Full-screen list of the current user's organised events, grouped by status.
 class OrganizerDashboardScreen extends StatefulWidget {
@@ -160,9 +161,8 @@ class _OrganizerDashboardScreenState extends State<OrganizerDashboardScreen> {
                                   icon: Badge(
                                     label: Text(
                                       badge,
-                                      style: const TextStyle(
+                                      style: AppTypography.microIndex.copyWith(
                                         fontSize: 10,
-                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                     child: const Icon(
@@ -196,30 +196,9 @@ class _OrganizerDashboardScreenState extends State<OrganizerDashboardScreen> {
                 else if (_loadError != null && _myEvents.isEmpty)
                   SliverFillRemaining(
                     hasScrollBody: false,
-                    child: Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          const Icon(
-                            CupertinoIcons.exclamationmark_circle,
-                            size: 40,
-                            color: AppColors.textMuted,
-                          ),
-                          const SizedBox(height: AppSpacing.sm),
-                          Text(
-                            context.l10n.eventsFeedInitialLoadFailed,
-                            style: AppTypography.eventsBodyMuted(
-                              Theme.of(context).textTheme,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: AppSpacing.md),
-                          TextButton(
-                            onPressed: _loadMyEvents,
-                            child: Text(context.l10n.commonRetry),
-                          ),
-                        ],
-                      ),
+                    child: AppErrorView(
+                      error: _loadError!,
+                      onRetry: _loadMyEvents,
                     ),
                   )
                 else if (_myEvents.isEmpty)

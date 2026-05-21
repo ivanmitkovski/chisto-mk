@@ -6,8 +6,7 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_panel_bottom_sheet.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/app_panel_bottom_sheet.dart';
 
 class MapGeoAreaOption {
   const MapGeoAreaOption({required this.id, required this.label});
@@ -40,7 +39,6 @@ class MapGeoAreaPickerSheet extends StatefulWidget {
     required String? selectedId,
     bool enableSearch = false,
   }) {
-    AppHaptics.light(context);
     return showAppPanelBottomSheet<String?>(
       context: context,
       builder: (BuildContext sheetContext) {
@@ -168,7 +166,6 @@ class _GeoOptionRow extends StatelessWidget {
       color: selected ? AppColors.primary.withValues(alpha: 0.08) : AppColors.transparent,
       child: InkWell(
         onTap: () {
-          AppHaptics.tap(context);
           onTap();
         },
         child: Padding(

@@ -7,15 +7,10 @@ import 'package:chisto_mobile/core/theme/app_spacing.dart';
 /// Follow-ups that need product + API/schema (not UI-only): message reactions,
 /// richer read receipts, link unfurl previews, voice notes.
 abstract final class ChatTheme {
-  static Color surfaceCanvas(ColorScheme colorScheme) => colorScheme.surface;
+  static Color surfaceCanvas(ColorScheme colorScheme) => AppColors.appBackground;
 
   static Color surfaceCanvasElevated(ColorScheme colorScheme) =>
-      Color.lerp(
-        colorScheme.surface,
-        colorScheme.surfaceContainerHighest,
-        0.08,
-      ) ??
-      colorScheme.surface;
+      AppColors.panelBackground;
 
   static Color get bubbleOwnFill => AppColors.primary.withValues(alpha: 0.14);
 
@@ -104,5 +99,6 @@ abstract final class ChatTheme {
     );
   }
 
-  static BorderRadius get bubbleRadiusSymmetric => BorderRadius.circular(18);
+  static BorderRadius get bubbleRadiusSymmetric =>
+      BorderRadius.circular(AppSpacing.radius18);
 }

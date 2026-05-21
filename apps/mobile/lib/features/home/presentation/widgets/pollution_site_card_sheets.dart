@@ -16,7 +16,7 @@ import 'package:chisto_mobile/features/home/presentation/widgets/comments_bottom
 import 'package:chisto_mobile/features/home/presentation/widgets/site_comments_modal_bottom_sheet.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/pollution_site_card_analytics.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/site_card/upvoters_sheet_content.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
 
 /// Bottom sheets and server share tracking extracted from [PollutionSiteCard].
 Future<void> openPollutionSiteCardCommentsSheet({
@@ -134,12 +134,15 @@ Future<void> openPollutionSiteCardUpvotersSheet({
   required BuildContext context,
   required WidgetRef ref,
   required String siteId,
+  String? highlightUserId,
 }) async {
   final int count = ref
       .read(siteEngagementNotifierProvider(siteId))
       .upvoteCount
       .clamp(0, 999);
-  if (count == 0) {
+  final bool openingFromNotification =
+      highlightUserId != null && highlightUserId.trim().isNotEmpty;
+  if (count == 0 && !openingFromNotification) {
     AppSnack.show(
       context,
       message: context.l10n.siteDetailNoUpvotesSnack,
@@ -177,6 +180,7 @@ Future<void> openPollutionSiteCardUpvotersSheet({
             child: UpvotersSheetContent(
               siteId: siteId,
               scrollController: scrollController,
+              highlightUserId: highlightUserId,
             ),
           );
         },

@@ -1,0 +1,6 @@
+lib/features/events/presentation/event_chat/controllers/event_chat_send_media_coordinator.dart:228
+lib/features/events/presentation/event_chat/controllers/event_chat_send_media_coordinator.dart:291
+lib/features/events/presentation/event_chat/controllers/event_chat_send_media_coordinator.dart:63
+lib/features/profile/presentation/avatar/profile_avatar_image_pipeline.dart:56
+lib/features/reports/data/api_reports_multipart.dart:37
+lib/features/reports/data/report_photo_upload_prep.dart:39

@@ -1,5 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { verifyOtpCode } from './otp-code.util';
 
 const OTP_MAX_VERIFY_ATTEMPTS = 5;
 
@@ -7,6 +8,7 @@ type PhoneOtpRecord = {
   id: string;
   phoneNumber: string;
   code: string;
+  codeHash: string | null;
   expiresAt: Date;
   attemptCount: number;
 };
@@ -30,8 +32,6 @@ export class OtpService {
 
   /**
    * Validates the OTP against the stored code without consuming it.
-   * Used before navigating to "new password" in the password-reset flow;
-   * {@link verifyAndConsumeOtp} still runs on {@code confirm} to atomically consume + reset password.
    */
   async assertOtpMatches(phoneNumber: string, code: string): Promise<void> {
     const normalized = phoneNumber.trim();
@@ -80,10 +80,8 @@ export class OtpService {
     record: PhoneOtpRecord,
     code: string,
   ): Promise<void> {
-    const expectedCode = String(record.code).trim();
-    const providedCode = String(code ?? '').trim();
-
-    if (expectedCode !== providedCode) {
+    const ok = await verifyOtpCode(record, code);
+    if (!ok) {
       await this.prisma.phoneOtp.update({
         where: { phoneNumber: normalized },
         data: { attemptCount: record.attemptCount + 1 },

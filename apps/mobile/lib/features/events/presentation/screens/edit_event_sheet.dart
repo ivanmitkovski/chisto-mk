@@ -32,8 +32,8 @@ import 'package:chisto_mobile/features/events/presentation/widgets/event_form_pi
 import 'package:chisto_mobile/features/events/presentation/widgets/time_range_picker.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 
 /// Organizer-only editor for fields supported by `PATCH /events/:id`.
@@ -313,7 +313,6 @@ class _EditEventSheetState extends State<EditEventSheet>
   }
 
   void _showCategoryPicker() {
-    AppHaptics.tap();
     showEventsSurfaceModal<void>(
       context: context,
       builder: (BuildContext ctx) {
@@ -357,7 +356,6 @@ class _EditEventSheetState extends State<EditEventSheet>
                           : AppColors.divider,
                     ),
                     onTap: () {
-                      AppHaptics.tap();
                       setState(() => _category = cat);
                       Navigator.of(ctx).pop();
                     },
@@ -374,7 +372,6 @@ class _EditEventSheetState extends State<EditEventSheet>
   }
 
   void _showScalePicker() {
-    AppHaptics.tap();
     showEventsSurfaceModal<void>(
       context: context,
       builder: (BuildContext ctx) {
@@ -418,7 +415,6 @@ class _EditEventSheetState extends State<EditEventSheet>
                           : AppColors.divider,
                     ),
                     onTap: () {
-                      AppHaptics.tap();
                       setState(() => _scale = scale);
                       Navigator.of(ctx).pop();
                     },
@@ -435,7 +431,6 @@ class _EditEventSheetState extends State<EditEventSheet>
   }
 
   void _showDifficultyPicker() {
-    AppHaptics.tap();
     showEventsSurfaceModal<void>(
       context: context,
       builder: (BuildContext ctx) {
@@ -480,7 +475,6 @@ class _EditEventSheetState extends State<EditEventSheet>
                       ),
                     ),
                     onTap: () {
-                      AppHaptics.tap();
                       setState(() => _difficulty = diff);
                       Navigator.of(ctx).pop();
                     },
@@ -497,7 +491,6 @@ class _EditEventSheetState extends State<EditEventSheet>
   }
 
   void _showGearPicker() {
-    AppHaptics.tap();
     showEventsSurfaceModal<void>(
       context: context,
       builder: (BuildContext ctx) {
@@ -526,7 +519,6 @@ class _EditEventSheetState extends State<EditEventSheet>
                         _gear.length,
                       ),
                 onPressed: () {
-                  AppHaptics.tap();
                   Navigator.of(ctx).pop();
                 },
               ),
@@ -559,10 +551,8 @@ class _EditEventSheetState extends State<EditEventSheet>
                               : AppColors.divider,
                         ),
                         onTap: () {
-                          AppHaptics.tap();
                           if (!isActive &&
                               _gear.length >= kEditEventGearMaxCount) {
-                            AppHaptics.warning();
                             AppSnack.show(
                               context,
                               message: ctx.l10n.editEventGearLimitReached(
@@ -687,8 +677,8 @@ class _EditEventSheetState extends State<EditEventSheet>
       return;
     }
     if (!_isValid) {
-      setState(() => _showValidationErrors = true);
       AppHaptics.warning();
+      setState(() => _showValidationErrors = true);
       await _scrollToFirstError();
       return;
     }
@@ -783,7 +773,6 @@ class _EditEventSheetState extends State<EditEventSheet>
       if (!mounted) {
         return;
       }
-      AppHaptics.warning();
       AppSnack.show(
         context,
         message: context.l10n.editEventNoChangesToSave,
@@ -830,7 +819,6 @@ class _EditEventSheetState extends State<EditEventSheet>
       return;
     }
     setState(() => _submitting = false);
-    AppHaptics.success();
     AppSnack.show(
       context,
       message: context.l10n.eventsEventUpdated,
@@ -916,7 +904,6 @@ class _EditEventSheetState extends State<EditEventSheet>
                   icon: CupertinoIcons.info_circle,
                   semanticLabel: l10n.editEventHelpButtonTooltip,
                   onTap: () {
-                    AppHaptics.tap();
                     showEditEventHelpSheet(context);
                   },
                 ),
@@ -926,7 +913,6 @@ class _EditEventSheetState extends State<EditEventSheet>
                 icon: CupertinoIcons.xmark,
                 semanticLabel: l10n.commonClose,
                 onTap: () {
-                  AppHaptics.tap();
                   unawaited(_requestClose());
                 },
               ),

@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+import 'package:chisto_mobile/core/theme/app_shadows.dart';
+import 'package:chisto_mobile/core/theme/app_radii.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:geolocator/geolocator.dart';
@@ -13,7 +15,6 @@ import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/map/map_status_codes.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/map/map_shimmer_box.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/map/map_site_pin_image.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 class SitePreviewSheet extends StatefulWidget {
   const SitePreviewSheet({
@@ -69,7 +70,6 @@ class _SitePreviewSheetState extends State<SitePreviewSheet>
     _entranceController.forward();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      AppHaptics.softTransition(context);
     });
   }
 
@@ -112,10 +112,8 @@ class _SitePreviewSheetState extends State<SitePreviewSheet>
           Directionality.of(context),
         );
       }
-      AppHaptics.sheetDismiss(context);
       widget.onDismiss();
     } else if (v < -300) {
-      AppHaptics.softTransition(context);
       widget.onViewDetails();
     }
     setState(() => _dragAccumulated = 0);
@@ -269,7 +267,6 @@ class _SitePreviewSheetState extends State<SitePreviewSheet>
                           color: AppColors.transparent,
                           child: InkWell(
                             onTap: () {
-                              AppHaptics.sheetDismiss(context);
                               widget.onDismiss();
                             },
                             borderRadius:
@@ -295,7 +292,6 @@ class _SitePreviewSheetState extends State<SitePreviewSheet>
                             icon: Icons.directions_rounded,
                             label: context.l10n.mapPreviewDirections,
                             onTap: () {
-                              AppHaptics.light(context);
                               widget.onGetDirections(site);
                             },
                           ),
@@ -307,7 +303,6 @@ class _SitePreviewSheetState extends State<SitePreviewSheet>
                             label: context.l10n.mapPreviewDetails,
                             primary: true,
                             onTap: () {
-                              AppHaptics.softTransition(context);
                               widget.onViewDetails();
                             },
                           ),
@@ -398,17 +393,11 @@ class _SitePreviewImageState extends State<SitePreviewImage>
       width: 56,
       height: 56,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: AppColors.shadowLight,
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        borderRadius: AppRadii.md,
+        boxShadow: AppShadows.panel(Theme.of(context).colorScheme),
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppRadii.md,
         child: Image(
           image: provider,
           fit: BoxFit.cover,
@@ -497,7 +486,7 @@ class ActionPill extends StatelessWidget {
         ? AppColors.primaryDark
         : AppColors.primary.withValues(alpha: 0.12);
     return Material(
-      color: Colors.transparent,
+      color: AppColors.transparent,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppSpacing.radiusPill),

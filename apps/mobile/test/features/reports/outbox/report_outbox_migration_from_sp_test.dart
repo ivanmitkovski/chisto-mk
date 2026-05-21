@@ -21,6 +21,9 @@ class _FakeOutbox implements ReportOutboxRepository {
   Future<void> delete(String id) async {}
 
   @override
+  Future<void> close() async {}
+
+  @override
   Future<ReportOutboxEntry?> getById(String id) async =>
       id == kReportWizardDraftRowId ? wizard : null;
 

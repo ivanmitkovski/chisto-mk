@@ -1,5 +1,6 @@
 import 'package:chisto_mobile/core/auth/auth_state.dart';
 import 'package:chisto_mobile/core/config/app_config.dart';
+import 'package:chisto_mobile/features/auth/domain/refresh_outcome.dart';
 import 'package:flutter/foundation.dart';
 
 import 'reports_owner_event.dart';
@@ -13,11 +14,13 @@ class ReportsRealtimeService {
   ReportsRealtimeService({
     required AppConfig config,
     required AuthState authState,
-    Future<bool> Function()? sessionRefresh,
+    Future<RefreshOutcome> Function()? sessionRefresh,
+    void Function()? onAuthRejected,
   }) : _transport = ReportsOwnerSocketStream(
          baseUrl: config.apiBaseUrl.replaceFirst(RegExp(r'/$'), ''),
          authState: authState,
          sessionRefresh: sessionRefresh,
+         onAuthRejected: onAuthRejected,
        );
 
   /// Test seam: full Socket.IO reconnect coverage still needs injectable transport in prod.

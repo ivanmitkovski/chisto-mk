@@ -8,7 +8,6 @@ import 'package:chisto_mobile/features/reports/presentation/l10n/report_severity
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_stage.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_category_picker.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -134,7 +133,6 @@ class NewReportDetailsSeverityField extends StatelessWidget {
                   divisions: 4,
                   activeColor: AppColors.primary,
                   onChanged: (double value) {
-                    AppHaptics.light();
                     onSeverityChanged(value.round().clamp(1, 5));
                   },
                 ),

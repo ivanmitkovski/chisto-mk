@@ -6,7 +6,7 @@ import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/r
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_stage_config.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/stage_chip.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
-import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_back_button.dart';
 import 'package:flutter/material.dart';
 
 /// Top title row + horizontal stage stepper for the new-report wizard.

@@ -9,6 +9,7 @@ import { EventsMobileMapperService } from './events-mobile-mapper.service';
 import { EventRouteSegmentsService } from './event-route-segments.service';
 import { eventDetailIncludeForViewer } from './events-query.include.detail';
 import { EventsRepository } from './events.repository';
+import { SiteLifecycleFromEventsService } from '../sites/site-lifecycle-from-events.service';
 
 @Injectable()
 export class EventCreationPersistenceService {
@@ -20,6 +21,7 @@ export class EventCreationPersistenceService {
     private readonly cleanupEventsSse: CleanupEventRealtimeService,
     private readonly cleanupEventNotifications: CleanupEventNotificationsService,
     private readonly routeSegments: EventRouteSegmentsService,
+    private readonly siteLifecycleFromEvents: SiteLifecycleFromEventsService,
   ) {}
 
   private emitPostCreate(
@@ -72,6 +74,8 @@ export class EventCreationPersistenceService {
       data: createData,
     });
 
+    await this.siteLifecycleFromEvents.onEventLinkedToSite(dto.siteId, created.id);
+
     if (dto.routeWaypoints != null && dto.routeWaypoints.length > 0) {
       await this.routeSegments.replaceWaypoints(created.id, user, dto.routeWaypoints);
     }
@@ -104,6 +108,8 @@ export class EventCreationPersistenceService {
           recurrenceIndex: 0,
         },
       });
+
+      await this.siteLifecycleFromEvents.onEventLinkedToSite(dto.siteId, parent.id, tx);
 
       if (dates.length > 1) {
         await tx.cleanupEvent.createMany({

@@ -10,8 +10,14 @@ import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.
 function makeSiteCommentsService(prisma: unknown, engagement: unknown, uploads: unknown) {
   const sitesFeed = { invalidateFeedCache: jest.fn() } as never;
   const reporterNotifications = { emitForSiteActivity: jest.fn() } as never;
+  const moderation = { blockedUserIdsFor: jest.fn().mockResolvedValue([]) };
   return new SiteCommentsService(
-    new SiteCommentsListService(prisma as never, engagement as never, uploads as never),
+    new SiteCommentsListService(
+      prisma as never,
+      engagement as never,
+      uploads as never,
+      moderation as never,
+    ),
     new SiteCommentsMutationsService(prisma as never, engagement as never, uploads as never),
     sitesFeed,
     reporterNotifications,

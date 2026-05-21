@@ -1,6 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_mobile/features/home/domain/models/site_report_reason.dart';
 
 const String _kReportedSiteIdsKey = 'chisto_site_issue_reported_ids';
@@ -33,7 +33,7 @@ class SiteIssueReportRepository {
     required SiteReportReason reason,
     String? details,
   }) async {
-    await ServiceLocator.instance.sitesRepository.submitFeedFeedback(
+    await AppBootstrap.instance.sitesRepository.submitFeedFeedback(
       siteId,
       feedbackType: 'misleading',
       metadata: <String, dynamic>{

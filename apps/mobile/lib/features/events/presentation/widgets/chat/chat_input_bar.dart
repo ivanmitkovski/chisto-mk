@@ -1,17 +1,17 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
-import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/events_diagnostic_log.dart';
@@ -21,10 +21,11 @@ import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_message.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_input_bar_attach_option_row.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_theme.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_voice_recorder.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/voice_recording_meter.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_loading_indicator.dart';
+import 'package:chisto_mobile/features/events/presentation/mic_permission_ui.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
 
 /// One-time in-app rationale before the OS microphone prompt (parity with push flow).
 const String kEventChatMicRationaleCompletedKey =
@@ -34,6 +35,7 @@ class ChatInputBar extends StatefulWidget {
   const ChatInputBar({
     super.key,
     required this.onSend,
+    @visibleForTesting this.voiceRecorder,
     this.composerFocusNode,
     this.replyTo,
     this.onCancelReply,
@@ -48,6 +50,8 @@ class ChatInputBar extends StatefulWidget {
   });
 
   final Future<void> Function(String text) onSend;
+  @visibleForTesting
+  final ChatVoiceRecorder? voiceRecorder;
   /// When set, the screen owns the node (e.g. to focus from an empty-state CTA).
   final FocusNode? composerFocusNode;
   final EventChatMessage? replyTo;
@@ -67,7 +71,8 @@ class ChatInputBar extends StatefulWidget {
   State<ChatInputBar> createState() => _ChatInputBarState();
 }
 
-class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderStateMixin {
+class _ChatInputBarState extends State<ChatInputBar>
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   /// Pull this far left from the mic (horizontal) before cancel arms — avoids tiny wobble.
   static const double _kVoiceCancelEnterPx = 160;
   /// While cancelling, move this far back toward the mic before we leave cancel (hysteresis).
@@ -81,7 +86,8 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
   bool _sending = false;
   final List<XFile> _stagedImages = <XFile>[];
   final ImagePicker _picker = ImagePicker();
-  final AudioRecorder _voiceRecorder = AudioRecorder();
+  late final ChatVoiceRecorder _voiceRecorder =
+      widget.voiceRecorder ?? PackageChatVoiceRecorder();
   bool _voiceRecording = false;
   bool _voiceCancelled = false;
   /// True while the user’s finger is down on the mic long-press (set synchronously).
@@ -102,6 +108,7 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     if (widget.composerFocusNode != null) {
       _focusNode = widget.composerFocusNode!;
       _ownsComposerFocus = false;
@@ -128,16 +135,84 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
   }
 
   @override
-  void dispose() {
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Do not tear down on [inactive] — iOS shows the mic permission sheet as inactive.
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.detached) {
+      unawaited(_teardownVoiceRecording());
+    }
+  }
+
+  Future<bool> _voiceRecorderIsRecordingSafe() async {
+    try {
+      return await _voiceRecorder.isRecording();
+    } on Object {
+      return false;
+    }
+  }
+
+  /// Releases the mic when the widget is removed or the app backgrounds mid-record.
+  Future<void> _teardownVoiceRecording() async {
     _voiceMaxTimer?.cancel();
+    _voiceMaxTimer = null;
+    if (_voiceRecording || await _voiceRecorderIsRecordingSafe()) {
+      await _discardVoiceCapture(deleteFile: true);
+    }
+  }
+
+  bool _disposed = false;
+
+  @override
+  void dispose() {
+    _disposed = true;
+    WidgetsBinding.instance.removeObserver(this);
+    _voiceMaxTimer?.cancel();
+    _voiceMaxTimer = null;
     _stopVoiceDurationUi();
-    unawaited(_voiceRecorder.dispose());
+    // Cancel any in-flight recording synchronously (best-effort); then dispose
+    // the native recorder in a microtask without blocking [super.dispose].
+    final ChatVoiceRecorder recorder = _voiceRecorder;
+    final AudioRecorder? fallback = _fallbackMeterRecorder;
+    _voiceRecording = false;
+    unawaited(() async {
+      try {
+        if (await recorder.isRecording()) {
+          await recorder.cancel();
+        }
+      } on Object {
+        // Hot restart can race the native side; the dispose below still runs.
+      }
+      try {
+        await recorder.dispose();
+      } on Object {
+        // Same race; swallow.
+      }
+      if (fallback != null) {
+        try {
+          await fallback.dispose();
+        } on Object {
+          // Fallback recorder is only used in tests; tolerate errors.
+        }
+      }
+    }());
     _controller.dispose();
     if (_ownsComposerFocus) {
       _focusNode.dispose();
     }
     _sendAnim.dispose();
     super.dispose();
+  }
+
+  /// Cached fallback recorder for the meter when [widget.voiceRecorder] is not
+  /// a [PackageChatVoiceRecorder] (test seam). Created lazily so production
+  /// builds (which always inject [PackageChatVoiceRecorder]) skip it entirely.
+  AudioRecorder? _fallbackMeterRecorder;
+
+  AudioRecorder _resolveMeterRecorder() {
+    final ChatVoiceRecorder r = _voiceRecorder;
+    if (r is PackageChatVoiceRecorder) {
+      return r.recorder;
+    }
+    return _fallbackMeterRecorder ??= AudioRecorder();
   }
 
   @override
@@ -472,10 +547,10 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
                 backgroundColor: AppColors.primary,
               ),
               child: _sendingVoiceReview
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 20,
                       height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.textOnDark),
+                      child: AppLoadingIndicator(size: AppLoadingIndicatorSize.sm, color: AppColors.textOnDark),
                     )
                   : const Icon(CupertinoIcons.arrow_up, size: 20, color: AppColors.textOnDark),
             ),
@@ -490,7 +565,6 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
     if (f == null) {
       return;
     }
-    AppHaptics.light(context);
     setState(() {
       _voiceReviewFile = null;
       _voiceReviewLength = Duration.zero;
@@ -509,7 +583,6 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
       return;
     }
     setState(() => _sendingVoiceReview = true);
-    AppHaptics.tap();
     final String path = f.path;
     try {
       await cb(f, _voiceReviewLength);
@@ -613,7 +686,7 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
                         SizedBox(
                           height: VoiceRecordingMeter.maxBarHeight + 2,
                           child: VoiceRecordingMeter(
-                            recorder: _voiceRecorder,
+                            recorder: _resolveMeterRecorder(),
                             active: _voiceRecording,
                             cancelled: _voiceCancelled,
                             reduceMotion: MediaQuery.disableAnimationsOf(context),
@@ -792,10 +865,10 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
                 foregroundColor: AppColors.textOnDark,
               ),
               child: _sending
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 20,
                       height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.textOnDark),
+                      child: AppLoadingIndicator(size: AppLoadingIndicatorSize.sm, color: AppColors.textOnDark),
                     )
                   : Icon(
                       widget.editingMessage != null
@@ -845,27 +918,7 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
 
   Future<void> _showMicOpenSettingsDialog() async {
     if (!mounted) return;
-    final AppLocalizations l10n = context.l10n;
-    await showDialog<void>(
-      context: context,
-      builder: (BuildContext c) => AlertDialog(
-        title: Text(l10n.eventChatMicPermissionDenied),
-        content: Text(l10n.micPermissionRationaleBody),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.of(c).pop(),
-            child: Text(l10n.commonCancel),
-          ),
-          FilledButton(
-            onPressed: () {
-              Navigator.of(c).pop();
-              unawaited(openAppSettings());
-            },
-            child: Text(l10n.micPermissionOpenSettings),
-          ),
-        ],
-      ),
-    );
+    await showMicOpenSettingsDialog(context);
   }
 
   /// In-app rationale once, then OS prompt; on permanent denial offers Settings.
@@ -875,30 +928,12 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
       return true;
     }
 
-    final prefs = ServiceLocator.instance.preferences;
+    final prefs = AppBootstrap.instance.preferences;
     if (prefs.getBool(kEventChatMicRationaleCompletedKey) != true) {
       if (!mounted) {
         return false;
       }
-      final AppLocalizations l10n = context.l10n;
-      final bool? accepted = await showDialog<bool>(
-        context: context,
-        barrierDismissible: true,
-        builder: (BuildContext c) => AlertDialog(
-          title: Text(l10n.micPermissionRationaleTitle),
-          content: Text(l10n.micPermissionRationaleBody),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(c).pop(false),
-              child: Text(l10n.micPermissionRationaleNotNow),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.of(c).pop(true),
-              child: Text(l10n.micPermissionRationaleAllow),
-            ),
-          ],
-        ),
-      );
+      final bool? accepted = await showMicPermissionRationaleDialog(context);
       await prefs.setBool(kEventChatMicRationaleCompletedKey, true);
       if (accepted != true) {
         return false;
@@ -923,20 +958,17 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
   }
 
   Future<void> _beginVoiceRecording() async {
+    if (_disposed) {
+      _voicePressHeld = false;
+      return;
+    }
     if (!_voiceAttachAvailable || _sending || _voiceReviewFile != null) {
       _voicePressHeld = false;
       return;
     }
     final bool micOk = await _requestMicrophoneWithRationale();
-    if (!micOk) {
+    if (_disposed || !micOk) {
       _voicePressHeld = false;
-      return;
-    }
-    if (!await _voiceRecorder.hasPermission()) {
-      _voicePressHeld = false;
-      if (mounted) {
-        AppSnack.show(context, message: context.l10n.eventChatMicPermissionDenied);
-      }
       return;
     }
     if (!_voicePressHeld) {
@@ -952,7 +984,7 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
       // Favor raw-ish levels for the meter (less AGC/DSP) and legacy MediaRecorder on
       // Android so getAmplitude / onAmplitudeChanged are more likely to move the strip.
       await _voiceRecorder.start(
-        RecordConfig(
+        config: RecordConfig(
           encoder: AudioEncoder.aacLc,
           noiseSuppress: false,
           echoCancel: false,
@@ -983,7 +1015,6 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
     _voiceRecording = true;
     _startVoiceDurationUi();
     if (mounted) {
-      AppHaptics.medium(context);
       setState(() {});
     }
   }
@@ -1059,7 +1090,6 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
         ? dx < -_kVoiceCancelReleasePx
         : dx < -_kVoiceCancelEnterPx;
     if (cancel != wasCancelled) {
-      AppHaptics.light(context);
     }
     setState(() {
       _voicePanDx = dx;
@@ -1072,7 +1102,7 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
     _voiceMaxTimer = null;
     _voicePressHeld = false;
 
-    final bool hardwareRecording = await _voiceRecorder.isRecording();
+    final bool hardwareRecording = await _voiceRecorderIsRecordingSafe();
     if (!_voiceRecording && !hardwareRecording) {
       return;
     }
@@ -1118,7 +1148,6 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
           _voiceReviewFile = XFile(uploadPath, name: 'voice.m4a');
           _voiceReviewLength = recorded < Duration.zero ? Duration.zero : recorded;
         });
-        AppHaptics.light(context);
       } else {
         try {
           await widget.onSendImages!(<XFile>[XFile(uploadPath, name: 'voice.m4a')]);
@@ -1348,7 +1377,6 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
     final bool hasImages = _stagedImages.isNotEmpty;
     if (t.isEmpty && !hasImages) return;
     if (_sending) return;
-    AppHaptics.success(context);
     setState(() => _sending = true);
     final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
     if (!reduceMotion) {

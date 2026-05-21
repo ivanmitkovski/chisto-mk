@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/theme/app_card_chrome.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
-import 'package:chisto_mobile/shared/widgets/skeleton_shimmer_box.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/skeleton_shimmer_box.dart';
 
 /// Placeholder row for a stacked [EcoEventCard] while the parent drives shimmer [t].
 ///

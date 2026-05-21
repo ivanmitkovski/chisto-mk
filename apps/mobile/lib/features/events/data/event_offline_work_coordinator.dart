@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/widgets.dart';
 
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_mobile/core/network/connectivity_gate.dart';
 import 'package:chisto_mobile/features/events/data/chat/chat_outbox_sync.dart';
 import 'package:chisto_mobile/features/events/data/chat/outbox/chat_outbox_store.dart';
@@ -109,16 +109,16 @@ class EventOfflineWorkCoordinator {
     });
     _lifecycle = _LifecycleBridge(scheduleDrain);
     WidgetsBinding.instance.addObserver(_lifecycle!);
-    if (ServiceLocator.instance.isInitialized) {
-      ServiceLocator.instance.authState.addListener(_onAuthChanged);
+    if (AppBootstrap.instance.isInitialized) {
+      AppBootstrap.instance.authState.addListener(_onAuthChanged);
     }
     scheduleDrain();
   }
 
   void _onAuthChanged() {
     unawaited(refreshSnapshot());
-    if (ServiceLocator.instance.isInitialized &&
-        ServiceLocator.instance.authState.isAuthenticated) {
+    if (AppBootstrap.instance.isInitialized &&
+        AppBootstrap.instance.authState.isAuthenticated) {
       scheduleDrain();
     }
   }
@@ -136,19 +136,19 @@ class EventOfflineWorkCoordinator {
       WidgetsBinding.instance.removeObserver(_lifecycle!);
       _lifecycle = null;
     }
-    if (ServiceLocator.instance.isInitialized) {
-      ServiceLocator.instance.authState.removeListener(_onAuthChanged);
+    if (AppBootstrap.instance.isInitialized) {
+      AppBootstrap.instance.authState.removeListener(_onAuthChanged);
     }
     snapshot.value = EventOfflineWorkSnapshot.empty();
     _drainChain = Future<void>.value();
   }
 
   Future<void> refreshSnapshot() async {
-    if (!ServiceLocator.instance.isInitialized) {
+    if (!AppBootstrap.instance.isInitialized) {
       snapshot.value = EventOfflineWorkSnapshot.empty();
       return;
     }
-    final ServiceLocator sl = ServiceLocator.instance;
+    final AppBootstrap sl = AppBootstrap.instance;
     if (!sl.authState.isAuthenticated) {
       snapshot.value = EventOfflineWorkSnapshot.empty();
       return;
@@ -175,7 +175,7 @@ class EventOfflineWorkCoordinator {
     if (!_started) {
       return;
     }
-    final ServiceLocator sl = ServiceLocator.instance;
+    final AppBootstrap sl = AppBootstrap.instance;
     if (!sl.isInitialized || !sl.authState.isAuthenticated) {
       await refreshSnapshot();
       return;

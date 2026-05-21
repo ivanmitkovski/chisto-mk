@@ -1,7 +1,7 @@
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/feed_filter_sheet.dart';
-import 'package:chisto_mobile/shared/widgets/app_filter_pill_bar.dart';
+import 'package:chisto_mobile/shared/widgets/molecules/app_filter_pill_bar.dart';
 import 'package:flutter/material.dart';
 
 /// Horizontal filter chips for the pollution feed (scrolls with the list).

@@ -16,6 +16,7 @@ import { authenticateSocketUser } from '../common/ws/authenticate-socket-user';
 import { resolveSocketIoCorsOrigin } from '../common/ws/ws-cors';
 import { EventChatAccessService } from './event-chat-access.service';
 import { EventChatRoomEmitterService } from './event-chat-room-emitter.service';
+import { EventChatSseService } from './event-chat-sse.service';
 
 interface SocketData {
   userId?: string;
@@ -49,6 +50,7 @@ export class EventChatGateway
     private readonly prisma: PrismaService,
     private readonly eventChatAccess: EventChatAccessService,
     private readonly chatRoomEmitter: EventChatRoomEmitterService,
+    private readonly eventChatRealtime: EventChatSseService,
   ) {}
 
   afterInit(server: Server): void {
@@ -113,13 +115,32 @@ export class EventChatGateway
     return true;
   }
 
-  private parseEventId(data: unknown): string | null {
+  private parseJoinPayload(data: unknown): {
+    eventId: string | null;
+    lastStreamEventId?: string;
+  } {
     const coerced = this.coerceMessageBody(data);
     if (coerced === null || typeof coerced !== 'object') {
-      return null;
+      return { eventId: null };
     }
-    const raw = (coerced as { eventId?: unknown }).eventId;
-    return typeof raw === 'string' && raw.length > 0 ? raw : null;
+    const o = coerced as { eventId?: unknown; lastStreamEventId?: unknown };
+    const eventId =
+      typeof o.eventId === 'string' && o.eventId.length > 0 ? o.eventId : null;
+    const lastStreamEventId =
+      typeof o.lastStreamEventId === 'string' && o.lastStreamEventId.trim().length > 0
+        ? o.lastStreamEventId.trim()
+        : undefined;
+    return lastStreamEventId != null
+      ? { eventId, lastStreamEventId }
+      : { eventId };
+  }
+
+  private emitReplayToClient(client: Socket, eventId: string, lastStreamEventId?: string): void {
+    const replay = this.eventChatRealtime.getReplaySince(eventId, lastStreamEventId);
+    if (replay.length === 0) {
+      return;
+    }
+    client.emit('sync', { eventId, events: replay });
   }
 
   @SubscribeMessage('join')
@@ -127,7 +148,7 @@ export class EventChatGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() data: unknown,
   ): Promise<void> {
-    const eventId = this.parseEventId(data);
+    const { eventId, lastStreamEventId } = this.parseJoinPayload(data);
     if (!eventId) {
       this.logger.warn(`join: invalid payload type=${typeof data}`);
       return;
@@ -158,6 +179,7 @@ export class EventChatGateway
     }
     const room = `event:${eventId}`;
     await client.join(room);
+    this.emitReplayToClient(client, eventId, lastStreamEventId);
     this.logger.debug(`${userId} joined ${room}`);
   }
 
@@ -166,7 +188,7 @@ export class EventChatGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() data: unknown,
   ): Promise<void> {
-    const eventId = this.parseEventId(data);
+    const { eventId } = this.parseJoinPayload(data);
     if (!eventId) {
       return;
     }

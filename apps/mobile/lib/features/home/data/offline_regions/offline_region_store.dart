@@ -1,10 +1,10 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'offline_region_model.dart';
+import 'package:chisto_mobile/core/logging/app_log.dart';
 
 /// Manages Hive-backed storage for offline map regions, tiles, and site data.
 ///
@@ -55,7 +55,7 @@ class OfflineRegionStore {
         regions.add(OfflineRegion.fromJson(json));
       } catch (e) {
         if (kDebugMode) {
-          debugPrint('[OfflineRegionStore] corrupt region entry "$key": $e');
+          AppLog.verbose('[OfflineRegionStore] corrupt region entry "$key": $e');
         }
       }
     }

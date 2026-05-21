@@ -18,8 +18,9 @@ import 'package:chisto_mobile/features/home/presentation/widgets/map/map_site_pi
 import 'package:chisto_mobile/features/home/presentation/widgets/map/map_pollution_type_ui.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/map/map_status_codes.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_empty_state.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_loading_indicator.dart';
+import 'package:chisto_mobile/shared/widgets/molecules/app_empty_state.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -224,15 +225,14 @@ class _MapSearchModalState extends ConsumerState<MapSearchModal> {
                                 : IconButton(
                                     style: IconButton.styleFrom(
                                       foregroundColor: AppColors.textMuted,
-                                      visualDensity: VisualDensity.compact,
-                                      tapTargetSize:
-                                          MaterialTapTargetSize.shrinkWrap,
-                                      padding: const EdgeInsets.all(AppSpacing.xs),
+                                      tapTargetSize: MaterialTapTargetSize.padded,
+                                      padding: const EdgeInsets.all(AppSpacing.sm),
                                     ),
                                     constraints: const BoxConstraints(
-                                      minWidth: 36,
-                                      minHeight: 36,
+                                      minWidth: 44,
+                                      minHeight: 44,
                                     ),
+                                    tooltip: context.l10n.semanticClose,
                                     onPressed: () {
                                       _controller.clear();
                                       _search.clearQuery();
@@ -243,8 +243,8 @@ class _MapSearchModalState extends ConsumerState<MapSearchModal> {
                                     ),
                                   ),
                             suffixIconConstraints: const BoxConstraints(
-                              minWidth: 40,
-                              minHeight: 40,
+                              minWidth: 44,
+                              minHeight: 44,
                             ),
                           ),
                         ),
@@ -280,20 +280,9 @@ class _MapSearchModalState extends ConsumerState<MapSearchModal> {
                           ),
                         ),
                       ),
-                    TextButton(
-                      style: TextButton.styleFrom(
-                        foregroundColor: AppColors.primaryDark,
-                        textStyle:
-                            Theme.of(context).textTheme.titleSmall?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.sm,
-                          vertical: AppSpacing.xs,
-                        ),
-                      ),
+                    AppButton.text(
+                      label: context.l10n.searchModalCancel,
                       onPressed: widget.onDismiss,
-                      child: Text(context.l10n.searchModalCancel),
                     ),
                   ],
                 ),
@@ -301,7 +290,7 @@ class _MapSearchModalState extends ConsumerState<MapSearchModal> {
               if (hasRemoteLoading)
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                  child: LinearProgressIndicator(minHeight: 2),
+                  child: AppLinearProgress(),
                 ),
               if (hasRemoteError)
                 Padding(
@@ -321,9 +310,9 @@ class _MapSearchModalState extends ConsumerState<MapSearchModal> {
                               ),
                         ),
                       ),
-                      TextButton(
+                      AppButton.text(
+                        label: context.l10n.mapSearchRemoteRetry,
                         onPressed: _search.retryRemote,
-                        child: Text(context.l10n.mapSearchRemoteRetry),
                       ),
                     ],
                   ),
@@ -349,7 +338,6 @@ class _MapSearchModalState extends ConsumerState<MapSearchModal> {
                             ),
                       ),
                       onPressed: () {
-                        AppHaptics.light(context);
                         widget.onGeoIntentSelected!(state.geoIntent!);
                       },
                     ),
@@ -391,7 +379,6 @@ class _MapSearchModalState extends ConsumerState<MapSearchModal> {
                             onPressed: () {
                               _controller.text = s;
                               _search.updateQuery(s);
-                              AppHaptics.light(context);
                               setState(() {});
                             },
                           ),
@@ -424,31 +411,14 @@ class _MapSearchModalState extends ConsumerState<MapSearchModal> {
                                 ),
                           ),
                           const Spacer(),
-                          TextButton(
-                            style: TextButton.styleFrom(
-                              foregroundColor: AppColors.primaryDark,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: AppSpacing.xs,
-                                vertical: AppSpacing.xxs,
-                              ),
-                              minimumSize: Size.zero,
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              visualDensity: VisualDensity.compact,
-                            ),
+                          AppButton.text(
+                            label: context.l10n.mapSearchClearRecentsButton,
                             onPressed: () async {
-                              AppHaptics.light(context);
                               final SharedPreferences prefs =
                                   await SharedPreferences.getInstance();
                               await MapSearchRecentsStore.clear(prefs);
                               await _refreshRecents();
                             },
-                            child: Text(
-                              context.l10n.mapSearchClearRecentsButton,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .labelSmall
-                                  ?.copyWith(fontWeight: FontWeight.w600),
-                            ),
                           ),
                         ],
                       ),
@@ -473,7 +443,6 @@ class _MapSearchModalState extends ConsumerState<MapSearchModal> {
                                   onPressed: () {
                                     _controller.text = r;
                                     _search.updateQuery(r);
-                                    AppHaptics.light(context);
                                     setState(() {});
                                   },
                                 ),
@@ -654,10 +623,9 @@ class _SearchResultTile extends StatelessWidget {
         subtitleBase.copyWith(fontWeight: FontWeight.w700);
 
     return Material(
-      color: Colors.transparent,
+      color: AppColors.transparent,
       child: InkWell(
         onTap: () {
-          AppHaptics.light(context);
           onTap();
         },
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),

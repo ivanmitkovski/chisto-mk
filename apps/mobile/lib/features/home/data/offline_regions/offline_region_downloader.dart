@@ -7,6 +7,7 @@ import 'package:chisto_mobile/core/network/api_client.dart';
 
 import 'offline_region_model.dart';
 import 'offline_region_store.dart';
+import 'package:chisto_mobile/core/logging/app_log.dart';
 
 /// Downloads map tiles and site data for an [OfflineRegion] and persists them
 /// into the [OfflineRegionStore].
@@ -99,7 +100,7 @@ class OfflineRegionDownloader {
           totalBytes += response.bytes.length;
         } catch (e) {
           if (kDebugMode) {
-            debugPrint(
+            AppLog.verbose(
               '[OfflineDownloader] tile ${tile.z}/${tile.x}/${tile.y} failed: $e',
             );
           }
@@ -144,7 +145,7 @@ class OfflineRegionDownloader {
       }
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('[OfflineDownloader] site data download failed: $e');
+        AppLog.verbose('[OfflineDownloader] site data download failed: $e');
       }
     }
 

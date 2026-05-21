@@ -1,7 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:chisto_mobile/core/di/service_locator.dart';
-import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
-import 'package:chisto_mobile/features/events/presentation/navigation/events_navigation.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
+import 'package:chisto_mobile/features/auth/presentation/eula_acceptance_flow.dart';
 import 'package:chisto_mobile/features/events/presentation/screens/events_feed_screen.dart'
     show EventsFeedScreenState;
 import 'package:chisto_mobile/features/home/presentation/navigation/home_shell_router.dart';
@@ -13,7 +14,6 @@ import 'package:chisto_mobile/features/reports/presentation/widgets/draft/draft_
 import 'package:chisto_mobile/features/reports/data/outbox/report_draft_summary_projector.dart';
 import 'package:chisto_mobile/features/reports/presentation/flow/report_entry_flow.dart';
 import 'package:chisto_mobile/features/reports/presentation/screens/reports_list_screen.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:go_router/go_router.dart';
 
 class HomeShell extends StatefulWidget {
@@ -55,13 +55,16 @@ class _HomeShellState extends State<HomeShell> {
   );
   final ValueNotifier<int> _reportsRefreshNotifier = ValueNotifier<int>(0);
 
+  final GlobalKey<NavigatorState> _shellNavigatorKey =
+      GlobalKey<NavigatorState>(debugLabel: 'homeShellRouterRoot');
+
   late final GoRouter _homeRouter;
 
   @override
   void initState() {
     super.initState();
     _coachTour = CoachTourController(
-      repository: ServiceLocator.instance.featureGuideRepository,
+      repository: AppBootstrap.instance.featureGuideRepository,
       debugForceSessionEligible: CoachTourDebug.forceSessionEligible,
     );
     final int tab = widget.initialTabIndex.clamp(0, 3);
@@ -72,6 +75,7 @@ class _HomeShellState extends State<HomeShell> {
         : homeShellTabIndexToLocation(tab);
 
     _homeRouter = buildHomeShellGoRouter(
+      navigatorKey: _shellNavigatorKey,
       initialLocation: initialLocation,
       mapPendingSiteFocus: _mapPendingSiteFocus,
       feedKey: _feedKey,
@@ -117,6 +121,11 @@ class _HomeShellState extends State<HomeShell> {
         }
       });
     }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      await ensureCommunityGuidelinesAccepted(context);
+    });
   }
 
   @override
@@ -156,22 +165,7 @@ class _HomeShellState extends State<HomeShell> {
     );
   }
 
-  Future<void> _handleCentralFabPressed(
-    BuildContext context,
-    int tabIndex,
-  ) async {
-    if (tabIndex == 3) {
-      AppHaptics.softTransition();
-      final EcoEvent? created = await EventsNavigation.openCreate(context);
-      if (!context.mounted) {
-        return;
-      }
-      if (created != null) {
-        await EventsNavigation.openDetail(context, eventId: created.id);
-      }
-      return;
-    }
-
+  Future<void> _handleCentralFabPressed(BuildContext context) async {
     if (_isLaunchingReportFlow) {
       return;
     }
@@ -192,7 +186,7 @@ class _HomeShellState extends State<HomeShell> {
         return;
       }
       final ReportDraftSummary draftSummary =
-          ServiceLocator.instance.reportDraftRepository.summaryListenable.value;
+          AppBootstrap.instance.reportDraftRepository.summaryListenable.value;
       if (draftSummary.hasDraft) {
         final CentralFabDraftChoice? choice =
             await ReportEntryFlow.promptDraftChoiceIfNeeded(
@@ -206,7 +200,6 @@ class _HomeShellState extends State<HomeShell> {
           return;
         }
         if (choice == CentralFabDraftChoice.continueDraft) {
-          AppHaptics.softTransition();
           final Object? navResult = await ReportEntryFlow.openNewReportWizard(
             context,
           );

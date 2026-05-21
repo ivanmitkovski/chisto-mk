@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 /// Recurrence preset for the event creation wizard.
 enum EventRecurrence {
@@ -129,7 +129,6 @@ class _RecurrencePickerSheetState extends State<RecurrencePickerSheet> {
                 final bool selected = _recurrence == r;
                 return InkWell(
                   onTap: () {
-                    AppHaptics.tap();
                     setState(() => _recurrence = r);
                   },
                   child: Padding(
@@ -204,22 +203,15 @@ class _RecurrencePickerSheetState extends State<RecurrencePickerSheet> {
                 padding: const EdgeInsets.fromLTRB(
                   AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.sm,
                 ),
-                child: FilledButton(
+                child: AppButton.primary(
+                  label: context.l10n.eventsRecurrenceDone,
                   onPressed: () => Navigator.of(context).pop(
                     RecurrenceSelection(
                       recurrence: _recurrence,
                       occurrences: _occurrences,
                     ),
                   ),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: AppColors.white,
-                    minimumSize: const Size.fromHeight(50),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-                    ),
-                  ),
-                  child: Text(context.l10n.eventsRecurrenceDone),
+                  expand: true,
                 ),
               ),
             ],

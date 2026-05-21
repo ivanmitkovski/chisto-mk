@@ -48,6 +48,7 @@ void main() {
         body: 'Your report was reviewed',
         createdAt: createdAt,
         type: UserNotificationType.siteUpdate,
+        isRead: false,
       );
 
       expect(notification.id, 'n1');

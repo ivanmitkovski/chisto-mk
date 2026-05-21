@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_mobile/features/profile/presentation/screens/profile_screen.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +17,7 @@ void main() {
   ) async {
     await tester.pumpWidget(
       UncontrolledProviderScope(
-        container: ServiceLocator.instance.providerContainer,
+        container: AppBootstrap.instance.providerContainer,
         child: const MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,

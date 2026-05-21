@@ -8,6 +8,7 @@ import 'package:chisto_mobile/core/storage/secure_token_storage.dart';
 import 'package:chisto_mobile/features/home/data/offline_regions/offline_region_downloader.dart';
 import 'package:chisto_mobile/features/home/data/offline_regions/offline_region_model.dart';
 import 'package:chisto_mobile/features/home/data/offline_regions/offline_region_store.dart';
+import 'package:chisto_mobile/core/logging/app_log.dart';
 
 /// Background refresh for saved offline map regions (unmetered network only).
 ///
@@ -46,7 +47,7 @@ abstract final class OfflineRefreshDispatcher {
       return true;
     } on Exception catch (e, st) {
       if (kDebugMode) {
-        debugPrint('[OfflineRefreshDispatcher] failed: $e\n$st');
+        AppLog.verbose('[OfflineRefreshDispatcher] failed: $e\n$st');
       }
       return false;
     }

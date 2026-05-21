@@ -163,6 +163,7 @@ class EventSiteResolver {
             dateTime: event.startDateTime,
             participantCount: event.participantCount,
             isOrganizer: event.isOrganizer,
+            isJoined: event.isJoined,
             statusLabel: statusLabelFor(event.status),
             statusColor: Color(event.status.colorValue),
           ),

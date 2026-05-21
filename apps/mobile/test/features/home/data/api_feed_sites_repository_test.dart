@@ -135,4 +135,30 @@ void main() {
       throwsA(isA<AppError>().having((e) => e.code, 'code', 'VALIDATION_ERROR')),
     );
   });
+
+  test('getSavedSites returns empty list when endpoint is not available', () async {
+    final stub = _StubApiClient()
+      ..nextError = AppError.validation(message: 'Request validation failed');
+    final repository = ApiFeedSitesRepository(
+      client: stub,
+      localCache: _StubSitesLocalCache(),
+    );
+    final result = await repository.getSavedSites(page: 1, limit: 24);
+    expect(result.sites, isEmpty);
+    expect(result.total, 0);
+    expect(stub.lastPath, contains('/sites/saved'));
+  });
+
+  test('getSavedSites rethrows unauthorized errors', () async {
+    final stub = _StubApiClient()
+      ..nextError = AppError.unauthorized();
+    final repository = ApiFeedSitesRepository(
+      client: stub,
+      localCache: _StubSitesLocalCache(),
+    );
+    await expectLater(
+      repository.getSavedSites(),
+      throwsA(isA<AppError>().having((AppError e) => e.code, 'code', 'UNAUTHORIZED')),
+    );
+  });
 }

@@ -42,9 +42,20 @@ AppError appErrorFromFailedResponse({
   }
 
   if (statusCode == 401) {
+    final Map<String, dynamic> merged = <String, dynamic>{};
+    if (details is Map) {
+      merged.addAll(Map<String, dynamic>.from(details));
+    }
+    final int? retryAfter = jsonRetryAfter ?? headerRetryAfter;
+    if (retryAfter != null) {
+      merged['retryAfterSeconds'] = retryAfter;
+    }
+    final bool retryable = json?['retryable'] == true || retryAfter != null;
     return AppError(
       code: code,
       message: message,
+      retryable: retryable,
+      details: merged.isEmpty ? null : merged,
       serverTimestamp: serverTimestamp,
     );
   }
@@ -57,7 +68,10 @@ AppError appErrorFromFailedResponse({
     );
   }
   if (statusCode == 404) {
+    final String resolvedCode =
+        json?['code'] is String ? json!['code'] as String : 'NOT_FOUND';
     return AppError.notFound(
+      code: resolvedCode,
       message: message,
       serverTimestamp: serverTimestamp,
     );

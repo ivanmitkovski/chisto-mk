@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/cupertino.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
@@ -68,6 +69,7 @@ class _EventSuccessDialogState extends State<EventSuccessDialog>
       if (!mounted) {
         return;
       }
+      AppHaptics.success(context);
       final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
       if (widget.requiresModeration) {
         if (reduceMotion) {
@@ -75,12 +77,10 @@ class _EventSuccessDialogState extends State<EventSuccessDialog>
         } else {
           unawaited(_containerController.forward());
         }
-        AppHaptics.light(context);
       } else {
         if (reduceMotion) {
           _containerController.value = 1.0;
           _checkController.value = 1.0;
-          AppHaptics.success(context);
         } else {
           unawaited(
             _containerController.forward().then((_) {
@@ -88,7 +88,6 @@ class _EventSuccessDialogState extends State<EventSuccessDialog>
                 return;
               }
               unawaited(_checkController.forward());
-              AppHaptics.success(context);
             }),
           );
         }
@@ -160,27 +159,12 @@ class _EventSuccessDialogState extends State<EventSuccessDialog>
                   style: AppTypography.eventsBodyMuted(textTheme).copyWith(height: 1.5),
                 ),
                 const SizedBox(height: AppSpacing.lg),
-                SizedBox(
-                  width: double.infinity,
-                  height: 54,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      AppHaptics.tap();
-                      Navigator.of(context).pop(true);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      elevation: 0,
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: AppColors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-                      ),
-                    ),
-                    child: Text(
-                      context.l10n.eventsSuccessDialogViewEvent,
-                      style: AppTypography.eventsPrimaryButtonLabel(textTheme),
-                    ),
-                  ),
+                AppButton.primary(
+                  label: context.l10n.eventsSuccessDialogViewEvent,
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                  },
+                  expand: true,
                 ),
               ],
             ),

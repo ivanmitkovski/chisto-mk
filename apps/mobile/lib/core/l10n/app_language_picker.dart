@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
+import 'package:chisto_mobile/core/providers/app_providers.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 /// Rows matching [ProfileLanguageScreen] styling (design system).
 class LanguagePickerOptionRow extends StatelessWidget {
@@ -187,14 +188,13 @@ Future<void> showAppLanguagePicker(BuildContext context) async {
                   right: AppSpacing.sm,
                   bottom: AppSpacing.sm,
                 ),
-                child: ValueListenableBuilder<Locale?>(
-                  valueListenable: ServiceLocator.instance.appLocaleOverride,
-                  builder: (_, Locale? current, Widget? _) {
+                child: Consumer(
+                  builder: (_, WidgetRef ref, _) {
+                    final Locale? current = ref.watch(appLocaleOverrideProvider);
                     return AppLanguagePickerList(
                       current: current,
                       onSelect: (Locale? locale) async {
-                        AppHaptics.light(sheetContext);
-                        await ServiceLocator.instance.setAppLocale(locale);
+                        await AppBootstrap.instance.setAppLocale(locale);
                         if (sheetContext.mounted) {
                           Navigator.of(sheetContext).pop();
                         }

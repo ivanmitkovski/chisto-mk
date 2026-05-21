@@ -12,7 +12,12 @@ import { Role, UserStatus } from '../../src/prisma-client';
 import * as bcrypt from 'bcrypt';
 import { AuthAdminLoginService } from '../../src/auth/auth-admin-login.service';
 import { AuthProfileService } from '../../src/auth/auth-profile.service';
+import { AuthProfileReadService } from '../../src/auth/auth-profile-read.service';
+import { AuthProfileAvatarService } from '../../src/auth/auth-profile-avatar.service';
 import { AuthRegistrationService } from '../../src/auth/auth-registration.service';
+import { AuthLoginService } from '../../src/auth/auth-login.service';
+import { LOGIN_MAX_ATTEMPTS } from '../../src/auth/auth.constants';
+import { AuthOtpService } from '../../src/auth/auth-otp.service';
 import { AuthSessionService } from '../../src/auth/auth-session.service';
 import { loadAuthEnvRuntime } from '../../src/auth/auth-env.config';
 import { is2FAResponse } from '../../src/auth/types/auth-response.type';
@@ -28,7 +33,7 @@ const mockUser = {
   passwordHash: '',
   role: Role.USER,
   status: UserStatus.ACTIVE,
-  isPhoneVerified: false,
+  isPhoneVerified: true,
   pointsBalance: 0,
   totalPointsEarned: 0,
   totalPointsSpent: 0,
@@ -137,9 +142,12 @@ function makeRankingsService() {
 
 describe('Auth stack (registration, session, profile)', () => {
   let registration: AuthRegistrationService;
+  let login: AuthLoginService;
   let adminLoginSvc: AuthAdminLoginService;
   let session: AuthSessionService;
   let profile: AuthProfileService;
+  let profileRead: AuthProfileReadService;
+  let profileAvatar: AuthProfileAvatarService;
   let prisma: ReturnType<typeof makePrisma>;
   let jwt: ReturnType<typeof makeJwt>;
   let eventEmitter: ReturnType<typeof makeEventEmitter>;
@@ -166,26 +174,31 @@ describe('Auth stack (registration, session, profile)', () => {
       eventEmitter as any,
       env,
     );
-    registration = new AuthRegistrationService(
-      prisma as any,
-      eventEmitter as any,
-      session,
-      env,
-    );
+    const authOtp = {
+      sendPhoneVerificationOtp: jest.fn().mockResolvedValue({ expiresIn: 600 }),
+    } as unknown as AuthOtpService;
+    registration = new AuthRegistrationService(prisma as any, eventEmitter as any, authOtp, env);
+    login = new AuthLoginService(prisma as any, session);
     adminLoginSvc = new AuthAdminLoginService(prisma as any, audit as any, session, env);
-    profile = new AuthProfileService(
+    profileRead = new AuthProfileReadService(
       prisma as any,
       reportsUploadService as any,
       gamificationService as any,
       rankingsService as any,
     );
+    profileAvatar = new AuthProfileAvatarService(prisma as any, reportsUploadService as any);
+    profile = new AuthProfileService(
+      prisma as any,
+      reportsUploadService as any,
+      profileRead,
+      profileAvatar,
+    );
   });
 
   describe('register', () => {
-    it('creates a user and returns tokens', async () => {
+    it('creates a user and returns verification payload without tokens', async () => {
       prisma.user.findFirst.mockResolvedValue(null);
-      prisma.user.create.mockResolvedValue(mockUser);
-      prisma.userSession.create.mockResolvedValue({});
+      prisma.user.create.mockResolvedValue({ ...mockUser, isPhoneVerified: false });
 
       const result = await registration.register({
         firstName: 'Test',
@@ -195,12 +208,10 @@ describe('Auth stack (registration, session, profile)', () => {
         password: 'StrongPass123!',
       });
 
-      expect(result.accessToken).toBe('jwt-token');
-      expect(result.refreshToken).toBeDefined();
-      expect(result.user.id).toBe('user-1');
-      expect(result.user.avatarUrl).toBeNull();
+      expect(result.userId).toBe('user-1');
+      expect(result.requiresPhoneVerification).toBe(true);
+      expect(result.otpExpiresIn).toBeGreaterThan(0);
       expect(prisma.user.create).toHaveBeenCalledTimes(1);
-      expect(prisma.userSession.create).toHaveBeenCalledTimes(1);
     });
 
     it('throws ConflictException for duplicate email', async () => {
@@ -237,7 +248,7 @@ describe('Auth stack (registration, session, profile)', () => {
       prisma.user.findUnique.mockResolvedValue(mockUser);
       prisma.userSession.create.mockResolvedValue({});
 
-      const result = await registration.citizenLogin({
+      const result = await login.citizenLogin({
         phoneNumber: '+38970123456',
         password: 'StrongPass123!',
       });
@@ -257,7 +268,7 @@ describe('Auth stack (registration, session, profile)', () => {
       });
       prisma.userSession.create.mockResolvedValue({});
 
-      const result = await registration.citizenLogin({
+      const result = await login.citizenLogin({
         phoneNumber: '+38970123456',
         password: 'StrongPass123!',
       });
@@ -272,7 +283,7 @@ describe('Auth stack (registration, session, profile)', () => {
       prisma.user.findUnique.mockResolvedValue(null);
 
       await expect(
-        registration.citizenLogin({ phoneNumber: '+38999999999', password: 'any' }),
+        login.citizenLogin({ phoneNumber: '+38999999999', password: 'any' }),
       ).rejects.toThrow(UnauthorizedException);
     });
 
@@ -280,7 +291,7 @@ describe('Auth stack (registration, session, profile)', () => {
       prisma.user.findUnique.mockResolvedValue(mockUser);
 
       await expect(
-        registration.citizenLogin({ phoneNumber: '+38970123456', password: 'WrongPass!' }),
+        login.citizenLogin({ phoneNumber: '+38970123456', password: 'WrongPass!' }),
       ).rejects.toThrow(UnauthorizedException);
     });
 
@@ -288,8 +299,55 @@ describe('Auth stack (registration, session, profile)', () => {
       prisma.user.findUnique.mockResolvedValue({ ...mockUser, status: UserStatus.SUSPENDED });
 
       await expect(
-        registration.citizenLogin({ phoneNumber: '+38970123456', password: 'StrongPass123!' }),
+        login.citizenLogin({ phoneNumber: '+38970123456', password: 'StrongPass123!' }),
       ).rejects.toThrow(UnauthorizedException);
+    });
+
+    it('returns TOO_MANY_ATTEMPTS when lockout window is active', async () => {
+      const now = Date.now();
+      prisma.loginFailure.findUnique.mockResolvedValue({
+        phoneNumber: '+38970123456',
+        attemptCount: LOGIN_MAX_ATTEMPTS,
+        firstFailedAt: new Date(now - 60_000),
+      });
+
+      await expect(
+        login.citizenLogin({ phoneNumber: '+38970123456', password: 'StrongPass123!' }),
+      ).rejects.toMatchObject({
+        response: expect.objectContaining({
+          code: 'TOO_MANY_ATTEMPTS',
+          retryAfterSeconds: expect.any(Number),
+        }),
+      });
+    });
+
+    it('rejects login when phone is not verified', async () => {
+      prisma.loginFailure.findUnique.mockResolvedValue(null);
+      prisma.user.findUnique.mockResolvedValue({
+        ...mockUser,
+        isPhoneVerified: false,
+      });
+
+      await expect(
+        login.citizenLogin({ phoneNumber: '+38970123456', password: 'StrongPass123!' }),
+      ).rejects.toMatchObject({
+        response: expect.objectContaining({ code: 'PHONE_NOT_VERIFIED' }),
+      });
+    });
+
+    it('clears loginFailure on successful login', async () => {
+      prisma.loginFailure.findUnique.mockResolvedValue(null);
+      prisma.user.findUnique.mockResolvedValue(mockUser);
+      prisma.userSession.create.mockResolvedValue({});
+
+      await login.citizenLogin({
+        phoneNumber: '+38970123456',
+        password: 'StrongPass123!',
+      });
+
+      expect(prisma.loginFailure.deleteMany).toHaveBeenCalledWith({
+        where: { phoneNumber: '+38970123456' },
+      });
     });
   });
 
@@ -458,7 +516,7 @@ describe('Auth stack (registration, session, profile)', () => {
       const reportsUpload = {
         signPrivateObjectKey: jest.fn().mockResolvedValue('https://signed/avatar'),
       };
-      (profile as any).reportsUploadService = reportsUpload;
+      (profileRead as any).reportsUploadService = reportsUpload;
       prisma.user.findUnique.mockResolvedValue({
         ...mockUser,
         totpSecret: null,
@@ -481,7 +539,7 @@ describe('Auth stack (registration, session, profile)', () => {
         signPrivateObjectKey: jest.fn().mockResolvedValue('https://signed/new'),
         deleteObjectByKey: jest.fn().mockResolvedValue(undefined),
       };
-      (profile as any).reportsUploadService = reportsUpload;
+      (profileAvatar as any).reportsUploadService = reportsUpload;
       prisma.user.findUnique.mockResolvedValue({
         id: 'user-1',
         status: UserStatus.ACTIVE,

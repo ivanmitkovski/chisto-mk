@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:chisto_mobile/core/theme/app_shadows.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
@@ -32,13 +33,7 @@ class WeeklyRankingsEmpty extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.inputFill,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
-                  boxShadow: <BoxShadow>[
-                    BoxShadow(
-                      color: AppColors.shadowLight,
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+                  boxShadow: AppShadows.panel(Theme.of(context).colorScheme),
                 ),
                 child: const Icon(
                   Icons.emoji_events_outlined,

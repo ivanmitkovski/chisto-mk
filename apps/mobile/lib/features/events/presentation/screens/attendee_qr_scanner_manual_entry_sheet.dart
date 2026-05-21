@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -7,8 +8,7 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
 
 class _ManualEntrySheetHandle extends StatelessWidget {
   const _ManualEntrySheetHandle();
@@ -70,7 +70,6 @@ class _AttendeeManualCodeEntrySheetState extends State<AttendeeManualCodeEntrySh
     if (!mounted || data?.text == null) {
       return;
     }
-    AppHaptics.tap();
     widget.controller.text = data!.text!;
     widget.controller.selection = TextSelection.collapsed(
       offset: widget.controller.text.length,
@@ -221,24 +220,10 @@ class _AttendeeManualCodeEntrySheetState extends State<AttendeeManualCodeEntrySh
                   child: Row(
                     children: <Widget>[
                       Expanded(
-                        child: SizedBox(
-                          height: 54,
-                          child: OutlinedButton(
-                            onPressed: () => Navigator.of(context).pop(false),
-                            style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: AppColors.divider),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(
-                                  AppSpacing.radiusPill,
-                                ),
-                              ),
-                            ),
-                            child: Text(
-                              l10n.commonCancel,
-                              style: AppTypography.eventsSecondaryCtaLabel(textTheme)
-                                  .copyWith(color: AppColors.primaryDark),
-                            ),
-                          ),
+                        child: AppButton.outlined(
+                          label: l10n.commonCancel,
+                          onPressed: () => Navigator.of(context).pop(false),
+                          expand: true,
                         ),
                       ),
                       const SizedBox(width: AppSpacing.sm),

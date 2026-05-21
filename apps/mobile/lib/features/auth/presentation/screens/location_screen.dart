@@ -7,7 +7,8 @@ import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/features/auth/application/home_location_controller.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:chisto_mobile/core/navigation/app_navigator_key.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
@@ -16,20 +17,30 @@ import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/shared/utils/cached_tile_provider.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
+import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/features/auth/presentation/constants/auth_error_messages.dart';
+import 'package:chisto_mobile/shared/widgets/molecules/api_error_banner.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/loading_overlay.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
 
 /// Shown only after OTP verification in the sign-up flow.
 /// User picks location, then taps "Confirm and continue" to go to the feed.
 /// Sign-in and returning users skip this and go straight to home.
-class LocationScreen extends StatefulWidget {
-  const LocationScreen({super.key});
+class LocationScreen extends ConsumerStatefulWidget {
+  const LocationScreen({
+    super.key,
+    this.tileProviderOverride,
+  });
+
+  /// Test/golden hook: flat tile layer without network fetches.
+  final TileProvider? tileProviderOverride;
 
   @override
-  State<LocationScreen> createState() => _LocationScreenState();
+  ConsumerState<LocationScreen> createState() => _LocationScreenState();
 }
 
-class _LocationScreenState extends State<LocationScreen> {
+class _LocationScreenState extends ConsumerState<LocationScreen> {
   String? _currentAddress;
   bool _resolvingLocation = false;
   final LatLng _mapCenter = const LatLng(
@@ -39,17 +50,20 @@ class _LocationScreenState extends State<LocationScreen> {
   LatLng? _selectedPosition;
   final MapController _mapController = MapController();
   bool _showTileLoadingOverlay = true;
+  Timer? _tileLoadingTimer;
 
   @override
   void initState() {
     super.initState();
-    Future<void>.delayed(const Duration(milliseconds: 900), () {
+    _tileLoadingTimer = Timer(const Duration(milliseconds: 900), () {
       if (mounted) setState(() => _showTileLoadingOverlay = false);
     });
   }
 
   @override
   void dispose() {
+    _tileLoadingTimer?.cancel();
+    _mapController.dispose();
     super.dispose();
   }
 
@@ -107,13 +121,14 @@ class _LocationScreenState extends State<LocationScreen> {
     if (_resolvingLocation) {
       return;
     }
-    AppHaptics.light(context);
     setState(() => _resolvingLocation = true);
 
     try {
       final bool ok = await _ensurePermission();
       if (!ok) {
-        setState(() => _resolvingLocation = false);
+        if (mounted) {
+          setState(() => _resolvingLocation = false);
+        }
         return;
       }
 
@@ -172,7 +187,6 @@ class _LocationScreenState extends State<LocationScreen> {
           _mapController.move(_selectedPosition!, 15);
         }
       });
-      AppHaptics.success(context);
     } catch (_) {
       if (!mounted) {
         return;
@@ -186,14 +200,26 @@ class _LocationScreenState extends State<LocationScreen> {
     }
   }
 
-  void _confirmAndGoToFeed() {
+  Future<void> _confirmAndGoToFeed() async {
     if (_selectedPosition == null) return;
-    AppHaptics.light(context);
-    unawaited(_navigateHomeWithCoachPending());
+    final bool isSaving = ref.read(homeLocationControllerProvider).isLoading;
+    if (isSaving) return;
+    try {
+      await ref.read(homeLocationControllerProvider.notifier).saveHomeLocation(
+            latitude: _selectedPosition!.latitude,
+            longitude: _selectedPosition!.longitude,
+            label: _currentAddress,
+          );
+      if (!mounted) return;
+      AppHaptics.success(context);
+      await _navigateHomeWithCoachPending();
+    } on AppError {
+      if (!mounted) return;
+      AppHaptics.warning(context);
+    }
   }
 
   Future<void> _navigateHomeWithCoachPending() async {
-    await _persistPostRegistrationGuidePending();
     if (!mounted) {
       return;
     }
@@ -207,26 +233,19 @@ class _LocationScreenState extends State<LocationScreen> {
     );
   }
 
-  Future<void> _persistPostRegistrationGuidePending() async {
-    try {
-      await ServiceLocator.instance.featureGuideRepository
-          .markPostRegistrationGuidePending();
-    } catch (e, stackTrace) {
-      assert(() {
-        debugPrint(
-          '[LocationScreen] markPostRegistrationGuidePending failed: $e\n$stackTrace',
-        );
-        return true;
-      }());
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
+    final locationState = ref.watch(homeLocationControllerProvider);
+    final bool isSaving = locationState.isLoading;
+    final String? apiError = locationState.error != null
+        ? messageForAuthError(l10n, locationState.error!)
+        : null;
     final double keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
 
-    return PopScope(
+    return Stack(
+      children: <Widget>[
+        PopScope(
       canPop: false,
       child: Scaffold(
         resizeToAvoidBottomInset: false,
@@ -254,13 +273,22 @@ class _LocationScreenState extends State<LocationScreen> {
                     const SizedBox(height: AppSpacing.radiusSm),
                     Text(
                       l10n.authLocationTitle,
-                      style: AppTypography.authHeadline,
+                      style: AppTypography.authScreenTitle(context),
                     ),
-                    const SizedBox(height: AppSpacing.radius10),
+                    const SizedBox(height: AppSpacing.xs),
                     Text(
                       l10n.authLocationSubtitle,
-                      style: AppTypography.authSubtitle,
+                      style: AppTypography.authScreenSubtitle(context),
                     ),
+                    if (apiError != null) ...<Widget>[
+                      const SizedBox(height: AppSpacing.md),
+                      ApiErrorBanner(
+                        message: apiError,
+                        onDismiss: () => ref
+                            .read(homeLocationControllerProvider.notifier)
+                            .clearError(),
+                      ),
+                    ],
                     const SizedBox(height: AppSpacing.lg),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
@@ -294,9 +322,10 @@ class _LocationScreenState extends State<LocationScreen> {
                                   maxNativeZoom: 20,
                                   userAgentPackageName: 'chisto_mobile',
                                   retinaMode: false,
-                                  tileProvider: createCachedTileProvider(
-                                    maxStaleDays: 30,
-                                  ),
+                                  tileProvider: widget.tileProviderOverride ??
+                                      createCachedTileProvider(
+                                        maxStaleDays: 30,
+                                      ),
                                   tileDisplay: TileDisplay.instantaneous(),
                                 ),
                                 if (_selectedPosition != null)
@@ -374,11 +403,11 @@ class _LocationScreenState extends State<LocationScreen> {
                             : _selectedPosition != null
                             ? l10n.authLocationContinue
                             : l10n.authLocationUseCurrent,
-                        enabled: !_resolvingLocation,
-                        onPressed: _resolvingLocation
+                        enabled: !_resolvingLocation && !isSaving,
+                        onPressed: _resolvingLocation || isSaving
                             ? null
                             : _selectedPosition != null
-                            ? _confirmAndGoToFeed
+                            ? () => unawaited(_confirmAndGoToFeed())
                             : _useCurrentLocation,
                       ),
                     ),
@@ -400,7 +429,7 @@ class _LocationScreenState extends State<LocationScreen> {
                                         horizontal: AppSpacing.sm,
                                         vertical: AppSpacing.xs,
                                       ),
-                                      minimumSize: Size.zero,
+                                      minimumSize: const Size(44, 44),
                                       onPressed: _useCurrentLocation,
                                       child: Text(
                                         l10n.authLocationUseDifferent,
@@ -432,6 +461,9 @@ class _LocationScreenState extends State<LocationScreen> {
           ),
         ),
       ),
+    ),
+        LoadingOverlay(visible: isSaving),
+      ],
     );
   }
 }

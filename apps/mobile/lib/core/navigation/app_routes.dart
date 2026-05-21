@@ -9,6 +9,7 @@ import 'package:chisto_mobile/features/auth/presentation/screens/otp_screen.dart
 import 'package:chisto_mobile/features/auth/presentation/screens/forgot_password_new_screen.dart';
 import 'package:chisto_mobile/features/auth/presentation/screens/forgot_password_otp_screen.dart';
 import 'package:chisto_mobile/features/auth/presentation/screens/forgot_password_request_screen.dart';
+import 'package:chisto_mobile/features/auth/presentation/screens/forgot_password_email_sent_screen.dart';
 import 'package:chisto_mobile/features/auth/presentation/screens/forgot_password_success_screen.dart';
 import 'package:chisto_mobile/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:chisto_mobile/features/auth/presentation/screens/sign_up_screen.dart';
@@ -27,6 +28,7 @@ import 'package:chisto_mobile/features/events/presentation/screens/organizer_das
 import 'package:chisto_mobile/core/navigation/unknown_route_screen.dart';
 import 'package:chisto_mobile/features/home/presentation/screens/home_shell.dart';
 import 'package:chisto_mobile/features/home/presentation/screens/site_detail_route_screen.dart';
+import 'package:chisto_mobile/features/notifications/domain/models/notification_inbox_highlight.dart';
 import 'package:chisto_mobile/features/reports/presentation/screens/new_report_screen.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -42,8 +44,10 @@ class AppRoutes {
   static const String forgotPasswordRequest = '/auth/forgot-password';
   static const String forgotPasswordOtp = '/auth/forgot-password/otp';
   static const String forgotPasswordNew = '/auth/forgot-password/new';
+  static const String forgotPasswordEmailSent = '/auth/forgot-password/email-sent';
   static const String forgotPasswordSuccess = '/auth/forgot-password/success';
   static const String location = '/auth/location';
+  /// Coach tour entry for deep links only; in-app uses [HomeRouteArgs.startCoachTour].
   static const String featureGuide = '/feature-guide';
   static const String home = '/home';
 
@@ -72,6 +76,27 @@ class ForgotPasswordNewRouteArgs {
 
   final String phoneNumberE164;
   final String code;
+}
+
+class EmailPasswordResetRouteArgs {
+  const EmailPasswordResetRouteArgs({required this.token});
+
+  final String token;
+}
+
+/// OTP screen route: [phoneNumberE164] and whether to call `/auth/otp/send` on open.
+///
+/// Set [requestOtpOnOpen] when the user already has an account but phone is
+/// unverified (sign-in, guarded APIs). Leave `false` after registration when
+/// the API already sent the code.
+class OtpRouteArgs {
+  const OtpRouteArgs({
+    required this.phoneNumberE164,
+    this.requestOtpOnOpen = false,
+  });
+
+  final String phoneNumberE164;
+  final bool requestOtpOnOpen;
 }
 
 class EventCreateRouteArguments {
@@ -119,9 +144,15 @@ class MapSiteFocusRouteArgs {
 
 /// [AppRoutes.siteDetail] arguments.
 class SiteDetailByIdRouteArgs {
-  const SiteDetailByIdRouteArgs({required this.siteId});
+  const SiteDetailByIdRouteArgs({
+    required this.siteId,
+    this.initialAction,
+    this.initialHighlight,
+  });
 
   final String siteId;
+  final String? initialAction;
+  final NotificationInboxHighlight? initialHighlight;
 }
 
 /// Prefer this over raw `int` tab index when you need map focus in one place.
@@ -139,6 +170,46 @@ class HomeRouteArgs {
 
 class AppRouter {
   const AppRouter._();
+
+  static bool _isHomeShellRoute(String? name) {
+    return name == AppRoutes.home ||
+        name == AppRoutes.homeMapFocus ||
+        name == AppRoutes.homeEvents ||
+        name == AppRoutes.featureGuide;
+  }
+
+  /// Pops to an existing [HomeShell] or pushes one — avoids stacking shells (duplicate GoRouter keys).
+  static void navigateToHome(
+    BuildContext context, {
+    Object? arguments,
+  }) {
+    final NavigatorState nav = Navigator.of(context);
+    var found = false;
+    nav.popUntil((Route<dynamic> route) {
+      if (_isHomeShellRoute(route.settings.name)) {
+        found = true;
+        return true;
+      }
+      return route.isFirst;
+    });
+    if (!found) {
+      nav.pushReplacementNamed(AppRoutes.home, arguments: arguments);
+    }
+  }
+
+  static void navigateToHomeMapFocus(
+    BuildContext context, {
+    required MapSiteFocusRouteArgs args,
+  }) {
+    final NavigatorState nav = Navigator.of(context);
+    nav.popUntil((Route<dynamic> route) {
+      if (_isHomeShellRoute(route.settings.name)) {
+        return true;
+      }
+      return route.isFirst;
+    });
+    nav.pushReplacementNamed(AppRoutes.homeMapFocus, arguments: args);
+  }
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -181,10 +252,19 @@ class AppRouter {
           settings: settings,
         );
       case AppRoutes.otp:
-        if (settings.arguments is! String) {
+        late final String phoneNumber;
+        late final bool requestOtpOnOpen;
+        if (settings.arguments is OtpRouteArgs) {
+          final OtpRouteArgs args = settings.arguments! as OtpRouteArgs;
+          phoneNumber = args.phoneNumberE164;
+          requestOtpOnOpen = args.requestOtpOnOpen;
+        } else if (settings.arguments is String) {
+          phoneNumber = settings.arguments! as String;
+          requestOtpOnOpen = false;
+        } else {
           if (kDebugMode) {
             debugPrint(
-              '[AppRouter] AppRoutes.otp expected String phone; got '
+              '[AppRouter] AppRoutes.otp expected String or OtpRouteArgs; got '
               '${settings.arguments?.runtimeType}. Sending user to sign up.',
             );
           }
@@ -193,9 +273,11 @@ class AppRouter {
             settings: settings,
           );
         }
-        final String phoneNumber = settings.arguments! as String;
         return MaterialPageRoute<void>(
-          builder: (_) => OtpScreen(phoneNumber: phoneNumber),
+          builder: (_) => OtpScreen(
+            phoneNumber: phoneNumber,
+            requestOtpOnOpen: requestOtpOnOpen,
+          ),
           settings: settings,
         );
       case AppRoutes.forgotPasswordRequest:
@@ -222,6 +304,16 @@ class AppRouter {
           settings: settings,
         );
       case AppRoutes.forgotPasswordNew:
+        if (settings.arguments is EmailPasswordResetRouteArgs) {
+          final EmailPasswordResetRouteArgs emailArgs =
+              settings.arguments! as EmailPasswordResetRouteArgs;
+          return MaterialPageRoute<void>(
+            builder: (_) => ForgotPasswordNewScreen(
+              emailResetToken: emailArgs.token,
+            ),
+            settings: settings,
+          );
+        }
         if (settings.arguments is! ForgotPasswordNewRouteArgs) {
           if (kDebugMode) {
             debugPrint(
@@ -241,6 +333,11 @@ class AppRouter {
             phoneNumberE164: fpArgs.phoneNumberE164,
             code: fpArgs.code,
           ),
+          settings: settings,
+        );
+      case AppRoutes.forgotPasswordEmailSent:
+        return MaterialPageRoute<void>(
+          builder: (_) => const ForgotPasswordEmailSentScreen(),
           settings: settings,
         );
       case AppRoutes.forgotPasswordSuccess:
@@ -297,9 +394,9 @@ class AppRouter {
         );
       case AppRoutes.siteDetail:
         final Object? siteDetailArgs = settings.arguments;
-        final String siteDetailId = siteDetailArgs is SiteDetailByIdRouteArgs
-            ? siteDetailArgs.siteId.trim()
-            : '';
+        final SiteDetailByIdRouteArgs? siteDetailRouteArgs =
+            siteDetailArgs is SiteDetailByIdRouteArgs ? siteDetailArgs : null;
+        final String siteDetailId = siteDetailRouteArgs?.siteId.trim() ?? '';
         if (siteDetailId.isEmpty) {
           return MaterialPageRoute<void>(
             builder: (_) =>
@@ -308,7 +405,11 @@ class AppRouter {
           );
         }
         return CupertinoPageRoute<void>(
-          builder: (_) => SiteDetailRouteScreen(siteId: siteDetailId),
+          builder: (_) => SiteDetailRouteScreen(
+            siteId: siteDetailId,
+            initialAction: siteDetailRouteArgs?.initialAction,
+            initialHighlight: siteDetailRouteArgs?.initialHighlight,
+          ),
           settings: settings,
         );
       case AppRoutes.newReport:

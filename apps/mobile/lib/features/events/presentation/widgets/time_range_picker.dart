@@ -1,12 +1,14 @@
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
+import 'package:chisto_mobile/core/theme/app_radii.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
+import 'package:chisto_mobile/core/theme/app_shadows.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 class TimeRangePicker extends StatelessWidget {
   const TimeRangePicker({
@@ -61,7 +63,6 @@ class TimeRangePicker extends StatelessWidget {
     DateTime? minimumDate,
     DateTime? maximumDate,
   }) async {
-    AppHaptics.tap();
     final TimeOfDay clampedInitial = _clampInitialTimeOfDay(
       initial,
       minimumDate: minimumDate,
@@ -108,30 +109,13 @@ class TimeRangePicker extends StatelessWidget {
                   padding: const EdgeInsets.fromLTRB(
                     AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.md,
                   ),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        AppHaptics.tap();
-                        onChanged(picked);
-                        Navigator.of(ctx).pop();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        elevation: 0,
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: AppColors.textPrimary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-                        ),
-                      ),
-                      child: Text(
-                        ctx.l10n.eventsTimePickerConfirm,
-                        style: AppTypography.eventsFormLeadHeading(
-                          Theme.of(ctx).textTheme,
-                        ),
-                      ),
-                    ),
+                  child:                   AppButton.primary(
+                    label: ctx.l10n.eventsTimePickerConfirm,
+                    onPressed: () {
+                      onChanged(picked);
+                      Navigator.of(ctx).pop();
+                    },
+                    expand: true,
                   ),
                 ),
               ],
@@ -167,13 +151,7 @@ class TimeRangePicker extends StatelessWidget {
                     color: AppColors.accentDanger.withValues(alpha: 0.4),
                   )
                 : null,
-            boxShadow: <BoxShadow>[
-              BoxShadow(
-                color: AppColors.black.withValues(alpha: 0.03),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
+            boxShadow: AppShadows.softCard(Theme.of(context).colorScheme),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -244,7 +222,7 @@ class _TimeBlock extends StatelessWidget {
       label: semanticLabel,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppRadii.lg,
         child: Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.xs,

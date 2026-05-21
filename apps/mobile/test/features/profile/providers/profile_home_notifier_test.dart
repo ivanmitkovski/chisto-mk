@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_mobile/features/profile/data/profile_me_json.dart';
 import 'package:chisto_mobile/features/profile/presentation/providers/profile_home_notifier.dart';
 import 'package:chisto_mobile/features/profile/presentation/providers/profile_providers.dart';
@@ -20,7 +20,8 @@ void main() {
     late ProviderContainer container;
 
     setUp(() {
-      ServiceLocator.instance.authState.setAuthenticated(
+      AppBootstrap.instance.reportsRealtimeService.stop();
+      AppBootstrap.instance.authState.setAuthenticated(
         userId: 'u1',
         displayName: 'Tester',
         accessToken: 't',
@@ -67,8 +68,9 @@ void main() {
     });
 
     tearDown(() {
+      AppBootstrap.instance.reportsRealtimeService.stop();
+      AppBootstrap.instance.authState.setUnauthenticated();
       container.dispose();
-      ServiceLocator.instance.authState.setUnauthenticated();
     });
 
     test('loadProfile sets user when authenticated', () async {

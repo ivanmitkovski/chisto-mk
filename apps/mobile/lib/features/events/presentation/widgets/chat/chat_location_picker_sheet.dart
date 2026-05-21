@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
@@ -11,6 +12,7 @@ import 'package:chisto_mobile/features/events/presentation/utils/events_diagnost
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/shared/utils/cached_tile_provider.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_loading_indicator.dart';
 
 class ChatLocationPickerSheet extends StatefulWidget {
   const ChatLocationPickerSheet({super.key});
@@ -173,8 +175,8 @@ class _ChatLocationPickerSheetState extends State<ChatLocationPickerSheet>
                               CupertinoIcons.location_solid,
                               size: 42,
                               color: AppColors.primary,
-                              shadows: const <Shadow>[
-                                Shadow(blurRadius: 8, color: Colors.black26),
+                              shadows: <Shadow>[
+                                Shadow(blurRadius: 8, color: AppColors.overlayLight),
                               ],
                             ),
                           ),
@@ -190,10 +192,10 @@ class _ChatLocationPickerSheetState extends State<ChatLocationPickerSheet>
                       backgroundColor: AppColors.appBackground,
                       onPressed: _locating ? null : _goToCurrentLocation,
                       child: _locating
-                          ? const SizedBox(
+                          ? SizedBox(
                               width: 20,
                               height: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
+                              child: AppLoadingIndicator(size: AppLoadingIndicatorSize.sm),
                             )
                           : Icon(CupertinoIcons.location_fill, color: AppColors.primary),
                     ),
@@ -226,26 +228,16 @@ class _ChatLocationPickerSheetState extends State<ChatLocationPickerSheet>
                 AppSpacing.md,
                 AppSpacing.md + bottomInset,
               ),
-              child: SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  onPressed: () {
-                    Navigator.pop(context, <String, dynamic>{
-                      'lat': _center.latitude,
-                      'lng': _center.longitude,
-                      'label': _label,
-                    });
-                  },
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: AppColors.textOnDark,
-                    padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-                    ),
-                  ),
-                  child: Text(context.l10n.eventChatSendLocation),
-                ),
+              child: AppButton.primary(
+                label: context.l10n.eventChatSendLocation,
+                onPressed: () {
+                  Navigator.pop(context, <String, dynamic>{
+                    'lat': _center.latitude,
+                    'lng': _center.longitude,
+                    'label': _label,
+                  });
+                },
+                expand: true,
               ),
             ),
           ],

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/features/events/data/discovery_analytics.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
@@ -24,8 +24,8 @@ class EventsNavigation {
     String? preselectedSiteImageUrl,
     double? preselectedSiteDistanceKm,
   }) {
-    if (ServiceLocator.instance.isInitialized &&
-        !ServiceLocator.instance.authState.isOrganizerCertified) {
+    if (AppBootstrap.instance.isInitialized &&
+        !AppBootstrap.instance.authState.isOrganizerCertified) {
       return _rootNavigator(context).push<EcoEvent?>(
         MaterialPageRoute<EcoEvent?>(
           builder: (_) => OrganizerToolkitScreen(

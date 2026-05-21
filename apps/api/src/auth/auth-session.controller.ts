@@ -12,15 +12,16 @@ import { CitizenLoginDto } from './dto/citizen-login.dto';
 import { Complete2FALoginDto } from './dto/complete-2fa-login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { RegisterDto } from './dto/register.dto';
+import { RegisterResponseDto } from './dto/register-response.dto';
 import { SendOtpDto } from './dto/send-otp.dto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { AuthResponseDto } from './dto/auth-response.dto';
-import { OtpSmsPurpose } from '../otp/otp-sender.interface';
 import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-error-responses.decorator';
 import { AuthAdminLoginService } from './auth-admin-login.service';
-import { AuthCredentialService } from './auth-credential.service';
 import { AuthRegistrationService } from './auth-registration.service';
 import { AuthSessionService } from './auth-session.service';
+import { AuthLoginService } from './auth-login.service';
+import { AuthOtpService } from './auth-otp.service';
 
 @ApiTags('auth')
 @ApiStandardHttpErrorResponses()
@@ -28,20 +29,24 @@ import { AuthSessionService } from './auth-session.service';
 export class AuthSessionController {
   constructor(
     private readonly registration: AuthRegistrationService,
+    private readonly login: AuthLoginService,
     private readonly adminLoginSvc: AuthAdminLoginService,
     private readonly session: AuthSessionService,
-    private readonly credential: AuthCredentialService,
+    private readonly authOtp: AuthOtpService,
   ) {}
 
   @Post('register')
   @Throttle({ default: { ttl: 60_000, limit: 5 } })
-  @ApiOperation({ summary: 'Register a new citizen account' })
+  @ApiOperation({ summary: 'Register a new citizen account (phone verification required before sign-in)' })
   @ApiCreatedResponse({
-    description: 'User registered and tokens issued',
-    type: AuthResponseDto,
+    description: 'User created; OTP sent to phone. Complete verification via POST /auth/otp/verify to receive tokens.',
+    type: RegisterResponseDto,
   })
-  register(@Body() dto: RegisterDto) {
-    return this.registration.register(dto);
+  register(
+    @Body() dto: RegisterDto,
+    @Headers('accept-language') acceptLanguage?: string,
+  ) {
+    return this.registration.register(dto, acceptLanguage);
   }
 
   @Post('login')
@@ -53,7 +58,7 @@ export class AuthSessionController {
   })
   @HttpCode(HttpStatus.OK)
   citizenLogin(@Body() dto: CitizenLoginDto) {
-    return this.registration.citizenLogin(dto);
+    return this.login.citizenLogin(dto);
   }
 
   @Post('admin/login')
@@ -106,18 +111,21 @@ export class AuthSessionController {
   @ApiOkResponse({ description: 'OTP sent; in development devCode is returned' })
   @HttpCode(HttpStatus.OK)
   sendOtp(@Body() dto: SendOtpDto, @Headers('accept-language') acceptLanguage?: string) {
-    return this.credential.sendOtp(dto.phoneNumber, {
-      purpose: OtpSmsPurpose.PhoneVerification,
-      ...(acceptLanguage != null && acceptLanguage !== '' ? { acceptLanguage } : {}),
-    });
+    return this.authOtp.sendPhoneVerificationOtp(
+      dto.phoneNumber,
+      acceptLanguage != null && acceptLanguage !== '' ? acceptLanguage : undefined,
+    );
   }
 
   @Post('otp/verify')
   @Throttle({ default: { ttl: 60_000, limit: 10 } })
-  @ApiOperation({ summary: 'Verify OTP and mark phone as verified' })
-  @ApiNoContentResponse({ description: 'Phone verified' })
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async verifyOtp(@Body() dto: VerifyOtpDto): Promise<void> {
-    await this.credential.verifyOtp(dto.phoneNumber, dto.code);
+  @ApiOperation({ summary: 'Verify OTP, mark phone verified, and issue auth tokens' })
+  @ApiOkResponse({
+    description: 'Phone verified and session tokens issued',
+    type: AuthResponseDto,
+  })
+  @HttpCode(HttpStatus.OK)
+  verifyOtp(@Body() dto: VerifyOtpDto) {
+    return this.authOtp.verifyPhoneAndIssueSession(dto.phoneNumber, dto.code);
   }
 }

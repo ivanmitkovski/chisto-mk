@@ -4,14 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
+import 'package:chisto_mobile/core/theme/app_colors.dart';
 
 /// Bottom sheet with the Open-Meteo disclaimer (reusable from [WeatherCard] and elsewhere).
 Future<void> showWeatherIndicativeInfoSheet(BuildContext context) {
-  AppHaptics.tap();
   return showModalBottomSheet<void>(
     context: context,
-    backgroundColor: Colors.transparent,
+    backgroundColor: AppColors.transparent,
     isScrollControlled: true,
     builder: (BuildContext ctx) {
       return ReportSheetScaffold(
@@ -21,7 +20,6 @@ Future<void> showWeatherIndicativeInfoSheet(BuildContext context) {
           icon: CupertinoIcons.xmark,
           semanticLabel: ctx.l10n.commonClose,
           onTap: () {
-            AppHaptics.tap();
             Navigator.of(ctx).pop();
           },
         ),

@@ -1,0 +1,29 @@
+name: Update Flutter goldens
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-goldens:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subos/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Regenerate goldens
+        working-directory: apps/mobile
+        run: |
+          flutter pub get
+          flutter test --update-goldens test/
+
+      - name: Commit updated goldens
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'chore(mobile): update flutter goldens'
+          file_pattern: 'apps/mobile/test/**/__goldens__/** apps/mobile/test/**/goldens/**'

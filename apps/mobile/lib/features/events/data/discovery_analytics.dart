@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/events_diagnostic_log.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -47,6 +47,12 @@ class DiscoveryAnalytics {
     return prefs.getBool(_consentKey) ?? false;
   }
 
+  /// Clears opt-in consent on logout so the next user is not attributed.
+  static Future<void> clearUserConsent() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_consentKey);
+  }
+
   /// Fire-and-forget; never throws to callers.
   Future<void> maybeTrack(
     DiscoveryFunnelStep step, {
@@ -56,19 +62,19 @@ class DiscoveryAnalytics {
       return;
     }
     try {
-      if (!ServiceLocator.instance.isInitialized) {
+      if (!AppBootstrap.instance.isInitialized) {
         return;
       }
       if (!await readUserConsent()) {
         return;
       }
-      if (!ServiceLocator.instance.authState.isAuthenticated) {
+      if (!AppBootstrap.instance.authState.isAuthenticated) {
         return;
       }
       final PackageInfo info = await PackageInfo.fromPlatform();
       final String platform = Platform.isIOS ? 'ios' : 'android';
       final String trimmedKey = _kIngestKey.trim();
-      await ServiceLocator.instance.apiClient.post(
+      await AppBootstrap.instance.apiClient.post(
         '/discovery-analytics/events',
         headers: trimmedKey.isNotEmpty
             ? <String, String>{'X-Chisto-Analytics-Key': trimmedKey}

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/core/theme/app_shadows.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/site_card/site_upvote_affordance.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 class SiteStatsRow extends StatelessWidget {
   const SiteStatsRow({
@@ -115,7 +115,6 @@ class SiteStatsRow extends StatelessWidget {
         GestureDetector(
           onTap: onDistanceTap != null
               ? () {
-                  AppHaptics.tap();
                   onDistanceTap!();
                 }
               : null,
@@ -190,13 +189,7 @@ class _StatChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.panelBackground,
         borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: AppColors.shadowLight,
-            blurRadius: AppSpacing.xs,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        boxShadow: AppShadows.softCard(Theme.of(context).colorScheme),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -214,7 +207,6 @@ class _StatChip extends StatelessWidget {
     final Widget wrapped = onTap != null
         ? GestureDetector(
             onTap: () {
-              AppHaptics.tap();
               onTap!();
             },
             behavior: HitTestBehavior.opaque,

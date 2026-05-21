@@ -5,6 +5,7 @@ import 'package:chisto_mobile/features/events/data/chat/event_chat_fetch_result.
 import 'package:chisto_mobile/features/events/data/chat/event_chat_message.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_participants.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_read_cursor.dart';
+import 'package:chisto_mobile/features/notifications/data/event_chat_mark_read_result.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_stream_event.dart';
 
 class UploadableFile {
@@ -61,7 +62,7 @@ abstract class EventChatRepository {
 
   Future<List<EventChatMessage>> fetchPinnedMessages(String eventId);
 
-  Future<void> markRead(String eventId, String? lastReadMessageId);
+  Future<EventChatMarkReadResult?> markRead(String eventId, String? lastReadMessageId);
 
   Future<int> fetchUnreadCount(String eventId);
 
@@ -87,4 +88,7 @@ abstract class EventChatRepository {
 
   /// Connection lifecycle for UI (banner). Stops when cancelled.
   Stream<EventChatConnectionStatus> connectionStatus(String eventId);
+
+  /// Latest connection status for [eventId] (replay-by-default for UI seeding).
+  EventChatConnectionStatus currentConnectionStatus(String eventId);
 }

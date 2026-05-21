@@ -2,6 +2,7 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/events/domain/models/check_in_payload.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -67,9 +68,9 @@ class EventCheckInQrCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: AppSpacing.sm),
-                  TextButton(
+                  AppButton.text(
+                    label: retryLabel,
                     onPressed: onRetryAfterEncodeError,
-                    child: Text(retryLabel),
                   ),
                 ],
               ),

@@ -1,5 +1,7 @@
 /// <reference types="jest" />
 import { PushDeliveryWorkerService } from '../../src/notifications/push-delivery-worker.service';
+import { PushDeliveryOutboxService } from '../../src/notifications/push-delivery-outbox.service';
+import { PushDeliverySenderService } from '../../src/notifications/push-delivery-sender.service';
 
 function makePrisma() {
   const notificationOutbox = {
@@ -25,6 +27,7 @@ function makeFcm() {
     sendToToken: jest.fn(),
     revokeToken: jest.fn(),
     incrementFailureCount: jest.fn(),
+    maybeSendBadgeSync: jest.fn(),
   };
 }
 
@@ -62,7 +65,9 @@ describe('PushDeliveryWorkerService', () => {
     prisma.notificationOutbox.updateMany.mockResolvedValue({ count: 1 });
     fcm.sendToToken.mockResolvedValue({ success: true });
 
-    const service = new PushDeliveryWorkerService(prisma, fcm);
+    const sender = new PushDeliverySenderService(prisma, fcm);
+    const outbox = new PushDeliveryOutboxService(prisma, fcm, sender);
+    const service = new PushDeliveryWorkerService(fcm, outbox);
     const delivered = await service.processOutbox();
 
     expect(delivered).toBe(1);
@@ -112,7 +117,9 @@ describe('PushDeliveryWorkerService', () => {
     prisma.notificationOutbox.updateMany.mockResolvedValue({ count: 1 });
     fcm.sendToToken.mockResolvedValue({ success: false, shouldRevoke: false });
 
-    const service = new PushDeliveryWorkerService(prisma, fcm);
+    const sender = new PushDeliverySenderService(prisma, fcm);
+    const outbox = new PushDeliveryOutboxService(prisma, fcm, sender);
+    const service = new PushDeliveryWorkerService(fcm, outbox);
     await service.processOutbox();
 
     expect(fcm.incrementFailureCount).toHaveBeenCalledWith('token-abcdefgh');
@@ -129,4 +136,3 @@ describe('PushDeliveryWorkerService', () => {
     );
   });
 });
-

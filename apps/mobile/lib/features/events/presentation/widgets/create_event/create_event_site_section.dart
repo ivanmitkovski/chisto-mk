@@ -61,7 +61,7 @@ class CreateEventSiteSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               Material(
-                color: Colors.transparent,
+                color: AppColors.transparent,
                 child: InkWell(
                   borderRadius: BorderRadius.circular(AppSpacing.radius14),
                   onTap: () => unawaited(onSelectSiteTap()),
@@ -132,7 +132,7 @@ class CreateEventSiteSection extends StatelessWidget {
                   button: true,
                   label: context.l10n.createEventSiteMapPreviewSemantic,
                   child: Material(
-                    color: Colors.transparent,
+                    color: AppColors.transparent,
                     child: InkWell(
                       borderRadius:
                           BorderRadius.circular(AppSpacing.radiusMd),

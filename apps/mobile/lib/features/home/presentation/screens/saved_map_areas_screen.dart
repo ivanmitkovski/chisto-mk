@@ -3,18 +3,22 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/home/data/map_regions/map_region_catalog.dart';
 import 'package:chisto_mobile/features/home/data/map_regions/map_region_names_catalog.dart';
 import 'package:chisto_mobile/features/home/data/map_regions/macedonia_map_regions.dart';
 import 'package:chisto_mobile/features/home/data/offline_regions/offline_region_downloader.dart';
 import 'package:chisto_mobile/features/home/data/offline_regions/offline_region_model.dart';
 import 'package:chisto_mobile/features/home/data/offline_regions/offline_region_store.dart';
-import 'package:chisto_mobile/shared/widgets/app_refresh_indicator.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_loading_indicator.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/app_refresh_indicator.dart';
 import 'package:flutter_map/flutter_map.dart';
+// v1: screen is implemented but not linked from navigation; deferred until offline-map UX ships.
+import 'package:chisto_mobile/core/logging/app_log.dart';
 
 class SavedMapAreasScreen extends StatefulWidget {
   const SavedMapAreasScreen({super.key});
@@ -25,7 +29,7 @@ class SavedMapAreasScreen extends StatefulWidget {
 
 class _SavedMapAreasScreenState extends State<SavedMapAreasScreen> {
   OfflineRegionStore get _offlineStore =>
-      ServiceLocator.instance.offlineRegionStore;
+      AppBootstrap.instance.offlineRegionStore;
 
   OfflineRegionDownloader? _downloader;
   List<OfflineRegion> _regions = <OfflineRegion>[];
@@ -44,10 +48,10 @@ class _SavedMapAreasScreenState extends State<SavedMapAreasScreen> {
   Future<void> _initStore() async {
     assert(
       _offlineStore.isInitialized,
-      'OfflineRegionStore must init in ServiceLocator',
+      'OfflineRegionStore must init in AppBootstrap',
     );
     _downloader = OfflineRegionDownloader(
-      apiClient: ServiceLocator.instance.apiClient,
+      apiClient: AppBootstrap.instance.apiClient,
       store: _offlineStore,
     );
     _refresh();
@@ -93,7 +97,7 @@ class _SavedMapAreasScreenState extends State<SavedMapAreasScreen> {
       await _downloader!.downloadRegion(region, progress: _progress);
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('[SavedMapAreas] download failed: $e');
+        AppLog.verbose('[SavedMapAreas] download failed: $e');
       }
     }
 
@@ -235,10 +239,10 @@ class _SavedMapAreasScreenState extends State<SavedMapAreasScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: _downloadingRegionId != null ? null : _showAddRegionSheet,
         backgroundColor: AppColors.primary,
-        child: const Icon(Icons.add, color: Colors.white),
+        child: const Icon(Icons.add, color: AppColors.white),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(child: AppLoadingIndicator())
           : AppRefreshIndicator(
               onRefresh: () async => _refresh(),
               child: _regions.isEmpty
@@ -262,7 +266,7 @@ class _SavedMapAreasScreenState extends State<SavedMapAreasScreen> {
                                   Text(
                                     context.l10n.savedMapAreasPlaceholder,
                                     textAlign: TextAlign.center,
-                                    style: TextStyle(
+                                    style: AppTypography.cardSubtitle.copyWith(
                                       color: AppColors.textMuted,
                                     ),
                                   ),
@@ -338,7 +342,7 @@ class _RegionTile extends StatelessWidget {
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: AppSpacing.lg),
         color: AppColors.accentDanger,
-        child: const Icon(Icons.delete_outline, color: Colors.white),
+        child: const Icon(Icons.delete_outline, color: AppColors.white),
       ),
       onDismissed: (_) => onDelete(),
       child: Card(

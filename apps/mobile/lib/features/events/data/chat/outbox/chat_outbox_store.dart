@@ -54,9 +54,10 @@ class ChatOutboxStore {
   Database? _db;
 
   Future<Database> _database() async {
-    if (_db != null) {
+    if (_db != null && _db!.isOpen) {
       return _db!;
     }
+    _db = null;
     final String dir = (await getApplicationDocumentsDirectory()).path;
     final String path = '$dir/chat_outbox.db';
     _db = await openDatabase(
@@ -95,18 +96,32 @@ CREATE TABLE $_table (
     return _db!;
   }
 
+  /// After hot restart or [clearAll], a cached [Database] may be closed — reopen once.
+  Future<T> _withDb<T>(Future<T> Function(Database db) action) async {
+    try {
+      return await action(await _database());
+    } on DatabaseException catch (e) {
+      if (!e.isDatabaseClosedError()) {
+        rethrow;
+      }
+      _db = null;
+      return await action(await _database());
+    }
+  }
+
   /// True when the per-event cap is reached and [enqueueText] would return false.
   Future<bool> isOutboxFullForEvent(String eventId) async {
     return (await _countForEvent(eventId)) >= _maxRowsPerEvent;
   }
 
   Future<int> _countForEvent(String eventId) async {
-    final Database db = await _database();
+    return _withDb((Database db) async {
     final List<Map<String, Object?>> rows = await db.rawQuery(
       'SELECT COUNT(*) AS c FROM $_table WHERE event_id = ?',
       <Object>[eventId],
     );
     return Sqflite.firstIntValue(rows) ?? 0;
+    });
   }
 
   /// Returns false if the per-event cap is reached.
@@ -120,29 +135,30 @@ CREATE TABLE $_table (
     if (await _countForEvent(eventId) >= _maxRowsPerEvent) {
       return false;
     }
-    final Database db = await _database();
-    await db.insert(
-      _table,
-      <String, Object?>{
-        'event_id': eventId,
-        'client_message_id': clientMessageId,
-        'temp_id': tempId,
-        'kind': 'text',
-        'body': body,
-        'reply_to_id': replyToId,
-        'created_at': DateTime.now().millisecondsSinceEpoch,
-        'sync_status': syncStatusPending,
-        'attempt_count': 0,
-        'last_error_code': null,
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await _withDb((Database db) async {
+      await db.insert(
+        _table,
+        <String, Object?>{
+          'event_id': eventId,
+          'client_message_id': clientMessageId,
+          'temp_id': tempId,
+          'kind': 'text',
+          'body': body,
+          'reply_to_id': replyToId,
+          'created_at': DateTime.now().millisecondsSinceEpoch,
+          'sync_status': syncStatusPending,
+          'attempt_count': 0,
+          'last_error_code': null,
+        },
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    });
     return true;
   }
 
   /// Rows eligible for automatic send (excludes terminal [syncStatusFailed]).
   Future<List<ChatOutboxEntry>> listPending(String eventId) async {
-    final Database db = await _database();
+    return _withDb((Database db) async {
     final List<Map<String, Object?>> rows = await db.query(
       _table,
       where: 'event_id = ? AND sync_status = ?',
@@ -150,11 +166,12 @@ CREATE TABLE $_table (
       orderBy: 'created_at ASC',
     );
     return rows.map(_rowToEntry).toList();
+    });
   }
 
   /// Pending and failed rows for restoring bubbles after restart.
   Future<List<ChatOutboxEntry>> listPendingAndFailed(String eventId) async {
-    final Database db = await _database();
+    return _withDb((Database db) async {
     final List<Map<String, Object?>> rows = await db.query(
       _table,
       where: 'event_id = ? AND sync_status IN (?, ?)',
@@ -162,10 +179,11 @@ CREATE TABLE $_table (
       orderBy: 'created_at ASC',
     );
     return rows.map(_rowToEntry).toList();
+    });
   }
 
   Future<ChatOutboxEntry?> peekNext(String eventId) async {
-    final Database db = await _database();
+    return _withDb((Database db) async {
     final List<Map<String, Object?>> rows = await db.query(
       _table,
       where: 'event_id = ? AND sync_status = ?',
@@ -177,11 +195,12 @@ CREATE TABLE $_table (
       return null;
     }
     return _rowToEntry(rows.first);
+    });
   }
 
   /// Oldest pending row across all events (for app-wide drain).
   Future<ChatOutboxEntry?> peekNextGlobally() async {
-    final Database db = await _database();
+    return _withDb((Database db) async {
     final List<Map<String, Object?>> rows = await db.query(
       _table,
       where: 'sync_status = ?',
@@ -193,43 +212,32 @@ CREATE TABLE $_table (
       return null;
     }
     return _rowToEntry(rows.first);
+    });
   }
 
   Future<int> totalPendingCount() async {
-    try {
-      final Database db = await _database();
+    return _withDb((Database db) async {
       final List<Map<String, Object?>> rows = await db.rawQuery(
         'SELECT COUNT(*) AS c FROM $_table WHERE sync_status = ?',
         <Object>[syncStatusPending],
       );
       return Sqflite.firstIntValue(rows) ?? 0;
-    } on DatabaseException catch (e) {
-      if (e.isDatabaseClosedError()) {
-        return 0;
-      }
-      rethrow;
-    }
+    });
   }
 
   Future<int> totalFailedCount() async {
-    try {
-      final Database db = await _database();
+    return _withDb((Database db) async {
       final List<Map<String, Object?>> rows = await db.rawQuery(
         'SELECT COUNT(*) AS c FROM $_table WHERE sync_status = ?',
         <Object>[syncStatusFailed],
       );
       return Sqflite.firstIntValue(rows) ?? 0;
-    } on DatabaseException catch (e) {
-      if (e.isDatabaseClosedError()) {
-        return 0;
-      }
-      rethrow;
-    }
+    });
   }
 
   /// Distinct [eventId] values that still have pending or failed outbox rows.
   Future<List<String>> listDistinctEventIdsWithWork() async {
-    final Database db = await _database();
+    return _withDb((Database db) async {
     final List<Map<String, Object?>> rows = await db.rawQuery(
       'SELECT DISTINCT event_id FROM $_table WHERE sync_status IN (?, ?) ORDER BY event_id ASC',
       <Object>[syncStatusPending, syncStatusFailed],
@@ -238,15 +246,39 @@ CREATE TABLE $_table (
         .map((Map<String, Object?> r) => r['event_id'] as String?)
         .whereType<String>()
         .toList(growable: false);
+    });
   }
 
   Future<void> remove(String eventId, String clientMessageId) async {
-    final Database db = await _database();
-    await db.delete(
-      _table,
-      where: 'event_id = ? AND client_message_id = ?',
-      whereArgs: <Object>[eventId, clientMessageId],
-    );
+    await _withDb((Database db) async {
+      await db.delete(
+        _table,
+        where: 'event_id = ? AND client_message_id = ?',
+        whereArgs: <Object>[eventId, clientMessageId],
+      );
+    });
+  }
+
+  /// Reconciles an outbox row by **either** matching [clientMessageId] **or**
+  /// the optimistic [tempId]. Used after a successful POST or after the
+  /// realtime echo arrives — whichever happens first.
+  ///
+  /// Falls back to a tempId match because the server may echo a message
+  /// before the POST response returns, and the realtime payload carries only
+  /// [tempId] in some flows.
+  Future<int> removeByTempIdOrClientMessageId(
+    String eventId, {
+    required String tempId,
+    required String clientMessageId,
+  }) async {
+    return _withDb((Database db) async {
+      return db.delete(
+        _table,
+        where:
+            'event_id = ? AND (client_message_id = ? OR temp_id = ?)',
+        whereArgs: <Object>[eventId, clientMessageId, tempId],
+      );
+    });
   }
 
   Future<void> recordRetryableFailure(
@@ -254,23 +286,24 @@ CREATE TABLE $_table (
     String clientMessageId, {
     String? lastErrorCode,
   }) async {
-    final Database db = await _database();
-    await db.rawUpdate(
-      '''
+    await _withDb((Database db) async {
+      await db.rawUpdate(
+        '''
 UPDATE $_table
 SET attempt_count = attempt_count + 1,
     last_error_code = COALESCE(?, last_error_code),
     sync_status = ?
 WHERE event_id = ? AND client_message_id = ?
 ''',
-      <Object?>[lastErrorCode, syncStatusPending, eventId, clientMessageId],
-    );
+        <Object?>[lastErrorCode, syncStatusPending, eventId, clientMessageId],
+      );
+    });
   }
 
   /// Re-queue every terminal failed row so the coordinator can retry send (user-initiated).
   Future<int> requeueAllFailedRows() async {
-    final Database db = await _database();
-    return db.rawUpdate(
+    return _withDb((Database db) async {
+      return db.rawUpdate(
       '''
 UPDATE $_table
 SET sync_status = ?,
@@ -279,7 +312,8 @@ SET sync_status = ?,
 WHERE sync_status = ?
 ''',
       <Object>[syncStatusPending, syncStatusFailed],
-    );
+      );
+    });
   }
 
   Future<void> markTerminalFailure(
@@ -287,34 +321,35 @@ WHERE sync_status = ?
     String clientMessageId,
     String errorCode,
   ) async {
-    final Database db = await _database();
-    await db.update(
-      _table,
-      <String, Object?>{
-        'sync_status': syncStatusFailed,
-        'last_error_code': errorCode,
-      },
-      where: 'event_id = ? AND client_message_id = ?',
-      whereArgs: <Object>[eventId, clientMessageId],
-    );
+    await _withDb((Database db) async {
+      await db.update(
+        _table,
+        <String, Object?>{
+          'sync_status': syncStatusFailed,
+          'last_error_code': errorCode,
+        },
+        where: 'event_id = ? AND client_message_id = ?',
+        whereArgs: <Object>[eventId, clientMessageId],
+      );
+    });
   }
 
   /// Clears all queued messages and closes the DB handle. Call on logout (see [ApiAuthRepository]).
   Future<void> clearAll() async {
-    try {
-      final Database db = await _database();
-      await db.delete(_table);
-    } on Object {
-      // Best-effort: storage unavailable, or table missing on a corrupted file.
-    }
-    if (_db != null) {
+    final Database? db = _db;
+    if (db != null && db.isOpen) {
       try {
-        await _db!.close();
+        await db.delete(_table);
+      } on Object {
+        // Best-effort: storage unavailable, or table missing on a corrupted file.
+      }
+      try {
+        await db.close();
       } on Object {
         // ignore
       }
-      _db = null;
     }
+    _db = null;
   }
 
   ChatOutboxEntry _rowToEntry(Map<String, Object?> row) {

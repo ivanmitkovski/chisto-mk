@@ -1,6 +1,7 @@
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:flutter/material.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_loading_indicator.dart';
 
 /// Shown over the map while GPS is resolving and the map center is not yet known.
 class LocationPickerMapTilesFallback extends StatelessWidget {
@@ -23,8 +24,7 @@ class LocationPickerMapTilesFallback extends StatelessWidget {
             SizedBox(
               width: AppSpacing.iconLg,
               height: AppSpacing.iconLg,
-              child: CircularProgressIndicator(
-                strokeWidth: 2.5,
+              child: AppLoadingIndicator(
                 color: AppColors.primaryDark,
               ),
             ),

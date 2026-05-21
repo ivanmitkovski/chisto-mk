@@ -1,0 +1,166 @@
+{
+  "questions": {
+    "q1_safety": {
+      "text": "Çfarë duhet të bëni para se të filloni një ngjarje pastrimi?",
+      "options": {
+        "q1_a": "Filloni menjëherë pa planifikim",
+        "q1_b": "Vlerësoni vendin për rreziqe, përgatitni pajisjet e sigurisë dhe informoni vullnetarët",
+        "q1_c": "Sillni vetëm qese plehrash",
+        "q1_d": "Prisni që vullnetarët ta kuptojnë vetë"
+      }
+    },
+    "q2_moderation": {
+      "text": "Çfarë ndodh pasi të krijoni një ngjarje pastrimi?",
+      "options": {
+        "q2_a": "Bëhet menjëherë i dukshëm për të gjithë vullnetarët",
+        "q2_b": "Moderatorët e shqyrtojnë para se vullnetarët ta shohin dhe të bashkohen",
+        "q2_c": "Fshihet pas 24 orësh",
+        "q2_d": "Vetëm ju mund ta shihni përgjithmonë"
+      }
+    },
+    "q3_checkin": {
+      "text": "Si verifikoni që një vullnetar ka marrë pjesë vërtet në ngjarjen tuaj?",
+      "options": {
+        "q3_a": "Besoni të gjithëve automatikisht",
+        "q3_b": "Kërkoni të dërgojnë një selfie",
+        "q3_c": "Përdorni sistemin e check-in me QR në aplikacion për verifikim në vend",
+        "q3_d": "Shkruani emrat në letër"
+      }
+    },
+    "q4_weather": {
+      "text": "Nëse parashikohet mot i rrezikshëm për pastrimin, cila është praktika më e mirë?",
+      "options": {
+        "q4_a": "Injoroni parashikimin dhe vazhdoni",
+        "q4_b": "Anuloni ose shtyni dhe njoftoni qartë vullnetarët e regjistruar në aplikacion",
+        "q4_c": "Thuajuni vetëm atyre që pyesin",
+        "q4_d": "Supozoni se të gjithë vetë do të shohin lajmet"
+      }
+    },
+    "q5_waste": {
+      "text": "Kur renditni mbeturinat e mbledhura, çfarë duhet të përparësojnë organizatorët?",
+      "options": {
+        "q5_a": "Përzieni gjithçka në një qese për të kursyer kohë",
+        "q5_b": "Ndiqni udhëzimet lokale: ndani riciklimin dhe hidhni në objekte të përshtatshme kur është e mundur",
+        "q5_c": "Lërni qeset në vend për dikë tjetër",
+        "q5_d": "Djegni mbeturinat nëse është më shpejt"
+      }
+    },
+    "q6_inclusion": {
+      "text": "Si duhet t’i mirëpresni vullnetarët me aftësi ose prejardhje të ndryshme?",
+      "options": {
+        "q6_a": "Caktoni vetëm detyrat më të vështira për personat e rinj",
+        "q6_b": "Ofroni role të qarta, ritëm të arsyeshëm dhe pyetni si mund të mbështesni pjesëmarrjen",
+        "q6_c": "Supozoni se të gjithë mund të ngrejnë të njëjtën peshë",
+        "q6_d": "Anashkaloni briefing-un e sigurisë për të kursyer kohë"
+      }
+    },
+    "q7_privacy": {
+      "text": "Cila është mënyra më e sigurt për të dhënat personale në bisedën publike të ngjarjes?",
+      "options": {
+        "q7_a": "Postoni numrin tuaj që të gjithë të telefonojnë",
+        "q7_b": "Kërkoni nga vullnetarët të postojnë email-et publikisht",
+        "q7_c": "Mbajini të dhënat personale jashtë bisedës publike; përdorni kanalet zyrtare në aplikacion",
+        "q7_d": "Ndani adresat e shtëpisë për carpooling pa pyetur"
+      }
+    },
+    "q8_evidence": {
+      "text": "Pse të ngarkoni foto të ndershme “pas” pastrimit në aplikacion?",
+      "options": {
+        "q8_a": "Janë opsionale dhe nuk përdoren kurrë",
+        "q8_b": "I ndihmojnë komunitetit të shohë ndikimin real dhe e mbajnë platformën të besueshme",
+        "q8_c": "Vetëm moderatorët i shohin fotot, prandaj çdo imazh është në rregull",
+        "q8_d": "Preferohen foto të internetit"
+      }
+    },
+    "q9_emergency": {
+      "text": "Nëse dikush lëndohet gjatë pastrimit, çfarë duhet të bëjë fillimisht organizatori?",
+      "options": {
+        "q9_a": "Vazhdoni ngjarjen dhe merreni më vonë",
+        "q9_b": "Ndërprini punën e pasigurt, jepni ndihmën e parë nëse jeni trajnuar dhe thirrni emergjencën kur duhet",
+        "q9_c": "Kërkoni nga vullnetarët të diagnostikojnë lëndimet online",
+        "q9_d": "Shmangni thirrjen e ndihmës për të mos tërhequr vëmendje"
+      }
+    },
+    "q10_capacity": {
+      "text": "Nëse ngjarja arrin numrin maksimal të pjesëmarrësve në aplikacion, çfarë duhet të bëni?",
+      "options": {
+        "q10_a": "Lini njerëz shtesë të bashkohen jo zyrtarisht",
+        "q10_b": "Respektoni kufirin për siguri dhe logjistikë; ofroni listë pritjeje ose një datë tjetër",
+        "q10_c": "Uljeni kufirin pa i thënë askujt",
+        "q10_d": "Merrni para në hyrje"
+      }
+    },
+    "q11_declined": {
+      "text": "Nëse moderatorët e refuzojnë ngjarjen, çfarë zakonisht mund të bëni më pas?",
+      "options": {
+        "q11_a": "Krijoni ngjarje të dyfishta derisa të aprovohet njëra",
+        "q11_b": "Lexoni komentin, ndreqni problemet dhe paraqitni përsëri përmes aplikacionit",
+        "q11_c": "Fshini llogarinë",
+        "q11_d": "Injoroni refuzimin dhe reklamoni vetëm jashtë platformës"
+      }
+    },
+    "q12_disposal": {
+      "text": "Pas pastrimit, cila është praktika më e mirë për mbeturinat e mbledhura?",
+      "options": {
+        "q12_a": "Lërni qeset të fshehura në vend",
+        "q12_b": "Çojini mbeturinat në pika të autorizuara të hedhjes ose riciklimit sipas rregullave vendase",
+        "q12_c": "Djegni mbeturina të përziera në vend nëse është ftohtë",
+        "q12_d": "Hidhini në çdo lum që të lahet"
+      }
+    },
+    "q13_meeting": {
+      "text": "Si duhet të zgjidhni pikën e takimit për vullnetarët?",
+      "options": {
+        "q13_a": "Zgjidhni një vend të rastësishëm pa pin në hartë",
+        "q13_b": "Përdorni një vend të qartë, të arritshëm, të lidhur me vendngjarjen dhe përshkruani aksesin",
+        "q13_c": "Ndani vetëm udhëzime gojore në mesazhe private",
+        "q13_d": "Kërkoni njerëzit të enden derisa t’ju gjejnë"
+      }
+    },
+    "q14_minors": {
+      "text": "Kur familjet sjellin fëmijë në pastrim, cila është përgjegjësia e organizatorit?",
+      "options": {
+        "q14_a": "Organizatorët bëhen kujdestarë ligjorë i çdo fëmije",
+        "q14_b": "Sigurohuni që aktivitetet përputhen me vështirësinë; kujtoni prindërit se ata mbikëqyrin fëmijët",
+        "q14_c": "Caktoni fëmijë të punojnë vetëm larg të rriturve",
+        "q14_d": "Fëmijët nuk lejohen në pastrime"
+      }
+    },
+    "q15_updates": {
+      "text": "Nëse ndryshon ora e fillimit ose vendi i takimit në minutën e fundit, çfarë duhet të bëni?",
+      "options": {
+        "q15_a": "Supozoni se të gjithë do ta vërejnë ndryshimin automatikisht",
+        "q15_b": "Përditësoni ngjarjen në aplikacion dhe postoni një shënim të qartë në chat që të informohen vullnetarët",
+        "q15_c": "Thuajuni vetëm njerëzve që i njihni personalisht",
+        "q15_d": "Anuloni pa shpjegim"
+      }
+    },
+    "q16_integrity": {
+      "text": "Pse është e rëndësishme të raportoni saktë numrin e qeseve dhe pjesëmarrjen?",
+      "options": {
+        "q16_a": "Numrat e fryrë duken më mirë vetëm në rrjete sociale",
+        "q16_b": "Të dhënat e sakta mbajnë drejt pikët, ndihmojnë besimin e financuesve dhe planifikimin",
+        "q16_c": "Supozimet e përafërta janë gjithmonë në rregull",
+        "q16_d": "Vetëm organizatorët i shohin totalet, prandaj saktësia nuk ka rëndësi"
+      }
+    },
+    "q17_qr_rotate": {
+      "text": "Nëse kodi QR i check-in mund të jetë ndarë ose fotografuar jashtë grupit tuaj, çfarë duhet të bëni?",
+      "options": {
+        "q17_a": "Injorojeni; kodet QR skadojnë kurrë",
+        "q17_b": "Përdorni mjetet e organizatorit për check-in për të rrotulluar sesionin që skanimet e reja të kërkojnë QR të ri",
+        "q17_c": "Fikeni internetin në vend",
+        "q17_d": "Kërkoni nga pjesëmarrësit të çinstalojnë aplikacionin"
+      }
+    },
+    "q18_moderators": {
+      "text": "Ku duhet të shkoni fillimisht nëse ju duhet ndihmë me moderim ose shqetësim serioz sigurie në platformë?",
+      "options": {
+        "q18_a": "Emërtoni publikisht përdorues të tjerë në chat",
+        "q18_b": "Përdorni raportimin zyrtar në aplikacion dhe kanalet e moderatorëve në vend të eskalimit në postime publike",
+        "q18_c": "Ndani pamje të ekranit private në rrjete sociale",
+        "q18_d": "Fshini ngjarjen për të fshehur problemin"
+      }
+    }
+  }
+}

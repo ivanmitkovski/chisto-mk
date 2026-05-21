@@ -1,3 +1,4 @@
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
@@ -6,6 +7,7 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_loading_indicator.dart';
 
 /// Full-screen “waiting for organizer confirmation” state after a check-in request.
 class AttendeeQrScannerPendingPanel extends StatelessWidget {
@@ -33,12 +35,12 @@ class AttendeeQrScannerPendingPanel extends StatelessWidget {
         shape: BoxShape.circle,
         color: AppColors.primary.withValues(alpha: 0.12),
       ),
-      child: const Center(
+      child: Center(
         child: SizedBox(
           width: 40,
           height: 40,
-          child: CircularProgressIndicator(
-            strokeWidth: 3,
+          child: AppLoadingIndicator(
+            size: AppLoadingIndicatorSize.lg,
             color: AppColors.primary,
           ),
         ),
@@ -102,12 +104,9 @@ class AttendeeQrScannerPendingPanel extends StatelessWidget {
                 const Spacer(),
                 Padding(
                   padding: EdgeInsets.only(bottom: bottomSafe + AppSpacing.md),
-                  child: TextButton(
+                  child: AppButton.text(
+                    label: MaterialLocalizations.of(context).cancelButtonLabel,
                     onPressed: onCancel,
-                    child: Text(
-                      MaterialLocalizations.of(context).cancelButtonLabel,
-                      style: AppTypography.eventsBodyMediumSecondary(textTheme),
-                    ),
                   ),
                 ),
               ],

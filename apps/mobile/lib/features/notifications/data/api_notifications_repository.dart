@@ -48,6 +48,11 @@ class ApiNotificationsRepository implements NotificationsRepository {
   }
 
   @override
+  Future<void> recordOpened(String notificationId) async {
+    await _client.post('/notifications/$notificationId/opened');
+  }
+
+  @override
   Future<void> markAllAsRead() async {
     await _client.patch('/notifications/read-all');
   }

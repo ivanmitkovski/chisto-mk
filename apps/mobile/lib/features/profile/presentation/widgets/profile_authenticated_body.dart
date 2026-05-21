@@ -12,9 +12,8 @@ import 'package:chisto_mobile/features/profile/presentation/widgets/profile_sett
 import 'package:chisto_mobile/features/profile/presentation/widgets/profile_weekly_rank_card.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_capacity.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_capacity_summary_card.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_refresh_indicator.dart';
-import 'package:chisto_mobile/shared/widgets/no_overscroll_overlay_scroll_behavior.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/app_refresh_indicator.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/no_overscroll_overlay_scroll_behavior.dart';
 
 /// Scrollable profile home content below the gradient header.
 class ProfileAuthenticatedBody extends StatelessWidget {
@@ -78,7 +77,6 @@ class ProfileAuthenticatedBody extends StatelessWidget {
                             ProfileLevelAndPointsCard(
                               user: user,
                               onOpenPointsHistory: () {
-                                AppHaptics.softTransition();
                                 Navigator.of(context).push(
                                   MaterialPageRoute<void>(
                                     builder: (_) => ProfilePointsHistoryScreen(
@@ -101,7 +99,6 @@ class ProfileAuthenticatedBody extends StatelessWidget {
                             ProfileWeeklyRankCard(
                               user: user,
                               onViewRankings: () {
-                                AppHaptics.softTransition();
                                 Navigator.of(context).push(
                                   MaterialPageRoute<void>(
                                     builder: (_) => const WeeklyRankingsScreen(),

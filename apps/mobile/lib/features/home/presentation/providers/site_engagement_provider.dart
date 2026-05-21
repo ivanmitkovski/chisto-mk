@@ -2,6 +2,7 @@ import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/features/home/data/engagement_outbox_store.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/domain/repositories/sites_repository.dart';
+import 'package:chisto_mobile/core/providers/app_providers.dart';
 import 'package:chisto_mobile/features/home/presentation/providers/repository_providers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -188,7 +189,7 @@ class SiteEngagementNotifier extends StateNotifier<SiteEngagementState> {
   }
 
   Future<SiteEngagementOutcome> toggleUpvote() async {
-    if (!_ref.read(homeAuthStateProvider).isAuthenticated) {
+    if (!_ref.read(authStateProvider).isAuthenticated) {
       return const SiteEngagementOutcome.notAuthenticated();
     }
     final DateTime now = DateTime.now();
@@ -238,7 +239,7 @@ class SiteEngagementNotifier extends StateNotifier<SiteEngagementState> {
   }
 
   Future<SiteEngagementOutcome> toggleSave() async {
-    if (!_ref.read(homeAuthStateProvider).isAuthenticated) {
+    if (!_ref.read(authStateProvider).isAuthenticated) {
       return const SiteEngagementOutcome.notAuthenticated();
     }
     final DateTime now = DateTime.now();

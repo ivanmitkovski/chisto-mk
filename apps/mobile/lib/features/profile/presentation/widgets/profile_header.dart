@@ -11,10 +11,9 @@ import 'package:chisto_mobile/core/validation/phone_display_formatter.dart';
 import 'package:chisto_mobile/features/profile/domain/models/profile_user.dart';
 import 'package:chisto_mobile/features/profile/presentation/providers/profile_avatar_notifier.dart';
 import 'package:chisto_mobile/features/profile/presentation/screens/profile_general_info_screen.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_avatar.dart';
-import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
-import 'package:chisto_mobile/shared/widgets/profile_avatar_peek_overlay.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_avatar.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_back_button.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/profile_avatar_peek_overlay.dart';
 
 String? profilePeekNormalizeUrl(String? url) {
   final String? trimmed = url?.trim();
@@ -85,7 +84,6 @@ class ProfileHeader extends ConsumerWidget {
                     final bool canPeek = profileHeaderHasPeekablePhoto(user, avatar);
                     return GestureDetector(
                       onTap: () async {
-                        AppHaptics.tap();
                         final ProfileUser? updated =
                             await Navigator.of(context).push<ProfileUser>(
                           MaterialPageRoute<ProfileUser>(

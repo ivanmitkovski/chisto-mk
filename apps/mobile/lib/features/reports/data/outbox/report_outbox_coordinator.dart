@@ -88,6 +88,10 @@ class ReportOutboxCoordinator {
   Stream<ReportOutboxPipelinePhase> get pipelinePhaseStream => _pipelinePhase.stream;
 
   void _emitPhase(ReportOutboxPipelinePhase p) {
+    if (_disposed || _pipelinePhase.isClosed) {
+      chistoReportSentrySyncOutboxScope(pipelinePhase: p.name);
+      return;
+    }
     if (!_pipelinePhase.isClosed) {
       _pipelinePhase.add(p);
     }
@@ -260,17 +264,29 @@ class ReportOutboxCoordinator {
       while (true) {
         final ReportOutboxEntry? raw = await _repo.getNextProcessable();
         if (raw == null) {
-          _active.add(null);
-          chistoReportSentryClearOutboxEntryScope();
-          _emitPhase(ReportOutboxPipelinePhase.idle);
+          if (!_disposed) {
+            if (!_active.isClosed) {
+              _active.add(null);
+            }
+            chistoReportSentryClearOutboxEntryScope();
+            _emitPhase(ReportOutboxPipelinePhase.idle);
+          }
+          break;
+        }
+        if (_disposed) {
           break;
         }
         final List<ConnectivityResult> conn = await ConnectivityGate.check();
+        if (_disposed) {
+          break;
+        }
         if (_scheduler.shouldStopAfterFetch(
           online: ConnectivityGate.isOnline(conn),
           foundRow: true,
         )) {
-          _active.add(raw);
+          if (!_disposed && !_active.isClosed) {
+            _active.add(raw);
+          }
           chistoReportSentrySyncOutboxScope(
             outboxState: raw.state.name,
             outboxId: raw.id,

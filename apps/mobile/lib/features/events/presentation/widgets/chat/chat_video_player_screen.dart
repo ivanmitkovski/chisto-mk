@@ -7,6 +7,8 @@ import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
+import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_loading_indicator.dart';
 
 Future<void> openChatVideoPlayer(BuildContext context, {required String videoUrl}) {
   return Navigator.of(context).push<void>(
@@ -62,10 +64,10 @@ class _ChatVideoPlayerScreenState extends State<ChatVideoPlayerScreen> {
       allowMuting: true,
       showControls: true,
       materialProgressColors: ChewieProgressColors(
-        playedColor: Colors.white,
-        handleColor: Colors.white,
-        backgroundColor: Colors.white24,
-        bufferedColor: Colors.white38,
+        playedColor: AppColors.white,
+        handleColor: AppColors.white,
+        backgroundColor: AppColors.onMediaFaint,
+        bufferedColor: AppColors.onMediaSubtle,
       ),
     );
     setState(() {});
@@ -83,10 +85,10 @@ class _ChatVideoPlayerScreenState extends State<ChatVideoPlayerScreen> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
-        backgroundColor: Colors.black,
+        backgroundColor: AppColors.black,
         appBar: AppBar(
-          backgroundColor: Colors.black,
-          foregroundColor: Colors.white,
+          backgroundColor: AppColors.black,
+          foregroundColor: AppColors.white,
           title: Text(context.l10n.eventChatVideoViewerTitle),
           leading: IconButton(
             icon: const Icon(Icons.close),
@@ -96,9 +98,9 @@ class _ChatVideoPlayerScreenState extends State<ChatVideoPlayerScreen> {
         ),
         body: Center(
           child: _failed
-              ? const Icon(Icons.error_outline, color: Colors.white54, size: 48)
+              ? Icon(Icons.error_outline, color: AppColors.onMediaMuted, size: 48)
               : _chewie == null
-                  ? const CircularProgressIndicator(color: Colors.white54)
+                  ? AppLoadingIndicator(color: AppColors.onMediaMuted)
                   : AspectRatio(
                       aspectRatio: _video!.value.aspectRatio,
                       child: Chewie(controller: _chewie!),

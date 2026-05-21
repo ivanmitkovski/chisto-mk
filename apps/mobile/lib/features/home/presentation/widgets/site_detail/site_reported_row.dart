@@ -3,8 +3,7 @@ import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_avatar.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_avatar.dart';
 
 class SiteReportedRow extends StatelessWidget {
   const SiteReportedRow({
@@ -63,7 +62,6 @@ class SiteReportedRow extends StatelessWidget {
         color: AppColors.transparent,
         child: InkWell(
           onTap: () {
-            AppHaptics.tap();
             onTap!();
           },
           borderRadius: BorderRadius.circular(AppSpacing.radiusMd),

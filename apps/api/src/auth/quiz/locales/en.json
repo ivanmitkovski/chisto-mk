@@ -1,0 +1,166 @@
+{
+  "questions": {
+    "q1_safety": {
+      "text": "What should you do before starting a cleanup event?",
+      "options": {
+        "q1_a": "Start immediately without planning",
+        "q1_b": "Assess the site for hazards, prepare safety gear, and brief volunteers",
+        "q1_c": "Only bring trash bags",
+        "q1_d": "Wait for volunteers to figure it out themselves"
+      }
+    },
+    "q2_moderation": {
+      "text": "What happens after you create a cleanup event?",
+      "options": {
+        "q2_a": "It is immediately visible to all volunteers",
+        "q2_b": "Moderators review it before volunteers can see and join it",
+        "q2_c": "It gets deleted after 24 hours",
+        "q2_d": "Only you can see it forever"
+      }
+    },
+    "q3_checkin": {
+      "text": "How do you verify that a volunteer actually attended your event?",
+      "options": {
+        "q3_a": "Trust everyone automatically",
+        "q3_b": "Ask them to send a selfie",
+        "q3_c": "Use the in-app QR check-in system so attendance is verified on-site",
+        "q3_d": "Write down names on paper"
+      }
+    },
+    "q4_weather": {
+      "text": "If dangerous weather is forecast for your cleanup window, what is the best practice?",
+      "options": {
+        "q4_a": "Ignore the forecast and go ahead",
+        "q4_b": "Cancel or postpone and clearly tell registered volunteers in the app",
+        "q4_c": "Only tell people who ask",
+        "q4_d": "Assume everyone will check the news themselves"
+      }
+    },
+    "q5_waste": {
+      "text": "When sorting collected waste, what should organizers prioritize?",
+      "options": {
+        "q5_a": "Mix everything in one bag to save time",
+        "q5_b": "Follow local guidance: separate recyclables and dispose at proper facilities when possible",
+        "q5_c": "Leave bags at the site for someone else",
+        "q5_d": "Burn waste if it is faster"
+      }
+    },
+    "q6_inclusion": {
+      "text": "How should you welcome volunteers with different abilities or backgrounds?",
+      "options": {
+        "q6_a": "Assign only the hardest tasks to new people",
+        "q6_b": "Offer clear roles, reasonable pacing, and ask how you can support participation",
+        "q6_c": "Assume everyone can lift the same weight",
+        "q6_d": "Skip the safety briefing to save time"
+      }
+    },
+    "q7_privacy": {
+      "text": "What is the safest approach to personal contact details in the public event chat?",
+      "options": {
+        "q7_a": "Post your phone number so everyone can call you",
+        "q7_b": "Ask volunteers to post their emails publicly",
+        "q7_c": "Keep sensitive personal data out of public chat; use official in-app channels",
+        "q7_d": "Share home addresses for carpooling without asking"
+      }
+    },
+    "q8_evidence": {
+      "text": "Why upload honest “after” cleanup photos in the app?",
+      "options": {
+        "q8_a": "They are optional and never used",
+        "q8_b": "They help the community see real impact and keep the platform trustworthy",
+        "q8_c": "Only moderators see photos, so any image is fine",
+        "q8_d": "Stock internet photos are preferred"
+      }
+    },
+    "q9_emergency": {
+      "text": "If someone is injured during a cleanup, what should the organizer do first?",
+      "options": {
+        "q9_a": "Continue the event and deal with it later",
+        "q9_b": "Stop unsafe work, provide basic first aid if trained, and call local emergency services when needed",
+        "q9_c": "Ask volunteers to diagnose injuries online",
+        "q9_d": "Avoid calling help to prevent attention"
+      }
+    },
+    "q10_capacity": {
+      "text": "If your event reaches the maximum participants set in the app, what should you do?",
+      "options": {
+        "q10_a": "Let extra people join unofficially anyway",
+        "q10_b": "Respect the limit for safety and logistics; offer a waitlist or schedule another date",
+        "q10_c": "Lower the limit without telling anyone",
+        "q10_d": "Charge money at the gate for entry"
+      }
+    },
+    "q11_declined": {
+      "text": "If moderators decline your event, what can you typically do next?",
+      "options": {
+        "q11_a": "Create duplicate events until one is approved",
+        "q11_b": "Read the feedback, fix the issues, and resubmit through the app",
+        "q11_c": "Delete your account",
+        "q11_d": "Ignore the decline and advertise off-platform only"
+      }
+    },
+    "q12_disposal": {
+      "text": "After the cleanup, what is the best practice for collected waste?",
+      "options": {
+        "q12_a": "Leave bags hidden at the site",
+        "q12_b": "Take waste to authorized disposal or recycling points following local rules",
+        "q12_c": "Burn mixed waste on-site if it is cold",
+        "q12_d": "Dump in any river to wash it away"
+      }
+    },
+    "q13_meeting": {
+      "text": "How should you choose the meeting point for volunteers?",
+      "options": {
+        "q13_a": "Pick a random spot each time without a map pin",
+        "q13_b": "Use a clear, reachable location tied to the event site and describe access in the description",
+        "q13_c": "Share only voice directions in private messages",
+        "q13_d": "Ask people to wander until they find you"
+      }
+    },
+    "q14_minors": {
+      "text": "When families bring children to a cleanup, what is the organizer’s responsibility?",
+      "options": {
+        "q14_a": "Organizers become legal guardians of every child",
+        "q14_b": "Ensure activities match the stated difficulty; remind parents/guardians they supervise their children",
+        "q14_c": "Assign children to work alone far from adults",
+        "q14_d": "Children are not allowed at cleanups"
+      }
+    },
+    "q15_updates": {
+      "text": "If the start time or meeting place changes last minute, what should you do?",
+      "options": {
+        "q15_a": "Assume everyone will notice the change automatically",
+        "q15_b": "Update the event in the app and post a clear note in event chat so joined volunteers are informed",
+        "q15_c": "Only tell people you know personally",
+        "q15_d": "Cancel without explanation"
+      }
+    },
+    "q16_integrity": {
+      "text": "Why is it important to report accurate bag counts and attendance?",
+      "options": {
+        "q16_a": "Inflated numbers look better for social media only",
+        "q16_b": "Accurate data keeps credits fair, helps funders trust outcomes, and improves planning",
+        "q16_c": "Rough guesses are always acceptable",
+        "q16_d": "Only organizers see totals, so accuracy does not matter"
+      }
+    },
+    "q17_qr_rotate": {
+      "text": "If a check-in QR code may have been shared or photographed outside your group, what should you do?",
+      "options": {
+        "q17_a": "Ignore it; QR codes never expire",
+        "q17_b": "Use the organizer check-in tools to rotate the session so new scans require a fresh QR",
+        "q17_c": "Turn off the internet at the site",
+        "q17_d": "Ask attendees to uninstall the app"
+      }
+    },
+    "q18_moderators": {
+      "text": "Where should you go first if you need help with moderation or a serious safety concern on the platform?",
+      "options": {
+        "q18_a": "Publicly name and shame other users in chat",
+        "q18_b": "Use official in-app reporting and moderator channels rather than escalating in public posts",
+        "q18_c": "Share private screenshots on social media",
+        "q18_d": "Delete the event to hide the problem"
+      }
+    }
+  }
+}

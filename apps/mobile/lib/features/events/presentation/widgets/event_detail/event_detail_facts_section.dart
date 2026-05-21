@@ -17,7 +17,6 @@ import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_details_grid.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_surface_decoration.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/location_chip.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 /// Event “where / when / what” block: separate soft cards and a chip strip instead of one grouped table.
 class EventDetailFactsSection extends StatelessWidget {
@@ -68,7 +67,6 @@ class _LocationFactCard extends StatelessWidget {
         child: InkWell(
           onTap: () => LocationChip.openSiteDetail(context, event),
           onLongPress: () {
-            AppHaptics.light();
             unawaited(showEventLocationDetailSheet(context, event: event));
           },
           borderRadius: EventDetailSurfaceDecoration.cardBorderRadius,

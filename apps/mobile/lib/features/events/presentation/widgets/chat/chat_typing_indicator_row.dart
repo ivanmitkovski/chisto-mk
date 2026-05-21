@@ -5,7 +5,7 @@ import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_theme.dart';
-import 'package:chisto_mobile/shared/widgets/user_avatar_circle.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/user_avatar_circle.dart';
 
 /// Typing indicator that renders as a ghost peer bubble inside the message list.
 class ChatTypingBubble extends StatelessWidget {

@@ -2,14 +2,74 @@
 // rotate device; VoiceOver / TalkBack order; rate limit / slow network; cancel edit mid-flight;
 // pull-to-refresh on full-screen route; sort change while offline.
 
+import 'package:chisto_mobile/core/config/app_config.dart';
+import 'package:chisto_mobile/core/network/api_client.dart';
+import 'package:chisto_mobile/core/network/request_cancellation.dart';
 import 'package:chisto_mobile/features/home/domain/models/comment.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/comments_bottom_sheet.dart';
+import 'package:chisto_mobile/features/safety/data/ugc_moderation_repository.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+class _UgcTestApiClient extends ApiClient {
+  _UgcTestApiClient()
+      : super(
+          config: AppConfig.dev,
+          accessToken: () => null,
+          onUnauthorized: () {},
+        );
+
+  @override
+  Future<ApiResponse> post(
+    String path, {
+    Object? body,
+    RequestCancellationToken? cancellation,
+    Map<String, String>? headers,
+  }) async {
+    return ApiResponse(statusCode: 204, json: null);
+  }
+}
+
 void main() {
   final DateTime commentTime = DateTime.utc(2026, 1, 10, 15);
+
+  testWidgets('non-owned comment menu offers report and block', (tester) async {
+    final UgcModerationRepository ugcTestRepo =
+        UgcModerationRepository(client: _UgcTestApiClient());
+    final comments = <Comment>[
+      Comment(
+        id: 'c-peer',
+        authorId: 'u-peer',
+        authorName: 'Peer User',
+        text: 'Needs cleanup here',
+        createdAt: commentTime,
+        isOwnedByMe: false,
+      ),
+    ];
+
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('en'),
+        home: Scaffold(
+          body: CommentsBottomSheet(
+            comments: comments,
+            ugcModerationRepository: ugcTestRepo,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.more_horiz_rounded));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Report content'), findsOneWidget);
+    expect(find.text('Block user'), findsOneWidget);
+    expect(find.text('Edit comment'), findsNothing);
+  });
 
   testWidgets('clears draft when reply mode is cancelled', (tester) async {
     final comments = <Comment>[
@@ -76,7 +136,8 @@ void main() {
     await tester.enterText(find.byType(TextField), '@Ivan Mitkovski Child reply');
     await tester.pump();
     await tester.tap(find.byIcon(Icons.arrow_upward_rounded));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
 
     expect(latestComments, isNotNull);
     expect(latestComments!.first.replies.length, 1);

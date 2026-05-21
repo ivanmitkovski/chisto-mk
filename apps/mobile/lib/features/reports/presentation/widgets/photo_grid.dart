@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:chisto_mobile/core/theme/app_shadows.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
@@ -7,8 +8,8 @@ import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_smart_image.dart';
-import 'package:chisto_mobile/shared/widgets/immersive_photo_gallery.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/app_smart_image.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/immersive_photo_gallery.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:chisto_mobile/features/reports/domain/report_field_limits.dart';
@@ -19,12 +20,15 @@ class PhotoGrid extends StatefulWidget {
     required this.photos,
     required this.onAddPhoto,
     required this.onRemovePhoto,
+    this.reportId = 'draft',
     this.maxPhotos = ReportFieldLimits.maxPhotos,
   });
 
   final List<XFile> photos;
   final VoidCallback onAddPhoto;
   final void Function(int index) onRemovePhoto;
+  /// Stable id for [Hero] tags (`report-photo-{reportId}-{index}`).
+  final String reportId;
   final int maxPhotos;
 
   @override
@@ -55,7 +59,7 @@ class _PhotoGridState extends State<PhotoGrid> {
       widget.photos.length,
       (int index) => GalleryImageItem(
         image: FileImage(File(widget.photos[index].path), scale: 1.0),
-        heroTag: 'report-photo-${widget.photos[index].path.hashCode}-$index',
+        heroTag: 'report-photo-${widget.reportId}-$index',
         semanticLabel: l10n.reportPhotoSemanticReportPhoto(index + 1),
       ),
     );
@@ -130,7 +134,6 @@ class _PhotoGridState extends State<PhotoGrid> {
                   totalCount: widget.photos.length,
                   isSelected: index == _selectedIndex,
                   onSelect: () {
-                    AppHaptics.light();
                     setState(() => _selectedIndex = index);
                   },
                   onRemove: () => widget.onRemovePhoto(index),
@@ -229,7 +232,6 @@ class _PhotoThumbnail extends StatelessWidget {
                   label: l10n.reportPhotoSemanticRemove,
                   child: GestureDetector(
                     onTap: () {
-                      AppHaptics.light();
                       onRemove();
                     },
                     child: Container(
@@ -366,13 +368,7 @@ class _EmptyPhotoGalleryCard extends StatelessWidget {
           color: AppColors.inputFill,
           borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
           border: Border.all(color: AppColors.divider.withValues(alpha: 0.8)),
-          boxShadow: <BoxShadow>[
-            BoxShadow(
-              color: AppColors.black.withValues(alpha: 0.025),
-              blurRadius: 18,
-              offset: const Offset(0, 8),
-            ),
-          ],
+          boxShadow: AppShadows.card(Theme.of(context).colorScheme),
         ),
         child: _AddPhotoTile.expanded(onTap: onTap),
       ),

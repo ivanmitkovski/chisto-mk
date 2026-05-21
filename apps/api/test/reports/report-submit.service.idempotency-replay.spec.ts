@@ -127,6 +127,8 @@ describe('ReportSubmitService idempotency replay', () => {
       nearbySiteResolver as never,
       idempotency,
       mediaAppend,
+      { emit: jest.fn() } as never,
+      { recordSiteCreated: jest.fn(), recordReportSubmitted: jest.fn(), emitHistoryAppended: jest.fn() } as never,
     );
 
     const key = 'idem-key-abc1234567';

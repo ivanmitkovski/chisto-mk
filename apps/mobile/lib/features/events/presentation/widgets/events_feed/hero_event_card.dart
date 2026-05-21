@@ -10,7 +10,6 @@ import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/events_localized_strings.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_cover_image.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 class HeroEventCard extends StatelessWidget {
   const HeroEventCard({super.key, required this.event, required this.onTap});
@@ -40,11 +39,10 @@ class HeroEventCard extends StatelessWidget {
           : '${context.l10n.eventsCardOpenTitle}: ${event.title}. ${event.siteName}',
       hint: context.l10n.eventsCardOpenSubtitle,
       child: Material(
-        color: Colors.transparent,
+        color: AppColors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
           onTap: () {
-            AppHaptics.softTransition(context);
             onTap();
           },
           child: Container(
@@ -76,7 +74,7 @@ class HeroEventCard extends StatelessWidget {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: <Color>[
-                            Colors.transparent,
+                            AppColors.transparent,
                             colorScheme.scrim.withValues(alpha: 0.62),
                           ],
                           stops: const <double>[0.32, 1.0],

@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_mobile/features/auth/presentation/screens/onboarding_screen.dart';
 import 'package:chisto_mobile/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:chisto_mobile/features/auth/presentation/screens/splash_screen.dart';
@@ -16,7 +16,7 @@ void main() {
   testWidgets('boot flow reaches onboarding and sign in', (WidgetTester tester) async {
     await tester.pumpWidget(
       UncontrolledProviderScope(
-        container: ServiceLocator.instance.providerContainer,
+        container: AppBootstrap.instance.providerContainer,
         child: const ChistoApp(),
       ),
     );

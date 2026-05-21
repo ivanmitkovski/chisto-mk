@@ -176,6 +176,9 @@ List<PollutionSite> computeVisibleSitesForFilter({
               (b.rankingScore ?? 0).compareTo(a.rankingScore ?? 0),
         );
     case FeedFilter.saved:
+      if (source.isNotEmpty && source.every((PollutionSite s) => s.isSavedByMe)) {
+        return List<PollutionSite>.from(source);
+      }
       return source
           .where((PollutionSite s) => s.isSavedByMe)
           .toList(growable: false);

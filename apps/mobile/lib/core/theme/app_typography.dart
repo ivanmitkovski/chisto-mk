@@ -75,6 +75,73 @@ class AppTypography {
     letterSpacing: -0.4,
   );
 
+  /// Title on login, register, and password-reset form screens ([AuthScreenHeader]).
+  static TextStyle authScreenTitle(BuildContext context) =>
+      textTheme.titleLarge!.copyWith(
+        fontWeight: FontWeight.w700,
+        letterSpacing: -0.5,
+        height: 1.2,
+      );
+
+  /// Subtitle paired with [authScreenTitle].
+  static TextStyle authScreenSubtitle(BuildContext context) =>
+      textTheme.bodyMedium!.copyWith(
+        color: AppColors.textMuted,
+        height: 1.4,
+      );
+
+  /// Compact status / chip labels (11pt).
+  static const TextStyle microLabel = TextStyle(
+    fontSize: 11,
+    fontWeight: FontWeight.w600,
+    letterSpacing: -0.1,
+  );
+
+  /// Index digit in micro chips (9pt).
+  static const TextStyle microIndex = TextStyle(
+    fontSize: 9,
+    fontWeight: FontWeight.w600,
+    letterSpacing: -0.1,
+  );
+
+  /// Toolbar / gallery overlay on dark backgrounds (16pt).
+  static const TextStyle overlayBodyMedium = TextStyle(
+    fontSize: 16,
+    fontWeight: FontWeight.w500,
+  );
+
+  /// Emphasized inline link in auth RichText (terms, sign-in).
+  static const TextStyle authTextLink = TextStyle(
+    color: AppColors.primaryDark,
+    fontWeight: FontWeight.w700,
+  );
+
+  static const TextStyle authTextLinkUnderline = TextStyle(
+    color: AppColors.primaryDark,
+    fontWeight: FontWeight.w700,
+    decoration: TextDecoration.underline,
+  );
+
+  /// Avatar / user-circle initials (dynamic size).
+  static TextStyle avatarInitials({
+    required double fontSize,
+    required Color color,
+    double letterSpacing = 0.5,
+  }) =>
+      TextStyle(
+        fontSize: fontSize,
+        fontWeight: FontWeight.w700,
+        color: color,
+        letterSpacing: letterSpacing,
+      );
+
+  /// "+N" overlay on chat attachment grids.
+  static const TextStyle galleryMoreCount = TextStyle(
+    color: AppColors.textOnDark,
+    fontSize: 22,
+    fontWeight: FontWeight.w600,
+  );
+
   static const TextStyle authSubtitle = TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.w400,

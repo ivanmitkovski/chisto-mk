@@ -446,6 +446,36 @@ class AppLocalizationsMk extends AppLocalizations {
   String get authRememberMe => 'Запомни ме';
 
   @override
+  String get authSessionExpired => 'Сесијата истече. Најавете се повторно.';
+
+  @override
+  String get authPhoneNotVerified =>
+      'Потврдете го телефонот за да се најавите.';
+
+  @override
+  String get authVerifyPhoneCta => 'Потврди телефон';
+
+  @override
+  String get authResetViaEmail => 'Ресетирај преку е-пошта';
+
+  @override
+  String get authResetViaSms => 'Ресетирај преку SMS';
+
+  @override
+  String get authForgotPasswordEmailSubtitle =>
+      'Внесете ја е-поштата на сметката. Ќе испратиме врска за ресетирање ако постои сметка.';
+
+  @override
+  String get authForgotPasswordEmailSentTitle => 'Проверете ја е-поштата';
+
+  @override
+  String get authForgotPasswordEmailSentBody =>
+      'Ако постои сметка за таа е-пошта, испративме врска за нова лозинка.';
+
+  @override
+  String get authForgotPasswordEmailField => 'Е-пошта';
+
+  @override
   String get authForgotPassword => 'Заборавена лозинка?';
 
   @override
@@ -503,6 +533,9 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get authSignInLink => 'Најави се';
+
+  @override
+  String get authValidationFullNameTwoParts => 'Внесете име и презиме';
 
   @override
   String authValidationFieldRequired(String fieldName) {
@@ -582,6 +615,11 @@ class AppLocalizationsMk extends AppLocalizations {
       'Премногу неуспешни обиди. Обидете се подоцна.';
 
   @override
+  String authErrorTooManyAttemptsRetryIn(String duration) {
+    return 'Премногу неуспешни обиди. Обидете се повторно за $duration.';
+  }
+
+  @override
   String get authErrorRateLimited =>
       'Премногу барања. Почекајте малку и обидете се повторно.';
 
@@ -594,7 +632,7 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String authOtpSubtitle(String phone) {
-    return 'Испративме 4-цифрен код на $phone';
+    return 'Испративме 6-цифрен код на $phone';
   }
 
   @override
@@ -627,6 +665,12 @@ class AppLocalizationsMk extends AppLocalizations {
   String get authForgotPasswordSendCode => 'Испрати код';
 
   @override
+  String get authForgotPasswordSendLink => 'Испрати врска';
+
+  @override
+  String get authForgotPasswordTryAnotherWay => 'Обиди се на друг начин';
+
+  @override
   String get authForgotPasswordRequestSemantic => 'Испрати код за ресет';
 
   @override
@@ -634,8 +678,15 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String authForgotPasswordOtpSubtitle(String phone) {
-    return 'Испративме 4-цифрен код на $phone';
+    return 'Испративме 6-цифрен код на $phone';
   }
+
+  @override
+  String get authErrorPhoneNotVerified => 'Телефонот сè уште не е потврден.';
+
+  @override
+  String get authErrorPasswordResetTokenInvalid =>
+      'Врската за ресетирање е невалидна или истечена.';
 
   @override
   String get authNewPasswordTitle => 'Нова лозинка';
@@ -1089,6 +1140,134 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get profileHelpCenterTile => 'Центар за помош';
+
+  @override
+  String get profilePrivacyPolicyTile => 'Политика за приватност';
+
+  @override
+  String get profileTermsTile => 'Услови за користење';
+
+  @override
+  String get profileSafetySection => 'Безбедност';
+
+  @override
+  String get profileSafetyReportIssueTile => 'Пријави проблем со безбедност';
+
+  @override
+  String get profileBlockedUsersTile => 'Блокирани корисници';
+
+  @override
+  String get profileBlockedUsersSubtitle =>
+      'Лицата што сте ги блокирале не можат да ви пишуваат ниту да се појават во вашиот фид.';
+
+  @override
+  String get profileBlockedUsersEmpty => 'Не сте блокирале никого.';
+
+  @override
+  String get profileBlockedUsersEmptySubtitle =>
+      'Блокирајте некого од разговор на настан или коментари на место.';
+
+  @override
+  String get profileBlockedUsersUnblock => 'Одблокирај';
+
+  @override
+  String get profileBlockedUsersUnblockFailed =>
+      'Одблокирањето не успеа. Обидете се повторно.';
+
+  @override
+  String get profileBlockedUsersLoadFailed =>
+      'Не можеше да се вчита листата. Обидете се повторно.';
+
+  @override
+  String get safetyBlockUserTitle => 'Блокирај корисник';
+
+  @override
+  String safetyBlockUserBody(String name) {
+    return 'Да го блокираме $name? Нема да се појавува во разговор и коментари.';
+  }
+
+  @override
+  String get safetyBlockUserConfirm => 'Блокирај';
+
+  @override
+  String get safetyBlockUserSuccess => 'Корисникот е блокиран.';
+
+  @override
+  String get safetyBlockUserFailed =>
+      'Блокирањето не успеа. Обидете се повторно.';
+
+  @override
+  String get safetyBlockUserSelfSnack => 'Не можете да се блокирате сами.';
+
+  @override
+  String get safetyUnblockUserTitle => 'Одблокирај корисник';
+
+  @override
+  String safetyUnblockUserBody(String name) {
+    return 'Да го одблокираме $name? Пораките и коментарите може повторно да се појават.';
+  }
+
+  @override
+  String get safetyUnblockUserConfirm => 'Одблокирај';
+
+  @override
+  String get profilePrivacyPolicyOpenFailedSnack =>
+      'Не можеше да се отвори политиката за приватност';
+
+  @override
+  String get profileTermsOpenFailedSnack =>
+      'Не можеше да се отворат условите за користење';
+
+  @override
+  String get profileEulaTitle => 'Заеднички правила';
+
+  @override
+  String get profileEulaBody =>
+      'Chisto.mk нема толеранција кон неприфатлива содржина или злоупотреба. Со продолжување се согласувате со нашите Услови и ќе пријавувате кршења.';
+
+  @override
+  String get profileEulaBodyBeforeTerms =>
+      'Chisto.mk нема толеранција кон неприфатлива содржина или злоупотреба. Со продолжување се согласувате со нашите ';
+
+  @override
+  String get profileEulaBodyAfterTerms => ' и ќе пријавувате кршења.';
+
+  @override
+  String get profileEulaAccept => 'Се согласувам';
+
+  @override
+  String get safetyReportTitle => 'Пријави содржина';
+
+  @override
+  String get safetyReportSubmit => 'Испрати пријава';
+
+  @override
+  String get safetyReportDetailsHint => 'Опционални детали за модератори';
+
+  @override
+  String get safetyReportSubmitted =>
+      'Пријавата е испратена. Прегледуваме во рок од 24 часа.';
+
+  @override
+  String get safetyReportFailed => 'Неуспешна пријава. Обидете се повторно.';
+
+  @override
+  String get safetyReportReasonSpam => 'Спам';
+
+  @override
+  String get safetyReportReasonHarassment => 'Вознемирување';
+
+  @override
+  String get safetyReportReasonHate => 'Омраза';
+
+  @override
+  String get safetyReportReasonViolence => 'Насилство';
+
+  @override
+  String get safetyReportReasonNudity => 'Голотија';
+
+  @override
+  String get safetyReportReasonOther => 'Друго';
 
   @override
   String get profileAccountSection => 'Сметка';
@@ -1727,7 +1906,8 @@ class AppLocalizationsMk extends AppLocalizations {
   String get feedFilterUrgentName => 'Итно';
 
   @override
-  String get feedFilterUrgentDesc => 'Најважните инциденти први';
+  String get feedFilterUrgentDesc =>
+      'Нови или непотврдени локации што бараат внимание';
 
   @override
   String get feedFilterNearbyName => 'Во близина';
@@ -2515,7 +2695,14 @@ class AppLocalizationsMk extends AppLocalizations {
   String get notificationsTypeCleanupEvents => 'Акции за чистење';
 
   @override
+  String get notificationsTypeEventChat => 'Разговор на настан';
+
+  @override
   String get notificationsTypeSystem => 'Системски';
+
+  @override
+  String get notificationsPrefSystemGroupSubtitle =>
+      'Објави, достигнувања и добредојде пораки';
 
   @override
   String get notificationsSwipeMarkUnread => 'Означи непрочитано';
@@ -2591,6 +2778,106 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get notificationsFilterUnread => 'Непрочитани';
+
+  @override
+  String get notificationsDayToday => 'Денес';
+
+  @override
+  String get notificationsDayYesterday => 'Вчера';
+
+  @override
+  String get notificationsTimeNow => 'сега';
+
+  @override
+  String notificationsTimeMinutes(int count) {
+    return '$countм';
+  }
+
+  @override
+  String notificationsTimeHours(int count) {
+    return '$countч';
+  }
+
+  @override
+  String notificationsTimeDays(int count) {
+    return '$countд';
+  }
+
+  @override
+  String notificationsGroupSummaryOne(String actor) {
+    return '$actor';
+  }
+
+  @override
+  String notificationsGroupSummaryTwo(String actorA, String actorB) {
+    return '$actorA и $actorB';
+  }
+
+  @override
+  String notificationsGroupSummaryMany(
+    String actorA,
+    String actorB,
+    int count,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count',
+      one: '1',
+    );
+    return '$actorA, $actorB и уште $_temp0';
+  }
+
+  @override
+  String notificationsGroupSummaryGeneric(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count известувања',
+      one: '1 известување',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get notificationsGroupExpandHint => 'Прошири група известувања';
+
+  @override
+  String get notificationsGroupCollapseHint => 'Собери група известувања';
+
+  @override
+  String get notificationsGroupMarkAllRead =>
+      'Означи ја групата како прочитана';
+
+  @override
+  String get notificationsGroupArchiveAll => 'Архивирај ја групата';
+
+  @override
+  String notificationsGroupShowingN(int count, String summary) {
+    return 'Прикажани $count известувања: $summary';
+  }
+
+  @override
+  String notificationsGroupMessageCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count пораки',
+      one: '1 порака',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String notificationsGroupSimilarCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count слични',
+      one: '1 слично',
+    );
+    return 'и уште $_temp0';
+  }
 
   @override
   String get eventsEventNotFoundTitle => 'Настанот не е пронајден';
@@ -4477,6 +4764,146 @@ class AppLocalizationsMk extends AppLocalizations {
   String get siteDetailTabCleaningEvents => 'Акции за чистење';
 
   @override
+  String get siteDetailTabHistory => 'Историја';
+
+  @override
+  String get siteHistoryServiceUnavailable =>
+      'Историјата на локацијата сè уште не е достапна. Ажурирајте ја апликацијата и обидете се повторно, или побарајте од тимот да го пушти најновиот API.';
+
+  @override
+  String get siteHistoryEmptyTitle => 'Сè уште нема историја';
+
+  @override
+  String get siteHistoryEmptyMessage =>
+      'Активностите на оваа локација ќе се прикажат тука — пријави, чистења и промени на статус.';
+
+  @override
+  String get siteHistoryRetry => 'Обиди се повторно';
+
+  @override
+  String siteHistoryCurrentStatus(String status) {
+    return 'Тековен статус: $status';
+  }
+
+  @override
+  String siteHistoryByActor(String name) {
+    return 'Од $name';
+  }
+
+  @override
+  String get siteHistoryKindSiteCreated => 'Локацијата е креирана';
+
+  @override
+  String get siteHistoryKindReportSubmitted => 'Пријавата е поднесена';
+
+  @override
+  String get siteHistoryKindReportApproved => 'Пријавата е одобрена';
+
+  @override
+  String get siteHistoryKindReportRejected => 'Пријавата е одбиена';
+
+  @override
+  String get siteHistoryKindReportMerged => 'Пријавите се споени';
+
+  @override
+  String siteHistoryKindStatusChanged(String from, String to) {
+    return 'Статус: $from → $to';
+  }
+
+  @override
+  String get siteHistoryKindStatusChangedGeneric => 'Статусот е ажуриран';
+
+  @override
+  String get siteHistoryKindCleanupScheduled => 'Закажано чистење';
+
+  @override
+  String get siteHistoryKindCleanupStarted => 'Чистење во тек';
+
+  @override
+  String get siteHistoryKindCleanupCompleted => 'Чистењето е завршено';
+
+  @override
+  String get siteHistoryKindCleanupCancelled => 'Чистењето е откажано';
+
+  @override
+  String get siteHistoryKindArchived => 'Архивирано од модератори';
+
+  @override
+  String get siteHistoryKindUnarchived => 'Вратено од модератори';
+
+  @override
+  String get siteHistoryKindAdminNote => 'Белешка од модератор';
+
+  @override
+  String get siteHistoryKindUnknown => 'Активност';
+
+  @override
+  String get siteHistoryStatusHeaderTitle => 'Тековен статус';
+
+  @override
+  String siteHistoryStatusHeaderUpdated(String time) {
+    return 'Ажурирано $time';
+  }
+
+  @override
+  String siteHistoryStatusHeaderEntries(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count записи',
+      one: '1 запис',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get siteHistorySectionToday => 'Денес';
+
+  @override
+  String get siteHistorySectionYesterday => 'Вчера';
+
+  @override
+  String get siteHistorySectionThisWeek => 'Претходно оваа недела';
+
+  @override
+  String siteHistorySectionMonth(String month, int year) {
+    return '$month $year';
+  }
+
+  @override
+  String get siteHistoryTimeNow => 'сега';
+
+  @override
+  String siteHistoryTimeMinutes(int count) {
+    return '$countм';
+  }
+
+  @override
+  String siteHistoryTimeHours(int count) {
+    return '$countч';
+  }
+
+  @override
+  String siteHistoryTimeDays(int count) {
+    return '$countд';
+  }
+
+  @override
+  String get siteHistoryLoadingMore => 'Се вчитуваат повеќе…';
+
+  @override
+  String get siteHistoryEndOfList => 'Крај на историјата';
+
+  @override
+  String get siteHistoryEntryOpenEvent => 'Отвори настан за чистење';
+
+  @override
+  String get siteHistoryEntryShowMore => 'Прикажи повеќе';
+
+  @override
+  String get siteHistoryEntryShowLess => 'Прикажи помалку';
+
+  @override
   String get siteDetailInfoCardTitle => 'Потребна е акција од заедницата';
 
   @override
@@ -5402,6 +5829,12 @@ class AppLocalizationsMk extends AppLocalizations {
   String get eventsCompletedBagsSave => 'Зачувај';
 
   @override
+  String get eventsCompletedBagsDecrease => 'Намали број на ќесии';
+
+  @override
+  String get eventsCompletedBagsIncrease => 'Зголеми број на ќесии';
+
+  @override
   String get eventsCompletedBagsSaved => 'Бројот на ќесии е зачуван.';
 
   @override
@@ -6213,6 +6646,9 @@ class AppLocalizationsMk extends AppLocalizations {
   String get homeSiteCleaningJoinAction => 'Приклучи се';
 
   @override
+  String get homeSiteCleaningJoinedAction => 'Приклучен';
+
+  @override
   String get homeSiteCleaningEventUnavailable =>
       'Деталите за настанот моментално не се достапни.';
 
@@ -6985,6 +7421,63 @@ class AppLocalizationsMk extends AppLocalizations {
   @override
   String get eventChatPushChannelDescription =>
       'Пораки за чистења на кои сте се пријавиле';
+
+  @override
+  String get eventChatPushReplyAction => 'Одговори';
+
+  @override
+  String get eventChatPushReplyButton => 'Испрати';
+
+  @override
+  String get eventChatPushReplyPlaceholder => 'Порака';
+
+  @override
+  String get eventChatPushPreviewVoice => 'Гласовна порака';
+
+  @override
+  String get eventChatPushPreviewPhoto => 'Фотографија';
+
+  @override
+  String get eventChatPushPreviewVideo => 'Видео';
+
+  @override
+  String get eventChatPushPreviewFile => 'Датотека';
+
+  @override
+  String get eventChatPushPreviewLocation => 'Споделена локација';
+
+  @override
+  String get eventChatPushPreviewMessage => 'Порака';
+
+  @override
+  String get eventChatPushPreviewSystem => 'Ажурирање на настан';
+
+  @override
+  String get pushChannelReportsName => 'Ажурирања на пријави';
+
+  @override
+  String get pushChannelReportsDescription =>
+      'Статус на пријави и пријави во близина';
+
+  @override
+  String get pushChannelEventsName => 'Чистења';
+
+  @override
+  String get pushChannelEventsDescription =>
+      'Потсетници и ажурирања за чистења';
+
+  @override
+  String get pushChannelSocialName => 'Социјална активност';
+
+  @override
+  String get pushChannelSocialDescription => 'Гласови, коментари и заедница';
+
+  @override
+  String get pushChannelSystemName => 'Систем';
+
+  @override
+  String get pushChannelSystemDescription =>
+      'Системски известувања и достигнувања';
 
   @override
   String get micPermissionRationaleTitle => 'Пристап до микрофон';

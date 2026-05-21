@@ -6,8 +6,8 @@ import 'package:chisto_mobile/features/reports/data/outbox/report_draft_reposito
 import 'package:chisto_mobile/features/reports/domain/models/report_wizard_restore_snapshot.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_modal_dialog.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -78,26 +78,15 @@ Future<ResumeDraftBannerResult?> showResumeDraftBanner({
               PrimaryButton(
                 label: l10n.reportDraftResumeContinue,
                 onPressed: () {
-                  AppHaptics.light();
                   Navigator.of(ctx).pop('continue');
                 },
               ),
               const SizedBox(height: AppSpacing.sm),
-              TextButton(
-                style: TextButton.styleFrom(
-                  foregroundColor: AppColors.primary,
-                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-                ),
+              AppButton.text(
+                label: l10n.reportDraftResumeDiscard,
                 onPressed: () {
-                  AppHaptics.tap();
                   Navigator.of(ctx).pop('discard');
                 },
-                child: Text(
-                  l10n.reportDraftResumeDiscard,
-                  style: AppTypography.textTheme.labelLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
               ),
             ],
           ),
@@ -134,23 +123,19 @@ Future<ResumeDraftBannerResult?> showResumeDraftBanner({
             footer: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
-                TextButton(
+                AppButton.text(
+                  label: MaterialLocalizations.of(ctx).cancelButtonLabel,
                   onPressed: () {
-                    AppHaptics.tap();
                     Navigator.of(ctx).pop(false);
                   },
-                  child: Text(MaterialLocalizations.of(ctx).cancelButtonLabel),
                 ),
                 const SizedBox(width: AppSpacing.sm),
-                TextButton(
-                  style: TextButton.styleFrom(
-                    foregroundColor: AppColors.accentDanger,
-                  ),
+                AppButton.destructive(
+                  label: l10n.reportDraftResumeDiscard,
                   onPressed: () {
-                    AppHaptics.light();
                     Navigator.of(ctx).pop(true);
                   },
-                  child: Text(l10n.reportDraftResumeDiscard),
+                  expand: false,
                 ),
               ],
             ),

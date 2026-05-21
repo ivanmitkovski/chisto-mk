@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/providers/notifications_providers.dart';
+import 'package:chisto_mobile/core/providers/root_container.dart';
 
 /// Forces map SSE resync after long background (carrier NAT / suspended HTTP).
 class MapRealtimeLifecycle with WidgetsBindingObserver {
@@ -29,7 +30,7 @@ class MapRealtimeLifecycle with WidgetsBindingObserver {
         return;
       }
       if (DateTime.now().difference(paused) > const Duration(seconds: 30)) {
-        ServiceLocator.instance.mapRealtimeService.requestReconnect();
+        readRoot(mapRealtimeServiceProvider).requestReconnect();
       }
     }
   }

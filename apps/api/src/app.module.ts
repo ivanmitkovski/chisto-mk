@@ -29,6 +29,7 @@ import { EventChatModule } from './event-chat/event-chat.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
 import { RedisIoAdapterLifecycle } from './common/adapters/redis-io-adapter.lifecycle';
 import { DiscoveryAnalyticsModule } from './discovery-analytics/discovery-analytics.module';
+import { ModerationModule } from './moderation/moderation.module';
 import { LoggerModule } from 'nestjs-pino';
 import { safePinoReqSerializer } from './common/logging/safe-pino-req.serializer';
 import { StorageModule } from './storage/storage.module';
@@ -58,6 +59,8 @@ import { StorageModule } from './storage/storage.module';
             'req.body.currentPassword',
             'req.body.mfaSecret',
             'req.body.privateKey',
+            'req.body.To',
+            'req.body.From',
           ],
           remove: true,
         },
@@ -92,6 +95,7 @@ import { StorageModule } from './storage/storage.module';
     EventChatModule,
     WebhooksModule,
     DiscoveryAnalyticsModule.register(),
+    ModerationModule,
   ],
   controllers: [AppController],
   providers: [

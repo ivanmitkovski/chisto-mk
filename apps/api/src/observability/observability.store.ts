@@ -332,11 +332,31 @@ export class ObservabilityStore {
     this.feedV2ShadowAvgAbsDeltaSum += Math.max(0, input.avgAbsDelta);
   }
 
-  static recordPushSend(outcome: 'success' | 'failure' | 'revoked'): void {
+  private static pushSendsByType: Record<string, { success: number; failure: number; revoked: number }> =
+    {};
+
+  static recordPushSend(
+    outcome: 'success' | 'failure' | 'revoked',
+    notificationType?: string,
+  ): void {
     this.pushSendsTotal += 1;
     if (outcome === 'success') this.pushSendsSuccess += 1;
     else if (outcome === 'failure') this.pushSendsFailure += 1;
     else if (outcome === 'revoked') this.pushSendsRevoked += 1;
+
+    if (notificationType) {
+      const bucket = this.pushSendsByType[notificationType] ?? {
+        success: 0,
+        failure: 0,
+        revoked: 0,
+      };
+      bucket[outcome] += 1;
+      this.pushSendsByType[notificationType] = bucket;
+    }
+  }
+
+  static getPushSendsByType(): Record<string, { success: number; failure: number; revoked: number }> {
+    return { ...this.pushSendsByType };
   }
 
   static recordPushTokenRevocation(): void {
@@ -547,6 +567,7 @@ export class ObservabilityStore {
       pushSendsSuccess: this.pushSendsSuccess,
       pushSendsFailure: this.pushSendsFailure,
       pushSendsRevoked: this.pushSendsRevoked,
+      pushSendsByType: this.getPushSendsByType(),
       pushTokenRevocations: this.pushTokenRevocations,
       pushQueueRetries: this.pushQueueRetries,
       pushInboxReads: this.pushInboxReads,

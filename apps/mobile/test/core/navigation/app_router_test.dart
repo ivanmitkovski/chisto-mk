@@ -6,7 +6,13 @@ import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../shared/pump_auth_app.dart';
+import '../../shared/widget_test_bootstrap.dart';
+
 void main() {
+  setUpAll(() async {
+    await bootstrapWidgetTests();
+  });
   testWidgets('unknown named route builds UnknownRouteScreen not SignInScreen', (
     WidgetTester tester,
   ) async {
@@ -35,9 +41,7 @@ void main() {
         AppRouter.onGenerateRoute(const RouteSettings(name: AppRoutes.signIn))
             as MaterialPageRoute<void>;
     await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
+      pumpAuthScreen(
         locale: const Locale('en'),
         home: Builder(
           builder: (BuildContext context) => generated.builder(context),

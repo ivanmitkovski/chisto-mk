@@ -62,6 +62,23 @@ export function reportCoReporterCreditCopy(locale: NotificationLocale, reportNum
   return { title: 'Ко-пријавувач', body: `Вие сте кредитирани како ко-пријавувач на ${reportNumber}.` };
 }
 
+export function reportReceivedUserCopy(locale: NotificationLocale, reportNumber: string): CopyResult {
+  if (locale === 'en') {
+    return {
+      title: reportNumber ? `We received ${reportNumber}` : 'We received your report',
+      body: reportNumber
+        ? `Thank you. We received your report ${reportNumber}. Our team will review it soon.`
+        : 'Thank you. We received your report. Our team will review it soon.',
+    };
+  }
+  return {
+    title: reportNumber ? `Ја примивме ${reportNumber}` : 'Ја примивме вашата пријава',
+    body: reportNumber
+      ? `Ви благодариме. Ја примивме вашата пријава ${reportNumber}. Нашиот тим наскоро ќе ја разгледа.`
+      : 'Ви благодариме. Ја примивме вашата пријава. Нашиот тим наскоро ќе ја разгледа.',
+  };
+}
+
 function translateReportStatus(status: string): string {
   switch (status) {
     case 'approved': return 'одобрена';

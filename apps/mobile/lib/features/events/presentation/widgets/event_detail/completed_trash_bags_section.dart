@@ -8,8 +8,7 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_surface_decoration.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
 
 /// Organizer-only: record how many trash bags were collected after completion.
 class CompletedTrashBagsSection extends StatefulWidget {
@@ -87,11 +86,15 @@ class _CompletedTrashBagsSectionState extends State<CompletedTrashBagsSection> {
                     onPressed: _saving || _bags <= 0
                         ? null
                         : () {
-                            AppHaptics.tap();
                             setState(() => _bags -= 1);
                           },
                     icon: const Icon(CupertinoIcons.minus_circle_fill),
                     color: AppColors.textSecondary,
+                    tooltip: context.l10n.eventsCompletedBagsDecrease,
+                    constraints: const BoxConstraints(
+                      minWidth: 44,
+                      minHeight: 44,
+                    ),
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(
@@ -107,11 +110,15 @@ class _CompletedTrashBagsSectionState extends State<CompletedTrashBagsSection> {
                         _saving || _bags >= CompletedTrashBagsSection._maxBags
                         ? null
                         : () {
-                            AppHaptics.tap();
                             setState(() => _bags += 1);
                           },
                     icon: const Icon(CupertinoIcons.plus_circle_fill),
                     color: AppColors.primaryDark,
+                    tooltip: context.l10n.eventsCompletedBagsIncrease,
+                    constraints: const BoxConstraints(
+                      minWidth: 44,
+                      minHeight: 44,
+                    ),
                   ),
                 ],
               ),

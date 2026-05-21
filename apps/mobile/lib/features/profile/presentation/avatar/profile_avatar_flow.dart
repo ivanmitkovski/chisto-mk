@@ -5,11 +5,11 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/features/profile/presentation/avatar/profile_avatar_crop_screen.dart';
 import 'package:chisto_mobile/features/profile/presentation/avatar/profile_avatar_image_pipeline.dart';
 import 'package:chisto_mobile/features/profile/presentation/avatar/profile_avatar_source_sheet.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -169,54 +169,20 @@ Future<bool> _confirmRemoveAvatar(BuildContext context) async {
                 ),
               ),
               const SizedBox(height: AppSpacing.xl),
-              OutlinedButton(
+              AppButton.outlined(
+                label: l10n.profileAvatarRemoveConfirmCancel,
                 onPressed: () {
-                  AppHaptics.tap();
                   Navigator.of(dialogContext).pop(false);
                 },
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 52),
-                  side: BorderSide(
-                    color: AppColors.divider.withValues(alpha: 0.95),
-                  ),
-                  foregroundColor: AppColors.textPrimary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-                  ),
-                ),
-                child: Text(
-                  l10n.profileAvatarRemoveConfirmCancel,
-                  style: AppTypography.buttonLabel.copyWith(
-                    color: AppColors.textSecondary,
-                    fontSize: 17,
-                  ),
-                ),
+                expand: true,
               ),
               const SizedBox(height: AppSpacing.sm),
-              SizedBox(
-                height: 52,
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    AppHaptics.warning();
-                    Navigator.of(dialogContext).pop(true);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    elevation: 0,
-                    backgroundColor: AppColors.accentDanger,
-                    foregroundColor: AppColors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-                    ),
-                  ),
-                  child: Text(
-                    l10n.profileAvatarRemoveConfirmRemove,
-                    style: AppTypography.buttonLabel.copyWith(
-                      color: AppColors.white,
-                      fontSize: 17,
-                    ),
-                  ),
-                ),
+              AppButton.destructive(
+                label: l10n.profileAvatarRemoveConfirmRemove,
+                onPressed: () {
+                  Navigator.of(dialogContext).pop(true);
+                },
+                expand: true,
               ),
             ],
           ),
@@ -231,7 +197,7 @@ PageRoute<String> _avatarCropPageRoute(XFile picked) {
   return PageRouteBuilder<String>(
     fullscreenDialog: true,
     opaque: true,
-    barrierColor: Colors.black26,
+    barrierColor: AppColors.overlayLight,
     pageBuilder:
         (BuildContext context, Animation<double> a, Animation<double> b) {
       return ProfileAvatarCropScreen(picked: picked);

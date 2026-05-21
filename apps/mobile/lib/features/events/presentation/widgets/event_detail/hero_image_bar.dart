@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:chisto_mobile/core/theme/app_radii.dart';
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/cupertino.dart';
@@ -13,8 +14,7 @@ import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/events_localized_strings.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_cover_image.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_layout.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_back_button.dart';
 
 /// Key for tests and accessibility drivers targeting the organizer edit control.
 const ValueKey<String> kEventDetailHeroEditKey = ValueKey<String>(
@@ -144,7 +144,6 @@ class HeroImageBar extends StatelessWidget {
               ),
               badgeCount: eventChatUnreadCount,
               onTap: () {
-                AppHaptics.softTransition();
                 onOpenEventChat!();
               },
             ),
@@ -427,7 +426,7 @@ class _ActionChip extends StatelessWidget {
                       ),
                       decoration: BoxDecoration(
                         color: colorScheme.primary,
-                        borderRadius: BorderRadius.circular(999),
+                        borderRadius: AppRadii.circle,
                       ),
                       child: Text(
                         badgeCount > 99 ? '99+' : '$badgeCount',

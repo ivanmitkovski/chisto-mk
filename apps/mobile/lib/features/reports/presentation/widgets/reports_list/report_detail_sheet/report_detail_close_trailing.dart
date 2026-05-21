@@ -1,6 +1,6 @@
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
+import 'package:chisto_mobile/core/theme/app_shadows.dart';
 import 'package:flutter/material.dart';
 
 /// Close control for [ReportDetailSheet] with optional refresh/sync affordance.
@@ -44,26 +44,20 @@ class ReportDetailCloseTrailing extends StatelessWidget {
               color: AppColors.transparent,
               child: InkWell(
                 onTap: () {
-                  AppHaptics.tap();
                   Navigator.of(context, rootNavigator: true).pop();
                 },
                 customBorder: const CircleBorder(),
-                child: Ink(
+                child: Container(
                   width: 44,
                   height: 44,
+                  alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: AppColors.inputFill,
                     shape: BoxShape.circle,
                     border: Border.all(
                       color: AppColors.divider.withValues(alpha: 0.8),
                     ),
-                    boxShadow: <BoxShadow>[
-                      BoxShadow(
-                        color: AppColors.black.withValues(alpha: 0.03),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
+                    boxShadow: AppShadows.panel(Theme.of(context).colorScheme),
                   ),
                   child: AnimatedSwitcher(
                     duration: AppMotion.fast,

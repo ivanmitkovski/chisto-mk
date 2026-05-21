@@ -33,7 +33,7 @@ class ViewToggleButton extends StatelessWidget {
         selected: selected,
         label: tooltip,
         child: Material(
-          color: Colors.transparent,
+          color: AppColors.transparent,
           child: InkWell(
             onTap: onTap,
             customBorder: RoundedRectangleBorder(

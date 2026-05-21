@@ -1,16 +1,16 @@
 import 'package:flutter/cupertino.dart';
+import 'package:chisto_mobile/core/theme/app_radii.dart';
 import 'package:flutter/material.dart';
 
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/presentation/screens/organizer_toolkit/organizer_quiz_screen.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_back_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
 
 class OrganizerToolkitScreen extends StatefulWidget {
   const OrganizerToolkitScreen({super.key, this.onCertified});
@@ -33,7 +33,7 @@ class _OrganizerToolkitScreenState extends State<OrganizerToolkitScreen> {
       return;
     }
     _authListenerAttached = false;
-    ServiceLocator.instance.authState.removeListener(_onAuthStateChanged);
+    AppBootstrap.instance.authState.removeListener(_onAuthStateChanged);
   }
 
   void _onAuthStateChanged() {
@@ -48,7 +48,7 @@ class _OrganizerToolkitScreenState extends State<OrganizerToolkitScreen> {
     if (!mounted) {
       return;
     }
-    final ServiceLocator sl = ServiceLocator.instance;
+    final AppBootstrap sl = AppBootstrap.instance;
     if (!sl.isInitialized || !sl.authState.isOrganizerCertified) {
       return;
     }
@@ -63,8 +63,8 @@ class _OrganizerToolkitScreenState extends State<OrganizerToolkitScreen> {
   @override
   void initState() {
     super.initState();
-    if (ServiceLocator.instance.isInitialized) {
-      ServiceLocator.instance.authState.addListener(_onAuthStateChanged);
+    if (AppBootstrap.instance.isInitialized) {
+      AppBootstrap.instance.authState.addListener(_onAuthStateChanged);
       _authListenerAttached = true;
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -80,7 +80,6 @@ class _OrganizerToolkitScreenState extends State<OrganizerToolkitScreen> {
   }
 
   void _nextPage() {
-    AppHaptics.tap();
     final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
     final Duration duration = reduceMotion
         ? const Duration(milliseconds: 1)
@@ -207,7 +206,7 @@ class _OrganizerToolkitScreenState extends State<OrganizerToolkitScreen> {
                       color: i == _currentPage
                           ? AppColors.primary
                           : AppColors.divider,
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: AppRadii.xs,
                     ),
                   );
                 }),

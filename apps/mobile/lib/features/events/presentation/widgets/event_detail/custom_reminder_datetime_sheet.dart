@@ -1,11 +1,10 @@
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
-import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 class CustomReminderDateTimeSheet {
   CustomReminderDateTimeSheet._();
@@ -73,7 +72,6 @@ class _CustomReminderPickerBodyState extends State<_CustomReminderPickerBody> {
         !_selected.isBefore(widget.lastDate.add(const Duration(minutes: 1)))) {
       return;
     }
-    AppHaptics.tap();
     Navigator.of(context).pop(_selected);
   }
 
@@ -82,15 +80,9 @@ class _CustomReminderPickerBodyState extends State<_CustomReminderPickerBody> {
     return ReportSheetScaffold(
       title: context.l10n.eventsReminderPickTitle,
       maxHeightFactor: 0.5,
-      trailing: TextButton(
+      trailing: AppButton.text(
+        label: context.l10n.eventsReminderDone,
         onPressed: _onConfirm,
-        child: Text(
-          context.l10n.eventsReminderDone,
-          style: AppTypography.pillLabel.copyWith(
-            color: AppColors.primary,
-            fontSize: 17,
-          ),
-        ),
       ),
       child: SizedBox(
         height: 320,

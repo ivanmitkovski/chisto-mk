@@ -16,7 +16,14 @@ describe('SitesAdminService bulkSites', () => {
     const sitesMapQuery = { invalidateMapCache: jest.fn() } as never;
     const sitesFeed = { invalidateFeedCache: jest.fn() } as never;
     return {
-      service: new SitesAdminService(prisma as never, audit as never, siteEventsService, sitesMapQuery, sitesFeed),
+      service: new SitesAdminService(
+        prisma as never,
+        audit as never,
+        siteEventsService,
+        sitesMapQuery,
+        sitesFeed,
+        { recordStatusChanged: jest.fn(), emitHistoryAppended: jest.fn() } as never,
+      ),
       prisma,
       audit,
       sitesMapQuery,

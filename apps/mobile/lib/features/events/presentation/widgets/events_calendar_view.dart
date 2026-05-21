@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chisto_mobile/core/theme/app_radii.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -10,7 +11,7 @@ import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/event_ui_mappers.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 
 /// Month grid with optional server pagination hint when [hasMorePages] stays true
 /// but the focused month has no loaded events yet.
@@ -216,7 +217,6 @@ class _EventsCalendarViewState extends State<EventsCalendarView> {
   }
 
   Future<void> _onManualLoadMore() async {
-    AppHaptics.tap();
     if (widget.onRequestMoreFromServer == null) {
       return;
     }
@@ -227,7 +227,6 @@ class _EventsCalendarViewState extends State<EventsCalendarView> {
   }
 
   void _shiftMonth(int delta) {
-    AppHaptics.tap();
     setState(() {
       _focusedMonth = DateTime(_focusedMonth.year, _focusedMonth.month + delta);
     });
@@ -349,7 +348,6 @@ class _EventsCalendarViewState extends State<EventsCalendarView> {
                 child: GestureDetector(
                   onTap: inMonth
                       ? () {
-                          AppHaptics.light();
                           setState(() => _selectedDate = date);
                         }
                       : null,
@@ -421,9 +419,10 @@ class _EventsCalendarViewState extends State<EventsCalendarView> {
           const SizedBox(height: AppSpacing.sm),
           Align(
             alignment: Alignment.centerLeft,
-            child: TextButton(
-              onPressed: widget.hasMorePages ? _onManualLoadMore : null,
-              child: Text(context.l10n.eventsCalendarLoadMoreButton),
+            child: AppButton.text(
+              label: context.l10n.eventsCalendarLoadMoreButton,
+              onPressed: _onManualLoadMore,
+              enabled: widget.hasMorePages,
             ),
           ),
         ],
@@ -451,7 +450,7 @@ class _EventsCalendarViewState extends State<EventsCalendarView> {
                 color: AppColors.transparent,
                 child: InkWell(
                   onTap: () => widget.onEventTap(e),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: AppRadii.lg,
                   child: Container(
                     padding: const EdgeInsets.all(AppSpacing.md),
                     decoration: BoxDecoration(

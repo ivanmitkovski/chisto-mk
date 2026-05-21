@@ -190,6 +190,37 @@ void main() {
     expect(find.text('1:05'), findsOneWidget);
   });
 
+  testWidgets('peer message long-press offers report action', (WidgetTester tester) async {
+    await tester.pumpWidget(_wrap(
+      ChatMessageBubble(
+        message: _msg(),
+        showAuthorName: true,
+        isFirstInGroup: true,
+        isLastInGroup: true,
+      ),
+    ));
+    await tester.pumpAndSettle();
+    await tester.longPress(find.textContaining('Hello from the river'));
+    await tester.pumpAndSettle();
+    expect(find.text('Report content'), findsOneWidget);
+  });
+
+  testWidgets('own message long-press does not offer report', (WidgetTester tester) async {
+    await tester.pumpWidget(_wrap(
+      ChatMessageBubble(
+        message: _msg(own: true),
+        showAuthorName: false,
+        isFirstInGroup: true,
+        isLastInGroup: true,
+        onCopy: () {},
+      ),
+    ));
+    await tester.pumpAndSettle();
+    await tester.longPress(find.textContaining('Hello from the river'));
+    await tester.pumpAndSettle();
+    expect(find.text('Report content'), findsNothing);
+  });
+
   testWidgets('location bubble shows pin icon and label', (WidgetTester tester) async {
     await tester.pumpWidget(_wrap(
       ChatMessageBubble(

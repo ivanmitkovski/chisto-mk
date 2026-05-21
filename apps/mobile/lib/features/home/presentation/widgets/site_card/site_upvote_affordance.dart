@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/site_card/site_upvote_motion.dart';
+import 'package:chisto_mobile/core/theme/app_shadows.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 
@@ -196,13 +197,7 @@ class _SiteUpvoteAffordanceState extends State<SiteUpvoteAffordance>
             decoration: BoxDecoration(
               color: AppColors.panelBackground,
               borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-              boxShadow: <BoxShadow>[
-                BoxShadow(
-                  color: AppColors.shadowLight,
-                  blurRadius: AppSpacing.xs,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+              boxShadow: AppShadows.softCard(Theme.of(context).colorScheme),
             ),
             child: _scaledHitChild(child: row),
           ),

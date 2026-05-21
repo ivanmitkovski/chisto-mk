@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:chisto_mobile/core/logging/app_log.dart';
 
 class NotificationOpenDiagnostics {
   const NotificationOpenDiagnostics._();
@@ -28,6 +29,6 @@ class NotificationOpenDiagnostics {
 
   static void _debug(String event, String source) {
     if (!kDebugMode) return;
-    debugPrint('${summary()} event=$event source=$source');
+    AppLog.verbose('${summary()} event=$event source=$source');
   }
 }

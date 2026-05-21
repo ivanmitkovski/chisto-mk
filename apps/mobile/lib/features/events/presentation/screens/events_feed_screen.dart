@@ -1,3 +1,5 @@
+library;
+
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
@@ -5,7 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_cover_image.dart';
 
 import 'package:chisto_mobile/core/errors/app_error.dart';
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/providers/events_providers.dart';
+import 'package:chisto_mobile/core/providers/home_providers.dart';
 import 'package:chisto_mobile/core/l10n/app_error_localizations.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/location/location_service.dart';
@@ -13,10 +16,9 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
-import 'package:chisto_mobile/shared/widgets/animated_phase_switcher.dart';
-import 'package:chisto_mobile/shared/widgets/app_cupertino_search_field.dart';
-import 'package:chisto_mobile/shared/widgets/app_error_view.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/molecules/app_cupertino_search_field.dart';
+import 'package:chisto_mobile/shared/widgets/molecules/app_error_view.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
 import 'package:chisto_mobile/features/events/data/api_events_repository.dart';
 import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
@@ -29,26 +31,34 @@ import 'package:chisto_mobile/features/events/presentation/widgets/events_feed_s
 import 'package:chisto_mobile/features/events/presentation/widgets/events_feed/events_feed_widgets.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/events_filter_chips.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/events_feed/events_filter_sheet.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_refresh_indicator.dart';
-import 'package:provider/provider.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/app_refresh_indicator.dart';
+import 'package:chisto_mobile/features/events/presentation/providers/events_feed_controller_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class EventsFeedScreen extends StatefulWidget {
+
+part '../widgets/events_feed/events_feed_toolbar.dart';
+part '../widgets/events_feed/events_feed_content_slivers.dart';
+
+class EventsFeedScreen extends ConsumerStatefulWidget {
   const EventsFeedScreen({super.key});
 
   @override
   EventsFeedScreenState createState() => EventsFeedScreenState();
 }
 
-class EventsFeedScreenState extends State<EventsFeedScreen> {
+class EventsFeedScreenState extends ConsumerState<EventsFeedScreen> {
   static const Duration _silentRefreshMinInterval = Duration(minutes: 3);
 
-  late final EventsFeedController _feed = EventsFeedController(
-    repository: EventsRepositoryRegistry.instance,
-  );
+  EventsFeedController? _boundFeed;
   final ScrollController _scrollController = ScrollController();
   final FocusNode _searchFocusNode = FocusNode();
   String? _lastCoverPrecacheSignature;
+
+  EventsFeedController get _feed {
+    final EventsFeedController? bound = _boundFeed;
+    assert(bound != null, 'Events feed controller not bound yet');
+    return bound!;
+  }
 
   void _onRemoteRefreshTick() {
     if (!mounted) {
@@ -64,27 +74,35 @@ class EventsFeedScreenState extends State<EventsFeedScreen> {
   @override
   void initState() {
     super.initState();
-    ServiceLocator.instance.eventsFeedRemoteRefreshTick.addListener(
-      _onRemoteRefreshTick,
-    );
-    _feed.addListener(_onFeedUpdate);
     _scrollController.addListener(_onScrollNearBottom);
-    // [context.l10n] requires [Localizations]; inherited widgets are not available
-    // during [initState] (see HomeShell IndexedStack child build order).
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) {
-        return;
-      }
-      unawaited(_refreshUserLocationHints());
-      unawaited(_feed.loadCalendarViewPreference());
+  }
+
+  /// Keeps the screen on the live Riverpod instance (hot restart / provider recreate).
+  void _bindFeedController(EventsFeedController feed) {
+    if (identical(_boundFeed, feed)) {
+      return;
+    }
+    _boundFeed?.removeListener(_onFeedUpdate);
+    _boundFeed = feed;
+    feed.addListener(_onFeedUpdate);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _bootstrapFeed(feed));
+  }
+
+  void _bootstrapFeed(EventsFeedController feed) {
+    if (!mounted || !identical(_boundFeed, feed)) {
+      return;
+    }
+    unawaited(_refreshUserLocationHints());
+    unawaited(feed.loadCalendarViewPreference());
+    unawaited(feed.loadRecentSearches());
+    if (feed.feedPhase() == 'loading') {
       unawaited(
-        _feed.loadInitial(
+        feed.loadInitial(
           initialListEmptyErrorMessage:
               context.l10n.eventsFeedInitialLoadFailed,
         ),
       );
-    });
-    unawaited(_feed.loadRecentSearches());
+    }
   }
 
   void _onFeedUpdate() {
@@ -113,7 +131,7 @@ class EventsFeedScreenState extends State<EventsFeedScreen> {
   }
 
   Future<void> _refreshUserLocationHints() async {
-    final LocationService geo = ServiceLocator.instance.locationService;
+    final LocationService geo = ref.read(locationServiceProvider);
     try {
       if (!await geo.isLocationServiceEnabled()) {
         return;
@@ -130,10 +148,12 @@ class EventsFeedScreenState extends State<EventsFeedScreen> {
         accuracy: AppGeoAccuracy.medium,
         timeLimit: const Duration(seconds: 6),
       );
+      if (!mounted) return;
       _feed.setUserLocationHint(
         latitude: pos.latitude,
         longitude: pos.longitude,
       );
+      if (!mounted) return;
       final Object repository = EventsRepositoryRegistry.instance;
       if (repository is ApiEventsRepository) {
         repository.setUserLocationHint(
@@ -199,13 +219,13 @@ class EventsFeedScreenState extends State<EventsFeedScreen> {
 
   @override
   void dispose() {
-    ServiceLocator.instance.eventsFeedRemoteRefreshTick.removeListener(
-      _onRemoteRefreshTick,
-    );
+    _scrollController.removeListener(_onScrollNearBottom);
     _scrollController.dispose();
     _searchFocusNode.dispose();
-    _feed.removeListener(_onFeedUpdate);
-    _feed.dispose();
+    _boundFeed?.removeListener(_onFeedUpdate);
+    _boundFeed?.remoteSearch.cancel();
+    _boundFeed = null;
+    // EventsFeedController lifecycle is owned by eventsFeedControllerProvider.
     super.dispose();
   }
 
@@ -214,7 +234,6 @@ class EventsFeedScreenState extends State<EventsFeedScreen> {
   }
 
   Future<void> _openFilterSheet() async {
-    AppHaptics.tap();
     FocusManager.instance.primaryFocus?.unfocus();
     final result = await EventsFilterSheet.show(
       context,
@@ -235,7 +254,6 @@ class EventsFeedScreenState extends State<EventsFeedScreen> {
   }
 
   void _onFilterChanged(EcoEventFilter filter) {
-    AppHaptics.tap();
     unawaited(() async {
       final bool ok = await _feed.setActiveFilter(filter);
       if (!ok && mounted) {
@@ -270,7 +288,6 @@ class EventsFeedScreenState extends State<EventsFeedScreen> {
   }
 
   Future<void> _navigateToDetail(EcoEvent event) async {
-    AppHaptics.softTransition();
     final String cover = event.siteImageUrl.trim();
     if (cover.isNotEmpty) {
       final String lower = cover.toLowerCase();
@@ -285,7 +302,6 @@ class EventsFeedScreenState extends State<EventsFeedScreen> {
   }
 
   Future<void> _navigateToCreate() async {
-    AppHaptics.softTransition();
     final EcoEvent? createdEvent = await EventsNavigation.openCreate(context);
     if (!mounted || createdEvent == null) {
       return;
@@ -294,7 +310,6 @@ class EventsFeedScreenState extends State<EventsFeedScreen> {
   }
 
   Future<void> _resetFiltersAndRefresh() async {
-    AppHaptics.tap();
     final bool ok = await _feed.resetAllDiscoveryFilters();
     if (!ok && mounted) {
       logEventsDiagnostic('events_feed_refresh_failed');
@@ -307,7 +322,6 @@ class EventsFeedScreenState extends State<EventsFeedScreen> {
   }
 
   Future<void> _clearSearchOnly() async {
-    AppHaptics.tap();
     final bool ok = await _feed.clearSearchField();
     if (!ok && mounted) {
       logEventsDiagnostic('events_feed_refresh_failed');
@@ -350,7 +364,6 @@ class EventsFeedScreenState extends State<EventsFeedScreen> {
   }
 
   Future<void> _onRecentSearchTap(String s) async {
-    AppHaptics.light();
     final bool ok = await _feed.applySearchSuggestion(s);
     if (!ok && mounted) {
       logEventsDiagnostic('events_feed_refresh_failed');
@@ -379,19 +392,24 @@ class EventsFeedScreenState extends State<EventsFeedScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<int>(eventsFeedRefreshTickProvider, (int? previous, int next) {
+      if (previous != next) {
+        _onRemoteRefreshTick();
+      }
+    });
+    final EventsFeedController feed = ref.watch(eventsFeedControllerProvider);
+    _bindFeedController(feed);
     final double bottomSafePadding = MediaQuery.paddingOf(context).bottom;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    return ChangeNotifierProvider<EventsFeedController>.value(
-      value: _feed,
-      child: Scaffold(
-      backgroundColor: colorScheme.surface,
+    return Scaffold(
+      backgroundColor: AppColors.appBackground,
       // Inset applied by tab [HomeShell] to avoid double layout on iOS.
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         bottom: false,
         child: ListenableBuilder(
-          listenable: Listenable.merge(<Listenable>[_feed, _feed.remoteSearch]),
+          listenable: feed,
           builder: (BuildContext context, Widget? _) {
             final List<EcoEvent> filtered = _feed.filteredEvents(context.l10n);
             final EcoEvent? hero = _feed.heroEvent;
@@ -419,414 +437,66 @@ class EventsFeedScreenState extends State<EventsFeedScreen> {
           label: context.l10n.eventsFeedSemantic,
           child: Builder(
             builder: (BuildContext context) {
+              if (phase == 'loading') {
+                final Widget loadingScroll = CustomScrollView(
+                  controller: _scrollController,
+                  physics: eventsListScrollPhysics(context),
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
+                  slivers: <Widget>[
+                    SliverToBoxAdapter(
+                      child: EventsFeedSkeleton(
+                        calendarView: _feed.calendarView,
+                      ),
+                    ),
+                    SliverToBoxAdapter(
+                      child: SizedBox(
+                        height: AppSpacing.xxl + bottomSafePadding,
+                      ),
+                    ),
+                  ],
+                );
+                return AppRefreshIndicator(
+                  onRefresh: _onRefresh,
+                  child: loadingScroll,
+                );
+              }
+
               final Widget scrollView = CustomScrollView(
                 controller: _scrollController,
                 physics: eventsListScrollPhysics(context),
                 keyboardDismissBehavior:
                     ScrollViewKeyboardDismissBehavior.onDrag,
                 slivers: <Widget>[
-                  // Same pattern as [ReportsListScreen]: static headline + tools (no collapsing app bar).
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(
-                        AppSpacing.lg,
-                        AppSpacing.md,
-                        AppSpacing.lg,
-                        AppSpacing.sm,
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          Expanded(
-                            child: Text(
-                              context.l10n.eventsFeedTitle,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: AppTypography.textTheme.headlineMedium
-                                  ?.copyWith(
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: -0.4,
-                                height: 1.15,
-                              ),
-                            ),
-                          ),
-                          if (isOrganizer)
-                            Semantics(
-                              button: true,
-                              label: context.l10n.eventsOrganizerDashboardTitle,
-                              child: IconButton(
-                                tooltip:
-                                    context.l10n.eventsOrganizerDashboardTitle,
-                                onPressed: () {
-                                  AppHaptics.tap();
-                                  EventsNavigation.openOrganizerDashboard(
-                                    context,
-                                  );
-                                },
-                                icon: const Icon(
-                                  CupertinoIcons.chart_bar_alt_fill,
-                                ),
-                              ),
-                            ),
-                          if (isOrganizer) const SizedBox(width: AppSpacing.xs),
-                          Semantics(
-                            button: true,
-                            label: context.l10n.eventsFeedCreateSemantic,
-                            child: IconButton(
-                              tooltip: context.l10n.eventsFeedCreateSemantic,
-                              onPressed: _navigateToCreate,
-                              icon: const Icon(Icons.add_rounded),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                  ...buildEventsFeedToolbarSlivers(
+                    context: context,
+                    colorScheme: colorScheme,
+                    bottomSafePadding: bottomSafePadding,
+                    filtered: filtered,
+                    hero: hero,
+                    showSections: showSections,
+                    showHero: showHero,
+                    featuredHeroForList: featuredHeroForList,
+                    happeningNowRows: happeningNowRows,
+                    comingUpRows: comingUpRows,
+                    listToShow: listToShow,
+                    isOrganizer: isOrganizer,
+                    phase: phase,
                   ),
-
-                  // ── Search + filter + view toggle ──
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(
-                        AppSpacing.lg,
-                        0,
-                        AppSpacing.lg,
-                        AppSpacing.sm,
-                      ),
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: AppCupertinoSearchField(
-                              controller: _feed.searchController,
-                              focusNode: _searchFocusNode,
-                              toolbarHeight:
-                                  AppSpacing.eventsFeedToolbarControlSize,
-                              placeholder:
-                                  context.l10n.eventsFeedSearchPlaceholder,
-                              semanticLabel:
-                                  context.l10n.eventsFeedSearchPlaceholder,
-                              onChanged: _onSearchChanged,
-                              onSubmitted: () {
-                                unawaited(
-                                  _feed.rememberSearch(
-                                    _feed.searchController.text,
-                                  ),
-                                );
-                              },
-                              onClear: () {
-                                unawaited(() async {
-                                  final bool ok =
-                                      await _feed.clearSearchField();
-                                  if (!ok && context.mounted) {
-                                    logEventsDiagnostic(
-                                      'events_feed_refresh_failed',
-                                    );
-                                    AppSnack.show(
-                                      context,
-                                      message: context
-                                          .l10n.eventsFeedRefreshFailed,
-                                      type: AppSnackType.warning,
-                                    );
-                                  }
-                                }());
-                              },
-                              autocorrect: false,
-                              smartDashesType: SmartDashesType.disabled,
-                              smartQuotesType: SmartQuotesType.disabled,
-                              enableIMEPersonalizedLearning: false,
-                            ),
-                          ),
-                          const SizedBox(width: AppSpacing.sm),
-                          Semantics(
-                            button: true,
-                            label: context.l10n.eventsFilterSheetTitle,
-                            child: Material(
-                              color: Colors.transparent,
-                              child: InkWell(
-                                onTap: _openFilterSheet,
-                                customBorder: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                    AppSpacing.radiusMd,
-                                  ),
-                                ),
-                                child: Container(
-                                  width: AppSpacing.eventsFeedToolbarControlSize,
-                                  height:
-                                      AppSpacing.eventsFeedToolbarControlSize,
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    color: _feed.hasActiveFilters
-                                        ? AppColors.feedPillSelectedFill
-                                        : colorScheme.surface,
-                                    borderRadius: BorderRadius.circular(
-                                      AppSpacing.radiusMd,
-                                    ),
-                                    border: Border.all(
-                                      color: _feed.hasActiveFilters
-                                          ? AppColors.feedPillSelectedBorder
-                                          : colorScheme.outlineVariant.withValues(
-                                              alpha: 0.6,
-                                            ),
-                                    ),
-                                  ),
-                                  child: Stack(
-                                    clipBehavior: Clip.none,
-                                    fit: StackFit.expand,
-                                    alignment: Alignment.center,
-                                    children: <Widget>[
-                                      Icon(
-                                        CupertinoIcons.slider_horizontal_3,
-                                        size: 18,
-                                        color: _feed.hasActiveFilters
-                                            ? AppColors.feedPillSelectedForeground
-                                            : colorScheme.onSurfaceVariant,
-                                      ),
-                                      if (_feed.hasActiveFilters)
-                                        Positioned(
-                                          top: 8,
-                                          right: 8,
-                                          child: Container(
-                                            width: 7,
-                                            height: 7,
-                                            decoration: const BoxDecoration(
-                                              color: AppColors.feedPillSelectedForeground,
-                                              shape: BoxShape.circle,
-                                            ),
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: AppSpacing.xs),
-                          ViewToggleButton(
-                            icon: CupertinoIcons.square_list_fill,
-                            selected: !_feed.calendarView,
-                            tooltip: context.l10n.eventsFeedViewListToggle,
-                            onTap: () {
-                              AppHaptics.tap();
-                              _feed.setCalendarView(false);
-                            },
-                          ),
-                          const SizedBox(width: AppSpacing.xxs),
-                          ViewToggleButton(
-                            icon: CupertinoIcons.calendar,
-                            selected: _feed.calendarView,
-                            tooltip: context.l10n.eventsFeedViewCalendarToggle,
-                            onTap: () {
-                              AppHaptics.tap();
-                              _feed.setCalendarView(true);
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  if (!_feed.calendarView && _feed.searchQuery.trim().isEmpty)
-                    SliverToBoxAdapter(
-                      child: RecentSearchesShelf(
-                        recentSearches: _feed.recentSearches,
-                        onSearchTap: _onRecentSearchTap,
-                      ),
-                    ),
-
-                  // ── Filter chips ──
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                      child: EventsFilterChips(
-                        active: _feed.activeFilter,
-                        onSelected: _onFilterChanged,
-                      ),
-                    ),
-                  ),
-
-                  if (phase == 'content' &&
-                      _feed.repository.isShowingStaleCachedEvents)
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(
-                          AppSpacing.lg,
-                          0,
-                          AppSpacing.lg,
-                          AppSpacing.md,
-                        ),
-                        child: Semantics(
-                          label: context.l10n.eventsFeedOfflineStaleBanner,
-                          container: true,
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(
-                              color: colorScheme.primary.withValues(alpha: 0.08),
-                              borderRadius: BorderRadius.circular(
-                                AppSpacing.radiusMd,
-                              ),
-                              border: Border.all(
-                                color: colorScheme.outlineVariant.withValues(alpha: 0.6),
-                              ),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: AppSpacing.md,
-                                vertical: AppSpacing.sm,
-                              ),
-                              child: Row(
-                                children: <Widget>[
-                                  Icon(
-                                    CupertinoIcons.wifi_slash,
-                                    size: 20,
-                                    color: colorScheme.primary,
-                                  ),
-                                  const SizedBox(width: AppSpacing.sm),
-                                  Expanded(
-                                    child: Text(
-                                      context.l10n.eventsFeedOfflineStaleBanner,
-                                      style:
-                                          AppTypography.eventsInlineInfoBanner(
-                                            Theme.of(context).textTheme,
-                                          ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                  if (phase != 'content') ...<Widget>[
-                    SliverFillRemaining(
-                      hasScrollBody: phase == 'loading',
-                      child: AnimatedPhaseSwitcher(
-                        phaseKey: phase,
-                        child: phase == 'loading'
-                            ? EventsFeedSkeleton(
-                                calendarView: _feed.calendarView,
-                              )
-                            : AppErrorView(
-                                error: _feed.initialLoadError!,
-                                onRetry: _retryInitialLoad,
-                              ),
-                      ),
-                    ),
-                  ] else ...<Widget>[
-                    if (showHero)
-                      SliverToBoxAdapter(
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(
-                            AppSpacing.lg,
-                            0,
-                            AppSpacing.lg,
-                            AppSpacing.md,
-                          ),
-                          child: HeroEventCard(
-                            event: hero,
-                            onTap: () => _navigateToDetail(hero),
-                          ),
-                        ),
-                      ),
-
-                    if (showSections && !_feed.calendarView) ...<Widget>[
-                      if (happeningNowRows.isNotEmpty) ...<Widget>[
-                        SectionHeader(
-                          title: context.l10n.eventsFeedHappeningNow,
-                        ),
-                        EventsSliverList(
-                          events: happeningNowRows,
-                          onTap: _navigateToDetail,
-                          startIndex: 0,
-                        ),
-                        const SliverToBoxAdapter(
-                          child: SizedBox(height: AppSpacing.lg),
-                        ),
-                      ],
-                      if (comingUpRows.isNotEmpty) ...<Widget>[
-                        SectionHeader(title: context.l10n.eventsFeedComingUp),
-                        EventsSliverList(
-                          events: comingUpRows,
-                          onTap: _navigateToDetail,
-                          startIndex: happeningNowRows.length,
-                        ),
-                        const SliverToBoxAdapter(
-                          child: SizedBox(height: AppSpacing.lg),
-                        ),
-                      ],
-                      if (_feed.recentlyCompleted.isNotEmpty) ...<Widget>[
-                        SectionHeader(
-                          title: context.l10n.eventsFeedRecentlyCompleted,
-                        ),
-                        EventsSliverList(
-                          events: _feed.recentlyCompleted.take(3).toList(),
-                          onTap: _navigateToDetail,
-                          startIndex:
-                              happeningNowRows.length + comingUpRows.length,
-                        ),
-                      ],
-                      if (happeningNowRows.isEmpty &&
-                          comingUpRows.isEmpty &&
-                          _feed.recentlyCompleted.isEmpty &&
-                          hero == null)
-                        SliverFillRemaining(
-                          hasScrollBody: false,
-                          child: EventsEmptyState(
-                            filter: _feed.activeFilter,
-                            showClearFilters: _feed.hasActiveFilters,
-                            onClearFilters: _feed.hasActiveFilters
-                                ? _resetFiltersAndRefresh
-                                : null,
-                            onCreateEvent: _navigateToCreate,
-                          ),
-                        ),
-                    ] else if (!showSections &&
-                        !_feed.calendarView) ...<Widget>[
-                      if (filtered.isEmpty)
-                        SliverFillRemaining(
-                          hasScrollBody: false,
-                          child: _feed.searchQuery.isNotEmpty
-                              ? SearchEmptyState(
-                                  query: _feed.searchQuery,
-                                  onClearSearch: _clearSearchOnly,
-                                  onCreateEvent: _navigateToCreate,
-                                )
-                              : EventsEmptyState(
-                                  filter: _feed.activeFilter,
-                                  showClearFilters: _feed.hasActiveFilters,
-                                  onClearFilters: _feed.hasActiveFilters
-                                      ? _resetFiltersAndRefresh
-                                      : null,
-                                  onCreateEvent: _navigateToCreate,
-                                ),
-                        )
-                      else
-                        EventsSliverList(
-                          events: listToShow,
-                          onTap: _navigateToDetail,
-                        ),
-                    ],
-
-                    if (_feed.calendarView)
-                      SliverToBoxAdapter(
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(
-                            AppSpacing.lg,
-                            AppSpacing.sm,
-                            AppSpacing.lg,
-                            AppSpacing.xxl,
-                          ),
-                          child: EventsCalendarView(
-                            events: filtered,
-                            onEventTap: _navigateToDetail,
-                            hasMorePages: _feed.repository.hasMoreEvents,
-                            onRequestMoreFromServer: _calendarLoadMore,
-                          ),
-                        ),
-                      ),
-                  ],
-
-                  SliverToBoxAdapter(
-                    child: SizedBox(height: AppSpacing.xxl + bottomSafePadding),
+                  ...buildEventsFeedContentSlivers(
+                    context: context,
+                    colorScheme: colorScheme,
+                    bottomSafePadding: bottomSafePadding,
+                    filtered: filtered,
+                    hero: hero,
+                    showSections: showSections,
+                    showHero: showHero,
+                    featuredHeroForList: featuredHeroForList,
+                    happeningNowRows: happeningNowRows,
+                    comingUpRows: comingUpRows,
+                    listToShow: listToShow,
+                    isOrganizer: isOrganizer,
+                    phase: phase,
                   ),
                 ],
               );
@@ -839,7 +509,6 @@ class EventsFeedScreenState extends State<EventsFeedScreen> {
         );
           },
         ),
-      ),
       ),
     );
   }

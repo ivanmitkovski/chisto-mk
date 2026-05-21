@@ -9,7 +9,6 @@ import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/data/event_site_resolver.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/create_event/create_event_sites_map.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 class SitePickerSheet extends StatefulWidget {
   const SitePickerSheet({
@@ -156,7 +155,6 @@ class _SitePickerSheetState extends State<SitePickerSheet> {
                   if (value == null) {
                     return;
                   }
-                  AppHaptics.tap(context);
                   setState(() => _viewMode = value);
                 },
               ),

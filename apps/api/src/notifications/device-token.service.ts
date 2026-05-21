@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { RegisterDeviceTokenDto } from './dto/register-device-token.dto';
@@ -16,13 +16,11 @@ export class DeviceTokenService {
       select: { id: true, userId: true, revokedAt: true },
     });
 
+    if (existing && existing.userId !== user.userId) {
+      await this.revokeOutboxForToken(dto.token);
+    }
+
     if (existing) {
-      if (existing.userId !== user.userId && existing.revokedAt == null) {
-        throw new ForbiddenException({
-          code: 'DEVICE_TOKEN_IN_USE',
-          message: 'This device is already registered to another account',
-        });
-      }
       const updated = await this.prisma.userDeviceToken.update({
         where: { id: existing.id },
         data: {
@@ -50,6 +48,22 @@ export class DeviceTokenService {
       select: { id: true },
     });
     return { id: created.id };
+  }
+
+  /** Prevent cross-user delivery when a physical device logs into another account. */
+  private async revokeOutboxForToken(token: string): Promise<void> {
+    await this.prisma.notificationOutbox.updateMany({
+      where: {
+        deviceToken: token,
+        deliveredAt: null,
+        failedPermanently: false,
+      },
+      data: {
+        failedPermanently: true,
+        lastErrorCode: 'TOKEN_REASSIGNED',
+        lastErrorMessage: 'Device token reassigned to another user',
+      },
+    });
   }
 
   async unregisterDeviceToken(

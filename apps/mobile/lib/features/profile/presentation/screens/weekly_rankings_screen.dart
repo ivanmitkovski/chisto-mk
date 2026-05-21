@@ -14,10 +14,9 @@ import 'package:chisto_mobile/features/profile/presentation/widgets/weekly_curre
 import 'package:chisto_mobile/features/profile/presentation/widgets/weekly_ranking_row.dart';
 import 'package:chisto_mobile/features/profile/presentation/widgets/weekly_rankings_empty.dart';
 import 'package:chisto_mobile/features/profile/presentation/widgets/weekly_rankings_skeleton.dart';
-import 'package:chisto_mobile/shared/widgets/animated_phase_switcher.dart';
-import 'package:chisto_mobile/shared/widgets/app_error_view.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_refresh_indicator.dart';
+import 'package:chisto_mobile/shared/widgets/molecules/animated_phase_switcher.dart';
+import 'package:chisto_mobile/shared/widgets/molecules/app_error_view.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/app_refresh_indicator.dart';
 import 'package:intl/intl.dart';
 
 class WeeklyRankingsScreen extends ConsumerStatefulWidget {
@@ -39,7 +38,6 @@ class _WeeklyRankingsScreenState extends ConsumerState<WeeklyRankingsScreen> {
   }
 
   void _scrollToCurrentUser() {
-    AppHaptics.tap();
     final BuildContext? rowContext = _currentUserRowKey.currentContext;
     if (rowContext == null) return;
     Scrollable.ensureVisible(

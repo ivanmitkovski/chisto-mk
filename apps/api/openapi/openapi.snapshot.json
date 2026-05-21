@@ -279,7 +279,16 @@
     "/auth/register": {
       "post": {
         "operationId": "AuthSessionController_register",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "accept-language",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -292,11 +301,11 @@
         },
         "responses": {
           "201": {
-            "description": "User registered and tokens issued",
+            "description": "User created; OTP sent to phone. Complete verification via POST /auth/otp/verify to receive tokens.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AuthResponseDto"
+                  "$ref": "#/components/schemas/RegisterResponseDto"
                 }
               }
             }
@@ -317,7 +326,7 @@
             "description": "Rate limited"
           }
         },
-        "summary": "Register a new citizen account",
+        "summary": "Register a new citizen account (phone verification required before sign-in)",
         "tags": [
           "auth"
         ]
@@ -608,8 +617,15 @@
           }
         },
         "responses": {
-          "204": {
-            "description": "Phone verified"
+          "200": {
+            "description": "Phone verified and session tokens issued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponseDto"
+                }
+              }
+            }
           },
           "400": {
             "description": "Validation or bad request"
@@ -627,7 +643,7 @@
             "description": "Rate limited"
           }
         },
-        "summary": "Verify OTP and mark phone as verified",
+        "summary": "Verify OTP, mark phone verified, and issue auth tokens",
         "tags": [
           "auth"
         ]
@@ -651,14 +667,14 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SendOtpDto"
+                "$ref": "#/components/schemas/PasswordResetRequestDto"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "OTP sent; in development devCode is returned when SMS_PROVIDER is not Twilio"
+            "description": "Generic success message. When an account exists, SMS OTP or email link is sent. devCode returned in development when SMS is used."
           },
           "400": {
             "description": "Validation or bad request"
@@ -676,7 +692,7 @@
             "description": "Rate limited"
           }
         },
-        "summary": "Request password reset; sends OTP to registered phone",
+        "summary": "Request password reset via SMS (phone) or email link",
         "tags": [
           "auth"
         ]
@@ -738,6 +754,46 @@
         },
         "responses": {
           "200": {
+            "description": "Password reset successful; all sessions invalidated. A password-changed confirmation email may be sent when transactional email is enabled."
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "summary": "Confirm password reset with SMS OTP and new password",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/auth/password-reset/email/confirm": {
+      "post": {
+        "operationId": "AuthPasswordController_confirmEmailPasswordReset",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordResetEmailConfirmDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
             "description": "Password reset successful; all sessions invalidated"
           },
           "400": {
@@ -756,7 +812,7 @@
             "description": "Rate limited"
           }
         },
-        "summary": "Confirm password reset with OTP and new password",
+        "summary": "Confirm password reset using token from email link",
         "tags": [
           "auth"
         ]
@@ -1131,6 +1187,51 @@
         ]
       }
     },
+    "/auth/me/home-location": {
+      "patch": {
+        "operationId": "AuthProfileController_updateHomeLocation",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateHomeLocationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Home location saved"
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Save citizen home map location (post-registration onboarding)",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
     "/auth/me/avatar": {
       "post": {
         "operationId": "AuthProfileController_uploadAvatar[0]",
@@ -1443,6 +1544,163 @@
         "summary": "Weekly points leaderboard (Europe/Skopje Monday–Sunday, report points only)",
         "tags": [
           "rankings"
+        ]
+      }
+    },
+    "/notifications/email/unsubscribe": {
+      "post": {
+        "operationId": "EmailUnsubscribeController_unsubscribePost",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnsubscribePostDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "summary": "One-click unsubscribe (RFC 8058); use ?token= on POST URL or JSON body",
+        "tags": [
+          "notifications"
+        ]
+      },
+      "get": {
+        "operationId": "EmailUnsubscribeController_unsubscribeGet",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "summary": "Unsubscribe via link (browser)",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/admin/feature-flags": {
+      "get": {
+        "operationId": "FeatureFlagsController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Feature flags"
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List feature flags",
+        "tags": [
+          "admin-feature-flags"
+        ]
+      }
+    },
+    "/admin/feature-flags/{key}": {
+      "patch": {
+        "operationId": "FeatureFlagsController_patch",
+        "parameters": [
+          {
+            "name": "key",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatchFeatureFlagDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Feature flag updated"
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update a feature flag",
+        "tags": [
+          "admin-feature-flags"
         ]
       }
     },
@@ -2264,6 +2522,81 @@
           }
         ],
         "summary": "List sites with optional filters",
+        "tags": [
+          "sites"
+        ]
+      }
+    },
+    "/sites/saved": {
+      "get": {
+        "operationId": "SitesController_listSaved",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "lat",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lng",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Saved sites fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteFeedListResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid JWT"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Too many requests"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List sites saved by the current user",
         "tags": [
           "sites"
         ]
@@ -3694,6 +4027,244 @@
         ]
       }
     },
+    "/moderation/reports": {
+      "post": {
+        "operationId": "ModerationController_submitReport",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostUgcReportDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Report UGC (comment, chat message, user, site, event)",
+        "tags": [
+          "moderation"
+        ]
+      }
+    },
+    "/users/me/blocks": {
+      "post": {
+        "operationId": "ModerationController_blockUser",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostUserBlockDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Block a user",
+        "tags": [
+          "moderation"
+        ]
+      },
+      "get": {
+        "operationId": "ModerationController_listBlocks",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List blocked users",
+        "tags": [
+          "moderation"
+        ]
+      }
+    },
+    "/users/me/blocks/{blockedUserId}": {
+      "delete": {
+        "operationId": "ModerationController_unblock",
+        "parameters": [
+          {
+            "name": "blockedUserId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Unblock a user",
+        "tags": [
+          "moderation"
+        ]
+      }
+    },
+    "/sites/{id}/history": {
+      "get": {
+        "operationId": "SiteHistoryController_listHistory",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maximum": 100,
+              "default": 30,
+              "type": "number"
+            }
+          },
+          {
+            "name": "beforeId",
+            "required": false,
+            "in": "query",
+            "description": "Return entries older than this entry id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteHistoryListResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Site not found"
+          },
+          "429": {
+            "description": "Too many requests"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List chronological site history entries",
+        "tags": [
+          "sites"
+        ]
+      }
+    },
+    "/sites/{id}/history/notes": {
+      "post": {
+        "operationId": "SiteHistoryAdminController_postNote",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostSiteHistoryNoteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteHistoryEntryDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid JWT"
+          },
+          "403": {
+            "description": "Caller is not an admin"
+          },
+          "404": {
+            "description": "Site not found"
+          },
+          "429": {
+            "description": "Too many requests"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Add an admin note to the site timeline",
+        "tags": [
+          "sites"
+        ]
+      }
+    },
     "/reports": {
       "post": {
         "operationId": "ReportsController_createWithLocation",
@@ -5106,95 +5677,6 @@
         ]
       }
     },
-    "/admin/feature-flags": {
-      "get": {
-        "operationId": "FeatureFlagsController_list",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Feature flags"
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "List feature flags",
-        "tags": [
-          "admin-feature-flags"
-        ]
-      }
-    },
-    "/admin/feature-flags/{key}": {
-      "patch": {
-        "operationId": "FeatureFlagsController_patch",
-        "parameters": [
-          {
-            "name": "key",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PatchFeatureFlagDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Feature flag updated"
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Update a feature flag",
-        "tags": [
-          "admin-feature-flags"
-        ]
-      }
-    },
     "/config": {
       "get": {
         "operationId": "PublicConfigController_get",
@@ -6529,6 +7011,50 @@
         ]
       }
     },
+    "/notifications/{id}/opened": {
+      "post": {
+        "operationId": "NotificationsController_recordOpened",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Open recorded"
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Record that the user opened a notification (push tap or deep link)",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
     "/notifications/{id}/read": {
       "patch": {
         "operationId": "NotificationsController_markOneRead",
@@ -6954,6 +7480,41 @@
         ]
       }
     },
+    "/notifications/admin/test-push": {
+      "post": {
+        "operationId": "NotificationsController_testPush",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Test notification dispatched"
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Send a test push to the current admin user (full outbox → FCM pipeline)",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
     "/notifications/admin/push-stats": {
       "get": {
         "operationId": "NotificationsController_pushStats",
@@ -6984,6 +7545,41 @@
           }
         ],
         "summary": "Push delivery statistics (admin only)",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/notifications/admin/delivery-report": {
+      "get": {
+        "operationId": "NotificationsController_deliveryReport",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Delivery and open metrics"
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Push delivery funnel (admin only)",
         "tags": [
           "notifications"
         ]
@@ -11869,66 +12465,6 @@
         ]
       }
     },
-    "/events/{eventId}/chat/events": {
-      "get": {
-        "description": "Requires `Authorization: Bearer`. Send optional `Last-Event-ID` header (or `last-event-id`) with the last received `id` field to replay buffered events after that id, then continue with live events. Heartbeat events have `data: {\"type\":\"heartbeat\"}` and no `id`. See docs/event-chat-stream-events.md.",
-        "operationId": "EventChatReadController_streamChatEvents",
-        "parameters": [
-          {
-            "name": "eventId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "last-event-id",
-            "required": true,
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "example": {
-                    "code": "UNAUTHORIZED",
-                    "message": "Unauthorized"
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "User may not access this event chat"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "SSE stream for chat message updates",
-        "tags": [
-          "event-chat"
-        ]
-      }
-    },
     "/events/{eventId}/chat/read-cursors": {
       "get": {
         "operationId": "EventChatReadController_listReadCursors",
@@ -12980,6 +13516,46 @@
           "webhooks"
         ]
       }
+    },
+    "/webhooks/postmark": {
+      "post": {
+        "operationId": "EmailWebhooksController_handlePostmark",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostmarkWebhookDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Acknowledged"
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "summary": "Postmark bounce/complaint webhook (JSON)",
+        "tags": [
+          "webhooks"
+        ]
+      }
     }
   },
   "info": {
@@ -13027,6 +13603,58 @@
           "firstName",
           "lastName",
           "email",
+          "phoneNumber",
+          "password"
+        ]
+      },
+      "RegisterResponseDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "example": "+38970123456"
+          },
+          "requiresPhoneVerification": {
+            "type": "boolean",
+            "example": true
+          },
+          "otpExpiresIn": {
+            "type": "number",
+            "example": 600,
+            "description": "OTP validity in seconds"
+          }
+        },
+        "required": [
+          "userId",
+          "phoneNumber",
+          "requiresPhoneVerification",
+          "otpExpiresIn"
+        ]
+      },
+      "CitizenLoginDto": {
+        "type": "object",
+        "properties": {
+          "phoneNumber": {
+            "type": "string",
+            "example": "+38970123456",
+            "description": "Phone number in E.164 format"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 72,
+            "example": "StrongPass123!"
+          },
+          "rememberMe": {
+            "type": "boolean",
+            "description": "If true, refresh token lasts longer (e.g. 30 days). If false, short-lived (e.g. 1 day).",
+            "default": true
+          }
+        },
+        "required": [
           "phoneNumber",
           "password"
         ]
@@ -13118,31 +13746,6 @@
           "user"
         ]
       },
-      "CitizenLoginDto": {
-        "type": "object",
-        "properties": {
-          "phoneNumber": {
-            "type": "string",
-            "example": "+38970123456",
-            "description": "Phone number in E.164 format"
-          },
-          "password": {
-            "type": "string",
-            "minLength": 8,
-            "maxLength": 72,
-            "example": "StrongPass123!"
-          },
-          "rememberMe": {
-            "type": "boolean",
-            "description": "If true, refresh token lasts longer (e.g. 30 days). If false, short-lived (e.g. 1 day).",
-            "default": true
-          }
-        },
-        "required": [
-          "phoneNumber",
-          "password"
-        ]
-      },
       "AdminLoginDto": {
         "type": "object",
         "properties": {
@@ -13216,16 +13819,29 @@
           },
           "code": {
             "type": "string",
-            "example": "1234",
-            "description": "4-digit code received via SMS",
-            "minLength": 4,
-            "maxLength": 4
+            "example": "123456",
+            "description": "6-digit code received via SMS",
+            "minLength": 6,
+            "maxLength": 6
           }
         },
         "required": [
           "phoneNumber",
           "code"
         ]
+      },
+      "PasswordResetRequestDto": {
+        "type": "object",
+        "properties": {
+          "phoneNumber": {
+            "type": "string",
+            "example": "+38970123456"
+          },
+          "email": {
+            "type": "string",
+            "example": "citizen@chisto.mk"
+          }
+        }
       },
       "ResetPasswordConfirmDto": {
         "type": "object",
@@ -13251,6 +13867,24 @@
         "required": [
           "phoneNumber",
           "code",
+          "newPassword"
+        ]
+      },
+      "PasswordResetEmailConfirmDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Opaque token from the password reset email link"
+          },
+          "newPassword": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 72
+          }
+        },
+        "required": [
+          "token",
           "newPassword"
         ]
       },
@@ -13498,6 +14132,26 @@
             "type": "object",
             "nullable": true,
             "description": "Set when user passed the organizer toolkit quiz"
+          },
+          "homeLatitude": {
+            "type": "object",
+            "nullable": true,
+            "description": "Saved home map latitude (WGS84)"
+          },
+          "homeLongitude": {
+            "type": "object",
+            "nullable": true,
+            "description": "Saved home map longitude (WGS84)"
+          },
+          "homeLocationLabel": {
+            "type": "object",
+            "nullable": true,
+            "description": "Optional geocoded label for home location"
+          },
+          "homeLocationSetAt": {
+            "type": "object",
+            "nullable": true,
+            "description": "When home location was last saved, ISO-8601"
           }
         },
         "required": [
@@ -13524,7 +14178,35 @@
           "weeklyRank",
           "weekStartsAt",
           "weekEndsAt",
-          "organizerCertifiedAt"
+          "organizerCertifiedAt",
+          "homeLatitude",
+          "homeLongitude",
+          "homeLocationLabel",
+          "homeLocationSetAt"
+        ]
+      },
+      "UpdateHomeLocationDto": {
+        "type": "object",
+        "properties": {
+          "latitude": {
+            "type": "number",
+            "example": 41.9981,
+            "description": "WGS84 latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "example": 21.4254,
+            "description": "WGS84 longitude"
+          },
+          "label": {
+            "type": "string",
+            "example": "Skopje, North Macedonia",
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "latitude",
+          "longitude"
         ]
       },
       "UpdateProfileDto": {
@@ -13641,6 +14323,26 @@
           "myRank",
           "myWeeklyPoints"
         ]
+      },
+      "UnsubscribePostDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Signed unsubscribe token from email link"
+          }
+        }
+      },
+      "PatchFeatureFlagDto": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "metadata": {
+            "type": "object"
+          }
+        }
       },
       "CreateSiteDto": {
         "type": "object",
@@ -14701,6 +15403,178 @@
         },
         "required": [
           "feedbackType"
+        ]
+      },
+      "PostUgcReportDto": {
+        "type": "object",
+        "properties": {
+          "subjectType": {
+            "type": "string",
+            "enum": [
+              "site_comment",
+              "event_chat_message",
+              "user",
+              "site",
+              "event",
+              "safety_issue"
+            ]
+          },
+          "subjectId": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "spam",
+              "harassment",
+              "hate",
+              "violence",
+              "nudity",
+              "other"
+            ]
+          },
+          "details": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "subjectType",
+          "subjectId",
+          "reason"
+        ]
+      },
+      "PostUserBlockDto": {
+        "type": "object",
+        "properties": {
+          "blockedUserId": {
+            "type": "string",
+            "description": "User id to block"
+          }
+        },
+        "required": [
+          "blockedUserId"
+        ]
+      },
+      "SiteHistoryActorDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "object"
+          },
+          "role": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "SiteHistoryEntryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "SITE_CREATED",
+              "REPORT_SUBMITTED",
+              "REPORT_APPROVED",
+              "REPORT_REJECTED",
+              "REPORT_MERGED",
+              "STATUS_CHANGED",
+              "CLEANUP_EVENT_SCHEDULED",
+              "CLEANUP_EVENT_STARTED",
+              "CLEANUP_EVENT_COMPLETED",
+              "CLEANUP_EVENT_CANCELLED",
+              "ARCHIVED_BY_ADMIN",
+              "UNARCHIVED_BY_ADMIN",
+              "ADMIN_NOTE"
+            ]
+          },
+          "occurredAt": {
+            "type": "string"
+          },
+          "fromStatus": {
+            "type": "string",
+            "enum": [
+              "REPORTED",
+              "VERIFIED",
+              "CLEANUP_SCHEDULED",
+              "IN_PROGRESS",
+              "CLEANED",
+              "DISPUTED"
+            ]
+          },
+          "toStatus": {
+            "type": "string",
+            "enum": [
+              "REPORTED",
+              "VERIFIED",
+              "CLEANUP_SCHEDULED",
+              "IN_PROGRESS",
+              "CLEANED",
+              "DISPUTED"
+            ]
+          },
+          "reportId": {
+            "type": "object"
+          },
+          "cleanupEventId": {
+            "type": "object"
+          },
+          "actor": {
+            "$ref": "#/components/schemas/SiteHistoryActorDto"
+          },
+          "note": {
+            "type": "object"
+          },
+          "metadata": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "occurredAt"
+        ]
+      },
+      "SiteHistoryListResponseDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SiteHistoryEntryDto"
+            }
+          },
+          "nextBeforeId": {
+            "type": "object",
+            "description": "Cursor for the next page (entry id)"
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "PostSiteHistoryNoteDto": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": "string",
+            "description": "Free-form admin note shown on the site timeline"
+          },
+          "occurredAt": {
+            "type": "string",
+            "description": "Optional ISO-8601 timestamp for when the note occurred"
+          }
+        },
+        "required": [
+          "note"
         ]
       },
       "AdminReportEvidenceDto": {
@@ -15911,17 +16785,6 @@
           "entries"
         ]
       },
-      "PatchFeatureFlagDto": {
-        "type": "object",
-        "properties": {
-          "enabled": {
-            "type": "boolean"
-          },
-          "metadata": {
-            "type": "object"
-          }
-        }
-      },
       "JoinersCumulativeEntryDto": {
         "type": "object",
         "properties": {
@@ -16130,11 +16993,31 @@
         "properties": {
           "muted": {
             "type": "boolean",
-            "description": "Whether this notification type is muted"
+            "description": "Whether this notification type is muted (in-app + push)"
           },
           "mutedUntil": {
             "type": "string",
             "description": "Optional ISO timestamp until mute is active"
+          },
+          "emailMuted": {
+            "type": "boolean",
+            "description": "Whether transactional email for this type is muted"
+          },
+          "emailMutedUntil": {
+            "type": "string",
+            "description": "Optional ISO timestamp until email mute is active"
+          },
+          "quietHoursStart": {
+            "type": "number",
+            "description": "Quiet hours start (minutes from midnight, 0–1439)"
+          },
+          "quietHoursEnd": {
+            "type": "number",
+            "description": "Quiet hours end (minutes from midnight, 0–1439)"
+          },
+          "quietHoursTimezone": {
+            "type": "string",
+            "description": "IANA timezone for quiet hours"
           }
         },
         "required": [
@@ -18097,6 +18980,10 @@
           "To",
           "From"
         ]
+      },
+      "PostmarkWebhookDto": {
+        "type": "object",
+        "properties": {}
       }
     }
   }

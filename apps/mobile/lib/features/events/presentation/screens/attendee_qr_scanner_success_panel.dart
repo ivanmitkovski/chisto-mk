@@ -7,8 +7,8 @@ import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/presentation/screens/attendee_qr_scanner_painters.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_back_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
 
 /// Post check-in success state with optional points line and primary “Done”.
 class AttendeeQrScannerSuccessScaffold extends StatelessWidget {

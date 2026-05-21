@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/providers/reports_providers.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/features/reports/application/report_wizard_submit_port.dart';
@@ -16,15 +16,16 @@ import 'package:chisto_mobile/features/reports/presentation/widgets/photo_review
 import 'package:chisto_mobile/features/reports/presentation/widgets/photo_source_modal.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/new_report_widgets.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:provider/provider.dart';
+import 'package:chisto_mobile/features/reports/presentation/providers/new_report_controller_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class NewReportScreen extends StatefulWidget {
+class NewReportScreen extends ConsumerStatefulWidget {
   const NewReportScreen({
     super.key,
     this.initialPhoto,
@@ -37,10 +38,10 @@ class NewReportScreen extends StatefulWidget {
   final String? entryHint;
 
   @override
-  State<NewReportScreen> createState() => _NewReportScreenState();
+  ConsumerState<NewReportScreen> createState() => _NewReportScreenState();
 }
 
-class _NewReportScreenState extends State<NewReportScreen>
+class _NewReportScreenState extends ConsumerState<NewReportScreen>
     with WidgetsBindingObserver {
   final ImagePicker _imagePicker = ImagePicker();
   final TextEditingController _titleController = TextEditingController();
@@ -48,7 +49,7 @@ class _NewReportScreenState extends State<NewReportScreen>
   final TextEditingController _descriptionController = TextEditingController();
   final FocusNode _descriptionFocus = FocusNode();
 
-  late final NewReportController _controller;
+  late NewReportController _controller;
 
   bool _isRestoringDraft = true;
   bool _showDraftRestoredChip = false;
@@ -58,12 +59,7 @@ class _NewReportScreenState extends State<NewReportScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _controller = NewReportController(
-      initialPhoto: widget.initialPhoto,
-      draftRepository: ServiceLocator.instance.reportDraftRepository,
-      reportsApiRepository: ServiceLocator.instance.reportsApiRepository,
-      reportSubmitPort: ServiceLocator.instance.reportWizardSubmitPort,
-    );
+    _controller = ref.read(newReportControllerProvider(widget.initialPhoto));
     _titleController.text = _controller.draft.title;
     _descriptionController.text = _controller.draft.description;
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -109,7 +105,6 @@ class _NewReportScreenState extends State<NewReportScreen>
   void dispose() {
     _draftChipTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
-    _controller.dispose();
     _titleController.dispose();
     _titleFocus.dispose();
     _descriptionController.dispose();
@@ -167,9 +162,6 @@ class _NewReportScreenState extends State<NewReportScreen>
     final ReportStage next =
         ReportStage.values[_controller.currentStageIndex + 1];
     _goToStage(next, unfocusFirst: false);
-    if (!MediaQuery.disableAnimationsOf(context)) {
-      AppHaptics.settle();
-    }
   }
 
   Future<void> _addPhoto() async {
@@ -178,7 +170,6 @@ class _NewReportScreenState extends State<NewReportScreen>
       return;
     }
 
-    AppHaptics.tap();
     final ImageSource? source = await showPhotoSourceModal(context);
     if (source == null || !mounted) return;
     await _pickAndReview(source);
@@ -227,11 +218,8 @@ class _NewReportScreenState extends State<NewReportScreen>
         }
 
         if (result == PhotoReviewResult.use) {
-          final bool wasEmpty = _controller.draft.photos.isEmpty;
+          AppHaptics.tap();
           await _controller.addPhoto(selectedFile);
-          if (wasEmpty) {
-            AppHaptics.success();
-          }
           _scheduleDraftSave();
           if (mounted && MediaQuery.supportsAnnounceOf(context)) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -265,9 +253,8 @@ class _NewReportScreenState extends State<NewReportScreen>
       titleController: _titleController,
       descriptionController: _descriptionController,
       bindings: NewReportSubmitBindings(
-        reportsListSession: ServiceLocator.instance.reportsListSession,
-        reportDraftRepository: ServiceLocator.instance.reportDraftRepository,
-        profileNeedsRefresh: ServiceLocator.instance.profileNeedsRefresh,
+        reportsListSession: ref.read(reportsListSessionProvider),
+        reportDraftRepository: ref.read(reportDraftRepositoryProvider),
       ),
       onCannotSubmit: () {
         AppSnack.show(
@@ -282,8 +269,9 @@ class _NewReportScreenState extends State<NewReportScreen>
 
   @override
   Widget build(BuildContext context) {
+    _controller = ref.watch(newReportControllerProvider(widget.initialPhoto));
     final ReportWizardSubmitPort submitPort =
-        ServiceLocator.instance.reportWizardSubmitPort;
+        ref.read(reportWizardSubmitPortProvider);
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (bool didPop, Object? result) async {
@@ -299,9 +287,7 @@ class _NewReportScreenState extends State<NewReportScreen>
         }
         Navigator.of(context).pop(result);
       },
-      child: ChangeNotifierProvider<NewReportController>.value(
-        value: _controller,
-        child: _isRestoringDraft
+      child: _isRestoringDraft
             ? Scaffold(
                 backgroundColor: AppColors.panelBackground,
                 body: SafeArea(
@@ -326,8 +312,8 @@ class _NewReportScreenState extends State<NewReportScreen>
                 onScheduleDraftSave: _scheduleDraftSave,
                 uploadPrepListenable: submitPort.uploadPrepProgress,
                 showDraftRestoredChip: _showDraftRestoredChip,
+                controller: _controller,
               ),
-      ),
     );
   }
 }

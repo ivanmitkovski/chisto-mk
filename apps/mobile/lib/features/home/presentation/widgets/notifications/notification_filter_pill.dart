@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:chisto_mobile/core/theme/app_radii.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
@@ -35,7 +36,7 @@ class NotificationFilterPill extends StatelessWidget {
             color: selected
                 ? AppColors.primaryDark.withValues(alpha: 0.1)
                 : AppColors.panelBackground,
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: AppRadii.circle,
             border: Border.all(
               color: selected
                   ? AppColors.primaryDark.withValues(alpha: 0.3)

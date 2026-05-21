@@ -2,6 +2,10 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AdminRealtimeModule } from '../admin-realtime/admin-realtime.module';
 import { AuditModule } from '../audit/audit.module';
+import { FeatureFlagsModule } from '../feature-flags/feature-flags.module';
+import { ModerationModule } from '../moderation/moderation.module';
+import { SiteHistoryModule } from './history/site-history.module';
+import { SiteLifecycleFromEventsService } from './site-lifecycle-from-events.service';
 import { ReportsUploadModule } from '../reports/reports-upload.module';
 import { FeedRankingService } from './feed-ranking.service';
 import { SiteBookmarkService } from './site-bookmark.service';
@@ -70,9 +74,18 @@ import { MapMvtTilesPostgisService } from './map/map-mvt-tiles-postgis.service';
 import { MapMvtTilesService } from './map/map-mvt-tiles.service';
 import { SitesMapSearchQueryService } from './sites-map-search-query.service';
 import { SitesSearchService } from './sites-search.service';
+import { SitesSavedListService } from './sites-saved-list.service';
 
 @Module({
-  imports: [ConfigModule, AuditModule, ReportsUploadModule, AdminRealtimeModule],
+  imports: [
+    ConfigModule,
+    AuditModule,
+    ReportsUploadModule,
+    AdminRealtimeModule,
+    FeatureFlagsModule,
+    ModerationModule,
+    SiteHistoryModule,
+  ],
   controllers: [
     SitesMapController,
     SitesController,
@@ -105,9 +118,11 @@ import { SitesSearchService } from './sites-search.service';
     SitesFeedEnrichmentService,
     SitesFeedQueryService,
     SitesFeedService,
+    SitesSavedListService,
     SitesDetailService,
     SitesMediaService,
     SitesAdminService,
+    SiteLifecycleFromEventsService,
     SitesMapAdminTimelineService,
     SitesSiteUpvotesListService,
     SitesEngagementSnapshotService,
@@ -144,6 +159,6 @@ import { SitesSearchService } from './sites-search.service';
     PersonalRetriever,
     MapRateLimitGuard,
   ],
-  exports: [FeedRankingService],
+  exports: [FeedRankingService, SiteHistoryModule, SiteLifecycleFromEventsService],
 })
 export class SitesModule {}

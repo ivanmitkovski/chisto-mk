@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AdminRealtimeModule } from '../admin-realtime/admin-realtime.module';
 import { EventScheduleConflictModule } from '../event-schedule-conflict/event-schedule-conflict.module';
@@ -53,6 +53,7 @@ import { EventsTelemetryService } from './events-telemetry.service';
 import { EventsCheckInThrottlerGuard } from './events-check-in-throttler.guard';
 import { EventEndSoonNotifierService } from './event-end-soon-notifier.service';
 import { EventImpactReceiptService } from './event-impact-receipt.service';
+import { SitesModule } from '../sites/sites.module';
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { EventImpactReceiptService } from './event-impact-receipt.service';
     NotificationsModule,
     EventChatModule,
     AdminRealtimeModule,
+    forwardRef(() => SitesModule),
   ],
   controllers: [
     EventsListController,

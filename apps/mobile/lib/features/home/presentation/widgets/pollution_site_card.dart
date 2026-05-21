@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chisto_mobile/core/theme/app_shadows.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -20,8 +21,7 @@ import 'package:chisto_mobile/features/home/domain/models/take_action_type.dart'
 import 'package:chisto_mobile/features/home/presentation/navigation/site_share_result.dart';
 import 'package:chisto_mobile/features/home/presentation/navigation/take_action_coordinator.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/take_action_sheet.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/site_card/feed_feedback_sheet.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/site_card/site_card_engagement_bar.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/site_card/site_card_image_carousel.dart';
@@ -143,14 +143,12 @@ class _PollutionSiteCardState extends ConsumerState<PollutionSiteCard>
 
   Future<void> _onUpvoteTap() async {
     if (!mounted) return;
-    AppHaptics.tap(context);
     final SiteEngagementOutcome outcome = await ref
         .read(siteEngagementNotifierProvider(site.id).notifier)
         .toggleUpvote();
     if (!mounted) return;
     if (outcome.isSuccess) {
       if (ref.read(siteEngagementNotifierProvider(site.id)).isUpvoted) {
-        AppHaptics.light(context);
       }
       trackPollutionFeedCardEvent(
         site.id,
@@ -166,12 +164,10 @@ class _PollutionSiteCardState extends ConsumerState<PollutionSiteCard>
       genericFailureMessage: context.l10n.siteCardUpvoteFailedSnack,
     );
     if (outcome.kind == SiteEngagementOutcomeKind.failure) {
-      AppHaptics.medium();
     }
   }
 
   Future<void> _toggleSave() async {
-    AppHaptics.light(context);
     setState(() => _saveIconScale = 0.9);
 
     Future<void>.delayed(AppMotion.xFast, () {
@@ -192,7 +188,6 @@ class _PollutionSiteCardState extends ConsumerState<PollutionSiteCard>
     }
     if (outcome.isSuccess) {
       final bool nowSaved = ref.read(siteEngagementNotifierProvider(site.id)).isSaved;
-      AppHaptics.success(context);
       AppSnack.show(
         context,
         message: nowSaved
@@ -292,18 +287,7 @@ class _PollutionSiteCardState extends ConsumerState<PollutionSiteCard>
           decoration: BoxDecoration(
             color: AppColors.panelBackground,
             borderRadius: BorderRadius.circular(_cardRadius),
-            boxShadow: <BoxShadow>[
-              BoxShadow(
-                color: AppColors.shadowLight,
-                blurRadius: AppSpacing.md,
-                offset: const Offset(0, 4),
-              ),
-              BoxShadow(
-                color: AppColors.shadowMedium,
-                blurRadius: AppSpacing.lg,
-                offset: const Offset(0, 8),
-              ),
-            ],
+            boxShadow: AppShadows.card(Theme.of(context).colorScheme),
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(_cardRadius),
@@ -387,7 +371,6 @@ class _PollutionSiteCardState extends ConsumerState<PollutionSiteCard>
   }
 
   Future<void> _openDetails(BuildContext context) async {
-    AppHaptics.softTransition();
     trackPollutionFeedCardEvent(
       site.id,
       eventType: PollutionFeedCardEventType.detailOpen,
@@ -406,17 +389,15 @@ class _PollutionSiteCardState extends ConsumerState<PollutionSiteCard>
     } else {
       await Navigator.of(context).push(
         MaterialPageRoute<void>(
-          builder: (_) => PollutionSiteDetailScreen(site: site),
+          builder: (_) => PollutionSiteDetailScreen(
+            site: site,
+            skipInitialRefresh: true,
+          ),
         ),
       );
     }
-    if (!mounted) return;
-    try {
-      final refreshed = await ref.read(sitesRepositoryProvider).getSiteById(site.id);
-      if (!mounted || refreshed == null) return;
-      ref.read(siteEngagementNotifierProvider(site.id).notifier).hydrate(refreshed);
-    } catch (_) {
-      // Detail rehydrate is best-effort; leaving current optimistic state is acceptable.
+    if (!context.mounted) {
+      return;
     }
   }
 
@@ -609,7 +590,6 @@ class _PollutionSiteCardState extends ConsumerState<PollutionSiteCard>
   }
 
   Future<void> _openFeedbackSheet() async {
-    AppHaptics.tap();
     final FeedCardFeedbackAction? action =
         await showModalBottomSheet<FeedCardFeedbackAction>(
       context: context,

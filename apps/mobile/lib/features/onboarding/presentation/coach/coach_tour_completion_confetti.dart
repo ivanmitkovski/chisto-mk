@@ -26,7 +26,6 @@ class _CoachTourCompletionConfettiLayerState
         return;
       }
       _launchConfettiIfAllowed();
-      AppHaptics.success(context);
     });
   }
 
@@ -38,6 +37,7 @@ class _CoachTourCompletionConfettiLayerState
     if (!CoachTourVisualPolicy.useCompletionConfetti(context)) {
       return;
     }
+    AppHaptics.success(context);
     Confetti.launch(
       context,
       options: ConfettiOptions(
@@ -63,7 +63,7 @@ class _CoachTourCompletionConfettiLayerState
   @override
   Widget build(BuildContext context) {
     return const AbsorbPointer(
-      child: ColoredBox(color: Colors.transparent, child: SizedBox.expand()),
+      child: ColoredBox(color: AppColors.transparent, child: SizedBox.expand()),
     );
   }
 }

@@ -2,31 +2,76 @@ import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_confirm_dialog.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/features/safety/presentation/ugc_report_sheet.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/app_confirm_dialog.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
 
 abstract final class ProfileActionsHandler {
-  static Future<void> handleHelp(BuildContext context) async {
-    AppHaptics.tap();
-    final String url = ServiceLocator.instance.config.helpCenterUrl;
+  static Future<void> openExternalUrl(
+    BuildContext context,
+    String url, {
+    required String failedSnackMessage,
+  }) async {
     final Uri uri = Uri.parse(url);
     final bool launched =
         await launchUrl(uri, mode: LaunchMode.externalApplication);
     if (!launched && context.mounted) {
       AppSnack.show(
         context,
-        message: context.l10n.profileHelpCenterOpenFailedSnack,
+        message: failedSnackMessage,
         type: AppSnackType.info,
       );
     }
   }
 
+  static Future<void> handlePrivacyPolicy(BuildContext context) async {
+    await openExternalUrl(
+      context,
+      AppBootstrap.instance.config.privacyUrl,
+      failedSnackMessage: context.l10n.profilePrivacyPolicyOpenFailedSnack,
+    );
+  }
+
+  static Future<void> handleTerms(BuildContext context) async {
+    await openExternalUrl(
+      context,
+      AppBootstrap.instance.config.termsUrl,
+      failedSnackMessage: context.l10n.profileTermsOpenFailedSnack,
+    );
+  }
+
+  static Future<void> handleSafetyReport(BuildContext context) async {
+    final String? userId =
+        AppBootstrap.instance.authRepository.currentUserId;
+    if (userId == null || userId.isEmpty) {
+      if (!context.mounted) return;
+      AppSnack.show(
+        context,
+        message: context.l10n.safetyReportFailed,
+        type: AppSnackType.error,
+      );
+      return;
+    }
+    await showUgcReportSheet(
+      context,
+      subjectType: 'safety_issue',
+      subjectId: userId,
+      title: context.l10n.profileSafetyReportIssueTile,
+    );
+  }
+
+  static Future<void> handleHelp(BuildContext context) async {
+    await openExternalUrl(
+      context,
+      AppBootstrap.instance.config.helpCenterUrl,
+      failedSnackMessage: context.l10n.profileHelpCenterOpenFailedSnack,
+    );
+  }
+
   static Future<void> handleLogout(BuildContext context) async {
-    AppHaptics.tap();
     final l10n = context.l10n;
     final bool? confirm = await AppConfirmDialog.show(
       context: context,
@@ -38,8 +83,7 @@ abstract final class ProfileActionsHandler {
     );
     if (confirm != true || !context.mounted) return;
     try {
-      await ServiceLocator.instance.authRepository.signOut();
-      AppHaptics.success();
+      await AppBootstrap.instance.authRepository.signOut();
       if (!context.mounted) return;
       Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
         AppRoutes.signIn,
@@ -63,7 +107,6 @@ abstract final class ProfileActionsHandler {
   }
 
   static Future<void> handleDeleteAccount(BuildContext context) async {
-    AppHaptics.tap();
     final l10n = context.l10n;
 
     final bool? warned = await AppConfirmDialog.show(
@@ -91,8 +134,7 @@ abstract final class ProfileActionsHandler {
     if (typedConfirm != true || !context.mounted) return;
 
     try {
-      await ServiceLocator.instance.authRepository.deleteAccount();
-      AppHaptics.success();
+      await AppBootstrap.instance.authRepository.deleteAccount();
       if (!context.mounted) return;
       Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
         AppRoutes.signIn,

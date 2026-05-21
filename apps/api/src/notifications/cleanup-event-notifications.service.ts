@@ -54,6 +54,7 @@ export class CleanupEventNotificationsService {
             kind: 'pending_review',
             eventId: params.eventId,
             siteId: params.siteId,
+            eventTitle: params.title,
           },
           threadKey: `staff_pending:${params.eventId}`,
           groupKey: `cleanup_event:${params.eventId}`,
@@ -79,7 +80,7 @@ export class CleanupEventNotificationsService {
         title,
         body,
         type: NotificationType.CLEANUP_EVENT,
-        data: { kind: 'pending_review', eventId: params.eventId },
+        data: { kind: 'pending_review', eventId: params.eventId, eventTitle: '' },
         threadKey: `organizer_pending_review:${params.eventId}:${Date.now()}`,
         groupKey: `cleanup_event:${params.eventId}`,
       })
@@ -112,6 +113,7 @@ export class CleanupEventNotificationsService {
             kind: 'published',
             eventId: params.eventId,
             siteId: params.siteId,
+            eventTitle: params.title,
           },
           threadKey: `published:${params.eventId}:${params.dedupeKey}`,
           groupKey: `cleanup_event:${params.eventId}`,
@@ -139,7 +141,7 @@ export class CleanupEventNotificationsService {
         title,
         body,
         type: NotificationType.CLEANUP_EVENT,
-        data: { kind: 'approved', eventId: params.eventId },
+        data: { kind: 'approved', eventId: params.eventId, eventTitle: params.title },
         threadKey: `organizer_approved:${params.eventId}`,
         groupKey: `cleanup_event:${params.eventId}`,
       })
@@ -163,7 +165,7 @@ export class CleanupEventNotificationsService {
         title,
         body,
         type: NotificationType.CLEANUP_EVENT,
-        data: { kind: 'declined', eventId: params.eventId },
+        data: { kind: 'declined', eventId: params.eventId, eventTitle: params.title },
         threadKey: `organizer_declined:${params.eventId}`,
         groupKey: `cleanup_event:${params.eventId}`,
       })

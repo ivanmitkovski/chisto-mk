@@ -49,6 +49,9 @@ class _FakeOutboxRepo implements ReportOutboxRepository {
   }
 
   @override
+  Future<void> close() async {}
+
+  @override
   Future<ReportOutboxEntry?> getById(String id) async => _rows[id];
 
   @override
@@ -528,6 +531,34 @@ void main() {
       expect(ev.outboxId, kReportWizardDraftRowId);
       expect(uploadBatchSizes, isNotEmpty);
       await c.dispose();
+    });
+
+    test('new coordinator resumes pending row after dispose', () async {
+      final _FakeOutboxRepo repo = _FakeOutboxRepo();
+      final _StubApi api = _StubApi();
+      final ReportOutboxCoordinator first = ReportOutboxCoordinator(
+        repository: repo,
+        reportsApi: api,
+      );
+      await first.start();
+      await first.enqueueSubmit(
+        draft: _validDraft(),
+        title: 'Title',
+        description: 'Desc',
+      );
+      await first.dispose();
+
+      final ReportOutboxCoordinator second = ReportOutboxCoordinator(
+        repository: repo,
+        reportsApi: api,
+      );
+      final Future<ReportOutboxSuccess> done = second.successStream.first;
+      await second.start();
+      final ReportOutboxSuccess ev =
+          await done.timeout(const Duration(seconds: 15));
+      expect(ev.outboxId, kReportWizardDraftRowId);
+      expect(api.recordedIdempotencyKeys, isNotEmpty);
+      await second.dispose();
     });
   });
 }

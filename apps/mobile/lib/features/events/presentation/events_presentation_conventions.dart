@@ -101,8 +101,8 @@
 // -----------------------------------------------------------------------------
 // 2c) Offline work coordinator (upgrade #2 — foreground reliability)
 // -----------------------------------------------------------------------------
-// - [EventOfflineWorkCoordinator] is a singleton started from ServiceLocator.initialize and
-//   disposed on ServiceLocator.reset. It owns a debounced (~550ms), serialized drain after
+// - [EventOfflineWorkCoordinator] is a singleton started from AppBootstrap.initialize and
+//   disposed on AppBootstrap.reset. It owns a debounced (~550ms), serialized drain after
 //   [ConnectivityGate.watch] reports online and on app resume ([WidgetsBindingObserver] bridge).
 // - Drain order (deterministic, single flight): check-in redeem queue → field batch
 //   ([FieldModeSyncService] / POST /events/field-batch) → chat text outbox ([ChatOutboxSync],

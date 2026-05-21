@@ -103,7 +103,7 @@ class _ShimmerDisc extends StatelessWidget {
         width: 36,
         height: 36,
         decoration: const BoxDecoration(
-          color: Color(0xFFE8E8E8),
+          color: AppColors.detailSurfaceGrouped,
           shape: BoxShape.circle,
         ),
       ),

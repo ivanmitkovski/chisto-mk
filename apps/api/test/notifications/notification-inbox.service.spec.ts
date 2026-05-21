@@ -8,6 +8,9 @@ function makePrisma() {
       count: jest.fn(),
       groupBy: jest.fn(),
     },
+    user: {
+      findMany: jest.fn(),
+    },
     notificationOutbox: {
       findMany: jest.fn(),
       count: jest.fn(),
@@ -16,6 +19,12 @@ function makePrisma() {
       findUnique: jest.fn(),
     },
     $transaction: jest.fn(async (ops: Promise<unknown>[]) => Promise.all(ops)),
+  };
+}
+
+function makeReportsUpload() {
+  return {
+    signPrivateObjectKey: jest.fn().mockResolvedValue('https://cdn.test/avatar.jpg'),
   };
 }
 
@@ -40,7 +49,13 @@ describe('NotificationInboxService', () => {
       .mockResolvedValueOnce(1)
       .mockResolvedValueOnce(1);
 
-    const service = new NotificationInboxService(prisma, makeFlags(true) as any);
+    prisma.user.findMany.mockResolvedValue([]);
+
+    const service = new NotificationInboxService(
+      prisma,
+      makeFlags(true) as any,
+      makeReportsUpload() as any,
+    );
     const result = await service.listForUser(
       { userId: 'u1' } as any,
       { page: 1, limit: 20 } as any,
@@ -59,7 +74,11 @@ describe('NotificationInboxService', () => {
     const prisma = makePrisma() as any;
     prisma.userNotification.count.mockResolvedValue(3);
 
-    const service = new NotificationInboxService(prisma, makeFlags(true) as any);
+    const service = new NotificationInboxService(
+      prisma,
+      makeFlags(true) as any,
+      makeReportsUpload() as any,
+    );
     const result = await service.getUnreadCount({ userId: 'u1' } as any);
 
     expect(result.unreadCount).toBe(3);
@@ -70,7 +89,11 @@ describe('NotificationInboxService', () => {
 
   it('returns empty when inbox feature is disabled', async () => {
     const prisma = makePrisma() as any;
-    const service = new NotificationInboxService(prisma, makeFlags(false) as any);
+    const service = new NotificationInboxService(
+      prisma,
+      makeFlags(false) as any,
+      makeReportsUpload() as any,
+    );
 
     const result = await service.listForUser(
       { userId: 'u1' } as any,
@@ -87,7 +110,11 @@ describe('NotificationInboxService', () => {
       { type: 'COMMENT', isRead: false, _count: 1 },
     ]);
 
-    const service = new NotificationInboxService(prisma, makeFlags(true) as any);
+    const service = new NotificationInboxService(
+      prisma,
+      makeFlags(true) as any,
+      makeReportsUpload() as any,
+    );
     const result = await service.getSummary({ userId: 'u1' } as any);
 
     const upvote = result.data.find((d: any) => d.type === 'UPVOTE');
@@ -97,5 +124,105 @@ describe('NotificationInboxService', () => {
     const comment = result.data.find((d: any) => d.type === 'COMMENT');
     expect(comment?.total).toBe(1);
     expect(comment?.unread).toBe(1);
+  });
+
+  it('listForUser attaches actor when data.actorUserId is set', async () => {
+    const prisma = makePrisma() as any;
+    const now = new Date();
+    prisma.userNotification.findMany.mockResolvedValue([
+      {
+        id: 'n1',
+        title: 'Upvote',
+        body: 'Body',
+        type: 'UPVOTE',
+        isRead: false,
+        data: { siteId: 's1', actorUserId: 'actor-1' },
+        createdAt: now,
+        sentAt: null,
+        threadKey: null,
+        groupKey: 'UPVOTE:site:s1',
+        archivedAt: null,
+      },
+    ]);
+    prisma.userNotification.count
+      .mockResolvedValueOnce(1)
+      .mockResolvedValueOnce(1);
+    prisma.user.findMany.mockResolvedValue([
+      {
+        id: 'actor-1',
+        firstName: 'Ana',
+        lastName: 'K',
+        avatarObjectKey: 'avatars/a1.jpg',
+      },
+    ]);
+
+    const upload = makeReportsUpload();
+    const service = new NotificationInboxService(
+      prisma,
+      makeFlags(true) as any,
+      upload as any,
+    );
+    const result = await service.listForUser(
+      { userId: 'u1' } as any,
+      { page: 1, limit: 20 } as any,
+    );
+
+    expect(result.data[0].actor).toEqual({
+      id: 'actor-1',
+      displayName: 'Ana K',
+      avatarUrl: 'https://cdn.test/avatar.jpg',
+    });
+    expect(upload.signPrivateObjectKey).toHaveBeenCalledWith('avatars/a1.jpg');
+  });
+
+  it('listGrouped collapses EVENT_CHAT rows with the same groupKey', async () => {
+    const prisma = makePrisma() as any;
+    const t1 = new Date('2026-05-20T12:00:00Z');
+    const t2 = new Date('2026-05-20T12:01:00Z');
+    prisma.userNotification.findMany.mockResolvedValue([
+      {
+        id: 'c1',
+        title: 'Clean it',
+        body: 'Ana: hi',
+        type: 'EVENT_CHAT',
+        isRead: false,
+        data: { eventId: 'evt-1', messageCount: 2 },
+        createdAt: t1,
+        sentAt: null,
+        threadKey: 'event-chat:evt-1:msg-2',
+        groupKey: 'event-chat:evt-1',
+        archivedAt: null,
+      },
+      {
+        id: 'c2',
+        title: 'Clean it',
+        body: 'Ana: earlier',
+        type: 'EVENT_CHAT',
+        isRead: false,
+        data: { eventId: 'evt-1', messageCount: 1 },
+        createdAt: t2,
+        sentAt: null,
+        threadKey: 'event-chat:evt-1:msg-1',
+        groupKey: 'event-chat:evt-1',
+        archivedAt: null,
+      },
+    ]);
+    prisma.userNotification.count
+      .mockResolvedValueOnce(2)
+      .mockResolvedValueOnce(2);
+    prisma.user.findMany.mockResolvedValue([]);
+
+    const service = new NotificationInboxService(
+      prisma,
+      makeFlags(true) as any,
+      makeReportsUpload() as any,
+    );
+    const result = await service.listGrouped(
+      { userId: 'u1' } as any,
+      { page: 1, limit: 20 } as any,
+    );
+
+    expect(result.data).toHaveLength(1);
+    expect(result.data[0].groupCount).toBe(2);
   });
 });

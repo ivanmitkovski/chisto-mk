@@ -8,7 +8,6 @@ import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/detail_section_header.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 class DescriptionSection extends StatefulWidget {
   const DescriptionSection({super.key, required this.event});
@@ -97,9 +96,8 @@ class _DescriptionSectionState extends State<DescriptionSection> {
                 if (_needsExpansion)
                   CupertinoButton(
                     padding: const EdgeInsets.only(top: AppSpacing.xs),
-                    minimumSize: Size.zero,
+                    minimumSize: const Size(44, 44),
                     onPressed: () {
-                      AppHaptics.light();
                       setState(() => _expanded = !_expanded);
                     },
                     child: Text(

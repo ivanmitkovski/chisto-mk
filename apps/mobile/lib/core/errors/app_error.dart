@@ -59,9 +59,13 @@ class AppError implements Exception {
         retryable: false,
       );
 
-  factory AppError.notFound({String? message, DateTime? serverTimestamp}) =>
+  factory AppError.notFound({
+    String? message,
+    String? code,
+    DateTime? serverTimestamp,
+  }) =>
       AppError(
-        code: 'NOT_FOUND',
+        code: code ?? 'NOT_FOUND',
         message: message ?? 'The requested resource was not found.',
         retryable: false,
         serverTimestamp: serverTimestamp,
