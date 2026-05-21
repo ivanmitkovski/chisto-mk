@@ -10,7 +10,6 @@ import 'package:chisto_mobile/features/events/presentation/event_ui_mappers.dart
 import 'package:chisto_mobile/features/events/presentation/utils/events_localized_strings.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_grouped_metadata_row.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 class CategorySection extends StatelessWidget {
   const CategorySection({
@@ -26,7 +25,6 @@ class CategorySection extends StatelessWidget {
 
   /// Same sheet as tapping the category row on the event detail screen.
   static void showCategoryInfoSheet(BuildContext context, EcoEvent event) {
-    AppHaptics.tap();
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: AppColors.transparent,

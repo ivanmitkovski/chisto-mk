@@ -1,11 +1,14 @@
 import 'dart:async';
 
+import 'package:chisto_mobile/core/theme/app_radii.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/home/presentation/utils/comment_input_validator.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/comments/comments_motion.dart';
 import 'package:flutter/material.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_loading_indicator.dart';
 
 /// Sticky composer for site comments (reply / edit banners + field + send).
 class CommentsInputBar extends StatelessWidget {
@@ -191,9 +194,8 @@ class CommentsInputBar extends StatelessWidget {
                         : (replyToCommentId == null
                               ? context.l10n.commentsInputHintAdd
                               : context.l10n.commentsInputHintReply),
-                    hintStyle: const TextStyle(
+                    hintStyle: AppTypography.cardSubtitle.copyWith(
                       color: AppColors.textMuted,
-                      fontSize: 14,
                     ),
                     border: InputBorder.none,
                     filled: true,
@@ -231,7 +233,7 @@ class CommentsInputBar extends StatelessWidget {
                 child: Material(
                   color: AppColors.transparent,
                   child: InkWell(
-                    borderRadius: BorderRadius.circular(999),
+                    borderRadius: AppRadii.circle,
                     onTap: (canPost && !isCommitting)
                         ? () => unawaited(onCommit())
                         : null,
@@ -247,8 +249,8 @@ class CommentsInputBar extends StatelessWidget {
                       child: isCommitting
                           ? Padding(
                               padding: const EdgeInsets.all(8),
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
+                              child: AppLoadingIndicator(
+                                size: AppLoadingIndicatorSize.sm,
                                 color: AppColors.textOnDark,
                               ),
                             )

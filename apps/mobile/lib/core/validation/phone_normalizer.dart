@@ -1,14 +1,31 @@
-/// Normalizes a Macedonian local phone number to E.164 format.
+/// Normalizes a Macedonian phone number to E.164 format (`+389XXXXXXXX`).
 ///
-/// Input examples: "70 123 456", "070123456", "+389 70 123 456"
-/// Output: "+38970123456"
+/// Accepts every common citizen input variant:
+///   "70 123 456"        → "+38970123456"
+///   "070 123 456"       → "+38970123456"
+///   "+389 70 123 456"   → "+38970123456"
+///   "00389 70 123 456"  → "+38970123456"
+///   "389 70 123 456"    → "+38970123456"
+///   "+3890701234"       → "+389701234"   (collapses redundant leading "0")
+///
+/// Returns the cleaned string even when it could not be parsed as MK so the
+/// caller can still surface a validation error against the raw value.
 String normalizeToE164(String raw) {
   final String digits = raw.replaceAll(RegExp(r'[^\d+]'), '');
+  if (digits.isEmpty) return '';
 
-  if (digits.startsWith('+389')) {
-    return '+389${digits.substring(4)}';
+  String local = digits;
+  if (local.startsWith('+389')) {
+    local = local.substring(4);
+  } else if (local.startsWith('00389')) {
+    local = local.substring(5);
+  } else if (local.startsWith('389')) {
+    local = local.substring(3);
   }
-
-  final String localDigits = digits.startsWith('0') ? digits.substring(1) : digits;
-  return '+389$localDigits';
+  // Collapse a single leading "0" left over from a local-trunk prefix.
+  while (local.startsWith('0')) {
+    local = local.substring(1);
+  }
+  if (local.isEmpty) return '';
+  return '+389$local';
 }

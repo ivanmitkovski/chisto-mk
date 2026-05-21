@@ -1,6 +1,8 @@
 import 'dart:async';
 
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
+import 'package:chisto_mobile/features/home/presentation/utils/comment_thread_navigation.dart';
+import 'package:chisto_mobile/shared/widgets/molecules/notification_row_highlight.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:flutter/material.dart';
@@ -15,9 +17,12 @@ import 'package:chisto_mobile/features/home/presentation/widgets/comments/commen
 import 'package:chisto_mobile/features/home/presentation/widgets/comments/comments_motion.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/comments/comments_sheet_comment_list.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/comments/comments_thread_flatten.dart';
+import 'package:chisto_mobile/features/safety/data/ugc_moderation_repository.dart';
+import 'package:chisto_mobile/features/safety/presentation/block_user_flow.dart';
+import 'package:chisto_mobile/features/safety/presentation/ugc_report_sheet.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_loading_indicator.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
 
 /// Instagram-style comments bottom sheet: header + scrollable list + sticky input bar.
 ///
@@ -37,9 +42,15 @@ class CommentsBottomSheet extends StatefulWidget {
     this.onCommentEdited,
     this.onCommentDeleted,
     this.onCommentLikeToggled,
+    this.highlightCommentId,
+    this.highlightActorUserId,
+    this.ugcModerationRepository,
   });
 
   final List<Comment> comments;
+  final String? highlightCommentId;
+  final String? highlightActorUserId;
+  final UgcModerationRepository? ugcModerationRepository;
   final String? siteId;
   final String? siteTitle;
   final ScrollController? scrollController;
@@ -79,6 +90,10 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
   String? _loadingMoreDirectRepliesForParentId;
   final Map<String, _CommentActionState> _commentActionStates =
       <String, _CommentActionState>{};
+  final Map<String, GlobalKey> _rowKeys = <String, GlobalKey>{};
+  String? _activeHighlightCommentId;
+  Timer? _highlightTimer;
+  bool _highlightScheduled = false;
   bool _isCommittingNewComment = false;
 
   /// API sort for threaded loads (UI sort toggle removed; server default is top-ranked).
@@ -109,10 +124,52 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
     _comments = List<Comment>.from(widget.comments);
     _commentController = TextEditingController();
     _commentFocusNode = FocusNode();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _scheduleCommentHighlight());
+  }
+
+  GlobalKey _rowKeyFor(String commentId) =>
+      _rowKeys.putIfAbsent(commentId, GlobalKey.new);
+
+  void _scheduleCommentHighlight() {
+    if (_highlightScheduled) return;
+    final String? targetId = resolveHighlightCommentId(
+      comments: _comments,
+      commentId: widget.highlightCommentId,
+      actorUserId: widget.highlightActorUserId,
+    );
+    if (targetId == null || targetId.isEmpty) return;
+    _highlightScheduled = true;
+    final List<String> ancestors = findCommentAncestorIds(_comments, targetId);
+    void runScrollAndHighlight() {
+      scheduleNotificationRowHighlight(
+        targetId: targetId,
+        rowKey: _rowKeyFor(targetId),
+        onHighlight: () {
+          if (!mounted) return;
+          setState(() => _activeHighlightCommentId = targetId);
+          _highlightTimer?.cancel();
+          _highlightTimer = Timer(NotificationRowHighlight.highlightDuration, () {
+            if (mounted) {
+              setState(() => _activeHighlightCommentId = null);
+            }
+          });
+        },
+      );
+    }
+
+    if (ancestors.isNotEmpty) {
+      setState(() => _expandedReplyIds.addAll(ancestors));
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) runScrollAndHighlight();
+      });
+    } else {
+      runScrollAndHighlight();
+    }
   }
 
   @override
   void dispose() {
+    _highlightTimer?.cancel();
     _commentController.dispose();
     _commentFocusNode.dispose();
     if (_ownsScrollController) {
@@ -172,7 +229,6 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
         return;
       }
       final List<Comment> before = cloneCommentForest(_comments);
-      AppHaptics.tap(context);
       setState(() {
         _commentActionStates[editingCommentId] = _CommentActionState.editing;
         updateCommentNode(
@@ -225,10 +281,9 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
     final String? parentId = _replyToCommentId;
     final String localId = 'local-${DateTime.now().microsecondsSinceEpoch}';
 
-    AppHaptics.light(context);
     final DateTime optimisticAt = DateTime.now();
     final String optimisticAuthor = () {
-      final String? n = ServiceLocator.instance.authStateOrNull?.displayName
+      final String? n = AppBootstrap.instance.authStateOrNull?.displayName
           ?.trim();
       if (n != null && n.isNotEmpty) {
         return n;
@@ -270,6 +325,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
         );
         if (!mounted || created == null) return;
         setState(() {
+          _rowKeys.remove(localId);
           updateCommentNode(_comments, localId, (_) => created);
         });
         widget.onCommentsChanged?.call(List<Comment>.unmodifiable(_comments));
@@ -314,8 +370,93 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
     });
   }
 
+  Future<void> _openCommentReport(Comment comment) async {
+    if (_isCommentBusy(comment.id)) return;
+    await showUgcReportSheet(
+      context,
+      subjectType: 'site_comment',
+      subjectId: comment.id,
+      repository: widget.ugcModerationRepository,
+    );
+  }
+
+  Future<void> _blockCommentAuthor(Comment comment) async {
+    final String? authorId = comment.authorId?.trim();
+    if (authorId == null || authorId.isEmpty) {
+      return;
+    }
+    final bool blocked = await confirmAndBlockUser(
+      context,
+      blockedUserId: authorId,
+      displayName: comment.authorName,
+      repository: widget.ugcModerationRepository,
+    );
+    if (!blocked || !mounted) {
+      return;
+    }
+    setState(() {
+      removeCommentsByAuthorId(_comments, authorId);
+    });
+    widget.onCommentsCountChanged?.call(_totalCommentCount);
+    widget.onCommentsChanged?.call(List<Comment>.unmodifiable(_comments));
+  }
+
+  Future<void> _openPeerCommentActions(Comment comment) async {
+    final String? action = await showModalBottomSheet<String>(
+      context: context,
+      useRootNavigator: true,
+      isScrollControlled: true,
+      backgroundColor: AppColors.transparent,
+      builder: (BuildContext context) {
+        return ReportSheetScaffold(
+          fitToContent: true,
+          addBottomInset: false,
+          title: context.l10n.commentsSheetTitle,
+          subtitle: context.l10n.commentsSheetSubtitle,
+          trailing: ReportCircleIconButton(
+            icon: Icons.close_rounded,
+            semanticLabel: context.l10n.semanticClose,
+            onTap: () => Navigator.of(context).pop(),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              ReportActionTile(
+                icon: Icons.flag_outlined,
+                title: context.l10n.safetyReportTitle,
+                subtitle: context.l10n.safetyReportDetailsHint,
+                onTap: () => Navigator.of(context).pop('report'),
+                tone: ReportSurfaceTone.neutral,
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              ReportActionTile(
+                icon: Icons.block_flipped,
+                title: context.l10n.safetyBlockUserTitle,
+                subtitle: context.l10n.profileBlockedUsersSubtitle,
+                onTap: () => Navigator.of(context).pop('block'),
+                tone: ReportSurfaceTone.danger,
+              ),
+            ],
+          ),
+        );
+      },
+    );
+    if (!mounted || action == null) return;
+    if (action == 'report') {
+      await _openCommentReport(comment);
+      return;
+    }
+    if (action == 'block') {
+      await _blockCommentAuthor(comment);
+    }
+  }
+
   Future<void> _openCommentActions(Comment comment) async {
     if (_isCommentBusy(comment.id)) return;
+    if (!comment.isOwnedByMe) {
+      await _openPeerCommentActions(comment);
+      return;
+    }
     final String? action = await showModalBottomSheet<String>(
       context: context,
       useRootNavigator: true,
@@ -378,13 +519,11 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
       );
     });
     FocusScope.of(context).requestFocus(_commentFocusNode);
-    AppHaptics.tap(context);
   }
 
   Future<void> _deleteComment(Comment comment) async {
     if (_isCommentBusy(comment.id)) return;
     if (!mounted) return;
-    AppHaptics.medium(context);
     final List<Comment> before = cloneCommentForest(_comments);
     setState(() {
       _commentActionStates[comment.id] = _CommentActionState.deleting;
@@ -396,7 +535,6 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
     try {
       await widget.onCommentDeleted?.call(comment.id);
       if (!mounted) return;
-      AppHaptics.light(context);
       AppSnack.show(
         context,
         message: context.l10n.commentsDeletedSnack,
@@ -450,7 +588,6 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
     final int previousLikeCount = current.likeCount ?? 0;
     final bool previousLiked = current.isLikedByMe ?? false;
 
-    AppHaptics.tap(context);
     setState(() {
       _commentActionStates[commentId] = _CommentActionState.liking;
       updateCommentNode(_comments, commentId, (Comment node) {
@@ -514,7 +651,10 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
               comments: _comments,
               expandedReplyIds: _expandedReplyIds,
               scrollController: _listController,
-              expandedKeyToken: '${_expandedReplyIds.length}',
+              expandedKeyToken:
+                  '${_expandedReplyIds.length}-$_activeHighlightCommentId',
+              highlightedCommentId: _activeHighlightCommentId,
+              rowKeyFor: _rowKeyFor,
               isCommentBusy: _isCommentBusy,
               isCommentLiking: _isCommentLiking,
               isCommentEditing: _isCommentEditing,
@@ -552,7 +692,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
             ),
           ),
           if (widget.isLoadingMoreComments)
-            const LinearProgressIndicator(minHeight: 2),
+            const AppLinearProgress(),
           CommentsInputBar(
             commentController: _commentController,
             commentFocusNode: _commentFocusNode,

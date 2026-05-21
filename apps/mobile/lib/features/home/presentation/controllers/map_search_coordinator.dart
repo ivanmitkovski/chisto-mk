@@ -7,8 +7,7 @@ import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/domain/repositories/sites_repository.dart';
 import 'package:chisto_mobile/features/home/presentation/providers/map_selection_notifier.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
 
 class MapSearchCoordinator {
   const MapSearchCoordinator();
@@ -55,7 +54,6 @@ class MapSearchCoordinator {
       return;
     }
     ref.read(mapSelectionNotifierProvider.notifier).select(chosen);
-    AppHaptics.pinSelect(context);
     await mapController.animateTo(dest: point, zoom: 14.5);
   }
 }

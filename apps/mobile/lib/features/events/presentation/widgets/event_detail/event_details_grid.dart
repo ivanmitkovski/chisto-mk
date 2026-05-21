@@ -12,7 +12,6 @@ import 'package:chisto_mobile/features/events/presentation/utils/events_localize
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_grouped_metadata_row.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_grouped_panel.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 class EventDetailsGrid extends StatelessWidget {
   const EventDetailsGrid({
@@ -64,7 +63,6 @@ class EventDetailsGrid extends StatelessWidget {
     required String description,
     required Color color,
   }) {
-    AppHaptics.tap();
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: AppColors.transparent,

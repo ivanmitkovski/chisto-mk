@@ -1,23 +1,15 @@
-import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/features/events/presentation/screens/event_impact_receipt_screen.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_back_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../shared/widget_test_bootstrap.dart';
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
-
-  setUp(() async {
-    SharedPreferences.setMockInitialValues(<String, Object>{});
-    ServiceLocator.instance.reset();
-    await ServiceLocator.instance.initialize();
-  });
-
-  tearDown(() {
-    ServiceLocator.instance.reset();
+  setUpAll(() async {
+    await bootstrapWidgetTests();
   });
 
   testWidgets('uses neutral AppBar and AppBackButton while loading', (

@@ -3,14 +3,11 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:chisto_mobile/core/auth/auth_state.dart';
 import 'package:chisto_mobile/core/logging/app_log.dart';
+import 'package:chisto_mobile/features/auth/domain/refresh_outcome.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_connection_status.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_message.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_stream_event.dart';
 import 'package:socket_io_client/socket_io_client.dart' as sio;
-
-/// When true (`--dart-define=CHAT_WS_ONLY=true`), use websocket-only (stricter; test after /socket.io reaches the API).
-const bool kChatSocketWsOnly =
-    bool.fromEnvironment('CHAT_WS_ONLY', defaultValue: false);
 
 @visibleForTesting
 bool chatSocketNeedsReconnectForNewToken({
@@ -24,25 +21,29 @@ bool chatSocketNeedsReconnectForNewToken({
       newAccessToken != tokenAtHandshake;
 }
 
-/// Manages a Socket.IO connection to the chat namespace.
-///
-/// Produces [EventChatStreamEvent] objects through a broadcast stream,
-/// matching the same interface used by the SSE transport so that the
-/// repository layer can swap transports transparently.
+/// Manages a Socket.IO connection to the `/chat` namespace (sole realtime transport).
 class SocketEventChatStream {
   SocketEventChatStream({
     required String baseUrl,
     required AuthState authState,
+    Future<RefreshOutcome> Function()? sessionRefresh,
+    void Function()? onAuthRejected,
   })  : _baseUrl = baseUrl.replaceFirst(RegExp(r'/$'), ''),
-        _authState = authState;
+        _authState = authState,
+        _sessionRefresh = sessionRefresh,
+        _onAuthRejected = onAuthRejected;
 
   final String _baseUrl;
   final AuthState _authState;
+  final Future<RefreshOutcome> Function()? _sessionRefresh;
+  final void Function()? _onAuthRejected;
 
   sio.Socket? _socket;
   String? _currentEventId;
   bool _authListenerAttached = false;
+  bool _refreshInFlight = false;
   String? _tokenAtHandshake;
+  String? _lastStreamEventId;
   final StreamController<EventChatStreamEvent> _controller =
       StreamController<EventChatStreamEvent>.broadcast();
 
@@ -54,11 +55,19 @@ class SocketEventChatStream {
 
   void connect(String eventId) {
     _currentEventId = eventId;
+    final sio.Socket? existing = _socket;
+    if (existing != null && existing.connected) {
+      scheduleMicrotask(_emitJoin);
+      _replayCurrentStatus();
+      return;
+    }
     _disconnectSocketOnly();
     _ensureAuthListener();
 
     final String? token = _authState.accessToken;
     if (token == null || token.isEmpty) return;
+
+    _emitStatus(EventChatConnectionStatus.reconnecting);
 
     // Socket.IO expects an http(s) origin; the client opens ws/wss internally.
     final String origin = '$_baseUrl/chat';
@@ -67,12 +76,8 @@ class SocketEventChatStream {
     _socket = sio.io(
       origin,
       sio.OptionBuilder()
-          // Polling first works more reliably behind ALB/proxies; then upgrades.
-          .setTransports(
-            kChatSocketWsOnly
-                ? <String>['websocket']
-                : <String>['polling', 'websocket'],
-          )
+          // Polling handshake first, then upgrades to WebSocket (reliable behind ALB/proxies).
+          .setTransports(<String>['polling', 'websocket'])
           // Fresh token on every connect/reconnect (access JWT is short-lived; static
           // setAuth would keep the expired token after proactive refresh).
           .setAuthFn((void Function(Map<dynamic, dynamic> data) submit) {
@@ -93,28 +98,15 @@ class SocketEventChatStream {
 
     _socket!
       ..onConnect((_) {
-        AppLog.verbose(
-          '[chat:ws] connect host=$debugHost event=$eventId wsOnly=$kChatSocketWsOnly',
-        );
+        AppLog.verbose('[chat:ws] connect host=$debugHost event=$eventId');
         _tokenAtHandshake = _authState.accessToken;
         _emitStatus(EventChatConnectionStatus.connected);
-        // Let the namespace handshake finish before joining rooms (pairs with server await join).
-        scheduleMicrotask(() {
-          final sio.Socket? s = _socket;
-          if (s != null) {
-            s.emit('join', <String, String>{'eventId': eventId});
-          }
-        });
+        scheduleMicrotask(_emitJoin);
       })
       ..onReconnect((_) {
         _tokenAtHandshake = _authState.accessToken;
         _emitStatus(EventChatConnectionStatus.connected);
-        scheduleMicrotask(() {
-          final sio.Socket? s = _socket;
-          if (s != null) {
-            s.emit('join', <String, String>{'eventId': eventId});
-          }
-        });
+        scheduleMicrotask(_emitJoin);
       })
       ..onReconnectAttempt((_) {
         AppLog.verbose('[chat:ws] reconnectAttempt host=$debugHost event=$eventId');
@@ -143,122 +135,66 @@ class SocketEventChatStream {
       })
       ..on('error', (dynamic data) {
         if (data is Map && data['code'] == 'AUTH_FAILED') {
-          _disconnectSocketOnly();
-          _emitStatus(EventChatConnectionStatus.disconnected);
+          unawaited(_onAuthFailed(eventId));
         }
       })
-      ..on('message:created', (dynamic data) {
-        final dynamic raw = _unwrapSocketArgs(data);
-        if (!_payloadRoomMatches(raw)) {
-          return;
-        }
-        final EventChatMessage? m = _parseMessage(raw);
-        if (m != null) {
-          if (_messageRoomMatches(m)) {
-            _addEvent(EventChatStreamMessageCreated(
-              m.withViewer(_authState.userId),
-            ));
+      ..on('sync', (dynamic data) {
+        final Map<String, dynamic>? map = _asStringKeyedMap(_unwrapSocketArgs(data));
+        if (map == null) return;
+        final Object? events = map['events'];
+        if (events is! List) return;
+        for (final Object? item in events) {
+          if (item is Map) {
+            _dispatchBusPayload(
+              eventId,
+              Map<String, dynamic>.from(item),
+            );
           }
-        } else {
-          AppLog.verbose(
-            '[chat:ws] message:created parse failed event=$eventId keys=${_debugPayloadKeys(raw)}',
-          );
         }
       })
-      ..on('message:deleted', (dynamic data) {
-        final dynamic raw = _unwrapSocketArgs(data);
-        if (!_payloadRoomMatches(raw)) {
-          return;
-        }
-        final String? mid = _str(raw, 'messageId');
-        if (mid != null) _addEvent(EventChatStreamMessageDeleted(mid));
-      })
-      ..on('message:edited', (dynamic data) {
-        final dynamic raw = _unwrapSocketArgs(data);
-        if (!_payloadRoomMatches(raw)) {
-          return;
-        }
-        final EventChatMessage? m = _parseMessage(raw);
-        if (m != null && _messageRoomMatches(m)) {
-          _addEvent(EventChatStreamMessageEdited(
-            m.withViewer(_authState.userId),
-          ));
-        }
-      })
-      ..on('message:pinned', (dynamic data) {
-        final dynamic raw = _unwrapSocketArgs(data);
-        if (!_payloadRoomMatches(raw)) {
-          return;
-        }
-        final EventChatMessage? m = _parseMessage(raw);
-        if (m != null && _messageRoomMatches(m)) {
-          _addEvent(EventChatStreamMessagePinned(
-            m.withViewer(_authState.userId),
-          ));
-        }
-      })
-      ..on('message:unpinned', (dynamic data) {
-        final dynamic raw = _unwrapSocketArgs(data);
-        if (!_payloadRoomMatches(raw)) {
-          return;
-        }
-        final EventChatMessage? m = _parseMessage(raw);
-        if (m != null && _messageRoomMatches(m)) {
-          _addEvent(EventChatStreamMessageUnpinned(
-            m.withViewer(_authState.userId),
-          ));
-        }
-      })
-      ..on('typing:update', (dynamic data) {
-        final Map<String, dynamic>? map = _asStringKeyedMap(_unwrapSocketArgs(data));
-        if (map == null) return;
-        final Object? pe = map['eventId'];
-        if (pe is String &&
-            pe.isNotEmpty &&
-            (_currentEventId == null || pe != _currentEventId)) {
-          AppLog.verbose('[chat:ws] drop typing eventId mismatch');
-          return;
-        }
-        final String? uid = map['userId'] as String?;
-        final String? dn = map['displayName'] as String?;
-        final bool? ty = map['typing'] as bool?;
-        if (uid != null && ty != null) {
-          final String name = (dn != null && dn.trim().isNotEmpty) ? dn.trim() : '';
-          _addEvent(EventChatStreamTypingUpdated(
-            eventId: eventId,
-            userId: uid,
-            displayName: name,
-            typing: ty,
-          ));
-        }
-      })
-      ..on('read_cursor:updated', (dynamic data) {
-        final Map<String, dynamic>? map = _asStringKeyedMap(_unwrapSocketArgs(data));
-        if (map == null) return;
-        final Object? pe = map['eventId'];
-        if (pe is String &&
-            pe.isNotEmpty &&
-            (_currentEventId == null || pe != _currentEventId)) {
-          AppLog.verbose('[chat:ws] drop read_cursor eventId mismatch');
-          return;
-        }
-        final String? uid = map['userId'] as String?;
-        final String? dn = map['displayName'] as String?;
-        if (uid != null && dn != null) {
-          DateTime? at;
-          final String? lca = map['lastReadMessageCreatedAt'] as String?;
-          if (lca != null && lca.isNotEmpty) at = DateTime.tryParse(lca);
-          _addEvent(EventChatStreamReadCursorUpdated(
-            eventId: eventId,
-            userId: uid,
-            displayName: dn,
-            lastReadMessageId: map['lastReadMessageId'] as String?,
-            lastReadMessageCreatedAt: at,
-          ));
-        }
-      });
+      ..on('message:created', (dynamic data) => _onSocketPayload(eventId, data))
+      ..on('message:deleted', (dynamic data) => _onSocketPayload(eventId, data))
+      ..on('message:edited', (dynamic data) => _onSocketPayload(eventId, data))
+      ..on('message:pinned', (dynamic data) => _onSocketPayload(eventId, data))
+      ..on('message:unpinned', (dynamic data) => _onSocketPayload(eventId, data))
+      ..on('typing:update', (dynamic data) => _onSocketPayload(eventId, data))
+      ..on('read_cursor:updated', (dynamic data) => _onSocketPayload(eventId, data));
 
     _socket!.connect();
+  }
+
+  Future<void> _onAuthFailed(String eventId) async {
+    if (_refreshInFlight) return;
+    _disconnectSocketOnly();
+    final Future<RefreshOutcome> Function()? refresh = _sessionRefresh;
+    if (refresh == null) {
+      _emitStatus(EventChatConnectionStatus.disconnected);
+      return;
+    }
+    _refreshInFlight = true;
+    try {
+      final RefreshOutcome outcome = await refresh();
+      if (_controller.isClosed) return;
+      if (!_authState.isAuthenticated) return;
+      _applyAuthRefreshOutcome(eventId, outcome);
+    } catch (_) {
+      if (!_controller.isClosed) {
+        _emitStatus(EventChatConnectionStatus.reconnecting);
+      }
+    } finally {
+      _refreshInFlight = false;
+    }
+  }
+
+  void _applyAuthRefreshOutcome(String eventId, RefreshOutcome outcome) {
+    switch (outcome) {
+      case RefreshOutcome.success:
+        connect(eventId);
+      case RefreshOutcome.serverRejected:
+        _onAuthRejected?.call();
+      case RefreshOutcome.transient:
+        _emitStatus(EventChatConnectionStatus.reconnecting);
+    }
   }
 
   void emitTyping(String eventId, bool typing) {
@@ -377,12 +313,6 @@ class SocketEventChatStream {
     return EventChatMessage.tryFromJson(map);
   }
 
-  String? _str(dynamic data, String key) {
-    final Map<String, dynamic>? map = _asStringKeyedMap(data);
-    if (map == null) return null;
-    return map[key] as String?;
-  }
-
   /// JSON from Socket.IO is often `Map<dynamic, dynamic>`; normalize for parsing.
   Map<String, dynamic>? _asStringKeyedMap(Object? value) {
     if (value is Map<String, dynamic>) {
@@ -394,6 +324,150 @@ class SocketEventChatStream {
       );
     }
     return null;
+  }
+
+  void _emitJoin() {
+    final String? eventId = _currentEventId;
+    final sio.Socket? s = _socket;
+    if (eventId == null || eventId.isEmpty || s == null) {
+      return;
+    }
+    final Map<String, String> payload = <String, String>{'eventId': eventId};
+    final String? last = _lastStreamEventId;
+    if (last != null && last.isNotEmpty) {
+      payload['lastStreamEventId'] = last;
+    }
+    s.emit('join', payload);
+  }
+
+  void _onSocketPayload(String eventId, dynamic data) {
+    final dynamic raw = _unwrapSocketArgs(data);
+    if (!_payloadRoomMatches(raw)) {
+      return;
+    }
+    final Map<String, dynamic>? map = _asStringKeyedMap(raw);
+    if (map == null) {
+      return;
+    }
+    _dispatchBusPayload(eventId, map);
+  }
+
+  void _dispatchBusPayload(String eventId, Map<String, dynamic> decoded) {
+    _noteStreamEventId(decoded);
+    final String? type = decoded['type'] as String?;
+    if (type == null || type.isEmpty) {
+      return;
+    }
+    switch (type) {
+      case 'message_created':
+        final EventChatMessage? m = _parseMessage(decoded);
+        if (m != null && _messageRoomMatches(m)) {
+          _addEvent(EventChatStreamMessageCreated(
+            m.withViewer(_authState.userId),
+          ));
+        } else if (m == null) {
+          AppLog.verbose(
+            '[chat:ws] message_created parse failed event=$eventId keys=${_debugPayloadKeys(decoded)}',
+          );
+        }
+      case 'message_deleted':
+        final String? mid = decoded['messageId'] as String?;
+        if (mid != null && mid.isNotEmpty) {
+          _addEvent(EventChatStreamMessageDeleted(mid));
+        }
+      case 'message_edited':
+        final EventChatMessage? m = _parseMessage(decoded);
+        if (m != null && _messageRoomMatches(m)) {
+          _addEvent(EventChatStreamMessageEdited(
+            m.withViewer(_authState.userId),
+          ));
+        }
+      case 'message_pinned':
+        final EventChatMessage? m = _parseMessage(decoded);
+        if (m != null && _messageRoomMatches(m)) {
+          _addEvent(EventChatStreamMessagePinned(
+            m.withViewer(_authState.userId),
+          ));
+        }
+      case 'message_unpinned':
+        final EventChatMessage? m = _parseMessage(decoded);
+        if (m != null && _messageRoomMatches(m)) {
+          _addEvent(EventChatStreamMessageUnpinned(
+            m.withViewer(_authState.userId),
+          ));
+        }
+      case 'typing_update':
+        _dispatchTyping(eventId, decoded);
+      case 'read_cursor_updated':
+        _dispatchReadCursor(eventId, decoded);
+      default:
+        break;
+    }
+  }
+
+  void _noteStreamEventId(Map<String, dynamic> decoded) {
+    final String? id = decoded['streamEventId'] as String?;
+    if (id != null && id.isNotEmpty) {
+      _lastStreamEventId = id;
+    }
+  }
+
+  void _dispatchTyping(String eventId, Map<String, dynamic> map) {
+    final Object? pe = map['eventId'];
+    if (pe is String &&
+        pe.isNotEmpty &&
+        (_currentEventId == null || pe != _currentEventId)) {
+      return;
+    }
+    final String? uid = map['userId'] as String?;
+    final String? dn = map['displayName'] as String?;
+    final bool? ty = map['typing'] as bool?;
+    if (uid != null && ty != null) {
+      final String name = (dn != null && dn.trim().isNotEmpty) ? dn.trim() : '';
+      _addEvent(EventChatStreamTypingUpdated(
+        eventId: eventId,
+        userId: uid,
+        displayName: name,
+        typing: ty,
+      ));
+    }
+  }
+
+  void _dispatchReadCursor(String eventId, Map<String, dynamic> map) {
+    final Object? pe = map['eventId'];
+    if (pe is String &&
+        pe.isNotEmpty &&
+        (_currentEventId == null || pe != _currentEventId)) {
+      return;
+    }
+    final String? uid = map['userId'] as String?;
+    final String? dn = map['displayName'] as String?;
+    if (uid != null && dn != null) {
+      DateTime? at;
+      final String? lca = map['lastReadMessageCreatedAt'] as String?;
+      if (lca != null && lca.isNotEmpty) {
+        at = DateTime.tryParse(lca);
+      }
+      _addEvent(EventChatStreamReadCursorUpdated(
+        eventId: eventId,
+        userId: uid,
+        displayName: dn,
+        lastReadMessageId: map['lastReadMessageId'] as String?,
+        lastReadMessageCreatedAt: at,
+      ));
+    }
+  }
+
+  void _replayCurrentStatus() {
+    if (_controller.isClosed) {
+      return;
+    }
+    // While a handshake is in flight, report reconnecting — not stale disconnected.
+    final EventChatConnectionStatus replay = _lastStatus == EventChatConnectionStatus.disconnected &&
+            (_socket != null && !_socket!.connected)
+        ? EventChatConnectionStatus.reconnecting
+        : _lastStatus;
+    _addEvent(EventChatStreamConnectionChanged(replay));
   }
 
   void _emitStatus(EventChatConnectionStatus status) {
@@ -438,5 +512,15 @@ class SocketEventChatStream {
       return false;
     }
     return true;
+  }
+
+  /// Invokes the same path as server `AUTH_FAILED` for unit tests (no socket required).
+  @visibleForTesting
+  Future<void> handleAuthFailedForTest(String eventId) => _onAuthFailed(eventId);
+
+  /// Applies refresh outcome without opening a socket (unit tests).
+  @visibleForTesting
+  void applyAuthRefreshOutcomeForTest(String eventId, RefreshOutcome outcome) {
+    _applyAuthRefreshOutcome(eventId, outcome);
   }
 }

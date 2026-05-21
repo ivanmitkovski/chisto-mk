@@ -86,6 +86,25 @@ class AppColors {
   static const Color glassDark = Color(0xB3000000);
   static const Color scrim = Color(0x29000000);
 
+  /// Full-screen media viewers (chat images/video).
+  static const Color mediaViewerBackground = black;
+
+  static Color get overlayStrong => black.withValues(alpha: 0.54);
+  static Color get overlayMedium => black.withValues(alpha: 0.45);
+  static Color get overlayLight => black.withValues(alpha: 0.26);
+  static Color get onMediaMuted => white.withValues(alpha: 0.54);
+  static Color get onMediaSubtle => white.withValues(alpha: 0.38);
+  static Color get onMediaFaint => white.withValues(alpha: 0.24);
+  static Color get onMediaHint => white.withValues(alpha: 0.38);
+
+  /// Inbox row accents by notification category.
+  static const Color notificationReport = Color(0xFF1976D2);
+  static const Color notificationUpvote = Color(0xFFE91E63);
+  static const Color notificationComment = Color(0xFF7B1FA2);
+  static const Color notificationNearby = Color(0xFFE65100);
+  static const Color notificationChat = Color(0xFF00897B);
+  static const Color notificationAchievement = Color(0xFFF9A825);
+
   static const List<Color> avatarPalette = <Color>[
     Color(0xFF2FD788),
     Color(0xFF3BA3F7),

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
@@ -38,8 +38,8 @@ import 'package:chisto_mobile/features/events/presentation/widgets/event_success
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 import 'package:chisto_mobile/shared/current_user.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_back_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
 import 'package:chisto_mobile/features/home/domain/repositories/sites_repository.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart' hide TextDirection;
@@ -219,10 +219,10 @@ class _CreateEventSheetState extends State<CreateEventSheet>
     if (!mounted) {
       return;
     }
-    if (!ServiceLocator.instance.isInitialized) {
+    if (!AppBootstrap.instance.isInitialized) {
       return;
     }
-    if (ServiceLocator.instance.authState.isOrganizerCertified) {
+    if (AppBootstrap.instance.authState.isOrganizerCertified) {
       return;
     }
     final NavigatorState nav = Navigator.of(context);
@@ -552,7 +552,6 @@ class _CreateEventSheetState extends State<CreateEventSheet>
     }
     setState(() => _submitting = false);
 
-    AppHaptics.success();
 
     final bool? confirmed = await showDialog<bool>(
       context: context,
@@ -599,7 +598,7 @@ class _CreateEventSheetState extends State<CreateEventSheet>
   }
 
   Future<CreateEventSitesLoadResult> _loadSitesForCreatePicker() async {
-    if (!ServiceLocator.instance.isInitialized) {
+    if (!AppBootstrap.instance.isInitialized) {
       return CreateEventSitesLoadResult(
         sites: _offlineSiteSummaries(),
         usedOfflineFallback: true,
@@ -608,7 +607,7 @@ class _CreateEventSheetState extends State<CreateEventSheet>
     }
     final (double? lat, double? lng) = await _tryUserLatLng();
     try {
-      final SitesListResult result = await ServiceLocator
+      final SitesListResult result = await AppBootstrap
           .instance
           .sitesRepository
           .getSites(
@@ -689,7 +688,6 @@ class _CreateEventSheetState extends State<CreateEventSheet>
   }
 
   void _showSitePicker({bool showMapTab = false}) {
-    AppHaptics.tap();
     showEventsSurfaceModal<void>(
       context: context,
       builder: (BuildContext ctx) {
@@ -698,7 +696,6 @@ class _CreateEventSheetState extends State<CreateEventSheet>
           selectedSiteId: _selectedSite?.id,
           initialShowMapTab: showMapTab,
           onSelect: (EventSiteSummary site) {
-            AppHaptics.tap();
             setState(() => _selectedSite = site);
             _scheduleConflictPreviewDebounced();
             Navigator.of(ctx).pop();
@@ -710,7 +707,6 @@ class _CreateEventSheetState extends State<CreateEventSheet>
   }
 
   void _showVolunteerCapPicker() {
-    AppHaptics.tap();
     showEventsSurfaceModal<void>(
       context: context,
       builder: (BuildContext ctx) {
@@ -726,7 +722,6 @@ class _CreateEventSheetState extends State<CreateEventSheet>
   }
 
   void _showCategoryPicker() {
-    AppHaptics.tap();
     showEventsSurfaceModal<void>(
       context: context,
       builder: (BuildContext ctx) {
@@ -770,7 +765,6 @@ class _CreateEventSheetState extends State<CreateEventSheet>
                           : AppColors.divider,
                     ),
                     onTap: () {
-                      AppHaptics.tap();
                       setState(() => _selectedCategory = cat);
                       Navigator.of(ctx).pop();
                     },
@@ -787,7 +781,6 @@ class _CreateEventSheetState extends State<CreateEventSheet>
   }
 
   void _showGearPicker() {
-    AppHaptics.tap();
     showEventsSurfaceModal<void>(
       context: context,
       builder: (BuildContext ctx) {
@@ -816,7 +809,6 @@ class _CreateEventSheetState extends State<CreateEventSheet>
                         _selectedGear.length,
                       ),
                 onPressed: () {
-                  AppHaptics.tap();
                   Navigator.of(ctx).pop();
                 },
               ),
@@ -849,7 +841,6 @@ class _CreateEventSheetState extends State<CreateEventSheet>
                               : AppColors.divider,
                         ),
                         onTap: () {
-                          AppHaptics.tap();
                           setModalState(() {
                             if (isActive) {
                               _selectedGear.remove(gear);
@@ -874,7 +865,6 @@ class _CreateEventSheetState extends State<CreateEventSheet>
   }
 
   void _showScalePicker() {
-    AppHaptics.tap();
     showEventsSurfaceModal<void>(
       context: context,
       builder: (BuildContext ctx) {
@@ -918,7 +908,6 @@ class _CreateEventSheetState extends State<CreateEventSheet>
                           : AppColors.divider,
                     ),
                     onTap: () {
-                      AppHaptics.tap();
                       setState(() => _selectedScale = scale);
                       Navigator.of(ctx).pop();
                     },
@@ -935,7 +924,6 @@ class _CreateEventSheetState extends State<CreateEventSheet>
   }
 
   void _showDifficultyPicker() {
-    AppHaptics.tap();
     showEventsSurfaceModal<void>(
       context: context,
       builder: (BuildContext ctx) {
@@ -980,7 +968,6 @@ class _CreateEventSheetState extends State<CreateEventSheet>
                       ),
                     ),
                     onTap: () {
-                      AppHaptics.tap();
                       setState(() => _selectedDifficulty = diff);
                       Navigator.of(ctx).pop();
                     },
@@ -1295,7 +1282,6 @@ class _CreateEventSheetState extends State<CreateEventSheet>
             child: IconButton(
               iconSize: 18,
               onPressed: () {
-                AppHaptics.tap();
                 showCreateEventHelpSheet(context);
               },
               icon: const Icon(

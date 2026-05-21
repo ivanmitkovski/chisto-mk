@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/theme/app_colors.dart';
-import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_radii.dart';
+import 'package:chisto_mobile/core/theme/app_shadows.dart';
 
 /// Shared Material 3-style elevation for event discovery cards ([EcoEventCard],
 /// [HeroEventCard] outer shell, list skeletons).
@@ -11,22 +12,7 @@ import 'package:chisto_mobile/core/theme/app_spacing.dart';
 abstract final class AppCardChrome {
   const AppCardChrome._();
 
-  static BorderRadius get _cardRadius =>
-      BorderRadius.circular(AppSpacing.radiusCard);
-
-  static List<BoxShadow> _defaultShadowPair(ColorScheme colorScheme) =>
-      <BoxShadow>[
-        BoxShadow(
-          color: colorScheme.shadow.withValues(alpha: 0.06),
-          blurRadius: AppSpacing.md,
-          offset: const Offset(0, 4),
-        ),
-        BoxShadow(
-          color: colorScheme.shadow.withValues(alpha: 0.1),
-          blurRadius: AppSpacing.lg,
-          offset: const Offset(0, 8),
-        ),
-      ];
+  static BorderRadius get _cardRadius => AppRadii.card;
 
   /// List row + list skeleton: neutral panel fill (avoids seed-tinted
   /// [ColorScheme.surfaceContainerHighest] on green seeds) + outline + elevation.
@@ -37,7 +23,7 @@ abstract final class AppCardChrome {
         border: Border.all(
           color: colorScheme.outlineVariant.withValues(alpha: 0.75),
         ),
-        boxShadow: _defaultShadowPair(colorScheme),
+        boxShadow: AppShadows.card(colorScheme),
       );
 
   /// [EcoEventCard] pressed: same fill and border; reduced shadow (no second layer).
@@ -48,13 +34,7 @@ abstract final class AppCardChrome {
         border: Border.all(
           color: colorScheme.outlineVariant.withValues(alpha: 0.75),
         ),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: 0.06),
-            blurRadius: AppSpacing.sm,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        boxShadow: AppShadows.cardPressed(colorScheme),
       );
 
   /// [HeroEventCard] / [_HeroEventSkeleton] outer: border + shadows only (media fills).
@@ -64,6 +44,6 @@ abstract final class AppCardChrome {
         border: Border.all(
           color: colorScheme.outlineVariant.withValues(alpha: 0.75),
         ),
-        boxShadow: _defaultShadowPair(colorScheme),
+        boxShadow: AppShadows.card(colorScheme),
       );
 }

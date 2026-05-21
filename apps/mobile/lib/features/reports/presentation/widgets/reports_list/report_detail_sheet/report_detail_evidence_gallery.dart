@@ -6,11 +6,11 @@ import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/reports/presentation/theme/report_tokens.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/shared/utils/file_exists.dart';
-import 'package:chisto_mobile/shared/widgets/immersive_photo_gallery.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/immersive_photo_gallery.dart';
 import 'package:flutter/material.dart';
 
 /// Evidence carousel / gallery for the report detail sheet.
-class ReportDetailEvidenceGallery extends StatelessWidget {
+class ReportDetailEvidenceGallery extends StatefulWidget {
   const ReportDetailEvidenceGallery({
     super.key,
     required this.evidencePaths,
@@ -22,6 +22,16 @@ class ReportDetailEvidenceGallery extends StatelessWidget {
   final String reportTag;
   final String noPhotosLabel;
 
+  @override
+  State<ReportDetailEvidenceGallery> createState() =>
+      _ReportDetailEvidenceGalleryState();
+}
+
+class _ReportDetailEvidenceGalleryState extends State<ReportDetailEvidenceGallery> {
+  List<GalleryImageItem>? _items;
+  String? _itemsCacheKey;
+  bool _didPrefetch = false;
+
   static bool _isNetworkUrl(String s) =>
       s.startsWith('http://') || s.startsWith('https://');
 
@@ -29,24 +39,74 @@ class ReportDetailEvidenceGallery extends StatelessWidget {
     return paths.where((String path) {
       if (_isNetworkUrl(path)) return true;
       return fileExistsSync(path);
-    }).toList();
+    }).toList(growable: false);
   }
 
-  static int _decodeWidthCap(BuildContext context) {
-    final MediaQueryData mq = MediaQuery.of(context);
-    final double px = mq.size.width * mq.devicePixelRatio;
-    return px.clamp(1, 1280).round();
+  void _rebuildItemsIfNeeded(BuildContext context) {
+    final List<String> validPaths = _validPaths(widget.evidencePaths);
+    final int maxW = reportEvidenceDecodeWidthCap(context);
+    final String cacheKey = '$maxW\u0001${validPaths.join('\u0001')}';
+    if (_itemsCacheKey == cacheKey && _items != null) {
+      return;
+    }
+    _itemsCacheKey = cacheKey;
+    _didPrefetch = false;
+    if (validPaths.isEmpty) {
+      _items = <GalleryImageItem>[];
+      return;
+    }
+
+    final AppLocalizations l10n = context.l10n;
+    _items = List<GalleryImageItem>.generate(
+      validPaths.length,
+      (int index) {
+        final String path = validPaths[index];
+        return GalleryImageItem(
+          image: imageProviderForReportEvidence(path, maxWidth: maxW),
+          heroTag: 'report-evidence-${widget.reportTag}-$index',
+          semanticLabel: l10n.reportDetailEvidencePhotoSemantic(index + 1),
+        );
+      },
+      growable: false,
+    );
   }
 
-  static ImageProvider _imageForPath(BuildContext context, String path) {
-    final int maxW = _decodeWidthCap(context);
-    return imageProviderForReportEvidence(path, maxWidth: maxW);
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _rebuildItemsIfNeeded(context);
+    if (_didPrefetch || _items == null || _items!.isEmpty) {
+      return;
+    }
+    _didPrefetch = true;
+    for (int i = 0; i < _items!.length && i < 3; i++) {
+      precacheImage(_items![i].image, context);
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant ReportDetailEvidenceGallery oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.evidencePaths != widget.evidencePaths ||
+        oldWidget.reportTag != widget.reportTag) {
+      _items = null;
+      _itemsCacheKey = null;
+      _didPrefetch = false;
+    }
+    _rebuildItemsIfNeeded(context);
+    if (!_didPrefetch && _items != null && _items!.isNotEmpty) {
+      _didPrefetch = true;
+      for (int i = 0; i < _items!.length && i < 3; i++) {
+        precacheImage(_items![i].image, context);
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final List<String> validPaths = _validPaths(evidencePaths);
-    if (validPaths.isEmpty) {
+    final List<GalleryImageItem> items = _items ?? <GalleryImageItem>[];
+
+    if (items.isEmpty) {
       return AspectRatio(
         aspectRatio: ReportTokens.evidenceAspectRatio,
         child: Container(
@@ -58,14 +118,14 @@ class ReportDetailEvidenceGallery extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Icon(
+                const Icon(
                   Icons.image_not_supported_outlined,
                   size: 32,
                   color: AppColors.textMuted,
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
-                  noPhotosLabel,
+                  widget.noPhotosLabel,
                   style: AppTypography.textTheme.bodySmall!.copyWith(
                     color: AppColors.textMuted,
                   ),
@@ -78,16 +138,7 @@ class ReportDetailEvidenceGallery extends StatelessWidget {
     }
 
     final AppLocalizations l10n = context.l10n;
-    final List<GalleryImageItem> items = List<GalleryImageItem>.generate(
-      validPaths.length,
-      (int index) => GalleryImageItem(
-        image: _imageForPath(context, validPaths[index]),
-        heroTag: 'report-evidence-$reportTag-$index',
-        semanticLabel: l10n.reportDetailEvidencePhotoSemantic(index + 1),
-      ),
-    );
-
-    final Widget gallery = ClipRRect(
+    return ClipRRect(
       borderRadius: BorderRadius.circular(AppSpacing.radius22),
       child: ImmersivePhotoGallery(
         items: items,
@@ -120,9 +171,5 @@ class ReportDetailEvidenceGallery extends StatelessWidget {
             },
       ),
     );
-    if (validPaths.length == 1) {
-      return Hero(tag: 'report-evidence-hero-$reportTag', child: gallery);
-    }
-    return gallery;
   }
 }

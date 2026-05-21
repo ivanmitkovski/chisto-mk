@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/features/events/data/in_memory_events_store.dart';
+import '../../support/events/in_memory_events_store.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/domain/models/event_participant_row.dart';
 import 'package:flutter_test/flutter_test.dart';

@@ -32,6 +32,7 @@ import {
 import { notificationLocalesByUserId } from '../common/i18n/notification-locale.resolver';
 import { eventDetailIncludeForViewer } from './events-query.include.detail';
 import { EventsRepository } from './events.repository';
+import { SiteLifecycleFromEventsService } from '../sites/site-lifecycle-from-events.service';
 
 /**
  * Organizer-only lifecycle transitions for cleanup events (start, complete, cancel).
@@ -45,6 +46,7 @@ export class EventsLifecycleService {
     private readonly mobileMapper: EventsMobileMapperService,
     private readonly ecoEventPoints: EcoEventPointsService,
     private readonly notificationDispatcher: NotificationDispatcherService,
+    private readonly siteLifecycleFromEvents: SiteLifecycleFromEventsService,
   ) {}
 
   async patchLifecycle(id: string, dto: PatchEventLifecycleDto, user: AuthenticatedUser) {
@@ -113,6 +115,11 @@ export class EventsLifecycleService {
         data,
         include: eventDetailIncludeForViewer(user.userId),
       });
+      await this.siteLifecycleFromEvents.onEventLifecycleChanged(
+        existing.siteId,
+        id,
+        next,
+      );
       return this.mobileMapper.toMobileEvent(updated);
     }
 
@@ -196,7 +203,7 @@ export class EventsLifecycleService {
           title,
           body,
           type: NotificationType.CLEANUP_EVENT,
-          data: { eventId: id, pointsAdjusted: points },
+          data: { eventId: id, pointsAdjusted: points, eventTitle: updated.title },
         })
         .catch((err: unknown) => {
           this.logger.warn(
@@ -218,7 +225,7 @@ export class EventsLifecycleService {
           title,
           body,
           type: NotificationType.CLEANUP_EVENT,
-          data: { eventId: id, pointsAwarded: points },
+          data: { eventId: id, pointsAwarded: points, eventTitle: updated.title },
         })
         .catch((err: unknown) => {
           this.logger.warn(
@@ -228,6 +235,12 @@ export class EventsLifecycleService {
           );
         });
     }
+
+    await this.siteLifecycleFromEvents.onEventLifecycleChanged(
+      existing.siteId,
+      id,
+      EcoEventLifecycleStatus.COMPLETED,
+    );
 
     return this.mobileMapper.toMobileEvent(updated);
   }

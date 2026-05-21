@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:chisto_mobile/core/theme/app_radii.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
-import 'package:chisto_mobile/shared/widgets/immersive_photo_gallery.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/immersive_photo_gallery.dart';
 
 /// Status glance line overlaid on the feed card image (site lifecycle + label).
 class SiteCardFeedStatusPill extends StatelessWidget {
@@ -30,7 +31,7 @@ class SiteCardFeedStatusPill extends StatelessWidget {
               height: 8,
               decoration: BoxDecoration(
                 color: statusColor,
-                borderRadius: BorderRadius.circular(999),
+                borderRadius: AppRadii.circle,
               ),
             ),
             const SizedBox(width: 6),

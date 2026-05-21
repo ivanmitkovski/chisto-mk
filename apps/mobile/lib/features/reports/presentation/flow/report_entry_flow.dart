@@ -1,6 +1,7 @@
 import 'dart:async';
 
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/providers/reports_providers.dart';
+import 'package:chisto_mobile/core/providers/root_container.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
@@ -14,8 +15,7 @@ import 'package:chisto_mobile/features/reports/presentation/navigation/reports_n
 import 'package:chisto_mobile/features/reports/presentation/screens/new_report_screen.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/reporting_capacity_guard.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/photo_review_sheet.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -30,9 +30,8 @@ class ReportEntryFlow {
   /// `true` if the user may proceed (has credits / emergency or accepted cooldown).
   static Future<bool> ensureReportingAllowed(BuildContext context) async {
     try {
-      final ReportCapacity capacity = await ServiceLocator.instance
-          .reportsApiRepository
-          .getReportingCapacity();
+      final ReportCapacity capacity =
+          await readRoot(reportsApiRepositoryProvider).getReportingCapacity();
       if (capacity.creditsAvailable > 0 || capacity.emergencyAvailable) {
         return true;
       }
@@ -133,7 +132,6 @@ class ReportEntryFlow {
         imagePickerOverride: picker,
       );
     } else if (result == PhotoReviewResult.use) {
-      AppHaptics.softTransition();
       return ReportsNavigation.pushNewReportScreen<Object>(
         context,
         child: NewReportScreen(initialPhoto: selectedFile),

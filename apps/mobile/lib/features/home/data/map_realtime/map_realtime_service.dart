@@ -4,7 +4,9 @@ import 'dart:math' as math;
 
 import 'package:clock/clock.dart';
 import 'package:chisto_mobile/core/auth/auth_state.dart';
+import 'package:chisto_mobile/features/auth/domain/refresh_outcome.dart';
 import 'package:chisto_mobile/core/config/app_config.dart';
+import 'package:chisto_mobile/core/logging/app_log.dart';
 import 'package:chisto_mobile/core/network/connectivity_gate.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:http/http.dart' as http;
@@ -25,6 +27,7 @@ class MapRealtimeService {
     required AppConfig config,
     required AuthState authState,
     this.sessionRefresh,
+    this.onAuthRejected,
     http.Client? httpClient,
   }) : _baseUrl = config.apiBaseUrl.replaceFirst(RegExp(r'/$'), ''),
        _authState = authState,
@@ -38,7 +41,8 @@ class MapRealtimeService {
 
   final String _baseUrl;
   final AuthState _authState;
-  final Future<bool> Function()? sessionRefresh;
+  final Future<RefreshOutcome> Function()? sessionRefresh;
+  final void Function()? onAuthRejected;
 
   final bool _ownsHttpClient;
   /// Non-null only when tests inject a shared [http.Client].
@@ -228,20 +232,26 @@ class MapRealtimeService {
       if (res.statusCode == 401) {
         try {
           await res.stream.drain<void>();
-        } catch (_) {}
-        final bool refreshed = await _tryRefreshSession();
-        if (refreshed && _authState.isAuthenticated) {
+        } on Object catch (e, st) {
+          AppLog.warn('[map:sse] drain after 401 failed', error: e, stackTrace: st, category: 'map');
+        }
+        final RefreshOutcome? outcome = await _tryRefreshSession();
+        if (outcome == RefreshOutcome.success && _authState.isAuthenticated) {
           _attempt = 0;
           _immediateRetryAfterAttempt = true;
           return;
         }
-        _authState.setUnauthenticated();
+        if (outcome == RefreshOutcome.serverRejected) {
+          onAuthRejected?.call();
+        }
         return;
       }
       if (res.statusCode < 200 || res.statusCode >= 300) {
         try {
           await res.stream.drain<void>();
-        } catch (_) {}
+        } on Object catch (e, st) {
+          AppLog.warn('[map:sse] drain after HTTP error failed', error: e, stackTrace: st, category: 'map');
+        }
         throw Exception('Map SSE connect failed: ${res.statusCode}');
       }
 
@@ -354,7 +364,9 @@ class MapRealtimeService {
       if (_ownsHttpClient) {
         try {
           attemptClient.close();
-        } catch (_) {}
+        } on Object catch (e, st) {
+          AppLog.warn('[map:sse] client close failed', error: e, stackTrace: st, category: 'map');
+        }
       }
       if (_activeSseAttemptClient == attemptClient) {
         _activeSseAttemptClient = null;
@@ -365,15 +377,15 @@ class MapRealtimeService {
     }
   }
 
-  Future<bool> _tryRefreshSession() async {
-    final Future<bool> Function()? refresh = sessionRefresh;
+  Future<RefreshOutcome?> _tryRefreshSession() async {
+    final Future<RefreshOutcome> Function()? refresh = sessionRefresh;
     if (refresh == null) {
-      return false;
+      return null;
     }
     try {
       return await refresh();
-    } catch (_) {
-      return false;
+    } on Object {
+      return RefreshOutcome.transient;
     }
   }
 
@@ -428,14 +440,18 @@ class MapRealtimeService {
       if (_ownsHttpClient) {
         try {
           active.close();
-        } catch (_) {}
+        } on Object catch (e, st) {
+          AppLog.warn('[map:sse] active client close failed', error: e, stackTrace: st, category: 'map');
+        }
       }
     }
     final http.Client? injected = _injectedHttp;
     if (disposeOnly && !_ownsHttpClient && injected != null) {
       try {
         injected.close();
-      } catch (_) {}
+      } on Object catch (e, st) {
+        AppLog.warn('[map:sse] injected client close failed', error: e, stackTrace: st, category: 'map');
+      }
     }
   }
 

@@ -7,6 +7,8 @@ import 'package:chisto_mobile/core/location/location_service.dart';
 import 'package:chisto_mobile/features/home/presentation/providers/map_location_notifier.dart';
 import 'package:chisto_mobile/features/home/presentation/providers/repository_providers.dart';
 
+import '../../../shared/widget_test_bootstrap.dart';
+
 class _FakeLocationService implements LocationService {
   _FakeLocationService({
     this.enabled = true,
@@ -39,6 +41,10 @@ class _FakeLocationService implements LocationService {
 }
 
 void main() {
+  setUpAll(() async {
+    await bootstrapWidgetTests();
+  });
+
   test('tryInitialLocate sets user location on allowed permission', () async {
     final _FakeLocationService fake = _FakeLocationService();
     final ProviderContainer container = ProviderContainer(

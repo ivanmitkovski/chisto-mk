@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:chisto_mobile/core/logging/app_log.dart';
 
 /// Lightweight coach funnel logging (debug only; no PII).
 enum CoachTourAnalyticsEvent {
@@ -18,6 +19,6 @@ abstract final class CoachTourAnalytics {
       return;
     }
     final String suffix = stepIndex != null ? ' step=$stepIndex' : '';
-    debugPrint('[CoachTour] ${event.name}$suffix');
+    AppLog.verbose('[CoachTour] ${event.name}$suffix');
   }
 }

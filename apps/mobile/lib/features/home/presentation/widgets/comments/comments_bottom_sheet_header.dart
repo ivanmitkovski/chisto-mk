@@ -1,4 +1,5 @@
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
+import 'package:chisto_mobile/core/theme/app_radii.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
@@ -44,7 +45,7 @@ class CommentsBottomSheetHeader extends StatelessWidget {
                   height: 5,
                   decoration: BoxDecoration(
                     color: AppColors.inputBorder,
-                    borderRadius: BorderRadius.circular(999),
+                    borderRadius: AppRadii.circle,
                   ),
                 ),
               ),

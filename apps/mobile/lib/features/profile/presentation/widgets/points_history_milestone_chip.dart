@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/core/theme/app_shadows.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/profile/domain/models/points_history_page.dart';
 import 'package:chisto_mobile/features/profile/presentation/utils/profile_level_tier.dart';
@@ -44,13 +45,7 @@ class PointsHistoryMilestoneChip extends StatelessWidget {
           border: Border.all(
             color: AppColors.primary.withValues(alpha: 0.35),
           ),
-          boxShadow: <BoxShadow>[
-            BoxShadow(
-              color: AppColors.shadowLight,
-              blurRadius: 8,
-              offset: const Offset(0, 3),
-            ),
-          ],
+          boxShadow: AppShadows.softCard(Theme.of(context).colorScheme),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:chisto_mobile/core/theme/app_shadows.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show CustomSemanticsAction;
 
@@ -7,7 +8,7 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/check_in_payload.dart';
-import 'package:chisto_mobile/shared/widgets/user_avatar_circle.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/user_avatar_circle.dart';
 
 /// Checked-in attendee row.
 /// Swipe left to remove. No persistent buttons to avoid the "tick does
@@ -59,13 +60,7 @@ class CheckedInRow extends StatelessWidget {
             border: Border.all(
               color: AppColors.divider.withValues(alpha: 0.85),
             ),
-            boxShadow: <BoxShadow>[
-              BoxShadow(
-                color: AppColors.shadowLight,
-                blurRadius: AppSpacing.sm,
-                offset: const Offset(0, 2),
-              ),
-            ],
+            boxShadow: AppShadows.softCard(Theme.of(context).colorScheme),
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(
@@ -85,13 +80,9 @@ class CheckedInRow extends StatelessWidget {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(color: AppColors.white, width: 2),
-                        boxShadow: <BoxShadow>[
-                          BoxShadow(
-                            color: AppColors.black.withValues(alpha: 0.06),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
+                        boxShadow: AppShadows.softCard(
+                          Theme.of(context).colorScheme,
+                        ),
                       ),
                       clipBehavior: Clip.none,
                       child: UserAvatarCircle(

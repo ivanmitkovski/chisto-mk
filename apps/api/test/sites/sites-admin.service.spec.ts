@@ -29,7 +29,20 @@ function makeService(input?: {
   const sitesMapQuery = { invalidateMapCache: jest.fn() } as any;
   const sitesFeed = { invalidateFeedCache: jest.fn() } as any;
   return {
-    service: new SitesAdminService(prisma, audit, siteEventsService, sitesMapQuery, sitesFeed),
+    service: new SitesAdminService(
+      prisma,
+      audit,
+      siteEventsService,
+      sitesMapQuery,
+      sitesFeed,
+      {
+        recordSiteCreated: jest.fn(),
+        recordStatusChanged: jest.fn(),
+        emitHistoryAppended: jest.fn(),
+        recordArchived: jest.fn(),
+        recordUnarchived: jest.fn(),
+      } as never,
+    ),
     prisma,
     audit,
     siteEventsService,

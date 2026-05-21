@@ -1,7 +1,12 @@
+library;
+
 import 'dart:async';
 
 import 'package:intl/intl.dart';
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/providers/app_providers.dart';
+import 'package:chisto_mobile/core/widgets/state_rebuild_mixin.dart';
+import 'package:chisto_mobile/core/providers/reports_providers.dart';
+import 'package:chisto_mobile/core/providers/root_container.dart';
 import 'package:chisto_mobile/core/network/request_cancellation.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
@@ -10,7 +15,7 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
 import 'package:chisto_mobile/features/reports/data/report_image_prefetch_coordinator.dart';
 import 'package:chisto_mobile/features/reports/data/reports_realtime/reports_owner_event.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_list_item.dart';
@@ -25,9 +30,10 @@ import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list
 import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/reports_list_screen_slivers.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/reports_list_widgets.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_refresh_indicator.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/app_refresh_indicator.dart';
 import 'package:flutter/material.dart';
+
+part '../widgets/reports_list/reports_list_bootstrap.dart';
 
 class ReportsListScreen extends StatefulWidget {
   const ReportsListScreen({
@@ -52,16 +58,12 @@ class ReportsListScreen extends StatefulWidget {
   State<ReportsListScreen> createState() => _ReportsListScreenState();
 }
 
-class _ReportsListScreenState extends State<ReportsListScreen> {
-  static final Duration _searchDebounceDuration = AppMotion.medium;
-  static final Duration _minSkeletonDuration =
-      AppMotion.reportsListSkeletonMinHold;
-
+class _ReportsListScreenState extends State<ReportsListScreen> with StateRebuildMixin {
   late final ReportsListController _listController = ReportsListController(
-    repository: ServiceLocator.instance.reportsApiRepository,
+    repository: readRoot(reportsApiRepositoryProvider),
   );
   late final DefaultReportImagePrefetchCoordinator _prefetchCoordinator =
-      DefaultReportImagePrefetchCoordinator(ServiceLocator.instance.preferences);
+      DefaultReportImagePrefetchCoordinator(readRoot(preferencesProvider));
 
   ReportSheetStatus? _statusFilter;
   final ScrollController _scrollController = ScrollController();
@@ -161,33 +163,6 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
     }
   }
 
-  void _onReportsOwnerEvent(ReportsOwnerEvent event) {
-    if (event.type == 'report_created' && event.mutationKind == 'created') {
-      _listController.clearOptimisticForReport(event.reportId);
-      _realtimeCoalescer.schedule();
-      return;
-    }
-    if (event.type == 'report_updated' && event.mutationKind == 'merged') {
-      _listController.removeReportById(event.reportId);
-      if (mounted) {
-        AppSnack.show(
-          context,
-          message: context.l10n.reportsListMergedToast,
-          type: AppSnackType.info,
-        );
-      }
-      _realtimeCoalescer.schedule();
-      return;
-    }
-    if (event.type == 'report_updated' &&
-        event.mutationKind == 'status_changed' &&
-        (event.status != null && event.status!.isNotEmpty)) {
-      _listController.applyStatusFromApi(event.reportId, event.status!);
-      return;
-    }
-    _realtimeCoalescer.schedule();
-  }
-
   List<ReportListItem> _filteredReports(AppLocalizations l10n) {
     List<ReportListItem> list = _listController.reports;
     if (_statusFilter != null) {
@@ -223,145 +198,13 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
   @override
   void initState() {
     super.initState();
-    _listController.addListener(_onListControllerChanged);
-    _scrollController.addListener(_onScrollNearEnd);
-    _searchController.addListener(_onSearchChanged);
-    _searchQuery = _searchController.text.trim();
-    _loadReports();
-    ServiceLocator.instance.reportsListSession.attach(_listController);
-    _realtimeSub = ServiceLocator.instance.reportsRealtimeService.events.listen(
-      _onReportsOwnerEvent,
-    );
-    ServiceLocator.instance.reportDraftRepository.summaryListenable.addListener(
-      _onDraftSummaryChanged,
-    );
-    if (widget.initialReportIdToOpen != null &&
-        widget.initialReportIdToOpen!.isNotEmpty) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _openReportDetailById(widget.initialReportIdToOpen!);
-      });
-    }
+    bootstrapInitState();
   }
 
   @override
   void didUpdateWidget(ReportsListScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.refreshTrigger != null &&
-        widget.refreshTrigger != oldWidget.refreshTrigger) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) _loadReports();
-      });
-    }
-    final String? id = widget.initialReportIdToOpen;
-    if (id != null && id.isNotEmpty && id != oldWidget.initialReportIdToOpen) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) _openReportDetailById(id);
-      });
-    }
-  }
-
-  void _onDraftSummaryChanged() {
-    if (mounted) {
-      setState(() {});
-    }
-  }
-
-  void _onListControllerChanged() {
-    final AppError? appendErr = _listController.appendLoadError;
-    if (appendErr != null && mounted) {
-      AppSnack.show(
-        context,
-        message: appendErr.message,
-        type: AppSnackType.warning,
-      );
-      _listController.clearAppendError();
-    }
-    // List UI rebuilds via [ListenableBuilder] on [_listController]; avoid full-screen
-    // setState on every list notification (pagination, realtime updates).
-  }
-
-  void _onScrollNearEnd() {
-    if (!_scrollController.hasClients) {
-      return;
-    }
-    final ScrollPosition pos = _scrollController.position;
-    if (pos.pixels < pos.maxScrollExtent - 600) {
-      return;
-    }
-    unawaited(_listController.loadNextPage());
-  }
-
-  Future<void> _loadReports() async {
-    final bool wasEmpty = _listController.reports.isEmpty;
-    final Stopwatch stopwatch = Stopwatch()..start();
-    await _listController.refreshFirstPage();
-    if (!mounted) {
-      return;
-    }
-    if (wasEmpty && _listController.loadError == null) {
-      final int elapsed = stopwatch.elapsedMilliseconds;
-      if (elapsed < _minSkeletonDuration.inMilliseconds) {
-        await Future<void>.delayed(
-          Duration(
-            milliseconds: _minSkeletonDuration.inMilliseconds - elapsed,
-          ),
-        );
-      }
-      if (!mounted) {
-        return;
-      }
-      setState(() {});
-    }
-    final AppError? err = _listController.loadError;
-    if (err != null) {
-      if (err.code == 'UNAUTHORIZED' ||
-          err.code == 'INVALID_TOKEN_USER' ||
-          err.code == 'ACCOUNT_NOT_ACTIVE') {
-        Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
-          AppRoutes.signIn,
-          (Route<dynamic> route) => false,
-        );
-        return;
-      }
-      if (mounted) {
-        AppSnack.show(
-          context,
-          message: err.message,
-          type: AppSnackType.warning,
-        );
-      }
-      return;
-    }
-    if (_listController.reports.isNotEmpty) {
-      unawaited(
-        _prefetchCoordinator.warmList(_listController.reports, context),
-      );
-    }
-    unawaited(_loadReportCapacityHint());
-  }
-
-  Future<void> _loadReportCapacityHint() async {
-    try {
-      final ReportCapacity capacity = await ServiceLocator
-          .instance
-          .reportsApiRepository
-          .getReportingCapacity();
-      if (!mounted) return;
-      setState(() => _reportCapacity = capacity);
-    } catch (_) {
-      if (!mounted) return;
-      setState(() => _reportCapacity = null);
-    }
-  }
-
-  void _onSearchChanged() {
-    _searchDebounce?.cancel();
-    _searchDebounce = Timer(_searchDebounceDuration, () {
-      if (!mounted) return;
-      final String next = _searchController.text.trim();
-      if (next == _searchQuery) return;
-      setState(() => _searchQuery = next);
-    });
+    bootstrapDidUpdateWidget(oldWidget);
   }
 
   void _onSearchSubmitted() {
@@ -378,27 +221,11 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
 
   @override
   void dispose() {
-    ServiceLocator.instance.reportDraftRepository.summaryListenable.removeListener(
-      _onDraftSummaryChanged,
-    );
-    _prefetchCoordinator.cancel();
-    ServiceLocator.instance.reportsListSession.detach(_listController);
-    _listController.removeListener(_onListControllerChanged);
-    _listController.dispose();
-    _searchDebounce?.cancel();
-    _realtimeCoalescer.dispose();
-    _realtimeSub?.cancel();
-    _searchController.removeListener(_onSearchChanged);
-    _searchController.dispose();
-    _searchFocusNode.dispose();
-    _scrollController.removeListener(_onScrollNearEnd);
-    _scrollController.dispose();
-    _reportDetailFetchCancellation?.cancel();
+    bootstrapDispose();
     super.dispose();
   }
 
   Future<void> _handleRefresh() async {
-    AppHaptics.medium();
     await _loadReports();
   }
 
@@ -406,11 +233,10 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
     if (_isOpeningReportDetail) return;
     _isOpeningReportDetail = true;
     if (mounted) setState(() {});
-    AppHaptics.softTransition();
     widget.onReportOpened?.call();
     final RequestCancellationToken cancellation = _beginReportDetailFetch();
     try {
-      final detail = await ServiceLocator.instance.reportsApiRepository
+      final detail = await readRoot(reportsApiRepositoryProvider)
           .getReportById(id, cancellation: cancellation);
       if (!mounted) return;
       final ReportSheetViewModel display =
@@ -434,10 +260,9 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
     if (_isOpeningReportDetail) return;
     _isOpeningReportDetail = true;
     if (mounted) setState(() {});
-    AppHaptics.softTransition();
     final RequestCancellationToken cancellation = _beginReportDetailFetch();
     try {
-      final detail = await ServiceLocator.instance.reportsApiRepository
+      final detail = await readRoot(reportsApiRepositoryProvider)
           .getReportById(report.id, cancellation: cancellation);
       if (!mounted) return;
       final ReportSheetViewModel display =
@@ -506,9 +331,9 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
                 child: ReportDetailSheet(
                   report: report,
                   reportsRealtimeService:
-                      ServiceLocator.instance.reportsRealtimeService,
+                      readRoot(reportsRealtimeServiceProvider),
                   reportsApiRepository:
-                      ServiceLocator.instance.reportsApiRepository,
+                      readRoot(reportsApiRepositoryProvider),
                   onShowSiteOnMap: widget.onShowSiteOnMap,
                   onOpenLinkedPollutionSiteDetail:
                       widget.onOpenLinkedPollutionSiteDetail,
@@ -575,7 +400,6 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
   }
 
   void _selectStatusFilter(ReportSheetStatus? status) {
-    AppHaptics.tap();
     setState(() => _statusFilter = status);
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
@@ -623,7 +447,6 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
               color: AppColors.transparent,
               child: InkWell(
                 onTap: () {
-                  AppHaptics.tap();
                   _searchDebounce?.cancel();
                   _searchController.clear();
                   _searchFocusNode.unfocus();
@@ -652,7 +475,6 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
   }
 
   Future<void> _startNewReport() async {
-    AppHaptics.medium();
     if (!await ReportEntryFlow.ensureReportingAllowed(context)) {
       return;
     }
@@ -660,7 +482,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
       return;
     }
     final ReportDraftSummary summary =
-        ServiceLocator.instance.reportDraftRepository.summaryListenable.value;
+        readRoot(reportDraftRepositoryProvider).summaryListenable.value;
     if (summary.hasDraft) {
       final CentralFabDraftChoice? choice =
           await ReportEntryFlow.promptDraftChoiceIfNeeded(

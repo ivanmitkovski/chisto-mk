@@ -3,8 +3,7 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_action_sheet.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/app_action_sheet.dart';
 import 'package:flutter/material.dart';
 
 /// Source for the profile avatar capture flow (not [ImageSource], keeps picker types internal).
@@ -26,7 +25,6 @@ Future<ProfileAvatarSource?> showProfileAvatarSourceSheet(
           icon: Icons.close_rounded,
           semanticLabel: l10n.semanticsClose,
           onTap: () {
-            AppHaptics.sheetDismiss();
             Navigator.of(context).pop();
           },
         ),
@@ -52,7 +50,6 @@ Future<ProfileAvatarSource?> showProfileAvatarSourceSheet(
                 badgeLabel: l10n.profileAvatarSourceRecommended,
                 emphasized: true,
                 onTap: () {
-                  AppHaptics.medium();
                   Navigator.of(context).pop(ProfileAvatarSource.selfie);
                 },
               ),
@@ -62,7 +59,6 @@ Future<ProfileAvatarSource?> showProfileAvatarSourceSheet(
                 label: l10n.profileAvatarSourcePhotos,
                 description: l10n.profileAvatarSourcePhotosHint,
                 onTap: () {
-                  AppHaptics.light();
                   Navigator.of(context).pop(ProfileAvatarSource.gallery);
                 },
               ),
@@ -74,7 +70,6 @@ Future<ProfileAvatarSource?> showProfileAvatarSourceSheet(
                   description: l10n.profileAvatarSourceRemoveHint,
                   destructive: true,
                   onTap: () {
-                    AppHaptics.warning();
                     Navigator.of(context).pop(ProfileAvatarSource.remove);
                   },
                 ),

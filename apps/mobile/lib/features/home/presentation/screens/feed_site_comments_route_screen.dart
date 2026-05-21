@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/features/home/domain/models/comment.dart';
@@ -11,17 +11,25 @@ import 'package:chisto_mobile/features/home/presentation/providers/site_engageme
 import 'package:chisto_mobile/features/home/presentation/utils/site_comment_mapping.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/comments/comments_route_loading_skeleton.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/comments_bottom_sheet.dart';
-import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
-import 'package:chisto_mobile/shared/widgets/app_refresh_indicator.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_back_button.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/app_refresh_indicator.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Full-screen comments for a site (shell route: `/feed/:siteId/comments`).
 class FeedSiteCommentsRouteScreen extends ConsumerStatefulWidget {
-  const FeedSiteCommentsRouteScreen({super.key, required this.siteId});
+  const FeedSiteCommentsRouteScreen({
+    super.key,
+    required this.siteId,
+    this.highlightCommentId,
+    this.highlightActorUserId,
+  });
 
   final String siteId;
+  final String? highlightCommentId;
+  final String? highlightActorUserId;
 
   @override
   ConsumerState<FeedSiteCommentsRouteScreen> createState() =>
@@ -117,7 +125,8 @@ class _FeedSiteCommentsRouteScreenState
                   children: <Widget>[
                     Text(errorMessage, textAlign: TextAlign.center),
                     const SizedBox(height: 16),
-                    FilledButton(
+                    AppButton.primary(
+                      label: context.l10n.commonTryAgain,
                       onPressed: () {
                         unawaited(
                           ref
@@ -129,7 +138,7 @@ class _FeedSiteCommentsRouteScreenState
                               .retryBootstrap(),
                         );
                       },
-                      child: Text(context.l10n.commonTryAgain),
+                      expand: false,
                     ),
                   ],
                 ),
@@ -163,6 +172,8 @@ class _FeedSiteCommentsRouteScreenState
                     comments: st.comments,
                     siteTitle: st.site?.title,
                     scrollController: _scrollController,
+                    highlightCommentId: widget.highlightCommentId,
+                    highlightActorUserId: widget.highlightActorUserId,
                     isLoadingMoreComments: st.loadingMoreComments,
                     onCommentsCountChanged: (int count) {
                       ref
@@ -187,7 +198,7 @@ class _FeedSiteCommentsRouteScreenState
                     },
                     onLoadMoreDirectReplies:
                         (String parentId, int page, String sort) async {
-                          final SiteCommentsResult result = await ServiceLocator
+                          final SiteCommentsResult result = await AppBootstrap
                               .instance
                               .sitesRepository
                               .getSiteComments(
@@ -202,7 +213,7 @@ class _FeedSiteCommentsRouteScreenState
                               .toList();
                         },
                     onCommentSubmitted: (String text, String? parentId) {
-                      return ServiceLocator.instance.sitesRepository
+                      return AppBootstrap.instance.sitesRepository
                           .createSiteComment(
                             widget.siteId,
                             text,
@@ -211,19 +222,19 @@ class _FeedSiteCommentsRouteScreenState
                           .then(commentFromSiteCommentItem);
                     },
                     onCommentEdited: (String commentId, String body) {
-                      return ServiceLocator.instance.sitesRepository
+                      return AppBootstrap.instance.sitesRepository
                           .updateSiteComment(widget.siteId, commentId, body);
                     },
                     onCommentDeleted: (String commentId) {
-                      return ServiceLocator.instance.sitesRepository
+                      return AppBootstrap.instance.sitesRepository
                           .deleteSiteComment(widget.siteId, commentId);
                     },
                     onCommentLikeToggled: (String commentId, bool shouldLike) {
                       return shouldLike
-                          ? ServiceLocator.instance.sitesRepository
+                          ? AppBootstrap.instance.sitesRepository
                                 .likeSiteComment(widget.siteId, commentId)
                                 .then((_) {})
-                          : ServiceLocator.instance.sitesRepository
+                          : AppBootstrap.instance.sitesRepository
                                 .unlikeSiteComment(widget.siteId, commentId)
                                 .then((_) {});
                     },

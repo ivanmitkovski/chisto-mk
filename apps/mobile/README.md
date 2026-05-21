@@ -1,6 +1,24 @@
 # chisto_mobile
 
-A new Flutter project.
+Chisto.mk Flutter app.
+
+## Toolchain
+
+Pinned in repo root [`.tool-versions`](../.tool-versions): **Flutter 3.41.3**, **Dart 3.11.1**.
+
+```sh
+flutter pub get
+flutter analyze lib
+flutter test test/
+dart run tool/check_haptics_usage.dart
+```
+
+Release version: `pubspec.yaml` (`1.0.0-beta.1+3`). See [`docs/beta-release-checklist.md`](docs/beta-release-checklist.md), [`docs/ios-beta.md`](docs/ios-beta.md), and [`docs/android-beta.md`](docs/android-beta.md).
+
+```sh
+# Staging beta IPA / AAB (requires signing secrets — see checklist)
+./scripts/build-beta.sh both
+```
 
 ## Local development privacy (draft)
 

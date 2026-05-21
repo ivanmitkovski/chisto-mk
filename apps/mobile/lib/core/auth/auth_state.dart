@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 
+import 'package:chisto_mobile/core/observability/chisto_sentry.dart';
+
 enum AuthStatus { unknown, authenticated, unauthenticated }
 
 class AuthState extends ChangeNotifier {
@@ -30,6 +32,7 @@ class AuthState extends ChangeNotifier {
     /// Use for `/auth/me` and login payloads so certification state matches the server.
     bool syncOrganizerCertifiedAt = false,
   }) {
+    final String? previousUserId = _userId;
     _status = AuthStatus.authenticated;
     _userId = userId;
     _displayName = displayName;
@@ -39,6 +42,10 @@ class AuthState extends ChangeNotifier {
       _organizerCertifiedAt = organizerCertifiedAt;
     } else if (organizerCertifiedAt != null) {
       _organizerCertifiedAt = organizerCertifiedAt;
+    }
+    if (previousUserId != userId) {
+      // Tag subsequent crashes with the signed-in user id (no PII).
+      chistoSentrySetUser(userId);
     }
     notifyListeners();
   }
@@ -50,6 +57,8 @@ class AuthState extends ChangeNotifier {
     _phoneNumber = null;
     _accessToken = null;
     _organizerCertifiedAt = null;
+    // Drop the Sentry user tag so the next session is not mis-attributed.
+    chistoSentryClearUser();
     notifyListeners();
   }
 

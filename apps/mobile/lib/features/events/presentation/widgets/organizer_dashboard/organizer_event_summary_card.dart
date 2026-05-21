@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:chisto_mobile/core/theme/app_radii.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
@@ -8,7 +9,6 @@ import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/event_calendar_date_format.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/events_localized_strings.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 /// Compact card for an organizer's event in the dashboard list.
 ///
@@ -77,7 +77,6 @@ class OrganizerEventSummaryCard extends StatelessWidget {
       label: semanticsLabel,
       child: GestureDetector(
         onTap: () {
-          AppHaptics.tap();
           onTap();
         },
         child: Container(
@@ -162,7 +161,7 @@ class OrganizerEventSummaryCard extends StatelessWidget {
                   children: <Widget>[
                     Expanded(
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: AppRadii.xs,
                         child: LinearProgressIndicator(
                           value: fillRatio,
                           minHeight: 4,
@@ -345,7 +344,6 @@ class _QuickActionButton extends StatelessWidget {
           color: AppColors.transparent,
           child: InkWell(
             onTap: () {
-              AppHaptics.tap();
               onTap();
             },
             borderRadius: BorderRadius.circular(AppSpacing.radiusMd),

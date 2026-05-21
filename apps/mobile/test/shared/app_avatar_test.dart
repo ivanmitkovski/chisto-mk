@@ -1,5 +1,5 @@
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
-import 'package:chisto_mobile/shared/widgets/app_avatar.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

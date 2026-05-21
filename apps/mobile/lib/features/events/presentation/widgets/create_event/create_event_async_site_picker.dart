@@ -9,6 +9,7 @@ import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/data/event_site_resolver.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/create_event/site_picker_sheet.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 
 /// Result of loading pollution sites for the create-event picker.
 class CreateEventSitesLoadResult {
@@ -127,11 +128,11 @@ class _CreateEventAsyncSitePickerState extends State<CreateEventAsyncSitePicker>
           const SizedBox(height: AppSpacing.sm),
           SizedBox(
             width: double.infinity,
-            child: TextButton(
+            child: AppButton.text(
+              label: context.l10n.createEventSitePickerRetry,
               onPressed: () {
                 unawaited(_fetch());
               },
-              child: Text(context.l10n.createEventSitePickerRetry),
             ),
           ),
         ] else if (r.usedOfflineFallback)

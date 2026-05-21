@@ -1,6 +1,6 @@
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/widgets/app_error_view.dart';
+import 'package:chisto_mobile/shared/widgets/molecules/app_error_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -16,6 +16,7 @@ void main() {
           locale: const Locale('en'),
           home: Scaffold(
             body: AppErrorView(
+              autoRecoverSession: false,
               error: AppError(
                 code: 'ERR',
                 message: errorMessage,
@@ -37,6 +38,7 @@ void main() {
           locale: const Locale('en'),
           home: Scaffold(
             body: AppErrorView(
+              autoRecoverSession: false,
               error: AppError.network(),
               onRetry: () {},
             ),
@@ -57,6 +59,7 @@ void main() {
           locale: const Locale('en'),
           home: Scaffold(
             body: AppErrorView(
+              autoRecoverSession: false,
               error: AppError.unauthorized(),
               onRetry: () {},
             ),
@@ -77,6 +80,7 @@ void main() {
           locale: const Locale('en'),
           home: Scaffold(
             body: AppErrorView(
+              autoRecoverSession: false,
               error: AppError.unauthorized(),
               onLogout: () {},
             ),
@@ -98,6 +102,7 @@ void main() {
           locale: const Locale('en'),
           home: Scaffold(
             body: AppErrorView(
+              autoRecoverSession: false,
               error: const AppError(
                 code: 'SESSION_REVOKED',
                 message: 'Session is no longer valid',
@@ -125,6 +130,7 @@ void main() {
           locale: const Locale('en'),
           home: Scaffold(
             body: AppErrorView(
+              autoRecoverSession: false,
               error: AppError.network(),
               onRetry: () {},
             ),
@@ -147,6 +153,7 @@ void main() {
           locale: const Locale('en'),
           home: Scaffold(
             body: AppErrorView(
+              autoRecoverSession: false,
               error: AppError.unauthorized(),
               onLogout: () => loggedOut = true,
             ),
@@ -170,6 +177,7 @@ void main() {
           locale: const Locale('en'),
           home: Scaffold(
             body: AppErrorView(
+              autoRecoverSession: false,
               error: AppError.network(),
               onRetry: () => retried = true,
             ),

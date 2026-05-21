@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
+import 'package:chisto_mobile/features/notifications/domain/notifications_time_format.dart';
+import 'package:chisto_mobile/core/theme/app_radii.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/notifications/domain/models/user_notification.dart';
@@ -28,29 +31,29 @@ class NotificationVisual {
       case UserNotificationType.reportStatus:
         return NotificationVisual(
           icon: Icons.assignment_rounded,
-          iconColor: const Color(0xFF1976D2),
-          iconBackground: const Color(0xFF1976D2).withValues(alpha: 0.12),
+          iconColor: AppColors.notificationReport,
+          iconBackground: AppColors.notificationReport.withValues(alpha: 0.12),
           label: 'Report',
         );
       case UserNotificationType.upvote:
         return NotificationVisual(
           icon: Icons.favorite_rounded,
-          iconColor: const Color(0xFFE91E63),
-          iconBackground: const Color(0xFFE91E63).withValues(alpha: 0.12),
+          iconColor: AppColors.notificationUpvote,
+          iconBackground: AppColors.notificationUpvote.withValues(alpha: 0.12),
           label: 'Upvote',
         );
       case UserNotificationType.comment:
         return NotificationVisual(
           icon: Icons.chat_bubble_rounded,
-          iconColor: const Color(0xFF7B1FA2),
-          iconBackground: const Color(0xFF7B1FA2).withValues(alpha: 0.12),
+          iconColor: AppColors.notificationComment,
+          iconBackground: AppColors.notificationComment.withValues(alpha: 0.12),
           label: 'Comment',
         );
       case UserNotificationType.nearbyReport:
         return NotificationVisual(
           icon: Icons.radar_rounded,
-          iconColor: const Color(0xFFE65100),
-          iconBackground: const Color(0xFFE65100).withValues(alpha: 0.12),
+          iconColor: AppColors.notificationNearby,
+          iconBackground: AppColors.notificationNearby.withValues(alpha: 0.12),
           label: 'Nearby',
         );
       case UserNotificationType.cleanupEvent:
@@ -63,8 +66,8 @@ class NotificationVisual {
       case UserNotificationType.eventChat:
         return NotificationVisual(
           icon: Icons.forum_rounded,
-          iconColor: const Color(0xFF00897B),
-          iconBackground: const Color(0xFF00897B).withValues(alpha: 0.12),
+          iconColor: AppColors.notificationChat,
+          iconBackground: AppColors.notificationChat.withValues(alpha: 0.12),
           label: 'Chat',
         );
       case UserNotificationType.system:
@@ -77,8 +80,8 @@ class NotificationVisual {
       case UserNotificationType.achievement:
         return NotificationVisual(
           icon: Icons.emoji_events_rounded,
-          iconColor: const Color(0xFFF9A825),
-          iconBackground: const Color(0xFFF9A825).withValues(alpha: 0.12),
+          iconColor: AppColors.notificationAchievement,
+          iconBackground: AppColors.notificationAchievement.withValues(alpha: 0.12),
           label: 'Achievement',
         );
       case UserNotificationType.welcome:
@@ -98,60 +101,57 @@ class NotificationTile extends StatelessWidget {
     required this.item,
     required this.onTap,
     this.groupCount = 1,
+    this.borderRadius,
   });
 
   final UserNotification item;
   final VoidCallback onTap;
   final int groupCount;
+  /// When swiping, pass a radius with square corners on the revealed edge.
+  final BorderRadius? borderRadius;
+
+  BorderRadius get _shapeRadius =>
+      borderRadius ?? BorderRadius.circular(AppSpacing.radius18);
 
   @override
   Widget build(BuildContext context) {
     final NotificationVisual visual = NotificationVisual.fromType(item.type);
     final bool hasTarget = item.targetSiteId != null;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-      child: Semantics(
-        button: true,
-        label:
-            '${item.isRead ? 'Read' : 'Unread'} ${visual.label} notification: ${item.title}',
-        hint: hasTarget ? 'Opens related content' : null,
-        child: Material(
-          color: AppColors.transparent,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(AppSpacing.radius18),
-            onTap: onTap,
-            child: Ink(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              decoration: BoxDecoration(
-                color: item.isRead
-                    ? AppColors.panelBackground
-                    : AppColors.primary.withValues(alpha: 0.06),
-                borderRadius: BorderRadius.circular(AppSpacing.radius18),
-                border: Border.all(
-                  color: item.isRead
-                      ? AppColors.divider
-                      : AppColors.primary.withValues(alpha: 0.2),
-                ),
-                boxShadow: <BoxShadow>[
-                  BoxShadow(
-                    color: AppColors.shadowLight,
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: IntrinsicHeight(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    Align(
+    return Semantics(
+      button: true,
+      label:
+          '${item.isRead ? 'Read' : 'Unread'} ${visual.label} notification: ${item.title}',
+      hint: hasTarget ? 'Opens related content' : null,
+      child: Material(
+        color: item.isRead
+            ? AppColors.panelBackground
+            : AppColors.primary.withValues(alpha: 0.06),
+        shape: RoundedRectangleBorder(
+          borderRadius: _shapeRadius,
+          side: BorderSide(
+            color: item.isRead
+                ? AppColors.divider
+                : AppColors.primary.withValues(alpha: 0.2),
+          ),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          borderRadius: _shapeRadius,
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  Align(
                       alignment: Alignment.topCenter,
                       child: Container(
                         width: 34,
                         height: 34,
                         decoration: BoxDecoration(
                           color: visual.iconBackground,
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(AppSpacing.radius10),
                         ),
                         child: Icon(visual.icon, size: 18, color: visual.iconColor),
                       ),
@@ -168,7 +168,7 @@ class NotificationTile extends StatelessWidget {
                           ),
                           decoration: BoxDecoration(
                             color: visual.iconBackground,
-                            borderRadius: BorderRadius.circular(999),
+                            borderRadius: AppRadii.circle,
                           ),
                           child: Text(
                             visual.label,
@@ -200,7 +200,13 @@ class NotificationTile extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.only(bottom: 4),
                             child: Text(
-                              'and ${groupCount - 1} similar',
+                              item.type == UserNotificationType.eventChat
+                                  ? context.l10n.notificationsGroupMessageCount(
+                                      groupCount,
+                                    )
+                                  : context.l10n.notificationsGroupSimilarCount(
+                                      groupCount - 1,
+                                    ),
                               style: Theme.of(context).textTheme.bodySmall
                                   ?.copyWith(
                                     color: visual.iconColor,
@@ -246,7 +252,10 @@ class NotificationTile extends StatelessWidget {
                                 const SizedBox(width: 6),
                               ],
                               Text(
-                                _relativeTime(item.createdAt),
+                                notificationRelativeTime(
+                                  context.l10n,
+                                  item.createdAt,
+                                ),
                                 textAlign: TextAlign.right,
                                 style: Theme.of(context).textTheme.bodySmall
                                     ?.copyWith(
@@ -272,8 +281,7 @@ class NotificationTile extends StatelessWidget {
                       ],
                     ),
                   ),
-                  ],
-                ),
+                ],
               ),
             ),
           ),
@@ -282,12 +290,4 @@ class NotificationTile extends StatelessWidget {
     );
   }
 
-  static String _relativeTime(DateTime value) {
-    final Duration diff = DateTime.now().difference(value);
-    if (diff.inMinutes < 1) return 'now';
-    if (diff.inMinutes < 60) return '${diff.inMinutes}m';
-    if (diff.inHours < 24) return '${diff.inHours}h';
-    if (diff.inDays < 7) return '${diff.inDays}d';
-    return '${value.day.toString().padLeft(2, '0')}.${value.month.toString().padLeft(2, '0')}';
-  }
 }

@@ -5,8 +5,7 @@ import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
 import 'package:chisto_mobile/features/reports/presentation/l10n/report_category_l10n.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_action_sheet.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/app_action_sheet.dart';
 import 'package:flutter/cupertino.dart';
 
 /// Modal picker for report category with icons.
@@ -15,7 +14,6 @@ void showReportCategoryPicker(
   required ReportCategory? selected,
   required void Function(ReportCategory) onSelected,
 }) {
-  AppHaptics.tap();
   showAppActionSheet<void>(
     context: context,
     builder: (BuildContext context) {
@@ -64,7 +62,6 @@ void showReportCategoryPicker(
                       color: isActive ? AppColors.primaryDark : AppColors.divider,
                     ),
                     onTap: () {
-                      AppHaptics.tap();
                       onSelected(cat);
                       Navigator.of(context).pop();
                     },

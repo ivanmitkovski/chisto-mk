@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
@@ -10,14 +10,13 @@ import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/validation/phone_display_formatter.dart';
 import 'package:chisto_mobile/features/profile/domain/models/profile_user.dart';
 import 'package:chisto_mobile/features/profile/presentation/providers/profile_avatar_notifier.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/features/profile/presentation/widgets/profile_sub_screen_header.dart';
-import 'package:chisto_mobile/shared/widgets/keyboard_aware_form_scroll.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/keyboard_aware_form_scroll.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
-import 'package:chisto_mobile/shared/widgets/profile_avatar_peek_overlay.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/profile_avatar_peek_overlay.dart';
 import 'package:chisto_mobile/features/profile/presentation/widgets/profile_avatar_section.dart';
 import 'package:chisto_mobile/features/profile/presentation/widgets/profile_info_fields_card.dart';
 import 'package:chisto_mobile/features/profile/presentation/avatar/profile_avatar_flow.dart';
@@ -214,10 +213,9 @@ class _ProfileGeneralInfoScreenState
         : '';
 
     setState(() => _isSaving = true);
-    AppHaptics.light();
 
     try {
-      final ProfileUser? updated = await ServiceLocator
+      final ProfileUser? updated = await AppBootstrap
           .instance
           .profileRepository
           .updateProfile(firstName: firstName, lastName: lastName);
@@ -247,7 +245,6 @@ class _ProfileGeneralInfoScreenState
 
   Future<void> _handleChangeAvatar() async {
     if (_isSaving || _isAvatarBusy) return;
-    AppHaptics.softTransition();
     final bool showRemove = _normalizeAvatarUrl(_remoteAvatarUrl) != null;
     final ProfileAvatarFlowResult flow = await runProfileAvatarFlow(
       context,
@@ -271,7 +268,7 @@ class _ProfileGeneralInfoScreenState
 
     try {
       final String avatarUrl =
-          await ServiceLocator.instance.profileRepository.uploadAvatar(
+          await AppBootstrap.instance.profileRepository.uploadAvatar(
         pickedPath,
       );
       if (!mounted) return;
@@ -335,7 +332,7 @@ class _ProfileGeneralInfoScreenState
   Future<void> _removeAvatarConfirmed() async {
     setState(() => _isAvatarBusy = true);
     try {
-      await ServiceLocator.instance.profileRepository.removeAvatar();
+      await AppBootstrap.instance.profileRepository.removeAvatar();
       if (!mounted) return;
       setState(() {
         _remoteAvatarUrl = null;
@@ -343,7 +340,6 @@ class _ProfileGeneralInfoScreenState
       });
       ref.read(profileAvatarNotifierProvider.notifier).clearLocalPath();
       ref.read(profileAvatarNotifierProvider.notifier).setRemoteUrl(null);
-      AppHaptics.success();
       AppSnack.show(
         context,
         message: context.l10n.profileAvatarRemovedMessage,

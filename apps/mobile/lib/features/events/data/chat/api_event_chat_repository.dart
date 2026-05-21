@@ -1,11 +1,7 @@
 import 'dart:async';
-import 'dart:collection';
-import 'dart:convert';
-import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:chisto_mobile/core/auth/auth_state.dart';
-import 'package:chisto_mobile/core/logging/app_log.dart';
 import 'package:chisto_mobile/core/config/app_config.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/network/api_client.dart';
@@ -14,50 +10,11 @@ import 'package:chisto_mobile/features/events/data/chat/event_chat_fetch_result.
 import 'package:chisto_mobile/features/events/data/chat/event_chat_message.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_participants.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_read_cursor.dart';
+import 'package:chisto_mobile/features/notifications/data/event_chat_mark_read_result.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_repository.dart';
 import 'package:chisto_mobile/features/events/data/chat/chat_message_list_parse.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_stream_event.dart';
 import 'package:chisto_mobile/features/events/data/chat/socket_event_chat_stream.dart';
-import 'package:http/http.dart' as http;
-
-/// Merges WebSocket + SSE connection states: connected if either path is up.
-class _ConnMergeState {
-  EventChatConnectionStatus? ws;
-  EventChatConnectionStatus? sse;
-  EventChatConnectionStatus? lastMerged;
-
-  EventChatConnectionStatus merged() {
-    if (ws == EventChatConnectionStatus.connected ||
-        sse == EventChatConnectionStatus.connected) {
-      return EventChatConnectionStatus.connected;
-    }
-    if (ws == EventChatConnectionStatus.disconnected &&
-        sse == EventChatConnectionStatus.disconnected) {
-      return EventChatConnectionStatus.disconnected;
-    }
-    return EventChatConnectionStatus.reconnecting;
-  }
-}
-
-/// Sliding dedupe for duplicate chat events when both SSE and WebSocket deliver the same update.
-class _DedupeBuffer {
-  final Queue<String> _order = Queue<String>();
-  final Set<String> _set = <String>{};
-  static const int _max = 250;
-
-  bool remember(String k) {
-    if (_set.contains(k)) {
-      return false;
-    }
-    _set.add(k);
-    _order.add(k);
-    while (_order.length > _max) {
-      final String r = _order.removeFirst();
-      _set.remove(r);
-    }
-    return true;
-  }
-}
 
 class ApiEventChatRepository implements EventChatRepository {
   ApiEventChatRepository({
@@ -72,32 +29,42 @@ class ApiEventChatRepository implements EventChatRepository {
   final String _baseUrl;
   final AuthState _authState;
 
+  static const int _maxOpenChatSockets = 6;
   final Map<String, SocketEventChatStream> _wsByEvent = <String, SocketEventChatStream>{};
+  final List<String> _chatSocketLru = <String>[];
   final Map<String, StreamSubscription<EventChatStreamEvent>> _wsSubs = {};
   final Map<String, StreamController<EventChatStreamEvent>> _chatByEvent = {};
-  final Map<String, Future<void>> _loops = {};
-  final Map<String, bool> _loopCancelled = {};
-  /// Bumped on stop and on each new realtime session so a prior [_runSseLoop] cannot
-  /// keep running after leave/re-enter chat (avoids clearing [_loopCancelled] for a stale loop).
-  final Map<String, int> _chatLiveSessionGen = <String, int>{};
-  final Map<String, _ConnMergeState> _connMerge = <String, _ConnMergeState>{};
-  final Map<String, _DedupeBuffer> _dedupeBuffers = <String, _DedupeBuffer>{};
 
   /// Parse message lists off the UI isolate when history is large.
   static const int _fetchMessagesIsolateThreshold = 80;
 
+  void _touchChatSocketLru(String eventId) {
+    _chatSocketLru.remove(eventId);
+    _chatSocketLru.add(eventId);
+    while (_chatSocketLru.length > _maxOpenChatSockets) {
+      final String evict = _chatSocketLru.removeAt(0);
+      _stopRealtime(evict);
+      final StreamController<EventChatStreamEvent>? ctrl = _chatByEvent.remove(evict);
+      if (ctrl != null && !ctrl.isClosed) {
+        unawaited(ctrl.close());
+      }
+    }
+  }
+
   SocketEventChatStream _wsStream(String eventId) {
+    _touchChatSocketLru(eventId);
     return _wsByEvent.putIfAbsent(eventId, () {
       return SocketEventChatStream(
         baseUrl: _baseUrl,
         authState: _authState,
+        sessionRefresh: () => _client.refreshSessionQueued(),
+        onAuthRejected: () => _client.notifySessionAuthRejected(),
       );
     });
   }
 
   StreamController<EventChatStreamEvent> _chatController(String eventId) {
     return _chatByEvent.putIfAbsent(eventId, () {
-      _loopCancelled[eventId] = false;
       late final StreamController<EventChatStreamEvent> ctrl;
       ctrl = StreamController<EventChatStreamEvent>.broadcast(
         onListen: () {
@@ -107,9 +74,8 @@ class ApiEventChatRepository implements EventChatRepository {
           final StreamController<EventChatStreamEvent>? c = _chatByEvent[eventId];
           if (c != null && !c.hasListener) {
             _stopRealtime(eventId);
-            _loopCancelled[eventId] = true;
             _chatByEvent.remove(eventId);
-            _loops.remove(eventId);
+            unawaited(c.close());
           }
         },
       );
@@ -118,108 +84,36 @@ class ApiEventChatRepository implements EventChatRepository {
   }
 
   void _startRealtime(String eventId, StreamController<EventChatStreamEvent> out) {
-    _loopCancelled[eventId] = false;
-    _chatLiveSessionGen[eventId] = (_chatLiveSessionGen[eventId] ?? 0) + 1;
-    final int sessionGen = _chatLiveSessionGen[eventId]!;
-    _connMerge.putIfAbsent(eventId, _ConnMergeState.new);
-    _dedupeBuffers.putIfAbsent(eventId, _DedupeBuffer.new);
-
+    // [messageStream] and [connectionStatus] both listen to the same broadcast
+    // controller; a second onListen must not call [SocketEventChatStream.connect]
+    // again or the first socket is disposed and the UI stays on "Reconnecting…".
     final SocketEventChatStream ws = _wsStream(eventId);
-    ws.connect(eventId);
-    _wsSubs[eventId]?.cancel();
+    if (_wsSubs.containsKey(eventId)) {
+      if (!out.isClosed) {
+        out.add(EventChatStreamConnectionChanged(ws.connectionStatus));
+      }
+      return;
+    }
     _wsSubs[eventId] = ws.stream.listen((EventChatStreamEvent e) {
-      if (out.isClosed) {
-        return;
+      if (!out.isClosed) {
+        out.add(e);
       }
-      if (e is EventChatStreamConnectionChanged) {
-        _updateMergedConnection(eventId, out, ws: e.status);
-        return;
-      }
-      _emitStreamEventDeduped(eventId, out, e, debugTransport: 'ws');
     });
+    ws.connect(eventId);
+  }
 
-    _loops[eventId] = _runSseLoop(eventId, out, sessionGen);
+  @override
+  EventChatConnectionStatus currentConnectionStatus(String eventId) {
+    return _wsByEvent[eventId]?.connectionStatus ??
+        EventChatConnectionStatus.disconnected;
   }
 
   void _stopRealtime(String eventId) {
-    _loopCancelled[eventId] = true;
-    _chatLiveSessionGen[eventId] = (_chatLiveSessionGen[eventId] ?? 0) + 1;
     _wsSubs[eventId]?.cancel();
     _wsSubs.remove(eventId);
     _wsByEvent[eventId]?.dispose();
     _wsByEvent.remove(eventId);
-    _connMerge.remove(eventId);
-    _dedupeBuffers.remove(eventId);
-    _loops.remove(eventId);
   }
-
-  void _updateMergedConnection(
-    String eventId,
-    StreamController<EventChatStreamEvent> out, {
-    EventChatConnectionStatus? ws,
-    EventChatConnectionStatus? sse,
-  }) {
-    if (out.isClosed) {
-      return;
-    }
-    final _ConnMergeState merge = _connMerge.putIfAbsent(eventId, _ConnMergeState.new);
-    if (ws != null) {
-      merge.ws = ws;
-    }
-    if (sse != null) {
-      merge.sse = sse;
-    }
-    final EventChatConnectionStatus next = merge.merged();
-    if (merge.lastMerged != next) {
-      merge.lastMerged = next;
-      out.add(EventChatStreamConnectionChanged(next));
-    }
-  }
-
-  String? _dedupeKeyFor(EventChatStreamEvent e) {
-    if (e is EventChatStreamMessageCreated) {
-      return 'c:${e.message.id}';
-    }
-    if (e is EventChatStreamMessageEdited) {
-      return 'e:${e.message.id}';
-    }
-    if (e is EventChatStreamMessagePinned) {
-      return 'p:${e.message.id}';
-    }
-    if (e is EventChatStreamMessageUnpinned) {
-      return 'u:${e.message.id}';
-    }
-    if (e is EventChatStreamMessageDeleted) {
-      return 'd:${e.messageId}';
-    }
-    return null;
-  }
-
-  void _emitStreamEventDeduped(
-    String eventId,
-    StreamController<EventChatStreamEvent> out,
-    EventChatStreamEvent e, {
-    required String debugTransport,
-  }) {
-    if (out.isClosed) {
-      return;
-    }
-    final String? key = _dedupeKeyFor(e);
-    if (key != null) {
-      final _DedupeBuffer buf = _dedupeBuffers.putIfAbsent(eventId, _DedupeBuffer.new);
-      if (!buf.remember(key)) {
-        AppLog.verbose('[chat:$debugTransport] dedupe drop $key event=$eventId (${e.runtimeType})');
-        return;
-      }
-      AppLog.verbose('[chat:$debugTransport] → UI $key ${e.runtimeType} event=$eventId');
-    } else {
-      AppLog.verbose('[chat:$debugTransport] → UI ${e.runtimeType} event=$eventId');
-    }
-    out.add(e);
-  }
-
-  EventChatMessage _normalizeMessage(EventChatMessage m) =>
-      m.withViewer(_authState.userId);
 
   @override
   Future<EventChatFetchResult> fetchMessages(
@@ -469,13 +363,17 @@ class ApiEventChatRepository implements EventChatRepository {
   }
 
   @override
-  Future<void> markRead(String eventId, String? lastReadMessageId) async {
-    await _client.patch(
+  Future<EventChatMarkReadResult?> markRead(
+    String eventId,
+    String? lastReadMessageId,
+  ) async {
+    final ApiResponse res = await _client.patch(
       '/events/$eventId/chat/read',
       body: lastReadMessageId != null
           ? <String, dynamic>{'lastReadMessageId': lastReadMessageId}
           : <String, dynamic>{},
     );
+    return EventChatMarkReadResult.fromResponseJson(res.json);
   }
 
   @override
@@ -588,8 +486,7 @@ class ApiEventChatRepository implements EventChatRepository {
 
   @override
   Future<void> setTyping(String eventId, bool typing) async {
-    // Always use REST so typing reaches SSE subscribers and Redis fan-out.
-    // WS-only emit skipped peers who only consume SSE and dropped events if the socket was not connected.
+    // REST typing is authoritative; WS is best-effort when offline.
     try {
       await _client.post(
         '/events/$eventId/chat/typing',
@@ -611,286 +508,5 @@ class ApiEventChatRepository implements EventChatRepository {
     return _chatController(eventId).stream.where((EventChatStreamEvent e) => e is EventChatStreamConnectionChanged).map(
           (EventChatStreamEvent e) => (e as EventChatStreamConnectionChanged).status,
         );
-  }
-
-  Future<void> _runSseLoop(
-    String eventId,
-    StreamController<EventChatStreamEvent> out,
-    int sessionGen,
-  ) async {
-    http.Client? sseClient;
-    String? lastStreamEventId;
-    int attempt = 0;
-    bool firstConnect = true;
-
-    bool sessionAlive() =>
-        _loopCancelled[eventId] != true &&
-        !out.isClosed &&
-        (_chatLiveSessionGen[eventId] ?? 0) == sessionGen;
-
-    void emitConn(EventChatConnectionStatus s) {
-      _updateMergedConnection(eventId, out, sse: s);
-    }
-
-    while (sessionAlive()) {
-      if (!_authState.isAuthenticated) {
-        if (!firstConnect) {
-          emitConn(EventChatConnectionStatus.reconnecting);
-        }
-        await Future<void>.delayed(const Duration(seconds: 1));
-        if (!sessionAlive()) {
-          break;
-        }
-        continue;
-      }
-      final String? token = _authState.accessToken;
-      if (token == null || token.isEmpty) {
-        if (!firstConnect) {
-          emitConn(EventChatConnectionStatus.reconnecting);
-        }
-        await Future<void>.delayed(const Duration(seconds: 1));
-        if (!sessionAlive()) {
-          break;
-        }
-        continue;
-      }
-      if (!firstConnect && attempt > 0) {
-        emitConn(EventChatConnectionStatus.reconnecting);
-      }
-      sseClient?.close();
-      final http.Client liveClient = http.Client();
-      sseClient = liveClient;
-      try {
-        await _connectSseOnce(
-          eventId: eventId,
-          token: token,
-          client: liveClient,
-          controller: out,
-          lastStreamEventId: lastStreamEventId,
-          logStreamOpenedDebug: firstConnect,
-          emitConnectionStatus: emitConn,
-          emitChatEvent: (EventChatStreamEvent evt) =>
-              _emitStreamEventDeduped(eventId, out, evt, debugTransport: 'sse'),
-          onStreamEventId: (String id) {
-            lastStreamEventId = id;
-          },
-        );
-        // Stream ended gracefully (server closed / keepalive timeout).
-        // Reset attempt counter and reconnect — this is NOT an error, so we must NOT emit reconnecting.
-        attempt = 0;
-        firstConnect = false;
-        if (!sessionAlive()) {
-          break;
-        }
-        // Avoid tight reconnect loops (ALB/proxy closes, log spam, request storms).
-        await Future<void>.delayed(const Duration(milliseconds: 750));
-        if (!sessionAlive()) {
-          break;
-        }
-        continue;
-      } on AppError catch (e) {
-        if (e.code == 'UNAUTHORIZED' || e.code == 'FORBIDDEN') {
-          emitConn(EventChatConnectionStatus.disconnected);
-          return;
-        }
-      } on Object catch (_) {
-        // reconnect with backoff
-      }
-      if (!sessionAlive()) {
-        break;
-      }
-      attempt += 1;
-      await Future<void>.delayed(_nextBackoff(attempt));
-    }
-  }
-
-  Duration _nextBackoff(int a) {
-    final int capped = a.clamp(1, 8);
-    final int baseMs = 500 * (1 << (capped - 1));
-    const int maxMs = 30 * 1000;
-    final int ms = math.min(baseMs, maxMs);
-    final int jitterMs = (ms * 0.2).round();
-    final int random =
-        DateTime.now().microsecondsSinceEpoch % ((jitterMs * 2) + 1);
-    final int withJitter = ms - jitterMs + random;
-    return Duration(milliseconds: withJitter.clamp(300, maxMs));
-  }
-
-  Future<void> _connectSseOnce({
-    required String eventId,
-    required String token,
-    required http.Client client,
-    required StreamController<EventChatStreamEvent> controller,
-    required String? lastStreamEventId,
-    required bool logStreamOpenedDebug,
-    required void Function(EventChatConnectionStatus status) emitConnectionStatus,
-    required void Function(EventChatStreamEvent evt) emitChatEvent,
-    required void Function(String id) onStreamEventId,
-  }) async {
-    final Uri uri = Uri.parse('$_baseUrl/events/$eventId/chat/events');
-    final http.Request req = http.Request('GET', uri);
-    req.headers['Accept'] = 'text/event-stream';
-    req.headers['Cache-Control'] = 'no-cache';
-    req.headers['Authorization'] = 'Bearer $token';
-    if (lastStreamEventId != null && lastStreamEventId.isNotEmpty) {
-      req.headers['Last-Event-ID'] = lastStreamEventId;
-    }
-
-    final http.StreamedResponse res = await client.send(req).timeout(
-      const Duration(seconds: 45),
-      onTimeout: () => throw TimeoutException('Chat SSE connect'),
-    );
-    if (res.statusCode == 401) {
-      _authState.setUnauthenticated();
-      emitConnectionStatus(EventChatConnectionStatus.disconnected);
-      throw AppError.unauthorized();
-    }
-    if (res.statusCode == 403) {
-      emitConnectionStatus(EventChatConnectionStatus.disconnected);
-      throw AppError.forbidden(message: 'Chat SSE forbidden');
-    }
-    if (res.statusCode < 200 || res.statusCode >= 300) {
-      AppLog.verbose('[chat:sse] connect failed event=$eventId status=${res.statusCode}');
-      throw AppError.network(message: 'Chat SSE failed: ${res.statusCode}');
-    }
-
-    if (kDebugMode && logStreamOpenedDebug) {
-      AppLog.verbose('[chat:sse] stream opened event=$eventId');
-    }
-    emitConnectionStatus(EventChatConnectionStatus.connected);
-
-    final Stream<String> lines =
-        res.stream.transform(utf8.decoder).transform(const LineSplitter());
-    final StringBuffer data = StringBuffer();
-    String? currentEventId;
-
-    Future<void> dispatch() async {
-      if (data.isEmpty) {
-        currentEventId = null;
-        return;
-      }
-      final String raw = data.toString();
-      data.clear();
-      Object? decoded;
-      try {
-        decoded = jsonDecode(raw);
-      } on Object catch (_) {
-        currentEventId = null;
-        return;
-      }
-      if (decoded is! Map<String, dynamic>) {
-        currentEventId = null;
-        return;
-      }
-      final String? type = decoded['type'] as String?;
-      if (type == 'heartbeat') {
-        currentEventId = null;
-        return;
-      }
-      if (currentEventId != null && currentEventId!.isNotEmpty) {
-        onStreamEventId(currentEventId!);
-      }
-      if (type == 'message_created') {
-        final Object? msg = decoded['message'];
-        if (msg is Map<String, dynamic>) {
-          final EventChatMessage? m = EventChatMessage.tryFromJson(msg);
-          if (m != null) {
-            emitChatEvent(EventChatStreamMessageCreated(_normalizeMessage(m)));
-          }
-        }
-      } else if (type == 'message_deleted') {
-        final String? mid = decoded['messageId'] as String?;
-        if (mid != null && mid.isNotEmpty) {
-          emitChatEvent(EventChatStreamMessageDeleted(mid));
-        }
-      } else if (type == 'message_edited') {
-        final Object? msg = decoded['message'];
-        if (msg is Map<String, dynamic>) {
-          final EventChatMessage? m = EventChatMessage.tryFromJson(msg);
-          if (m != null) {
-            emitChatEvent(EventChatStreamMessageEdited(_normalizeMessage(m)));
-          }
-        }
-      } else if (type == 'message_pinned') {
-        final Object? msg = decoded['message'];
-        if (msg is Map<String, dynamic>) {
-          final EventChatMessage? m = EventChatMessage.tryFromJson(msg);
-          if (m != null) {
-            emitChatEvent(EventChatStreamMessagePinned(_normalizeMessage(m)));
-          }
-        }
-      } else if (type == 'message_unpinned') {
-        final Object? msg = decoded['message'];
-        if (msg is Map<String, dynamic>) {
-          final EventChatMessage? m = EventChatMessage.tryFromJson(msg);
-          if (m != null) {
-            emitChatEvent(EventChatStreamMessageUnpinned(_normalizeMessage(m)));
-          }
-        }
-      } else if (type == 'typing_update') {
-        final Object? uid = decoded['userId'];
-        final Object? dn = decoded['displayName'];
-        final Object? ty = decoded['typing'];
-        if (uid is String && ty is bool) {
-          final String name = dn is String ? dn.trim() : '';
-          emitChatEvent(
-            EventChatStreamTypingUpdated(
-              eventId: eventId,
-              userId: uid,
-              displayName: name,
-              typing: ty,
-            ),
-          );
-        }
-      } else if (type == 'read_cursor_updated') {
-        final Object? uid = decoded['userId'];
-        final Object? dn = decoded['displayName'];
-        final Object? lid = decoded['lastReadMessageId'];
-        final Object? lca = decoded['lastReadMessageCreatedAt'];
-        if (uid is String && dn is String) {
-          DateTime? at;
-          if (lca is String && lca.isNotEmpty) {
-            at = DateTime.tryParse(lca);
-          }
-          emitChatEvent(
-            EventChatStreamReadCursorUpdated(
-              eventId: eventId,
-              userId: uid,
-              displayName: dn,
-              lastReadMessageId: lid is String ? lid : null,
-              lastReadMessageCreatedAt: at,
-            ),
-          );
-        }
-      }
-      currentEventId = null;
-    }
-
-    await for (final String line in lines) {
-      if (controller.isClosed) {
-        return;
-      }
-      if (line.isEmpty) {
-        await dispatch();
-        continue;
-      }
-      if (line.startsWith(':')) {
-        continue;
-      }
-      final int idx = line.indexOf(':');
-      final String field = idx == -1 ? line : line.substring(0, idx);
-      String value = idx == -1 ? '' : line.substring(idx + 1);
-      if (value.startsWith(' ')) {
-        value = value.substring(1);
-      }
-      if (field == 'data') {
-        if (data.isNotEmpty) {
-          data.writeln();
-        }
-        data.write(value);
-      } else if (field == 'id') {
-        currentEventId = value;
-      }
-    }
   }
 }

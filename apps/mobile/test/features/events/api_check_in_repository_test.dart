@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:chisto_mobile/core/config/app_config.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/network/api_client.dart';
+import 'package:chisto_mobile/core/network/request_cancellation.dart';
 import 'package:chisto_mobile/features/events/data/api_check_in_repository.dart';
 import 'package:chisto_mobile/features/events/domain/models/check_in_payload.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
@@ -41,7 +42,11 @@ class _StubApiClient extends ApiClient {
   }
 
   @override
-  Future<ApiResponse> get(String path, {Map<String, String>? headers}) async {
+  Future<ApiResponse> get(
+    String path, {
+    Map<String, String>? headers,
+    RequestCancellationToken? cancellation,
+  }) async {
     getCallCount++;
     return const ApiResponse(statusCode: 200, json: <String, dynamic>{});
   }

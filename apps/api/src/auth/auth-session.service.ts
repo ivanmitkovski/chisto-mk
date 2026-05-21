@@ -160,8 +160,6 @@ export class AuthSessionService {
     const accessToken = this.jwtService.sign(
       {
         sub: user.id,
-        email: user.email,
-        phoneNumber: user.phoneNumber,
         role: user.role,
         sid: session.id,
       },

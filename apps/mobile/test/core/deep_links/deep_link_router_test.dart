@@ -37,6 +37,15 @@ void main() {
       expect(DeepLinkRouter.parse(u), isA<DeepLinkNewReport>());
     });
 
+    test('parses /reset-password?token= for email reset', () {
+      final Uri u = Uri.parse(
+        'https://chisto.mk/reset-password?token=abc123',
+      );
+      final DeepLinkRoute? r = DeepLinkRouter.parse(u);
+      expect(r, isA<DeepLinkPasswordReset>());
+      expect((r as DeepLinkPasswordReset).token, 'abc123');
+    });
+
     test('parses home/map-focus with siteId query', () {
       final Uri u = Uri.parse('https://chisto.mk/app/home/map-focus?siteId=site-1');
       final DeepLinkRoute? r = DeepLinkRouter.parse(u);

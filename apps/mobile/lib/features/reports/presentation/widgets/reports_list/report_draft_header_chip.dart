@@ -1,4 +1,5 @@
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/providers/reports_providers.dart';
+import 'package:chisto_mobile/core/providers/root_container.dart';
 import 'package:chisto_mobile/core/observability/chisto_sentry.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
@@ -6,7 +7,6 @@ import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/reports/data/outbox/report_draft_repository.dart';
 import 'package:chisto_mobile/features/reports/presentation/l10n/report_draft_saved_label.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:flutter/material.dart';
 
 /// Compact draft affordance in the reports list pinned header.
@@ -28,7 +28,7 @@ class ReportDraftHeaderChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return ValueListenableBuilder<ReportDraftSummary>(
       valueListenable:
-          ServiceLocator.instance.reportDraftRepository.summaryListenable,
+          readRoot(reportDraftRepositoryProvider).summaryListenable,
       builder: (BuildContext context, ReportDraftSummary s, _) {
         if (!s.hasDraft) {
           return const SizedBox.shrink();
@@ -48,7 +48,6 @@ class ReportDraftHeaderChip extends StatelessWidget {
               child: InkWell(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                 onTap: () {
-                  AppHaptics.tap();
                   chistoReportsBreadcrumb(
                     'report_draft',
                     'entry_reports_list_chip',

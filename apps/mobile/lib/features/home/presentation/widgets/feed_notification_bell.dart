@@ -21,12 +21,23 @@ class FeedNotificationBell extends StatefulWidget {
   final double size;
 
   @override
-  State<FeedNotificationBell> createState() => _FeedNotificationBellState();
+  State<FeedNotificationBell> createState() => FeedNotificationBellState();
 }
 
-class _FeedNotificationBellState extends State<FeedNotificationBell>
-    with SingleTickerProviderStateMixin {
+class FeedNotificationBellState extends State<FeedNotificationBell>
+    with TickerProviderStateMixin {
+  static const Duration _swingDuration = Duration(milliseconds: 560);
+
   late final AnimationController _pulseController;
+  late final AnimationController _swingController;
+  late final Animation<double> _swingRotation;
+  late final Animation<double> _swingScale;
+
+  @visibleForTesting
+  AnimationController get swingController => _swingController;
+
+  @visibleForTesting
+  Animation<double> get swingRotation => _swingRotation;
 
   @override
   void initState() {
@@ -34,6 +45,35 @@ class _FeedNotificationBellState extends State<FeedNotificationBell>
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1600),
+    );
+    _swingController = AnimationController(
+      vsync: this,
+      duration: _swingDuration,
+    );
+    final CurvedAnimation swingCurve = CurvedAnimation(
+      parent: _swingController,
+      curve: AppMotion.decelerate,
+    );
+    _swingRotation = TweenSequence<double>(<TweenSequenceItem<double>>[
+      TweenSequenceItem<double>(
+        tween: Tween<double>(begin: 0, end: -0.24),
+        weight: 25,
+      ),
+      TweenSequenceItem<double>(
+        tween: Tween<double>(begin: -0.24, end: 0.17),
+        weight: 25,
+      ),
+      TweenSequenceItem<double>(
+        tween: Tween<double>(begin: 0.17, end: -0.09),
+        weight: 25,
+      ),
+      TweenSequenceItem<double>(
+        tween: Tween<double>(begin: -0.09, end: 0),
+        weight: 25,
+      ),
+    ]).animate(swingCurve);
+    _swingScale = Tween<double>(begin: 1, end: 1.06).animate(
+      CurvedAnimation(parent: _swingController, curve: AppMotion.emphasized),
     );
     if (widget.unreadCount > 0) {
       _pulseController.repeat(reverse: true);
@@ -43,6 +83,9 @@ class _FeedNotificationBellState extends State<FeedNotificationBell>
   @override
   void didUpdateWidget(covariant FeedNotificationBell oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (widget.unreadCount > oldWidget.unreadCount) {
+      _triggerSwing();
+    }
     if (oldWidget.unreadCount == 0 && widget.unreadCount > 0) {
       _pulseController.repeat(reverse: true);
     } else if (oldWidget.unreadCount > 0 && widget.unreadCount == 0) {
@@ -51,10 +94,69 @@ class _FeedNotificationBellState extends State<FeedNotificationBell>
     }
   }
 
+  void _triggerSwing() {
+    if (!mounted) return;
+    if (MediaQuery.disableAnimationsOf(context)) return;
+    _swingController.forward(from: 0);
+  }
+
   @override
   void dispose() {
     _pulseController.dispose();
+    _swingController.dispose();
     super.dispose();
+  }
+
+  Widget _buildBellBody({
+    required bool hasUnread,
+    required double inner,
+    required double icon,
+    required double m,
+  }) {
+    return Container(
+      width: inner,
+      height: inner,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: hasUnread
+              ? <Color>[
+                  AppColors.white,
+                  AppColors.accentDanger.withValues(alpha: 0.04),
+                ]
+              : <Color>[
+                  AppColors.white,
+                  AppColors.inputFill,
+                ],
+        ),
+        border: Border.all(
+          color: hasUnread
+              ? AppColors.accentDanger.withValues(alpha: 0.22)
+              : AppColors.divider,
+          width: 1,
+        ),
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: AppColors.shadowLight,
+            blurRadius: 10 * m,
+            offset: Offset(0, 3 * m),
+          ),
+        ],
+      ),
+      child: Center(
+        child: SvgPicture.asset(
+          AppAssets.notificationBing,
+          width: icon,
+          height: icon,
+          colorFilter: ColorFilter.mode(
+            hasUnread ? AppColors.accentDanger : AppColors.textPrimary,
+            BlendMode.srcIn,
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -103,50 +205,23 @@ class _FeedNotificationBellState extends State<FeedNotificationBell>
                   ),
                 ),
               Center(
-                child: Container(
-                  width: inner,
-                  height: inner,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: hasUnread
-                          ? <Color>[
-                              AppColors.white,
-                              AppColors.accentDanger.withValues(alpha: 0.04),
-                            ]
-                          : <Color>[
-                              AppColors.white,
-                              AppColors.inputFill,
-                            ],
-                    ),
-                    border: Border.all(
-                      color: hasUnread
-                          ? AppColors.accentDanger.withValues(alpha: 0.22)
-                          : AppColors.divider,
-                      width: 1,
-                    ),
-                    boxShadow: <BoxShadow>[
-                      BoxShadow(
-                        color: AppColors.shadowLight,
-                        blurRadius: 10 * m,
-                        offset: Offset(0, 3 * m),
+                child: AnimatedBuilder(
+                  animation: _swingController,
+                  builder: (BuildContext context, Widget? child) {
+                    return Transform.rotate(
+                      angle: _swingRotation.value,
+                      child: Transform.scale(
+                        scale: _swingScale.value,
+                        alignment: Alignment.center,
+                        child: child,
                       ),
-                    ],
-                  ),
-                  child: Center(
-                    child: SvgPicture.asset(
-                      AppAssets.notificationBing,
-                      width: icon,
-                      height: icon,
-                      colorFilter: ColorFilter.mode(
-                        hasUnread
-                            ? AppColors.accentDanger
-                            : AppColors.textPrimary,
-                        BlendMode.srcIn,
-                      ),
-                    ),
+                    );
+                  },
+                  child: _buildBellBody(
+                    hasUnread: hasUnread,
+                    inner: inner,
+                    icon: icon,
+                    m: m,
                   ),
                 ),
               ),
@@ -177,7 +252,9 @@ class _FeedNotificationBellState extends State<FeedNotificationBell>
                     ),
                     child: Center(
                       child: Text(
-                        widget.unreadCount > 9 ? '9+' : '${widget.unreadCount}',
+                        widget.unreadCount > 9
+                            ? '9+'
+                            : '${widget.unreadCount}',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: AppColors.textOnDark,
                               fontSize: badgeFont,
@@ -195,3 +272,7 @@ class _FeedNotificationBellState extends State<FeedNotificationBell>
     );
   }
 }
+
+/// Peak swing angle in radians (~14°) for tests and documentation.
+@visibleForTesting
+double feedNotificationBellPeakSwingRadians() => 0.24;

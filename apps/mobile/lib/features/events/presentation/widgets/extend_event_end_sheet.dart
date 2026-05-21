@@ -20,10 +20,10 @@ import 'package:chisto_mobile/features/events/presentation/utils/extend_event_en
 import 'package:chisto_mobile/features/events/presentation/widgets/edit_event/edit_event_schedule_conflict_callout.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/events_modal_sheet.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
 import 'package:intl/intl.dart' hide TextDirection;
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 
 Future<void> showExtendEventEndSheet({
   required BuildContext context,
@@ -178,7 +178,6 @@ class _ExtendEventEndSheetState extends State<ExtendEventEndSheet> {
   }
 
   void _bumpEnd(Duration delta) {
-    AppHaptics.tap();
     setState(() {
       _proposedEndLocal = clampProposedEndLocal(
         event: _event,
@@ -189,7 +188,6 @@ class _ExtendEventEndSheetState extends State<ExtendEventEndSheet> {
   }
 
   Future<void> _pickCustomEndTime() async {
-    AppHaptics.tap();
     final TimeOfDay initial = TimeOfDay.fromDateTime(_proposedEndLocal);
     final TimeOfDay? picked = await showTimePicker(
       context: context,
@@ -226,7 +224,6 @@ class _ExtendEventEndSheetState extends State<ExtendEventEndSheet> {
       now: DateTime.now(),
     );
     if (issue != null) {
-      AppHaptics.warning();
       final String message = switch (issue) {
         ScheduleValidationIssue.endNotAfterStart =>
           context.l10n.eventsExtendEndInvalidRange,
@@ -295,7 +292,6 @@ class _ExtendEventEndSheetState extends State<ExtendEventEndSheet> {
     final DateTime newEndUtc = _proposedEndLocal.toUtc();
     if (newEndUtc.millisecondsSinceEpoch ==
         _event.endDateTime.toUtc().millisecondsSinceEpoch) {
-      AppHaptics.warning();
       AppSnack.show(
         context,
         message: context.l10n.eventsExtendEndSameAsCurrent,
@@ -342,7 +338,6 @@ class _ExtendEventEndSheetState extends State<ExtendEventEndSheet> {
       return;
     }
     setState(() => _submitting = false);
-    AppHaptics.success();
     AppSnack.show(
       context,
       message: context.l10n.eventsExtendEndSuccess,
@@ -403,9 +398,10 @@ class _ExtendEventEndSheetState extends State<ExtendEventEndSheet> {
           const SizedBox(height: AppSpacing.sm),
           Align(
             alignment: Alignment.centerLeft,
-            child: TextButton(
-              onPressed: _submitting ? null : () => unawaited(_pickCustomEndTime()),
-              child: Text(context.l10n.eventsExtendEndCustomTime),
+            child: AppButton.text(
+              label: context.l10n.eventsExtendEndCustomTime,
+              onPressed: () => unawaited(_pickCustomEndTime()),
+              enabled: !_submitting,
             ),
           ),
           if (_scheduleConflictHint != null) ...<Widget>[

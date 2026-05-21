@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
@@ -6,7 +7,6 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 /// Bottom sheet: volunteer cap presets, no limit, or custom numeric entry.
 class CreateEventVolunteerCapPickerSheet extends StatefulWidget {
@@ -96,27 +96,10 @@ class _CreateEventVolunteerCapPickerSheetState
               ),
               const SizedBox(height: AppSpacing.sm),
             ],
-            SizedBox(
-              width: double.infinity,
-              height: 52,
-              child: ElevatedButton(
-                onPressed: _applyCustom,
-                style: ElevatedButton.styleFrom(
-                  elevation: 0,
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: AppColors.textPrimary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-                  ),
-                ),
-                child: Text(
-                  context.l10n.createEventVolunteerCapApply,
-                  style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
+            AppButton.primary(
+              label: context.l10n.createEventVolunteerCapApply,
+              onPressed: _applyCustom,
+              expand: true,
             ),
           ],
         ),
@@ -141,7 +124,6 @@ class _CreateEventVolunteerCapPickerSheetState
                   : AppColors.divider,
             ),
             onTap: () {
-              AppHaptics.tap();
               widget.onApply(null);
             },
           ),
@@ -165,7 +147,6 @@ class _CreateEventVolunteerCapPickerSheetState
                       : AppColors.divider,
                 ),
                 onTap: () {
-                  AppHaptics.tap();
                   widget.onApply(n);
                 },
               ),

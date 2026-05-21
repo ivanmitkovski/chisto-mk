@@ -1,3 +1,4 @@
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/theme/app_colors.dart';
@@ -52,13 +53,10 @@ class EventsAsyncSection extends StatelessWidget {
               const SizedBox(height: AppSpacing.sm),
               Align(
                 alignment: Alignment.centerLeft,
-                child: TextButton(
-                  style: TextButton.styleFrom(
-                    minimumSize: const Size(88, 44),
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                  onPressed: isLoading ? null : () => onRetry(),
-                  child: Text(retryLabel),
+                child: AppButton.text(
+                  label: retryLabel,
+                  onPressed: () => onRetry(),
+                  enabled: !isLoading,
                 ),
               ),
             ],

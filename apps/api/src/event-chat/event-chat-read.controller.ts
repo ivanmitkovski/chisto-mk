@@ -2,14 +2,11 @@ import {
   Body,
   Controller,
   Get,
-  Headers,
-  MessageEvent as NestMessageEvent,
   Param,
   Patch,
   Post,
   Put,
   Query,
-  Sse,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -20,7 +17,6 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { SkipThrottle, Throttle } from '@nestjs/throttler';
-import { concat, defer, finalize, from, interval, map, merge } from 'rxjs';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { ParseCuidPipe } from '../common/pipes/parse-cuid.pipe';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -34,7 +30,6 @@ import { EventChatAccessGuard } from './event-chat-access.guard';
 import { ApiEventChatStandardErrors } from './event-chat-openapi.decorators';
 import { EventChatListService } from './event-chat-list.service';
 import { EventChatPresenceService } from './event-chat-presence.service';
-import { EventChatSseService } from './event-chat-sse.service';
 import { EventChatThrottlerGuard } from './event-chat-throttler.guard';
 import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-error-responses.decorator';
 
@@ -44,12 +39,9 @@ import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-e
 @UseGuards(JwtAuthGuard, EventChatThrottlerGuard, EventChatAccessGuard)
 @ApiBearerAuth()
 export class EventChatReadController {
-  private static readonly HEARTBEAT_INTERVAL_MS = 25_000;
-
   constructor(
     private readonly list: EventChatListService,
     private readonly presence: EventChatPresenceService,
-    private readonly eventChatSse: EventChatSseService,
   ) {}
 
   @Get(':eventId/chat/unread-count')
@@ -148,43 +140,6 @@ export class EventChatReadController {
     @Query() query: SearchEventChatQueryDto,
   ) {
     return this.list.searchMessages(eventId, user, query);
-  }
-
-  @Sse(':eventId/chat/events')
-  @SkipThrottle()
-  @ApiOperation({
-    summary: 'SSE stream for chat message updates',
-    description:
-      'Requires `Authorization: Bearer`. Send optional `Last-Event-ID` header (or `last-event-id`) with the last ' +
-      'received `id` field to replay buffered events after that id, then continue with live events. ' +
-      'Heartbeat events have `data: {"type":"heartbeat"}` and no `id`. See docs/event-chat-stream-events.md.',
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Missing or invalid bearer token',
-    schema: { example: { code: 'UNAUTHORIZED', message: 'Unauthorized' } },
-  })
-  @ApiResponse({ status: 403, description: 'User may not access this event chat' })
-  streamChatEvents(
-    @Param('eventId', ParseCuidPipe) eventId: string,
-    @Headers('last-event-id') lastEventId?: string,
-  ) {
-    return defer(() => {
-      const replayEvents = this.eventChatSse.getReplaySince(eventId, lastEventId);
-      const toSse = (event: Record<string, unknown>): NestMessageEvent => ({
-        data: event as object,
-        type: String(event.type ?? 'message'),
-        id: String(event.streamEventId ?? ''),
-      });
-      const replay$ = from(replayEvents).pipe(map((e) => toSse(e as unknown as Record<string, unknown>)));
-      const live$ = this.eventChatSse.getStream(eventId).pipe(
-        map((e) => toSse(e as unknown as Record<string, unknown>)),
-      );
-      const heartbeat$ = interval(EventChatReadController.HEARTBEAT_INTERVAL_MS).pipe(
-        map(() => ({ data: { type: 'heartbeat' } } as NestMessageEvent)),
-      );
-      return concat(replay$, merge(live$, heartbeat$)).pipe(finalize(() => undefined));
-    });
   }
 
   @Get(':eventId/chat/read-cursors')

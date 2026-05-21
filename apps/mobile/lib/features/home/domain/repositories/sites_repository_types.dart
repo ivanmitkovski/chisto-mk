@@ -25,6 +25,23 @@ class SitesListResult {
   final DateTime? cachedAt;
   final DateTime? lastSuccessfulRefreshAt;
   final String feedVariant;
+
+  factory SitesListResult.empty({
+    required int page,
+    required int limit,
+    String feedVariant = 'v1',
+  }) {
+    return SitesListResult(
+      sites: const <PollutionSite>[],
+      total: 0,
+      page: page,
+      limit: limit,
+      nextCursor: null,
+      servedFromCache: false,
+      isStaleFallback: false,
+      feedVariant: feedVariant,
+    );
+  }
 }
 
 class MapSitesResult {
@@ -257,9 +274,7 @@ class SiteMapSearchRequest {
 
   Map<String, dynamic> toBodyJson() {
     final List<String>? st = statuses;
-    final List<String>? apiStatuses = st == null
-        ? null
-        : st.where(_apiWorkflowStatuses.contains).toList();
+    final List<String>? apiStatuses = st?.where(_apiWorkflowStatuses.contains).toList();
     final List<String>? pt = pollutionTypes;
     return <String, dynamic>{
       'query': query,

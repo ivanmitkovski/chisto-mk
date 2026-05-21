@@ -16,6 +16,7 @@ out/
 .env.*.local
 
 # IDE
+.cursor/
 .idea/
 .vscode/
 *.swp
@@ -41,6 +42,9 @@ coverage/
 # Misc
 *.tsbuildinfo
 .turbo
+apps/api/tmp/
+apps/api/coverage-area-runs/
+apps/api/coverage-baseline-tmp/
 
 # Flutter
 apps/mobile/.dart_tool/

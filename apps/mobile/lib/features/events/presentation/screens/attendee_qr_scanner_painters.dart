@@ -146,7 +146,7 @@ class AttendeeQrSquareScanFramePainter extends CustomPainter {
           <Color>[
             color.withValues(alpha: 0.11),
             color.withValues(alpha: 0.03),
-            Colors.transparent,
+            AppColors.transparent,
           ],
           <double>[0.0, 0.45, 1.0],
         );

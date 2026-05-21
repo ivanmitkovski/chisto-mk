@@ -1,5 +1,6 @@
 import 'dart:ui' as ui;
 
+import 'package:chisto_mobile/core/theme/app_radii.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -47,7 +48,7 @@ Widget attendeeQrScannerGlassChip(
   final Widget inner = DecoratedBox(
     decoration: BoxDecoration(
       color: AppColors.glassDark,
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(AppSpacing.radius14),
       border: Border.all(color: AppColors.white.withValues(alpha: 0.12)),
     ),
     child: Padding(
@@ -74,7 +75,7 @@ Widget attendeeQrScannerGlassChip(
     return inner;
   }
   return ClipRRect(
-    borderRadius: BorderRadius.circular(14),
+    borderRadius: BorderRadius.circular(AppSpacing.radius14),
     child: BackdropFilter(
       filter: ui.ImageFilter.blur(sigmaX: 14, sigmaY: 14),
       child: inner,
@@ -90,7 +91,7 @@ Widget attendeeQrScannerGlassBottomPanel(
   final Widget inner = DecoratedBox(
     decoration: BoxDecoration(
       color: AppColors.glassDark,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: AppRadii.lg,
       border: Border.all(color: AppColors.white.withValues(alpha: 0.1)),
     ),
     child: Padding(
@@ -102,7 +103,7 @@ Widget attendeeQrScannerGlassBottomPanel(
     return inner;
   }
   return ClipRRect(
-    borderRadius: BorderRadius.circular(16),
+    borderRadius: AppRadii.lg,
     child: BackdropFilter(
       filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
       child: inner,
@@ -117,7 +118,7 @@ Widget attendeeQrScannerProcessingHud(BuildContext context) {
   final Widget card = DecoratedBox(
     decoration: BoxDecoration(
       color: AppColors.white.withValues(alpha: 0.1),
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: AppRadii.lg,
       border: Border.all(color: AppColors.white.withValues(alpha: 0.14)),
     ),
     child: Padding(
@@ -146,7 +147,7 @@ Widget attendeeQrScannerProcessingHud(BuildContext context) {
     return card;
   }
   return ClipRRect(
-    borderRadius: BorderRadius.circular(16),
+    borderRadius: AppRadii.lg,
     child: BackdropFilter(
       filter: ui.ImageFilter.blur(sigmaX: 24, sigmaY: 24),
       child: card,

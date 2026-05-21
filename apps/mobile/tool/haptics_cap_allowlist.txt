@@ -1,0 +1,4 @@
+# Optional per-file caps on AppHaptics.* call count (path:max).
+# Files not listed are uncapped; listed files may not exceed max during migration.
+lib/features/events/presentation/organizer_checkin/organizer_checkin_screen_state.dart:14
+lib/features/home/presentation/notifications_inbox/notifications_inbox_screen_state.dart:1

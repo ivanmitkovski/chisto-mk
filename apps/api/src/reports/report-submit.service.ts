@@ -1,7 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
   AdminNotificationCategory,
   AdminNotificationTone,
+  NotificationType,
   Prisma,
   ReportCleanupEffort,
 } from '../prisma-client';
@@ -20,6 +22,8 @@ import { adminSubmitNotificationCopy, getReportNumber } from './report-copy.help
 import type { ReportSubmitLocale } from './report-locale.util';
 import { ObservabilityStore } from '../observability/observability.store';
 import { ReportsUploadService } from './reports-upload.service';
+import { reportReceivedUserCopy } from '../notifications/notification-templates';
+import { SiteHistoryWriterService } from '../sites/history/site-history-writer.service';
 
 @Injectable()
 export class ReportSubmitService {
@@ -34,6 +38,8 @@ export class ReportSubmitService {
     private readonly nearbySiteResolver: NearbySiteForReportSubmitResolver,
     private readonly idempotency: ReportSubmitIdempotencyService,
     private readonly mediaAppend: ReportSubmitMediaAppendService,
+    private readonly eventEmitter: EventEmitter2,
+    private readonly siteHistoryWriter: SiteHistoryWriterService,
   ) {}
 
   async createWithLocation(
@@ -104,6 +110,14 @@ export class ReportSubmitService {
           siteId = newSite.id;
           isNewSite = true;
           siteUpdatedAt = newSite.updatedAt;
+          await this.siteHistoryWriter.recordSiteCreated(
+            {
+              siteId,
+              occurredAt: newSite.createdAt,
+              actor: { userId: user.userId, role: user.role },
+            },
+            tx,
+          );
         }
 
         const newReport = await tx.report.create({
@@ -119,6 +133,16 @@ export class ReportSubmitService {
             cleanupEffort: cleanupEffortParsed,
           },
         });
+
+        await this.siteHistoryWriter.recordReportSubmitted(
+          {
+            siteId,
+            reportId: newReport.id,
+            occurredAt: newReport.createdAt,
+            actor: { userId: user.userId, role: user.role },
+          },
+          tx,
+        );
 
         if (
           primaryReport &&
@@ -190,6 +214,8 @@ export class ReportSubmitService {
         });
       }
 
+      this.siteHistoryWriter.emitHistoryAppended(result.siteId, result.reportId);
+
       this.postCreateEvents.emit({
         userId: user.userId,
         reportId: result.reportId,
@@ -201,6 +227,24 @@ export class ReportSubmitService {
         latitude,
         longitude,
       });
+
+      const inboxLocale = locale === 'en' ? 'en' : 'mk';
+      const receivedCopy = reportReceivedUserCopy(inboxLocale, result.reportNumber);
+      this.eventEmitter.emit('notification.send', {
+        recipientUserIds: [user.userId],
+        title: receivedCopy.title,
+        body: receivedCopy.body,
+        type: NotificationType.SYSTEM,
+        data: {
+          kind: 'report_received',
+          reportId: result.reportId,
+          siteId: result.siteId,
+          reportNumber: result.reportNumber,
+        },
+        threadKey: `report_received:${result.reportId}`,
+        groupKey: `SYSTEM:report_received:${result.siteId}`,
+      });
+
       ObservabilityStore.recordReportSubmit('success', Date.now() - startedAt);
       this.logger.log(
         JSON.stringify({

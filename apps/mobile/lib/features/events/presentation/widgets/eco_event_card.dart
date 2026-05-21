@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_card_chrome.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
+import 'package:chisto_mobile/core/theme/app_shadows.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
@@ -14,7 +15,7 @@ import 'package:chisto_mobile/features/events/presentation/utils/ellipsize_words
 import 'package:chisto_mobile/features/events/presentation/utils/event_calendar_date_format.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/events_localized_strings.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_cover_image.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
+import 'package:chisto_mobile/core/theme/app_colors.dart';
 
 class EcoEventCard extends StatefulWidget {
   const EcoEventCard({
@@ -326,10 +327,9 @@ class _EcoEventCardState extends State<EcoEventCard> {
             duration: AppMotion.xFast,
             curve: AppMotion.emphasized,
             child: Material(
-              color: Colors.transparent,
+              color: AppColors.transparent,
               child: InkWell(
                 onTap: () {
-                  AppHaptics.softTransition();
                   widget.onTap();
                 },
                 borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
@@ -363,13 +363,7 @@ class _Thumbnail extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(AppSpacing.radius14),
           border: Border.all(color: colorScheme.surface, width: 2),
-          boxShadow: <BoxShadow>[
-            BoxShadow(
-              color: colorScheme.shadow.withValues(alpha: 0.08),
-              blurRadius: AppSpacing.xxs,
-              offset: const Offset(0, 1),
-            ),
-          ],
+          boxShadow: AppShadows.softCard(colorScheme),
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(AppSpacing.radius14),

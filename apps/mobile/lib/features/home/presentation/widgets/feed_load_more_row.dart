@@ -1,6 +1,7 @@
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:flutter/material.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_loading_indicator.dart';
 
 /// Trailing row for the feed [SliverList] when loading more or retrying.
 class FeedLoadMoreRow extends StatelessWidget {
@@ -34,8 +35,8 @@ class FeedLoadMoreRow extends StatelessWidget {
       container: true,
       liveRegion: true,
       label: context.l10n.feedLoadingMoreSemantic,
-      child: const Padding(
-        padding: EdgeInsets.symmetric(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.lg,
           vertical: AppSpacing.md,
         ),
@@ -43,7 +44,7 @@ class FeedLoadMoreRow extends StatelessWidget {
           child: SizedBox(
             width: 24,
             height: 24,
-            child: CircularProgressIndicator(strokeWidth: 2),
+            child: AppLoadingIndicator(size: AppLoadingIndicatorSize.sm),
           ),
         ),
       ),

@@ -1,5 +1,5 @@
 import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
-import 'package:chisto_mobile/features/events/data/in_memory_events_store.dart';
+import '../../support/events/in_memory_events_store.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/screens/edit_event_sheet.dart';
 import 'package:chisto_mobile/features/events/presentation/screens/event_detail_screen.dart';
@@ -15,8 +15,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../shared/widget_test_bootstrap.dart';
+
 void main() {
   late InMemoryEventsStore store;
+
+  setUpAll(() async {
+    await bootstrapWidgetTests();
+  });
 
   setUp(() async {
     SharedPreferences.setMockInitialValues(<String, Object>{});

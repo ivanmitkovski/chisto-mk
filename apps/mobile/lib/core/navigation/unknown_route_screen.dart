@@ -1,13 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
 
 /// Shown when [Navigator] requests an unknown named route (bad deep link, typo, stale link).
 class UnknownRouteScreen extends StatelessWidget {
@@ -20,7 +20,7 @@ class UnknownRouteScreen extends StatelessWidget {
   final String? attemptedRouteName;
 
   void _continueToApp(BuildContext context) {
-    final bool authed = ServiceLocator.instance.authState.isAuthenticated;
+    final bool authed = AppBootstrap.instance.authState.isAuthenticated;
     final String target = authed ? AppRoutes.home : AppRoutes.onboarding;
     Navigator.of(context).pushNamedAndRemoveUntil(
       target,

@@ -1,0 +1,9 @@
+lib/features/events/presentation/organizer_checkin/organizer_checkin_confirm_sheet.dart:39
+lib/features/events/presentation/widgets/chat/chat_input_bar.dart:711
+lib/features/events/presentation/widgets/chat/chat_message_bubble.dart:1155
+lib/features/events/presentation/widgets/chat/chat_message_bubble.dart:422
+lib/features/events/presentation/widgets/create_event/recurrence_picker_sheet.dart:111
+lib/features/home/presentation/screens/saved_map_areas_screen.dart:180
+lib/features/home/presentation/widgets/map/map_filter_sheet.dart:188
+lib/features/home/presentation/widgets/map/search_modal.dart:147
+lib/features/onboarding/presentation/widgets/story_guide_progress_bar.dart:41

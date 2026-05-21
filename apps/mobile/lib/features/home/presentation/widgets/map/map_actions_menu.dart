@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:chisto_mobile/core/theme/app_shadows.dart';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -8,7 +9,7 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_loading_indicator.dart';
 
 const double _mapControlTapTargetSize = 48;
 
@@ -219,7 +220,6 @@ class _MapActionsMenuState extends State<MapActionsMenu>
               curve: Curves.easeInOutCubic,
               child: _frostedButton(
                 onTap: () {
-                  AppHaptics.light();
                   _toggle();
                 },
                 icon: Icons.apps_rounded,
@@ -269,7 +269,6 @@ class _MapActionsMenuState extends State<MapActionsMenu>
           ),
           child: _frostedButton(
             onTap: () {
-              AppHaptics.softTransition(context);
               final bool enabling = !widget.showHeatmap;
               widget.onToggleHeatmap();
               if (enabling) {
@@ -331,11 +330,9 @@ class _MapActionsMenuState extends State<MapActionsMenu>
           iconChild: widget.isLocating
               ? Padding(
                   padding: const EdgeInsets.all(10),
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      AppColors.primaryDark.withValues(alpha: 0.7),
-                    ),
+                  child: AppLoadingIndicator(
+                    size: AppLoadingIndicatorSize.sm,
+                    color: AppColors.primaryDark.withValues(alpha: 0.7),
                   ),
                 )
               : Icon(
@@ -396,7 +393,7 @@ class MapFilterButton extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(AppSpacing.radius14),
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
             child: AnimatedContainer(
@@ -410,7 +407,7 @@ class MapFilterButton extends StatelessWidget {
                     : useDarkTiles
                         ? AppColors.glassDark.withValues(alpha: 0.52)
                         : AppColors.white.withValues(alpha: 0.65),
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(AppSpacing.radius14),
                 border: Border.all(
                   color: hasFilterActive
                       ? AppColors.primary.withValues(alpha: 0.45)
@@ -514,13 +511,7 @@ class MapSearchIconButton extends StatelessWidget {
               color: bg,
               shape: BoxShape.circle,
               border: Border.all(color: border),
-              boxShadow: <BoxShadow>[
-                BoxShadow(
-                  color: AppColors.shadowLight,
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+              boxShadow: AppShadows.panel(Theme.of(context).colorScheme),
             ),
             child: Icon(Icons.search_rounded, size: 20, color: fg),
           ),
@@ -569,13 +560,7 @@ class MapCompassButton extends StatelessWidget {
               color: bg,
               shape: BoxShape.circle,
               border: Border.all(color: border),
-              boxShadow: <BoxShadow>[
-                BoxShadow(
-                  color: AppColors.shadowLight,
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+              boxShadow: AppShadows.panel(Theme.of(context).colorScheme),
             ),
             child: AnimatedRotation(
               turns: -rotationDegrees / 360,

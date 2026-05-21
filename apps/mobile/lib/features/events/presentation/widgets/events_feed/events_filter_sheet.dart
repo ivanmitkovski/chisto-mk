@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
@@ -10,8 +11,7 @@ import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event_search_params.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/events_localized_strings.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_panel_bottom_sheet.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/app_panel_bottom_sheet.dart';
 
 /// Bottom-sheet filter panel for the events feed.
 ///
@@ -63,7 +63,6 @@ class _EventsFilterSheetState extends State<EventsFilterSheet> {
   }
 
   void _toggleCategory(EcoEventCategory cat) {
-    AppHaptics.tap();
     setState(() {
       if (_categories.contains(cat)) {
         _categories.remove(cat);
@@ -74,7 +73,6 @@ class _EventsFilterSheetState extends State<EventsFilterSheet> {
   }
 
   void _toggleStatus(EcoEventStatus status) {
-    AppHaptics.tap();
     setState(() {
       if (_statuses.contains(status)) {
         _statuses.remove(status);
@@ -85,7 +83,6 @@ class _EventsFilterSheetState extends State<EventsFilterSheet> {
   }
 
   void _clearAll() {
-    AppHaptics.tap();
     setState(() {
       _categories = <EcoEventCategory>{};
       _statuses = <EcoEventStatus>{};
@@ -190,22 +187,12 @@ class _EventsFilterSheetState extends State<EventsFilterSheet> {
         ),
         footer: Padding(
           padding: const EdgeInsets.only(top: AppSpacing.sm),
-          child: FilledButton(
+          child: AppButton.primary(
+            label: _activeCount > 0
+                ? context.l10n.eventsFilterSheetActiveCount(_activeCount)
+                : context.l10n.eventsFilterSheetShowResults,
             onPressed: _apply,
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: AppColors.white,
-              minimumSize: const Size.fromHeight(50),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-              ),
-            ),
-            child: Text(
-              _activeCount > 0
-                  ? context.l10n.eventsFilterSheetActiveCount(_activeCount)
-                  : context.l10n.eventsFilterSheetShowResults,
-              style: AppTypography.eventsPrimaryButtonLabel(textTheme),
-            ),
+            expand: true,
           ),
         ),
         child: SingleChildScrollView(

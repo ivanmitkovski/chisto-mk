@@ -140,7 +140,7 @@ class LocationPickerController extends ChangeNotifier {
       final bool ok = await _ensurePermission();
       if (_disposed) return;
       if (!ok) {
-        AppHaptics.gpsFailed();
+        AppHaptics.warning();
         resolvingGps = false;
         permissionUnavailable = true;
         gpsOutsideCoverage = false;
@@ -156,7 +156,7 @@ class LocationPickerController extends ChangeNotifier {
       if (_disposed) return;
 
       if (!ReportGeoFence.contains(pos.latitude, pos.longitude)) {
-        AppHaptics.gpsFailed();
+        AppHaptics.warning();
         resolvingGps = false;
         gpsOutsideCoverage = true;
         gpsNeedsReview = false;
@@ -177,7 +177,6 @@ class LocationPickerController extends ChangeNotifier {
       gpsNeedsReview = needsReview;
       notifyListeners();
       safeMapMove(position, 17.5);
-      AppHaptics.gpsFound();
       await reverseGeocode(
         position,
         fromUser: false,
@@ -186,7 +185,7 @@ class LocationPickerController extends ChangeNotifier {
       );
     } catch (_) {
       if (!_disposed) {
-        AppHaptics.gpsFailed();
+        AppHaptics.warning();
         resolvingGps = false;
         locationLookupFailed = true;
         gpsNeedsReview = true;
@@ -214,15 +213,12 @@ class LocationPickerController extends ChangeNotifier {
       newCenter.longitude,
     );
     if (atFence && !wasAtFenceLastMove) {
-      AppHaptics.boundaryLimitPulse();
+      AppHaptics.warning();
     }
     wasAtFenceLastMove = atFence;
 
     const double kMaxZoom = 19;
     final bool atMaxZoom = newZoom >= kMaxZoom;
-    if (atMaxZoom && !wasAtMaxZoomLastMove) {
-      AppHaptics.light();
-    }
     wasAtMaxZoomLastMove = atMaxZoom;
 
     if (_disposed) return;
@@ -324,7 +320,6 @@ class LocationPickerController extends ChangeNotifier {
   Future<void> retryGeocode() async {
     final LatLng? center = currentCenter;
     if (center == null || geocodingInProgress || _disposed) return;
-    AppHaptics.light();
     geocodeRetryCount += 1;
     final int requestId = ++geocodeRequestId;
     geocodingInProgress = true;
@@ -341,14 +336,14 @@ class LocationPickerController extends ChangeNotifier {
     final LatLng? position = currentCenter;
     if (position == null || _disposed) return;
     if (!currentPositionIsInMacedoniaByApi) {
-      AppHaptics.locationRejected();
+      AppHaptics.warning();
       return;
     }
     confirmedCenter = position;
     needsConfirmation = false;
     gpsNeedsReview = false;
     notifyListeners();
-    AppHaptics.locationConfirmed();
+    AppHaptics.success();
     _notifyParent(position, isInMacedonia: true, fromUser: fromUser);
   }
 
@@ -385,6 +380,7 @@ class LocationPickerController extends ChangeNotifier {
     _disposed = true;
     geocodeDebounce?.cancel();
     stableAutoConfirmTimer?.cancel();
+    mapController.dispose();
     super.dispose();
   }
 }

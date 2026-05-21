@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
+import 'package:chisto_mobile/core/providers/home_providers.dart';
+import 'package:chisto_mobile/core/providers/root_container.dart';
 import 'package:chisto_mobile/features/notifications/data/notification_open_diagnostics.dart';
 import 'package:chisto_mobile/features/notifications/data/notification_open_payload.dart';
 import 'package:chisto_mobile/shared/current_user.dart';
@@ -14,6 +16,43 @@ enum _NotificationOpenChannel {
 
 class NotificationOpenRouter {
   const NotificationOpenRouter._();
+
+  static void _pushNamedAfterFrame(
+    BuildContext context,
+    String routeName, {
+    Object? arguments,
+  }) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!context.mounted) {
+        return;
+      }
+      Navigator.of(context).pushNamed(routeName, arguments: arguments);
+    });
+  }
+
+  static void _navigateHomeAfterFrame(
+    BuildContext context, {
+    Object? arguments,
+  }) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!context.mounted) {
+        return;
+      }
+      AppRouter.navigateToHome(context, arguments: arguments);
+    });
+  }
+
+  static void _navigateHomeMapFocusAfterFrame(
+    BuildContext context, {
+    required MapSiteFocusRouteArgs args,
+  }) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!context.mounted) {
+        return;
+      }
+      AppRouter.navigateToHomeMapFocus(context, args: args);
+    });
+  }
 
   static void handleOpen(BuildContext context, RemoteMessage message) {
     NotificationOpenDiagnostics.recordOpenAttempt('push_remote');
@@ -45,13 +84,23 @@ class NotificationOpenRouter {
     required _NotificationOpenChannel channel,
     String? notificationTitle,
   }) {
+    final String? notificationId = data['notificationId'] as String?;
     final String? type = data['type'] as String?;
+    if (notificationId != null && notificationId.isNotEmpty) {
+      final notificationsRepo = readRoot(notificationsRepositoryProvider);
+      // ignore: discarded_futures
+      notificationsRepo.recordOpened(notificationId);
+      if (type == 'EVENT_CHAT') {
+        // ignore: discarded_futures
+        notificationsRepo.markAsRead(notificationId);
+      }
+    }
     final String? siteId = data['siteId'] as String?;
 
     if (siteId != null && siteId.isNotEmpty) {
-      Navigator.of(context).pushNamed(
-        AppRoutes.homeMapFocus,
-        arguments: MapSiteFocusRouteArgs(siteId: siteId),
+      _navigateHomeMapFocusAfterFrame(
+        context,
+        args: MapSiteFocusRouteArgs(siteId: siteId),
       );
       NotificationOpenDiagnostics.recordOpenSuccess(
         channel == _NotificationOpenChannel.remoteMessage ? 'push_site_map_focus' : 'data_site_map_focus',
@@ -65,7 +114,7 @@ class NotificationOpenRouter {
       case 'UPVOTE':
       case 'COMMENT':
       case 'NEARBY_REPORT':
-        Navigator.of(context).pushNamed(AppRoutes.home, arguments: 0);
+        _navigateHomeAfterFrame(context, arguments: 0);
         NotificationOpenDiagnostics.recordOpenSuccess(
           channel == _NotificationOpenChannel.remoteMessage ? 'push_home' : 'data_home',
         );
@@ -75,7 +124,8 @@ class NotificationOpenRouter {
         if (eventId != null &&
             eventId.isNotEmpty &&
             notificationOpenPayloadLooksLikeEventId(eventId)) {
-          Navigator.of(context).pushNamed(
+          _pushNamedAfterFrame(
+            context,
             AppRoutes.eventsDetail,
             arguments: EventRouteArguments(eventId: eventId),
           );
@@ -84,7 +134,7 @@ class NotificationOpenRouter {
           );
           return;
         }
-        Navigator.of(context).pushNamed(AppRoutes.homeEvents);
+        _pushNamedAfterFrame(context, AppRoutes.homeEvents);
         NotificationOpenDiagnostics.recordOpenSuccess(
           channel == _NotificationOpenChannel.remoteMessage ? 'push_events' : 'data_events',
         );
@@ -105,7 +155,8 @@ class NotificationOpenRouter {
           final bool isOrganizer = cachedEvent != null &&
               cachedEvent.organizerId.isNotEmpty &&
               cachedEvent.organizerId == CurrentUser.id;
-          Navigator.of(context).pushNamed(
+          _pushNamedAfterFrame(
+            context,
             AppRoutes.eventChat,
             arguments: EventChatRouteArguments(
               eventId: chatEventId,
@@ -118,13 +169,13 @@ class NotificationOpenRouter {
           );
           return;
         }
-        Navigator.of(context).pushNamed(AppRoutes.homeEvents);
+        _pushNamedAfterFrame(context, AppRoutes.homeEvents);
         NotificationOpenDiagnostics.recordOpenSuccess(
           channel == _NotificationOpenChannel.remoteMessage ? 'push_events_fallback' : 'data_events_fallback',
         );
         return;
       default:
-        Navigator.of(context).pushNamed(AppRoutes.home, arguments: 0);
+        _navigateHomeAfterFrame(context, arguments: 0);
         NotificationOpenDiagnostics.recordOpenSuccess(
           channel == _NotificationOpenChannel.remoteMessage ? 'push_default' : 'data_home',
         );

@@ -27,6 +27,7 @@ import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { ParseCuidPipe } from '../common/pipes/parse-cuid.pipe';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { PhoneVerifiedGuard } from '../auth/phone-verified.guard';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { ListEventParticipantsResponseDto } from './dto/event-participant-row.dto';
 import { ListEventParticipantsQueryDto } from './dto/list-event-participants-query.dto';
@@ -165,7 +166,7 @@ export class EventsController {
   }
 
   @Post(':id/join')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PhoneVerifiedGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Join event' })
   @ApiBadRequestResponse({

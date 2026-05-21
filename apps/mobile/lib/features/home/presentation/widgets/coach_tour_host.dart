@@ -14,9 +14,9 @@ import 'package:chisto_mobile/features/onboarding/presentation/coach/coach_tour_
 import 'package:chisto_mobile/features/onboarding/presentation/coach/coach_tour_visual_policy.dart';
 import 'package:chisto_mobile/features/onboarding/presentation/widgets/story_guide_progress_bar.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:go_router/go_router.dart';
@@ -295,7 +295,6 @@ class _CoachTourHostState extends State<CoachTourHost>
     AppLocalizations l10n,
     bool reduceMotion,
   ) async {
-    AppHaptics.light(context);
     if (widget.controller.isLastStep) {
       try {
         await widget.controller.completeWithCelebration(
@@ -495,7 +494,6 @@ class _CoachTourHostState extends State<CoachTourHost>
                     );
                   },
                   onSkip: () {
-                    AppHaptics.light(context);
                     unawaited(widget.controller.skip());
                   },
                 );
@@ -553,7 +551,7 @@ class _CoachTooltipCard extends StatelessWidget {
         elevation: 8,
         shadowColor: AppColors.shadowLight.withValues(alpha: 0.5),
         color: AppColors.panelBackground,
-        surfaceTintColor: Colors.transparent,
+        surfaceTintColor: AppColors.transparent,
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
@@ -590,23 +588,10 @@ class _CoachTooltipCard extends StatelessWidget {
                     Semantics(
                       button: true,
                       label: skipSemantics,
-                      child: TextButton(
-                        style: TextButton.styleFrom(
-                          foregroundColor: AppColors.textSecondary,
-                          minimumSize: const Size(48, 44),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.sm,
-                          ),
-                          tapTargetSize: MaterialTapTargetSize.padded,
-                        ),
-                        onPressed: busy ? null : onSkip,
-                        child: Text(
-                          skipLabel,
-                          style: tt.titleSmall!.copyWith(
-                            color: AppColors.textSecondary,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                      child: AppButton.text(
+                        label: skipLabel,
+                        onPressed: onSkip,
+                        enabled: !busy,
                       ),
                     ),
                   ],

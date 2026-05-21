@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:chisto_mobile/core/theme/app_radii.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
@@ -195,7 +196,7 @@ class EventEvidenceStripSection extends StatelessWidget {
                                               color: AppColors.textPrimary
                                                   .withValues(alpha: 0.72),
                                               borderRadius:
-                                                  BorderRadius.circular(4),
+                                                  AppRadii.xs,
                                             ),
                                             child: Padding(
                                               padding:

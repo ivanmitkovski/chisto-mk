@@ -874,6 +874,60 @@ abstract class AppLocalizations {
   /// **'Remember me'**
   String get authRememberMe;
 
+  /// No description provided for @authSessionExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Your session expired. Please sign in again.'**
+  String get authSessionExpired;
+
+  /// No description provided for @authPhoneNotVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify your phone number to sign in.'**
+  String get authPhoneNotVerified;
+
+  /// No description provided for @authVerifyPhoneCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify phone'**
+  String get authVerifyPhoneCta;
+
+  /// No description provided for @authResetViaEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset via email'**
+  String get authResetViaEmail;
+
+  /// No description provided for @authResetViaSms.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset via SMS'**
+  String get authResetViaSms;
+
+  /// No description provided for @authForgotPasswordEmailSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the email on your account and we\'ll send a reset link if it exists.'**
+  String get authForgotPasswordEmailSubtitle;
+
+  /// No description provided for @authForgotPasswordEmailSentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your email'**
+  String get authForgotPasswordEmailSentTitle;
+
+  /// No description provided for @authForgotPasswordEmailSentBody.
+  ///
+  /// In en, this message translates to:
+  /// **'If an account exists for that email, we sent a link to reset your password.'**
+  String get authForgotPasswordEmailSentBody;
+
+  /// No description provided for @authForgotPasswordEmailField.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get authForgotPasswordEmailField;
+
   /// No description provided for @authForgotPassword.
   ///
   /// In en, this message translates to:
@@ -987,6 +1041,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sign in'**
   String get authSignInLink;
+
+  /// No description provided for @authValidationFullNameTwoParts.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your first and last name'**
+  String get authValidationFullNameTwoParts;
 
   /// No description provided for @authValidationFieldRequired.
   ///
@@ -1120,6 +1180,12 @@ abstract class AppLocalizations {
   /// **'Too many failed attempts. Try again later.'**
   String get authErrorTooManyAttempts;
 
+  /// No description provided for @authErrorTooManyAttemptsRetryIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many failed attempts. Try again in {duration}.'**
+  String authErrorTooManyAttemptsRetryIn(String duration);
+
   /// No description provided for @authErrorRateLimited.
   ///
   /// In en, this message translates to:
@@ -1141,7 +1207,7 @@ abstract class AppLocalizations {
   /// No description provided for @authOtpSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'We just sent a 4-digit code to {phone}'**
+  /// **'We just sent a 6-digit code to {phone}'**
   String authOtpSubtitle(String phone);
 
   /// No description provided for @authOtpContinue.
@@ -1192,6 +1258,18 @@ abstract class AppLocalizations {
   /// **'Send reset code'**
   String get authForgotPasswordSendCode;
 
+  /// No description provided for @authForgotPasswordSendLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Send reset link'**
+  String get authForgotPasswordSendLink;
+
+  /// No description provided for @authForgotPasswordTryAnotherWay.
+  ///
+  /// In en, this message translates to:
+  /// **'Try another way'**
+  String get authForgotPasswordTryAnotherWay;
+
   /// No description provided for @authForgotPasswordRequestSemantic.
   ///
   /// In en, this message translates to:
@@ -1207,8 +1285,20 @@ abstract class AppLocalizations {
   /// No description provided for @authForgotPasswordOtpSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'We sent a 4-digit code to {phone}'**
+  /// **'We sent a 6-digit code to {phone}'**
   String authForgotPasswordOtpSubtitle(String phone);
+
+  /// No description provided for @authErrorPhoneNotVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'Your phone number is not verified yet.'**
+  String get authErrorPhoneNotVerified;
+
+  /// No description provided for @authErrorPasswordResetTokenInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'This reset link is invalid or has expired.'**
+  String get authErrorPasswordResetTokenInvalid;
 
   /// No description provided for @authNewPasswordTitle.
   ///
@@ -1975,6 +2065,234 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Help center'**
   String get profileHelpCenterTile;
+
+  /// No description provided for @profilePrivacyPolicyTile.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy policy'**
+  String get profilePrivacyPolicyTile;
+
+  /// No description provided for @profileTermsTile.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of use'**
+  String get profileTermsTile;
+
+  /// No description provided for @profileSafetySection.
+  ///
+  /// In en, this message translates to:
+  /// **'Safety'**
+  String get profileSafetySection;
+
+  /// No description provided for @profileSafetyReportIssueTile.
+  ///
+  /// In en, this message translates to:
+  /// **'Report a safety issue'**
+  String get profileSafetyReportIssueTile;
+
+  /// No description provided for @profileBlockedUsersTile.
+  ///
+  /// In en, this message translates to:
+  /// **'Blocked users'**
+  String get profileBlockedUsersTile;
+
+  /// No description provided for @profileBlockedUsersSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'People you blocked cannot message you or appear in your feed.'**
+  String get profileBlockedUsersSubtitle;
+
+  /// No description provided for @profileBlockedUsersEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'You have not blocked anyone.'**
+  String get profileBlockedUsersEmpty;
+
+  /// No description provided for @profileBlockedUsersEmptySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Block someone from event chat or site comments to add them here.'**
+  String get profileBlockedUsersEmptySubtitle;
+
+  /// No description provided for @profileBlockedUsersUnblock.
+  ///
+  /// In en, this message translates to:
+  /// **'Unblock'**
+  String get profileBlockedUsersUnblock;
+
+  /// No description provided for @profileBlockedUsersUnblockFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not unblock. Try again.'**
+  String get profileBlockedUsersUnblockFailed;
+
+  /// No description provided for @profileBlockedUsersLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load blocked users. Try again.'**
+  String get profileBlockedUsersLoadFailed;
+
+  /// No description provided for @safetyBlockUserTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Block user'**
+  String get safetyBlockUserTitle;
+
+  /// No description provided for @safetyBlockUserBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Block {name}? They will not appear in your chat or comments.'**
+  String safetyBlockUserBody(String name);
+
+  /// No description provided for @safetyBlockUserConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Block'**
+  String get safetyBlockUserConfirm;
+
+  /// No description provided for @safetyBlockUserSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'User blocked.'**
+  String get safetyBlockUserSuccess;
+
+  /// No description provided for @safetyBlockUserFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not block user. Try again.'**
+  String get safetyBlockUserFailed;
+
+  /// No description provided for @safetyBlockUserSelfSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'You cannot block yourself.'**
+  String get safetyBlockUserSelfSnack;
+
+  /// No description provided for @safetyUnblockUserTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unblock user'**
+  String get safetyUnblockUserTitle;
+
+  /// No description provided for @safetyUnblockUserBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Unblock {name}? Their messages and comments may appear again.'**
+  String safetyUnblockUserBody(String name);
+
+  /// No description provided for @safetyUnblockUserConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Unblock'**
+  String get safetyUnblockUserConfirm;
+
+  /// No description provided for @profilePrivacyPolicyOpenFailedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open privacy policy'**
+  String get profilePrivacyPolicyOpenFailedSnack;
+
+  /// No description provided for @profileTermsOpenFailedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open terms of use'**
+  String get profileTermsOpenFailedSnack;
+
+  /// No description provided for @profileEulaTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Community guidelines'**
+  String get profileEulaTitle;
+
+  /// No description provided for @profileEulaBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Chisto.mk has zero tolerance for objectionable content or abusive users. By continuing you agree to our Terms and will report content that violates our guidelines.'**
+  String get profileEulaBody;
+
+  /// No description provided for @profileEulaBodyBeforeTerms.
+  ///
+  /// In en, this message translates to:
+  /// **'Chisto.mk has zero tolerance for objectionable content or abusive users. By continuing you agree to our '**
+  String get profileEulaBodyBeforeTerms;
+
+  /// No description provided for @profileEulaBodyAfterTerms.
+  ///
+  /// In en, this message translates to:
+  /// **' and will report content that violates our guidelines.'**
+  String get profileEulaBodyAfterTerms;
+
+  /// No description provided for @profileEulaAccept.
+  ///
+  /// In en, this message translates to:
+  /// **'I agree'**
+  String get profileEulaAccept;
+
+  /// No description provided for @safetyReportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Report content'**
+  String get safetyReportTitle;
+
+  /// No description provided for @safetyReportSubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit report'**
+  String get safetyReportSubmit;
+
+  /// No description provided for @safetyReportDetailsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional details for moderators'**
+  String get safetyReportDetailsHint;
+
+  /// No description provided for @safetyReportSubmitted.
+  ///
+  /// In en, this message translates to:
+  /// **'Report submitted. We review reports within 24 hours.'**
+  String get safetyReportSubmitted;
+
+  /// No description provided for @safetyReportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not submit report. Try again.'**
+  String get safetyReportFailed;
+
+  /// No description provided for @safetyReportReasonSpam.
+  ///
+  /// In en, this message translates to:
+  /// **'Spam'**
+  String get safetyReportReasonSpam;
+
+  /// No description provided for @safetyReportReasonHarassment.
+  ///
+  /// In en, this message translates to:
+  /// **'Harassment'**
+  String get safetyReportReasonHarassment;
+
+  /// No description provided for @safetyReportReasonHate.
+  ///
+  /// In en, this message translates to:
+  /// **'Hate speech'**
+  String get safetyReportReasonHate;
+
+  /// No description provided for @safetyReportReasonViolence.
+  ///
+  /// In en, this message translates to:
+  /// **'Violence'**
+  String get safetyReportReasonViolence;
+
+  /// No description provided for @safetyReportReasonNudity.
+  ///
+  /// In en, this message translates to:
+  /// **'Nudity'**
+  String get safetyReportReasonNudity;
+
+  /// No description provided for @safetyReportReasonOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get safetyReportReasonOther;
 
   /// No description provided for @profileAccountSection.
   ///
@@ -2963,7 +3281,7 @@ abstract class AppLocalizations {
   /// No description provided for @feedFilterUrgentDesc.
   ///
   /// In en, this message translates to:
-  /// **'High-priority incidents first'**
+  /// **'New or unverified sites that need community attention'**
   String get feedFilterUrgentDesc;
 
   /// No description provided for @feedFilterNearbyName.
@@ -4316,11 +4634,23 @@ abstract class AppLocalizations {
   /// **'Cleanup events'**
   String get notificationsTypeCleanupEvents;
 
+  /// No description provided for @notificationsTypeEventChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Event chat'**
+  String get notificationsTypeEventChat;
+
   /// No description provided for @notificationsTypeSystem.
   ///
   /// In en, this message translates to:
   /// **'System'**
   String get notificationsTypeSystem;
+
+  /// No description provided for @notificationsPrefSystemGroupSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Announcements, achievements, and welcome messages'**
+  String get notificationsPrefSystemGroupSubtitle;
 
   /// No description provided for @notificationsSwipeMarkUnread.
   ///
@@ -4435,6 +4765,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unread'**
   String get notificationsFilterUnread;
+
+  /// No description provided for @notificationsDayToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get notificationsDayToday;
+
+  /// No description provided for @notificationsDayYesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get notificationsDayYesterday;
+
+  /// No description provided for @notificationsTimeNow.
+  ///
+  /// In en, this message translates to:
+  /// **'now'**
+  String get notificationsTimeNow;
+
+  /// No description provided for @notificationsTimeMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}m'**
+  String notificationsTimeMinutes(int count);
+
+  /// No description provided for @notificationsTimeHours.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}h'**
+  String notificationsTimeHours(int count);
+
+  /// No description provided for @notificationsTimeDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}d'**
+  String notificationsTimeDays(int count);
+
+  /// No description provided for @notificationsGroupSummaryOne.
+  ///
+  /// In en, this message translates to:
+  /// **'{actor}'**
+  String notificationsGroupSummaryOne(String actor);
+
+  /// No description provided for @notificationsGroupSummaryTwo.
+  ///
+  /// In en, this message translates to:
+  /// **'{actorA} and {actorB}'**
+  String notificationsGroupSummaryTwo(String actorA, String actorB);
+
+  /// No description provided for @notificationsGroupSummaryMany.
+  ///
+  /// In en, this message translates to:
+  /// **'{actorA}, {actorB} and {count, plural, one{1 other} other{{count} others}}'**
+  String notificationsGroupSummaryMany(String actorA, String actorB, int count);
+
+  /// No description provided for @notificationsGroupSummaryGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 update} other{{count} updates}}'**
+  String notificationsGroupSummaryGeneric(int count);
+
+  /// No description provided for @notificationsGroupExpandHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Expand notification group'**
+  String get notificationsGroupExpandHint;
+
+  /// No description provided for @notificationsGroupCollapseHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Collapse notification group'**
+  String get notificationsGroupCollapseHint;
+
+  /// No description provided for @notificationsGroupMarkAllRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark group as read'**
+  String get notificationsGroupMarkAllRead;
+
+  /// No description provided for @notificationsGroupArchiveAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive group'**
+  String get notificationsGroupArchiveAll;
+
+  /// No description provided for @notificationsGroupShowingN.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing {count} notifications: {summary}'**
+  String notificationsGroupShowingN(int count, String summary);
+
+  /// No description provided for @notificationsGroupMessageCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 message} other{{count} messages}}'**
+  String notificationsGroupMessageCount(int count);
+
+  /// No description provided for @notificationsGroupSimilarCount.
+  ///
+  /// In en, this message translates to:
+  /// **'and {count, plural, one{1 similar} other{{count} similar}}'**
+  String notificationsGroupSimilarCount(int count);
 
   /// No description provided for @eventsEventNotFoundTitle.
   ///
@@ -7562,6 +7994,234 @@ abstract class AppLocalizations {
   /// **'Cleaning events'**
   String get siteDetailTabCleaningEvents;
 
+  /// No description provided for @siteDetailTabHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get siteDetailTabHistory;
+
+  /// No description provided for @siteHistoryServiceUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Site history is not available yet. Update the app and try again, or ask your team to deploy the latest API.'**
+  String get siteHistoryServiceUnavailable;
+
+  /// No description provided for @siteHistoryEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No history yet'**
+  String get siteHistoryEmptyTitle;
+
+  /// No description provided for @siteHistoryEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity on this site will appear here as reports, cleanups, and status changes happen.'**
+  String get siteHistoryEmptyMessage;
+
+  /// No description provided for @siteHistoryRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get siteHistoryRetry;
+
+  /// No description provided for @siteHistoryCurrentStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Current status: {status}'**
+  String siteHistoryCurrentStatus(String status);
+
+  /// No description provided for @siteHistoryByActor.
+  ///
+  /// In en, this message translates to:
+  /// **'By {name}'**
+  String siteHistoryByActor(String name);
+
+  /// No description provided for @siteHistoryKindSiteCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Site created'**
+  String get siteHistoryKindSiteCreated;
+
+  /// No description provided for @siteHistoryKindReportSubmitted.
+  ///
+  /// In en, this message translates to:
+  /// **'Report submitted'**
+  String get siteHistoryKindReportSubmitted;
+
+  /// No description provided for @siteHistoryKindReportApproved.
+  ///
+  /// In en, this message translates to:
+  /// **'Report approved'**
+  String get siteHistoryKindReportApproved;
+
+  /// No description provided for @siteHistoryKindReportRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Report rejected'**
+  String get siteHistoryKindReportRejected;
+
+  /// No description provided for @siteHistoryKindReportMerged.
+  ///
+  /// In en, this message translates to:
+  /// **'Reports merged'**
+  String get siteHistoryKindReportMerged;
+
+  /// No description provided for @siteHistoryKindStatusChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Status changed: {from} → {to}'**
+  String siteHistoryKindStatusChanged(String from, String to);
+
+  /// No description provided for @siteHistoryKindStatusChangedGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Status updated'**
+  String get siteHistoryKindStatusChangedGeneric;
+
+  /// No description provided for @siteHistoryKindCleanupScheduled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cleanup event scheduled'**
+  String get siteHistoryKindCleanupScheduled;
+
+  /// No description provided for @siteHistoryKindCleanupStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Cleanup in progress'**
+  String get siteHistoryKindCleanupStarted;
+
+  /// No description provided for @siteHistoryKindCleanupCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Cleanup completed'**
+  String get siteHistoryKindCleanupCompleted;
+
+  /// No description provided for @siteHistoryKindCleanupCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cleanup event cancelled'**
+  String get siteHistoryKindCleanupCancelled;
+
+  /// No description provided for @siteHistoryKindArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived by moderators'**
+  String get siteHistoryKindArchived;
+
+  /// No description provided for @siteHistoryKindUnarchived.
+  ///
+  /// In en, this message translates to:
+  /// **'Restored by moderators'**
+  String get siteHistoryKindUnarchived;
+
+  /// No description provided for @siteHistoryKindAdminNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderator note'**
+  String get siteHistoryKindAdminNote;
+
+  /// No description provided for @siteHistoryKindUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity'**
+  String get siteHistoryKindUnknown;
+
+  /// No description provided for @siteHistoryStatusHeaderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Current status'**
+  String get siteHistoryStatusHeaderTitle;
+
+  /// No description provided for @siteHistoryStatusHeaderUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated {time}'**
+  String siteHistoryStatusHeaderUpdated(String time);
+
+  /// No description provided for @siteHistoryStatusHeaderEntries.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 entry} other{{count} entries}}'**
+  String siteHistoryStatusHeaderEntries(int count);
+
+  /// No description provided for @siteHistorySectionToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get siteHistorySectionToday;
+
+  /// No description provided for @siteHistorySectionYesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get siteHistorySectionYesterday;
+
+  /// No description provided for @siteHistorySectionThisWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Earlier this week'**
+  String get siteHistorySectionThisWeek;
+
+  /// No description provided for @siteHistorySectionMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'{month} {year}'**
+  String siteHistorySectionMonth(String month, int year);
+
+  /// No description provided for @siteHistoryTimeNow.
+  ///
+  /// In en, this message translates to:
+  /// **'now'**
+  String get siteHistoryTimeNow;
+
+  /// No description provided for @siteHistoryTimeMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}m'**
+  String siteHistoryTimeMinutes(int count);
+
+  /// No description provided for @siteHistoryTimeHours.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}h'**
+  String siteHistoryTimeHours(int count);
+
+  /// No description provided for @siteHistoryTimeDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}d'**
+  String siteHistoryTimeDays(int count);
+
+  /// No description provided for @siteHistoryLoadingMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading more…'**
+  String get siteHistoryLoadingMore;
+
+  /// No description provided for @siteHistoryEndOfList.
+  ///
+  /// In en, this message translates to:
+  /// **'End of history'**
+  String get siteHistoryEndOfList;
+
+  /// No description provided for @siteHistoryEntryOpenEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Open cleanup event'**
+  String get siteHistoryEntryOpenEvent;
+
+  /// No description provided for @siteHistoryEntryShowMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Show more'**
+  String get siteHistoryEntryShowMore;
+
+  /// No description provided for @siteHistoryEntryShowLess.
+  ///
+  /// In en, this message translates to:
+  /// **'Show less'**
+  String get siteHistoryEntryShowLess;
+
   /// No description provided for @siteDetailInfoCardTitle.
   ///
   /// In en, this message translates to:
@@ -8880,6 +9540,18 @@ abstract class AppLocalizations {
   /// **'Save'**
   String get eventsCompletedBagsSave;
 
+  /// No description provided for @eventsCompletedBagsDecrease.
+  ///
+  /// In en, this message translates to:
+  /// **'Decrease bag count'**
+  String get eventsCompletedBagsDecrease;
+
+  /// No description provided for @eventsCompletedBagsIncrease.
+  ///
+  /// In en, this message translates to:
+  /// **'Increase bag count'**
+  String get eventsCompletedBagsIncrease;
+
   /// No description provided for @eventsCompletedBagsSaved.
   ///
   /// In en, this message translates to:
@@ -10168,6 +10840,12 @@ abstract class AppLocalizations {
   /// **'Join action'**
   String get homeSiteCleaningJoinAction;
 
+  /// No description provided for @homeSiteCleaningJoinedAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Joined'**
+  String get homeSiteCleaningJoinedAction;
+
   /// No description provided for @homeSiteCleaningEventUnavailable.
   ///
   /// In en, this message translates to:
@@ -11455,6 +12133,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Messages on cleanup events you joined'**
   String get eventChatPushChannelDescription;
+
+  /// No description provided for @eventChatPushReplyAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Reply'**
+  String get eventChatPushReplyAction;
+
+  /// No description provided for @eventChatPushReplyButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get eventChatPushReplyButton;
+
+  /// No description provided for @eventChatPushReplyPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get eventChatPushReplyPlaceholder;
+
+  /// No description provided for @eventChatPushPreviewVoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice message'**
+  String get eventChatPushPreviewVoice;
+
+  /// No description provided for @eventChatPushPreviewPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo'**
+  String get eventChatPushPreviewPhoto;
+
+  /// No description provided for @eventChatPushPreviewVideo.
+  ///
+  /// In en, this message translates to:
+  /// **'Video'**
+  String get eventChatPushPreviewVideo;
+
+  /// No description provided for @eventChatPushPreviewFile.
+  ///
+  /// In en, this message translates to:
+  /// **'File'**
+  String get eventChatPushPreviewFile;
+
+  /// No description provided for @eventChatPushPreviewLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared location'**
+  String get eventChatPushPreviewLocation;
+
+  /// No description provided for @eventChatPushPreviewMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get eventChatPushPreviewMessage;
+
+  /// No description provided for @eventChatPushPreviewSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'Event update'**
+  String get eventChatPushPreviewSystem;
+
+  /// No description provided for @pushChannelReportsName.
+  ///
+  /// In en, this message translates to:
+  /// **'Report updates'**
+  String get pushChannelReportsName;
+
+  /// No description provided for @pushChannelReportsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Report status changes and nearby pollution reports'**
+  String get pushChannelReportsDescription;
+
+  /// No description provided for @pushChannelEventsName.
+  ///
+  /// In en, this message translates to:
+  /// **'Cleanup events'**
+  String get pushChannelEventsName;
+
+  /// No description provided for @pushChannelEventsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Cleanup event reminders and updates'**
+  String get pushChannelEventsDescription;
+
+  /// No description provided for @pushChannelSocialName.
+  ///
+  /// In en, this message translates to:
+  /// **'Social activity'**
+  String get pushChannelSocialName;
+
+  /// No description provided for @pushChannelSocialDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Upvotes, comments, and community interactions'**
+  String get pushChannelSocialDescription;
+
+  /// No description provided for @pushChannelSystemName.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get pushChannelSystemName;
+
+  /// No description provided for @pushChannelSystemDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'System announcements and achievements'**
+  String get pushChannelSystemDescription;
 
   /// No description provided for @micPermissionRationaleTitle.
   ///

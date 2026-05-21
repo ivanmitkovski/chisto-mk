@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/site_card/share_sheet.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 enum DonateOption { oneTime, monthly }
 
@@ -12,7 +11,6 @@ class DonateSheet extends StatelessWidget {
   final String siteTitle;
 
   static Future<DonateOption?> show(BuildContext context, {required String siteTitle}) {
-    AppHaptics.tap();
     return showModalBottomSheet<DonateOption>(
       context: context,
       isScrollControlled: false,
@@ -92,7 +90,6 @@ class DonateSheet extends StatelessWidget {
   }
 
   void _pop(BuildContext context, DonateOption option) {
-    AppHaptics.tap();
     Navigator.of(context).pop(option);
   }
 }

@@ -28,7 +28,11 @@
     "feed:simulate": "tsx scripts/feed-v2-simulation.ts",
     "seed": "tsx prisma/seed.ts",
     "db:resolve:report-title": "prisma migrate resolve --applied 20260326190001_add_report_title",
-    "db:migrate:status": "prisma migrate status"
+    "db:migrate:status": "prisma migrate status",
+    "email:preview": "tsx scripts/render-email-preview.ts",
+    "backfill:site-history": "tsx scripts/backfill-site-history.ts",
+    "verify:v1": "node scripts/verify-v1-readiness.mjs",
+    "merge:event-chat-inbox": "tsx scripts/merge-event-chat-inbox-rows.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.958.0",
@@ -66,6 +70,7 @@
     "dotenv": "^16.4.5",
     "express": "^4.22.1",
     "firebase-admin": "^13.7.0",
+    "handlebars": "^4.7.9",
     "helmet": "^8.1.0",
     "image-size": "^2.0.2",
     "ioredis": "^5.10.1",
@@ -109,8 +114,8 @@
     "jest": "^29.7.0",
     "madge": "^8.0.0",
     "prisma": "^7.8.0",
-    "source-map-support": "^0.5.21",
     "socket.io-client": "^4.8.3",
+    "source-map-support": "^0.5.21",
     "supertest": "^7.0.0",
     "ts-jest": "^29.2.5",
     "ts-loader": "^9.5.1",

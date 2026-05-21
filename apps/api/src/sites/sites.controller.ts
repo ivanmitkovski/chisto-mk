@@ -41,7 +41,9 @@ import { TrackFeedEventDto } from './dto/track-feed-event.dto';
 import { SiteFeedListResponseDto } from './dto/site-list-item-response.dto';
 import { SitesAdminService } from './sites-admin.service';
 import { SitesFeedService } from './sites-feed.service';
+import { SitesSavedListService } from './sites-saved-list.service';
 import { SiteEngagementService } from './site-engagement.service';
+import { PaginationQueryDto20 } from '../common/dto/pagination-query.dto';
 import { SitesMapFacadeService } from './sites-map-facade.service';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { Observable } from 'rxjs';
@@ -63,6 +65,7 @@ export class SitesController {
   constructor(
     private readonly sitesAdmin: SitesAdminService,
     private readonly sitesFeed: SitesFeedService,
+    private readonly sitesSavedList: SitesSavedListService,
     private readonly siteEngagement: SiteEngagementService,
     private readonly sitesMapFacade: SitesMapFacadeService,
     private readonly siteEventsService: SiteEventsService,
@@ -78,6 +81,32 @@ export class SitesController {
   @ApiForbiddenResponse({ description: 'Caller is not an admin' })
   create(@Body() dto: CreateSiteDto) {
     return this.sitesAdmin.create(dto);
+  }
+
+  @Get('saved')
+  @UseGuards(JwtAuthGuard, ThrottlerGuard)
+  @Throttle({ default: { limit: 90, ttl: 60_000 } })
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'List sites saved by the current user' })
+  @ApiOkResponse({ description: 'Saved sites fetched successfully', type: SiteFeedListResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
+  @ApiTooManyRequestsResponse({ description: 'Too many requests' })
+  listSaved(
+    @Query() query: PaginationQueryDto20,
+    @CurrentUser() user: AuthenticatedUser,
+    @Query('lat') latRaw?: string,
+    @Query('lng') lngRaw?: string,
+  ) {
+    const latNum = latRaw != null && latRaw.trim() !== '' ? Number(latRaw) : Number.NaN;
+    const lngNum = lngRaw != null && lngRaw.trim() !== '' ? Number(lngRaw) : Number.NaN;
+    const geo: { lat?: number; lng?: number } = {};
+    if (Number.isFinite(latNum)) geo.lat = latNum;
+    if (Number.isFinite(lngNum)) geo.lng = lngNum;
+    return this.sitesSavedList.listSavedForUser(
+      user,
+      query,
+      Object.keys(geo).length > 0 ? geo : undefined,
+    );
   }
 
   @Get()

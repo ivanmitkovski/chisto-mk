@@ -23,14 +23,46 @@ double _heatmapWeightForStatus(String statusCode) {
   }
 }
 
+String _filteredSitesHeatmapIdentity(List<PollutionSite> sites) {
+  if (sites.isEmpty) {
+    return '';
+  }
+  final List<String> parts = sites.map((PollutionSite s) => s.id).toList()
+    ..sort();
+  return parts.join('\x1e');
+}
+
 /// Derived heatmap layer from current filtered map sites.
 class MapHeatmapLayer extends ConsumerWidget {
   const MapHeatmapLayer({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final String sitesIdentity = ref.watch(
+      mapFilteredSitesProvider.select(_filteredSitesHeatmapIdentity),
+    );
     final List<PollutionSite> sites = ref.watch(mapFilteredSitesProvider);
     final Map<String, LatLng> coords = ref.watch(mapSiteCoordinatesProvider);
+    return _MapHeatmapLayerBody(
+      key: ValueKey<String>(sitesIdentity),
+      sites: sites,
+      coords: coords,
+    );
+  }
+}
+
+class _MapHeatmapLayerBody extends StatelessWidget {
+  const _MapHeatmapLayerBody({
+    super.key,
+    required this.sites,
+    required this.coords,
+  });
+
+  final List<PollutionSite> sites;
+  final Map<String, LatLng> coords;
+
+  @override
+  Widget build(BuildContext context) {
     final List<WeightedLatLng> data = <WeightedLatLng>[];
     for (final PollutionSite site in sites) {
       final LatLng? point = coords[site.id];

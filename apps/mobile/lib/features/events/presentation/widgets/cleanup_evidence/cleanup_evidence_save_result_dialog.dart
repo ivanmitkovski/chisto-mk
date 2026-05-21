@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/cupertino.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
@@ -79,22 +80,21 @@ class _CleanupEvidenceSaveResultDialogState
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
+      if (_isSuccess) {
+        AppHaptics.success(context);
+      } else {
+        AppHaptics.warning(context);
+      }
       if (MediaQuery.disableAnimationsOf(context)) {
         _containerController.value = 1.0;
         if (_isSuccess) {
           _checkController.value = 1.0;
-          AppHaptics.success();
-        } else {
-          AppHaptics.warning();
         }
       } else {
         _containerController.forward().then((_) {
           if (!mounted) return;
           if (_isSuccess) {
             _checkController.forward();
-            AppHaptics.success();
-          } else {
-            AppHaptics.warning();
           }
         });
       }
@@ -210,30 +210,14 @@ class _CleanupEvidenceSaveResultDialogState
                   ),
                 ),
                 const SizedBox(height: AppSpacing.lg),
-                SizedBox(
-                  width: double.infinity,
-                  height: 54,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      AppHaptics.tap();
-                      Navigator.of(context).pop();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      elevation: 0,
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: AppColors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(AppSpacing.radiusPill),
-                      ),
-                    ),
-                    child: Text(
-                      _isSuccess
-                          ? context.l10n.commonGotIt
-                          : context.l10n.commonTryAgain,
-                      style: AppTypography.eventsPrimaryButtonLabel(textTheme),
-                    ),
-                  ),
+                AppButton.primary(
+                  label: _isSuccess
+                      ? context.l10n.commonGotIt
+                      : context.l10n.commonTryAgain,
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  expand: true,
                 ),
               ],
             ),

@@ -6,12 +6,11 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_card_skeleton.dart';
-import 'package:chisto_mobile/shared/widgets/no_overscroll_overlay_scroll_behavior.dart';
-import 'package:chisto_mobile/shared/widgets/skeleton_shimmer_box.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/skeleton_shimmer_box.dart';
 
-/// Loading placeholder for the events feed body: mirrors loaded order — [HeroEventCard],
-/// then sectioned list rows (or calendar grid when [calendarView] is true).
-/// One shimmer pass; scroll shell matches [ProfileScreenSkeleton].
+/// Full-feed loading placeholder for [EventsFeedScreen]: title, search, chips, then
+/// list/calendar body. Inline in the parent [CustomScrollView] (no nested scroll, no
+/// fixed chrome over the skeleton).
 class EventsFeedSkeleton extends StatefulWidget {
   const EventsFeedSkeleton({super.key, this.calendarView = false});
 
@@ -51,62 +50,134 @@ class _EventsFeedSkeletonState extends State<EventsFeedSkeleton>
     return Semantics(
       label: context.l10n.eventsFeedLoadingSemantic,
       child: ExcludeSemantics(
-        child: ClipRect(
-          clipper: const _EventsFeedSkeletonScrollClipper(
-            bottomExtension: AppSpacing.xxl + AppSpacing.xl,
-          ),
-          child: ScrollConfiguration(
-            behavior: const NoOverscrollOverlayScrollBehavior(),
-            child: CustomScrollView(
-              physics: const AlwaysScrollableScrollPhysics(
-                parent: BouncingScrollPhysics(),
-              ),
-              clipBehavior: Clip.none,
-              slivers: <Widget>[
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(
-                    0,
-                    AppSpacing.md,
-                    0,
-                    AppSpacing.xl + AppSpacing.lg,
-                  ),
-                  sliver: SliverToBoxAdapter(
-                    child: AnimatedBuilder(
-                      animation: _shimmer,
-                      builder: (BuildContext context, Widget? child) {
-                        final double t = _shimmer.value;
-                        return widget.calendarView
-                            ? _EventsCalendarFeedSkeleton(t: t)
-                            : _EventsListFeedSkeleton(t: t);
-                      },
-                    ),
-                  ),
-                ),
+        child: AnimatedBuilder(
+          animation: _shimmer,
+          builder: (BuildContext context, Widget? child) {
+            final double t = _shimmer.value;
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                _EventsFeedHeaderSkeleton(t: t),
+                widget.calendarView
+                    ? _EventsCalendarFeedSkeleton(t: t)
+                    : _EventsListFeedSkeleton(t: t),
               ],
-            ),
-          ),
+            );
+          },
         ),
       ),
     );
   }
 }
 
-class _EventsFeedSkeletonScrollClipper extends CustomClipper<Rect> {
-  const _EventsFeedSkeletonScrollClipper({required this.bottomExtension});
+/// Title, search/tools, and filter chips — mirrors loaded feed chrome.
+class _EventsFeedHeaderSkeleton extends StatelessWidget {
+  const _EventsFeedHeaderSkeleton({required this.t});
 
-  final double bottomExtension;
-
-  @override
-  Rect getClip(Size size) => Rect.fromLTRB(
-        0,
-        0,
-        size.width,
-        size.height + bottomExtension,
-      );
+  final double t;
 
   @override
-  bool shouldReclip(covariant _EventsFeedSkeletonScrollClipper oldClipper) =>
-      oldClipper.bottomExtension != bottomExtension;
+  Widget build(BuildContext context) {
+    final double control = AppSpacing.eventsFeedToolbarControlSize;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.md,
+            AppSpacing.lg,
+            AppSpacing.sm,
+          ),
+          child: Row(
+            children: <Widget>[
+              Expanded(
+                child: SkeletonShimmerBox(
+                  width: double.infinity,
+                  height: 28,
+                  radius: AppSpacing.radiusSm,
+                  t: t,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              SkeletonShimmerBox(
+                width: control,
+                height: control,
+                radius: AppSpacing.radiusMd,
+                t: t,
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            0,
+            AppSpacing.lg,
+            AppSpacing.sm,
+          ),
+          child: Row(
+            children: <Widget>[
+              Expanded(
+                child: SkeletonShimmerBox(
+                  width: double.infinity,
+                  height: control,
+                  radius: AppSpacing.radiusMd,
+                  t: t,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              SkeletonShimmerBox(
+                width: control,
+                height: control,
+                radius: AppSpacing.radiusMd,
+                t: t,
+              ),
+              const SizedBox(width: AppSpacing.xs),
+              SkeletonShimmerBox(
+                width: control,
+                height: control,
+                radius: AppSpacing.radiusMd,
+                t: t,
+              ),
+              const SizedBox(width: AppSpacing.xxs),
+              SkeletonShimmerBox(
+                width: control,
+                height: control,
+                radius: AppSpacing.radiusMd,
+                t: t,
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.md),
+          child: SizedBox(
+            height: 40,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: 5,
+              separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.sm),
+              itemBuilder: (BuildContext context, int index) {
+                final bool selected = index == 0;
+                return SkeletonShimmerBox(
+                  width: index == 4 ? 72 : 88,
+                  height: 36,
+                  radius: AppSpacing.radiusPill,
+                  t: t,
+                  baseTint: selected
+                      ? AppColors.feedPillSelectedFill
+                      : AppColors.divider.withValues(alpha: 0.55),
+                );
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 /// Section title shim — same padding as [SectionHeader] in events_sliver_list.dart.
@@ -209,23 +280,6 @@ class _EventsListFeedSkeleton extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: AppSpacing.lg),
-        _EventsFeedSectionTitleSkeleton(t: t, barWidth: 168),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              EventCardSkeleton(t: t, layoutSeed: 7),
-              const SizedBox(height: AppSpacing.sm),
-              EventCardSkeleton(
-                t: t,
-                layoutSeed: 8,
-                showCheckedInRow: true,
-              ),
-            ],
-          ),
-        ),
       ],
     );
   }
@@ -322,6 +376,7 @@ class _EventsCalendarFeedSkeleton extends StatelessWidget {
           _CalendarAgendaRowSkeleton(t: t),
           const SizedBox(height: AppSpacing.sm),
           _CalendarAgendaRowSkeleton(t: t, wideTitle: true),
+          const SizedBox(height: AppSpacing.lg),
         ],
       ),
     );
@@ -426,138 +481,147 @@ class _HeroEventSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final BorderRadius cardRadius =
+        BorderRadius.circular(AppSpacing.radiusCard);
     final double iconBox = (AppSpacing.iconSm * 0.75).roundToDouble();
+    // Outer shell matches [HeroEventCard]: decoration + shadow, inner [ClipRRect] only.
     return Container(
-      height: AppSpacing.eventsHeroCardMediaHeight,
       decoration: AppCardChrome.discoveryHeroOuter(colorScheme),
-      clipBehavior: Clip.antiAlias,
-      child: Stack(
-        fit: StackFit.expand,
-        children: <Widget>[
-          Positioned.fill(
-            child: SkeletonShimmerBox(
-              width: double.infinity,
-              height: double.infinity,
-              radius: 0,
-              t: t,
-            ),
-          ),
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: <Color>[
-                    Colors.transparent,
-                    colorScheme.scrim.withValues(alpha: 0.62),
-                  ],
-                  stops: const <double>[0.32, 1.0],
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            left: AppSpacing.sm,
-            top: AppSpacing.sm,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: colorScheme.scrim.withValues(alpha: 0.38),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.radiusSm,
-                  vertical: AppSpacing.xxs,
-                ),
+      child: ClipRRect(
+        borderRadius: cardRadius,
+        child: SizedBox(
+          height: AppSpacing.eventsHeroCardMediaHeight,
+          width: double.infinity,
+          child: Stack(
+            fit: StackFit.expand,
+            children: <Widget>[
+              Positioned.fill(
                 child: SkeletonShimmerBox(
-                  width: 96,
-                  height: 12,
-                  radius: AppSpacing.radiusSm,
-                  t: t,
-                  baseTint: AppColors.textOnDark,
-                  tintPulseBoost: 0.08,
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            top: AppSpacing.sm,
-            right: AppSpacing.sm,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: AppColors.primaryDark.withValues(alpha: 0.75),
-                borderRadius: BorderRadius.circular(AppSpacing.radius10),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.radius10,
-                  vertical: AppSpacing.xxs,
-                ),
-                child: SkeletonShimmerBox(
-                  width: 56,
-                  height: 11,
-                  radius: AppSpacing.radiusSm,
-                  t: t,
-                  baseTint: AppColors.textOnDark,
-                  tintPulseBoost: 0.14,
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            left: AppSpacing.lg,
-            right: AppSpacing.lg,
-            bottom: AppSpacing.lg,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                SkeletonShimmerBox(
                   width: double.infinity,
-                  height: 18,
-                  radius: AppSpacing.radiusSm,
+                  height: double.infinity,
+                  radius: 0,
                   t: t,
-                  baseTint: AppColors.white,
-                  tintPulseBoost: 0.12,
                 ),
-                const SizedBox(height: AppSpacing.xxs),
-                Row(
+              ),
+              Positioned.fill(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    borderRadius: cardRadius,
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: <Color>[
+                        AppColors.transparent,
+                        colorScheme.scrim.withValues(alpha: 0.62),
+                      ],
+                      stops: const <double>[0.32, 1.0],
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: AppSpacing.sm,
+                top: AppSpacing.sm,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: colorScheme.scrim.withValues(alpha: 0.38),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.radiusSm,
+                      vertical: AppSpacing.xxs,
+                    ),
+                    child: SkeletonShimmerBox(
+                      width: 96,
+                      height: 12,
+                      radius: AppSpacing.radiusSm,
+                      t: t,
+                      baseTint: AppColors.textOnDark,
+                      tintPulseBoost: 0.08,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: AppSpacing.sm,
+                right: AppSpacing.sm,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryDark.withValues(alpha: 0.75),
+                    borderRadius: BorderRadius.circular(AppSpacing.radius10),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.radius10,
+                      vertical: AppSpacing.xxs,
+                    ),
+                    child: SkeletonShimmerBox(
+                      width: 56,
+                      height: 11,
+                      radius: AppSpacing.radiusSm,
+                      t: t,
+                      baseTint: AppColors.textOnDark,
+                      tintPulseBoost: 0.14,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: AppSpacing.lg,
+                right: AppSpacing.lg,
+                bottom: AppSpacing.lg,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     SkeletonShimmerBox(
-                      width: iconBox,
-                      height: iconBox,
-                      radius: 3,
+                      width: double.infinity,
+                      height: 18,
+                      radius: AppSpacing.radiusSm,
                       t: t,
                       baseTint: AppColors.white,
                       tintPulseBoost: 0.12,
                     ),
-                    const SizedBox(width: AppSpacing.xxs),
-                    Expanded(
-                      child: SkeletonShimmerBox(
-                        width: double.infinity,
-                        height: 14,
-                        radius: 6,
-                        t: t,
-                        baseTint: AppColors.white,
-                        tintPulseBoost: 0.12,
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.radiusSm),
-                    SkeletonShimmerBox(
-                      width: 64,
-                      height: 14,
-                      radius: 6,
-                      t: t,
-                      baseTint: AppColors.white,
-                      tintPulseBoost: 0.12,
+                    const SizedBox(height: AppSpacing.xxs),
+                    Row(
+                      children: <Widget>[
+                        SkeletonShimmerBox(
+                          width: iconBox,
+                          height: iconBox,
+                          radius: 3,
+                          t: t,
+                          baseTint: AppColors.white,
+                          tintPulseBoost: 0.12,
+                        ),
+                        const SizedBox(width: AppSpacing.xxs),
+                        Expanded(
+                          child: SkeletonShimmerBox(
+                            width: double.infinity,
+                            height: 14,
+                            radius: 6,
+                            t: t,
+                            baseTint: AppColors.white,
+                            tintPulseBoost: 0.12,
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.radiusSm),
+                        SkeletonShimmerBox(
+                          width: 64,
+                          height: 14,
+                          radius: 6,
+                          t: t,
+                          baseTint: AppColors.white,
+                          tintPulseBoost: 0.12,
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

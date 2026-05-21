@@ -10,6 +10,7 @@ import { UpdateSiteStatusDto } from './dto/update-site-status.dto';
 import { BulkSitesDto } from './dto/bulk-sites.dto';
 import { SitesMapQueryService } from './sites-map-query.service';
 import { SitesFeedService } from './sites-feed.service';
+import { SiteHistoryWriterService } from './history/site-history-writer.service';
 
 const ALLOWED_SITE_STATUS_TRANSITIONS: Record<SiteStatus, SiteStatus[]> = {
   REPORTED: ['VERIFIED', 'DISPUTED'],
@@ -28,6 +29,7 @@ export class SitesAdminService {
     private readonly siteEventsService: SiteEventsService,
     private readonly sitesMapQuery: SitesMapQueryService,
     private readonly sitesFeed: SitesFeedService,
+    private readonly siteHistoryWriter: SiteHistoryWriterService,
   ) {}
 
   async create(dto: CreateSiteDto): Promise<Site> {
@@ -45,6 +47,11 @@ export class SitesAdminService {
       latitude: site.latitude,
       longitude: site.longitude,
       updatedAt: site.updatedAt,
+    });
+    await this.siteHistoryWriter.recordSiteCreated({
+      siteId: site.id,
+      occurredAt: site.createdAt,
+      actor: { userId: null, role: 'system' },
     });
     return site;
   }
@@ -105,6 +112,15 @@ export class SitesAdminService {
       resourceId: siteId,
       metadata: { from: site.status, to: dto.status },
     });
+
+    await this.siteHistoryWriter.recordStatusChanged({
+      siteId,
+      fromStatus: site.status,
+      toStatus: dto.status,
+      actor: { userId: admin.userId, role: admin.role },
+      metadata: { trigger: 'ADMIN_MANUAL' },
+    });
+    this.siteHistoryWriter.emitHistoryAppended(siteId, siteId);
 
     this.sitesFeed.invalidateFeedCache('site_status_updated');
     this.sitesMapQuery.invalidateMapCache('site_status_updated', updated.id);
@@ -186,6 +202,20 @@ export class SitesAdminService {
         reason: normalizedReason,
       },
     });
+
+    if (dto.archived) {
+      await this.siteHistoryWriter.recordArchived({
+        siteId,
+        actor: { userId: admin.userId, role: admin.role },
+        note: normalizedReason,
+      });
+    } else {
+      await this.siteHistoryWriter.recordUnarchived({
+        siteId,
+        actor: { userId: admin.userId, role: admin.role },
+      });
+    }
+    this.siteHistoryWriter.emitHistoryAppended(siteId, siteId);
 
     this.sitesFeed.invalidateFeedCache(dto.archived ? 'site_archived' : 'site_unarchived');
     this.sitesMapQuery.invalidateMapCache(dto.archived ? 'site_archived' : 'site_unarchived', siteId);

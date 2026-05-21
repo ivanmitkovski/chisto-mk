@@ -11,9 +11,17 @@ import 'package:chisto_mobile/core/theme/app_typography.dart';
 class AppTheme {
   AppTheme._();
 
-  static ThemeData get light {
+  static ThemeData get light => _build(Brightness.light);
+
+  /// Dark theme stub. Currently identical surfaces to [light] until a full
+  /// dark palette lands; isolated here so consumers can wire `darkTheme:` +
+  /// `themeMode:` today without code churn when the palette ships.
+  static ThemeData get dark => _build(Brightness.dark);
+
+  static ThemeData _build(Brightness brightness) {
     final ColorScheme colorScheme = ColorScheme.fromSeed(
       seedColor: AppColors.primary,
+      brightness: brightness,
       surface: AppColors.appBackground,
     );
     final TextTheme textTheme =
@@ -28,12 +36,13 @@ class AppTheme {
 
     return ThemeData(
       colorScheme: colorScheme,
+      brightness: brightness,
       scaffoldBackgroundColor: AppColors.appBackground,
       fontFamily: robotoFamily,
       textTheme: textTheme,
       primaryTextTheme: primaryTextTheme,
       cupertinoOverrideTheme: CupertinoThemeData(
-        brightness: Brightness.light,
+        brightness: brightness,
         primaryColor: AppColors.primary,
         scaffoldBackgroundColor: AppColors.appBackground,
         barBackgroundColor: AppColors.appBackground,
@@ -79,64 +88,45 @@ class AppTheme {
   /// Cupertino widgets ([CupertinoSearchTextField], pickers) read this instead of
   /// [ThemeData.textTheme]; mirror stock weights/sizes with Roboto.
   static CupertinoTextThemeData _cupertinoRobotoTextTheme() {
+    final TextTheme tt = GoogleFonts.robotoTextTheme(AppTypography.textTheme);
     return CupertinoTextThemeData(
       primaryColor: AppColors.primaryDark,
-      textStyle: GoogleFonts.roboto(
-        fontSize: 17,
-        height: 1.36,
-        fontWeight: FontWeight.w400,
-        color: AppColors.textPrimary,
-      ),
-      actionTextStyle: GoogleFonts.roboto(
-        fontSize: 17,
-        height: 1.36,
-        fontWeight: FontWeight.w400,
+      textStyle: tt.bodyLarge?.copyWith(height: 1.36),
+      actionTextStyle: tt.bodyLarge?.copyWith(
         color: AppColors.primaryDark,
+        height: 1.36,
       ),
-      actionSmallTextStyle: GoogleFonts.roboto(
-        fontSize: 15,
+      actionSmallTextStyle: tt.titleSmall?.copyWith(
+        color: AppColors.primaryDark,
         height: 1.33,
-        fontWeight: FontWeight.w400,
-        color: AppColors.primaryDark,
       ),
-      tabLabelTextStyle: GoogleFonts.roboto(
+      tabLabelTextStyle: tt.bodySmall?.copyWith(
         fontSize: 10,
         height: 1.2,
         fontWeight: FontWeight.w500,
         letterSpacing: -0.24,
-        color: AppColors.textSecondary,
       ),
-      navTitleTextStyle: GoogleFonts.roboto(
-        fontSize: 17,
-        height: 1.29,
+      navTitleTextStyle: tt.titleSmall?.copyWith(
         fontWeight: FontWeight.w600,
         letterSpacing: -0.41,
-        color: AppColors.textPrimary,
-      ),
-      navLargeTitleTextStyle: GoogleFonts.roboto(
-        fontSize: 34,
-        height: 1.12,
-        fontWeight: FontWeight.w700,
-        letterSpacing: 0.37,
-        color: AppColors.textPrimary,
-      ),
-      navActionTextStyle: GoogleFonts.roboto(
-        fontSize: 17,
         height: 1.29,
-        fontWeight: FontWeight.w400,
+      ),
+      navLargeTitleTextStyle: tt.headlineLarge?.copyWith(
+        height: 1.12,
+        letterSpacing: 0.37,
+      ),
+      navActionTextStyle: tt.bodyLarge?.copyWith(
         color: AppColors.primaryDark,
+        height: 1.29,
       ),
-      pickerTextStyle: GoogleFonts.roboto(
-        fontSize: 21,
-        height: 1.19,
+      pickerTextStyle: tt.titleMedium?.copyWith(
         fontWeight: FontWeight.w400,
-        color: AppColors.textPrimary,
+        height: 1.19,
       ),
-      dateTimePickerTextStyle: GoogleFonts.roboto(
+      dateTimePickerTextStyle: tt.bodyLarge?.copyWith(
         fontSize: 16,
         height: 1.25,
         fontWeight: FontWeight.w600,
-        color: AppColors.textPrimary,
       ),
     );
   }

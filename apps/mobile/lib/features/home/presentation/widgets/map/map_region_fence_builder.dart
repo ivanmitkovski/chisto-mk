@@ -19,7 +19,6 @@ List<Polygon> buildRegionFence({
           (polygon) => Polygon(
             points: polygon.outerRing,
             holePointsList: polygon.holes,
-            isFilled: true,
             color: AppColors.primary.withValues(alpha: reduceMotion ? 0.05 : 0.09),
             borderColor: AppColors.primary.withValues(alpha: 0.82),
             borderStrokeWidth: 2.0,
@@ -34,7 +33,6 @@ List<Polygon> buildRegionFence({
   return <Polygon>[
     Polygon(
       points: ring,
-      isFilled: true,
       color: AppColors.primary.withValues(alpha: reduceMotion ? 0.05 : 0.09),
       borderColor: AppColors.primary.withValues(alpha: 0.82),
       borderStrokeWidth: 2.0,

@@ -10,7 +10,6 @@ import 'package:chisto_mobile/features/events/presentation/utils/event_calendar_
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_grouped_metadata_row.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_surface_decoration.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 class DateTimeSection extends StatelessWidget {
   const DateTimeSection({
@@ -27,7 +26,6 @@ class DateTimeSection extends StatelessWidget {
   final bool embeddedInGroupedPanel;
 
   void _showDateInfo(BuildContext context) {
-    AppHaptics.tap();
     final Duration diff = event.startDateTime.difference(DateTime.now());
     final String relative;
     if (diff.isNegative) {

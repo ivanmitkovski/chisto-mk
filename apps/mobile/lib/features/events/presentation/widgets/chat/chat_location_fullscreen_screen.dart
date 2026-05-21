@@ -5,8 +5,7 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
 import 'package:chisto_mobile/shared/utils/cached_tile_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -130,7 +129,6 @@ class ChatLocationFullscreenScreen extends StatelessWidget {
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: () async {
-                        AppHaptics.light();
                         await Clipboard.setData(ClipboardData(text: '$lat,$lng'));
                         if (context.mounted) {
                           AppSnack.show(context, message: context.l10n.eventChatCopied);
@@ -144,7 +142,6 @@ class ChatLocationFullscreenScreen extends StatelessWidget {
                   Expanded(
                     child: FilledButton.icon(
                       onPressed: () {
-                        AppHaptics.light();
                         unawaited(openChatLocationInMaps(context, lat, lng));
                       },
                       icon: const Icon(Icons.directions, size: 18),

@@ -117,6 +117,12 @@ class _VoiceRecordingMeterState extends State<VoiceRecordingMeter>
     super.dispose();
   }
 
+  /// Skip a [setState] when the trailing bar moved by less than this fraction
+  /// **and** no horizontal scroll tick happened this frame. Keeps the meter
+  /// fluid while culling pointless repaints when the input level is steady.
+  static const double _setStateThreshold = 0.004;
+  double _lastPaintedLevel = 0;
+
   void _onTick(Duration elapsed) {
     if (!mounted || !widget.active || widget.reduceMotion) {
       return;
@@ -139,16 +145,23 @@ class _VoiceRecordingMeterState extends State<VoiceRecordingMeter>
     _smoothNorm += err * (1 - math.exp(-rate * dt));
     _smoothNorm = _smoothNorm.clamp(0.0, 1.0);
 
+    bool didScroll = false;
     _scrollDebtSec += dt;
     while (_scrollDebtSec >= _scrollPeriodSec) {
       _scrollDebtSec -= _scrollPeriodSec;
+      didScroll = true;
       for (int i = 0; i < _levels.length - 1; i++) {
         _levels[i] = _levels[i + 1];
       }
     }
     _levels[_levels.length - 1] = _smoothNorm;
 
-    setState(() {});
+    final bool meaningfulDelta =
+        (_smoothNorm - _lastPaintedLevel).abs() >= _setStateThreshold;
+    if (didScroll || meaningfulDelta) {
+      _lastPaintedLevel = _smoothNorm;
+      setState(() {});
+    }
   }
 
   void _startListening() {

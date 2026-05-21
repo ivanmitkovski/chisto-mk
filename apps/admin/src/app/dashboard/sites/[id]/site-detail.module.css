@@ -235,3 +235,24 @@
   font-size: 0.8125rem;
   color: rgba(8, 54, 39, 0.55);
 }
+
+.twoColumn {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-8);
+  max-width: 72rem;
+}
+
+@media (min-width: 960px) {
+  .twoColumn {
+    grid-template-columns: minmax(0, 28rem) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+.columnMain,
+.columnSide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}

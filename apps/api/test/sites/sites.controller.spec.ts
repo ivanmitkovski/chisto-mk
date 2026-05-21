@@ -6,6 +6,7 @@ import { SitesMapController } from '../../src/sites/sites-map.controller';
 import { SitesMapFacadeService } from '../../src/sites/sites-map-facade.service';
 import { SitesAdminService } from '../../src/sites/sites-admin.service';
 import { SitesFeedService } from '../../src/sites/sites-feed.service';
+import { SitesSavedListService } from '../../src/sites/sites-saved-list.service';
 import { SiteEngagementService } from '../../src/sites/site-engagement.service';
 import { SiteEventsService } from '../../src/admin-realtime/site-events.service';
 import { weakEtagForJson } from '../../src/sites/http/map-etag';
@@ -31,6 +32,13 @@ describe('SitesController', () => {
         ...input,
       })),
     } as unknown as SiteEngagementService;
+    const sitesSavedList = {
+      listSavedForUser: jest.fn(async () => ({
+        data: [{ id: 'saved_1', isSavedByMe: true }],
+        meta: { page: 1, limit: 20, total: 1, nextCursor: null },
+        feedVariant: 'v1',
+      })),
+    } as unknown as SitesSavedListService;
     const siteEvents = {
       getReplaySince: jest.fn(() => []),
       getEvents: jest.fn(),
@@ -40,8 +48,16 @@ describe('SitesController', () => {
       getAdminMapTimeline: jest.fn(),
     } as unknown as SitesMapFacadeService;
     return {
-      controller: new SitesController(sitesAdmin, sitesFeed, siteEngagement, mapFacade, siteEvents),
+      controller: new SitesController(
+        sitesAdmin,
+        sitesFeed,
+        sitesSavedList,
+        siteEngagement,
+        mapFacade,
+        siteEvents,
+      ),
       sitesFeed,
+      sitesSavedList,
       siteEngagement,
     };
   }
@@ -78,6 +94,18 @@ describe('SitesController', () => {
     );
     expect(sitesFeed.findAll).toHaveBeenCalled();
     expect(out.meta.page).toBe(1);
+  });
+
+  it('delegates listSaved to SitesSavedListService', async () => {
+    const { controller, sitesSavedList } = buildController();
+    const user = { userId: 'user_1' } as never;
+    const out = await controller.listSaved({ page: 1, limit: 10 } as never, user);
+    expect(sitesSavedList.listSavedForUser).toHaveBeenCalledWith(
+      user,
+      { page: 1, limit: 10 },
+      undefined,
+    );
+    expect(out.data).toHaveLength(1);
   });
 
   it('forces CLICK + WEB for click ingestion regardless of payload values', async () => {

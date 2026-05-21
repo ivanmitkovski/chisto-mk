@@ -1,43 +1,65 @@
+import 'package:flutter/foundation.dart';
+
 class AppConfig {
   const AppConfig._({
     required this.apiBaseUrl,
     required this.helpCenterUrl,
+    required this.termsUrl,
+    required this.privacyUrl,
     required this.environment,
   });
 
   final String apiBaseUrl;
   final String helpCenterUrl;
+  final String termsUrl;
+  final String privacyUrl;
   final AppEnvironment environment;
 
-  static const AppConfig dev = AppConfig._(
+  static String _legalUrlFromEnvironment(String key, String fallback) {
+    final String raw = String.fromEnvironment(key, defaultValue: '');
+    final String trimmed = raw.trim();
+    return trimmed.isNotEmpty ? trimmed : fallback;
+  }
+
+  static final AppConfig dev = AppConfig._(
     apiBaseUrl: 'https://api-dev.chisto.mk',
     helpCenterUrl: 'https://chisto.mk/help',
+    termsUrl: _legalUrlFromEnvironment('TERMS_URL', 'https://chisto.mk/terms'),
+    privacyUrl: _legalUrlFromEnvironment('PRIVACY_URL', 'https://chisto.mk/privacy'),
     environment: AppEnvironment.dev,
   );
 
-  static const AppConfig staging = AppConfig._(
+  static final AppConfig staging = AppConfig._(
     apiBaseUrl: 'https://api-staging.chisto.mk',
     helpCenterUrl: 'https://chisto.mk/help',
+    termsUrl: _legalUrlFromEnvironment('TERMS_URL', 'https://chisto.mk/terms'),
+    privacyUrl: _legalUrlFromEnvironment('PRIVACY_URL', 'https://chisto.mk/privacy'),
     environment: AppEnvironment.staging,
   );
 
-  static const AppConfig prod = AppConfig._(
+  static final AppConfig prod = AppConfig._(
     apiBaseUrl: 'https://api.chisto.mk',
     helpCenterUrl: 'https://chisto.mk/help',
+    termsUrl: _legalUrlFromEnvironment('TERMS_URL', 'https://chisto.mk/terms'),
+    privacyUrl: _legalUrlFromEnvironment('PRIVACY_URL', 'https://chisto.mk/privacy'),
     environment: AppEnvironment.prod,
   );
 
   /// Local API (iOS Simulator). Use with --dart-define=ENV=local
-  static const AppConfig local = AppConfig._(
+  static final AppConfig local = AppConfig._(
     apiBaseUrl: 'http://127.0.0.1:3000',
     helpCenterUrl: 'https://chisto.mk/help',
+    termsUrl: _legalUrlFromEnvironment('TERMS_URL', 'https://chisto.mk/terms'),
+    privacyUrl: _legalUrlFromEnvironment('PRIVACY_URL', 'https://chisto.mk/privacy'),
     environment: AppEnvironment.dev,
   );
 
   /// Local API (Android Emulator). Use with --dart-define=ENV=localAndroid
-  static const AppConfig localAndroid = AppConfig._(
+  static final AppConfig localAndroid = AppConfig._(
     apiBaseUrl: 'http://10.0.2.2:3000',
     helpCenterUrl: 'https://chisto.mk/help',
+    termsUrl: _legalUrlFromEnvironment('TERMS_URL', 'https://chisto.mk/terms'),
+    privacyUrl: _legalUrlFromEnvironment('PRIVACY_URL', 'https://chisto.mk/privacy'),
     environment: AppEnvironment.dev,
   );
 
@@ -48,6 +70,8 @@ class AppConfig {
     return AppConfig._(
       apiBaseUrl: 'http://$host:3000',
       helpCenterUrl: 'https://chisto.mk/help',
+      termsUrl: _legalUrlFromEnvironment('TERMS_URL', 'https://chisto.mk/terms'),
+      privacyUrl: _legalUrlFromEnvironment('PRIVACY_URL', 'https://chisto.mk/privacy'),
       environment: AppEnvironment.dev,
     );
   }
@@ -67,6 +91,8 @@ class AppConfig {
     return AppConfig._(
       apiBaseUrl: url,
       helpCenterUrl: 'https://chisto.mk/help',
+      termsUrl: _legalUrlFromEnvironment('TERMS_URL', 'https://chisto.mk/terms'),
+      privacyUrl: _legalUrlFromEnvironment('PRIVACY_URL', 'https://chisto.mk/privacy'),
       environment: AppEnvironment.dev,
     );
   }
@@ -109,6 +135,20 @@ class AppConfig {
   bool get isDev => environment == AppEnvironment.dev;
   bool get isStaging => environment == AppEnvironment.staging;
   bool get isProd => environment == AppEnvironment.prod;
+
+  /// Site detail "History" tab. Override with `--dart-define=SITE_HISTORY_TAB_ENABLED=true|false`.
+  ///
+  /// **v1 store release:** pass `--dart-define=SITE_HISTORY_TAB_ENABLED=true` after API
+  /// migration/backfill ([apps/api/docs/beta-readiness.md]).
+  bool get siteHistoryTabEnabled {
+    const String raw = String.fromEnvironment(
+      'SITE_HISTORY_TAB_ENABLED',
+      defaultValue: 'true',
+    );
+    if (raw == '1' || raw.toLowerCase() == 'true') return true;
+    if (raw == '0' || raw.toLowerCase() == 'false') return false;
+    return true;
+  }
 }
 
 enum AppEnvironment { dev, staging, prod }

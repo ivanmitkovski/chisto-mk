@@ -4,6 +4,7 @@ import 'package:chisto_mobile/features/home/presentation/widgets/comments/commen
 import 'package:chisto_mobile/features/home/presentation/widgets/comments/comments_motion.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/comments/comments_thread_empty_state.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/comments/comments_thread_flatten.dart';
+import 'package:chisto_mobile/shared/widgets/molecules/notification_row_highlight.dart';
 import 'package:flutter/material.dart';
 
 /// Scrollable thread for [CommentsBottomSheet].
@@ -26,6 +27,8 @@ class CommentsSheetCommentList extends StatelessWidget {
     required this.showLoadMoreReplies,
     required this.onLoadMoreReplies,
     required this.isLoadingMoreReplies,
+    this.highlightedCommentId,
+    this.rowKeyFor,
   });
 
   final List<Comment> comments;
@@ -44,6 +47,8 @@ class CommentsSheetCommentList extends StatelessWidget {
   final bool Function(Comment c) showLoadMoreReplies;
   final void Function(Comment c)? onLoadMoreReplies;
   final bool Function(Comment c) isLoadingMoreReplies;
+  final String? highlightedCommentId;
+  final GlobalKey Function(String commentId)? rowKeyFor;
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +61,8 @@ class CommentsSheetCommentList extends StatelessWidget {
     );
     return AnimatedSwitcher(
       duration: CommentsMotion.listAnimatedSwitcherDuration(context),
+      layoutBuilder: (Widget? current, List<Widget> previous) =>
+          current ?? const SizedBox.shrink(),
       child: ListView.separated(
         key: ValueKey<String>('$expandedKeyToken-${flattened.length}'),
         controller: scrollController,
@@ -73,7 +80,7 @@ class CommentsSheetCommentList extends StatelessWidget {
         itemBuilder: (BuildContext context, int index) {
           final FlattenedComment item = flattened[index];
           final Comment comment = item.comment;
-          return CommentListTile(
+          final Widget tile = CommentListTile(
             comment: comment,
             depth: item.depth,
             isBusy: isCommentBusy(comment.id),
@@ -81,9 +88,7 @@ class CommentsSheetCommentList extends StatelessWidget {
             isEditing: isCommentEditing(comment.id),
             isDeleting: isCommentDeleting(comment.id),
             onLikeTap: () => onLikeTap(comment.id),
-            onOpenMenu: comment.isOwnedByMe && onOpenMenu != null
-                ? () => onOpenMenu!(comment)
-                : null,
+            onOpenMenu: onOpenMenu != null ? () => onOpenMenu!(comment) : null,
             onReplyTap: () => onReplyTap(comment),
             hasReplies: hasExpandableThread(comment),
             repliesExpanded: expandedReplyIds.contains(comment.id),
@@ -96,6 +101,20 @@ class CommentsSheetCommentList extends StatelessWidget {
                 ? () => onLoadMoreReplies!(comment)
                 : null,
             isLoadingMoreReplies: isLoadingMoreReplies(comment),
+          );
+          final bool highlighted =
+              highlightedCommentId != null && highlightedCommentId == comment.id;
+          final Widget wrapped = NotificationRowHighlight(
+            highlighted: highlighted,
+            child: tile,
+          );
+          final GlobalKey Function(String commentId)? keyFor = rowKeyFor;
+          if (keyFor == null) {
+            return wrapped;
+          }
+          return KeyedSubtree(
+            key: keyFor(comment.id),
+            child: wrapped,
           );
         },
       ),

@@ -1,5 +1,6 @@
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:flutter/material.dart';
+import 'package:chisto_mobile/core/theme/app_colors.dart';
 
 /// Dims the shell with an optional rounded cutout (used by [CoachTourHost] and tests).
 class CoachTourScrimPainter extends CustomPainter {
@@ -35,7 +36,7 @@ class CoachTourScrimPainter extends CustomPainter {
     final double v = vignetteStrength.clamp(0.0, 1.0);
     if (v > 0.001) {
       final Paint edge = Paint()
-        ..color = Colors.black.withValues(alpha: 0.14 * v)
+        ..color = AppColors.black.withValues(alpha: 0.14 * v)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 28
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 18);

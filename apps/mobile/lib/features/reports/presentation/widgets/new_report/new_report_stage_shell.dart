@@ -1,4 +1,5 @@
 import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/core/theme/app_shadows.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
@@ -6,7 +7,7 @@ import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_stage.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_stage_config.dart';
-import 'package:chisto_mobile/shared/widgets/api_error_banner.dart';
+import 'package:chisto_mobile/shared/widgets/molecules/api_error_banner.dart';
 import 'package:flutter/material.dart';
 
 /// Scrollable body for a report stage including optional API error banner.
@@ -96,13 +97,7 @@ class NewReportStageSurface extends StatelessWidget {
               ? AppColors.accentDanger.withValues(alpha: 0.32)
               : AppColors.divider.withValues(alpha: 0.7),
         ),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.025),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        boxShadow: AppShadows.card(Theme.of(context).colorScheme),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -120,8 +115,8 @@ class NewReportStageSurface extends StatelessWidget {
                   visualDensity: VisualDensity.compact,
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(
-                    minWidth: 40,
-                    minHeight: 40,
+                    minWidth: 44,
+                    minHeight: 44,
                   ),
                   icon: const Icon(Icons.info_outline_rounded),
                   color: AppColors.textSecondary,
@@ -151,8 +146,8 @@ class NewReportStageSurface extends StatelessWidget {
                   visualDensity: VisualDensity.compact,
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(
-                    minWidth: 40,
-                    minHeight: 40,
+                    minWidth: 44,
+                    minHeight: 44,
                   ),
                   icon: const Icon(Icons.close_rounded, size: 20),
                   color: AppColors.textMuted,

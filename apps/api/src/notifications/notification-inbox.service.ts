@@ -4,7 +4,9 @@ import { PrismaService } from '../prisma/prisma.service';
 import { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { FeatureFlagsService } from '../feature-flags/feature-flags.service';
 import { ObservabilityStore } from '../observability/observability.store';
+import { ReportsUploadService } from '../reports/reports-upload.service';
 import { ListNotificationsQueryDto } from './dto/list-notifications-query.dto';
+import { NotificationActorDto } from './dto/notification-actor.dto';
 
 type NotificationListItem = {
   id: string;
@@ -18,6 +20,7 @@ type NotificationListItem = {
   threadKey: string | null;
   groupKey: string | null;
   archivedAt: string | null;
+  actor?: NotificationActorDto | null;
 };
 
 type NotificationListResponse = {
@@ -67,6 +70,7 @@ export class NotificationInboxService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly featureFlags: FeatureFlagsService,
+    private readonly reportsUpload: ReportsUploadService,
   ) {}
 
   async listForUser(
@@ -107,20 +111,27 @@ export class NotificationInboxService {
     ]);
 
     ObservabilityStore.recordPushInboxRead();
+    const actorById = await this.resolveActorsForNotifications(notifications);
     return {
-      data: notifications.map((n) => ({
-        id: n.id,
-        title: n.title,
-        body: n.body,
-        type: n.type,
-        isRead: n.isRead,
-        data: n.data,
-        createdAt: n.createdAt.toISOString(),
-        sentAt: n.sentAt?.toISOString() ?? null,
-        threadKey: n.threadKey ?? null,
-        groupKey: n.groupKey ?? null,
-        archivedAt: n.archivedAt?.toISOString() ?? null,
-      })),
+      data: notifications.map((n) => {
+        const actorUserId = this.extractActorUserId(n.data);
+        const actor =
+          actorUserId != null ? actorById.get(actorUserId) ?? null : null;
+        return {
+          id: n.id,
+          title: n.title,
+          body: n.body,
+          type: n.type,
+          isRead: n.isRead,
+          data: n.data,
+          createdAt: n.createdAt.toISOString(),
+          sentAt: n.sentAt?.toISOString() ?? null,
+          threadKey: n.threadKey ?? null,
+          groupKey: n.groupKey ?? null,
+          archivedAt: n.archivedAt?.toISOString() ?? null,
+          ...(actor != null ? { actor } : {}),
+        };
+      }),
       meta: {
         page: query.page,
         limit: query.limit,
@@ -128,6 +139,70 @@ export class NotificationInboxService {
         unreadCount,
       },
     };
+  }
+
+  private extractActorUserId(data: unknown): string | null {
+    if (data == null || typeof data !== 'object') return null;
+    const record = data as Record<string, unknown>;
+    const raw =
+      record['actorUserId'] ?? record['highlightActorUserId'];
+    if (typeof raw !== 'string' || raw.trim().length === 0) return null;
+    return raw.trim();
+  }
+
+  private async resolveActorsForNotifications(
+    notifications: Array<{ data: unknown }>,
+  ): Promise<Map<string, NotificationActorDto>> {
+    const actorIds = [
+      ...new Set(
+        notifications
+          .map((n) => this.extractActorUserId(n.data))
+          .filter((id): id is string => id != null),
+      ),
+    ];
+    if (actorIds.length === 0) return new Map();
+
+    const users = await this.prisma.user.findMany({
+      where: { id: { in: actorIds } },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        avatarObjectKey: true,
+      },
+    });
+
+    const avatarUrlByKey = new Map<string, string | null>();
+    const signingTasks = new Map<string, Promise<string | null>>();
+    for (const user of users) {
+      const key = user.avatarObjectKey?.trim();
+      if (!key) continue;
+      if (!signingTasks.has(key)) {
+        signingTasks.set(key, this.reportsUpload.signPrivateObjectKey(key));
+      }
+    }
+    await Promise.all(
+      [...signingTasks.entries()].map(async ([key, task]) => {
+        avatarUrlByKey.set(key, await task);
+      }),
+    );
+
+    const result = new Map<string, NotificationActorDto>();
+    for (const user of users) {
+      const displayName =
+        `${user.firstName} ${user.lastName}`.trim() || user.id;
+      const key = user.avatarObjectKey?.trim();
+      const avatarUrl =
+        key != null && key.length > 0
+          ? (avatarUrlByKey.get(key) ?? null)
+          : null;
+      result.set(user.id, {
+        id: user.id,
+        displayName,
+        avatarUrl,
+      });
+    }
+    return result;
   }
 
   async getUnreadCount(user: AuthenticatedUser): Promise<{ unreadCount: number }> {
@@ -182,9 +257,12 @@ export class NotificationInboxService {
 
     for (let i = 1; i < items.length; i++) {
       const item = items[i];
-      const sameGroup = current.groupKey != null
-        && item.groupKey === current.groupKey
-        && Math.abs(new Date(current.createdAt).getTime() - new Date(item.createdAt).getTime()) < WINDOW_MS;
+      const sameGroup =
+        current.groupKey != null &&
+        item.groupKey === current.groupKey &&
+        Math.abs(
+          new Date(current.createdAt).getTime() - new Date(item.createdAt).getTime(),
+        ) < WINDOW_MS;
 
       if (sameGroup) {
         groupCount++;
@@ -196,6 +274,18 @@ export class NotificationInboxService {
     }
     result.push({ ...current, groupCount });
     return result;
+  }
+
+  async countSentNotifications(): Promise<number> {
+    return this.prisma.userNotification.count({
+      where: { sentAt: { not: null } },
+    });
+  }
+
+  async countOpenedNotifications(): Promise<number> {
+    return this.prisma.userNotification.count({
+      where: { openedAt: { not: null } },
+    });
   }
 
   async listDeadLetters(page = 1, limit = 20): Promise<DeadLetterListResponse> {

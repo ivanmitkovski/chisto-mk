@@ -20,8 +20,8 @@ export class EventsCheckInSharedService {
     if (raw != null && raw.length >= 24) {
       return Buffer.from(raw, 'utf8');
     }
-    if (nodeEnv === 'production') {
-      this.logger.error('CHECK_IN_QR_SECRET missing or too short in production');
+    if (nodeEnv === 'production' || nodeEnv === 'staging') {
+      this.logger.error('CHECK_IN_QR_SECRET missing or too short in production/staging');
       throw new InternalServerErrorException({
         code: 'CHECK_IN_MISCONFIG',
         message: 'Server misconfigured',

@@ -5,7 +5,6 @@ import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/r
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_stage_config.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_stage_help.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:flutter/material.dart';
 
 /// Bottom sheet with localized help for a report wizard step.
@@ -15,7 +14,6 @@ Future<void> showNewReportStageHelpModal(
   required Future<void> Function() onFlowHelpOpened,
   String? infoExtra,
 }) async {
-  AppHaptics.light();
   await onFlowHelpOpened();
   if (!context.mounted) return;
   final String trimmed = infoExtra?.trim() ?? '';
@@ -51,7 +49,6 @@ Future<void> showNewReportStageHelpModal(
                 icon: Icons.close_rounded,
                 semanticLabel: sheetContext.l10n.semanticsClose,
                 onTap: () {
-                  AppHaptics.tap();
                   Navigator.of(sheetContext).pop();
                 },
               ),

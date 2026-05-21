@@ -38,11 +38,15 @@ describe('EventsLifecycleService', () => {
       clawBackPoints: jest.fn(),
     };
     const notificationDispatcher = { dispatch: jest.fn() };
+    const siteLifecycleFromEvents = {
+      onEventLifecycleChanged: jest.fn().mockResolvedValue(undefined),
+    };
     service = new EventsLifecycleService(
       repo,
       mobileMapper,
       ecoEventPoints as never,
       notificationDispatcher as never,
+      siteLifecycleFromEvents as never,
     );
   });
 

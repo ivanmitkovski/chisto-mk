@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
+import 'package:chisto_mobile/core/theme/app_shadows.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
-import 'package:chisto_mobile/shared/widgets/no_overscroll_overlay_scroll_behavior.dart';
-import 'package:chisto_mobile/shared/widgets/skeleton_shimmer_box.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/no_overscroll_overlay_scroll_behavior.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/skeleton_shimmer_box.dart';
 
 /// Full-profile loading placeholder: gradient header, summary cards, then settings-style
 /// grouped lists matching [_buildAuthenticatedProfileBody] section structure.
@@ -319,13 +320,7 @@ class _LevelCardSkeleton extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.panelBackground,
         borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: AppColors.shadowMedium,
-            blurRadius: 14,
-            offset: const Offset(0, 6),
-          ),
-        ],
+        boxShadow: AppShadows.panel(Theme.of(context).colorScheme),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -424,13 +419,7 @@ class _WeeklyRankCardSkeleton extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.panelBackground,
         borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: AppColors.shadowMedium,
-            blurRadius: 14,
-            offset: const Offset(0, 6),
-          ),
-        ],
+        boxShadow: AppShadows.panel(Theme.of(context).colorScheme),
       ),
       child: Row(
         children: <Widget>[
@@ -489,13 +478,7 @@ class _ProfileSettingsGroupedCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.panelBackground,
         borderRadius: BorderRadius.circular(AppSpacing.radius18),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: AppColors.shadowLight,
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: AppShadows.panel(Theme.of(context).colorScheme),
         border: Border.all(
           color: AppColors.divider.withValues(alpha: 0.9),
         ),

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:chisto_mobile/core/theme/app_shadows.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
 
 class StickyBottomCTA extends StatelessWidget {
   const StickyBottomCTA({super.key, required this.label, required this.onPressed});
@@ -24,13 +25,7 @@ class StickyBottomCTA extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: AppColors.appBackground,
-          boxShadow: <BoxShadow>[
-            BoxShadow(
-              color: AppColors.shadowLight,
-              blurRadius: AppSpacing.md,
-              offset: const Offset(0, -4),
-            ),
-          ],
+          boxShadow: AppShadows.sheet(Theme.of(context).colorScheme),
         ),
         child: PrimaryButton(label: label, onPressed: onPressed),
       ),

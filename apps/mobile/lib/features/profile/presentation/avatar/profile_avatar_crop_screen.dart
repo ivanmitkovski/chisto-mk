@@ -8,12 +8,13 @@ import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/profile/presentation/avatar/profile_avatar_image_pipeline.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
 import 'package:crop_your_image/crop_your_image.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_loading_indicator.dart';
 
 /// Circular avatar crop: 1:1 viewport with circle mask; user pans and pinches.
 /// Prep (copy, settle, decode) runs after the route is shown; loading UI is
@@ -137,14 +138,12 @@ class _ProfileAvatarCropScreenState extends State<ProfileAvatarCropScreen> {
   }
 
   void _cancel() {
-    AppHaptics.light();
     Navigator.of(context).pop();
   }
 
   Future<void> _done() async {
     if (_cropping || _preparing || _imageBytes == null) return;
     setState(() => _cropping = true);
-    AppHaptics.light();
     _controller.cropCircle();
   }
 
@@ -158,7 +157,6 @@ class _ProfileAvatarCropScreenState extends State<ProfileAvatarCropScreen> {
               '${tempDir.path}/avatar_cropped_${DateTime.now().millisecondsSinceEpoch}.jpg';
           await File(path).writeAsBytes(croppedImage);
           if (!mounted) return;
-          AppHaptics.medium();
           Navigator.of(context).pop<String>(path);
         } catch (_) {
           if (!mounted) return;
@@ -192,11 +190,11 @@ class _ProfileAvatarCropScreenState extends State<ProfileAvatarCropScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  const SizedBox(
+                  SizedBox(
                     width: 36,
                     height: 36,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 3,
+                    child: AppLoadingIndicator(
+                      size: AppLoadingIndicatorSize.lg,
                       color: AppColors.primaryDark,
                     ),
                   ),
@@ -235,12 +233,12 @@ class _ProfileAvatarCropScreenState extends State<ProfileAvatarCropScreen> {
               const SizedBox.shrink(),
           clipBehavior: Clip.hardEdge,
           filterQuality: FilterQuality.medium,
-          progressIndicator: const Center(
+          progressIndicator: Center(
             child: SizedBox(
               width: 36,
               height: 36,
-              child: CircularProgressIndicator(
-                strokeWidth: 3,
+              child: AppLoadingIndicator(
+                size: AppLoadingIndicatorSize.lg,
                 color: AppColors.primaryDark,
               ),
             ),
@@ -278,27 +276,10 @@ class _ProfileAvatarCropScreenState extends State<ProfileAvatarCropScreen> {
                       width: 88,
                       child: Align(
                         alignment: Alignment.centerLeft,
-                        child: TextButton(
-                          onPressed: _cropping ? null : _cancel,
-                          style: TextButton.styleFrom(
-                            foregroundColor: AppColors.textSecondary,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.sm,
-                              vertical: AppSpacing.sm,
-                            ),
-                            minimumSize: const Size(44, 44),
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          ),
-                          child: Text(
-                            l10n.profileAvatarCropCancel,
-                            style: AppTypography.textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w400,
-                              fontSize: 17,
-                              height: 1.2,
-                              letterSpacing: -0.41,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
+                        child: AppButton.text(
+                          label: l10n.profileAvatarCropCancel,
+                          onPressed: _cancel,
+                          enabled: !_cropping,
                         ),
                       ),
                     ),
@@ -369,29 +350,10 @@ class _ProfileAvatarCropScreenState extends State<ProfileAvatarCropScreen> {
                       width: 88,
                       child: Align(
                         alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: (_cropping || !canAct) ? null : _done,
-                          style: TextButton.styleFrom(
-                            foregroundColor: AppColors.primaryDark,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.sm,
-                              vertical: AppSpacing.sm,
-                            ),
-                            minimumSize: const Size(44, 44),
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          ),
-                          child: Text(
-                            l10n.profileAvatarCropDone,
-                            style: AppTypography.textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 17,
-                              height: 1.2,
-                              letterSpacing: -0.41,
-                              color: (_cropping || !canAct)
-                                  ? AppColors.textMuted
-                                  : AppColors.primaryDark,
-                            ),
-                          ),
+                        child: AppButton.text(
+                          label: l10n.profileAvatarCropDone,
+                          onPressed: _done,
+                          enabled: !_cropping && canAct,
                         ),
                       ),
                     ),

@@ -1,9 +1,12 @@
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/providers/reports_providers.dart';
+import 'package:chisto_mobile/core/theme/app_radii.dart';
+import 'package:chisto_mobile/core/providers/root_container.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/reports/data/reports_realtime/reports_realtime_connection_state.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 import 'package:flutter/material.dart';
 
 /// Shows when [ReportsRealtimeConnectionState.offline] — e.g. auth refresh failed or
@@ -17,7 +20,7 @@ class ReportsListRealtimeBanner extends StatelessWidget {
     final AppLocalizations l10n = context.l10n;
     return ValueListenableBuilder<ReportsRealtimeConnectionState?>(
       valueListenable:
-          ServiceLocator.instance.reportsRealtimeService.connectionState,
+          readRoot(reportsRealtimeServiceProvider).connectionState,
       builder: (
         BuildContext context,
         ReportsRealtimeConnectionState? value,
@@ -37,7 +40,7 @@ class ReportsListRealtimeBanner extends StatelessWidget {
           ),
           child: Material(
             color: AppColors.primary.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: AppRadii.sm,
             child: Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.md,
@@ -72,16 +75,12 @@ class ReportsListRealtimeBanner extends StatelessWidget {
                   ),
                   Align(
                     alignment: Alignment.centerRight,
-                    child: TextButton(
-                      style: TextButton.styleFrom(
-                        visualDensity: VisualDensity.compact,
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                      ),
+                    child: AppButton.text(
+                      label: l10n.reportsSseReconnectAction,
                       onPressed: () {
-                        ServiceLocator.instance.reportsRealtimeService
+                        readRoot(reportsRealtimeServiceProvider)
                             .requestReconnect();
                       },
-                      child: Text(l10n.reportsSseReconnectAction),
                     ),
                   ),
                 ],

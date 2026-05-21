@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:chisto_mobile/core/serialization/safe_json.dart';
+
 import 'package:chisto_mobile/features/events/presentation/utils/events_diagnostic_log.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -98,7 +100,10 @@ class CheckInSyncQueue {
     final String? raw = prefs.getString(_prefKey);
     if (raw == null || raw.isEmpty) return <CheckInQueueEntry>[];
     try {
-      final List<dynamic> list = jsonDecode(raw) as List<dynamic>;
+      final List<dynamic>? list = safeJsonDecodeList(raw);
+      if (list == null) {
+        return <CheckInQueueEntry>[];
+      }
       final List<CheckInQueueEntry> entries = <CheckInQueueEntry>[];
       for (final dynamic item in list) {
         if (item is Map<String, dynamic>) {

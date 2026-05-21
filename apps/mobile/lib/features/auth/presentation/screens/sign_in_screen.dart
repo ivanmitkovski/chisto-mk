@@ -3,39 +3,40 @@ import 'dart:ui' show PlatformDispatcher;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/providers/app_providers.dart';
+import 'package:chisto_mobile/features/auth/application/sign_in_controller.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:chisto_mobile/core/l10n/app_language_picker.dart';
 import 'package:chisto_mobile/core/l10n/app_locale_resolution.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/features/auth/presentation/eula_acceptance_flow.dart';
 import 'package:chisto_mobile/features/auth/presentation/constants/auth_error_messages.dart';
+import 'package:chisto_mobile/features/auth/presentation/utils/auth_guard_ui.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
-import 'package:chisto_mobile/core/validation/phone_display_formatter.dart';
 import 'package:chisto_mobile/core/validation/phone_normalizer.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/auth/presentation/utils/auth_validators.dart';
+import 'package:chisto_mobile/features/auth/presentation/widgets/auth_form_scaffold.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/widgets/api_error_banner.dart';
-import 'package:chisto_mobile/shared/widgets/auth_shell.dart';
-import 'package:chisto_mobile/shared/widgets/auth_text_field.dart';
-import 'package:chisto_mobile/shared/widgets/brand_logo.dart';
-import 'package:chisto_mobile/shared/widgets/loading_overlay.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/molecules/api_error_banner.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/auth_shell.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/auth_text_field.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/auth_screen_header.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/loading_overlay.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
 import 'package:chisto_mobile/core/validation/macedonian_phone_formatter.dart';
 
-const String _keyRememberMe = 'chisto_remember_me';
-const String _keyLastSignInPhone = 'chisto_last_signin_phone';
-
-class SignInScreen extends StatefulWidget {
+class SignInScreen extends ConsumerStatefulWidget {
   const SignInScreen({super.key});
 
   @override
-  State<SignInScreen> createState() => _SignInScreenState();
+  ConsumerState<SignInScreen> createState() => _SignInScreenState();
 }
 
-class _SignInScreenState extends State<SignInScreen>
+class _SignInScreenState extends ConsumerState<SignInScreen>
     with SingleTickerProviderStateMixin {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey _phoneFieldKey = GlobalKey();
@@ -45,11 +46,9 @@ class _SignInScreenState extends State<SignInScreen>
   final TextEditingController _passwordController = TextEditingController();
   final FocusNode _phoneFocus = FocusNode();
   final FocusNode _passwordFocus = FocusNode();
-  bool _rememberMe = false;
-  bool _isLoading = false;
   bool _hasSubmitted = false;
   bool _hasValidationError = false;
-  String? _apiError;
+  bool _phonePrefilled = false;
   late AnimationController _entranceController;
   late Animation<double> _entranceAnimation;
 
@@ -77,7 +76,6 @@ class _SignInScreenState extends State<SignInScreen>
         _entranceController.forward();
       }
     });
-    _loadRememberMe();
   }
 
   void _scrollToFocusedField() {
@@ -101,32 +99,6 @@ class _SignInScreenState extends State<SignInScreen>
     });
   }
 
-  Future<void> _loadRememberMe() async {
-    if (!ServiceLocator.instance.isInitialized) return;
-    final prefs = ServiceLocator.instance.preferences;
-    final bool rememberMe = prefs.getBool(_keyRememberMe) ?? false;
-    final String? lastPhone = prefs.getString(_keyLastSignInPhone);
-    if (!mounted) return;
-    setState(() {
-      _rememberMe = rememberMe;
-      if (rememberMe && lastPhone != null && lastPhone.isNotEmpty) {
-        // National part only: field has prefixFixedText '+389', so avoid "+389 +389 ...".
-        _phoneController.text = formatPhoneNationalPart(lastPhone);
-      }
-    });
-  }
-
-  Future<void> _saveRememberMe({required String phoneE164, required bool remember}) async {
-    if (!ServiceLocator.instance.isInitialized) return;
-    final prefs = ServiceLocator.instance.preferences;
-    await prefs.setBool(_keyRememberMe, remember);
-    if (remember) {
-      await prefs.setString(_keyLastSignInPhone, phoneE164);
-    } else {
-      await prefs.remove(_keyLastSignInPhone);
-    }
-  }
-
   @override
   void dispose() {
     _phoneController.removeListener(_onInputChanged);
@@ -144,9 +116,8 @@ class _SignInScreenState extends State<SignInScreen>
 
   void _onInputChanged() {
     if (!mounted) return;
-    setState(() {
-      if (_apiError != null) _apiError = null;
-    });
+    ref.read(signInControllerProvider.notifier).clearError();
+    setState(() {});
   }
 
 
@@ -155,53 +126,47 @@ class _SignInScreenState extends State<SignInScreen>
       _passwordController.text.trim().isNotEmpty;
 
   Future<void> _handleSignIn() async {
-    if (_isLoading) return;
+    if (ref.read(signInControllerProvider).isLoading) return;
     final FormState? formState = _formKey.currentState;
     setState(() => _hasSubmitted = true);
     if (formState == null || !formState.validate()) {
-      setState(() => _hasValidationError = true);
       AppHaptics.warning(context);
+      setState(() => _hasValidationError = true);
       return;
     }
     setState(() => _hasValidationError = false);
-    AppHaptics.light(context);
-    setState(() {
-      _isLoading = true;
-      _apiError = null;
-    });
-
+    final String phoneE164 = normalizeToE164(_phoneController.text);
     try {
-      final String phoneE164 = normalizeToE164(_phoneController.text);
-      await ServiceLocator.instance.authRepository.signIn(
-        phoneNumber: phoneE164,
-        password: _passwordController.text,
-      );
-      if (!mounted) return;
-      await _saveRememberMe(phoneE164: phoneE164, remember: _rememberMe);
+      await ref.read(signInControllerProvider.notifier).signIn(
+            phoneNumberE164: phoneE164,
+            password: _passwordController.text,
+          );
       if (!mounted) return;
       AppHaptics.success(context);
+      final bool accepted = await ensureCommunityGuidelinesAccepted(context);
+      if (!accepted || !mounted) return;
       Navigator.of(context).pushNamedAndRemoveUntil(
         AppRoutes.home,
         (Route<dynamic> route) => false,
       );
     } on AppError catch (e) {
       if (!mounted) return;
-      setState(
-        () => _apiError = messageForAuthError(AppLocalizations.of(context)!, e),
-      );
-      AppHaptics.warning(context);
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (e.code == 'PHONE_NOT_VERIFIED') {
+        ref.read(signInControllerProvider.notifier).clearError();
+        final bool verify = await showPhoneNotVerifiedDialog(context);
+        if (verify && mounted) {
+          await pushPhoneVerificationOtp(context, phoneE164);
+        }
+        return;
+      }
     }
   }
 
   void _handleForgotPassword() {
-    AppHaptics.tap(context);
     Navigator.of(context).pushNamed(AppRoutes.forgotPasswordRequest);
   }
 
   void _handleSignUp() {
-    AppHaptics.tap(context);
     Navigator.of(context).pushNamed(AppRoutes.signUp);
   }
 
@@ -209,6 +174,16 @@ class _SignInScreenState extends State<SignInScreen>
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
     final double keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
+    final SignInState signInState = ref.watch(signInControllerProvider);
+    final bool isLoading = signInState.isLoading;
+    final String? apiError = signInState.error != null
+        ? messageForAuthError(l10n, signInState.error!)
+        : null;
+
+    if (!_phonePrefilled && signInState.lastPhoneNational != null) {
+      _phoneController.text = signInState.lastPhoneNational!;
+      _phonePrefilled = true;
+    }
 
     return Stack(
       children: <Widget>[
@@ -220,39 +195,20 @@ class _SignInScreenState extends State<SignInScreen>
                 begin: const Offset(0, 0.08),
                 end: Offset.zero,
               ).animate(_entranceAnimation),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  const BrandLogo(compact: true),
-                  const SizedBox(height: AppSpacing.md),
-                  Text(
-                    l10n.authSignInTitle,
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.5,
-                      height: 1.2,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    l10n.authSignInSubtitle,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.textMuted,
-                      height: 1.4,
-                    ),
-                  ),
-                ],
+              child: AuthScreenHeader(
+                showLogo: true,
+                title: l10n.authSignInTitle,
+                subtitle: l10n.authSignInSubtitle,
               ),
             ),
           ),
           body: LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
-              return SingleChildScrollView(
-                controller: _scrollController,
+              return AuthFormScaffold(
+                scrollController: _scrollController,
                 physics: const BouncingScrollPhysics(
                   parent: AlwaysScrollableScrollPhysics(),
                 ),
-                keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                 padding: EdgeInsets.fromLTRB(
                   AppSpacing.lg,
                   AppSpacing.xl,
@@ -283,11 +239,13 @@ class _SignInScreenState extends State<SignInScreen>
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: <Widget>[
-                                if (_apiError != null) ...[
+                                if (apiError != null) ...[
                                   ApiErrorBanner(
-                                    message: _apiError!,
+                                    message: apiError,
                                     onDismiss: () {
-                                      setState(() => _apiError = null);
+                                      ref
+                                          .read(signInControllerProvider.notifier)
+                                          .clearError();
                                     },
                                   ),
                                   const SizedBox(height: AppSpacing.md),
@@ -335,9 +293,11 @@ class _SignInScreenState extends State<SignInScreen>
                                 const SizedBox(height: AppSpacing.md),
                                 _RememberMeRow(
                                   l10n: l10n,
-                                  value: _rememberMe,
+                                  value: signInState.rememberMe,
                                   onChanged: (bool v) {
-                                    setState(() => _rememberMe = v);
+                                    ref
+                                        .read(signInControllerProvider.notifier)
+                                        .setRememberMe(v);
                                   },
                                   onForgotPassword: _handleForgotPassword,
                                 ),
@@ -399,62 +359,59 @@ class _SignInScreenState extends State<SignInScreen>
                                   label: l10n.authSignInCta,
                                   child: PrimaryButton(
                                     label: l10n.authSignInCta,
-                                    enabled: _canSubmit && !_isLoading,
-                                    onPressed: _isLoading ? null : _handleSignIn,
+                                    enabled: _canSubmit && !isLoading,
+                                    onPressed: isLoading ? null : _handleSignIn,
                                   ),
                                 ),
                                 const SizedBox(height: AppSpacing.radius22),
                                 Center(
-                                    child: Semantics(
-                                      button: true,
-                                      label:
-                                          '${l10n.authSignUpPrompt}${l10n.authSignUpLink}',
-                                      child: GestureDetector(
-                                        onTap: _handleSignUp,
-                                        behavior: HitTestBehavior.opaque,
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: AppSpacing.sm,
-                                            vertical: AppSpacing.sm,
-                                          ),
-                                          child: RichText(
-                                            text: TextSpan(
-                                              text: l10n.authSignUpPrompt,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodyMedium
-                                                  ?.copyWith(
-                                                    color: AppColors.textMuted,
-                                                  ),
-                                              children: <TextSpan>[
-                                                TextSpan(
-                                                  text: l10n.authSignUpLink,
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .bodyMedium
-                                                      ?.copyWith(
-                                                        color:
-                                                            AppColors.primaryDark,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                      ),
+                                  child: Semantics(
+                                    button: true,
+                                    label:
+                                        '${l10n.authSignUpPrompt}${l10n.authSignUpLink}',
+                                    child: GestureDetector(
+                                      onTap: _handleSignUp,
+                                      behavior: HitTestBehavior.opaque,
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: AppSpacing.sm,
+                                          vertical: AppSpacing.sm,
+                                        ),
+                                        child: RichText(
+                                          text: TextSpan(
+                                            text: l10n.authSignUpPrompt,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium
+                                                ?.copyWith(
+                                                  color: AppColors.textMuted,
                                                 ),
-                                              ],
-                                            ),
+                                            children: <TextSpan>[
+                                              TextSpan(
+                                                text: l10n.authSignUpLink,
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyMedium
+                                                    ?.copyWith(
+                                                      color:
+                                                          AppColors.primaryDark,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ),
                                     ),
                                   ),
+                                ),
                                 const SizedBox(height: AppSpacing.md),
-                                ValueListenableBuilder<Locale?>(
-                                  valueListenable:
-                                      ServiceLocator.instance.appLocaleOverride,
-                                  builder: (
-                                    BuildContext context,
-                                    Locale? override,
-                                    _,
-                                  ) {
+                                Builder(
+                                  builder: (BuildContext context) {
+                                    final Locale? override = ref.watch(
+                                      appLocaleOverrideProvider,
+                                    );
                                     final Locale effective = resolveAppLocale(
                                       override: override,
                                       platformLocales:
@@ -468,7 +425,6 @@ class _SignInScreenState extends State<SignInScreen>
                                         label: l10n.profileLanguageTile,
                                         child: InkWell(
                                           onTap: () {
-                                            AppHaptics.tap(context);
                                             showAppLanguagePicker(context);
                                           },
                                           borderRadius: BorderRadius.circular(
@@ -522,7 +478,7 @@ class _SignInScreenState extends State<SignInScreen>
             },
           ),
         ),
-        LoadingOverlay(visible: _isLoading),
+        LoadingOverlay(visible: isLoading),
       ],
     );
   }
@@ -611,7 +567,7 @@ class _RememberMeRow extends StatelessWidget {
                   horizontal: AppSpacing.sm,
                   vertical: AppSpacing.xs,
                 ),
-                minimumSize: Size.zero,
+                minimumSize: const Size(44, 44),
                 onPressed: onForgotPassword,
                 child: Text(
                   l10n.authForgotPassword,

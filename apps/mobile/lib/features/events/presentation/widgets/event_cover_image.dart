@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_loading_indicator.dart';
 
 /// Site cover for [EcoEvent.siteImageUrl]: HTTPS URLs from the API, local
 /// `assets/…` paths, or empty (placeholder).
@@ -46,10 +47,10 @@ class EcoEventCoverImage extends StatelessWidget {
       height: height,
       color: AppColors.inputFill,
       alignment: Alignment.center,
-      child: const SizedBox(
+      child: SizedBox(
         width: 22,
         height: 22,
-        child: CircularProgressIndicator(strokeWidth: 2),
+        child: AppLoadingIndicator(size: AppLoadingIndicatorSize.sm),
       ),
     );
   }

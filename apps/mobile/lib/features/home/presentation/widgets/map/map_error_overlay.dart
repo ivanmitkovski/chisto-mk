@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
-import 'package:chisto_mobile/shared/widgets/app_error_view.dart';
+import 'package:chisto_mobile/shared/widgets/molecules/app_error_view.dart';
 
 class MapErrorOverlay extends StatelessWidget {
   const MapErrorOverlay({

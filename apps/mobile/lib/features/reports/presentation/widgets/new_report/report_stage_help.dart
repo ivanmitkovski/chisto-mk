@@ -1,5 +1,6 @@
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 
 /// Grouped, Apple-style sections for the per-step help sheet.
@@ -28,24 +29,20 @@ class StageHelpFormattedContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextTheme themeText = Theme.of(context).textTheme;
     final TextScaler scaler = MediaQuery.textScalerOf(
       context,
     ).clamp(minScaleFactor: 0.85, maxScaleFactor: 1.3);
 
-    final TextStyle titleStyle = (themeText.titleSmall ?? const TextStyle())
-        .copyWith(
-          fontWeight: FontWeight.w600,
-          letterSpacing: -0.2,
-          color: AppColors.textPrimary,
-          height: 1.25,
-        );
-    final TextStyle bodyStyle = (themeText.bodyMedium ?? const TextStyle())
-        .copyWith(
-          color: AppColors.textSecondary,
-          height: 1.45,
-          letterSpacing: -0.08,
-        );
+    final TextStyle titleStyle = AppTypography.textTheme.titleSmall!.copyWith(
+      letterSpacing: -0.2,
+      color: AppColors.textPrimary,
+      height: 1.25,
+    );
+    final TextStyle bodyStyle = AppTypography.textTheme.bodyMedium!.copyWith(
+      color: AppColors.textSecondary,
+      height: 1.45,
+      letterSpacing: -0.08,
+    );
 
     final List<Widget> children = <Widget>[];
 

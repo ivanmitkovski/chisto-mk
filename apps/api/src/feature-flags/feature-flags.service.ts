@@ -15,6 +15,11 @@ const DEFAULT_FLAGS: Array<{ key: string; enabled: boolean }> = [
   { key: 'reports_map_heatmap', enabled: true },
   { key: 'notifications_inbox_enabled', enabled: true },
   { key: 'push_fcm_enabled', enabled: false },
+  { key: 'push_realtime_socket_enabled', enabled: true },
+  { key: 'push_quiet_hours_enabled', enabled: false },
+  { key: 'email_enabled', enabled: false },
+  { key: 'site_lifecycle_from_events', enabled: false },
+  { key: 'event_chat_push_coalesce_v2', enabled: false },
 ];
 
 @Injectable()
@@ -106,6 +111,34 @@ export class FeatureFlagsService {
       expiresAt: now + PUBLIC_FLAGS_CACHE_TTL_MS,
     };
     return value;
+  }
+
+  async isPushRealtimeSocketEnabled(): Promise<boolean> {
+    const fromEnv = this.config.get<string>('PUSH_REALTIME_SOCKET_ENABLED', 'true') === 'true';
+    await this.ensureDefaults();
+    const row = await this.prisma.featureFlag.findUnique({
+      where: { key: 'push_realtime_socket_enabled' },
+      select: { enabled: true },
+    });
+    return row?.enabled ?? fromEnv;
+  }
+
+  async isEventChatPushCoalesceV2Enabled(): Promise<boolean> {
+    await this.ensureDefaults();
+    const row = await this.prisma.featureFlag.findUnique({
+      where: { key: 'event_chat_push_coalesce_v2' },
+      select: { enabled: true },
+    });
+    return row?.enabled ?? true;
+  }
+
+  async isPushQuietHoursEnabled(): Promise<boolean> {
+    await this.ensureDefaults();
+    const row = await this.prisma.featureFlag.findUnique({
+      where: { key: 'push_quiet_hours_enabled' },
+      select: { enabled: true },
+    });
+    return row?.enabled ?? false;
   }
 
   async patch(

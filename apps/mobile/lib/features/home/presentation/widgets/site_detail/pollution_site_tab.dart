@@ -105,11 +105,12 @@ class _PollutionSiteTabState extends State<PollutionSiteTab> {
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
-              if (widget.site.firstReport != null) ...<Widget>[
+              if (widget.site.displayFirstReport != null) ...<Widget>[
                 SiteReportedRow(
-                  reporterName: widget.site.firstReport!.reporterName,
-                  reportedAgo: widget.site.firstReport!.reportedAgo,
-                  reporterAvatarUrl: widget.site.firstReport!.reporterAvatarUrl,
+                  reporterName: widget.site.displayFirstReport!.reporterName,
+                  reportedAgo: widget.site.displayFirstReport!.reportedAgo,
+                  reporterAvatarUrl:
+                      widget.site.displayFirstReport!.reporterAvatarUrl,
                   onTap: widget.onReportedTap,
                 ),
               ],

@@ -6,8 +6,8 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
 
 /// Confirms invalidating the organizer QR session (rotates codes).
 Future<bool?> showOrganizerInvalidateQrSessionSheet(BuildContext context) {
@@ -18,7 +18,6 @@ Future<bool?> showOrganizerInvalidateQrSessionSheet(BuildContext context) {
     barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
     builder: (BuildContext sheetCtx) {
       final AppLocalizations l10n = sheetCtx.l10n;
-      final TextTheme sheetTextTheme = Theme.of(sheetCtx).textTheme;
       return ReportSheetScaffold(
         fitToContent: true,
         title: l10n.eventsOrganizerInvalidateQrTitle,
@@ -27,7 +26,6 @@ Future<bool?> showOrganizerInvalidateQrSessionSheet(BuildContext context) {
           icon: CupertinoIcons.xmark,
           semanticLabel: l10n.commonClose,
           onTap: () {
-            AppHaptics.tap();
             Navigator.of(sheetCtx).pop(false);
           },
         ),
@@ -35,37 +33,18 @@ Future<bool?> showOrganizerInvalidateQrSessionSheet(BuildContext context) {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            SizedBox(
-              width: double.infinity,
-              height: 54,
-              child: OutlinedButton(
-                onPressed: () {
-                  AppHaptics.tap();
-                  Navigator.of(sheetCtx).pop(false);
-                },
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: AppColors.divider),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusPill,
-                    ),
-                  ),
-                ),
-                child: Text(
-                  l10n.commonCancel,
-                  style: sheetTextTheme.titleMedium?.copyWith(
-                    color: AppColors.primaryDark,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
+            AppButton.outlined(
+              label: l10n.commonCancel,
+              onPressed: () {
+                Navigator.of(sheetCtx).pop(false);
+              },
+              expand: true,
             ),
             const SizedBox(height: AppSpacing.sm),
             PrimaryButton(
               label: l10n.eventsOrganizerInvalidateQrTitle,
               enabled: true,
               onPressed: () {
-                AppHaptics.tap();
                 Navigator.of(sheetCtx).pop(true);
               },
             ),

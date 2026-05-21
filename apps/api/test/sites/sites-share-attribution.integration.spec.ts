@@ -20,7 +20,15 @@ describe('Share attribution controller/service integration', () => {
       searchMapSites: jest.fn(),
       getAdminMapTimeline: jest.fn(),
     } as unknown as SitesMapFacadeService;
-    const controller = new SitesController(sitesAdmin, sitesFeed, siteEngagement, mapFacade, siteEvents);
+    const sitesSavedList = { listSavedForUser: jest.fn() } as never;
+    const controller = new SitesController(
+      sitesAdmin,
+      sitesFeed,
+      sitesSavedList,
+      siteEngagement,
+      mapFacade,
+      siteEvents,
+    );
     const req = { ip: '203.0.113.15' } as never;
 
     await controller.ingestShareClick(

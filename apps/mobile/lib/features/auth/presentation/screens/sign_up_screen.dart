@@ -1,6 +1,10 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:chisto_mobile/core/providers/app_providers.dart';
+import 'package:chisto_mobile/features/auth/application/sign_up_controller.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/features/auth/presentation/constants/auth_error_messages.dart';
 import 'package:chisto_mobile/features/auth/presentation/utils/auth_validators.dart';
@@ -13,23 +17,24 @@ import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/core/validation/password_strength.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/widgets/api_error_banner.dart';
-import 'package:chisto_mobile/shared/widgets/password_strength_indicator.dart';
-import 'package:chisto_mobile/shared/widgets/auth_shell.dart';
-import 'package:chisto_mobile/shared/widgets/auth_text_field.dart';
-import 'package:chisto_mobile/shared/widgets/brand_logo.dart';
-import 'package:chisto_mobile/shared/widgets/loading_overlay.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/molecules/api_error_banner.dart';
+import 'package:chisto_mobile/shared/widgets/molecules/password_strength_indicator.dart';
+import 'package:chisto_mobile/features/auth/presentation/widgets/auth_form_scaffold.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/auth_shell.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/auth_text_field.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/auth_screen_header.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/loading_overlay.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
 import 'package:chisto_mobile/core/validation/macedonian_phone_formatter.dart';
 
-class SignUpScreen extends StatefulWidget {
+class SignUpScreen extends ConsumerStatefulWidget {
   const SignUpScreen({super.key});
 
   @override
-  State<SignUpScreen> createState() => _SignUpScreenState();
+  ConsumerState<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _SignUpScreenState extends State<SignUpScreen>
+class _SignUpScreenState extends ConsumerState<SignUpScreen>
     with SingleTickerProviderStateMixin {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey _fullNameFieldKey = GlobalKey();
@@ -44,10 +49,8 @@ class _SignUpScreenState extends State<SignUpScreen>
   final FocusNode _emailFocus = FocusNode();
   final FocusNode _phoneFocus = FocusNode();
   final FocusNode _passwordFocus = FocusNode();
-  bool _isLoading = false;
   bool _hasSubmitted = false;
   bool _hasValidationError = false;
-  String? _apiError;
   PasswordStrength _passwordStrength = PasswordStrength.none;
   late AnimationController _entranceController;
   late Animation<double> _entranceAnimation;
@@ -111,16 +114,12 @@ class _SignUpScreenState extends State<SignUpScreen>
     if (!mounted) return;
     setState(() {
       _passwordStrength = computePasswordStrength(_passwordController.text);
-      if (_apiError != null) _apiError = null;
     });
+    ref.read(signUpControllerProvider.notifier).clearError();
   }
 
   @override
   void dispose() {
-    _fullNameFocus.dispose();
-    _emailFocus.dispose();
-    _phoneFocus.dispose();
-    _passwordFocus.dispose();
     _fullNameFocus.removeListener(_scrollToFocusedField);
     _emailFocus.removeListener(_scrollToFocusedField);
     _phoneFocus.removeListener(_scrollToFocusedField);
@@ -129,6 +128,10 @@ class _SignUpScreenState extends State<SignUpScreen>
     _emailController.removeListener(_onInputChanged);
     _phoneController.removeListener(_onInputChanged);
     _passwordController.removeListener(_onInputChanged);
+    _fullNameFocus.dispose();
+    _emailFocus.dispose();
+    _phoneFocus.dispose();
+    _passwordFocus.dispose();
     _fullNameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
@@ -138,12 +141,7 @@ class _SignUpScreenState extends State<SignUpScreen>
   }
 
   bool _isSubmitReady(AppLocalizations l10n) {
-    return AuthValidators.requiredField(
-              l10n,
-              _fullNameController.text,
-              l10n.authFieldFullName,
-            ) ==
-            null &&
+    return AuthValidators.fullName(l10n, _fullNameController.text) == null &&
         AuthValidators.email(l10n, _emailController.text) == null &&
         AuthValidators.macedonianPhone(l10n, _phoneController.text) == null &&
         AuthValidators.password(l10n, _passwordController.text) == null;
@@ -153,21 +151,17 @@ class _SignUpScreenState extends State<SignUpScreen>
     final FormState? currentState = _formKey.currentState;
     setState(() => _hasSubmitted = true);
     if (currentState == null) {
+      AppHaptics.warning(context);
       setState(() => _hasValidationError = true);
-      AppHaptics.tap(context);
       return;
     }
     final bool isValid = currentState.validate();
     if (!isValid) {
+      AppHaptics.warning(context);
       setState(() => _hasValidationError = true);
-      AppHaptics.tap(context);
       return;
     }
-    setState(() {
-      _hasValidationError = false;
-      _isLoading = true;
-      _apiError = null;
-    });
+    setState(() => _hasValidationError = false);
 
     try {
       final String fullName = _fullNameController.text.trim();
@@ -176,27 +170,22 @@ class _SignUpScreenState extends State<SignUpScreen>
       final String lastName = parts.length > 1 ? parts.sublist(1).join(' ') : '';
       final String phoneE164 = normalizeToE164(_phoneController.text);
 
-      await ServiceLocator.instance.authRepository.signUp(
-        firstName: firstName,
-        lastName: lastName,
-        email: _emailController.text.trim(),
-        phoneNumber: phoneE164,
-        password: _passwordController.text,
-      );
+      await ref.read(signUpControllerProvider.notifier).signUp(
+            firstName: firstName,
+            lastName: lastName,
+            email: _emailController.text.trim(),
+            phoneNumberE164: phoneE164,
+            password: _passwordController.text,
+          );
       if (!mounted) return;
       AppHaptics.success(context);
       Navigator.of(context).pushNamed(
         AppRoutes.otp,
         arguments: phoneE164,
       );
-    } on AppError catch (e) {
+    } on AppError {
       if (!mounted) return;
-      setState(
-        () => _apiError = messageForAuthError(AppLocalizations.of(context)!, e),
-      );
       AppHaptics.warning(context);
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -204,6 +193,12 @@ class _SignUpScreenState extends State<SignUpScreen>
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
     final double keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
+    final formState = ref.watch(signUpControllerProvider);
+    final bool isLoading = formState.isLoading;
+    final String? apiError = formState.error != null
+        ? messageForAuthError(l10n, formState.error!)
+        : null;
+    final String termsUrl = ref.watch(appConfigProvider).termsUrl;
 
     return Stack(
       children: [
@@ -215,34 +210,24 @@ class _SignUpScreenState extends State<SignUpScreen>
                 begin: const Offset(0, 0.08),
                 end: Offset.zero,
               ).animate(_entranceAnimation),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const BrandLogo(compact: true),
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(
-                    l10n.authSignUpTitle,
-                    style: AppTypography.authHeadline,
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    l10n.authSignUpSubtitle,
-                    style: AppTypography.authSubtitle,
-                  ),
-                ],
+              child: AuthScreenHeader(
+                showLogo: true,
+                title: l10n.authSignUpTitle,
+                subtitle: l10n.authSignUpSubtitle,
               ),
             ),
           ),
           body: LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
-              return SingleChildScrollView(
-                keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              return AuthFormScaffold(
                 padding: EdgeInsets.fromLTRB(
                   AppSpacing.lg,
                   AppSpacing.xl,
                   AppSpacing.lg,
                   AppSpacing.lg + keyboardInset,
                 ),
+                child: SingleChildScrollView(
+                keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
                     minHeight: constraints.maxHeight - AppSpacing.radius18,
@@ -268,11 +253,12 @@ class _SignUpScreenState extends State<SignUpScreen>
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              if (_apiError != null) ...[
+                              if (apiError != null) ...[
                                 ApiErrorBanner(
-                                  message: _apiError!,
-                                  onDismiss: () =>
-                                      setState(() => _apiError = null),
+                                  message: apiError,
+                                  onDismiss: () => ref
+                                      .read(signUpControllerProvider.notifier)
+                                      .clearError(),
                                 ),
                                 const SizedBox(height: AppSpacing.md),
                               ],
@@ -289,12 +275,8 @@ class _SignUpScreenState extends State<SignUpScreen>
                                 ],
                                 onFieldSubmitted: (_) =>
                                     _emailFocus.requestFocus(),
-                                validator: (String? value) =>
-                                    AuthValidators.requiredField(
-                                      l10n,
-                                      value,
-                                      l10n.authFieldFullName,
-                                    ),
+                                validator: (String? v) =>
+                                    AuthValidators.fullName(l10n, v),
                               ),
                               const SizedBox(height: AppSpacing.sm),
                               AuthTextField(
@@ -379,10 +361,19 @@ class _SignUpScreenState extends State<SignUpScreen>
                                   children: [
                                     TextSpan(
                                       text: l10n.authTermsLink,
-                                      style: const TextStyle(
-                                        color: AppColors.primaryDark,
-                                        fontWeight: FontWeight.w700,
-                                      ),
+                                      style: AppTypography.authTextLinkUnderline,
+                                      recognizer: TapGestureRecognizer()
+                                        ..onTap = () async {
+                                          final Uri uri = Uri.parse(
+                                            termsUrl,
+                                          );
+                                          if (await canLaunchUrl(uri)) {
+                                            await launchUrl(
+                                              uri,
+                                              mode: LaunchMode.externalApplication,
+                                            );
+                                          }
+                                        },
                                     ),
                                   ],
                                 ),
@@ -412,9 +403,8 @@ class _SignUpScreenState extends State<SignUpScreen>
                                 child: PrimaryButton(
                                   label: l10n.authSignUpCta,
                                   enabled:
-                                      _isSubmitReady(l10n) && !_isLoading,
-                                  onPressed:
-                                      _isLoading ? null : _handleSignUp,
+                                      _isSubmitReady(l10n) && !isLoading,
+                                  onPressed: isLoading ? null : _handleSignUp,
                                 ),
                               ),
                               const SizedBox(height: AppSpacing.xxl),
@@ -435,10 +425,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                                         children: [
                                           TextSpan(
                                             text: l10n.authSignInLink,
-                                            style: const TextStyle(
-                                              color: AppColors.primaryDark,
-                                              fontWeight: FontWeight.w700,
-                                            ),
+                                            style: AppTypography.authTextLink,
                                           ),
                                         ],
                                       ),
@@ -453,11 +440,12 @@ class _SignUpScreenState extends State<SignUpScreen>
                     ),
                   ),
                 ),
+              ),
               );
             },
           ),
         ),
-        LoadingOverlay(visible: _isLoading),
+        LoadingOverlay(visible: isLoading),
       ],
     );
   }

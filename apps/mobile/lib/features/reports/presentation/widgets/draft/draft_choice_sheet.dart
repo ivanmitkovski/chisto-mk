@@ -6,8 +6,8 @@ import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/reports/data/outbox/report_draft_repository.dart';
 import 'package:chisto_mobile/features/reports/presentation/l10n/report_draft_saved_label.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
 import 'package:flutter/material.dart';
 
 /// Result of the draft-choice sheet (central FAB or reports entry) when a saved draft exists.
@@ -86,7 +86,6 @@ Future<CentralFabDraftChoice> showCentralFabDraftChoiceSheet({
             PrimaryButton(
               label: l10n.reportDraftCentralFabContinue,
               onPressed: () {
-                AppHaptics.light();
                 chistoReportsBreadcrumb(
                   'report_draft',
                   'entry_central_fab_continue',
@@ -95,53 +94,27 @@ Future<CentralFabDraftChoice> showCentralFabDraftChoiceSheet({
               },
             ),
             const SizedBox(height: AppSpacing.sm),
-            SizedBox(
-              height: 48,
-              width: double.infinity,
-              child: OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.textPrimary,
-                  side: const BorderSide(color: AppColors.inputBorder),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-                  ),
-                ),
-                onPressed: () {
-                  AppHaptics.tap();
-                  chistoReportsBreadcrumb(
-                    'report_draft',
-                    'entry_central_fab_take_new',
-                  );
-                  Navigator.of(ctx).pop(CentralFabDraftChoice.takeNewPhoto);
-                },
-                child: Text(
-                  l10n.reportDraftCentralFabTakeNewPhoto,
-                  style: textTheme.labelLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
+            AppButton.outlined(
+              label: l10n.reportDraftCentralFabTakeNewPhoto,
+              onPressed: () {
+                chistoReportsBreadcrumb(
+                  'report_draft',
+                  'entry_central_fab_take_new',
+                );
+                Navigator.of(ctx).pop(CentralFabDraftChoice.takeNewPhoto);
+              },
+              expand: true,
             ),
             const SizedBox(height: AppSpacing.xs),
-            TextButton(
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.primary,
-                padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-              ),
+            AppButton.text(
+              label: l10n.reportDraftCentralFabCancel,
               onPressed: () {
-                AppHaptics.tap();
                 chistoReportsBreadcrumb(
                   'report_draft',
                   'entry_central_fab_cancel',
                 );
                 Navigator.of(ctx).pop(CentralFabDraftChoice.cancel);
               },
-              child: Text(
-                l10n.reportDraftCentralFabCancel,
-                style: textTheme.labelLarge?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
             ),
           ],
         ),

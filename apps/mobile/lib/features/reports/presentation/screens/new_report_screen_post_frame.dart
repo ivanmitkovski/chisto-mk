@@ -6,7 +6,7 @@ import 'package:chisto_mobile/features/reports/presentation/controllers/new_repo
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/resume_draft_banner.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/resume_with_incoming_photo_dialog.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
 import 'package:flutter/material.dart';
 
 /// First-frame work: capacity, SQLite restore, optional prune snack, resume banner.

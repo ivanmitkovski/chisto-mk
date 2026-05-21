@@ -1,42 +1,42 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/core/validation/phone_display_formatter.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
-import 'package:chisto_mobile/shared/widgets/loading_overlay.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
-import 'package:chisto_mobile/core/di/service_locator.dart';
-import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/features/auth/application/password_reset_otp_controller.dart';
 import 'package:chisto_mobile/features/auth/presentation/constants/auth_error_messages.dart';
+import 'package:chisto_mobile/features/auth/presentation/constants/auth_otp_constants.dart';
+import 'package:chisto_mobile/features/auth/presentation/widgets/auth_otp_input.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/api_error_banner.dart';
+import 'package:chisto_mobile/shared/widgets/molecules/api_error_banner.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_back_button.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/auth_screen_header.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/loading_overlay.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ForgotPasswordOtpScreen extends StatefulWidget {
+class ForgotPasswordOtpScreen extends ConsumerStatefulWidget {
   const ForgotPasswordOtpScreen({super.key, required this.phoneNumberE164});
 
   final String phoneNumberE164;
 
   @override
-  State<ForgotPasswordOtpScreen> createState() =>
+  ConsumerState<ForgotPasswordOtpScreen> createState() =>
       _ForgotPasswordOtpScreenState();
 }
 
-class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
-  static const int _otpLength = 4;
-
+class _ForgotPasswordOtpScreenState
+    extends ConsumerState<ForgotPasswordOtpScreen> {
   final TextEditingController _codeController = TextEditingController();
   final FocusNode _codeFocusNode = FocusNode();
-  bool _isLoading = false;
-  static const int _initialResendSeconds = 45;
-  int _secondsRemaining = _initialResendSeconds;
+  int _secondsRemaining = kAuthOtpResendSeconds;
   Timer? _resendTimer;
-  String? _apiError;
 
   @override
   void dispose() {
@@ -46,8 +46,24 @@ class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
     super.dispose();
   }
 
-  bool get _isComplete => _codeController.text.trim().length == _otpLength;
+  bool get _isComplete =>
+      _codeController.text.trim().length == kAuthOtpLength;
+
+  PasswordResetOtpState get _otpState =>
+      ref.watch(passwordResetOtpControllerProvider);
+
+  bool get _isLoading => _otpState.isLoading;
+  bool get _otpLocked => _otpState.otpLocked;
+
   bool get _canResend => _secondsRemaining == 0 && !_isLoading;
+
+  String? get _apiErrorMessage {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    if (_otpState.otpLocked) return l10n.authErrorOtpMaxAttempts;
+    final AppError? error = _otpState.error;
+    if (error == null) return null;
+    return messageForAuthError(l10n, error);
+  }
 
   @override
   void initState() {
@@ -60,7 +76,7 @@ class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
 
   void _startResendCountdown() {
     _resendTimer?.cancel();
-    setState(() => _secondsRemaining = _initialResendSeconds);
+    setState(() => _secondsRemaining = kAuthOtpResendSeconds);
     _resendTimer = Timer.periodic(const Duration(seconds: 1), (Timer timer) {
       if (!mounted) {
         timer.cancel();
@@ -76,18 +92,19 @@ class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
   }
 
   void _handleCodeChanged(String value) {
-    AppHaptics.tap(context);
+    ref.read(passwordResetOtpControllerProvider.notifier).clearError();
+    if (value.length == kAuthOtpLength) {
+      AppHaptics.tap(context);
+    }
     setState(() {});
-    if (_isComplete && !_isLoading) _onContinue();
+    if (_isComplete && !_isLoading && !_otpLocked) {
+      unawaited(_onContinue());
+    }
   }
 
   Future<void> _onContinue() async {
-    if (!_isComplete || _isLoading) return;
+    if (!_isComplete || _isLoading || _otpLocked) return;
 
-    setState(() {
-      _isLoading = true;
-      _apiError = null;
-    });
     final Duration delay = MediaQuery.disableAnimationsOf(context)
         ? Duration.zero
         : AppMotion.standard;
@@ -95,23 +112,20 @@ class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
     if (!mounted) return;
 
     try {
-      await ServiceLocator.instance.authRepository.verifyPasswordResetCode(
-        widget.phoneNumberE164,
-        _codeController.text.trim(),
-      );
-    } on AppError catch (e) {
+      await ref.read(passwordResetOtpControllerProvider.notifier).verifyCode(
+            widget.phoneNumberE164,
+            _codeController.text.trim(),
+          );
+    } on AppError {
       if (!mounted) return;
-      setState(() {
-        _isLoading = false;
-        _apiError =
-            messageForAuthError(AppLocalizations.of(context)!, e);
-      });
+      if (_otpLocked) {
+        _codeController.clear();
+      }
       AppHaptics.warning(context);
       return;
     }
 
     if (!mounted) return;
-    setState(() => _isLoading = false);
     AppHaptics.success(context);
 
     Navigator.of(context).pushNamed(
@@ -125,26 +139,18 @@ class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
 
   Future<void> _handleResend() async {
     if (!_canResend) return;
-    AppHaptics.light(context);
-    setState(() => _isLoading = true);
-    setState(() => _apiError = null);
     try {
-      await ServiceLocator.instance.authRepository.requestPasswordReset(
-        widget.phoneNumberE164,
-      );
+      await ref
+          .read(passwordResetOtpControllerProvider.notifier)
+          .resend(widget.phoneNumberE164);
       if (!mounted) return;
+      ref.read(passwordResetOtpControllerProvider.notifier).resetAttempts();
       _codeController.clear();
       _codeFocusNode.requestFocus();
       _startResendCountdown();
-    } on AppError catch (e) {
+    } on AppError {
       if (!mounted) return;
-      setState(
-        () => _apiError =
-            messageForAuthError(AppLocalizations.of(context)!, e),
-      );
       _startResendCountdown();
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -152,9 +158,10 @@ class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
     final double keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
+    final String? apiError = _apiErrorMessage;
 
     return Stack(
-      children: [
+      children: <Widget>[
         Scaffold(
           resizeToAvoidBottomInset: false,
           backgroundColor: AppColors.panelBackground,
@@ -179,80 +186,32 @@ class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                    children: <Widget>[
                       const AppBackButton(),
-                      if (_apiError != null) ...[
+                      if (apiError != null) ...<Widget>[
                         const SizedBox(height: AppSpacing.sm),
                         ApiErrorBanner(
-                          message: _apiError!,
-                          onDismiss: () => setState(() => _apiError = null),
+                          message: apiError,
+                          onDismiss: () => ref
+                              .read(passwordResetOtpControllerProvider.notifier)
+                              .clearError(),
                         ),
                       ],
                       const SizedBox(height: AppSpacing.xxl),
-                      Text(
-                        l10n.authForgotPasswordOtpTitle,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: -0.3,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        l10n.authForgotPasswordOtpSubtitle(
+                      AuthScreenHeader(
+                        title: l10n.authForgotPasswordOtpTitle,
+                        subtitle: l10n.authForgotPasswordOtpSubtitle(
                           formatPhoneForDisplay(widget.phoneNumberE164),
                         ),
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.textMuted,
-                        ),
+                        subtitleMaxLines: 2,
                       ),
                       const SizedBox(height: AppSpacing.radiusPill),
-                      GestureDetector(
-                        behavior: HitTestBehavior.translucent,
-                        onTap: () => _codeFocusNode.requestFocus(),
-                        child: ExcludeSemantics(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: List<Widget>.generate(
-                              _otpLength,
-                              (int index) {
-                                final String text =
-                                    index < _codeController.text.length
-                                        ? _codeController.text[index]
-                                        : '';
-                                final bool isActive =
-                                    index == _codeController.text.length &&
-                                        !_isComplete;
-
-                                return _OtpDigitBox(
-                                  value: text,
-                                  isActive: isActive,
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 0,
-                        width: 0,
-                        child: Semantics(
-                          label: l10n.authOtpCodeSemantic,
-                          textField: true,
-                          child: TextField(
-                            controller: _codeController,
-                            focusNode: _codeFocusNode,
-                            keyboardType: TextInputType.number,
-                            textInputAction: TextInputAction.done,
-                            autofillHints: const <String>[
-                              AutofillHints.oneTimeCode,
-                            ],
-                            inputFormatters: <TextInputFormatter>[
-                              FilteringTextInputFormatter.digitsOnly,
-                              LengthLimitingTextInputFormatter(_otpLength),
-                            ],
-                            onChanged: _handleCodeChanged,
-                          ),
-                        ),
+                      AuthOtpInput(
+                        controller: _codeController,
+                        focusNode: _codeFocusNode,
+                        semanticsLabel: l10n.authOtpCodeSemantic,
+                        onChanged: _handleCodeChanged,
+                        enabled: !_otpLocked && !_isLoading,
                       ),
                       const SizedBox(height: AppSpacing.radiusPill),
                       Semantics(
@@ -260,8 +219,8 @@ class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
                         label: l10n.authOtpContinue,
                         child: PrimaryButton(
                           label: l10n.authOtpContinue,
-                          enabled: _isComplete && !_isLoading,
-                          onPressed: _isLoading ? null : _onContinue,
+                          enabled: _isComplete && !_isLoading && !_otpLocked,
+                          onPressed: _isLoading || _otpLocked ? null : _onContinue,
                         ),
                       ),
                       const SizedBox(height: AppSpacing.lg),
@@ -283,13 +242,10 @@ class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
                                           ?.copyWith(
                                             color: AppColors.textPrimary,
                                           ),
-                                      children: [
+                                      children: <InlineSpan>[
                                         TextSpan(
                                           text: l10n.authOtpResendAction,
-                                          style: const TextStyle(
-                                            color: AppColors.primaryDark,
-                                            fontWeight: FontWeight.w700,
-                                          ),
+                                          style: AppTypography.authTextLink,
                                         ),
                                       ],
                                     ),
@@ -320,49 +276,6 @@ class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
         ),
         LoadingOverlay(visible: _isLoading),
       ],
-    );
-  }
-}
-
-class _OtpDigitBox extends StatelessWidget {
-  const _OtpDigitBox({
-    required this.value,
-    required this.isActive,
-  });
-
-  final String value;
-  final bool isActive;
-
-  @override
-  Widget build(BuildContext context) {
-    final bool hasValue = value.isNotEmpty;
-    final Duration animDuration = MediaQuery.disableAnimationsOf(context)
-        ? Duration.zero
-        : AppMotion.xFast;
-
-    return AnimatedContainer(
-      duration: animDuration,
-      curve: AppMotion.emphasized,
-      width: 72,
-      height: 56,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: AppColors.inputFill,
-        borderRadius: BorderRadius.circular(AppSpacing.radius14),
-        border: Border.all(
-          color: hasValue
-              ? AppColors.primaryDark
-              : (isActive ? AppColors.primary : AppColors.divider),
-          width: hasValue || isActive ? 1.5 : 1.0,
-        ),
-      ),
-      child: Text(
-        value,
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-          fontWeight: FontWeight.w500,
-          color: AppColors.textPrimary,
-        ),
-      ),
     );
   }
 }

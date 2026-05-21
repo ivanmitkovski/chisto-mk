@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 /// iOS / macOS: native-style overscroll bounce; pull-to-refresh still uses shared
 /// [AppRefreshIndicator] (Material chrome) for consistency with the rest of the app.
@@ -29,8 +28,6 @@ ScrollPhysics eventDetailScrollPhysics(BuildContext context) {
 /// Pull-to-refresh haptics: lighter on iOS/macOS (bouncy scroll already feels tactile).
 void eventsPullRefreshHaptic(BuildContext context) {
   if (eventsUseCupertinoSystemEffects(context)) {
-    AppHaptics.light(context);
   } else {
-    AppHaptics.medium(context);
   }
 }

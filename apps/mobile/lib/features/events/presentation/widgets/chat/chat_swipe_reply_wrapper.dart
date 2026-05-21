@@ -3,7 +3,6 @@ import 'package:flutter/physics.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
-import 'package:chisto_mobile/features/events/presentation/widgets/chat/event_chat_haptics.dart';
 
 /// Drag left to reply (Messages-style affordance) with spring release.
 class ChatSwipeReplyWrapper extends StatefulWidget {
@@ -82,7 +81,6 @@ class _ChatSwipeReplyWrapperState extends State<ChatSwipeReplyWrapper>
         if (next != _dx) setState(() => _dx = next);
         if (!_armed && _dx < -armAt) {
           _armed = true;
-          EventChatHaptics.swipeReplyThreshold(context);
         }
       },
       onHorizontalDragEnd: (_) {

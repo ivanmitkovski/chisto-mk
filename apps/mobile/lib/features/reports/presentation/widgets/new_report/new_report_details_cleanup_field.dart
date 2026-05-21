@@ -4,7 +4,6 @@ import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
 import 'package:chisto_mobile/features/reports/presentation/l10n/cleanup_effort_l10n.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:flutter/material.dart';
 
 class NewReportDetailsCleanupEffortField extends StatelessWidget {
@@ -43,7 +42,6 @@ class NewReportDetailsCleanupEffortField extends StatelessWidget {
                 label: Text(effort.localizedLabel(context.l10n)),
                 selected: selected,
                 onSelected: (_) {
-                  AppHaptics.light();
                   onCleanupEffort(effort);
                 },
                 selectedColor: AppColors.primary.withValues(alpha: 0.14),

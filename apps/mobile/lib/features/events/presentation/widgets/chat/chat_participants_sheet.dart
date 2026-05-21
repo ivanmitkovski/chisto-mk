@@ -7,9 +7,9 @@ import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_participants.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_repository.dart';
-import 'package:chisto_mobile/shared/widgets/app_refresh_indicator.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
-import 'package:chisto_mobile/shared/widgets/user_avatar_circle.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/app_refresh_indicator.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/user_avatar_circle.dart';
 import 'package:flutter/material.dart';
 
 /// Opens a bottom sheet listing chat participants (same chrome as pinned messages sheet).

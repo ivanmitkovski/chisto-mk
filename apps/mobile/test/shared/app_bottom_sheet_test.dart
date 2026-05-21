@@ -1,5 +1,5 @@
 import 'package:chisto_mobile/core/theme/app_colors.dart';
-import 'package:chisto_mobile/shared/widgets/app_bottom_sheet.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/app_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

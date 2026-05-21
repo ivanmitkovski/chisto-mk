@@ -5,7 +5,6 @@ import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/home/domain/models/take_action_type.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/site_card/share_sheet.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 class TakeActionSheet extends StatelessWidget {
   const TakeActionSheet({
@@ -19,7 +18,6 @@ class TakeActionSheet extends StatelessWidget {
     BuildContext context, {
     bool canCreateEcoAction = true,
   }) {
-    AppHaptics.medium();
     return showModalBottomSheet<TakeActionType>(
       context: context,
       useRootNavigator: true,
@@ -112,7 +110,6 @@ class TakeActionSheet extends StatelessWidget {
 }
 
 void _popWith(BuildContext context, TakeActionType type) {
-  AppHaptics.tap();
   Navigator.of(context).pop(type);
 }
 

@@ -21,6 +21,7 @@ class EventsSearchController extends ChangeNotifier {
 
   final EventsSearchParamsRunner _runSearchParams;
   Timer? _debounce;
+  bool _disposed = false;
 
   EventsSearchRemotePhase _phase = EventsSearchRemotePhase.idle;
   Object? _lastError;
@@ -35,6 +36,7 @@ class EventsSearchController extends ChangeNotifier {
   }
 
   void clearPhase() {
+    if (_disposed) return;
     _phase = EventsSearchRemotePhase.idle;
     _lastError = null;
     notifyListeners();
@@ -50,6 +52,7 @@ class EventsSearchController extends ChangeNotifier {
   }) {
     _debounce?.cancel();
     _debounce = Timer(debounce, () async {
+      if (_disposed) return;
       final String trimmed = rawText.trim();
       final EcoEventSearchParams next = mergedBase.copyWith(
         query: trimmed.isEmpty ? null : trimmed,
@@ -78,12 +81,20 @@ class EventsSearchController extends ChangeNotifier {
         _phase = EventsSearchRemotePhase.error;
         _lastError = e;
       }
+      if (_disposed) return;
       notifyListeners();
     });
   }
 
   @override
+  void notifyListeners() {
+    if (_disposed) return;
+    super.notifyListeners();
+  }
+
+  @override
   void dispose() {
+    _disposed = true;
     cancel();
     super.dispose();
   }

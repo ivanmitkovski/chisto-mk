@@ -2,7 +2,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 /// Plain chat body with tappable http(s) and www. links.
 class ChatLinkifiedText extends StatefulWidget {
@@ -74,7 +73,6 @@ class _ChatLinkifiedTextState extends State<ChatLinkifiedText> {
       final String href = raw.startsWith('http') ? raw : 'https://$raw';
       final TapGestureRecognizer tap = TapGestureRecognizer()
         ..onTap = () async {
-          AppHaptics.light(context);
           final Uri? uri = Uri.tryParse(href);
           if (uri == null || !context.mounted) {
             return;

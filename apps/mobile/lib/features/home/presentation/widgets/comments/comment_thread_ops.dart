@@ -24,6 +24,28 @@ bool insertReplyInto(List<Comment> nodes, String parentId, Comment reply) {
   return false;
 }
 
+/// Removes all comments (and nested replies) authored by [authorId].
+int removeCommentsByAuthorId(List<Comment> nodes, String authorId) {
+  int removed = 0;
+  nodes.removeWhere((Comment c) {
+    if (c.authorId == authorId) {
+      removed += 1 + countCommentNodes(c.replies);
+      return true;
+    }
+    return false;
+  });
+  for (int i = 0; i < nodes.length; i++) {
+    final Comment node = nodes[i];
+    final List<Comment> replies = List<Comment>.from(node.replies);
+    final int nested = removeCommentsByAuthorId(replies, authorId);
+    if (nested > 0) {
+      nodes[i] = node.copyWith(replies: replies);
+      removed += nested;
+    }
+  }
+  return removed;
+}
+
 bool removeCommentNode(List<Comment> nodes, String id) {
   final int index = nodes.indexWhere((Comment c) => c.id == id);
   if (index >= 0) {

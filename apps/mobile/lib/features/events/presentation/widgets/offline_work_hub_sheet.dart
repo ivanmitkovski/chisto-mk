@@ -1,8 +1,9 @@
 import 'dart:async';
 
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 import 'package:flutter/material.dart';
 
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
@@ -13,8 +14,8 @@ import 'package:chisto_mobile/features/events/presentation/navigation/events_nav
 import 'package:chisto_mobile/features/events/presentation/screens/field_mode_screen.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/events_modal_sheet.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
 
 Future<void> showOfflineWorkHubSheet(BuildContext context) {
   return showEventsSurfaceModal<void>(
@@ -117,20 +118,20 @@ class _OfflineWorkHubBodyState extends State<_OfflineWorkHubBody> {
                     child: Semantics(
                       button: true,
                       label: context.l10n.eventsOfflineWorkRetryFailedChat,
-                      child: OutlinedButton(
-                        onPressed: _syncing || !ServiceLocator.instance.isInitialized
-                            ? null
-                            : () => unawaited(_retryFailedChatOutbox()),
-                        child: Text(context.l10n.eventsOfflineWorkRetryFailedChat),
+                      child: AppButton.outlined(
+                        label: context.l10n.eventsOfflineWorkRetryFailedChat,
+                        onPressed: () => unawaited(_retryFailedChatOutbox()),
+                        enabled: !_syncing && AppBootstrap.instance.isInitialized,
+                        expand: true,
                       ),
                     ),
                   ),
                 PrimaryButton(
                   label: context.l10n.eventsOfflineWorkSyncNow,
                   isLoading: _syncing,
-                  enabled: ServiceLocator.instance.isInitialized,
+                  enabled: AppBootstrap.instance.isInitialized,
                   onPressed:
-                      ServiceLocator.instance.isInitialized ? () => unawaited(_onSyncNow()) : null,
+                      AppBootstrap.instance.isInitialized ? () => unawaited(_onSyncNow()) : null,
                 ),
               ],
             ),

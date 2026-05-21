@@ -4,7 +4,9 @@ import 'package:chisto_mobile/core/auth/auth_state.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/location/location_service.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
+import 'package:chisto_mobile/features/home/domain/repositories/sites_repository_types.dart';
 import 'package:chisto_mobile/features/home/presentation/providers/map_location_notifier.dart';
+import 'package:chisto_mobile/core/providers/app_providers.dart';
 import 'package:chisto_mobile/features/home/presentation/providers/repository_providers.dart';
 import 'package:chisto_mobile/features/home/presentation/utils/feed_visible_sites.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/feed_filter_sheet.dart';
@@ -15,8 +17,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 const String _feedFilterPrefsKey = 'feed_active_filter_v1';
 
 /// Maps UI filters to [ListSitesQueryDto] (`sort`: hybrid|recent, `mode`: for_you|latest).
-/// Server has no `most_voted`, `saved`, or `urgent` list modes — those stay client-side in
-/// [computeVisibleSitesForFilter]; we only tune which ranked window we fetch.
+/// [FeedFilter.saved] uses [SitesRepository.getSavedSites] instead. `most_voted` and
+/// `urgent` refine the fetched window client-side in [computeVisibleSitesForFilter].
 ({String sort, String mode, double radiusKm}) _feedApiParams(FeedFilter filter) {
   switch (filter) {
     case FeedFilter.recent:
@@ -28,7 +30,7 @@ const String _feedFilterPrefsKey = 'feed_active_filter_v1';
     case FeedFilter.all:
     case FeedFilter.mostVoted:
     case FeedFilter.saved:
-      return (sort: 'hybrid', mode: 'for_you', radiusKm: 100.0);
+      return (sort: 'recent', mode: 'latest', radiusKm: 100.0);
   }
 }
 
@@ -43,8 +45,9 @@ int feedServerFetchGroup(FeedFilter filter) {
       return 3;
     case FeedFilter.all:
     case FeedFilter.mostVoted:
-    case FeedFilter.saved:
       return 0;
+    case FeedFilter.saved:
+      return 5;
   }
 }
 
@@ -62,14 +65,13 @@ enum FeedSitesViewStatus {
 /// Stable per-tab session id for feed analytics (one id per provider lifetime).
 final feedSessionIdProvider = Provider<String>((Ref ref) {
   ref.keepAlive();
-  final AuthState auth = ref.watch(homeAuthStateProvider);
+  final AuthState auth = ref.watch(authStateProvider);
   final String userId = auth.userId ?? 'anon';
   return 'feed_${DateTime.now().millisecondsSinceEpoch}_$userId';
 });
 
 final feedFilterProvider =
-    StateNotifierProvider<FeedFilterNotifier, FeedFilter>((Ref ref) {
-  ref.keepAlive();
+    StateNotifierProvider.autoDispose<FeedFilterNotifier, FeedFilter>((Ref ref) {
   return FeedFilterNotifier();
 });
 
@@ -221,8 +223,7 @@ FeedSitesViewStatus _statusForLoadedResult({
 }
 
 final feedSitesNotifierProvider =
-    StateNotifierProvider<FeedSitesNotifier, FeedSitesState>((Ref ref) {
-  ref.keepAlive();
+    StateNotifierProvider.autoDispose<FeedSitesNotifier, FeedSitesState>((Ref ref) {
   return FeedSitesNotifier(ref);
 });
 
@@ -244,19 +245,11 @@ class FeedSitesNotifier extends StateNotifier<FeedSitesState> {
     try {
       await _resolveUserLocation();
       final FeedFilter filter = _ref.read(feedFilterProvider);
-      final ({String sort, String mode, double radiusKm}) api =
-          _feedApiParams(filter);
-      final result = await _ref.read(sitesRepositoryProvider).getSites(
-            latitude: state.userLatitude,
-            longitude: state.userLongitude,
-            radiusKm: api.radiusKm,
-            status: 'VERIFIED',
-            page: 1,
-            limit: 24,
-            mode: api.mode,
-            sort: api.sort,
-            explain: true,
-          );
+      final SitesListResult result = await _fetchListForFilter(
+        filter: filter,
+        page: 1,
+        cursor: null,
+      );
       state = state.copyWith(
         status: _statusForLoadedResult(
           sites: result.sites,
@@ -312,20 +305,12 @@ class FeedSitesNotifier extends StateNotifier<FeedSitesState> {
     );
     try {
       final FeedFilter filter = _ref.read(feedFilterProvider);
-      final ({String sort, String mode, double radiusKm}) api =
-          _feedApiParams(filter);
-      final result = await _ref.read(sitesRepositoryProvider).getSites(
-            latitude: state.userLatitude,
-            longitude: state.userLongitude,
-            radiusKm: api.radiusKm,
-            status: 'VERIFIED',
-            page: 1,
-            limit: 24,
-            mode: api.mode,
-            sort: api.sort,
-            explain: true,
-            cursor: state.nextCursor,
-          );
+      final int nextPage = int.tryParse(state.nextCursor ?? '') ?? 2;
+      final SitesListResult result = await _fetchListForFilter(
+        filter: filter,
+        page: nextPage,
+        cursor: state.nextCursor,
+      );
       final Map<String, PollutionSite> mergedById = <String, PollutionSite>{
         for (final PollutionSite s in state.allSites) s.id: s,
       };
@@ -391,6 +376,35 @@ class FeedSitesNotifier extends StateNotifier<FeedSitesState> {
   void patchSiteCommentsCount(String siteId, int commentsCount) {
     state = state.copyWith(
       allSites: patchPollutionSitesCommentsCount(state.allSites, siteId, commentsCount),
+    );
+  }
+
+  Future<SitesListResult> _fetchListForFilter({
+    required FeedFilter filter,
+    required int page,
+    required String? cursor,
+  }) async {
+    final sitesRepo = _ref.read(sitesRepositoryProvider);
+    if (filter == FeedFilter.saved) {
+      return sitesRepo.getSavedSites(
+        page: page,
+        limit: 24,
+        latitude: state.userLatitude,
+        longitude: state.userLongitude,
+      );
+    }
+    final ({String sort, String mode, double radiusKm}) api = _feedApiParams(filter);
+    return sitesRepo.getSites(
+      latitude: state.userLatitude,
+      longitude: state.userLongitude,
+      radiusKm: api.radiusKm,
+      status: 'VERIFIED',
+      page: page,
+      limit: 24,
+      mode: api.mode,
+      sort: api.sort,
+      explain: true,
+      cursor: cursor,
     );
   }
 

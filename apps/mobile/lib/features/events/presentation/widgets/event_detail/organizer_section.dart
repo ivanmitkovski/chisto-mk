@@ -7,8 +7,7 @@ import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/user_avatar_circle.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/user_avatar_circle.dart';
 
 class OrganizerSection extends StatelessWidget {
   const OrganizerSection({super.key, required this.event});
@@ -16,7 +15,6 @@ class OrganizerSection extends StatelessWidget {
   final EcoEvent event;
 
   void _showOrganizerInfo(BuildContext context) {
-    AppHaptics.tap();
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: AppColors.transparent,

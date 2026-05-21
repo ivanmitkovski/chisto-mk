@@ -9,6 +9,9 @@ function makePrisma() {
       create: jest.fn(),
       update: jest.fn(),
     },
+    notificationOutbox: {
+      updateMany: jest.fn().mockResolvedValue({ count: 0 }),
+    },
   };
 }
 
@@ -45,19 +48,25 @@ describe('DeviceTokenService', () => {
     expect(prisma.userDeviceToken.update).toHaveBeenCalled();
   });
 
-  it('registerDeviceToken rejects token owned by different user', async () => {
+  it('registerDeviceToken reassigns token from another user', async () => {
     const prisma = makePrisma() as any;
     prisma.userDeviceToken.findUnique.mockResolvedValue({
       id: 'dt1', userId: 'u2', revokedAt: null,
     });
+    prisma.userDeviceToken.update.mockResolvedValue({ id: 'dt1' });
 
     const service = new DeviceTokenService(prisma);
-    await expect(
-      service.registerDeviceToken(
-        { userId: 'u1' } as any,
-        { token: 'fcm_token_abc', platform: 'ANDROID' } as any,
-      ),
-    ).rejects.toThrow();
+    const result = await service.registerDeviceToken(
+      { userId: 'u1' } as any,
+      { token: 'fcm_token_abc', platform: 'ANDROID' } as any,
+    );
+
+    expect(result.id).toBe('dt1');
+    expect(prisma.userDeviceToken.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ userId: 'u1', revokedAt: null }),
+      }),
+    );
   });
 
   it('unregisterDeviceToken revokes owned token', async () => {

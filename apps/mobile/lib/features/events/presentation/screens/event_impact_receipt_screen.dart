@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chisto_mobile/core/config/app_config.dart';
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/l10n/app_error_localizations.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
@@ -15,17 +15,18 @@ import 'package:chisto_mobile/features/events/domain/models/event_impact_receipt
 import 'package:chisto_mobile/features/events/presentation/utils/event_share_payload.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/events_diagnostic_log.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/utils/share_popover_origin.dart';
-import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
-import 'package:chisto_mobile/shared/widgets/app_refresh_indicator.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_back_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_loading_indicator.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/app_refresh_indicator.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 
 /// Full-screen impact receipt (server-backed counts + signed media).
 class EventImpactReceiptScreen extends StatefulWidget {
@@ -54,14 +55,14 @@ class _EventImpactReceiptScreenState extends State<EventImpactReceiptScreen> {
       _error = null;
     });
     try {
-      final ApiResponse res = await ServiceLocator.instance.apiClient.get(
+      final ApiResponse res = await AppBootstrap.instance.apiClient.get(
         '/events/${widget.eventId}/impact-receipt',
       );
       final Map<String, dynamic>? json = res.json;
       if (json == null) {
-        throw AppError(
-          code: 'HTTP_ERROR',
-          message: 'Invalid response',
+        throw const AppError(
+          code: 'SERVER_ERROR',
+          message: '',
           retryable: false,
         );
       }
@@ -87,11 +88,7 @@ class _EventImpactReceiptScreenState extends State<EventImpactReceiptScreen> {
         return;
       }
       setState(() {
-        _error = AppError(
-          code: 'HTTP_ERROR',
-          message: 'Invalid response',
-          retryable: true,
-        );
+        _error = AppError.server();
         _loading = false;
         _receipt = null;
       });
@@ -127,6 +124,9 @@ class _EventImpactReceiptScreenState extends State<EventImpactReceiptScreen> {
         subject: receipt.title,
         sharePositionOrigin: sharePopoverOrigin(context),
       );
+    }
+    if (!mounted) {
+      return;
     }
   }
 
@@ -179,7 +179,7 @@ class _EventImpactReceiptScreenState extends State<EventImpactReceiptScreen> {
         ],
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(strokeWidth: 2.2))
+          ? Center(child: AppLoadingIndicator())
           : _error != null
               ? Center(
                   child: Padding(
@@ -317,6 +317,11 @@ class _EventImpactReceiptScreenState extends State<EventImpactReceiptScreen> {
                                           child: CachedNetworkImage(
                                             imageUrl: e.imageUrl,
                                             fit: BoxFit.cover,
+                                            // 112dp thumbnail strip × DPR 3 ≈ 336px;
+                                            // capping at 360 keeps thumbnail mem tiny
+                                            // even when remote images are full-res.
+                                            memCacheWidth: 360,
+                                            memCacheHeight: 360,
                                             errorWidget:
                                                 (BuildContext context, String url, dynamic error) =>
                                                     const ColoredBox(
@@ -338,6 +343,8 @@ class _EventImpactReceiptScreenState extends State<EventImpactReceiptScreen> {
                                           child: CachedNetworkImage(
                                             imageUrl: url,
                                             fit: BoxFit.cover,
+                                            memCacheWidth: 360,
+                                            memCacheHeight: 360,
                                             errorWidget:
                                                 (BuildContext context, String url, dynamic error) =>
                                                     const ColoredBox(
@@ -357,32 +364,16 @@ class _EventImpactReceiptScreenState extends State<EventImpactReceiptScreen> {
                           PrimaryButton(
                             label: l10n.eventsImpactReceiptShare,
                             onPressed: () {
-                              AppHaptics.tap();
                               unawaited(_share(r));
                             },
                           ),
                           const SizedBox(height: AppSpacing.sm),
-                          SizedBox(
-                            width: double.infinity,
-                            height: 56,
-                            child: OutlinedButton(
-                              onPressed: () {
-                                AppHaptics.tap();
-                                unawaited(_copyLink(r));
-                              },
-                              style: OutlinedButton.styleFrom(
-                                side: const BorderSide(color: AppColors.divider),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(AppSpacing.radiusPill),
-                                ),
-                              ),
-                              child: Text(
-                                l10n.eventsImpactReceiptCopyLink,
-                                style: AppTypography.eventsSecondaryCtaLabel(textTheme)
-                                    .copyWith(color: AppColors.primaryDark),
-                              ),
-                            ),
+                          AppButton.outlined(
+                            label: l10n.eventsImpactReceiptCopyLink,
+                            onPressed: () {
+                              unawaited(_copyLink(r));
+                            },
+                            expand: true,
                           ),
                         ],
                       ),

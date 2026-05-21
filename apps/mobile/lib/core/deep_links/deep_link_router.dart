@@ -32,6 +32,13 @@ final class DeepLinkHomeEvents extends DeepLinkRoute {
   const DeepLinkHomeEvents();
 }
 
+/// Password reset from email: `/reset-password?token=...`
+final class DeepLinkPasswordReset extends DeepLinkRoute {
+  const DeepLinkPasswordReset(this.token);
+
+  final String token;
+}
+
 /// Public share URL: `https://chisto.mk/sites/<id>` opens the site detail screen.
 final class DeepLinkSiteDetail extends DeepLinkRoute {
   const DeepLinkSiteDetail(
@@ -76,9 +83,33 @@ bool deepLinkTrustedShareHost(String? host) {
 class DeepLinkRouter {
   DeepLinkRouter._();
 
+  /// Tracks the last URI processed by [handleUri] so a single share link
+  /// (which can fire from both the initial cold-start handler and the live
+  /// app-links subscription) does not push the same route twice.
+  static String? _lastHandledUri;
+  static DateTime? _lastHandledAt;
+
+  /// How long a URI stays in the dedupe window. Long enough to absorb the
+  /// app-links replay race, short enough that the same link can be opened
+  /// again from a fresh share within the same session.
+  static const Duration _dedupeWindow = Duration(seconds: 5);
+
+  /// Public for testing: clears the dedupe cache.
+  static void resetDedupeForTest() {
+    _lastHandledUri = null;
+    _lastHandledAt = null;
+  }
+
   /// Returns a route plan when the URI is recognized; otherwise `null`.
   static DeepLinkRoute? parse(Uri uri) {
     final List<String> raw = uri.pathSegments.where((String s) => s.isNotEmpty).toList();
+
+    if (raw.length == 1 && raw[0] == 'reset-password') {
+      final String? token = uri.queryParameters['token']?.trim();
+      if (token != null && token.isNotEmpty) {
+        return DeepLinkPasswordReset(token);
+      }
+    }
 
     // Public share URL: `/sites/<id>` on the marketing host.
     if (raw.length == 2 && raw[0] == 'sites') {
@@ -142,14 +173,23 @@ class DeepLinkRouter {
   /// Applies [parse] and pushes a named route when recognized.
   ///
   /// Event list/detail deep links require a signed-in session (API is JWT-only).
+  /// New-report and map-focus deep links are also gated behind auth because
+  /// they target screens whose data fetch immediately requires a JWT.
+  ///
+  /// Re-entrant safe: if the same URI was handled less than [_dedupeWindow]
+  /// ago, the call is a no-op (returns `true` to signal "already routed").
   static bool handleUri(
     NavigatorState nav,
     Uri uri, {
     required bool isAuthenticated,
   }) {
+    if (_isDuplicate(uri)) {
+      return true;
+    }
     final DeepLinkRoute? route = parse(uri);
     switch (route) {
       case DeepLinkEventDetail(:final String eventId):
+        _markHandled(uri);
         if (!isAuthenticated) {
           nav.pushNamed(AppRoutes.signIn);
           return true;
@@ -160,21 +200,44 @@ class DeepLinkRouter {
         );
         return true;
       case DeepLinkNewReport():
+        _markHandled(uri);
+        if (!isAuthenticated) {
+          nav.pushNamed(AppRoutes.signIn);
+          return true;
+        }
         nav.pushNamed(AppRoutes.newReport);
         return true;
+      case DeepLinkPasswordReset(:final String token):
+        _markHandled(uri);
+        nav.pushNamed(
+          AppRoutes.forgotPasswordNew,
+          arguments: EmailPasswordResetRouteArgs(token: token),
+        );
+        return true;
       case DeepLinkHomeMapFocus(:final String siteId):
+        _markHandled(uri);
+        if (!isAuthenticated) {
+          nav.pushNamed(AppRoutes.signIn);
+          return true;
+        }
         nav.pushNamed(
           AppRoutes.homeMapFocus,
           arguments: MapSiteFocusRouteArgs(siteId: siteId),
         );
         return true;
       case DeepLinkSiteDetail(:final String siteId):
+        _markHandled(uri);
+        if (!isAuthenticated) {
+          nav.pushNamed(AppRoutes.signIn);
+          return true;
+        }
         nav.pushNamed(
           AppRoutes.siteDetail,
           arguments: SiteDetailByIdRouteArgs(siteId: siteId),
         );
         return true;
       case DeepLinkHomeEvents():
+        _markHandled(uri);
         if (!isAuthenticated) {
           nav.pushNamed(AppRoutes.signIn);
           return true;
@@ -184,5 +247,20 @@ class DeepLinkRouter {
       case null:
         return false;
     }
+  }
+
+  static bool _isDuplicate(Uri uri) {
+    final String key = uri.toString();
+    final String? prev = _lastHandledUri;
+    final DateTime? at = _lastHandledAt;
+    if (prev == null || at == null || prev != key) {
+      return false;
+    }
+    return DateTime.now().difference(at) < _dedupeWindow;
+  }
+
+  static void _markHandled(Uri uri) {
+    _lastHandledUri = uri.toString();
+    _lastHandledAt = DateTime.now();
   }
 }

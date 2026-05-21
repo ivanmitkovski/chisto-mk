@@ -37,10 +37,12 @@ void main() {
       expect(backoffMsForAttempt(1), lessThan(backoffMsForAttempt(3)));
     });
 
-    test('clamps to attempt 8 and cap', () {
+    test('clamps to attempt 8 tier (256s base before 5m cap)', () {
+      const int tier8BaseMs = 2000 * (1 << 7);
       final int high = backoffMsForAttempt(99);
-      expect(high, lessThanOrEqualTo(5 * 60 * 1000 + (5 * 60 * 1000 * 0.15).ceil()));
-      expect(high, greaterThanOrEqualTo(5 * 60 * 1000 - (5 * 60 * 1000 * 0.15).ceil()));
+      final int jitter = (tier8BaseMs * 0.15).round();
+      expect(high, lessThanOrEqualTo(tier8BaseMs + jitter));
+      expect(high, greaterThanOrEqualTo(tier8BaseMs - jitter));
     });
 
     test('attempt 0 is clamped to tier 1 like attempt 1 (jittered range)', () {

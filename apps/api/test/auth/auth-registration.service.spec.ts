@@ -4,7 +4,7 @@ import { ConflictException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { AuthRegistrationService } from '../../src/auth/auth-registration.service';
-import { AuthSessionService } from '../../src/auth/auth-session.service';
+import { AuthOtpService } from '../../src/auth/auth-otp.service';
 import { loadAuthEnvRuntime } from '../../src/auth/auth-env.config';
 
 describe('AuthRegistrationService', () => {
@@ -15,12 +15,12 @@ describe('AuthRegistrationService', () => {
       },
     } as never;
     const emitter = { emit: jest.fn() } as never;
-    const session = {} as AuthSessionService;
+    const authOtp = { sendPhoneVerificationOtp: jest.fn() } as unknown as AuthOtpService;
     const env = loadAuthEnvRuntime(null as unknown as ConfigService);
     const registration = new AuthRegistrationService(
       prisma,
       emitter as unknown as EventEmitter2,
-      session,
+      authOtp,
       env,
     );
     await expect(

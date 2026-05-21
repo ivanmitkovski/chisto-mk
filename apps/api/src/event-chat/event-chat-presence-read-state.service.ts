@@ -4,6 +4,7 @@ import { Prisma } from '../prisma-client';
 import { PrismaService } from '../prisma/prisma.service';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import type { PatchEventChatReadDto } from './dto/patch-event-chat-read.dto';
+import { NotificationStateService } from '../notifications/notification-state.service';
 import { EventChatSseService } from './event-chat-sse.service';
 
 /** Safety cap on joiners scanned when building read-cursor roster for organizers. */
@@ -14,13 +15,21 @@ export class EventChatPresenceReadStateService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly sse: EventChatSseService,
+    private readonly notificationState: NotificationStateService,
   ) {}
 
   async patchReadCursor(
     eventId: string,
     user: AuthenticatedUser,
     dto: PatchEventChatReadDto,
-  ): Promise<{ data: { ok: true }; meta: { timestamp: string } }> {
+  ): Promise<{
+    data: { ok: true };
+    meta: {
+      timestamp: string;
+      unreadCount: number;
+      eventChatNotificationsMarkedRead: number;
+    };
+  }> {
     const lastRead = dto.lastReadMessageId?.trim() || null;
     if (lastRead) {
       const exists = await this.prisma.eventChatMessage.findFirst({
@@ -96,7 +105,19 @@ export class EventChatPresenceReadStateService {
       lastReadMessageCreatedAt,
     });
 
-    return { data: { ok: true }, meta: { timestamp: new Date().toISOString() } };
+    const inboxSync = await this.notificationState.markEventChatGroupRead(
+      user.userId,
+      eventId,
+    );
+
+    return {
+      data: { ok: true },
+      meta: {
+        timestamp: new Date().toISOString(),
+        unreadCount: inboxSync.unreadCount,
+        eventChatNotificationsMarkedRead: inboxSync.updated,
+      },
+    };
   }
 
   async listReadCursors(eventId: string): Promise<{

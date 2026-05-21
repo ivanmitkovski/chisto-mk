@@ -10,7 +10,7 @@ import 'package:chisto_mobile/features/events/presentation/utils/events_diagnost
 /// Singleton that drains the [CheckInSyncQueue] when the app-level offline-work
 /// coordinator schedules work (connectivity restored, app resume, or manual sync).
 ///
-/// Start once in ServiceLocator via [CheckInSyncService.start].
+/// Start once in AppBootstrap via [CheckInSyncService.start].
 /// Entries that return [CheckInSubmissionStatus.replayDetected] or
 /// [CheckInSubmissionStatus.alreadyCheckedIn] are treated as already synced
 /// and silently removed.

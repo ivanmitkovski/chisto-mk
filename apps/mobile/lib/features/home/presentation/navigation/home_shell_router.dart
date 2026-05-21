@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:chisto_mobile/core/navigation/app_navigator_key.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
@@ -12,14 +11,17 @@ import 'package:chisto_mobile/features/home/presentation/screens/feed_site_upvot
 import 'package:chisto_mobile/features/home/presentation/screens/pollution_feed_screen.dart';
 import 'package:chisto_mobile/features/home/presentation/screens/pollution_map_screen.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
+import 'package:chisto_mobile/features/home/presentation/navigation/feed_shell_route_extras.dart';
 import 'package:chisto_mobile/features/home/presentation/screens/site_detail_route_screen.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/coach_tour_host.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/home_bottom_nav_bar.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/home_shell_coach_keys.dart';
+import 'package:chisto_mobile/features/notifications/domain/models/notification_inbox_highlight.dart';
 import 'package:chisto_mobile/features/onboarding/application/coach_tour_controller.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_loading_indicator.dart';
 
 /// Maps bottom-nav index to shell location.
 String homeShellTabIndexToLocation(int index) {
@@ -52,9 +54,8 @@ int homeShellLocationToTabIndex(String location) {
 /// Full-screen feed sub-routes where the tab bar and central FAB should not show.
 bool homeShellShouldHideBottomBar(Uri uri) {
   final List<String> s = uri.pathSegments;
-  return s.length >= 3 &&
-      s[0] == 'feed' &&
-      (s[2] == 'comments' || s[2] == 'upvoters');
+  // `/feed/:siteId`, `/feed/:siteId/comments`, `/feed/:siteId/upvoters`
+  return s.length >= 2 && s[0] == 'feed';
 }
 
 /// Shell scaffold: bottom navigation, central report FAB, and [StatefulNavigationShell] body.
@@ -82,9 +83,7 @@ class HomeShellRouterScaffold extends StatefulWidget {
   final GlobalKey<EventsFeedScreenState> eventsFeedKey;
   final WidgetBuilder reportsPageBuilder;
 
-  /// [tabIndex] is [StatefulNavigationShell.currentIndex] (0 feed, 1 reports, 2 map, 3 events).
-  final Future<void> Function(BuildContext context, int tabIndex)
-  onCentralFabPressed;
+  final Future<void> Function(BuildContext context) onCentralFabPressed;
   final bool isLaunchingReportFlow;
   final HomeShellCoachKeys coachKeys;
   final CoachTourController coachTour;
@@ -136,19 +135,12 @@ class _HomeShellRouterScaffoldState extends State<HomeShellRouterScaffold> {
                             key: widget.coachKeys.fabKey,
                             child: _CentralReportButton(
                               enabled: !widget.isLaunchingReportFlow,
-                              semanticsLabel: currentIndex == 3
-                                  ? AppLocalizations.of(
-                                      context,
-                                    )!.eventsFeedCreateSemantic
-                                  : AppLocalizations.of(
-                                      context,
-                                    )!.reportListFabLabel,
+                              semanticsLabel: AppLocalizations.of(
+                                context,
+                              )!.reportListFabLabel,
                               onPressed: () {
                                 unawaited(
-                                  widget.onCentralFabPressed(
-                                    context,
-                                    currentIndex,
-                                  ),
+                                  widget.onCentralFabPressed(context),
                                 );
                               },
                             ),
@@ -286,11 +278,8 @@ class _CentralReportButtonState extends State<_CentralReportButton> {
                       child: SizedBox(
                         width: 22,
                         height: 22,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2.4,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            AppColors.white,
-                          ),
+                        child: AppLoadingIndicator(
+                          color: AppColors.white,
                         ),
                       ),
                     ),
@@ -333,20 +322,20 @@ class _MapTabPlaceholder extends StatelessWidget {
 
 /// Builds the nested [GoRouter] for the signed-in home shell (tabs + feed sub-routes).
 GoRouter buildHomeShellGoRouter({
+  required GlobalKey<NavigatorState> navigatorKey,
   required String initialLocation,
   required ValueNotifier<String?> mapPendingSiteFocus,
   required GlobalKey feedKey,
   required GlobalKey<EventsFeedScreenState> eventsFeedKey,
   required WidgetBuilder reportsPageBuilder,
-  required Future<void> Function(BuildContext context, int tabIndex)
-  onCentralFabPressed,
+  required Future<void> Function(BuildContext context) onCentralFabPressed,
   required ValueNotifier<bool> isLaunchingReportFlow,
   Listenable? refreshListenable,
   required HomeShellCoachKeys coachKeys,
   required CoachTourController coachTour,
 }) {
   return GoRouter(
-    navigatorKey: homeShellGoRouterNavigatorKey,
+    navigatorKey: navigatorKey,
     refreshListenable: refreshListenable,
     initialLocation: initialLocation,
     routes: <RouteBase>[
@@ -357,15 +346,17 @@ GoRouter buildHomeShellGoRouter({
               GoRouterState state,
               StatefulNavigationShell navigationShell,
             ) {
+              final GoRouter shellRouter = GoRouter.of(context);
               return ListenableBuilder(
                 listenable: Listenable.merge(<Listenable>[
                   isLaunchingReportFlow,
                   coachTour,
+                  shellRouter.routeInformationProvider,
                 ]),
                 builder: (BuildContext context, Widget? _) {
                   return HomeShellRouterScaffold(
                     navigationShell: navigationShell,
-                    shellUri: state.uri,
+                    shellUri: shellRouter.state.uri,
                     mapPendingSiteFocus: mapPendingSiteFocus,
                     feedKey: feedKey,
                     eventsFeedKey: eventsFeedKey,
@@ -395,34 +386,63 @@ GoRouter buildHomeShellGoRouter({
                 routes: <RouteBase>[
                   GoRoute(
                     path: ':siteId',
-                    parentNavigatorKey: homeShellGoRouterNavigatorKey,
+                    parentNavigatorKey: navigatorKey,
                     builder: (BuildContext context, GoRouterState state) {
                       final String siteId = state.pathParameters['siteId']!;
                       final Object? extra = state.extra;
+                      String? initialAction;
+                      NotificationInboxHighlight? initialHighlight;
+                      PollutionSite? previewSite;
+                      if (extra is FeedSiteDetailRouteExtra) {
+                        previewSite = extra.previewSite;
+                        initialAction = extra.initialAction;
+                        initialHighlight = extra.initialHighlight;
+                      } else if (extra is SiteDetailPreviewExtra) {
+                        previewSite = extra.site;
+                      } else if (extra is PollutionSite) {
+                        previewSite = extra;
+                      }
                       return SiteDetailRouteScreen(
                         siteId: siteId,
-                        previewSite: extra is SiteDetailPreviewExtra
-                            ? extra.site
-                            : extra is PollutionSite
-                            ? extra
-                            : null,
+                        previewSite: previewSite,
+                        initialAction: initialAction,
+                        initialHighlight: initialHighlight,
                       );
                     },
                     routes: <RouteBase>[
                       GoRoute(
                         path: 'comments',
-                        parentNavigatorKey: homeShellGoRouterNavigatorKey,
+                        parentNavigatorKey: navigatorKey,
                         builder: (BuildContext context, GoRouterState state) {
                           final String siteId = state.pathParameters['siteId']!;
-                          return FeedSiteCommentsRouteScreen(siteId: siteId);
+                          final Object? extra = state.extra;
+                          final FeedSiteCommentsRouteExtra? commentsExtra =
+                              extra is FeedSiteCommentsRouteExtra
+                              ? extra
+                              : null;
+                          return FeedSiteCommentsRouteScreen(
+                            siteId: siteId,
+                            highlightCommentId:
+                                commentsExtra?.highlightCommentId,
+                            highlightActorUserId:
+                                commentsExtra?.highlightActorUserId,
+                          );
                         },
                       ),
                       GoRoute(
                         path: 'upvoters',
-                        parentNavigatorKey: homeShellGoRouterNavigatorKey,
+                        parentNavigatorKey: navigatorKey,
                         builder: (BuildContext context, GoRouterState state) {
                           final String siteId = state.pathParameters['siteId']!;
-                          return FeedSiteUpvotersRouteScreen(siteId: siteId);
+                          final Object? extra = state.extra;
+                          final String? highlightUserId =
+                              extra is FeedSiteUpvotersRouteExtra
+                              ? extra.highlightUserId
+                              : null;
+                          return FeedSiteUpvotersRouteScreen(
+                            siteId: siteId,
+                            highlightUserId: highlightUserId,
+                          );
                         },
                       ),
                     ],

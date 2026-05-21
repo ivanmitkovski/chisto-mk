@@ -10,6 +10,7 @@ import { ReportEventsService } from '../../admin-realtime/report-events.service'
 import { SiteEventsService } from '../../admin-realtime/site-events.service';
 import { ReportsOwnerEventsService } from '../reports-owner-events.service';
 import { getReportNumber } from '../report-copy.helpers';
+import { SiteHistoryWriterService } from '../../sites/history/site-history-writer.service';
 
 export type DuplicateMergeSiteStatusEvent = {
   id: string;
@@ -46,6 +47,7 @@ export class DuplicateMergeSideEffectsService {
     private readonly siteEventsService: SiteEventsService,
     private readonly reportsOwnerEventsService: ReportsOwnerEventsService,
     private readonly eventEmitter: EventEmitter2,
+    private readonly siteHistoryWriter: SiteHistoryWriterService,
   ) {}
 
   async runPostMergeEffects(input: DuplicateMergePostTxInput): Promise<number> {
@@ -67,7 +69,28 @@ export class DuplicateMergeSideEffectsService {
         longitude: siteStatusEvent.longitude,
         updatedAt: siteStatusEvent.updatedAt,
       });
+      await this.siteHistoryWriter.recordStatusChanged({
+        siteId: siteStatusEvent.id,
+        fromStatus: SiteStatus.REPORTED,
+        toStatus: siteStatusEvent.status,
+        occurredAt: siteStatusEvent.updatedAt,
+        reportId: primaryReport.id,
+        actor: { userId: moderator.userId, role: moderator.role },
+        metadata: { trigger: 'REPORT_MERGE' },
+      });
     }
+
+    await this.siteHistoryWriter.recordReportMerged({
+      siteId: primaryReport.siteId,
+      reportId: primaryReport.id,
+      occurredAt: new Date(),
+      actor: { userId: moderator.userId, role: moderator.role },
+      metadata: {
+        mergedChildCount: selectedChildren.length,
+        childReportIds: selectedChildIds,
+      },
+    });
+    this.siteHistoryWriter.emitHistoryAppended(primaryReport.siteId, primaryReport.id);
 
     const mergedMediaDeletedCount =
       await this.reportsUploadService.deleteReportMediaUrls(duplicateMediaUrls);

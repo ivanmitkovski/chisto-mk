@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 /// Tappable row for message overflow actions (reply, copy, delete, …).
 class ChatMessageActionRow extends StatelessWidget {
@@ -28,7 +27,6 @@ class ChatMessageActionRow extends StatelessWidget {
       label: label,
       child: InkWell(
         onTap: () {
-          AppHaptics.light();
           onTap();
         },
         child: Padding(

@@ -5,8 +5,10 @@ import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/home/domain/models/comment.dart';
 import 'package:chisto_mobile/features/home/presentation/utils/comment_meta_formatting.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/comments/comments_motion.dart';
-import 'package:chisto_mobile/shared/widgets/app_avatar.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_avatar.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 import 'package:flutter/material.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_loading_indicator.dart';
 
 /// One comment row in a site thread (feed sheet or full-screen route).
 class CommentListTile extends StatelessWidget {
@@ -195,24 +197,12 @@ class CommentListTile extends StatelessWidget {
                             comment.repliesCount > comment.replies.length)
                           Padding(
                             padding: const EdgeInsets.only(top: 6),
-                            child: TextButton(
-                              onPressed: isLoadingMoreReplies
-                                  ? null
-                                  : onLoadMoreReplies,
-                              child: isLoadingMoreReplies
-                                  ? const SizedBox(
-                                      width: 18,
-                                      height: 18,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                      ),
-                                    )
-                                  : Text(
-                                      context.l10n.commentsLoadMoreReplies(
-                                        comment.repliesCount -
-                                            comment.replies.length,
-                                      ),
-                                    ),
+                            child: AppButton.text(
+                              label: context.l10n.commentsLoadMoreReplies(
+                                comment.repliesCount - comment.replies.length,
+                              ),
+                              onPressed: onLoadMoreReplies,
+                              enabled: !isLoadingMoreReplies,
                             ),
                           ),
                       ],
@@ -239,10 +229,10 @@ class CommentListTile extends StatelessWidget {
                       minHeight: 24,
                     ),
                     visualDensity: VisualDensity.compact,
-                    splashColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
-                    hoverColor: Colors.transparent,
-                    focusColor: Colors.transparent,
+                    splashColor: AppColors.transparent,
+                    highlightColor: AppColors.transparent,
+                    hoverColor: AppColors.transparent,
+                    focusColor: AppColors.transparent,
                   ),
                 Semantics(
                   button: true,
@@ -266,13 +256,11 @@ class CommentListTile extends StatelessWidget {
                                 ),
                               ),
                       child: isLiking
-                          ? const SizedBox(
-                              key: ValueKey<String>('liking'),
+                          ? SizedBox(
+                              key: const ValueKey<String>('liking'),
                               width: 16,
                               height: 16,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 1.8,
-                              ),
+                              child: AppLoadingIndicator(size: AppLoadingIndicatorSize.sm),
                             )
                           : Icon(
                               isLikedByMe
@@ -294,10 +282,10 @@ class CommentListTile extends StatelessWidget {
                     tooltip: isLikedByMe
                         ? context.l10n.commentsUnlikeTooltip
                         : context.l10n.commentsLikeTooltip,
-                    splashColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
-                    hoverColor: Colors.transparent,
-                    focusColor: Colors.transparent,
+                    splashColor: AppColors.transparent,
+                    highlightColor: AppColors.transparent,
+                    hoverColor: AppColors.transparent,
+                    focusColor: AppColors.transparent,
                   ),
                 ),
               ],

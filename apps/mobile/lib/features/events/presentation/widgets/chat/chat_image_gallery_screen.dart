@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
+import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_message.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_attachment_source.dart';
 import 'package:flutter/material.dart';
@@ -65,13 +67,15 @@ class _ChatImageGalleryScreenState extends State<ChatImageGalleryScreen> {
     return Semantics(
       label: context.l10n.eventChatImageViewerTitle,
       child: Scaffold(
-        backgroundColor: Colors.black,
+        backgroundColor: AppColors.black,
         appBar: AppBar(
-          backgroundColor: Colors.black,
-          foregroundColor: Colors.white,
+          backgroundColor: AppColors.black,
+          foregroundColor: AppColors.white,
           title: Text(
             context.l10n.eventChatImageViewerPage(_index + 1, widget.attachments.length),
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            style: AppTypography.overlayBodyMedium.copyWith(
+              color: AppColors.textOnDark,
+            ),
           ),
           leading: IconButton(
             icon: const Icon(Icons.close),
@@ -97,8 +101,12 @@ class _ChatImageGalleryScreenState extends State<ChatImageGalleryScreen> {
               maxScale: PhotoViewComputedScale.covered * 3,
               filterQuality: FilterQuality.medium,
               errorBuilder: (BuildContext ctx, Object error, StackTrace? stackTrace) {
-                return const Center(
-                  child: Icon(Icons.broken_image_outlined, color: Colors.white38, size: 56),
+                return Center(
+                  child: Icon(
+                    Icons.broken_image_outlined,
+                    color: AppColors.onMediaSubtle,
+                    size: 56,
+                  ),
                 );
               },
             );
@@ -114,12 +122,12 @@ class _ChatImageGalleryScreenState extends State<ChatImageGalleryScreen> {
                   value: event == null || event.expectedTotalBytes == null
                       ? null
                       : event.cumulativeBytesLoaded / event.expectedTotalBytes!,
-                  color: Colors.white54,
+                  color: AppColors.onMediaMuted,
                 ),
               ),
             );
           },
-          backgroundDecoration: const BoxDecoration(color: Colors.black),
+          backgroundDecoration: const BoxDecoration(color: AppColors.black),
           pageController: _pageController,
           onPageChanged: (int i) => setState(() => _index = i),
         ),

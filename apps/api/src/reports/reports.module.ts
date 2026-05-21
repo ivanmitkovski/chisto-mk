@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AdminRealtimeModule } from '../admin-realtime/admin-realtime.module';
 import { AuditModule } from '../audit/audit.module';
+import { SiteHistoryModule } from '../sites/history/site-history.module';
 import { GamificationModule } from '../gamification/gamification.module';
 import { ReportsController } from './reports.controller';
 import { OwnerEventsModule } from './owner-events/owner-events.module';
@@ -31,7 +32,14 @@ import { ReportsUserThrottlerGuard } from './reports-user-throttler.guard';
 import { ParseCuidPipe } from '../common/pipes/parse-cuid.pipe';
 
 @Module({
-  imports: [AdminRealtimeModule, AuditModule, GamificationModule, ReportsUploadModule, OwnerEventsModule],
+  imports: [
+    AdminRealtimeModule,
+    AuditModule,
+    GamificationModule,
+    ReportsUploadModule,
+    OwnerEventsModule,
+    SiteHistoryModule,
+  ],
   controllers: [ReportsController],
   providers: [
     ReportsModerationListService,

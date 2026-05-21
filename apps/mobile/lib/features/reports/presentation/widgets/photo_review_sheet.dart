@@ -5,8 +5,8 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/immersive_photo_gallery.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/immersive_photo_gallery.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -77,7 +77,6 @@ class _PhotoReviewSheetState extends State<PhotoReviewSheet> {
             icon: Icons.close_rounded,
             semanticLabel: context.l10n.reportPhotoReviewCloseSemantic,
             onTap: () async {
-              AppHaptics.tap();
               final bool? discard = await showDialog<bool>(
                 context: context,
                 builder: (BuildContext dialogContext) {
@@ -85,19 +84,16 @@ class _PhotoReviewSheetState extends State<PhotoReviewSheet> {
                     title: Text(dialogContext.l10n.photoReviewDiscardTitle),
                     content: Text(dialogContext.l10n.photoReviewDiscardBody),
                     actions: <Widget>[
-                      TextButton(
+                      AppButton.text(
+                        label: dialogContext.l10n.commonKeepEditing,
                         onPressed: () => Navigator.of(dialogContext).pop(false),
-                        child: Text(dialogContext.l10n.commonKeepEditing),
                       ),
-                      TextButton(
+                      AppButton.destructive(
+                        label: dialogContext.l10n.commonDiscard,
                         onPressed: () {
-                          AppHaptics.light();
                           Navigator.of(dialogContext).pop(true);
                         },
-                        style: TextButton.styleFrom(
-                          foregroundColor: AppColors.accentDanger,
-                        ),
-                        child: Text(dialogContext.l10n.commonDiscard),
+                        expand: false,
                       ),
                     ],
                   );
@@ -114,33 +110,12 @@ class _PhotoReviewSheetState extends State<PhotoReviewSheet> {
                 child: Semantics(
                   button: true,
                   label: context.l10n.reportPhotoReviewRetakeSemantic,
-                  child: OutlinedButton(
+                  child: AppButton.outlined(
+                    label: context.l10n.reportPhotoReviewRetake,
                     onPressed: () {
-                      AppHaptics.tap();
                       Navigator.of(context).pop(PhotoReviewResult.retake);
                     },
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.textPrimary,
-                      backgroundColor: AppColors.panelBackground,
-                      side: BorderSide(
-                        color: AppColors.divider.withValues(alpha: 0.8),
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusLg,
-                        ),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        vertical: AppSpacing.sm,
-                      ),
-                    ),
-                    child: Text(
-                      context.l10n.reportPhotoReviewRetake,
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: -0.2,
-                      ),
-                    ),
+                    expand: true,
                   ),
                 ),
               ),
@@ -149,37 +124,12 @@ class _PhotoReviewSheetState extends State<PhotoReviewSheet> {
                 child: Semantics(
                   button: true,
                   label: context.l10n.reportPhotoReviewUseSemantic,
-                  child: FilledButton(
+                  child: AppButton.primary(
+                    label: context.l10n.reportPhotoReviewUsePhoto,
                     onPressed: () {
-                      AppHaptics.medium();
                       Navigator.of(context).pop(PhotoReviewResult.use);
                     },
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: AppColors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusLg,
-                        ),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        vertical: AppSpacing.sm,
-                      ),
-                    ),
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.center,
-                      child: Text(
-                        context.l10n.reportPhotoReviewUsePhoto,
-                        maxLines: 1,
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: -0.2,
-                        ),
-                      ),
-                    ),
+                    expand: true,
                   ),
                 ),
               ),

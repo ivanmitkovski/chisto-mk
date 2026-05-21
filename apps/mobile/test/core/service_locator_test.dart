@@ -1,4 +1,7 @@
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
+import 'package:chisto_mobile/core/providers/refresh_signals_providers.dart';
+import 'package:chisto_mobile/core/providers/root_container.dart';
+import '../shared/widget_test_bootstrap.dart' show ensureWidgetTestPlumbing;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -6,12 +9,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  group('ServiceLocator', () {
-    late ServiceLocator locator;
+  group('AppBootstrap', () {
+    late AppBootstrap locator;
 
-    setUp(() {
-      locator = ServiceLocator.instance;
-      locator.reset();
+    setUp(() async {
+      locator = AppBootstrap.instance;
+      await locator.reset();
       SharedPreferences.setMockInitialValues(<String, Object>{});
     });
 
@@ -20,11 +23,13 @@ void main() {
     });
 
     test('initialize sets isInitialized to true', () async {
+      await ensureWidgetTestPlumbing();
       await locator.initialize();
       expect(locator.isInitialized, isTrue);
     });
 
     test('double initialization is idempotent', () async {
+      await ensureWidgetTestPlumbing();
       await locator.initialize();
       final authState = locator.authState;
 
@@ -33,6 +38,7 @@ void main() {
     });
 
     test('after init, repositories are available', () async {
+      await ensureWidgetTestPlumbing();
       await locator.initialize();
       expect(locator.authRepository, isNotNull);
       expect(locator.eventsRepository, isNotNull);
@@ -40,35 +46,41 @@ void main() {
     });
 
     test('after init, authState starts unauthenticated (no hardcoded user)', () async {
+      await ensureWidgetTestPlumbing();
       await locator.initialize();
       expect(locator.authState.isAuthenticated, isFalse);
-    });
-
-    test('reset sets isInitialized to false', () async {
-      await locator.initialize();
-      expect(locator.isInitialized, isTrue);
-
-      locator.reset();
-      expect(locator.isInitialized, isFalse);
     });
 
     test('loads app locale from SharedPreferences on initialize', () async {
       SharedPreferences.setMockInitialValues(<String, Object>{
         'app_locale_code': 'mk',
       });
+      await ensureWidgetTestPlumbing();
       await locator.initialize();
-      expect(locator.appLocaleOverride.value, const Locale('mk'));
+      setRootProviderContainer(locator.providerContainer);
+      expect(readAppLocaleOverride(), const Locale('mk'));
     });
 
     test('setAppLocale persists and updates notifier', () async {
+      await ensureWidgetTestPlumbing();
       await locator.initialize();
+      setRootProviderContainer(locator.providerContainer);
       await locator.setAppLocale(const Locale('sq'));
-      expect(locator.appLocaleOverride.value, const Locale('sq'));
+      expect(readAppLocaleOverride(), const Locale('sq'));
       expect(locator.preferences.getString('app_locale_code'), 'sq');
 
       await locator.setAppLocale(null);
-      expect(locator.appLocaleOverride.value, isNull);
+      expect(readAppLocaleOverride(), isNull);
       expect(locator.preferences.containsKey('app_locale_code'), isFalse);
+    });
+
+    test('reset sets isInitialized to false', () async {
+      await ensureWidgetTestPlumbing();
+      await locator.initialize();
+      expect(locator.isInitialized, isTrue);
+
+      await locator.reset();
+      expect(locator.isInitialized, isFalse);
     });
   });
 }

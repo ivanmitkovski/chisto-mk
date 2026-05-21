@@ -5,6 +5,7 @@ import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/feed_filter_sheet.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 import 'package:flutter/material.dart';
 
 class FeedEmptyState extends StatelessWidget {
@@ -140,20 +141,10 @@ class FeedEmptyState extends StatelessWidget {
                 child: Text(context.l10n.feedShowAllSites),
               )
             else
-              OutlinedButton(
+              AppButton.outlined(
+                label: context.l10n.feedPullToRefreshSemantic,
                 onPressed: onRefresh,
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.textPrimary,
-                  side: const BorderSide(color: AppColors.divider),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                    vertical: AppSpacing.sm,
-                  ),
-                ),
-                child: Text(context.l10n.feedPullToRefreshSemantic),
+                expand: false,
               ),
           ],
         ),

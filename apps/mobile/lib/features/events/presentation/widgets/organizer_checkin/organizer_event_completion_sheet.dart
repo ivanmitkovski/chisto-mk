@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
@@ -10,8 +11,7 @@ import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
 
 /// Result of the organizer completion sheet — drives post-pop navigation.
 enum OrganizerEventCompletionAction {
@@ -158,7 +158,6 @@ class _OrganizerEventCompletionSheetBodyState
           icon: CupertinoIcons.xmark,
           semanticLabel: l10n.commonClose,
           onTap: () {
-            AppHaptics.tap(context);
             Navigator.of(context).pop(OrganizerEventCompletionAction.dismissed);
           },
         ),
@@ -170,55 +169,24 @@ class _OrganizerEventCompletionSheetBodyState
               label: l10n.eventsOrganizerCompletionBackToEvent,
               enabled: true,
               onPressed: () {
-                AppHaptics.tap(context);
                 Navigator.of(context).pop(OrganizerEventCompletionAction.dismissed);
               },
             ),
             const SizedBox(height: AppSpacing.sm),
-            SizedBox(
-              width: double.infinity,
-              height: 54,
-              child: OutlinedButton(
-                onPressed: () {
-                  AppHaptics.tap(context);
-                  Navigator.of(context).pop(OrganizerEventCompletionAction.openImpactReceipt);
-                },
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: AppColors.divider),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-                  ),
-                ),
-                child: Text(
-                  l10n.eventsOrganizerCompletionViewReceipt,
-                  style: AppTypography.eventsSecondaryCtaLabel(textTheme).copyWith(
-                    color: AppColors.primaryDark,
-                  ),
-                ),
-              ),
+            AppButton.outlined(
+              label: l10n.eventsOrganizerCompletionViewReceipt,
+              onPressed: () {
+                Navigator.of(context).pop(OrganizerEventCompletionAction.openImpactReceipt);
+              },
+              expand: true,
             ),
             const SizedBox(height: AppSpacing.sm),
-            SizedBox(
-              width: double.infinity,
-              height: 54,
-              child: OutlinedButton(
-                onPressed: () {
-                  AppHaptics.tap(context);
-                  Navigator.of(context).pop(OrganizerEventCompletionAction.openEvidence);
-                },
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: AppColors.divider),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-                  ),
-                ),
-                child: Text(
-                  l10n.eventsOrganizerCompletionAddPhotosNow,
-                  style: AppTypography.eventsSecondaryCtaLabel(textTheme).copyWith(
-                    color: AppColors.primaryDark,
-                  ),
-                ),
-              ),
+            AppButton.outlined(
+              label: l10n.eventsOrganizerCompletionAddPhotosNow,
+              onPressed: () {
+                Navigator.of(context).pop(OrganizerEventCompletionAction.openEvidence);
+              },
+              expand: true,
             ),
           ],
         ),

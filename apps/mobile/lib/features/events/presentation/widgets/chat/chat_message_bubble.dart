@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chisto_mobile/core/theme/app_radii.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -21,12 +22,14 @@ import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_loc
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_theme.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/event_chat_audio_playback_scope.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_video_player_screen.dart';
+import 'package:chisto_mobile/features/safety/presentation/block_user_flow.dart';
+import 'package:chisto_mobile/features/safety/presentation/ugc_report_sheet.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_action_sheet.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/app_action_sheet.dart';
 import 'package:chisto_mobile/shared/utils/cached_tile_provider.dart';
-import 'package:chisto_mobile/shared/widgets/user_avatar_circle.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/user_avatar_circle.dart';
 import 'package:intl/intl.dart' hide TextDirection;
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 
 class ChatMessageBubble extends StatefulWidget {
   const ChatMessageBubble({
@@ -48,6 +51,7 @@ class ChatMessageBubble extends StatefulWidget {
     this.receiptAllPeersRead = false,
     this.uploadFraction,
     this.onCancelUpload,
+    this.onAuthorBlocked,
   });
 
   final EventChatMessage message;
@@ -71,6 +75,9 @@ class ChatMessageBubble extends StatefulWidget {
 
   /// Requests upload cancellation (repository surfaces this as a cancelled error).
   final VoidCallback? onCancelUpload;
+
+  /// Called after the peer author was blocked (remove their messages locally).
+  final void Function(String authorId)? onAuthorBlocked;
 
   @override
   State<ChatMessageBubble> createState() => _ChatMessageBubbleState();
@@ -215,14 +222,12 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble>
                   child: InkWell(
                     onTap: m.failed
                         ? () {
-                            AppHaptics.light();
                             widget.onRetry?.call();
                           }
                         : null,
                     onLongPress: (m.isDeleted || m.pending)
                         ? null
                         : () {
-                            AppHaptics.tap(context);
                             unawaited(_showActions(context));
                           },
                     onHighlightChanged: reduceMotion
@@ -431,12 +436,9 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble>
                   if (widget.onCancelUpload != null)
                     Align(
                       alignment: AlignmentDirectional.centerEnd,
-                      child: TextButton(
-                        onPressed: () {
-                          AppHaptics.light(context);
-                          widget.onCancelUpload!();
-                        },
-                        child: Text(context.l10n.commonCancel),
+                      child: AppButton.text(
+                        label: context.l10n.commonCancel,
+                        onPressed: widget.onCancelUpload,
                       ),
                     ),
                 ],
@@ -455,7 +457,6 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble>
       return null;
     }
     return () {
-      AppHaptics.tap(context);
       unawaited(_showActions(context));
     };
   }
@@ -478,7 +479,6 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble>
         own: own,
         onOpenMessageActions: canOpenActions
             ? () {
-                AppHaptics.tap(context);
                 unawaited(_showActions(context));
               }
             : null,
@@ -540,15 +540,42 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble>
     );
   }
 
+  bool _canReportMessage(EventChatMessage msg) =>
+      !msg.isOwnMessage && !msg.isDeleted && !msg.pending;
+
+  bool _canBlockAuthor(EventChatMessage msg) =>
+      _canReportMessage(msg) && msg.authorId.isNotEmpty;
+
   bool _hasAnyMessageAction(EventChatMessage msg) {
     final bool canCopy =
         widget.onCopy != null && msg.body != null && msg.body!.isNotEmpty;
     return canCopy ||
+        _canReportMessage(msg) ||
+        _canBlockAuthor(msg) ||
         widget.onReply != null ||
         widget.onEdit != null ||
         widget.onPin != null ||
         widget.onUnpin != null ||
         widget.onDelete != null;
+  }
+
+  Future<void> _reportMessage(BuildContext context, EventChatMessage msg) async {
+    await showUgcReportSheet(
+      context,
+      subjectType: 'event_chat_message',
+      subjectId: msg.id,
+    );
+  }
+
+  Future<void> _blockAuthor(BuildContext context, EventChatMessage msg) async {
+    final bool blocked = await confirmAndBlockUser(
+      context,
+      blockedUserId: msg.authorId,
+      displayName: msg.authorName,
+    );
+    if (blocked) {
+      widget.onAuthorBlocked?.call(msg.authorId);
+    }
   }
 
   Future<void> _showActions(BuildContext context) async {
@@ -564,6 +591,8 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble>
     final EventChatMessage msg = widget.message;
     final bool canCopy =
         widget.onCopy != null && msg.body != null && msg.body!.isNotEmpty;
+    final bool canReport = _canReportMessage(msg);
+    final bool canBlock = _canBlockAuthor(msg);
     final bool ios = Theme.of(context).platform == TargetPlatform.iOS;
 
     if (ios) {
@@ -572,6 +601,23 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble>
         builder: (BuildContext ctx) {
           return CupertinoActionSheet(
             actions: <Widget>[
+              if (canReport)
+                CupertinoActionSheetAction(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    unawaited(_reportMessage(context, msg));
+                  },
+                  child: Text(context.l10n.safetyReportTitle),
+                ),
+              if (canBlock)
+                CupertinoActionSheetAction(
+                  isDestructiveAction: true,
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    unawaited(_blockAuthor(context, msg));
+                  },
+                  child: Text(context.l10n.safetyBlockUserTitle),
+                ),
               if (canCopy)
                 CupertinoActionSheetAction(
                   onPressed: () {
@@ -616,7 +662,6 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble>
                 CupertinoActionSheetAction(
                   isDestructiveAction: true,
                   onPressed: () {
-                    AppHaptics.medium(context);
                     Navigator.pop(ctx);
                     widget.onDelete?.call();
                   },
@@ -656,6 +701,24 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble>
                   ),
                 ),
               ),
+              if (canReport)
+                ChatMessageActionRow(
+                  icon: CupertinoIcons.flag,
+                  label: context.l10n.safetyReportTitle,
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    unawaited(_reportMessage(context, msg));
+                  },
+                ),
+              if (canBlock)
+                ChatMessageActionRow(
+                  icon: CupertinoIcons.person_crop_circle_badge_xmark,
+                  label: context.l10n.safetyBlockUserTitle,
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    unawaited(_blockAuthor(context, msg));
+                  },
+                ),
               if (canCopy)
                 ChatMessageActionRow(
                   icon: CupertinoIcons.doc_on_doc,
@@ -706,7 +769,6 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble>
                   icon: CupertinoIcons.trash,
                   label: context.l10n.eventChatDelete,
                   onTap: () {
-                    AppHaptics.medium(context);
                     Navigator.pop(ctx);
                     widget.onDelete?.call();
                   },
@@ -746,10 +808,9 @@ class _ImageGrid extends StatelessWidget {
       button: true,
       label: context.l10n.eventChatImageViewerTitle,
       child: Material(
-        color: Colors.transparent,
+        color: AppColors.transparent,
         child: InkWell(
           onTap: () {
-            AppHaptics.light();
             unawaited(
               openChatImageGallery(
                 context,
@@ -785,10 +846,9 @@ class _ImageGrid extends StatelessWidget {
               if (i > 0) const SizedBox(width: 2),
               Expanded(
                 child: Material(
-                  color: Colors.transparent,
+                  color: AppColors.transparent,
                   child: InkWell(
                     onTap: () {
-                      AppHaptics.light();
                       unawaited(
                         openChatImageGallery(
                           context,
@@ -804,15 +864,11 @@ class _ImageGrid extends StatelessWidget {
                         eventChatImageTile(attachments[i], cacheWidth: 300),
                         if (hasMore && i == count - 1)
                           Container(
-                            color: Colors.black45,
+                            color: AppColors.overlayMedium,
                             alignment: Alignment.center,
                             child: Text(
                               '+${attachments.length - count}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 22,
-                                fontWeight: FontWeight.w600,
-                              ),
+                              style: AppTypography.galleryMoreCount,
                             ),
                           ),
                       ],
@@ -850,10 +906,9 @@ class _VideoPreview extends StatelessWidget {
       button: true,
       label: context.l10n.eventChatVideoViewerTitle,
       child: Material(
-        color: Colors.transparent,
+        color: AppColors.transparent,
         child: InkWell(
           onTap: () {
-            AppHaptics.light();
             unawaited(openChatVideoPlayer(context, videoUrl: attachment.url));
           },
           onLongPress: onOpenMessageActions,
@@ -876,7 +931,7 @@ class _VideoPreview extends StatelessWidget {
                     )
                   else if (!remoteVideo)
                     Container(
-                      color: const Color(0xFF1C1C1E),
+                      color: AppColors.mapDarkPaper,
                       width: double.infinity,
                       height: 180,
                       alignment: Alignment.center,
@@ -892,11 +947,11 @@ class _VideoPreview extends StatelessWidget {
                   Container(
                     width: 56,
                     height: 56,
-                    decoration: const BoxDecoration(
-                      color: Colors.black54,
+                    decoration: BoxDecoration(
+                      color: AppColors.overlayStrong,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(CupertinoIcons.play_fill, size: 28, color: Colors.white),
+                    child: const Icon(CupertinoIcons.play_fill, size: 28, color: AppColors.white),
                   ),
                   if (attachment.duration != null)
                     Positioned(
@@ -905,12 +960,14 @@ class _VideoPreview extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: Colors.black54,
-                          borderRadius: BorderRadius.circular(4),
+                          color: AppColors.overlayStrong,
+                          borderRadius: AppRadii.xs,
                         ),
                         child: Text(
                           _formatDuration(attachment.duration!),
-                          style: const TextStyle(color: Colors.white, fontSize: 11),
+                          style: AppTypography.microLabel.copyWith(
+                            color: AppColors.textOnDark,
+                          ),
                         ),
                       ),
                     ),
@@ -966,7 +1023,6 @@ class _ChatAudioInline extends StatelessWidget {
                 onTap: playback == null
                     ? null
                     : () {
-                        AppHaptics.light();
                         unawaited(playback.toggle(clipKey, attachment.url));
                       },
                 child: SizedBox(
@@ -979,11 +1035,11 @@ class _ChatAudioInline extends StatelessWidget {
                         width: outer,
                         height: outer,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.white,
                           shape: BoxShape.circle,
                           boxShadow: <BoxShadow>[
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.08),
+                              color: AppColors.black.withValues(alpha: 0.08),
                               blurRadius: 4,
                               offset: const Offset(0, 1),
                             ),
@@ -1001,7 +1057,7 @@ class _ChatAudioInline extends StatelessWidget {
                         child: Icon(
                           playing ? CupertinoIcons.pause_fill : CupertinoIcons.play_fill,
                           size: 18,
-                          color: Colors.white,
+                          color: AppColors.white,
                         ),
                       ),
                     ],
@@ -1129,7 +1185,6 @@ class _ChatAudioTimeline extends StatelessWidget {
               trackFg: trackFg,
               seekable: true,
               onSeekFraction: (double fx) {
-                AppHaptics.light();
                 final int ms = (total.inMilliseconds * fx.clamp(0.0, 1.0)).round();
                 unawaited(ctrl.player.seek(Duration(milliseconds: ms)));
               },
@@ -1229,10 +1284,9 @@ class _DocumentPreview extends StatelessWidget {
       button: true,
       label: context.l10n.eventChatOpenFile,
       child: Material(
-        color: Colors.transparent,
+        color: AppColors.transparent,
         child: InkWell(
           onTap: () {
-            AppHaptics.light();
             unawaited(openChatDocument(context, attachment));
           },
           onLongPress: onOpenMessageActions,
@@ -1305,10 +1359,9 @@ class _LocationPreview extends StatelessWidget {
       child: Tooltip(
         message: context.l10n.eventChatLocationMapTitle,
         child: Material(
-          color: Colors.transparent,
+          color: AppColors.transparent,
           child: InkWell(
             onTap: () {
-              AppHaptics.light();
               unawaited(openChatLocationFullscreen(context, lat: lat, lng: lng, label: label));
             },
             borderRadius: BorderRadius.circular(AppSpacing.radiusMd),

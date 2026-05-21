@@ -1,9 +1,25 @@
 import 'package:chisto_mobile/features/notifications/domain/models/user_notification.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/notifications/notification_tile.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../../shared/widget_test_bootstrap.dart';
+
 void main() {
+  setUpAll(() async {
+    await bootstrapWidgetTests();
+  });
+
+  Widget wrapTile(NotificationTile tile) {
+    return MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('en'),
+      home: Scaffold(body: tile),
+    );
+  }
+
   testWidgets('renders unread notification with type-specific visual', (
     WidgetTester tester,
   ) async {
@@ -18,11 +34,7 @@ void main() {
     );
 
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: NotificationTile(item: item, onTap: () {}),
-        ),
-      ),
+      wrapTile(NotificationTile(item: item, onTap: () {})),
     );
 
     expect(find.text('New site update'), findsOneWidget);
@@ -43,11 +55,7 @@ void main() {
     );
 
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: NotificationTile(item: item, onTap: () {}),
-        ),
-      ),
+      wrapTile(NotificationTile(item: item, onTap: () {})),
     );
 
     expect(find.text('Report'), findsOneWidget);
@@ -68,11 +76,7 @@ void main() {
       );
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: NotificationTile(item: item, onTap: () {}),
-          ),
-        ),
+        wrapTile(NotificationTile(item: item, onTap: () {})),
       );
 
       expect(find.text('Test ${type.name}'), findsOneWidget);

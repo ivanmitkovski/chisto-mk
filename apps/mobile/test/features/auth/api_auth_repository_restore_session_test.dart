@@ -1,13 +1,34 @@
 import 'package:chisto_mobile/core/auth/auth_state.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
+import 'package:chisto_mobile/core/profile/profile_avatar_sync.dart';
 import 'package:chisto_mobile/core/config/app_config.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/network/api_client.dart';
 import 'package:chisto_mobile/core/network/request_cancellation.dart';
 import 'package:chisto_mobile/core/storage/secure_token_storage.dart';
 import 'package:chisto_mobile/features/auth/data/api_auth_repository.dart';
+import 'package:chisto_mobile/features/auth/domain/refresh_outcome.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../shared/widget_test_bootstrap.dart';
+
+class _RecordingAvatarSync implements ProfileAvatarSync {
+  String? lastRemoteUrl;
+  int clearCount = 0;
+
+  @override
+  void clearAll() {
+    clearCount++;
+    lastRemoteUrl = null;
+  }
+
+  @override
+  void setRemoteUrl(String? remoteUrl) {
+    lastRemoteUrl = remoteUrl;
+  }
+}
 
 class _RestoreSessionTestApiClient extends ApiClient {
   _RestoreSessionTestApiClient()
@@ -50,18 +71,83 @@ class _RestoreSessionTestApiClient extends ApiClient {
           'lastName': 'B',
           'phoneNumber': '+38970111222',
           'organizerCertifiedAt': '2026-03-15T10:00:00.000Z',
+          'avatarUrl': 'https://cdn.example/avatar.jpg',
         },
       );
     }
     return super.get(path, headers: headers);
+  }
+
+  @override
+  Future<ApiResponse> post(
+    String path, {
+    Map<String, String>? headers,
+    Object? body,
+  }) async {
+    if (path == '/auth/login') {
+      return const ApiResponse(
+        statusCode: 200,
+        json: <String, dynamic>{
+          'accessToken': 'new-access',
+          'refreshToken': 'new-refresh',
+          'user': <String, dynamic>{
+            'id': 'user-1',
+            'firstName': 'A',
+            'lastName': 'B',
+            'phoneNumber': '+38970111222',
+            'avatarUrl': 'https://cdn.example/login-avatar.jpg',
+          },
+        },
+      );
+    }
+    return super.post(path, headers: headers, body: body);
+  }
+}
+
+/// `/auth/me` and `/auth/refresh` return 401 to simulate stale Keychain tokens.
+class _StaleTokenRestoreClient extends ApiClient {
+  _StaleTokenRestoreClient({required void Function() onUnauthorized})
+      : super(
+          config: AppConfig.dev,
+          accessToken: () => 'stale-access',
+          onUnauthorized: onUnauthorized,
+        );
+
+  @override
+  Future<ApiResponse> get(
+    String path, {
+    Map<String, String>? headers,
+    RequestCancellationToken? cancellation,
+  }) async {
+    if (path == '/auth/me') {
+      throw AppError.unauthorized();
+    }
+    return super.get(path, headers: headers, cancellation: cancellation);
+  }
+
+  @override
+  Future<ApiResponse> post(
+    String path, {
+    Map<String, String>? headers,
+    Object? body,
+  }) async {
+    if (path == '/auth/refresh') {
+      throw AppError.unauthorized();
+    }
+    return super.post(path, headers: headers, body: body);
   }
 }
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  setUpAll(() async {
+    await bootstrapWidgetTests();
+  });
+
   setUp(() {
     FlutterSecureStorage.setMockInitialValues(<String, String>{});
+    AppBootstrap.instance.suppressSessionExpiredMessage = false;
   });
 
   test(
@@ -130,5 +216,108 @@ void main() {
 
     expect(authState.isOrganizerCertified, isFalse);
     expect(await storage.organizerCertifiedAtIso, isNull);
+  });
+
+  test('restoreSession syncs avatar URL from /auth/me', () async {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+    final SecureTokenStorage storage = SecureTokenStorage(
+      storage: const FlutterSecureStorage(),
+    );
+    await storage.saveTokens(
+      accessToken: 'access-token',
+      refreshToken: 'refresh-token',
+    );
+    await storage.saveSessionData(userId: 'user-1', displayName: 'A B');
+
+    final _RecordingAvatarSync avatarSync = _RecordingAvatarSync();
+    final ApiAuthRepository repo = ApiAuthRepository(
+      client: _RestoreSessionTestApiClient(),
+      authState: AuthState(),
+      tokenStorage: storage,
+      preferences: await SharedPreferences.getInstance(),
+      avatarSync: avatarSync,
+    );
+
+    await repo.restoreSession();
+
+    expect(avatarSync.lastRemoteUrl, 'https://cdn.example/avatar.jpg');
+  });
+
+  test(
+    'restoreSession rejects stale tokens without unauthorized callback',
+    () async {
+      SharedPreferences.setMockInitialValues(<String, Object>{});
+      final SecureTokenStorage storage = SecureTokenStorage(
+        storage: const FlutterSecureStorage(),
+      );
+      await storage.saveTokens(
+        accessToken: 'stale-access',
+        refreshToken: 'stale-refresh',
+      );
+      await storage.saveSessionData(
+        userId: 'user-1',
+        displayName: 'A B',
+      );
+
+      final AuthState authState = AuthState();
+      int unauthorizedCalls = 0;
+      final _StaleTokenRestoreClient client = _StaleTokenRestoreClient(
+        onUnauthorized: () => unauthorizedCalls++,
+      );
+      final ApiAuthRepository repo = ApiAuthRepository(
+        client: client,
+        authState: authState,
+        tokenStorage: storage,
+        preferences: await SharedPreferences.getInstance(),
+      );
+      client.refreshSession = () async => RefreshOutcome.serverRejected;
+
+      await repo.restoreSession();
+
+      expect(unauthorizedCalls, 0);
+      expect(authState.isAuthenticated, isFalse);
+      expect(
+        AppBootstrap.instance.consumeSuppressSessionExpiredMessage(),
+        isTrue,
+      );
+    },
+  );
+
+  test('restoreSession clears avatar when no stored access token', () async {
+    final _RecordingAvatarSync avatarSync = _RecordingAvatarSync();
+    final ApiAuthRepository repo = ApiAuthRepository(
+      client: _RestoreSessionTestApiClient(),
+      authState: AuthState(),
+      tokenStorage: SecureTokenStorage(
+        storage: const FlutterSecureStorage(),
+      ),
+      preferences: await SharedPreferences.getInstance(),
+      avatarSync: avatarSync,
+    );
+
+    await repo.restoreSession();
+
+    expect(avatarSync.clearCount, 1);
+  });
+
+  test('signIn syncs avatar URL from login user payload', () async {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+    final _RecordingAvatarSync avatarSync = _RecordingAvatarSync();
+    final ApiAuthRepository repo = ApiAuthRepository(
+      client: _RestoreSessionTestApiClient(),
+      authState: AuthState(),
+      tokenStorage: SecureTokenStorage(
+        storage: const FlutterSecureStorage(),
+      ),
+      preferences: await SharedPreferences.getInstance(),
+      avatarSync: avatarSync,
+    );
+
+    await repo.signIn(
+      phoneNumber: '+38970111222',
+      password: 'Password1!',
+    );
+
+    expect(avatarSync.lastRemoteUrl, 'https://cdn.example/login-avatar.jpg');
   });
 }

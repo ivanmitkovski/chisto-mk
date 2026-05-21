@@ -1,10 +1,16 @@
+import 'dart:async';
+
+import 'package:chisto_mobile/core/theme/app_radii.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/home/domain/repositories/sites_repository.dart';
 import 'package:chisto_mobile/features/home/presentation/providers/site_upvoters_provider.dart';
-import 'package:chisto_mobile/shared/widgets/app_avatar.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_avatar.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_loading_indicator.dart';
+import 'package:chisto_mobile/shared/widgets/molecules/notification_row_highlight.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -14,16 +20,26 @@ class UpvotersSheetContent extends ConsumerStatefulWidget {
     super.key,
     required this.siteId,
     required this.scrollController,
+    this.highlightUserId,
   });
 
   final String siteId;
   final ScrollController scrollController;
+  final String? highlightUserId;
 
   @override
   ConsumerState<UpvotersSheetContent> createState() => _UpvotersSheetContentState();
 }
 
 class _UpvotersSheetContentState extends ConsumerState<UpvotersSheetContent> {
+  final Map<String, GlobalKey> _rowKeys = <String, GlobalKey>{};
+  String? _activeHighlightUserId;
+  Timer? _highlightTimer;
+  bool _highlightCompleted = false;
+
+  GlobalKey _rowKeyFor(String userId) =>
+      _rowKeys.putIfAbsent(userId, GlobalKey.new);
+
   @override
   void initState() {
     super.initState();
@@ -32,8 +48,41 @@ class _UpvotersSheetContentState extends ConsumerState<UpvotersSheetContent> {
 
   @override
   void dispose() {
+    _highlightTimer?.cancel();
     widget.scrollController.removeListener(_onScroll);
     super.dispose();
+  }
+
+  void _onUpvotersLoaded(SiteUpvotersState? previous, SiteUpvotersState next) {
+    if (next.initialLoading) return;
+    _tryHighlightUpvoter(next);
+  }
+
+  void _tryHighlightUpvoter(SiteUpvotersState data) {
+    if (_highlightCompleted) return;
+    final String? userId = widget.highlightUserId?.trim();
+    if (userId == null || userId.isEmpty) return;
+
+    final bool found =
+        data.items.any((SiteUpvoterItem item) => item.userId == userId);
+    if (!found) return;
+
+    scheduleNotificationRowHighlight(
+      targetId: userId,
+      rowKey: _rowKeyFor(userId),
+      delay: const Duration(milliseconds: 320),
+      onHighlight: () {
+        if (!mounted) return;
+        _highlightCompleted = true;
+        setState(() => _activeHighlightUserId = userId);
+        _highlightTimer?.cancel();
+        _highlightTimer = Timer(NotificationRowHighlight.highlightDuration, () {
+          if (mounted) {
+            setState(() => _activeHighlightUserId = null);
+          }
+        });
+      },
+    );
   }
 
   void _onScroll() {
@@ -56,6 +105,11 @@ class _UpvotersSheetContentState extends ConsumerState<UpvotersSheetContent> {
   Widget build(BuildContext context) {
     final SiteUpvotersState data =
         ref.watch(siteUpvotersNotifierProvider(widget.siteId));
+
+    ref.listen<SiteUpvotersState>(
+      siteUpvotersNotifierProvider(widget.siteId),
+      _onUpvotersLoaded,
+    );
 
     final String subtitle = data.initialLoading
         ? ''
@@ -82,7 +136,7 @@ class _UpvotersSheetContentState extends ConsumerState<UpvotersSheetContent> {
                   height: 5,
                   decoration: BoxDecoration(
                     color: AppColors.inputBorder,
-                    borderRadius: BorderRadius.circular(999),
+                    borderRadius: AppRadii.circle,
                   ),
                 ),
               ),
@@ -117,7 +171,7 @@ class _UpvotersSheetContentState extends ConsumerState<UpvotersSheetContent> {
 
   Widget _buildBody(BuildContext context, SiteUpvotersState data) {
     if (data.initialLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return Center(child: AppLoadingIndicator());
     }
     if (data.error != null && data.items.isEmpty) {
       return Center(
@@ -134,11 +188,11 @@ class _UpvotersSheetContentState extends ConsumerState<UpvotersSheetContent> {
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
-              TextButton(
+              AppButton.text(
+                label: context.l10n.siteUpvotersRetry,
                 onPressed: () => ref
                     .read(siteUpvotersNotifierProvider(widget.siteId).notifier)
                     .loadInitial(),
-                child: Text(context.l10n.siteUpvotersRetry),
               ),
             ],
           ),
@@ -176,20 +230,21 @@ class _UpvotersSheetContentState extends ConsumerState<UpvotersSheetContent> {
           const Divider(height: 1, color: AppColors.divider),
       itemBuilder: (BuildContext context, int index) {
         if (index >= data.items.length) {
-          return const Padding(
-            padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
             child: Center(
               child: SizedBox(
                 width: 22,
                 height: 22,
-                child: CircularProgressIndicator(strokeWidth: 2),
+                child: AppLoadingIndicator(size: AppLoadingIndicatorSize.sm),
               ),
             ),
           );
         }
         final SiteUpvoterItem item = data.items[index];
-        return ListTile(
-          key: ValueKey<String>(item.userId),
+        final bool highlighted =
+            _activeHighlightUserId != null && _activeHighlightUserId == item.userId;
+        final Widget row = ListTile(
           minLeadingWidth: 48,
           contentPadding: const EdgeInsets.symmetric(vertical: 2),
           leading: AppAvatar(
@@ -210,6 +265,13 @@ class _UpvotersSheetContentState extends ConsumerState<UpvotersSheetContent> {
             style: AppTypography.cardSubtitle.copyWith(
               color: AppColors.textMuted,
             ),
+          ),
+        );
+        return KeyedSubtree(
+          key: _rowKeyFor(item.userId),
+          child: NotificationRowHighlight(
+            highlighted: highlighted,
+            child: row,
           ),
         );
       },

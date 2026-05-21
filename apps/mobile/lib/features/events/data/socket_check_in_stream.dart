@@ -93,10 +93,23 @@ class SocketCheckInStream {
   int _connectErrorCount = 0;
   static const int _maxConnectErrors = 5;
 
-  final StreamController<CheckInStreamEvent> _controller =
-      StreamController<CheckInStreamEvent>.broadcast();
+  late final StreamController<CheckInStreamEvent> _controller =
+      StreamController<CheckInStreamEvent>.broadcast(
+    onListen: _replayCurrentStatus,
+  );
 
   Stream<CheckInStreamEvent> get stream => _controller.stream;
+
+  /// Re-emits the latest connection status when a new listener subscribes so
+  /// late subscribers (e.g. screen re-attaching after navigation) don't miss
+  /// the initial "connected" transition.
+  void _replayCurrentStatus() {
+    if (_controller.isClosed) return;
+    scheduleMicrotask(() {
+      if (_controller.isClosed) return;
+      _controller.add(CheckInConnectionChanged(_lastStatus));
+    });
+  }
 
   CheckInWsConnectionStatus _lastStatus =
       CheckInWsConnectionStatus.disconnected;

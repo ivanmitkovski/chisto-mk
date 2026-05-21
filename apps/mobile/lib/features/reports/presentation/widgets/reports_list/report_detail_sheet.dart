@@ -20,10 +20,10 @@ import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list
 import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/report_detail_sheet/report_detail_evidence_gallery.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/report_detail_sheet/report_detail_row.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/report_detail_sheet/report_detail_status_banner.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/utils/file_exists.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_loading_indicator.dart';
 
 class ReportDetailSheet extends StatefulWidget {
   const ReportDetailSheet({
@@ -104,7 +104,6 @@ class _ReportDetailSheetState extends State<ReportDetailSheet> {
   }
 
   void _showExternalMapsSheet() {
-    AppHaptics.light();
     if (report.latitude == null || report.longitude == null) return;
     unawaited(
       showReportViewLocationDirectionsSheet(
@@ -333,8 +332,8 @@ class _ReportDetailSheetState extends State<ReportDetailSheet> {
                         SizedBox(
                           width: AppSpacing.iconSm,
                           height: AppSpacing.iconSm,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
+                          child: AppLoadingIndicator(
+                            size: AppLoadingIndicatorSize.sm,
                             color: AppColors.primary,
                           ),
                         ),

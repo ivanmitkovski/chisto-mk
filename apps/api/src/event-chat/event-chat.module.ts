@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ModerationModule } from '../moderation/moderation.module';
+import { FeatureFlagsModule } from '../feature-flags/feature-flags.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { PrismaModule } from '../prisma/prisma.module';
 import { ReportsUploadModule } from '../reports/reports-upload.module';
@@ -16,6 +18,7 @@ import { EventChatMutationModerateService } from './event-chat-mutation-moderate
 import { EventChatMutationSendService } from './event-chat-mutation-send.service';
 import { EventChatMutationsService } from './event-chat-mutations.service';
 import { EventChatNotificationsService } from './event-chat-notifications.service';
+import { EventChatPushAggregatorService } from './event-chat-push-aggregator.service';
 import { EventChatPresenceMuteService } from './event-chat-presence-mute.service';
 import { EventChatPresenceReadStateService } from './event-chat-presence-read-state.service';
 import { EventChatPresenceRosterService } from './event-chat-presence-roster.service';
@@ -28,12 +31,20 @@ import { EventChatTelemetryService } from './event-chat-telemetry.service';
 import { EventChatThrottlerGuard } from './event-chat-throttler.guard';
 
 @Module({
-  imports: [ConfigModule, PrismaModule, NotificationsModule, ReportsUploadModule],
+  imports: [
+    ConfigModule,
+    PrismaModule,
+    ModerationModule,
+    FeatureFlagsModule,
+    NotificationsModule,
+    ReportsUploadModule,
+  ],
   controllers: [EventChatReadController, EventChatMessagesController],
   providers: [
     EventChatClusterConfig,
     EventChatTelemetryService,
     EventChatThrottlerGuard,
+    EventChatPushAggregatorService,
     EventChatNotificationsService,
     EventChatMessageDtoService,
     EventChatListService,

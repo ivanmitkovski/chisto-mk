@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
-import 'package:chisto_mobile/features/home/presentation/utils/site_image_hero_tag.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/site_card/site_card_header.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/site_card/site_card_menu.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_smart_image.dart';
-import 'package:chisto_mobile/shared/widgets/immersive_photo_gallery.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/app_smart_image.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/immersive_photo_gallery.dart';
 
 /// 16:9 gallery strip for a feed site card (page dots, status pill, overflow menu).
 class SiteCardImageCarousel extends StatefulWidget {
@@ -66,7 +64,6 @@ class _SiteCardImageCarouselState extends State<SiteCardImageCarousel> {
               controller: _pageController,
               itemCount: images.length,
               onPageChanged: (int index) {
-                AppHaptics.light();
                 setState(() => _currentIndex = index);
                 widget.onPageIndexChanged(index);
               },
@@ -80,12 +77,7 @@ class _SiteCardImageCarouselState extends State<SiteCardImageCarousel> {
                   ),
                   decodePreset: AppSmartImageDecodePreset.feed,
                 );
-                return SizedBox.expand(
-                  child: Hero(
-                    tag: siteImageHeroTag(widget.siteId, index),
-                    child: image,
-                  ),
-                );
+                return SizedBox.expand(child: image);
               },
             ),
             Positioned.fill(

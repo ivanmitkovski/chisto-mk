@@ -44,6 +44,17 @@ class AuthValidators {
     return null;
   }
 
+  static String? fullName(AppLocalizations l10n, String? value) {
+    final String? required = requiredField(l10n, value, l10n.authFieldFullName);
+    if (required != null) return required;
+    final List<String> parts =
+        value!.trim().split(RegExp(r'\s+')).where((String p) => p.isNotEmpty).toList();
+    if (parts.length < 2) {
+      return l10n.authValidationFullNameTwoParts;
+    }
+    return null;
+  }
+
   static String? macedonianPhone(AppLocalizations l10n, String? value) {
     final String digits = (value ?? '').replaceAll(RegExp(r'\D'), '');
     if (digits.isEmpty) {

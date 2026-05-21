@@ -7,8 +7,8 @@ import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
-import 'package:chisto_mobile/shared/widgets/app_error_view.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/molecules/app_error_view.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/presentation/screens/notifications_screen.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/feed_caught_up_footer.dart';
@@ -21,14 +21,15 @@ import 'package:chisto_mobile/features/home/presentation/widgets/feed_offline_ba
 import 'package:chisto_mobile/features/home/presentation/widgets/feed_section_header.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/feed_skeleton.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/feed_stale_banner.dart';
+import 'package:chisto_mobile/features/notifications/data/notification_inbox_refresh.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/core/providers/app_providers.dart';
+import 'package:chisto_mobile/core/providers/notifications_providers.dart';
 import 'package:chisto_mobile/features/home/presentation/providers/feed_providers.dart';
-import 'package:chisto_mobile/features/home/presentation/providers/repository_providers.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/pollution_site_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:chisto_mobile/features/profile/presentation/screens/profile_screen.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_refresh_indicator.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/app_refresh_indicator.dart';
 
 class PollutionFeedScreen extends ConsumerStatefulWidget {
   const PollutionFeedScreen({super.key, this.coachProfileAvatarKey});
@@ -51,7 +52,6 @@ class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
   static const double _scrollToTopTapMinWhenInsetTiny = 32.0;
   static const double _scrollToTopTapTinyInsetThreshold = 16.0;
 
-  int _serverUnreadCount = 0;
   final ScrollController _scrollController = ScrollController();
 
   AnimationController? _entranceController;
@@ -59,8 +59,6 @@ class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
   bool _hasShownEntrance = false;
   List<PollutionSite> _ensureSitesSeeded(WidgetRef ref) =>
       ref.read(feedSitesNotifierProvider).allSites;
-
-  int get _unreadNotificationsCount => _serverUnreadCount;
 
   @override
   void initState() {
@@ -79,6 +77,11 @@ class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
         unawaited(_loadFeed());
       }
     });
+  }
+
+  void _onNotificationsInboxRefreshTick() {
+    if (!mounted) return;
+    ref.read(notificationsInboxCoordinatorProvider).onInboxRefreshTick();
   }
 
   Future<void> _loadFeed() async {
@@ -120,7 +123,6 @@ class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
   }
 
   void _openProfile() {
-    AppHaptics.softTransition();
     Navigator.of(
       context,
       rootNavigator: true,
@@ -154,7 +156,6 @@ class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
 
   /// Shared by [AppRefreshIndicator], empty state retry, and any future triggers.
   Future<void> _performFeedRefresh() async {
-    AppHaptics.medium();
     final bool hadCachedSites = ref
         .read(feedSitesNotifierProvider)
         .allSites
@@ -176,7 +177,6 @@ class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
       );
     }
     if (!showedStaleSnack) {
-      AppHaptics.light(context);
     }
   }
 
@@ -190,7 +190,6 @@ class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
   }
 
   Future<void> _openNotifications() async {
-    AppHaptics.softTransition();
     final int? unreadAfter = await Navigator.of(context).push<int>(
       CupertinoPageRoute<int>(
         builder: (_) =>
@@ -198,31 +197,29 @@ class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
       ),
     );
     if (!mounted) return;
-    if (unreadAfter != null) {
-      setState(() {
-        _serverUnreadCount = unreadAfter;
-      });
+    final int resolvedUnread =
+        unreadAfter ?? ref.read(notificationsUnreadCountProvider);
+    publishNotificationsUnreadCount(resolvedUnread);
+    if (resolvedUnread > 0) {
+      unawaited(_refreshUnreadCount());
     }
-    unawaited(_refreshUnreadCount());
   }
 
   Future<void> _refreshUnreadCount() async {
-    try {
-      final int count = await ref
-          .read(notificationsRepositoryProvider)
-          .getUnreadCount();
-      if (!mounted) return;
-      setState(() {
-        _serverUnreadCount = count;
-      });
-    } catch (_) {
-      // Unread badge refresh is non-critical; avoid interruptive UI if it fails.
-      return;
-    }
+    if (!mounted) return;
+    await ref.read(notificationsInboxCoordinatorProvider).refreshUnreadBadge();
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<int>(notificationsInboxRefreshTickProvider, (
+      int? previous,
+      int next,
+    ) {
+      if (previous != next) {
+        _onNotificationsInboxRefreshTick();
+      }
+    });
     ref.listen<FeedFilter>(feedFilterProvider, (
       FeedFilter? previous,
       FeedFilter next,
@@ -269,7 +266,7 @@ class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
     final FeedFilter activeFilter = ref.watch(feedFilterProvider);
     final String feedSessionId = ref.watch(feedSessionIdProvider);
     final String displayName =
-        ref.watch(homeAuthStateProvider).displayName ??
+        ref.watch(authStateProvider).displayName ??
         context.l10n.feedDisplayNameFallback;
     final String feedVariant = ref.watch(
       feedSitesNotifierProvider.select((FeedSitesState s) => s.feedVariant),
@@ -315,7 +312,6 @@ class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
                     SliverToBoxAdapter(
                       child: FeedHeader(
                         displayName: displayName,
-                        unreadCount: _unreadNotificationsCount,
                         onProfileTap: _openProfile,
                         onNotificationTap: _openNotifications,
                         profileAvatarKey: widget.coachProfileAvatarKey,
@@ -349,7 +345,6 @@ class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
                           activeFilter: activeFilter,
                           locationAvailable: feedLocationAvailable,
                           onShowAllSites: () {
-                            AppHaptics.tap();
                             unawaited(
                               ref
                                   .read(feedFilterProvider.notifier)
@@ -358,7 +353,6 @@ class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
                             unawaited(scrollToTop());
                           },
                           onRefresh: () {
-                            AppHaptics.tap();
                             unawaited(_performFeedRefresh());
                           },
                         ),
@@ -462,7 +456,6 @@ class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
                   child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: () {
-                      AppHaptics.tap();
                       unawaited(scrollToTop());
                     },
                     child: ColoredBox(color: feedBackground),
@@ -476,7 +469,6 @@ class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
   }
 
   void _openFilterSheet(BuildContext context) {
-    AppHaptics.tap();
     showModalBottomSheet<void>(
       context: context,
       useRootNavigator: true,

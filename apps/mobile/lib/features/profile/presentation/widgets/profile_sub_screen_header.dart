@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
-import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_back_button.dart';
 
 /// Back + title + optional subtitle for profile sub-screens (not [ProfileScreen] gradient header).
 ///

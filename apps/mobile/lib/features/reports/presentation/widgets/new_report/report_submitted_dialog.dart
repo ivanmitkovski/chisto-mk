@@ -82,10 +82,10 @@ class _ReportSubmittedDialogState extends State<ReportSubmittedDialog>
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
+      AppHaptics.success(context);
       _entryController.forward().then((_) {
         if (!mounted) return;
         _checkController.forward();
-        AppHaptics.success(context);
         _pointsRevealDelay = Timer(AppMotion.fast, () {
           _pointsRevealDelay = null;
           if (mounted) _pointsController.forward();
@@ -238,14 +238,11 @@ class _ReportSubmittedDialogState extends State<ReportSubmittedDialog>
                       const SizedBox(height: AppSpacing.lg),
                       Text(
                         l10n.reportSubmittedTitle,
-                        style:
-                            (AppTypography.textTheme.titleLarge ??
-                                    const TextStyle())
-                                .copyWith(
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: -0.4,
-                                  height: 1.2,
-                                ),
+                        style: AppTypography.textTheme.titleLarge!.copyWith(
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.4,
+                          height: 1.2,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                       if (hasReportNumber) ...[
@@ -253,17 +250,14 @@ class _ReportSubmittedDialogState extends State<ReportSubmittedDialog>
                         Text(
                           l10n.reportSubmittedSavedAs(widget.reportNumber!),
                           textAlign: TextAlign.center,
-                          style:
-                              (AppTypography.textTheme.bodyMedium ??
-                                      const TextStyle())
-                                  .copyWith(
-                                    fontFeatures: const <FontFeature>[
-                                      FontFeature.tabularFigures(),
-                                    ],
-                                    color: AppColors.textSecondary,
-                                    fontWeight: FontWeight.w600,
-                                    height: 1.35,
-                                  ),
+                          style: AppTypography.textTheme.bodyMedium!.copyWith(
+                            fontFeatures: const <FontFeature>[
+                              FontFeature.tabularFigures(),
+                            ],
+                            color: AppColors.textSecondary,
+                            fontWeight: FontWeight.w600,
+                            height: 1.35,
+                          ),
                         ),
                       ],
                       const SizedBox(height: AppSpacing.md),
@@ -275,13 +269,10 @@ class _ReportSubmittedDialogState extends State<ReportSubmittedDialog>
                               )
                             : l10n.reportSubmittedBodyNoAddress(categoryLabel),
                         textAlign: TextAlign.center,
-                        style:
-                            (AppTypography.textTheme.bodyMedium ??
-                                    const TextStyle())
-                                .copyWith(
-                                  color: AppColors.textSecondary,
-                                  height: 1.5,
-                                ),
+                        style: AppTypography.textTheme.bodyMedium!.copyWith(
+                          color: AppColors.textSecondary,
+                          height: 1.5,
+                        ),
                       ),
                       if (widget.isNewSite) ...[
                         const SizedBox(height: AppSpacing.sm),
@@ -399,7 +390,6 @@ class _ReportSubmittedDialogState extends State<ReportSubmittedDialog>
                           label: l10n.reportSubmittedViewThisReport,
                           primary: true,
                           onPressed: () {
-                            AppHaptics.light();
                             Navigator.of(context).pop(widget.reportId);
                           },
                         ),
@@ -409,7 +399,6 @@ class _ReportSubmittedDialogState extends State<ReportSubmittedDialog>
                           primary: false,
                           outlined: true,
                           onPressed: () {
-                            AppHaptics.light();
                             Navigator.of(
                               context,
                             ).pop(SubmittedDialogResult.viewReports);
@@ -420,7 +409,6 @@ class _ReportSubmittedDialogState extends State<ReportSubmittedDialog>
                           label: l10n.reportSubmittedViewInMyReports,
                           primary: true,
                           onPressed: () {
-                            AppHaptics.light();
                             Navigator.of(
                               context,
                             ).pop(SubmittedDialogResult.viewReports);
@@ -431,7 +419,6 @@ class _ReportSubmittedDialogState extends State<ReportSubmittedDialog>
                         label: l10n.reportSubmittedReportAnother,
                         primary: false,
                         onPressed: () {
-                          AppHaptics.light();
                           Navigator.of(
                             context,
                           ).pop(SubmittedDialogResult.reportAnother);
@@ -446,7 +433,6 @@ class _ReportSubmittedDialogState extends State<ReportSubmittedDialog>
                       icon: Icons.close_rounded,
                       semanticLabel: l10n.semanticsClose,
                       onTap: () {
-                        AppHaptics.tap();
                         Navigator.of(
                           context,
                         ).pop(SubmittedDialogResult.viewReports);

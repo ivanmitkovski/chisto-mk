@@ -1,3 +1,4 @@
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -7,9 +8,8 @@ import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/event_site_maps.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_snack.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
 
 /// Bottom sheet: full site name / address, copy, optional maps.
 Future<void> showEventLocationDetailSheet(
@@ -45,7 +45,6 @@ Future<void> showEventLocationDetailSheet(
               PrimaryButton(
                 label: sheetCtx.l10n.eventsDetailCopyAddress,
                 onPressed: () {
-                  AppHaptics.tap();
                   Clipboard.setData(ClipboardData(text: event.siteName));
                   Navigator.of(sheetCtx).pop();
                   AppSnack.show(
@@ -57,33 +56,17 @@ Future<void> showEventLocationDetailSheet(
               ),
               if (hasCoords) ...<Widget>[
                 const SizedBox(height: AppSpacing.sm),
-                SizedBox(
-                  width: double.infinity,
-                  height: 54,
-                  child: OutlinedButton(
-                    onPressed: () async {
-                      AppHaptics.softTransition();
-                      Navigator.of(sheetCtx).pop();
-                      await showEventSiteMapsSheet(
-                        context,
-                        lat: event.siteLat!,
-                        lng: event.siteLng!,
-                      );
-                    },
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: AppColors.divider),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-                      ),
-                    ),
-                    child: Text(
-                      sheetCtx.l10n.eventsDetailOpenInMaps,
-                      style: Theme.of(sheetCtx).textTheme.titleMedium?.copyWith(
-                            color: AppColors.textSecondary,
-                            fontWeight: FontWeight.w600,
-                          ),
-                    ),
-                  ),
+                AppButton.outlined(
+                  label: sheetCtx.l10n.eventsDetailOpenInMaps,
+                  onPressed: () async {
+                    Navigator.of(sheetCtx).pop();
+                    await showEventSiteMapsSheet(
+                      context,
+                      lat: event.siteLat!,
+                      lng: event.siteLng!,
+                    );
+                  },
+                  expand: true,
                 ),
               ],
             ],

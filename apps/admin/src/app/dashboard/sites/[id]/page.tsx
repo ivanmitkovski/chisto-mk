@@ -5,7 +5,7 @@ import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell/constants';
 import { SectionState } from '@/components/ui';
 import { ApiError } from '@/lib/api';
 import { getSiteDetail } from '@/features/sites/data/sites-adapter';
-import { SiteStatusForm } from '@/app/dashboard/sites/[id]/site-status-form';
+import { SiteDetailClient } from '@/app/dashboard/sites/[id]/site-detail-client';
 
 type PageProps = { params: Promise<{ id: string }> };
 
@@ -46,7 +46,7 @@ export default async function SiteDetailPage(props: PageProps) {
 
   return (
     <AdminShell title="Site detail" activeItem="sites" initialSidebarCollapsed={initialSidebarCollapsed}>
-      <SiteStatusForm
+      <SiteDetailClient
         siteId={s.id}
         initialStatus={s.status}
         initialArchivedByAdmin={Boolean(s.isArchivedByAdmin)}

@@ -1,7 +1,9 @@
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
+import 'package:chisto_mobile/core/theme/app_radii.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 
 class ReportStepChips extends StatelessWidget {
@@ -75,13 +77,10 @@ class ReportStepChips extends StatelessWidget {
                     : l10n.reportFlowStepStatusInProgress,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
+                style: AppTypography.microLabel.copyWith(
                   color: isComplete
                       ? AppColors.primaryDark
                       : AppColors.textSecondary,
-                  letterSpacing: -0.1,
                 ),
               ),
             ),
@@ -120,7 +119,7 @@ class ReportStepChips extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.sm),
         ClipRRect(
-          borderRadius: BorderRadius.circular(999),
+          borderRadius: AppRadii.circle,
           child: LinearProgressIndicator(
             value: completedCount / 3,
             minHeight: 4,
@@ -178,7 +177,7 @@ class _StepChip extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: AppRadii.circle,
         border: Border.all(
           color: isDone
               ? AppColors.primary.withValues(alpha: 0.4)
@@ -209,12 +208,7 @@ class _StepChip extends StatelessWidget {
                     )
                   : Text(
                       '$index',
-                      style: TextStyle(
-                        fontSize: 9,
-                        fontWeight: FontWeight.w600,
-                        color: fg,
-                        letterSpacing: -0.1,
-                      ),
+                      style: AppTypography.microIndex.copyWith(color: fg),
                     ),
             ),
           ),
@@ -223,12 +217,7 @@ class _StepChip extends StatelessWidget {
             child: Text(
               label,
               maxLines: 1,
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: fg,
-                letterSpacing: -0.1,
-              ),
+              style: AppTypography.microLabel.copyWith(color: fg),
               overflow: TextOverflow.ellipsis,
             ),
           ),

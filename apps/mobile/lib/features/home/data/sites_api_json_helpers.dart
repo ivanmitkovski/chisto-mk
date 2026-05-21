@@ -128,6 +128,50 @@ List<dynamic> sitesApiReportMediaUrlsList(Map<String, dynamic> r) {
   return <dynamic>[];
 }
 
+DateTime? sitesApiReportCreatedAt(Map<String, dynamic> report) {
+  final Object? raw = report['createdAt'] ?? report['created_at'];
+  if (raw is String && raw.isNotEmpty) {
+    return DateTime.tryParse(raw);
+  }
+  return null;
+}
+
+/// Chronologically first report on a site (minimum `createdAt`).
+Map<String, dynamic> sitesApiEarliestReport(
+  List<Map<String, dynamic>> reports,
+) {
+  assert(reports.isNotEmpty);
+  Map<String, dynamic> earliest = reports.first;
+  DateTime earliestAt = sitesApiReportCreatedAt(earliest) ?? DateTime.now();
+  for (int i = 1; i < reports.length; i++) {
+    final Map<String, dynamic> candidate = reports[i];
+    final DateTime candidateAt =
+        sitesApiReportCreatedAt(candidate) ?? DateTime.now();
+    if (candidateAt.isBefore(earliestAt)) {
+      earliest = candidate;
+      earliestAt = candidateAt;
+    }
+  }
+  return earliest;
+}
+
+/// Most recent report on a site (maximum `createdAt`).
+Map<String, dynamic> sitesApiLatestReport(List<Map<String, dynamic>> reports) {
+  assert(reports.isNotEmpty);
+  Map<String, dynamic> latest = reports.first;
+  DateTime latestAt = sitesApiReportCreatedAt(latest) ?? DateTime(0);
+  for (int i = 1; i < reports.length; i++) {
+    final Map<String, dynamic> candidate = reports[i];
+    final DateTime candidateAt =
+        sitesApiReportCreatedAt(candidate) ?? DateTime(0);
+    if (candidateAt.isAfter(latestAt)) {
+      latest = candidate;
+      latestAt = candidateAt;
+    }
+  }
+  return latest;
+}
+
 String? sitesApiCoReporterRowUserId(Map<String, dynamic> co) {
   final Object? v = co['userId'] ?? co['user_id'];
   if (v is String) {

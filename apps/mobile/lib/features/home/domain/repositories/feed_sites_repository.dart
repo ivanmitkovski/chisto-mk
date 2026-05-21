@@ -6,6 +6,14 @@ abstract class FeedSitesRepository {
   static const String mapDetailFull = 'full';
   static const String mapDetailLite = 'lite';
 
+  /// Paginated sites the current user has saved (`GET /sites/saved`).
+  Future<SitesListResult> getSavedSites({
+    int page = 1,
+    int limit = 24,
+    double? latitude,
+    double? longitude,
+  });
+
   Future<SitesListResult> getSites({
     double? latitude,
     double? longitude,

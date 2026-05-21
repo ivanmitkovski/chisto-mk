@@ -33,6 +33,19 @@ void main() {
     expect(err.serverTimestamp, isNull);
   });
 
+  test('404 preserves API error code such as SITE_NOT_FOUND', () {
+    final AppError err = appErrorFromFailedResponse(
+      statusCode: 404,
+      json: <String, dynamic>{
+        'code': 'SITE_NOT_FOUND',
+        'message': 'Site missing',
+      },
+      bodyStr: null,
+      retryAfterHeader: null,
+    );
+    expect(err.code, 'SITE_NOT_FOUND');
+  });
+
   test('422 maps to AppError.validation with stable VALIDATION_ERROR code', () {
     final AppError err = appErrorFromFailedResponse(
       statusCode: 422,

@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
 
 const String _prefDarkTiles = 'map_use_dark_tiles';
 const String _prefHeatmap = 'map_show_heatmap';
@@ -36,7 +36,7 @@ final mapUiModeNotifierProvider =
 class MapUiModeNotifier extends Notifier<MapUiModeState> {
   @override
   MapUiModeState build() {
-    final prefs = ServiceLocator.instance.preferences;
+    final prefs = AppBootstrap.instance.preferences;
     return MapUiModeState(
       useDarkTiles: prefs.getBool(_prefDarkTiles) ?? false,
       showHeatmap: prefs.getBool(_prefHeatmap) ?? false,
@@ -47,23 +47,23 @@ class MapUiModeNotifier extends Notifier<MapUiModeState> {
   Future<void> toggleDarkTiles() async {
     final bool next = !state.useDarkTiles;
     state = state.copyWith(useDarkTiles: next);
-    await ServiceLocator.instance.preferences.setBool(_prefDarkTiles, next);
+    await AppBootstrap.instance.preferences.setBool(_prefDarkTiles, next);
   }
 
   Future<void> toggleHeatmap() async {
     final bool next = !state.showHeatmap;
     state = state.copyWith(showHeatmap: next);
-    await ServiceLocator.instance.preferences.setBool(_prefHeatmap, next);
+    await AppBootstrap.instance.preferences.setBool(_prefHeatmap, next);
   }
 
   Future<void> toggleRotationLock() async {
     final bool next = !state.rotationLocked;
     state = state.copyWith(rotationLocked: next);
-    await ServiceLocator.instance.preferences.setBool(_prefRotationLock, next);
+    await AppBootstrap.instance.preferences.setBool(_prefRotationLock, next);
   }
 
   Future<void> setRotationLocked(bool locked) async {
     state = state.copyWith(rotationLocked: locked);
-    await ServiceLocator.instance.preferences.setBool(_prefRotationLock, locked);
+    await AppBootstrap.instance.preferences.setBool(_prefRotationLock, locked);
   }
 }

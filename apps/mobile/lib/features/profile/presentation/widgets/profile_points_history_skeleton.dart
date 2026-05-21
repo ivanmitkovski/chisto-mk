@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
+import 'package:chisto_mobile/core/theme/app_shadows.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/profile/presentation/widgets/profile_scroll_bottom_shadow_clipper.dart';
 import 'package:chisto_mobile/features/profile/presentation/widgets/profile_sub_screen_header.dart';
-import 'package:chisto_mobile/shared/widgets/no_overscroll_overlay_scroll_behavior.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/no_overscroll_overlay_scroll_behavior.dart';
 
 /// Shimmer layout matching [ProfilePointsHistoryScreen] while history loads.
 class ProfilePointsHistorySkeleton extends StatefulWidget {
@@ -166,13 +167,7 @@ class _PointsHistorySummarySkeleton extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.panelBackground,
         borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: AppColors.shadowMedium,
-            blurRadius: 14,
-            offset: const Offset(0, 6),
-          ),
-        ],
+        boxShadow: AppShadows.panel(Theme.of(context).colorScheme),
         border: Border.all(
           color: AppColors.divider.withValues(alpha: 0.9),
         ),
@@ -243,13 +238,7 @@ class _ActivityRowSkeleton extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.panelBackground,
         borderRadius: BorderRadius.circular(AppSpacing.radius18),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: AppColors.shadowLight,
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: AppShadows.panel(Theme.of(context).colorScheme),
         border: Border.all(
           color: AppColors.divider.withValues(alpha: 0.9),
         ),

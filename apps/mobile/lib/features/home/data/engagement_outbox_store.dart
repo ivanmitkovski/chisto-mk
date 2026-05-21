@@ -134,6 +134,12 @@ class EngagementOutboxStore {
         );
       });
 
+  /// Wipes all pending engagement intents. Used on logout / account switch.
+  Future<void> clearAll() => _serialized(() async {
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.remove(_prefKey);
+      });
+
   Future<void> removeById(String id) => _serialized(() async {
         if (id.isEmpty) return;
         final SharedPreferences prefs = await SharedPreferences.getInstance();

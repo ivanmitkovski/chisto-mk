@@ -21,16 +21,14 @@ import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/n
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/new_report_stage_shell.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_upload_prep_progress.dart';
 import 'package:chisto_mobile/features/reports/presentation/theme/report_tokens.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:provider/provider.dart';
-
 /// Wizard body for [NewReportScreen]; keeps [BuildContext] usage to side-effects only.
 class NewReportWizardView extends StatelessWidget {
   const NewReportWizardView({
     super.key,
+    required this.controller,
     required this.entryLabel,
     required this.entryHint,
     required this.hasInitialPhoto,
@@ -65,6 +63,7 @@ class NewReportWizardView extends StatelessWidget {
   final VoidCallback onScheduleDraftSave;
   final ValueListenable<ReportUploadPrepProgress?> uploadPrepListenable;
   final bool showDraftRestoredChip;
+  final NewReportController controller;
 
   Future<void> _openStageHelp(
     BuildContext context,
@@ -82,8 +81,10 @@ class NewReportWizardView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<NewReportController>(
-      builder: (BuildContext context, NewReportController c, _) {
+    return ListenableBuilder(
+      listenable: controller,
+      builder: (BuildContext context, Widget? _) {
+        final NewReportController c = controller;
         final String? evidenceHelpExtra =
             entryHint ??
             (hasInitialPhoto ? context.l10n.reportEntryHintCamera : null);
@@ -119,7 +120,6 @@ class NewReportWizardView extends StatelessWidget {
               reportFlowPrefsLoaded: c.reportFlowPrefsLoaded,
               hasSeenReportHelpHint: c.hasSeenReportHelpHint,
               onDismissFlowHelpHint: () async {
-                AppHaptics.light();
                 await c.markSeenReportHelp();
                 onScheduleDraftSave();
               },
@@ -149,7 +149,6 @@ class NewReportWizardView extends StatelessWidget {
                   evidenceTipDismissed: c.evidenceTipDismissed,
                   attemptedStages: c.attemptedStages,
                   onDismissTip: () {
-                    AppHaptics.light();
                     c.setEvidenceTipDismissed(true);
                     onScheduleDraftSave();
                   },
@@ -202,7 +201,6 @@ class NewReportWizardView extends StatelessWidget {
                     onScheduleDraftSave();
                   },
                   onCleanupEffort: (CleanupEffort effort) {
-                    AppHaptics.light();
                     c.setCleanupEffort(effort);
                     onScheduleDraftSave();
                   },

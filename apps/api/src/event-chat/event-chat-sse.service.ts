@@ -35,6 +35,10 @@ type ChatRoom = {
   seenStreamIds: Set<string>;
 };
 
+/**
+ * In-process chat realtime bus (replay buffer + Redis fan-out).
+ * Clients consume updates via Socket.IO `/chat`; this is not an HTTP SSE transport.
+ */
 @Injectable()
 export class EventChatSseService implements OnModuleDestroy {
   private static readonly REPLAY_LIMIT = 20;

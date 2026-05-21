@@ -28,6 +28,12 @@ class EventsFeedController extends ChangeNotifier {
     remoteSearch = EventsSearchController(
       runSearchParams: (EcoEventSearchParams next) => setSearchParams(next),
     );
+    remoteSearch.addListener(_onRemoteSearchPhaseChanged);
+  }
+
+  void _onRemoteSearchPhaseChanged() {
+    if (_disposed) return;
+    notifyListeners();
   }
 
   final EventsRepository _repository;
@@ -102,6 +108,7 @@ class EventsFeedController extends ChangeNotifier {
     required double latitude,
     required double longitude,
   }) {
+    if (_disposed) return;
     if (_userLatitude == latitude && _userLongitude == longitude) {
       return;
     }
@@ -109,6 +116,12 @@ class EventsFeedController extends ChangeNotifier {
     _userLongitude = longitude;
     _invalidateDerived();
     notifyListeners();
+  }
+
+  @override
+  void notifyListeners() {
+    if (_disposed) return;
+    super.notifyListeners();
   }
 
   /// Unapproved events are organizer-only; keeps hero/sections safe if bad data slips in.
@@ -156,7 +169,29 @@ class EventsFeedController extends ChangeNotifier {
     }
   }
 
+  Future<void>? _initialLoadFuture;
+
   Future<void> loadInitial({required String initialListEmptyErrorMessage}) async {
+    final Future<void>? inFlight = _initialLoadFuture;
+    if (inFlight != null) {
+      return inFlight;
+    }
+    final Future<void> work = _runInitialLoad(
+      initialListEmptyErrorMessage: initialListEmptyErrorMessage,
+    );
+    _initialLoadFuture = work;
+    try {
+      await work;
+    } finally {
+      if (identical(_initialLoadFuture, work)) {
+        _initialLoadFuture = null;
+      }
+    }
+  }
+
+  Future<void> _runInitialLoad({
+    required String initialListEmptyErrorMessage,
+  }) async {
     void emitIfAlive() {
       if (_disposed) {
         return;
@@ -185,14 +220,8 @@ class EventsFeedController extends ChangeNotifier {
         _initialLoadError = AppError.network(
           message: initialListEmptyErrorMessage,
         );
-        _isInitialLoading = false;
-        _invalidateDerived();
-        emitIfAlive();
         return;
       }
-      _isInitialLoading = false;
-      _invalidateDerived();
-      emitIfAlive();
 
       final EcoEventSearchParams mergedForList =
           EventsFeedSearchMerge.mergedForChip(_activeSearchParams, _activeFilter);
@@ -209,13 +238,15 @@ class EventsFeedController extends ChangeNotifier {
         }
       }
     } on Object catch (e) {
-      if (_disposed) {
-        return;
+      if (!_disposed) {
+        _initialLoadError = AppError.network(cause: e);
       }
-      _initialLoadError = AppError.network(cause: e);
-      _isInitialLoading = false;
-      _invalidateDerived();
-      emitIfAlive();
+    } finally {
+      if (!_disposed && _isInitialLoading) {
+        _isInitialLoading = false;
+        _invalidateDerived();
+        emitIfAlive();
+      }
     }
   }
 
@@ -412,6 +443,18 @@ class EventsFeedController extends ChangeNotifier {
 
   List<EcoEvent> _computeFiltered(AppLocalizations _) {
     List<EcoEvent> list = _applyDiscoverySort(List<EcoEvent>.from(events));
+    final String query = _searchQuery.trim().toLowerCase();
+    if (query.isNotEmpty) {
+      list = list
+          .where(
+            (EcoEvent e) =>
+                e.title.toLowerCase().contains(query) ||
+                e.description.toLowerCase().contains(query) ||
+                e.siteName.toLowerCase().contains(query) ||
+                e.organizerName.toLowerCase().contains(query),
+          )
+          .toList();
+    }
     switch (_activeFilter) {
       case EcoEventFilter.all:
       case EcoEventFilter.upcoming:
@@ -459,6 +502,8 @@ class EventsFeedController extends ChangeNotifier {
   @override
   void dispose() {
     _disposed = true;
+    remoteSearch.removeListener(_onRemoteSearchPhaseChanged);
+    remoteSearch.cancel();
     remoteSearch.dispose();
     _repository.removeListener(_onRepositoryUpdate);
     searchController.dispose();

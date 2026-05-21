@@ -5,8 +5,8 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/home/domain/models/site_report.dart';
 import 'package:chisto_mobile/features/home/presentation/utils/site_image_resolver.dart';
-import 'package:chisto_mobile/shared/widgets/app_avatar.dart';
-import 'package:chisto_mobile/shared/widgets/immersive_photo_gallery.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_avatar.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/immersive_photo_gallery.dart';
 
 class FirstReportModal extends StatelessWidget {
   const FirstReportModal({

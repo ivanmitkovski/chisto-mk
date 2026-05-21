@@ -1,3 +1,4 @@
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -16,11 +17,12 @@ import 'package:chisto_mobile/features/profile/presentation/widgets/profile_poin
 import 'package:chisto_mobile/features/profile/presentation/widgets/profile_scroll_bottom_shadow_clipper.dart';
 import 'package:chisto_mobile/features/profile/presentation/widgets/profile_sub_screen_header.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/widgets/animated_phase_switcher.dart';
-import 'package:chisto_mobile/shared/widgets/app_error_view.dart';
-import 'package:chisto_mobile/shared/widgets/app_refresh_indicator.dart';
-import 'package:chisto_mobile/shared/widgets/no_overscroll_overlay_scroll_behavior.dart';
+import 'package:chisto_mobile/shared/widgets/molecules/animated_phase_switcher.dart';
+import 'package:chisto_mobile/shared/widgets/molecules/app_error_view.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/app_refresh_indicator.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/no_overscroll_overlay_scroll_behavior.dart';
 import 'package:intl/intl.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_loading_indicator.dart';
 
 sealed class _HistoryListEntry {
   const _HistoryListEntry();
@@ -304,7 +306,9 @@ class _ProfilePointsHistoryScreenState
                                       ),
                                 ),
                               ),
-                              TextButton(
+                              AppButton.text(
+                                label: context.l10n
+                                    .profilePointsHistoryLoadMoreRetry,
                                 onPressed: () {
                                   ref
                                       .read(
@@ -312,10 +316,6 @@ class _ProfilePointsHistoryScreenState
                                       )
                                       .loadMore();
                                 },
-                                child: Text(
-                                  context.l10n
-                                      .profilePointsHistoryLoadMoreRetry,
-                                ),
                               ),
                             ],
                           ),
@@ -324,14 +324,14 @@ class _ProfilePointsHistoryScreenState
                     ),
                   );
                 }
-                return const Padding(
-                  padding: EdgeInsets.all(AppSpacing.lg),
+                return Padding(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
                   child: Center(
                     child: SizedBox(
                       width: 24,
                       height: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
+                      child: AppLoadingIndicator(
+                        size: AppLoadingIndicatorSize.sm,
                         color: AppColors.primaryDark,
                       ),
                     ),

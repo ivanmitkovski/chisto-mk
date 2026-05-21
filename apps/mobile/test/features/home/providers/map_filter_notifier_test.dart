@@ -32,14 +32,7 @@ void main() {
     final MapFilterState state = container.read(mapFilterNotifierProvider);
     expect(
       state.activeStatuses,
-      equals(<String>{
-        mapStatusReported,
-        mapStatusVerified,
-        mapStatusCleanupScheduled,
-        mapStatusInProgress,
-        mapStatusCleaned,
-        mapStatusDisputed,
-      }),
+      equals(mapStatusOrder.toSet()),
     );
     expect(state.activePollutionTypes, equals(reportPollutionTypeCodes.toSet()));
     expect(state.geoAreaId, isNull);

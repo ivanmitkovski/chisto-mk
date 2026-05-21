@@ -16,7 +16,6 @@ import 'package:chisto_mobile/features/events/presentation/utils/events_localize
 import 'package:chisto_mobile/features/events/presentation/utils/event_site_maps.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_grouped_metadata_row.dart';
 import 'package:chisto_mobile/features/home/presentation/screens/pollution_site_detail_screen.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 class LocationChip extends StatelessWidget {
   const LocationChip({
@@ -32,7 +31,6 @@ class LocationChip extends StatelessWidget {
 
   /// Opens the pollution site detail for [event] (same as tapping the location row).
   static void openSiteDetail(BuildContext context, EcoEvent event) {
-    AppHaptics.softTransition();
     final PollutionSite site = EventSiteResolver.resolveSiteForEvent(
       event,
       statusLabel: event.status.localizedLabel(context.l10n),
@@ -52,7 +50,6 @@ class LocationChip extends StatelessWidget {
     if (lat == null || lng == null) {
       return;
     }
-    AppHaptics.tap();
     await showEventSiteMapsSheet(context, lat: lat, lng: lng);
   }
 
@@ -78,7 +75,6 @@ class LocationChip extends StatelessWidget {
                 child: InkWell(
                   onTap: () => openSiteDetail(context, event),
                   onLongPress: () {
-                    AppHaptics.light();
                     unawaited(
                       showEventLocationDetailSheet(context, event: event),
                     );

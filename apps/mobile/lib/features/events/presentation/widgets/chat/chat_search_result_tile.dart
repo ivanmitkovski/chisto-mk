@@ -5,7 +5,7 @@ import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_message.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_theme.dart';
-import 'package:chisto_mobile/shared/widgets/user_avatar_circle.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/user_avatar_circle.dart';
 
 class ChatSearchResultTile extends StatelessWidget {
   const ChatSearchResultTile({
@@ -118,10 +118,7 @@ class _HighlightedBody extends StatelessWidget {
       spans.add(
         TextSpan(
           text: body.substring(m.start, m.end),
-          style: TextStyle(
-            fontWeight: FontWeight.w700,
-            color: AppColors.primary,
-          ),
+          style: AppTypography.chipLabel.copyWith(color: AppColors.primary),
         ),
       );
       start = m.end;

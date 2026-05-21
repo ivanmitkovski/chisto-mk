@@ -4,7 +4,7 @@ import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/eco_event_card.dart';
-import 'package:chisto_mobile/shared/widgets/animated_list_item.dart';
+import 'package:chisto_mobile/shared/widgets/molecules/animated_list_item.dart';
 
 class SectionHeader extends StatelessWidget {
   const SectionHeader({super.key, required this.title});

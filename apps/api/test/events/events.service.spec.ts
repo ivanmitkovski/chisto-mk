@@ -263,12 +263,17 @@ describe('EventsService', () => {
       eventsRepository,
       scheduleConflict as never,
     );
+    const siteLifecycleFromEvents = {
+      onEventLinkedToSite: jest.fn().mockResolvedValue(undefined),
+      onEventLifecycleChanged: jest.fn().mockResolvedValue(undefined),
+    };
     const creationPersistence = new EventCreationPersistenceService(
       eventsRepository,
       mobileMapper,
       cleanupEventsSse as never,
       cleanupEventNotifications as never,
       routeSegments as never,
+      siteLifecycleFromEvents as never,
     );
     const creation = new EventsCreationService(creationValidation, creationPersistence);
     const patchValidation = new EventUpdateValidationService(scheduleConflict as never);
@@ -286,6 +291,7 @@ describe('EventsService', () => {
       mobileMapper,
       ecoEventPoints as never,
       notificationDispatcher as never,
+      siteLifecycleFromEvents as never,
     );
     const participation = new EventsParticipationService(
       eventsRepository,

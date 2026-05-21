@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:integration_test/integration_test.dart';
 
+import 'integration_api_env.dart';
+
 /// Optional smoke: `GET /events/:eventId/chat/unread-count` with a bearer token.
 ///
 /// ```sh
@@ -15,11 +17,11 @@ import 'package:integration_test/integration_test.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  const String apiUrl = String.fromEnvironment('API_URL', defaultValue: '');
   const String accessToken =
       String.fromEnvironment('INTEGRATION_TEST_ACCESS_TOKEN', defaultValue: '');
   const String eventId = String.fromEnvironment('INTEGRATION_TEST_EVENT_ID', defaultValue: '');
 
+  final String apiUrl = integrationApiBaseUrl();
   final bool configured =
       apiUrl.isNotEmpty && accessToken.isNotEmpty && eventId.isNotEmpty;
 

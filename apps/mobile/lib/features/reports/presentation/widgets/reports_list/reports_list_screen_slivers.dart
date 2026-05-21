@@ -10,9 +10,10 @@ import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list
 import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/reports_list_screen_header.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/reports_list_widgets.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/widgets/animated_list_item.dart';
-import 'package:chisto_mobile/shared/widgets/app_error_view.dart';
+import 'package:chisto_mobile/shared/widgets/molecules/animated_list_item.dart';
+import 'package:chisto_mobile/shared/widgets/molecules/app_error_view.dart';
 import 'package:flutter/material.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_loading_indicator.dart';
 
 /// Body for [ReportsListScreen]: one [CustomScrollView] like [PollutionFeedScreen] —
 /// realtime banner, stats/search/filters, and list share the same scroll physics.
@@ -116,14 +117,14 @@ class ReportsListScreenSlivers extends StatelessWidget {
           ),
         ),
       if (controller.isAppending)
-        const SliverToBoxAdapter(
+        SliverToBoxAdapter(
           child: Padding(
-            padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
             child: Center(
               child: SizedBox(
                 width: 24,
                 height: 24,
-                child: CircularProgressIndicator(strokeWidth: 2),
+                child: AppLoadingIndicator(size: AppLoadingIndicatorSize.sm),
               ),
             ),
           ),

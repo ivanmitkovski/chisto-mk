@@ -29,6 +29,7 @@ import { ADMIN_PANEL_ROLES } from './admin-roles';
 import { AuthProfileService } from './auth-profile.service';
 import { CurrentUser } from './current-user.decorator';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { UpdateHomeLocationDto } from './dto/update-home-location.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { Roles } from './roles.decorator';
 import { RolesGuard } from './roles.guard';
@@ -92,6 +93,25 @@ export class AuthProfileController {
     }
 
     return this.profile.me(user, localeFromAcceptLanguage(acceptLanguage));
+  }
+
+  @Patch('me/home-location')
+  @UseGuards(JwtAuthGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Save citizen home map location (post-registration onboarding)' })
+  @ApiOkResponse({ description: 'Home location saved' })
+  updateHomeLocation(
+    @CurrentUser() user: AuthenticatedUser | undefined,
+    @Body() dto: UpdateHomeLocationDto,
+  ) {
+    if (!user) {
+      throw new UnauthorizedException({
+        code: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+    return this.profile.updateHomeLocation(user.userId, dto);
   }
 
   @Patch('me')

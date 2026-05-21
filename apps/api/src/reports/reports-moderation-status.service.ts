@@ -13,6 +13,7 @@ import { transitionSiteToVerifiedIfFirstApproved } from './report-site-verificat
 import { ReportSideEffectProcessorService } from './side-effects/report-side-effect-processor.service';
 import type { ModerationStatusSideEffectPayload } from './side-effects/report-side-effect-processor.service';
 import { ALLOWED_REPORT_STATUS_TRANSITIONS } from './reports-moderation-transitions';
+import { SiteHistoryWriterService } from '../sites/history/site-history-writer.service';
 
 @Injectable()
 export class ReportsModerationStatusService {
@@ -20,6 +21,7 @@ export class ReportsModerationStatusService {
     private readonly prisma: PrismaService,
     private readonly reportApprovalPoints: ReportApprovalPointsService,
     private readonly reportSideEffectProcessor: ReportSideEffectProcessorService,
+    private readonly siteHistoryWriter: SiteHistoryWriterService,
   ) {}
 
   async updateStatus(
@@ -118,6 +120,47 @@ export class ReportsModerationStatusService {
         }
       }
 
+      const moderatorActor = {
+        userId: moderator.userId,
+        role: moderator.role,
+      };
+      if (dto.status === 'APPROVED') {
+        await this.siteHistoryWriter.recordReportApproved(
+          {
+            siteId: updatedReport.siteId,
+            reportId,
+            occurredAt: now,
+            actor: moderatorActor,
+          },
+          tx,
+        );
+      } else if (dto.status === 'DELETED') {
+        await this.siteHistoryWriter.recordReportRejected(
+          {
+            siteId: updatedReport.siteId,
+            reportId,
+            occurredAt: now,
+            actor: moderatorActor,
+            ...(dto.reason ? { metadata: { reason: dto.reason } } : {}),
+          },
+          tx,
+        );
+      }
+      if (siteStatusEvent != null) {
+        await this.siteHistoryWriter.recordStatusChanged(
+          {
+            siteId: siteStatusEvent.id,
+            fromStatus: SiteStatus.REPORTED,
+            toStatus: siteStatusEvent.status,
+            occurredAt: siteStatusEvent.updatedAt,
+            reportId,
+            actor: moderatorActor,
+            metadata: { trigger: 'REPORT_APPROVED' },
+          },
+          tx,
+        );
+      }
+
       const coReporterUserIds = report.coReporters.map((c) => c.userId);
       const moderationPayload: ModerationStatusSideEffectPayload = {
         moderatorUserId: moderator.userId,
@@ -152,6 +195,7 @@ export class ReportsModerationStatusService {
     });
     const updated = updatedResult.updatedReport;
     await this.reportSideEffectProcessor.processModerationStatusPost(updatedResult.effectId);
+    this.siteHistoryWriter.emitHistoryAppended(updated.siteId, updated.id);
     return updated;
   }
 }

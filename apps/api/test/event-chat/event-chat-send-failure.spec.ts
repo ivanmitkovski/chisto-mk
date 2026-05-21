@@ -7,6 +7,8 @@ import { EventChatMutationModerateService } from '../../src/event-chat/event-cha
 import { EventChatMutationSendService } from '../../src/event-chat/event-chat-mutation-send.service';
 import { EventChatMutationsService } from '../../src/event-chat/event-chat-mutations.service';
 import { EventChatNotificationsService } from '../../src/event-chat/event-chat-notifications.service';
+import { EventChatPushAggregatorService } from '../../src/event-chat/event-chat-push-aggregator.service';
+import { FeatureFlagsService } from '../../src/feature-flags/feature-flags.service';
 import { EventChatSseService } from '../../src/event-chat/event-chat-sse.service';
 import { EventChatTelemetryService } from '../../src/event-chat/event-chat-telemetry.service';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
@@ -49,9 +51,17 @@ describe('EventChatService send failures', () => {
     };
     const uploads = { signPrivateObjectKey: jest.fn().mockResolvedValue(null) };
 
+    const pushAggregator = new EventChatPushAggregatorService(
+      { get: jest.fn().mockReturnValue('100') } as never,
+      {} as unknown as NotificationDispatcherService,
+    );
     const cn = new EventChatNotificationsService(
       prisma as unknown as PrismaService,
       {} as unknown as NotificationDispatcherService,
+      {
+        isEventChatPushCoalesceV2Enabled: jest.fn().mockResolvedValue(false),
+      } as unknown as FeatureFlagsService,
+      pushAggregator,
     );
     const dto = new EventChatMessageDtoService(
       encryption as unknown as ChatEncryptionService,

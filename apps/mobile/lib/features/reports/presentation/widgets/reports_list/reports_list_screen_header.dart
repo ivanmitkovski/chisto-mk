@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/providers/reports_providers.dart';
+import 'package:chisto_mobile/core/providers/root_container.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/observability/chisto_sentry.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
@@ -14,8 +15,7 @@ import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list
 import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/report_filter_chip.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/report_sheet_view_model.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_cupertino_search_field.dart';
+import 'package:chisto_mobile/shared/widgets/molecules/app_cupertino_search_field.dart';
 
 /// Title row + total / under-review / capacity pills for the reports list pinned header.
 class ReportsListStatsHeader extends StatelessWidget {
@@ -67,7 +67,6 @@ class ReportsListStatsHeader extends StatelessWidget {
                 child: IconButton(
                   tooltip: l10n.reportListAppBarStartNewReportLabel,
                   onPressed: () {
-                    AppHaptics.tap();
                     chistoReportsBreadcrumb(
                       'report_draft',
                       'entry_reports_list_appbar_plus',
@@ -81,7 +80,7 @@ class ReportsListStatsHeader extends StatelessWidget {
           ),
           ValueListenableBuilder<ReportDraftSummary>(
             valueListenable:
-                ServiceLocator.instance.reportDraftRepository.summaryListenable,
+                readRoot(reportDraftRepositoryProvider).summaryListenable,
             builder: (BuildContext context, ReportDraftSummary summary, _) {
               if (!summary.hasDraft) {
                 return const SizedBox(height: AppSpacing.sm);

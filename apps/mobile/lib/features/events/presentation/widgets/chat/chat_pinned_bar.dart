@@ -5,7 +5,6 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_message.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 /// Shows the latest pinned message; opens full list on tap.
 class ChatPinnedBar extends StatelessWidget {
@@ -40,7 +39,6 @@ class ChatPinnedBar extends StatelessWidget {
           color: AppColors.panelBackground,
           child: InkWell(
             onTap: () {
-              AppHaptics.softTransition();
               onOpenAll();
             },
             child: Padding(
@@ -72,9 +70,8 @@ class ChatPinnedBar extends StatelessWidget {
                             ),
                             child: Text(
                               '$pinnedCount',
-                              style: const TextStyle(
+                              style: AppTypography.microIndex.copyWith(
                                 fontSize: 10,
-                                fontWeight: FontWeight.w600,
                                 color: AppColors.textOnDark,
                               ),
                             ),
@@ -86,7 +83,6 @@ class ChatPinnedBar extends StatelessWidget {
                   Expanded(
                     child: GestureDetector(
                       onTap: () {
-                        AppHaptics.light();
                         onTapMessage(m);
                       },
                       child: Text(
@@ -100,7 +96,6 @@ class ChatPinnedBar extends StatelessWidget {
                   if (isOrganizer && onUnpinLatest != null)
                     GestureDetector(
                       onTap: () {
-                        AppHaptics.light();
                         onUnpinLatest!();
                       },
                       child: Padding(

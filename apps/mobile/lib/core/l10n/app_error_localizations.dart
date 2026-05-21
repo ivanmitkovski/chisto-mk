@@ -20,6 +20,8 @@ String localizedAppErrorMessage(AppLocalizations l10n, AppError error) {
       return l10n.errorUserForbidden;
     case 'NOT_FOUND':
       return l10n.errorUserNotFound;
+    case 'SITE_NOT_FOUND':
+      return l10n.feedSiteNotFoundMessage;
     case 'EVENT_START_TOO_EARLY':
       return l10n.eventsStartEventTooEarly;
     case 'EVENT_END_AT_TOO_FAR':

@@ -1,11 +1,10 @@
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
-import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_upload_prep_progress.dart';
-import 'package:chisto_mobile/features/reports/presentation/theme/report_tokens.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_stage.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_stage_config.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 import 'package:flutter/material.dart';
 
 /// Primary + back actions for the multi-step new-report flow.
@@ -107,29 +106,11 @@ class NewReportFlowBottomBar extends StatelessWidget {
                   child: Semantics(
                     button: true,
                     label: context.l10n.commonBack,
-                    child: OutlinedButton(
-                      onPressed: primaryLocked ? null : onBack,
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.textPrimary,
-                        side: BorderSide(
-                          color: AppColors.reportDividerStrong,
-                        ),
-                        backgroundColor: AppColors.panelBackground,
-                        padding: const EdgeInsets.symmetric(
-                          vertical: AppSpacing.md,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radius18,
-                          ),
-                        ),
-                      ),
-                      child: Text(
-                        context.l10n.commonBack,
-                        style: AppTypography.reportsBottomBarButtonLabel(
-                          Theme.of(context).textTheme,
-                        ),
-                      ),
+                    child: AppButton.outlined(
+                      label: context.l10n.commonBack,
+                      onPressed: onBack,
+                      enabled: !primaryLocked,
+                      expand: true,
                     ),
                   ),
                 ),
@@ -145,61 +126,12 @@ class NewReportFlowBottomBar extends StatelessWidget {
                       : (isReviewStage
                             ? context.l10n.reportFormPrimarySemanticsHintSubmit
                             : context.l10n.reportFormPrimarySemanticsHintNext),
-                  child: SizedBox(
-                    height: ReportTokens.wizardBottomBarCtaHeight,
-                    child: FilledButton(
-                      onPressed: primaryLocked ? null : onPrimary,
-                      style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: AppColors.white,
-                        disabledBackgroundColor: AppColors.reportDisabledPrimaryFill,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radius18,
-                          ),
-                        ),
-                      ),
-                      child: submitting
-                          ? Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2.2,
-                                    color: AppColors.white,
-                                  ),
-                                ),
-                                const SizedBox(width: AppSpacing.sm),
-                                Flexible(
-                                  child: Text(
-                                    primaryLabel,
-                                    style:
-                                        AppTypography.reportsBottomBarButtonLabel(
-                                          Theme.of(context).textTheme,
-                                        ).copyWith(color: AppColors.white),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            )
-                          : FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                primaryLabel,
-                                style:
-                                    AppTypography.reportsBottomBarButtonLabel(
-                                      Theme.of(context).textTheme,
-                                    ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                    ),
+                  child: AppButton.primary(
+                    label: primaryLabel,
+                    onPressed: onPrimary,
+                    enabled: !primaryLocked,
+                    isLoading: submitting,
+                    expand: true,
                   ),
                 ),
               ),

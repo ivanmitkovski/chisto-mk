@@ -6,8 +6,9 @@ import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
-import 'package:chisto_mobile/shared/widgets/app_avatar.dart';
-import 'package:chisto_mobile/shared/widgets/profile_avatar_peek_overlay.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_avatar.dart';
+import 'package:chisto_mobile/shared/widgets/organisms/profile_avatar_peek_overlay.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_loading_indicator.dart';
 
 /// Avatar stack, camera badge, and caption for profile general info.
 class ProfileAvatarSection extends StatelessWidget {
@@ -110,12 +111,11 @@ class ProfileAvatarSection extends StatelessWidget {
                                   child: ColoredBox(
                                     color: AppColors.black
                                         .withValues(alpha: 0.28),
-                                    child: const Center(
+                                    child: Center(
                                       child: SizedBox(
                                         width: 28,
                                         height: 28,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2.5,
+                                        child: AppLoadingIndicator(
                                           color: AppColors.white,
                                         ),
                                       ),

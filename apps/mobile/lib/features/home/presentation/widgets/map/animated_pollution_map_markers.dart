@@ -168,7 +168,6 @@ class _AnimatedPollutionMapMarkersState extends State<AnimatedPollutionMapMarker
   @override
   void initState() {
     super.initState();
-    _controller.addListener(() => setState(() {}));
     _controller.addStatusListener(_onStatus);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) {
@@ -187,9 +186,7 @@ class _AnimatedPollutionMapMarkersState extends State<AnimatedPollutionMapMarker
 
   void _onStatus(AnimationStatus s) {
     if (s == AnimationStatus.completed) {
-      setState(() {
-        _from.clear();
-      });
+      _from.clear();
     }
   }
 
@@ -292,30 +289,35 @@ class _AnimatedPollutionMapMarkersState extends State<AnimatedPollutionMapMarker
 
   @override
   Widget build(BuildContext context) {
-    final bool useLerp = !widget.reduceAnimations &&
-        (_controller.isAnimating || _from.isNotEmpty);
-    final Map<String, LatLng>? displayPoints = useLerp
-        ? _visualPositionsAtProgress(_controller.value)
-        : null;
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (BuildContext context, Widget? child) {
+        final bool useLerp = !widget.reduceAnimations &&
+            (_controller.isAnimating || _from.isNotEmpty);
+        final Map<String, LatLng>? displayPoints = useLerp
+            ? _visualPositionsAtProgress(_controller.value)
+            : null;
 
-    final List<Marker> markers = buildMapMarkers(
-      clusters: widget.clusters,
-      coords: widget.coords,
-      selectedSite: widget.selectedSite,
-      reduceAnimations: widget.reduceAnimations,
-      cameraCenter: widget.cameraCenter,
-      onSiteTap: widget.onSiteTap,
-      onSiteLongPress: widget.onSiteLongPress,
-      onClusterTap: widget.onClusterTap,
-      expansionOrigin: widget.expansionOrigin,
-      expandingSiteIds: widget.expandingSiteIds,
-      expansionGhostCenter: widget.expansionGhostCenter,
-      expansionGhostColor: widget.expansionGhostColor,
-      expansionGhostCount: widget.expansionGhostCount,
-      expansionToken: widget.expansionToken,
-      markerDisplayPoints: displayPoints,
+        final List<Marker> markers = buildMapMarkers(
+          clusters: widget.clusters,
+          coords: widget.coords,
+          selectedSite: widget.selectedSite,
+          reduceAnimations: widget.reduceAnimations,
+          cameraCenter: widget.cameraCenter,
+          onSiteTap: widget.onSiteTap,
+          onSiteLongPress: widget.onSiteLongPress,
+          onClusterTap: widget.onClusterTap,
+          expansionOrigin: widget.expansionOrigin,
+          expandingSiteIds: widget.expandingSiteIds,
+          expansionGhostCenter: widget.expansionGhostCenter,
+          expansionGhostColor: widget.expansionGhostColor,
+          expansionGhostCount: widget.expansionGhostCount,
+          expansionToken: widget.expansionToken,
+          markerDisplayPoints: displayPoints,
+        );
+
+        return MarkerLayer(markers: markers);
+      },
     );
-
-    return MarkerLayer(markers: markers);
   }
 }

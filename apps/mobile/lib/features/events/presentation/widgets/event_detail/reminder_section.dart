@@ -66,7 +66,7 @@ class ReminderSection extends StatelessWidget {
           CupertinoButton(
             onPressed: onToggleReminder,
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.radius10, vertical: AppSpacing.xxs),
-            minimumSize: Size.zero,
+            minimumSize: const Size(44, 44),
             child: Text(
               event.reminderEnabled
                   ? context.l10n.eventsReminderSectionDisable

@@ -25,6 +25,17 @@ export function validateEnv(): void {
     MAX_SESSIONS_PER_USER: Joi.number().integer().min(1).max(100).default(5),
     SENTRY_DSN: Joi.string().trim().allow('').optional(),
     SENTRY_TRACES_SAMPLE_RATE: Joi.number().min(0).max(1).optional(),
+    EMAIL_ENABLED: Joi.string().valid('true', 'false').optional(),
+    POSTMARK_SERVER_TOKEN: Joi.string().trim().optional(),
+    POSTMARK_WEBHOOK_BASIC_USER: Joi.string().trim().optional(),
+    POSTMARK_WEBHOOK_BASIC_PASS: Joi.string().trim().optional(),
+    EMAIL_FROM_ADDRESS: Joi.string().trim().email().optional(),
+    EMAIL_FROM_NAME: Joi.string().trim().optional(),
+    EMAIL_PUBLIC_API_BASE_URL: Joi.string().trim().uri().optional(),
+    EMAIL_PREFERENCES_INFO_URL: Joi.string().trim().uri().optional(),
+    EMAIL_APP_BASE_URL: Joi.string().trim().uri().optional(),
+    EMAIL_LOGO_URL: Joi.string().trim().uri().optional(),
+    PASSWORD_RESET_URL: Joi.string().trim().uri().optional(),
   }).unknown(true);
 
   const { error, value } = schema.validate(process.env, { abortEarly: false, allowUnknown: true });
@@ -115,5 +126,45 @@ export function validateEnv(): void {
       );
       process.exit(1);
     }
+  }
+
+  const emailEnabled = (process.env.EMAIL_ENABLED ?? '').trim().toLowerCase() === 'true';
+  if (emailEnabled && (nodeEnv === 'production' || nodeEnv === 'staging')) {
+    requireEnv('POSTMARK_SERVER_TOKEN');
+    requireEnv('POSTMARK_WEBHOOK_BASIC_USER');
+    requireEnv('POSTMARK_WEBHOOK_BASIC_PASS');
+  }
+
+  if (nodeEnv === 'production' || nodeEnv === 'staging') {
+    requireEnv('CHECK_IN_QR_SECRET');
+    if ((process.env.CHECK_IN_QR_SECRET?.trim() ?? '').length < 24) {
+      console.error('CHECK_IN_QR_SECRET must be at least 24 characters in production/staging');
+      process.exit(1);
+    }
+    requireEnv('SITE_SHARE_TOKEN_SECRET');
+    if ((process.env.SITE_SHARE_TOKEN_SECRET?.trim() ?? '').length < 24) {
+      console.error('SITE_SHARE_TOKEN_SECRET must be at least 24 characters in production/staging');
+      process.exit(1);
+    }
+    const fingerprint = process.env.SITE_SHARE_FINGERPRINT_SECRET?.trim();
+    if (fingerprint && fingerprint.length < 24) {
+      console.error('SITE_SHARE_FINGERPRINT_SECRET must be at least 24 characters when set');
+      process.exit(1);
+    }
+
+    const pushEnabled = (process.env.PUSH_FCM_ENABLED ?? '').trim().toLowerCase() === 'true';
+    if (pushEnabled) {
+      requireEnv('FIREBASE_SERVICE_ACCOUNT_JSON');
+    }
+
+    const redisRequired =
+      (process.env.NOTIFICATIONS_INBOX_ENABLED ?? 'true').trim().toLowerCase() !== 'false' ||
+      (process.env.PG_OUTBOX_LISTEN ?? 'true').trim().toLowerCase() !== 'false';
+    if (redisRequired) {
+      requireEnv('REDIS_URL');
+    }
+
+    requireEnv('CHAT_ENCRYPTION_KEY');
+    requireEnv('METRICS_BEARER_TOKEN');
   }
 }

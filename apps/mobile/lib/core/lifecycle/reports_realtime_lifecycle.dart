@@ -2,7 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/providers/reports_providers.dart';
+import 'package:chisto_mobile/core/providers/root_container.dart';
 
 /// Forces a reports Socket.IO resync after long background (carrier NAT / suspended sockets).
 class ReportsRealtimeLifecycle with WidgetsBindingObserver {
@@ -31,8 +32,8 @@ class ReportsRealtimeLifecycle with WidgetsBindingObserver {
         return;
       }
       if (DateTime.now().difference(paused) > const Duration(seconds: 30)) {
-        ServiceLocator.instance.reportsRealtimeService.requestReconnect();
-        unawaited(ServiceLocator.instance.reportOutboxCoordinator.scheduleProcess());
+        readRoot(reportsRealtimeServiceProvider).requestReconnect();
+        unawaited(readRoot(reportOutboxCoordinatorProvider).scheduleProcess());
       }
     }
   }

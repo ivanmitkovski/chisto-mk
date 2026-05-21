@@ -6,8 +6,10 @@ import 'dart:typed_data';
 
 import 'package:chisto_mobile/core/config/app_config.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/features/auth/domain/refresh_outcome.dart';
 import 'package:chisto_mobile/core/network/api_failure_mapper.dart';
 import 'package:chisto_mobile/core/network/request_cancellation.dart';
+import 'package:chisto_mobile/core/time/server_clock.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:http/http.dart' as http;
 
@@ -16,29 +18,77 @@ import 'package:http/http.dart' as http;
 /// session (if a [refreshSession] callback is provided) for `UNAUTHORIZED` and
 /// `SESSION_REVOKED` (rotated / revoked access session on the server).
 ///
-/// Parallel 401s: [_refreshing] allows only one refresh at a time; other
-/// requests may fail once before the retry path succeeds after refresh.
+/// Parallel 401s: one shared refresh [Future]; concurrent callers await it and replay.
 class ApiClient {
   ApiClient({
     required AppConfig config,
     required String? Function() accessToken,
     required void Function() onUnauthorized,
     String? Function()? acceptLanguageHeader,
+    http.Client? httpClient,
   })  : _baseUrl = config.apiBaseUrl.replaceFirst(RegExp(r'/$'), ''),
         _accessToken = accessToken,
         _onUnauthorized = onUnauthorized,
-        _acceptLanguageHeader = acceptLanguageHeader;
+        _acceptLanguageHeader = acceptLanguageHeader,
+        _httpClient = httpClient ?? http.Client();
 
   final String _baseUrl;
   final String? Function() _accessToken;
   final void Function() _onUnauthorized;
   final String? Function()? _acceptLanguageHeader;
 
-  Future<bool> Function()? refreshSession;
+  Future<RefreshOutcome> Function()? refreshSession;
 
-  bool _refreshing = false;
+  Future<RefreshOutcome>? _refreshInFlight;
 
-  final http.Client _httpClient = http.Client();
+  /// Prevents parallel realtime/REST paths from firing [onUnauthorized] repeatedly.
+  bool _sessionAuthFailureNotified = false;
+
+  final http.Client _httpClient;
+
+  /// Single-flight refresh shared by REST 401 recovery and realtime transports.
+  Future<RefreshOutcome> refreshSessionQueued() => _refreshSessionQueued();
+
+  /// Clears the session-teardown guard after a successful login/token save.
+  void resetSessionAuthFailureGuard() {
+    _sessionAuthFailureNotified = false;
+  }
+
+  void notifySessionAuthRejected() {
+    _notifySessionAuthFailureOnce();
+  }
+
+  Future<RefreshOutcome> _refreshSessionQueued() async {
+    final Future<RefreshOutcome> Function()? refresh = refreshSession;
+    if (refresh == null) {
+      return RefreshOutcome.transient;
+    }
+    final Future<RefreshOutcome>? inFlight = _refreshInFlight;
+    if (inFlight != null) {
+      return inFlight;
+    }
+    final Future<RefreshOutcome> started = refresh();
+    _refreshInFlight = started;
+    try {
+      return await started;
+    } finally {
+      if (identical(_refreshInFlight, started)) {
+        _refreshInFlight = null;
+      }
+    }
+  }
+
+  /// Returns true when refresh succeeded and the caller may retry the request.
+  Future<bool> _refreshForUnauthorizedRetry(AppError error, String path) async {
+    final RefreshOutcome outcome = await _refreshSessionQueued();
+    if (outcome == RefreshOutcome.success) {
+      return true;
+    }
+    if (outcome == RefreshOutcome.serverRejected) {
+      _notifySessionAuthFailure(error, path);
+    }
+    return false;
+  }
 
   static const Duration _timeout = Duration(seconds: 30);
 
@@ -133,24 +183,21 @@ class ApiClient {
     try {
       return await _postMultipart(path, filePaths);
     } on AppError catch (e) {
+      if (e.code == 'CANCELLED') {
+        rethrow;
+      }
       final bool mayRecoverWithRefresh = e.code == 'UNAUTHORIZED' ||
           e.code == 'SESSION_REVOKED';
       if (!mayRecoverWithRefresh ||
           _authPaths.contains(path) ||
-          refreshSession == null ||
-          _refreshing) {
+          refreshSession == null) {
+        _notifySessionAuthFailure(e, path);
         rethrow;
       }
-      _refreshing = true;
-      try {
-        final bool refreshed = await refreshSession!();
-        if (!refreshed) rethrow;
-      } on Exception catch (_) {
+      if (!await _refreshForUnauthorizedRetry(e, path)) {
         rethrow;
-      } finally {
-        _refreshing = false;
       }
-      return _postMultipart(path, filePaths);
+      return await _postMultipart(path, filePaths);
     }
   }
 
@@ -237,18 +284,11 @@ class ApiClient {
           e.code == 'SESSION_REVOKED';
       if (!mayRecoverWithRefresh ||
           _authPaths.contains(path) ||
-          refreshSession == null ||
-          _refreshing) {
+          refreshSession == null) {
         rethrow;
       }
-      _refreshing = true;
-      try {
-        final bool refreshed = await refreshSession!();
-        if (!refreshed) rethrow;
-      } on Exception catch (_) {
+      if (await _refreshSessionQueued() != RefreshOutcome.success) {
         rethrow;
-      } finally {
-        _refreshing = false;
       }
       return await multipartPost(
         path,
@@ -350,6 +390,24 @@ class ApiClient {
     '/auth/password-reset/confirm',
   };
 
+  /// Best-effort teardown: 401 here must not cascade into [onUnauthorized].
+  static const Set<String> _pathsExemptFromUnauthorizedCallback = <String>{
+    '/notifications/devices/unregister',
+  };
+
+  void _notifySessionAuthFailure(AppError error, String path) {
+    if (!error.indicatesInvalidOrEndedSession) return;
+    if (_authPaths.contains(path)) return;
+    if (_pathsExemptFromUnauthorizedCallback.contains(path)) return;
+    _notifySessionAuthFailureOnce();
+  }
+
+  void _notifySessionAuthFailureOnce() {
+    if (_sessionAuthFailureNotified) return;
+    _sessionAuthFailureNotified = true;
+    _onUnauthorized();
+  }
+
   Future<ApiBytesResponse> _getBytesWithRetry(
     String path, {
     Map<String, String>? headers,
@@ -369,19 +427,12 @@ class ApiClient {
           e.code == 'SESSION_REVOKED';
       if (!mayRecoverWithRefresh ||
           _authPaths.contains(path) ||
-          refreshSession == null ||
-          _refreshing) {
+          refreshSession == null) {
+        _notifySessionAuthFailure(e, path);
         rethrow;
       }
-
-      _refreshing = true;
-      try {
-        final bool refreshed = await refreshSession!();
-        if (!refreshed) rethrow;
-      } on Exception catch (_) {
+      if (!await _refreshForUnauthorizedRetry(e, path)) {
         rethrow;
-      } finally {
-        _refreshing = false;
       }
 
       cancellation?.throwIfCancelled();
@@ -428,6 +479,7 @@ class ApiClient {
   }
 
   ApiBytesResponse _handleBytesResponse(http.Response response) {
+    _recordServerClock(response.headers);
     final Uint8List bytes = Uint8List.fromList(response.bodyBytes);
     if (response.statusCode >= 200 && response.statusCode < 300) {
       return ApiBytesResponse(
@@ -456,10 +508,6 @@ class ApiClient {
       retryAfterHeader: retryAfterHeader,
     );
 
-    if (response.statusCode == 401 && error.indicatesInvalidOrEndedSession) {
-      _onUnauthorized();
-    }
-
     throw error;
   }
 
@@ -486,19 +534,12 @@ class ApiClient {
           e.code == 'SESSION_REVOKED';
       if (!mayRecoverWithRefresh ||
           _authPaths.contains(path) ||
-          refreshSession == null ||
-          _refreshing) {
+          refreshSession == null) {
+        _notifySessionAuthFailure(e, path);
         rethrow;
       }
-
-      _refreshing = true;
-      try {
-        final bool refreshed = await refreshSession!();
-        if (!refreshed) rethrow;
-      } on Exception catch (_) {
+      if (!await _refreshForUnauthorizedRetry(e, path)) {
         rethrow;
-      } finally {
-        _refreshing = false;
       }
 
       cancellation?.throwIfCancelled();
@@ -610,7 +651,16 @@ class ApiClient {
     return null;
   }
 
+  void _recordServerClock(Map<String, String> headers) {
+    // [http] lowercases header keys; pull either casing to be safe.
+    final String? date = headers['date'] ?? headers['Date'];
+    if (date != null) {
+      ServerClock.instance.recordDateHeader(date);
+    }
+  }
+
   ApiResponse _handleResponse(http.Response response) {
+    _recordServerClock(response.headers);
     final String? bodyStr = response.body.isNotEmpty ? response.body : null;
     final Map<String, dynamic>? json =
         bodyStr != null ? _decodeJsonObject(bodyStr) : null;
@@ -631,10 +681,6 @@ class ApiClient {
       bodyStr: bodyStr,
       retryAfterHeader: retryAfterHeader,
     );
-
-    if (response.statusCode == 401 && error.indicatesInvalidOrEndedSession) {
-      _onUnauthorized();
-    }
 
     throw error;
   }

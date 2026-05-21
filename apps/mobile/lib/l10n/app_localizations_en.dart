@@ -441,6 +441,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authRememberMe => 'Remember me';
 
   @override
+  String get authSessionExpired =>
+      'Your session expired. Please sign in again.';
+
+  @override
+  String get authPhoneNotVerified => 'Verify your phone number to sign in.';
+
+  @override
+  String get authVerifyPhoneCta => 'Verify phone';
+
+  @override
+  String get authResetViaEmail => 'Reset via email';
+
+  @override
+  String get authResetViaSms => 'Reset via SMS';
+
+  @override
+  String get authForgotPasswordEmailSubtitle =>
+      'Enter the email on your account and we\'ll send a reset link if it exists.';
+
+  @override
+  String get authForgotPasswordEmailSentTitle => 'Check your email';
+
+  @override
+  String get authForgotPasswordEmailSentBody =>
+      'If an account exists for that email, we sent a link to reset your password.';
+
+  @override
+  String get authForgotPasswordEmailField => 'Email';
+
+  @override
   String get authForgotPassword => 'Forgot password?';
 
   @override
@@ -499,6 +529,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get authSignInLink => 'Sign in';
+
+  @override
+  String get authValidationFullNameTwoParts => 'Enter your first and last name';
 
   @override
   String authValidationFieldRequired(String fieldName) {
@@ -579,6 +612,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'Too many failed attempts. Try again later.';
 
   @override
+  String authErrorTooManyAttemptsRetryIn(String duration) {
+    return 'Too many failed attempts. Try again in $duration.';
+  }
+
+  @override
   String get authErrorRateLimited =>
       'Too many requests. Please wait a moment and try again.';
 
@@ -591,7 +629,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String authOtpSubtitle(String phone) {
-    return 'We just sent a 4-digit code to $phone';
+    return 'We just sent a 6-digit code to $phone';
   }
 
   @override
@@ -624,6 +662,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authForgotPasswordSendCode => 'Send reset code';
 
   @override
+  String get authForgotPasswordSendLink => 'Send reset link';
+
+  @override
+  String get authForgotPasswordTryAnotherWay => 'Try another way';
+
+  @override
   String get authForgotPasswordRequestSemantic => 'Send reset code';
 
   @override
@@ -631,8 +675,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String authForgotPasswordOtpSubtitle(String phone) {
-    return 'We sent a 4-digit code to $phone';
+    return 'We sent a 6-digit code to $phone';
   }
+
+  @override
+  String get authErrorPhoneNotVerified =>
+      'Your phone number is not verified yet.';
+
+  @override
+  String get authErrorPasswordResetTokenInvalid =>
+      'This reset link is invalid or has expired.';
 
   @override
   String get authNewPasswordTitle => 'Create new password';
@@ -1085,6 +1137,133 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileHelpCenterTile => 'Help center';
+
+  @override
+  String get profilePrivacyPolicyTile => 'Privacy policy';
+
+  @override
+  String get profileTermsTile => 'Terms of use';
+
+  @override
+  String get profileSafetySection => 'Safety';
+
+  @override
+  String get profileSafetyReportIssueTile => 'Report a safety issue';
+
+  @override
+  String get profileBlockedUsersTile => 'Blocked users';
+
+  @override
+  String get profileBlockedUsersSubtitle =>
+      'People you blocked cannot message you or appear in your feed.';
+
+  @override
+  String get profileBlockedUsersEmpty => 'You have not blocked anyone.';
+
+  @override
+  String get profileBlockedUsersEmptySubtitle =>
+      'Block someone from event chat or site comments to add them here.';
+
+  @override
+  String get profileBlockedUsersUnblock => 'Unblock';
+
+  @override
+  String get profileBlockedUsersUnblockFailed =>
+      'Could not unblock. Try again.';
+
+  @override
+  String get profileBlockedUsersLoadFailed =>
+      'Could not load blocked users. Try again.';
+
+  @override
+  String get safetyBlockUserTitle => 'Block user';
+
+  @override
+  String safetyBlockUserBody(String name) {
+    return 'Block $name? They will not appear in your chat or comments.';
+  }
+
+  @override
+  String get safetyBlockUserConfirm => 'Block';
+
+  @override
+  String get safetyBlockUserSuccess => 'User blocked.';
+
+  @override
+  String get safetyBlockUserFailed => 'Could not block user. Try again.';
+
+  @override
+  String get safetyBlockUserSelfSnack => 'You cannot block yourself.';
+
+  @override
+  String get safetyUnblockUserTitle => 'Unblock user';
+
+  @override
+  String safetyUnblockUserBody(String name) {
+    return 'Unblock $name? Their messages and comments may appear again.';
+  }
+
+  @override
+  String get safetyUnblockUserConfirm => 'Unblock';
+
+  @override
+  String get profilePrivacyPolicyOpenFailedSnack =>
+      'Could not open privacy policy';
+
+  @override
+  String get profileTermsOpenFailedSnack => 'Could not open terms of use';
+
+  @override
+  String get profileEulaTitle => 'Community guidelines';
+
+  @override
+  String get profileEulaBody =>
+      'Chisto.mk has zero tolerance for objectionable content or abusive users. By continuing you agree to our Terms and will report content that violates our guidelines.';
+
+  @override
+  String get profileEulaBodyBeforeTerms =>
+      'Chisto.mk has zero tolerance for objectionable content or abusive users. By continuing you agree to our ';
+
+  @override
+  String get profileEulaBodyAfterTerms =>
+      ' and will report content that violates our guidelines.';
+
+  @override
+  String get profileEulaAccept => 'I agree';
+
+  @override
+  String get safetyReportTitle => 'Report content';
+
+  @override
+  String get safetyReportSubmit => 'Submit report';
+
+  @override
+  String get safetyReportDetailsHint => 'Optional details for moderators';
+
+  @override
+  String get safetyReportSubmitted =>
+      'Report submitted. We review reports within 24 hours.';
+
+  @override
+  String get safetyReportFailed => 'Could not submit report. Try again.';
+
+  @override
+  String get safetyReportReasonSpam => 'Spam';
+
+  @override
+  String get safetyReportReasonHarassment => 'Harassment';
+
+  @override
+  String get safetyReportReasonHate => 'Hate speech';
+
+  @override
+  String get safetyReportReasonViolence => 'Violence';
+
+  @override
+  String get safetyReportReasonNudity => 'Nudity';
+
+  @override
+  String get safetyReportReasonOther => 'Other';
 
   @override
   String get profileAccountSection => 'Account';
@@ -1717,7 +1896,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get feedFilterUrgentName => 'Urgent';
 
   @override
-  String get feedFilterUrgentDesc => 'High-priority incidents first';
+  String get feedFilterUrgentDesc =>
+      'New or unverified sites that need community attention';
 
   @override
   String get feedFilterNearbyName => 'Nearby';
@@ -2489,7 +2669,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notificationsTypeCleanupEvents => 'Cleanup events';
 
   @override
+  String get notificationsTypeEventChat => 'Event chat';
+
+  @override
   String get notificationsTypeSystem => 'System';
+
+  @override
+  String get notificationsPrefSystemGroupSubtitle =>
+      'Announcements, achievements, and welcome messages';
 
   @override
   String get notificationsSwipeMarkUnread => 'Mark unread';
@@ -2565,6 +2752,105 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notificationsFilterUnread => 'Unread';
+
+  @override
+  String get notificationsDayToday => 'Today';
+
+  @override
+  String get notificationsDayYesterday => 'Yesterday';
+
+  @override
+  String get notificationsTimeNow => 'now';
+
+  @override
+  String notificationsTimeMinutes(int count) {
+    return '${count}m';
+  }
+
+  @override
+  String notificationsTimeHours(int count) {
+    return '${count}h';
+  }
+
+  @override
+  String notificationsTimeDays(int count) {
+    return '${count}d';
+  }
+
+  @override
+  String notificationsGroupSummaryOne(String actor) {
+    return '$actor';
+  }
+
+  @override
+  String notificationsGroupSummaryTwo(String actorA, String actorB) {
+    return '$actorA and $actorB';
+  }
+
+  @override
+  String notificationsGroupSummaryMany(
+    String actorA,
+    String actorB,
+    int count,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count others',
+      one: '1 other',
+    );
+    return '$actorA, $actorB and $_temp0';
+  }
+
+  @override
+  String notificationsGroupSummaryGeneric(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count updates',
+      one: '1 update',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get notificationsGroupExpandHint => 'Expand notification group';
+
+  @override
+  String get notificationsGroupCollapseHint => 'Collapse notification group';
+
+  @override
+  String get notificationsGroupMarkAllRead => 'Mark group as read';
+
+  @override
+  String get notificationsGroupArchiveAll => 'Archive group';
+
+  @override
+  String notificationsGroupShowingN(int count, String summary) {
+    return 'Showing $count notifications: $summary';
+  }
+
+  @override
+  String notificationsGroupMessageCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count messages',
+      one: '1 message',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String notificationsGroupSimilarCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count similar',
+      one: '1 similar',
+    );
+    return 'and $_temp0';
+  }
 
   @override
   String get eventsEventNotFoundTitle => 'Event not found';
@@ -4421,6 +4707,146 @@ class AppLocalizationsEn extends AppLocalizations {
   String get siteDetailTabCleaningEvents => 'Cleaning events';
 
   @override
+  String get siteDetailTabHistory => 'History';
+
+  @override
+  String get siteHistoryServiceUnavailable =>
+      'Site history is not available yet. Update the app and try again, or ask your team to deploy the latest API.';
+
+  @override
+  String get siteHistoryEmptyTitle => 'No history yet';
+
+  @override
+  String get siteHistoryEmptyMessage =>
+      'Activity on this site will appear here as reports, cleanups, and status changes happen.';
+
+  @override
+  String get siteHistoryRetry => 'Try again';
+
+  @override
+  String siteHistoryCurrentStatus(String status) {
+    return 'Current status: $status';
+  }
+
+  @override
+  String siteHistoryByActor(String name) {
+    return 'By $name';
+  }
+
+  @override
+  String get siteHistoryKindSiteCreated => 'Site created';
+
+  @override
+  String get siteHistoryKindReportSubmitted => 'Report submitted';
+
+  @override
+  String get siteHistoryKindReportApproved => 'Report approved';
+
+  @override
+  String get siteHistoryKindReportRejected => 'Report rejected';
+
+  @override
+  String get siteHistoryKindReportMerged => 'Reports merged';
+
+  @override
+  String siteHistoryKindStatusChanged(String from, String to) {
+    return 'Status changed: $from → $to';
+  }
+
+  @override
+  String get siteHistoryKindStatusChangedGeneric => 'Status updated';
+
+  @override
+  String get siteHistoryKindCleanupScheduled => 'Cleanup event scheduled';
+
+  @override
+  String get siteHistoryKindCleanupStarted => 'Cleanup in progress';
+
+  @override
+  String get siteHistoryKindCleanupCompleted => 'Cleanup completed';
+
+  @override
+  String get siteHistoryKindCleanupCancelled => 'Cleanup event cancelled';
+
+  @override
+  String get siteHistoryKindArchived => 'Archived by moderators';
+
+  @override
+  String get siteHistoryKindUnarchived => 'Restored by moderators';
+
+  @override
+  String get siteHistoryKindAdminNote => 'Moderator note';
+
+  @override
+  String get siteHistoryKindUnknown => 'Activity';
+
+  @override
+  String get siteHistoryStatusHeaderTitle => 'Current status';
+
+  @override
+  String siteHistoryStatusHeaderUpdated(String time) {
+    return 'Updated $time';
+  }
+
+  @override
+  String siteHistoryStatusHeaderEntries(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count entries',
+      one: '1 entry',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get siteHistorySectionToday => 'Today';
+
+  @override
+  String get siteHistorySectionYesterday => 'Yesterday';
+
+  @override
+  String get siteHistorySectionThisWeek => 'Earlier this week';
+
+  @override
+  String siteHistorySectionMonth(String month, int year) {
+    return '$month $year';
+  }
+
+  @override
+  String get siteHistoryTimeNow => 'now';
+
+  @override
+  String siteHistoryTimeMinutes(int count) {
+    return '${count}m';
+  }
+
+  @override
+  String siteHistoryTimeHours(int count) {
+    return '${count}h';
+  }
+
+  @override
+  String siteHistoryTimeDays(int count) {
+    return '${count}d';
+  }
+
+  @override
+  String get siteHistoryLoadingMore => 'Loading more…';
+
+  @override
+  String get siteHistoryEndOfList => 'End of history';
+
+  @override
+  String get siteHistoryEntryOpenEvent => 'Open cleanup event';
+
+  @override
+  String get siteHistoryEntryShowMore => 'Show more';
+
+  @override
+  String get siteHistoryEntryShowLess => 'Show less';
+
+  @override
   String get siteDetailInfoCardTitle => 'Community action needed';
 
   @override
@@ -5340,6 +5766,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get eventsCompletedBagsSave => 'Save';
 
   @override
+  String get eventsCompletedBagsDecrease => 'Decrease bag count';
+
+  @override
+  String get eventsCompletedBagsIncrease => 'Increase bag count';
+
+  @override
   String get eventsCompletedBagsSaved => 'Bag count saved.';
 
   @override
@@ -6141,6 +6573,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeSiteCleaningJoinAction => 'Join action';
 
   @override
+  String get homeSiteCleaningJoinedAction => 'Joined';
+
+  @override
   String get homeSiteCleaningEventUnavailable =>
       'Event details are unavailable right now.';
 
@@ -6910,6 +7345,64 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get eventChatPushChannelDescription =>
       'Messages on cleanup events you joined';
+
+  @override
+  String get eventChatPushReplyAction => 'Reply';
+
+  @override
+  String get eventChatPushReplyButton => 'Send';
+
+  @override
+  String get eventChatPushReplyPlaceholder => 'Message';
+
+  @override
+  String get eventChatPushPreviewVoice => 'Voice message';
+
+  @override
+  String get eventChatPushPreviewPhoto => 'Photo';
+
+  @override
+  String get eventChatPushPreviewVideo => 'Video';
+
+  @override
+  String get eventChatPushPreviewFile => 'File';
+
+  @override
+  String get eventChatPushPreviewLocation => 'Shared location';
+
+  @override
+  String get eventChatPushPreviewMessage => 'Message';
+
+  @override
+  String get eventChatPushPreviewSystem => 'Event update';
+
+  @override
+  String get pushChannelReportsName => 'Report updates';
+
+  @override
+  String get pushChannelReportsDescription =>
+      'Report status changes and nearby pollution reports';
+
+  @override
+  String get pushChannelEventsName => 'Cleanup events';
+
+  @override
+  String get pushChannelEventsDescription =>
+      'Cleanup event reminders and updates';
+
+  @override
+  String get pushChannelSocialName => 'Social activity';
+
+  @override
+  String get pushChannelSocialDescription =>
+      'Upvotes, comments, and community interactions';
+
+  @override
+  String get pushChannelSystemName => 'System';
+
+  @override
+  String get pushChannelSystemDescription =>
+      'System announcements and achievements';
 
   @override
   String get micPermissionRationaleTitle => 'Microphone access';

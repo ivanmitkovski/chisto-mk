@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
+import 'package:chisto_mobile/core/theme/app_shadows.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 
@@ -69,13 +70,7 @@ class StageChip extends StatelessWidget {
                 color: background,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                 boxShadow: isCurrent
-                    ? <BoxShadow>[
-                        BoxShadow(
-                          color: AppColors.black.withValues(alpha: 0.04),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ]
+                    ? AppShadows.panel(Theme.of(context).colorScheme)
                     : const <BoxShadow>[],
               ),
               child: isComplete && !isCurrent

@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_mobile/features/reports/application/report_wizard_submit_port.dart';
 import 'package:chisto_mobile/features/reports/data/outbox/report_draft_photo_store.dart';
 import 'package:chisto_mobile/features/reports/data/outbox/report_draft_repository.dart';
@@ -84,9 +84,9 @@ void main() {
     );
     final NewReportController c = NewReportController(
       draftRepository: draftRepo,
-      reportsApiRepository: ServiceLocator.instance.reportsApiRepository,
+      reportsApiRepository: AppBootstrap.instance.reportsApiRepository,
       reportSubmitPort: ReportWizardSubmitPortImpl(
-        ServiceLocator.instance.reportOutboxCoordinator,
+        AppBootstrap.instance.reportOutboxCoordinator,
       ),
     );
     c.updateTitle('deb');
@@ -115,9 +115,9 @@ void main() {
     final File f2 = File(p.join(tmp.path, 'p2.jpg'))..writeAsBytes(<int>[2]);
     final NewReportController c = NewReportController(
       draftRepository: draftRepo,
-      reportsApiRepository: ServiceLocator.instance.reportsApiRepository,
+      reportsApiRepository: AppBootstrap.instance.reportsApiRepository,
       reportSubmitPort: ReportWizardSubmitPortImpl(
-        ServiceLocator.instance.reportOutboxCoordinator,
+        AppBootstrap.instance.reportOutboxCoordinator,
       ),
     );
     await c.addPhoto(XFile(f1.path));
@@ -129,9 +129,9 @@ void main() {
 
     final NewReportController c2 = NewReportController(
       draftRepository: draftRepo,
-      reportsApiRepository: ServiceLocator.instance.reportsApiRepository,
+      reportsApiRepository: AppBootstrap.instance.reportsApiRepository,
       reportSubmitPort: ReportWizardSubmitPortImpl(
-        ServiceLocator.instance.reportOutboxCoordinator,
+        AppBootstrap.instance.reportOutboxCoordinator,
       ),
     );
     final ReportDraftLoadResult r = await c2.restoreSavedDraft();
@@ -164,9 +164,9 @@ void main() {
     final File f = File(p.join(tmp.path, 'cam.jpg'))..writeAsBytes(<int>[9]);
     final NewReportController c = NewReportController(
       draftRepository: draftRepo,
-      reportsApiRepository: ServiceLocator.instance.reportsApiRepository,
+      reportsApiRepository: AppBootstrap.instance.reportsApiRepository,
       reportSubmitPort: ReportWizardSubmitPortImpl(
-        ServiceLocator.instance.reportOutboxCoordinator,
+        AppBootstrap.instance.reportOutboxCoordinator,
       ),
       initialPhoto: XFile(f.path),
     );
@@ -190,9 +190,9 @@ void main() {
     );
     final NewReportController seed = NewReportController(
       draftRepository: draftRepo,
-      reportsApiRepository: ServiceLocator.instance.reportsApiRepository,
+      reportsApiRepository: AppBootstrap.instance.reportsApiRepository,
       reportSubmitPort: ReportWizardSubmitPortImpl(
-        ServiceLocator.instance.reportOutboxCoordinator,
+        AppBootstrap.instance.reportOutboxCoordinator,
       ),
     );
     seed.updateTitle('old');
@@ -202,9 +202,9 @@ void main() {
     final File incoming = File(p.join(tmp.path, 'new.jpg'))..writeAsBytes(<int>[8]);
     final NewReportController c = NewReportController(
       draftRepository: draftRepo,
-      reportsApiRepository: ServiceLocator.instance.reportsApiRepository,
+      reportsApiRepository: AppBootstrap.instance.reportsApiRepository,
       reportSubmitPort: ReportWizardSubmitPortImpl(
-        ServiceLocator.instance.reportOutboxCoordinator,
+        AppBootstrap.instance.reportOutboxCoordinator,
       ),
       initialPhoto: XFile(incoming.path),
     );

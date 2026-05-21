@@ -1,12 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
 import type { TwilioStatusDto } from './dto/twilio-status.dto';
 
 @Injectable()
 export class WebhooksService {
   private readonly logger = new Logger(WebhooksService.name);
-
-  constructor(private readonly prisma: PrismaService) {}
 
   /**
    * Handles Twilio SMS status callbacks. Swallows errors so Twilio always receives 2xx
@@ -24,29 +21,22 @@ export class WebhooksService {
   }
 
   private async processTwilioSmsStatus(dto: TwilioStatusDto): Promise<void> {
-    const { MessageSid, MessageStatus, To, From, ErrorCode, ErrorMessage } = dto;
+    const { MessageSid, MessageStatus, ErrorCode, ErrorMessage } = dto;
 
     switch (MessageStatus) {
       case 'delivered':
-        this.logger.log(
-          `Twilio SMS delivered sid=${MessageSid} to=${To} from=${From}`,
-        );
+        this.logger.log(`Twilio SMS delivered sid=${MessageSid}`);
         break;
       case 'failed':
       case 'undelivered':
         this.logger.warn(
-          `Twilio SMS ${MessageStatus} sid=${MessageSid} to=${To} from=${From} errorCode=${ErrorCode ?? 'n/a'} errorMessage=${ErrorMessage ?? 'n/a'}`,
+          `Twilio SMS ${MessageStatus} sid=${MessageSid} errorCode=${ErrorCode ?? 'n/a'} errorMessage=${ErrorMessage ?? 'n/a'}`,
         );
         break;
       case 'queued':
       case 'sent':
-        this.logger.log(
-          `Twilio SMS ${MessageStatus} sid=${MessageSid} to=${To} from=${From}`,
-        );
+        this.logger.log(`Twilio SMS ${MessageStatus} sid=${MessageSid}`);
         break;
     }
-
-    // Keep PrismaService injected for future delivery-log persistence without extra round-trips today.
-    void this.prisma;
   }
 }

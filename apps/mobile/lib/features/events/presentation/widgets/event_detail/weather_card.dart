@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chisto_mobile/core/theme/app_radii.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -14,6 +15,7 @@ import 'package:chisto_mobile/features/events/presentation/view_models/weather_c
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/detail_section_header.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_surface_decoration.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/weather_indicative_info_sheet.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 
 /// Weather forecast card shown in the event detail screen.
 ///
@@ -113,11 +115,11 @@ class _WeatherCardState extends State<WeatherCard> {
         const SizedBox(height: AppSpacing.sm),
         Align(
           alignment: AlignmentDirectional.centerEnd,
-          child: TextButton(
+          child: AppButton.text(
+            label: context.l10n.eventsWeatherRetry,
             onPressed: () {
               unawaited(_vm.load(widget.event));
             },
-            child: Text(context.l10n.eventsWeatherRetry),
           ),
         ),
       ],
@@ -146,7 +148,7 @@ class _WeatherCardState extends State<WeatherCard> {
                 width: 100,
                 decoration: BoxDecoration(
                   color: AppColors.inputFill,
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: AppRadii.xs,
                 ),
               ),
               const SizedBox(height: 6),
@@ -155,7 +157,7 @@ class _WeatherCardState extends State<WeatherCard> {
                 width: 140,
                 decoration: BoxDecoration(
                   color: AppColors.inputFill,
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: AppRadii.xs,
                 ),
               ),
             ],
@@ -267,19 +269,17 @@ class _WeatherCardState extends State<WeatherCard> {
 
   static Color _colorFor(WeatherWmoVisual v) {
     return switch (v) {
-      WeatherWmoVisual.clear || WeatherWmoVisual.mainlyClear =>
-        const Color(0xFFFFBF00),
+      WeatherWmoVisual.clear || WeatherWmoVisual.mainlyClear => AppColors.accentWarning,
       WeatherWmoVisual.partlyCloudy ||
       WeatherWmoVisual.overcast ||
       WeatherWmoVisual.fog =>
-        const Color(0xFF8099B0),
-      WeatherWmoVisual.snow || WeatherWmoVisual.snowShowers =>
-        const Color(0xFF64B5F6),
-      WeatherWmoVisual.thunderstorm => const Color(0xFFFFA000),
+        AppColors.textMuted,
+      WeatherWmoVisual.snow || WeatherWmoVisual.snowShowers => AppColors.accentInfo,
+      WeatherWmoVisual.thunderstorm => AppColors.accentWarningDark,
       WeatherWmoVisual.drizzle ||
       WeatherWmoVisual.rain ||
       WeatherWmoVisual.rainShowers =>
-        const Color(0xFF3BA3F7),
+        AppColors.accentInfo,
     };
   }
 }

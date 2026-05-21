@@ -144,7 +144,39 @@ exports.Prisma.UserScalarFieldEnum = {
   avatarUpdatedAt: 'avatarUpdatedAt',
   totpSecret: 'totpSecret',
   mfaBackupCodes: 'mfaBackupCodes',
-  organizerCertifiedAt: 'organizerCertifiedAt'
+  organizerCertifiedAt: 'organizerCertifiedAt',
+  homeLatitude: 'homeLatitude',
+  homeLongitude: 'homeLongitude',
+  homeLocationLabel: 'homeLocationLabel',
+  homeLocationSetAt: 'homeLocationSetAt'
+};
+
+exports.Prisma.UserBlockScalarFieldEnum = {
+  id: 'id',
+  blockerId: 'blockerId',
+  blockedUserId: 'blockedUserId',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.UgcContentReportScalarFieldEnum = {
+  id: 'id',
+  reporterId: 'reporterId',
+  subjectType: 'subjectType',
+  subjectId: 'subjectId',
+  reason: 'reason',
+  details: 'details',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PasswordResetEmailTokenScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  tokenHash: 'tokenHash',
+  expiresAt: 'expiresAt',
+  usedAt: 'usedAt',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.UserSessionScalarFieldEnum = {
@@ -164,8 +196,12 @@ exports.Prisma.PhoneOtpScalarFieldEnum = {
   createdAt: 'createdAt',
   phoneNumber: 'phoneNumber',
   code: 'code',
+  codeHash: 'codeHash',
   expiresAt: 'expiresAt',
-  attemptCount: 'attemptCount'
+  attemptCount: 'attemptCount',
+  lastSentAt: 'lastSentAt',
+  sendCountInWindow: 'sendCountInWindow',
+  sendWindowStartedAt: 'sendWindowStartedAt'
 };
 
 exports.Prisma.LoginFailureScalarFieldEnum = {
@@ -246,6 +282,22 @@ exports.Prisma.SiteScalarFieldEnum = {
   sharesCount: 'sharesCount'
 };
 
+exports.Prisma.SiteHistoryEntryScalarFieldEnum = {
+  id: 'id',
+  siteId: 'siteId',
+  kind: 'kind',
+  occurredAt: 'occurredAt',
+  fromStatus: 'fromStatus',
+  toStatus: 'toStatus',
+  reportId: 'reportId',
+  cleanupEventId: 'cleanupEventId',
+  actorUserId: 'actorUserId',
+  actorRole: 'actorRole',
+  note: 'note',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.ReportScalarFieldEnum = {
   id: 'id',
   createdAt: 'createdAt',
@@ -309,6 +361,15 @@ exports.Prisma.FeatureFlagScalarFieldEnum = {
   key: 'key',
   enabled: 'enabled',
   metadata: 'metadata'
+};
+
+exports.Prisma.EmailSuppressionScalarFieldEnum = {
+  email: 'email',
+  reason: 'reason',
+  source: 'source',
+  payload: 'payload',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.AuditLogScalarFieldEnum = {
@@ -609,6 +670,7 @@ exports.Prisma.UserNotificationScalarFieldEnum = {
   isRead: 'isRead',
   data: 'data',
   sentAt: 'sentAt',
+  openedAt: 'openedAt',
   threadKey: 'threadKey',
   groupKey: 'groupKey',
   archivedAt: 'archivedAt'
@@ -621,7 +683,12 @@ exports.Prisma.UserNotificationPreferenceScalarFieldEnum = {
   userId: 'userId',
   type: 'type',
   muted: 'muted',
-  mutedUntil: 'mutedUntil'
+  mutedUntil: 'mutedUntil',
+  quietHoursStart: 'quietHoursStart',
+  quietHoursEnd: 'quietHoursEnd',
+  quietHoursTimezone: 'quietHoursTimezone',
+  emailMuted: 'emailMuted',
+  emailMutedUntil: 'emailMutedUntil'
 };
 
 exports.Prisma.NotificationOutboxScalarFieldEnum = {
@@ -766,6 +833,22 @@ exports.SiteStatus = exports.$Enums.SiteStatus = {
   DISPUTED: 'DISPUTED'
 };
 
+exports.SiteHistoryEntryKind = exports.$Enums.SiteHistoryEntryKind = {
+  SITE_CREATED: 'SITE_CREATED',
+  REPORT_SUBMITTED: 'REPORT_SUBMITTED',
+  REPORT_APPROVED: 'REPORT_APPROVED',
+  REPORT_REJECTED: 'REPORT_REJECTED',
+  REPORT_MERGED: 'REPORT_MERGED',
+  STATUS_CHANGED: 'STATUS_CHANGED',
+  CLEANUP_EVENT_SCHEDULED: 'CLEANUP_EVENT_SCHEDULED',
+  CLEANUP_EVENT_STARTED: 'CLEANUP_EVENT_STARTED',
+  CLEANUP_EVENT_COMPLETED: 'CLEANUP_EVENT_COMPLETED',
+  CLEANUP_EVENT_CANCELLED: 'CLEANUP_EVENT_CANCELLED',
+  ARCHIVED_BY_ADMIN: 'ARCHIVED_BY_ADMIN',
+  UNARCHIVED_BY_ADMIN: 'UNARCHIVED_BY_ADMIN',
+  ADMIN_NOTE: 'ADMIN_NOTE'
+};
+
 exports.ReportCleanupEffort = exports.$Enums.ReportCleanupEffort = {
   ONE_TO_TWO: 'ONE_TO_TWO',
   THREE_TO_FIVE: 'THREE_TO_FIVE',
@@ -901,6 +984,9 @@ exports.MapEventOutboxStatus = exports.$Enums.MapEventOutboxStatus = {
 
 exports.Prisma.ModelName = {
   User: 'User',
+  UserBlock: 'UserBlock',
+  UgcContentReport: 'UgcContentReport',
+  PasswordResetEmailToken: 'PasswordResetEmailToken',
   UserSession: 'UserSession',
   PhoneOtp: 'PhoneOtp',
   LoginFailure: 'LoginFailure',
@@ -910,12 +996,14 @@ exports.Prisma.ModelName = {
   AdminNotification: 'AdminNotification',
   PointTransaction: 'PointTransaction',
   Site: 'Site',
+  SiteHistoryEntry: 'SiteHistoryEntry',
   Report: 'Report',
   ReportCoReporter: 'ReportCoReporter',
   ReportSubmitIdempotency: 'ReportSubmitIdempotency',
   ReportSideEffect: 'ReportSideEffect',
   SystemConfig: 'SystemConfig',
   FeatureFlag: 'FeatureFlag',
+  EmailSuppression: 'EmailSuppression',
   AuditLog: 'AuditLog',
   CleanupEvent: 'CleanupEvent',
   EventParticipant: 'EventParticipant',

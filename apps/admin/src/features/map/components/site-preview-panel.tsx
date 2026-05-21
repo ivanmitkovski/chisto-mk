@@ -52,8 +52,8 @@ export function SitePreviewPanel({ site, onClose }: SitePreviewPanelProps) {
     () => typeof window !== 'undefined' && window.matchMedia('(max-width: 920px)').matches,
   );
 
-  const media: string[] = (site.latestReportMediaUrls ?? []).filter(
-    (url): url is string => Boolean(url),
+  const media: string[] = ((site.latestReportMediaUrls ?? []) as unknown[]).filter(
+    (url): url is string => typeof url === 'string' && url.length > 0,
   );
   const hasMedia = media.length > 0;
   const safePhotoIndex = hasMedia ? Math.min(photoIndex, media.length - 1) : 0;

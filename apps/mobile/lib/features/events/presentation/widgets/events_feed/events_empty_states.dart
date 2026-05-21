@@ -1,3 +1,4 @@
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -8,7 +9,7 @@ import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event_filter.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
 
 class EventsEmptyState extends StatelessWidget {
   const EventsEmptyState({
@@ -99,12 +100,9 @@ class EventsEmptyState extends StatelessWidget {
               ),
               if (showClearFilters && onClearFilters != null) ...<Widget>[
                 const SizedBox(height: AppSpacing.lg),
-                TextButton(
-                  style: TextButton.styleFrom(
-                    foregroundColor: AppColors.primaryDark,
-                  ),
+                AppButton.text(
+                  label: l10n.eventsEmptyActionClearFilters,
                   onPressed: onClearFilters,
-                  child: Text(l10n.eventsEmptyActionClearFilters),
                 ),
               ],
               if (onCreateEvent != null) ...<Widget>[
@@ -181,12 +179,9 @@ class SearchEmptyState extends StatelessWidget {
               ],
               if (onClearSearch != null) ...<Widget>[
                 const SizedBox(height: AppSpacing.lg),
-                TextButton(
-                  style: TextButton.styleFrom(
-                    foregroundColor: AppColors.primaryDark,
-                  ),
+                AppButton.text(
+                  label: l10n.eventsSearchEmptyClearSearch,
                   onPressed: onClearSearch,
-                  child: Text(l10n.eventsSearchEmptyClearSearch),
                 ),
               ],
               if (onCreateEvent != null) ...<Widget>[

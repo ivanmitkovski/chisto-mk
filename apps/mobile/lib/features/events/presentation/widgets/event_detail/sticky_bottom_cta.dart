@@ -1,16 +1,16 @@
 import 'dart:ui' show ImageFilter;
 
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
-import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/event_detail_cta_presentation.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_layout.dart';
 import 'package:chisto_mobile/features/profile/presentation/widgets/profile_primary_action_bar.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
 
 class StickyBottomCTA extends StatelessWidget {
   const StickyBottomCTA({
@@ -146,24 +146,11 @@ class _CtaContent extends StatelessWidget {
             onPressed: state.enabled ? state.onPrimaryPressed : null,
           ),
           const SizedBox(height: AppSpacing.sm),
-          SizedBox(
-            width: double.infinity,
-            height: kEventDetailCtaSecondaryButtonHeight,
-            child: OutlinedButton(
-              onPressed: isPrimaryLoading ? null : state.onSecondaryPressed,
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: AppColors.divider),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-                ),
-              ),
-              child: Text(
-                state.secondaryLabel!,
-                style: AppTypography.eventsSecondaryCtaLabel(
-                  Theme.of(context).textTheme,
-                ),
-              ),
-            ),
+          AppButton.outlined(
+            label: state.secondaryLabel!,
+            onPressed: state.onSecondaryPressed,
+            enabled: !isPrimaryLoading,
+            expand: true,
           ),
         ],
       );

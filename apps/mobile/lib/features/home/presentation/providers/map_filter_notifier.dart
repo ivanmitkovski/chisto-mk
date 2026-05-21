@@ -50,9 +50,9 @@ class MapFilterState {
 }
 
 final mapFilterNotifierProvider =
-    NotifierProvider<MapFilterNotifier, MapFilterState>(MapFilterNotifier.new);
+    NotifierProvider.autoDispose<MapFilterNotifier, MapFilterState>(MapFilterNotifier.new);
 
-class MapFilterNotifier extends Notifier<MapFilterState> {
+class MapFilterNotifier extends AutoDisposeNotifier<MapFilterState> {
   static const Set<String> _defaultStatuses = <String>{...mapStatusOrder};
   static int get defaultStatusCount => _defaultStatuses.length;
 

@@ -1,0 +1,20 @@
+name: Verify universal links
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1'
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch apple-app-site-association
+        run: |
+          curl -fsSL "https://chisto.mk/.well-known/apple-app-site-association" | tee aasa.json
+          grep -q "applinks" aasa.json
+          grep -q "mk.chisto" aasa.json || grep -q "chistoMobile" aasa.json || true
+      - name: Fetch assetlinks.json
+        run: |
+          curl -fsSL "https://chisto.mk/.well-known/assetlinks.json" | tee assetlinks.json
+          grep -q "android_app" assetlinks.json

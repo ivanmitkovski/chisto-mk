@@ -1,8 +1,12 @@
 import 'dart:io';
 
 import 'package:chisto_mobile/core/config/app_config.dart';
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
+import 'package:chisto_mobile/core/providers/root_container.dart';
 import 'package:chisto_mobile/core/network/connectivity_gate.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_local_notifications_platform_interface/flutter_local_notifications_platform_interface.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -33,7 +37,8 @@ class _WidgetTestPathProvider extends PathProviderPlatform {
   Future<String?> getApplicationCachePath() async => '$_root/cache';
 }
 
-Future<void> bootstrapWidgetTests() async {
+/// Native/plugin plumbing for widget tests (no [AppBootstrap.initialize]).
+Future<void> ensureWidgetTestPlumbing() async {
   if (_bootstrapped) return;
   TestWidgetsFlutterBinding.ensureInitialized();
   sqfliteFfiInit();
@@ -45,13 +50,39 @@ Future<void> bootstrapWidgetTests() async {
   );
   Hive.init(dir.path);
   PathProviderPlatform.instance = _WidgetTestPathProvider(dir.path);
-  SharedPreferences.setMockInitialValues(<String, Object>{});
   ConnectivityGate.check = () async => <ConnectivityResult>[
     ConnectivityResult.wifi,
   ];
   ConnectivityGate.watch = () => Stream<List<ConnectivityResult>>.value(
     <ConnectivityResult>[ConnectivityResult.wifi],
   );
-  await ServiceLocator.instance.initialize(config: AppConfig.local);
   _bootstrapped = true;
+}
+
+Future<void> bootstrapWidgetTests() async {
+  await ensureWidgetTestPlumbing();
+  if (AppBootstrap.instance.isInitialized) {
+    setRootProviderContainer(AppBootstrap.instance.providerContainer);
+    return;
+  }
+  SharedPreferences.setMockInitialValues(<String, Object>{});
+  await AppBootstrap.instance.initialize(config: AppConfig.local);
+  setRootProviderContainer(AppBootstrap.instance.providerContainer);
+}
+
+/// Wraps [child] for widget tests that need Riverpod + l10n (post–AppBootstrap migration).
+Widget wrapForWidgetTest(
+  Widget child, {
+  Locale locale = const Locale('en'),
+}) {
+  return UncontrolledProviderScope(
+    container: AppBootstrap.instance.providerContainer,
+    child: MaterialApp(
+      debugShowCheckedModeBanner: false,
+      locale: locale,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: child,
+    ),
+  );
 }

@@ -4,6 +4,7 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
+import 'package:chisto_mobile/shared/widgets/atoms/app_loading_indicator.dart';
 
 /// Status strip under the app bar when the chat stream is recovering.
 class ChatConnectionBanner extends StatelessWidget {
@@ -80,8 +81,8 @@ class ChatConnectionBanner extends StatelessWidget {
               SizedBox(
                 width: 14,
                 height: 14,
-                child: CircularProgressIndicator(
-                  strokeWidth: 1.5,
+                child: AppLoadingIndicator(
+                  size: AppLoadingIndicatorSize.sm,
                   color: AppColors.textSecondary,
                 ),
               )

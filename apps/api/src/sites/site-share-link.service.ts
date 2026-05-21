@@ -243,8 +243,8 @@ export class SiteShareLinkService {
     if (raw != null && raw.length >= 24) {
       return Buffer.from(raw, 'utf8');
     }
-    if (nodeEnv === 'production') {
-      this.logger.error('SITE_SHARE_TOKEN_SECRET missing or too short in production');
+    if (nodeEnv === 'production' || nodeEnv === 'staging') {
+      this.logger.error('SITE_SHARE_TOKEN_SECRET missing or too short in production/staging');
       throw new InternalServerErrorException({
         code: 'SITES_SHARE_SECRET_MISCONFIG',
         message: 'Server misconfigured',
@@ -262,8 +262,8 @@ export class SiteShareLinkService {
     if (raw != null && raw.length >= 24) {
       return Buffer.from(raw, 'utf8');
     }
-    if (nodeEnv === 'production') {
-      this.logger.error('SITE_SHARE_FINGERPRINT_SECRET missing or too short in production');
+    if (nodeEnv === 'production' || nodeEnv === 'staging') {
+      this.logger.error('SITE_SHARE_FINGERPRINT_SECRET missing or too short in production/staging');
       throw new InternalServerErrorException({
         code: 'SITES_SHARE_SECRET_MISCONFIG',
         message: 'Server misconfigured',

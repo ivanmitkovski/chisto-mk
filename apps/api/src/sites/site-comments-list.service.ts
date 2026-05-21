@@ -4,6 +4,7 @@ import { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { ListSiteCommentsQueryDto, SiteCommentsSort } from './dto/list-site-comments-query.dto';
 import { SiteEngagementService } from './site-engagement.service';
 import { ReportsUploadService } from '../reports/reports-upload.service';
+import { ModerationService } from '../moderation/moderation.service';
 import type { SiteCommentTreeNode } from './site-comments.types';
 
 @Injectable()
@@ -15,7 +16,21 @@ export class SiteCommentsListService {
     private readonly prisma: PrismaService,
     private readonly siteEngagement: SiteEngagementService,
     private readonly reportsUpload: ReportsUploadService,
+    private readonly moderation: ModerationService,
   ) {}
+
+  private async blockedAuthorFilter(
+    user?: AuthenticatedUser,
+  ): Promise<{ authorId?: { notIn: string[] } }> {
+    if (!user) {
+      return {};
+    }
+    const blockedIds = await this.moderation.blockedUserIdsFor(user.userId);
+    if (blockedIds.length === 0) {
+      return {};
+    }
+    return { authorId: { notIn: blockedIds } };
+  }
 
   async findSiteComments(
     siteId: string,
@@ -26,7 +41,8 @@ export class SiteCommentsListService {
     meta: { page: number; limit: number; total: number; truncated?: boolean };
   }> {
     await this.siteEngagement.ensureSiteExists(siteId);
-    const baseWhere = { siteId, isDeleted: false };
+    const blockedFilter = await this.blockedAuthorFilter(user);
+    const baseWhere = { siteId, isDeleted: false, ...blockedFilter };
 
     if (query.parentId) {
       const where = { ...baseWhere, parentId: query.parentId };

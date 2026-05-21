@@ -44,4 +44,32 @@ void main() {
     ]);
     expect(grouped.first.items.first.id, 'a');
   });
+
+  test('collapseByGroupKey merges EVENT_CHAT rows with same groupKey', () {
+    final DateTime at = DateTime(2026, 3, 27, 12, 0);
+    final List<UserNotification> chats = <UserNotification>[
+      UserNotification(
+        id: 'chat-1',
+        title: 'Cleanup',
+        body: 'Alex: one',
+        type: UserNotificationType.eventChat,
+        isRead: false,
+        createdAt: at,
+        groupKey: 'event-chat:evt1',
+      ),
+      UserNotification(
+        id: 'chat-2',
+        title: 'Cleanup',
+        body: 'Alex: two',
+        type: UserNotificationType.eventChat,
+        isRead: false,
+        createdAt: at.subtract(const Duration(seconds: 1)),
+        groupKey: 'event-chat:evt1',
+      ),
+    ];
+    final List<CollapsedNotification> collapsed = collapseByGroupKey(chats);
+    expect(collapsed.length, 1);
+    expect(collapsed.first.groupCount, 2);
+    expect(collapsed.first.representative.id, 'chat-1');
+  });
 }

@@ -9,4 +9,7 @@ module.exports = {
   modulePathIgnorePatterns: ['<rootDir>/dist/'],
   coverageDirectory: './coverage-area-runs',
   verbose: true,
+  // Area gates run many suites back-to-back; timers/SSE mocks may keep handles open.
+  forceExit: true,
+  testTimeout: 30_000,
 };

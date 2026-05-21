@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event_filter.dart';
-import 'package:chisto_mobile/shared/widgets/app_filter_pill_bar.dart';
+import 'package:chisto_mobile/shared/widgets/molecules/app_filter_pill_bar.dart';
 
 export 'package:chisto_mobile/features/events/domain/models/eco_event_filter.dart';
 

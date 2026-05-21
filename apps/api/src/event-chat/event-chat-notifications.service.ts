@@ -2,23 +2,25 @@ import { Injectable, Logger } from '@nestjs/common';
 import { NotificationType } from '../prisma-client';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationDispatcherService } from '../notifications/notification-dispatcher.service';
+import { FeatureFlagsService } from '../feature-flags/feature-flags.service';
+import { EventChatPushAggregatorService } from './event-chat-push-aggregator.service';
+import { buildEventChatPushPreview } from './event-chat-push-preview';
 import type { EventChatMessageRow } from './event-chat-message.select';
 
-const CHAT_PUSH_DEBOUNCE_MS = 30_000;
 const REPLY_SNIPPET_MAX = 120;
 
 /**
- * FCM fan-out for new chat messages (debounced per recipient per event).
- * Chat notification side-effects (kept separate from list/presence/mutation services).
+ * FCM fan-out for new chat messages (one push per message; optional coalesce v2 flag for rollback).
  */
 @Injectable()
 export class EventChatNotificationsService {
   private readonly logger = new Logger(EventChatNotificationsService.name);
-  private readonly lastChatPushAt = new Map<string, number>();
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly notificationDispatcher: NotificationDispatcherService,
+    private readonly featureFlags: FeatureFlagsService,
+    private readonly pushAggregator: EventChatPushAggregatorService,
   ) {}
 
   async notifyParticipantsDebounced(
@@ -59,34 +61,50 @@ export class EventChatNotificationsService {
     });
     const muted = new Set(mutedRows.map((m) => m.userId));
 
-    const preview = this.snippet(messagePreview);
+    const preview = this.snippet(
+      messagePreview.trim().length > 0
+        ? messagePreview
+        : buildEventChatPushPreview(created, ''),
+    );
     const senderName = `${created.author.firstName} ${created.author.lastName}`.trim();
-    const now = Date.now();
+    const coalesceV2 = await this.featureFlags.isEventChatPushCoalesceV2Enabled();
 
     for (const recipientId of recipientIds) {
       if (muted.has(recipientId)) {
         continue;
       }
-      const key = `${eventId}:${recipientId}`;
-      const last = this.lastChatPushAt.get(key) ?? 0;
-      if (now - last < CHAT_PUSH_DEBOUNCE_MS) {
+      if (coalesceV2) {
+        this.pushAggregator.enqueue({
+          recipientUserId: recipientId,
+          eventId,
+          eventTitle: event.title,
+          senderDisplayName: senderName,
+          senderUserId: senderId,
+          messagePreview: preview,
+          messageId: created.id,
+          messageType: created.messageType,
+        });
         continue;
       }
-      this.lastChatPushAt.set(key, now);
-
+      const threadKey = `event-chat:${eventId}:${created.id}`;
+      const groupKey = `event-chat:${eventId}`;
       void this.notificationDispatcher
         .dispatchToUser(recipientId, {
           title: event.title,
           body: `${senderName}: ${preview}`,
           type: NotificationType.EVENT_CHAT,
-          threadKey: `event-chat:${eventId}`,
-          groupKey: `event-chat:${eventId}`,
+          threadKey,
+          groupKey,
           data: {
             eventId,
             messageId: created.id,
-            senderName,
+            messageCount: 1,
             messagePreview: preview.slice(0, 100),
+            messageType: String(created.messageType),
+            senderName,
+            actorUserId: senderId,
             threadTitle: event.title,
+            collapseId: `event-chat-msg:${created.id}`,
           },
         })
         .catch((err: unknown) => {
@@ -97,9 +115,8 @@ export class EventChatNotificationsService {
 
   private snippet(body: string): string {
     const t = body.trim();
-    if (t.length <= REPLY_SNIPPET_MAX) {
-      return t;
-    }
-    return `${t.slice(0, REPLY_SNIPPET_MAX)}…`;
+    const core =
+      t.length <= REPLY_SNIPPET_MAX ? t : `${t.slice(0, REPLY_SNIPPET_MAX)}…`;
+    return core.length > 0 ? core : 'Message';
   }
 }

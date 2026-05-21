@@ -9,6 +9,7 @@ import { EVENT_CHAT_MESSAGE_SELECT } from './event-chat-message.select';
 import { EventChatTelemetryService } from './event-chat-telemetry.service';
 import { EventChatMessageDtoService } from './event-chat-message-dto.service';
 import { MAX_PINNED_PER_EVENT } from './event-chat.constants';
+import { ModerationService } from '../moderation/moderation.service';
 
 @Injectable()
 export class EventChatListService {
@@ -16,6 +17,7 @@ export class EventChatListService {
     private readonly prisma: PrismaService,
     private readonly telemetry: EventChatTelemetryService,
     private readonly dto: EventChatMessageDtoService,
+    private readonly moderation: ModerationService,
   ) {}
 
   async listMessages(
@@ -28,7 +30,11 @@ export class EventChatListService {
   }> {
     const t0 = Date.now();
     const limit = query.limit;
-    const where: Prisma.EventChatMessageWhereInput = { eventId };
+    const blockedIds = await this.moderation.blockedUserIdsFor(user.userId);
+    const where: Prisma.EventChatMessageWhereInput = {
+      eventId,
+      ...(blockedIds.length > 0 ? { authorId: { notIn: blockedIds } } : {}),
+    };
 
     if (query.cursor?.trim()) {
       const ref = await this.prisma.eventChatMessage.findFirst({
@@ -85,12 +91,14 @@ export class EventChatListService {
   }> {
     const limit = query.limit;
     const q = query.q.trim();
+    const blockedIds = await this.moderation.blockedUserIdsFor(user.userId);
     // Encrypted bodies are ciphertext; search only plaintext rows (see EVENT_CHAT_BODY_INVALID for send path).
     const where: Prisma.EventChatMessageWhereInput = {
       eventId,
       deletedAt: null,
       bodyEncrypted: false,
       body: { contains: q, mode: 'insensitive' },
+      ...(blockedIds.length > 0 ? { authorId: { notIn: blockedIds } } : {}),
     };
 
     if (query.cursor?.trim()) {
@@ -144,11 +152,13 @@ export class EventChatListService {
     data: EventChatMessageResponseDto[];
     meta: { timestamp: string };
   }> {
+    const blockedIds = await this.moderation.blockedUserIdsFor(user.userId);
     const rows = await this.prisma.eventChatMessage.findMany({
       where: {
         eventId,
         isPinned: true,
         deletedAt: null,
+        ...(blockedIds.length > 0 ? { authorId: { notIn: blockedIds } } : {}),
       },
       orderBy: [{ pinnedAt: 'desc' }, { id: 'desc' }],
       take: MAX_PINNED_PER_EVENT,

@@ -1,9 +1,11 @@
+import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_input_outline.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
+import 'package:chisto_mobile/core/theme/app_radii.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/home/data/map_regions/macedonia_map_regions.dart';
 import 'package:chisto_mobile/features/home/data/map_regions/map_geo_labels.dart';
@@ -12,7 +14,6 @@ import 'package:chisto_mobile/features/home/presentation/widgets/map/map_polluti
 import 'package:chisto_mobile/features/home/presentation/widgets/map/map_filter_site_status_ui.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/map/map_status_codes.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 class MapFilterSheet extends StatefulWidget {
   const MapFilterSheet({
@@ -77,7 +78,6 @@ class _MapFilterSheetState extends State<MapFilterSheet> {
       }
     });
     widget.onToggleStatus(status);
-    AppHaptics.pinSelect(context);
   }
 
   void _toggleType(String type) {
@@ -92,13 +92,11 @@ class _MapFilterSheetState extends State<MapFilterSheet> {
       }
     });
     widget.onTogglePollutionType(type);
-    AppHaptics.pinSelect(context);
   }
 
   void _onGeoChanged(String? next) {
     setState(() => _geoAreaId = next);
     widget.onGeoAreaIdChanged(next);
-    AppHaptics.light(context);
   }
 
   void _onRootAreaChanged(String? next) {
@@ -188,7 +186,7 @@ class _MapFilterSheetState extends State<MapFilterSheet> {
                   height: 4,
                   decoration: BoxDecoration(
                     color: AppColors.textMuted.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(2),
+                    borderRadius: AppRadii.handle,
                   ),
                 ),
               ),
@@ -207,21 +205,9 @@ class _MapFilterSheetState extends State<MapFilterSheet> {
                                 color: AppColors.textPrimary,
                               ),
                         ),
-                        TextButton(
-                          onPressed: () {
-                            AppHaptics.medium(context);
-                            widget.onResetFilters();
-                          },
-                          style: TextButton.styleFrom(
-                            padding: EdgeInsets.zero,
-                            foregroundColor: AppColors.primaryDark,
-                            textStyle:
-                                Theme.of(context).textTheme.titleSmall?.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                      letterSpacing: -0.1,
-                                    ),
-                          ),
-                          child: Text(l10n.mapResetFiltersSemantic),
+                        AppButton.text(
+                          label: l10n.mapResetFiltersSemantic,
+                          onPressed: widget.onResetFilters,
                         ),
                       ],
                     ),
@@ -231,7 +217,6 @@ class _MapFilterSheetState extends State<MapFilterSheet> {
                     color: AppColors.textMuted,
                     tooltip: l10n.mapFilterCloseTooltip,
                     onPressed: () {
-                      AppHaptics.sheetDismiss(context);
                       widget.onDismiss();
                     },
                   ),
@@ -369,7 +354,6 @@ class _MapFilterSheetState extends State<MapFilterSheet> {
                       onChanged: (bool value) {
                         setState(() => _includeArchived = value);
                         widget.onIncludeArchivedChanged(value);
-                        AppHaptics.light(context);
                       },
                     ),
                   ],

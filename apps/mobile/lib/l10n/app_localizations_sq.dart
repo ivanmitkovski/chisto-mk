@@ -438,7 +438,36 @@ class AppLocalizationsSq extends AppLocalizations {
   String get authFieldPasswordHint => 'Shkruaj fjalëkalimin';
 
   @override
-  String get authRememberMe => 'Më mbaj mend';
+  String get authRememberMe => 'Mbaj mend';
+
+  @override
+  String get authSessionExpired => 'Sesioni skadoi. Hyni përsëri.';
+
+  @override
+  String get authPhoneNotVerified => 'Verifikoni telefonin për të hyrë.';
+
+  @override
+  String get authVerifyPhoneCta => 'Verifiko telefonin';
+
+  @override
+  String get authResetViaEmail => 'Rivendos me email';
+
+  @override
+  String get authResetViaSms => 'Rivendos me SMS';
+
+  @override
+  String get authForgotPasswordEmailSubtitle =>
+      'Vendosni emailin e llogarisë. Do të dërgojmë një lidhje nëse ekziston llogaria.';
+
+  @override
+  String get authForgotPasswordEmailSentTitle => 'Kontrolloni emailin';
+
+  @override
+  String get authForgotPasswordEmailSentBody =>
+      'Nëse ekziston një llogari për atë email, dërguam një lidhje për fjalëkalimin e ri.';
+
+  @override
+  String get authForgotPasswordEmailField => 'Email';
 
   @override
   String get authForgotPassword => 'Harrove fjalëkalimin?';
@@ -499,6 +528,9 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String get authSignInLink => 'Hyr';
+
+  @override
+  String get authValidationFullNameTwoParts => 'Shkruani emrin dhe mbiemrin';
 
   @override
   String authValidationFieldRequired(String fieldName) {
@@ -581,6 +613,11 @@ class AppLocalizationsSq extends AppLocalizations {
       'Shumë përpjekje të dështuara. Provo më vonë.';
 
   @override
+  String authErrorTooManyAttemptsRetryIn(String duration) {
+    return 'Shumë përpjekje të dështuara. Provo përsëri pas $duration.';
+  }
+
+  @override
   String get authErrorRateLimited =>
       'Shumë kërkesa. Prit pak dhe provo përsëri.';
 
@@ -593,7 +630,7 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String authOtpSubtitle(String phone) {
-    return 'Dërguam një kod me 4 shifra te $phone';
+    return 'Dërguam një kod me 6 shifra te $phone';
   }
 
   @override
@@ -626,6 +663,12 @@ class AppLocalizationsSq extends AppLocalizations {
   String get authForgotPasswordSendCode => 'Dërgo kodin';
 
   @override
+  String get authForgotPasswordSendLink => 'Dërgo lidhjen';
+
+  @override
+  String get authForgotPasswordTryAnotherWay => 'Provo një mënyrë tjetër';
+
+  @override
   String get authForgotPasswordRequestSemantic => 'Dërgo kod për rivendosje';
 
   @override
@@ -633,8 +676,15 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String authForgotPasswordOtpSubtitle(String phone) {
-    return 'Dërguam një kod me 4 shifra te $phone';
+    return 'Dërguam një kod me 6 shifra te $phone';
   }
+
+  @override
+  String get authErrorPhoneNotVerified => 'Telefoni nuk është verifikuar ende.';
+
+  @override
+  String get authErrorPasswordResetTokenInvalid =>
+      'Lidhja e rivendosjes është e pavlefshme ose ka skaduar.';
 
   @override
   String get authNewPasswordTitle => 'Fjalëkalim i ri';
@@ -1090,6 +1140,132 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String get profileHelpCenterTile => 'Qendra e ndihmës';
+
+  @override
+  String get profilePrivacyPolicyTile => 'Politika e privatësisë';
+
+  @override
+  String get profileTermsTile => 'Kushtet e përdorimit';
+
+  @override
+  String get profileSafetySection => 'Siguria';
+
+  @override
+  String get profileSafetyReportIssueTile => 'Raporto një problem sigurie';
+
+  @override
+  String get profileBlockedUsersTile => 'Përdorues të bllokuar';
+
+  @override
+  String get profileBlockedUsersSubtitle =>
+      'Personat që keni bllokuar nuk mund t’ju shkruajnë dhe nuk shfaqen në burimin tuaj.';
+
+  @override
+  String get profileBlockedUsersEmpty => 'Nuk keni bllokuar askënd.';
+
+  @override
+  String get profileBlockedUsersEmptySubtitle =>
+      'Bllokoni dikë nga biseda e ngjarjes ose komentet e vendit.';
+
+  @override
+  String get profileBlockedUsersUnblock => 'Zhblloko';
+
+  @override
+  String get profileBlockedUsersUnblockFailed =>
+      'Zhbllokimi dështoi. Provoni përsëri.';
+
+  @override
+  String get profileBlockedUsersLoadFailed =>
+      'Lista e bllokuarve nuk u ngarkua. Provoni përsëri.';
+
+  @override
+  String get safetyBlockUserTitle => 'Blloko përdoruesin';
+
+  @override
+  String safetyBlockUserBody(String name) {
+    return 'Të bllokohet $name? Nuk do të shfaqet në bisedë dhe komente.';
+  }
+
+  @override
+  String get safetyBlockUserConfirm => 'Blloko';
+
+  @override
+  String get safetyBlockUserSuccess => 'Përdoruesi u bllokua.';
+
+  @override
+  String get safetyBlockUserFailed => 'Bllokimi dështoi. Provoni përsëri.';
+
+  @override
+  String get safetyBlockUserSelfSnack => 'Nuk mund të bllokoni veten.';
+
+  @override
+  String get safetyUnblockUserTitle => 'Zhblloko përdoruesin';
+
+  @override
+  String safetyUnblockUserBody(String name) {
+    return 'Të zhbllokohet $name? Mesazhet dhe komentet mund të shfaqen përsëri.';
+  }
+
+  @override
+  String get safetyUnblockUserConfirm => 'Zhblloko';
+
+  @override
+  String get profilePrivacyPolicyOpenFailedSnack =>
+      'Politika e privatësisë nuk u hap';
+
+  @override
+  String get profileTermsOpenFailedSnack => 'Kushtet e përdorimit nuk u hapën';
+
+  @override
+  String get profileEulaTitle => 'Udhëzimet e komunitetit';
+
+  @override
+  String get profileEulaBody =>
+      'Chisto.mk nuk toleron përmbajtje të papërshtatshme ose abuzim. Duke vazhduar, pranoni Kushtet tona dhe do të raportoni shkeljet.';
+
+  @override
+  String get profileEulaBodyBeforeTerms =>
+      'Chisto.mk nuk toleron përmbajtje të papërshtatshme ose abuzim. Duke vazhduar, pranoni ';
+
+  @override
+  String get profileEulaBodyAfterTerms => ' tona dhe do të raportoni shkeljet.';
+
+  @override
+  String get profileEulaAccept => 'Pranoj';
+
+  @override
+  String get safetyReportTitle => 'Raporto përmbajtje';
+
+  @override
+  String get safetyReportSubmit => 'Dërgo raportin';
+
+  @override
+  String get safetyReportDetailsHint => 'Detaje opsionale për moderatorët';
+
+  @override
+  String get safetyReportSubmitted =>
+      'Raporti u dërgua. E shqyrtojmë brenda 24 orëve.';
+
+  @override
+  String get safetyReportFailed => 'Raporti dështoi. Provoni përsëri.';
+
+  @override
+  String get safetyReportReasonSpam => 'Spam';
+
+  @override
+  String get safetyReportReasonHarassment => 'Ngacmim';
+
+  @override
+  String get safetyReportReasonHate => 'Gjuha e urrejtjes';
+
+  @override
+  String get safetyReportReasonViolence => 'Dhuna';
+
+  @override
+  String get safetyReportReasonNudity => 'Papërshtatshmëri';
+
+  @override
+  String get safetyReportReasonOther => 'Tjetër';
 
   @override
   String get profileAccountSection => 'Llogaria';
@@ -1730,7 +1906,8 @@ class AppLocalizationsSq extends AppLocalizations {
   String get feedFilterUrgentName => 'Urgjente';
 
   @override
-  String get feedFilterUrgentDesc => 'Së pari incidentet me prioritet të lartë';
+  String get feedFilterUrgentDesc =>
+      'Vendndodhje të reja ose të paverifikuara që kanë nevojë për vëmendje';
 
   @override
   String get feedFilterNearbyName => 'Afër';
@@ -2515,7 +2692,14 @@ class AppLocalizationsSq extends AppLocalizations {
   String get notificationsTypeCleanupEvents => 'Ngjarje pastrimi';
 
   @override
+  String get notificationsTypeEventChat => 'Biseda e ngjarjes';
+
+  @override
   String get notificationsTypeSystem => 'Sistemi';
+
+  @override
+  String get notificationsPrefSystemGroupSubtitle =>
+      'Njoftime, arritje dhe mirëseardhje';
 
   @override
   String get notificationsSwipeMarkUnread => 'Shëno si të palexuar';
@@ -2591,6 +2775,105 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String get notificationsFilterUnread => 'Të palexuara';
+
+  @override
+  String get notificationsDayToday => 'Sot';
+
+  @override
+  String get notificationsDayYesterday => 'Dje';
+
+  @override
+  String get notificationsTimeNow => 'tani';
+
+  @override
+  String notificationsTimeMinutes(int count) {
+    return '${count}m';
+  }
+
+  @override
+  String notificationsTimeHours(int count) {
+    return '${count}h';
+  }
+
+  @override
+  String notificationsTimeDays(int count) {
+    return '${count}d';
+  }
+
+  @override
+  String notificationsGroupSummaryOne(String actor) {
+    return '$actor';
+  }
+
+  @override
+  String notificationsGroupSummaryTwo(String actorA, String actorB) {
+    return '$actorA dhe $actorB';
+  }
+
+  @override
+  String notificationsGroupSummaryMany(
+    String actorA,
+    String actorB,
+    int count,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count të tjerë',
+      one: '1 tjetër',
+    );
+    return '$actorA, $actorB dhe $_temp0';
+  }
+
+  @override
+  String notificationsGroupSummaryGeneric(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count përditësime',
+      one: '1 përditësim',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get notificationsGroupExpandHint => 'Zgjero grupin e njoftimeve';
+
+  @override
+  String get notificationsGroupCollapseHint => 'Mbyll grupin e njoftimeve';
+
+  @override
+  String get notificationsGroupMarkAllRead => 'Shëno grupin si të lexuar';
+
+  @override
+  String get notificationsGroupArchiveAll => 'Arkivo grupin';
+
+  @override
+  String notificationsGroupShowingN(int count, String summary) {
+    return 'Duke shfaqur $count njoftime: $summary';
+  }
+
+  @override
+  String notificationsGroupMessageCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mesazhe',
+      one: '1 mesazh',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String notificationsGroupSimilarCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count të ngjashme',
+      one: '1 i ngjashëm',
+    );
+    return 'dhe $_temp0';
+  }
 
   @override
   String get eventsEventNotFoundTitle => 'Ngjarja nuk u gjet';
@@ -4474,6 +4757,146 @@ class AppLocalizationsSq extends AppLocalizations {
   String get siteDetailTabCleaningEvents => 'Aksione pastrimi';
 
   @override
+  String get siteDetailTabHistory => 'Historiku';
+
+  @override
+  String get siteHistoryServiceUnavailable =>
+      'Historia e vendit nuk është ende e disponueshme. Përditësoni aplikacionin dhe provoni përsëri, ose kërkoni ekipin të publikojë API-në më të fundit.';
+
+  @override
+  String get siteHistoryEmptyTitle => 'Ende pa histori';
+
+  @override
+  String get siteHistoryEmptyMessage =>
+      'Aktiviteti në këtë vend do të shfaqet këtu — raporte, pastrime dhe ndryshime statusi.';
+
+  @override
+  String get siteHistoryRetry => 'Provo përsëri';
+
+  @override
+  String siteHistoryCurrentStatus(String status) {
+    return 'Statusi aktual: $status';
+  }
+
+  @override
+  String siteHistoryByActor(String name) {
+    return 'Nga $name';
+  }
+
+  @override
+  String get siteHistoryKindSiteCreated => 'Vendi u krijua';
+
+  @override
+  String get siteHistoryKindReportSubmitted => 'Raporti u dorëzua';
+
+  @override
+  String get siteHistoryKindReportApproved => 'Raporti u miratua';
+
+  @override
+  String get siteHistoryKindReportRejected => 'Raporti u refuzua';
+
+  @override
+  String get siteHistoryKindReportMerged => 'Raportet u bashkuan';
+
+  @override
+  String siteHistoryKindStatusChanged(String from, String to) {
+    return 'Statusi: $from → $to';
+  }
+
+  @override
+  String get siteHistoryKindStatusChangedGeneric => 'Statusi u përditësua';
+
+  @override
+  String get siteHistoryKindCleanupScheduled => 'Pastrim i planifikuar';
+
+  @override
+  String get siteHistoryKindCleanupStarted => 'Pastrim në progres';
+
+  @override
+  String get siteHistoryKindCleanupCompleted => 'Pastrimi përfundoi';
+
+  @override
+  String get siteHistoryKindCleanupCancelled => 'Pastrimi u anulua';
+
+  @override
+  String get siteHistoryKindArchived => 'Arkivuar nga moderatorët';
+
+  @override
+  String get siteHistoryKindUnarchived => 'Rikthyer nga moderatorët';
+
+  @override
+  String get siteHistoryKindAdminNote => 'Shënim moderator';
+
+  @override
+  String get siteHistoryKindUnknown => 'Aktivitet';
+
+  @override
+  String get siteHistoryStatusHeaderTitle => 'Statusi aktual';
+
+  @override
+  String siteHistoryStatusHeaderUpdated(String time) {
+    return 'Përditësuar $time';
+  }
+
+  @override
+  String siteHistoryStatusHeaderEntries(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count hyrje',
+      one: '1 hyrje',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get siteHistorySectionToday => 'Sot';
+
+  @override
+  String get siteHistorySectionYesterday => 'Dje';
+
+  @override
+  String get siteHistorySectionThisWeek => 'Më herët këtë javë';
+
+  @override
+  String siteHistorySectionMonth(String month, int year) {
+    return '$month $year';
+  }
+
+  @override
+  String get siteHistoryTimeNow => 'tani';
+
+  @override
+  String siteHistoryTimeMinutes(int count) {
+    return '${count}m';
+  }
+
+  @override
+  String siteHistoryTimeHours(int count) {
+    return '${count}or';
+  }
+
+  @override
+  String siteHistoryTimeDays(int count) {
+    return '${count}d';
+  }
+
+  @override
+  String get siteHistoryLoadingMore => 'Duke ngarkuar më shumë…';
+
+  @override
+  String get siteHistoryEndOfList => 'Fund i historisë';
+
+  @override
+  String get siteHistoryEntryOpenEvent => 'Hap ngjarjen e pastrimit';
+
+  @override
+  String get siteHistoryEntryShowMore => 'Shfaq më shumë';
+
+  @override
+  String get siteHistoryEntryShowLess => 'Shfaq më pak';
+
+  @override
   String get siteDetailInfoCardTitle => 'Nevojitet veprim i komunitetit';
 
   @override
@@ -5400,6 +5823,12 @@ class AppLocalizationsSq extends AppLocalizations {
   String get eventsCompletedBagsSave => 'Ruaj';
 
   @override
+  String get eventsCompletedBagsDecrease => 'Zvogëlo numrin e qeseve';
+
+  @override
+  String get eventsCompletedBagsIncrease => 'Rrit numrin e qeseve';
+
+  @override
   String get eventsCompletedBagsSaved => 'Numri i thesave u ruajt.';
 
   @override
@@ -6211,6 +6640,9 @@ class AppLocalizationsSq extends AppLocalizations {
   String get homeSiteCleaningJoinAction => 'Bashkohu';
 
   @override
+  String get homeSiteCleaningJoinedAction => 'U bashkua';
+
+  @override
   String get homeSiteCleaningEventUnavailable =>
       'Detajet e ngjarjes nuk janë të disponueshme për momentin.';
 
@@ -6986,6 +7418,62 @@ class AppLocalizationsSq extends AppLocalizations {
   @override
   String get eventChatPushChannelDescription =>
       'Mesazhe për pastrimet ku jeni regjistruar';
+
+  @override
+  String get eventChatPushReplyAction => 'Përgjigju';
+
+  @override
+  String get eventChatPushReplyButton => 'Dërgo';
+
+  @override
+  String get eventChatPushReplyPlaceholder => 'Mesazh';
+
+  @override
+  String get eventChatPushPreviewVoice => 'Mesazh zanor';
+
+  @override
+  String get eventChatPushPreviewPhoto => 'Foto';
+
+  @override
+  String get eventChatPushPreviewVideo => 'Video';
+
+  @override
+  String get eventChatPushPreviewFile => 'Skedar';
+
+  @override
+  String get eventChatPushPreviewLocation => 'Vendndodhje e ndarë';
+
+  @override
+  String get eventChatPushPreviewMessage => 'Mesazh';
+
+  @override
+  String get eventChatPushPreviewSystem => 'Përditësim i ngjarjes';
+
+  @override
+  String get pushChannelReportsName => 'Përditësime raportesh';
+
+  @override
+  String get pushChannelReportsDescription =>
+      'Statusi i raporteve dhe raporte në afërsi';
+
+  @override
+  String get pushChannelEventsName => 'Pastrime';
+
+  @override
+  String get pushChannelEventsDescription =>
+      'Kujtesa dhe përditësime për pastrime';
+
+  @override
+  String get pushChannelSocialName => 'Aktivitet social';
+
+  @override
+  String get pushChannelSocialDescription => 'Vota, komente dhe komunitet';
+
+  @override
+  String get pushChannelSystemName => 'Sistem';
+
+  @override
+  String get pushChannelSystemDescription => 'Njoftime sistemi dhe arritje';
 
   @override
   String get micPermissionRationaleTitle => 'Qasja në mikrofon';
