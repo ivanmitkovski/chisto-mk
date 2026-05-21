@@ -1,3 +1,4 @@
+import { Idempotent } from '../common/idempotency/idempotency.decorator';
 import {
   Body,
   Controller,
@@ -71,6 +72,7 @@ export class SitesController {
     private readonly siteEventsService: SiteEventsService,
   ) {}
 
+  @Idempotent('sites_sites_74')
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(...ADMIN_WRITE_ROLES)
@@ -129,6 +131,7 @@ export class SitesController {
     return result;
   }
 
+  @Idempotent('sites_sites_132')
   @Post('feed/events')
   @UseGuards(JwtAuthGuard, ThrottlerGuard)
   @Throttle({ default: { limit: 240, ttl: 60_000 } })
@@ -141,6 +144,7 @@ export class SitesController {
     return this.sitesFeed.trackFeedEvent(dto, user);
   }
 
+  @Idempotent('sites_sites_144')
   @Post('search')
   @UseGuards(MapRateLimitGuard)
   @ApiOperation({ summary: 'Search sites for map (text + optional geo intent)' })
@@ -149,6 +153,7 @@ export class SitesController {
     return this.sitesMapFacade.searchMapSites(dto);
   }
 
+  @Idempotent('sites_sites_152')
   @Post('admin/bulk')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(...ADMIN_WRITE_ROLES)
@@ -181,6 +186,7 @@ export class SitesController {
     return buildSiteEventsStream(this.siteEventsService, user, lastEventId);
   }
 
+  @Idempotent('sites_sites_184')
   @Post('share-events/click')
   @UseGuards(ThrottlerGuard)
   @Throttle({ default: { limit: 180, ttl: 60_000 } })
@@ -201,6 +207,7 @@ export class SitesController {
     });
   }
 
+  @Idempotent('sites_sites_204')
   @Post('share-events/open')
   @UseGuards(ThrottlerGuard, OptionalJwtAuthGuard)
   @Throttle({ default: { limit: 180, ttl: 60_000 } })

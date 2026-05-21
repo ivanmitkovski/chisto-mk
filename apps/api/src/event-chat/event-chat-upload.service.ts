@@ -7,11 +7,12 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import sharp from 'sharp';
 import { randomUUID } from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
+import { S3StorageClient } from '../storage/s3-storage.client';
 import type { EventChatMessageResponseDto } from './dto/event-chat-message-response.dto';
 import {
   ALL_ALLOWED_MIMES,
@@ -27,39 +28,26 @@ export type { ProcessedAttachment } from './event-chat-upload.types';
 @Injectable()
 export class EventChatUploadService implements OnModuleInit {
   private readonly logger = new Logger(EventChatUploadService.name);
-  private s3: S3Client | null = null;
-  private bucket: string | null = null;
-  private region = 'eu-central-1';
-  private enabled = false;
   private signedGetEnabled = false;
   private cfg!: (key: string) => string | undefined;
-  private static readonly SIGNED_GET_TTL_SECONDS = 3600;
+  private static readonly SIGNED_GET_TTL_SECONDS = 15 * 60;
 
   constructor(
     @Optional() private readonly config: ConfigService | null,
     private readonly prisma: PrismaService,
+    private readonly s3: S3StorageClient,
   ) {}
 
   onModuleInit(): void {
     this.cfg = (key: string) =>
       this.config?.get<string>(key)?.trim() ?? process.env[key]?.trim();
-    this.region =
-      this.cfg('AWS_REGION') || this.cfg('AWS_DEFAULT_REGION') || 'eu-central-1';
-    const bucketRaw = this.cfg('S3_BUCKET_NAME');
-    this.bucket = bucketRaw && bucketRaw.length > 0 ? bucketRaw : null;
-    this.enabled = !!this.bucket;
-    if (this.enabled) {
-      this.s3 = new S3Client({ region: this.region });
-    }
     const signFlag = this.cfg('CHAT_SIGNED_ATTACHMENT_URLS')?.toLowerCase();
-    this.signedGetEnabled = this.enabled && (signFlag === 'true' || signFlag === '1');
+    this.signedGetEnabled =
+      this.s3.enabled && (signFlag === 'true' || signFlag === '1');
   }
 
   private publishedUrlPrefix(): string | null {
-    if (!this.bucket) {
-      return null;
-    }
-    return `https://${this.bucket}.s3.${this.region}.amazonaws.com/`;
+    return this.s3.getVirtualHostedHttpsBase();
   }
 
   /** True if [url] is a published object URL for this deployment's chat prefix (trusted for persistence). */
@@ -81,16 +69,21 @@ export class EventChatUploadService implements OnModuleInit {
   }
 
   async signChatPublishedUrl(url: string | null): Promise<string | null> {
-    if (url == null || url === '' || !this.signedGetEnabled || !this.s3 || !this.bucket) {
+    if (url == null || url === '' || !this.signedGetEnabled) {
       return url;
     }
     const key = this.keyFromChatPublishedUrl(url);
     if (!key) {
       return url;
     }
+    const client = this.s3.getClientOrNull();
+    const bucket = this.s3.bucket;
+    if (!client || !bucket) {
+      return url;
+    }
     try {
-      const cmd = new GetObjectCommand({ Bucket: this.bucket, Key: key });
-      return await getSignedUrl(this.s3, cmd, {
+      const cmd = new GetObjectCommand({ Bucket: bucket, Key: key });
+      return await getSignedUrl(client, cmd, {
         expiresIn: EventChatUploadService.SIGNED_GET_TTL_SECONDS,
       });
     } catch (error) {
@@ -117,7 +110,7 @@ export class EventChatUploadService implements OnModuleInit {
     eventId: string,
     files: Array<{ buffer: Buffer; mimetype: string; size: number; originalname: string }>,
   ): Promise<ProcessedAttachment[]> {
-    if (!this.enabled || !this.s3 || !this.bucket) {
+    if (!this.s3.enabled || !this.s3.bucket) {
       throw new ServiceUnavailableException({
         code: 'S3_NOT_CONFIGURED',
         message: 'File upload is not configured.',
@@ -131,6 +124,7 @@ export class EventChatUploadService implements OnModuleInit {
     }
 
     const results: ProcessedAttachment[] = [];
+    const base = this.publishedUrlPrefix()!;
 
     for (const file of files) {
       if (!ALL_ALLOWED_MIMES.has(file.mimetype)) {
@@ -155,18 +149,15 @@ export class EventChatUploadService implements OnModuleInit {
         const height = meta.height ?? null;
         const webp = await image.webp({ quality: 80 }).toBuffer();
 
-        await this.s3.send(
-          new PutObjectCommand({
-            Bucket: this.bucket,
-            Key: key,
-            Body: webp,
-            ContentType: 'image/webp',
-            CacheControl: 'public, max-age=31536000, immutable',
-          }),
-        );
+        await this.s3.putObject({
+          Key: key,
+          Body: webp,
+          ContentType: 'image/webp',
+          CacheControl: 'public, max-age=31536000, immutable',
+        });
 
         results.push({
-          url: `https://${this.bucket}.s3.${this.region}.amazonaws.com/${key}`,
+          url: `${base}${key}`,
           mimeType: 'image/webp',
           fileName: file.originalname,
           sizeBytes: webp.length,
@@ -178,19 +169,14 @@ export class EventChatUploadService implements OnModuleInit {
       } else {
         const ext = file.originalname.split('.').pop()?.toLowerCase() || 'bin';
         const key = `chat/${eventId}/${randomUUID()}.${ext}`;
-
-        await this.s3.send(
-          new PutObjectCommand({
-            Bucket: this.bucket,
-            Key: key,
-            Body: file.buffer,
-            ContentType: file.mimetype,
-            CacheControl: 'public, max-age=31536000, immutable',
-          }),
-        );
-
+        await this.s3.putObject({
+          Key: key,
+          Body: file.buffer,
+          ContentType: file.mimetype,
+          CacheControl: 'public, max-age=31536000, immutable',
+        });
         results.push({
-          url: `https://${this.bucket}.s3.${this.region}.amazonaws.com/${key}`,
+          url: `${base}${key}`,
           mimeType: file.mimetype,
           fileName: file.originalname,
           sizeBytes: file.size,
@@ -207,28 +193,18 @@ export class EventChatUploadService implements OnModuleInit {
 
   /** Best-effort removal of objects uploaded under `chat/{eventId}/…` (matches [processAndUpload] URLs). */
   async deleteUploadedObjectsByUrls(urls: string[]): Promise<void> {
-    if (!this.enabled || !this.s3 || !this.bucket || urls.length === 0) {
+    if (!this.s3.enabled || urls.length === 0) {
       return;
     }
-    const prefix = `https://${this.bucket}.s3.${this.region}.amazonaws.com/`;
     const unique = [...new Set(urls.map((u) => u.trim()).filter((u) => u.length > 0))];
     for (const url of unique) {
-      if (!url.startsWith(prefix)) {
-        this.logger.warn(`Skipping S3 delete: URL not under expected chat bucket prefix`);
-        continue;
-      }
-      const key = decodeURIComponent(url.slice(prefix.length));
-      if (!key.startsWith('chat/')) {
-        this.logger.warn(`Skipping S3 delete: key does not start with chat/: ${key.slice(0, 64)}`);
+      const key = this.keyFromChatPublishedUrl(url);
+      if (!key) {
+        this.logger.warn('Skipping S3 delete: URL not under expected chat bucket prefix');
         continue;
       }
       try {
-        await this.s3.send(
-          new DeleteObjectCommand({
-            Bucket: this.bucket,
-            Key: key,
-          }),
-        );
+        await this.s3.deleteObject(key);
       } catch (error) {
         this.logger.warn(`S3 delete failed for ${key}: ${String(error)}`);
       }

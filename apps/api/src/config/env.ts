@@ -36,9 +36,14 @@ export function validateEnv(): void {
     EMAIL_APP_BASE_URL: Joi.string().trim().uri().optional(),
     EMAIL_LOGO_URL: Joi.string().trim().uri().optional(),
     PASSWORD_RESET_URL: Joi.string().trim().uri().optional(),
-  }).unknown(true);
+    TERMS_VERSION: Joi.string().trim().min(1).max(32).default('1'),
+  });
 
-  const { error, value } = schema.validate(process.env, { abortEarly: false, allowUnknown: true });
+  const nodeEnvForValidate = (process.env.NODE_ENV ?? 'development').trim();
+  const allowUnknown = nodeEnvForValidate !== 'production' && nodeEnvForValidate !== 'staging';
+  const validatedSchema = allowUnknown ? schema.unknown(true) : schema.unknown(false);
+
+  const { error, value } = validatedSchema.validate(process.env, { abortEarly: false, allowUnknown });
   if (error) {
     for (const detail of error.details) {
       console.error(detail.message);
@@ -164,7 +169,14 @@ export function validateEnv(): void {
       requireEnv('REDIS_URL');
     }
 
-    requireEnv('CHAT_ENCRYPTION_KEY');
+    const chatKey = requireEnv('CHAT_ENCRYPTION_KEY');
+    if (!/^[\da-f]{64}$/i.test(chatKey)) {
+      console.error(
+        'CHAT_ENCRYPTION_KEY must be exactly 64 hexadecimal characters (32 bytes) in production/staging',
+      );
+      process.exit(1);
+    }
+
     requireEnv('METRICS_BEARER_TOKEN');
   }
 }

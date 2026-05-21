@@ -1,4 +1,5 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { UserStatus } from '../prisma-client';
 import { PrismaService } from '../prisma/prisma.service';
 import { ReportsUploadService } from '../reports/reports-upload.service';
@@ -8,6 +9,10 @@ import { assertHomeLocationInMacedonia } from './auth-home-location.util';
 import { AuthenticatedUser } from './types/authenticated-user.type';
 import { AuthProfileReadService } from './auth-profile-read.service';
 import { AuthProfileAvatarService } from './auth-profile-avatar.service';
+import { AccountErasureService } from './account-erasure.service';
+import { AuditService } from '../audit/audit.service';
+import { AcceptTermsDto } from './dto/accept-terms.dto';
+import { resolveTermsVersionFromEnv, termsConsentPayload } from './terms-consent.util';
 
 @Injectable()
 export class AuthProfileService {
@@ -16,10 +21,64 @@ export class AuthProfileService {
     private readonly reportsUploadService: ReportsUploadService,
     private readonly readService: AuthProfileReadService,
     private readonly avatarService: AuthProfileAvatarService,
+    private readonly accountErasure: AccountErasureService,
+    private readonly configService: ConfigService,
+    private readonly audit: AuditService,
   ) {}
 
   me(authenticatedUser: AuthenticatedUser, locale = 'en') {
     return this.readService.me(authenticatedUser, locale);
+  }
+
+  async acceptTerms(userId: string, dto: AcceptTermsDto) {
+    await this.assertActiveUser(userId);
+    const currentTermsVersion = resolveTermsVersionFromEnv(
+      this.configService.get<string>('TERMS_VERSION'),
+    );
+    const requestedVersion = dto.termsVersion?.trim() || currentTermsVersion;
+    if (requestedVersion !== currentTermsVersion) {
+      throw new BadRequestException({
+        code: 'TERMS_VERSION_MISMATCH',
+        message: `termsVersion must be ${currentTermsVersion}`,
+      });
+    }
+
+    const now = new Date();
+    const existing = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { privacyAcceptedAt: true, termsAcceptedAt: true, termsVersion: true },
+    });
+    if (!existing) {
+      throw new UnauthorizedException({
+        code: 'INVALID_TOKEN_USER',
+        message: 'User not found',
+      });
+    }
+
+    const updated = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        termsAcceptedAt: now,
+        termsVersion: currentTermsVersion,
+        ...(existing.privacyAcceptedAt == null ? { privacyAcceptedAt: now } : {}),
+      },
+      select: {
+        termsAcceptedAt: true,
+        termsVersion: true,
+      },
+    });
+
+    await this.audit
+      .log({
+        actorId: userId,
+        action: 'TERMS_ACCEPTED',
+        resourceType: 'User',
+        resourceId: userId,
+        metadata: { termsVersion: currentTermsVersion },
+      })
+      .catch(() => {});
+
+    return termsConsentPayload(updated, currentTermsVersion);
   }
 
   uploadAvatar(userId: string, file: Express.Multer.File | undefined) {
@@ -101,7 +160,7 @@ export class AuthProfileService {
   async deleteAccount(userId: string): Promise<void> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true },
+      select: { id: true, status: true },
     });
     if (!user) {
       throw new UnauthorizedException({
@@ -109,17 +168,10 @@ export class AuthProfileService {
         message: 'User not found',
       });
     }
-    const now = new Date();
-    await this.prisma.$transaction([
-      this.prisma.userSession.updateMany({
-        where: { userId: user.id },
-        data: { revokedAt: now },
-      }),
-      this.prisma.user.update({
-        where: { id: userId },
-        data: { status: UserStatus.DELETED },
-      }),
-    ]);
+    if (user.status === UserStatus.DELETED) {
+      return;
+    }
+    await this.accountErasure.eraseUserAccount(userId);
   }
 
   private async profileResponse(updated: {

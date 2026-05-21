@@ -1,3 +1,4 @@
+import { Idempotent } from '../common/idempotency/idempotency.decorator';
 import {
   Body,
   Controller,
@@ -9,7 +10,6 @@ import {
   Patch,
   Post,
   Query,
-  UnauthorizedException,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
@@ -24,15 +24,12 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
-import { ADMIN_PANEL_ROLES } from './admin-roles';
+import { Throttle } from '@nestjs/throttler';
 import { AuthProfileService } from './auth-profile.service';
 import { CurrentUser } from './current-user.decorator';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { UpdateHomeLocationDto } from './dto/update-home-location.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
-import { Roles } from './roles.decorator';
-import { RolesGuard } from './roles.guard';
 import { AuthenticatedUser } from './types/authenticated-user.type';
 import { MeResponseDto } from './dto/me-response.dto';
 import { PointHistoryQueryDto } from './dto/point-history-query.dto';
@@ -42,6 +39,9 @@ import { localeFromAcceptLanguage } from '../common/utils/format-relative-time-s
 import { OrganizerCertificationService } from './organizer-certification.service';
 import { SubmitOrganizerCertificationDto } from './dto/submit-organizer-certification.dto';
 import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-error-responses.decorator';
+import { AcceptTermsDto } from './dto/accept-terms.dto';
+import { TermsConsentDto } from './dto/terms-consent-response.dto';
+import { requireAuthenticatedUser } from './auth-require-user.util';
 
 @ApiTags('auth')
 @ApiStandardHttpErrorResponses()
@@ -63,14 +63,8 @@ export class AuthProfileController {
     @Query() query: PointHistoryQueryDto,
     @Headers('accept-language') acceptLanguage?: string,
   ): Promise<PointHistoryResponseDto> {
-    if (!user) {
-      throw new UnauthorizedException({
-        code: 'UNAUTHORIZED',
-        message: 'Authentication required',
-      });
-    }
     return this.pointHistoryService.listForUser(
-      user.userId,
+      requireAuthenticatedUser(user).userId,
       query,
       localeFromAcceptLanguage(acceptLanguage),
     );
@@ -85,14 +79,24 @@ export class AuthProfileController {
     @CurrentUser() user?: AuthenticatedUser,
     @Headers('accept-language') acceptLanguage?: string,
   ): Promise<MeResponseDto> {
-    if (!user) {
-      throw new UnauthorizedException({
-        code: 'UNAUTHORIZED',
-        message: 'Authentication required',
-      });
-    }
+    return this.profile.me(
+      requireAuthenticatedUser(user),
+      localeFromAcceptLanguage(acceptLanguage),
+    );
+  }
 
-    return this.profile.me(user, localeFromAcceptLanguage(acceptLanguage));
+  @Post('me/accept-terms')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 20 } })
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Record acceptance of current terms and community guidelines' })
+  @ApiOkResponse({ description: 'Terms consent recorded', type: TermsConsentDto })
+  acceptTerms(
+    @CurrentUser() user: AuthenticatedUser | undefined,
+    @Body() dto: AcceptTermsDto,
+  ): Promise<TermsConsentDto> {
+    return this.profile.acceptTerms(requireAuthenticatedUser(user).userId, dto);
   }
 
   @Patch('me/home-location')
@@ -105,13 +109,7 @@ export class AuthProfileController {
     @CurrentUser() user: AuthenticatedUser | undefined,
     @Body() dto: UpdateHomeLocationDto,
   ) {
-    if (!user) {
-      throw new UnauthorizedException({
-        code: 'UNAUTHORIZED',
-        message: 'Authentication required',
-      });
-    }
-    return this.profile.updateHomeLocation(user.userId, dto);
+    return this.profile.updateHomeLocation(requireAuthenticatedUser(user).userId, dto);
   }
 
   @Patch('me')
@@ -124,32 +122,10 @@ export class AuthProfileController {
     @CurrentUser() user: AuthenticatedUser | undefined,
     @Body() dto: UpdateProfileDto,
   ) {
-    if (!user) {
-      throw new UnauthorizedException({
-        code: 'UNAUTHORIZED',
-        message: 'Authentication required',
-      });
-    }
-    return this.profile.updateProfile(user.userId, dto);
+    return this.profile.updateProfile(requireAuthenticatedUser(user).userId, dto);
   }
 
-  @Delete('me')
-  @UseGuards(JwtAuthGuard)
-  @Throttle({ default: { ttl: 60_000, limit: 3 } })
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Delete account (soft delete)' })
-  @ApiNoContentResponse({ description: 'Account deleted' })
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteAccount(@CurrentUser() user?: AuthenticatedUser): Promise<void> {
-    if (!user) {
-      throw new UnauthorizedException({
-        code: 'UNAUTHORIZED',
-        message: 'Authentication required',
-      });
-    }
-    await this.profile.deleteAccount(user.userId);
-  }
-
+  @Idempotent('auth_profile_avatar_upload')
   @Post(['me/avatar', 'avatar'])
   @UseGuards(JwtAuthGuard)
   @Throttle({ default: { ttl: 60_000, limit: 10 } })
@@ -169,13 +145,7 @@ export class AuthProfileController {
     @CurrentUser() user: AuthenticatedUser | undefined,
     @UploadedFiles() files: Express.Multer.File[],
   ): Promise<{ avatarUrl: string | null }> {
-    if (!user) {
-      throw new UnauthorizedException({
-        code: 'UNAUTHORIZED',
-        message: 'Authentication required',
-      });
-    }
-    return this.profile.uploadAvatar(user.userId, files?.[0]);
+    return this.profile.uploadAvatar(requireAuthenticatedUser(user).userId, files?.[0]);
   }
 
   @Delete(['me/avatar', 'avatar'])
@@ -189,33 +159,28 @@ export class AuthProfileController {
   @ApiNoContentResponse({ description: 'Avatar removed' })
   @HttpCode(HttpStatus.NO_CONTENT)
   async removeAvatar(@CurrentUser() user: AuthenticatedUser | undefined): Promise<void> {
-    if (!user) {
-      throw new UnauthorizedException({
-        code: 'UNAUTHORIZED',
-        message: 'Authentication required',
-      });
-    }
-    await this.profile.removeAvatar(user.userId);
+    await this.profile.removeAvatar(requireAuthenticatedUser(user).userId);
   }
 
   @Get('me/organizer-certification/quiz')
-  @UseGuards(JwtAuthGuard, ThrottlerGuard)
-  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Throttle({ default: { ttl: 60_000, limit: 60 } })
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Fetch organizer certification quiz questions' })
   @ApiOkResponse({ description: 'Quiz questions for the caller locale' })
   async getOrganizerQuiz(
     @CurrentUser() user: AuthenticatedUser | undefined,
     @Headers('accept-language') acceptLanguage?: string,
   ) {
-    if (!user) {
-      throw new UnauthorizedException({ code: 'UNAUTHORIZED', message: 'Authentication required' });
-    }
-    return this.organizerCertification.getQuiz(user.userId, acceptLanguage ?? 'en');
+    return this.organizerCertification.getQuiz(
+      requireAuthenticatedUser(user).userId,
+      acceptLanguage ?? 'en',
+    );
   }
 
+  @Idempotent('auth_organizer_cert_submit')
   @Post('me/organizer-certification')
-  @UseGuards(JwtAuthGuard, ThrottlerGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @HttpCode(HttpStatus.OK)
   @Throttle({ default: { ttl: 60_000, limit: 10 } })
@@ -226,19 +191,6 @@ export class AuthProfileController {
     @CurrentUser() user: AuthenticatedUser | undefined,
     @Body() body: SubmitOrganizerCertificationDto,
   ) {
-    if (!user) {
-      throw new UnauthorizedException({ code: 'UNAUTHORIZED', message: 'Authentication required' });
-    }
-    return this.organizerCertification.submit(user.userId, body);
-  }
-
-  @Get('admin/ping')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(...ADMIN_PANEL_ROLES)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Admin-only authorization check endpoint' })
-  @ApiOkResponse({ description: 'Admin role validated' })
-  adminPing() {
-    return { message: 'Admin access granted' };
+    return this.organizerCertification.submit(requireAuthenticatedUser(user).userId, body);
   }
 }

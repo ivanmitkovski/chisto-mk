@@ -22,7 +22,7 @@ describe('HTTP throttling (e2e)', () => {
     const password = 'E2eThrottle99!';
     let lastStatus = 200;
     for (let i = 0; i < 6; i += 1) {
-      const res = await agent.post('/auth/register').send({
+      const res = await agent.post('/v1/auth/register').send({
         firstName: 'E2e',
         lastName: 'Throttle',
         email: `e2e_throttle_${Date.now()}_${i}@test.local`,

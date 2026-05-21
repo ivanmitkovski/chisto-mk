@@ -23,6 +23,7 @@ import { ReportsDuplicateMergeService } from './reports-duplicate-merge.service'
 import { DuplicateGroupQueryService } from './duplicates/duplicate-group-query.service';
 import { DuplicateMergeSideEffectsService } from './duplicates/duplicate-merge-side-effects.service';
 import { ReportSideEffectProcessorService } from './side-effects/report-side-effect-processor.service';
+import { ReportSideEffectRetryService } from './side-effects/report-side-effect-retry.service';
 import { ReportCapacityService } from './report-capacity.service';
 import { ReportsUploadModule } from './reports-upload.module';
 import { ReportSubmitIdempotencyCleanupService } from './report-submit-idempotency-cleanup.service';
@@ -49,6 +50,7 @@ import { ParseCuidPipe } from '../common/pipes/parse-cuid.pipe';
     DuplicateGroupQueryService,
     DuplicateMergeSideEffectsService,
     ReportSideEffectProcessorService,
+    ReportSideEffectRetryService,
     DuplicateMergeSnapshotService,
     DuplicateMergeTransactionService,
     ReportsDuplicateMergeService,

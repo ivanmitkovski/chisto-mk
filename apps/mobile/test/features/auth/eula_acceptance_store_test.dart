@@ -41,6 +41,23 @@ void main() {
     expect(await store.hasAcceptedForUser(''), isFalse);
   });
 
+  test('syncFromServer seeds local cache when server does not require acceptance',
+      () async {
+    await store.syncFromServer(
+      userId: userA,
+      requiresTermsAcceptance: false,
+    );
+    expect(await store.hasAcceptedForUser(userA), isTrue);
+  });
+
+  test('syncFromServer no-op when server still requires acceptance', () async {
+    await store.syncFromServer(
+      userId: userA,
+      requiresTermsAcceptance: true,
+    );
+    expect(await store.hasAcceptedForUser(userA), isFalse);
+  });
+
   test('migrateLegacyIfNeeded copies global key to per-user key', () async {
     await prefs.setString(EulaAcceptanceStore.acceptedVersionKey, '1');
     expect(await store.hasAcceptedForUser(userA), isTrue);

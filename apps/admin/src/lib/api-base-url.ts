@@ -1,6 +1,8 @@
 function normalizeBaseUrl(raw: string): string {
   const t = raw.trim();
-  return t.endsWith('/') ? t.slice(0, -1) : t;
+  const withoutSlash = t.endsWith('/') ? t.slice(0, -1) : t;
+  if (withoutSlash.endsWith('/v1')) return withoutSlash;
+  return `${withoutSlash}/v1`;
 }
 
 /**
@@ -16,8 +18,14 @@ export function getApiBaseUrl(): string {
   }
 
   const raw = process.env.NEXT_PUBLIC_API_BASE_URL?.trim();
-  if (!raw) return 'http://localhost:3000';
+  if (!raw) return normalizeBaseUrl('http://localhost:3000');
   return normalizeBaseUrl(raw);
+}
+
+/** Host without `/v1` — for routes excluded from the API global prefix (e.g. `/health`). */
+export function getApiOrigin(): string {
+  const base = getApiBaseUrl();
+  return base.endsWith('/v1') ? base.slice(0, -3) : base;
 }
 
 export function getApiBaseUrlMisconfigurationHint(): string | null {

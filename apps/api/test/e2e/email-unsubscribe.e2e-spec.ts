@@ -30,16 +30,16 @@ describe('Email unsubscribe (e2e)', () => {
       where: { email: citizen.email },
       select: { id: true },
     });
-    const token = tokens.sign(user.id, NotificationType.SITE_COMMENT);
+    const token = tokens.sign(user.id, NotificationType.COMMENT);
 
     await request(app.getHttpServer())
-      .post('/notifications/email/unsubscribe')
+      .post('/v1/notifications/email/unsubscribe')
       .send({ token })
       .expect(204);
 
     const pref = await prisma.userNotificationPreference.findUnique({
       where: {
-        userId_type: { userId: user.id, type: NotificationType.SITE_COMMENT },
+        userId_type: { userId: user.id, type: NotificationType.COMMENT },
       },
     });
     expect(pref?.emailMuted).toBe(true);

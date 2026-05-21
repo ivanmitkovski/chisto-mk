@@ -648,7 +648,7 @@
   "profileSignOutDialogBody": "Можете повторно да се најавите со вашата сметка.",
   "profileSignOutFailedSnack": "Не можевме да ве одјавиме. Обидете се повторно.",
   "profileDeleteAccountDialogTitle": "Да се избрише сметката?",
-  "profileDeleteAccountDialogBody": "Сите податоци трајно ќе бидат избришани. Ова не може да се врати.",
+  "profileDeleteAccountDialogBody": "Сметката веднаш се анонимизира. Личните податоци се целосно бришат во рок од 30 дена.",
   "profileDeleteAccountFailedSnack": "Не можевме да ја избришеме сметката. Обидете се повторно.",
   "profileDeleteAccountTypeConfirmTitle": "Потврда со внес",
   "profileDeleteAccountTypeConfirmBody": "Напишете го зборот подолу точно како што е прикажан. Ова спречува случајно бришење.",

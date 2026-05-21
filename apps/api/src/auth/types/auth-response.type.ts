@@ -15,6 +15,9 @@ export type AuthResponse = {
     pointsBalance: number;
     avatarUrl: string | null;
     organizerCertifiedAt: string | null;
+    termsAcceptedAt: string | null;
+    termsVersion: string | null;
+    requiresTermsAcceptance: boolean;
   };
 };
 

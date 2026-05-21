@@ -1,5 +1,6 @@
 import type { INestApplication } from '@nestjs/common';
 import request from 'supertest';
+import { apiPath } from './api-path';
 
 export function uniquePhone(): string {
   const n = String(1_000_000 + Math.floor(Math.random() * 8_999_999));
@@ -24,18 +25,20 @@ export async function registerCitizen(
   const phoneNumber = uniquePhone();
   const agent = request(app.getHttpServer());
 
-  const reg = await agent.post('/auth/register').send({
+  const reg = await agent.post(apiPath('/auth/register')).send({
     firstName: 'E2e',
     lastName: 'User',
     email,
     phoneNumber,
     password,
+    termsAcceptedAt: new Date().toISOString(),
+    termsVersion: '1',
   });
   expect([200, 201]).toContain(reg.status);
   expect(reg.body.requiresPhoneVerification).toBe(true);
   expect(reg.body.userId).toBeDefined();
 
-  const sendOtp = await agent.post('/auth/otp/send').send({ phoneNumber });
+  const sendOtp = await agent.post(apiPath('/auth/otp/send')).send({ phoneNumber });
   expect(sendOtp.status).toBe(200);
   const code =
     sendOtp.body.devCode ??
@@ -44,9 +47,10 @@ export async function registerCitizen(
     throw new Error('OTP devCode required for e2e verify (set SMS_PROVIDER!=twilio or E2E_OTP_CODE)');
   }
 
-  const verified = await agent.post('/auth/otp/verify').send({ phoneNumber, code });
+  const verified = await agent.post(apiPath('/auth/otp/verify')).send({ phoneNumber, code });
   expect(verified.status).toBe(200);
   expect(verified.body.accessToken).toBeDefined();
+  expect(verified.body.user?.requiresTermsAcceptance).toBe(false);
 
   return {
     accessToken: verified.body.accessToken as string,
@@ -64,7 +68,7 @@ export async function resetPasswordViaSms(
   newPassword: string,
 ): Promise<string> {
   const agent = request(app.getHttpServer());
-  const req = await agent.post('/auth/password-reset/request').send({ phoneNumber });
+  const req = await agent.post(apiPath('/auth/password-reset/request')).send({ phoneNumber });
   expect(req.status).toBe(200);
   const code =
     req.body.devCode ?? (process.env.E2E_OTP_CODE as string | undefined);
@@ -75,12 +79,12 @@ export async function resetPasswordViaSms(
   }
 
   await agent
-    .post('/auth/password-reset/verify-code')
+    .post(apiPath('/auth/password-reset/verify-code'))
     .send({ phoneNumber, code })
     .expect(200);
 
   await agent
-    .post('/auth/password-reset/confirm')
+    .post(apiPath('/auth/password-reset/confirm'))
     .send({ phoneNumber, code, newPassword })
     .expect(200);
 

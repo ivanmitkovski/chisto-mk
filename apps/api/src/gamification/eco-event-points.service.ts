@@ -57,23 +57,26 @@ export class EcoEventPointsService {
       return 0;
     }
 
-    const user = await tx.user.findUnique({
-      where: { id: userId },
-      select: { pointsBalance: true, totalPointsEarned: true },
-    });
-    if (user == null) {
+    let updated: { pointsBalance: number };
+    try {
+      updated = await tx.user.update({
+        where: { id: userId },
+        data: {
+          pointsBalance: { increment: delta },
+          totalPointsEarned: { increment: delta },
+        },
+        select: { pointsBalance: true },
+      });
+    } catch {
       return 0;
     }
-
-    const balanceAfter = user.pointsBalance + delta;
-    const totalEarnedAfter = user.totalPointsEarned + delta;
 
     try {
       await tx.pointTransaction.create({
         data: {
           userId,
           delta,
-          balanceAfter,
+          balanceAfter: updated.pointsBalance,
           reasonCode,
           referenceType,
           referenceId,
@@ -82,18 +85,17 @@ export class EcoEventPointsService {
       });
     } catch (err: unknown) {
       if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+        await tx.user.update({
+          where: { id: userId },
+          data: {
+            pointsBalance: { decrement: delta },
+            totalPointsEarned: { decrement: delta },
+          },
+        });
         return 0;
       }
       throw err;
     }
-
-    await tx.user.update({
-      where: { id: userId },
-      data: {
-        pointsBalance: balanceAfter,
-        totalPointsEarned: totalEarnedAfter,
-      },
-    });
 
     return delta;
   }

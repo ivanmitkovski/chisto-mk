@@ -66,6 +66,7 @@ export class SitesDetailController {
     return this.sitesMedia.findSiteMedia(id, query);
   }
 
+  // safe-to-retry: repeated Patch is acceptable
   @Patch(':id/status')
   @UseGuards(JwtAuthGuard, RolesGuard, ThrottlerGuard)
   @Throttle({ default: { limit: 60, ttl: 60_000 } })
@@ -86,6 +87,7 @@ export class SitesDetailController {
     return this.sitesAdmin.updateStatus(id, dto, admin);
   }
 
+  // safe-to-retry: repeated Patch is acceptable
   @Patch(':id/archive')
   @UseGuards(JwtAuthGuard, RolesGuard, ThrottlerGuard)
   @Throttle({ default: { limit: 60, ttl: 60_000 } })

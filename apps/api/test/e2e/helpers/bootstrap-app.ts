@@ -15,6 +15,16 @@ export async function createE2eApplication(): Promise<{
 }> {
   validateEnv();
   const app = await NestFactory.create(AppModule, { logger: false, bufferLogs: true });
+  app.setGlobalPrefix('v1', {
+    exclude: [
+      'health',
+      'health/(.*)',
+      'metrics',
+      'api/docs',
+      'api/docs-json',
+      'api/docs/(.*)',
+    ],
+  });
   configureHttpApplication(app);
   await app.init();
 

@@ -45,6 +45,12 @@ model User {
   homeLocationLabel String?
   homeLocationSetAt DateTime?
 
+  termsAcceptedAt   DateTime?
+  termsVersion      String?
+  privacyAcceptedAt DateTime?
+  deletedAt         DateTime?
+  showOnLeaderboard Boolean   @default(true)
+
   reports                     Report[]                     @relation("ReporterReports")
   moderatedReports            Report[]                     @relation("ModeratorReports")
   adminNotifications          AdminNotification[]
@@ -306,16 +312,18 @@ model Site {
   /// Reverse-geocoded or user-confirmed place line from mobile (not the report narrative).
   address           String?
   description       String?
-  status            SiteStatus @default(REPORTED)
-  isArchivedByAdmin Boolean    @default(false)
+  searchVector      Unsupported("tsvector")?
+  geo               Unsupported("geography(Point,4326)")?
+  status            SiteStatus                            @default(REPORTED)
+  isArchivedByAdmin Boolean                               @default(false)
   archivedAt        DateTime?
   archivedById      String?
-  archivedBy        User?      @relation("SiteArchivedBy", fields: [archivedById], references: [id], onDelete: SetNull)
+  archivedBy        User?                                 @relation("SiteArchivedBy", fields: [archivedById], references: [id], onDelete: SetNull)
   archiveReason     String?
-  upvotesCount      Int        @default(0)
-  commentsCount     Int        @default(0)
-  savesCount        Int        @default(0)
-  sharesCount       Int        @default(0)
+  upvotesCount      Int                                   @default(0)
+  commentsCount     Int                                   @default(0)
+  savesCount        Int                                   @default(0)
+  sharesCount       Int                                   @default(0)
 
   reports         Report[]
   events          CleanupEvent[]
@@ -428,6 +436,7 @@ model Report {
   submitIdempotencyKeys ReportSubmitIdempotency[]
 
   @@index([siteId])
+  @@index([siteId, createdAt(sort: Desc)])
   @@index([reporterId])
   @@index([status])
   @@index([potentialDuplicateOfId])
@@ -489,15 +498,17 @@ enum ReportSideEffectStatus {
 }
 
 model ReportSideEffect {
-  id          String                 @id @default(cuid())
-  createdAt   DateTime               @default(now())
-  updatedAt   DateTime               @updatedAt
-  kind        ReportSideEffectKind
-  status      ReportSideEffectStatus @default(PENDING)
-  payload     Json
-  attempts    Int                    @default(0)
-  lastError   String?
-  processedAt DateTime?
+  id           String                 @id @default(cuid())
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
+  kind         ReportSideEffectKind
+  status       ReportSideEffectStatus @default(PENDING)
+  payload      Json
+  attempts     Int                    @default(0)
+  lastError    String?
+  processedAt  DateTime?
+  processingAt DateTime?
+  leaseOwner   String?
 
   @@index([status, createdAt])
 }
@@ -1252,11 +1263,34 @@ model NotificationOutbox {
   @@index([createdAt])
 }
 
+model EmailOutbox {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId            String
+  templateId        String
+  payload           Json
+  attempts          Int       @default(0)
+  nextRetryAt       DateTime?
+  processingAt      DateTime?
+  leaseOwner        String?
+  lastAttemptAt     DateTime?
+  lastError         String?
+  deliveredAt       DateTime?
+  failedPermanently Boolean   @default(false)
+  idempotencyKey    String    @unique
+
+  @@index([deliveredAt, failedPermanently, attempts])
+  @@index([processingAt, nextRetryAt])
+}
+
 model MapSiteProjection {
-  siteId                  String     @id
-  site                    Site       @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  siteId                  String                                @id
+  site                    Site                                  @relation(fields: [siteId], references: [id], onDelete: Cascade)
   latitude                Float
   longitude               Float
+  geo                     Unsupported("geography(Point,4326)")?
   status                  SiteStatus
   address                 String?
   description             String?
@@ -1265,17 +1299,17 @@ model MapSiteProjection {
   latestReportTitle       String?
   latestReportDescription String?
   latestReportNumber      String?
-  reportCount             Int        @default(0)
-  upvotesCount            Int        @default(0)
-  commentsCount           Int        @default(0)
-  savesCount              Int        @default(0)
-  sharesCount             Int        @default(0)
+  reportCount             Int                                   @default(0)
+  upvotesCount            Int                                   @default(0)
+  commentsCount           Int                                   @default(0)
+  savesCount              Int                                   @default(0)
+  sharesCount             Int                                   @default(0)
   latestReportAt          DateTime?
   siteCreatedAt           DateTime
   siteUpdatedAt           DateTime
-  projectedAt             DateTime   @default(now())
-  isHot                   Boolean    @default(true)
-  isArchivedByAdmin       Boolean    @default(false)
+  projectedAt             DateTime                              @default(now())
+  isHot                   Boolean                               @default(true)
+  isArchivedByAdmin       Boolean                               @default(false)
   archivedAt              DateTime?
 
   @@index([isHot, status, latitude, longitude])

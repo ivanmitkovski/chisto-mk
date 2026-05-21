@@ -148,7 +148,12 @@ exports.Prisma.UserScalarFieldEnum = {
   homeLatitude: 'homeLatitude',
   homeLongitude: 'homeLongitude',
   homeLocationLabel: 'homeLocationLabel',
-  homeLocationSetAt: 'homeLocationSetAt'
+  homeLocationSetAt: 'homeLocationSetAt',
+  termsAcceptedAt: 'termsAcceptedAt',
+  termsVersion: 'termsVersion',
+  privacyAcceptedAt: 'privacyAcceptedAt',
+  deletedAt: 'deletedAt',
+  showOnLeaderboard: 'showOnLeaderboard'
 };
 
 exports.Prisma.UserBlockScalarFieldEnum = {
@@ -343,7 +348,9 @@ exports.Prisma.ReportSideEffectScalarFieldEnum = {
   payload: 'payload',
   attempts: 'attempts',
   lastError: 'lastError',
-  processedAt: 'processedAt'
+  processedAt: 'processedAt',
+  processingAt: 'processingAt',
+  leaseOwner: 'leaseOwner'
 };
 
 exports.Prisma.SystemConfigScalarFieldEnum = {
@@ -710,6 +717,24 @@ exports.Prisma.NotificationOutboxScalarFieldEnum = {
   idempotencyKey: 'idempotencyKey'
 };
 
+exports.Prisma.EmailOutboxScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId',
+  templateId: 'templateId',
+  payload: 'payload',
+  attempts: 'attempts',
+  nextRetryAt: 'nextRetryAt',
+  processingAt: 'processingAt',
+  leaseOwner: 'leaseOwner',
+  lastAttemptAt: 'lastAttemptAt',
+  lastError: 'lastError',
+  deliveredAt: 'deliveredAt',
+  failedPermanently: 'failedPermanently',
+  idempotencyKey: 'idempotencyKey'
+};
+
 exports.Prisma.MapSiteProjectionScalarFieldEnum = {
   siteId: 'siteId',
   latitude: 'latitude',
@@ -1032,6 +1057,7 @@ exports.Prisma.ModelName = {
   UserNotification: 'UserNotification',
   UserNotificationPreference: 'UserNotificationPreference',
   NotificationOutbox: 'NotificationOutbox',
+  EmailOutbox: 'EmailOutbox',
   MapSiteProjection: 'MapSiteProjection',
   MapEventOutbox: 'MapEventOutbox',
   MapCdnPurgeLog: 'MapCdnPurgeLog',

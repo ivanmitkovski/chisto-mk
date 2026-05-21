@@ -3,6 +3,7 @@
 import { ConfigService } from '@nestjs/config';
 import { EventChatUploadService } from '../../src/event-chat/event-chat-upload.service';
 import type { PrismaService } from '../../src/prisma/prisma.service';
+import { S3StorageClient } from '../../src/storage/s3-storage.client';
 
 describe('EventChatUploadService', () => {
   function buildService(bucket: string | null, region = 'eu-central-1'): EventChatUploadService {
@@ -17,7 +18,9 @@ describe('EventChatUploadService', () => {
         return undefined;
       },
     } as unknown as ConfigService;
-    const svc = new EventChatUploadService(config, {} as PrismaService);
+    const s3 = new S3StorageClient(config);
+    s3.onModuleInit();
+    const svc = new EventChatUploadService(config, {} as PrismaService, s3);
     svc.onModuleInit();
     return svc;
   }

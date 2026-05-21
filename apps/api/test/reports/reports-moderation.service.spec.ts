@@ -19,16 +19,20 @@ function createModerationService(
     processModerationStatusPost: jest.fn().mockResolvedValue(undefined),
   };
   const list = new ReportsModerationListService(prisma as never);
+  const siteHistoryWriter = {
+    recordStatusChanged: jest.fn(),
+    emitHistoryAppended: jest.fn(),
+  };
+  const siteHistoryReportRecorder = {
+    recordReportApproved: jest.fn(),
+    recordReportRejected: jest.fn(),
+  };
   const status = new ReportsModerationStatusService(
     prisma as never,
     reportApprovalPoints as never,
     reportSideEffectProcessor as never,
-    {
-      recordReportApproved: jest.fn(),
-      recordReportRejected: jest.fn(),
-      recordStatusChanged: jest.fn(),
-      emitHistoryAppended: jest.fn(),
-    } as never,
+    siteHistoryWriter as never,
+    siteHistoryReportRecorder as never,
   );
   const detail = new ReportsModerationDetailService(prisma as never, reportsUploadService as never);
   const service = new ReportsModerationService(list, status, detail);

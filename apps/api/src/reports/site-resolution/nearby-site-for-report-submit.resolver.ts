@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import type { Prisma } from '../../prisma-client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { distanceInMeters } from '../../common/utils/distance';
 import { SITE_NEARBY_RADIUS_METERS } from '../reports.constants';
@@ -24,6 +25,7 @@ export class NearbySiteForReportSubmitResolver {
   async resolveEarliestReportAnchor(
     latitude: number,
     longitude: number,
+    db: PrismaService | Prisma.TransactionClient = this.prisma,
   ): Promise<EarliestReportOnSite | null> {
     const metersPerDegreeLat = 111_320;
     const deltaLat = SITE_NEARBY_RADIUS_METERS / metersPerDegreeLat;
@@ -31,7 +33,7 @@ export class NearbySiteForReportSubmitResolver {
       Math.cos((latitude * Math.PI) / 180) * metersPerDegreeLat || metersPerDegreeLat;
     const deltaLng = SITE_NEARBY_RADIUS_METERS / metersPerDegreeLng;
 
-    const candidateSites = await this.prisma.site.findMany({
+    const candidateSites = await db.site.findMany({
       where: {
         latitude: { gte: latitude - deltaLat, lte: latitude + deltaLat },
         longitude: { gte: longitude - deltaLng, lte: longitude + deltaLng },

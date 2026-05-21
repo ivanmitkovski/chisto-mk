@@ -1407,7 +1407,7 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get profileDeleteAccountDialogBody =>
-      'Сите податоци трајно ќе бидат избришани. Ова не може да се врати.';
+      'Сметката веднаш се анонимизира. Личните податоци се целосно бришат во рок од 30 дена.';
 
   @override
   String get profileDeleteAccountFailedSnack =>

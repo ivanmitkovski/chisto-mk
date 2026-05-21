@@ -30,6 +30,7 @@ export class SessionsController {
     return this.sessionsService.listMine(admin);
   }
 
+  // safe-to-retry: repeated Delete is acceptable
   @Delete('me/others')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(...ADMIN_PANEL_ROLES)

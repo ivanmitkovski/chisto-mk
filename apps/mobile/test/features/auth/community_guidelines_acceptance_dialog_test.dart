@@ -3,6 +3,7 @@ import 'package:chisto_mobile/features/auth/data/eula_acceptance_store.dart';
 import 'package:chisto_mobile/features/auth/presentation/widgets/community_guidelines_acceptance_dialog.dart';
 
 import '../../shared/widget_test_bootstrap.dart';
+import 'support/fake_auth_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -16,6 +17,12 @@ void main() {
   setUp(() async {
     await EulaAcceptanceStore(AppBootstrap.instance.preferences)
         .clearAllForTests();
+    AppBootstrap.instance.overrideAuthRepositoryForTests(
+      FakeAuthRepository(
+        isAuthenticated: true,
+        currentUserId: testUserId,
+      )..requiresTermsAcceptance = true,
+    );
   });
 
   testWidgets('shows design-system modal and persists on accept', (tester) async {

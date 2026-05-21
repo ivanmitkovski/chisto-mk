@@ -1,3 +1,4 @@
+import { Idempotent } from '../common/idempotency/idempotency.decorator';
 import {
   Body,
   Controller,
@@ -71,6 +72,7 @@ export class EventChatMessagesController {
     return this.list.listMessages(eventId, user, query);
   }
 
+  @Idempotent('event-chat_event-chat-messages_74')
   @Post(':eventId/chat')
   @Throttle({ default: { limit: 45, ttl: 60_000 } })
   @ApiOperation({ summary: 'Send a chat message' })
@@ -89,6 +91,7 @@ export class EventChatMessagesController {
     return this.mutations.sendMessage(eventId, user, dto);
   }
 
+  // safe-to-retry: repeated Patch is acceptable
   @Patch(':eventId/chat/:messageId')
   @Throttle({ default: { limit: 45, ttl: 60_000 } })
   @ApiOperation({ summary: 'Edit own text message' })
@@ -108,6 +111,7 @@ export class EventChatMessagesController {
     return this.mutations.editMessage(eventId, messageId, user, dto);
   }
 
+  @Idempotent('event-chat_event-chat-messages_111')
   @Post(':eventId/chat/:messageId/pin')
   @Throttle({ default: { limit: 30, ttl: 60_000 } })
   @ApiOperation({ summary: 'Pin or unpin a message (organizer only)' })
@@ -127,6 +131,7 @@ export class EventChatMessagesController {
     return this.mutations.setMessagePin(eventId, messageId, user, dto);
   }
 
+  @Idempotent('event-chat_event-chat-messages_130')
   @Post(':eventId/chat/upload')
   @Throttle({ default: { limit: 10, ttl: 60_000 } })
   @ApiOperation({ summary: 'Upload images for a chat message (max 5, 10 MB each)' })
@@ -160,6 +165,7 @@ export class EventChatMessagesController {
     return { data: processed, meta: { timestamp: new Date().toISOString() } };
   }
 
+  // safe-to-retry: repeated Delete is acceptable
   @Delete(':eventId/chat/:messageId')
   @Throttle({ default: { limit: 30, ttl: 60_000 } })
   @ApiOperation({ summary: 'Soft-delete a chat message (author only)' })

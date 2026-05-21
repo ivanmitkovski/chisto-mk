@@ -28,7 +28,9 @@ describe('EmailTemplateService', () => {
     expect(mk.subject).toBeTruthy();
     expect(mk.html).toContain('Ана');
     expect(mk.html).toContain('https://chisto.mk/prefs');
-    expect(mk.text).toContain('Unsubscribe:');
+    expect(mk.text).toContain('Отпиши се:');
+    expect(mk.html).toContain('Поставки за известувања');
+    expect(mk.html).toContain('Отпиши се од вакви пораки');
     expect(mk.html).toContain('lang="mk"');
     expect(mk.html).toContain(baseInput.appBaseUrl);
 
@@ -54,7 +56,7 @@ describe('EmailTemplateService', () => {
   });
 
   it('embeds logo when logoUrl is set', () => {
-    const logo = 'https://cdn.example.test/brand/logo.svg';
+    const logo = 'https://cdn.example.test/brand/logo.png';
     const r = svc.render({
       templateId: 'welcome',
       locale: 'en',
@@ -63,7 +65,9 @@ describe('EmailTemplateService', () => {
       logoUrl: logo,
     });
     expect(r.html).toContain(`src="${logo}"`);
-    expect(r.html).toContain('width="140"');
+    expect(r.html).toContain('width="28"');
+    expect(r.html).toContain('height="32"');
+    expect(r.html).toContain('Chisto<span');
   });
 
   it('renders report_approved detail card and success accent bar', () => {

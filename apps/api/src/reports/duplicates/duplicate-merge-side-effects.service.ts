@@ -11,6 +11,7 @@ import { SiteEventsService } from '../../admin-realtime/site-events.service';
 import { ReportsOwnerEventsService } from '../reports-owner-events.service';
 import { getReportNumber } from '../report-copy.helpers';
 import { SiteHistoryWriterService } from '../../sites/history/site-history-writer.service';
+import { SiteHistoryReportRecorderService } from '../../sites/history/site-history-report-recorder.service';
 
 export type DuplicateMergeSiteStatusEvent = {
   id: string;
@@ -48,6 +49,7 @@ export class DuplicateMergeSideEffectsService {
     private readonly reportsOwnerEventsService: ReportsOwnerEventsService,
     private readonly eventEmitter: EventEmitter2,
     private readonly siteHistoryWriter: SiteHistoryWriterService,
+    private readonly siteHistoryReportRecorder: SiteHistoryReportRecorderService,
   ) {}
 
   async runPostMergeEffects(input: DuplicateMergePostTxInput): Promise<number> {
@@ -80,7 +82,7 @@ export class DuplicateMergeSideEffectsService {
       });
     }
 
-    await this.siteHistoryWriter.recordReportMerged({
+    await this.siteHistoryReportRecorder.recordReportMerged({
       siteId: primaryReport.siteId,
       reportId: primaryReport.id,
       occurredAt: new Date(),

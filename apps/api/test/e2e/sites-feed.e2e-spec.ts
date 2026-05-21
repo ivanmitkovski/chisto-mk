@@ -17,7 +17,7 @@ describe('Sites feed (e2e)', () => {
   });
 
   it('GET /sites returns feed payload', async () => {
-    const res = await request(app.getHttpServer()).get('/sites').query({ page: 1, limit: 5 }).expect(200);
+    const res = await request(app.getHttpServer()).get('/v1/sites').query({ page: 1, limit: 5 }).expect(200);
     expect(res.body).toBeDefined();
   });
 });

@@ -31,7 +31,7 @@ export class TwilioOtpSender implements OtpSender {
     fromNumber: string | undefined,
     alphanumericSender: string | undefined,
   ) {
-    this.client = Twilio(accountSid, authToken);
+    this.client = Twilio(accountSid, authToken, { timeout: 15_000 });
     this.messagingServiceSidOrFrom = messagingServiceSid;
     this.fromNumber = fromNumber;
     this.alphanumericSender = alphanumericSender;

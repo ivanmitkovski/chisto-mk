@@ -38,7 +38,7 @@ describe('EcoEventPointsService', () => {
   it('returns 0 when user missing', async () => {
     const { tx, pointTransaction, user } = makeTx();
     pointTransaction.findFirst.mockResolvedValue(null);
-    user.findUnique.mockResolvedValue(null);
+    user.update.mockRejectedValue(new Error('not found'));
     const r = await service.creditIfNew(tx as never, {
       userId: 'missing',
       delta: 10,
@@ -53,7 +53,7 @@ describe('EcoEventPointsService', () => {
   it('credits once and is idempotent on second call', async () => {
     const { tx, pointTransaction, user } = makeTx();
     pointTransaction.findFirst.mockResolvedValue(null);
-    user.findUnique.mockResolvedValue({ pointsBalance: 100, totalPointsEarned: 200 });
+    user.update.mockResolvedValue({ pointsBalance: 105 });
 
     const params = {
       userId: 'u1',
@@ -68,7 +68,11 @@ describe('EcoEventPointsService', () => {
     expect(pointTransaction.create).toHaveBeenCalledTimes(1);
     expect(user.update).toHaveBeenCalledWith({
       where: { id: 'u1' },
-      data: { pointsBalance: 105, totalPointsEarned: 205 },
+      data: {
+        pointsBalance: { increment: 5 },
+        totalPointsEarned: { increment: 5 },
+      },
+      select: { pointsBalance: true },
     });
 
     pointTransaction.findFirst.mockResolvedValue({ id: 'existing-tx' });
@@ -80,7 +84,9 @@ describe('EcoEventPointsService', () => {
   it('treats P2002 on create as idempotent without updating balances', async () => {
     const { tx, pointTransaction, user } = makeTx();
     pointTransaction.findFirst.mockResolvedValue(null);
-    user.findUnique.mockResolvedValue({ pointsBalance: 100, totalPointsEarned: 200 });
+    user.update
+      .mockResolvedValueOnce({ pointsBalance: 105 })
+      .mockResolvedValueOnce({ pointsBalance: 100 });
     const dup = new Prisma.PrismaClientKnownRequestError('Unique constraint failed', {
       code: 'P2002',
       clientVersion: 'test',
@@ -94,7 +100,7 @@ describe('EcoEventPointsService', () => {
       referenceId: 'p1',
     });
     expect(r).toBe(0);
-    expect(user.update).not.toHaveBeenCalled();
+    expect(user.update).toHaveBeenCalledTimes(2);
   });
 
   describe('debitOnceIfNew', () => {

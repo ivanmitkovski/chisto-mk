@@ -7,7 +7,7 @@ import { getSkopjeWeekBoundsUtc } from './week-skopje';
 
 export type WeeklyLeaderboardEntry = {
   rank: number;
-  userId: string;
+  userId?: string;
   displayName: string;
   weeklyPoints: number;
   isCurrentUser: boolean;
@@ -64,31 +64,41 @@ export class RankingsService {
     const capped = Math.min(100, Math.max(1, Math.floor(limit)));
 
     const rows = await this.prisma.$queryRaw<
-      Array<{ userId: string; pts: number; firstName: string; lastName: string }>
+      Array<{
+        userId: string;
+        pts: number;
+        firstName: string;
+        lastName: string;
+        showOnLeaderboard: boolean;
+      }>
     >`
       SELECT pt."userId",
              SUM(pt.delta)::int AS pts,
              u."firstName",
-             u."lastName"
+             u."lastName",
+             u."showOnLeaderboard"
       FROM "PointTransaction" pt
       INNER JOIN "User" u ON u.id = pt."userId"
       WHERE pt."createdAt" >= ${bounds.weekStartsAt}
         AND pt."createdAt" <= ${bounds.weekEndsAt}
         AND pt.delta > 0
         AND u.role = 'USER'::"Role"
-      GROUP BY pt."userId", u."firstName", u."lastName"
+      GROUP BY pt."userId", u."firstName", u."lastName", u."showOnLeaderboard"
       HAVING SUM(pt.delta) > 0
       ORDER BY pts DESC
       LIMIT ${capped}
     `;
 
-    const entries: WeeklyLeaderboardEntry[] = rows.map((row, index) => ({
-      rank: index + 1,
-      userId: row.userId,
-      displayName: `${row.firstName} ${row.lastName}`.trim(),
-      weeklyPoints: row.pts,
-      isCurrentUser: row.userId === currentUserId,
-    }));
+    const entries: WeeklyLeaderboardEntry[] = rows.map((row, index) => {
+      const isCurrentUser = row.userId === currentUserId;
+      return {
+        rank: index + 1,
+        ...(isCurrentUser ? { userId: row.userId } : {}),
+        displayName: this.leaderboardDisplayName(row),
+        weeklyPoints: row.pts,
+        isCurrentUser,
+      };
+    });
 
     const myWeeklyPoints = await this.sumWeeklyPointsForUser(currentUserId, bounds.weekStartsAt, bounds.weekEndsAt);
     let myRank: number | null = null;
@@ -103,6 +113,21 @@ export class RankingsService {
       myRank,
       myWeeklyPoints,
     };
+  }
+
+  private leaderboardDisplayName(row: {
+    firstName: string;
+    lastName: string;
+    showOnLeaderboard: boolean;
+    userId: string;
+  }): string {
+    if (!row.showOnLeaderboard) {
+      const suffix = row.userId.slice(-4);
+      return `Citizen ·${suffix}`;
+    }
+    const first = row.firstName.trim();
+    const lastInitial = row.lastName.trim().charAt(0);
+    return lastInitial ? `${first} ${lastInitial}.` : first;
   }
 
   private async sumWeeklyPointsForUser(

@@ -45,6 +45,12 @@ model User {
   homeLocationLabel  String?
   homeLocationSetAt  DateTime?
 
+  termsAcceptedAt   DateTime?
+  termsVersion      String?
+  privacyAcceptedAt DateTime?
+  deletedAt         DateTime?
+  showOnLeaderboard Boolean @default(true)
+
   reports              Report[]             @relation("ReporterReports")
   moderatedReports     Report[]             @relation("ModeratorReports")
   adminNotifications   AdminNotification[]
@@ -306,6 +312,8 @@ model Site {
   /// Reverse-geocoded or user-confirmed place line from mobile (not the report narrative).
   address     String?
   description String?
+  searchVector Unsupported("tsvector")?
+  geo          Unsupported("geography(Point,4326)")?
   status      SiteStatus @default(REPORTED)
   isArchivedByAdmin Boolean @default(false)
   archivedAt DateTime?
@@ -428,6 +436,7 @@ model Report {
   submitIdempotencyKeys ReportSubmitIdempotency[]
 
   @@index([siteId])
+  @@index([siteId, createdAt(sort: Desc)])
   @@index([reporterId])
   @@index([status])
   @@index([potentialDuplicateOfId])
@@ -498,6 +507,8 @@ model ReportSideEffect {
   attempts    Int                    @default(0)
   lastError   String?
   processedAt DateTime?
+  processingAt DateTime?
+  leaseOwner   String?
 
   @@index([status, createdAt])
 }
@@ -1252,12 +1263,34 @@ model NotificationOutbox {
   @@index([createdAt])
 }
 
+model EmailOutbox {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId         String
+  templateId     String
+  payload        Json
+  attempts       Int       @default(0)
+  nextRetryAt    DateTime?
+  processingAt   DateTime?
+  leaseOwner     String?
+  lastAttemptAt  DateTime?
+  lastError      String?
+  deliveredAt    DateTime?
+  failedPermanently Boolean @default(false)
+  idempotencyKey String    @unique
+
+  @@index([deliveredAt, failedPermanently, attempts])
+  @@index([processingAt, nextRetryAt])
+}
 
 model MapSiteProjection {
   siteId            String    @id
   site              Site      @relation(fields: [siteId], references: [id], onDelete: Cascade)
   latitude          Float
   longitude         Float
+  geo               Unsupported("geography(Point,4326)")?
   status            SiteStatus
   address           String?
   description       String?

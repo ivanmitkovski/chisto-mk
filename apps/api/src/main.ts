@@ -16,6 +16,7 @@ import { validateEnv } from './config/env';
 import { ObservabilityStore } from './observability/observability.store';
 import { configureHttpApplication } from './bootstrap/configure-http-app';
 import { runWithInboundTraceparent } from './common/logging/http-request-trace';
+import { sentryBeforeSend } from './common/security/sentry-scrub';
 
 async function bootstrap() {
   validateEnv();
@@ -29,6 +30,7 @@ async function bootstrap() {
       environment: process.env.NODE_ENV ?? 'development',
       release: process.env.SENTRY_RELEASE?.trim() || process.env.npm_package_version,
       tracesSampleRate: Number(process.env.SENTRY_TRACES_SAMPLE_RATE ?? 0.05),
+      beforeSend: sentryBeforeSend,
     });
   }
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
@@ -96,11 +98,24 @@ async function bootstrap() {
     }),
   );
   app.enableShutdownHooks();
+  app.getHttpAdapter().getInstance().on('close', () => {
+    ObservabilityStore.stopPushGatewayLoop();
+  });
 
   const allowedOriginsEnv = process.env.CORS_ORIGINS;
-  const allowedOrigins = allowedOriginsEnv
+  const nodeEnv = process.env.NODE_ENV ?? 'development';
+  let allowedOrigins = allowedOriginsEnv
     ? allowedOriginsEnv.split(',').map((origin) => origin.trim()).filter(Boolean)
     : ['http://localhost:3000', 'http://localhost:3001'];
+  if (nodeEnv === 'production' || nodeEnv === 'staging') {
+    const insecure = allowedOrigins.filter((o) => /^http:\/\//i.test(o));
+    if (insecure.length > 0) {
+      bootstrapLog.error(
+        `CORS_ORIGINS must use https in ${nodeEnv} (rejecting: ${insecure.join(', ')})`,
+      );
+      process.exit(1);
+    }
+  }
 
   const allowCredentials = process.env.CORS_ALLOW_CREDENTIALS?.trim() === 'true';
 
@@ -120,9 +135,19 @@ async function bootstrap() {
     credentials: allowCredentials,
   });
 
+  app.setGlobalPrefix('v1', {
+    exclude: [
+      'health',
+      'health/(.*)',
+      'metrics',
+      'api/docs',
+      'api/docs-json',
+      'api/docs/(.*)',
+    ],
+  });
+
   configureHttpApplication(app);
 
-  const nodeEnv = process.env.NODE_ENV ?? 'development';
   if (nodeEnv !== 'production') {
     const config = new DocumentBuilder()
       .setTitle('Chisto.mk API')

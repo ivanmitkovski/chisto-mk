@@ -1,4 +1,3 @@
-import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_capacity.dart';
@@ -164,15 +163,8 @@ class ReportsListScreenSlivers extends StatelessWidget {
       slivers: <Widget>[
         const SliverToBoxAdapter(child: ReportsListRealtimeBanner()),
         SliverToBoxAdapter(
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: bg,
-              border: Border(
-                bottom: BorderSide(
-                  color: AppColors.divider.withValues(alpha: 0.45),
-                ),
-              ),
-            ),
+          child: ColoredBox(
+            color: bg,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,

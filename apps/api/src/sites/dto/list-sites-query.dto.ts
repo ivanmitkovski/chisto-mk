@@ -2,6 +2,7 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 import { PaginationQueryDto20 } from '../../common/dto/pagination-query.dto';
 import { SiteStatus } from '../../prisma-client';
 import { Type } from 'class-transformer';
+import { StrictBoolean } from '../../common/transformers/strict-boolean.transformer';
 import { IsBoolean, IsEnum, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
 
 export enum SiteFeedSort {
@@ -72,8 +73,8 @@ export class ListSitesQueryDto extends PaginationQueryDto20 {
     default: false,
   })
   @IsOptional()
+  @StrictBoolean()
   @IsBoolean()
-  @Type(() => Boolean)
   explain = false;
 
   @ApiPropertyOptional({

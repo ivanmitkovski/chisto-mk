@@ -15,6 +15,7 @@ import {
 
 import { GeoPointLatitudeLongitudeDto } from '../../common/dto/geo-point.dto';
 import { REPORT_CLEANUP_EFFORT_KEYS } from '../report-cleanup-effort';
+import { SanitizePlainText } from '../../common/sanitize/sanitize-transform.decorator';
 
 export class CreateReportWithLocationDto extends GeoPointLatitudeLongitudeDto {
   // SECURITY: All fields are length/type bounded for DB alignment and to limit abuse; whitelist via global ValidationPipe.
@@ -23,6 +24,7 @@ export class CreateReportWithLocationDto extends GeoPointLatitudeLongitudeDto {
     example: 'Illegal dump behind the bus station',
     maxLength: 120,
   })
+  @SanitizePlainText()
   @IsString()
   @MinLength(1)
   @MaxLength(120)
@@ -34,6 +36,7 @@ export class CreateReportWithLocationDto extends GeoPointLatitudeLongitudeDto {
     maxLength: 500,
   })
   @IsOptional()
+  @SanitizePlainText()
   @IsString()
   @MaxLength(500)
   description?: string;
@@ -79,6 +82,7 @@ export class CreateReportWithLocationDto extends GeoPointLatitudeLongitudeDto {
     maxLength: 500,
   })
   @IsOptional()
+  @SanitizePlainText()
   @IsString()
   @MaxLength(500)
   address?: string;

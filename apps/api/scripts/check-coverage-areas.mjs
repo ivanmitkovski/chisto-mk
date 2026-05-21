@@ -54,6 +54,24 @@ const gates = [
     threshold: { statements: 50, branches: 33, functions: 50, lines: 49 },
   },
   {
+    name: 'storage',
+    testPathPattern: 'test/storage',
+    collectCoverageFrom: ['src/storage/**/*.ts', '!src/storage/**/*.module.ts'],
+    threshold: { statements: 20, branches: 15, functions: 20, lines: 20 },
+  },
+  {
+    name: 'system-config',
+    testPathPattern: 'test/system-config',
+    collectCoverageFrom: ['src/system-config/**/*.ts', '!src/system-config/**/*.module.ts'],
+    threshold: { statements: 15, branches: 10, functions: 15, lines: 15 },
+  },
+  {
+    name: 'observability',
+    testPathPattern: 'test/observability',
+    collectCoverageFrom: ['src/observability/**/*.ts'],
+    threshold: { statements: 25, branches: 15, functions: 25, lines: 25 },
+  },
+  {
     name: 'admin-users',
     testPathPattern: 'test/admin-users',
     collectCoverageFrom: ['src/admin-users/**/*.ts', '!src/admin-users/**/*.module.ts'],

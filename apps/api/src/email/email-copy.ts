@@ -27,7 +27,7 @@ function esc(s: string): string {
 const CTA_LABELS = {
   openSite: { en: 'Open Chisto.mk', mk: 'Отвори Chisto.mk' },
   secureAccount: { en: 'Secure your account', mk: 'Заштити ја сметката' },
-  viewReports: { en: 'View your reports', mk: 'Вашите пријави' },
+  viewReports: { en: 'View your reports', mk: 'Прегледај пријави' },
   viewReport: { en: 'View report', mk: 'Види пријава' },
   openEvent: { en: 'Open event', mk: 'Отвори настан' },
   openApp: { en: 'Open in app', mk: 'Отвори во апликација' },
@@ -74,15 +74,48 @@ function siteDetailRows(en: boolean, siteLabel: string): { label: string; value:
   return [{ label: en ? 'Site' : 'Локалитет', value: siteLabel }];
 }
 
+const BODY_P_STYLE = `margin:0 0 ${EMAIL_LAYOUT.sectionGapPx}px 0;font-size:16px;line-height:1.5;color:${EMAIL_BRAND.textSecondary};`;
+const EXTRA_P_STYLE = `margin:0 0 12px 0;font-size:16px;line-height:1.5;color:${EMAIL_BRAND.textSecondary};`;
+const FOOTER_NOTE_STYLE = `margin:16px 0 0 0;font-size:14px;line-height:1.45;color:${EMAIL_BRAND.textMuted};`;
+
+export type EmailShellCopy = {
+  footerDisclaimer: string;
+  footerPrefsLabel: string;
+  footerUnsubscribeLabel: string;
+  textPrefsPrefix: string;
+  textUnsubscribePrefix: string;
+};
+
+export function getEmailShellCopy(locale: EmailLocale): EmailShellCopy {
+  if (locale === 'en') {
+    return {
+      footerDisclaimer:
+        'Chisto.mk: civic environmental platform. You received this transactional email because of activity on your account.',
+      footerPrefsLabel: 'Manage preferences',
+      footerUnsubscribeLabel: 'Unsubscribe from this type',
+      textPrefsPrefix: 'Manage preferences',
+      textUnsubscribePrefix: 'Unsubscribe',
+    };
+  }
+  return {
+    footerDisclaimer:
+      'Chisto.mk: граѓанска еколошка платформа. Оваа трансакциска порака е испратена поради активност на вашата сметка.',
+    footerPrefsLabel: 'Поставки за известувања',
+    footerUnsubscribeLabel: 'Отпиши се од вакви пораки',
+    textPrefsPrefix: 'Поставки за известувања',
+    textUnsubscribePrefix: 'Отпиши се',
+  };
+}
+
 export function linesToHtml(lines: string[]): string {
-  return lines.map((l) => `<p style="margin:0 0 12px 0;">${esc(l)}</p>`).join('');
+  return lines
+    .map((l) => `<p class="cm-text" style="${EXTRA_P_STYLE}">${esc(l)}</p>`)
+    .join('');
 }
 
 export function buildBodyHtml(block: EmailCopyBlock): string {
   const parts: string[] = [];
-  parts.push(
-    `<p style="margin:0 0 ${EMAIL_LAYOUT.sectionGapPx}px 0;font-size:16px;line-height:1.45;color:${EMAIL_BRAND.textSecondary};">${esc(block.lead)}</p>`,
-  );
+  parts.push(`<p class="cm-text" style="${BODY_P_STYLE}">${esc(block.lead)}</p>`);
   if (block.detailRows?.length) {
     parts.push(buildDetailCardHtml(block.detailRows));
   }
@@ -90,9 +123,7 @@ export function buildBodyHtml(block: EmailCopyBlock): string {
     parts.push(linesToHtml(block.extraLines));
   }
   if (block.footerNote) {
-    parts.push(
-      `<p style="margin:16px 0 0 0;font-size:14px;line-height:1.4;color:${EMAIL_BRAND.textMuted};">${esc(block.footerNote)}</p>`,
-    );
+    parts.push(`<p class="cm-muted" style="${FOOTER_NOTE_STYLE}">${esc(block.footerNote)}</p>`);
   }
   return parts.join('');
 }
@@ -143,9 +174,12 @@ export function getCopy(
             {
               subject: 'Добредојдовте на Chisto.mk',
               headline: `Добредојдовте${firstName ? `, ${firstName}` : ''}`,
-              lead: 'Вашата сметка е подготова. Пријавувајте загадување, следете локалитети и учествувајте во акции за чистење.',
-              extraLines: ['Оваа порака е испратена бидејќи креиравте сметка во апликацијата Chisto.mk.'],
-              footerNote: 'Ако не се регистриравте, игнорирајте ја пораката или контактирајте поддршка.',
+              lead: 'Вашата сметка е подготвена. Пријавувајте загадувања и следете ги локалитетите и учествувајте во акции за чистење.',
+              extraLines: [
+                'Оваа порака е испратена бидејќи ја креиравте сметката во апликацијата Chisto.mk.',
+              ],
+              footerNote:
+                'Ако не се регистриравте, игнорирајте ја пораката или контактирајте ја поддршката.',
             },
             url,
             en,
@@ -333,8 +367,8 @@ export function getCopy(
                 subject: 'Спојување на дупликат пријави',
                 headline: 'Пријавите се споени',
                 lead: reportNumber
-                  ? `Слични пријави се спојуваат во вашата пријава ${reportNumber}.`
-                  : 'Слични пријави се спојуваат во вашата пријава.',
+                  ? `Слични пријави се споија во вашата пријава ${reportNumber}.`
+                  : 'Слични пријави се споија во вашата пријава.',
                 detailRows: reportDetailRow(en, reportNumber),
               },
               url,
@@ -417,7 +451,9 @@ export function getCopy(
             {
               subject: 'Вашиот настан за чистење е одобрен',
               headline: 'Настанот е одобрен',
-              lead: eventTitle ? `«${eventTitle}» е одобрен и видлив за доброволците.` : 'Настанот е одобрен и видлив за доброволците.',
+              lead: eventTitle
+                ? `„${eventTitle}" е одобрен и видлив за доброволците.`
+                : 'Настанот е одобрен и видлив за доброволците.',
               detailRows: eventDetailRows(en, eventTitle),
             },
             url,
@@ -445,7 +481,7 @@ export function getCopy(
               subject: 'Настанот не е одобрен',
               headline: 'Настанот не е одобрен',
               lead: eventTitle
-                ? `«${eventTitle}» не ги исполни критериумите. Уредете и поднесете повторно од апликацијата.`
+                ? `„${eventTitle}" не ги исполни критериумите. Уредете и поднесете повторно од апликацијата.`
                 : 'Настанот не ги исполни критериумите. Уредете и поднесете повторно од апликацијата.',
               detailRows: eventDetailRows(en, eventTitle),
             },
@@ -472,10 +508,10 @@ export function getCopy(
         : withCta(
             {
               subject: 'Нов настан за чистење',
-              headline: 'Нов настан кај зачувана локација',
+              headline: 'Нов настан на локација што ја следите',
               lead: eventTitle
-                ? `${eventTitle}: отворен е нов чистење настан кај зачувана локација.`
-                : 'Отворен е нов чистење настан кај зачувана локација.',
+                ? `„${eventTitle}“: отворен е нов настан за чистење на локација што ја следите.`
+                : 'Отворен е нов настан за чистење на локација што ја следите.',
               detailRows: eventDetailRows(en, eventTitle),
             },
             url,
@@ -539,8 +575,8 @@ export function getCopy(
               subject: 'Настанот заврши: ажурирање на поени',
               headline: 'Поените се прилагодени',
               lead: eventTitle
-                ? `Вашиот бонус за пријавување за „${eventTitle}“ е отстранет бидејќи нема зачленување.`
-                : 'Вашиот бонус за пријавување е отстранет бидејќи нема зачленување.',
+                ? `Вашиот бонус за пријавување за „${eventTitle}“ е отстранет бидејќи не е евидентирано присуство.`
+                : 'Вашиот бонус за пријавување е отстранет бидејќи не е евидентирано присуство.',
               detailRows: eventDetailRows(en, eventTitle),
               accent: 'warning',
             },
@@ -569,8 +605,8 @@ export function getCopy(
               subject: 'Ново гласање на локалитет',
               headline: 'Некој го поддржа локалитетот',
               lead: siteLabel
-                ? `Локалитетот што го пријавивте (${siteLabel}) доби ново гласање.`
-                : 'Локалитетот што го пријавивте доби ново гласање.',
+                ? `Локалитетот што го пријавивте (${siteLabel}) доби ново поддржување.`
+                : 'Локалитетот што го пријавивте доби ново поддржување.',
               detailRows: siteDetailRows(en, siteLabel),
             },
             url,
@@ -599,7 +635,7 @@ export function getCopy(
               headline: 'Нов коментар',
               lead: commentPreview
                 ? `Нов коментар: „${commentPreview}"`
-                : 'Некој коментираше на локалитет што го пријавивте.',
+                : 'Некој остави коментар на локалитетот што го пријавивте.',
               detailRows: siteDetailRows(en, siteLabel),
             },
             url,

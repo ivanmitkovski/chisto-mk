@@ -10,7 +10,7 @@ import type { SiteCommentTreeNode } from './site-comments.types';
 @Injectable()
 export class SiteCommentsListService {
   private static readonly INLINE_BRANCH_REPLY_CAP = 20;
-  private static readonly MAX_COMMENTS_FOR_TREE = 15_000;
+  private static readonly MAX_COMMENTS_FOR_TREE = 500;
 
   constructor(
     private readonly prisma: PrismaService,

@@ -11,60 +11,66 @@
     @media screen {
       .cm-cta:hover { background-color: {{ctaHoverBg}} !important; }
     }
+    @media only screen and (max-width: 480px) {
+      .cm-outer-pad { padding: 24px 12px !important; }
+      .cm-card-pad { padding-left: 20px !important; padding-right: 20px !important; }
+    }
     @media (prefers-color-scheme: dark) {
       .cm-body { background-color: #1a1c1f !important; }
       .cm-card { background-color: #24262b !important; border-color: #3a3d45 !important; }
       .cm-text { color: #e8e8ea !important; }
       .cm-muted { color: #a8a8b0 !important; }
       .cm-detail { background-color: #2c2f36 !important; border-color: #3a3d45 !important; }
+      .cm-detail .cm-text { color: #e8e8ea !important; }
+      .cm-detail .cm-muted { color: #a8a8b0 !important; }
+      .cm-link { color: #4dd99a !important; }
+      .cm-cta { background-color: {{brandPrimary}} !important; color: #121212 !important; }
     }
   </style>
   <!--[if mso]><noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript><![endif]-->
 </head>
 <body class="cm-body" style="margin:0;padding:0;background-color:{{brandAppBackground}};font-family:{{brandFontStack}};">
   <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;">{{preheader}}&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;</div>
-  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="cm-body" style="background-color:{{brandAppBackground}};">
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="cm-body" bgcolor="{{brandAppBackground}}" style="background-color:{{brandAppBackground}};">
     <tr>
-      <td align="center" style="padding:32px 16px;">
-        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="cm-card" style="max-width:600px;background-color:{{brandPanel}};border-radius:16px;border:1px solid {{brandDivider}};">
+      <td align="center" class="cm-outer-pad" style="padding:32px 16px;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="cm-card" bgcolor="{{brandPanel}}" style="max-width:600px;background-color:{{brandPanel}};border-radius:16px;border:1px solid {{brandDivider}};">
           {{#if showAccentBar}}
           <tr>
             <td height="4" bgcolor="{{accentHex}}" style="line-height:4px;font-size:0;mso-line-height-rule:exactly;border-radius:16px 16px 0 0;">&nbsp;</td>
           </tr>
           {{/if}}
           <tr>
-            <td style="padding:24px {{innerPadX}} 8px {{innerPadX}};">
-              {{#if logoUrl}}
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+            <td class="cm-card-pad" style="padding:{{headerPadTop}} {{innerPadX}} {{headerPadBottom}} {{innerPadX}};">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0">
                 <tr>
-                  <td style="padding:0 0 12px 0;">
-                    <img src="{{{logoUrl}}}" width="140" height="auto" alt="Chisto.mk" style="display:block;border:0;outline:none;text-decoration:none;height:auto;max-width:140px;" />
+                  {{#if logoUrl}}
+                  <td width="{{headerLogoWidth}}" valign="middle" align="left" style="width:{{headerLogoWidthStyle}};padding:0 {{headerLogoGap}} 0 0;vertical-align:middle;line-height:{{headerWordmarkRowLineHeight}};font-size:0;mso-line-height-rule:exactly;">
+                    <img src="{{{logoUrl}}}" width="{{headerLogoWidth}}" height="{{headerLogoHeight}}" alt="" style="display:block;border:0;outline:none;text-decoration:none;width:{{headerLogoWidthStyle}};height:{{headerLogoHeightStyle}};max-width:{{headerLogoWidthStyle}};max-height:{{headerLogoHeightStyle}};" />
                   </td>
-                </tr>
-              </table>
-              {{/if}}
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                  <td class="cm-text" style="font-size:22px;font-weight:700;letter-spacing:-0.3px;color:{{brandTextPrimary}};">
-                    Chisto<span style="color:{{brandPrimary}};">.mk</span>
+                  {{/if}}
+                  <td valign="middle" class="cm-text cm-brand-wordmark" style="vertical-align:middle;padding:0;margin:0;line-height:{{headerWordmarkRowLineHeight}};mso-line-height-rule:exactly;">
+                    <span style="display:inline-block;vertical-align:middle;font-size:{{headerWordmarkSize}};font-weight:700;letter-spacing:{{headerWordmarkTracking}};line-height:{{headerWordmarkLineHeight}};color:{{brandTextPrimary}};">
+                      Chisto<span style="color:{{brandPrimary}};">.mk</span>
+                    </span>
                   </td>
                 </tr>
               </table>
             </td>
           </tr>
           <tr>
-            <td style="padding:8px {{innerPadX}} 8px {{innerPadX}};">
-              <h1 class="cm-text" style="margin:0;font-size:26px;font-weight:600;letter-spacing:-0.2px;line-height:1.2;color:{{brandTextPrimary}};">{{headline}}</h1>
+            <td class="cm-card-pad" style="padding:{{headlinePadTop}} {{innerPadX}} 8px {{innerPadX}};">
+              <h1 class="cm-text" style="margin:0;font-size:26px;font-weight:600;letter-spacing:-0.2px;line-height:1.25;color:{{brandTextPrimary}};">{{headline}}</h1>
             </td>
           </tr>
           <tr>
-            <td class="cm-muted" style="padding:8px {{innerPadX}} 24px {{innerPadX}};font-size:16px;line-height:1.45;color:{{brandTextSecondary}};">
+            <td class="cm-card-pad cm-muted" style="padding:8px {{innerPadX}} 24px {{innerPadX}};font-size:16px;line-height:1.5;color:{{brandTextSecondary}};">
               {{{bodyHtml}}}
             </td>
           </tr>
           {{#if ctaUrl}}
           <tr>
-            <td style="padding:0 {{innerPadX}} 28px {{innerPadX}};">
+            <td class="cm-card-pad" style="padding:0 {{innerPadX}} 28px {{innerPadX}};">
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="left">
                 <tr>
                   <td align="center" bgcolor="{{ctaBg}}" style="border-radius:12px;mso-padding-alt:14px 28px;">
@@ -84,14 +90,14 @@
           </tr>
           {{/if}}
           <tr>
-            <td style="padding:0 {{innerPadX}} 28px {{innerPadX}};border-top:1px solid {{brandDivider}};">
-              <p class="cm-muted" style="margin:20px 0 8px 0;font-size:13px;line-height:1.45;color:{{brandTextMuted}};">
-                Chisto.mk: civic environmental platform. You received this transactional email because of activity on your account.
+            <td class="cm-card-pad" style="padding:0 {{innerPadX}} 28px {{innerPadX}};border-top:1px solid {{brandDivider}};">
+              <p class="cm-muted" style="margin:20px 0 8px 0;font-size:13px;line-height:1.5;color:{{brandTextMuted}};">
+                {{footerDisclaimer}}
               </p>
-              <p class="cm-muted" style="margin:0;font-size:13px;line-height:1.45;color:{{brandTextMuted}};">
-                <a href="{{{prefsUrl}}}" style="color:{{brandPrimaryDark}};text-decoration:underline;">Manage preferences</a>
+              <p class="cm-muted" style="margin:0;font-size:13px;line-height:1.5;color:{{brandTextMuted}};">
+                <a class="cm-link" href="{{{prefsUrl}}}" style="color:{{brandPrimaryDark}};text-decoration:underline;">{{footerPrefsLabel}}</a>
                 &nbsp;·&nbsp;
-                <a href="{{{unsubscribeUrl}}}" style="color:{{brandPrimaryDark}};text-decoration:underline;">Unsubscribe from this type</a>
+                <a class="cm-link" href="{{{unsubscribeUrl}}}" style="color:{{brandPrimaryDark}};text-decoration:underline;">{{footerUnsubscribeLabel}}</a>
               </p>
               <p class="cm-muted" style="margin:16px 0 0 0;font-size:12px;color:{{brandTextMuted}};">© {{year}} Chisto.mk</p>
             </td>

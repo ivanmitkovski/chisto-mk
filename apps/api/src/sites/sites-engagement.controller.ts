@@ -25,6 +25,7 @@ import { SitesFeedService } from './sites-feed.service';
 import { SitesSiteUpvotesListService } from './sites-site-upvotes-list.service';
 import { ParseCuidPipe } from '../common/pipes/parse-cuid.pipe';
 import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-error-responses.decorator';
+import { Idempotent } from '../common/idempotency/idempotency.decorator';
 
 @ApiTags('sites')
 @ApiStandardHttpErrorResponses()
@@ -53,6 +54,7 @@ export class SitesEngagementController {
   }
 
   @Post(':id/upvote')
+  @Idempotent('site_upvote')
   @UseGuards(JwtAuthGuard, ThrottlerGuard)
   @Throttle({ default: { limit: 120, ttl: 60_000 } })
   @ApiBearerAuth()
@@ -64,6 +66,7 @@ export class SitesEngagementController {
     return this.engagementActions.upvoteSite(id, user);
   }
 
+  // safe-to-retry: repeated Delete is acceptable
   @Delete(':id/upvote')
   @UseGuards(JwtAuthGuard, ThrottlerGuard)
   @Throttle({ default: { limit: 120, ttl: 60_000 } })
@@ -77,6 +80,7 @@ export class SitesEngagementController {
   }
 
   @Post(':id/save')
+  @Idempotent('site_save')
   @UseGuards(JwtAuthGuard, ThrottlerGuard)
   @Throttle({ default: { limit: 120, ttl: 60_000 } })
   @ApiBearerAuth()
@@ -88,6 +92,7 @@ export class SitesEngagementController {
     return this.engagementActions.saveSite(id, user);
   }
 
+  // safe-to-retry: repeated Delete is acceptable
   @Delete(':id/save')
   @UseGuards(JwtAuthGuard, ThrottlerGuard)
   @Throttle({ default: { limit: 120, ttl: 60_000 } })
@@ -100,6 +105,7 @@ export class SitesEngagementController {
     return this.engagementActions.unsaveSite(id, user);
   }
 
+  @Idempotent('sites_sites-engagement_105')
   @Post(':id/share')
   @UseGuards(JwtAuthGuard, ThrottlerGuard)
   @Throttle({ default: { limit: 120, ttl: 60_000 } })
@@ -116,6 +122,7 @@ export class SitesEngagementController {
     return this.engagementActions.shareSite(id, dto, user);
   }
 
+  @Idempotent('sites_sites-engagement_121')
   @Post(':id/share-link')
   @UseGuards(JwtAuthGuard, ThrottlerGuard)
   @Throttle({ default: { limit: 90, ttl: 60_000 } })
@@ -132,6 +139,7 @@ export class SitesEngagementController {
     return this.engagementActions.issueShareLink(id, dto, user);
   }
 
+  @Idempotent('sites_sites-engagement_137')
   @Post(':id/feed-feedback')
   @UseGuards(JwtAuthGuard, ThrottlerGuard)
   @Throttle({ default: { limit: 180, ttl: 60_000 } })

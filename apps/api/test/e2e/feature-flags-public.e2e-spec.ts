@@ -17,7 +17,7 @@ describe('Public feature flags (e2e)', () => {
   });
 
   it('GET /config/feature-flags returns a flags object', async () => {
-    const res = await request(app.getHttpServer()).get('/config/feature-flags').expect(200);
+    const res = await request(app.getHttpServer()).get('/v1/config/feature-flags').expect(200);
     expect(res.body.flags).toBeDefined();
     expect(typeof res.body.flags).toBe('object');
   });

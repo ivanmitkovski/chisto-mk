@@ -15,6 +15,7 @@ import {
 } from './events-mobile.mapper';
 import type { LoadedEventDetail, MobileMappableEvent } from './events-query.include';
 import { EventsRepository } from './events.repository';
+import { signPublicMediaUrlsDeduped } from '../storage/batch-private-object-sign';
 
 export type MobileEventMappingOptions = {
   /** Distance from viewer to event site (km); 0 when viewer coordinates are absent. */
@@ -43,9 +44,7 @@ export class EventsMobileMapperService {
     const reminderEnabled = participant?.reminderEnabled ?? false;
     const reminderAt = participant?.reminderAt ?? null;
 
-    const signedAfter = await this.uploads.signUrls(
-      this.uploads.getPublicUrlsForKeys(row.afterImageKeys),
-    );
+    const afterCanonical = this.uploads.getPublicUrlsForKeys(row.afterImageKeys);
 
     const organizerName = row.organizer
       ? `${row.organizer.firstName} ${row.organizer.lastName}`.trim()
@@ -84,9 +83,15 @@ export class EventsMobileMapperService {
     const routeSegmentRows: LoadedEventDetail['routeSegments'] =
       'routeSegments' in row && Array.isArray(row.routeSegments) ? row.routeSegments : [];
 
-    const evidenceSigned = await this.uploads.signUrls(
-      this.uploads.getPublicUrlsForKeys(evidencePhotos.map((p) => p.objectKey)),
+    const evidenceCanonical = this.uploads.getPublicUrlsForKeys(
+      evidencePhotos.map((p) => p.objectKey),
     );
+    const signedByUrl = await signPublicMediaUrlsDeduped(
+      [...afterCanonical, ...evidenceCanonical],
+      (unique) => this.uploads.signUrls(unique),
+    );
+    const signedAfter = afterCanonical.map((url) => signedByUrl.get(url.trim()) ?? url);
+    const evidenceSigned = evidenceCanonical.map((url) => signedByUrl.get(url.trim()) ?? url);
     const routeSegments: EventMobileRouteSegmentDto[] = routeSegmentRows.map((s) => {
       const seg = new EventMobileRouteSegmentDto();
       seg.id = s.id;

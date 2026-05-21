@@ -27,6 +27,7 @@ import {
 import { SiteCommentsService } from './site-comments.service';
 import { ParseCuidPipe } from '../common/pipes/parse-cuid.pipe';
 import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-error-responses.decorator';
+import { Idempotent } from '../common/idempotency/idempotency.decorator';
 
 @ApiTags('sites')
 @ApiStandardHttpErrorResponses()
@@ -50,7 +51,9 @@ export class SitesCommentsController {
     return this.siteComments.findSiteComments(id, query, user);
   }
 
+  @Idempotent('sites_sites-comments_53')
   @Post(':id/comments')
+  @Idempotent('site_comment_create')
   @UseGuards(JwtAuthGuard, ThrottlerGuard)
   @Throttle({ default: { limit: 60, ttl: 60_000 } })
   @ApiBearerAuth()
@@ -67,7 +70,9 @@ export class SitesCommentsController {
     return this.siteComments.createSiteComment(id, dto, user);
   }
 
+  @Idempotent('sites_sites-comments_71')
   @Post(':id/comments/:commentId/like')
+  @Idempotent('site_comment_like')
   @UseGuards(JwtAuthGuard, ThrottlerGuard)
   @Throttle({ default: { limit: 120, ttl: 60_000 } })
   @ApiBearerAuth()
@@ -83,6 +88,7 @@ export class SitesCommentsController {
     return this.siteComments.likeSiteComment(id, commentId, user);
   }
 
+  // safe-to-retry: repeated Delete is acceptable
   @Delete(':id/comments/:commentId/like')
   @UseGuards(JwtAuthGuard, ThrottlerGuard)
   @Throttle({ default: { limit: 120, ttl: 60_000 } })
@@ -99,6 +105,7 @@ export class SitesCommentsController {
     return this.siteComments.unlikeSiteComment(id, commentId, user);
   }
 
+  // safe-to-retry: repeated Patch is acceptable
   @Patch(':id/comments/:commentId')
   @UseGuards(JwtAuthGuard, ThrottlerGuard)
   @Throttle({ default: { limit: 60, ttl: 60_000 } })
@@ -118,6 +125,7 @@ export class SitesCommentsController {
     return this.siteComments.updateSiteComment(id, commentId, dto, user);
   }
 
+  // safe-to-retry: repeated Delete is acceptable
   @Delete(':id/comments/:commentId')
   @UseGuards(JwtAuthGuard, ThrottlerGuard)
   @Throttle({ default: { limit: 60, ttl: 60_000 } })

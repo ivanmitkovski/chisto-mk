@@ -7,6 +7,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { TwilioStatusDto } from './dto/twilio-status.dto';
 import { TwilioSignatureGuard } from './guards/twilio-signature.guard';
@@ -23,7 +24,8 @@ export class WebhooksController {
   @Post('twilio/status')
   @HttpCode(200)
   @Header('Content-Type', 'text/plain; charset=utf-8')
-  @UseGuards(TwilioSignatureGuard)
+  @UseGuards(ThrottlerGuard, TwilioSignatureGuard)
+  @Throttle({ default: { limit: 600, ttl: 60_000 } })
   @UseInterceptors(TwilioStatusBodySanitizeInterceptor)
   @ApiOperation({ summary: 'Twilio SMS status callback (form-encoded)' })
   @ApiResponse({ status: 200, description: 'Acknowledged' })

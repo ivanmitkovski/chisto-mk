@@ -16,6 +16,7 @@ import { SiteCommentsListService } from './site-comments-list.service';
 import { SiteCommentsMutationsService } from './site-comments-mutations.service';
 import { SiteCommentsService } from './site-comments.service';
 import { SitesAdminService } from './sites-admin.service';
+import { SitesAdminBulkService } from './sites-admin-bulk.service';
 import { SitesController } from './sites.controller';
 import { SitesCommentsController } from './sites-comments.controller';
 import { SitesDetailController } from './sites-detail.controller';
@@ -75,6 +76,7 @@ import { MapMvtTilesService } from './map/map-mvt-tiles.service';
 import { SitesMapSearchQueryService } from './sites-map-search-query.service';
 import { SitesSearchService } from './sites-search.service';
 import { SitesSavedListService } from './sites-saved-list.service';
+import { FeedCacheRedisService } from './feed/feed-cache-redis.service';
 
 @Module({
   imports: [
@@ -122,6 +124,7 @@ import { SitesSavedListService } from './sites-saved-list.service';
     SitesDetailService,
     SitesMediaService,
     SitesAdminService,
+    SitesAdminBulkService,
     SiteLifecycleFromEventsService,
     SitesMapAdminTimelineService,
     SitesSiteUpvotesListService,
@@ -158,6 +161,7 @@ import { SitesSavedListService } from './sites-saved-list.service';
     EngagementRetriever,
     PersonalRetriever,
     MapRateLimitGuard,
+    FeedCacheRedisService,
   ],
   exports: [FeedRankingService, SiteHistoryModule, SiteLifecycleFromEventsService],
 })

@@ -27,6 +27,7 @@ import { EventsScheduleConflictPreviewQueryService } from './events-schedule-con
 import { EventsSearchService } from './events-search.service';
 import { ApiEventsJwtStandardErrors } from './events-openapi.decorators';
 import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-error-responses.decorator';
+import { Idempotent } from '../common/idempotency/idempotency.decorator';
 
 @ApiTags('events')
 @ApiStandardHttpErrorResponses()
@@ -54,6 +55,7 @@ export class EventsListController {
     return this.query.list(user, query);
   }
 
+  @Idempotent('events_events-list_57')
   @Post('search')
   @Throttle({ default: { ttl: 60_000, limit: 60 } })
   @UseGuards(JwtAuthGuard)
@@ -84,6 +86,7 @@ export class EventsListController {
     return this.schedulePreview.checkScheduleConflictPreview(query);
   }
 
+  @Idempotent('events_events-list_87')
   @Post('field-batch')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -95,7 +98,9 @@ export class EventsListController {
     return this.fieldBatchService.applyBatch(user, dto);
   }
 
+  @Idempotent('events_events-list_98')
   @Post()
+  @Idempotent('event_create')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Throttle({ default: { ttl: 60_000, limit: 20 } })

@@ -648,7 +648,7 @@
   "profileSignOutDialogBody": "Mund të hysh përsëri me llogarinë tënde.",
   "profileSignOutFailedSnack": "Nuk mund të dilnim. Provo përsëri.",
   "profileDeleteAccountDialogTitle": "Të fshihet llogaria?",
-  "profileDeleteAccountDialogBody": "Të gjitha të dhënat do të hiqen përgjithmonë. Ky veprim nuk kthehet mbrapsht.",
+  "profileDeleteAccountDialogBody": "Llogaria anonimohet menjëherë. Të dhënat personale fshihen plotësisht brenda 30 ditëve.",
   "profileDeleteAccountFailedSnack": "Nuk mund të fshihej llogaria. Provo përsëri.",
   "profileDeleteAccountTypeConfirmTitle": "Konfirmo me shkrim",
   "profileDeleteAccountTypeConfirmBody": "Shkruaj fjalën më poshtë saktësisht siç shfaqet. Kjo parandalon fshirjet aksidentale.",

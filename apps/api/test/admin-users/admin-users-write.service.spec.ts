@@ -15,13 +15,19 @@ function actor(overrides: Partial<AuthenticatedUser> = {}): AuthenticatedUser {
   };
 }
 
-describe('AdminUsersWriteService', () => {
+function makeSvc(prisma: never) {
   const audit = { log: jest.fn().mockResolvedValue(undefined) } as never;
   const userEvents = { emitUserUpdated: jest.fn() } as never;
+  const sessionRevocation = { revokeAllForUser: jest.fn().mockResolvedValue(undefined) } as never;
+  const authSnapshotCache = { invalidate: jest.fn() } as never;
+  return new AdminUsersWriteService(prisma, audit, userEvents, sessionRevocation, authSnapshotCache);
+}
+
+describe('AdminUsersWriteService', () => {
 
   it('patchRole forbids changing own role', async () => {
     const prisma = {} as never;
-    const svc = new AdminUsersWriteService(prisma, audit, userEvents);
+    const svc = makeSvc(prisma);
     await expect(
       svc.patchRole(
         'actor-1',
@@ -35,7 +41,7 @@ describe('AdminUsersWriteService', () => {
     const prisma = {
       user: { findUnique: jest.fn().mockResolvedValue(null) },
     } as never;
-    const svc = new AdminUsersWriteService(prisma, audit, userEvents);
+    const svc = makeSvc(prisma);
     await expect(
       svc.patchRole('missing', { role: Role.USER } as never, actor({ role: Role.SUPER_ADMIN })),
     ).rejects.toBeInstanceOf(NotFoundException);
@@ -54,7 +60,7 @@ describe('AdminUsersWriteService', () => {
         }),
       },
     } as never;
-    const svc = new AdminUsersWriteService(prisma, audit, userEvents);
+    const svc = makeSvc(prisma);
     await expect(
       svc.patchRole('sa-1', { role: Role.ADMIN } as never, actor({ role: Role.ADMIN })),
     ).rejects.toBeInstanceOf(ForbiddenException);
@@ -62,7 +68,7 @@ describe('AdminUsersWriteService', () => {
 
   it('bulk changeRole requires super admin', async () => {
     const prisma = {} as never;
-    const svc = new AdminUsersWriteService(prisma, audit, userEvents);
+    const svc = makeSvc(prisma);
     await expect(
       svc.bulk(
         { action: 'changeRole', userIds: ['u1'], role: Role.SUPPORT } as never,
@@ -73,7 +79,7 @@ describe('AdminUsersWriteService', () => {
 
   it('bulk changeRole requires role when action is changeRole', async () => {
     const prisma = {} as never;
-    const svc = new AdminUsersWriteService(prisma, audit, userEvents);
+    const svc = makeSvc(prisma);
     await expect(
       svc.bulk({ action: 'changeRole', userIds: ['u1'] } as never, actor({ role: Role.SUPER_ADMIN })),
     ).rejects.toBeInstanceOf(ConflictException);
@@ -96,7 +102,7 @@ describe('AdminUsersWriteService', () => {
         findFirst: jest.fn().mockResolvedValue({ id: 'other' }),
       },
     } as never;
-    const svc = new AdminUsersWriteService(prisma, audit, userEvents);
+    const svc = makeSvc(prisma);
     await expect(
       svc.patch('u1', { phoneNumber: '+38970000099' } as never, actor()),
     ).rejects.toBeInstanceOf(ConflictException);

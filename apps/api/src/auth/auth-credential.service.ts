@@ -7,6 +7,7 @@ import type { PrismaWithLoginFailure } from './auth-prisma-extensions';
 import { AUTH_ENV_RUNTIME, type AuthEnvRuntime } from './auth-env.config';
 import { EmailService } from '../email/email.service';
 import { notificationLocalesByUserId } from '../common/i18n/notification-locale.resolver';
+import { AuthSessionRevocationService } from './auth-session-revocation.service';
 
 @Injectable()
 export class AuthCredentialService {
@@ -14,6 +15,7 @@ export class AuthCredentialService {
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
     private readonly emailService: EmailService,
+    private readonly sessionRevocation: AuthSessionRevocationService,
     @Inject(AUTH_ENV_RUNTIME) private readonly env: AuthEnvRuntime,
   ) {}
 
@@ -42,6 +44,8 @@ export class AuthCredentialService {
     });
     const db = this.prisma as PrismaWithLoginFailure;
     await db.loginFailure.deleteMany({ where: { phoneNumber: user.phoneNumber } }).catch(() => {});
+    await this.sessionRevocation.revokeAllForUser(userId, 'password_changed');
+
     await this.audit.log({
       actorId: userId,
       action: 'PASSWORD_CHANGED',

@@ -31,6 +31,7 @@ export class FeatureFlagsController {
     return this.featureFlagsService.listForAdmin();
   }
 
+  // safe-to-retry: repeated Patch is acceptable
   @Patch(':key')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(...ADMIN_WRITE_ROLES)

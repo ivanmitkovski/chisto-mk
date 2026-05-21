@@ -1403,7 +1403,7 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String get profileDeleteAccountDialogBody =>
-      'Të gjitha të dhënat do të hiqen përgjithmonë. Ky veprim nuk kthehet mbrapsht.';
+      'Llogaria anonimohet menjëherë. Të dhënat personale fshihen plotësisht brenda 30 ditëve.';
 
   @override
   String get profileDeleteAccountFailedSnack =>

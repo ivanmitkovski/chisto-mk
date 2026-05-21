@@ -16,11 +16,19 @@ describe('AuthProfileService', () => {
         }),
       ),
     } as unknown as AuthProfileReadService;
+    const accountErasure = { eraseUserAccount: jest.fn() } as never;
+    const configService = {
+      get: jest.fn((key: string) => (key === 'TERMS_VERSION' ? '1' : undefined)),
+    } as never;
+    const audit = { log: jest.fn().mockResolvedValue(undefined) } as never;
     const svc = new AuthProfileService(
       { user: { findUnique: jest.fn() } } as never,
       { signPrivateObjectKey: jest.fn() } as never,
       read,
       {} as AuthProfileAvatarService,
+      accountErasure,
+      configService,
+      audit,
     );
     const user = buildAuthenticatedUser({ userId: 'missing' });
     await expect(svc.me(user)).rejects.toBeInstanceOf(UnauthorizedException);

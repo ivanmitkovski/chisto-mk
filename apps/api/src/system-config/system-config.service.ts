@@ -56,8 +56,15 @@ const DEFAULT_KEYS: Array<{ key: string; value: string }> = [
   { key: 'api_url_prod', value: 'https://api.chisto.mk' },
 ];
 
+const PUBLIC_CONFIG_CACHE_TTL_MS = 60_000;
+
 @Injectable()
 export class SystemConfigService {
+  private publicConfigCache: {
+    value: { activeEnvironment: string; apiUrls: { dev: string; staging: string; prod: string } };
+    expiresAt: number;
+  } | null = null;
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
@@ -95,6 +102,10 @@ export class SystemConfigService {
     activeEnvironment: string;
     apiUrls: { dev: string; staging: string; prod: string };
   }> {
+    const now = Date.now();
+    if (this.publicConfigCache && this.publicConfigCache.expiresAt > now) {
+      return this.publicConfigCache.value;
+    }
     await this.ensureDefaults();
     const rows = await this.prisma.systemConfig.findMany({
       where: {
@@ -104,7 +115,7 @@ export class SystemConfigService {
       },
     });
     const map = Object.fromEntries(rows.map((r) => [r.key, r.value]));
-    return {
+    const value = {
       activeEnvironment: map.active_environment ?? 'dev',
       apiUrls: {
         dev: map.api_url_dev ?? '',
@@ -112,6 +123,8 @@ export class SystemConfigService {
         prod: map.api_url_prod ?? '',
       },
     };
+    this.publicConfigCache = { value, expiresAt: now + PUBLIC_CONFIG_CACHE_TTL_MS };
+    return value;
   }
 
   validate(dto: PatchSystemConfigDto): { valid: boolean; errors?: Array<{ key: string; message: string }> } {
@@ -168,6 +181,8 @@ export class SystemConfigService {
       });
       updated += 1;
     }
+
+    this.publicConfigCache = null;
 
     await this.audit.log({
       actorId: actor.userId,

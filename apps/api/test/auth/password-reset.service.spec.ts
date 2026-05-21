@@ -60,6 +60,7 @@ describe('PasswordResetService', () => {
       }),
     } as unknown as ConfigService;
 
+    const identifierThrottle = { assertAllowed: jest.fn().mockResolvedValue(undefined) };
     const svc = new PasswordResetService(
       prisma as never,
       otpService,
@@ -68,6 +69,7 @@ describe('PasswordResetService', () => {
       eligibility as never,
       config,
       envWithDevCode,
+      identifierThrottle as never,
     );
 
     return { svc, prisma, otpService, email };

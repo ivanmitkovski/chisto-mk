@@ -1,6 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { fetchWithTimeout } from '../common/resilience/fetch-with-timeout';
 import type { EmailSendPayload, EmailTransport } from './email-transport.types';
+
+const POSTMARK_TIMEOUT_MS = 15_000;
 
 const POSTMARK_API_URL = 'https://api.postmarkapp.com/email';
 
@@ -50,7 +53,8 @@ export class EmailPostmarkTransportService implements EmailTransport {
     const pause = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
-        const res = await fetch(POSTMARK_API_URL, {
+        const res = await fetchWithTimeout(POSTMARK_API_URL, {
+          timeoutMs: POSTMARK_TIMEOUT_MS,
           method: 'POST',
           headers: {
             'X-Postmark-Server-Token': serverToken,

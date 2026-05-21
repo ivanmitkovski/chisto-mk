@@ -28,7 +28,7 @@ describe('TwilioSignatureGuard', () => {
 
   it('accepts valid signature', () => {
     const params = { MessageSid: 'SM1', MessageStatus: 'delivered' };
-    const url = `${baseUrl}/webhooks/twilio/status`;
+    const url = `${baseUrl}/v1/webhooks/twilio/status`;
     const signature = twilio.getExpectedTwilioSignature(authToken, url, params);
     const guard = new TwilioSignatureGuard(config as never);
     expect(guard.canActivate(context(params, signature))).toBe(true);

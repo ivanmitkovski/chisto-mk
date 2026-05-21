@@ -648,7 +648,7 @@
   "profileSignOutDialogBody": "You can sign back in anytime with your account.",
   "profileSignOutFailedSnack": "Could not sign out. Try again.",
   "profileDeleteAccountDialogTitle": "Delete account?",
-  "profileDeleteAccountDialogBody": "All your data will be permanently removed. This action cannot be undone.",
+  "profileDeleteAccountDialogBody": "Your account will be anonymized immediately. Personal data is fully erased within 30 days.",
   "profileDeleteAccountFailedSnack": "Could not delete your account. Try again.",
   "profileDeleteAccountTypeConfirmTitle": "Confirm by typing",
   "profileDeleteAccountTypeConfirmBody": "Type the word below exactly as shown. This helps prevent accidental deletion.",

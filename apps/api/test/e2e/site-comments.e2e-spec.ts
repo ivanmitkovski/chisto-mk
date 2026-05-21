@@ -18,7 +18,7 @@ describe('Site comments (e2e)', () => {
 
   it('rejects unauthenticated comment creation', async () => {
     const res = await request(app.getHttpServer())
-      .post('/sites/c123456789012345678901234/comments')
+      .post('/v1/sites/c123456789012345678901234/comments')
       .send({ body: 'Hello', parentId: null })
       .expect(401);
     expect(res.body.code).toBeDefined();

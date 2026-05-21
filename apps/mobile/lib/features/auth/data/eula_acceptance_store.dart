@@ -39,6 +39,15 @@ class EulaAcceptanceStore {
     await _prefs.remove(acceptedVersionKey);
   }
 
+  /// Seeds local cache when the API reports current terms are already accepted.
+  Future<void> syncFromServer({
+    required String userId,
+    required bool requiresTermsAcceptance,
+  }) async {
+    if (userId.isEmpty || requiresTermsAcceptance) return;
+    await acceptForUser(userId);
+  }
+
   Future<void> clearForUser(String userId) async {
     if (userId.isEmpty) return;
     await _prefs.remove(keyForUser(userId));

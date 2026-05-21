@@ -3,8 +3,8 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import * as Handlebars from 'handlebars';
 import { EMAIL_BRAND } from './email.constants';
-import { buildBodyHtml, getCopy, type EmailCopyBlock } from './email-copy';
-import { accentBorderColor } from './email-layout';
+import { buildBodyHtml, getCopy, getEmailShellCopy, type EmailCopyBlock } from './email-copy';
+import { accentBorderColor, emailTemplateLayoutVars } from './email-layout';
 import type { EmailLocale, EmailTemplateId } from './email.types';
 
 export type RenderEmailInput = {
@@ -68,7 +68,8 @@ export class EmailTemplateService implements OnModuleInit {
     const accentHex = accentBorderColor(copy.accent ?? 'none');
     const showAccentBar = accentHex !== 'transparent';
     const preheader = computePreheader(copy);
-    const innerPadX = '28px';
+    const layout = emailTemplateLayoutVars();
+    const shell = getEmailShellCopy(input.locale);
 
     const html =
       this.baseTemplate != null
@@ -82,10 +83,13 @@ export class EmailTemplateService implements OnModuleInit {
             ctaLabel: copy.ctaLabel ?? 'Open Chisto.mk',
             prefsUrl: input.prefsUrl,
             unsubscribeUrl: input.unsubscribeUrl,
+            footerDisclaimer: shell.footerDisclaimer,
+            footerPrefsLabel: shell.footerPrefsLabel,
+            footerUnsubscribeLabel: shell.footerUnsubscribeLabel,
             year,
             showAccentBar,
             accentHex,
-            innerPadX,
+            ...layout,
             brandPrimary: EMAIL_BRAND.primary,
             brandPrimaryDark: EMAIL_BRAND.primaryDark,
             brandAppBackground: EMAIL_BRAND.appBackground,
@@ -107,7 +111,11 @@ export class EmailTemplateService implements OnModuleInit {
     if (copy.ctaUrl && copy.ctaLabel) {
       textLines.push('', `${copy.ctaLabel}: ${copy.ctaUrl}`);
     }
-    textLines.push('', `Manage preferences: ${input.prefsUrl}`, `Unsubscribe: ${input.unsubscribeUrl}`);
+    textLines.push(
+      '',
+      `${shell.textPrefsPrefix}: ${input.prefsUrl}`,
+      `${shell.textUnsubscribePrefix}: ${input.unsubscribeUrl}`,
+    );
     return { html, text: textLines.join('\n'), preheader, subject: copy.subject };
   }
 

@@ -4,6 +4,7 @@ import { Type } from 'class-transformer';
 import { IsBoolean, IsEnum, IsIn, IsInt, IsNumber, IsOptional, Max, Min } from 'class-validator';
 
 import { GeoPointLatLngDto } from '../../common/dto/geo-point.dto';
+import { StrictBoolean } from '../../common/transformers/strict-boolean.transformer';
 
 export class ListSitesMapQueryDto extends GeoPointLatLngDto {
   @ApiPropertyOptional({
@@ -102,8 +103,8 @@ export class ListSitesMapQueryDto extends GeoPointLatLngDto {
     default: false,
   })
   @IsOptional()
+  @StrictBoolean()
   @IsBoolean()
-  @Type(() => Boolean)
   includeArchived = false;
 
   @ApiPropertyOptional({
@@ -112,8 +113,8 @@ export class ListSitesMapQueryDto extends GeoPointLatLngDto {
     default: false,
   })
   @IsOptional()
+  @StrictBoolean()
   @IsBoolean()
-  @Type(() => Boolean)
   prefetch = false;
 }
 

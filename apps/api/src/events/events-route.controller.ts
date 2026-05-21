@@ -1,3 +1,4 @@
+import { Idempotent } from '../common/idempotency/idempotency.decorator';
 import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
@@ -29,6 +30,7 @@ export class EventsRouteController {
     return this.routeSegments.listForEvent(id, user);
   }
 
+  // safe-to-retry: repeated Patch is acceptable
   @Patch(':id/route')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -44,6 +46,7 @@ export class EventsRouteController {
     return this.routeSegments.replaceWaypoints(id, user, body.waypoints);
   }
 
+  @Idempotent('events_events-route_47')
   @Post(':id/route/segments/:segmentId/claim')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -59,6 +62,7 @@ export class EventsRouteController {
     return this.routeSegments.claimSegment(segmentId, user);
   }
 
+  @Idempotent('events_events-route_62')
   @Post(':id/route/segments/:segmentId/complete')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

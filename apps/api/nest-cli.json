@@ -7,6 +7,7 @@
     "assets": [
       "generated/**/*",
       { "include": "email/templates/**/*.hbs", "watchAssets": true },
+      { "include": "email/assets/**/*", "watchAssets": true },
       { "include": "auth/quiz/**/*.json", "watchAssets": true }
     ]
   }

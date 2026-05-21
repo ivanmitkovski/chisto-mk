@@ -28,7 +28,7 @@ describe('Postmark webhook Basic Auth (e2e)', () => {
 
   it('rejects missing auth', async () => {
     await request(app.getHttpServer())
-      .post('/webhooks/postmark')
+      .post('/v1/webhooks/postmark')
       .send({
         RecordType: 'HardBounce',
         Email: 'bounced@example.com',
@@ -38,7 +38,7 @@ describe('Postmark webhook Basic Auth (e2e)', () => {
 
   it('accepts valid Basic Auth', async () => {
     await request(app.getHttpServer())
-      .post('/webhooks/postmark')
+      .post('/v1/webhooks/postmark')
       .set('Authorization', authHeader())
       .send({
         RecordType: 'HardBounce',

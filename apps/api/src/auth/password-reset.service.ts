@@ -19,6 +19,7 @@ import type { PrismaWithLoginFailure } from './auth-prisma-extensions';
 import { EmailService } from '../email/email.service';
 import { notificationLocalesByUserId } from '../common/i18n/notification-locale.resolver';
 import { EmailSendEligibilityService } from '../email/email-send-eligibility.service';
+import { AuthIdentifierThrottleService } from './auth-identifier-throttle.service';
 
 const EMAIL_RESET_TOKEN_TTL_MS = 30 * 60 * 1000;
 
@@ -39,6 +40,7 @@ export class PasswordResetService {
     private readonly emailEligibility: EmailSendEligibilityService,
     private readonly config: ConfigService,
     @Inject(AUTH_ENV_RUNTIME) private readonly env: AuthEnvRuntime,
+    private readonly identifierThrottle: AuthIdentifierThrottleService,
   ) {}
 
   async request(params: {
@@ -61,6 +63,7 @@ export class PasswordResetService {
     };
 
     if (phone) {
+      await this.identifierThrottle.assertAllowed('password_reset', phone, 5, 3600);
       const user = await this.prisma.user.findUnique({
         where: { phoneNumber: phone },
         select: { id: true },
@@ -77,6 +80,7 @@ export class PasswordResetService {
       };
     }
 
+    await this.identifierThrottle.assertAllowed('password_reset', email!, 5, 3600);
     const user = await this.prisma.user.findUnique({
       where: { email: email! },
       select: { id: true, email: true, firstName: true },

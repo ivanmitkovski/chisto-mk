@@ -50,6 +50,7 @@ import { EventsUpdateService } from './events-update.service';
 import { EventImpactReceiptService } from './event-impact-receipt.service';
 import { ApiEventsJwtStandardErrors } from './events-openapi.decorators';
 import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-error-responses.decorator';
+import { Idempotent } from '../common/idempotency/idempotency.decorator';
 
 @ApiTags('events')
 @ApiStandardHttpErrorResponses()
@@ -150,6 +151,7 @@ export class EventsController {
     return this.query.findOne(id, user, geo);
   }
 
+  // safe-to-retry: repeated Patch is acceptable
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -165,7 +167,9 @@ export class EventsController {
     return this.updates.patchEvent(id, dto, user);
   }
 
+  @Idempotent('events_events_168')
   @Post(':id/join')
+  @Idempotent('event_join')
   @UseGuards(JwtAuthGuard, PhoneVerifiedGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Join event' })
@@ -189,6 +193,7 @@ export class EventsController {
     return this.participation.join(id, user);
   }
 
+  // safe-to-retry: repeated Delete is acceptable
   @Delete(':id/join')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -199,6 +204,7 @@ export class EventsController {
     return this.participation.leave(id, user);
   }
 
+  // safe-to-retry: repeated Patch is acceptable
   @Patch(':id/status')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -213,6 +219,7 @@ export class EventsController {
     return this.lifecycle.patchLifecycle(id, dto, user);
   }
 
+  // safe-to-retry: repeated Patch is acceptable
   @Patch(':id/reminder')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -237,6 +244,7 @@ export class EventsController {
     return this.analytics.getAnalytics(id, user);
   }
 
+  @Idempotent('events_events_241')
   @Post(':id/after-images')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

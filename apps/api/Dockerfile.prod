@@ -2,7 +2,6 @@
 # Build from repo root: docker build -f Dockerfile.prod -t chisto-api .
 FROM node:20-bookworm-slim AS base
 # wget: required by ECS task-definition container health check (`wget -qO- http://localhost:3000/health`).
-# bookworm-slim does not ship wget (unlike Alpine/busybox); missing binary => permanent UNHEALTHY.
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates wget && rm -rf /var/lib/apt/lists/*
 RUN corepack enable && corepack prepare pnpm@9.14.2 --activate
 WORKDIR /app
@@ -13,10 +12,8 @@ COPY apps/api/package.json ./apps/api/
 RUN pnpm install --frozen-lockfile
 
 FROM base AS builder
-# Copy the full install tree so pnpm symlinks from apps/api into root .pnpm stay valid.
 COPY --from=deps /app ./
 COPY . .
-# prisma generate needs DATABASE_URL in config; use placeholder (not used for codegen)
 ENV DATABASE_URL="postgresql://build:build@localhost:5432/build"
 RUN pnpm --filter @chisto/api exec prisma generate
 RUN pnpm --filter @chisto/api build
@@ -25,14 +22,25 @@ FROM base AS deploy
 COPY --from=builder /app/ ./
 RUN pnpm --filter @chisto/api deploy --prod /deployed
 
+# Prisma CLI + engines for migrate/generate (isolated npm install; pnpm symlinks are not COPY-safe).
+FROM base AS prisma-cli
+WORKDIR /opt/prisma-cli
+RUN npm init -y \
+  && npm install prisma@7.8.0 \
+  && rm -f package.json package-lock.json
+
 FROM base AS runner
 ENV NODE_ENV=production
+RUN groupadd --gid 1001 chisto && useradd --uid 1001 --gid chisto --create-home chisto
 COPY --from=deploy /deployed ./
+COPY --from=builder /app/apps/api/prisma ./prisma
 COPY --from=builder /app/apps/api/docker-entrypoint.sh ./docker-entrypoint.sh
-RUN chmod +x ./docker-entrypoint.sh
-RUN mkdir -p /opt/prisma-cli && cd /opt/prisma-cli && npm init -y && npm install prisma@7.5.0 dotenv@16 && \
-    rm -f package.json package-lock.json
+COPY --from=prisma-cli /opt/prisma-cli/node_modules /opt/prisma-cli/node_modules
 ENV PATH="/opt/prisma-cli/node_modules/.bin:${PATH}"
 ENV NODE_PATH="/opt/prisma-cli/node_modules"
+RUN chmod +x ./docker-entrypoint.sh && chown -R chisto:chisto /app
+USER chisto
 EXPOSE 3000
+HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
+  CMD wget -qO- http://127.0.0.1:3000/health || exit 1
 ENTRYPOINT ["./docker-entrypoint.sh"]

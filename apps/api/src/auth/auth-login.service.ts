@@ -86,24 +86,20 @@ export class AuthLoginService {
   private async recordLoginFailure(phoneNumber: string): Promise<void> {
     const db = this.prisma as PrismaWithLoginFailure;
     const now = new Date();
-    const existing = await db.loginFailure.findUnique({
-      where: { phoneNumber },
-    });
     const windowMs = LOGIN_LOCKOUT_WINDOW_MINUTES * 60 * 1000;
-    if (existing && existing.firstFailedAt.getTime() < now.getTime() - windowMs) {
-      await db.loginFailure.update({
-        where: { phoneNumber },
-        data: { firstFailedAt: now, attemptCount: 1 },
-      });
-    } else if (existing) {
-      await db.loginFailure.update({
-        where: { phoneNumber },
-        data: { attemptCount: existing.attemptCount + 1 },
-      });
-    } else {
-      await db.loginFailure.create({
-        data: { phoneNumber, firstFailedAt: now, attemptCount: 1 },
-      });
-    }
+    const windowStart = new Date(now.getTime() - windowMs);
+    await db.$executeRaw`
+      INSERT INTO "LoginFailure" ("phoneNumber", "firstFailedAt", "attemptCount")
+      VALUES (${phoneNumber}, ${now}, 1)
+      ON CONFLICT ("phoneNumber") DO UPDATE SET
+        "attemptCount" = CASE
+          WHEN "LoginFailure"."firstFailedAt" < ${windowStart} THEN 1
+          ELSE "LoginFailure"."attemptCount" + 1
+        END,
+        "firstFailedAt" = CASE
+          WHEN "LoginFailure"."firstFailedAt" < ${windowStart} THEN ${now}
+          ELSE "LoginFailure"."firstFailedAt"
+        END
+    `;
   }
 }

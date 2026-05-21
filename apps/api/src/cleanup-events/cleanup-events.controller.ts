@@ -1,3 +1,4 @@
+import { Idempotent } from '../common/idempotency/idempotency.decorator';
 import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -105,6 +106,7 @@ export class CleanupEventsController {
     return this.cleanupEventsService.findOne(id);
   }
 
+  @Idempotent('cleanup-events_cleanup-events_108')
   @Post('bulk-moderate')
   @UseGuards(JwtAuthGuard, RolesGuard, ThrottlerGuard)
   @Roles(...ADMIN_WRITE_ROLES)
@@ -122,6 +124,7 @@ export class CleanupEventsController {
     return this.cleanupEventsService.bulkModerate(dto, actor);
   }
 
+  @Idempotent('cleanup-events_cleanup-events_125')
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard, ThrottlerGuard)
   @Roles(...ADMIN_WRITE_ROLES)
@@ -134,6 +137,7 @@ export class CleanupEventsController {
     return this.cleanupEventsService.create(dto, actor);
   }
 
+  // safe-to-retry: repeated Patch is acceptable
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard, ThrottlerGuard)
   @Roles(...ADMIN_WRITE_ROLES)

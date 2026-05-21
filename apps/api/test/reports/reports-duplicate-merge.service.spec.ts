@@ -28,7 +28,8 @@ function createMergeServiceWithMocks(
     siteEvents as never,
     reportsOwnerEvents as never,
     eventEmitter as never,
-    { recordStatusChanged: jest.fn(), recordReportMerged: jest.fn(), emitHistoryAppended: jest.fn() } as never,
+    { recordStatusChanged: jest.fn(), emitHistoryAppended: jest.fn() } as never,
+    { recordReportMerged: jest.fn() } as never,
   );
   const reportSideEffectProcessor = new ReportSideEffectProcessorService(
     prisma as never,
@@ -102,6 +103,7 @@ describe('ReportsDuplicateMergeService mergeDuplicateReports', () => {
           }
           return Promise.resolve(null);
         }),
+        updateMany: jest.fn().mockResolvedValue({ count: 1 }),
         update: jest.fn().mockResolvedValue({}),
       },
       report: {
@@ -365,6 +367,7 @@ describe('ReportsDuplicateMergeService mergeDuplicateReports', () => {
           }
           return Promise.resolve(null);
         }),
+        updateMany: jest.fn().mockResolvedValue({ count: 1 }),
         update: jest.fn().mockResolvedValue({}),
       },
       report: {
@@ -378,6 +381,7 @@ describe('ReportsDuplicateMergeService mergeDuplicateReports', () => {
           }
           if (findUniqueCalls === 3) {
             return Promise.resolve({
+              id: primaryId,
               reporterId: 'user-a',
               coReporters: [{ userId: coOnlyUserId }],
             });

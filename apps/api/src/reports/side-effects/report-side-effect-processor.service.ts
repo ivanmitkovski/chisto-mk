@@ -13,6 +13,11 @@ import {
   DuplicateMergeSideEffectsService,
   DuplicateMergeSiteStatusEvent,
 } from '../duplicates/duplicate-merge-side-effects.service';
+import { ObservabilityStore } from '../../observability/observability.store';
+import {
+  claimReportSideEffect,
+  reportSideEffectLeaseOwner,
+} from './report-side-effect-claim.util';
 
 /** JSON shape stored for [ReportSideEffectKind.MERGE_DUPLICATE_POST]. */
 export type MergeDuplicateSideEffectPayload = {
@@ -83,13 +88,11 @@ export class ReportSideEffectProcessorService {
       return 0;
     }
 
-    await this.prisma.reportSideEffect.update({
-      where: { id: effectId },
-      data: {
-        status: ReportSideEffectStatus.PROCESSING,
-        attempts: { increment: 1 },
-      },
-    });
+    const leaseOwner = reportSideEffectLeaseOwner();
+    if (!(await claimReportSideEffect(this.prisma, effectId, leaseOwner))) {
+      this.logger.debug(`processMergeDuplicatePost: could not claim id=${effectId}`);
+      return 0;
+    }
 
     const raw = row.payload as unknown as MergeDuplicateSideEffectPayload;
     try {
@@ -126,6 +129,8 @@ export class ReportSideEffectProcessorService {
           status: ReportSideEffectStatus.COMPLETED,
           processedAt: new Date(),
           lastError: null,
+          processingAt: null,
+          leaseOwner: null,
         },
       });
 
@@ -138,8 +143,11 @@ export class ReportSideEffectProcessorService {
         data: {
           status: ReportSideEffectStatus.FAILED,
           lastError: message.slice(0, 4000),
+          processingAt: null,
+          leaseOwner: null,
         },
       });
+      ObservabilityStore.recordReportSideEffectFailed();
       return 0;
     }
   }
@@ -156,13 +164,11 @@ export class ReportSideEffectProcessorService {
       return;
     }
 
-    await this.prisma.reportSideEffect.update({
-      where: { id: effectId },
-      data: {
-        status: ReportSideEffectStatus.PROCESSING,
-        attempts: { increment: 1 },
-      },
-    });
+    const leaseOwner = reportSideEffectLeaseOwner();
+    if (!(await claimReportSideEffect(this.prisma, effectId, leaseOwner))) {
+      this.logger.debug(`processModerationStatusPost: could not claim id=${effectId}`);
+      return;
+    }
 
     const raw = row.payload as unknown as ModerationStatusSideEffectPayload;
     try {
@@ -233,6 +239,8 @@ export class ReportSideEffectProcessorService {
           status: ReportSideEffectStatus.COMPLETED,
           processedAt: new Date(),
           lastError: null,
+          processingAt: null,
+          leaseOwner: null,
         },
       });
     } catch (err) {
@@ -243,8 +251,11 @@ export class ReportSideEffectProcessorService {
         data: {
           status: ReportSideEffectStatus.FAILED,
           lastError: message.slice(0, 4000),
+          processingAt: null,
+          leaseOwner: null,
         },
       });
+      ObservabilityStore.recordReportSideEffectFailed();
     }
   }
 }

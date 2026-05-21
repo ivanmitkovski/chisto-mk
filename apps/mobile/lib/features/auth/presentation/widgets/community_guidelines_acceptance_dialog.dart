@@ -65,6 +65,7 @@ class _CommunityGuidelinesAcceptanceDialog extends StatelessWidget {
           PrimaryButton(
             label: l10n.profileEulaAccept,
             onPressed: () async {
+              await AppBootstrap.instance.authRepository.acceptTermsOnServer();
               await EulaAcceptanceStore(AppBootstrap.instance.preferences)
                   .acceptForUser(userId);
               if (context.mounted) {

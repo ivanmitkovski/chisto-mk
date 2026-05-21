@@ -1,4 +1,5 @@
-import { DEFAULT_EMAIL_APP_BASE_URL, DEFAULT_EMAIL_LOGO_URL } from './email.constants';
+import { DEFAULT_EMAIL_APP_BASE_URL } from './email.constants';
+import { resolveEmailLogoSrc } from './email-logo';
 
 /** Normalize HTTPS origin with no trailing slash. */
 export function normalizeHttpsBase(raw: string | undefined): string {
@@ -37,8 +38,7 @@ export function normalizeHttpsAbsoluteUrl(raw: string | undefined): string {
   }
 }
 
-/** EMAIL_LOGO_URL or default landing logo URL (must be publicly reachable HTTPS). */
+/** @deprecated Use resolveEmailLogoSrc — kept for callers that import from email-urls. */
 export function resolveLogoUrl(cfg: { logo?: string | undefined }): string {
-  const u = normalizeHttpsAbsoluteUrl(cfg.logo);
-  return u || DEFAULT_EMAIL_LOGO_URL;
+  return resolveEmailLogoSrc(cfg);
 }

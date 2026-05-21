@@ -14,6 +14,7 @@ import {
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { Throttle } from '@nestjs/throttler';
+import { Idempotent } from '../common/idempotency/idempotency.decorator';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import {
@@ -65,7 +66,9 @@ export class ReportsController {
     private readonly reportsUploadService: ReportsUploadService,
   ) {}
 
+  @Idempotent('reports_reports_68')
   @Post()
+  @Idempotent('report_create')
   @Throttle({ default: { limit: 10, ttl: 60_000 } })
   @UseGuards(JwtAuthGuard, PhoneVerifiedGuard, ReportsUserThrottlerGuard)
   @ApiBearerAuth()
@@ -92,6 +95,7 @@ export class ReportsController {
     );
   }
 
+  @Idempotent('reports_reports_96')
   @Post('upload')
   @Throttle({ default: { limit: 30, ttl: 60_000 } })
   @UseGuards(JwtAuthGuard, ReportsUserThrottlerGuard)
@@ -112,6 +116,7 @@ export class ReportsController {
     return { urls };
   }
 
+  @Idempotent('reports_reports_116')
   @Post(':id/media')
   @Throttle({ default: { limit: 30, ttl: 60_000 } })
   @UseGuards(JwtAuthGuard, ReportsUserThrottlerGuard)
@@ -225,6 +230,7 @@ export class ReportsController {
     return this.reportsService.findOne(id, user);
   }
 
+  // safe-to-retry: repeated Patch is acceptable
   @Patch(':id/status')
   @Throttle({ default: { limit: 60, ttl: 60_000 } })
   @UseGuards(JwtAuthGuard, RolesGuard, ReportsUserThrottlerGuard)
@@ -240,6 +246,7 @@ export class ReportsController {
     return this.reportsService.updateStatus(id, dto, moderator);
   }
 
+  @Idempotent('reports_reports_244')
   @Post(':id/merge')
   @Throttle({ default: { limit: 60, ttl: 60_000 } })
   @UseGuards(JwtAuthGuard, RolesGuard, ReportsUserThrottlerGuard)

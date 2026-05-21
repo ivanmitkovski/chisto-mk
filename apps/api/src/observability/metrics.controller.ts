@@ -1,6 +1,7 @@
 import { Controller, Get, Header, Headers, UnauthorizedException } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ObservabilityStore } from './observability.store';
+import { renderPrometheusMetrics } from './prom-registry';
 import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-error-responses.decorator';
 
 @ApiTags('metrics')
@@ -10,7 +11,7 @@ export class MetricsController {
   @Get()
   @Header('Content-Type', 'text/plain; version=0.0.4')
   @ApiOperation({ summary: 'Prometheus text exposition (protected outside development when METRICS_BEARER_TOKEN is set)' })
-  metrics(@Headers('authorization') authorization?: string): string {
+  async metrics(@Headers('authorization') authorization?: string): Promise<string> {
     const token = process.env.METRICS_BEARER_TOKEN?.trim();
     const nodeEnv = (process.env.NODE_ENV ?? 'development').trim().toLowerCase();
     const mustBeProtected = nodeEnv !== 'development' && nodeEnv !== 'test';
@@ -26,20 +27,25 @@ export class MetricsController {
         message: 'Metrics access denied',
       });
     }
+    ObservabilityStore.syncLegacyPromGauges();
+    const promNative = await renderPrometheusMetrics();
     const s = ObservabilityStore.snapshot();
-    return [
+    const legacyLines = [
       '# HELP api_requests_total Total API requests',
       '# TYPE api_requests_total counter',
       `api_requests_total ${s.requestsTotal}`,
+      `chisto_requests_total ${s.requestsTotal}`,
       '# HELP api_requests_failed_total Total 5xx API requests',
       '# TYPE api_requests_failed_total counter',
       `api_requests_failed_total ${s.requestsFailed}`,
+      `chisto_requests_failed_total ${s.requestsFailed}`,
       '# HELP api_request_duration_ms_p50 Request duration p50 in milliseconds',
       '# TYPE api_request_duration_ms_p50 gauge',
       `api_request_duration_ms_p50 ${s.p50Ms}`,
       '# HELP api_request_duration_ms_p95 Request duration p95 in milliseconds',
       '# TYPE api_request_duration_ms_p95 gauge',
       `api_request_duration_ms_p95 ${s.p95Ms}`,
+      `chisto_request_duration_p95_ms ${s.p95Ms}`,
       '# HELP api_request_duration_ms_p99 Request duration p99 in milliseconds',
       '# TYPE api_request_duration_ms_p99 gauge',
       `api_request_duration_ms_p99 ${s.p99Ms}`,
@@ -141,6 +147,7 @@ export class MetricsController {
       '# HELP push_dead_letter_total Push outbox rows marked permanently failed',
       '# TYPE push_dead_letter_total gauge',
       `push_dead_letter_total ${s.pushDeadLetterCount}`,
+      `chisto_push_dead_letter_total ${s.pushDeadLetterCount}`,
       '# HELP map_requests_total Total map API responses served',
       '# TYPE map_requests_total counter',
       `map_requests_total ${s.mapRequestsTotal}`,
@@ -192,6 +199,7 @@ export class MetricsController {
       '# HELP map_outbox_failed_total Map outbox dispatch failures',
       '# TYPE map_outbox_failed_total counter',
       `map_outbox_failed_total ${s.mapOutboxFailed}`,
+      `chisto_map_outbox_failed_total ${s.mapOutboxFailed}`,
       '# HELP map_outbox_lag_ms Current lag between event occurrence and outbox dispatch',
       '# TYPE map_outbox_lag_ms gauge',
       `map_outbox_lag_ms ${s.mapOutboxLagMs}`,
@@ -252,6 +260,7 @@ export class MetricsController {
       '# HELP reports_submit_error_total Failed citizen report submissions',
       '# TYPE reports_submit_error_total counter',
       `reports_submit_error_total ${s.reportsSubmitError}`,
+      `chisto_reports_submit_error_total ${s.reportsSubmitError}`,
       '# HELP reports_upload_success_total Successful report media uploads',
       '# TYPE reports_upload_success_total counter',
       `reports_upload_success_total ${s.reportsUploadSuccess}`,
@@ -273,7 +282,12 @@ export class MetricsController {
       '# HELP reports_signed_url_latency_ms_p95 Presign latency p95 (ms)',
       '# TYPE reports_signed_url_latency_ms_p95 gauge',
       `reports_signed_url_latency_ms_p95 ${s.reportsSignedUrlLatencyP95Ms}`,
+      '# HELP report_side_effect_failed_total Report side effects marked permanently failed',
+      '# TYPE report_side_effect_failed_total counter',
+      `report_side_effect_failed_total ${s.reportSideEffectFailedTotal}`,
+      `chisto_report_side_effect_failed_total ${s.reportSideEffectFailedTotal}`,
       '',
     ].join('\n');
+    return `${promNative}\n${legacyLines}`;
   }
 }

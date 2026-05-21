@@ -2549,7 +2549,7 @@ abstract class AppLocalizations {
   /// No description provided for @profileDeleteAccountDialogBody.
   ///
   /// In en, this message translates to:
-  /// **'All your data will be permanently removed. This action cannot be undone.'**
+  /// **'Your account will be anonymized immediately. Personal data is fully erased within 30 days.'**
   String get profileDeleteAccountDialogBody;
 
   /// No description provided for @profileDeleteAccountFailedSnack.

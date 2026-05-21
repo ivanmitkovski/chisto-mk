@@ -1,9 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import type { TwilioStatusDto } from './dto/twilio-status.dto';
+import { TwilioWebhookDedupeService } from './twilio-webhook-dedupe.service';
 
 @Injectable()
 export class WebhooksService {
   private readonly logger = new Logger(WebhooksService.name);
+
+  constructor(private readonly twilioDedupe: TwilioWebhookDedupeService) {}
 
   /**
    * Handles Twilio SMS status callbacks. Swallows errors so Twilio always receives 2xx
@@ -21,6 +24,7 @@ export class WebhooksService {
   }
 
   private async processTwilioSmsStatus(dto: TwilioStatusDto): Promise<void> {
+    await this.twilioDedupe.assertFresh(dto.MessageSid);
     const { MessageSid, MessageStatus, ErrorCode, ErrorMessage } = dto;
 
     switch (MessageStatus) {

@@ -40,6 +40,7 @@ export class AdminNotificationsController {
     );
   }
 
+  // safe-to-retry: repeated Patch is acceptable
   @Patch(':id/read')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(...ADMIN_PANEL_ROLES)
@@ -51,6 +52,7 @@ export class AdminNotificationsController {
     return { success: true };
   }
 
+  // safe-to-retry: repeated Patch is acceptable
   @Patch('read-all')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(...ADMIN_PANEL_ROLES)

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getApiBaseUrl } from '@/lib/api-base-url';
+import { getApiBaseUrl, getApiOrigin } from '@/lib/api-base-url';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
 
   const base = getApiBaseUrl();
   try {
-    const r = await fetch(`${base}/health`, { cache: 'no-store' });
+    const r = await fetch(`${getApiOrigin()}/health`, { cache: 'no-store' });
     const text = await r.text();
     return NextResponse.json({
       resolvedBase: base,

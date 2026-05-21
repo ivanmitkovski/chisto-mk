@@ -71,7 +71,10 @@ void main() {
     await tester.enterText(textFields.at(0), 'John Doe');
     await tester.enterText(textFields.at(1), 'john@chisto.mk');
     await tester.enterText(textFields.at(2), '70123456');
-    await tester.enterText(textFields.at(3), 'password123');
+    await tester.enterText(textFields.at(3), 'Password123!');
+    final Finder termsCheckbox = find.byType(Checkbox);
+    await tester.ensureVisible(termsCheckbox);
+    await tester.tap(termsCheckbox);
     await tester.pump();
 
     final ElevatedButton signUpButton = tester.widget<ElevatedButton>(

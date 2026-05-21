@@ -28,7 +28,7 @@ export class SitesFeedService {
   async findAll(query: ListSitesQueryDto, user?: AuthenticatedUser): Promise<SitesFeedListResult> {
     const startedAt = Date.now();
     const cacheKey = this.feedCache.buildFeedCacheKey(query, user);
-    const cached = this.feedCache.get(cacheKey);
+    const cached = await this.feedCache.get(cacheKey);
     const nowMs = Date.now();
     if (cached && nowMs - cached.cachedAt <= this.feedCacheTtlMs) {
       ObservabilityStore.recordFeedRequest({

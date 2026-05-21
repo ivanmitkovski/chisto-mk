@@ -2,7 +2,8 @@ import { WebhooksService } from '../../src/webhooks/webhooks.service';
 import type { TwilioStatusDto } from '../../src/webhooks/dto/twilio-status.dto';
 
 describe('WebhooksService', () => {
-  const service = new WebhooksService();
+  const twilioDedupe = { assertFresh: jest.fn().mockResolvedValue(undefined) };
+  const service = new WebhooksService(twilioDedupe as never);
 
   it('handleTwilioSmsStatus does not throw for delivered', async () => {
     const dto: TwilioStatusDto = {

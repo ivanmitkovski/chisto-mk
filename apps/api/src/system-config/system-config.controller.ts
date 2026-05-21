@@ -1,3 +1,4 @@
+import { Idempotent } from '../common/idempotency/idempotency.decorator';
 import { Body, Controller, Get, Patch, Post, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -31,6 +32,7 @@ export class SystemConfigController {
     return this.systemConfigService.getAll();
   }
 
+  @Idempotent('system-config_system-config_34')
   @Post('validate')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(...SUPER_ADMIN_ROLES)
@@ -41,6 +43,7 @@ export class SystemConfigController {
     return this.systemConfigService.validate(dto);
   }
 
+  // safe-to-retry: repeated Patch is acceptable
   @Patch()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(...SUPER_ADMIN_ROLES)

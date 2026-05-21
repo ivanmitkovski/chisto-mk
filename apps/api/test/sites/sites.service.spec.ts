@@ -426,7 +426,12 @@ describe('Sites public feed and comment engagement', () => {
       } as any,
     });
 
-    const out = await service.findOne('site_corep');
+    const out = await service.findOne('site_corep', {
+      userId: 'mod-1',
+      email: 'mod@chisto.mk',
+      phoneNumber: '+38970000099',
+      role: 'ADMIN' as never,
+    });
     expect(out.coReporterNames).toEqual(['Anonymous', 'Ben Co']);
     expect(out.coReporterSummaries).toHaveLength(2);
     expect(out.coReporterSummaries.map((s) => s.name)).toEqual(['Anonymous', 'Ben Co']);

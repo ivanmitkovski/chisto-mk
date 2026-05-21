@@ -79,6 +79,12 @@ class ApiAuthRepository implements AuthRepository {
 
   bool _restoreProfileValidationPending = false;
 
+  /// `false` when the server reports current terms are accepted; `null` until known.
+  bool? _requiresTermsAcceptance;
+
+  @override
+  bool? get requiresTermsAcceptance => _requiresTermsAcceptance;
+
   @override
   bool get restoreProfileValidationPending => _restoreProfileValidationPending;
 
@@ -120,6 +126,7 @@ class ApiAuthRepository implements AuthRepository {
     required String phoneNumber,
     required String password,
   }) async {
+    final DateTime acceptedAt = DateTime.now().toUtc();
     final ApiResponse response = await _client.post(
       '/auth/register',
       body: <String, dynamic>{
@@ -128,6 +135,9 @@ class ApiAuthRepository implements AuthRepository {
         'email': email.trim().toLowerCase(),
         'phoneNumber': phoneNumber,
         'password': password,
+        'termsAcceptedAt': acceptedAt.toIso8601String(),
+        'termsVersion': EulaAcceptanceStore.currentVersion,
+        'privacyAcceptedAt': acceptedAt.toIso8601String(),
       },
     );
     final Map<String, dynamic>? json = response.json;
@@ -323,6 +333,35 @@ class ApiAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<EmailChangeRequestResult> requestEmailChange(String newEmail) async {
+    final ApiResponse response = await _client.patch(
+      '/auth/me/email',
+      body: <String, dynamic>{'newEmail': newEmail.trim().toLowerCase()},
+    );
+    final Map<String, dynamic>? json = response.json;
+    if (json == null) throw AppError.unknown();
+    return EmailChangeRequestResult(
+      expiresInSeconds: json['expiresIn'] is int ? json['expiresIn'] as int : 600,
+      devCode: json['devCode']?.toString(),
+    );
+  }
+
+  @override
+  Future<void> confirmEmailChange({
+    required String newEmail,
+    required String code,
+  }) async {
+    await _client.post(
+      '/auth/me/email/confirm',
+      body: <String, dynamic>{
+        'newEmail': newEmail.trim().toLowerCase(),
+        'code': code.trim(),
+      },
+    );
+    await invalidateLocalSession();
+  }
+
+  @override
   Future<void> deleteAccount() async {
     final String? userId = _authState.userId;
     try {
@@ -348,6 +387,7 @@ class ApiAuthRepository implements AuthRepository {
   bool _isRestoreStale(int generation) => generation != _restoreGeneration;
 
   Future<void> _clearLocalSessionCore() async {
+    _requiresTermsAcceptance = null;
     if (_clearingLocalSession) return;
     _clearingLocalSession = true;
     _cancelProactiveRefresh();
@@ -561,6 +601,51 @@ class ApiAuthRepository implements AuthRepository {
     }
   }
 
+  @override
+  Future<bool> refreshTermsConsentFromServer() async {
+    final ApiResponse response = await _client.get('/auth/me');
+    final Map<String, dynamic>? profile = response.json;
+    if (profile == null) {
+      throw AppError.unknown();
+    }
+    final String? userId = profile['id'] as String?;
+    _applyTermsConsentFromJson(profile, userId: userId);
+    return _requiresTermsAcceptance ?? true;
+  }
+
+  @override
+  Future<void> acceptTermsOnServer() async {
+    final ApiResponse response = await _client.post(
+      '/auth/me/accept-terms',
+      body: <String, dynamic>{
+        'termsVersion': EulaAcceptanceStore.currentVersion,
+      },
+    );
+    final Map<String, dynamic>? json = response.json;
+    if (json == null) {
+      throw AppError.unknown();
+    }
+    _applyTermsConsentFromJson(json, userId: _authState.userId);
+  }
+
+  void _applyTermsConsentFromJson(
+    Map<String, dynamic> json, {
+    String? userId,
+  }) {
+    if (!json.containsKey('requiresTermsAcceptance')) return;
+    final bool requires = json['requiresTermsAcceptance'] == true;
+    _requiresTermsAcceptance = requires;
+    final String uid = userId ?? _authState.userId ?? '';
+    if (uid.isNotEmpty) {
+      unawaited(
+        EulaAcceptanceStore(_preferences).syncFromServer(
+          userId: uid,
+          requiresTermsAcceptance: requires,
+        ),
+      );
+    }
+  }
+
   Future<void> _saveAndNotify(Map<String, dynamic> json) async {
     _restoreGeneration++;
     final String? newAccessToken = json['accessToken'] as String?;
@@ -609,6 +694,7 @@ class ApiAuthRepository implements AuthRepository {
     if (hasOrganizerCertifiedAtKey || switchedAccount) {
       await _tokenStorage.writeOrganizerCertifiedAt(organizerCertifiedAt);
     }
+    _applyTermsConsentFromJson(user, userId: id);
     _client.resetSessionAuthFailureGuard();
     AppBootstrap.instance.armSuppressSessionExpiredWindow(
       const Duration(seconds: 3),
@@ -651,6 +737,7 @@ class ApiAuthRepository implements AuthRepository {
       await _tokenStorage.writeOrganizerCertifiedAt(organizerCertifiedAtFromServer);
     }
     await UserHomeLocationStore(_preferences).applyFromProfileJson(json);
+    _applyTermsConsentFromJson(json, userId: id);
     _scheduleProactiveRefresh();
     AppBootstrap.instance.startNotificationsRealtimeIfAuthenticated();
   }

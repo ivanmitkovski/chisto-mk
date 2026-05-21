@@ -1,3 +1,4 @@
+import { Idempotent } from '../common/idempotency/idempotency.decorator';
 import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -14,6 +15,7 @@ import { PostUserBlockDto } from './dto/post-user-block.dto';
 export class ModerationController {
   constructor(private readonly moderation: ModerationService) {}
 
+  @Idempotent('moderation_moderation_17')
   @Post('moderation/reports')
   @ApiOperation({ summary: 'Report UGC (comment, chat message, user, site, event)' })
   submitReport(
@@ -23,6 +25,7 @@ export class ModerationController {
     return this.moderation.submitReport(user, dto);
   }
 
+  @Idempotent('moderation_moderation_26')
   @Post('users/me/blocks')
   @ApiOperation({ summary: 'Block a user' })
   blockUser(
@@ -38,6 +41,7 @@ export class ModerationController {
     return this.moderation.listBlocks(user);
   }
 
+  // safe-to-retry: repeated Delete is acceptable
   @Delete('users/me/blocks/:blockedUserId')
   @ApiOperation({ summary: 'Unblock a user' })
   unblock(

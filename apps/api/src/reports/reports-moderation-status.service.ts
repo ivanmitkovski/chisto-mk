@@ -14,6 +14,7 @@ import { ReportSideEffectProcessorService } from './side-effects/report-side-eff
 import type { ModerationStatusSideEffectPayload } from './side-effects/report-side-effect-processor.service';
 import { ALLOWED_REPORT_STATUS_TRANSITIONS } from './reports-moderation-transitions';
 import { SiteHistoryWriterService } from '../sites/history/site-history-writer.service';
+import { SiteHistoryReportRecorderService } from '../sites/history/site-history-report-recorder.service';
 
 @Injectable()
 export class ReportsModerationStatusService {
@@ -22,6 +23,7 @@ export class ReportsModerationStatusService {
     private readonly reportApprovalPoints: ReportApprovalPointsService,
     private readonly reportSideEffectProcessor: ReportSideEffectProcessorService,
     private readonly siteHistoryWriter: SiteHistoryWriterService,
+    private readonly siteHistoryReportRecorder: SiteHistoryReportRecorderService,
   ) {}
 
   async updateStatus(
@@ -125,7 +127,7 @@ export class ReportsModerationStatusService {
         role: moderator.role,
       };
       if (dto.status === 'APPROVED') {
-        await this.siteHistoryWriter.recordReportApproved(
+        await this.siteHistoryReportRecorder.recordReportApproved(
           {
             siteId: updatedReport.siteId,
             reportId,
@@ -135,7 +137,7 @@ export class ReportsModerationStatusService {
           tx,
         );
       } else if (dto.status === 'DELETED') {
-        await this.siteHistoryWriter.recordReportRejected(
+        await this.siteHistoryReportRecorder.recordReportRejected(
           {
             siteId: updatedReport.siteId,
             reportId,

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:ui' show PlatformDispatcher;
 
 import 'package:flutter/foundation.dart'
-    show TargetPlatform, defaultTargetPlatform, kIsWeb;
+    show TargetPlatform, defaultTargetPlatform, kIsWeb, visibleForTesting;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -107,6 +107,13 @@ class AppBootstrap {
   SharedPreferences get preferences => _preferences!;
   ApiClient get apiClient => _apiClient!;
   AuthRepository get authRepository => _authRepository!;
+
+  /// Replaces the live auth repository in widget/unit tests (e.g. terms dialog).
+  @visibleForTesting
+  void overrideAuthRepositoryForTests(AuthRepository repository) {
+    _authRepository = repository;
+    _authRepositoryForUnauthorized = repository;
+  }
   EventsRepository get eventsRepository => _eventsRepository!;
   CheckInRepository get checkInRepository => _checkInRepository!;
   ProfileRepository get profileRepository => _profileRepository!;
