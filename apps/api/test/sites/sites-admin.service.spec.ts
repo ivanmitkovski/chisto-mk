@@ -1,5 +1,6 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { SitesAdminService } from '../../src/sites/sites-admin.service';
+import { SitesAdminBulkService } from '../../src/sites/sites-admin-bulk.service';
 
 function makeService(input?: {
   site?: any;
@@ -42,6 +43,7 @@ function makeService(input?: {
         recordArchived: jest.fn(),
         recordUnarchived: jest.fn(),
       } as never,
+      new SitesAdminBulkService(prisma, audit, sitesMapQuery, sitesFeed),
     ),
     prisma,
     audit,

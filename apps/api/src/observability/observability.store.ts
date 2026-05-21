@@ -1,3 +1,6 @@
+import { fetchWithTimeout } from '../common/resilience/fetch-with-timeout';
+import { legacySnapshotGauges } from './prom-registry';
+
 const PUSH_GATEWAY_URL = process.env.METRICS_PUSH_GATEWAY_URL?.trim() || null;
 const PUSH_INTERVAL_MS = 15_000;
 const JOB_NAME = 'chisto_api';
@@ -53,11 +56,11 @@ export class ObservabilityStore {
     const body = lines.join('\n') + '\n';
     const url = `${PUSH_GATEWAY_URL}/metrics/job/${JOB_NAME}`;
     try {
-      await fetch(url, {
+      await fetchWithTimeout(url, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain; version=0.0.4' },
         body,
-        signal: AbortSignal.timeout(5_000),
+        timeoutMs: 5_000,
       });
     } catch {
       // Silently ignore push failures to avoid cascading alerts
@@ -147,6 +150,12 @@ export class ObservabilityStore {
   private static reportApprovalPointsAwardedTotal = 0;
   private static reportApprovalPointsCappedTotal = 0;
   private static reportApprovalPointsRevokedTotal = 0;
+  private static reportSideEffectFailedTotal = 0;
+
+  static recordReportSideEffectFailed(): void {
+    this.reportSideEffectFailedTotal += 1;
+    legacySnapshotGauges.reportSideEffectFailed.set(this.reportSideEffectFailedTotal);
+  }
 
   static recordReportSubmitPointsAwarded(delta: number): void {
     if (delta > 0) {
@@ -263,6 +272,18 @@ export class ObservabilityStore {
     if (this.requestDurationsMs.length > 2000) {
       this.requestDurationsMs = this.requestDurationsMs.slice(-1200);
     }
+    this.syncLegacyPromGauges();
+  }
+
+  /** Push rolling snapshot values into prom-client gauges for scrape. */
+  static syncLegacyPromGauges(): void {
+    const snap = this.snapshot();
+    legacySnapshotGauges.requestsTotal.set(snap.requestsTotal);
+    legacySnapshotGauges.requestsFailed.set(snap.requestsFailed);
+    legacySnapshotGauges.requestDurationP95Ms.set(snap.p95Ms);
+    legacySnapshotGauges.pushDeadLetter.set(snap.pushDeadLetterCount);
+    legacySnapshotGauges.mapOutboxFailed.set(snap.mapOutboxFailed);
+    legacySnapshotGauges.reportSideEffectFailed.set(snap.reportSideEffectFailedTotal);
   }
 
   static recordFeedRequest(input: {
@@ -684,6 +705,7 @@ export class ObservabilityStore {
       })(),
       mapOutboxPending: this.mapOutboxPendingGauge,
       prismaP1008Total: this.prismaP1008Total,
+      reportSideEffectFailedTotal: this.reportSideEffectFailedTotal,
     };
   }
 }

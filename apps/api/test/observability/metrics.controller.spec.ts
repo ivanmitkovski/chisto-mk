@@ -12,23 +12,23 @@ describe('MetricsController', () => {
     }
   });
 
-  it('allows metrics when no bearer token is configured', () => {
+  it('allows metrics when no bearer token is configured', async () => {
     delete process.env.METRICS_BEARER_TOKEN;
 
-    expect(new MetricsController().metrics()).toContain('api_requests_total');
+    const body = await new MetricsController().metrics();
+    expect(body).toContain('chisto_http_requests_total');
   });
 
-  it('rejects metrics when bearer token is configured and missing', () => {
+  it('rejects metrics when bearer token is configured and missing', async () => {
     process.env.METRICS_BEARER_TOKEN = 'secret';
 
-    expect(() => new MetricsController().metrics()).toThrow(UnauthorizedException);
+    await expect(new MetricsController().metrics()).rejects.toBeInstanceOf(UnauthorizedException);
   });
 
-  it('allows metrics with the configured bearer token', () => {
+  it('allows metrics with the configured bearer token', async () => {
     process.env.METRICS_BEARER_TOKEN = 'secret';
 
-    expect(new MetricsController().metrics('Bearer secret')).toContain(
-      'feed_v2_ranker_mode_info',
-    );
+    const body = await new MetricsController().metrics('Bearer secret');
+    expect(body).toContain('feed_v2_ranker_mode_info');
   });
 });

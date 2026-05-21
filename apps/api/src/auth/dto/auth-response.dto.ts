@@ -40,6 +40,18 @@ export class AuthUserDto {
     description: 'ISO-8601 timestamp when the user passed the organizer toolkit quiz',
   })
   organizerCertifiedAt!: string | null;
+
+  @ApiProperty({ nullable: true, description: 'ISO-8601 when terms were last accepted' })
+  termsAcceptedAt!: string | null;
+
+  @ApiProperty({ nullable: true, description: 'Version of terms last accepted' })
+  termsVersion!: string | null;
+
+  @ApiProperty({
+    description:
+      'True when the user must accept current terms before using the app',
+  })
+  requiresTermsAcceptance!: boolean;
 }
 
 export class AuthResponseDto {

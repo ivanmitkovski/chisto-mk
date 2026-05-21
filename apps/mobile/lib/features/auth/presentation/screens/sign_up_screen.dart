@@ -51,6 +51,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen>
   final FocusNode _passwordFocus = FocusNode();
   bool _hasSubmitted = false;
   bool _hasValidationError = false;
+  bool _termsAccepted = false;
   PasswordStrength _passwordStrength = PasswordStrength.none;
   late AnimationController _entranceController;
   late Animation<double> _entranceAnimation;
@@ -141,7 +142,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen>
   }
 
   bool _isSubmitReady(AppLocalizations l10n) {
-    return AuthValidators.fullName(l10n, _fullNameController.text) == null &&
+    return _termsAccepted &&
+        AuthValidators.fullName(l10n, _fullNameController.text) == null &&
         AuthValidators.email(l10n, _emailController.text) == null &&
         AuthValidators.macedonianPhone(l10n, _phoneController.text) == null &&
         AuthValidators.password(l10n, _passwordController.text) == null;
@@ -352,30 +354,37 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen>
                                 style: AppTypography.cardSubtitle,
                               ),
                               const SizedBox(height: AppSpacing.md),
-                              RichText(
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                text: TextSpan(
-                                  text: l10n.authTermsPrefix,
-                                  style: AppTypography.authSubtitle,
-                                  children: [
-                                    TextSpan(
-                                      text: l10n.authTermsLink,
-                                      style: AppTypography.authTextLinkUnderline,
-                                      recognizer: TapGestureRecognizer()
-                                        ..onTap = () async {
-                                          final Uri uri = Uri.parse(
-                                            termsUrl,
-                                          );
-                                          if (await canLaunchUrl(uri)) {
-                                            await launchUrl(
-                                              uri,
-                                              mode: LaunchMode.externalApplication,
-                                            );
-                                          }
-                                        },
+                              Semantics(
+                                checked: _termsAccepted,
+                                child: CheckboxListTile(
+                                  value: _termsAccepted,
+                                  onChanged: (bool? value) {
+                                    setState(() => _termsAccepted = value ?? false);
+                                  },
+                                  contentPadding: EdgeInsets.zero,
+                                  controlAffinity: ListTileControlAffinity.leading,
+                                  title: RichText(
+                                    text: TextSpan(
+                                      style: AppTypography.authSubtitle,
+                                      children: <TextSpan>[
+                                        TextSpan(text: l10n.authTermsPrefix),
+                                        TextSpan(
+                                          text: l10n.authTermsLink,
+                                          style: AppTypography.authTextLinkUnderline,
+                                          recognizer: TapGestureRecognizer()
+                                            ..onTap = () async {
+                                              final Uri uri = Uri.parse(termsUrl);
+                                              if (await canLaunchUrl(uri)) {
+                                                await launchUrl(
+                                                  uri,
+                                                  mode: LaunchMode.externalApplication,
+                                                );
+                                              }
+                                            },
+                                        ),
+                                      ],
                                     ),
-                                  ],
+                                  ),
                                 ),
                               ),
                               const SizedBox(height: AppSpacing.xl),

@@ -41,6 +41,8 @@ const mockUser = {
   avatarObjectKey: null,
   avatarUpdatedAt: null,
   organizerCertifiedAt: null,
+  termsAcceptedAt: new Date('2026-06-01T00:00:00.000Z'),
+  termsVersion: '1',
 };
 
 const mockAdmin = {
@@ -83,6 +85,7 @@ function makePrisma() {
       aggregate: jest.fn().mockResolvedValue({ _sum: { delta: null } }),
     },
     $queryRaw: jest.fn(),
+    $executeRaw: jest.fn().mockResolvedValue(1),
   };
 }
 
@@ -95,6 +98,7 @@ function makeConfig() {
     get: jest.fn((key: string) => {
       if (key === 'JWT_ACCESS_EXPIRES_IN') return '900';
       if (key === 'JWT_REFRESH_EXPIRES_DAYS') return '30';
+      if (key === 'TERMS_VERSION') return '1';
       return undefined;
     }),
   };
@@ -152,6 +156,7 @@ describe('Auth stack (registration, session, profile)', () => {
   let jwt: ReturnType<typeof makeJwt>;
   let eventEmitter: ReturnType<typeof makeEventEmitter>;
   let reportsUploadService: ReturnType<typeof makeReportsUploadService>;
+  let sessionRevocation: { revokeAllForUser: jest.Mock };
 
   beforeEach(async () => {
     prisma = makePrisma();
@@ -166,18 +171,27 @@ describe('Auth stack (registration, session, profile)', () => {
     const gamificationService = makeGamificationService();
     const rankingsService = makeRankingsService();
     const env = loadAuthEnvRuntime(config as unknown as ConfigService);
+    sessionRevocation = { revokeAllForUser: jest.fn().mockResolvedValue(undefined) };
     session = new AuthSessionService(
       prisma as any,
       jwt as unknown as JwtService,
       reportsUploadService as any,
       audit as any,
       eventEmitter as any,
+      sessionRevocation as never,
       env,
+      config as unknown as ConfigService,
     );
     const authOtp = {
       sendPhoneVerificationOtp: jest.fn().mockResolvedValue({ expiresIn: 600 }),
     } as unknown as AuthOtpService;
-    registration = new AuthRegistrationService(prisma as any, eventEmitter as any, authOtp, env);
+    registration = new AuthRegistrationService(
+      prisma as any,
+      eventEmitter as any,
+      authOtp,
+      env,
+      config as unknown as ConfigService,
+    );
     login = new AuthLoginService(prisma as any, session);
     adminLoginSvc = new AuthAdminLoginService(prisma as any, audit as any, session, env);
     profileRead = new AuthProfileReadService(
@@ -185,13 +199,18 @@ describe('Auth stack (registration, session, profile)', () => {
       reportsUploadService as any,
       gamificationService as any,
       rankingsService as any,
+      config as unknown as ConfigService,
     );
     profileAvatar = new AuthProfileAvatarService(prisma as any, reportsUploadService as any);
+    const accountErasure = { eraseUserAccount: jest.fn().mockResolvedValue(undefined) } as never;
     profile = new AuthProfileService(
       prisma as any,
       reportsUploadService as any,
       profileRead,
       profileAvatar,
+      accountErasure,
+      config as unknown as ConfigService,
+      audit as any,
     );
   });
 
@@ -206,6 +225,8 @@ describe('Auth stack (registration, session, profile)', () => {
         email: 'test@chisto.mk',
         phoneNumber: '+38970123456',
         password: 'StrongPass123!',
+        termsAcceptedAt: new Date().toISOString(),
+        termsVersion: '1',
       });
 
       expect(result.userId).toBe('user-1');
@@ -224,6 +245,8 @@ describe('Auth stack (registration, session, profile)', () => {
           email: 'test@chisto.mk',
           phoneNumber: '+38970999999',
           password: 'StrongPass123!',
+          termsAcceptedAt: new Date().toISOString(),
+          termsVersion: '1',
         }),
       ).rejects.toThrow(ConflictException);
     });
@@ -238,6 +261,8 @@ describe('Auth stack (registration, session, profile)', () => {
           email: 'unique@chisto.mk',
           phoneNumber: '+38970123456',
           password: 'StrongPass123!',
+          termsAcceptedAt: new Date().toISOString(),
+          termsVersion: '1',
         }),
       ).rejects.toThrow(ConflictException);
     });
@@ -256,6 +281,8 @@ describe('Auth stack (registration, session, profile)', () => {
       expect(result.accessToken).toBe('jwt-token');
       expect(result.user.phoneNumber).toBe('+38970123456');
       expect(result.user.avatarUrl).toBeNull();
+      expect(result.user.requiresTermsAcceptance).toBe(false);
+      expect(result.user.termsVersion).toBe('1');
     });
 
     it('includes signed avatarUrl when user has avatarObjectKey', async () => {
@@ -461,11 +488,7 @@ describe('Auth stack (registration, session, profile)', () => {
       });
 
       await expect(session.refresh(fullToken)).rejects.toThrow(UnauthorizedException);
-      expect(prisma.userSession.updateMany).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: { userId: 'user-1', revokedAt: null },
-        }),
-      );
+      expect(sessionRevocation.revokeAllForUser).toHaveBeenCalledWith('user-1', 'refresh_token_reuse');
       expect(eventEmitter.emit).toHaveBeenCalledWith(
         'security.refresh_token_reuse',
         expect.objectContaining({ userId: 'user-1' }),

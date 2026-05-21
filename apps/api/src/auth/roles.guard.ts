@@ -5,6 +5,7 @@ import { Request } from 'express';
 import { ROLES_KEY } from './roles.decorator';
 import { AuthenticatedUser } from './types/authenticated-user.type';
 import { AuditService } from '../audit/audit.service';
+import { recordAuditWriteFailure } from '../common/audit/audit-log-failure.util';
 
 type AuthenticatedRequest = Request & { user?: AuthenticatedUser };
 
@@ -50,7 +51,7 @@ export class RolesGuard implements CanActivate {
           resourceId: null,
           metadata: { route, requiredRoles, actualRole: user.role },
         })
-        .catch(() => {});
+        .catch((err) => recordAuditWriteFailure('ACCESS_DENIED_ROLE', err));
       throw new ForbiddenException({
         code: 'FORBIDDEN',
         message: 'Insufficient role permissions',

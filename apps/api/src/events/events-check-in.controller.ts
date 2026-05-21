@@ -1,3 +1,4 @@
+import { Idempotent } from '../common/idempotency/idempotency.decorator';
 import {
   Body,
   Controller,
@@ -71,6 +72,7 @@ import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-e
 export class EventsCheckInController {
   constructor(private readonly checkIn: EventsCheckInService) {}
 
+  // safe-to-retry: repeated Patch is acceptable
   @Patch()
   @Throttle({ default: { ttl: 60_000, limit: 40 } })
   @ApiOperation({ summary: 'Open or pause QR check-in (organizer only)' })
@@ -85,6 +87,7 @@ export class EventsCheckInController {
     return { ok: true };
   }
 
+  @Idempotent('events_events-check-in_88')
   @Post('session/rotate')
   @Throttle({ default: { ttl: 60_000, limit: 30 } })
   @ApiOperation({ summary: 'Rotate check-in session (invalidates old QR codes)' })
@@ -123,6 +126,7 @@ export class EventsCheckInController {
     return this.checkIn.listAttendees(eventId, user, query);
   }
 
+  @Idempotent('events_events-check-in_126')
   @Post('manual')
   @Throttle({ default: { ttl: 60_000, limit: 40 } })
   @ApiOperation({
@@ -139,6 +143,7 @@ export class EventsCheckInController {
     return this.checkIn.manualAdd(eventId, user, dto);
   }
 
+  // safe-to-retry: repeated Delete is acceptable
   @Delete('attendees/:checkInId')
   @Throttle({ default: { ttl: 60_000, limit: 30 } })
   @ApiOperation({ summary: 'Remove a check-in row (organizer only)' })
@@ -153,6 +158,7 @@ export class EventsCheckInController {
     return { ok: true };
   }
 
+  @Idempotent('events_events-check-in_156')
   @Post('redeem')
   @Throttle({ default: { ttl: 60_000, limit: 45 } })
   @ApiOperation({
@@ -173,6 +179,7 @@ export class EventsCheckInController {
     return this.checkIn.redeem(eventId, user, dto.qrPayload, geo);
   }
 
+  @Idempotent('events_events-check-in_176')
   @Post('pending/:pendingId/resolve')
   @Throttle({ default: { ttl: 60_000, limit: 60 } })
   @ApiOperation({

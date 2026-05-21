@@ -12,6 +12,8 @@ import { AuditService } from '../audit/audit.service';
 import { BulkAdminUsersDto } from './dto/bulk-admin-users.dto';
 import { PatchAdminUserDto } from './dto/patch-admin-user.dto';
 import { PatchAdminUserRoleDto } from './dto/patch-admin-user-role.dto';
+import { AuthSessionRevocationService } from '../auth/auth-session-revocation.service';
+import { UserAuthSnapshotCacheService } from '../auth/user-auth-snapshot-cache.service';
 
 @Injectable()
 export class AdminUsersWriteService {
@@ -19,6 +21,8 @@ export class AdminUsersWriteService {
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
     private readonly userEventsService: UserEventsService,
+    private readonly sessionRevocation: AuthSessionRevocationService,
+    private readonly authSnapshotCache: UserAuthSnapshotCacheService,
   ) {}
 
   async patch(
@@ -107,6 +111,11 @@ export class AdminUsersWriteService {
       metadata: { before: target, after: updated, changes } as Prisma.InputJsonValue,
     });
 
+    if (dto.status != null && dto.status !== UserStatus.ACTIVE) {
+      await this.sessionRevocation.revokeAllForUser(id, 'status_changed');
+    }
+
+    this.authSnapshotCache.invalidate(id);
     this.userEventsService.emitUserUpdated(id);
     return updated;
   }
@@ -165,6 +174,10 @@ export class AdminUsersWriteService {
       } as Prisma.InputJsonValue,
     });
 
+    if (dto.role !== target.role) {
+      await this.sessionRevocation.revokeAllForUser(id, 'role_changed');
+    }
+    this.authSnapshotCache.invalidate(id);
     this.userEventsService.emitUserUpdated(id);
     return updated;
   }

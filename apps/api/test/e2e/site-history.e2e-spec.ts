@@ -25,7 +25,7 @@ describe('Site history (e2e)', () => {
     const agent = request(app.getHttpServer());
 
     const submit = await agent
-      .post('/reports')
+      .post('/v1/reports')
       .set('Authorization', `Bearer ${citizen.accessToken}`)
       .send({
         latitude: 41.9981,

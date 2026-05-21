@@ -1,4 +1,5 @@
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { JwtService } from '@nestjs/jwt';
 import { randomBytes } from 'crypto';
@@ -9,6 +10,11 @@ import { ReportsUploadService } from '../reports/reports-upload.service';
 import { AuditService } from '../audit/audit.service';
 import { AuthResponse } from './types/auth-response.type';
 import { AUTH_ENV_RUNTIME, REMEMBER_ME_SHORT_DAYS, type AuthEnvRuntime } from './auth-env.config';
+import { defaultJwtKid, resolveJwtSecretsFromEnv } from './jwt-secret.resolver';
+import { AuthSessionRevocationService } from './auth-session-revocation.service';
+import type { AuthenticatedUser } from './types/authenticated-user.type';
+import { resolveTermsVersionFromEnv, termsConsentPayload } from './terms-consent.util';
+import { recordAuditWriteFailure } from '../common/audit/audit-log-failure.util';
 
 @Injectable()
 export class AuthSessionService {
@@ -18,7 +24,9 @@ export class AuthSessionService {
     private readonly reportsUploadService: ReportsUploadService,
     private readonly audit: AuditService,
     private readonly eventEmitter: EventEmitter2,
+    private readonly sessionRevocation: AuthSessionRevocationService,
     @Inject(AUTH_ENV_RUNTIME) private readonly env: AuthEnvRuntime,
+    private readonly configService: ConfigService,
   ) {}
 
   async refresh(rawRefreshToken: string): Promise<AuthResponse> {
@@ -46,7 +54,7 @@ export class AuthSessionService {
 
     if (session.revokedAt != null) {
       if (hashOk) {
-        await this.revokeAllSessionsForUserInternal(session.userId);
+        await this.sessionRevocation.revokeAllForUser(session.userId, 'refresh_token_reuse');
         await this.audit
           .log({
             actorId: session.userId,
@@ -55,7 +63,7 @@ export class AuthSessionService {
             resourceId: session.id,
             metadata: { tokenId },
           })
-          .catch(() => {});
+          .catch((err) => recordAuditWriteFailure('REFRESH_TOKEN_REUSE_DETECTED', err));
         this.eventEmitter.emit('security.refresh_token_reuse', { userId: session.userId });
       }
       throw new UnauthorizedException({
@@ -157,6 +165,7 @@ export class AuthSessionService {
       },
     });
 
+    const jwtKid = defaultJwtKid(resolveJwtSecretsFromEnv());
     const accessToken = this.jwtService.sign(
       {
         sub: user.id,
@@ -167,10 +176,15 @@ export class AuthSessionService {
         expiresIn: this.env.accessTokenTtl,
         issuer: 'chisto-api',
         audience: 'chisto-api',
+        header: { kid: jwtKid, alg: 'HS256' },
       },
     );
 
     const avatarUrl = await this.reportsUploadService.signPrivateObjectKey(user.avatarObjectKey);
+    const currentTermsVersion = resolveTermsVersionFromEnv(
+      this.configService.get<string>('TERMS_VERSION'),
+    );
+    const consent = termsConsentPayload(user, currentTermsVersion);
 
     return {
       accessToken,
@@ -187,16 +201,13 @@ export class AuthSessionService {
         pointsBalance: user.pointsBalance,
         avatarUrl,
         organizerCertifiedAt: user.organizerCertifiedAt?.toISOString() ?? null,
+        ...consent,
       },
     };
   }
 
-  private async revokeAllSessionsForUserInternal(userId: string): Promise<void> {
-    const now = new Date();
-    await this.prisma.userSession.updateMany({
-      where: { userId, revokedAt: null },
-      data: { revokedAt: now },
-    });
+  async revokeOthersForCurrentUser(user: AuthenticatedUser): Promise<{ revoked: number }> {
+    return this.sessionRevocation.revokeOthersForUser(user, 'user_revoke_others');
   }
 
   private parseTokenIdFromRefreshToken(fullToken: string): string | null {

@@ -67,6 +67,27 @@ describe('email-copy', () => {
     expect(getCopy('event_completed_no_show', 'en', ctx, baseUrl).accent).toBe('warning');
   });
 
+  it('welcome mk uses correct Macedonian grammar', () => {
+    const copy = getCopy('welcome', 'mk', { firstName: 'Иван' }, baseUrl);
+    expect(copy.lead).toContain('подготвена');
+    expect(copy.lead).not.toContain('подготова');
+    expect(copy.lead).toContain('загадувања');
+    expect(copy.extraLines?.[0]).toContain('ја креиравте сметката');
+    expect(copy.footerNote).toContain('поддршката');
+    expect(copy.ctaLabel).toBe('Отвори Chisto.mk');
+  });
+
+  it('viewReports mk CTA uses action label', () => {
+    const copy = getCopy('report_received', 'mk', ctx, baseUrl);
+    expect(copy.ctaLabel).toBe('Прегледај пријави');
+  });
+
+  it('report_merged primary mk uses past tense', () => {
+    const copy = getCopy('report_merged', 'mk', { ...ctx, mergeRole: 'primary' }, baseUrl);
+    expect(copy.lead).toContain('се споија');
+    expect(copy.lead).not.toContain('се спојуваат');
+  });
+
   it('buildBodyHtml collapses repeated hyphens before escaping', () => {
     const html = buildBodyHtml({
       subject: '',

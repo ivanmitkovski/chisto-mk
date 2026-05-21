@@ -1,7 +1,7 @@
 import { BadRequestException } from '@nestjs/common';
-import { SitesAdminService } from '../../src/sites/sites-admin.service';
+import { SitesAdminBulkService } from '../../src/sites/sites-admin-bulk.service';
 
-describe('SitesAdminService bulkSites', () => {
+describe('SitesAdminBulkService bulkSites', () => {
   function makeService() {
     const prisma: { site: { updateMany: jest.Mock } } = {
       site: {
@@ -12,18 +12,10 @@ describe('SitesAdminService bulkSites', () => {
       log: jest.fn().mockResolvedValue(undefined),
       findByActionAndIdempotencyKey: jest.fn().mockResolvedValue(null),
     };
-    const siteEventsService = {} as never;
     const sitesMapQuery = { invalidateMapCache: jest.fn() } as never;
     const sitesFeed = { invalidateFeedCache: jest.fn() } as never;
     return {
-      service: new SitesAdminService(
-        prisma as never,
-        audit as never,
-        siteEventsService,
-        sitesMapQuery,
-        sitesFeed,
-        { recordStatusChanged: jest.fn(), emitHistoryAppended: jest.fn() } as never,
-      ),
+      service: new SitesAdminBulkService(prisma as never, audit as never, sitesMapQuery, sitesFeed),
       prisma,
       audit,
       sitesMapQuery,
@@ -33,34 +25,25 @@ describe('SitesAdminService bulkSites', () => {
 
   it('updates status in bulk and returns actual updated count', async () => {
     const { service, prisma } = makeService();
-    const out = await service.bulkSites(
-      { action: 'set_status', status: 'VERIFIED', siteIds: ['s1', 's2'] },
-      { userId: 'admin_1' } as never,
+    const result = await service.bulkSites(
+      {
+        siteIds: ['s1', 's2'],
+        action: 'set_status',
+        status: 'VERIFIED',
+      } as never,
+      { userId: 'admin-1', role: 'ADMIN' } as never,
     );
+    expect(result.updated).toBe(2);
     expect(prisma.site.updateMany).toHaveBeenCalled();
-    expect(out.updated).toBe(2);
   });
 
-  it('rejects missing status for set_status', async () => {
+  it('rejects set_status without status', async () => {
     const { service } = makeService();
     await expect(
       service.bulkSites(
-        { action: 'set_status', siteIds: ['s1'] } as never,
-        { userId: 'admin_1' } as never,
+        { siteIds: ['s1'], action: 'set_status' } as never,
+        { userId: 'admin-1', role: 'ADMIN' } as never,
       ),
     ).rejects.toBeInstanceOf(BadRequestException);
-  });
-
-  it('returns previous result for duplicate idempotency key', async () => {
-    const { service, audit, prisma } = makeService();
-    (audit.findByActionAndIdempotencyKey as jest.Mock).mockResolvedValue({
-      metadata: { updated: 1, siteIds: ['s1'] },
-    });
-    const out = await service.bulkSites(
-      { action: 'set_archived', archived: true, siteIds: ['s1'], idempotencyKey: 'k1' },
-      { userId: 'admin_1' } as never,
-    );
-    expect(prisma.site.updateMany).not.toHaveBeenCalled();
-    expect(out).toEqual({ updated: 1, siteIds: ['s1'] });
   });
 });

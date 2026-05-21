@@ -24,7 +24,8 @@ describe('AuthCredentialService', () => {
       },
       loginFailure: { deleteMany: jest.fn().mockResolvedValue({ count: 0 }) },
     } as never;
-    const svc = new AuthCredentialService(prisma, audit, email as never, env);
+    const sessionRevocation = { revokeAllForUser: jest.fn().mockResolvedValue(undefined) } as never;
+    const svc = new AuthCredentialService(prisma, audit, email as never, sessionRevocation, env);
     await expect(
       svc.changePassword('user-1', {
         currentPassword: 'WrongPass1',

@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { RedisThrottlerStorage } from './common/throttle/redis-throttler.storage';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
@@ -33,6 +34,9 @@ import { ModerationModule } from './moderation/moderation.module';
 import { LoggerModule } from 'nestjs-pino';
 import { safePinoReqSerializer } from './common/logging/safe-pino-req.serializer';
 import { StorageModule } from './storage/storage.module';
+import { IdempotencyInterceptor } from './common/idempotency/idempotency.interceptor';
+import { IdempotencyResponseStore } from './common/idempotency/idempotency-response.store';
+import { RequestMetricsInterceptor } from './observability/request-metrics.interceptor';
 
 @Module({
   imports: [
@@ -61,6 +65,10 @@ import { StorageModule } from './storage/storage.module';
             'req.body.privateKey',
             'req.body.To',
             'req.body.From',
+            'req.body.email',
+            'req.body.phoneNumber',
+            '*.email',
+            '*.phoneNumber',
           ],
           remove: true,
         },
@@ -69,10 +77,10 @@ import { StorageModule } from './storage/storage.module';
     EventEmitterModule.forRoot(),
     StorageModule,
     HealthModule,
-    ThrottlerModule.forRoot([{
-      ttl: 60_000,
-      limit: 60,
-    }]),
+    ThrottlerModule.forRoot({
+      throttlers: [{ ttl: 60_000, limit: 60 }],
+      storage: new RedisThrottlerStorage(),
+    }),
     PrismaModule,
     AuditModule,
     AuthModule,
@@ -101,7 +109,10 @@ import { StorageModule } from './storage/storage.module';
   providers: [
     AppService,
     RedisIoAdapterLifecycle,
+    IdempotencyResponseStore,
     { provide: APP_GUARD, useClass: ThrottlerGuard },
+    { provide: APP_INTERCEPTOR, useClass: RequestMetricsInterceptor },
+    { provide: APP_INTERCEPTOR, useClass: IdempotencyInterceptor },
   ],
 })
 export class AppModule {}

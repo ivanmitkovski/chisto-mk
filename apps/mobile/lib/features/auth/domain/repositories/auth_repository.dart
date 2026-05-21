@@ -63,6 +63,14 @@ abstract class AuthRepository {
     required String newPassword,
   });
 
+  /// Starts verified email change (OTP to new address). Requires Redis on API.
+  Future<EmailChangeRequestResult> requestEmailChange(String newEmail);
+
+  Future<void> confirmEmailChange({
+    required String newEmail,
+    required String code,
+  });
+
   Future<void> deleteAccount();
 
   Future<void> updateHomeLocation({
@@ -70,10 +78,26 @@ abstract class AuthRepository {
     required double longitude,
     String? label,
   });
+
+  /// Last known server flag: `false` = terms already accepted for current version.
+  bool? get requiresTermsAcceptance;
+
+  /// Refreshes terms consent from `GET /auth/me` (when [requiresTermsAcceptance] is unknown).
+  Future<bool> refreshTermsConsentFromServer();
+
+  /// Persists acceptance of current terms on the server (`POST /auth/me/accept-terms`).
+  Future<void> acceptTermsOnServer();
 }
 
 class SendOtpResult {
   const SendOtpResult({required this.expiresInSeconds});
 
   final int expiresInSeconds;
+}
+
+class EmailChangeRequestResult {
+  const EmailChangeRequestResult({required this.expiresInSeconds, this.devCode});
+
+  final int expiresInSeconds;
+  final String? devCode;
 }

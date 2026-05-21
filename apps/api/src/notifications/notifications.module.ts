@@ -4,8 +4,12 @@ import { FeatureFlagsModule } from '../feature-flags/feature-flags.module';
 import { PrismaModule } from '../prisma/prisma.module';
 import { EmailModule } from '../email/email.module';
 import { ReportsUploadModule } from '../reports/reports-upload.module';
-import { NotificationsController } from './notifications.controller';
+import { NotificationsInboxController } from './notifications-inbox.controller';
+import { NotificationsStateController } from './notifications-state.controller';
+import { NotificationsAdminController } from './notifications-admin.controller';
 import { NotificationInboxService } from './notification-inbox.service';
+import { NotificationInboxActorsService } from './notification-inbox-actors.service';
+import { NotificationInboxAdminService } from './notification-inbox-admin.service';
 import { NotificationStateService } from './notification-state.service';
 import { NotificationPreferencesService } from './notification-preferences.service';
 import { NotificationWriterService } from './notification-writer.service';
@@ -27,9 +31,15 @@ import { NotificationsRoomEmitterService } from './notifications-room-emitter.se
     EmailModule,
     ReportsUploadModule,
   ],
-  controllers: [NotificationsController],
+  controllers: [
+    NotificationsInboxController,
+    NotificationsStateController,
+    NotificationsAdminController,
+  ],
   providers: [
     NotificationInboxService,
+    NotificationInboxActorsService,
+    NotificationInboxAdminService,
     NotificationStateService,
     NotificationPreferencesService,
     NotificationWriterService,

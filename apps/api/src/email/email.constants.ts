@@ -22,5 +22,5 @@ export const DEFAULT_EMAIL_FROM_NAME = 'Chisto.mk';
 /** Primary button link target when no entity-specific deep links exist. */
 export const DEFAULT_EMAIL_APP_BASE_URL = 'https://chisto.mk';
 
-/** Default logo if EMAIL_LOGO_URL unset (landing site asset over HTTPS). */
-export const DEFAULT_EMAIL_LOGO_URL = 'https://chisto.mk/brand/logo.svg';
+/** Fallback hosted logo when inline asset is missing (use www — apex redirects break many clients). */
+export const DEFAULT_EMAIL_LOGO_URL = 'https://www.chisto.mk/brand/logo.png';

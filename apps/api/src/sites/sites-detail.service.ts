@@ -6,6 +6,7 @@ import {
   signPublicMediaUrlsDeduped,
 } from '../storage/batch-private-object-sign';
 import { SiteDetailRepository } from './repositories/site-detail.repository';
+import { projectPublicReporter, viewerIsModerator } from '../common/projections/public-identity.projection';
 
 @Injectable()
 export class SitesDetailService {
@@ -116,44 +117,81 @@ export class SitesDetailService {
       signPublicMediaUrlsDeduped(flatMedia, (urls) => this.reportsUploadService.signUrls(urls)),
     ]);
 
+    const isModerator = viewerIsModerator(user?.role);
     const reportsWithSignedUrls = site.reports.map((r) => {
       const mediaUrls = (r.mediaUrls ?? []).map((u) => {
         const t = typeof u === 'string' ? u.trim() : '';
         if (t.length === 0) return u;
         return mediaUrlByOriginal.get(t) ?? u;
       });
+      const reporterPublic = projectPublicReporter(
+        r.reporter && r.reporterId
+          ? {
+              userId: r.reporterId,
+              firstName: r.reporter.firstName,
+              lastName: r.reporter.lastName,
+            }
+          : null,
+        user,
+        isModerator,
+      );
       const reporter =
         r.reporter == null
           ? null
           : {
-              firstName: r.reporter.firstName,
-              lastName: r.reporter.lastName,
+              displayLabel: reporterPublic?.displayLabel ?? 'Anonymous',
+              isSelf: reporterPublic?.isSelf ?? false,
+              ...(isModerator || reporterPublic?.isSelf
+                ? {
+                    firstName: r.reporter.firstName,
+                    lastName: r.reporter.lastName,
+                  }
+                : {}),
               avatarUrl: r.reporter.avatarObjectKey
                 ? (avatarUrlByKey.get(r.reporter.avatarObjectKey) ?? null)
                 : null,
             };
-      const coReporters = r.coReporters.map((cr) => ({
-        id: cr.id,
-        createdAt: cr.createdAt,
-        reportedAt: cr.reportedAt,
-        reportId: cr.reportId,
-        userId: cr.userId,
-        user: cr.user
-          ? {
-              firstName: cr.user.firstName,
-              lastName: cr.user.lastName,
-              avatarUrl: cr.user.avatarObjectKey
-                ? (avatarUrlByKey.get(cr.user.avatarObjectKey) ?? null)
-                : null,
-            }
-          : null,
-      }));
+      const coReporters = r.coReporters.map((cr) => {
+        const coPublic = projectPublicReporter(
+          cr.user
+            ? {
+                userId: cr.userId,
+                firstName: cr.user.firstName,
+                lastName: cr.user.lastName,
+              }
+            : null,
+          user,
+          isModerator,
+        );
+        return {
+          id: cr.id,
+          createdAt: cr.createdAt,
+          reportedAt: cr.reportedAt,
+          reportId: cr.reportId,
+          ...(isModerator || coPublic?.isSelf ? { userId: cr.userId } : {}),
+          displayLabel: coPublic?.displayLabel ?? 'Anonymous',
+          user: cr.user
+            ? {
+                displayLabel: coPublic?.displayLabel ?? 'Anonymous',
+                ...(isModerator || coPublic?.isSelf
+                  ? {
+                      firstName: cr.user.firstName,
+                      lastName: cr.user.lastName,
+                    }
+                  : {}),
+                avatarUrl: cr.user.avatarObjectKey
+                  ? (avatarUrlByKey.get(cr.user.avatarObjectKey) ?? null)
+                  : null,
+              }
+            : null,
+        };
+      });
       return {
         id: r.id,
         createdAt: r.createdAt,
         reportNumber: r.reportNumber,
         siteId: r.siteId,
-        reporterId: r.reporterId,
+        ...(isModerator || user?.userId === r.reporterId ? { reporterId: r.reporterId } : {}),
         title: r.title,
         description: r.description,
         mediaUrls,
@@ -187,7 +225,25 @@ export class SitesDetailService {
       isSavedByMe = Boolean(save);
     }
 
-    const coReporterSummaries = this.buildSiteCoReporterSummaries(reportsWithSignedUrls);
+    const coReporterSummaries = isModerator
+      ? this.buildSiteCoReporterSummaries(
+          site.reports.map((r) => ({
+            coReporters: r.coReporters.map((cr) => ({
+              userId: cr.userId,
+              reportedAt: cr.reportedAt,
+              user: cr.user
+                ? {
+                    firstName: cr.user.firstName,
+                    lastName: cr.user.lastName,
+                    avatarUrl: cr.user.avatarObjectKey
+                      ? (avatarUrlByKey.get(cr.user.avatarObjectKey) ?? null)
+                      : null,
+                  }
+                : null,
+            })),
+          })),
+        )
+      : [];
     return {
       ...site,
       reports: reportsWithSignedUrls,

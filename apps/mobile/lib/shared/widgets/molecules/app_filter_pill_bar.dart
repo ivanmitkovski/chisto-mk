@@ -4,8 +4,6 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-
 const double _kSurfacePillControlHeight = 48;
 const double _kSurfacePillSelectedBorderAlpha = 0.5;
 const double _kSurfacePillUnselectedBorderAlpha = 0.8;
@@ -134,7 +132,6 @@ class _Pill<T> extends StatelessWidget {
             showCheckmark: false,
             onSelected: (_) {
               if (!_isActive) {
-                AppHaptics.tap(context);
                 onSelected(item.value);
               }
             },
@@ -172,7 +169,6 @@ class _Pill<T> extends StatelessWidget {
               child: InkWell(
                 onTap: () {
                   if (!_isActive) {
-                    AppHaptics.tap(context);
                     onSelected(item.value);
                   }
                 },

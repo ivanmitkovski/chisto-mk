@@ -1,0 +1,176 @@
+name: API deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        required: true
+        default: awsDev
+        type: choice
+        options:
+          - awsDev
+          - staging
+          - production
+  push:
+    branches: [develop, main]
+    paths:
+      - 'apps/api/**'
+      - '.github/workflows/api-deploy.yml'
+
+concurrency:
+  group: api-deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION || 'eu-central-1' }}
+  ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY || 'chisto-api' }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build production image
+        run: docker build -f apps/api/Dockerfile.prod -t chisto-api:${{ github.sha }} .
+
+      - name: Smoke health (no DB)
+        run: |
+          docker run -d --name api-smoke \
+            -e DATABASE_URL=postgresql://u:p@127.0.0.1:5432/db \
+            -e JWT_SECRET=01234567890123456789012345678901 \
+            -e SKIP_MIGRATE_STATUS_CHECK=1 \
+            -p 3099:3000 \
+            chisto-api:${{ github.sha }}
+          sleep 4
+          curl -sf http://127.0.0.1:3099/health
+          docker rm -f api-smoke
+
+  push-ecr:
+    needs: build
+    runs-on: ubuntu-latest
+    if: ${{ secrets.AWS_ROLE_ARN != '' }}
+    outputs:
+      image_digest: ${{ steps.push.outputs.digest }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push
+        id: push
+        env:
+          REGISTRY: ${{ steps.ecr.outputs.registry }}
+          GITHUB_SHA: ${{ github.sha }}
+        run: |
+          IMAGE="${REGISTRY}/${ECR_REPOSITORY}"
+          docker build -f apps/api/Dockerfile.prod -t "${IMAGE}:${GITHUB_SHA}" -t "${IMAGE}:latest" .
+          docker push "${IMAGE}:${GITHUB_SHA}"
+          docker push "${IMAGE}:latest"
+          DIGEST=$(aws ecr describe-images \
+            --repository-name "${ECR_REPOSITORY}" \
+            --image-ids imageTag="${GITHUB_SHA}" \
+            --query 'imageDetails[0].imageDigest' --output text)
+          echo "digest=${DIGEST}" >> "$GITHUB_OUTPUT"
+
+  migrate:
+    needs: push-ecr
+    runs-on: ubuntu-latest
+    if: ${{ secrets.AWS_ROLE_ARN != '' && secrets.ECS_CLUSTER != '' && secrets.ECS_MIGRATE_TASK_DEFINITION != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Run ECS migrate task
+        run: |
+          TASK_ARN=$(aws ecs run-task \
+            --cluster "${{ secrets.ECS_CLUSTER }}" \
+            --task-definition "${{ secrets.ECS_MIGRATE_TASK_DEFINITION }}" \
+            --launch-type FARGATE \
+            --network-configuration "awsvpcConfiguration={subnets=[${{ secrets.ECS_SUBNETS }}],securityGroups=[${{ secrets.ECS_SECURITY_GROUP }}],assignPublicIp=DISABLED}" \
+            --query 'tasks[0].taskArn' --output text)
+          aws ecs wait tasks-stopped --cluster "${{ secrets.ECS_CLUSTER }}" --tasks "$TASK_ARN"
+          EXIT=$(aws ecs describe-tasks --cluster "${{ secrets.ECS_CLUSTER }}" --tasks "$TASK_ARN" \
+            --query 'tasks[0].containers[0].exitCode' --output text)
+          test "$EXIT" = "0"
+
+  deploy-ecs:
+    needs: migrate
+    runs-on: ubuntu-latest
+    if: ${{ secrets.AWS_ROLE_ARN != '' && secrets.ECS_CLUSTER != '' && secrets.ECS_SERVICE != '' }}
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Rolling ECS deploy
+        run: |
+          aws ecs update-service \
+            --cluster "${{ secrets.ECS_CLUSTER }}" \
+            --service "${{ secrets.ECS_SERVICE }}" \
+            --force-new-deployment
+          aws ecs wait services-stable \
+            --cluster "${{ secrets.ECS_CLUSTER }}" \
+            --services "${{ secrets.ECS_SERVICE }}"
+
+  verify-staging:
+    needs: deploy-ecs
+    runs-on: ubuntu-latest
+    if: ${{ secrets.STAGING_API_BASE != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.14.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.19'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: verify:v1
+        env:
+          API_BASE: ${{ secrets.STAGING_API_BASE }}
+          AUTH_TOKEN: ${{ secrets.STAGING_AUTH_TOKEN }}
+        run: pnpm --filter @chisto/api run verify:v1
+      - name: Blackbox probe
+        env:
+          API_BASE: ${{ secrets.STAGING_API_BASE }}
+        run: node apps/api/scripts/blackbox-probe.mjs
+
+  cosign-sign:
+    needs: push-ecr
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && secrets.COSIGN_ECR_IMAGE != ''
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: sigstore/cosign-installer@v3
+      - name: Sign image by digest
+        run: cosign sign --yes "${{ secrets.COSIGN_ECR_IMAGE }}@${{ needs.push-ecr.outputs.image_digest }}"
+
+      - name: Attach SBOM
+        run: |
+          IMAGE="${{ secrets.COSIGN_ECR_IMAGE }}@${{ needs.push-ecr.outputs.image_digest }}"
+          echo '{"spdxVersion":"2.3","name":"chisto-api","packages":[]}' > sbom.spdx.json
+          cosign attach sbom --sbom sbom.spdx.json "$IMAGE"

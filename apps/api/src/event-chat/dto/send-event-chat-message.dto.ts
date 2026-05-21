@@ -4,6 +4,7 @@ import { IsArray, IsOptional, IsString, IsUUID, Matches, MaxLength, ValidateNest
 
 import { GeoPointLatLngWithLabelDto } from '../../common/dto/geo-point.dto';
 import { PRISMA_CUID_REGEX } from '../../common/validators/is-cuid.validator';
+import { SanitizePlainText } from '../../common/sanitize/sanitize-transform.decorator';
 
 export class ChatLocationDto extends GeoPointLatLngWithLabelDto {}
 
@@ -14,6 +15,7 @@ export class SendEventChatMessageDto {
     description:
       'Plain text. May be empty when sending only attachments (e.g. voice) or a location pin.',
   })
+  @SanitizePlainText()
   @IsString()
   @MaxLength(2000)
   body!: string;

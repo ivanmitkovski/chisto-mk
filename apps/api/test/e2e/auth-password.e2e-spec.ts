@@ -18,7 +18,7 @@ describe('Auth password (e2e)', () => {
 
   it('password-reset request validates phone format', async () => {
     const res = await request(app.getHttpServer())
-      .post('/auth/password-reset/request')
+      .post('/v1/auth/password-reset/request')
       .send({ phoneNumber: 'invalid' })
       .expect(400);
     expect(res.body.code).toBeDefined();

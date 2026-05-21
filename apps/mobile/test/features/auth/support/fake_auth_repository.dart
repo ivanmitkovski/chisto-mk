@@ -62,6 +62,18 @@ class FakeAuthRepository implements AuthRepository {
   @override
   bool restoreProfileValidationPending = false;
 
+  @override
+  bool? requiresTermsAcceptance;
+
+  @override
+  Future<bool> refreshTermsConsentFromServer() async =>
+      requiresTermsAcceptance ?? true;
+
+  @override
+  Future<void> acceptTermsOnServer() async {
+    requiresTermsAcceptance = false;
+  }
+
   final Future<void> Function({
     required String phoneNumber,
     required String password,
@@ -243,4 +255,15 @@ class FakeAuthRepository implements AuthRepository {
     final f = _updateHomeLocationImpl;
     if (f != null) await f(latitude: latitude, longitude: longitude, label: label);
   }
+
+  @override
+  Future<EmailChangeRequestResult> requestEmailChange(String newEmail) async {
+    return const EmailChangeRequestResult(expiresInSeconds: 300);
+  }
+
+  @override
+  Future<void> confirmEmailChange({
+    required String newEmail,
+    required String code,
+  }) async {}
 }

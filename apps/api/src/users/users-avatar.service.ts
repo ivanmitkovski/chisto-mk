@@ -16,6 +16,7 @@ const AVATAR_SIGNED_URL_TTL_SECONDS = 15 * 60;
 export class UsersAvatarService {
   private readonly logger = new Logger(UsersAvatarService.name);
   private readonly signedUrlCache = new Map<string, { url: string; expiresAt: number }>();
+  private readonly signInFlight = new Map<string, Promise<string | null>>();
 
   constructor(private readonly s3: S3StorageClient) {}
 
@@ -66,6 +67,18 @@ export class UsersAvatarService {
     if (!objectKey || !this.s3.enabled) {
       return null;
     }
+    const inflight = this.signInFlight.get(objectKey);
+    if (inflight) {
+      return inflight;
+    }
+    const promise = this.resolveSignPrivateObjectKey(objectKey).finally(() => {
+      this.signInFlight.delete(objectKey);
+    });
+    this.signInFlight.set(objectKey, promise);
+    return promise;
+  }
+
+  private async resolveSignPrivateObjectKey(objectKey: string): Promise<string | null> {
     const client = this.s3.getClientOrNull();
     const bucket = this.s3.bucket;
     if (!client || !bucket) {

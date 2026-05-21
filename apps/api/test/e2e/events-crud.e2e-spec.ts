@@ -25,7 +25,7 @@ describe('Events list (e2e)', () => {
   it('GET /events returns paginated list for authenticated user', async () => {
     const u = await registerCitizen(app, 'events');
     const res = await request(app.getHttpServer())
-      .get('/events')
+      .get('/v1/events')
       .set('Authorization', `Bearer ${u.accessToken}`)
       .query({ limit: 10 })
       .expect(200);

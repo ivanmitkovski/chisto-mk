@@ -4,6 +4,7 @@ import { Socket } from 'socket.io';
 import * as jwt from 'jsonwebtoken';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UserStatus } from '../../prisma-client';
+import { resolveJwtSecretsFromEnv, secretForKid } from '../../auth/jwt-secret.resolver';
 
 export type AuthenticatedSocketUser = {
   userId: string;
@@ -16,7 +17,7 @@ export type AuthenticatedSocketUser = {
  */
 export async function authenticateSocketUser(
   client: Socket,
-  config: ConfigService,
+  _config: ConfigService,
   prisma: PrismaService,
 ): Promise<AuthenticatedSocketUser> {
   const authHeader = client.handshake.headers.authorization;
@@ -31,25 +32,52 @@ export async function authenticateSocketUser(
     throw new UnauthorizedException('Missing token');
   }
 
-  const secret = config.get<string>('JWT_SECRET');
-  if (!secret) {
+  const jwtEntries = resolveJwtSecretsFromEnv();
+  if (jwtEntries.length === 0) {
     throw new InternalServerErrorException({
       code: 'JWT_SECRET_MISSING',
       message: 'JWT_SECRET is not configured',
     });
   }
 
-  let payload: { sub: string; email: string; sid?: string };
+  let payload: { sub: string; sid?: string };
   try {
-    payload = jwt.verify(token, secret, { algorithms: ['HS256'] }) as {
-      sub: string;
-      email: string;
-      sid?: string;
-    };
+    const header = JSON.parse(
+      Buffer.from(token.split('.')[0] ?? '', 'base64url').toString('utf8'),
+    ) as { kid?: string };
+    const secret = secretForKid(header.kid, jwtEntries) ?? jwtEntries[0]!.secret;
+    payload = jwt.verify(token, secret, {
+      algorithms: ['HS256'],
+      issuer: 'chisto-api',
+      audience: 'chisto-api',
+    }) as { sub: string; sid?: string };
   } catch {
     throw new UnauthorizedException({
       code: 'INVALID_TOKEN',
       message: 'Invalid or expired authentication token',
+    });
+  }
+
+  if (!payload.sid?.trim()) {
+    throw new UnauthorizedException({
+      code: 'SESSION_REQUIRED',
+      message: 'Access token is not bound to a session',
+    });
+  }
+
+  const session = await prisma.userSession.findFirst({
+    where: {
+      id: payload.sid,
+      userId: payload.sub,
+      revokedAt: null,
+      expiresAt: { gt: new Date() },
+    },
+    select: { id: true },
+  });
+  if (!session) {
+    throw new UnauthorizedException({
+      code: 'SESSION_REVOKED',
+      message: 'Session is no longer valid',
     });
   }
 
@@ -60,25 +88,6 @@ export async function authenticateSocketUser(
 
   if (!user || user.status !== UserStatus.ACTIVE) {
     throw new UnauthorizedException('User not active');
-  }
-
-  // Align with HTTP JwtStrategy: access tokens carrying `sid` must match a live session row.
-  if (payload.sid) {
-    const session = await prisma.userSession.findFirst({
-      where: {
-        id: payload.sid,
-        userId: payload.sub,
-        revokedAt: null,
-        expiresAt: { gt: new Date() },
-      },
-      select: { id: true },
-    });
-    if (!session) {
-      throw new UnauthorizedException({
-        code: 'SESSION_REVOKED',
-        message: 'Session is no longer valid',
-      });
-    }
   }
 
   return {

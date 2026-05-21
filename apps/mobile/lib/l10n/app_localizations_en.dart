@@ -1403,7 +1403,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileDeleteAccountDialogBody =>
-      'All your data will be permanently removed. This action cannot be undone.';
+      'Your account will be anonymized immediately. Personal data is fully erased within 30 days.';
 
   @override
   String get profileDeleteAccountFailedSnack =>

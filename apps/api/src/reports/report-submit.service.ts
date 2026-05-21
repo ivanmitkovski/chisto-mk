@@ -24,6 +24,7 @@ import { ObservabilityStore } from '../observability/observability.store';
 import { ReportsUploadService } from './reports-upload.service';
 import { reportReceivedUserCopy } from '../notifications/notification-templates';
 import { SiteHistoryWriterService } from '../sites/history/site-history-writer.service';
+import { SiteHistoryReportRecorderService } from '../sites/history/site-history-report-recorder.service';
 
 @Injectable()
 export class ReportSubmitService {
@@ -40,6 +41,7 @@ export class ReportSubmitService {
     private readonly mediaAppend: ReportSubmitMediaAppendService,
     private readonly eventEmitter: EventEmitter2,
     private readonly siteHistoryWriter: SiteHistoryWriterService,
+    private readonly siteHistoryReportRecorder: SiteHistoryReportRecorderService,
   ) {}
 
   async createWithLocation(
@@ -76,14 +78,15 @@ export class ReportSubmitService {
       const cleanupEffortParsed: ReportCleanupEffort | null = parseReportCleanupEffort(
         dto.cleanupEffort,
       );
-      const primaryReport = await this.nearbySiteResolver.resolveEarliestReportAnchor(
-        latitude,
-        longitude,
-      );
-      const targetSiteId = primaryReport?.siteId ?? null;
-
       const result = await this.prisma.$transaction(async (tx) => {
         await this.reportCapacity.spendWithinTransaction(tx, user.userId, new Date());
+
+        const primaryReport = await this.nearbySiteResolver.resolveEarliestReportAnchor(
+          latitude,
+          longitude,
+          tx,
+        );
+        const targetSiteId = primaryReport?.siteId ?? null;
 
         let siteId: string;
         let isNewSite: boolean;
@@ -134,7 +137,7 @@ export class ReportSubmitService {
           },
         });
 
-        await this.siteHistoryWriter.recordReportSubmitted(
+        await this.siteHistoryReportRecorder.recordReportSubmitted(
           {
             siteId,
             reportId: newReport.id,

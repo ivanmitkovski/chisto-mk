@@ -1,8 +1,10 @@
 import { Controller, Get } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SystemConfigService } from '../system-config/system-config.service';
 import { FeatureFlagsService } from '../feature-flags/feature-flags.service';
 import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-error-responses.decorator';
+import { resolveTermsVersionFromEnv } from '../auth/terms-consent.util';
 
 @ApiTags('config')
 @ApiStandardHttpErrorResponses()
@@ -11,6 +13,7 @@ export class PublicConfigController {
   constructor(
     private readonly systemConfig: SystemConfigService,
     private readonly featureFlagsService: FeatureFlagsService,
+    private readonly configService: ConfigService,
   ) {}
 
   @Get()
@@ -25,6 +28,11 @@ export class PublicConfigController {
   @ApiOkResponse({ description: 'Feature flags' })
   async getFeatureFlags() {
     const flags = await this.featureFlagsService.getPublicMap();
-    return { flags };
+    return {
+      flags,
+      currentTermsVersion: resolveTermsVersionFromEnv(
+        this.configService.get<string>('TERMS_VERSION'),
+      ),
+    };
   }
 }

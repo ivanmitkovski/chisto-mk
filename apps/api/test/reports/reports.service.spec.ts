@@ -72,7 +72,8 @@ function makeService(overrides?: {
     idempotency,
     mediaAppend,
     { emit: jest.fn() } as never,
-    { recordSiteCreated: jest.fn(), recordReportSubmitted: jest.fn(), emitHistoryAppended: jest.fn() } as never,
+    { recordSiteCreated: jest.fn(), emitHistoryAppended: jest.fn() } as never,
+    { recordReportSubmitted: jest.fn() } as never,
   );
   const reportCitizenQuery = new ReportCitizenQueryService(prisma as never, reportsUploadService as never);
 

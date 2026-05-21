@@ -1,3 +1,4 @@
+import { Idempotent } from '../common/idempotency/idempotency.decorator';
 import {
   Body,
   Controller,
@@ -51,6 +52,7 @@ export class EventsEvidenceController {
     return this.evidence.listForEvent(id, user);
   }
 
+  @Idempotent('events_events-evidence_54')
   @Post(':id/evidence')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -85,6 +87,7 @@ export class EventsEvidenceController {
     return this.evidence.addPhoto(id, user, file, body.kind);
   }
 
+  // safe-to-retry: repeated Delete is acceptable
   @Delete(':id/evidence/:photoId')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

@@ -9,6 +9,7 @@ import { AuditService } from '../audit/audit.service';
 import { FeatureFlagsService } from '../feature-flags/feature-flags.service';
 import { SiteEventsService } from '../admin-realtime/site-events.service';
 import { SiteHistoryWriterService } from './history/site-history-writer.service';
+import { SiteHistoryEventRecorderService } from './history/site-history-event-recorder.service';
 import { SitesFeedService } from './sites-feed.service';
 import { SitesMapQueryService } from './sites-map-query.service';
 import type { Prisma } from '../prisma-client';
@@ -29,6 +30,7 @@ export class SiteLifecycleFromEventsService {
     private readonly prisma: PrismaService,
     private readonly featureFlags: FeatureFlagsService,
     private readonly historyWriter: SiteHistoryWriterService,
+    private readonly historyEventRecorder: SiteHistoryEventRecorderService,
     private readonly audit: AuditService,
     private readonly siteEventsService: SiteEventsService,
     private readonly sitesFeed: SitesFeedService,
@@ -53,7 +55,7 @@ export class SiteLifecycleFromEventsService {
       select: { id: true, status: true },
     });
     if (!site || !SCHEDULE_FROM.includes(site.status)) {
-      await this.historyWriter.recordEventScheduled(
+      await this.historyEventRecorder.recordEventScheduled(
         { siteId, cleanupEventId, occurredAt: new Date() },
         tx,
       );
@@ -68,7 +70,7 @@ export class SiteLifecycleFromEventsService {
       trigger: 'EVENT_SCHEDULED',
       ...(tx != null ? { tx } : {}),
     });
-    await this.historyWriter.recordEventScheduled(
+    await this.historyEventRecorder.recordEventScheduled(
       { siteId, cleanupEventId, occurredAt: new Date() },
       tx,
     );
@@ -101,7 +103,7 @@ export class SiteLifecycleFromEventsService {
           ...(tx != null ? { tx } : {}),
         });
       }
-      await this.historyWriter.recordEventStarted(
+      await this.historyEventRecorder.recordEventStarted(
         { siteId, cleanupEventId, occurredAt: now },
         tx,
       );
@@ -109,7 +111,7 @@ export class SiteLifecycleFromEventsService {
     }
 
     if (lifecycle === EcoEventLifecycleStatus.COMPLETED) {
-      await this.historyWriter.recordEventCompleted(
+      await this.historyEventRecorder.recordEventCompleted(
         { siteId, cleanupEventId, occurredAt: now },
         tx,
       );
@@ -117,7 +119,7 @@ export class SiteLifecycleFromEventsService {
     }
 
     if (lifecycle === EcoEventLifecycleStatus.CANCELLED) {
-      await this.historyWriter.recordEventCancelled(
+      await this.historyEventRecorder.recordEventCancelled(
         { siteId, cleanupEventId, occurredAt: now },
         tx,
       );
@@ -149,11 +151,11 @@ export class SiteLifecycleFromEventsService {
   ): Promise<void> {
     const now = new Date();
     if (lifecycle === EcoEventLifecycleStatus.IN_PROGRESS) {
-      await this.historyWriter.recordEventStarted({ siteId, cleanupEventId, occurredAt: now }, tx);
+      await this.historyEventRecorder.recordEventStarted({ siteId, cleanupEventId, occurredAt: now }, tx);
     } else if (lifecycle === EcoEventLifecycleStatus.COMPLETED) {
-      await this.historyWriter.recordEventCompleted({ siteId, cleanupEventId, occurredAt: now }, tx);
+      await this.historyEventRecorder.recordEventCompleted({ siteId, cleanupEventId, occurredAt: now }, tx);
     } else if (lifecycle === EcoEventLifecycleStatus.CANCELLED) {
-      await this.historyWriter.recordEventCancelled({ siteId, cleanupEventId, occurredAt: now }, tx);
+      await this.historyEventRecorder.recordEventCancelled({ siteId, cleanupEventId, occurredAt: now }, tx);
     }
   }
 

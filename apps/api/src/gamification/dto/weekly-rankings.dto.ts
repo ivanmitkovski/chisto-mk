@@ -16,8 +16,8 @@ export class WeeklyLeaderboardEntryDto {
   @ApiProperty()
   rank!: number;
 
-  @ApiProperty()
-  userId!: string;
+  @ApiPropertyOptional({ description: 'Present only for the current user (privacy)' })
+  userId?: string;
 
   @ApiProperty()
   displayName!: string;

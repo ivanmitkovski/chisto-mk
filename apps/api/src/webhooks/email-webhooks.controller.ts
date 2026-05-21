@@ -3,7 +3,8 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-error-responses.decorator';
 import { PostmarkWebhookDto } from './dto/postmark-webhook.dto';
 import { EmailWebhooksService } from './email-webhooks.service';
-import { PostmarkWebhookBasicAuthGuard } from './guards/postmark-webhook-basic-auth.guard';
+import { PostmarkWebhookSignatureGuard } from './guards/postmark-webhook-signature.guard';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 
 @ApiTags('webhooks')
 @ApiStandardHttpErrorResponses()
@@ -13,7 +14,8 @@ export class EmailWebhooksController {
 
   @Post('postmark')
   @HttpCode(200)
-  @UseGuards(PostmarkWebhookBasicAuthGuard)
+  @UseGuards(ThrottlerGuard, PostmarkWebhookSignatureGuard)
+  @Throttle({ default: { limit: 300, ttl: 60_000 } })
   @ApiOperation({ summary: 'Postmark bounce/complaint webhook (JSON)' })
   @ApiResponse({ status: 200, description: 'Acknowledged' })
   async handlePostmark(@Body() body: PostmarkWebhookDto): Promise<{ ok: true }> {

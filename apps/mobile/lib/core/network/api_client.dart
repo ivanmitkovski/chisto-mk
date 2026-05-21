@@ -18,6 +18,12 @@ import 'package:http/http.dart' as http;
 /// session (if a [refreshSession] callback is provided) for `UNAUTHORIZED` and
 /// `SESSION_REVOKED` (rotated / revoked access session on the server).
 ///
+String _normalizeApiV1Base(String raw) {
+  final String trimmed = raw.replaceFirst(RegExp(r'/$'), '');
+  if (trimmed.endsWith('/v1')) return trimmed;
+  return '$trimmed/v1';
+}
+
 /// Parallel 401s: one shared refresh [Future]; concurrent callers await it and replay.
 class ApiClient {
   ApiClient({
@@ -26,7 +32,7 @@ class ApiClient {
     required void Function() onUnauthorized,
     String? Function()? acceptLanguageHeader,
     http.Client? httpClient,
-  })  : _baseUrl = config.apiBaseUrl.replaceFirst(RegExp(r'/$'), ''),
+  })  : _baseUrl = _normalizeApiV1Base(config.apiBaseUrl),
         _accessToken = accessToken,
         _onUnauthorized = onUnauthorized,
         _acceptLanguageHeader = acceptLanguageHeader,

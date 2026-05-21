@@ -9,7 +9,7 @@ import { DeviceTokenService } from './device-token.service';
 import { FcmPushService } from './fcm-push.service';
 import { buildFcmDataPayload } from './notification-push-data';
 import type { NotificationEvent } from './notification-event.types';
-import { EmailService } from '../email/email.service';
+import { EmailDeliveryOutboxService } from '../email/email-delivery-outbox.service';
 import { NotificationsRoomEmitterService } from './notifications-room-emitter.service';
 import { FeatureFlagsService } from '../feature-flags/feature-flags.service';
 import { resolveInterruptionLevel } from './fcm-apns-payload';
@@ -28,7 +28,7 @@ export class NotificationDispatcherService {
     private readonly deviceTokens: DeviceTokenService,
     private readonly fcm: FcmPushService,
     private readonly configService: ConfigService,
-    private readonly emailService: EmailService,
+    private readonly emailOutbox: EmailDeliveryOutboxService,
     private readonly roomEmitter: NotificationsRoomEmitterService,
     private readonly featureFlags: FeatureFlagsService,
   ) {}
@@ -103,17 +103,13 @@ export class NotificationDispatcherService {
     }
 
     if (!(await this.isPushEnabled()) || !this.fcm.isReady()) {
-      void this.emailService.sendForNotificationEvent(userId, event).catch((err: unknown) => {
-        this.logger.warn(
-          `Transactional email failed for user ${userId}: ${err instanceof Error ? err.message : String(err)}`,
-        );
-      });
+      await this.emailOutbox.enqueue(userId, notificationId, event);
       return;
     }
 
     const tokens = await this.deviceTokens.getActiveTokensForUser(userId);
     if (tokens.length === 0) {
-      void this.emailService.sendForNotificationEvent(userId, event).catch(() => {});
+      await this.emailOutbox.enqueue(userId, notificationId, event);
       return;
     }
 
@@ -182,11 +178,7 @@ export class NotificationDispatcherService {
       data: { sentAt: new Date() },
     });
 
-    void this.emailService.sendForNotificationEvent(userId, event).catch((err: unknown) => {
-      this.logger.warn(
-        `Transactional email failed for user ${userId}: ${err instanceof Error ? err.message : String(err)}`,
-      );
-    });
+    await this.emailOutbox.enqueue(userId, notificationId, event);
   }
 
   private async isPushEnabled(): Promise<boolean> {

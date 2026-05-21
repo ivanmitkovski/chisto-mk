@@ -58,6 +58,7 @@ export class EventsLiveImpactController {
     return merge(live$, heartbeat$);
   }
 
+  // safe-to-retry: repeated Patch is acceptable
   @Patch(':id/live-impact')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

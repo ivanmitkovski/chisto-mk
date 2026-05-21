@@ -33,7 +33,8 @@ export class TwilioSignatureGuard implements CanActivate {
     }
 
     const normalizedBase = baseUrl.replace(/\/+$/, '');
-    const url = `${normalizedBase}/webhooks/twilio/status`;
+    // Must match the public callback URL (global prefix `v1` in main.ts).
+    const url = `${normalizedBase}/v1/webhooks/twilio/status`;
     const body = req.body;
     if (body == null || typeof body !== 'object' || Array.isArray(body)) {
       throw new UnauthorizedException({

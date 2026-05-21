@@ -19,6 +19,7 @@ import type { FeedSiteRow, SitesFeedCandidateBundle } from './sites-feed-candida
 import { SitesFeedCacheService } from './sites-feed-cache.service';
 import { SitesFeedPreferencesService } from './sites-feed-preferences.service';
 import { mapWithConcurrency } from './sites-feed-query-async.util';
+import { applyBatchSignedMediaToRows } from './sites-feed-media-sign.util';
 import type { SitesFeedListResult } from './sites-feed.types';
 
 @Injectable()
@@ -71,9 +72,7 @@ export class SitesFeedEnrichmentService {
     const enrichedRows = await mapWithConcurrency(sites, 10, async (site) => {
       const { reports, votes, saves, _count, ...siteBase } = site;
       const firstReport = reports[0];
-      const mediaUrls = firstReport?.mediaUrls?.length
-        ? await this.reportsUploadService.signUrls(firstReport.mediaUrls)
-        : undefined;
+      const mediaUrls = firstReport?.mediaUrls?.length ? firstReport.mediaUrls : undefined;
       let latestReportReporterName: string | null = null;
       let latestReportReporterAvatarUrl: string | null = null;
       let latestReportReporterId: string | null = null;
@@ -150,10 +149,15 @@ export class SitesFeedEnrichmentService {
         distanceKm,
       } as SiteEnriched;
     });
+
+    const enrichedRowsSigned = await applyBatchSignedMediaToRows(enrichedRows, (unique) =>
+      this.reportsUploadService.signUrls(unique),
+    );
+
     const feedVariant = await this.feedV2.resolveVariant(user);
     if (user?.userId) this.preferences.setVariantMemo(user.userId, feedVariant);
 
-    let enriched = enrichedRows;
+    let enriched = enrichedRowsSigned;
     enriched = this.preferences.applyUserPreferences(enriched, user);
 
     if (hasGeo && query.lat != null && query.lng != null) {
@@ -180,7 +184,7 @@ export class SitesFeedEnrichmentService {
       enriched = enriched.filter((row) => isAfterRankedCursor(row, cursorState.hybrid!));
     }
 
-    const total = query.cursor ? 0 : await this.prisma.site.count({ where });
+    const total = query.cursor ? 0 : await this.approximateSiteCount(where);
     const skip = query.cursor ? 0 : (query.page - 1) * query.limit;
     const data = enriched.slice(skip, skip + query.limit);
     const nextCursor =
@@ -269,5 +273,21 @@ export class SitesFeedEnrichmentService {
       default:
         return 0.4;
     }
+  }
+
+  /** Avoid full-table COUNT(*) on hot feed path; falls back when estimate unavailable. */
+  private async approximateSiteCount(where: object): Promise<number> {
+    try {
+      const rows = await this.prisma.$queryRaw<Array<{ estimate: number }>>`
+        SELECT COALESCE(reltuples, 0)::float AS estimate
+        FROM pg_class
+        WHERE relname = 'Site'
+      `;
+      const estimate = Math.max(0, Math.round(rows[0]?.estimate ?? 0));
+      if (estimate > 0) return estimate;
+    } catch {
+      // fall through
+    }
+    return this.prisma.site.count({ where: where as never });
   }
 }

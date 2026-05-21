@@ -18,6 +18,7 @@ import {
 import { PRISMA_CUID_REGEX } from '../../common/validators/is-cuid.validator';
 import { MOBILE_CATEGORY_KEYS } from '../events-mobile.mapper';
 import { EventRouteWaypointDto } from './event-route-waypoint.dto';
+import { SanitizePlainText } from '../../common/sanitize/sanitize-transform.decorator';
 
 export class CreatePublicEventDto {
   @ApiProperty()
@@ -27,6 +28,7 @@ export class CreatePublicEventDto {
   siteId!: string;
 
   @ApiProperty({ minLength: 3, maxLength: 200 })
+  @SanitizePlainText()
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   @IsString()
   @MinLength(3)
@@ -34,6 +36,7 @@ export class CreatePublicEventDto {
   title!: string;
 
   @ApiProperty({ maxLength: 10_000 })
+  @SanitizePlainText()
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   @IsString()
   @MaxLength(10_000)

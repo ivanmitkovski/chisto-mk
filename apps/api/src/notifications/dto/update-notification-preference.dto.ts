@@ -1,10 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
 import { IsBoolean, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { StrictBoolean } from '../../common/transformers/strict-boolean.transformer';
 
 export class UpdateNotificationPreferenceDto {
   @ApiProperty({ description: 'Whether this notification type is muted (in-app + push)' })
-  @Type(() => Boolean)
+  @StrictBoolean()
   @IsBoolean()
   muted!: boolean;
 
@@ -21,7 +21,7 @@ export class UpdateNotificationPreferenceDto {
     description: 'Whether transactional email for this type is muted',
   })
   @IsOptional()
-  @Type(() => Boolean)
+  @StrictBoolean()
   @IsBoolean()
   emailMuted?: boolean;
 

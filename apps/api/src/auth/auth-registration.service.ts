@@ -1,4 +1,5 @@
 import { ConflictException, Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import * as bcrypt from 'bcrypt';
 import { Role } from '../prisma-client';
@@ -8,6 +9,10 @@ import { RegisterResponse } from './types/register-response.type';
 import { AUTH_ENV_RUNTIME, type AuthEnvRuntime } from './auth-env.config';
 import { AuthOtpService } from './auth-otp.service';
 import { OTP_EXPIRES_SECONDS } from './auth.constants';
+import {
+  assertRegisterTermsAcceptance,
+  resolveTermsVersionFromEnv,
+} from './terms-consent.util';
 
 @Injectable()
 export class AuthRegistrationService {
@@ -16,9 +21,14 @@ export class AuthRegistrationService {
     private readonly eventEmitter: EventEmitter2,
     private readonly authOtp: AuthOtpService,
     @Inject(AUTH_ENV_RUNTIME) private readonly env: AuthEnvRuntime,
+    private readonly configService: ConfigService,
   ) {}
 
   async register(dto: RegisterDto, acceptLanguage?: string): Promise<RegisterResponse> {
+    const currentTermsVersion = resolveTermsVersionFromEnv(
+      this.configService.get<string>('TERMS_VERSION'),
+    );
+    assertRegisterTermsAcceptance(dto, currentTermsVersion);
     const firstName = dto.firstName.trim();
     const lastName = dto.lastName.trim();
     const email = dto.email.toLowerCase().trim();
@@ -32,15 +42,9 @@ export class AuthRegistrationService {
     });
 
     if (existingUser) {
-      if (existingUser.email === email) {
-        throw new ConflictException({
-          code: 'EMAIL_ALREADY_REGISTERED',
-          message: 'Email is already registered',
-        });
-      }
       throw new ConflictException({
-        code: 'PHONE_ALREADY_REGISTERED',
-        message: 'Phone number is already registered',
+        code: 'REGISTRATION_CONFLICT',
+        message: 'An account with this email or phone number already exists',
       });
     }
 
@@ -54,6 +58,9 @@ export class AuthRegistrationService {
         passwordHash,
         role: Role.USER,
         isPhoneVerified: false,
+        termsAcceptedAt: new Date(dto.termsAcceptedAt),
+        termsVersion: dto.termsVersion.trim(),
+        privacyAcceptedAt: new Date(dto.privacyAcceptedAt ?? dto.termsAcceptedAt),
       },
     });
 

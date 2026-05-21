@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Prisma } from '../prisma-client';
 import { PrismaService } from '../prisma/prisma.service';
+import { hashPiiForLog } from '../common/security/pii-hash.util';
 
 export type EmailSuppressionReason =
   | 'HardBounce'
@@ -34,7 +35,9 @@ export class EmailSuppressionService {
 
     if (input.suppress === false) {
       await this.prisma.emailSuppression.deleteMany({ where: { email } });
-      this.logger.log(`Email suppression cleared email=${email} reason=${input.reason}`);
+      this.logger.log(
+        `Email suppression cleared emailHash=${hashPiiForLog(email)} reason=${input.reason}`,
+      );
       return;
     }
 
@@ -52,7 +55,9 @@ export class EmailSuppressionService {
         payload: input.payload ?? Prisma.JsonNull,
       },
     });
-    this.logger.log(`Email suppression recorded email=${email} reason=${input.reason}`);
+    this.logger.log(
+      `Email suppression recorded emailHash=${hashPiiForLog(email)} reason=${input.reason}`,
+    );
   }
 
   async isSuppressed(email: string): Promise<boolean> {

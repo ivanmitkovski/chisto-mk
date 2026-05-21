@@ -11,6 +11,7 @@ import { AuthSessionService } from './auth-session.service';
 import { AuthResponse } from './types/auth-response.type';
 import { EmailService } from '../email/email.service';
 import { notificationLocalesByUserId } from '../common/i18n/notification-locale.resolver';
+import { AuthIdentifierThrottleService } from './auth-identifier-throttle.service';
 
 @Injectable()
 export class AuthOtpService {
@@ -22,6 +23,7 @@ export class AuthOtpService {
     private readonly audit: AuditService,
     private readonly emailService: EmailService,
     @Inject(AUTH_ENV_RUNTIME) private readonly env: AuthEnvRuntime,
+    private readonly identifierThrottle: AuthIdentifierThrottleService,
   ) {}
 
   async sendPhoneVerificationOtp(
@@ -43,10 +45,12 @@ export class AuthOtpService {
     });
     if (!user) {
       throw new BadRequestException({
-        code: 'PHONE_NOT_REGISTERED',
-        message: 'No account found for this phone number',
+        code: 'OTP_SEND_FAILED',
+        message: 'If this phone number is registered, a verification code will be sent',
       });
     }
+
+    await this.identifierThrottle.assertAllowed('otp_send', normalized, 5, 3600);
 
     const existing = await this.prisma.phoneOtp.findUnique({
       where: { phoneNumber: normalized },

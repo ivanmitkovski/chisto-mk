@@ -10,6 +10,8 @@ import { EmailService } from './email.service';
 import { EmailTemplateService } from './email-template.service';
 import { EmailUnsubscribeController } from './email-unsubscribe.controller';
 import { EmailUnsubscribeTokenService } from './email-unsubscribe-token.service';
+import { EmailDeliveryOutboxService } from './email-delivery-outbox.service';
+import { EmailDeliveryWorkerService } from './email-delivery-worker.service';
 
 @Module({
   imports: [PrismaModule, ConfigModule, FeatureFlagsModule],
@@ -22,9 +24,12 @@ import { EmailUnsubscribeTokenService } from './email-unsubscribe-token.service'
     EmailPostmarkTransportService,
     EmailTemplateService,
     EmailService,
+    EmailDeliveryOutboxService,
+    EmailDeliveryWorkerService,
   ],
   exports: [
     EmailService,
+    EmailDeliveryOutboxService,
     EmailTemplateService,
     EmailSendEligibilityService,
     EmailSuppressionService,

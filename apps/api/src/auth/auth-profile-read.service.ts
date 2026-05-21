@@ -5,6 +5,8 @@ import { ReportsUploadService } from '../reports/reports-upload.service';
 import { GamificationService } from '../gamification/gamification.service';
 import { RankingsService } from '../gamification/rankings.service';
 import { AuthenticatedUser } from './types/authenticated-user.type';
+import { ConfigService } from '@nestjs/config';
+import { resolveTermsVersionFromEnv, termsConsentPayload } from './terms-consent.util';
 
 @Injectable()
 export class AuthProfileReadService {
@@ -13,6 +15,7 @@ export class AuthProfileReadService {
     private readonly reportsUploadService: ReportsUploadService,
     private readonly gamificationService: GamificationService,
     private readonly rankingsService: RankingsService,
+    private readonly configService: ConfigService,
   ) {}
 
   async me(authenticatedUser: AuthenticatedUser, locale = 'en') {
@@ -37,6 +40,8 @@ export class AuthProfileReadService {
         homeLongitude: true,
         homeLocationLabel: true,
         homeLocationSetAt: true,
+        termsAcceptedAt: true,
+        termsVersion: true,
       },
     });
 
@@ -59,6 +64,10 @@ export class AuthProfileReadService {
     void avatarObjectKey;
     const levelState = this.gamificationService.getLevelProgress(user.totalPointsEarned, locale);
     const weekly = await this.rankingsService.getUserWeeklySummary(authenticatedUser.userId);
+    const currentTermsVersion = resolveTermsVersionFromEnv(
+      this.configService.get<string>('TERMS_VERSION'),
+    );
+    const consent = termsConsentPayload(user, currentTermsVersion);
     return {
       ...rest,
       role: rest.role as Role,
@@ -77,6 +86,7 @@ export class AuthProfileReadService {
       weekEndsAt: weekly.weekEndsAt,
       organizerCertifiedAt: organizerCertifiedAt?.toISOString() ?? null,
       homeLocationSetAt: homeLocationSetAt?.toISOString() ?? null,
+      ...consent,
     };
   }
 }

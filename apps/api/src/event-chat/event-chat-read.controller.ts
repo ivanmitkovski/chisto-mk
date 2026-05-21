@@ -1,3 +1,4 @@
+import { Idempotent } from '../common/idempotency/idempotency.decorator';
 import {
   Body,
   Controller,
@@ -75,6 +76,7 @@ export class EventChatReadController {
     return this.presence.getMuteStatus(eventId, user);
   }
 
+  // safe-to-retry: repeated Put is acceptable
   @Put(':eventId/chat/mute')
   @Throttle({ default: { limit: 40, ttl: 60_000 } })
   @ApiOperation({ summary: 'Mute or unmute push notifications for this event chat' })
@@ -156,6 +158,7 @@ export class EventChatReadController {
     return this.presence.listReadCursors(eventId);
   }
 
+  @Idempotent('event-chat_event-chat-read_159')
   @Post(':eventId/chat/typing')
   @Throttle({ default: { limit: 60, ttl: 60_000 } })
   @ApiOperation({
@@ -176,6 +179,7 @@ export class EventChatReadController {
     return this.presence.recordTyping(eventId, user, dto.typing);
   }
 
+  // safe-to-retry: repeated Patch is acceptable
   @Patch(':eventId/chat/read')
   @Throttle({ default: { limit: 90, ttl: 60_000 } })
   @ApiOperation({ summary: 'Update read cursor for event chat' })

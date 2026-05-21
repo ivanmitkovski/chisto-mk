@@ -25,7 +25,7 @@ describe('Twilio webhook signature (e2e)', () => {
 
   it('rejects missing signature', async () => {
     await request(app.getHttpServer())
-      .post('/webhooks/twilio/status')
+      .post('/v1/webhooks/twilio/status')
       .type('form')
       .send({ MessageSid: 'SM123', MessageStatus: 'delivered' })
       .expect(401);
@@ -33,11 +33,11 @@ describe('Twilio webhook signature (e2e)', () => {
 
   it('accepts valid signature', async () => {
     const params = { MessageSid: 'SM456', MessageStatus: 'delivered', To: '+15550001111', From: '+15550002222' };
-    const url = `${baseUrl}/webhooks/twilio/status`;
+    const url = `${baseUrl}/v1/webhooks/twilio/status`;
     const signature = twilio.getExpectedTwilioSignature(authToken, url, params);
 
     await request(app.getHttpServer())
-      .post('/webhooks/twilio/status')
+      .post('/v1/webhooks/twilio/status')
       .set('X-Twilio-Signature', signature)
       .type('form')
       .send(params)

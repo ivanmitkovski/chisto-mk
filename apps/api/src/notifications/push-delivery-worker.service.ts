@@ -18,6 +18,7 @@ export class PushDeliveryWorkerService implements OnModuleInit, OnModuleDestroy 
   private pgListenClient: Client | null = null;
   private pgListenConnected = false;
   private consecutiveIdleTicks = 0;
+  private shuttingDown = false;
   private readonly workerId = `worker-${process.pid}-${randomUUID().slice(0, 8)}`;
 
   constructor(
@@ -37,6 +38,7 @@ export class PushDeliveryWorkerService implements OnModuleInit, OnModuleDestroy 
   }
 
   async onModuleDestroy() {
+    this.shuttingDown = true;
     if (this.listenWakeTimer) {
       clearTimeout(this.listenWakeTimer);
       this.listenWakeTimer = null;
@@ -48,6 +50,11 @@ export class PushDeliveryWorkerService implements OnModuleInit, OnModuleDestroy 
     await endPgOutboxListener(this.pgListenClient);
     this.pgListenClient = null;
     this.pgListenConnected = false;
+    try {
+      await this.outbox.processOutbox(this.workerId);
+    } catch (err) {
+      this.logger.warn('Push outbox drain on shutdown failed', err);
+    }
   }
 
   private async startPgListener(): Promise<void> {
@@ -71,6 +78,9 @@ export class PushDeliveryWorkerService implements OnModuleInit, OnModuleDestroy 
   }
 
   private scheduleNextTick(delayMs: number): void {
+    if (this.shuttingDown) {
+      return;
+    }
     if (this.timer) {
       clearTimeout(this.timer);
     }
@@ -80,7 +90,7 @@ export class PushDeliveryWorkerService implements OnModuleInit, OnModuleDestroy 
   }
 
   private async runTick(): Promise<void> {
-    if (!this.fcm?.isEnabled()) {
+    if (this.shuttingDown || !this.fcm?.isEnabled()) {
       return;
     }
     let delivered = 0;

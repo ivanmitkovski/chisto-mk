@@ -1,11 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { ObservabilityStore } from '../observability/observability.store';
+import { legacySnapshotGauges } from '../observability/prom-registry';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { ListSitesQueryDto } from './dto/list-sites-query.dto';
 import type { SitesFeedListResult } from './sites-feed.types';
+import { FeedCacheRedisService } from './feed/feed-cache-redis.service';
 
 @Injectable()
 export class SitesFeedCacheService {
+  constructor(private readonly feedRedis: FeedCacheRedisService) {}
+
   private readonly feedResponseCache = new Map<
     string,
     {
@@ -31,17 +35,27 @@ export class SitesFeedCacheService {
     ].join('|');
   }
 
-  get(key: string):
-    | {
-        cachedAt: number;
-        value: SitesFeedListResult;
-      }
-    | undefined {
-    return this.feedResponseCache.get(key);
+  async get(
+    key: string,
+  ): Promise<{ cachedAt: number; value: SitesFeedListResult } | undefined> {
+    const mem = this.feedResponseCache.get(key);
+    if (mem) return mem;
+    const raw = await this.feedRedis.get(key);
+    if (!raw) return undefined;
+    try {
+      const parsed = JSON.parse(raw) as SitesFeedListResult;
+      const row = { cachedAt: Date.now(), value: parsed };
+      this.feedResponseCache.set(key, row);
+      legacySnapshotGauges.feedCacheL2Hits.inc();
+      return row;
+    } catch {
+      return undefined;
+    }
   }
 
   set(key: string, value: SitesFeedListResult, siteIds: string[], nowMs: number): void {
     this.feedResponseCache.set(key, { cachedAt: nowMs, value });
+    void this.feedRedis.set(key, JSON.stringify(value));
     ObservabilityStore.setFeedCacheEntries(this.feedResponseCache.size);
     this.indexCacheKeySites(key, siteIds);
     if (this.feedResponseCache.size > 300) {
@@ -53,6 +67,7 @@ export class SitesFeedCacheService {
   invalidate(reason: string, siteId?: string): void {
     ObservabilityStore.recordFeedCacheInvalidation(reason);
     if (siteId) {
+      void this.feedRedis.invalidateTag(siteId);
       const keys = this.feedCacheSiteIndex.get(siteId);
       if (keys && keys.size > 0) {
         for (const key of [...keys]) {
@@ -78,14 +93,12 @@ export class SitesFeedCacheService {
   private removeCacheKey(cacheKey: string): void {
     const cached = this.feedResponseCache.get(cacheKey);
     if (cached) {
-      for (const row of cached.value.data) {
-        const keys = this.feedCacheSiteIndex.get(row.id);
-        if (!keys) continue;
-        keys.delete(cacheKey);
-        if (keys.size === 0) this.feedCacheSiteIndex.delete(row.id);
-      }
+      this.feedResponseCache.delete(cacheKey);
+      ObservabilityStore.setFeedCacheEntries(this.feedResponseCache.size);
     }
-    this.feedResponseCache.delete(cacheKey);
-    ObservabilityStore.setFeedCacheEntries(this.feedResponseCache.size);
+    for (const [siteId, keys] of this.feedCacheSiteIndex.entries()) {
+      keys.delete(cacheKey);
+      if (keys.size === 0) this.feedCacheSiteIndex.delete(siteId);
+    }
   }
 }

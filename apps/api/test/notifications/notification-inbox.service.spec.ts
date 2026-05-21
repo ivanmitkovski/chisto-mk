@@ -34,6 +34,16 @@ function makeFlags(inboxEnabled: boolean) {
   };
 }
 
+function makeInboxActors(prisma: ReturnType<typeof makePrisma>, upload = makeReportsUpload()) {
+  const { NotificationInboxActorsService } = require('../../src/notifications/notification-inbox-actors.service');
+  return new NotificationInboxActorsService(prisma as any, upload as any);
+}
+
+function makeInboxAdmin(prisma: ReturnType<typeof makePrisma>) {
+  const { NotificationInboxAdminService } = require('../../src/notifications/notification-inbox-admin.service');
+  return new NotificationInboxAdminService(prisma as any);
+}
+
 describe('NotificationInboxService', () => {
   it('listForUser returns paginated results excluding archived', async () => {
     const prisma = makePrisma() as any;
@@ -54,7 +64,8 @@ describe('NotificationInboxService', () => {
     const service = new NotificationInboxService(
       prisma,
       makeFlags(true) as any,
-      makeReportsUpload() as any,
+      makeInboxActors(prisma),
+      makeInboxAdmin(prisma),
     );
     const result = await service.listForUser(
       { userId: 'u1' } as any,
@@ -77,7 +88,8 @@ describe('NotificationInboxService', () => {
     const service = new NotificationInboxService(
       prisma,
       makeFlags(true) as any,
-      makeReportsUpload() as any,
+      makeInboxActors(prisma),
+      makeInboxAdmin(prisma),
     );
     const result = await service.getUnreadCount({ userId: 'u1' } as any);
 
@@ -92,7 +104,8 @@ describe('NotificationInboxService', () => {
     const service = new NotificationInboxService(
       prisma,
       makeFlags(false) as any,
-      makeReportsUpload() as any,
+      makeInboxActors(prisma),
+      makeInboxAdmin(prisma),
     );
 
     const result = await service.listForUser(
@@ -113,7 +126,8 @@ describe('NotificationInboxService', () => {
     const service = new NotificationInboxService(
       prisma,
       makeFlags(true) as any,
-      makeReportsUpload() as any,
+      makeInboxActors(prisma),
+      makeInboxAdmin(prisma),
     );
     const result = await service.getSummary({ userId: 'u1' } as any);
 
@@ -160,7 +174,8 @@ describe('NotificationInboxService', () => {
     const service = new NotificationInboxService(
       prisma,
       makeFlags(true) as any,
-      upload as any,
+      makeInboxActors(prisma, upload),
+      makeInboxAdmin(prisma),
     );
     const result = await service.listForUser(
       { userId: 'u1' } as any,
@@ -215,7 +230,8 @@ describe('NotificationInboxService', () => {
     const service = new NotificationInboxService(
       prisma,
       makeFlags(true) as any,
-      makeReportsUpload() as any,
+      makeInboxActors(prisma),
+      makeInboxAdmin(prisma),
     );
     const result = await service.listGrouped(
       { userId: 'u1' } as any,

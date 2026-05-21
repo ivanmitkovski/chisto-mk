@@ -1,4 +1,5 @@
 import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { createPresignedPost } from '@aws-sdk/s3-presigned-post';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Injectable, ServiceUnavailableException } from '@nestjs/common';
 import { S3StorageClient } from './s3-storage.client';
@@ -18,6 +19,8 @@ export type PresignedPutResult = {
   key: string;
   expiresInSeconds: number;
   maxBytesHint?: number;
+  /** Present when [maxBytesHint] is set — client must POST multipart fields to [uploadUrl]. */
+  postFields?: Record<string, string>;
 };
 
 /**
@@ -48,6 +51,27 @@ export class MediaAssetService {
       });
     }
     const expiresInSeconds = input.expiresInSeconds ?? 15 * 60;
+    if (input.maxBytesHint != null && input.maxBytesHint > 0) {
+      const { url, fields } = await createPresignedPost(client as never, {
+        Bucket: bucket,
+        Key: input.key,
+        Conditions: [
+          ['content-length-range', 1, input.maxBytesHint],
+          ['eq', '$Content-Type', input.contentType],
+        ],
+        Fields: {
+          'Content-Type': input.contentType,
+        },
+        Expires: expiresInSeconds,
+      });
+      return {
+        uploadUrl: url,
+        key: input.key,
+        expiresInSeconds,
+        maxBytesHint: input.maxBytesHint,
+        postFields: fields,
+      };
+    }
     const cmd = new PutObjectCommand({
       Bucket: bucket,
       Key: input.key,
@@ -58,7 +82,6 @@ export class MediaAssetService {
       uploadUrl,
       key: input.key,
       expiresInSeconds,
-      ...(input.maxBytesHint !== undefined ? { maxBytesHint: input.maxBytesHint } : {}),
     };
   }
 }

@@ -6,24 +6,13 @@ import {
 } from '../../prisma-client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { SiteEventsService } from '../../admin-realtime/site-events.service';
+import {
+  compactSiteHistoryInput,
+  type SiteHistoryActor,
+  type SiteHistoryWriteInput,
+} from './site-history-write.util';
 
-export type SiteHistoryActor = {
-  userId?: string | null;
-  role?: string | null;
-};
-
-export type SiteHistoryWriteInput = {
-  siteId: string;
-  kind: SiteHistoryEntryKind;
-  occurredAt?: Date;
-  fromStatus?: SiteStatus | null;
-  toStatus?: SiteStatus | null;
-  reportId?: string | null;
-  cleanupEventId?: string | null;
-  actor?: SiteHistoryActor | null;
-  note?: string | null;
-  metadata?: Prisma.InputJsonValue;
-};
+export type { SiteHistoryActor, SiteHistoryWriteInput } from './site-history-write.util';
 
 @Injectable()
 export class SiteHistoryWriterService {
@@ -34,34 +23,6 @@ export class SiteHistoryWriterService {
 
   private client(tx?: Prisma.TransactionClient): Prisma.TransactionClient | PrismaService {
     return tx ?? this.prisma;
-  }
-
-  /** Strips undefined optional keys for exactOptionalPropertyTypes. */
-  private compactInput(input: {
-    siteId: string;
-    kind: SiteHistoryEntryKind;
-    occurredAt?: Date | undefined;
-    fromStatus?: SiteStatus | null | undefined;
-    toStatus?: SiteStatus | null | undefined;
-    reportId?: string | null | undefined;
-    cleanupEventId?: string | null | undefined;
-    actor?: SiteHistoryActor | null | undefined;
-    note?: string | null | undefined;
-    metadata?: Prisma.InputJsonValue | undefined;
-  }): SiteHistoryWriteInput {
-    const out: SiteHistoryWriteInput = {
-      siteId: input.siteId,
-      kind: input.kind,
-    };
-    if (input.occurredAt !== undefined) out.occurredAt = input.occurredAt;
-    if (input.fromStatus !== undefined) out.fromStatus = input.fromStatus;
-    if (input.toStatus !== undefined) out.toStatus = input.toStatus;
-    if (input.reportId !== undefined) out.reportId = input.reportId;
-    if (input.cleanupEventId !== undefined) out.cleanupEventId = input.cleanupEventId;
-    if (input.actor !== undefined) out.actor = input.actor;
-    if (input.note !== undefined) out.note = input.note;
-    if (input.metadata !== undefined) out.metadata = input.metadata;
-    return out;
   }
 
   async write(
@@ -107,100 +68,12 @@ export class SiteHistoryWriterService {
     tx?: Prisma.TransactionClient,
   ): Promise<{ id: string }> {
     return this.write(
-      this.compactInput({
+      compactSiteHistoryInput({
         siteId: params.siteId,
         kind: SiteHistoryEntryKind.SITE_CREATED,
         occurredAt: params.occurredAt,
         toStatus: SiteStatus.REPORTED,
         actor: params.actor,
-      }),
-      { ...(tx != null ? { tx } : {}), emitSse: false },
-    );
-  }
-
-  async recordReportSubmitted(
-    params: {
-      siteId: string;
-      reportId: string;
-      occurredAt?: Date;
-      actor?: SiteHistoryActor | null;
-    },
-    tx?: Prisma.TransactionClient,
-  ): Promise<{ id: string }> {
-    return this.write(
-      this.compactInput({
-        siteId: params.siteId,
-        kind: SiteHistoryEntryKind.REPORT_SUBMITTED,
-        reportId: params.reportId,
-        occurredAt: params.occurredAt,
-        actor: params.actor,
-      }),
-      { ...(tx != null ? { tx } : {}), emitSse: false },
-    );
-  }
-
-  async recordReportApproved(
-    params: {
-      siteId: string;
-      reportId: string;
-      occurredAt?: Date;
-      actor?: SiteHistoryActor | null;
-    },
-    tx?: Prisma.TransactionClient,
-  ): Promise<{ id: string }> {
-    return this.write(
-      this.compactInput({
-        siteId: params.siteId,
-        kind: SiteHistoryEntryKind.REPORT_APPROVED,
-        reportId: params.reportId,
-        occurredAt: params.occurredAt,
-        actor: params.actor,
-      }),
-      { ...(tx != null ? { tx } : {}), emitSse: false },
-    );
-  }
-
-  async recordReportRejected(
-    params: {
-      siteId: string;
-      reportId: string;
-      occurredAt?: Date;
-      actor?: SiteHistoryActor | null;
-      metadata?: Prisma.InputJsonValue;
-    },
-    tx?: Prisma.TransactionClient,
-  ): Promise<{ id: string }> {
-    return this.write(
-      this.compactInput({
-        siteId: params.siteId,
-        kind: SiteHistoryEntryKind.REPORT_REJECTED,
-        reportId: params.reportId,
-        occurredAt: params.occurredAt,
-        actor: params.actor,
-        metadata: params.metadata,
-      }),
-      { ...(tx != null ? { tx } : {}), emitSse: false },
-    );
-  }
-
-  async recordReportMerged(
-    params: {
-      siteId: string;
-      reportId: string;
-      occurredAt?: Date;
-      actor?: SiteHistoryActor | null;
-      metadata?: Prisma.InputJsonValue;
-    },
-    tx?: Prisma.TransactionClient,
-  ): Promise<{ id: string }> {
-    return this.write(
-      this.compactInput({
-        siteId: params.siteId,
-        kind: SiteHistoryEntryKind.REPORT_MERGED,
-        reportId: params.reportId,
-        occurredAt: params.occurredAt,
-        actor: params.actor,
-        metadata: params.metadata,
       }),
       { ...(tx != null ? { tx } : {}), emitSse: false },
     );
@@ -221,7 +94,7 @@ export class SiteHistoryWriterService {
     tx?: Prisma.TransactionClient,
   ): Promise<{ id: string }> {
     return this.write(
-      this.compactInput({
+      compactSiteHistoryInput({
         siteId: params.siteId,
         kind: SiteHistoryEntryKind.STATUS_CHANGED,
         fromStatus: params.fromStatus,
@@ -237,90 +110,6 @@ export class SiteHistoryWriterService {
     );
   }
 
-  async recordEventScheduled(
-    params: {
-      siteId: string;
-      cleanupEventId: string;
-      occurredAt?: Date;
-      actor?: SiteHistoryActor | null;
-    },
-    tx?: Prisma.TransactionClient,
-  ): Promise<{ id: string }> {
-    return this.write(
-      this.compactInput({
-        siteId: params.siteId,
-        kind: SiteHistoryEntryKind.CLEANUP_EVENT_SCHEDULED,
-        cleanupEventId: params.cleanupEventId,
-        occurredAt: params.occurredAt,
-        actor: params.actor,
-      }),
-      { ...(tx != null ? { tx } : {}), emitSse: false },
-    );
-  }
-
-  async recordEventStarted(
-    params: {
-      siteId: string;
-      cleanupEventId: string;
-      occurredAt?: Date;
-      actor?: SiteHistoryActor | null;
-    },
-    tx?: Prisma.TransactionClient,
-  ): Promise<{ id: string }> {
-    return this.write(
-      this.compactInput({
-        siteId: params.siteId,
-        kind: SiteHistoryEntryKind.CLEANUP_EVENT_STARTED,
-        cleanupEventId: params.cleanupEventId,
-        occurredAt: params.occurredAt,
-        actor: params.actor,
-      }),
-      { ...(tx != null ? { tx } : {}), emitSse: false },
-    );
-  }
-
-  async recordEventCompleted(
-    params: {
-      siteId: string;
-      cleanupEventId: string;
-      occurredAt?: Date;
-      actor?: SiteHistoryActor | null;
-    },
-    tx?: Prisma.TransactionClient,
-  ): Promise<{ id: string }> {
-    return this.write(
-      this.compactInput({
-        siteId: params.siteId,
-        kind: SiteHistoryEntryKind.CLEANUP_EVENT_COMPLETED,
-        cleanupEventId: params.cleanupEventId,
-        occurredAt: params.occurredAt,
-        actor: params.actor,
-      }),
-      { ...(tx != null ? { tx } : {}), emitSse: false },
-    );
-  }
-
-  async recordEventCancelled(
-    params: {
-      siteId: string;
-      cleanupEventId: string;
-      occurredAt?: Date;
-      actor?: SiteHistoryActor | null;
-    },
-    tx?: Prisma.TransactionClient,
-  ): Promise<{ id: string }> {
-    return this.write(
-      this.compactInput({
-        siteId: params.siteId,
-        kind: SiteHistoryEntryKind.CLEANUP_EVENT_CANCELLED,
-        cleanupEventId: params.cleanupEventId,
-        occurredAt: params.occurredAt,
-        actor: params.actor,
-      }),
-      { ...(tx != null ? { tx } : {}), emitSse: false },
-    );
-  }
-
   async recordArchived(
     params: {
       siteId: string;
@@ -331,7 +120,7 @@ export class SiteHistoryWriterService {
     tx?: Prisma.TransactionClient,
   ): Promise<{ id: string }> {
     return this.write(
-      this.compactInput({
+      compactSiteHistoryInput({
         siteId: params.siteId,
         kind: SiteHistoryEntryKind.ARCHIVED_BY_ADMIN,
         occurredAt: params.occurredAt,
@@ -351,7 +140,7 @@ export class SiteHistoryWriterService {
     tx?: Prisma.TransactionClient,
   ): Promise<{ id: string }> {
     return this.write(
-      this.compactInput({
+      compactSiteHistoryInput({
         siteId: params.siteId,
         kind: SiteHistoryEntryKind.UNARCHIVED_BY_ADMIN,
         occurredAt: params.occurredAt,
@@ -371,7 +160,7 @@ export class SiteHistoryWriterService {
     tx?: Prisma.TransactionClient,
   ): Promise<{ id: string }> {
     return this.write(
-      this.compactInput({
+      compactSiteHistoryInput({
         siteId: params.siteId,
         kind: SiteHistoryEntryKind.ADMIN_NOTE,
         note: params.note,

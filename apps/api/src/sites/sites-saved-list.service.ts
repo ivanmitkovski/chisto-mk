@@ -6,6 +6,7 @@ import { ReportsUploadService } from '../reports/reports-upload.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { PaginationQueryDto20 } from '../common/dto/pagination-query.dto';
 import { mapWithConcurrency } from './sites-feed-query-async.util';
+import { signPublicMediaUrlsDeduped } from '../storage/batch-private-object-sign';
 import type { FeedSiteRow } from './sites-feed-candidate.types';
 import type { SitesFeedListResult } from './sites-feed.types';
 
@@ -70,9 +71,7 @@ export class SitesSavedListService {
     const enriched = await mapWithConcurrency(sites, 8, async (site) => {
       const { reports, votes, saves: saveRows, _count, ...siteBase } = site;
       const firstReport = reports[0];
-      const mediaUrls = firstReport?.mediaUrls?.length
-        ? await this.reportsUploadService.signUrls(firstReport.mediaUrls)
-        : undefined;
+      const mediaUrls = firstReport?.mediaUrls?.length ? firstReport.mediaUrls : undefined;
       let latestReportReporterName: string | null = null;
       let latestReportReporterAvatarUrl: string | null = null;
       let latestReportReporterId: string | null = null;
@@ -118,11 +117,27 @@ export class SitesSavedListService {
       };
     });
 
+    const signedMediaByUrl = await signPublicMediaUrlsDeduped(
+      enriched.flatMap((row) => row.latestReportMediaUrls ?? []),
+      (unique) => this.reportsUploadService.signUrls(unique),
+    );
+    const enrichedSigned = enriched.map((row) => {
+      if (!row.latestReportMediaUrls?.length) {
+        return row;
+      }
+      return {
+        ...row,
+        latestReportMediaUrls: row.latestReportMediaUrls.map(
+          (url) => signedMediaByUrl.get(url.trim()) ?? url,
+        ),
+      };
+    });
+
     const nextCursor =
-      skip + enriched.length < total ? String(query.page + 1) : null;
+      skip + enrichedSigned.length < total ? String(query.page + 1) : null;
 
     return {
-      data: enriched as SitesFeedListResult['data'],
+      data: enrichedSigned as SitesFeedListResult['data'],
       meta: {
         page: query.page,
         limit: query.limit,

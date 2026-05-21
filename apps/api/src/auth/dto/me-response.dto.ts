@@ -94,4 +94,16 @@ export class MeResponseDto {
 
   @ApiProperty({ nullable: true, description: 'When home location was last saved, ISO-8601' })
   homeLocationSetAt!: string | null;
+
+  @ApiProperty({ nullable: true, description: 'ISO-8601 when terms were last accepted' })
+  termsAcceptedAt!: string | null;
+
+  @ApiProperty({ nullable: true, description: 'Version of terms last accepted' })
+  termsVersion!: string | null;
+
+  @ApiProperty({
+    description:
+      'True when the user must accept current terms (missing or outdated acceptance)',
+  })
+  requiresTermsAcceptance!: boolean;
 }

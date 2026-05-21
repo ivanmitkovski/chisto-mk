@@ -25,7 +25,7 @@ describe('Admin moderation (e2e)', () => {
   it('GET /admin/overview forbids citizen role', async () => {
     const u = await registerCitizen(app, 'admin');
     const res = await request(app.getHttpServer())
-      .get('/admin/overview')
+      .get('/v1/admin/overview')
       .set('Authorization', `Bearer ${u.accessToken}`)
       .expect(403);
     expect(res.body.code).toBeDefined();

@@ -1,8 +1,8 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { PaginationQueryDto20 } from '../../common/dto/pagination-query.dto';
 import { ReportStatus } from '../../prisma-client';
-import { Type } from 'class-transformer';
 import { IsBoolean, IsEnum, IsOptional, IsString, Length, Matches } from 'class-validator';
+import { StrictBoolean } from '../../common/transformers/strict-boolean.transformer';
 
 export class ListReportsQueryDto extends PaginationQueryDto20 {
   @ApiPropertyOptional({ enum: ReportStatus })
@@ -26,7 +26,7 @@ export class ListReportsQueryDto extends PaginationQueryDto20 {
     description: 'When true, returns only reports that are in a duplicate relationship',
     default: false,
   })
-  @Type(() => Boolean)
+  @StrictBoolean()
   @IsOptional()
   @IsBoolean()
   duplicatesOnly?: boolean;

@@ -1,3 +1,4 @@
+import { Idempotent } from '../../common/idempotency/idempotency.decorator';
 import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -32,6 +33,7 @@ export class SiteHistoryAdminController {
     private readonly siteHistoryQuery: SiteHistoryQueryService,
   ) {}
 
+  @Idempotent('sites_history_site-history-admin_35')
   @Post(':id/history/notes')
   @UseGuards(JwtAuthGuard, RolesGuard, ThrottlerGuard)
   @Throttle({ default: { limit: 60, ttl: 60_000 } })

@@ -27,12 +27,12 @@ describe('Auth session (e2e)', () => {
     const agent = request(app.getHttpServer());
 
     const refreshed = await agent
-      .post('/auth/refresh')
+      .post('/v1/auth/refresh')
       .send({ refreshToken: u.refreshToken })
       .expect(200);
     expect(refreshed.body.accessToken).toBeDefined();
 
-    await agent.post('/auth/logout').send({ refreshToken: refreshed.body.refreshToken }).expect(204);
+    await agent.post('/v1/auth/logout').send({ refreshToken: refreshed.body.refreshToken }).expect(204);
   });
 
   it('rejects reuse of revoked refresh token after rotation', async () => {
@@ -40,11 +40,11 @@ describe('Auth session (e2e)', () => {
     const agent = request(app.getHttpServer());
     const first = u.refreshToken;
 
-    const rotated = await agent.post('/auth/refresh').send({ refreshToken: first }).expect(200);
+    const rotated = await agent.post('/v1/auth/refresh').send({ refreshToken: first }).expect(200);
     expect(rotated.body.refreshToken).toBeDefined();
     expect(rotated.body.refreshToken).not.toBe(first);
 
-    const replay = await agent.post('/auth/refresh').send({ refreshToken: first });
+    const replay = await agent.post('/v1/auth/refresh').send({ refreshToken: first });
     expect(replay.status).toBe(401);
     expect(replay.body?.code ?? replay.body?.message).toBeDefined();
   });

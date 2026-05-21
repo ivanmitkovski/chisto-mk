@@ -19,7 +19,7 @@ describe('Validation errors (e2e)', () => {
 
   it('rejects unknown properties on register (forbidNonWhitelisted)', async () => {
     const res = await request(app.getHttpServer())
-      .post('/auth/register')
+      .post('/v1/auth/register')
       .send({
         firstName: 'E2e',
         lastName: 'User',

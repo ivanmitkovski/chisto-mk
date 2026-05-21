@@ -5,6 +5,8 @@ import { PrismaModule } from '../prisma/prisma.module';
 import { EmailWebhooksController } from './email-webhooks.controller';
 import { EmailWebhooksService } from './email-webhooks.service';
 import { PostmarkWebhookBasicAuthGuard } from './guards/postmark-webhook-basic-auth.guard';
+import { PostmarkWebhookSignatureGuard } from './guards/postmark-webhook-signature.guard';
+import { TwilioWebhookDedupeService } from './twilio-webhook-dedupe.service';
 import { TwilioSignatureGuard } from './guards/twilio-signature.guard';
 import { TwilioStatusBodySanitizeInterceptor } from './interceptors/twilio-status-body-sanitize.interceptor';
 import { WebhooksController } from './webhooks.controller';
@@ -18,6 +20,8 @@ import { WebhooksService } from './webhooks.service';
     EmailWebhooksService,
     TwilioSignatureGuard,
     PostmarkWebhookBasicAuthGuard,
+    PostmarkWebhookSignatureGuard,
+    TwilioWebhookDedupeService,
     TwilioStatusBodySanitizeInterceptor,
   ],
 })

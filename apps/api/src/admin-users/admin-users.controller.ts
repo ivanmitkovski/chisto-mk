@@ -1,3 +1,4 @@
+import { Idempotent } from '../common/idempotency/idempotency.decorator';
 import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -34,6 +35,7 @@ export class AdminUsersController {
     return this.adminUsersService.list(query);
   }
 
+  @Idempotent('admin-users_admin-users_37')
   @Post('bulk')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(...ADMIN_WRITE_ROLES)
@@ -78,6 +80,7 @@ export class AdminUsersController {
     return this.adminUsersService.findOne(id);
   }
 
+  // safe-to-retry: repeated Patch is acceptable
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(...ADMIN_WRITE_ROLES)
@@ -92,6 +95,7 @@ export class AdminUsersController {
     return this.adminUsersService.patch(id, dto, actor);
   }
 
+  // safe-to-retry: repeated Patch is acceptable
   @Patch(':id/role')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(...SUPER_ADMIN_ROLES)

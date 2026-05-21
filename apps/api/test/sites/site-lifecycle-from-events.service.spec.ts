@@ -4,12 +4,14 @@ import { SiteLifecycleFromEventsService } from '../../src/sites/site-lifecycle-f
 describe('SiteLifecycleFromEventsService', () => {
   const featureFlags = { getPublicMap: jest.fn().mockResolvedValue({ site_lifecycle_from_events: true }) };
   const historyWriter = {
+    recordStatusChanged: jest.fn().mockResolvedValue({ id: 'h5' }),
+    emitHistoryAppended: jest.fn(),
+  };
+  const historyEventRecorder = {
     recordEventScheduled: jest.fn().mockResolvedValue({ id: 'h1' }),
     recordEventStarted: jest.fn().mockResolvedValue({ id: 'h2' }),
     recordEventCompleted: jest.fn().mockResolvedValue({ id: 'h3' }),
     recordEventCancelled: jest.fn().mockResolvedValue({ id: 'h4' }),
-    recordStatusChanged: jest.fn().mockResolvedValue({ id: 'h5' }),
-    emitHistoryAppended: jest.fn(),
   };
   const audit = { log: jest.fn().mockResolvedValue(undefined) };
   const siteEventsService = { emitSiteUpdated: jest.fn() };
@@ -32,6 +34,7 @@ describe('SiteLifecycleFromEventsService', () => {
       prisma as never,
       featureFlags as never,
       historyWriter as never,
+      historyEventRecorder as never,
       audit as never,
       siteEventsService as never,
       sitesFeed as never,
@@ -57,7 +60,7 @@ describe('SiteLifecycleFromEventsService', () => {
       }),
     );
     expect(historyWriter.recordStatusChanged).toHaveBeenCalled();
-    expect(historyWriter.recordEventScheduled).toHaveBeenCalled();
+    expect(historyEventRecorder.recordEventScheduled).toHaveBeenCalled();
   });
 
   it('does not auto-transition to CLEANED on event completed', async () => {
@@ -68,7 +71,7 @@ describe('SiteLifecycleFromEventsService', () => {
     );
 
     expect(prisma.site.update).not.toHaveBeenCalled();
-    expect(historyWriter.recordEventCompleted).toHaveBeenCalled();
+    expect(historyEventRecorder.recordEventCompleted).toHaveBeenCalled();
   });
 
   it('reverts to VERIFIED on cancel when no other active events', async () => {

@@ -1,5 +1,7 @@
 /// <reference types="jest" />
 import { NotificationInboxService } from '../../src/notifications/notification-inbox.service';
+import { NotificationInboxAdminService } from '../../src/notifications/notification-inbox-admin.service';
+import { NotificationInboxActorsService } from '../../src/notifications/notification-inbox-actors.service';
 
 function makePrisma() {
   return {
@@ -55,7 +57,8 @@ describe('NotificationInboxService', () => {
     const service = new NotificationInboxService(
       prisma,
       makeInboxFlags(true) as any,
-      { signUrls: jest.fn().mockResolvedValue([]) } as any,
+      { resolveActorsForNotifications: jest.fn().mockResolvedValue(new Map()) } as any,
+      new NotificationInboxAdminService(prisma),
     );
     const result = await service.listDeadLetters(1, 20);
 
@@ -70,7 +73,10 @@ describe('NotificationInboxService', () => {
     const service = new NotificationInboxService(
       prisma,
       makeInboxFlags(false) as any,
-      { signUrls: jest.fn().mockResolvedValue([]) } as any,
+      new NotificationInboxActorsService(prisma, {
+        signPrivateObjectKey: jest.fn(),
+      } as any),
+      new NotificationInboxAdminService(prisma),
     );
     const result = await service.listForUser(
       { userId: 'u1' } as any,

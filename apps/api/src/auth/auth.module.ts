@@ -6,6 +6,9 @@ import { AuthSessionController } from './auth-session.controller';
 import { AuthPasswordController } from './auth-password.controller';
 import { AuthMfaController } from './auth-mfa.controller';
 import { AuthProfileController } from './auth-profile.controller';
+import { AuthProfileIdentifierController } from './auth-profile-identifier.controller';
+import { AuthProfilePrivacyController } from './auth-profile-privacy.controller';
+import { AuthAdminController } from './auth-admin.controller';
 import { AUTH_ENV_RUNTIME, loadAuthEnvRuntime } from './auth-env.config';
 import { AuthSessionService } from './auth-session.service';
 import { AuthRegistrationService } from './auth-registration.service';
@@ -29,6 +32,14 @@ import { OtpModule } from '../otp/otp.module';
 import { AuditModule } from '../audit/audit.module';
 import { ReportsUploadModule } from '../reports/reports-upload.module';
 import { GamificationModule } from '../gamification/gamification.module';
+import { UserAuthSnapshotCacheService } from './user-auth-snapshot-cache.service';
+import { AuthSessionRevocationService } from './auth-session-revocation.service';
+import { SecurityEventsListener } from './security-events.listener';
+import { AccountErasureService } from './account-erasure.service';
+import { AccountErasureCronService } from './account-erasure-cron.service';
+import { AuthIdentifierChangeService } from './auth-identifier-change.service';
+import { UserDsarExportService } from './user-dsar-export.service';
+import { AuthIdentifierThrottleService } from './auth-identifier-throttle.service';
 
 /** Global so JwtStrategy, JwtAuthGuard, and RolesGuard resolve in every feature module without duplicate imports. */
 @Global()
@@ -60,6 +71,9 @@ import { GamificationModule } from '../gamification/gamification.module';
     AuthPasswordController,
     AuthMfaController,
     AuthProfileController,
+    AuthProfileIdentifierController,
+    AuthProfilePrivacyController,
+    AuthAdminController,
   ],
   providers: [
     {
@@ -67,6 +81,14 @@ import { GamificationModule } from '../gamification/gamification.module';
       useFactory: (configService: ConfigService) => loadAuthEnvRuntime(configService),
       inject: [ConfigService],
     },
+    UserAuthSnapshotCacheService,
+    AuthSessionRevocationService,
+    SecurityEventsListener,
+    AccountErasureService,
+    AccountErasureCronService,
+    AuthIdentifierChangeService,
+    UserDsarExportService,
+    AuthIdentifierThrottleService,
     AuthSessionService,
     AuthRegistrationService,
     AuthLoginService,
@@ -85,6 +107,15 @@ import { GamificationModule } from '../gamification/gamification.module';
     OptionalJwtAuthGuard,
     OrganizerCertificationService,
   ],
-  exports: [JwtAuthGuard, RolesGuard, OptionalJwtAuthGuard, PhoneVerifiedGuard, AuditModule],
+  exports: [
+    JwtAuthGuard,
+    RolesGuard,
+    OptionalJwtAuthGuard,
+    PhoneVerifiedGuard,
+    AuditModule,
+    AuthSessionRevocationService,
+    UserAuthSnapshotCacheService,
+    AuthIdentifierThrottleService,
+  ],
 })
 export class AuthModule {}

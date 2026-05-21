@@ -132,6 +132,11 @@ class AppButton extends StatefulWidget {
 class _AppButtonState extends State<AppButton> {
   bool _pressed = false;
 
+  void _setPressed(bool value) {
+    if (!mounted || _pressed == value) return;
+    setState(() => _pressed = value);
+  }
+
   @override
   Widget build(BuildContext context) {
     if (widget.variant == AppButtonVariant.primary && widget.expand) {
@@ -197,10 +202,10 @@ class _AppButtonState extends State<AppButton> {
         height: height,
         child: Listener(
           onPointerDown: (_) {
-            if (canPress) setState(() => _pressed = true);
+            if (canPress) _setPressed(true);
           },
-          onPointerUp: (_) => setState(() => _pressed = false),
-          onPointerCancel: (_) => setState(() => _pressed = false),
+          onPointerUp: (_) => _setPressed(false),
+          onPointerCancel: (_) => _setPressed(false),
           child: Material(
             color: _backgroundColor(busy, canPress),
             elevation: 0,

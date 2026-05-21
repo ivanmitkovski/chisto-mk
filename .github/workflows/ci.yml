@@ -107,6 +107,12 @@ jobs:
       - name: Apply database migrations (CI parity with e2e)
         run: pnpm --filter @chisto/api exec prisma migrate deploy
 
+      - name: Migration index lint (CONCURRENTLY)
+        run: bash apps/api/scripts/check-migration-indexes.sh
+
+      - name: API typecheck
+        run: pnpm --filter @chisto/api run typecheck
+
       - name: API service size guard (repo-wide *.service.ts)
         run: pnpm --filter @chisto/api run check:god-services
 
@@ -118,6 +124,18 @@ jobs:
 
       - name: API OpenAPI snapshot check
         run: pnpm --filter @chisto/api run snapshot:openapi:check
+
+      - name: API OpenAPI PII allowlist
+        run: pnpm --filter @chisto/api run openapi:pii
+
+      - name: Regenerate api-client types from OpenAPI snapshot
+        run: pnpm --filter @chisto/api-client run generate
+
+      - name: API contract verify
+        run: pnpm verify:contract
+
+      - name: Mutating routes idempotency audit
+        run: node apps/api/scripts/audit-mutating-routes.mjs
 
       - name: API ESLint
         run: pnpm --filter @chisto/api run lint

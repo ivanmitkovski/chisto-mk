@@ -1,24 +1,29 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEmail,
+  IsISO8601,
+  IsOptional,
   IsString,
   Matches,
   MaxLength,
   MinLength,
 } from 'class-validator';
 import { IsStrongPassword } from '../../common/validators/password-strength.validator';
+import { SanitizePlainText } from '../../common/sanitize/sanitize-transform.decorator';
 
 export class RegisterDto {
   @ApiProperty({ example: 'Ivan' })
   @IsString()
   @MinLength(2)
   @MaxLength(60)
+  @SanitizePlainText()
   firstName!: string;
 
   @ApiProperty({ example: 'Mitkovski' })
   @IsString()
   @MinLength(2)
   @MaxLength(60)
+  @SanitizePlainText()
   lastName!: string;
 
   @ApiProperty({ example: 'citizen@chisto.mk' })
@@ -43,4 +48,19 @@ export class RegisterDto {
   @Matches(/[A-Za-z]/, { message: 'Password must contain at least one letter' })
   @IsStrongPassword()
   password!: string;
+
+  @ApiProperty({ example: '2026-06-01T12:00:00.000Z', description: 'ISO-8601 when terms were accepted on device' })
+  @IsISO8601()
+  termsAcceptedAt!: string;
+
+  @ApiProperty({ example: '1', description: 'Must match server TERMS_VERSION' })
+  @IsString()
+  @MinLength(1)
+  @MaxLength(32)
+  termsVersion!: string;
+
+  @ApiProperty({ required: false, example: '2026-06-01' })
+  @IsOptional()
+  @IsISO8601()
+  privacyAcceptedAt?: string;
 }

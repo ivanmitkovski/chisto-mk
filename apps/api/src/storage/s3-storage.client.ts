@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { CircuitBreaker, CircuitBreakerOpenError } from '../common/resilience/circuit-breaker';
 import { ConfigService } from '@nestjs/config';
+import { NodeHttpHandler } from '@smithy/node-http-handler';
 import {
   DeleteObjectCommand,
   type DeleteObjectCommandInput,
@@ -63,8 +64,16 @@ export class S3StorageClient implements OnModuleInit {
           : forceRaw === 'false' || forceRaw === '0'
             ? false
             : Boolean(endpoint);
+      // WHEN_REQUIRED: presigned GET URLs must work in mobile/web browsers without
+      // x-amz-checksum-mode request headers (default SDK checksums cause 403).
       this.client = new S3Client({
         region: this.region,
+        requestChecksumCalculation: 'WHEN_REQUIRED',
+        responseChecksumValidation: 'WHEN_REQUIRED',
+        requestHandler: new NodeHttpHandler({
+          connectionTimeout: 5_000,
+          requestTimeout: 30_000,
+        }),
         ...(endpoint ? { endpoint, forcePathStyle } : {}),
       });
     }

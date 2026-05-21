@@ -27,6 +27,11 @@ class PrimaryButton extends StatefulWidget {
 class _PrimaryButtonState extends State<PrimaryButton> {
   bool _pressed = false;
 
+  void _setPressed(bool value) {
+    if (!mounted || _pressed == value) return;
+    setState(() => _pressed = value);
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool busy = widget.isLoading && widget.enabled;
@@ -42,12 +47,10 @@ class _PrimaryButtonState extends State<PrimaryButton> {
         height: 56,
         child: Listener(
           onPointerDown: (_) {
-            if (canPress) {
-              setState(() => _pressed = true);
-            }
+            if (canPress) _setPressed(true);
           },
-          onPointerUp: (_) => setState(() => _pressed = false),
-          onPointerCancel: (_) => setState(() => _pressed = false),
+          onPointerUp: (_) => _setPressed(false),
+          onPointerCancel: (_) => _setPressed(false),
           child: ElevatedButton(
             onPressed: canPress ? widget.onPressed : null,
             style: ElevatedButton.styleFrom(

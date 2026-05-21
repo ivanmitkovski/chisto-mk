@@ -25,7 +25,7 @@ describe('Reports submit (e2e)', () => {
   it('creates a report with location when authenticated', async () => {
     const u = await registerCitizen(app, 'report');
     const res = await request(app.getHttpServer())
-      .post('/reports')
+      .post('/v1/reports')
       .set('Authorization', `Bearer ${u.accessToken}`)
       .send({
         latitude: 41.9981,
@@ -48,7 +48,7 @@ describe('Reports submit (e2e)', () => {
       category: 'OTHER' as const,
     };
     const first = await request(server)
-      .post('/reports')
+      .post('/v1/reports')
       .set('Authorization', `Bearer ${u.accessToken}`)
       .set('idempotency-key', idemKey)
       .send(body);
@@ -57,7 +57,7 @@ describe('Reports submit (e2e)', () => {
     expect(reportId).toBeDefined();
 
     const second = await request(server)
-      .post('/reports')
+      .post('/v1/reports')
       .set('Authorization', `Bearer ${u.accessToken}`)
       .set('idempotency-key', idemKey)
       .send({ ...body, title: 'different title should not create new report' });
