@@ -31,6 +31,32 @@ const COPY: Record<Locale, { title: string; sections: string[]; contact: string 
     ],
     contact: "Kontakt: privacy@chisto.mk",
   },
+  rom: {
+    title: "Privacy policy",
+    sections: [
+      "Chisto.mk processes personal data for pollution reporting, cleanup participation, and notifications.",
+      "Export your data or delete your account from the app (Profile → Settings) or email privacy@chisto.mk.",
+      "Deleted accounts are anonymized; after 30 days remaining identifiers are purged.",
+    ],
+    contact: "Contact: privacy@chisto.mk",
+  },
+  sr: {
+    title: "Политика приватности",
+    sections: [
+      "Chisto.mk обрађује личне податке ради пријављивања загађења, учешћа у акцијама и обавештења.",
+      "Извоз података и брисање налога: апликација (Профил → Подешавања) или privacy@chisto.mk.",
+      "Обрисани налози се анонимизују; после 30 дана идентификатори се трајно бришу.",
+    ],
+    contact: "Контакт: privacy@chisto.mk",
+  },
+};
+
+const ACCOUNT_DELETION_LABEL: Record<Locale, string> = {
+  mk: "Бришење на сметка",
+  en: "Account deletion",
+  sq: "Fshirja e llogarisë",
+  rom: "Delete account",
+  sr: "Брисање налога",
 };
 
 export default async function PrivacyPage({
@@ -52,9 +78,7 @@ export default async function PrivacyPage({
         ))}
         <p>{copy.contact}</p>
         <p>
-          <Link href={`/${locale}/account-deletion`}>
-            {locale === "mk" ? "Бришење на сметка" : locale === "sq" ? "Fshirja e llogarisë" : "Account deletion"}
-          </Link>
+          <Link href={`/${locale}/account-deletion`}>{ACCOUNT_DELETION_LABEL[locale]}</Link>
         </p>
       </article>
     </main>
