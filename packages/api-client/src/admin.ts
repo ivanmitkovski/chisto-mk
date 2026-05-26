@@ -1,5 +1,4 @@
 import { ApiClient, type ApiClientOptions } from './client';
-import { apiPath } from './types';
 
 export type AdminOverview = Record<string, unknown>;
 
@@ -11,7 +10,7 @@ export class AdminApiClient {
   }
 
   async getOverview(): Promise<AdminOverview> {
-    const res = await this.client.request(apiPath('/admin/overview'), 'get');
+    const res = await this.client.request('/admin/overview', 'get');
     if (!res.ok) throw new Error(`admin/overview ${res.status}`);
     return res.json() as Promise<AdminOverview>;
   }
