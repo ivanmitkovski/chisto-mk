@@ -1,4 +1,4 @@
-import { getApiBaseUrl } from '@/lib/api-base-url';
+import { getApiOrigin } from '@/lib/api-base-url';
 
 /** Carto basemap tiles (Leaflet); explicit hosts avoid widening connect-src to untrusted origins. */
 const CARTO_TILE_HOSTS = [
@@ -13,7 +13,7 @@ const CARTO_TILE_HOSTS = [
  * and applies `nonce` to framework script tags when `script-src` includes `'nonce-…'`.
  */
 export function buildAdminContentSecurityPolicy(nonce: string, isDev: boolean): string {
-  const apiOrigin = getApiBaseUrl();
+  const apiOrigin = getApiOrigin();
   const scriptSrc = [
     "'self'",
     `'nonce-${nonce}'`,

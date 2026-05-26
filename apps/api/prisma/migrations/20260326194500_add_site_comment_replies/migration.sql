@@ -1,11 +1,5 @@
--- Add nested comment support for site discussions
-ALTER TABLE "SiteComment"
-ADD COLUMN "parentId" TEXT;
+-- Legacy migration (ordering fix): SiteComment replies are created in
+-- 20260327090000_add_site_engagement on fresh databases.
+-- Intentionally empty so migrate reset can apply migrations in filename order.
 
-ALTER TABLE "SiteComment"
-ADD CONSTRAINT "SiteComment_parentId_fkey"
-FOREIGN KEY ("parentId") REFERENCES "SiteComment"("id")
-ON DELETE CASCADE ON UPDATE CASCADE;
-
-CREATE INDEX "SiteComment_siteId_parentId_createdAt_idx"
-ON "SiteComment"("siteId", "parentId", "createdAt");
+SELECT 1;

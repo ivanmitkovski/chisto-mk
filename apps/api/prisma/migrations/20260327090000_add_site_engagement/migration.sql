@@ -35,8 +35,10 @@ CREATE TABLE IF NOT EXISTS "SiteComment" (
   "updatedAt" TIMESTAMP(3) NOT NULL,
   "siteId" TEXT NOT NULL,
   "authorId" TEXT NOT NULL,
+  "parentId" TEXT,
   "body" TEXT NOT NULL,
   "isDeleted" BOOLEAN NOT NULL DEFAULT false,
+  "likesCount" INTEGER NOT NULL DEFAULT 0,
   CONSTRAINT "SiteComment_pkey" PRIMARY KEY ("id")
 );
 
@@ -59,6 +61,25 @@ CREATE INDEX IF NOT EXISTS "SiteSave_siteId_createdAt_idx" ON "SiteSave"("siteId
 
 CREATE INDEX IF NOT EXISTS "SiteComment_siteId_createdAt_idx" ON "SiteComment"("siteId", "createdAt");
 CREATE INDEX IF NOT EXISTS "SiteComment_authorId_createdAt_idx" ON "SiteComment"("authorId", "createdAt");
+CREATE INDEX IF NOT EXISTS "SiteComment_siteId_parentId_createdAt_idx"
+ON "SiteComment"("siteId", "parentId", "createdAt");
+
+CREATE TABLE IF NOT EXISTS "SiteCommentLike" (
+  "id" TEXT NOT NULL,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "commentId" TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  CONSTRAINT "SiteCommentLike_pkey" PRIMARY KEY ("id")
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS "SiteCommentLike_commentId_userId_key"
+ON "SiteCommentLike"("commentId", "userId");
+
+CREATE INDEX IF NOT EXISTS "SiteCommentLike_commentId_createdAt_idx"
+ON "SiteCommentLike"("commentId", "createdAt");
+
+CREATE INDEX IF NOT EXISTS "SiteCommentLike_userId_createdAt_idx"
+ON "SiteCommentLike"("userId", "createdAt");
 
 CREATE INDEX IF NOT EXISTS "SiteShareEvent_siteId_createdAt_idx" ON "SiteShareEvent"("siteId", "createdAt");
 CREATE INDEX IF NOT EXISTS "SiteShareEvent_userId_createdAt_idx" ON "SiteShareEvent"("userId", "createdAt");
@@ -109,6 +130,30 @@ DO $$ BEGIN
   ALTER TABLE "SiteComment"
     ADD CONSTRAINT "SiteComment_authorId_fkey"
     FOREIGN KEY ("authorId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+  ALTER TABLE "SiteComment"
+    ADD CONSTRAINT "SiteComment_parentId_fkey"
+    FOREIGN KEY ("parentId") REFERENCES "SiteComment"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+  ALTER TABLE "SiteCommentLike"
+    ADD CONSTRAINT "SiteCommentLike_commentId_fkey"
+    FOREIGN KEY ("commentId") REFERENCES "SiteComment"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+  ALTER TABLE "SiteCommentLike"
+    ADD CONSTRAINT "SiteCommentLike_userId_fkey"
+    FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 EXCEPTION
   WHEN duplicate_object THEN null;
 END $$;
