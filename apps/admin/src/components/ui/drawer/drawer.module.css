@@ -1,0 +1,69 @@
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: 950;
+}
+
+.scrim {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(5, 20, 14, 0.42);
+}
+
+.drawer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: min(28rem, 100vw);
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-xl);
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.left {
+  left: 0;
+}
+
+.right {
+  right: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border-bottom: 1px solid var(--color-green-010);
+}
+
+.header h2 {
+  margin: 0;
+  font-size: var(--font-size-xl);
+}
+
+.body {
+  min-height: 0;
+  overflow: auto;
+  padding: var(--space-5);
+}
+
+.close {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--surface-subtle);
+  color: var(--text-primary);
+  font-size: var(--font-size-xl);
+  cursor: pointer;
+}
+
+.close:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}

@@ -74,6 +74,35 @@
   backdrop-filter: blur(2px);
 }
 
+.shortcuts {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.shortcuts div {
+  display: grid;
+  grid-template-columns: 4rem 1fr;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.shortcuts dt {
+  display: inline-grid;
+  place-items: center;
+  min-height: 2rem;
+  border: 1px solid var(--color-green-010);
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+  color: var(--text-primary);
+  font-weight: var(--font-weight-bold);
+}
+
+.shortcuts dd {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
 @media (max-width: 64rem) {
   .content {
     padding: var(--space-4) var(--space-5) var(--space-5);

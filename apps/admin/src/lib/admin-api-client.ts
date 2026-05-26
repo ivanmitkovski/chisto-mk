@@ -18,6 +18,7 @@ export const adminQueryKeys = {
     ['admin', 'sites', params ?? {}] as const,
   sitesAll: ['admin', 'sites'] as const,
   sitesStats: ['admin', 'sites', 'stats'] as const,
+  cleanupEventsAll: ['admin', 'cleanup-events'] as const,
   notifications: ['admin', 'notifications'] as const,
 };
 

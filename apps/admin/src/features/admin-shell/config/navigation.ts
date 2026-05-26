@@ -8,6 +8,8 @@ export const adminNavigation: ReadonlyArray<NavItem> = [
   { key: 'sites', label: 'Sites', href: '/dashboard/sites', icon: 'location' },
   { key: 'map', label: 'Map', href: '/dashboard/map', icon: 'map' },
   { key: 'events', label: 'Events', href: '/dashboard/events', icon: 'calendar' },
+  { key: 'moderation', label: 'Moderation', href: '/dashboard/moderation/ugc', icon: 'shield' },
+  { key: 'operations', label: 'Operations', href: '/dashboard/operations', icon: 'info' },
   { key: 'audit', label: 'Audit', href: '/dashboard/audit', icon: 'scroll-text' },
   { key: 'notifications', label: 'Notifications', href: '/dashboard/notifications', icon: 'notification-bing' },
   { key: 'settings', label: 'Settings', href: '/dashboard/settings', icon: 'setting' },

@@ -5,8 +5,9 @@ type ReportsTrendChartSkeletonProps = {
 };
 
 export function ReportsTrendChartSkeleton({ height = 120 }: ReportsTrendChartSkeletonProps) {
+  const sizeClass = height >= 160 ? styles.tall : height <= 96 ? styles.compact : styles.defaultHeight;
   return (
-    <div className={styles.root} style={{ height }} aria-hidden>
+    <div className={`${styles.root} ${sizeClass}`} aria-hidden>
       <div className={styles.bar} />
       <div className={styles.bar} />
       <div className={styles.bar} />

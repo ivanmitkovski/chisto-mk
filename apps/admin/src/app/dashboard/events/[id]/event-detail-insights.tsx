@@ -122,7 +122,7 @@ export function EventDetailInsights(props: {
   return (
     <section className={styles.sectionCard} aria-label="Event insights">
       <span className={styles.sectionLabel}>Insights</span>
-      <div className={styles.metaRow} style={{ flexWrap: 'wrap', gap: 8 }}>
+      <div className={styles.insightActions}>
         <Button type="button" variant="outline" size="sm" onClick={() => void loadTab('analytics')}>
           Analytics
         </Button>

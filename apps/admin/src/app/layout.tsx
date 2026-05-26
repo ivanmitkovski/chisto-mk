@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Roboto } from 'next/font/google';
 import '@/lib/server-dns-init';
 import { QueryProvider } from '@/components/providers/query-provider';
+import { ToastProvider } from '@/components/ui';
 import './globals.css';
 
 const roboto = Roboto({
@@ -62,9 +63,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={roboto.variable} style={{ colorScheme: 'light' }}>
+    <html lang="en" className={roboto.variable}>
       <body className={roboto.className}>
-        <QueryProvider>{children}</QueryProvider>
+        <QueryProvider>
+          <ToastProvider>{children}</ToastProvider>
+        </QueryProvider>
       </body>
     </html>
   );

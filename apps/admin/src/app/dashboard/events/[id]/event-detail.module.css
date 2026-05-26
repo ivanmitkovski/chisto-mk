@@ -172,6 +172,13 @@
   margin-top: var(--space-4);
 }
 
+.insightActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: var(--space-4);
+}
+
 .metaItem {
   display: flex;
   flex-direction: column;

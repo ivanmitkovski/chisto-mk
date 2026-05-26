@@ -2,6 +2,7 @@
 
 import { DataTable, DataTableLink } from '@/components/ui';
 import type { SiteRow } from '@/features/sites/data/sites-adapter';
+import styles from './sites-table.module.css';
 
 const columns = [
   {
@@ -13,7 +14,7 @@ const columns = [
           {s.latitude.toFixed(4)}, {s.longitude.toFixed(4)}
         </DataTableLink>
         {s.description ? (
-          <span style={{ display: 'block', color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)' }}>
+          <span className={styles.description}>
             {s.description}
           </span>
         ) : null}

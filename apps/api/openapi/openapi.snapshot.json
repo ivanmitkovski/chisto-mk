@@ -1154,7 +1154,7 @@
         ]
       },
       "delete": {
-        "operationId": "AuthProfileController_deleteAccount",
+        "operationId": "AuthProfilePrivacyController_deleteAccount",
         "parameters": [],
         "responses": {
           "204": {
@@ -1182,6 +1182,58 @@
           }
         ],
         "summary": "Delete account (soft delete)",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/auth/me/accept-terms": {
+      "post": {
+        "operationId": "AuthProfileController_acceptTerms",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptTermsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Terms consent recorded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TermsConsentDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Record acceptance of current terms and community guidelines",
         "tags": [
           "auth"
         ]
@@ -1457,9 +1509,258 @@
         ]
       }
     },
+    "/auth/me/email": {
+      "patch": {
+        "operationId": "AuthProfileIdentifierController_requestEmailChange",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestEmailChangeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Request email change (OTP sent to new address)",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/auth/me/email/confirm": {
+      "post": {
+        "operationId": "AuthProfileIdentifierController_confirmEmailChange",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmEmailChangeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Email updated; all sessions revoked"
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Confirm email change with OTP",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/auth/me/phone": {
+      "patch": {
+        "operationId": "AuthProfileIdentifierController_requestPhoneChange",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestPhoneChangeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Request phone change (OTP to new number)",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/auth/me/phone/confirm": {
+      "post": {
+        "operationId": "AuthProfileIdentifierController_confirmPhoneChange",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmPhoneChangeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Phone updated; all sessions revoked"
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/auth/me/data-export": {
+      "get": {
+        "operationId": "AuthProfilePrivacyController_exportMyData",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Export personal data (GDPR access / portability, NDJSON stream)",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/auth/sessions/revoke-others": {
+      "post": {
+        "operationId": "AuthProfilePrivacyController_revokeOtherSessions",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Revoke all sessions except the current access token session",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
     "/auth/admin/ping": {
       "get": {
-        "operationId": "AuthProfileController_adminPing",
+        "operationId": "AuthAdminController_adminPing",
         "parameters": [],
         "responses": {
           "200": {
@@ -6882,7 +7183,7 @@
     },
     "/notifications": {
       "get": {
-        "operationId": "NotificationsController_list",
+        "operationId": "NotificationsInboxController_list",
         "parameters": [
           {
             "name": "page",
@@ -6912,7 +7213,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Paginated notifications"
+            "description": ""
           },
           "400": {
             "description": "Validation or bad request"
@@ -6943,11 +7244,11 @@
     },
     "/notifications/unread-count": {
       "get": {
-        "operationId": "NotificationsController_unreadCount",
+        "operationId": "NotificationsInboxController_unreadCount",
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Unread count"
+            "description": ""
           },
           "400": {
             "description": "Validation or bad request"
@@ -6978,11 +7279,11 @@
     },
     "/notifications/summary": {
       "get": {
-        "operationId": "NotificationsController_summary",
+        "operationId": "NotificationsInboxController_summary",
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Grouped counts by notification type"
+            "description": ""
           },
           "400": {
             "description": "Validation or bad request"
@@ -7011,259 +7312,13 @@
         ]
       }
     },
-    "/notifications/{id}/opened": {
-      "post": {
-        "operationId": "NotificationsController_recordOpened",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Open recorded"
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Record that the user opened a notification (push tap or deep link)",
-        "tags": [
-          "notifications"
-        ]
-      }
-    },
-    "/notifications/{id}/read": {
-      "patch": {
-        "operationId": "NotificationsController_markOneRead",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Notification marked as read"
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Mark a notification as read",
-        "tags": [
-          "notifications"
-        ]
-      }
-    },
-    "/notifications/{id}/unread": {
-      "patch": {
-        "operationId": "NotificationsController_markOneUnread",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Notification marked as unread"
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Mark a notification as unread",
-        "tags": [
-          "notifications"
-        ]
-      }
-    },
-    "/notifications/read-all": {
-      "patch": {
-        "operationId": "NotificationsController_markAllRead",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Batch update result"
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Mark all notifications as read",
-        "tags": [
-          "notifications"
-        ]
-      }
-    },
-    "/notifications/{id}/archive": {
-      "patch": {
-        "operationId": "NotificationsController_archiveOne",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Notification archived"
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Archive a notification",
-        "tags": [
-          "notifications"
-        ]
-      }
-    },
-    "/notifications/archive-all-read": {
-      "patch": {
-        "operationId": "NotificationsController_archiveAllRead",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Batch archive result"
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Archive all read notifications",
-        "tags": [
-          "notifications"
-        ]
-      }
-    },
     "/notifications/preferences": {
       "get": {
-        "operationId": "NotificationsController_listPreferences",
+        "operationId": "NotificationsInboxController_listPreferences",
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Notification preferences"
+            "description": ""
           },
           "400": {
             "description": "Validation or bad request"
@@ -7294,7 +7349,7 @@
     },
     "/notifications/preferences/{type}": {
       "patch": {
-        "operationId": "NotificationsController_updatePreference",
+        "operationId": "NotificationsInboxController_updatePreference",
         "parameters": [
           {
             "name": "type",
@@ -7317,7 +7372,7 @@
         },
         "responses": {
           "200": {
-            "description": "Updated notification preference"
+            "description": ""
           },
           "400": {
             "description": "Validation or bad request"
@@ -7348,7 +7403,7 @@
     },
     "/notifications/devices/unregister": {
       "post": {
-        "operationId": "NotificationsController_unregisterDeviceBody",
+        "operationId": "NotificationsInboxController_unregisterDeviceBody",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -7361,8 +7416,8 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "Device token unregistered"
+          "201": {
+            "description": ""
           },
           "400": {
             "description": "Validation or bad request"
@@ -7385,7 +7440,7 @@
             "bearer": []
           }
         ],
-        "summary": "Unregister a device push token (preferred; token in body avoids proxy access logs)",
+        "summary": "Unregister a device push token (body token)",
         "tags": [
           "notifications"
         ]
@@ -7393,7 +7448,7 @@
     },
     "/notifications/devices": {
       "post": {
-        "operationId": "NotificationsController_registerDevice",
+        "operationId": "NotificationsInboxController_registerDevice",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -7406,8 +7461,8 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "Device token registered"
+          "201": {
+            "description": ""
           },
           "400": {
             "description": "Validation or bad request"
@@ -7438,7 +7493,7 @@
     },
     "/notifications/devices/{token}": {
       "delete": {
-        "operationId": "NotificationsController_unregisterDevice",
+        "operationId": "NotificationsInboxController_unregisterDevice",
         "parameters": [
           {
             "name": "token",
@@ -7451,7 +7506,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Device token unregistered"
+            "description": ""
           },
           "400": {
             "description": "Validation or bad request"
@@ -7474,7 +7529,253 @@
             "bearer": []
           }
         ],
-        "summary": "Unregister a device push token (deprecated: use POST /notifications/devices/unregister)",
+        "summary": "Unregister device token (deprecated)",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/notifications/{id}/opened": {
+      "post": {
+        "operationId": "NotificationsStateController_recordOpened",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Record notification opened",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/notifications/{id}/read": {
+      "patch": {
+        "operationId": "NotificationsStateController_markOneRead",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mark a notification as read",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/notifications/{id}/unread": {
+      "patch": {
+        "operationId": "NotificationsStateController_markOneUnread",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mark a notification as unread",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/notifications/read-all": {
+      "patch": {
+        "operationId": "NotificationsStateController_markAllRead",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mark all notifications as read",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/notifications/{id}/archive": {
+      "patch": {
+        "operationId": "NotificationsStateController_archiveOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Archive a notification",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/notifications/archive-all-read": {
+      "patch": {
+        "operationId": "NotificationsStateController_archiveAllRead",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Archive all read notifications",
         "tags": [
           "notifications"
         ]
@@ -7482,7 +7783,7 @@
     },
     "/notifications/admin/test-push": {
       "post": {
-        "operationId": "NotificationsController_testPush",
+        "operationId": "NotificationsAdminController_testPush",
         "parameters": [],
         "responses": {
           "200": {
@@ -7517,7 +7818,7 @@
     },
     "/notifications/admin/push-stats": {
       "get": {
-        "operationId": "NotificationsController_pushStats",
+        "operationId": "NotificationsAdminController_pushStats",
         "parameters": [],
         "responses": {
           "200": {
@@ -7552,7 +7853,7 @@
     },
     "/notifications/admin/delivery-report": {
       "get": {
-        "operationId": "NotificationsController_deliveryReport",
+        "operationId": "NotificationsAdminController_deliveryReport",
         "parameters": [],
         "responses": {
           "200": {
@@ -7587,7 +7888,7 @@
     },
     "/notifications/admin/dead-letters": {
       "get": {
-        "operationId": "NotificationsController_deadLetters",
+        "operationId": "NotificationsAdminController_deadLetters",
         "parameters": [
           {
             "name": "page",
@@ -13597,6 +13898,20 @@
             "minLength": 8,
             "maxLength": 72,
             "example": "StrongPass123!"
+          },
+          "termsAcceptedAt": {
+            "type": "string",
+            "example": "2026-06-01T12:00:00.000Z",
+            "description": "ISO-8601 when terms were accepted on device"
+          },
+          "termsVersion": {
+            "type": "string",
+            "example": "1",
+            "description": "Must match server TERMS_VERSION"
+          },
+          "privacyAcceptedAt": {
+            "type": "string",
+            "example": "2026-06-01"
           }
         },
         "required": [
@@ -13604,7 +13919,9 @@
           "lastName",
           "email",
           "phoneNumber",
-          "password"
+          "password",
+          "termsAcceptedAt",
+          "termsVersion"
         ]
       },
       "RegisterResponseDto": {
@@ -13709,6 +14026,20 @@
             "type": "object",
             "nullable": true,
             "description": "ISO-8601 timestamp when the user passed the organizer toolkit quiz"
+          },
+          "termsAcceptedAt": {
+            "type": "object",
+            "nullable": true,
+            "description": "ISO-8601 when terms were last accepted"
+          },
+          "termsVersion": {
+            "type": "object",
+            "nullable": true,
+            "description": "Version of terms last accepted"
+          },
+          "requiresTermsAcceptance": {
+            "type": "boolean",
+            "description": "True when the user must accept current terms before using the app"
           }
         },
         "required": [
@@ -13722,7 +14053,10 @@
           "isPhoneVerified",
           "pointsBalance",
           "avatarUrl",
-          "organizerCertifiedAt"
+          "organizerCertifiedAt",
+          "termsAcceptedAt",
+          "termsVersion",
+          "requiresTermsAcceptance"
         ]
       },
       "AuthResponseDto": {
@@ -14152,6 +14486,20 @@
             "type": "object",
             "nullable": true,
             "description": "When home location was last saved, ISO-8601"
+          },
+          "termsAcceptedAt": {
+            "type": "object",
+            "nullable": true,
+            "description": "ISO-8601 when terms were last accepted"
+          },
+          "termsVersion": {
+            "type": "object",
+            "nullable": true,
+            "description": "Version of terms last accepted"
+          },
+          "requiresTermsAcceptance": {
+            "type": "boolean",
+            "description": "True when the user must accept current terms (missing or outdated acceptance)"
           }
         },
         "required": [
@@ -14182,7 +14530,44 @@
           "homeLatitude",
           "homeLongitude",
           "homeLocationLabel",
-          "homeLocationSetAt"
+          "homeLocationSetAt",
+          "termsAcceptedAt",
+          "termsVersion",
+          "requiresTermsAcceptance"
+        ]
+      },
+      "AcceptTermsDto": {
+        "type": "object",
+        "properties": {
+          "termsVersion": {
+            "type": "string",
+            "example": "1",
+            "description": "Terms version being accepted; defaults to server TERMS_VERSION"
+          }
+        }
+      },
+      "TermsConsentDto": {
+        "type": "object",
+        "properties": {
+          "termsAcceptedAt": {
+            "type": "object",
+            "nullable": true,
+            "description": "ISO-8601 when terms were last accepted"
+          },
+          "termsVersion": {
+            "type": "object",
+            "nullable": true,
+            "description": "Version of terms last accepted"
+          },
+          "requiresTermsAcceptance": {
+            "type": "boolean",
+            "description": "True when the user must accept current terms (missing or outdated acceptance)"
+          }
+        },
+        "required": [
+          "termsAcceptedAt",
+          "termsVersion",
+          "requiresTermsAcceptance"
         ]
       },
       "UpdateHomeLocationDto": {
@@ -14262,6 +14647,64 @@
           "answers"
         ]
       },
+      "RequestEmailChangeDto": {
+        "type": "object",
+        "properties": {
+          "newEmail": {
+            "type": "string",
+            "example": "new.user@example.com"
+          }
+        },
+        "required": [
+          "newEmail"
+        ]
+      },
+      "ConfirmEmailChangeDto": {
+        "type": "object",
+        "properties": {
+          "newEmail": {
+            "type": "string",
+            "example": "new.user@example.com"
+          },
+          "code": {
+            "type": "string",
+            "example": "123456"
+          }
+        },
+        "required": [
+          "newEmail",
+          "code"
+        ]
+      },
+      "RequestPhoneChangeDto": {
+        "type": "object",
+        "properties": {
+          "newPhoneNumber": {
+            "type": "string",
+            "example": "+38970123456"
+          }
+        },
+        "required": [
+          "newPhoneNumber"
+        ]
+      },
+      "ConfirmPhoneChangeDto": {
+        "type": "object",
+        "properties": {
+          "newPhoneNumber": {
+            "type": "string",
+            "example": "+38970123456"
+          },
+          "code": {
+            "type": "string",
+            "example": "123456"
+          }
+        },
+        "required": [
+          "newPhoneNumber",
+          "code"
+        ]
+      },
       "WeeklyLeaderboardEntryDto": {
         "type": "object",
         "properties": {
@@ -14269,7 +14712,8 @@
             "type": "number"
           },
           "userId": {
-            "type": "string"
+            "type": "string",
+            "description": "Present only for the current user (privacy)"
           },
           "displayName": {
             "type": "string"
@@ -14283,7 +14727,6 @@
         },
         "required": [
           "rank",
-          "userId",
           "displayName",
           "weeklyPoints",
           "isCurrentUser"

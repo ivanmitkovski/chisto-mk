@@ -2,22 +2,18 @@
 
 import { useQueryClient } from '@tanstack/react-query';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef } from 'react';
 import { adminQueryKeys } from '@/lib/admin-api-client';
-import { getApiBaseUrl } from '@/lib/api-base-url';
 import { emitNewReportSignal } from '@/lib/realtime-signals';
-import {
-  getAdminTokenFromBrowserCookie,
-  refreshAdminAccessTokenInBrowser,
-  shouldProactivelyRefreshAdminAccessToken,
-} from '@/features/auth/lib/admin-auth';
+import { refreshAdminSession } from '@/features/auth/lib/admin-auth';
 import { useDashboardSSE } from '../context/dashboard-sse-context';
 
-const SSE_URL = `${getApiBaseUrl()}/admin/events`;
+const SSE_URL = '/api/admin/events';
 const MAX_RETRIES = 10;
 const MAX_RETRY_DELAY_MS = 30_000;
 const DEBUG_REALTIME_FLAG = 'chisto:debug-realtime';
+const MAX_AUTH_RECONNECTS = 2;
 
 function getRetryDelayMs(retryCount: number): number {
   const delay = Math.min(1000 * 2 ** retryCount, MAX_RETRY_DELAY_MS);
@@ -27,14 +23,6 @@ function getRetryDelayMs(retryCount: number): number {
 function isRealtimeDebugEnabled(): boolean {
   if (typeof window === 'undefined') return false;
   return process.env.NODE_ENV !== 'production' && window.localStorage.getItem(DEBUG_REALTIME_FLAG) === '1';
-}
-
-/** Thrown from SSE `onopen` after a successful refresh so the client reconnects with a new JWT. */
-class SSEAuthRefreshedError extends Error {
-  constructor() {
-    super('SSE authentication renewed');
-    this.name = 'SSEAuthRefreshedError';
-  }
 }
 
 type ReportEventPayload = {
@@ -120,7 +108,6 @@ function isCleanupEventSse(data: unknown): data is CleanupEventSsePayload {
 
 export function DashboardSSEClient() {
   const router = useRouter();
-  const pathname = usePathname();
   const queryClient = useQueryClient();
   const sseCtx = useDashboardSSE();
   const routerRef = useRef(router);
@@ -130,24 +117,12 @@ export function DashboardSSEClient() {
   const abortRef = useRef<AbortController | null>(null);
   const mapInvalidateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const retryCountRef = useRef(0);
-  const ssePostRefreshReconnectsRef = useRef(0);
+  const authReconnectCountRef = useRef(0);
 
   const sseCtxRef = useRef(sseCtx);
   sseCtxRef.current = sseCtx;
-  const pathnameRef = useRef(pathname);
-  pathnameRef.current = pathname;
-
   const connect = useCallback(() => {
     void (async () => {
-      let token = getAdminTokenFromBrowserCookie();
-      if (!token) return;
-
-      if (shouldProactivelyRefreshAdminAccessToken(token)) {
-        await refreshAdminAccessTokenInBrowser();
-        token = getAdminTokenFromBrowserCookie();
-        if (!token) return;
-      }
-
       if (abortRef.current) {
         abortRef.current.abort();
       }
@@ -157,15 +132,15 @@ export function DashboardSSEClient() {
       try {
         await fetchEventSource(SSE_URL, {
           signal: controller.signal,
+          credentials: 'include',
           headers: {
-            Authorization: `Bearer ${token}`,
             Accept: 'text/event-stream',
           },
           openWhenHidden: false,
           async onopen(response) {
             if (response.ok) {
               retryCountRef.current = 0;
-              ssePostRefreshReconnectsRef.current = 0;
+              authReconnectCountRef.current = 0;
               sseCtxRef.current?.setConnected(true);
               if (isRealtimeDebugEnabled()) {
                 console.debug('[realtime] sse-connected', { url: SSE_URL });
@@ -173,10 +148,10 @@ export function DashboardSSEClient() {
               return;
             }
             if (response.status === 401) {
-              const refreshed = await refreshAdminAccessTokenInBrowser();
-              if (refreshed) {
-                sseCtxRef.current?.setConnected(false);
-                throw new SSEAuthRefreshedError();
+              const refreshed = await refreshAdminSession();
+              if (refreshed && authReconnectCountRef.current < MAX_AUTH_RECONNECTS) {
+                authReconnectCountRef.current += 1;
+                throw new Error('SSE_AUTH_REFRESHED');
               }
               throw new Error('Unauthorized');
             }
@@ -241,16 +216,14 @@ export function DashboardSSEClient() {
                       : 'Cleanup event updated';
                 sseCtxRef.current?.showRefreshToast(label);
                 void qc.invalidateQueries({ queryKey: adminQueryKeys.overview });
-                if (pathnameRef.current.startsWith('/dashboard/events')) {
-                  routerRef.current.refresh();
-                }
+                void qc.invalidateQueries({ queryKey: adminQueryKeys.cleanupEventsAll });
               }
             } catch {
               // Ignore parse errors (e.g. heartbeat)
             }
           },
           onerror(err) {
-            if (err instanceof SSEAuthRefreshedError) {
+            if (err instanceof Error && err.message === 'SSE_AUTH_REFRESHED') {
               throw err;
             }
             if (err instanceof Error && err.message === 'Unauthorized') {
@@ -263,11 +236,10 @@ export function DashboardSSEClient() {
             return getRetryDelayMs(retryCountRef.current);
           },
         });
-      } catch (err) {
+      } catch (error) {
         sseCtxRef.current?.setConnected(false);
-        if (err instanceof SSEAuthRefreshedError && ssePostRefreshReconnectsRef.current < 3) {
-          ssePostRefreshReconnectsRef.current += 1;
-          setTimeout(() => connect(), 0);
+        if (error instanceof Error && error.message === 'SSE_AUTH_REFRESHED') {
+          window.setTimeout(() => connect(), 0);
         }
       }
     })();

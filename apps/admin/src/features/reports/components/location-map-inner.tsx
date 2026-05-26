@@ -69,7 +69,6 @@ export function LocationMapInner({ mapPin, locationLabel }: LocationMapInnerProp
         className={styles.map}
         zoomControl={true}
         attributionControl={false}
-        style={{ height: '100%', minHeight: '16rem' }}
       >
         <TileLayer url={CARTODB_POSITRON} attribution={CARTODB_ATTRIBUTION} />
         <Marker position={center} icon={createMarkerIcon()}>

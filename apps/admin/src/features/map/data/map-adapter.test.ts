@@ -6,18 +6,6 @@ import {
 } from './map-adapter';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 
-vi.mock('@/lib/api', () => ({
-  getApiBaseUrl: () => 'http://localhost:3000/api',
-}));
-
-const { refreshMock } = vi.hoisted(() => ({
-  refreshMock: vi.fn(async (): Promise<string | null> => null),
-}));
-vi.mock('@/features/auth/lib/admin-auth', () => ({
-  getAdminTokenFromBrowserCookie: () => 'test-token',
-  refreshAdminAccessTokenInBrowser: refreshMock,
-}));
-
 const mockPayload = {
   data: [],
   meta: { signedMediaExpiresAt: '2026-01-01T00:00:00.000Z' },
@@ -51,12 +39,13 @@ describe('fetchSitesForMap', () => {
     });
 
     expect(global.fetch).toHaveBeenCalledWith(
-      'http://localhost:3000/api/sites/map?lat=41.99&lng=21.43&radiusKm=20&limit=200&detail=lite&status=REPORTED',
+      '/api/proxy/sites/map?lat=41.99&lng=21.43&radiusKm=20&limit=200&detail=lite&status=REPORTED',
       expect.objectContaining({
         method: 'GET',
         headers: expect.objectContaining({
-          Authorization: 'Bearer test-token',
+          Accept: 'application/json',
         }),
+        credentials: 'include',
       }),
     );
   });
@@ -104,31 +93,9 @@ describe('fetchSitesForMap', () => {
     });
 
     expect(global.fetch).toHaveBeenCalledWith(
-      'http://localhost:3000/api/sites/map?lat=41.99&lng=21.43&radiusKm=20&limit=200&detail=lite&includeArchived=true',
+      '/api/proxy/sites/map?lat=41.99&lng=21.43&radiusKm=20&limit=200&detail=lite&includeArchived=true',
       expect.any(Object),
     );
-  });
-
-  it('retries with refreshed token after 401', async () => {
-    refreshMock.mockResolvedValueOnce('new-token');
-    (global.fetch as ReturnType<typeof vi.fn>)
-      .mockResolvedValueOnce({
-        ok: false,
-        status: 401,
-        headers: new Headers(),
-        json: async () => ({ message: 'expired' }),
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        headers: new Headers(),
-        json: async () => mockPayload,
-      });
-
-    await fetchSitesForMap({ lat: 41.99, lng: 21.43, radiusKm: 20 });
-
-    const secondCall = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[1];
-    expect(secondCall[1].headers.Authorization).toBe('Bearer new-token');
   });
 
   it('fetches cluster payload shape', async () => {

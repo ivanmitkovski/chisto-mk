@@ -1,4 +1,5 @@
 import type { ReportStatus } from '../types';
+import { getAdminCsrfHeaders } from '@/features/auth/lib/admin-auth';
 
 export type PatchReportStatusAction = 'approve' | 'reject' | 'in-review';
 
@@ -38,7 +39,7 @@ export async function patchReportStatus(
 
   const res = await fetch(`/api/reports/${encodeURIComponent(reportId)}/status`, {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...getAdminCsrfHeaders() },
     credentials: 'include',
     body: JSON.stringify(bodyPayload),
   });

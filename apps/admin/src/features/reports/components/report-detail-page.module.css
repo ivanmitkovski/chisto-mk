@@ -71,6 +71,19 @@
   flex-shrink: 0;
 }
 
+.opsLink {
+  border-radius: var(--radius-full);
+  padding: 0 var(--space-2);
+  min-height: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  background: rgba(8, 54, 39, 0.08);
+  color: var(--color-green-700);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  text-decoration: none;
+}
+
 .statusPill {
   border-radius: var(--radius-full);
   display: inline-flex;

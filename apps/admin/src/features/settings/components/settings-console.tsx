@@ -203,6 +203,10 @@ export function SettingsConsole({
     setConfigBusy(true);
     setConfigSnack(null);
     try {
+      await adminBrowserFetch('/admin/config/validate', {
+        method: 'POST',
+        body: { entries: configRows.map((r) => ({ key: r.key, value: r.value })) },
+      });
       await adminBrowserFetch('/admin/config', {
         method: 'PATCH',
         body: { entries: configRows.map((r) => ({ key: r.key, value: r.value })) },

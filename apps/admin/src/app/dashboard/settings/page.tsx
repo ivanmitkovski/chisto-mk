@@ -48,9 +48,7 @@ export default async function SettingsPage() {
     <AdminShell title="Settings" activeItem="settings" initialSidebarCollapsed={initialSidebarCollapsed}>
       <Suspense
         fallback={
-          <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)' }}>
-            Loading settings…
-          </p>
+          <SectionState variant="loading" message="Loading settings…" />
         }
       >
         <SettingsConsole

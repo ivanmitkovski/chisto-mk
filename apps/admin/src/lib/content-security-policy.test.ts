@@ -1,18 +1,22 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import { buildAdminContentSecurityPolicy } from './content-security-policy';
+import { describe, expect, it } from 'vitest';
+import {
+  buildAdminContentSecurityPolicy,
+  buildAdminReportOnlyContentSecurityPolicy,
+} from './content-security-policy';
 
 describe('buildAdminContentSecurityPolicy', () => {
-  afterEach(() => {
-    vi.unstubAllEnvs();
-  });
-
-  it('allows the API origin for nested /v1 requests', () => {
-    vi.stubEnv('SERVER_API_BASE_URL', 'https://api.chisto.mk/v1');
-
+  it('keeps browser connections on the BFF surface only', () => {
     const csp = buildAdminContentSecurityPolicy('test-nonce', false);
     const connectSrc = csp.split('; ').find((directive) => directive.startsWith('connect-src'));
 
-    expect(connectSrc).toContain('https://api.chisto.mk');
-    expect(connectSrc).not.toContain('https://api.chisto.mk/v1');
+    expect(connectSrc).toContain("connect-src 'self'");
+    expect(connectSrc).not.toContain('api.chisto.mk');
+  });
+
+  it('keeps the strict report-only policy available for explicit audits', () => {
+    const csp = buildAdminReportOnlyContentSecurityPolicy('test-nonce', false);
+
+    expect(csp).toContain("style-src 'self'");
+    expect(csp).toContain("require-trusted-types-for 'script'");
   });
 });

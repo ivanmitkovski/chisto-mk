@@ -34,7 +34,7 @@
 
 .variantSolid {
   background: var(--color-primary);
-  color: var(--color-green-900);
+  color: #062d21;
   box-shadow: 0 8px 20px rgba(37, 219, 134, 0.26);
 }
 

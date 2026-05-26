@@ -41,9 +41,9 @@ export function SiteTimelineNoteForm({ siteId, onPosted }: SiteTimelineNoteFormP
         onChange={(e) => setNote(e.target.value)}
         placeholder="Visible to users on the site history tab…"
         disabled={busy}
-        style={{ width: '100%', marginBottom: 'var(--space-3)' }}
+        className={styles.timelineNoteTextarea}
       />
-      {error ? <p style={{ color: 'var(--color-danger, #b91c1c)' }}>{error}</p> : null}
+      {error ? <p className={styles.timelineNoteError}>{error}</p> : null}
       <Button type="button" disabled={busy || !note.trim()} onClick={() => void submit()}>
         {busy ? 'Posting…' : 'Post note'}
       </Button>

@@ -8,6 +8,8 @@ export type NavItemKey =
   | 'sites'
   | 'map'
   | 'events'
+  | 'moderation'
+  | 'operations'
   | 'audit'
   | 'notifications'
   | 'settings';

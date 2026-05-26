@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { SnackState } from '@/components/ui';
+import { getAdminCsrfHeaders } from '@/features/auth/lib/admin-auth';
 import { DuplicateReportGroup, MergeDuplicateReportsResult } from '../types';
 
 type UseDuplicatesOptions = {
@@ -90,7 +91,7 @@ export function useDuplicates({ initialGroups, initialSelectedGroupId = null }: 
     try {
       const res = await fetch(`/api/reports/${encodeURIComponent(selectedGroup.primaryReport.id)}/merge`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...getAdminCsrfHeaders() },
         credentials: 'include',
         body: JSON.stringify({
           childReportIds: mergeChildIds,

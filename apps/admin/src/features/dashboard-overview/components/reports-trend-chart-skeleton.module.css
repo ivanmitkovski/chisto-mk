@@ -6,6 +6,18 @@
   width: 100%;
 }
 
+.compact {
+  height: 6rem;
+}
+
+.defaultHeight {
+  height: 7.5rem;
+}
+
+.tall {
+  height: 10rem;
+}
+
 .bar {
   flex: 1;
   min-width: 8px;

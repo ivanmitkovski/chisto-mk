@@ -11,8 +11,7 @@ export const SitesMap = dynamic(
     loading: () => (
       <div className={styles.mapWrap}>
         <div
-          className={styles.overlay}
-          style={{ background: 'rgba(247, 250, 255, 0.9)' }}
+          className={`${styles.overlay} ${styles.loadingOverlay}`}
           role="status"
           aria-live="polite"
           aria-busy="true"

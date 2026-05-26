@@ -22,15 +22,16 @@
   align-items: center;
   justify-content: center;
   color: var(--text-secondary);
-  pointer-events: none;
 }
 
 .leftSlot {
   left: var(--space-3);
+  pointer-events: none;
 }
 
 .rightSlot {
   right: var(--space-3);
+  pointer-events: auto;
 }
 
 .input {

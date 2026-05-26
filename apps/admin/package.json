@@ -10,7 +10,8 @@
     "analyze": "ANALYZE=true next build",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:a11y": "playwright test tests/a11y"
+    "test:a11y": "playwright test -c playwright.config.cjs tests/a11y",
+    "test:smoke": "playwright test -c playwright.config.cjs tests/smoke"
   },
   "dependencies": {
     "@chisto/map-contracts": "workspace:*",
@@ -21,7 +22,7 @@
     "isomorphic-dompurify": "2.26.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.575.0",
-    "next": "^15.0.3",
+    "next": "^15.5.18",
     "qrcode": "^1.5.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

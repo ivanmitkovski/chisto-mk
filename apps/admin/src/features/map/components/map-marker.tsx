@@ -3,6 +3,7 @@
 import { memo, useCallback, useMemo } from 'react';
 import { Marker } from 'react-leaflet';
 import L from 'leaflet';
+import { sanitizeDisplayText } from '@/lib/sanitize';
 import type { SiteMapRow } from '../data/map-adapter';
 import styles from './sites-map.module.css';
 
@@ -16,7 +17,7 @@ const STATUS_CLASS: Record<string, string> = {
 };
 
 function escapeHtml(value: string): string {
-  return value
+  return sanitizeDisplayText(value)
     .replaceAll('&', '&amp;')
     .replaceAll('<', '&lt;')
     .replaceAll('>', '&gt;')

@@ -5,6 +5,7 @@ test.describe('Admin map accessibility', () => {
   test('dashboard map route has no serious or critical axe violations', async ({ page }) => {
     await page.goto('/dashboard/map');
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(700);
 
     const results = await new AxeBuilder({ page })
       // Leaflet raster tiles use decorative imagery without alt text.
