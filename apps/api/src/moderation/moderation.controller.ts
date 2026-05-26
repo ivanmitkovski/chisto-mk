@@ -1,10 +1,16 @@
 import { Idempotent } from '../common/idempotency/idempotency.decorator';
-import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CurrentUser } from '../auth/current-user.decorator';
 import { CurrentAuthenticatedUser } from '../auth/current-authenticated-user.decorator';
 import { AuthenticatedUser } from '../auth/types/authenticated-user.type';
+import { Roles } from '../auth/roles.decorator';
+import { RolesGuard } from '../auth/roles.guard';
+import { ADMIN_PANEL_ROLES, ADMIN_WRITE_ROLES } from '../auth/admin-roles';
 import { ModerationService } from './moderation.service';
+import { ListAdminUgcReportsQueryDto } from './dto/list-admin-ugc-reports-query.dto';
+import { PatchAdminUgcReportDto } from './dto/patch-admin-ugc-report.dto';
 import { PostUgcReportDto } from './dto/post-ugc-report.dto';
 import { PostUserBlockDto } from './dto/post-user-block.dto';
 
@@ -14,6 +20,38 @@ import { PostUserBlockDto } from './dto/post-user-block.dto';
 @ApiBearerAuth()
 export class ModerationController {
   constructor(private readonly moderation: ModerationService) {}
+
+  @Get('admin/moderation/ugc-reports')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(...ADMIN_PANEL_ROLES)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'List UGC reports for admin moderation' })
+  listAdminUgcReports(@Query() query: ListAdminUgcReportsQueryDto) {
+    return this.moderation.listAdminUgcReports(query);
+  }
+
+  @Get('admin/moderation/ugc-reports/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(...ADMIN_PANEL_ROLES)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get UGC report detail for admin moderation' })
+  getAdminUgcReport(@Param('id') id: string) {
+    return this.moderation.getAdminUgcReport(id);
+  }
+
+  @Idempotent('moderation_admin_ugc_patch')
+  @Patch('admin/moderation/ugc-reports/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(...ADMIN_WRITE_ROLES)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Moderate a UGC report' })
+  patchAdminUgcReport(
+    @Param('id') id: string,
+    @Body() dto: PatchAdminUgcReportDto,
+    @CurrentUser() actor: AuthenticatedUser,
+  ) {
+    return this.moderation.patchAdminUgcReport(id, dto, actor);
+  }
 
   @Idempotent('moderation_moderation_17')
   @Post('moderation/reports')

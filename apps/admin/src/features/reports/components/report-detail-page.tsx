@@ -44,6 +44,9 @@ export function ReportDetailPage({ report }: ReportDetailPageProps) {
           <h1 className={styles.title}>{report.title}</h1>
         </div>
         <div className={styles.headerPills}>
+          <Link href="/dashboard/operations" className={styles.opsLink}>
+            Outbox
+          </Link>
           <span className={reportStatusPillClass(report.status, pillStyles)}>
             <Icon name={statusIconName(report.status)} size={12} />
             {formatReportStatus(report.status)}

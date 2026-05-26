@@ -19,6 +19,10 @@
   min-height: 0;
 }
 
+.loadingOverlay {
+  background: rgba(247, 250, 255, 0.9);
+}
+
 .toolbar {
   position: absolute;
   top: var(--space-3);
@@ -83,6 +87,13 @@
   flex-wrap: wrap;
   gap: 6px;
   align-items: center;
+}
+
+.includeArchivedToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding-left: 8px;
 }
 
 .chip {

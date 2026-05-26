@@ -16,6 +16,7 @@ type UserDetailFormProps = {
   initialPhoneNumber: string;
   email: string;
   pointsBalance: number;
+  currentAdminRole: string;
   reportsCount: number;
   sessionsCount: number;
 };
@@ -29,6 +30,7 @@ export function UserDetailForm({
   initialPhoneNumber,
   email,
   pointsBalance,
+  currentAdminRole,
   reportsCount,
   sessionsCount,
 }: UserDetailFormProps) {
@@ -40,6 +42,7 @@ export function UserDetailForm({
   const [status, setStatus] = useState(initialStatus);
   const [saving, setSaving] = useState(false);
   const [snack, setSnack] = useState<SnackState | null>(null);
+  const canChangeRole = currentAdminRole === 'SUPER_ADMIN';
 
   function validate(): string | null {
     if (!firstName.trim()) return 'First name is required';
@@ -59,8 +62,24 @@ export function UserDetailForm({
     try {
       await adminBrowserFetch(`/admin/users/${userId}`, {
         method: 'PATCH',
-        body: { firstName: firstName.trim(), lastName: lastName.trim(), phoneNumber: phoneNumber.trim() || null, role, status },
+        body: {
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          phoneNumber: phoneNumber.trim() || null,
+          status,
+        },
       });
+      if (role !== initialRole) {
+        const confirmed = window.confirm('Role changes are high-impact. Confirm this user role update?');
+        if (!confirmed) {
+          setSaving(false);
+          return;
+        }
+        await adminBrowserFetch(`/admin/users/${userId}/role`, {
+          method: 'PATCH',
+          body: { role },
+        });
+      }
       setSnack({ tone: 'success', title: 'Saved', message: 'User updated.' });
       router.refresh();
     } catch (e) {
@@ -125,20 +144,27 @@ export function UserDetailForm({
             maxLength={20}
           />
         </label>
-        <label className={styles.field} htmlFor="user-role">
-          <span className={styles.label}>Role</span>
-          <select
-            id="user-role"
-            className={styles.select}
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-          >
-            <option value="USER">USER</option>
-            <option value="SUPPORT">SUPPORT</option>
-            <option value="ADMIN">ADMIN</option>
-            <option value="SUPER_ADMIN">SUPER_ADMIN</option>
-          </select>
-        </label>
+        {canChangeRole ? (
+          <label className={styles.field} htmlFor="user-role">
+            <span className={styles.label}>Role</span>
+            <select
+              id="user-role"
+              className={styles.select}
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+            >
+              <option value="USER">USER</option>
+              <option value="SUPPORT">SUPPORT</option>
+              <option value="ADMIN">ADMIN</option>
+              <option value="SUPER_ADMIN">SUPER_ADMIN</option>
+            </select>
+          </label>
+        ) : (
+          <div>
+            <p className={styles.label}>Role</p>
+            <p className={styles.value}>{initialRole}</p>
+          </div>
+        )}
         <label className={styles.field} htmlFor="user-status">
           <span className={styles.label}>Status</span>
           <select

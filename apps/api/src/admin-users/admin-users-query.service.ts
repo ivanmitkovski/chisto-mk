@@ -96,6 +96,11 @@ export class AdminUsersQueryService {
     pointsBalance: number;
     totalPointsEarned: number;
     totalPointsSpent: number;
+    organizerCertifiedAt: string | null;
+    termsAcceptedAt: string | null;
+    termsVersion: string | null;
+    requiresTermsAcceptance: boolean;
+    privacyAcceptedAt: string | null;
     lastActiveAt: string | null;
     createdAt: string;
     reportsCount: number;
@@ -138,6 +143,11 @@ export class AdminUsersQueryService {
       pointsBalance: user.pointsBalance,
       totalPointsEarned: user.totalPointsEarned,
       totalPointsSpent: user.totalPointsSpent,
+      organizerCertifiedAt: user.organizerCertifiedAt?.toISOString() ?? null,
+      termsAcceptedAt: user.termsAcceptedAt?.toISOString() ?? null,
+      termsVersion: user.termsVersion,
+      requiresTermsAcceptance: !user.termsAcceptedAt,
+      privacyAcceptedAt: user.privacyAcceptedAt?.toISOString() ?? null,
       lastActiveAt: user.lastActiveAt?.toISOString() ?? null,
       createdAt: user.createdAt.toISOString(),
       reportsCount: user._count.reports,

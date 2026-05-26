@@ -66,7 +66,7 @@ export function MapToolbar({ statusFilter, onStatusChange, onFitBounds, onRefres
           ))}
         </div>
       </div>
-      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6, paddingLeft: 8 }}>
+      <label className={styles.includeArchivedToggle}>
         <input
           type="checkbox"
           checked={includeArchived}

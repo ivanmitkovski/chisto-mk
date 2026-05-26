@@ -1,14 +1,5 @@
-import { ApiError, apiFetch } from './api';
-import { ADMIN_AUTH_COOKIE_KEY } from '@/features/auth/lib/auth-constants';
-import { refreshAdminAccessTokenInBrowser } from '@/features/auth/lib/admin-auth';
-
-export function getAdminTokenFromDocumentCookie(): string | null {
-  if (typeof document === 'undefined') {
-    return null;
-  }
-  const match = document.cookie.match(new RegExp(`(?:^|;\\s*)${encodeURIComponent(ADMIN_AUTH_COOKIE_KEY)}=([^;]*)`));
-  return match ? decodeURIComponent(match[1]) : null;
-}
+import { ApiError } from './api';
+import { getAdminCsrfHeaders } from '@/features/auth/lib/admin-auth';
 
 export async function adminBrowserFetch<TResponse>(
   path: string,
@@ -17,27 +8,37 @@ export async function adminBrowserFetch<TResponse>(
     body?: unknown;
   } = {},
 ): Promise<TResponse> {
-  const token = getAdminTokenFromDocumentCookie();
-  if (!token) {
-    throw new Error('Not signed in');
+  const init: RequestInit = {
+    method: options.method ?? 'GET',
+    headers: {
+      Accept: 'application/json',
+      ...(options.body !== undefined ? { 'Content-Type': 'application/json' } : {}),
+      ...(options.method && options.method !== 'GET' ? getAdminCsrfHeaders() : {}),
+    },
+    credentials: 'include',
+  };
+  if (options.body !== undefined) {
+    init.body = JSON.stringify(options.body);
   }
 
-  const run = (authToken: string) =>
-    apiFetch<TResponse>(path, {
-      method: options.method ?? 'GET',
-      body: options.body,
-      authToken,
-    });
+  const response = await fetch(`/api/proxy${path}`, init);
 
-  try {
-    return await run(token);
-  } catch (error) {
-    if (error instanceof ApiError && error.status === 401) {
-      const next = await refreshAdminAccessTokenInBrowser();
-      if (next) {
-        return await run(next);
-      }
-    }
-    throw error;
+  const payload = (await response.json().catch(() => ({}))) as {
+    code?: unknown;
+    message?: unknown;
+    details?: unknown;
+    retryAfterSeconds?: number;
+  };
+  if (!response.ok) {
+    const code = typeof payload.code === 'string' ? payload.code : 'HTTP_ERROR';
+    const message =
+      typeof payload.message === 'string'
+        ? payload.message
+        : `Request to ${path} failed with status ${response.status}`;
+    const details =
+      payload.details ?? (payload.retryAfterSeconds != null ? { retryAfterSeconds: payload.retryAfterSeconds } : undefined);
+    throw new ApiError(response.status, code, message, details);
   }
+
+  return payload as TResponse;
 }

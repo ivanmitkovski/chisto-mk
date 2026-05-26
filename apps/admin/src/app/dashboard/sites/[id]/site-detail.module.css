@@ -179,6 +179,15 @@
   resize: vertical;
 }
 
+.timelineNoteTextarea {
+  width: 100%;
+  margin-bottom: var(--space-3);
+}
+
+.timelineNoteError {
+  color: var(--color-danger);
+}
+
 .statusForm textarea:hover,
 .statusForm textarea:focus {
   border-color: rgba(37, 219, 134, 0.4);

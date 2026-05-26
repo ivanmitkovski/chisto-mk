@@ -24,7 +24,7 @@ const isProduction = process.env.NODE_ENV === 'production';
 const securityHeaders = [
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'X-Frame-Options', value: 'DENY' },
-  { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+  { key: 'Referrer-Policy', value: 'same-origin' },
   {
     key: 'Permissions-Policy',
     value: 'camera=(), microphone=(), geolocation=()',
@@ -41,6 +41,9 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'recharts', 'framer-motion'],
+  },
   images: {
     remotePatterns: S3_MEDIA_HOSTS.map((hostname) => ({
       protocol: 'https',

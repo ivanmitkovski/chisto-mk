@@ -3,6 +3,7 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Modal } from '@/components/ui';
 import { adminNavigation } from '../config/navigation';
 import { DESKTOP_SIDEBAR_COOKIE_KEY, DESKTOP_SIDEBAR_STORAGE_KEY } from '../constants';
 import { NavItemKey } from '../types';
@@ -40,6 +41,7 @@ export function AdminShell({
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(initialSidebarCollapsed);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isSidebarPreferenceHydrated, setIsSidebarPreferenceHydrated] = useState(false);
+  const [showShortcuts, setShowShortcuts] = useState(false);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(max-width: 48rem)');
@@ -95,6 +97,21 @@ export function AdminShell({
       document.body.style.overflow = '';
     };
   }, [isMobile, isMobileSidebarOpen]);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === '?' && !event.metaKey && !event.ctrlKey && !event.altKey) {
+        const target = event.target as HTMLElement | null;
+        if (target?.closest('input, textarea, select, [contenteditable="true"]')) {
+          return;
+        }
+        event.preventDefault();
+        setShowShortcuts(true);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
 
   useEffect(() => {
     if (!isMobileSidebarOpen) {
@@ -192,6 +209,22 @@ export function AdminShell({
           </div>
         </main>
       </div>
+      <Modal open={showShortcuts} title="Keyboard shortcuts" onClose={() => setShowShortcuts(false)}>
+        <dl className={styles.shortcuts}>
+          <div>
+            <dt>?</dt>
+            <dd>Show this shortcuts panel</dd>
+          </div>
+          <div>
+            <dt>Esc</dt>
+            <dd>Close drawers, dialogs, or the mobile navigation</dd>
+          </div>
+          <div>
+            <dt>Tab</dt>
+            <dd>Move through controls; dialogs keep focus inside</dd>
+          </div>
+        </dl>
+      </Modal>
     </div>
   );
 }

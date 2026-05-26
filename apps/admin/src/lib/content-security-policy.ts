@@ -1,10 +1,13 @@
-import { getApiOrigin } from '@/lib/api-base-url';
-
 /** Carto basemap tiles (Leaflet); explicit hosts avoid widening connect-src to untrusted origins. */
 const CARTO_TILE_HOSTS = [
   'https://a.basemaps.cartocdn.com',
   'https://b.basemaps.cartocdn.com',
   'https://c.basemaps.cartocdn.com',
+] as const;
+
+const S3_MEDIA_HOSTS = [
+  'https://chisto-dev-media.s3.eu-central-1.amazonaws.com',
+  'https://chisto-prod-media.s3.eu-central-1.amazonaws.com',
 ] as const;
 
 /**
@@ -13,7 +16,6 @@ const CARTO_TILE_HOSTS = [
  * and applies `nonce` to framework script tags when `script-src` includes `'nonce-…'`.
  */
 export function buildAdminContentSecurityPolicy(nonce: string, isDev: boolean): string {
-  const apiOrigin = getApiOrigin();
   const scriptSrc = [
     "'self'",
     `'nonce-${nonce}'`,
@@ -26,9 +28,31 @@ export function buildAdminContentSecurityPolicy(nonce: string, isDev: boolean): 
     `script-src ${scriptSrc}`,
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: https: blob:",
-    `connect-src 'self' ${apiOrigin} ${CARTO_TILE_HOSTS.join(' ')}`,
+    `connect-src 'self' ${CARTO_TILE_HOSTS.join(' ')}`,
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'",
+  ].join('; ');
+}
+
+export function buildAdminReportOnlyContentSecurityPolicy(nonce: string, isDev: boolean): string {
+  const scriptSrc = [
+    "'self'",
+    `'nonce-${nonce}'`,
+    "'strict-dynamic'",
+    ...(isDev ? ["'unsafe-eval'" as const] : []),
+  ].join(' ');
+
+  return [
+    "default-src 'self'",
+    `script-src ${scriptSrc}`,
+    "style-src 'self'",
+    `img-src 'self' data: blob: ${S3_MEDIA_HOSTS.join(' ')} ${CARTO_TILE_HOSTS.join(' ')}`,
+    `connect-src 'self' ${CARTO_TILE_HOSTS.join(' ')}`,
+    "frame-ancestors 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "require-trusted-types-for 'script'",
+    "report-uri /api/security/csp-report",
   ].join('; ');
 }

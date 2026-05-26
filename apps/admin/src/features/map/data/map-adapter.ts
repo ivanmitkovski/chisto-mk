@@ -1,6 +1,10 @@
-import { getApiBaseUrl } from '@/lib/api';
-import { getAdminTokenFromBrowserCookie, refreshAdminAccessTokenInBrowser } from '@/features/auth/lib/admin-auth';
-import type { MapClustersResponse, MapEnvelope, MapListApiRow } from '@chisto/map-contracts';
+import type {
+  MapClustersResponse,
+  MapEnvelope,
+  MapHeatmapResponse,
+  MapListApiRow,
+} from '@chisto/map-contracts';
+import { getAdminCsrfHeaders } from '@/features/auth/lib/admin-auth';
 
 export class MapAdapterError extends Error {
   readonly status: number;
@@ -86,33 +90,18 @@ async function readErrorBody(response: Response): Promise<unknown> {
 }
 
 async function fetchWithAuth(
-  url: string,
+  path: string,
   headers: Record<string, string>,
 ): Promise<Response> {
-  const token = getAdminTokenFromBrowserCookie();
-  if (!token) throw new Error('Not signed in');
-
-  const makeRequest = (authToken: string) =>
-    fetch(url, {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-        Authorization: `Bearer ${authToken}`,
-        ...headers,
-      },
-      cache: 'no-store',
-    });
-
-  const response = await makeRequest(token);
-
-  if (response.status === 401) {
-    const refreshed = await refreshAdminAccessTokenInBrowser();
-    if (refreshed) {
-      return makeRequest(refreshed);
-    }
-  }
-
-  return response;
+  return fetch(`/api/proxy${path}`, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+      ...headers,
+    },
+    credentials: 'include',
+    cache: 'no-store',
+  });
 }
 
 export async function fetchSitesForMap(params: {
@@ -142,7 +131,6 @@ export async function fetchSitesForMap(params: {
   }
 
   const path = `/sites/map?${search.toString()}`;
-  const url = `${getApiBaseUrl()}${path}`;
 
   const requestHeaders: Record<string, string> = {};
   const cached = etagCache.get(path);
@@ -150,7 +138,7 @@ export async function fetchSitesForMap(params: {
     requestHeaders['If-None-Match'] = cached.etag;
   }
 
-  const response = await fetchWithAuth(url, requestHeaders);
+  const response = await fetchWithAuth(path, requestHeaders);
 
   if (response.status === 304 && cached) {
     return cached.payload;
@@ -203,7 +191,6 @@ export async function fetchClustersForMap(params: {
   }
 
   const path = `/sites/map/clusters?${search.toString()}`;
-  const url = `${getApiBaseUrl()}${path}`;
 
   const requestHeaders: Record<string, string> = {};
   const cached = clustersEtagCache.get(path);
@@ -211,7 +198,7 @@ export async function fetchClustersForMap(params: {
     requestHeaders['If-None-Match'] = cached.etag;
   }
 
-  const response = await fetchWithAuth(url, requestHeaders);
+  const response = await fetchWithAuth(path, requestHeaders);
   if (response.status === 304 && cached) {
     return cached.payload;
   }
@@ -259,6 +246,57 @@ export async function fetchClustersForMap(params: {
     setClustersEtagCache(path, { etag, payload: normalized });
   }
   return normalized;
+}
+
+export async function fetchHeatmapForMap(params: {
+  lat: number;
+  lng: number;
+  radiusKm: number;
+  zoom?: number;
+  status?: string;
+  includeArchived?: boolean;
+}): Promise<MapHeatmapResponse> {
+  const search = new URLSearchParams({
+    lat: String(params.lat),
+    lng: String(params.lng),
+    radiusKm: String(params.radiusKm),
+  });
+  if (params.zoom != null) search.set('zoom', String(params.zoom));
+  if (params.status) search.set('status', params.status);
+  if (params.includeArchived) search.set('includeArchived', 'true');
+
+  const path = `/sites/map/heatmap?${search.toString()}`;
+  const response = await fetchWithAuth(path, {});
+  if (!response.ok) {
+    const body = await readErrorBody(response);
+    throw new MapAdapterError(`Map heatmap fetch failed with status ${response.status}`, {
+      status: response.status,
+      body,
+    });
+  }
+  return (await response.json()) as MapHeatmapResponse;
+}
+
+export async function searchSitesForMap(query: string): Promise<MapResponse> {
+  const response = await fetch('/api/proxy/sites/search', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      ...getAdminCsrfHeaders(),
+    },
+    credentials: 'include',
+    body: JSON.stringify({ query }),
+    cache: 'no-store',
+  });
+  if (!response.ok) {
+    const body = await readErrorBody(response);
+    throw new MapAdapterError(`Map search failed with status ${response.status}`, {
+      status: response.status,
+      body,
+    });
+  }
+  return (await response.json()) as MapResponse;
 }
 
 let mapBroadcastChannel: BroadcastChannel | null = null;

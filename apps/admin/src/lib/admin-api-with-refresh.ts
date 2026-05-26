@@ -1,44 +1,65 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ADMIN_AUTH_COOKIE_KEY, ADMIN_REFRESH_COOKIE_KEY } from '@/features/auth/lib/auth-constants';
 import { getApiBaseUrl } from '@/lib/api-base-url';
+import {
+  clearAdminAuthCookies,
+  ensureAdminCsrfCookie,
+  getAdminAccessToken,
+  getAdminRefreshToken,
+  refreshAdminTokens,
+  setAdminAuthCookies,
+  verifyAdminCsrf,
+} from '@/lib/server/admin-session';
 
 type RequestInitWithBody = RequestInit & { body?: unknown };
+const mutationRateBuckets = new Map<string, { count: number; resetAt: number }>();
+const MUTATION_RATE_LIMIT = 120;
+const MUTATION_RATE_WINDOW_MS = 60_000;
+const FORWARDED_HEADER_ALLOWLIST = new Set([
+  'accept',
+  'content-type',
+  'if-match',
+  'if-none-match',
+  'idempotency-key',
+  'x-idempotency-key',
+]);
 
-async function doRefresh(refreshToken: string): Promise<{ accessToken: string; refreshToken?: string } | null> {
-  try {
-    const res = await fetch(`${getApiBaseUrl()}/auth/refresh`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refreshToken }),
-      cache: 'no-store',
-    });
-    if (!res.ok) return null;
-    return res.json();
-  } catch {
-    return null;
+function checkMutationRateLimit(request: NextRequest): boolean {
+  const method = request.method.toUpperCase();
+  if (method === 'GET' || method === 'HEAD' || method === 'OPTIONS') return true;
+  const forwarded = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim();
+  const key = `${forwarded || 'local'}:${getAdminAccessToken(request) ?? 'anon'}`;
+  const now = Date.now();
+  const bucket = mutationRateBuckets.get(key);
+  if (!bucket || bucket.resetAt <= now) {
+    mutationRateBuckets.set(key, { count: 1, resetAt: now + MUTATION_RATE_WINDOW_MS });
+    return true;
   }
+  bucket.count += 1;
+  return bucket.count <= MUTATION_RATE_LIMIT;
 }
 
-function applyTokenCookies(
-  response: NextResponse,
-  tokens: { accessToken: string; refreshToken?: string },
-  request: NextRequest,
-) {
-  const secure = request.nextUrl.protocol === 'https:';
-  response.cookies.set(ADMIN_AUTH_COOKIE_KEY, tokens.accessToken, {
-    path: '/',
-    maxAge: 15 * 60, // 15 min, aligned with JWT access expiry
-    sameSite: 'lax',
-    secure,
+export function createBackendProxyHeaders(request: NextRequest, accessToken: string | null): Headers {
+  const headers = new Headers();
+  request.headers.forEach((value, key) => {
+    const normalized = key.toLowerCase();
+    if (FORWARDED_HEADER_ALLOWLIST.has(normalized)) {
+      headers.set(key, value);
+    }
   });
-  if (tokens.refreshToken) {
-    response.cookies.set(ADMIN_REFRESH_COOKIE_KEY, tokens.refreshToken, {
-      path: '/',
-      maxAge: 7 * 24 * 60 * 60,
-      sameSite: 'lax',
-      secure,
-    });
+  headers.set('Accept', headers.get('Accept') ?? 'application/json');
+  if (accessToken) {
+    headers.set('Authorization', `Bearer ${accessToken}`);
   }
+  headers.set('X-Request-Id', request.headers.get('x-request-id') ?? crypto.randomUUID());
+  if (
+    request.method !== 'GET' &&
+    request.method !== 'HEAD' &&
+    !headers.has('X-Idempotency-Key') &&
+    !headers.has('Idempotency-Key')
+  ) {
+    headers.set('X-Idempotency-Key', crypto.randomUUID());
+  }
+  return headers;
 }
 
 export async function fetchBackendWithRefresh(
@@ -46,19 +67,46 @@ export async function fetchBackendWithRefresh(
   request: NextRequest,
   init: RequestInitWithBody = {},
 ): Promise<{ response: Response; nextResponse: NextResponse }> {
-  const accessToken = request.cookies.get(ADMIN_AUTH_COOKIE_KEY)?.value ?? null;
-  const refreshToken = request.cookies.get(ADMIN_REFRESH_COOKIE_KEY)?.value ?? null;
+  if (!checkMutationRateLimit(request)) {
+    const nextResponse = NextResponse.json(
+      { code: 'RATE_LIMITED', message: 'Too many admin requests. Please slow down.' },
+      { status: 429 },
+    );
+    ensureAdminCsrfCookie(request, nextResponse);
+    return { response: nextResponse, nextResponse };
+  }
+  if (!verifyAdminCsrf(request)) {
+    const nextResponse = NextResponse.json(
+      { code: 'CSRF_TOKEN_INVALID', message: 'Invalid CSRF token.' },
+      { status: 403 },
+    );
+    ensureAdminCsrfCookie(request, nextResponse);
+    return { response: nextResponse, nextResponse };
+  }
+
+  const accessToken = getAdminAccessToken(request);
+  const refreshToken = getAdminRefreshToken(request);
 
   const url = `${getApiBaseUrl()}${path}`;
   const headers: Record<string, string> = {
     Accept: 'application/json',
     ...((init.headers as Record<string, string>) ?? {}),
   };
+  headers['X-Request-Id'] = headers['X-Request-Id'] ?? request.headers.get('x-request-id') ?? crypto.randomUUID();
   if (accessToken) {
     headers.Authorization = `Bearer ${accessToken}`;
   }
   if (init.body !== undefined) {
     headers['Content-Type'] = 'application/json';
+  }
+  const method = init.method?.toUpperCase() ?? 'GET';
+  if (
+    method !== 'GET' &&
+    method !== 'HEAD' &&
+    !headers['X-Idempotency-Key'] &&
+    !headers['Idempotency-Key']
+  ) {
+    headers['X-Idempotency-Key'] = crypto.randomUUID();
   }
 
   const { body: bodyVal, ...restInit } = init;
@@ -75,17 +123,94 @@ export async function fetchBackendWithRefresh(
   let res = await fetch(url, fetchInit);
 
   if (res.status === 401 && refreshToken) {
-    const tokens = await doRefresh(refreshToken);
+    const tokens = await refreshAdminTokens(refreshToken);
     if (tokens) {
       headers.Authorization = `Bearer ${tokens.accessToken}`;
       res = await fetch(url, fetchInit);
       const payload = await res.json().catch(() => ({}));
       const nextRes = NextResponse.json(payload, { status: res.status });
-      applyTokenCookies(nextRes, tokens, request);
+      nextRes.headers.set('x-request-id', headers['X-Request-Id']);
+      setAdminAuthCookies(nextRes, tokens, request);
+      ensureAdminCsrfCookie(request, nextRes);
       return { response: res, nextResponse: nextRes };
     }
   }
 
   const payload = await res.json().catch(() => ({}));
-  return { response: res, nextResponse: NextResponse.json(payload, { status: res.status }) };
+  const nextResponse = NextResponse.json(payload, { status: res.status });
+  nextResponse.headers.set('x-request-id', headers['X-Request-Id']);
+  if (res.status === 401) {
+    clearAdminAuthCookies(nextResponse, request);
+  }
+  ensureAdminCsrfCookie(request, nextResponse);
+  return { response: res, nextResponse };
+}
+
+export async function proxyBackendWithRefresh(
+  path: string,
+  request: NextRequest,
+): Promise<NextResponse> {
+  if (!checkMutationRateLimit(request)) {
+    const response = NextResponse.json(
+      { code: 'RATE_LIMITED', message: 'Too many admin requests. Please slow down.' },
+      { status: 429 },
+    );
+    ensureAdminCsrfCookie(request, response);
+    return response;
+  }
+  if (!verifyAdminCsrf(request)) {
+    const response = NextResponse.json(
+      { code: 'CSRF_TOKEN_INVALID', message: 'Invalid CSRF token.' },
+      { status: 403 },
+    );
+    ensureAdminCsrfCookie(request, response);
+    return response;
+  }
+
+  const accessToken = getAdminAccessToken(request);
+  const refreshToken = getAdminRefreshToken(request);
+  const headers = createBackendProxyHeaders(request, accessToken);
+
+  const body =
+    request.method === 'GET' || request.method === 'HEAD' ? undefined : await request.text();
+  const run = () => {
+    const init: RequestInit = {
+      method: request.method,
+      headers,
+      cache: 'no-store',
+    };
+    if (body !== undefined) {
+      init.body = body;
+    }
+    return fetch(`${getApiBaseUrl()}${path}`, init);
+  };
+
+  let backendResponse = await run();
+  let refreshedTokens: Awaited<ReturnType<typeof refreshAdminTokens>> = null;
+  if (backendResponse.status === 401 && refreshToken) {
+    refreshedTokens = await refreshAdminTokens(refreshToken);
+    if (refreshedTokens) {
+      headers.set('Authorization', `Bearer ${refreshedTokens.accessToken}`);
+      backendResponse = await run();
+    }
+  }
+
+  const responseHeaders = new Headers();
+  const contentType = backendResponse.headers.get('content-type');
+  const etag = backendResponse.headers.get('etag');
+  if (contentType) responseHeaders.set('content-type', contentType);
+  if (etag) responseHeaders.set('etag', etag);
+
+  const response = new NextResponse(backendResponse.body, {
+    status: backendResponse.status,
+    headers: responseHeaders,
+  });
+  response.headers.set('x-request-id', headers.get('X-Request-Id') ?? crypto.randomUUID());
+  if (refreshedTokens) {
+    setAdminAuthCookies(response, refreshedTokens, request);
+  } else if (backendResponse.status === 401) {
+    clearAdminAuthCookies(response, request);
+  }
+  ensureAdminCsrfCookie(request, response);
+  return response;
 }

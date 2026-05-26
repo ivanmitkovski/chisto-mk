@@ -1,0 +1,43 @@
+.field {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.label {
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.select {
+  min-height: 2.75rem;
+  border: 1px solid var(--color-green-010);
+  border-radius: var(--radius-lg);
+  background: var(--bg-app);
+  color: var(--text-primary);
+  padding: 0 var(--space-3);
+  font: inherit;
+}
+
+.select:focus-visible {
+  border-color: var(--border-focus);
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.select[aria-invalid='true'] {
+  border-color: var(--color-error);
+}
+
+.helper,
+.error {
+  font-size: var(--font-size-sm);
+}
+
+.helper {
+  color: var(--text-secondary);
+}
+
+.error {
+  color: var(--color-error);
+}

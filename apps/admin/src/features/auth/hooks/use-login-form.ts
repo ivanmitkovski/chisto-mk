@@ -1,4 +1,4 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { SnackState } from '@/components/ui';
 import { ApiError } from '@/lib/api';
 import { completeTotpLogin, loginAdmin } from '../lib/admin-auth';
@@ -6,9 +6,10 @@ import { completeTotpLogin, loginAdmin } from '../lib/admin-auth';
 type LoginValues = {
   email: string;
   password: string;
+  rememberDevice: boolean;
 };
 
-type LoginErrors = Partial<Record<keyof LoginValues, string>>;
+type LoginErrors = Partial<Record<'email' | 'password' | 'totp', string>>;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -22,9 +23,9 @@ function validate(values: LoginValues): LoginErrors {
     errors.email = 'Please enter a valid email address.';
   }
 
-  if (!values.password.trim()) {
+  if (!values.password) {
     errors.password = 'Password is required.';
-  } else if (values.password.trim().length < 8) {
+  } else if (values.password.length < 8) {
     errors.password = 'Password must contain at least 8 characters.';
   }
 
@@ -37,6 +38,7 @@ export function useLoginForm() {
   const [values, setValues] = useState<LoginValues>({
     email: '',
     password: '',
+    rememberDevice: false,
   });
   const [step, setStep] = useState<LoginStep>('credentials');
   const [tempToken, setTempToken] = useState<string | null>(null);
@@ -45,10 +47,45 @@ export function useLoginForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<LoginErrors>({});
   const [snack, setSnack] = useState<SnackState | null>(null);
+  const [lockoutUntilMs, setLockoutUntilMs] = useState<number | null>(null);
+  const [lockoutRemainingSeconds, setLockoutRemainingSeconds] = useState(0);
 
-  function updateField(field: keyof LoginValues, value: string) {
+  useEffect(() => {
+    if (lockoutUntilMs == null) {
+      setLockoutRemainingSeconds(0);
+      return undefined;
+    }
+    const tick = () => {
+      const remaining = Math.max(0, Math.ceil((lockoutUntilMs - Date.now()) / 1000));
+      setLockoutRemainingSeconds(remaining);
+      if (remaining <= 0) {
+        setLockoutUntilMs(null);
+      }
+    };
+    tick();
+    const interval = window.setInterval(tick, 1000);
+    return () => window.clearInterval(interval);
+  }, [lockoutUntilMs]);
+
+  function updateField(field: keyof LoginValues, value: string | boolean) {
     setValues((prev) => ({ ...prev, [field]: value }));
-    setErrors((prev) => ({ ...prev, [field]: undefined }));
+    if (field === 'email' || field === 'password') {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next[field];
+        return next;
+      });
+    }
+    setSnack(null);
+  }
+
+  function updateTotpCode(value: string) {
+    setTotpCode(value);
+    setErrors((prev) => {
+      const next = { ...prev };
+      delete next.totp;
+      return next;
+    });
     setSnack(null);
   }
 
@@ -65,10 +102,20 @@ export function useLoginForm() {
       });
       return false;
     }
+    if (lockoutRemainingSeconds > 0) {
+      setSnack({
+        tone: 'warning',
+        title: 'Account locked',
+        message: `Try again in ${formatCountdown(lockoutRemainingSeconds)}.`,
+      });
+      return false;
+    }
 
     setIsSubmitting(true);
     try {
-      const result = await loginAdmin(values.email.trim(), values.password.trim());
+      const result = await loginAdmin(values.email.trim(), values.password, {
+        rememberDevice: values.rememberDevice,
+      });
 
       if ('requiresTotp' in result && result.requiresTotp) {
         setTempToken(result.tempToken);
@@ -99,6 +146,7 @@ export function useLoginForm() {
             error.details as { retryAfterSeconds?: number } | undefined
           )?.retryAfterSeconds;
           const minutes = retryAfter != null ? Math.ceil(retryAfter / 60) : 15;
+          setLockoutUntilMs(Date.now() + (retryAfter ?? minutes * 60) * 1000);
           message = `Too many attempts. Try again in ${minutes} minute${minutes !== 1 ? 's' : ''}.`;
         } else if (isAccountInactive) {
           message = error.message || 'This account is not active. Contact support for assistance.';
@@ -135,6 +183,12 @@ export function useLoginForm() {
     event.preventDefault();
     const code = totpCode.trim();
     if (!tempToken || code.length < 6) {
+      setErrors((prev) => ({
+        ...prev,
+        totp: useBackupCode
+          ? 'Please enter your backup code.'
+          : 'Please enter the 6-digit code from your authenticator app.',
+      }));
       setSnack({
         tone: 'warning',
         title: 'Enter code',
@@ -147,7 +201,7 @@ export function useLoginForm() {
 
     setIsSubmitting(true);
     try {
-      await completeTotpLogin(tempToken, code);
+      await completeTotpLogin(tempToken, code, { rememberDevice: values.rememberDevice });
 
       setSnack({
         tone: 'success',
@@ -172,6 +226,7 @@ export function useLoginForm() {
           title: 'Verification failed',
           message: error.message || 'Invalid code. Please try again.',
         });
+        setErrors((prev) => ({ ...prev, totp: error.message || 'Invalid code. Please try again.' }));
         return false;
       }
 
@@ -191,6 +246,7 @@ export function useLoginForm() {
     setTempToken(null);
     setTotpCode('');
     setUseBackupCode(false);
+    setErrors({});
     setSnack(null);
   }
 
@@ -201,14 +257,22 @@ export function useLoginForm() {
     step,
     tempToken,
     totpCode,
-    setTotpCode,
+    setTotpCode: updateTotpCode,
     useBackupCode,
     setUseBackupCode,
     isSubmitting,
+    isLockedOut: lockoutRemainingSeconds > 0,
+    lockoutRemainingSeconds,
     updateField,
     handleSubmit,
     handleTotpSubmit,
     resetToCredentials,
     clearSnack: () => setSnack(null),
   };
+}
+
+function formatCountdown(totalSeconds: number): string {
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${String(seconds).padStart(2, '0')}`;
 }

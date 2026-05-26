@@ -1,0 +1,26 @@
+.list {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.card {
+  min-width: 0;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.meta,
+.details {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.reason {
+  color: var(--text-primary);
+  font-weight: var(--font-weight-semibold);
+}

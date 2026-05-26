@@ -33,6 +33,15 @@ type UserDetailTabsProps = {
   initialPhoneNumber: string;
   email: string;
   pointsBalance: number;
+  totalPointsEarned: number;
+  isPhoneVerified: boolean;
+  organizerCertifiedAt: string | null;
+  termsAcceptedAt: string | null;
+  termsVersion: string | null;
+  requiresTermsAcceptance: boolean;
+  privacyAcceptedAt: string | null;
+  createdAt: string;
+  currentAdminRole: string;
   reportsCount: number;
   sessionsCount: number;
   audit: { data: AuditEntry[]; meta: { total: number } };
@@ -40,7 +49,7 @@ type UserDetailTabsProps = {
 };
 
 export function UserDetailTabs(props: UserDetailTabsProps) {
-  const [activeTab, setActiveTab] = useState<'profile' | 'sessions' | 'audit'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'privacy' | 'sessions' | 'audit'>('profile');
 
   return (
     <div>
@@ -53,6 +62,15 @@ export function UserDetailTabs(props: UserDetailTabsProps) {
           onClick={() => setActiveTab('profile')}
         >
           Profile
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === 'privacy'}
+          className={activeTab === 'privacy' ? styles.tabActive : styles.tab}
+          onClick={() => setActiveTab('privacy')}
+        >
+          Privacy & verification
         </button>
         <button
           type="button"
@@ -84,9 +102,49 @@ export function UserDetailTabs(props: UserDetailTabsProps) {
           initialPhoneNumber={props.initialPhoneNumber}
           email={props.email}
           pointsBalance={props.pointsBalance}
+          currentAdminRole={props.currentAdminRole}
           reportsCount={props.reportsCount}
           sessionsCount={props.sessionsCount}
         />
+      )}
+
+      {activeTab === 'privacy' && (
+        <Card padding="md">
+          <dl className={styles.privacyGrid}>
+            <div>
+              <dt>Organizer certification</dt>
+              <dd>{props.organizerCertifiedAt ? new Date(props.organizerCertifiedAt).toLocaleString() : 'Not certified'}</dd>
+            </div>
+            <div>
+              <dt>Phone verification</dt>
+              <dd>{props.isPhoneVerified ? 'Verified' : 'Not verified'}</dd>
+            </div>
+            <div>
+              <dt>Terms accepted</dt>
+              <dd>{props.termsAcceptedAt ? new Date(props.termsAcceptedAt).toLocaleString() : 'Missing'}</dd>
+            </div>
+            <div>
+              <dt>Terms version</dt>
+              <dd>{props.termsVersion ?? '—'}</dd>
+            </div>
+            <div>
+              <dt>Privacy accepted</dt>
+              <dd>{props.privacyAcceptedAt ? new Date(props.privacyAcceptedAt).toLocaleString() : 'Missing'}</dd>
+            </div>
+            <div>
+              <dt>Requires terms acceptance</dt>
+              <dd>{props.requiresTermsAcceptance ? 'Yes' : 'No'}</dd>
+            </div>
+            <div>
+              <dt>Total points earned</dt>
+              <dd>{props.totalPointsEarned}</dd>
+            </div>
+            <div>
+              <dt>Created</dt>
+              <dd>{new Date(props.createdAt).toLocaleString()}</dd>
+            </div>
+          </dl>
+        </Card>
       )}
 
       {activeTab === 'sessions' && (

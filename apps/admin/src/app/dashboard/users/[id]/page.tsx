@@ -4,6 +4,7 @@ import { AdminShell } from '@/features/admin-shell';
 import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell/constants';
 import { SectionState } from '@/components/ui';
 import { ApiError } from '@/lib/api';
+import { getMeProfile } from '@/features/auth/data/me-adapter';
 import { getUserDetail, getUserAudit, getUserSessions } from '@/features/users/data/users-adapter';
 import { UserDetailTabs } from './user-detail-tabs';
 
@@ -41,17 +42,30 @@ export default async function UserDetailPage(props: PageProps) {
     role: string;
     status: string;
     pointsBalance: number;
+    totalPointsEarned: number;
+    isPhoneVerified: boolean;
+    organizerCertifiedAt: string | null;
+    termsAcceptedAt: string | null;
+    termsVersion: string | null;
+    requiresTermsAcceptance: boolean;
+    privacyAcceptedAt: string | null;
+    createdAt: string;
     reportsCount: number;
     sessionsCount: number;
   };
 
   let audit: Awaited<ReturnType<typeof getUserAudit>>;
   let sessions: Awaited<ReturnType<typeof getUserSessions>>;
+  let meRole = '';
   try {
-    [audit, sessions] = await Promise.all([
+    const [auditResult, sessionsResult, me] = await Promise.all([
       getUserAudit(id, 1, 50),
       getUserSessions(id),
+      getMeProfile(),
     ]);
+    audit = auditResult;
+    sessions = sessionsResult;
+    meRole = me.role;
   } catch {
     audit = { data: [], meta: { page: 1, limit: 50, total: 0 } };
     sessions = [];
@@ -68,8 +82,17 @@ export default async function UserDetailPage(props: PageProps) {
         initialPhoneNumber={u.phoneNumber ?? ''}
         email={u.email}
         pointsBalance={u.pointsBalance}
+        totalPointsEarned={u.totalPointsEarned ?? 0}
+        isPhoneVerified={u.isPhoneVerified ?? false}
+        organizerCertifiedAt={u.organizerCertifiedAt ?? null}
+        termsAcceptedAt={u.termsAcceptedAt ?? null}
+        termsVersion={u.termsVersion ?? null}
+        requiresTermsAcceptance={u.requiresTermsAcceptance ?? false}
+        privacyAcceptedAt={u.privacyAcceptedAt ?? null}
+        createdAt={u.createdAt}
         reportsCount={u.reportsCount}
         sessionsCount={u.sessionsCount}
+        currentAdminRole={meRole}
         audit={audit}
         sessions={sessions}
       />

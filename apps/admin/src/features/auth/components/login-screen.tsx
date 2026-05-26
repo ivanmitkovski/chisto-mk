@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Brand, Button, Input, Snack } from '@/components/ui';
 import { useLoginForm } from '../hooks/use-login-form';
+import { OtpInput } from './otp-input';
+import { PasswordInput } from './password-input';
 import styles from './login-screen.module.css';
 
 const motionDuration = 0.22;
@@ -26,6 +28,8 @@ export function LoginScreen() {
     useBackupCode,
     setUseBackupCode,
     isSubmitting,
+    isLockedOut,
+    lockoutRemainingSeconds,
     updateField,
     handleSubmit,
     handleTotpSubmit,
@@ -97,19 +101,41 @@ export function LoginScreen() {
                   onChange={(event) => updateField('email', event.target.value)}
                   errorText={errors.email}
                 />
-                <Input
+                <PasswordInput
                   id="login-password"
                   label="Password"
-                  type="password"
                   autoComplete="current-password"
                   placeholder="••••••••••••"
                   value={values.password}
                   onChange={(event) => updateField('password', event.target.value)}
                   errorText={errors.password}
                 />
-                <Button className={styles.button} type="submit" isLoading={isSubmitting}>
-                  Sign in
-                </Button>
+                <label className={styles.checkboxRow}>
+                  <input
+                    type="checkbox"
+                    checked={values.rememberDevice}
+                    onChange={(event) => updateField('rememberDevice', event.target.checked)}
+                  />
+                  <span>Remember this trusted device</span>
+                </label>
+                {isLockedOut ? (
+                  <p className={styles.lockout} role="status" aria-live="polite">
+                    Too many attempts. Try again in {formatCountdown(lockoutRemainingSeconds)}.
+                  </p>
+                ) : null}
+                <div className={styles.actionsRow}>
+                  <Button
+                    className={styles.button}
+                    type="submit"
+                    isLoading={isSubmitting}
+                    disabled={isLockedOut}
+                  >
+                    Sign in
+                  </Button>
+                  <a className={styles.helpLink} href="mailto:support@chisto.mk?subject=Admin%20login%20help">
+                    Forgot password?
+                  </a>
+                </div>
               </form>
             </motion.div>
           ) : (
@@ -129,24 +155,30 @@ export function LoginScreen() {
               </p>
 
               <form className={styles.form} onSubmit={onTotpSubmit}>
-                <Input
-                  id="login-totp"
-                  label={useBackupCode ? 'Backup code' : 'Verification code'}
-                  type="text"
-                  inputMode={useBackupCode ? 'text' : 'numeric'}
-                  autoComplete="one-time-code"
-                  autoFocus
-                  placeholder={useBackupCode ? 'xxxxxxxx-xxxxxxxx' : '000000'}
-                  value={totpCode}
-                  onChange={(event) =>
-                    setTotpCode(
-                      useBackupCode
-                        ? event.target.value.slice(0, 32)
-                        : event.target.value.replace(/\D/g, '').slice(0, 6),
-                    )
-                  }
-                  maxLength={useBackupCode ? 32 : 6}
-                />
+                {useBackupCode ? (
+                  <Input
+                    id="login-totp"
+                    label="Backup code"
+                    type="text"
+                    inputMode="text"
+                    autoComplete="one-time-code"
+                    autoFocus
+                    placeholder="xxxxxxxx-xxxxxxxx"
+                    value={totpCode}
+                    onChange={(event) => setTotpCode(event.target.value.slice(0, 32))}
+                    maxLength={32}
+                    errorText={errors.totp}
+                  />
+                ) : (
+                  <OtpInput
+                    id="login-totp"
+                    label="Verification code"
+                    value={totpCode}
+                    onChange={setTotpCode}
+                    disabled={isSubmitting}
+                    errorText={errors.totp}
+                  />
+                )}
                 <Button className={styles.button} type="submit" isLoading={isSubmitting}>
                   Verify
                 </Button>
@@ -189,4 +221,10 @@ export function LoginScreen() {
       <Snack snack={snack} onClose={clearSnack} />
     </main>
   );
+}
+
+function formatCountdown(totalSeconds: number): string {
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${String(seconds).padStart(2, '0')}`;
 }
