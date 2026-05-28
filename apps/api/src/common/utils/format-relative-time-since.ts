@@ -4,6 +4,13 @@ const MS_PER_HOUR = 60 * MS_PER_MINUTE;
 const MS_PER_DAY = 24 * MS_PER_HOUR;
 const DEFAULT_LOCALE = 'en';
 
+/** BCP 47 primary tag (e.g. en, mk-MK). Rejects wildcards like `*` from fetch defaults. */
+const LOCALE_TAG_PATTERN = /^[a-zA-Z]{1,8}(-[a-zA-Z0-9]{1,8})*$/;
+
+function isUsableLanguageTag(tag: string): boolean {
+  return tag.length > 0 && tag !== '*' && LOCALE_TAG_PATTERN.test(tag);
+}
+
 /**
  * Parses the first language tag from an Accept-Language header (e.g. "mk-MK,en;q=0.9" → "mk-MK").
  */
@@ -12,25 +19,32 @@ export function localeFromAcceptLanguage(acceptLanguage?: string): string {
     return DEFAULT_LOCALE;
   }
   const first = acceptLanguage.split(',')[0]?.trim().split(';')[0]?.trim();
-  return first && first.length > 0 ? first : DEFAULT_LOCALE;
+  return first && isUsableLanguageTag(first) ? first : DEFAULT_LOCALE;
 }
 
 function resolveSupportedLocale(locale: string): string {
   const normalized = locale.replace(/_/g, '-').trim();
-  if (!normalized) {
+  if (!isUsableLanguageTag(normalized)) {
     return DEFAULT_LOCALE;
   }
 
-  // Prefer exact locale; fallback to language-only; then default.
-  const exact = Intl.RelativeTimeFormat.supportedLocalesOf([normalized]);
-  if (exact.length > 0) {
-    return exact[0];
-  }
+  try {
+    // Prefer exact locale; fallback to language-only; then default.
+    const exact = Intl.RelativeTimeFormat.supportedLocalesOf([normalized]);
+    if (exact.length > 0) {
+      return exact[0];
+    }
 
-  const languageOnly = normalized.split('-')[0];
-  const language = Intl.RelativeTimeFormat.supportedLocalesOf([languageOnly]);
-  if (language.length > 0) {
-    return language[0];
+    const languageOnly = normalized.split('-')[0] ?? '';
+    if (!isUsableLanguageTag(languageOnly)) {
+      return DEFAULT_LOCALE;
+    }
+    const language = Intl.RelativeTimeFormat.supportedLocalesOf([languageOnly]);
+    if (language.length > 0) {
+      return language[0];
+    }
+  } catch {
+    return DEFAULT_LOCALE;
   }
 
   return DEFAULT_LOCALE;

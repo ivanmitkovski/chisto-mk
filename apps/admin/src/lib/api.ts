@@ -59,6 +59,14 @@ export async function apiFetch<TResponse>(path: string, options: FetchOptions = 
     ...(options.headers ?? {}),
   };
 
+  if (
+    typeof window === 'undefined' &&
+    !headers['Accept-Language'] &&
+    !headers['accept-language']
+  ) {
+    headers['Accept-Language'] = 'en';
+  }
+
   if (options.body !== undefined) {
     headers['Content-Type'] = 'application/json';
   }

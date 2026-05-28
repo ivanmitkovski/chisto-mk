@@ -48,6 +48,10 @@ export function createBackendProxyHeaders(request: NextRequest, accessToken: str
     }
   });
   headers.set('Accept', headers.get('Accept') ?? 'application/json');
+  const acceptLanguage = headers.get('Accept-Language')?.trim();
+  if (!acceptLanguage || acceptLanguage === '*') {
+    headers.set('Accept-Language', 'en');
+  }
   if (accessToken) {
     headers.set('Authorization', `Bearer ${accessToken}`);
   }
