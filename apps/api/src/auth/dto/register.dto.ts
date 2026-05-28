@@ -63,4 +63,10 @@ export class RegisterDto {
   @IsOptional()
   @IsISO8601()
   privacyAcceptedAt?: string;
+
+  @ApiProperty({ required: false, description: 'Stable per-install device identifier.', maxLength: 128 })
+  @IsOptional()
+  @IsString()
+  @MaxLength(128)
+  deviceId?: string;
 }

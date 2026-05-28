@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 /// Tokens use platform secure storage with Apple keychain accessibility that
@@ -5,7 +7,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 /// default AES-GCM + KeyStore (see [AndroidOptions]).
 class SecureTokenStorage {
   SecureTokenStorage({FlutterSecureStorage? storage})
-      : _storage = storage ?? _defaultStorage;
+    : _storage = storage ?? _defaultStorage;
 
   static final FlutterSecureStorage _defaultStorage = FlutterSecureStorage(
     aOptions: const AndroidOptions(),
@@ -24,13 +26,24 @@ class SecureTokenStorage {
   static const String _keyUserId = 'chisto_user_id';
   static const String _keyDisplayName = 'chisto_display_name';
   static const String _keyPhoneNumber = 'chisto_phone_number';
-  static const String _keyOrganizerCertifiedAt = 'chisto_organizer_certified_at';
+  static const String _keyOrganizerCertifiedAt =
+      'chisto_organizer_certified_at';
+  static const String _keyDeviceId = 'chisto_device_id';
 
   Future<String?> get accessToken => _storage.read(key: _keyAccessToken);
   Future<String?> get refreshToken => _storage.read(key: _keyRefreshToken);
   Future<String?> get userId => _storage.read(key: _keyUserId);
   Future<String?> get displayName => _storage.read(key: _keyDisplayName);
   Future<String?> get phoneNumber => _storage.read(key: _keyPhoneNumber);
+  Future<String> get deviceId async {
+    final String? existing = await _storage.read(key: _keyDeviceId);
+    if (existing != null && existing.trim().isNotEmpty) {
+      return existing.trim();
+    }
+    final String created = _createDeviceId();
+    await _storage.write(key: _keyDeviceId, value: created);
+    return created;
+  }
 
   /// ISO-8601 timestamp from `/auth/me` or organizer quiz; used to hydrate
   /// certification before `/auth/me` succeeds on cold start.
@@ -83,5 +96,15 @@ class SecureTokenStorage {
       _storage.delete(key: _keyPhoneNumber),
       _storage.delete(key: _keyOrganizerCertifiedAt),
     ]);
+  }
+
+  static String _createDeviceId() {
+    final Random random = Random.secure();
+    final List<int> bytes = List<int>.generate(16, (_) => random.nextInt(256));
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+    String hex(int value) => value.toRadixString(16).padLeft(2, '0');
+    final String raw = bytes.map(hex).join();
+    return '${raw.substring(0, 8)}-${raw.substring(8, 12)}-${raw.substring(12, 16)}-${raw.substring(16, 20)}-${raw.substring(20)}';
   }
 }

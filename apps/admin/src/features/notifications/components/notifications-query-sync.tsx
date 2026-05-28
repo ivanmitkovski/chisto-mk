@@ -21,6 +21,7 @@ export function NotificationsQuerySync() {
     queryFn: fetchNotifications,
     staleTime: 0,
     gcTime: 600_000,
+    retry: 1,
     refetchOnWindowFocus: true,
   });
 

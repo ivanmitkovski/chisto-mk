@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getApiBaseUrl } from '@/lib/api-base-url';
-import { ensureAdminCsrfCookie, setAdminAuthCookies } from '@/lib/server/admin-session';
+import {
+  ensureAdminCsrfCookie,
+  getOrCreateAdminDeviceId,
+  setAdminAuthCookies,
+} from '@/lib/server/admin-session';
 import type { AuthResponse } from '@/features/auth/lib/types';
 
 export const dynamic = 'force-dynamic';
@@ -22,10 +26,11 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const deviceId = getOrCreateAdminDeviceId(request);
   const backendResponse = await fetch(`${getApiBaseUrl()}/auth/admin/2fa/complete-login`, {
     method: 'POST',
     headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-    body: JSON.stringify({ tempToken, code }),
+    body: JSON.stringify({ tempToken, code, deviceId }),
     cache: 'no-store',
   });
   const payload = (await backendResponse.json().catch(() => ({}))) as AuthResponse | Record<string, unknown>;
@@ -34,6 +39,7 @@ export async function POST(request: NextRequest) {
   if (backendResponse.ok) {
     setAdminAuthCookies(response, payload as AuthResponse, request, {
       rememberDevice: body.rememberDevice === true,
+      deviceId,
     });
   }
   ensureAdminCsrfCookie(request, response);

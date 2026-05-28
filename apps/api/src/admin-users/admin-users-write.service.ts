@@ -111,7 +111,7 @@ export class AdminUsersWriteService {
       metadata: { before: target, after: updated, changes } as Prisma.InputJsonValue,
     });
 
-    if (dto.status != null && dto.status !== UserStatus.ACTIVE) {
+    if (dto.status === UserStatus.SUSPENDED || dto.status === UserStatus.DELETED) {
       await this.sessionRevocation.revokeAllForUser(id, 'status_changed');
     }
 
@@ -174,9 +174,6 @@ export class AdminUsersWriteService {
       } as Prisma.InputJsonValue,
     });
 
-    if (dto.role !== target.role) {
-      await this.sessionRevocation.revokeAllForUser(id, 'role_changed');
-    }
     this.authSnapshotCache.invalidate(id);
     this.userEventsService.emitUserUpdated(id);
     return updated;

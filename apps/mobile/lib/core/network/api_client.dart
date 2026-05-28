@@ -31,17 +31,20 @@ class ApiClient {
     required String? Function() accessToken,
     required void Function() onUnauthorized,
     String? Function()? acceptLanguageHeader,
+    FutureOr<String?> Function()? deviceIdHeader,
     http.Client? httpClient,
-  })  : _baseUrl = _normalizeApiV1Base(config.apiBaseUrl),
-        _accessToken = accessToken,
-        _onUnauthorized = onUnauthorized,
-        _acceptLanguageHeader = acceptLanguageHeader,
-        _httpClient = httpClient ?? http.Client();
+  }) : _baseUrl = _normalizeApiV1Base(config.apiBaseUrl),
+       _accessToken = accessToken,
+       _onUnauthorized = onUnauthorized,
+       _acceptLanguageHeader = acceptLanguageHeader,
+       _deviceIdHeader = deviceIdHeader,
+       _httpClient = httpClient ?? http.Client();
 
   final String _baseUrl;
   final String? Function() _accessToken;
   final void Function() _onUnauthorized;
   final String? Function()? _acceptLanguageHeader;
+  final FutureOr<String?> Function()? _deviceIdHeader;
 
   Future<RefreshOutcome> Function()? refreshSession;
 
@@ -118,6 +121,17 @@ class ApiClient {
     headers[key] = value.trim();
   }
 
+  Future<void> _maybeAddDeviceId(Map<String, String> headers) async {
+    final FutureOr<String?> Function()? headerFn = _deviceIdHeader;
+    if (headerFn == null ||
+        headers.keys.any((String k) => k.toLowerCase() == 'x-device-id')) {
+      return;
+    }
+    final String? value = await headerFn();
+    if (value == null || value.trim().isEmpty) return;
+    headers['X-Device-Id'] = value.trim();
+  }
+
   Future<ApiResponse> get(
     String path, {
     Map<String, String>? headers,
@@ -169,16 +183,16 @@ class ApiClient {
     return _requestWithRetry('PUT', path, headers: headers, body: body);
   }
 
-  Future<ApiResponse> delete(String path, {Map<String, String>? headers}) async {
+  Future<ApiResponse> delete(
+    String path, {
+    Map<String, String>? headers,
+  }) async {
     return _requestWithRetry('DELETE', path, headers: headers);
   }
 
   /// Multipart file upload. [filePaths] are local paths to files.
   /// Field name is 'files' to match backend FilesInterceptor.
-  Future<ApiResponse> postMultipart(
-    String path,
-    List<String> filePaths,
-  ) async {
+  Future<ApiResponse> postMultipart(String path, List<String> filePaths) async {
     return _postMultipartWithRetry(path, filePaths);
   }
 
@@ -192,8 +206,8 @@ class ApiClient {
       if (e.code == 'CANCELLED') {
         rethrow;
       }
-      final bool mayRecoverWithRefresh = e.code == 'UNAUTHORIZED' ||
-          e.code == 'SESSION_REVOKED';
+      final bool mayRecoverWithRefresh =
+          e.code == 'UNAUTHORIZED' || e.code == 'SESSION_REVOKED';
       if (!mayRecoverWithRefresh ||
           _authPaths.contains(path) ||
           refreshSession == null) {
@@ -212,8 +226,7 @@ class ApiClient {
     List<String> filePaths,
   ) async {
     final Uri url = Uri.parse('$_baseUrl$path');
-    final http.MultipartRequest request =
-        http.MultipartRequest('POST', url);
+    final http.MultipartRequest request = http.MultipartRequest('POST', url);
 
     final String? token = _accessToken();
     if (token != null && token.isNotEmpty) {
@@ -221,6 +234,7 @@ class ApiClient {
     }
     request.headers['Accept'] = 'application/json';
     _maybeAddAcceptLanguage(request.headers);
+    await _maybeAddDeviceId(request.headers);
 
     for (final String filePath in filePaths) {
       final MediaType? contentType = _contentTypeForPath(filePath);
@@ -234,13 +248,15 @@ class ApiClient {
     }
 
     try {
-      final http.StreamedResponse streamed =
-          await request.send().timeout(_timeout);
+      final http.StreamedResponse streamed = await request.send().timeout(
+        _timeout,
+      );
       final http.Response response = await http.Response.fromStream(streamed);
       return _handleResponse(response);
     } on TimeoutException catch (e) {
       throw AppError.timeout(
-          message: e.message?.isEmpty ?? true ? null : e.message);
+        message: e.message?.isEmpty ?? true ? null : e.message,
+      );
     } on SocketException catch (e) {
       throw AppError.network(message: e.message, cause: e);
     } on AppError {
@@ -286,8 +302,8 @@ class ApiClient {
         timeout: timeout,
       );
     } on AppError catch (e) {
-      final bool mayRecoverWithRefresh = e.code == 'UNAUTHORIZED' ||
-          e.code == 'SESSION_REVOKED';
+      final bool mayRecoverWithRefresh =
+          e.code == 'UNAUTHORIZED' || e.code == 'SESSION_REVOKED';
       if (!mayRecoverWithRefresh ||
           _authPaths.contains(path) ||
           refreshSession == null) {
@@ -327,8 +343,10 @@ class ApiClient {
       request.fields.addAll(fields);
     }
 
-    final int totalBytes =
-        files.fold<int>(0, (int a, MultipartFileData f) => a + f.bytes.length);
+    final int totalBytes = files.fold<int>(
+      0,
+      (int a, MultipartFileData f) => a + f.bytes.length,
+    );
     int sentTotal = 0;
     for (final MultipartFileData f in files) {
       final int fileLen = f.bytes.length;
@@ -353,13 +371,15 @@ class ApiClient {
 
     try {
       final Duration effectiveTimeout = timeout ?? _timeout;
-      final http.StreamedResponse streamed =
-          await request.send().timeout(effectiveTimeout);
+      final http.StreamedResponse streamed = await request.send().timeout(
+        effectiveTimeout,
+      );
       final http.Response response = await http.Response.fromStream(streamed);
       return _handleResponse(response);
     } on TimeoutException catch (e) {
       throw AppError.timeout(
-          message: e.message?.isEmpty ?? true ? null : e.message);
+        message: e.message?.isEmpty ?? true ? null : e.message,
+      );
     } on SocketException catch (e) {
       throw AppError.network(message: e.message, cause: e);
     } on AppError {
@@ -429,8 +449,8 @@ class ApiClient {
       if (e.code == 'CANCELLED') {
         rethrow;
       }
-      final bool mayRecoverWithRefresh = e.code == 'UNAUTHORIZED' ||
-          e.code == 'SESSION_REVOKED';
+      final bool mayRecoverWithRefresh =
+          e.code == 'UNAUTHORIZED' || e.code == 'SESSION_REVOKED';
       if (!mayRecoverWithRefresh ||
           _authPaths.contains(path) ||
           refreshSession == null) {
@@ -458,7 +478,8 @@ class ApiClient {
     cancellation?.throwIfCancelled();
     final Uri url = Uri.parse('$_baseUrl$path');
     final Map<String, String> requestHeaders = <String, String>{
-      'Accept': 'application/vnd.mapbox-vector-tile, application/octet-stream;q=0.9, */*;q=0.8',
+      'Accept':
+          'application/vnd.mapbox-vector-tile, application/octet-stream;q=0.9, */*;q=0.8',
       ...?headers,
     };
     final String? token = _accessToken();
@@ -466,14 +487,18 @@ class ApiClient {
       requestHeaders['Authorization'] = 'Bearer $token';
     }
     _maybeAddAcceptLanguage(requestHeaders);
+    await _maybeAddDeviceId(requestHeaders);
 
     try {
-      final http.Response response =
-          await _httpClient.get(url, headers: requestHeaders).timeout(_timeout);
+      final http.Response response = await _httpClient
+          .get(url, headers: requestHeaders)
+          .timeout(_timeout);
       cancellation?.throwIfCancelled();
       return _handleBytesResponse(response);
     } on TimeoutException catch (e) {
-      throw AppError.timeout(message: e.message?.isEmpty ?? true ? null : e.message);
+      throw AppError.timeout(
+        message: e.message?.isEmpty ?? true ? null : e.message,
+      );
     } on AppError {
       rethrow;
     } on Exception catch (e) {
@@ -502,10 +527,12 @@ class ApiClient {
       );
     }
 
-    final String? bodyStr =
-        response.bodyBytes.isNotEmpty ? utf8.decode(response.bodyBytes) : null;
-    final Map<String, dynamic>? json =
-        bodyStr != null ? _decodeJsonObject(bodyStr) : null;
+    final String? bodyStr = response.bodyBytes.isNotEmpty
+        ? utf8.decode(response.bodyBytes)
+        : null;
+    final Map<String, dynamic>? json = bodyStr != null
+        ? _decodeJsonObject(bodyStr)
+        : null;
     final String? retryAfterHeader = response.headers['retry-after'];
     final AppError error = appErrorFromFailedResponse(
       statusCode: response.statusCode,
@@ -536,8 +563,8 @@ class ApiClient {
       if (e.code == 'CANCELLED') {
         rethrow;
       }
-      final bool mayRecoverWithRefresh = e.code == 'UNAUTHORIZED' ||
-          e.code == 'SESSION_REVOKED';
+      final bool mayRecoverWithRefresh =
+          e.code == 'UNAUTHORIZED' || e.code == 'SESSION_REVOKED';
       if (!mayRecoverWithRefresh ||
           _authPaths.contains(path) ||
           refreshSession == null) {
@@ -578,6 +605,7 @@ class ApiClient {
       requestHeaders['Authorization'] = 'Bearer $token';
     }
     _maybeAddAcceptLanguage(requestHeaders);
+    await _maybeAddDeviceId(requestHeaders);
 
     String? bodyStr;
     if (body != null) {
@@ -631,7 +659,9 @@ class ApiClient {
       cancellation?.throwIfCancelled();
       return _handleResponse(response);
     } on TimeoutException catch (e) {
-      throw AppError.timeout(message: e.message?.isEmpty ?? true ? null : e.message);
+      throw AppError.timeout(
+        message: e.message?.isEmpty ?? true ? null : e.message,
+      );
     } on AppError {
       rethrow;
     } on Exception catch (e) {
@@ -668,10 +698,12 @@ class ApiClient {
   ApiResponse _handleResponse(http.Response response) {
     _recordServerClock(response.headers);
     final String? bodyStr = response.body.isNotEmpty ? response.body : null;
-    final Map<String, dynamic>? json =
-        bodyStr != null ? _decodeJsonObject(bodyStr) : null;
+    final Map<String, dynamic>? json = bodyStr != null
+        ? _decodeJsonObject(bodyStr)
+        : null;
 
-    if ((response.statusCode >= 200 && response.statusCode < 300) || response.statusCode == 304) {
+    if ((response.statusCode >= 200 && response.statusCode < 300) ||
+        response.statusCode == 304) {
       return ApiResponse(
         statusCode: response.statusCode,
         body: bodyStr,

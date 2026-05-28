@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString, MinLength, MaxLength } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsOptional, IsString, MinLength, MaxLength } from 'class-validator';
 
 export class Complete2FALoginDto {
   @ApiProperty({ description: 'Short-lived temp token from admin login when 2FA is required' })
@@ -15,4 +15,13 @@ export class Complete2FALoginDto {
   @MinLength(6)
   @MaxLength(32)
   code!: string;
+
+  @ApiPropertyOptional({
+    description: 'Stable browser/device identifier used to keep one active admin session per device.',
+    maxLength: 128,
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(128)
+  deviceId?: string;
 }

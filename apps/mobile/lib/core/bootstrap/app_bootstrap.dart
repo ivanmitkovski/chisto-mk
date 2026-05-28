@@ -114,6 +114,7 @@ class AppBootstrap {
     _authRepository = repository;
     _authRepositoryForUnauthorized = repository;
   }
+
   EventsRepository get eventsRepository => _eventsRepository!;
   CheckInRepository get checkInRepository => _checkInRepository!;
   ProfileRepository get profileRepository => _profileRepository!;
@@ -242,6 +243,7 @@ class AppBootstrap {
         );
         return acceptLanguageFromLocale(effective);
       },
+      deviceIdHeader: () => _tokenStorage!.deviceId,
     );
 
     _notificationsRepository = ApiNotificationsRepository(client: _apiClient!);
@@ -389,14 +391,17 @@ class AppBootstrap {
     final ProviderContainer? container = _providerContainer;
     if (container == null) return;
     if (code == 'en') {
-      container.read(appLocaleOverrideProvider.notifier).state =
-          const Locale('en');
+      container.read(appLocaleOverrideProvider.notifier).state = const Locale(
+        'en',
+      );
     } else if (code == 'mk') {
-      container.read(appLocaleOverrideProvider.notifier).state =
-          const Locale('mk');
+      container.read(appLocaleOverrideProvider.notifier).state = const Locale(
+        'mk',
+      );
     } else if (code == 'sq') {
-      container.read(appLocaleOverrideProvider.notifier).state =
-          const Locale('sq');
+      container.read(appLocaleOverrideProvider.notifier).state = const Locale(
+        'sq',
+      );
     } else {
       container.read(appLocaleOverrideProvider.notifier).state = null;
     }

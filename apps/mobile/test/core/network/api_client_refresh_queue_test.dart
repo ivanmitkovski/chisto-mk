@@ -20,7 +20,11 @@ void main() {
             headers: {'content-type': 'application/json'},
           );
         }
-        return http.Response('{"ok":true}', 200, headers: {'content-type': 'application/json'});
+        return http.Response(
+          '{"ok":true}',
+          200,
+          headers: {'content-type': 'application/json'},
+        );
       }
       return http.Response('not found', 404);
     });
@@ -43,5 +47,29 @@ void main() {
 
     expect(refreshCalls, 1);
     expect(results.every((r) => r.statusCode == 200), isTrue);
+  });
+
+  test('adds stable device id header to API requests', () async {
+    late http.Request captured;
+    final mock = MockClient((http.Request request) async {
+      captured = request;
+      return http.Response(
+        '{"ok":true}',
+        200,
+        headers: {'content-type': 'application/json'},
+      );
+    });
+
+    final client = ApiClient(
+      config: AppConfig.local,
+      accessToken: () => 'token',
+      onUnauthorized: () {},
+      deviceIdHeader: () async => 'device-123',
+      httpClient: mock,
+    );
+
+    await client.get('/protected');
+
+    expect(captured.headers['X-Device-Id'], 'device-123');
   });
 }

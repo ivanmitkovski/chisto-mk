@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:chisto_mobile/core/auth/auth_state.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
@@ -59,11 +60,11 @@ class ApiAuthRepository implements AuthRepository {
     required SharedPreferences preferences,
     this.pushService,
     ProfileAvatarSync? avatarSync,
-  })  : _client = client,
-        _authState = authState,
-        _tokenStorage = tokenStorage,
-        _preferences = preferences,
-        _avatarSync = avatarSync ?? const NoOpProfileAvatarSync();
+  }) : _client = client,
+       _authState = authState,
+       _tokenStorage = tokenStorage,
+       _preferences = preferences,
+       _avatarSync = avatarSync ?? const NoOpProfileAvatarSync();
 
   final ApiClient _client;
   final AuthState _authState;
@@ -109,6 +110,7 @@ class ApiAuthRepository implements AuthRepository {
         'phoneNumber': phoneNumber,
         'password': password,
         'rememberMe': rememberMe,
+        'deviceId': await _tokenStorage.deviceId,
       },
     );
     final Map<String, dynamic>? json = response.json;
@@ -138,6 +140,7 @@ class ApiAuthRepository implements AuthRepository {
         'termsAcceptedAt': acceptedAt.toIso8601String(),
         'termsVersion': EulaAcceptanceStore.currentVersion,
         'privacyAcceptedAt': acceptedAt.toIso8601String(),
+        'deviceId': await _tokenStorage.deviceId,
       },
     );
     final Map<String, dynamic>? json = response.json;
@@ -168,7 +171,10 @@ class ApiAuthRepository implements AuthRepository {
 
       final ApiResponse response = await _client.post(
         '/auth/refresh',
-        body: <String, dynamic>{'refreshToken': storedRefresh},
+        body: <String, dynamic>{
+          'refreshToken': storedRefresh,
+          'deviceId': await _tokenStorage.deviceId,
+        },
       );
       final Map<String, dynamic>? json = response.json;
       if (json == null) {
@@ -210,6 +216,7 @@ class ApiAuthRepository implements AuthRepository {
       body: <String, dynamic>{
         'phoneNumber': phoneNumberE164,
         'code': code,
+        'deviceId': await _tokenStorage.deviceId,
       },
     );
     final Map<String, dynamic>? json = response.json;
@@ -246,9 +253,12 @@ class ApiAuthRepository implements AuthRepository {
   ) {
     if (json == null) throw AppError.unknown();
     final String message =
-        json['message']?.toString() ?? 'If an account exists, instructions were sent.';
+        json['message']?.toString() ??
+        'If an account exists, instructions were sent.';
     final String? channel = json['channel']?.toString();
-    final int? expiresIn = json['expiresIn'] is int ? json['expiresIn'] as int : null;
+    final int? expiresIn = json['expiresIn'] is int
+        ? json['expiresIn'] as int
+        : null;
     return PasswordResetRequestResult(
       message: message,
       channel: channel,
@@ -257,13 +267,13 @@ class ApiAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<void> verifyPasswordResetCode(String phoneNumberE164, String code) async {
+  Future<void> verifyPasswordResetCode(
+    String phoneNumberE164,
+    String code,
+  ) async {
     await _client.post(
       '/auth/password-reset/verify-code',
-      body: <String, dynamic>{
-        'phoneNumber': phoneNumberE164,
-        'code': code,
-      },
+      body: <String, dynamic>{'phoneNumber': phoneNumberE164, 'code': code},
     );
   }
 
@@ -290,10 +300,7 @@ class ApiAuthRepository implements AuthRepository {
   }) async {
     await _client.post(
       '/auth/password-reset/email/confirm',
-      body: <String, dynamic>{
-        'token': token,
-        'newPassword': newPassword,
-      },
+      body: <String, dynamic>{'token': token, 'newPassword': newPassword},
     );
   }
 
@@ -325,11 +332,9 @@ class ApiAuthRepository implements AuthRepository {
         if (label != null && label.trim().isNotEmpty) 'label': label.trim(),
       },
     );
-    await UserHomeLocationStore(_preferences).save(
-      latitude: latitude,
-      longitude: longitude,
-      label: label,
-    );
+    await UserHomeLocationStore(
+      _preferences,
+    ).save(latitude: latitude, longitude: longitude, label: label);
   }
 
   @override
@@ -341,7 +346,9 @@ class ApiAuthRepository implements AuthRepository {
     final Map<String, dynamic>? json = response.json;
     if (json == null) throw AppError.unknown();
     return EmailChangeRequestResult(
-      expiresInSeconds: json['expiresIn'] is int ? json['expiresIn'] as int : 600,
+      expiresInSeconds: json['expiresIn'] is int
+          ? json['expiresIn'] as int
+          : 600,
       devCode: json['devCode']?.toString(),
     );
   }
@@ -358,7 +365,6 @@ class ApiAuthRepository implements AuthRepository {
         'code': code.trim(),
       },
     );
-    await invalidateLocalSession();
   }
 
   @override
@@ -410,31 +416,49 @@ class ApiAuthRepository implements AuthRepository {
     // here must not block logout / unauthorized recovery.
     try {
       await EngagementOutboxStore.instance.clearAll();
-    } on Object {/* best effort */}
+    } on Object {
+      /* best effort */
+    }
     try {
       await FieldModeQueue.instance.clearAll();
-    } on Object {/* best effort */}
+    } on Object {
+      /* best effort */
+    }
     try {
       await PushBackgroundPendingStore.clearAll();
-    } on Object {/* best effort */}
+    } on Object {
+      /* best effort */
+    }
     try {
       await UserHomeLocationStore(_preferences).clear();
-    } on Object {/* best effort */}
+    } on Object {
+      /* best effort */
+    }
     try {
       await MapSearchRecentsStore.clear(_preferences);
-    } on Object {/* best effort */}
+    } on Object {
+      /* best effort */
+    }
     try {
       await const CheckInLocalCache().clear();
-    } on Object {/* best effort */}
+    } on Object {
+      /* best effort */
+    }
     try {
       await const EventFeedbackLocalCache().clear();
-    } on Object {/* best effort */}
+    } on Object {
+      /* best effort */
+    }
     try {
       await PendingChatReplyStore.clear();
-    } on Object {/* best effort */}
+    } on Object {
+      /* best effort */
+    }
     try {
       await DiscoveryAnalytics.clearUserConsent();
-    } on Object {/* best effort */}
+    } on Object {
+      /* best effort */
+    }
     await push?.teardownFirebaseListeners();
     ColdStartCoordinator.instance.resetSession();
     _clearingLocalSession = false;
@@ -456,7 +480,10 @@ class ApiAuthRepository implements AuthRepository {
       try {
         await _client.post(
           '/auth/logout',
-          body: <String, dynamic>{'refreshToken': storedRefresh},
+          body: <String, dynamic>{
+            'refreshToken': storedRefresh,
+            'deviceId': await _tokenStorage.deviceId,
+          },
         );
       } on AppError catch (_) {
         // Best-effort server-side revocation; local cleanup happens regardless.
@@ -476,27 +503,24 @@ class ApiAuthRepository implements AuthRepository {
     if (token == null || token.isEmpty) return;
     final int? exp = getAccessTokenExpiry(token);
     if (exp == null) return;
-    final double nowSec =
-        DateTime.now().millisecondsSinceEpoch / 1000.0;
-    final double delaySec = 0.8 * (exp - nowSec);
+    final double nowSec = DateTime.now().millisecondsSinceEpoch / 1000.0;
+    final double jitter = 0.9 + (math.Random().nextDouble() * 0.2);
+    final double delaySec = 0.8 * (exp - nowSec) * jitter;
     // Clock skew: device clock can be ahead of server, making the token look
     // already-expired even though it isn't. Schedule an immediate (short)
     // refresh so we recover instead of waiting indefinitely.
     final Duration delay = delaySec <= 0
         ? const Duration(seconds: 5)
         : Duration(seconds: delaySec.round().clamp(1, 86400));
-    _proactiveRefreshTimer = Timer(
-      delay,
-      () async {
-        _cancelProactiveRefresh();
-        try {
-          await refreshSession();
-          _scheduleProactiveRefresh();
-        } on Object catch (e, st) {
-          AppLog.warn('proactive token refresh failed', error: e, stackTrace: st);
-        }
-      },
-    );
+    _proactiveRefreshTimer = Timer(delay, () async {
+      _cancelProactiveRefresh();
+      try {
+        await _client.refreshSessionQueued();
+        _scheduleProactiveRefresh();
+      } on Object catch (e, st) {
+        AppLog.warn('proactive token refresh failed', error: e, stackTrace: st);
+      }
+    });
   }
 
   @override
@@ -542,8 +566,9 @@ class ApiAuthRepository implements AuthRepository {
     final String? storedCertIso = await _tokenStorage.organizerCertifiedAtIso;
     final bool hasStoredCertIso =
         storedCertIso != null && storedCertIso.trim().isNotEmpty;
-    final DateTime? organizerFromStorage =
-        hasStoredCertIso ? DateTime.tryParse(storedCertIso.trim()) : null;
+    final DateTime? organizerFromStorage = hasStoredCertIso
+        ? DateTime.tryParse(storedCertIso.trim())
+        : null;
 
     if (_isRestoreStale(generation)) return;
     final String? accessBeforeProfile = await _tokenStorage.accessToken;
@@ -579,7 +604,7 @@ class ApiAuthRepository implements AuthRepository {
             accessNow != storedAccess) {
           return;
         }
-        final RefreshOutcome outcome = await refreshSession();
+        final RefreshOutcome outcome = await _client.refreshSessionQueued();
         if (outcome == RefreshOutcome.success) {
           _scheduleProactiveRefresh();
         } else if (outcome == RefreshOutcome.serverRejected) {
@@ -628,20 +653,16 @@ class ApiAuthRepository implements AuthRepository {
     _applyTermsConsentFromJson(json, userId: _authState.userId);
   }
 
-  void _applyTermsConsentFromJson(
-    Map<String, dynamic> json, {
-    String? userId,
-  }) {
+  void _applyTermsConsentFromJson(Map<String, dynamic> json, {String? userId}) {
     if (!json.containsKey('requiresTermsAcceptance')) return;
     final bool requires = json['requiresTermsAcceptance'] == true;
     _requiresTermsAcceptance = requires;
     final String uid = userId ?? _authState.userId ?? '';
     if (uid.isNotEmpty) {
       unawaited(
-        EulaAcceptanceStore(_preferences).syncFromServer(
-          userId: uid,
-          requiresTermsAcceptance: requires,
-        ),
+        EulaAcceptanceStore(
+          _preferences,
+        ).syncFromServer(userId: uid, requiresTermsAcceptance: requires),
       );
     }
   }
@@ -666,11 +687,11 @@ class ApiAuthRepository implements AuthRepository {
     final String displayName = '$firstName $lastName'.trim();
     final String? phoneNumber = user['phoneNumber'] as String?;
     final String? priorUserId = _authState.userId;
-    final bool switchedAccount = priorUserId != null &&
-        priorUserId.isNotEmpty &&
-        priorUserId != id;
-    final bool hasOrganizerCertifiedAtKey =
-        user.containsKey('organizerCertifiedAt');
+    final bool switchedAccount =
+        priorUserId != null && priorUserId.isNotEmpty && priorUserId != id;
+    final bool hasOrganizerCertifiedAtKey = user.containsKey(
+      'organizerCertifiedAt',
+    );
     final DateTime? organizerCertifiedAt = hasOrganizerCertifiedAtKey
         ? _parseOrganizerCertifiedAtField(user['organizerCertifiedAt'])
         : null;
@@ -702,7 +723,10 @@ class ApiAuthRepository implements AuthRepository {
     AppBootstrap.instance.startNotificationsRealtimeIfAuthenticated();
   }
 
-  Future<void> _applyUserProfile(Map<String, dynamic> json, String accessToken) async {
+  Future<void> _applyUserProfile(
+    Map<String, dynamic> json,
+    String accessToken,
+  ) async {
     final String id = json['id'] as String? ?? '';
     final String firstName = json['firstName'] as String? ?? '';
     final String lastName = json['lastName'] as String? ?? '';
@@ -711,8 +735,9 @@ class ApiAuthRepository implements AuthRepository {
     // Only sync organizer certification when the server includes the field.
     // Otherwise preserve local state (secure storage + [AuthState]) so a partial
     // `/auth/me` payload cannot clear an existing certification.
-    final bool hasOrganizerCertifiedAtKey =
-        json.containsKey('organizerCertifiedAt');
+    final bool hasOrganizerCertifiedAtKey = json.containsKey(
+      'organizerCertifiedAt',
+    );
     final DateTime? organizerCertifiedAtFromServer = hasOrganizerCertifiedAtKey
         ? _parseOrganizerCertifiedAtField(json['organizerCertifiedAt'])
         : null;
@@ -734,7 +759,9 @@ class ApiAuthRepository implements AuthRepository {
       phoneNumber: phoneNumber,
     );
     if (hasOrganizerCertifiedAtKey) {
-      await _tokenStorage.writeOrganizerCertifiedAt(organizerCertifiedAtFromServer);
+      await _tokenStorage.writeOrganizerCertifiedAt(
+        organizerCertifiedAtFromServer,
+      );
     }
     await UserHomeLocationStore(_preferences).applyFromProfileJson(json);
     _applyTermsConsentFromJson(json, userId: id);
@@ -750,7 +777,12 @@ class ApiAuthRepository implements AuthRepository {
       await push.requestNotificationPermissionIfNeeded();
       await push.ensureNotificationDeliveryReady();
     } on Object catch (e, st) {
-      AppLog.warn('[Push] Post-auth init failed', error: e, stackTrace: st, category: 'push');
+      AppLog.warn(
+        '[Push] Post-auth init failed',
+        error: e,
+        stackTrace: st,
+        category: 'push',
+      );
     }
   }
 

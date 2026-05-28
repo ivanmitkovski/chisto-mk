@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString, Matches, MaxLength, MinLength } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
 
 export class VerifyOtpDto {
   @ApiProperty({
@@ -23,4 +23,13 @@ export class VerifyOtpDto {
   @MaxLength(6)
   @Matches(/^\d{6}$/, { message: 'code must be exactly 6 digits' })
   code!: string;
+
+  @ApiPropertyOptional({
+    description: 'Stable per-install device identifier used to keep one active session per device.',
+    maxLength: 128,
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(128)
+  deviceId?: string;
 }

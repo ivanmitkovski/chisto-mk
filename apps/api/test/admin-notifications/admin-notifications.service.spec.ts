@@ -16,6 +16,48 @@ describe('AdminNotificationsService', () => {
 
   it('listForAdmin returns data and meta', async () => {
     const createdAt = new Date('2026-01-01T12:00:00.000Z');
+    const findMany = jest.fn().mockResolvedValue([
+      {
+        id: 'n1',
+        title: 'T',
+        message: 'M',
+        timeLabel: 'legacy',
+        tone: 'INFO',
+        category: 'SYSTEM',
+        isUnread: true,
+        href: null,
+        createdAt,
+      },
+    ]);
+    const prisma = {
+      $transaction: jest.fn((ops: [Promise<unknown>, Promise<unknown>, Promise<unknown>]) =>
+        Promise.all(ops),
+      ),
+      adminNotification: {
+        findMany,
+        count: jest.fn().mockResolvedValueOnce(1).mockResolvedValueOnce(1),
+      },
+    } as never;
+    const svc = new AdminNotificationsService(prisma);
+    const query = { page: 1, limit: 20 } as ListAdminNotificationsQueryDto;
+    const out = await svc.listForAdmin(admin, query, 'en');
+    expect(out.data).toHaveLength(1);
+    expect(findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        select: expect.objectContaining({
+          id: true,
+          title: true,
+          message: true,
+          createdAt: true,
+        }),
+      }),
+    );
+    expect(out.meta.total).toBe(1);
+    expect(out.meta.unreadCount).toBe(1);
+  });
+
+  it('normalizes legacy UGC notification hrefs into dashboard routes', async () => {
+    const createdAt = new Date('2026-01-01T12:00:00.000Z');
     const prisma = {
       $transaction: jest.fn((ops: [Promise<unknown>, Promise<unknown>, Promise<unknown>]) =>
         Promise.all(ops),
@@ -24,15 +66,13 @@ describe('AdminNotificationsService', () => {
         findMany: jest.fn().mockResolvedValue([
           {
             id: 'n1',
-            title: 'T',
-            message: 'M',
+            title: 'UGC',
+            message: 'Report',
             timeLabel: 'legacy',
-            tone: 'INFO',
-            category: 'SYSTEM',
+            tone: 'info',
+            category: 'reports',
             isUnread: true,
-            href: null,
-            messageTemplateKey: null,
-            messageTemplateParams: null,
+            href: '/moderation/ugc?reportId=r1',
             createdAt,
           },
         ]),
@@ -42,9 +82,7 @@ describe('AdminNotificationsService', () => {
     const svc = new AdminNotificationsService(prisma);
     const query = { page: 1, limit: 20 } as ListAdminNotificationsQueryDto;
     const out = await svc.listForAdmin(admin, query, 'en');
-    expect(out.data).toHaveLength(1);
-    expect(out.meta.total).toBe(1);
-    expect(out.meta.unreadCount).toBe(1);
+    expect(out.data[0]?.href).toBe('/dashboard/moderation/ugc?reportId=r1');
   });
 
   it('markOneRead throws when notification missing', async () => {

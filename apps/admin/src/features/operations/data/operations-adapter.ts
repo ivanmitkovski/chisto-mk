@@ -1,5 +1,6 @@
 import { getAdminAuthTokenFromCookies } from '@/features/auth/lib/admin-auth-server';
 import { apiFetch } from '@/lib/api';
+import { getApiOrigin } from '@/lib/api-base-url';
 
 type PanelState<T> =
   | { status: 'ok'; data: T; updatedAt: string }
@@ -52,12 +53,13 @@ async function capture<T>(fn: () => Promise<T>): Promise<PanelState<T>> {
 export async function getOperationsSnapshot(): Promise<OperationsSnapshot> {
   const token = await getAdminAuthTokenFromCookies();
   const fetchOptions = { authToken: token };
+  const healthFetchOptions = { ...fetchOptions, baseUrl: getApiOrigin() };
   const [pushStats, deliveryReport, deadLetters, mapHealth, mapDeep, gdprAudit] = await Promise.all([
     capture(() => apiFetch<OperationsSnapshot['pushStats'] extends PanelState<infer T> ? T : never>('/notifications/admin/push-stats', fetchOptions)),
     capture(() => apiFetch<OperationsSnapshot['deliveryReport'] extends PanelState<infer T> ? T : never>('/notifications/admin/delivery-report', fetchOptions)),
     capture(() => apiFetch<OperationsSnapshot['deadLetters'] extends PanelState<infer T> ? T : never>('/notifications/admin/dead-letters?page=1&limit=5', fetchOptions)),
-    capture(() => apiFetch<OperationsSnapshot['mapHealth'] extends PanelState<infer T> ? T : never>('/health/map', fetchOptions)),
-    capture(() => apiFetch<OperationsSnapshot['mapDeep'] extends PanelState<infer T> ? T : never>('/health/map-deep', fetchOptions)),
+    capture(() => apiFetch<OperationsSnapshot['mapHealth'] extends PanelState<infer T> ? T : never>('/health/map', healthFetchOptions)),
+    capture(() => apiFetch<OperationsSnapshot['mapDeep'] extends PanelState<infer T> ? T : never>('/health/map-deep', healthFetchOptions)),
     capture(() => apiFetch<OperationsSnapshot['gdprAudit'] extends PanelState<infer T> ? T : never>('/admin/audit?page=1&limit=10&resourceType=User', fetchOptions)),
   ]);
 

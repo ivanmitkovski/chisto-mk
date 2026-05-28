@@ -80,7 +80,9 @@ export class AuthLoginService {
 
     await db.loginFailure.deleteMany({ where: { phoneNumber } }).catch(() => {});
 
-    return this.sessionService.buildAuthResponse(user, dto.rememberMe ?? true);
+    return this.sessionService.buildAuthResponse(user, dto.rememberMe ?? true, {
+      deviceId: dto.deviceId,
+    });
   }
 
   private async recordLoginFailure(phoneNumber: string): Promise<void> {

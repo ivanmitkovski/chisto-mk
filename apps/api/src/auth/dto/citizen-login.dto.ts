@@ -25,4 +25,13 @@ export class CitizenLoginDto {
   @IsOptional()
   @IsBoolean()
   rememberMe?: boolean;
+
+  @ApiPropertyOptional({
+    description: 'Stable per-install device identifier used to keep one active session per device.',
+    maxLength: 128,
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(128)
+  deviceId?: string;
 }

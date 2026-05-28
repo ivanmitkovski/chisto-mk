@@ -7,6 +7,7 @@ import {
 import {
   getAdminAccessToken,
   getAdminRefreshToken,
+  getOrCreateAdminDeviceId,
   getTokenExpiryMs,
   refreshAdminTokens,
   setAdminAuthCookies,
@@ -44,6 +45,7 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = getAdminAccessToken(request);
   const refreshToken = getAdminRefreshToken(request);
+  const deviceId = getOrCreateAdminDeviceId(request);
 
   const next = () =>
     applyCspHeaders(NextResponse.next({ request: { headers: requestHeaders } }), csp, reportOnlyCsp);
@@ -51,10 +53,10 @@ export async function middleware(request: NextRequest) {
   if (pathname.startsWith('/dashboard')) {
     if (!token) {
       if (refreshToken) {
-        const tokens = await refreshAdminTokens(refreshToken);
+        const tokens = await refreshAdminTokens(refreshToken, deviceId);
         if (tokens) {
           const response = NextResponse.redirect(request.url);
-          setAdminAuthCookies(response, tokens, request);
+          setAdminAuthCookies(response, tokens, request, { deviceId });
           return applyCspHeaders(response, csp, reportOnlyCsp);
         }
       }
@@ -63,10 +65,10 @@ export async function middleware(request: NextRequest) {
 
     const expMs = getTokenExpiryMs(token);
     if (expMs && refreshToken && Date.now() > expMs - REFRESH_THRESHOLD_MS) {
-      const tokens = await refreshAdminTokens(refreshToken);
+      const tokens = await refreshAdminTokens(refreshToken, deviceId);
       if (tokens) {
         const response = NextResponse.redirect(request.url);
-        setAdminAuthCookies(response, tokens, request);
+        setAdminAuthCookies(response, tokens, request, { deviceId });
         return applyCspHeaders(response, csp, reportOnlyCsp);
       }
     }

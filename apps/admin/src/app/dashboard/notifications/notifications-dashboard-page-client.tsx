@@ -49,6 +49,7 @@ export function NotificationsDashboardPageClient() {
   const { data, isPending, isError, error, dataUpdatedAt } = useQuery({
     queryKey: adminQueryKeys.notifications,
     queryFn: fetchNotifications,
+    retry: 1,
   });
 
   if (isPending) {

@@ -126,10 +126,14 @@ export class AuthAdminLoginService {
       })
       .catch(() => {});
 
-    return this.sessionService.buildAuthResponse(user, true);
+    return this.sessionService.buildAuthResponse(user, true, { deviceId: dto.deviceId });
   }
 
-  async completeAdmin2FALogin(tempToken: string, code: string): Promise<AuthResponse> {
+  async completeAdmin2FALogin(
+    tempToken: string,
+    code: string,
+    deviceId?: string,
+  ): Promise<AuthResponse> {
     const trimmedToken = tempToken.trim();
     const trimmedCode = code.trim();
     if (!trimmedToken || !trimmedCode) {
@@ -229,7 +233,7 @@ export class AuthAdminLoginService {
         message: 'User not found',
       });
     }
-    return this.sessionService.buildAuthResponse(freshUser, true);
+    return this.sessionService.buildAuthResponse(freshUser, true, { deviceId });
   }
 
   private async recordAdminLoginFailure(email: string): Promise<void> {

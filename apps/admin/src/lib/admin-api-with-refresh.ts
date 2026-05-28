@@ -5,6 +5,7 @@ import {
   ensureAdminCsrfCookie,
   getAdminAccessToken,
   getAdminRefreshToken,
+  getOrCreateAdminDeviceId,
   refreshAdminTokens,
   setAdminAuthCookies,
   verifyAdminCsrf,
@@ -86,6 +87,7 @@ export async function fetchBackendWithRefresh(
 
   const accessToken = getAdminAccessToken(request);
   const refreshToken = getAdminRefreshToken(request);
+  const deviceId = getOrCreateAdminDeviceId(request);
 
   const url = `${getApiBaseUrl()}${path}`;
   const headers: Record<string, string> = {
@@ -123,14 +125,14 @@ export async function fetchBackendWithRefresh(
   let res = await fetch(url, fetchInit);
 
   if (res.status === 401 && refreshToken) {
-    const tokens = await refreshAdminTokens(refreshToken);
+    const tokens = await refreshAdminTokens(refreshToken, deviceId);
     if (tokens) {
       headers.Authorization = `Bearer ${tokens.accessToken}`;
       res = await fetch(url, fetchInit);
       const payload = await res.json().catch(() => ({}));
       const nextRes = NextResponse.json(payload, { status: res.status });
       nextRes.headers.set('x-request-id', headers['X-Request-Id']);
-      setAdminAuthCookies(nextRes, tokens, request);
+      setAdminAuthCookies(nextRes, tokens, request, { deviceId });
       ensureAdminCsrfCookie(request, nextRes);
       return { response: res, nextResponse: nextRes };
     }
@@ -169,6 +171,7 @@ export async function proxyBackendWithRefresh(
 
   const accessToken = getAdminAccessToken(request);
   const refreshToken = getAdminRefreshToken(request);
+  const deviceId = getOrCreateAdminDeviceId(request);
   const headers = createBackendProxyHeaders(request, accessToken);
 
   const body =
@@ -188,7 +191,7 @@ export async function proxyBackendWithRefresh(
   let backendResponse = await run();
   let refreshedTokens: Awaited<ReturnType<typeof refreshAdminTokens>> = null;
   if (backendResponse.status === 401 && refreshToken) {
-    refreshedTokens = await refreshAdminTokens(refreshToken);
+    refreshedTokens = await refreshAdminTokens(refreshToken, deviceId);
     if (refreshedTokens) {
       headers.set('Authorization', `Bearer ${refreshedTokens.accessToken}`);
       backendResponse = await run();
@@ -207,7 +210,7 @@ export async function proxyBackendWithRefresh(
   });
   response.headers.set('x-request-id', headers.get('X-Request-Id') ?? crypto.randomUUID());
   if (refreshedTokens) {
-    setAdminAuthCookies(response, refreshedTokens, request);
+    setAdminAuthCookies(response, refreshedTokens, request, { deviceId });
   } else if (backendResponse.status === 401) {
     clearAdminAuthCookies(response, request);
   }

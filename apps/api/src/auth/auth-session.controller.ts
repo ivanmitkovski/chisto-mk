@@ -81,7 +81,7 @@ export class AuthSessionController {
   })
   @HttpCode(HttpStatus.OK)
   completeAdmin2FALogin(@Body() dto: Complete2FALoginDto) {
-    return this.adminLoginSvc.completeAdmin2FALogin(dto.tempToken, dto.code);
+    return this.adminLoginSvc.completeAdmin2FALogin(dto.tempToken, dto.code, dto.deviceId);
   }
 
   @Post('refresh')
@@ -93,7 +93,7 @@ export class AuthSessionController {
   })
   @HttpCode(HttpStatus.OK)
   refresh(@Body() dto: RefreshTokenDto) {
-    return this.session.refresh(dto.refreshToken);
+    return this.session.refresh(dto.refreshToken, dto.deviceId);
   }
 
   @Post('logout')
@@ -126,6 +126,6 @@ export class AuthSessionController {
   })
   @HttpCode(HttpStatus.OK)
   verifyOtp(@Body() dto: VerifyOtpDto) {
-    return this.authOtp.verifyPhoneAndIssueSession(dto.phoneNumber, dto.code);
+    return this.authOtp.verifyPhoneAndIssueSession(dto.phoneNumber, dto.code, true, dto.deviceId);
   }
 }

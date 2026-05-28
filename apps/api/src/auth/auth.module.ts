@@ -40,6 +40,7 @@ import { AccountErasureCronService } from './account-erasure-cron.service';
 import { AuthIdentifierChangeService } from './auth-identifier-change.service';
 import { UserDsarExportService } from './user-dsar-export.service';
 import { AuthIdentifierThrottleService } from './auth-identifier-throttle.service';
+import { AuthRefreshReplayCacheService } from './auth-refresh-replay-cache.service';
 
 /** Global so JwtStrategy, JwtAuthGuard, and RolesGuard resolve in every feature module without duplicate imports. */
 @Global()
@@ -82,6 +83,7 @@ import { AuthIdentifierThrottleService } from './auth-identifier-throttle.servic
       inject: [ConfigService],
     },
     UserAuthSnapshotCacheService,
+    AuthRefreshReplayCacheService,
     AuthSessionRevocationService,
     SecurityEventsListener,
     AccountErasureService,

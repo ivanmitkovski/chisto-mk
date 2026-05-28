@@ -46,6 +46,16 @@ export class AccountErasureCronService implements OnModuleInit, OnModuleDestroy 
   async purgeExpired(): Promise<number> {
     if (this.shuttingDown) return 0;
     const cutoff = new Date(Date.now() - PURGE_AFTER_MS);
+    const staleSessions = await this.prisma.userSession.deleteMany({
+      where: {
+        revokedAt: { lt: cutoff },
+        user: { status: { not: UserStatus.DELETED } },
+      },
+    });
+    if (staleSessions.count > 0) {
+      this.logger.log(`Purged ${staleSessions.count} revoked session(s) older than 30 days`);
+    }
+
     const users = await this.prisma.user.findMany({
       where: {
         status: UserStatus.DELETED,
@@ -54,7 +64,7 @@ export class AccountErasureCronService implements OnModuleInit, OnModuleDestroy 
       select: { id: true },
       take: 100,
     });
-    if (users.length === 0) return 0;
+    if (users.length === 0) return staleSessions.count;
 
     const ids = users.map((u) => u.id);
     await this.prisma.$transaction([
@@ -66,7 +76,7 @@ export class AccountErasureCronService implements OnModuleInit, OnModuleDestroy 
 
     legacySnapshotGauges.accountErasurePurged.inc(ids.length);
     this.logger.log(`Purged ${ids.length} user(s) past 30-day erasure grace`);
-    return ids.length;
+    return ids.length + staleSessions.count;
   }
 
   private async acquireLeaderLock(): Promise<boolean> {

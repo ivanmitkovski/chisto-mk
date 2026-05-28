@@ -63,7 +63,7 @@ function makePrisma() {
     },
     userSession: {
       create: jest.fn(),
-      findMany: jest.fn(),
+      findMany: jest.fn().mockResolvedValue([]),
       findUnique: jest.fn(),
       update: jest.fn(),
       updateMany: jest.fn().mockResolvedValue({ count: 0 }),
@@ -157,6 +157,7 @@ describe('Auth stack (registration, session, profile)', () => {
   let eventEmitter: ReturnType<typeof makeEventEmitter>;
   let reportsUploadService: ReturnType<typeof makeReportsUploadService>;
   let sessionRevocation: { revokeAllForUser: jest.Mock };
+  let replayCache: { get: jest.Mock; set: jest.Mock };
 
   beforeEach(async () => {
     prisma = makePrisma();
@@ -172,6 +173,10 @@ describe('Auth stack (registration, session, profile)', () => {
     const rankingsService = makeRankingsService();
     const env = loadAuthEnvRuntime(config as unknown as ConfigService);
     sessionRevocation = { revokeAllForUser: jest.fn().mockResolvedValue(undefined) };
+    replayCache = {
+      get: jest.fn().mockResolvedValue(null),
+      set: jest.fn().mockResolvedValue(undefined),
+    };
     session = new AuthSessionService(
       prisma as any,
       jwt as unknown as JwtService,
@@ -181,6 +186,7 @@ describe('Auth stack (registration, session, profile)', () => {
       sessionRevocation as never,
       env,
       config as unknown as ConfigService,
+      replayCache as never,
     );
     const authOtp = {
       sendPhoneVerificationOtp: jest.fn().mockResolvedValue({ expiresIn: 600 }),
@@ -412,12 +418,14 @@ describe('Auth stack (registration, session, profile)', () => {
         userId: 'user-1',
         tokenId,
         refreshTokenHash: hash,
+        previousTokenHash: null,
+        rotatedAt: null,
+        deviceId: null,
         expiresAt: new Date(Date.now() + 86400000),
         revokedAt: null,
         user: mockUser,
       });
-      prisma.userSession.update.mockResolvedValue({});
-      prisma.userSession.create.mockResolvedValue({});
+      prisma.userSession.updateMany.mockResolvedValue({ count: 1 });
 
       const result = await session.refresh(fullToken);
 
@@ -430,10 +438,19 @@ describe('Auth stack (registration, session, profile)', () => {
         where: { tokenId },
         include: { user: true },
       });
-      expect(prisma.userSession.update).toHaveBeenCalledWith({
-        where: { id: 'session-1' },
-        data: { revokedAt: expect.any(Date) },
+      expect(prisma.userSession.updateMany).toHaveBeenCalledWith({
+        where: {
+          id: 'session-1',
+          revokedAt: null,
+          refreshTokenHash: hash,
+        },
+        data: expect.objectContaining({
+          previousTokenHash: hash,
+          rotatedAt: expect.any(Date),
+          expiresAt: expect.any(Date),
+        }),
       });
+      expect(prisma.userSession.create).not.toHaveBeenCalled();
     });
 
     it('includes organizerCertifiedAt ISO string when user is certified', async () => {
@@ -447,12 +464,14 @@ describe('Auth stack (registration, session, profile)', () => {
         userId: 'user-1',
         tokenId,
         refreshTokenHash: hash,
+        previousTokenHash: null,
+        rotatedAt: null,
+        deviceId: null,
         expiresAt: new Date(Date.now() + 86400000),
         revokedAt: null,
         user: { ...mockUser, organizerCertifiedAt: certifiedAt },
       });
-      prisma.userSession.update.mockResolvedValue({});
-      prisma.userSession.create.mockResolvedValue({});
+      prisma.userSession.updateMany.mockResolvedValue({ count: 1 });
 
       const result = await session.refresh(fullToken);
 
@@ -472,7 +491,7 @@ describe('Auth stack (registration, session, profile)', () => {
       ).rejects.toThrow(UnauthorizedException);
     });
 
-    it('on reuse of a revoked refresh token with valid hash, revokes all user sessions and emits security event', async () => {
+    it('on reuse of a revoked refresh token with valid hash, emits security event without revoking all sessions', async () => {
       const tokenId = 'reuse-tid';
       const fullToken = `${tokenId}.stillvalidsecret`;
       const hash = await bcrypt.hash(fullToken, 4);
@@ -482,16 +501,19 @@ describe('Auth stack (registration, session, profile)', () => {
         userId: 'user-1',
         tokenId,
         refreshTokenHash: hash,
+        previousTokenHash: null,
+        rotatedAt: null,
+        deviceId: null,
         expiresAt: new Date(Date.now() + 86400000),
         revokedAt: new Date(),
         user: mockUser,
       });
 
       await expect(session.refresh(fullToken)).rejects.toThrow(UnauthorizedException);
-      expect(sessionRevocation.revokeAllForUser).toHaveBeenCalledWith('user-1', 'refresh_token_reuse');
+      expect(sessionRevocation.revokeAllForUser).not.toHaveBeenCalled();
       expect(eventEmitter.emit).toHaveBeenCalledWith(
         'security.refresh_token_reuse',
-        expect.objectContaining({ userId: 'user-1' }),
+        expect.objectContaining({ userId: 'user-1', sessionId: 'session-revoked' }),
       );
     });
   });

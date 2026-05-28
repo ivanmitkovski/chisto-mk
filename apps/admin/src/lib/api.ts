@@ -19,6 +19,8 @@ type FetchOptions = {
   body?: unknown;
   authToken?: string | null;
   cache?: RequestCache;
+  /** API origin without `/v1` — required for routes excluded from the global prefix (e.g. `/health/*`). */
+  baseUrl?: string;
 };
 
 async function parseJsonSafe(response: Response): Promise<unknown | null> {
@@ -49,7 +51,7 @@ export class ApiError extends Error {
 }
 
 export async function apiFetch<TResponse>(path: string, options: FetchOptions = {}): Promise<TResponse> {
-  const base = getApiBaseUrl();
+  const base = options.baseUrl ?? getApiBaseUrl();
   const url = `${base}${path}`;
 
   const headers: Record<string, string> = {

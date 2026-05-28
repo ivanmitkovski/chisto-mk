@@ -93,7 +93,7 @@ export function UserDetailForm({
   return (
     <Card className={styles.card} padding="md">
       <div className={styles.grid}>
-        <div>
+        <div className={styles.summaryItemEmail}>
           <p className={styles.label}>Email</p>
           <p className={styles.value}>{email}</p>
         </div>
@@ -160,7 +160,7 @@ export function UserDetailForm({
             </select>
           </label>
         ) : (
-          <div>
+          <div className={styles.readonlyField}>
             <p className={styles.label}>Role</p>
             <p className={styles.value}>{initialRole}</p>
           </div>
@@ -179,9 +179,11 @@ export function UserDetailForm({
           </select>
         </label>
       </div>
-      <Button type="button" onClick={() => void save()} disabled={saving}>
-        {saving ? 'Saving…' : 'Save changes'}
-      </Button>
+      <div className={styles.actions}>
+        <Button type="button" onClick={() => void save()} disabled={saving} className={styles.saveButton}>
+          {saving ? 'Saving…' : 'Save changes'}
+        </Button>
+      </div>
       <Snack snack={snack} onClose={() => setSnack(null)} />
     </Card>
   );

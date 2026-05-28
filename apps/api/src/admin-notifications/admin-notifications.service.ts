@@ -32,6 +32,33 @@ type AdminNotificationListResponse = {
   };
 };
 
+const adminNotificationListSelect = {
+  id: true,
+  title: true,
+  message: true,
+  timeLabel: true,
+  tone: true,
+  category: true,
+  isUnread: true,
+  href: true,
+  createdAt: true,
+} satisfies Prisma.AdminNotificationSelect;
+
+type SelectedAdminNotification = Prisma.AdminNotificationGetPayload<{
+  select: typeof adminNotificationListSelect;
+}>;
+
+function normalizeAdminNotificationHref(href: string | null): string | null {
+  if (!href) return null;
+  if (href.startsWith('/dashboard/')) return href;
+  if (href === '/moderation/ugc') return '/dashboard/moderation/ugc';
+  if (href.startsWith('/moderation/ugc?')) {
+    return `/dashboard${href}`;
+  }
+  if (href.startsWith('/')) return href;
+  return null;
+}
+
 @Injectable()
 export class AdminNotificationsService {
   constructor(private readonly prisma: PrismaService) {}
@@ -52,6 +79,7 @@ export class AdminNotificationsService {
     const [notifications, total, unreadCount] = await this.prisma.$transaction([
       this.prisma.adminNotification.findMany({
         where,
+        select: adminNotificationListSelect,
         skip,
         take: query.limit,
         orderBy: { createdAt: 'desc' },
@@ -69,7 +97,7 @@ export class AdminNotificationsService {
     const effectiveLocale = locale.trim() || 'en';
 
     const items: AdminNotificationListItem[] = notifications.map(
-      (notification) => ({
+      (notification: SelectedAdminNotification) => ({
         id: notification.id,
         title: notification.title,
         message: notification.message,
@@ -78,9 +106,9 @@ export class AdminNotificationsService {
         tone: notification.tone,
         category: notification.category,
         isUnread: notification.isUnread,
-        href: notification.href ?? null,
-        messageTemplateKey: notification.messageTemplateKey ?? null,
-        messageTemplateParams: notification.messageTemplateParams ?? null,
+        href: normalizeAdminNotificationHref(notification.href),
+        messageTemplateKey: null,
+        messageTemplateParams: null,
       }),
     );
 

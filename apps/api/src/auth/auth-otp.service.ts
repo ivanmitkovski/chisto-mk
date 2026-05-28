@@ -104,6 +104,7 @@ export class AuthOtpService {
     phoneNumber: string,
     code: string,
     rememberMe = true,
+    deviceId?: string,
   ): Promise<AuthResponse> {
     const normalized = phoneNumber.trim();
     await this.otpService.verifyAndConsumeOtp(normalized, code);
@@ -132,6 +133,6 @@ export class AuthOtpService {
       })
       .catch(() => {});
 
-    return this.sessionService.buildAuthResponse(user, rememberMe);
+    return this.sessionService.buildAuthResponse(user, rememberMe, { deviceId });
   }
 }

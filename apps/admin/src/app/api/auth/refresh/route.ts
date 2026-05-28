@@ -3,6 +3,7 @@ import {
   clearAdminAuthCookies,
   ensureAdminCsrfCookie,
   getAdminRefreshToken,
+  getOrCreateAdminDeviceId,
   refreshAdminTokens,
   setAdminAuthCookies,
   verifyAdminCsrf,
@@ -30,7 +31,8 @@ export async function POST(request: NextRequest) {
     return response;
   }
 
-  const tokens = await refreshAdminTokens(refreshToken);
+  const deviceId = getOrCreateAdminDeviceId(request);
+  const tokens = await refreshAdminTokens(refreshToken, deviceId);
   if (!tokens) {
     const response = NextResponse.json(
       { code: 'UNAUTHORIZED', message: 'Admin session expired. Please sign in again.' },
@@ -41,7 +43,7 @@ export async function POST(request: NextRequest) {
   }
 
   const response = NextResponse.json({ ok: true });
-  setAdminAuthCookies(response, tokens, request);
+  setAdminAuthCookies(response, tokens, request, { deviceId });
   ensureAdminCsrfCookie(request, response);
   return response;
 }

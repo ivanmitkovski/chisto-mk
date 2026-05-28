@@ -5,6 +5,7 @@ import {
   ensureAdminCsrfCookie,
   getAdminAccessToken,
   getAdminRefreshToken,
+  getOrCreateAdminDeviceId,
   refreshAdminTokens,
   setAdminAuthCookies,
 } from '@/lib/server/admin-session';
@@ -14,11 +15,13 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: NextRequest) {
   let accessToken = getAdminAccessToken(request);
   const refreshToken = getAdminRefreshToken(request);
+  const deviceId = getOrCreateAdminDeviceId(request);
+  let refreshedTokens: Awaited<ReturnType<typeof refreshAdminTokens>> = null;
 
   if (!accessToken && refreshToken) {
-    const refreshed = await refreshAdminTokens(refreshToken);
-    if (refreshed) {
-      accessToken = refreshed.accessToken;
+    refreshedTokens = await refreshAdminTokens(refreshToken, deviceId);
+    if (refreshedTokens) {
+      accessToken = refreshedTokens.accessToken;
     }
   }
 
@@ -38,9 +41,8 @@ export async function GET(request: NextRequest) {
     });
 
   let backendResponse = await run(accessToken);
-  let refreshedTokens: Awaited<ReturnType<typeof refreshAdminTokens>> = null;
   if (backendResponse.status === 401 && refreshToken) {
-    refreshedTokens = await refreshAdminTokens(refreshToken);
+    refreshedTokens = await refreshAdminTokens(refreshToken, deviceId);
     if (refreshedTokens) {
       backendResponse = await run(refreshedTokens.accessToken);
     }
@@ -65,7 +67,7 @@ export async function GET(request: NextRequest) {
   });
 
   if (refreshedTokens) {
-    setAdminAuthCookies(response, refreshedTokens, request);
+    setAdminAuthCookies(response, refreshedTokens, request, { deviceId });
   }
   ensureAdminCsrfCookie(request, response);
   return response;

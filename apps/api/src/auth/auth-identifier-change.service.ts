@@ -4,7 +4,6 @@ import Redis from 'ioredis';
 import { NotificationType } from '../prisma-client';
 import { PrismaService } from '../prisma/prisma.service';
 import { EmailService } from '../email/email.service';
-import { AuthSessionRevocationService } from './auth-session-revocation.service';
 import { AuditService } from '../audit/audit.service';
 import { hashPiiForLog } from '../common/security/pii-hash.util';
 import { AuthIdentifierThrottleService } from './auth-identifier-throttle.service';
@@ -12,6 +11,7 @@ import { notificationLocalesByUserId } from '../common/i18n/notification-locale.
 import type { EmailLocale } from '../email/email.types';
 import { OTP_SENDER, type OtpSender, OtpSmsPurpose } from '../otp/otp-sender.interface';
 import { generateOtpCode } from '../otp/otp-code.util';
+import { UserAuthSnapshotCacheService } from './user-auth-snapshot-cache.service';
 
 type PendingChange = {
   kind: 'email' | 'phone';
@@ -27,7 +27,7 @@ export class AuthIdentifierChangeService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly email: EmailService,
-    private readonly sessionRevocation: AuthSessionRevocationService,
+    private readonly authSnapshotCache: UserAuthSnapshotCacheService,
     private readonly audit: AuditService,
     private readonly identifierThrottle: AuthIdentifierThrottleService,
     @Inject(OTP_SENDER) private readonly otpSender: OtpSender,
@@ -118,7 +118,7 @@ export class AuthIdentifierChangeService {
     });
 
     await this.clearPending(userId);
-    await this.sessionRevocation.revokeAllForUser(userId, 'admin_action');
+    this.authSnapshotCache.invalidate(userId);
     await this.audit.log({
       actorId: userId,
       action: 'IDENTIFIER_CHANGED',
@@ -181,7 +181,7 @@ export class AuthIdentifierChangeService {
       data: { phoneNumber: normalized, isPhoneVerified: true },
     });
     await this.clearPending(userId);
-    await this.sessionRevocation.revokeAllForUser(userId, 'admin_action');
+    this.authSnapshotCache.invalidate(userId);
     await this.audit.log({
       actorId: userId,
       action: 'IDENTIFIER_CHANGED',

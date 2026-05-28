@@ -150,12 +150,16 @@ model UserSession {
 
   tokenId          String   @unique
   refreshTokenHash String
+  previousTokenHash String?
+  rotatedAt       DateTime?
+  deviceId        String?
   deviceInfo       String?
   ipAddress        String?
   expiresAt        DateTime
   revokedAt        DateTime?
 
   @@index([userId, revokedAt])
+  @@index([userId, deviceId])
   @@index([expiresAt])
 }
 

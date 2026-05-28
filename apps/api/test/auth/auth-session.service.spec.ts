@@ -27,6 +27,7 @@ describe('AuthSessionService', () => {
       sessionRevocation,
       env,
       configService,
+      { get: jest.fn(), set: jest.fn() } as never,
     );
     await expect(session.refresh('nodotseparator')).rejects.toBeInstanceOf(UnauthorizedException);
   });

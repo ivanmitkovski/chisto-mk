@@ -22,7 +22,8 @@ export function validateEnv(): void {
     CORS_ORIGINS: Joi.string().allow('').optional(),
     JWT_ACCESS_EXPIRES_IN: Joi.number().integer().min(60).max(86400).default(900),
     JWT_REFRESH_EXPIRES_DAYS: Joi.number().integer().min(1).max(365).default(30),
-    MAX_SESSIONS_PER_USER: Joi.number().integer().min(1).max(100).default(5),
+    MAX_SESSIONS_PER_USER: Joi.number().integer().min(1).max(100).default(10),
+    REFRESH_TOKEN_ROTATION_GRACE_SECONDS: Joi.number().integer().min(0).max(300).default(60),
     SENTRY_DSN: Joi.string().trim().allow('').optional(),
     SENTRY_TRACES_SAMPLE_RATE: Joi.number().min(0).max(1).optional(),
     EMAIL_ENABLED: Joi.string().valid('true', 'false').optional(),
@@ -51,7 +52,12 @@ export function validateEnv(): void {
     process.exit(1);
   }
 
-  for (const key of ['JWT_ACCESS_EXPIRES_IN', 'JWT_REFRESH_EXPIRES_DAYS', 'MAX_SESSIONS_PER_USER'] as const) {
+  for (const key of [
+    'JWT_ACCESS_EXPIRES_IN',
+    'JWT_REFRESH_EXPIRES_DAYS',
+    'MAX_SESSIONS_PER_USER',
+    'REFRESH_TOKEN_ROTATION_GRACE_SECONDS',
+  ] as const) {
     process.env[key] = String(value[key]);
   }
 

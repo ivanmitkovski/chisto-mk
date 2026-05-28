@@ -9,6 +9,7 @@ export type AuthEnvRuntime = {
   accessTokenTtl: number;
   refreshTokenTtlDays: number;
   maxSessionsPerUser: number;
+  refreshTokenRotationGraceSeconds: number;
   shouldReturnDevCode: boolean;
 };
 
@@ -32,15 +33,27 @@ export function loadAuthEnvRuntime(configService: ConfigService | null): AuthEnv
     throw new Error(`JWT_REFRESH_EXPIRES_DAYS must be an integer between 1 and 365 (got: ${refreshRaw})`);
   }
   const maxSessionsRaw = cfg('MAX_SESSIONS_PER_USER');
-  const maxSessionsPerUser = maxSessionsRaw ? Number(maxSessionsRaw) : 5;
+  const maxSessionsPerUser = maxSessionsRaw ? Number(maxSessionsRaw) : 10;
   if (!Number.isFinite(maxSessionsPerUser) || maxSessionsPerUser < 1 || maxSessionsPerUser > 100) {
     throw new Error(`MAX_SESSIONS_PER_USER must be an integer between 1 and 100 (got: ${maxSessionsRaw})`);
+  }
+  const graceRaw = cfg('REFRESH_TOKEN_ROTATION_GRACE_SECONDS');
+  const refreshTokenRotationGraceSeconds = graceRaw ? Number(graceRaw) : 60;
+  if (
+    !Number.isFinite(refreshTokenRotationGraceSeconds) ||
+    refreshTokenRotationGraceSeconds < 0 ||
+    refreshTokenRotationGraceSeconds > 300
+  ) {
+    throw new Error(
+      `REFRESH_TOKEN_ROTATION_GRACE_SECONDS must be an integer between 0 and 300 (got: ${graceRaw})`,
+    );
   }
   return {
     saltRounds: 12,
     accessTokenTtl,
     refreshTokenTtlDays,
     maxSessionsPerUser,
+    refreshTokenRotationGraceSeconds,
     shouldReturnDevCode,
   };
 }

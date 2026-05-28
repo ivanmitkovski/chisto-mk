@@ -4,6 +4,7 @@ import {
   ADMIN_AUTH_COOKIE_KEY,
   ADMIN_CSRF_COOKIE_KEY,
   ADMIN_CSRF_HEADER,
+  ADMIN_DEVICE_COOKIE_KEY,
   ADMIN_REFRESH_COOKIE_KEY,
 } from '@/features/auth/lib/auth-constants';
 import {
@@ -58,6 +59,7 @@ describe('admin session helpers', () => {
     const setCookie = response.headers.getSetCookie().join('\n');
     expect(setCookie).toContain(ADMIN_AUTH_COOKIE_KEY);
     expect(setCookie).toContain(ADMIN_REFRESH_COOKIE_KEY);
+    expect(setCookie).toContain(ADMIN_DEVICE_COOKIE_KEY);
     expect(setCookie).toContain('HttpOnly');
     expect(setCookie).toContain(ADMIN_CSRF_COOKIE_KEY);
   });
@@ -80,8 +82,17 @@ describe('admin session helpers', () => {
     });
     vi.stubGlobal('fetch', fetchMock);
 
-    await Promise.all([refreshAdminTokens('refresh-1'), refreshAdminTokens('refresh-1')]);
+    await Promise.all([
+      refreshAdminTokens('refresh-1', 'device-1'),
+      refreshAdminTokens('refresh-1', 'device-1'),
+    ]);
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/auth/refresh'),
+      expect.objectContaining({
+        body: JSON.stringify({ refreshToken: 'refresh-1', deviceId: 'device-1' }),
+      }),
+    );
   });
 });

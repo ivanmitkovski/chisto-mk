@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import {
   ADMIN_AUTH_COOKIE_KEY,
   ADMIN_CSRF_COOKIE_KEY,
+  ADMIN_DEVICE_COOKIE_KEY,
   ADMIN_CSRF_HEADER,
   ADMIN_LEGACY_AUTH_COOKIE_KEY,
   ADMIN_LEGACY_REFRESH_COOKIE_KEY,
@@ -16,6 +17,7 @@ export type AdminTokenPair = {
 
 const ACCESS_COOKIE_MAX_AGE = 15 * 60;
 const REFRESH_COOKIE_MAX_AGE = 7 * 24 * 60 * 60;
+const DEVICE_COOKIE_MAX_AGE = 365 * 24 * 60 * 60;
 const inFlightRefreshes = new Map<string, Promise<AdminTokenPair | null>>();
 
 export function getAdminAccessToken(request: NextRequest): string | null {
@@ -40,6 +42,26 @@ function shouldUseSecureCookie(request: NextRequest): boolean {
 
 function randomToken(): string {
   return crypto.randomUUID().replaceAll('-', '') + crypto.randomUUID().replaceAll('-', '');
+}
+
+export function getOrCreateAdminDeviceId(request: NextRequest): string {
+  const existing = request.cookies.get(ADMIN_DEVICE_COOKIE_KEY)?.value;
+  if (existing && existing.length >= 16) return existing;
+  return crypto.randomUUID();
+}
+
+export function setAdminDeviceIdCookie(
+  response: NextResponse,
+  request: NextRequest,
+  deviceId: string,
+): void {
+  response.cookies.set(ADMIN_DEVICE_COOKIE_KEY, deviceId, {
+    path: '/',
+    maxAge: DEVICE_COOKIE_MAX_AGE,
+    sameSite: 'lax',
+    secure: shouldUseSecureCookie(request),
+    httpOnly: true,
+  });
 }
 
 export function ensureAdminCsrfCookie(request: NextRequest, response: NextResponse): string {
@@ -68,8 +90,9 @@ export function setAdminAuthCookies(
   response: NextResponse,
   tokens: AdminTokenPair,
   request: NextRequest,
-  options: { rememberDevice?: boolean } = {},
+  options: { rememberDevice?: boolean; deviceId?: string } = {},
 ): void {
+  setAdminDeviceIdCookie(response, request, options.deviceId ?? getOrCreateAdminDeviceId(request));
   response.cookies.set(ADMIN_AUTH_COOKIE_KEY, tokens.accessToken, {
     path: '/',
     maxAge: ACCESS_COOKIE_MAX_AGE,
@@ -116,22 +139,32 @@ export function clearAdminAuthCookies(response: NextResponse, request: NextReque
   expireCookie(response, request, ADMIN_LEGACY_REFRESH_COOKIE_KEY, { httpOnly: false });
 }
 
-export async function refreshAdminTokens(refreshToken: string): Promise<AdminTokenPair | null> {
-  const existing = inFlightRefreshes.get(refreshToken);
+export async function refreshAdminTokens(
+  refreshToken: string,
+  deviceId?: string,
+): Promise<AdminTokenPair | null> {
+  const refreshKey = `${refreshToken}:${deviceId ?? ''}`;
+  const existing = inFlightRefreshes.get(refreshKey);
   if (existing) return existing;
 
-  const refreshPromise = refreshAdminTokensUncached(refreshToken).finally(() => {
-    inFlightRefreshes.delete(refreshToken);
+  const refreshPromise = refreshAdminTokensUncached(refreshToken, deviceId).finally(() => {
+    inFlightRefreshes.delete(refreshKey);
   });
-  inFlightRefreshes.set(refreshToken, refreshPromise);
+  inFlightRefreshes.set(refreshKey, refreshPromise);
   return refreshPromise;
 }
 
-async function refreshAdminTokensUncached(refreshToken: string): Promise<AdminTokenPair | null> {
+async function refreshAdminTokensUncached(
+  refreshToken: string,
+  deviceId?: string,
+): Promise<AdminTokenPair | null> {
   const res = await fetch(`${getApiBaseUrl()}/auth/refresh`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify({ refreshToken }),
+    body: JSON.stringify({
+      refreshToken,
+      ...(deviceId ? { deviceId } : {}),
+    }),
     cache: 'no-store',
   }).catch(() => null);
   if (!res?.ok) return null;
