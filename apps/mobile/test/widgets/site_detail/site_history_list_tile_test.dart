@@ -1,38 +1,36 @@
-import 'package:chisto_mobile/core/navigation/app_routes.dart';
-import 'package:chisto_mobile/features/home/domain/models/site_history_entry.dart';
-import 'package:chisto_mobile/features/home/presentation/widgets/site_detail/history/site_history_list_tile.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:chisto_infrastructure/core/navigation/app_go_router.dart';
+import 'package:chisto_infrastructure/core/navigation/app_routes.dart';
+import 'package:chisto_infrastructure/core/providers/root_container.dart';
+import 'package:feature_home/src/application/home_shell_controller.dart';
+import 'package:feature_home/src/domain/models/site_history_entry.dart';
+import 'package:feature_home/src/presentation/widgets/site_detail/history/site_history_timeline_tile.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../shared/widget_test_bootstrap.dart';
+
 void main() {
-  Widget wrap(Widget child) {
-    return MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      locale: const Locale('en'),
-      routes: <String, WidgetBuilder>{
-        AppRoutes.eventsDetail: (_) =>
-            const Scaffold(body: Text('event-detail')),
-      },
-      home: Scaffold(body: child),
-    );
-  }
+  setUpAll(() async {
+    await bootstrapWidgetTests();
+  });
 
   testWidgets('tap with cleanupEventId navigates to event detail', (
     WidgetTester tester,
   ) async {
+    readRoot(homeShellControllerProvider.notifier);
+    buildAppGoRouter(initialLocation: AppRoutes.home);
+
     await tester.pumpWidget(
-      wrap(
-        SiteHistoryListTile(
+      wrapForWidgetTest(
+        SiteHistoryTimelineTile(
           entry: SiteHistoryEntry(
             id: 'e1',
             kind: SiteHistoryEntryKind.cleanupEventScheduled,
             occurredAt: DateTime(2026, 5, 20),
             cleanupEventId: 'event-42',
           ),
-          showDividerBelow: false,
+          showLineAbove: false,
+          showLineBelow: true,
         ),
       ),
     );
@@ -41,22 +39,26 @@ void main() {
     await tester.tap(find.text('Cleanup event scheduled'));
     await tester.pumpAndSettle();
 
-    expect(find.text('event-detail'), findsOneWidget);
+    expect(
+      appGoRouter.routeInformationProvider.value.uri.path,
+      '${AppRoutes.eventsDetail}/event-42',
+    );
   });
 
   testWidgets('tap with note toggles show more / show less', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
-      wrap(
-        SiteHistoryListTile(
+      wrapForWidgetTest(
+        SiteHistoryTimelineTile(
           entry: SiteHistoryEntry(
             id: 'n1',
             kind: SiteHistoryEntryKind.adminNote,
             occurredAt: DateTime(2026, 5, 20),
             note: 'Moderator left a detailed note about this site.',
           ),
-          showDividerBelow: false,
+          showLineAbove: true,
+          showLineBelow: false,
         ),
       ),
     );
@@ -72,21 +74,23 @@ void main() {
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
-      wrap(
-        SiteHistoryListTile(
+      wrapForWidgetTest(
+        SiteHistoryTimelineTile(
           entry: SiteHistoryEntry(
             id: 'e2',
             kind: SiteHistoryEntryKind.siteCreated,
             occurredAt: DateTime(2026, 5, 20),
           ),
-          showDividerBelow: false,
+          showLineAbove: false,
+          showLineBelow: false,
         ),
       ),
     );
     await tester.pumpAndSettle();
 
-    final SemanticsNode node =
-        tester.getSemantics(find.byType(SiteHistoryListTile));
+    final SemanticsNode node = tester.getSemantics(
+      find.byType(SiteHistoryTimelineTile),
+    );
     expect(node.hasFlag(SemanticsFlag.isButton), isFalse);
   });
 }

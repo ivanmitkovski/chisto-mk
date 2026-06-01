@@ -1,6 +1,6 @@
-import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
-import 'package:chisto_mobile/features/events/presentation/widgets/organizer_dashboard/organizer_event_summary_card.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_events/src/domain/models/eco_event.dart';
+import 'package:feature_events/src/presentation/widgets/organizer_dashboard/organizer_event_summary_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -28,7 +28,9 @@ void main() {
     );
   }
 
-  testWidgets('hides Check-in when event is not moderation-approved', (WidgetTester tester) async {
+  testWidgets('hides Check-in when event is not moderation-approved', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       MaterialApp(
         localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
@@ -53,7 +55,9 @@ void main() {
     expect(find.text('Check-in'), findsNothing);
   });
 
-  testWidgets('shows Check-in when event is moderation-approved', (WidgetTester tester) async {
+  testWidgets('shows Check-in when event is moderation-approved', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       MaterialApp(
         localizationsDelegates: const <LocalizationsDelegate<dynamic>>[

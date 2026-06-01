@@ -1,5 +1,5 @@
-import 'package:chisto_mobile/features/notifications/domain/models/user_notification.dart';
-import 'package:chisto_mobile/features/notifications/domain/notifications_grouping.dart';
+import 'package:feature_notifications/src/domain/models/user_notification.dart';
+import 'package:feature_notifications/src/domain/notifications_grouping.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

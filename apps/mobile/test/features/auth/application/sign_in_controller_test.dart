@@ -1,5 +1,5 @@
-import 'package:chisto_mobile/core/errors/app_error.dart';
-import 'package:chisto_mobile/features/auth/application/sign_in_controller.dart';
+import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:feature_auth/src/application/sign_in_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,12 +32,14 @@ void main() {
     addTearDown(container.dispose);
 
     await expectLater(
-      container.read(signInControllerProvider.notifier).signIn(
-            phoneNumberE164: '+38970123456',
-            password: 'secret',
-          ),
+      container
+          .read(signInControllerProvider.notifier)
+          .signIn(phoneNumberE164: '+38970123456', password: 'secret'),
       throwsA(isA<AppError>()),
     );
-    expect(container.read(signInControllerProvider).error?.code, 'INVALID_CREDENTIALS');
+    expect(
+      container.read(signInControllerProvider).error?.code,
+      'INVALID_CREDENTIALS',
+    );
   });
 }

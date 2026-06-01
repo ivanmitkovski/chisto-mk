@@ -1,6 +1,6 @@
-import 'package:chisto_mobile/features/notifications/domain/inbox_groups.dart';
-import 'package:chisto_mobile/features/notifications/domain/models/notification_actor.dart';
-import 'package:chisto_mobile/features/notifications/domain/models/user_notification.dart';
+import 'package:feature_notifications/src/domain/inbox_groups.dart';
+import 'package:feature_notifications/src/domain/models/notification_actor.dart';
+import 'package:feature_notifications/src/domain/models/user_notification.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 UserNotification _item({

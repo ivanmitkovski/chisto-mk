@@ -1,22 +1,22 @@
 import 'dart:typed_data';
 
-import 'package:chisto_mobile/core/errors/app_error.dart';
-import 'package:chisto_mobile/features/auth/application/initial_route_controller.dart';
-import 'package:chisto_mobile/features/auth/presentation/constants/splash_constants.dart';
-import 'package:chisto_mobile/features/auth/application/sign_in_controller.dart';
-import 'package:chisto_mobile/features/auth/application/splash_session_controller.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/forgot_password_email_sent_screen.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/forgot_password_new_screen.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/forgot_password_otp_screen.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/forgot_password_request_screen.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/forgot_password_success_screen.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/initial_route_screen.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/location_screen.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/onboarding_screen.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/otp_screen.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/sign_in_screen.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/sign_up_screen.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/splash_screen.dart';
+import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:feature_auth/src/application/initial_route_controller.dart';
+import 'package:feature_auth/src/application/sign_in_controller.dart';
+import 'package:feature_auth/src/application/splash_session_controller.dart';
+import 'package:feature_auth/src/presentation/constants/splash_constants.dart';
+import 'package:feature_auth/src/presentation/screens/forgot_password_email_sent_screen.dart';
+import 'package:feature_auth/src/presentation/screens/forgot_password_new_screen.dart';
+import 'package:feature_auth/src/presentation/screens/forgot_password_otp_screen.dart';
+import 'package:feature_auth/src/presentation/screens/forgot_password_request_screen.dart';
+import 'package:feature_auth/src/presentation/screens/forgot_password_success_screen.dart';
+import 'package:feature_auth/src/presentation/screens/initial_route_screen.dart';
+import 'package:feature_auth/src/presentation/screens/location_screen.dart';
+import 'package:feature_auth/src/presentation/screens/onboarding_screen.dart';
+import 'package:feature_auth/src/presentation/screens/otp_screen.dart';
+import 'package:feature_auth/src/presentation/screens/sign_in_screen.dart';
+import 'package:feature_auth/src/presentation/screens/sign_up_screen.dart';
+import 'package:feature_auth/src/presentation/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,12 +28,73 @@ import '../support/auth_test_helpers.dart';
 
 /// 1×1 PNG for stable map tiles in goldens.
 final Uint8List _k1x1Png = Uint8List.fromList(<int>[
-  0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D, 0x49,
-  0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x08, 0x06,
-  0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4, 0x89, 0x00, 0x00, 0x00, 0x0A, 0x49, 0x44,
-  0x41, 0x54, 0x78, 0x9C, 0x63, 0x00, 0x01, 0x00, 0x00, 0x05, 0x00, 0x01, 0x0D,
-  0x0A, 0x2D, 0xB4, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE, 0x42,
-  0x60, 0x82,
+  0x89,
+  0x50,
+  0x4E,
+  0x47,
+  0x0D,
+  0x0A,
+  0x1A,
+  0x0A,
+  0x00,
+  0x00,
+  0x00,
+  0x0D,
+  0x49,
+  0x48,
+  0x44,
+  0x52,
+  0x00,
+  0x00,
+  0x00,
+  0x01,
+  0x00,
+  0x00,
+  0x00,
+  0x01,
+  0x08,
+  0x06,
+  0x00,
+  0x00,
+  0x00,
+  0x1F,
+  0x15,
+  0xC4,
+  0x89,
+  0x00,
+  0x00,
+  0x00,
+  0x0A,
+  0x49,
+  0x44,
+  0x41,
+  0x54,
+  0x78,
+  0x9C,
+  0x63,
+  0x00,
+  0x01,
+  0x00,
+  0x00,
+  0x05,
+  0x00,
+  0x01,
+  0x0D,
+  0x0A,
+  0x2D,
+  0xB4,
+  0x00,
+  0x00,
+  0x00,
+  0x00,
+  0x49,
+  0x45,
+  0x4E,
+  0x44,
+  0xAE,
+  0x42,
+  0x60,
+  0x82,
 ]);
 
 class _FlatTileProvider extends TileProvider {
@@ -46,8 +107,8 @@ class _FlatTileProvider extends TileProvider {
 class _SignInWithErrorController extends SignInController {
   @override
   SignInState build() => const SignInState(
-        error: AppError(code: 'INVALID_CREDENTIALS', message: 'bad'),
-      );
+    error: AppError(code: 'INVALID_CREDENTIALS', message: 'bad'),
+  );
 }
 
 void main() {
@@ -78,9 +139,9 @@ void main() {
     'forgot_otp': () =>
         const ForgotPasswordOtpScreen(phoneNumberE164: '+38970123456'),
     'forgot_new': () => const ForgotPasswordNewScreen(
-          phoneNumberE164: '+38970123456',
-          code: '123456',
-        ),
+      phoneNumberE164: '+38970123456',
+      code: '123456',
+    ),
     'forgot_email_sent': () => const ForgotPasswordEmailSentScreen(),
     'forgot_success': () => const ForgotPasswordSuccessScreen(),
     'onboarding': () => const OnboardingScreen(),
@@ -88,6 +149,8 @@ void main() {
     'initial_route': () => const InitialRouteScreen(),
     'location': () => LocationScreen(tileProviderOverride: _FlatTileProvider()),
   };
+
+  final List<Override> authOverrides = AuthTestOverrides().build();
 
   for (final Locale locale in locales) {
     for (final MapEntry<String, Widget Function()> entry in screens.entries) {
@@ -99,6 +162,7 @@ void main() {
           pumpAuthScreen(
             home: entry.value(),
             locale: locale,
+            overrides: authOverrides,
           ),
         );
         await tester.pump();
@@ -132,6 +196,7 @@ void main() {
         home: const SignInScreen(),
         locale: const Locale('mk'),
         overrides: <Override>[
+          ...authOverrides,
           signInControllerProvider.overrideWith(_SignInWithErrorController.new),
         ],
       ),

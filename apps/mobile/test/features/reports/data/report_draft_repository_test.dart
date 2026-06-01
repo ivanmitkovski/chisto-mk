@@ -1,11 +1,11 @@
 import 'dart:io';
 
-import 'package:chisto_mobile/features/reports/data/outbox/report_draft_photo_store.dart';
-import 'package:chisto_mobile/features/reports/data/outbox/report_draft_repository.dart';
-import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_database.dart';
-import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_entry.dart';
-import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_repository.dart';
-import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
+import 'package:feature_reports/src/data/outbox/report_draft_photo_store.dart';
+import 'package:feature_reports/src/data/outbox/report_draft_repository.dart';
+import 'package:feature_reports/src/data/outbox/report_outbox_database.dart';
+import 'package:feature_reports/src/data/outbox/report_outbox_entry.dart';
+import 'package:feature_reports/src/data/outbox/report_outbox_repository.dart';
+import 'package:feature_reports/src/domain/models/report_draft.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;

@@ -1,13 +1,14 @@
-import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
-import 'package:chisto_mobile/core/theme/app_colors.dart';
-import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
-import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/report_detail_sheet.dart';
-import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/report_sheet_view_model.dart';
-import 'package:chisto_mobile/features/home/presentation/screens/pollution_site_detail_screen.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
-import '../../shared/widget_test_bootstrap.dart';
+import 'package:chisto_infrastructure/core/bootstrap/app_bootstrap.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:design_system/design_system.dart';
+import 'package:feature_home/src/presentation/screens/pollution_site_detail_screen.dart';
+import 'package:feature_reports/src/domain/models/report_draft.dart';
+import 'package:feature_reports/src/presentation/widgets/reports_list/report_detail_sheet.dart';
+import 'package:feature_reports/src/presentation/widgets/reports_list/report_sheet_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../../shared/widget_test_bootstrap.dart';
 
 class _ReportSheetHost extends StatefulWidget {
   const _ReportSheetHost({required this.report, required this.onShowSiteOnMap});
@@ -33,8 +34,7 @@ class _ReportSheetHostState extends State<_ReportSheetHost> {
         backgroundColor: AppColors.transparent,
         builder: (BuildContext context) => ReportDetailSheet(
           report: widget.report,
-          reportsRealtimeService:
-              AppBootstrap.instance.reportsRealtimeService,
+          reportsRealtimeService: AppBootstrap.instance.reportsRealtimeService,
           reportsApiRepository: AppBootstrap.instance.reportsApiRepository,
           onShowSiteOnMap: widget.onShowSiteOnMap,
         ),
@@ -73,7 +73,7 @@ void main() {
               siteId: 'site-xyz',
               address: 'Distinct address for tap target',
             ),
-            onShowSiteOnMap: (String id) => siteIds.add(id),
+            onShowSiteOnMap: siteIds.add,
           ),
         ),
       );

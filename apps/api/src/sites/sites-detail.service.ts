@@ -141,12 +141,8 @@ export class SitesDetailService {
           : {
               displayLabel: reporterPublic?.displayLabel ?? 'Anonymous',
               isSelf: reporterPublic?.isSelf ?? false,
-              ...(isModerator || reporterPublic?.isSelf
-                ? {
-                    firstName: r.reporter.firstName,
-                    lastName: r.reporter.lastName,
-                  }
-                : {}),
+              firstName: r.reporter.firstName,
+              lastName: r.reporter.lastName,
               avatarUrl: r.reporter.avatarObjectKey
                 ? (avatarUrlByKey.get(r.reporter.avatarObjectKey) ?? null)
                 : null,
@@ -173,12 +169,8 @@ export class SitesDetailService {
           user: cr.user
             ? {
                 displayLabel: coPublic?.displayLabel ?? 'Anonymous',
-                ...(isModerator || coPublic?.isSelf
-                  ? {
-                      firstName: cr.user.firstName,
-                      lastName: cr.user.lastName,
-                    }
-                  : {}),
+                firstName: cr.user.firstName,
+                lastName: cr.user.lastName,
                 avatarUrl: cr.user.avatarObjectKey
                   ? (avatarUrlByKey.get(cr.user.avatarObjectKey) ?? null)
                   : null,
@@ -244,9 +236,20 @@ export class SitesDetailService {
           })),
         )
       : [];
+
+    const canonicalReport = [...reportsWithSignedUrls].sort(
+      (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+    )[0];
+    const canonicalReportId = canonicalReport?.id ?? null;
+    const heroMediaUrls = canonicalReport?.mediaUrls ?? [];
+    const heroReporter = canonicalReport?.reporter ?? null;
+
     return {
       ...site,
       reports: reportsWithSignedUrls,
+      canonicalReportId,
+      heroMediaUrls,
+      heroReporter,
       hasMoreReports: reportsTotal > reportsWithSignedUrls.length,
       hasMoreEvents: eventsTotal > site.events.length,
       coReporterNames: coReporterSummaries.map((s) => s.name),

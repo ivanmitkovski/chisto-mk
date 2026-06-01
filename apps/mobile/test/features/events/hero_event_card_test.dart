@@ -1,7 +1,7 @@
-import 'package:chisto_mobile/core/theme/app_spacing.dart';
-import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
-import 'package:chisto_mobile/features/events/presentation/widgets/events_feed/hero_event_card.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:design_system/design_system.dart';
+import 'package:feature_events/src/domain/models/eco_event.dart';
+import 'package:feature_events/src/presentation/widgets/events_feed/hero_event_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -44,15 +44,14 @@ void main() {
     );
   }
 
-  testWidgets('renders title, up next badge, and meets hero media height', (WidgetTester tester) async {
+  testWidgets('renders title, up next badge, and meets hero media height', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       wrap(
         SizedBox(
           width: 360,
-          child: HeroEventCard(
-            event: sampleHeroEvent(),
-            onTap: () {},
-          ),
+          child: HeroEventCard(event: sampleHeroEvent(), onTap: () {}),
         ),
       ),
     );
@@ -63,27 +62,30 @@ void main() {
     expect(find.textContaining('Starts in'), findsOneWidget);
 
     final Finder sized = find.byWidgetPredicate(
-      (Widget w) => w is SizedBox && w.height == AppSpacing.eventsHeroCardMediaHeight,
+      (Widget w) =>
+          w is SizedBox && w.height == AppSpacing.eventsHeroCardMediaHeight,
     );
     expect(sized, findsWidgets);
   });
 
-  testWidgets('Semantics bundles title, countdown, and site name', (WidgetTester tester) async {
+  testWidgets('Semantics bundles title, countdown, and site name', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       wrap(
         SizedBox(
           width: 360,
-          child: HeroEventCard(
-            event: sampleHeroEvent(),
-            onTap: () {},
-          ),
+          child: HeroEventCard(event: sampleHeroEvent(), onTap: () {}),
         ),
       ),
     );
     await tester.pump(const Duration(milliseconds: 600));
 
     final Iterable<Semantics> semanticsNodes = tester.widgetList<Semantics>(
-      find.descendant(of: find.byType(HeroEventCard), matching: find.byType(Semantics)),
+      find.descendant(
+        of: find.byType(HeroEventCard),
+        matching: find.byType(Semantics),
+      ),
     );
     final bool hasBundledLabel = semanticsNodes.any((Semantics s) {
       final String? label = s.properties.label;
@@ -94,8 +96,9 @@ void main() {
     });
     expect(hasBundledLabel, isTrue);
 
-    final bool hasHint =
-        semanticsNodes.any((Semantics s) => (s.properties.hint ?? '').isNotEmpty);
+    final bool hasHint = semanticsNodes.any(
+      (Semantics s) => (s.properties.hint ?? '').isNotEmpty,
+    );
     expect(hasHint, isTrue);
   });
 }

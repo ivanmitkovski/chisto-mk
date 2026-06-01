@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
+import 'package:feature_reports/src/domain/models/report_draft.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -11,16 +11,16 @@ void main() {
     });
 
     test('contains returns false for coordinates outside Macedonia', () {
-      expect(ReportGeoFence.contains(40.0, 21.0), isFalse);
-      expect(ReportGeoFence.contains(43.0, 21.0), isFalse);
-      expect(ReportGeoFence.contains(41.0, 19.0), isFalse);
-      expect(ReportGeoFence.contains(41.0, 24.0), isFalse);
+      expect(ReportGeoFence.contains(40, 21), isFalse);
+      expect(ReportGeoFence.contains(43, 21), isFalse);
+      expect(ReportGeoFence.contains(41, 19), isFalse);
+      expect(ReportGeoFence.contains(41, 24), isFalse);
     });
 
     test('clampToInsetBounds clamps out-of-bounds coordinates', () {
       final (double lat, double lng) = ReportGeoFence.clampToInsetBounds(
-        40.0,
-        19.0,
+        40,
+        19,
       );
       expect(lat, greaterThanOrEqualTo(ReportGeoFence.insetMinLat));
       expect(lat, lessThanOrEqualTo(ReportGeoFence.insetMaxLat));
@@ -74,12 +74,12 @@ void main() {
   });
 
   group('CleanupEffort', () {
-    test('has expected values and labels', () {
-      expect(CleanupEffort.oneToTwo.label, '1–2 people');
-      expect(CleanupEffort.threeToFive.label, '3–5 people');
-      expect(CleanupEffort.sixToTen.label, '6–10 people');
-      expect(CleanupEffort.tenPlus.label, '10+ people');
-      expect(CleanupEffort.notSure.label, 'Not sure');
+    test('has expected api keys', () {
+      expect(CleanupEffort.oneToTwo.apiKey, 'ONE_TO_TWO');
+      expect(CleanupEffort.threeToFive.apiKey, 'THREE_TO_FIVE');
+      expect(CleanupEffort.sixToTen.apiKey, 'SIX_TO_TEN');
+      expect(CleanupEffort.tenPlus.apiKey, 'TEN_PLUS');
+      expect(CleanupEffort.notSure.apiKey, 'NOT_SURE');
     });
 
     test('apiKey round-trips with fromApiString', () {
@@ -231,13 +231,13 @@ void main() {
     test('copyWith updates fields', () {
       final ReportDraft original = ReportDraft(
         description: 'Original',
-        latitude: 41.0,
-        longitude: 21.0,
+        latitude: 41,
+        longitude: 21,
       );
 
       final ReportDraft updated = original.copyWith(
         description: 'Updated',
-        latitude: 42.0,
+        latitude: 42,
       );
 
       expect(updated.description, 'Updated');

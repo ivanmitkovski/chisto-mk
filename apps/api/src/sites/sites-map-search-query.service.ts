@@ -4,6 +4,10 @@ import { PrismaService } from '../prisma/prisma.service';
 import { SiteMapSearchDto } from './dto/site-map-search.dto';
 import { MAP_SEARCH_KM_PER_DEGREE } from './sites-map-search-geo-intent';
 import type { RawSearchRow } from './sites-map-search.types';
+import {
+  mapSiteVisibilityPrismaWhere,
+  mapSiteVisibilitySql,
+} from './map/map-site-visibility.helper';
 
 @Injectable()
 export class SitesMapSearchQueryService {
@@ -11,7 +15,10 @@ export class SitesMapSearchQueryService {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  async executeSearch(dto: SiteMapSearchDto): Promise<RawSearchRow[]> {
+  async executeSearch(
+    dto: SiteMapSearchDto,
+    viewerUserId?: string | null,
+  ): Promise<RawSearchRow[]> {
     const q = dto.query.trim();
     const limit = dto.limit ?? 20;
 
@@ -41,6 +48,11 @@ export class SitesMapSearchQueryService {
             AND r_filter."category" IN (${Prisma.join(dto.pollutionTypes)})
           )`
         : Prisma.empty;
+
+    const visibilityClause = mapSiteVisibilitySql({
+      siteIdSql: Prisma.sql`s."id"`,
+      viewerUserId,
+    });
 
     try {
       return await this.prisma.$queryRaw<RawSearchRow[]>(Prisma.sql`
@@ -82,12 +94,13 @@ export class SitesMapSearchQueryService {
           ${archiveClause}
           ${statusClause}
           ${pollutionClause}
+          ${visibilityClause}
         ORDER BY "score" DESC
         LIMIT ${limit}
       `);
     } catch (error) {
       this.logger.error('Full-text search query failed, falling back to ILIKE', error);
-      return this.ilikeFallback(q, limit, dto);
+      return this.ilikeFallback(q, limit, dto, viewerUserId);
     }
   }
 
@@ -96,28 +109,38 @@ export class SitesMapSearchQueryService {
    * not yet available (e.g. migration pending). Uses the original ILIKE
    * approach without ranking.
    */
-  private async ilikeFallback(q: string, limit: number, dto: SiteMapSearchDto): Promise<RawSearchRow[]> {
-    const where: Record<string, unknown> = {
-      OR: [
-        { description: { contains: q, mode: 'insensitive' } },
-        { address: { contains: q, mode: 'insensitive' } },
+  private async ilikeFallback(
+    q: string,
+    limit: number,
+    dto: SiteMapSearchDto,
+    viewerUserId?: string | null,
+  ): Promise<RawSearchRow[]> {
+    const where: Prisma.SiteWhereInput = {
+      AND: [
+        mapSiteVisibilityPrismaWhere(viewerUserId),
+        {
+          OR: [
+            { description: { contains: q, mode: 'insensitive' } },
+            { address: { contains: q, mode: 'insensitive' } },
+          ],
+        },
+        ...(dto.includeArchived !== true ? [{ isArchivedByAdmin: false }] : []),
+        ...(dto.statuses?.length
+          ? [{ status: { in: dto.statuses as SiteStatus[] } }]
+          : []),
+        ...(dto.pollutionTypes?.length
+          ? [
+              {
+                reports: {
+                  some: { category: { in: dto.pollutionTypes } },
+                },
+              },
+            ]
+          : []),
       ],
     };
-    if (dto.includeArchived !== true) {
-      where.isArchivedByAdmin = false;
-    }
-    if (dto.statuses?.length) {
-      where.status = { in: dto.statuses as SiteStatus[] };
-    }
-    if (dto.pollutionTypes?.length) {
-      where.reports = {
-        some: {
-          category: { in: dto.pollutionTypes },
-        },
-      };
-    }
     const rows = await this.prisma.site.findMany({
-      where: where as never,
+      where,
       take: limit,
       orderBy: { updatedAt: 'desc' },
       select: {

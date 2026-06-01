@@ -1,5 +1,5 @@
-import 'package:chisto_mobile/features/home/domain/models/comment.dart';
-import 'package:chisto_mobile/features/home/presentation/utils/comment_thread_navigation.dart';
+import 'package:feature_home/src/domain/models/comment.dart';
+import 'package:feature_home/src/presentation/utils/comment_thread_navigation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Comment _comment({
@@ -27,20 +27,23 @@ void main() {
         _comment(
           id: 'root',
           replies: <Comment>[
-            _comment(id: 'reply', parentId: 'root', replies: <Comment>[
-              _comment(id: 'nested', parentId: 'reply'),
-            ]),
+            _comment(
+              id: 'reply',
+              parentId: 'root',
+              replies: <Comment>[_comment(id: 'nested', parentId: 'reply')],
+            ),
           ],
         ),
       ];
 
-      expect(findCommentAncestorIds(comments, 'nested'), <String>['root', 'reply']);
+      expect(findCommentAncestorIds(comments, 'nested'), <String>[
+        'root',
+        'reply',
+      ]);
     });
 
     test('returns empty list for root comment', () {
-      final List<Comment> comments = <Comment>[
-        _comment(id: 'root'),
-      ];
+      final List<Comment> comments = <Comment>[_comment(id: 'root')];
       expect(findCommentAncestorIds(comments, 'root'), isEmpty);
     });
   });
@@ -74,10 +77,7 @@ void main() {
         ),
       ];
       expect(
-        resolveHighlightCommentId(
-          comments: comments,
-          actorUserId: 'actor',
-        ),
+        resolveHighlightCommentId(comments: comments, actorUserId: 'actor'),
         'new',
       );
     });
@@ -88,16 +88,12 @@ void main() {
       final List<Comment> comments = <Comment>[
         _comment(
           id: 'root',
-          replies: <Comment>[
-            _comment(id: 'child', parentId: 'root'),
-          ],
+          replies: <Comment>[_comment(id: 'child', parentId: 'root')],
         ),
       ];
-      final int? index = flattenedCommentIndex(
-        comments,
-        <String>{'root'},
-        'child',
-      );
+      final int? index = flattenedCommentIndex(comments, <String>{
+        'root',
+      }, 'child');
       expect(index, 1);
     });
   });

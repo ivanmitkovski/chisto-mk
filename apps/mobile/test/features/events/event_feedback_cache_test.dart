@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/features/events/data/event_feedback_local_cache.dart';
+import 'package:feature_events/src/data/event_feedback_local_cache.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -25,15 +25,19 @@ void main() {
       final EventFeedbackSnapshot original = buildSnapshot();
 
       final Map<String, dynamic> json = original.toJson();
-      final EventFeedbackSnapshot decoded = EventFeedbackSnapshot.fromJson(json);
+      final EventFeedbackSnapshot decoded = EventFeedbackSnapshot.fromJson(
+        json,
+      );
 
       expect(decoded.eventId, original.eventId);
       expect(decoded.rating, original.rating);
       expect(decoded.bagsCollected, original.bagsCollected);
       expect(decoded.volunteerHours, original.volunteerHours);
       expect(decoded.notes, original.notes);
-      expect(decoded.createdAt.millisecondsSinceEpoch,
-          original.createdAt.millisecondsSinceEpoch);
+      expect(
+        decoded.createdAt.millisecondsSinceEpoch,
+        original.createdAt.millisecondsSinceEpoch,
+      );
     });
 
     test('fromJson uses default values for missing fields', () {
@@ -41,7 +45,9 @@ void main() {
         'eventId': 'evt-42',
       };
 
-      final EventFeedbackSnapshot decoded = EventFeedbackSnapshot.fromJson(minimal);
+      final EventFeedbackSnapshot decoded = EventFeedbackSnapshot.fromJson(
+        minimal,
+      );
 
       expect(decoded.eventId, 'evt-42');
       expect(decoded.rating, 5);

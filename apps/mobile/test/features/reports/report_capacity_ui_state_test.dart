@@ -1,6 +1,6 @@
-import 'package:chisto_mobile/features/reports/domain/models/report_capacity.dart';
-import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_capacity_ui_state.dart';
-import 'package:chisto_mobile/l10n/app_localizations_en.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations_en.dart';
+import 'package:feature_reports/src/domain/models/report_capacity.dart';
+import 'package:feature_reports/src/presentation/widgets/new_report/report_capacity_ui_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

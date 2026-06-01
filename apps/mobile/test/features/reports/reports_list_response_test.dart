@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/features/reports/domain/models/reports_list_response.dart';
+import 'package:feature_reports/src/domain/models/reports_list_response.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

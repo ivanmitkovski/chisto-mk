@@ -37,4 +37,21 @@ export class EventAnalyticsResponseDto {
     description: 'Exactly 24 entries (hours 0–23 UTC), zeros where no check-ins',
   })
   checkInsByHour!: CheckInsByHourEntryDto[];
+
+  @ApiProperty({ description: 'ISO-8601 instant when this analytics snapshot was generated' })
+  generatedAt!: string;
+
+  @ApiProperty({
+    required: false,
+    nullable: true,
+    description: 'ISO-8601 instant of the most recent participant join',
+  })
+  lastJoinAt!: string | null;
+
+  @ApiProperty({
+    required: false,
+    nullable: true,
+    description: 'ISO-8601 instant of the most recent check-in',
+  })
+  lastCheckInAt!: string | null;
 }

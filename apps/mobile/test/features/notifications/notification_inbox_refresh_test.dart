@@ -1,6 +1,6 @@
-import 'package:chisto_mobile/core/providers/refresh_signals_providers.dart';
-import 'package:chisto_mobile/core/providers/root_container.dart';
-import 'package:chisto_mobile/features/notifications/data/notification_inbox_refresh.dart';
+import 'package:chisto_infrastructure/core/providers/refresh_signals_providers.dart';
+import 'package:chisto_infrastructure/core/providers/root_container.dart';
+import 'package:feature_notifications/src/data/notification_inbox_refresh.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -9,14 +9,17 @@ void main() {
     setRootProviderContainer(ProviderContainer());
   });
 
-  test('notificationPushImpliesInboxUpdate is true when notificationId present', () {
-    expect(
-      notificationPushImpliesInboxUpdate(<String, dynamic>{
-        'notificationId': 'n1',
-      }),
-      isTrue,
-    );
-  });
+  test(
+    'notificationPushImpliesInboxUpdate is true when notificationId present',
+    () {
+      expect(
+        notificationPushImpliesInboxUpdate(<String, dynamic>{
+          'notificationId': 'n1',
+        }),
+        isTrue,
+      );
+    },
+  );
 
   test('notificationPushImpliesInboxUpdate is true when type present', () {
     expect(

@@ -1,23 +1,21 @@
 import 'dart:async';
 
-import 'package:flutter_test/flutter_test.dart';
+import 'package:chisto_infrastructure/core/location/location_service.dart';
+import 'package:feature_home/src/presentation/providers/map_location_notifier.dart';
+import 'package:feature_home/src/presentation/providers/repository_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'package:chisto_mobile/core/location/location_service.dart';
-import 'package:chisto_mobile/features/home/presentation/providers/map_location_notifier.dart';
-import 'package:chisto_mobile/features/home/presentation/providers/repository_providers.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 import '../../../shared/widget_test_bootstrap.dart';
 
 class _FakeLocationService implements LocationService {
-  _FakeLocationService({
-    this.enabled = true,
-  });
+  _FakeLocationService({this.enabled = true});
 
   bool enabled;
   AppLocationPermission permission = AppLocationPermission.whileInUse;
   GeoPosition position = const GeoPosition(latitude: 41.61, longitude: 21.75);
-  final StreamController<GeoPosition> stream = StreamController<GeoPosition>.broadcast();
+  final StreamController<GeoPosition> stream =
+      StreamController<GeoPosition>.broadcast();
 
   @override
   Future<AppLocationPermission> checkPermission() async => permission;
@@ -48,41 +46,39 @@ void main() {
   test('tryInitialLocate sets user location on allowed permission', () async {
     final _FakeLocationService fake = _FakeLocationService();
     final ProviderContainer container = ProviderContainer(
-      overrides: <Override>[
-        locationServiceProvider.overrideWithValue(fake),
-      ],
+      overrides: <Override>[locationServiceProvider.overrideWithValue(fake)],
     );
     addTearDown(container.dispose);
-    await container.read(mapLocationNotifierProvider.notifier).tryInitialLocate();
+    await container
+        .read(mapLocationNotifierProvider.notifier)
+        .tryInitialLocate();
     expect(container.read(mapLocationNotifierProvider).userLocation, isNotNull);
   });
 
   test('locateUserBest returns null when service disabled', () async {
     final _FakeLocationService fake = _FakeLocationService(enabled: false);
     final ProviderContainer container = ProviderContainer(
-      overrides: <Override>[
-        locationServiceProvider.overrideWithValue(fake),
-      ],
+      overrides: <Override>[locationServiceProvider.overrideWithValue(fake)],
     );
     addTearDown(container.dispose);
-    final GeoPosition? pos =
-        await container.read(mapLocationNotifierProvider.notifier).locateUserBest();
+    final GeoPosition? pos = await container
+        .read(mapLocationNotifierProvider.notifier)
+        .locateUserBest();
     expect(pos, isNull);
   });
 
   test('start/stop foreground tracking updates tracking state', () async {
     final _FakeLocationService fake = _FakeLocationService();
     final ProviderContainer container = ProviderContainer(
-      overrides: <Override>[
-        locationServiceProvider.overrideWithValue(fake),
-      ],
+      overrides: <Override>[locationServiceProvider.overrideWithValue(fake)],
     );
     addTearDown(() async {
       await fake.stream.close();
       container.dispose();
     });
-    final MapLocationNotifier notifier =
-        container.read(mapLocationNotifierProvider.notifier);
+    final MapLocationNotifier notifier = container.read(
+      mapLocationNotifierProvider.notifier,
+    );
 
     final bool started = await notifier.startForegroundTracking();
     expect(started, isTrue);
@@ -99,16 +95,15 @@ void main() {
   test('startForegroundTracking is idempotent', () async {
     final _FakeLocationService fake = _FakeLocationService();
     final ProviderContainer container = ProviderContainer(
-      overrides: <Override>[
-        locationServiceProvider.overrideWithValue(fake),
-      ],
+      overrides: <Override>[locationServiceProvider.overrideWithValue(fake)],
     );
     addTearDown(() async {
       await fake.stream.close();
       container.dispose();
     });
-    final MapLocationNotifier notifier =
-        container.read(mapLocationNotifierProvider.notifier);
+    final MapLocationNotifier notifier = container.read(
+      mapLocationNotifierProvider.notifier,
+    );
 
     expect(await notifier.startForegroundTracking(), isTrue);
     expect(await notifier.startForegroundTracking(), isTrue);

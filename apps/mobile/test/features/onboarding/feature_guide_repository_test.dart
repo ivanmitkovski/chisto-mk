@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/features/onboarding/data/shared_prefs_feature_guide_repository.dart';
+import 'package:feature_onboarding/src/data/shared_prefs_feature_guide_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

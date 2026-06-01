@@ -1,19 +1,22 @@
-import 'package:chisto_mobile/core/config/app_config.dart';
-import 'package:chisto_mobile/core/errors/app_error.dart';
-import 'package:chisto_mobile/core/network/api_client.dart';
-import 'package:chisto_mobile/features/events/data/check_in_offline_redeem.dart';
-import 'package:chisto_mobile/features/events/data/check_in_sync_queue.dart';
-import '../../support/events/in_memory_events_store.dart';
+import 'package:chisto_infrastructure/core/config/app_config.dart';
+import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:chisto_infrastructure/core/network/api_client.dart';
+import 'package:chisto_infrastructure/core/network/request_cancellation.dart';
+import 'package:feature_events/src/data/check_in_offline_redeem.dart';
+import 'package:feature_events/src/data/check_in_sync_queue.dart';
+import 'package:feature_events/src/domain/models/eco_event.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../support/events/in_memory_events_store.dart';
+
 class _FakePostClient extends ApiClient {
   _FakePostClient()
-      : super(
-          config: AppConfig.dev,
-          accessToken: () => null,
-          onUnauthorized: () {},
-        );
+    : super(
+        config: AppConfig.dev,
+        accessToken: () => null,
+        onUnauthorized: () {},
+      );
 
   Future<ApiResponse> Function(String path, Object? body)? postHandler;
 
@@ -22,8 +25,10 @@ class _FakePostClient extends ApiClient {
     String path, {
     Map<String, String>? headers,
     Object? body,
+    RequestCancellationToken? cancellation,
   }) async {
-    final Future<ApiResponse> Function(String path, Object? body)? h = postHandler;
+    final Future<ApiResponse> Function(String path, Object? body)? h =
+        postHandler;
     if (h == null) {
       throw StateError('post not stubbed');
     }
@@ -73,8 +78,8 @@ void main() {
     expect(await CheckInSyncQueue.instance.peek(), isEmpty);
   });
 
-  test('CHECK_IN_REPLAY removes queue entry without prefetch requirement', () async {
-    const String payload = 'qr-replay';
+  test('success with checkedInAt sets local check-in state', () async {
+    const String payload = 'qr-at';
     await CheckInSyncQueue.instance.clear();
     await CheckInSyncQueue.instance.enqueue(
       CheckInQueueEntry(
@@ -83,9 +88,17 @@ void main() {
         enqueuedAt: DateTime.now(),
       ),
     );
+    events.setAttendeeCheckInStatus(
+      eventId: 'evt-1',
+      status: AttendeeCheckInStatus.checkedIn,
+      checkedInAt: DateTime.now(),
+    );
 
     client.postHandler = (_, _) async {
-      throw const AppError(code: 'CHECK_IN_REPLAY', message: 'used');
+      return const ApiResponse(
+        statusCode: 200,
+        json: <String, dynamic>{'checkedInAt': '2026-06-15T13:01:00.000Z'},
+      );
     };
 
     await redeemOfflineCheckInEntry(
@@ -98,8 +111,84 @@ void main() {
       ),
     );
 
-    expect(await CheckInSyncQueue.instance.peek(), isEmpty);
+    final EcoEvent? evt = events.findById('evt-1');
+    expect(evt?.attendeeCheckInStatus, AttendeeCheckInStatus.checkedIn);
+    expect(evt?.attendeeCheckedInAt, isNotNull);
   });
+
+  test('success without checkedInAt reverts optimistic check-in', () async {
+    const String payload = 'qr-pending';
+    await CheckInSyncQueue.instance.clear();
+    await CheckInSyncQueue.instance.enqueue(
+      CheckInQueueEntry(
+        eventId: 'evt-1',
+        qrPayload: payload,
+        enqueuedAt: DateTime.now(),
+      ),
+    );
+    events.setAttendeeCheckInStatus(
+      eventId: 'evt-1',
+      status: AttendeeCheckInStatus.checkedIn,
+      checkedInAt: DateTime.now(),
+    );
+
+    client.postHandler = (_, _) async {
+      return const ApiResponse(statusCode: 200, json: <String, dynamic>{});
+    };
+
+    await redeemOfflineCheckInEntry(
+      client: client,
+      eventsRepository: events,
+      entry: CheckInQueueEntry(
+        eventId: 'evt-1',
+        qrPayload: payload,
+        enqueuedAt: DateTime.now(),
+      ),
+    );
+
+    final EcoEvent? evt = events.findById('evt-1');
+    expect(evt?.attendeeCheckInStatus, AttendeeCheckInStatus.notCheckedIn);
+    expect(evt?.attendeeCheckedInAt, isNull);
+  });
+
+  test(
+    'CHECK_IN_REPLAY removes queue entry and reverts local check-in',
+    () async {
+      const String payload = 'qr-replay';
+      await CheckInSyncQueue.instance.clear();
+      await CheckInSyncQueue.instance.enqueue(
+        CheckInQueueEntry(
+          eventId: 'evt-1',
+          qrPayload: payload,
+          enqueuedAt: DateTime.now(),
+        ),
+      );
+
+      events.setAttendeeCheckInStatus(
+        eventId: 'evt-1',
+        status: AttendeeCheckInStatus.checkedIn,
+        checkedInAt: DateTime.now(),
+      );
+
+      client.postHandler = (_, _) async {
+        throw const AppError(code: 'CHECK_IN_REPLAY', message: 'used');
+      };
+
+      await redeemOfflineCheckInEntry(
+        client: client,
+        eventsRepository: events,
+        entry: CheckInQueueEntry(
+          eventId: 'evt-1',
+          qrPayload: payload,
+          enqueuedAt: DateTime.now(),
+        ),
+      );
+
+      expect(await CheckInSyncQueue.instance.peek(), isEmpty);
+      final EcoEvent? evt = events.findById('evt-1');
+      expect(evt?.attendeeCheckInStatus, AttendeeCheckInStatus.notCheckedIn);
+    },
+  );
 
   test('network error leaves queue entry', () async {
     const String payload = 'qr-net';
@@ -129,7 +218,8 @@ void main() {
       throwsA(isA<AppError>()),
     );
 
-    final List<CheckInQueueEntry> remaining = await CheckInSyncQueue.instance.peek();
+    final List<CheckInQueueEntry> remaining = await CheckInSyncQueue.instance
+        .peek();
     expect(remaining, hasLength(1));
     expect(remaining.single.qrPayload, payload);
   });

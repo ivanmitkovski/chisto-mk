@@ -1,5 +1,5 @@
-import 'package:chisto_mobile/features/home/data/map_realtime/map_sync_coordinator.dart';
-import 'package:chisto_mobile/features/home/presentation/controllers/map_viewport_controller.dart';
+import 'package:feature_home/src/data/map_realtime/map_sync_coordinator.dart';
+import 'package:feature_home/src/presentation/controllers/map_viewport_controller.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
@@ -21,12 +21,12 @@ void main() {
 
   test('buildViewportQuery clamps oversized visible bounds', () {
     final LatLngBounds huge = LatLngBounds(
-      const LatLng(40.0, 20.0),
-      const LatLng(45.0, 24.0),
+      const LatLng(40, 20),
+      const LatLng(45, 24),
     );
     final MapViewportQuery q = c.buildViewportQuery(
-      latitude: 42.0,
-      longitude: 22.0,
+      latitude: 42,
+      longitude: 22,
       zoom: 10,
       visibleBounds: huge,
       limit: 200,

@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/core/cache/site_images_cache.dart';
+import 'package:chisto_infrastructure/core/cache/site_images_cache.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

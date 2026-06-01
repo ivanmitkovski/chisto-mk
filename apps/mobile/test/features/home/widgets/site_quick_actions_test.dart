@@ -1,12 +1,13 @@
-import 'package:chisto_mobile/features/home/presentation/widgets/site_detail/site_quick_actions.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_home/src/presentation/widgets/site_detail/site_quick_actions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('SiteQuickActions shows localized save and share labels',
-      (WidgetTester tester) async {
+  testWidgets('SiteQuickActions shows localized save and share labels', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       MaterialApp(
         localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
@@ -33,7 +34,9 @@ void main() {
     expect(find.text('Share'), findsOneWidget);
   });
 
-  testWidgets('SiteQuickActions shows Saved when isSaved', (WidgetTester tester) async {
+  testWidgets('SiteQuickActions shows Saved when isSaved', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       MaterialApp(
         localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
@@ -59,7 +62,9 @@ void main() {
     expect(find.text('Save site'), findsNothing);
   });
 
-  testWidgets('SiteQuickActions shows Reported when isReported', (WidgetTester tester) async {
+  testWidgets('SiteQuickActions shows Reported when isReported', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       MaterialApp(
         localizationsDelegates: const <LocalizationsDelegate<dynamic>>[

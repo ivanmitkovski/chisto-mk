@@ -2,8 +2,8 @@
 import 'dart:io';
 
 import 'design_system_guard_util.dart';
+import 'feature_roots_guard_util.dart';
 
-const List<String> _roots = <String>['lib/features'];
 const List<String> _skip = <String>['shared/widgets/atoms/app_snack.dart'];
 
 void main() {
@@ -12,7 +12,7 @@ void main() {
     exit(2);
   }
   final List<String> hits = scanDartRoots(
-    roots: _roots,
+    roots: allFeatureLibRoots(),
     skipPathFragments: _skip,
     matchesLine: (String line) => line.contains('showSnackBar('),
   );

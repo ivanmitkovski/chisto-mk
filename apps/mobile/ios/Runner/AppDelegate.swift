@@ -18,10 +18,6 @@ import workmanager_apple
       GeneratedPluginRegistrant.register(with: registry)
     }
     if #available(iOS 13.0, *) {
-      WorkmanagerPlugin.registerPeriodicTask(
-        withIdentifier: "offline-regions-refresh",
-        frequency: NSNumber(value: 24 * 60 * 60)
-      )
       WorkmanagerPlugin.registerBGProcessingTask(withIdentifier: "chisto.reportOutbox.drain")
     }
     let didFinish = super.application(application, didFinishLaunchingWithOptions: launchOptions)

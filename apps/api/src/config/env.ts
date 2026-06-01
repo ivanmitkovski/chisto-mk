@@ -86,7 +86,7 @@ export function validateEnv(): void {
       console.error('JWT_REFRESH_EXPIRES_DAYS must be a finite integer from 1 to 365');
       process.exit(1);
     }
-    const maxSessions = Number(process.env.MAX_SESSIONS_PER_USER ?? 5);
+    const maxSessions = Number(process.env.MAX_SESSIONS_PER_USER ?? 10);
     if (!Number.isFinite(maxSessions) || maxSessions < 1 || maxSessions > 100) {
       console.error('MAX_SESSIONS_PER_USER must be a finite integer from 1 to 100');
       process.exit(1);

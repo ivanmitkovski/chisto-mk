@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/features/home/presentation/providers/map_ui_mode_notifier.dart';
+import 'package:feature_home/src/presentation/providers/map_ui_mode_notifier.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

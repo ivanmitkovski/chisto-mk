@@ -1,7 +1,7 @@
-import 'package:chisto_mobile/features/events/data/chat/event_chat_message.dart';
-import 'package:chisto_mobile/features/events/data/chat/event_chat_read_cursor.dart';
-import 'package:chisto_mobile/features/events/data/chat/event_chat_stream_event.dart';
-import 'package:chisto_mobile/features/events/data/chat/in_memory_event_chat_repository.dart';
+import 'package:feature_events/src/data/chat/event_chat_message.dart';
+import 'package:feature_events/src/data/chat/event_chat_read_cursor.dart';
+import 'package:feature_events/src/data/chat/event_chat_stream_event.dart';
+import 'package:feature_events/src/data/chat/in_memory_event_chat_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -33,7 +33,11 @@ void main() {
     );
     final first = await repo.fetchMessages('e1', limit: 1);
     expect(first.messages.length, 1);
-    final second = await repo.fetchMessages('e1', cursor: first.nextCursor, limit: 10);
+    final second = await repo.fetchMessages(
+      'e1',
+      cursor: first.nextCursor,
+      limit: 10,
+    );
     expect(second.messages.length, 1);
     repo.dispose();
   });
@@ -43,7 +47,10 @@ void main() {
     final List<EventChatStreamEvent> seen = <EventChatStreamEvent>[];
     final sub = repo.messageStream('e1').listen(seen.add);
     await repo.sendMessage('e1', 'a');
-    final String id = (await repo.fetchMessages('e1', limit: 1)).messages.first.id;
+    final String id = (await repo.fetchMessages(
+      'e1',
+      limit: 1,
+    )).messages.first.id;
     await repo.editMessage('e1', id, 'b');
     await Future<void>.delayed(Duration.zero);
     expect(seen.whereType<EventChatStreamMessageEdited>(), isNotEmpty);
@@ -56,8 +63,18 @@ void main() {
 
   test('searchMessages filters body', () async {
     final InMemoryEventChatRepository repo = InMemoryEventChatRepository();
-    await repo.seedOtherMessage('e1', authorId: 'x', authorName: 'X', body: 'alpha beta');
-    await repo.seedOtherMessage('e1', authorId: 'y', authorName: 'Y', body: 'gamma');
+    await repo.seedOtherMessage(
+      'e1',
+      authorId: 'x',
+      authorName: 'X',
+      body: 'alpha beta',
+    );
+    await repo.seedOtherMessage(
+      'e1',
+      authorId: 'y',
+      authorName: 'Y',
+      body: 'gamma',
+    );
     final r = await repo.searchMessages('e1', 'beta', limit: 10);
     expect(r.messages.length, 1);
     expect(r.messages.first.body, contains('beta'));
@@ -66,8 +83,16 @@ void main() {
 
   test('setPin and fetchPinnedMessages', () async {
     final InMemoryEventChatRepository repo = InMemoryEventChatRepository();
-    await repo.seedOtherMessage('e1', authorId: 'x', authorName: 'X', body: 'pin me');
-    final String id = (await repo.fetchMessages('e1', limit: 1)).messages.first.id;
+    await repo.seedOtherMessage(
+      'e1',
+      authorId: 'x',
+      authorName: 'X',
+      body: 'pin me',
+    );
+    final String id = (await repo.fetchMessages(
+      'e1',
+      limit: 1,
+    )).messages.first.id;
     await repo.setPin('e1', id, pinned: true);
     final pinned = await repo.fetchPinnedMessages('e1');
     expect(pinned.length, 1);
@@ -87,7 +112,12 @@ void main() {
 
   test('fetchReadCursors merges participants with stored cursors', () async {
     final InMemoryEventChatRepository repo = InMemoryEventChatRepository();
-    await repo.seedOtherMessage('e1', authorId: 'peer', authorName: 'Peer', body: 'hi');
+    await repo.seedOtherMessage(
+      'e1',
+      authorId: 'peer',
+      authorName: 'Peer',
+      body: 'hi',
+    );
     final EventChatMessage mine = await repo.sendMessage('e1', 'own');
     repo.setReadCursorForUser(
       'e1',
@@ -114,7 +144,10 @@ void main() {
     final List<EventChatStreamEvent> seen = <EventChatStreamEvent>[];
     final sub = repo.messageStream('e1').listen(seen.add);
     await repo.sendMessage('e1', 'x');
-    final String id = (await repo.fetchMessages('e1', limit: 1)).messages.first.id;
+    final String id = (await repo.fetchMessages(
+      'e1',
+      limit: 1,
+    )).messages.first.id;
     await repo.markRead('e1', id);
     await Future<void>.delayed(Duration.zero);
     expect(seen.whereType<EventChatStreamReadCursorUpdated>(), isNotEmpty);

@@ -1,4 +1,5 @@
 import type { EmailTemplateId } from './email.types';
+import type { EmailInlineAttachment } from './email-logo';
 
 /** Structured outbound message shared by all email transports. */
 export type EmailSendPayload = {
@@ -9,6 +10,7 @@ export type EmailSendPayload = {
   html: string;
   listUnsubscribeUrl?: string;
   templateId: EmailTemplateId;
+  inlineAttachments?: EmailInlineAttachment[];
 };
 
 export interface EmailTransport {

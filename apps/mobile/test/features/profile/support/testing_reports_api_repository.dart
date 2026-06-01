@@ -1,9 +1,10 @@
-import 'package:chisto_mobile/core/network/request_cancellation.dart';
-import 'package:chisto_mobile/features/reports/domain/models/report_capacity.dart';
-import 'package:chisto_mobile/features/reports/domain/models/report_detail.dart';
-import 'package:chisto_mobile/features/reports/domain/models/report_submit_result.dart';
-import 'package:chisto_mobile/features/reports/domain/models/reports_list_response.dart';
-import 'package:chisto_mobile/features/reports/domain/repositories/reports_api_repository.dart';
+import 'package:chisto_infrastructure/core/network/request_cancellation.dart';
+import 'package:feature_reports/src/domain/models/report_capacity.dart';
+import 'package:feature_reports/src/domain/models/report_detail.dart';
+import 'package:feature_reports/src/domain/models/report_photo_upload_outcome.dart';
+import 'package:feature_reports/src/domain/models/report_submit_result.dart';
+import 'package:feature_reports/src/domain/models/reports_list_response.dart';
+import 'package:feature_reports/src/domain/repositories/reports_api_repository.dart';
 
 /// Minimal [ReportsApiRepository] for profile tests (capacity only).
 class TestingReportsApiRepository implements ReportsApiRepository {
@@ -23,7 +24,7 @@ class TestingReportsApiRepository implements ReportsApiRepository {
   }
 
   @override
-  Future<List<String>> uploadPhotos(List<String> filePaths) {
+  Future<ReportPhotoUploadOutcome> uploadPhotos(List<String> filePaths) {
     throw UnimplementedError();
   }
 

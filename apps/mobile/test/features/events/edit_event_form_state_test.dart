@@ -1,6 +1,6 @@
-import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
-import 'package:chisto_mobile/features/events/domain/models/event_update_payload.dart';
-import 'package:chisto_mobile/features/events/presentation/utils/edit_event_form_state.dart';
+import 'package:feature_events/src/domain/models/eco_event.dart';
+import 'package:feature_events/src/domain/models/event_update_payload.dart';
+import 'package:feature_events/src/presentation/utils/edit_event_form_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -57,23 +57,28 @@ void main() {
       );
     });
 
-    test('buildPartialPayload sends maxParticipants null when clearing cap', () {
-      final EditEventFormSnapshot s = EditEventFormSnapshot.fromEvent(_event(maxParticipants: 10));
-      final EventUpdatePayload p = s.buildPartialPayload(
-        titleTrimmed: 'River cleanup',
-        descriptionTrimmed: 'D',
-        maxParticipants: null,
-        scheduledAtUtc: DateTime.utc(2026, 6, 15, 10, 0),
-        endAtUtc: DateTime.utc(2026, 6, 15, 12, 0),
-        category: EcoEventCategory.generalCleanup,
-        gear: <EventGear>[EventGear.gloves],
-        scale: CleanupScale.small,
-        difficulty: EventDifficulty.easy,
-      );
-      final Map<String, dynamic> json = p.toPatchJson();
-      expect(json.containsKey('maxParticipants'), isTrue);
-      expect(json['maxParticipants'], isNull);
-    });
+    test(
+      'buildPartialPayload sends maxParticipants null when clearing cap',
+      () {
+        final EditEventFormSnapshot s = EditEventFormSnapshot.fromEvent(
+          _event(maxParticipants: 10),
+        );
+        final EventUpdatePayload p = s.buildPartialPayload(
+          titleTrimmed: 'River cleanup',
+          descriptionTrimmed: 'D',
+          maxParticipants: null,
+          scheduledAtUtc: DateTime.utc(2026, 6, 15, 10, 0),
+          endAtUtc: DateTime.utc(2026, 6, 15, 12, 0),
+          category: EcoEventCategory.generalCleanup,
+          gear: <EventGear>[EventGear.gloves],
+          scale: CleanupScale.small,
+          difficulty: EventDifficulty.easy,
+        );
+        final Map<String, dynamic> json = p.toPatchJson();
+        expect(json.containsKey('maxParticipants'), isTrue);
+        expect(json['maxParticipants'], isNull);
+      },
+    );
   });
 
   group('editEventTitleIssueKey', () {

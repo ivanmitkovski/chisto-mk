@@ -1,5 +1,5 @@
-import 'package:chisto_mobile/core/theme/app_colors.dart';
-import 'package:chisto_mobile/features/home/presentation/widgets/coach_tour_host.dart';
+import 'package:design_system/design_system.dart';
+import 'package:feature_onboarding/src/presentation/coach/coach_tour_host.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -18,8 +18,8 @@ void main() {
         home: MediaQuery(
           data: const MediaQueryData(
             size: Size(390, 520),
-            devicePixelRatio: 1.0,
-            textScaler: TextScaler.linear(1.0),
+            devicePixelRatio: 1,
+            textScaler: TextScaler.linear(1),
             disableAnimations: true,
           ),
           child: ColoredBox(

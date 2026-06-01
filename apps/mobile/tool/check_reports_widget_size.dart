@@ -1,17 +1,18 @@
 // Run from apps/mobile: dart run tool/check_reports_widget_size.dart
 import 'dart:io';
 
+import 'feature_roots_guard_util.dart';
+
 const int _maxScreenLines = 350;
 const int _maxSectionLines = 200;
 
 int _lineCount(File f) => f.readAsLinesSync().length;
 
 int runWidgetSizeCheck() {
-  final Directory root = Directory.current;
   final List<String> violations = <String>[];
 
   final File screen = File(
-    '${root.path}/lib/features/reports/presentation/screens/new_report_screen.dart',
+    '$reportsPackageRoot/src/presentation/screens/new_report_screen.dart',
   );
   if (screen.existsSync()) {
     final int n = _lineCount(screen);
@@ -23,13 +24,14 @@ int runWidgetSizeCheck() {
   }
 
   final Directory widgetsDir = Directory(
-    '${root.path}/lib/features/reports/presentation/widgets/new_report',
+    '$reportsPackageRoot/src/presentation/widgets/new_report',
   );
   if (widgetsDir.existsSync()) {
     for (final FileSystemEntity e in widgetsDir.listSync(recursive: false)) {
       if (e is! File || !e.path.endsWith('.dart')) continue;
       final String name = e.uri.pathSegments.last;
-      if (!name.startsWith('new_report_') || !name.endsWith('_stage_body.dart')) {
+      if (!name.startsWith('new_report_') ||
+          !name.endsWith('_stage_body.dart')) {
         continue;
       }
       final int n = _lineCount(e);

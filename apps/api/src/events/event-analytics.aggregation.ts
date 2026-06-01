@@ -21,6 +21,12 @@ export type EventAnalyticsPayload = {
   attendanceRate: number;
   joinersCumulative: JoinersCumulativePoint[];
   checkInsByHour: CheckInsByHourPoint[];
+  /** ISO-8601 instant when this payload was built (for client “updated” UI). */
+  generatedAt: string;
+  /** ISO-8601 instant of the most recent participant join, if any. */
+  lastJoinAt: string | null;
+  /** ISO-8601 instant of the most recent check-in, if any. */
+  lastCheckInAt: string | null;
 };
 
 export type BuildEventAnalyticsInput = {
@@ -63,11 +69,20 @@ export function buildEventAnalyticsPayload(input: BuildEventAnalyticsInput): Eve
   const attendanceRate =
     totalJoiners > 0 ? Math.round((checkedInCount / Math.max(totalJoiners, 1)) * 100) : 0;
 
+  const sortedCheckIns = [...input.checkInsCheckedAt].sort((a, b) => a.getTime() - b.getTime());
+  const lastJoinAt =
+    sortedJoins.length > 0 ? sortedJoins[sortedJoins.length - 1]!.toISOString() : null;
+  const lastCheckInAt =
+    sortedCheckIns.length > 0 ? sortedCheckIns[sortedCheckIns.length - 1]!.toISOString() : null;
+
   return {
     totalJoiners,
     checkedInCount,
     attendanceRate,
     joinersCumulative,
     checkInsByHour,
+    generatedAt: new Date().toISOString(),
+    lastJoinAt,
+    lastCheckInAt,
   };
 }

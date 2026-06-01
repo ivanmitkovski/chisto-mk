@@ -1,34 +1,82 @@
-import 'package:chisto_mobile/features/notifications/domain/models/user_notification.dart';
+import 'package:feature_notifications/src/domain/models/user_notification.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('UserNotificationType', () {
     test('has expected enum values', () {
       expect(UserNotificationType.values.length, 10);
-      expect(UserNotificationType.values, contains(UserNotificationType.siteUpdate));
-      expect(UserNotificationType.values, contains(UserNotificationType.reportStatus));
-      expect(UserNotificationType.values, contains(UserNotificationType.upvote));
-      expect(UserNotificationType.values, contains(UserNotificationType.comment));
-      expect(UserNotificationType.values, contains(UserNotificationType.nearbyReport));
-      expect(UserNotificationType.values, contains(UserNotificationType.cleanupEvent));
-      expect(UserNotificationType.values, contains(UserNotificationType.eventChat));
-      expect(UserNotificationType.values, contains(UserNotificationType.system));
-      expect(UserNotificationType.values, contains(UserNotificationType.achievement));
-      expect(UserNotificationType.values, contains(UserNotificationType.welcome));
+      expect(
+        UserNotificationType.values,
+        contains(UserNotificationType.siteUpdate),
+      );
+      expect(
+        UserNotificationType.values,
+        contains(UserNotificationType.reportStatus),
+      );
+      expect(
+        UserNotificationType.values,
+        contains(UserNotificationType.upvote),
+      );
+      expect(
+        UserNotificationType.values,
+        contains(UserNotificationType.comment),
+      );
+      expect(
+        UserNotificationType.values,
+        contains(UserNotificationType.nearbyReport),
+      );
+      expect(
+        UserNotificationType.values,
+        contains(UserNotificationType.cleanupEvent),
+      );
+      expect(
+        UserNotificationType.values,
+        contains(UserNotificationType.eventChat),
+      );
+      expect(
+        UserNotificationType.values,
+        contains(UserNotificationType.system),
+      );
+      expect(
+        UserNotificationType.values,
+        contains(UserNotificationType.achievement),
+      );
+      expect(
+        UserNotificationType.values,
+        contains(UserNotificationType.welcome),
+      );
     });
   });
 
   group('parseNotificationType', () {
     test('parses known types', () {
-      expect(parseNotificationType('SITE_UPDATE'), UserNotificationType.siteUpdate);
-      expect(parseNotificationType('REPORT_STATUS'), UserNotificationType.reportStatus);
+      expect(
+        parseNotificationType('SITE_UPDATE'),
+        UserNotificationType.siteUpdate,
+      );
+      expect(
+        parseNotificationType('REPORT_STATUS'),
+        UserNotificationType.reportStatus,
+      );
       expect(parseNotificationType('UPVOTE'), UserNotificationType.upvote);
       expect(parseNotificationType('COMMENT'), UserNotificationType.comment);
-      expect(parseNotificationType('NEARBY_REPORT'), UserNotificationType.nearbyReport);
-      expect(parseNotificationType('CLEANUP_EVENT'), UserNotificationType.cleanupEvent);
-      expect(parseNotificationType('EVENT_CHAT'), UserNotificationType.eventChat);
+      expect(
+        parseNotificationType('NEARBY_REPORT'),
+        UserNotificationType.nearbyReport,
+      );
+      expect(
+        parseNotificationType('CLEANUP_EVENT'),
+        UserNotificationType.cleanupEvent,
+      );
+      expect(
+        parseNotificationType('EVENT_CHAT'),
+        UserNotificationType.eventChat,
+      );
       expect(parseNotificationType('SYSTEM'), UserNotificationType.system);
-      expect(parseNotificationType('ACHIEVEMENT'), UserNotificationType.achievement);
+      expect(
+        parseNotificationType('ACHIEVEMENT'),
+        UserNotificationType.achievement,
+      );
       expect(parseNotificationType('WELCOME'), UserNotificationType.welcome);
     });
 

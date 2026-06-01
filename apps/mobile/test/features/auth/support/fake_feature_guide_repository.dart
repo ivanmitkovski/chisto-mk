@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/features/onboarding/domain/feature_guide_repository.dart';
+import 'package:feature_onboarding/src/domain/feature_guide_repository.dart';
 
 class FakeFeatureGuideRepository implements FeatureGuideRepository {
   FakeFeatureGuideRepository({

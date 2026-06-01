@@ -1,14 +1,14 @@
-import 'package:chisto_mobile/core/app_theme.dart';
-import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
-import 'package:chisto_mobile/features/home/presentation/utils/site_image_resolver.dart';
-import 'package:chisto_mobile/features/home/presentation/widgets/site_detail/site_stats_row.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:design_system/design_system.dart';
+import 'package:feature_home/src/domain/models/pollution_site.dart';
+import 'package:feature_home/src/presentation/utils/site_image_resolver.dart';
+import 'package:feature_home/src/presentation/widgets/site_detail/site_stats_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('site gallery returns all provided images', () {
-    final site = PollutionSite(
+    const site = PollutionSite(
       id: 'site_1',
       title: 'Title',
       description: 'Desc',
@@ -17,7 +17,7 @@ void main() {
       distanceKm: -1,
       score: 1,
       participantCount: 0,
-      mediaUrls: const <String>[
+      mediaUrls: <String>[
         'assets/images/content/people_cleaning.png',
         'assets/images/content/people_cleaning.png',
       ],
@@ -27,7 +27,7 @@ void main() {
   });
 
   testWidgets('shows compact token for unknown distance', (tester) async {
-    final site = PollutionSite(
+    const site = PollutionSite(
       id: 'site_1',
       title: 'Title',
       description: 'Desc',
@@ -36,7 +36,7 @@ void main() {
       distanceKm: -1,
       score: 1,
       participantCount: 0,
-      mediaUrls: const <String>['assets/images/content/people_cleaning.png'],
+      mediaUrls: <String>['assets/images/content/people_cleaning.png'],
     );
 
     await tester.pumpWidget(
@@ -45,12 +45,10 @@ void main() {
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         locale: const Locale('en'),
-        home: Scaffold(
-          body: SiteStatsRow(site: site),
-        ),
+        home: const Scaffold(body: SiteStatsRow(site: site)),
       ),
     );
 
-    expect(find.text('—'), findsOneWidget);
+    expect(find.text('Not available'), findsOneWidget);
   });
 }

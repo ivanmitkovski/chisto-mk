@@ -1,10 +1,12 @@
-import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
-import 'package:chisto_mobile/core/providers/refresh_signals_providers.dart';
-import 'package:chisto_mobile/core/providers/root_container.dart';
-import '../shared/widget_test_bootstrap.dart' show ensureWidgetTestPlumbing;
+import 'package:chisto_infrastructure/core/bootstrap/app_bootstrap.dart';
+import 'package:chisto_infrastructure/core/providers/refresh_signals_providers.dart';
+import 'package:chisto_infrastructure/core/providers/root_container.dart';
+import 'package:feature_events/src/data/event_offline_work_coordinator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../shared/widget_test_bootstrap.dart' show ensureWidgetTestPlumbing;
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -45,11 +47,14 @@ void main() {
       expect(locator.checkInRepository, isNotNull);
     });
 
-    test('after init, authState starts unauthenticated (no hardcoded user)', () async {
-      await ensureWidgetTestPlumbing();
-      await locator.initialize();
-      expect(locator.authState.isAuthenticated, isFalse);
-    });
+    test(
+      'after init, authState starts unauthenticated (no hardcoded user)',
+      () async {
+        await ensureWidgetTestPlumbing();
+        await locator.initialize();
+        expect(locator.authState.isAuthenticated, isFalse);
+      },
+    );
 
     test('loads app locale from SharedPreferences on initialize', () async {
       SharedPreferences.setMockInitialValues(<String, Object>{
@@ -77,8 +82,11 @@ void main() {
     test('reset sets isInitialized to false', () async {
       await ensureWidgetTestPlumbing();
       await locator.initialize();
+      setRootProviderContainer(locator.providerContainer);
+      await EventOfflineWorkCoordinator.instance.refreshSnapshot();
       expect(locator.isInitialized, isTrue);
 
+      clearRootProviderContainer();
       await locator.reset();
       expect(locator.isInitialized, isFalse);
     });

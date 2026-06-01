@@ -1,33 +1,30 @@
-import 'package:chisto_mobile/features/profile/domain/models/points_history_page.dart';
-import 'package:chisto_mobile/features/profile/domain/models/profile_user.dart';
-import 'package:chisto_mobile/features/profile/domain/models/weekly_rankings_result.dart';
-import 'package:chisto_mobile/features/profile/domain/repositories/profile_repository.dart';
+import 'package:feature_profile/src/domain/models/points_history_page.dart';
+import 'package:feature_profile/src/domain/models/profile_user.dart';
+import 'package:feature_profile/src/domain/models/weekly_rankings_result.dart';
+import 'package:feature_profile/src/domain/repositories/profile_repository.dart';
 
 /// Test-only configurable [ProfileRepository].
 class TestingProfileRepository implements ProfileRepository {
   TestingProfileRepository({
     required Future<ProfileUser> Function() getMeImpl,
     Future<PointsHistoryPage> Function({int limit, String? cursor})?
-        getPointsHistoryImpl,
+    getPointsHistoryImpl,
     Future<WeeklyRankingsResult> Function({int limit})? getWeeklyRankingsImpl,
-  })  : _getMeImpl = getMeImpl,
-        _getPointsHistoryImpl = getPointsHistoryImpl,
-        _getWeeklyRankingsImpl = getWeeklyRankingsImpl;
+  }) : _getMeImpl = getMeImpl,
+       _getPointsHistoryImpl = getPointsHistoryImpl,
+       _getWeeklyRankingsImpl = getWeeklyRankingsImpl;
 
   final Future<ProfileUser> Function() _getMeImpl;
   final Future<PointsHistoryPage> Function({int limit, String? cursor})?
-      _getPointsHistoryImpl;
+  _getPointsHistoryImpl;
   final Future<WeeklyRankingsResult> Function({int limit})?
-      _getWeeklyRankingsImpl;
+  _getWeeklyRankingsImpl;
 
   @override
   Future<ProfileUser> getMe() => _getMeImpl();
 
   @override
-  Future<PointsHistoryPage> getPointsHistory({
-    int limit = 30,
-    String? cursor,
-  }) {
+  Future<PointsHistoryPage> getPointsHistory({int limit = 30, String? cursor}) {
     final Future<PointsHistoryPage> Function({int limit, String? cursor})? f =
         _getPointsHistoryImpl;
     if (f == null) {

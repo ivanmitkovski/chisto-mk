@@ -1,11 +1,13 @@
-import 'package:chisto_mobile/features/events/presentation/utils/event_calendar_date_format.dart';
+import 'package:feature_events/src/presentation/utils/event_calendar_date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 
 void main() {
-  testWidgets('formatEventCalendarDate uses app locale', (WidgetTester tester) async {
+  testWidgets('formatEventCalendarDate uses app locale', (
+    WidgetTester tester,
+  ) async {
     late BuildContext ctx;
     await tester.pumpWidget(
       MaterialApp(
@@ -23,7 +25,10 @@ void main() {
         ),
       ),
     );
-    final String formatted = formatEventCalendarDate(ctx, DateTime(2025, 6, 15));
+    final String formatted = formatEventCalendarDate(
+      ctx,
+      DateTime(2025, 6, 15),
+    );
     expect(
       formatted,
       DateFormat('MMM d, y', 'en_US').format(DateTime(2025, 6, 15)),

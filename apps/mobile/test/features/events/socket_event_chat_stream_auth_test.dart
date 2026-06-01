@@ -1,7 +1,7 @@
-import 'package:chisto_mobile/core/auth/auth_state.dart';
-import 'package:chisto_mobile/features/auth/domain/refresh_outcome.dart';
-import 'package:chisto_mobile/features/events/data/chat/event_chat_connection_status.dart';
-import 'package:chisto_mobile/features/events/data/chat/socket_event_chat_stream.dart';
+import 'package:chisto_infrastructure/core/auth/auth_state.dart';
+import 'package:feature_auth/src/domain/refresh_outcome.dart';
+import 'package:feature_events/src/data/chat/event_chat_connection_status.dart';
+import 'package:feature_events/src/data/chat/socket_event_chat_stream.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

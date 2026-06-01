@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/features/auth/data/eula_acceptance_store.dart';
+import 'package:feature_auth/src/data/eula_acceptance_store.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -41,20 +41,16 @@ void main() {
     expect(await store.hasAcceptedForUser(''), isFalse);
   });
 
-  test('syncFromServer seeds local cache when server does not require acceptance',
-      () async {
-    await store.syncFromServer(
-      userId: userA,
-      requiresTermsAcceptance: false,
-    );
-    expect(await store.hasAcceptedForUser(userA), isTrue);
-  });
+  test(
+    'syncFromServer seeds local cache when server does not require acceptance',
+    () async {
+      await store.syncFromServer(userId: userA, requiresTermsAcceptance: false);
+      expect(await store.hasAcceptedForUser(userA), isTrue);
+    },
+  );
 
   test('syncFromServer no-op when server still requires acceptance', () async {
-    await store.syncFromServer(
-      userId: userA,
-      requiresTermsAcceptance: true,
-    );
+    await store.syncFromServer(userId: userA, requiresTermsAcceptance: true);
     expect(await store.hasAcceptedForUser(userA), isFalse);
   });
 

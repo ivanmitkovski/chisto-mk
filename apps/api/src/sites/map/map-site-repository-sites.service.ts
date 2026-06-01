@@ -6,6 +6,10 @@ import { ListSitesMapQueryDto } from '../dto/list-sites-map-query.dto';
 import { MapQueryValidatorService } from './map-query-validator.service';
 import { MapProjectionRow } from './map-types';
 import { resolveMapSiteBounds } from './map-site-repository-bounds.util';
+import {
+  mapSiteVisibilityPrismaWhere,
+  mapSiteVisibilitySql,
+} from './map-site-visibility.helper';
 
 type FallbackSiteRow = {
   id: string;
@@ -41,10 +45,11 @@ export class MapSiteRepositorySitesService {
   async findSites(
     query: ListSitesMapQueryDto,
     limit: number,
+    viewerUserId?: string | null,
   ): Promise<{ rows: MapProjectionRow[]; usedViewportBbox: boolean; usedFallback: boolean }> {
     const flags = loadFeatureFlags();
     if (!flags.mapUseProjection) {
-      return this.findSitesFromCanonical(query, limit);
+      return this.findSitesFromCanonical(query, limit, viewerUserId);
     }
     const bounds = resolveMapSiteBounds(query, this.validator);
     const statusFilter = query.status
@@ -53,6 +58,10 @@ export class MapSiteRepositorySitesService {
     const includeArchived = query.includeArchived === true;
     const archivedFilter = includeArchived ? Prisma.empty : Prisma.sql`AND "isArchivedByAdmin" = false`;
     const hotProjectionFilter = Prisma.sql`AND "isHot" = true`;
+    const visibilityFilter = mapSiteVisibilitySql({
+      siteIdSql: Prisma.sql`"siteId"`,
+      viewerUserId,
+    });
     const usePostgis = flags.mapPostgisEnabled;
     const geoWhere = usePostgis
       ? this.validator.hasViewportBounds(query)
@@ -95,13 +104,17 @@ export class MapSiteRepositorySitesService {
         ${hotProjectionFilter}
         ${statusFilter}
         ${archivedFilter}
+        ${visibilityFilter}
       ORDER BY "siteUpdatedAt" DESC
       LIMIT ${limit}
     `;
     return { rows, usedViewportBbox: true, usedFallback: false };
   }
 
-  async resolveDataVersion(query: ListSitesMapQueryDto): Promise<string> {
+  async resolveDataVersion(
+    query: ListSitesMapQueryDto,
+    viewerUserId?: string | null,
+  ): Promise<string> {
     const flags = loadFeatureFlags();
     const bounds = resolveMapSiteBounds(query, this.validator);
     const statusFilter = query.status
@@ -112,6 +125,10 @@ export class MapSiteRepositorySitesService {
       ? Prisma.empty
       : Prisma.sql`AND "isArchivedByAdmin" = false`;
     const hotProjectionFilter = Prisma.sql`AND "isHot" = true`;
+    const visibilityFilter = mapSiteVisibilitySql({
+      siteIdSql: Prisma.sql`"siteId"`,
+      viewerUserId,
+    });
 
     if (flags.mapUseProjection) {
       const usePostgis = flags.mapPostgisEnabled;
@@ -140,10 +157,15 @@ export class MapSiteRepositorySitesService {
           ${hotProjectionFilter}
           ${statusFilter}
           ${archivedFilter}
+          ${visibilityFilter}
       `;
       return `${row?.count ?? 0}:${row?.latestUpdatedAt?.getTime() ?? 0}`;
     }
 
+    const siteVisibilityFilter = mapSiteVisibilitySql({
+      siteIdSql: Prisma.sql`"Site"."id"`,
+      viewerUserId,
+    });
     const [row] = await this.prisma.$queryRaw<
       Array<{ count: number; latestUpdatedAt: Date | null }>
     >`
@@ -155,6 +177,7 @@ export class MapSiteRepositorySitesService {
         AND "longitude" BETWEEN ${bounds.minLng} AND ${bounds.maxLng}
         ${statusFilter}
         ${archivedFilter}
+        ${siteVisibilityFilter}
     `;
     return `${row?.count ?? 0}:${row?.latestUpdatedAt?.getTime() ?? 0}`;
   }
@@ -162,8 +185,12 @@ export class MapSiteRepositorySitesService {
   private async findSitesFromCanonical(
     query: ListSitesMapQueryDto,
     limit: number,
+    viewerUserId?: string | null,
   ): Promise<{ rows: MapProjectionRow[]; usedViewportBbox: boolean; usedFallback: boolean }> {
-    const where: Prisma.SiteWhereInput = query.status ? { status: query.status } : {};
+    const where: Prisma.SiteWhereInput = {
+      ...(query.status ? { status: query.status } : {}),
+      ...mapSiteVisibilityPrismaWhere(viewerUserId),
+    };
     if (!query.includeArchived) {
       (where as Record<string, unknown>).isArchivedByAdmin = false;
     }

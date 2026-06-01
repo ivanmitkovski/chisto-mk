@@ -1,21 +1,27 @@
+import 'package:chisto_infrastructure/core/network/request_cancellation.dart';
+import 'package:chisto_infrastructure/core/providers/reports_providers.dart';
+import 'package:feature_reports/src/domain/models/report_capacity.dart';
+import 'package:feature_reports/src/domain/models/report_detail.dart';
+import 'package:feature_reports/src/domain/models/report_draft.dart';
+import 'package:feature_reports/src/domain/models/report_list_item.dart';
+import 'package:feature_reports/src/domain/models/report_photo_upload_outcome.dart';
+import 'package:feature_reports/src/domain/models/report_submit_result.dart';
+import 'package:feature_reports/src/domain/models/reports_list_response.dart';
+import 'package:feature_reports/src/domain/repositories/reports_api_repository.dart';
+import 'package:feature_reports/src/presentation/controllers/reports_list_controller.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:chisto_mobile/core/network/request_cancellation.dart';
-import 'package:chisto_mobile/features/reports/domain/models/report_capacity.dart';
-import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
-import 'package:chisto_mobile/features/reports/domain/models/report_detail.dart';
-import 'package:chisto_mobile/features/reports/domain/models/report_list_item.dart';
-import 'package:chisto_mobile/features/reports/domain/models/report_submit_result.dart';
-import 'package:chisto_mobile/features/reports/domain/models/reports_list_response.dart';
-import 'package:chisto_mobile/features/reports/domain/repositories/reports_api_repository.dart';
-import 'package:chisto_mobile/features/reports/presentation/controllers/reports_list_controller.dart';
 
 class _FakeReportsApiRepository implements ReportsApiRepository {
   @override
-  Future<List<String>> uploadPhotos(List<String> filePaths) async => <String>[];
+  Future<ReportPhotoUploadOutcome> uploadPhotos(List<String> filePaths) async =>
+      const ReportPhotoUploadOutcome(urls: <String>[]);
 
   @override
-  Future<void> uploadReportMedia(String reportId, List<String> filePaths) async {}
+  Future<void> uploadReportMedia(
+    String reportId,
+    List<String> filePaths,
+  ) async {}
 
   @override
   Future<ReportSubmitResult> submitReport({
@@ -57,47 +63,61 @@ class _FakeReportsApiRepository implements ReportsApiRepository {
 }
 
 void main() {
-  test('insertOptimisticFromSubmit prepends and clearOptimisticForReport clears flag', () {
-    final ReportsListController c = ReportsListController(
-      repository: _FakeReportsApiRepository(),
-    );
-    c.reports = <ReportListItem>[
-      ReportListItem(
-        id: 'existing',
-        reportNumber: 'R-1',
-        title: 'Old',
-        location: 'Skopje',
-        submittedAt: DateTime.utc(2024, 1, 1),
-        status: ApiReportStatus.approved,
-        isPotentialDuplicate: false,
-        coReporterCount: 0,
-      ),
-    ];
+  test(
+    'insertOptimisticFromSubmit prepends and clearOptimisticForReport clears flag',
+    () {
+      final ProviderContainer container = ProviderContainer(
+        overrides: <Override>[
+          reportsApiRepositoryProvider.overrideWithValue(
+            _FakeReportsApiRepository(),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+      final ReportsListController c = container.read(
+        reportsListControllerProvider.notifier,
+      );
+      c.state = c.state.copyWith(
+        reports: <ReportListItem>[
+          ReportListItem(
+            id: 'existing',
+            reportNumber: 'R-1',
+            title: 'Old',
+            location: 'Skopje',
+            submittedAt: DateTime.utc(2024, 1, 1),
+            status: ApiReportStatus.approved,
+            isPotentialDuplicate: false,
+            coReporterCount: 0,
+          ),
+        ],
+        isLoadingFirstPage: false,
+      );
 
-    final ReportDraft draft = ReportDraft(
-      category: ReportCategory.other,
-      title: 'Hello',
-      description: 'D',
-      address: 'Addr',
-      cleanupEffort: CleanupEffort.notSure,
-      severity: 3,
-    );
+      final ReportDraft draft = ReportDraft(
+        category: ReportCategory.other,
+        title: 'Hello',
+        description: 'D',
+        address: 'Addr',
+        cleanupEffort: CleanupEffort.notSure,
+        severity: 3,
+      );
 
-    final ReportSubmitResult result = ReportSubmitResult(
-      reportId: 'new-id',
-      reportNumber: 'R-99',
-      siteId: 'site',
-      isNewSite: false,
-      pointsAwarded: 12,
-      submittedMediaUrls: <String>['https://example.com/a.jpg'],
-    );
+      const ReportSubmitResult result = ReportSubmitResult(
+        reportId: 'new-id',
+        reportNumber: 'R-99',
+        siteId: 'site',
+        isNewSite: false,
+        pointsAwarded: 12,
+        submittedMediaUrls: <String>['https://example.com/a.jpg'],
+      );
 
-    c.insertOptimisticFromSubmit(result, 'Hello', draft);
-    expect(c.reports.first.id, 'new-id');
-    expect(c.reports.first.isOptimistic, isTrue);
-    expect(c.reports.first.mediaUrls, <String>['https://example.com/a.jpg']);
+      c.insertOptimisticFromSubmit(result, 'Hello', draft);
+      expect(c.reports.first.id, 'new-id');
+      expect(c.reports.first.isOptimistic, isTrue);
+      expect(c.reports.first.mediaUrls, <String>['https://example.com/a.jpg']);
 
-    c.clearOptimisticForReport('new-id');
-    expect(c.reports.first.isOptimistic, isFalse);
-  });
+      c.clearOptimisticForReport('new-id');
+      expect(c.reports.first.isOptimistic, isFalse);
+    },
+  );
 }

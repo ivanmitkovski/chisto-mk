@@ -1,10 +1,11 @@
-import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
-import '../../support/events/in_memory_check_in_repository.dart';
-import '../../support/events/in_memory_events_store.dart';
-import 'package:chisto_mobile/features/events/domain/models/check_in_payload.dart';
-import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
+import 'package:chisto_infrastructure/core/providers/events_providers.dart';
+import 'package:feature_events/src/domain/models/check_in_payload.dart';
+import 'package:feature_events/src/domain/models/eco_event.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../support/events/in_memory_check_in_repository.dart';
+import '../../support/events/in_memory_events_store.dart';
 
 void main() {
   late InMemoryEventsStore eventsStore;
@@ -14,7 +15,7 @@ void main() {
   setUp(() async {
     SharedPreferences.setMockInitialValues(<String, Object>{});
     eventsStore = InMemoryEventsStore.instance;
-    EventsRepositoryRegistry.setTestOverride(eventsStore);
+    setEventsRepositoryTestOverride(eventsStore);
     checkInRepository = InMemoryCheckInRepository.instance;
     checkInRepository.reset();
     eventsStore.resetToSeed();
@@ -43,12 +44,13 @@ void main() {
   });
 
   tearDown(() {
-    EventsRepositoryRegistry.setTestOverride(null);
+    setEventsRepositoryTestOverride(null);
   });
 
   test('valid scan succeeds and replay is blocked', () async {
-    final CheckInQrPayload payload =
-        await checkInRepository.issuePayload(eventId: event.id);
+    final CheckInQrPayload payload = await checkInRepository.issuePayload(
+      eventId: event.id,
+    );
 
     final CheckInSubmissionResult first = await checkInRepository.submitScan(
       rawPayload: payload.encode(),
@@ -68,8 +70,9 @@ void main() {
   });
 
   test('duplicate attendee check-in is rejected', () async {
-    final CheckInQrPayload firstPayload =
-        await checkInRepository.issuePayload(eventId: event.id);
+    final CheckInQrPayload firstPayload = await checkInRepository.issuePayload(
+      eventId: event.id,
+    );
     final CheckInSubmissionResult first = await checkInRepository.submitScan(
       rawPayload: firstPayload.encode(),
       expectedEventId: event.id,
@@ -78,8 +81,9 @@ void main() {
     );
     expect(first.isSuccess, isTrue);
 
-    final CheckInQrPayload secondPayload =
-        await checkInRepository.issuePayload(eventId: event.id);
+    final CheckInQrPayload secondPayload = await checkInRepository.issuePayload(
+      eventId: event.id,
+    );
     final CheckInSubmissionResult second = await checkInRepository.submitScan(
       rawPayload: secondPayload.encode(),
       expectedEventId: event.id,
@@ -95,11 +99,12 @@ void main() {
       equals(const Duration(milliseconds: 45000)),
     );
 
-    final ManualCheckInResult added = await checkInRepository.markAttendeeCheckedIn(
-      eventId: event.id,
-      attendeeId: 'in_memory_volunteer_0',
-      attendeeName: 'Volunteer 1',
-    );
+    final ManualCheckInResult added = await checkInRepository
+        .markAttendeeCheckedIn(
+          eventId: event.id,
+          attendeeId: 'in_memory_volunteer_0',
+          attendeeName: 'Volunteer 1',
+        );
 
     expect(added.recorded, isTrue);
 

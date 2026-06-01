@@ -1,14 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:chisto_mobile/core/auth/auth_state.dart';
-import 'package:chisto_mobile/core/config/app_config.dart';
-import 'package:chisto_mobile/core/network/connectivity_gate.dart';
-import 'package:chisto_mobile/features/auth/domain/refresh_outcome.dart';
-import 'package:chisto_mobile/features/home/data/map_realtime/map_realtime_service.dart';
-import 'package:chisto_mobile/features/home/data/map_realtime/map_site_event.dart';
+import 'package:chisto_infrastructure/core/auth/auth_state.dart';
+import 'package:chisto_infrastructure/core/config/app_config.dart';
+import 'package:chisto_infrastructure/core/network/connectivity_gate.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:fake_async/fake_async.dart';
+import 'package:feature_auth/src/domain/refresh_outcome.dart';
+import 'package:feature_home/src/data/map_realtime/map_realtime_service.dart';
+import 'package:feature_home/src/data/map_realtime/map_site_event.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -36,21 +36,22 @@ class _HangUntilCloseClient extends http.BaseClient {
 }
 
 void main() {
-  late Future<List<ConnectivityResult>> Function() _origCheck;
-  late Stream<List<ConnectivityResult>> Function() _origWatch;
+  late Future<List<ConnectivityResult>> Function() origCheck;
+  late Stream<List<ConnectivityResult>> Function() origWatch;
 
   setUp(() {
-    _origCheck = ConnectivityGate.check;
-    _origWatch = ConnectivityGate.watch;
-    ConnectivityGate.check =
-        () async => <ConnectivityResult>[ConnectivityResult.wifi];
-    ConnectivityGate.watch =
-        () => const Stream<List<ConnectivityResult>>.empty();
+    origCheck = ConnectivityGate.check;
+    origWatch = ConnectivityGate.watch;
+    ConnectivityGate.check = () async => <ConnectivityResult>[
+      ConnectivityResult.wifi,
+    ];
+    ConnectivityGate.watch = () =>
+        const Stream<List<ConnectivityResult>>.empty();
   });
 
   tearDown(() {
-    ConnectivityGate.check = _origCheck;
-    ConnectivityGate.watch = _origWatch;
+    ConnectivityGate.check = origCheck;
+    ConnectivityGate.watch = origWatch;
   });
 
   test('connect reaches live and forwards site events', () async {
@@ -67,15 +68,16 @@ void main() {
         'longitude': 21.428,
       },
     });
-    final http.Client client = MockClient.streaming(
-      (http.BaseRequest request, _) async {
-        return http.StreamedResponse(
-          Stream<List<int>>.value(utf8.encode('data: $eventJson\n\n')),
-          200,
-          headers: <String, String>{'content-type': 'text/event-stream'},
-        );
-      },
-    );
+    final http.Client client = MockClient.streaming((
+      http.BaseRequest request,
+      _,
+    ) async {
+      return http.StreamedResponse(
+        Stream<List<int>>.value(utf8.encode('data: $eventJson\n\n')),
+        200,
+        headers: <String, String>{'content-type': 'text/event-stream'},
+      );
+    });
     final AuthState auth = AuthState()
       ..setAuthenticated(
         userId: 'u1',
@@ -88,11 +90,14 @@ void main() {
       sessionRefresh: null,
       httpClient: client,
     );
-    final List<MapRealtimeConnectionState> states = <MapRealtimeConnectionState>[];
-    final StreamSubscription<MapRealtimeConnectionState> sub =
-        svc.states.listen(states.add);
+    final List<MapRealtimeConnectionState> states =
+        <MapRealtimeConnectionState>[];
+    final StreamSubscription<MapRealtimeConnectionState> sub = svc.states
+        .listen(states.add);
     final List<MapSiteEvent> events = <MapSiteEvent>[];
-    final StreamSubscription<MapSiteEvent> evSub = svc.events.listen(events.add);
+    final StreamSubscription<MapSiteEvent> evSub = svc.events.listen(
+      events.add,
+    );
 
     svc.setActive(true);
     await Future<void>.delayed(Duration.zero);
@@ -119,20 +124,21 @@ void main() {
       'updatedAt': '2026-03-27T12:00:00.000Z',
       'mutation': <String, String>{'kind': 'updated'},
     });
-    final http.Client client = MockClient.streaming(
-      (http.BaseRequest request, _) async {
-        sends += 1;
-        if (sends == 1) {
-          return http.StreamedResponse(const Stream<List<int>>.empty(), 401);
-        }
-        expect(request.headers['authorization'], 'Bearer t2');
-        return http.StreamedResponse(
-          Stream<List<int>>.value(utf8.encode('data: $okBody\n\n')),
-          200,
-          headers: <String, String>{'content-type': 'text/event-stream'},
-        );
-      },
-    );
+    final http.Client client = MockClient.streaming((
+      http.BaseRequest request,
+      _,
+    ) async {
+      sends += 1;
+      if (sends == 1) {
+        return http.StreamedResponse(const Stream<List<int>>.empty(), 401);
+      }
+      expect(request.headers['authorization'], 'Bearer t2');
+      return http.StreamedResponse(
+        Stream<List<int>>.value(utf8.encode('data: $okBody\n\n')),
+        200,
+        headers: <String, String>{'content-type': 'text/event-stream'},
+      );
+    });
     final AuthState auth = AuthState()
       ..setAuthenticated(
         userId: 'u1',
@@ -166,11 +172,12 @@ void main() {
   });
 
   test('401 with serverRejected refresh invokes onAuthRejected', () async {
-    final http.Client client = MockClient.streaming(
-      (http.BaseRequest request, _) async {
-        return http.StreamedResponse(const Stream<List<int>>.empty(), 401);
-      },
-    );
+    final http.Client client = MockClient.streaming((
+      http.BaseRequest request,
+      _,
+    ) async {
+      return http.StreamedResponse(const Stream<List<int>>.empty(), 401);
+    });
     final AuthState auth = AuthState()
       ..setAuthenticated(
         userId: 'u1',
@@ -226,11 +233,15 @@ void main() {
     });
   });
 
-  test('requestReconnect closes active stream and allows another send', () async {
-    int sends = 0;
-    final StreamController<List<int>> first = StreamController<List<int>>();
-    final http.Client client = MockClient.streaming(
-      (http.BaseRequest request, _) async {
+  test(
+    'requestReconnect closes active stream and allows another send',
+    () async {
+      int sends = 0;
+      final StreamController<List<int>> first = StreamController<List<int>>();
+      final http.Client client = MockClient.streaming((
+        http.BaseRequest request,
+        _,
+      ) async {
         sends += 1;
         if (sends == 1) {
           return http.StreamedResponse(
@@ -244,49 +255,50 @@ void main() {
           200,
           headers: <String, String>{'content-type': 'text/event-stream'},
         );
-      },
-    );
-    final AuthState auth = AuthState()
-      ..setAuthenticated(
-        userId: 'u1',
-        displayName: 'Tester',
-        accessToken: 't1',
+      });
+      final AuthState auth = AuthState()
+        ..setAuthenticated(
+          userId: 'u1',
+          displayName: 'Tester',
+          accessToken: 't1',
+        );
+      final MapRealtimeService svc = MapRealtimeService(
+        config: AppConfig.local,
+        authState: auth,
+        sessionRefresh: null,
+        httpClient: client,
       );
-    final MapRealtimeService svc = MapRealtimeService(
-      config: AppConfig.local,
-      authState: auth,
-      sessionRefresh: null,
-      httpClient: client,
-    );
-    final Completer<void> sawLive = Completer<void>();
-    late final StreamSubscription<MapRealtimeConnectionState> stateSub;
-    stateSub = svc.states.listen((MapRealtimeConnectionState s) {
-      if (s == MapRealtimeConnectionState.live && !sawLive.isCompleted) {
-        sawLive.complete();
-      }
-    });
-    svc.setActive(true);
-    await sawLive.future.timeout(const Duration(seconds: 2));
-    await stateSub.cancel();
-    svc.requestReconnect();
-    // Backoff after a dropped stream is ~400–600ms (see [_nextBackoff]).
-    await Future<void>.delayed(const Duration(milliseconds: 800));
-    expect(sends, greaterThanOrEqualTo(2));
-    await first.close();
-    svc.setActive(false);
-    svc.dispose();
-  });
+      final Completer<void> sawLive = Completer<void>();
+      late final StreamSubscription<MapRealtimeConnectionState> stateSub;
+      stateSub = svc.states.listen((MapRealtimeConnectionState s) {
+        if (s == MapRealtimeConnectionState.live && !sawLive.isCompleted) {
+          sawLive.complete();
+        }
+      });
+      svc.setActive(true);
+      await sawLive.future.timeout(const Duration(seconds: 2));
+      await stateSub.cancel();
+      svc.requestReconnect();
+      // Backoff after a dropped stream is ~400–600ms (see [_nextBackoff]).
+      await Future<void>.delayed(const Duration(milliseconds: 800));
+      expect(sends, greaterThanOrEqualTo(2));
+      await first.close();
+      svc.setActive(false);
+      svc.dispose();
+    },
+  );
 
   test('setActive false stops without throwing', () async {
-    final http.Client client = MockClient.streaming(
-      (http.BaseRequest request, _) async {
-        return http.StreamedResponse(
-          const Stream<List<int>>.empty(),
-          200,
-          headers: <String, String>{'content-type': 'text/event-stream'},
-        );
-      },
-    );
+    final http.Client client = MockClient.streaming((
+      http.BaseRequest request,
+      _,
+    ) async {
+      return http.StreamedResponse(
+        const Stream<List<int>>.empty(),
+        200,
+        headers: <String, String>{'content-type': 'text/event-stream'},
+      );
+    });
     final AuthState auth = AuthState()
       ..setAuthenticated(
         userId: 'u1',

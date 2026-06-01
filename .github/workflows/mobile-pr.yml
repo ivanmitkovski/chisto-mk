@@ -20,17 +20,52 @@ jobs:
           cache: true
       - run: flutter pub get
       - name: Format
-        run: dart format --set-exit-if-changed lib test tool
-      - name: Analyze
-        run: flutter analyze --no-fatal-infos lib
-      - name: Design guards
+        run: dart format --set-exit-if-changed lib test tool packages
+      - name: Analyze workspace
         run: |
-          dart run tool/check_release_env.dart
-          dart run tool/check_pii_in_logs.dart
-          dart run tool/check_arb_key_parity.dart
-          dart run tool/check_min_tap_target.dart
-          dart run tool/check_no_magic_edge_insets_in_features.dart
-      - name: Unit tests
-        run: flutter test test/
+          dart analyze --fatal-infos packages/chisto_core
+          flutter analyze --fatal-infos lib packages/design_system/lib
+          for pkg in packages/*/lib; do
+            if [ -d "$pkg" ] && [ "$pkg" != "packages/design_system/lib" ]; then
+              flutter analyze --fatal-infos "$pkg"
+            fi
+          done
+      - name: Package tests
+        run: |
+          flutter test packages/chisto_networking/test/
+          flutter test packages/chisto_localization/test/
+          flutter test packages/design_system/test/
+          flutter test packages/feature_safety/test/
+          flutter test packages/feature_events/test/
+      - name: Architecture guards
+        run: |
+          set -euo pipefail
+          dart format --set-exit-if-changed lib test tool packages
+          for f in tool/check_*.dart; do
+            case "$(basename "$f")" in
+              check_coverage.dart) continue ;;
+            esac
+            echo "Running $f"
+            dart run "$f"
+          done
+      - name: Unit tests with coverage
+        run: flutter test --coverage test/
+      - name: Coverage gate
+        run: dart run tool/check_coverage.dart --print-summary
       - name: Debug APK smoke
         run: flutter build apk --debug --dart-define=ENV=dev
+
+  mobile-ios-smoke:
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: apps/mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: iOS simulator build smoke
+        run: flutter build ios --simulator --no-codesign --dart-define=ENV=dev

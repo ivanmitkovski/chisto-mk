@@ -1,6 +1,6 @@
-import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
-import 'package:chisto_mobile/features/events/presentation/utils/event_detail_cta_presentation.dart';
-import 'package:chisto_mobile/l10n/app_localizations_en.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations_en.dart';
+import 'package:feature_events/src/domain/models/eco_event.dart';
+import 'package:feature_events/src/presentation/utils/event_detail_cta_presentation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -40,19 +40,24 @@ void main() {
     );
   }
 
-  test('joinable public guest: primary enabled before join deadline, no secondary row', () {
-    final EcoEvent event = base(
-      id: '1',
-      status: EcoEventStatus.upcoming,
-      organizerId: 'other',
-      isJoined: false,
-    ).copyWith(scheduledAtUtc: DateTime.utc(2030, 6, 1, 8, 0));
-    final EventDetailCtaPresentation p =
-        resolveEventDetailCtaPresentation(event: event, l10n: l10n);
-    expect(p.primaryEnabled, isTrue);
-    expect(p.showsSecondaryRow, isFalse);
-    expect(p.primaryLabel, l10n.eventsCtaJoinEcoAction);
-  });
+  test(
+    'joinable public guest: primary enabled before join deadline, no secondary row',
+    () {
+      final EcoEvent event = base(
+        id: '1',
+        status: EcoEventStatus.upcoming,
+        organizerId: 'other',
+        isJoined: false,
+      ).copyWith(scheduledAtUtc: DateTime.utc(2030, 6, 1, 8, 0));
+      final EventDetailCtaPresentation p = resolveEventDetailCtaPresentation(
+        event: event,
+        l10n: l10n,
+      );
+      expect(p.primaryEnabled, isTrue);
+      expect(p.showsSecondaryRow, isFalse);
+      expect(p.primaryLabel, l10n.eventsCtaJoinEcoAction);
+    },
+  );
 
   test('joinable guest after join window: Join disabled', () {
     final EcoEvent event = base(
@@ -61,8 +66,10 @@ void main() {
       organizerId: 'other',
       isJoined: false,
     ).copyWith(scheduledAtUtc: DateTime.utc(2020, 6, 1, 8, 0));
-    final EventDetailCtaPresentation p =
-        resolveEventDetailCtaPresentation(event: event, l10n: l10n);
+    final EventDetailCtaPresentation p = resolveEventDetailCtaPresentation(
+      event: event,
+      l10n: l10n,
+    );
     expect(p.primaryLabel, l10n.eventsCtaJoinEcoAction);
     expect(p.primaryEnabled, isFalse);
     expect(p.showsSecondaryRow, isFalse);
@@ -75,8 +82,10 @@ void main() {
       organizerId: 'other',
       isJoined: true,
     );
-    final EventDetailCtaPresentation p =
-        resolveEventDetailCtaPresentation(event: event, l10n: l10n);
+    final EventDetailCtaPresentation p = resolveEventDetailCtaPresentation(
+      event: event,
+      l10n: l10n,
+    );
     expect(p.primaryEnabled, isTrue);
     expect(p.showsSecondaryRow, isTrue);
     expect(p.secondaryLabel, l10n.eventsCtaLeaveEvent);
@@ -88,26 +97,33 @@ void main() {
       status: EcoEventStatus.upcoming,
       organizerId: 'current_user',
     ).copyWith(scheduledAtUtc: DateTime.utc(2035, 6, 1, 9, 0));
-    final EventDetailCtaPresentation p =
-        resolveEventDetailCtaPresentation(event: event, l10n: l10n);
+    final EventDetailCtaPresentation p = resolveEventDetailCtaPresentation(
+      event: event,
+      l10n: l10n,
+    );
     expect(p.primaryLabel, l10n.eventsCtaStartEvent);
     expect(p.primaryEnabled, isFalse);
   });
 
-  test('organizer in progress: manage check-in primary and extend secondary', () {
-    final EcoEvent event = base(
-      id: 'org-live',
-      status: EcoEventStatus.inProgress,
-      organizerId: 'current_user',
-    );
-    final EventDetailCtaPresentation p =
-        resolveEventDetailCtaPresentation(event: event, l10n: l10n);
-    expect(p.primaryLabel, l10n.eventsCtaManageCheckIn);
-    expect(p.primaryEnabled, isTrue);
-    expect(p.showsSecondaryRow, isTrue);
-    expect(p.secondaryIsExtendCleanupEnd, isTrue);
-    expect(p.secondaryLabel, l10n.eventsCtaExtendCleanupEnd);
-  });
+  test(
+    'organizer in progress: manage check-in primary and extend secondary',
+    () {
+      final EcoEvent event = base(
+        id: 'org-live',
+        status: EcoEventStatus.inProgress,
+        organizerId: 'current_user',
+      );
+      final EventDetailCtaPresentation p = resolveEventDetailCtaPresentation(
+        event: event,
+        l10n: l10n,
+      );
+      expect(p.primaryLabel, l10n.eventsCtaManageCheckIn);
+      expect(p.primaryEnabled, isTrue);
+      expect(p.showsSecondaryRow, isTrue);
+      expect(p.secondaryIsExtendCleanupEnd, isTrue);
+      expect(p.secondaryLabel, l10n.eventsCtaExtendCleanupEnd);
+    },
+  );
 
   test('organizer upcoming after scheduled start: start enabled', () {
     final EcoEvent event = base(
@@ -115,8 +131,10 @@ void main() {
       status: EcoEventStatus.upcoming,
       organizerId: 'current_user',
     ).copyWith(scheduledAtUtc: DateTime.utc(2020, 6, 1, 9, 0));
-    final EventDetailCtaPresentation p =
-        resolveEventDetailCtaPresentation(event: event, l10n: l10n);
+    final EventDetailCtaPresentation p = resolveEventDetailCtaPresentation(
+      event: event,
+      l10n: l10n,
+    );
     expect(p.primaryLabel, l10n.eventsCtaStartEvent);
     expect(p.primaryEnabled, isTrue);
   });
@@ -128,8 +146,10 @@ void main() {
       organizerId: 'other',
       isJoined: true,
     );
-    final EventDetailCtaPresentation p =
-        resolveEventDetailCtaPresentation(event: event, l10n: l10n);
+    final EventDetailCtaPresentation p = resolveEventDetailCtaPresentation(
+      event: event,
+      l10n: l10n,
+    );
     expect(p.primaryEnabled, isFalse);
     expect(p.showsSecondaryRow, isFalse);
   });
@@ -141,8 +161,10 @@ void main() {
       organizerId: 'other',
       isJoined: true,
     );
-    final EventDetailCtaPresentation p =
-        resolveEventDetailCtaPresentation(event: event, l10n: l10n);
+    final EventDetailCtaPresentation p = resolveEventDetailCtaPresentation(
+      event: event,
+      l10n: l10n,
+    );
     expect(p.primaryEnabled, isFalse);
     expect(p.showsSecondaryRow, isFalse);
   });

@@ -1,13 +1,29 @@
-import '../../support/events/in_memory_events_store.dart';
-import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
-import 'package:chisto_mobile/features/events/domain/models/eco_event_filter.dart';
-import 'package:chisto_mobile/features/events/presentation/controllers/events_feed_controller.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/l10n/app_localizations_en.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations_en.dart';
+import 'package:feature_events/src/application/events_providers.dart';
+import 'package:feature_events/src/domain/models/eco_event.dart';
+import 'package:feature_events/src/domain/models/eco_event_filter.dart';
+import 'package:feature_events/src/domain/repositories/events_repository.dart';
+import 'package:feature_events/src/presentation/controllers/events_feed_controller.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../support/events/in_memory_events_store.dart';
 import 'recording_events_repository.dart';
+
+EventsFeedController _feedController(ProviderContainer container) =>
+    container.read(eventsFeedControllerProvider.notifier);
+
+ProviderContainer _feedContainer(EventsRepository repo) {
+  setEventsRepositoryTestOverride(repo);
+  final ProviderContainer container = ProviderContainer();
+  addTearDown(() {
+    container.dispose();
+    setEventsRepositoryTestOverride(null);
+  });
+  return container;
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -22,8 +38,8 @@ void main() {
   });
 
   test('filteredEvents is memoized for stable inputs', () async {
-    final EventsFeedController c = EventsFeedController(repository: store);
-    addTearDown(c.dispose);
+    final ProviderContainer container = _feedContainer(store);
+    final EventsFeedController c = _feedController(container);
 
     await store.ready;
     final AppLocalizations l10n = AppLocalizationsEn();
@@ -37,30 +53,26 @@ void main() {
     expect(identical(a, c2), isFalse);
   });
 
-  test('heroEvent reads from full list while client search narrows filtered list',
-      () async {
-    final EventsFeedController c = EventsFeedController(repository: store);
-    addTearDown(c.dispose);
+  test('filteredEvents does not apply client-side text filter', () async {
+    final ProviderContainer container = _feedContainer(store);
+    final EventsFeedController c = _feedController(container);
 
     await store.ready;
     final AppLocalizations l10n = AppLocalizationsEn();
-
-    final EcoEvent? heroAll = c.heroEvent;
-    expect(heroAll, isNotNull);
+    final int countBefore = c.filteredEvents(l10n).length;
 
     c.onSearchTextChanged(
       '__no_events_match_this_token__',
       debounce: Duration.zero,
     );
     await Future<void>.delayed(Duration.zero);
-    expect(c.filteredEvents(l10n), isEmpty);
-    expect(c.heroEvent, heroAll);
+    expect(c.filteredEvents(l10n).length, countBefore);
   });
 
   test('applySearchSuggestion syncs server params via refreshEvents', () async {
     final RecordingEventsRepository repo = RecordingEventsRepository();
-    final EventsFeedController c = EventsFeedController(repository: repo);
-    addTearDown(c.dispose);
+    final ProviderContainer container = _feedContainer(repo);
+    final EventsFeedController c = _feedController(container);
 
     await c.applySearchSuggestion('  river cleanup  ');
 
@@ -73,8 +85,8 @@ void main() {
   test('userPullRefresh returns false when refresh fails', () async {
     final RecordingEventsRepository repo = RecordingEventsRepository();
     repo.refreshShouldThrow = true;
-    final EventsFeedController c = EventsFeedController(repository: repo);
-    addTearDown(c.dispose);
+    final ProviderContainer container = _feedContainer(repo);
+    final EventsFeedController c = _feedController(container);
 
     final bool ok = await c.userPullRefresh();
 
@@ -86,8 +98,8 @@ void main() {
 
   test('resetAllDiscoveryFilters clears all state and refreshes', () async {
     final RecordingEventsRepository repo = RecordingEventsRepository();
-    final EventsFeedController c = EventsFeedController(repository: repo);
-    addTearDown(c.dispose);
+    final ProviderContainer container = _feedContainer(repo);
+    final EventsFeedController c = _feedController(container);
 
     await c.setActiveFilter(EcoEventFilter.nearby);
     await c.applySearchSuggestion('test');
@@ -102,8 +114,8 @@ void main() {
   });
 
   test('setCalendarView toggles and memoization resets', () async {
-    final EventsFeedController c = EventsFeedController(repository: store);
-    addTearDown(c.dispose);
+    final ProviderContainer container = _feedContainer(store);
+    final EventsFeedController c = _feedController(container);
 
     expect(c.calendarView, isFalse);
     c.setCalendarView(true);
@@ -116,8 +128,8 @@ void main() {
 
   test('feedPhase returns loading, error, content correctly', () async {
     final RecordingEventsRepository repo = RecordingEventsRepository();
-    final EventsFeedController c = EventsFeedController(repository: repo);
-    addTearDown(c.dispose);
+    final ProviderContainer container = _feedContainer(repo);
+    final EventsFeedController c = _feedController(container);
 
     expect(c.feedPhase(), 'loading');
 
@@ -127,13 +139,29 @@ void main() {
 
   test('hasActiveFilters detects active state', () async {
     final RecordingEventsRepository repo = RecordingEventsRepository();
-    final EventsFeedController c = EventsFeedController(repository: repo);
-    addTearDown(c.dispose);
+    final ProviderContainer container = _feedContainer(repo);
+    final EventsFeedController c = _feedController(container);
 
     expect(c.hasActiveFilters, isFalse);
     await c.setActiveFilter(EcoEventFilter.nearby);
     expect(c.hasActiveFilters, isTrue);
     await c.resetAllDiscoveryFilters();
     expect(c.hasActiveFilters, isFalse);
+  });
+
+  test('setUserLocationHint invalidates nearby memoization', () async {
+    final ProviderContainer container = _feedContainer(store);
+    final EventsFeedController c = _feedController(container);
+
+    await store.ready;
+    final AppLocalizations l10n = AppLocalizationsEn();
+
+    await c.setActiveFilter(EcoEventFilter.nearby);
+    final List<EcoEvent> before = c.filteredEvents(l10n);
+
+    c.setUserLocationHint(latitude: 41.9981, longitude: 21.4254);
+    final List<EcoEvent> after = c.filteredEvents(l10n);
+
+    expect(identical(before, after), isFalse);
   });
 }

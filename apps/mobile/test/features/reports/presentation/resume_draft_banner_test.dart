@@ -1,15 +1,16 @@
-import 'package:chisto_mobile/features/reports/data/outbox/report_draft_repository.dart';
-import 'package:chisto_mobile/features/reports/data/outbox/report_draft_summary_projector.dart';
-import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_constants.dart';
-import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_entry.dart';
-import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
-import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/resume_draft_banner.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_reports/src/data/outbox/report_draft_repository.dart';
+import 'package:feature_reports/src/data/outbox/report_outbox_constants.dart';
+import 'package:feature_reports/src/data/outbox/report_outbox_entry.dart';
+import 'package:feature_reports/src/domain/models/report_draft.dart';
+import 'package:feature_reports/src/presentation/widgets/new_report/resume_draft_banner.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('resume banner continue closes dialog', (WidgetTester tester) async {
+  testWidgets('resume banner continue closes dialog', (
+    WidgetTester tester,
+  ) async {
     final ReportOutboxEntry row = ReportOutboxEntry(
       id: kReportWizardDraftRowId,
       idempotencyKey: 'idem_x',
@@ -58,8 +59,9 @@ void main() {
     expect(find.text('Continue your draft?'), findsNothing);
   });
 
-  testWidgets('resume banner discard confirms and returns discarded',
-      (WidgetTester tester) async {
+  testWidgets('resume banner discard confirms and returns discarded', (
+    WidgetTester tester,
+  ) async {
     final ReportOutboxEntry row = ReportOutboxEntry(
       id: kReportWizardDraftRowId,
       idempotencyKey: 'idem_x',

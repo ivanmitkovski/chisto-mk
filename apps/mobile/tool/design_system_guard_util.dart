@@ -34,12 +34,13 @@ int runRatchetingAllowlistCheck({
     return 2;
   }
 
-  final List<String> allowed = allowlistFile
-      .readAsLinesSync()
-      .map((String line) => line.trim())
-      .where((String line) => line.isNotEmpty && !line.startsWith('#'))
-      .toList()
-    ..sort();
+  final List<String> allowed =
+      allowlistFile
+          .readAsLinesSync()
+          .map((String line) => line.trim())
+          .where((String line) => line.isNotEmpty && !line.startsWith('#'))
+          .toList()
+        ..sort();
 
   final List<String> unexpected = <String>[];
   for (final String hit in hits) {
@@ -85,6 +86,17 @@ int runRatchetingAllowlistCheck({
   );
   return 0;
 }
+
+void stampAllowlist({
+  required String allowlistPath,
+  required List<String> hits,
+}) {
+  hits.sort();
+  File(allowlistPath).writeAsStringSync('${hits.join('\n')}\n');
+  stdout.writeln('Wrote ${hits.length} lines to $allowlistPath');
+}
+
+bool wantsStampBaseline(List<String> args) => args.contains('--stamp-baseline');
 
 List<String> scanDartRoots({
   required List<String> roots,

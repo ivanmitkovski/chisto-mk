@@ -1,10 +1,10 @@
 import 'dart:io';
 
-import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_constants.dart';
-import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_database.dart';
-import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_entry.dart';
-import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_repository.dart';
-import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
+import 'package:feature_reports/src/data/outbox/report_outbox_constants.dart';
+import 'package:feature_reports/src/data/outbox/report_outbox_database.dart';
+import 'package:feature_reports/src/data/outbox/report_outbox_entry.dart';
+import 'package:feature_reports/src/data/outbox/report_outbox_repository.dart';
+import 'package:feature_reports/src/domain/models/report_draft.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
@@ -98,7 +98,9 @@ void main() {
   group('SqfliteReportOutboxRepository', () {
     test('roundtrip insert and getById', () async {
       final Database db = await _openTestDb('r1.db');
-      final SqfliteReportOutboxRepository repo = SqfliteReportOutboxRepository(db);
+      final SqfliteReportOutboxRepository repo = SqfliteReportOutboxRepository(
+        db,
+      );
       final ReportOutboxEntry e = _entry(
         id: 'a1',
         idem: 'idem_a1',
@@ -116,7 +118,9 @@ void main() {
 
     test('update transitions persist', () async {
       final Database db = await _openTestDb('r2.db');
-      final SqfliteReportOutboxRepository repo = SqfliteReportOutboxRepository(db);
+      final SqfliteReportOutboxRepository repo = SqfliteReportOutboxRepository(
+        db,
+      );
       final ReportOutboxEntry e = _entry(
         id: 'a2',
         idem: 'idem_a2',
@@ -137,31 +141,41 @@ void main() {
       await db.close();
     });
 
-    test('getWizardDraftEntry equals getById(kReportWizardDraftRowId)', () async {
-      final Database db = await _openTestDb('r3.db');
-      final SqfliteReportOutboxRepository repo = SqfliteReportOutboxRepository(db);
-      final ReportOutboxEntry e = _entry(
-        id: kReportWizardDraftRowId,
-        idem: 'idem_w',
-        state: ReportOutboxState.pending,
-        createdAtMs: 300,
-      );
-      await repo.insert(e);
-      final ReportOutboxEntry? a = await repo.getWizardDraftEntry();
-      final ReportOutboxEntry? b = await repo.getById(kReportWizardDraftRowId);
-      expect(a?.id, b?.id);
-      await db.close();
-    });
+    test(
+      'getWizardDraftEntry equals getById(kReportWizardDraftRowId)',
+      () async {
+        final Database db = await _openTestDb('r3.db');
+        final SqfliteReportOutboxRepository repo =
+            SqfliteReportOutboxRepository(db);
+        final ReportOutboxEntry e = _entry(
+          id: kReportWizardDraftRowId,
+          idem: 'idem_w',
+          state: ReportOutboxState.pending,
+          createdAtMs: 300,
+        );
+        await repo.insert(e);
+        final ReportOutboxEntry? a = await repo.getWizardDraftEntry();
+        final ReportOutboxEntry? b = await repo.getById(
+          kReportWizardDraftRowId,
+        );
+        expect(a?.id, b?.id);
+        await db.close();
+      },
+    );
 
     test('saveWizardDraft insert clears media and errors on new row', () async {
       final Database db = await _openTestDb('r4.db');
-      final SqfliteReportOutboxRepository repo = SqfliteReportOutboxRepository(db);
+      final SqfliteReportOutboxRepository repo = SqfliteReportOutboxRepository(
+        db,
+      );
       await repo.saveWizardDraft(
         draft: ReportDraft(title: 'x', category: ReportCategory.other),
         title: 'x',
         description: 'd',
       );
-      final ReportOutboxEntry? row = await repo.getById(kReportWizardDraftRowId);
+      final ReportOutboxEntry? row = await repo.getById(
+        kReportWizardDraftRowId,
+      );
       expect(row, isNotNull);
       expect(row!.submitRequested, false);
       expect(row.state, ReportOutboxState.pending);
@@ -170,7 +184,9 @@ void main() {
 
     test('saveWizardDraft upsert clears media errors cooldown', () async {
       final Database db = await _openTestDb('r5.db');
-      final SqfliteReportOutboxRepository repo = SqfliteReportOutboxRepository(db);
+      final SqfliteReportOutboxRepository repo = SqfliteReportOutboxRepository(
+        db,
+      );
       final int t = DateTime.now().millisecondsSinceEpoch;
       await repo.insert(
         _entry(
@@ -178,17 +194,16 @@ void main() {
           idem: 'old',
           state: ReportOutboxState.failed,
           createdAtMs: t,
-        ).copyWith(
-          lastErrorCode: 'E',
-          cooldownUntilMs: t + 99999,
-        ),
+        ).copyWith(lastErrorCode: 'E', cooldownUntilMs: t + 99999),
       );
       await repo.saveWizardDraft(
         draft: ReportDraft(title: 'y', category: ReportCategory.other),
         title: 'y',
         description: '',
       );
-      final ReportOutboxEntry? row = await repo.getById(kReportWizardDraftRowId);
+      final ReportOutboxEntry? row = await repo.getById(
+        kReportWizardDraftRowId,
+      );
       expect(row?.lastErrorCode, isNull);
       expect(row?.cooldownUntilMs, isNull);
       expect(row?.mediaUrls, isNull);
@@ -197,7 +212,9 @@ void main() {
 
     test('countSubmitPipeline and countAllRows matrix', () async {
       final Database db = await _openTestDb('r6.db');
-      final SqfliteReportOutboxRepository repo = SqfliteReportOutboxRepository(db);
+      final SqfliteReportOutboxRepository repo = SqfliteReportOutboxRepository(
+        db,
+      );
       await repo.insert(
         _entry(
           id: 'p1',
@@ -229,25 +246,31 @@ void main() {
       await db.close();
     });
 
-    test('getNextProcessable excludes pending when submit_requested is 0', () async {
-      final Database db = await _openTestDb('r7.db');
-      final SqfliteReportOutboxRepository repo = SqfliteReportOutboxRepository(db);
-      await repo.insert(
-        _entry(
-          id: 'only',
-          idem: 'i',
-          state: ReportOutboxState.pending,
-          createdAtMs: 10,
-          submitRequested: false,
-        ),
-      );
-      expect(await repo.getNextProcessable(), isNull);
-      await db.close();
-    });
+    test(
+      'getNextProcessable excludes pending when submit_requested is 0',
+      () async {
+        final Database db = await _openTestDb('r7.db');
+        final SqfliteReportOutboxRepository repo =
+            SqfliteReportOutboxRepository(db);
+        await repo.insert(
+          _entry(
+            id: 'only',
+            idem: 'i',
+            state: ReportOutboxState.pending,
+            createdAtMs: 10,
+            submitRequested: false,
+          ),
+        );
+        expect(await repo.getNextProcessable(), isNull);
+        await db.close();
+      },
+    );
 
     test('getNextProcessable respects cooldown_until_ms ordering', () async {
       final Database db = await _openTestDb('r8.db');
-      final SqfliteReportOutboxRepository repo = SqfliteReportOutboxRepository(db);
+      final SqfliteReportOutboxRepository repo = SqfliteReportOutboxRepository(
+        db,
+      );
       final int now = DateTime.now().millisecondsSinceEpoch;
       await repo.insert(
         _entry(
@@ -274,7 +297,9 @@ void main() {
 
     test('getNextProcessable orders by created_at_ms', () async {
       final Database db = await _openTestDb('r9.db');
-      final SqfliteReportOutboxRepository repo = SqfliteReportOutboxRepository(db);
+      final SqfliteReportOutboxRepository repo = SqfliteReportOutboxRepository(
+        db,
+      );
       await repo.insert(
         _entry(
           id: 'second',
@@ -300,7 +325,9 @@ void main() {
 
     test('delete removes row', () async {
       final Database db = await _openTestDb('r10.db');
-      final SqfliteReportOutboxRepository repo = SqfliteReportOutboxRepository(db);
+      final SqfliteReportOutboxRepository repo = SqfliteReportOutboxRepository(
+        db,
+      );
       await repo.insert(
         _entry(
           id: 'del',

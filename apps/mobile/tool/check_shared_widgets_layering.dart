@@ -8,11 +8,14 @@ const List<String> _allowedTopLevel = <String>[
   'widgets.dart',
 ];
 
+const String _sharedWidgetsRoot =
+    'packages/chisto_infrastructure/lib/shared/widgets';
+
 /// Returns `0` when clean, `1` when violations found.
 int runSharedWidgetsLayeringCheck() {
-  final Directory root = Directory('lib/shared/widgets');
+  final Directory root = Directory(_sharedWidgetsRoot);
   if (!root.existsSync()) {
-    stderr.writeln('Missing lib/shared/widgets');
+    stderr.writeln('Missing $_sharedWidgetsRoot');
     return 1;
   }
   final List<String> violations = <String>[];

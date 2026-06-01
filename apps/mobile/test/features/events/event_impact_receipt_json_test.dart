@@ -1,5 +1,5 @@
-import 'package:chisto_mobile/features/events/data/event_impact_receipt_json.dart';
-import 'package:chisto_mobile/features/events/domain/models/event_impact_receipt.dart';
+import 'package:feature_events/src/data/event_impact_receipt_json.dart';
+import 'package:feature_events/src/domain/models/event_impact_receipt.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

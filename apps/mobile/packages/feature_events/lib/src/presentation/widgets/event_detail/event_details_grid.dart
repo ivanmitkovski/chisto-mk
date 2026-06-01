@@ -1,0 +1,274 @@
+import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/shared/widgets/organisms/app_surface/report_surface_aliases.dart';
+import 'package:design_system/design_system.dart';
+import 'package:feature_events/src/domain/models/eco_event.dart';
+import 'package:feature_events/src/presentation/event_ui_mappers.dart';
+import 'package:feature_events/src/presentation/utils/events_localized_strings.dart';
+import 'package:feature_events/src/presentation/widgets/event_detail/event_detail_grouped_metadata_row.dart';
+import 'package:feature_events/src/presentation/widgets/event_detail/event_detail_grouped_panel.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
+class EventDetailsGrid extends StatelessWidget {
+  const EventDetailsGrid({
+    super.key,
+    required this.event,
+    this.embeddedInGroupedPanel = false,
+  });
+
+  final EcoEvent event;
+
+  /// When true, adds vertical inset for use inside [EventDetailGroupedPanel].
+  final bool embeddedInGroupedPanel;
+
+  /// Opens the same scale explainer as the grouped-panel row / chip.
+  static void openScaleInfoSheet(BuildContext context, EcoEvent event) {
+    final CleanupScale? scale = event.scale;
+    if (scale == null) {
+      return;
+    }
+    final AppLocalizations l10n = context.l10n;
+    _showInfoSheet(
+      context,
+      icon: Icons.groups_rounded,
+      title: scale.localizedLabel(l10n),
+      description: scale.localizedDescription(l10n),
+      color: AppColors.primaryDark,
+    );
+  }
+
+  /// Opens the same difficulty explainer as the grouped-panel row / chip.
+  static void openDifficultyInfoSheet(BuildContext context, EcoEvent event) {
+    final EventDifficulty? d = event.difficulty;
+    if (d == null) {
+      return;
+    }
+    final AppLocalizations l10n = context.l10n;
+    _showInfoSheet(
+      context,
+      icon: CupertinoIcons.shield_fill,
+      title: d.localizedLabel(l10n),
+      description: d.localizedDescription(l10n),
+      color: d.color,
+    );
+  }
+
+  static void _showInfoSheet(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String description,
+    required Color color,
+  }) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.transparent,
+      builder: (BuildContext ctx) {
+        return ReportSheetScaffold(
+          title: title,
+          fitToContent: true,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(AppSpacing.radius14),
+                ),
+                child: Icon(icon, size: 26, color: color),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                description,
+                textAlign: TextAlign.center,
+                style: AppTypography.eventsBodyMuted(
+                  Theme.of(ctx).textTheme,
+                ).copyWith(height: 1.5),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bool hasScale = event.scale != null;
+    final bool hasDifficulty = event.difficulty != null;
+
+    if (!hasScale && !hasDifficulty) {
+      return const SizedBox.shrink();
+    }
+
+    final AppLocalizations l10n = context.l10n;
+    final Widget row = Row(
+      children: <Widget>[
+        if (hasScale)
+          Expanded(
+            child: DetailChip(
+              icon: Icons.groups_rounded,
+              label: event.scale!.localizedLabel(l10n),
+              color: AppColors.primaryDark,
+              onTap: () => openScaleInfoSheet(context, event),
+            ),
+          ),
+        if (hasScale && hasDifficulty) const SizedBox(width: AppSpacing.sm),
+        if (hasDifficulty)
+          Expanded(
+            child: DetailChip(
+              icon: CupertinoIcons.shield_fill,
+              label: event.difficulty!.localizedLabel(l10n),
+              color: event.difficulty!.color,
+              onTap: () => openDifficultyInfoSheet(context, event),
+            ),
+          ),
+      ],
+    );
+
+    if (embeddedInGroupedPanel) {
+      final TextTheme textTheme = Theme.of(context).textTheme;
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          if (hasScale)
+            _GroupedPanelDetailsRow(
+              icon: CupertinoIcons.person_3,
+              label: event.scale!.localizedLabel(l10n),
+              textTheme: textTheme,
+              onTap: () => openScaleInfoSheet(context, event),
+            ),
+          if (hasScale && hasDifficulty)
+            Padding(
+              padding: EdgeInsets.only(
+                left: EventDetailGroupedPanel.innerDividerLeadingPadding,
+              ),
+              child: Divider(
+                height: 1,
+                thickness: 0.5,
+                color: AppColors.divider.withValues(alpha: 0.7),
+              ),
+            ),
+          if (hasDifficulty)
+            _GroupedPanelDetailsRow(
+              icon: CupertinoIcons.shield,
+              label: event.difficulty!.localizedLabel(l10n),
+              textTheme: textTheme,
+              onTap: () => openDifficultyInfoSheet(context, event),
+            ),
+        ],
+      );
+    }
+    return row;
+  }
+}
+
+class _GroupedPanelDetailsRow extends StatelessWidget {
+  const _GroupedPanelDetailsRow({
+    required this.icon,
+    required this.label,
+    required this.textTheme,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final TextTheme textTheme;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    return Semantics(
+      button: true,
+      label: label,
+      child: Material(
+        color: AppColors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+          child: EventDetailGroupedMetadataRow(
+            leading: EventDetailGroupedMetadataRowLeading(icon: icon),
+            center: Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: Text(
+                label,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textHeightBehavior: const TextHeightBehavior(
+                  applyHeightToFirstAscent: true,
+                  applyHeightToLastDescent: true,
+                  leadingDistribution: TextLeadingDistribution.even,
+                ),
+                style: AppTypography.eventsGroupedRowPrimary(textTheme),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class DetailChip extends StatelessWidget {
+  const DetailChip({
+    super.key,
+    required this.icon,
+    required this.label,
+    required this.color,
+    this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: onTap != null,
+      label: label,
+      child: Material(
+        color: AppColors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.sm,
+              vertical: AppSpacing.radius10,
+            ),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+              border: Border.all(color: color.withValues(alpha: 0.15)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Icon(icon, size: 16, color: color),
+                const SizedBox(width: AppSpacing.xs),
+                Flexible(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTypography.eventsCaptionStrong(
+                      Theme.of(context).textTheme,
+                      color: color,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

@@ -45,6 +45,14 @@ describe('Site history (e2e)', () => {
 
     expect(Array.isArray(history.body.items)).toBe(true);
     expect(history.body.items.length).toBeGreaterThanOrEqual(2);
+    expect(history.body.summary).toMatchObject({
+      totalEntries: expect.any(Number),
+      reportCount: expect.any(Number),
+      cleanupCount: expect.any(Number),
+      currentStatus: expect.any(String),
+      firstActivityAt: expect.any(String),
+      lastActivityAt: expect.any(String),
+    });
     const kinds = history.body.items.map((e: { kind: string }) => e.kind);
     expect(kinds).toContain('SITE_CREATED');
     expect(kinds).toContain('REPORT_SUBMITTED');

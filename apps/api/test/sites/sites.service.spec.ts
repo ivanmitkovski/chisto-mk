@@ -438,4 +438,114 @@ describe('Sites public feed and comment engagement', () => {
     expect(out.coReporterSummaries.map((s) => s.userId).sort()).toEqual(['user_ann', 'user_ben'].sort());
     expect(out.mergedDuplicateChildCountTotal).toBe(0);
   });
+
+  it('findOne exposes canonical hero fields and displayLabel for citizen viewers', async () => {
+    const prismaMock = {
+      site: {
+        findUnique: jest.fn(async () => ({
+          id: 'site_canonical',
+          latitude: 41.6,
+          longitude: 21.7,
+          address: null,
+          description: null,
+          status: 'REPORTED',
+          createdAt: new Date('2026-03-01'),
+          updatedAt: new Date('2026-03-01'),
+          upvotesCount: 0,
+          commentsCount: 0,
+          savesCount: 0,
+          sharesCount: 0,
+          reports: [
+            {
+              id: 'rep_new',
+              createdAt: new Date('2026-05-20T12:00:00.000Z'),
+              reportNumber: 'R-2',
+              siteId: 'site_canonical',
+              reporterId: 'user_new',
+              title: 'Newest',
+              description: null,
+              mediaUrls: ['https://bucket.example/new.jpg'],
+              category: 'illegal',
+              severity: null,
+              cleanupEffort: null,
+              status: 'NEW',
+              moderatedAt: null,
+              moderationReason: null,
+              moderatedById: null,
+              potentialDuplicateOfId: null,
+              mergedDuplicateChildCount: 0,
+              reporter: {
+                firstName: 'New',
+                lastName: 'User',
+                avatarObjectKey: null,
+              },
+              coReporters: [],
+            },
+            {
+              id: 'rep_old',
+              createdAt: new Date('2026-01-10T08:00:00.000Z'),
+              reportNumber: 'R-1',
+              siteId: 'site_canonical',
+              reporterId: 'user_old',
+              title: 'Earliest',
+              description: null,
+              mediaUrls: ['https://bucket.example/old.jpg'],
+              category: 'illegal',
+              severity: null,
+              cleanupEffort: null,
+              status: 'NEW',
+              moderatedAt: null,
+              moderationReason: null,
+              moderatedById: null,
+              potentialDuplicateOfId: null,
+              mergedDuplicateChildCount: 0,
+              reporter: {
+                firstName: 'Alice',
+                lastName: 'Old',
+                avatarObjectKey: null,
+              },
+              coReporters: [],
+            },
+          ],
+          events: [] as unknown[],
+        })),
+      },
+      siteVote: { findUnique: jest.fn(async () => null) },
+      siteSave: { findUnique: jest.fn(async () => null) },
+    } as any;
+
+    const signUrls = jest.fn(async (urls: string[]) =>
+      urls.map((u) => `https://signed.example/${u.split('/').pop()}`),
+    );
+    const service = makeSitesService(prismaMock, {
+      reportsUpload: {
+        signUrls,
+        signPrivateObjectKey: jest.fn(async () => null),
+      } as any,
+    });
+
+    const out = await service.findOne('site_canonical', {
+      userId: 'viewer-1',
+      email: 'v@x.com',
+      phoneNumber: '+38970123456',
+      role: 'USER' as never,
+    });
+
+    expect(out.canonicalReportId).toBe('rep_old');
+    expect(out.heroMediaUrls).toEqual(['https://signed.example/old.jpg']);
+    expect(out.heroReporter).toMatchObject({
+      displayLabel: 'Alice Old',
+      isSelf: false,
+      firstName: 'Alice',
+      lastName: 'Old',
+    });
+
+    const earliest = out.reports.find((r: { id: string }) => r.id === 'rep_old');
+    expect(earliest?.reporter).toMatchObject({
+      displayLabel: 'Alice Old',
+      isSelf: false,
+      firstName: 'Alice',
+      lastName: 'Old',
+    });
+  });
 });

@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/features/profile/data/weekly_rankings_json.dart';
+import 'package:feature_profile/src/data/weekly_rankings_json.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

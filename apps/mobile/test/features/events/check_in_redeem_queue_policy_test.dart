@@ -1,5 +1,5 @@
-import 'package:chisto_mobile/core/errors/app_error.dart';
-import 'package:chisto_mobile/features/events/data/check_in_redeem_queue_policy.dart';
+import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:feature_events/src/data/check_in_redeem_queue_policy.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -22,7 +22,9 @@ void main() {
     ];
     for (final String code in codes) {
       expect(
-        shouldRemoveQueuedCheckInAfterRedeemError(AppError(code: code, message: 'x')),
+        shouldRemoveQueuedCheckInAfterRedeemError(
+          AppError(code: code, message: 'x'),
+        ),
         isTrue,
         reason: code,
       );

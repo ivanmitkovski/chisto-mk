@@ -1,5 +1,5 @@
-import 'package:chisto_mobile/features/profile/presentation/screens/profile_password_screen.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_profile/src/presentation/screens/profile_password_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -10,8 +10,9 @@ void main() {
     await bootstrapWidgetTests();
   });
 
-  testWidgets('ProfilePasswordScreen shows fields and visibility semantics',
-      (WidgetTester tester) async {
+  testWidgets('ProfilePasswordScreen shows fields and visibility semantics', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       const MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,

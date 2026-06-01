@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:chisto_mobile/features/events/data/chat/outbox/chat_outbox_store.dart';
+import 'package:feature_events/src/data/chat/outbox/chat_outbox_store.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';

@@ -24,3 +24,6 @@ export const DEFAULT_EMAIL_APP_BASE_URL = 'https://chisto.mk';
 
 /** Fallback hosted logo when inline asset is missing (use www — apex redirects break many clients). */
 export const DEFAULT_EMAIL_LOGO_URL = 'https://www.chisto.mk/brand/logo.png';
+
+/** Content-ID for the bundled logo PNG attached inline (Gmail blocks data: URIs). */
+export const EMAIL_LOGO_CONTENT_ID = 'chisto-email-logo';

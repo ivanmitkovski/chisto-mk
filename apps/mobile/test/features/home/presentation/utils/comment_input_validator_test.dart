@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/features/home/presentation/utils/comment_input_validator.dart';
+import 'package:feature_home/src/presentation/utils/comment_input_validator.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

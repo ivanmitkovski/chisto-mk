@@ -4,6 +4,7 @@ import { SiteMapSearchDto } from './dto/site-map-search.dto';
 import { resolveGeoIntentFromQuery } from './sites-map-search-geo-intent';
 import { SitesMapSearchQueryService } from './sites-map-search-query.service';
 import type { RawSearchRow, SiteMapSearchItem, SiteMapSearchResponse } from './sites-map-search.types';
+import { MapViewerContext } from './map/map-site-visibility.helper';
 
 export type { GeoIntentBounds, SiteMapSearchItem, SiteMapSearchResponse } from './sites-map-search.types';
 
@@ -14,14 +15,17 @@ export class SitesSearchService {
     private readonly mapSearchQuery: SitesMapSearchQueryService,
   ) {}
 
-  async searchMapSites(dto: SiteMapSearchDto): Promise<SiteMapSearchResponse> {
+  async searchMapSites(
+    dto: SiteMapSearchDto,
+    viewer?: MapViewerContext,
+  ): Promise<SiteMapSearchResponse> {
     const q = dto.query.trim();
     if (q.length === 0) {
       return { items: [], suggestions: [], geoIntent: null };
     }
 
     const geoIntent = resolveGeoIntentFromQuery(q);
-    const rows = await this.mapSearchQuery.executeSearch(dto);
+    const rows = await this.mapSearchQuery.executeSearch(dto, viewer?.viewerUserId ?? null);
     const items = await this.mapRowsToSearchItems(rows);
     const suggestions = this.extractSuggestions(rows);
 

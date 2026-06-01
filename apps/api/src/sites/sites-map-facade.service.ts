@@ -5,6 +5,7 @@ import { SitesMapQueryService } from './sites-map-query.service';
 import { SitesMapAdminTimelineService } from './sites-map-admin-timeline.service';
 import { SitesSearchService } from './sites-search.service';
 import { MapMvtTilesService } from './map/map-mvt-tiles.service';
+import { MapViewerContext } from './map/map-site-visibility.helper';
 
 /**
  * Map read and admin-map surface area split from the public sites HTTP layer to keep
@@ -19,24 +20,24 @@ export class SitesMapFacadeService {
     private readonly sitesSearch: SitesSearchService,
   ) {}
 
-  findAllForMap(query: ListSitesMapQueryDto) {
-    return this.sitesMapQuery.findAllForMap(query);
+  findAllForMap(query: ListSitesMapQueryDto, viewer?: MapViewerContext) {
+    return this.sitesMapQuery.findAllForMap(query, viewer);
   }
 
-  resolveMapDataVersion(query: ListSitesMapQueryDto) {
-    return this.sitesMapQuery.resolveMapDataVersion(query);
+  resolveMapDataVersion(query: ListSitesMapQueryDto, viewer?: MapViewerContext) {
+    return this.sitesMapQuery.resolveMapDataVersion(query, viewer);
   }
 
-  findClustersForMap(query: ListSitesMapQueryDto) {
-    return this.sitesMapQuery.findClustersForMap(query);
+  findClustersForMap(query: ListSitesMapQueryDto, viewer?: MapViewerContext) {
+    return this.sitesMapQuery.findClustersForMap(query, viewer);
   }
 
-  findHeatmapForMap(query: ListSitesMapQueryDto) {
-    return this.sitesMapQuery.findHeatmapForMap(query);
+  findHeatmapForMap(query: ListSitesMapQueryDto, viewer?: MapViewerContext) {
+    return this.sitesMapQuery.findHeatmapForMap(query, viewer);
   }
 
-  searchMapSites(dto: SiteMapSearchDto) {
-    return this.sitesSearch.searchMapSites(dto);
+  searchMapSites(dto: SiteMapSearchDto, viewer?: MapViewerContext) {
+    return this.sitesSearch.searchMapSites(dto, viewer);
   }
 
   getAdminMapTimeline(at?: string) {

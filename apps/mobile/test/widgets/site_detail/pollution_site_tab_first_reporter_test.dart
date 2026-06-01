@@ -1,6 +1,6 @@
-import 'package:chisto_mobile/features/home/presentation/widgets/site_detail/site_reported_row.dart';
-import 'package:chisto_mobile/shared/widgets/atoms/app_avatar.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/shared/widgets/atoms/app_avatar.dart';
+import 'package:feature_home/src/presentation/widgets/site_detail/site_reported_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -9,10 +9,10 @@ void main() {
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
+        locale: Locale('en'),
         home: Scaffold(
           body: SiteReportedRow(
             reporterName: 'Alice First',

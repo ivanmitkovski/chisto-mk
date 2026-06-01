@@ -1,35 +1,21 @@
-import 'package:chisto_mobile/core/navigation/app_routes.dart'
-    show AppRouter, AppRoutes;
-import 'package:chisto_mobile/core/navigation/unknown_route_screen.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/sign_in_screen.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/core/navigation/app_routes.dart';
+import 'package:chisto_infrastructure/core/navigation/unknown_route_screen.dart';
+import 'package:feature_auth/src/presentation/screens/sign_in_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../shared/pump_auth_app.dart';
 import '../../shared/widget_test_bootstrap.dart';
 
 void main() {
   setUpAll(() async {
     await bootstrapWidgetTests();
   });
-  testWidgets('unknown named route builds UnknownRouteScreen not SignInScreen', (
+
+  testWidgets('unknown route builds UnknownRouteScreen not SignInScreen', (
     WidgetTester tester,
   ) async {
-    final MaterialPageRoute<void> generated =
-        AppRouter.onGenerateRoute(const RouteSettings(name: '/route-that-does-not-exist'))
-            as MaterialPageRoute<void>;
-    await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: Builder(
-          builder: (BuildContext context) => generated.builder(context),
-        ),
-      ),
-    );
-    await tester.pumpAndSettle();
+    await pumpAppRouter(tester, initialLocation: '/route-that-does-not-exist');
+    await tester.pumpAndSettle(const Duration(seconds: 2));
 
     expect(find.byType(SignInScreen), findsNothing);
     expect(find.byType(UnknownRouteScreen), findsOneWidget);
@@ -37,18 +23,12 @@ void main() {
   });
 
   testWidgets('sign-in route builds SignInScreen', (WidgetTester tester) async {
-    final MaterialPageRoute<void> generated =
-        AppRouter.onGenerateRoute(const RouteSettings(name: AppRoutes.signIn))
-            as MaterialPageRoute<void>;
-    await tester.pumpWidget(
-      pumpAuthScreen(
-        locale: const Locale('en'),
-        home: Builder(
-          builder: (BuildContext context) => generated.builder(context),
-        ),
-      ),
+    await pumpAppRouter(
+      tester,
+      locale: const Locale('en'),
+      initialLocation: AppRoutes.signIn,
     );
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(seconds: 2));
 
     expect(find.byType(SignInScreen), findsOneWidget);
   });

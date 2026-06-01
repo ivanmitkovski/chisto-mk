@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/features/profile/data/points_history_json.dart';
+import 'package:feature_profile/src/data/points_history_json.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

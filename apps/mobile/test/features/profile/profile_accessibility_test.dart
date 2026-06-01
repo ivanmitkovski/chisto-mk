@@ -1,7 +1,7 @@
-import 'package:chisto_mobile/features/profile/data/profile_me_json.dart';
-import 'package:chisto_mobile/features/profile/domain/models/profile_user.dart';
-import 'package:chisto_mobile/features/profile/presentation/widgets/profile_level_points_card.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_profile/src/data/profile_me_json.dart';
+import 'package:feature_profile/src/domain/models/profile_user.dart';
+import 'package:feature_profile/src/presentation/widgets/profile_level_points_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -12,8 +12,9 @@ void main() {
     await bootstrapWidgetTests();
   });
 
-  testWidgets('Profile level card meets Android tap target guideline',
-      (WidgetTester tester) async {
+  testWidgets('Profile level card meets Android tap target guideline', (
+    WidgetTester tester,
+  ) async {
     final ProfileUser user = profileUserFromMeJson(<String, dynamic>{
       'id': 'u1',
       'firstName': 'A',

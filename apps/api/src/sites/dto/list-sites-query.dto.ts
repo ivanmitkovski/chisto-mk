@@ -15,6 +15,11 @@ export enum SiteFeedMode {
   LATEST = 'latest',
 }
 
+export enum SiteFeedGeoScope {
+  LOCAL = 'local',
+  DISCOVERY = 'discovery',
+}
+
 export class ListSitesQueryDto extends PaginationQueryDto20 {
   @ApiPropertyOptional({
     description: 'Center latitude for geo search (with lng and radiusKm)',
@@ -67,6 +72,16 @@ export class ListSitesQueryDto extends PaginationQueryDto20 {
   @IsOptional()
   @IsEnum(SiteFeedMode)
   mode: SiteFeedMode = SiteFeedMode.FOR_YOU;
+
+  @ApiPropertyOptional({
+    enum: SiteFeedGeoScope,
+    default: SiteFeedGeoScope.LOCAL,
+    description:
+      'Geo scope: local = strict radius filter; discovery = country-wide candidates with soft distance ranking.',
+  })
+  @IsOptional()
+  @IsEnum(SiteFeedGeoScope)
+  scope: SiteFeedGeoScope = SiteFeedGeoScope.LOCAL;
 
   @ApiPropertyOptional({
     description: 'Include ranking explainability metadata in each feed item.',

@@ -2,23 +2,26 @@
 // rotate device; VoiceOver / TalkBack order; rate limit / slow network; cancel edit mid-flight;
 // pull-to-refresh on full-screen route; sort change while offline.
 
-import 'package:chisto_mobile/core/config/app_config.dart';
-import 'package:chisto_mobile/core/network/api_client.dart';
-import 'package:chisto_mobile/core/network/request_cancellation.dart';
-import 'package:chisto_mobile/features/home/domain/models/comment.dart';
-import 'package:chisto_mobile/features/home/presentation/widgets/comments_bottom_sheet.dart';
-import 'package:chisto_mobile/features/safety/data/ugc_moderation_repository.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/core/auth/auth_state.dart';
+import 'package:chisto_infrastructure/core/config/app_config.dart';
+import 'package:chisto_infrastructure/core/network/api_client.dart';
+import 'package:chisto_infrastructure/core/network/request_cancellation.dart';
+import 'package:chisto_infrastructure/core/providers/app_providers.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_home/src/domain/models/comment.dart';
+import 'package:feature_home/src/presentation/widgets/comments_bottom_sheet.dart';
+import 'package:feature_safety/feature_safety.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class _UgcTestApiClient extends ApiClient {
   _UgcTestApiClient()
-      : super(
-          config: AppConfig.dev,
-          accessToken: () => null,
-          onUnauthorized: () {},
-        );
+    : super(
+        config: AppConfig.dev,
+        accessToken: () => null,
+        onUnauthorized: () {},
+      );
 
   @override
   Future<ApiResponse> post(
@@ -27,16 +30,37 @@ class _UgcTestApiClient extends ApiClient {
     RequestCancellationToken? cancellation,
     Map<String, String>? headers,
   }) async {
-    return ApiResponse(statusCode: 204, json: null);
+    return const ApiResponse(statusCode: 204, json: null);
   }
+}
+
+AuthState _testAuthState({String displayName = 'Ivan Mitkovski'}) {
+  final AuthState state = AuthState();
+  state.setAuthenticated(userId: 'u-test', displayName: displayName);
+  return state;
+}
+
+Widget _wrapCommentsTest(Widget child) {
+  return ProviderScope(
+    overrides: <Override>[
+      authStateProvider.overrideWith((Ref ref) => _testAuthState()),
+    ],
+    child: MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('en'),
+      home: Scaffold(body: child),
+    ),
+  );
 }
 
 void main() {
   final DateTime commentTime = DateTime.utc(2026, 1, 10, 15);
 
   testWidgets('non-owned comment menu offers report and block', (tester) async {
-    final UgcModerationRepository ugcTestRepo =
-        UgcModerationRepository(client: _UgcTestApiClient());
+    final UgcModerationRepository ugcTestRepo = UgcModerationRepository(
+      client: _UgcTestApiClient(),
+    );
     final comments = <Comment>[
       Comment(
         id: 'c-peer',
@@ -49,15 +73,10 @@ void main() {
     ];
 
     await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: Scaffold(
-          body: CommentsBottomSheet(
-            comments: comments,
-            ugcModerationRepository: ugcTestRepo,
-          ),
+      _wrapCommentsTest(
+        CommentsBottomSheet(
+          comments: comments,
+          ugcModerationRepository: ugcTestRepo,
         ),
       ),
     );
@@ -82,14 +101,7 @@ void main() {
     ];
 
     await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: Scaffold(
-          body: CommentsBottomSheet(comments: comments),
-        ),
-      ),
+      _wrapCommentsTest(CommentsBottomSheet(comments: comments)),
     );
 
     await tester.tap(find.text('Reply'));
@@ -105,7 +117,9 @@ void main() {
     expect(textField.controller?.text ?? '', isEmpty);
   });
 
-  testWidgets('inserts reply under parent and keeps it visible', (tester) async {
+  testWidgets('inserts reply under parent and keeps it visible', (
+    tester,
+  ) async {
     final comments = <Comment>[
       Comment(
         id: 'c1',
@@ -117,15 +131,10 @@ void main() {
     List<Comment>? latestComments;
 
     await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: Scaffold(
-          body: CommentsBottomSheet(
-            comments: comments,
-            onCommentsChanged: (value) => latestComments = value,
-          ),
+      _wrapCommentsTest(
+        CommentsBottomSheet(
+          comments: comments,
+          onCommentsChanged: (value) => latestComments = value,
         ),
       ),
     );
@@ -133,7 +142,10 @@ void main() {
     await tester.tap(find.text('Reply'));
     await tester.pumpAndSettle();
 
-    await tester.enterText(find.byType(TextField), '@Ivan Mitkovski Child reply');
+    await tester.enterText(
+      find.byType(TextField),
+      '@Ivan Mitkovski Child reply',
+    );
     await tester.pump();
     await tester.tap(find.byIcon(Icons.arrow_upward_rounded));
     await tester.pump();
@@ -157,17 +169,12 @@ void main() {
     String? editedBody;
 
     await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: Scaffold(
-          body: CommentsBottomSheet(
-            comments: comments,
-            onCommentEdited: (commentId, body) async {
-              editedBody = body;
-            },
-          ),
+      _wrapCommentsTest(
+        CommentsBottomSheet(
+          comments: comments,
+          onCommentEdited: (commentId, body) async {
+            editedBody = body;
+          },
         ),
       ),
     );
@@ -199,17 +206,12 @@ void main() {
     String? deletedId;
 
     await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: Scaffold(
-          body: CommentsBottomSheet(
-            comments: comments,
-            onCommentDeleted: (commentId) async {
-              deletedId = commentId;
-            },
-          ),
+      _wrapCommentsTest(
+        CommentsBottomSheet(
+          comments: comments,
+          onCommentDeleted: (commentId) async {
+            deletedId = commentId;
+          },
         ),
       ),
     );

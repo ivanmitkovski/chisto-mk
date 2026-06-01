@@ -1,5 +1,5 @@
+import 'package:chisto_infrastructure/core/deep_links/deep_link_router.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:chisto_mobile/core/deep_links/deep_link_router.dart';
 
 const String _kEventUuid = '550e8400-e29b-41d4-a716-446655440000';
 const String _kSiteCuid = 'c1234567890abcdefghijklmn';
@@ -7,17 +7,19 @@ const String _kSiteCuid = 'c1234567890abcdefghijklmn';
 void main() {
   group('DeepLinkRouter.parse', () {
     test('parses /app/events/detail/:id', () {
-      final Uri u = Uri.parse('https://chisto.mk/app/events/detail/$_kEventUuid');
+      final Uri u = Uri.parse(
+        'https://chisto.mk/app/events/detail/$_kEventUuid',
+      );
       final DeepLinkRoute? r = DeepLinkRouter.parse(u);
       expect(r, isA<DeepLinkEventDetail>());
-      expect((r as DeepLinkEventDetail).eventId, _kEventUuid);
+      expect((r! as DeepLinkEventDetail).eventId, _kEventUuid);
     });
 
     test('parses HTTPS /events/:id share path on trusted host', () {
       final Uri u = Uri.parse('https://chisto.mk/events/$_kEventUuid');
       final DeepLinkRoute? r = DeepLinkRouter.parse(u);
       expect(r, isA<DeepLinkEventDetail>());
-      expect((r as DeepLinkEventDetail).eventId, _kEventUuid);
+      expect((r! as DeepLinkEventDetail).eventId, _kEventUuid);
     });
 
     test('rejects /events/:id on untrusted host', () {
@@ -26,10 +28,12 @@ void main() {
     });
 
     test('parses events/detail with query eventId', () {
-      final Uri u = Uri.parse('chisto://app/events/detail?eventId=$_kEventUuid');
+      final Uri u = Uri.parse(
+        'chisto://app/events/detail?eventId=$_kEventUuid',
+      );
       final DeepLinkRoute? r = DeepLinkRouter.parse(u);
       expect(r, isA<DeepLinkEventDetail>());
-      expect((r as DeepLinkEventDetail).eventId, _kEventUuid);
+      expect((r! as DeepLinkEventDetail).eventId, _kEventUuid);
     });
 
     test('parses reports/new', () {
@@ -38,19 +42,19 @@ void main() {
     });
 
     test('parses /reset-password?token= for email reset', () {
-      final Uri u = Uri.parse(
-        'https://chisto.mk/reset-password?token=abc123',
-      );
+      final Uri u = Uri.parse('https://chisto.mk/reset-password?token=abc123');
       final DeepLinkRoute? r = DeepLinkRouter.parse(u);
       expect(r, isA<DeepLinkPasswordReset>());
-      expect((r as DeepLinkPasswordReset).token, 'abc123');
+      expect((r! as DeepLinkPasswordReset).token, 'abc123');
     });
 
     test('parses home/map-focus with siteId query', () {
-      final Uri u = Uri.parse('https://chisto.mk/app/home/map-focus?siteId=site-1');
+      final Uri u = Uri.parse(
+        'https://chisto.mk/app/home/map-focus?siteId=site-1',
+      );
       final DeepLinkRoute? r = DeepLinkRouter.parse(u);
       expect(r, isA<DeepLinkHomeMapFocus>());
-      expect((r as DeepLinkHomeMapFocus).siteId, 'site-1');
+      expect((r! as DeepLinkHomeMapFocus).siteId, 'site-1');
     });
 
     test('parses home?tab=events', () {
@@ -59,15 +63,20 @@ void main() {
     });
 
     test('returns null for unknown paths', () {
-      expect(DeepLinkRouter.parse(Uri.parse('https://chisto.mk/app/unknown')), isNull);
+      expect(
+        DeepLinkRouter.parse(Uri.parse('https://chisto.mk/app/unknown')),
+        isNull,
+      );
     });
 
     group('site deep links (/sites/<id>)', () {
       test('parses HTTPS /sites/:id share path on trusted host', () {
-        final Uri u = Uri.parse('https://chisto.mk/sites/$_kSiteCuid?st=token123&cid=cid123');
+        final Uri u = Uri.parse(
+          'https://chisto.mk/sites/$_kSiteCuid?st=token123&cid=cid123',
+        );
         final DeepLinkRoute? r = DeepLinkRouter.parse(u);
         expect(r, isA<DeepLinkSiteDetail>());
-        expect((r as DeepLinkSiteDetail).siteId, _kSiteCuid);
+        expect((r! as DeepLinkSiteDetail).siteId, _kSiteCuid);
         expect(r.shareToken, 'token123');
         expect(r.cid, 'cid123');
       });
@@ -76,7 +85,7 @@ void main() {
         final Uri u = Uri.parse('https://www.chisto.mk/sites/$_kSiteCuid');
         final DeepLinkRoute? r = DeepLinkRouter.parse(u);
         expect(r, isA<DeepLinkSiteDetail>());
-        expect((r as DeepLinkSiteDetail).siteId, _kSiteCuid);
+        expect((r! as DeepLinkSiteDetail).siteId, _kSiteCuid);
       });
 
       test('rejects /sites/:id on untrusted host', () {

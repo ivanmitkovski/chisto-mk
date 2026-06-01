@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -43,10 +43,7 @@ void main() {
       test('notFound creates correct code and message', () {
         final err = AppError.notFound();
         expect(err.code, equals('NOT_FOUND'));
-        expect(
-          err.message,
-          equals('The requested resource was not found.'),
-        );
+        expect(err.message, equals('The requested resource was not found.'));
       });
 
       test('server creates correct code and message', () {
@@ -95,7 +92,12 @@ void main() {
 
     test('toString formats correctly', () {
       final err = AppError.network();
-      expect(err.toString(), equals('AppError(NETWORK_ERROR: Unable to reach the server. Check your connection.)'));
+      expect(
+        err.toString(),
+        equals(
+          'AppError(NETWORK_ERROR: Unable to reach the server. Check your connection.)',
+        ),
+      );
     });
   });
 }

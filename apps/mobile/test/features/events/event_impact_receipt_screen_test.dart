@@ -1,7 +1,7 @@
-import 'package:chisto_mobile/core/theme/app_colors.dart';
-import 'package:chisto_mobile/features/events/presentation/screens/event_impact_receipt_screen.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/widgets/atoms/app_back_button.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/shared/widgets/atoms/app_back_button.dart';
+import 'package:design_system/design_system.dart';
+import 'package:feature_events/src/presentation/screens/event_impact_receipt_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -16,11 +16,11 @@ void main() {
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: const EventImpactReceiptScreen(eventId: 'evt-test-impact'),
+        locale: Locale('en'),
+        home: EventImpactReceiptScreen(eventId: 'evt-test-impact'),
       ),
     );
     await tester.pump();

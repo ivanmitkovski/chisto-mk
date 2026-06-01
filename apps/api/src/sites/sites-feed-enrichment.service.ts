@@ -5,7 +5,7 @@ import { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { distanceInMeters } from '../common/utils/distance';
 import { ObservabilityStore } from '../observability/observability.store';
 import { ReportsUploadService } from '../reports/reports-upload.service';
-import { ListSitesQueryDto, SiteFeedMode, SiteFeedSort } from './dto/list-sites-query.dto';
+import { ListSitesQueryDto, SiteFeedGeoScope, SiteFeedMode, SiteFeedSort } from './dto/list-sites-query.dto';
 import { FeedRankingService, RankingInput } from './feed-ranking.service';
 import { FeedV2Service } from './feed/feed-v2.service';
 import {
@@ -21,6 +21,10 @@ import { SitesFeedPreferencesService } from './sites-feed-preferences.service';
 import { mapWithConcurrency } from './sites-feed-query-async.util';
 import { applyBatchSignedMediaToRows } from './sites-feed-media-sign.util';
 import type { SitesFeedListResult } from './sites-feed.types';
+import {
+  discoveryRankingRadiusKm,
+  resolveFeedGeoScope,
+} from './sites-feed-geo-scope.util';
 
 @Injectable()
 export class SitesFeedEnrichmentService {
@@ -43,6 +47,11 @@ export class SitesFeedEnrichmentService {
     const { sites, velocityBySite, duplicateTitleCounts, where } = bundle;
 
     const hasGeo = query.lat != null && query.lng != null;
+    const geoScope = resolveFeedGeoScope(query);
+    const rankingRadiusKm =
+      geoScope === SiteFeedGeoScope.DISCOVERY
+        ? discoveryRankingRadiusKm(query.radiusKm)
+        : query.radiusKm;
     const rankedHybrid = query.sort === SiteFeedSort.HYBRID && query.mode !== SiteFeedMode.LATEST;
     const cursorState = decodeFeedCursor(query.cursor, rankedHybrid);
 
@@ -99,11 +108,13 @@ export class SitesFeedEnrichmentService {
         sharesCount: siteBase.sharesCount,
         status: siteBase.status,
         ...(distanceKm != null ? { distanceKm } : {}),
-        ...(hasGeo ? { radiusKm: query.radiusKm } : {}),
+        ...(hasGeo ? { radiusKm: rankingRadiusKm } : {}),
         reportCount: _count.reports,
         sessionCategoryAffinity: this.sessionCategoryAffinity(firstReport?.category ?? null),
         sessionGeoAffinity:
-          distanceKm != null && query.radiusKm > 0 ? Math.max(0, 1 - distanceKm / query.radiusKm) : 0,
+          distanceKm != null && rankingRadiusKm > 0
+            ? Math.max(0, 1 - distanceKm / rankingRadiusKm)
+            : 0,
         sessionStatusAffinity: this.sessionStatusAffinity(siteBase.status),
         engagementVelocity: Math.min(1, (velocityBySite.get(siteBase.id) ?? 0) / 30),
         duplicateContentPenalty: Math.min(
@@ -160,7 +171,12 @@ export class SitesFeedEnrichmentService {
     let enriched = enrichedRowsSigned;
     enriched = this.preferences.applyUserPreferences(enriched, user);
 
-    if (hasGeo && query.lat != null && query.lng != null) {
+    if (
+      geoScope !== SiteFeedGeoScope.DISCOVERY &&
+      hasGeo &&
+      query.lat != null &&
+      query.lng != null
+    ) {
       const radiusMeters = (query.radiusKm ?? 10) * 1000;
       enriched = enriched.filter((s) => (s.distanceKm ?? 0) * 1000 <= radiusMeters);
     }

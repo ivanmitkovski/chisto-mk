@@ -1,13 +1,13 @@
-import 'package:chisto_mobile/features/auth/application/initial_route_controller.dart';
-import 'package:chisto_mobile/features/auth/application/splash_session_controller.dart';
-import 'package:chisto_mobile/features/auth/presentation/constants/splash_constants.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/forgot_password_email_sent_screen.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/forgot_password_new_screen.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/forgot_password_success_screen.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/initial_route_screen.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/location_screen.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/onboarding_screen.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/splash_screen.dart';
+import 'package:feature_auth/src/application/initial_route_controller.dart';
+import 'package:feature_auth/src/application/splash_session_controller.dart';
+import 'package:feature_auth/src/presentation/constants/splash_constants.dart';
+import 'package:feature_auth/src/presentation/screens/forgot_password_email_sent_screen.dart';
+import 'package:feature_auth/src/presentation/screens/forgot_password_new_screen.dart';
+import 'package:feature_auth/src/presentation/screens/forgot_password_success_screen.dart';
+import 'package:feature_auth/src/presentation/screens/initial_route_screen.dart';
+import 'package:feature_auth/src/presentation/screens/location_screen.dart';
+import 'package:feature_auth/src/presentation/screens/onboarding_screen.dart';
+import 'package:feature_auth/src/presentation/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -31,7 +31,9 @@ void main() {
     expect(find.byType(SplashScreen), findsOneWidget);
   });
 
-  testWidgets('initial route shows loading indicator', (WidgetTester tester) async {
+  testWidgets('initial route shows loading indicator', (
+    WidgetTester tester,
+  ) async {
     InitialRouteController.pauseNavigation = true;
     addTearDown(() => InitialRouteController.pauseNavigation = false);
     await pumpAuthWidget(tester, home: const InitialRouteScreen());
@@ -48,19 +50,25 @@ void main() {
     expect(find.text('Continue'), findsOneWidget);
   });
 
-  testWidgets('forgot password email sent screen renders', (WidgetTester tester) async {
+  testWidgets('forgot password email sent screen renders', (
+    WidgetTester tester,
+  ) async {
     await pumpAuthWidget(tester, home: const ForgotPasswordEmailSentScreen());
     await tester.pumpAndSettle();
     expect(find.byType(ForgotPasswordEmailSentScreen), findsOneWidget);
   });
 
-  testWidgets('forgot password success screen renders', (WidgetTester tester) async {
+  testWidgets('forgot password success screen renders', (
+    WidgetTester tester,
+  ) async {
     await pumpAuthWidget(tester, home: const ForgotPasswordSuccessScreen());
     await tester.pumpAndSettle();
     expect(find.byType(ForgotPasswordSuccessScreen), findsOneWidget);
   });
 
-  testWidgets('forgot password new password form renders', (WidgetTester tester) async {
+  testWidgets('forgot password new password form renders', (
+    WidgetTester tester,
+  ) async {
     await pumpAuthWidget(
       tester,
       home: const ForgotPasswordNewScreen(

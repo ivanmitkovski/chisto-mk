@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/core/auth/auth_state.dart';
+import 'package:chisto_infrastructure/core/auth/auth_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -32,10 +32,7 @@ void main() {
     });
 
     test('setAuthenticated works without accessToken', () {
-      authState.setAuthenticated(
-        userId: 'user-456',
-        displayName: 'Jane',
-      );
+      authState.setAuthenticated(userId: 'user-456', displayName: 'Jane');
 
       expect(authState.status, equals(AuthStatus.authenticated));
       expect(authState.userId, equals('user-456'));
@@ -61,10 +58,7 @@ void main() {
     });
 
     test('updateDisplayName changes name', () {
-      authState.setAuthenticated(
-        userId: 'user-123',
-        displayName: 'John',
-      );
+      authState.setAuthenticated(userId: 'user-123', displayName: 'John');
       authState.updateDisplayName('John Smith');
 
       expect(authState.displayName, equals('John Smith'));
@@ -74,10 +68,7 @@ void main() {
       var notified = false;
       authState.addListener(() => notified = true);
 
-      authState.setAuthenticated(
-        userId: 'user-1',
-        displayName: 'Test',
-      );
+      authState.setAuthenticated(userId: 'user-1', displayName: 'Test');
 
       expect(notified, isTrue);
     });
@@ -102,22 +93,25 @@ void main() {
       expect(notified, isTrue);
     });
 
-    test('syncOrganizerCertifiedAt overwrites organizer certification including null', () {
-      authState.setAuthenticated(
-        userId: 'u',
-        displayName: 'X',
-        organizerCertifiedAt: DateTime.utc(2026, 1, 1),
-        syncOrganizerCertifiedAt: true,
-      );
-      expect(authState.isOrganizerCertified, isTrue);
+    test(
+      'syncOrganizerCertifiedAt overwrites organizer certification including null',
+      () {
+        authState.setAuthenticated(
+          userId: 'u',
+          displayName: 'X',
+          organizerCertifiedAt: DateTime.utc(2026, 1, 1),
+          syncOrganizerCertifiedAt: true,
+        );
+        expect(authState.isOrganizerCertified, isTrue);
 
-      authState.setAuthenticated(
-        userId: 'u',
-        displayName: 'X',
-        organizerCertifiedAt: null,
-        syncOrganizerCertifiedAt: true,
-      );
-      expect(authState.isOrganizerCertified, isFalse);
-    });
+        authState.setAuthenticated(
+          userId: 'u',
+          displayName: 'X',
+          organizerCertifiedAt: null,
+          syncOrganizerCertifiedAt: true,
+        );
+        expect(authState.isOrganizerCertified, isFalse);
+      },
+    );
   });
 }

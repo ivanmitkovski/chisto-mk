@@ -2,24 +2,30 @@
 import 'dart:io';
 
 import 'design_system_guard_util.dart';
+import 'feature_roots_guard_util.dart';
 
-const List<String> _roots = <String>['lib/features', 'lib/shared'];
+List<String> _featureAndSharedRoots() => allFeatureLibRoots();
+
 const List<String> _skip = <String>[
   'core/theme/',
   'app_shadows.dart',
   'app_card_chrome.dart',
 ];
 
-void main() {
+void main(List<String> args) {
   if (!Directory('lib').existsSync()) {
     stderr.writeln('lib/ not found (run from apps/mobile).');
     exit(2);
   }
   final List<String> hits = scanDartRoots(
-    roots: _roots,
+    roots: _featureAndSharedRoots(),
     skipPathFragments: _skip,
     matchesLine: (String line) => line.contains('BoxShadow('),
   );
+  if (wantsStampBaseline(args)) {
+    stampAllowlist(allowlistPath: 'tool/raw_shadow_allowlist.txt', hits: hits);
+    exit(0);
+  }
   exit(
     runRatchetingAllowlistCheck(
       patternDescription: 'Raw BoxShadow',

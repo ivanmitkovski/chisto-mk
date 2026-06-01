@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/features/home/data/map_realtime/map_site_event.dart';
+import 'package:feature_home/src/data/map_realtime/map_site_event.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

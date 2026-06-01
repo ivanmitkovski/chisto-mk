@@ -1,5 +1,5 @@
-import 'package:chisto_mobile/features/events/presentation/utils/event_recurrence_rrule_summary.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_events/src/presentation/utils/event_recurrence_rrule_summary.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -22,13 +22,22 @@ void main() {
       ),
     );
 
-    expect(summarizeRecurrenceRule('FREQ=WEEKLY', l10n), l10n.eventsRecurrenceWeekly);
+    expect(
+      summarizeRecurrenceRule('FREQ=WEEKLY', l10n),
+      l10n.eventsRecurrenceWeekly,
+    );
     expect(
       summarizeRecurrenceRule('RRULE:FREQ=WEEKLY;INTERVAL=2', l10n),
       l10n.eventsRecurrenceBiweekly,
     );
-    expect(summarizeRecurrenceRule('FREQ=MONTHLY', l10n), l10n.eventsRecurrenceMonthly);
-    expect(summarizeRecurrenceRule('FREQ=DAILY', l10n), l10n.eventsRecurrenceDaily);
+    expect(
+      summarizeRecurrenceRule('FREQ=MONTHLY', l10n),
+      l10n.eventsRecurrenceMonthly,
+    );
+    expect(
+      summarizeRecurrenceRule('FREQ=DAILY', l10n),
+      l10n.eventsRecurrenceDaily,
+    );
     expect(summarizeRecurrenceRule(null, l10n), isNull);
   });
 }

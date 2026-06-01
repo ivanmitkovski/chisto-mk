@@ -1,6 +1,6 @@
-import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
-import 'package:chisto_mobile/features/home/domain/repositories/sites_repository.dart';
-import 'package:chisto_mobile/features/home/domain/repositories/sites_repository_types.dart';
+import 'package:chisto_infrastructure/core/network/request_cancellation.dart';
+import 'package:feature_home/src/domain/models/pollution_site.dart';
+import 'package:feature_home/src/domain/repositories/sites_repository.dart';
 
 /// Minimal [SitesRepository] for widget tests — only [searchSitesForMap] is used.
 class StubSitesRepository implements SitesRepository {
@@ -12,9 +12,12 @@ class StubSitesRepository implements SitesRepository {
 
   @override
   Future<SiteMapSearchResponse> searchSitesForMap(
-    SiteMapSearchRequest request,
-  ) async =>
-      searchResponse;
+    SiteMapSearchRequest request, {
+    RequestCancellationToken? cancellation,
+  }) async {
+    cancellation?.throwIfCancelled();
+    return searchResponse;
+  }
 
   @override
   Future<SitesListResult> getSavedSites({
@@ -22,8 +25,7 @@ class StubSitesRepository implements SitesRepository {
     int limit = 24,
     double? latitude,
     double? longitude,
-  }) =>
-      throw UnimplementedError();
+  }) => throw UnimplementedError();
 
   @override
   Future<SitesListResult> getSites({
@@ -35,10 +37,10 @@ class StubSitesRepository implements SitesRepository {
     int limit = 20,
     String sort = 'hybrid',
     String mode = 'for_you',
+    String scope = 'local',
     bool explain = false,
     String? cursor,
-  }) =>
-      throw UnimplementedError();
+  }) => throw UnimplementedError();
 
   @override
   Future<MapSitesResult> getSitesForMap({
@@ -55,14 +57,14 @@ class StubSitesRepository implements SitesRepository {
     String? status,
     bool includeArchived = false,
     bool prefetch = false,
-  }) =>
-      throw UnimplementedError();
+  }) => throw UnimplementedError();
 
   @override
   Future<PollutionSite?> getSiteById(String id) async => null;
 
   @override
-  Future<EngagementSnapshot> upvoteSite(String id) => throw UnimplementedError();
+  Future<EngagementSnapshot> upvoteSite(String id) =>
+      throw UnimplementedError();
 
   @override
   Future<EngagementSnapshot> removeSiteUpvote(String id) =>
@@ -72,29 +74,27 @@ class StubSitesRepository implements SitesRepository {
   Future<EngagementSnapshot> saveSite(String id) => throw UnimplementedError();
 
   @override
-  Future<EngagementSnapshot> unsaveSite(String id) => throw UnimplementedError();
+  Future<EngagementSnapshot> unsaveSite(String id) =>
+      throw UnimplementedError();
 
   @override
   Future<EngagementSnapshot> shareSite(
     String id, {
     String channel = 'native',
-  }) =>
-      throw UnimplementedError();
+  }) => throw UnimplementedError();
 
   @override
   Future<SiteShareLinkPayload> issueSiteShareLink(
     String id, {
     String channel = 'native',
-  }) =>
-      throw UnimplementedError();
+  }) => throw UnimplementedError();
 
   @override
   Future<bool> ingestSiteShareOpen({
     required String token,
     required String eventType,
     String source = 'APP',
-  }) =>
-      throw UnimplementedError();
+  }) => throw UnimplementedError();
 
   @override
   Future<SiteCommentsResult> getSiteComments(
@@ -103,32 +103,28 @@ class StubSitesRepository implements SitesRepository {
     int limit = 20,
     String sort = 'top',
     String? parentId,
-  }) =>
-      throw UnimplementedError();
+  }) => throw UnimplementedError();
 
   @override
   Future<SiteUpvotesResult> getSiteUpvotes(
     String id, {
     int page = 1,
     int limit = 20,
-  }) =>
-      throw UnimplementedError();
+  }) => throw UnimplementedError();
 
   @override
   Future<SiteCommentItem> createSiteComment(
     String id,
     String body, {
     String? parentId,
-  }) =>
-      throw UnimplementedError();
+  }) => throw UnimplementedError();
 
   @override
   Future<void> updateSiteComment(
     String siteId,
     String commentId,
     String body,
-  ) =>
-      throw UnimplementedError();
+  ) => throw UnimplementedError();
 
   @override
   Future<void> deleteSiteComment(String siteId, String commentId) =>
@@ -138,23 +134,20 @@ class StubSitesRepository implements SitesRepository {
   Future<SiteCommentLikeSnapshot> likeSiteComment(
     String siteId,
     String commentId,
-  ) =>
-      throw UnimplementedError();
+  ) => throw UnimplementedError();
 
   @override
   Future<SiteCommentLikeSnapshot> unlikeSiteComment(
     String siteId,
     String commentId,
-  ) =>
-      throw UnimplementedError();
+  ) => throw UnimplementedError();
 
   @override
   Future<SiteMediaResult> getSiteMedia(
     String id, {
     int page = 1,
     int limit = 24,
-  }) =>
-      throw UnimplementedError();
+  }) => throw UnimplementedError();
 
   @override
   Future<void> trackFeedEvent(
@@ -162,8 +155,7 @@ class StubSitesRepository implements SitesRepository {
     required String eventType,
     String? sessionId,
     Map<String, dynamic>? metadata,
-  }) =>
-      throw UnimplementedError();
+  }) => throw UnimplementedError();
 
   @override
   Future<void> submitFeedFeedback(
@@ -171,6 +163,5 @@ class StubSitesRepository implements SitesRepository {
     required String feedbackType,
     String? sessionId,
     Map<String, dynamic>? metadata,
-  }) =>
-      throw UnimplementedError();
+  }) => throw UnimplementedError();
 }

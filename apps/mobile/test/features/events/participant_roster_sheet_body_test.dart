@@ -1,18 +1,20 @@
-import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
-import '../../support/events/in_memory_events_store.dart';
-import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
-import 'package:chisto_mobile/features/events/domain/models/eco_event_join_toggle_result.dart';
-import 'package:chisto_mobile/features/events/domain/models/eco_event_search_params.dart';
-import 'package:chisto_mobile/features/events/domain/models/event_participant_row.dart';
-import 'package:chisto_mobile/features/events/domain/models/event_schedule_conflict_preview.dart';
-import 'package:chisto_mobile/features/events/domain/models/event_update_payload.dart';
-import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
-import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/participants_section.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/widgets/atoms/user_avatar_circle.dart';
+import 'package:chisto_infrastructure/core/providers/events_providers.dart';
+import 'package:chisto_infrastructure/shared/widgets/atoms/user_avatar_circle.dart';
+import 'package:feature_events/src/domain/models/eco_event.dart';
+import 'package:feature_events/src/domain/models/eco_event_join_toggle_result.dart';
+import 'package:feature_events/src/domain/models/eco_event_search_params.dart';
+import 'package:feature_events/src/domain/models/event_impact_receipt.dart';
+import 'package:feature_events/src/domain/models/event_participant_row.dart';
+import 'package:feature_events/src/domain/models/event_schedule_conflict_preview.dart';
+import 'package:feature_events/src/domain/models/event_update_payload.dart';
+import 'package:feature_events/src/domain/repositories/events_repository.dart';
+import 'package:feature_events/src/presentation/widgets/event_detail/participants_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../shared/widget_test_bootstrap.dart';
+import '../../support/events/in_memory_events_store.dart';
 
 /// [InMemoryEventsStore.fetchParticipants] completes in a microtask, so the roster
 /// sheet often skips the loading frame in widget tests. Delay only this call so we
@@ -32,7 +34,8 @@ class _DelayedParticipantsRepo implements EventsRepository {
   List<EcoEvent> get events => _inner.events;
 
   @override
-  List<String> get lastRankedSearchSuggestions => _inner.lastRankedSearchSuggestions;
+  List<String> get lastRankedSearchSuggestions =>
+      _inner.lastRankedSearchSuggestions;
 
   @override
   DateTime? get lastSuccessfulListRefreshAt =>
@@ -78,8 +81,7 @@ class _DelayedParticipantsRepo implements EventsRepository {
   EcoEvent? findBySiteAndTitle({
     required String siteId,
     required String title,
-  }) =>
-      _inner.findBySiteAndTitle(siteId: siteId, title: title);
+  }) => _inner.findBySiteAndTitle(siteId: siteId, title: title);
 
   @override
   Future<EcoEvent> create(EcoEvent event) => _inner.create(event);
@@ -90,79 +92,73 @@ class _DelayedParticipantsRepo implements EventsRepository {
     required DateTime scheduledAt,
     DateTime? endAt,
     String? excludeEventId,
-  }) =>
-      _inner.checkScheduleConflict(
-        siteId: siteId,
-        scheduledAt: scheduledAt,
-        endAt: endAt,
-        excludeEventId: excludeEventId,
-      );
+  }) => _inner.checkScheduleConflict(
+    siteId: siteId,
+    scheduledAt: scheduledAt,
+    endAt: endAt,
+    excludeEventId: excludeEventId,
+  );
 
   @override
   Future<EcoEvent> updateEventDetails(
     String eventId,
     EventUpdatePayload payload,
-  ) =>
-      _inner.updateEventDetails(eventId, payload);
+  ) => _inner.updateEventDetails(eventId, payload);
 
   @override
   Future<bool> updateStatus(String id, EcoEventStatus status) =>
       _inner.updateStatus(id, status);
 
   @override
-  Future<EcoEventJoinToggleResult> toggleJoin(String id) => _inner.toggleJoin(id);
+  Future<EcoEventJoinToggleResult> toggleJoin(String id) =>
+      _inner.toggleJoin(id);
 
   @override
-  bool setCheckInOpen({
-    required String eventId,
-    required bool isOpen,
-  }) =>
+  bool setCheckInOpen({required String eventId, required bool isOpen}) =>
       _inner.setCheckInOpen(eventId: eventId, isOpen: isOpen);
 
   @override
   bool rotateCheckInSession({
     required String eventId,
     required String sessionId,
-  }) =>
-      _inner.rotateCheckInSession(eventId: eventId, sessionId: sessionId);
+  }) => _inner.rotateCheckInSession(eventId: eventId, sessionId: sessionId);
 
   @override
   bool setCheckedInCount({
     required String eventId,
     required int checkedInCount,
-  }) =>
-      _inner.setCheckedInCount(eventId: eventId, checkedInCount: checkedInCount);
+  }) => _inner.setCheckedInCount(
+    eventId: eventId,
+    checkedInCount: checkedInCount,
+  );
 
   @override
   bool setAttendeeCheckInStatus({
     required String eventId,
     required AttendeeCheckInStatus status,
     DateTime? checkedInAt,
-  }) =>
-      _inner.setAttendeeCheckInStatus(
-        eventId: eventId,
-        status: status,
-        checkedInAt: checkedInAt,
-      );
+  }) => _inner.setAttendeeCheckInStatus(
+    eventId: eventId,
+    status: status,
+    checkedInAt: checkedInAt,
+  );
 
   @override
   Future<bool> setReminder({
     required String eventId,
     required bool enabled,
     DateTime? reminderAt,
-  }) =>
-      _inner.setReminder(
-        eventId: eventId,
-        enabled: enabled,
-        reminderAt: reminderAt,
-      );
+  }) => _inner.setReminder(
+    eventId: eventId,
+    enabled: enabled,
+    reminderAt: reminderAt,
+  );
 
   @override
   Future<bool> setAfterImages({
     required String eventId,
     required List<String> imagePaths,
-  }) =>
-      _inner.setAfterImages(eventId: eventId, imagePaths: imagePaths);
+  }) => _inner.setAfterImages(eventId: eventId, imagePaths: imagePaths);
 
   @override
   Future<void> loadMore() => _inner.loadMore();
@@ -179,9 +175,21 @@ class _DelayedParticipantsRepo implements EventsRepository {
     await Future<void>.delayed(const Duration(milliseconds: 16));
     return _inner.fetchParticipants(eventId, cursor: cursor);
   }
+
+  @override
+  Future<EventImpactReceipt> fetchImpactReceipt(String eventId) =>
+      _inner.fetchImpactReceipt(eventId);
+
+  @override
+  Future<bool> pushLiveImpactBags(String eventId, int reportedBagsCollected) =>
+      _inner.pushLiveImpactBags(eventId, reportedBagsCollected);
 }
 
 void main() {
+  setUpAll(() async {
+    await bootstrapWidgetTests();
+  });
+
   late InMemoryEventsStore store;
   late _DelayedParticipantsRepo delayedRepo;
 
@@ -189,14 +197,14 @@ void main() {
     SharedPreferences.setMockInitialValues(<String, Object>{});
     store = InMemoryEventsStore.instance;
     delayedRepo = _DelayedParticipantsRepo(store);
-    EventsRepositoryRegistry.setTestOverride(delayedRepo);
+    setEventsRepositoryTestOverride(delayedRepo);
     store.resetToSeed();
     store.loadInitialIfNeeded();
     await store.ready;
   });
 
   tearDown(() {
-    EventsRepositoryRegistry.setTestOverride(null);
+    setEventsRepositoryTestOverride(null);
   });
 
   testWidgets('shows loading then participant list from repository', (
@@ -206,13 +214,8 @@ void main() {
     expect(event.participantCount, greaterThan(0));
 
     await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: Scaffold(
-          body: ParticipantRosterSheetBody(event: event),
-        ),
+      wrapForWidgetTest(
+        Scaffold(body: ParticipantRosterSheetBody(event: event)),
       ),
     );
 
@@ -225,29 +228,40 @@ void main() {
     expect(find.text('Volunteer 1'), findsOneWidget);
   });
 
-  test('mergeParticipantPreviews skips API row that duplicates organizer id', () {
-    final EcoEvent event = store.findById('evt-1')!;
-    final List<EventParticipantRow> rows = <EventParticipantRow>[
-      EventParticipantRow(
-        userId: event.organizerId,
-        displayName: event.organizerName,
-        joinedAt: DateTime.utc(2024, 1, 1),
-      ),
-      EventParticipantRow(
-        userId: 'volunteer-extra',
-        displayName: 'Alex',
-        joinedAt: DateTime.utc(2024, 1, 2),
-      ),
-    ];
-    final List<AttendeePreview> merged = mergeParticipantPreviews(
-      event: event,
-      apiRows: rows,
-      youLabel: 'You',
-    );
-    expect(merged.length, 2);
-    expect(merged.where((AttendeePreview a) => a.userId == event.organizerId).length, 1);
-    expect(merged.any((AttendeePreview a) => a.userId == 'volunteer-extra'), isTrue);
-  });
+  test(
+    'mergeParticipantPreviews skips API row that duplicates organizer id',
+    () {
+      final EcoEvent event = store.findById('evt-1')!;
+      final List<EventParticipantRow> rows = <EventParticipantRow>[
+        EventParticipantRow(
+          userId: event.organizerId,
+          displayName: event.organizerName,
+          joinedAt: DateTime.utc(2024, 1, 1),
+        ),
+        EventParticipantRow(
+          userId: 'volunteer-extra',
+          displayName: 'Alex',
+          joinedAt: DateTime.utc(2024, 1, 2),
+        ),
+      ];
+      final List<AttendeePreview> merged = mergeParticipantPreviews(
+        event: event,
+        apiRows: rows,
+        youLabel: 'You',
+      );
+      expect(merged.length, 2);
+      expect(
+        merged
+            .where((AttendeePreview a) => a.userId == event.organizerId)
+            .length,
+        1,
+      );
+      expect(
+        merged.any((AttendeePreview a) => a.userId == 'volunteer-extra'),
+        isTrue,
+      );
+    },
+  );
 
   test('orderPreviewsForAvatarStack puts joiners before organizers', () {
     final EcoEvent event = store.findById('evt-1')!;
@@ -268,63 +282,55 @@ void main() {
     expect(ordered.last.isOrganizer, isTrue);
   });
 
-  testWidgets('ParticipantsSection shows multiple avatars after participant peek', (
-    WidgetTester tester,
-  ) async {
-    final EcoEvent event = store.findById('evt-1')!;
-    expect(event.participantCount, greaterThan(1));
+  testWidgets(
+    'ParticipantsSection shows multiple avatars after participant peek',
+    (WidgetTester tester) async {
+      final EcoEvent event = store.findById('evt-1')!;
+      expect(event.participantCount, greaterThan(1));
 
-    await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: Scaffold(
-          body: ParticipantsSection(event: event),
-        ),
-      ),
-    );
+      await tester.pumpWidget(
+        wrapForWidgetTest(Scaffold(body: ParticipantsSection(event: event))),
+      );
 
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 40));
-    await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 40));
+      await tester.pumpAndSettle();
 
-    expect(find.byType(UserAvatarCircle), findsAtLeastNWidgets(2));
-  });
+      expect(find.byType(UserAvatarCircle), findsAtLeastNWidgets(2));
+    },
+  );
 
-  testWidgets('AvatarStack pads circles when count exceeds fetched preview rows', (
-    WidgetTester tester,
-  ) async {
-    final EcoEvent base = store.findById('evt-1')!;
-    final EcoEvent event = base.copyWith(participantCount: 2);
-    final List<AttendeePreview> previews = mergeParticipantPreviews(
-      event: event,
-      apiRows: const <EventParticipantRow>[],
-      youLabel: 'You',
-    );
-    expect(previews.length, 1);
+  testWidgets(
+    'AvatarStack pads circles when count exceeds fetched preview rows',
+    (WidgetTester tester) async {
+      final EcoEvent base = store.findById('evt-1')!;
+      final EcoEvent event = base.copyWith(participantCount: 2);
+      final List<AttendeePreview> previews = mergeParticipantPreviews(
+        event: event,
+        apiRows: const <EventParticipantRow>[],
+        youLabel: 'You',
+      );
+      expect(previews.length, 1);
 
-    await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: Scaffold(
-          body: Center(
-            child: AvatarStack(
-              count: 2,
-              event: event,
-              previews: previews,
-              isLoadingPeek: false,
+      await tester.pumpWidget(
+        wrapForWidgetTest(
+          Scaffold(
+            body: Center(
+              child: AvatarStack(
+                count: 2,
+                event: event,
+                previews: previews,
+                isLoadingPeek: false,
+              ),
             ),
           ),
         ),
-      ),
-    );
-    await tester.pumpAndSettle();
+      );
+      await tester.pumpAndSettle();
 
-    expect(find.byType(UserAvatarCircle), findsNWidgets(2));
-  });
+      expect(find.byType(UserAvatarCircle), findsNWidgets(2));
+    },
+  );
 
   testWidgets(
     'AvatarStack shows joiner and organizer when participantCount is one joiner',
@@ -345,11 +351,8 @@ void main() {
       expect(previews.length, 2);
 
       await tester.pumpWidget(
-        MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          locale: const Locale('en'),
-          home: Scaffold(
+        wrapForWidgetTest(
+          Scaffold(
             body: Center(
               child: AvatarStack(
                 count: 1,

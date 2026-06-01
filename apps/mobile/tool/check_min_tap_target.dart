@@ -2,8 +2,10 @@
 
 import 'dart:io';
 
+import 'feature_roots_guard_util.dart';
+
 /// Heuristic: flags interactive widgets with a fixed [height] or [width] under
-/// 44dp inside `lib/features/`. Material guideline is 48dp; we use 44 as a
+/// 44dp inside feature code. Material guideline is 48dp; we use 44 as a
 /// floor because Cupertino uses 44pt. Allow-listed because dense rows
 /// legitimately exist for compact toolbars — those should add explicit
 /// [Semantics] containers; future passes can tighten this.
@@ -12,11 +14,6 @@ import 'dart:io';
 /// (`GestureDetector(onTap: ...)`, `InkWell`, `IconButton`) wrapping a
 /// `SizedBox(width: N, height: N)` where N is a literal under 44.
 int runMinTapTargetCheck() {
-  final Directory root = Directory('lib/features');
-  if (!root.existsSync()) {
-    stderr.writeln('Run from apps/mobile');
-    return 2;
-  }
   final RegExp tapWrapper = RegExp(
     r'(GestureDetector|InkWell|IconButton)\s*\(',
   );
@@ -24,10 +21,9 @@ int runMinTapTargetCheck() {
     r'SizedBox\s*\(\s*width:\s*(\d+(?:\.\d+)?)[^,)]*,\s*height:\s*(\d+(?:\.\d+)?)',
   );
   final List<String> violations = <String>[];
-  for (final FileSystemEntity e in root.listSync(recursive: true)) {
-    if (e is! File || !e.path.endsWith('.dart')) continue;
-    final String normalized = e.path.replaceAll(r'\', '/');
-    final String src = e.readAsStringSync();
+  for (final File file in iterFeatureDartFiles(roots: allFeatureLibRoots())) {
+    final String normalized = normalizePath(file.path);
+    final String src = file.readAsStringSync();
     if (!tapWrapper.hasMatch(src)) continue;
     final Iterable<RegExpMatch> hits = sizedBoxSize.allMatches(src);
     for (final RegExpMatch m in hits) {
@@ -40,7 +36,9 @@ int runMinTapTargetCheck() {
       final String prefix = src.substring(from, idx);
       if (!tapWrapper.hasMatch(prefix)) continue;
       if (w < 44 || h < 44) {
-        violations.add('$normalized: tap target ${w.toInt()}×${h.toInt()}dp at offset $idx');
+        violations.add(
+          '$normalized: tap target ${w.toInt()}×${h.toInt()}dp at offset $idx',
+        );
       }
     }
   }

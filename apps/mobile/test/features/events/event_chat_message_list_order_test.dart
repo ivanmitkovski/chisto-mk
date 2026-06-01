@@ -1,5 +1,5 @@
-import 'package:chisto_mobile/features/events/data/chat/event_chat_message.dart';
-import 'package:chisto_mobile/features/events/presentation/utils/event_chat_message_list_order.dart';
+import 'package:feature_events/src/data/chat/event_chat_message.dart';
+import 'package:feature_events/src/presentation/utils/event_chat_message_list_order.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

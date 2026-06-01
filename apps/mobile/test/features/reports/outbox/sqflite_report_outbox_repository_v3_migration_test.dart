@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:chisto_mobile/features/reports/data/outbox/report_draft_json_codec.dart';
-import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_constants.dart';
-import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_database.dart';
-import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_entry.dart';
-import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_repository.dart';
-import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
+import 'package:feature_reports/src/data/outbox/report_draft_json_codec.dart';
+import 'package:feature_reports/src/data/outbox/report_outbox_constants.dart';
+import 'package:feature_reports/src/data/outbox/report_outbox_database.dart';
+import 'package:feature_reports/src/data/outbox/report_outbox_entry.dart';
+import 'package:feature_reports/src/data/outbox/report_outbox_repository.dart';
+import 'package:feature_reports/src/domain/models/report_draft.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
@@ -105,7 +105,9 @@ void main() {
     expect(names, contains('attempted_stages_json'));
     expect(names, contains('last_persisted_at_ms'));
 
-    final SqfliteReportOutboxRepository repo = SqfliteReportOutboxRepository(v3);
+    final SqfliteReportOutboxRepository repo = SqfliteReportOutboxRepository(
+      v3,
+    );
     final ReportOutboxEntry? row = await repo.getById(kReportWizardDraftRowId);
     expect(row, isNotNull);
     expect(row!.title, 'Keep me');

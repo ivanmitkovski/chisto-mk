@@ -1,5 +1,5 @@
-import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_capacity_retry_duration.dart';
-import 'package:chisto_mobile/l10n/app_localizations_en.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations_en.dart';
+import 'package:feature_reports/src/presentation/widgets/new_report/report_capacity_retry_duration.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

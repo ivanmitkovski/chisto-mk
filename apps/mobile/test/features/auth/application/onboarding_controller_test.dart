@@ -1,6 +1,6 @@
-import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
-import 'package:chisto_mobile/features/auth/application/onboarding_controller.dart';
-import 'package:chisto_mobile/features/auth/data/marketing_onboarding_store.dart';
+import 'package:chisto_infrastructure/core/bootstrap/app_bootstrap.dart';
+import 'package:feature_auth/src/application/onboarding_controller.dart';
+import 'package:feature_auth/src/data/marketing_onboarding_store.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -18,10 +18,14 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    await container.read(onboardingControllerProvider.notifier).completeOnboarding();
+    await container
+        .read(onboardingControllerProvider.notifier)
+        .completeOnboarding();
 
     expect(
-      AppBootstrap.instance.preferences.getBool(kMarketingOnboardingCompletedKey),
+      AppBootstrap.instance.preferences.getBool(
+        kMarketingOnboardingCompletedKey,
+      ),
       isTrue,
     );
   });

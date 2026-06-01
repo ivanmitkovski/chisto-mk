@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/features/home/data/feed_urgency.dart';
+import 'package:feature_home/src/data/feed_urgency.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

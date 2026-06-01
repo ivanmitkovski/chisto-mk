@@ -1,8 +1,9 @@
-import 'package:chisto_mobile/features/reports/data/outbox/report_draft_summary_projector.dart';
-import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_constants.dart';
-import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_entry.dart'
+import 'package:feature_reports/src/data/outbox/report_draft_summary_projector.dart';
+import 'package:feature_reports/src/data/outbox/report_outbox_constants.dart';
+import 'package:feature_reports/src/data/outbox/report_outbox_entry.dart'
     show ReportOutboxEntry, ReportOutboxState;
-import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
+import 'package:feature_reports/src/domain/models/report_draft.dart';
+import 'package:feature_reports/src/domain/models/report_draft_summary.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -39,23 +40,33 @@ void main() {
     });
 
     test('true when title set on row', () {
-      expect(isReportWizardDraftEntryResumable(_wizardRow(title: ' Hi ')), isTrue);
+      expect(
+        isReportWizardDraftEntryResumable(_wizardRow(title: ' Hi ')),
+        isTrue,
+      );
     });
 
     test('true when description set on row', () {
-      expect(isReportWizardDraftEntryResumable(_wizardRow(description: 'x')), isTrue);
+      expect(
+        isReportWizardDraftEntryResumable(_wizardRow(description: 'x')),
+        isTrue,
+      );
     });
 
     test('true when stage past evidence', () {
       expect(
-        isReportWizardDraftEntryResumable(_wizardRow(currentStageName: 'location')),
+        isReportWizardDraftEntryResumable(
+          _wizardRow(currentStageName: 'location'),
+        ),
         isTrue,
       );
     });
 
     test('false when stage evidence explicitly', () {
       expect(
-        isReportWizardDraftEntryResumable(_wizardRow(currentStageName: 'evidence')),
+        isReportWizardDraftEntryResumable(
+          _wizardRow(currentStageName: 'evidence'),
+        ),
         isFalse,
       );
     });
@@ -89,7 +100,10 @@ void main() {
     });
 
     test('non-resumable row yields empty summary', () {
-      expect(ReportDraftSummaryProjector.fromWizardRow(_wizardRow()).hasDraft, isFalse);
+      expect(
+        ReportDraftSummaryProjector.fromWizardRow(_wizardRow()).hasDraft,
+        isFalse,
+      );
     });
 
     test('uses row title and lastPersistedAtMs when set', () {
@@ -128,9 +142,7 @@ void main() {
     test('photoCount from draft', () {
       final ReportDraftSummary s = ReportDraftSummaryProjector.fromWizardRow(
         _wizardRow(
-          draft: ReportDraft(
-            photos: <XFile>[XFile('1'), XFile('2')],
-          ),
+          draft: ReportDraft(photos: <XFile>[XFile('1'), XFile('2')]),
           attemptedStageNames: <String>['details'],
         ),
       );
@@ -139,11 +151,7 @@ void main() {
 
     test('uses updatedAtMs when lastPersistedAtMs null', () {
       final ReportDraftSummary s = ReportDraftSummaryProjector.fromWizardRow(
-        _wizardRow(
-          title: 'x',
-          updatedAtMs: 12345,
-          lastPersistedAtMs: null,
-        ),
+        _wizardRow(title: 'x', updatedAtMs: 12345, lastPersistedAtMs: null),
       );
       expect(s.lastPersistedAtMs, 12345);
     });

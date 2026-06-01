@@ -1,6 +1,6 @@
-import 'package:chisto_mobile/features/home/presentation/widgets/notifications/notification_tile.dart';
-import 'package:chisto_mobile/features/notifications/domain/models/user_notification.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_home/src/presentation/widgets/notifications/notification_tile.dart';
+import 'package:feature_notifications/src/domain/models/user_notification.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -11,7 +11,9 @@ void main() {
     await bootstrapWidgetTests();
   });
 
-  testWidgets('NotificationTile golden unread comment', (WidgetTester tester) async {
+  testWidgets('NotificationTile golden unread comment', (
+    WidgetTester tester,
+  ) async {
     await tester.binding.setSurfaceSize(const Size(390, 140));
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
@@ -34,15 +36,12 @@ void main() {
         home: MediaQuery(
           data: const MediaQueryData(
             size: Size(390, 140),
-            devicePixelRatio: 1.0,
-            textScaler: TextScaler.linear(1.0),
+            devicePixelRatio: 1,
+            textScaler: TextScaler.linear(1),
             disableAnimations: true,
           ),
           child: Scaffold(
-            body: NotificationTile(
-              item: item,
-              onTap: _noop,
-            ),
+            body: NotificationTile(item: item, onTap: _noop),
           ),
         ),
       ),

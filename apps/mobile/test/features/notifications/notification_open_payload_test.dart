@@ -1,11 +1,13 @@
-import 'package:chisto_mobile/features/notifications/data/notification_open_payload.dart';
+import 'package:feature_notifications/src/data/notification_open_payload.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('notificationOpenPayloadLooksLikeUuid', () {
     test('accepts lowercase UUID v4', () {
       expect(
-        notificationOpenPayloadLooksLikeUuid('550e8400-e29b-41d4-a716-446655440000'),
+        notificationOpenPayloadLooksLikeUuid(
+          '550e8400-e29b-41d4-a716-446655440000',
+        ),
         isTrue,
       );
     });

@@ -1,0 +1,36 @@
+/// Barrel exports for shared UI layers (atoms → molecules → organisms).
+library;
+
+export 'atoms/app_button.dart';
+export 'atoms/app_loading_indicator.dart';
+export 'atoms/app_text.dart';
+export 'atoms/app_text_field.dart';
+export 'atoms/auth_otp_hidden_field.dart';
+export 'atoms/design_system_text_field.dart';
+export 'atoms/events_chat_composer_field.dart';
+export 'atoms/no_overscroll_overlay_scroll_behavior.dart';
+export 'atoms/primary_button.dart';
+export 'atoms/profile_password_field.dart';
+export 'atoms/settings_list_tile.dart';
+export 'atoms/skeleton_shimmer_box.dart';
+export 'atoms/user_avatar_circle.dart';
+export 'molecules/animated_list_item.dart';
+export 'molecules/animated_phase_switcher.dart';
+export 'molecules/app_card.dart';
+export 'molecules/app_cupertino_search_field.dart';
+export 'molecules/app_empty_state.dart';
+export 'molecules/app_filter_pill_bar.dart';
+export 'molecules/app_filter_sheet_section.dart';
+export 'molecules/app_inline_banner.dart';
+export 'molecules/app_pill_filter_chips.dart';
+export 'molecules/app_section_header.dart';
+export 'molecules/app_status_pill.dart';
+export 'molecules/app_toggle_chip.dart';
+export 'molecules/notification_row_highlight.dart';
+export 'organisms/app_action_sheet.dart';
+export 'organisms/app_panel_bottom_sheet.dart';
+export 'organisms/app_refresh_indicator.dart';
+export 'organisms/app_surface/app_surface_primitives.dart';
+export 'organisms/auth_top_bar.dart';
+export 'organisms/keyboard_aware_form_scroll.dart';
+export 'organisms/profile_avatar_peek_overlay.dart';

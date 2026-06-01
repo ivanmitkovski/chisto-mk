@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:chisto_mobile/core/config/app_config.dart';
-import 'package:chisto_mobile/core/errors/app_error.dart';
-import 'package:chisto_mobile/core/network/api_client.dart';
-import 'package:chisto_mobile/core/network/request_cancellation.dart';
-import 'package:chisto_mobile/features/events/data/api_check_in_repository.dart';
-import 'package:chisto_mobile/features/events/domain/models/check_in_payload.dart';
-import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
+import 'package:chisto_infrastructure/core/config/app_config.dart';
+import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:chisto_infrastructure/core/network/api_client.dart';
+import 'package:chisto_infrastructure/core/network/request_cancellation.dart';
+import 'package:feature_events/src/data/api_check_in_repository.dart';
+import 'package:feature_events/src/domain/models/check_in_payload.dart';
+import 'package:feature_events/src/domain/models/eco_event.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -15,11 +15,11 @@ import 'recording_events_repository.dart';
 
 class _StubApiClient extends ApiClient {
   _StubApiClient()
-      : super(
-          config: AppConfig.dev,
-          accessToken: () => null,
-          onUnauthorized: () {},
-        );
+    : super(
+        config: AppConfig.dev,
+        accessToken: () => null,
+        onUnauthorized: () {},
+      );
 
   ApiResponse? postResult;
   Object? postError;
@@ -32,6 +32,7 @@ class _StubApiClient extends ApiClient {
     String path, {
     Map<String, String>? headers,
     Object? body,
+    RequestCancellationToken? cancellation,
   }) async {
     postCallCount++;
     if (postError != null) {
@@ -87,10 +88,7 @@ void main() {
     SharedPreferences.setMockInitialValues(<String, Object>{});
     client = _StubApiClient();
     events = RecordingEventsRepository(seed: <EcoEvent>[_buildEvent()]);
-    repo = ApiCheckInRepository(
-      client: client,
-      eventsRepository: events,
-    );
+    repo = ApiCheckInRepository(client: client, eventsRepository: events);
   });
 
   group('submissionStatusForAppError', () {
@@ -212,45 +210,45 @@ void main() {
       expect(events.lastSetAttendeeCheckInStatusAt, isNotNull);
     });
 
-    test('SocketException queues offline and sets optimistic state', () async {
-      client.postError = const SocketException('no network');
+    test(
+      'SocketException queues offline without optimistic check-in state',
+      () async {
+        client.postError = const SocketException('no network');
 
-      final CheckInSubmissionResult result = await repo.submitScan(
-        rawPayload: 'qr-offline-payload',
-        expectedEventId: 'evt-1',
-        attendeeId: 'att-1',
-        attendeeName: 'Alice',
-      );
+        final CheckInSubmissionResult result = await repo.submitScan(
+          rawPayload: 'qr-offline-payload',
+          expectedEventId: 'evt-1',
+          attendeeId: 'att-1',
+          attendeeName: 'Alice',
+        );
 
-      expect(result.status, CheckInSubmissionStatus.queuedOffline);
-      expect(events.setAttendeeCheckInStatusCallCount, 1);
-      expect(
-        events.lastSetAttendeeCheckInStatusValue,
-        AttendeeCheckInStatus.checkedIn,
-      );
-    });
+        expect(result.status, CheckInSubmissionStatus.queuedOffline);
+        expect(events.setAttendeeCheckInStatusCallCount, 0);
+      },
+    );
 
-    test('TimeoutException queues offline and sets optimistic state', () async {
-      client.postError = TimeoutException('timed out');
+    test(
+      'TimeoutException queues offline without optimistic check-in state',
+      () async {
+        client.postError = TimeoutException('timed out');
 
-      final CheckInSubmissionResult result = await repo.submitScan(
-        rawPayload: 'qr-timeout-payload',
-        expectedEventId: 'evt-1',
-        attendeeId: 'att-1',
-        attendeeName: 'Alice',
-      );
+        final CheckInSubmissionResult result = await repo.submitScan(
+          rawPayload: 'qr-timeout-payload',
+          expectedEventId: 'evt-1',
+          attendeeId: 'att-1',
+          attendeeName: 'Alice',
+        );
 
-      expect(result.status, CheckInSubmissionStatus.queuedOffline);
-      expect(events.setAttendeeCheckInStatusCallCount, 1);
-      expect(
-        events.lastSetAttendeeCheckInStatusValue,
-        AttendeeCheckInStatus.checkedIn,
-      );
-    });
+        expect(result.status, CheckInSubmissionStatus.queuedOffline);
+        expect(events.setAttendeeCheckInStatusCallCount, 0);
+      },
+    );
 
     test('AppError with no_internet queues offline', () async {
-      client.postError =
-          const AppError(code: 'no_internet', message: 'offline');
+      client.postError = const AppError(
+        code: 'no_internet',
+        message: 'offline',
+      );
 
       final CheckInSubmissionResult result = await repo.submitScan(
         rawPayload: 'qr-apperr-payload',
@@ -260,7 +258,7 @@ void main() {
       );
 
       expect(result.status, CheckInSubmissionStatus.queuedOffline);
-      expect(events.setAttendeeCheckInStatusCallCount, 1);
+      expect(events.setAttendeeCheckInStatusCallCount, 0);
     });
 
     test('AppError.network (NETWORK_ERROR) queues offline', () async {
@@ -274,7 +272,7 @@ void main() {
       );
 
       expect(result.status, CheckInSubmissionStatus.queuedOffline);
-      expect(events.setAttendeeCheckInStatusCallCount, 1);
+      expect(events.setAttendeeCheckInStatusCallCount, 0);
     });
 
     test('AppError.timeout (TIMEOUT) queues offline', () async {
@@ -288,7 +286,32 @@ void main() {
       );
 
       expect(result.status, CheckInSubmissionStatus.queuedOffline);
-      expect(events.setAttendeeCheckInStatusCallCount, 1);
+      expect(events.setAttendeeCheckInStatusCallCount, 0);
+    });
+
+    test('terminal AppError reverts optimistic check-in state', () async {
+      events.setAttendeeCheckInStatus(
+        eventId: 'evt-1',
+        status: AttendeeCheckInStatus.checkedIn,
+        checkedInAt: DateTime.now(),
+      );
+      client.postError = const AppError(
+        code: 'CHECK_IN_INVALID_QR',
+        message: 'bad',
+      );
+
+      final CheckInSubmissionResult result = await repo.submitScan(
+        rawPayload: 'qr-bad',
+        expectedEventId: 'evt-1',
+        attendeeId: 'att-1',
+        attendeeName: 'Alice',
+      );
+
+      expect(result.status, CheckInSubmissionStatus.invalidQr);
+      expect(
+        events.lastSetAttendeeCheckInStatusValue,
+        AttendeeCheckInStatus.notCheckedIn,
+      );
     });
 
     test('empty attendeeId returns invalidFormat immediately', () async {

@@ -1,9 +1,11 @@
+import 'package:feature_home/src/presentation/widgets/site_card/site_upvote_affordance.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:chisto_mobile/features/home/presentation/widgets/site_card/site_upvote_affordance.dart';
 
 void main() {
-  testWidgets('barIcon invokes onPressed once when not busy', (WidgetTester tester) async {
+  testWidgets('barIcon invokes onPressed once when not busy', (
+    WidgetTester tester,
+  ) async {
     int calls = 0;
     await tester.pumpWidget(
       MaterialApp(
@@ -32,7 +34,9 @@ void main() {
     expect(calls, 1);
   });
 
-  testWidgets('barIcon does not invoke onPressed when busy', (WidgetTester tester) async {
+  testWidgets('barIcon does not invoke onPressed when busy', (
+    WidgetTester tester,
+  ) async {
     int calls = 0;
     await tester.pumpWidget(
       MaterialApp(
@@ -61,7 +65,9 @@ void main() {
     expect(calls, 0);
   });
 
-  testWidgets('statChip exposes voted semantics label', (WidgetTester tester) async {
+  testWidgets('statChip exposes voted semantics label', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
@@ -80,7 +86,10 @@ void main() {
         ),
       ),
     );
-    expect(find.bySemanticsLabel('Remove upvote for River bend'), findsOneWidget);
+    expect(
+      find.bySemanticsLabel('Remove upvote for River bend'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('reduce motion does not break tap', (WidgetTester tester) async {

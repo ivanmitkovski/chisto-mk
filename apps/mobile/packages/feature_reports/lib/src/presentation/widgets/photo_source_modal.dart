@@ -1,0 +1,204 @@
+import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/shared/widgets/organisms/app_surface/report_surface_aliases.dart';
+import 'package:design_system/design_system.dart';
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+
+/// Modal for choosing photo source (camera or gallery).
+Future<ImageSource?> showPhotoSourceModal(BuildContext context) async {
+  return showAppActionSheet<ImageSource>(
+    context: context,
+    builder: (BuildContext context) {
+      final AppLocalizations l10n = context.l10n;
+      return ReportSheetScaffold(
+        title: l10n.photoSourceModalTitle,
+        subtitle: l10n.photoSourceModalSubtitle,
+        trailing: ReportCircleIconButton(
+          icon: Icons.close_rounded,
+          semanticLabel: l10n.photoSourceCloseSemanticLabel,
+          onTap: () => Navigator.of(context).pop(),
+        ),
+        maxHeightFactor: 0.7,
+        showHeaderDivider: false,
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          AppSpacing.xs,
+          AppSpacing.lg,
+          AppSpacing.md,
+        ),
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                l10n.photoSourceModalHint,
+                style: AppTypographySurfaces.reportsPhotoGridHint(
+                  Theme.of(context).textTheme,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              _PhotoSourceTile(
+                icon: Icons.camera_alt_rounded,
+                label: l10n.photoSourceTakePhoto,
+                subtitle: l10n.photoSourceTakePhotoSubtitle,
+                badgeLabel: l10n.photoSourceBestChoiceBadge,
+                emphasized: true,
+                onTap: () => Navigator.of(context).pop(ImageSource.camera),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              _PhotoSourceTile(
+                icon: Icons.photo_library_rounded,
+                label: l10n.photoSourceChooseFromLibrary,
+                subtitle: l10n.photoSourceChooseFromLibrarySubtitle,
+                onTap: () => Navigator.of(context).pop(ImageSource.gallery),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
+class _PhotoSourceTile extends StatelessWidget {
+  const _PhotoSourceTile({
+    this.icon = Icons.photo_outlined,
+    this.label = '',
+    this.subtitle = '',
+    this.onTap = _noop,
+    String? badgeLabel,
+    bool emphasized = false,
+    String? helperBadge,
+    ReportSurfaceTone? tone,
+  }) : badgeLabel = badgeLabel ?? helperBadge,
+       emphasized = emphasized || tone == ReportSurfaceTone.accent;
+
+  static void _noop() {}
+
+  final IconData icon;
+  final String label;
+  final String subtitle;
+  final VoidCallback onTap;
+  final String? badgeLabel;
+  final bool emphasized;
+
+  @override
+  Widget build(BuildContext context) {
+    final Color surfaceColor = emphasized
+        ? AppColors.primary.withValues(alpha: 0.08)
+        : AppColors.inputFill;
+    final Color borderColor = emphasized
+        ? AppColors.primaryDark.withValues(alpha: 0.18)
+        : AppColors.divider.withValues(alpha: 0.9);
+    final Color iconBackground = emphasized
+        ? AppColors.primary.withValues(alpha: 0.16)
+        : AppColors.panelBackground;
+    final Color chevronBackground = emphasized
+        ? AppColors.primary.withValues(alpha: 0.12)
+        : AppColors.panelBackground;
+    final Color chevronColor = emphasized
+        ? AppColors.primaryDark
+        : AppColors.textMuted;
+
+    return Semantics(
+      button: true,
+      label: label,
+      hint: subtitle,
+      child: Material(
+        color: AppColors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppSpacing.radius22),
+          child: Ink(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: 14,
+            ),
+            decoration: BoxDecoration(
+              color: surfaceColor,
+              borderRadius: BorderRadius.circular(AppSpacing.radius22),
+              border: Border.all(color: borderColor),
+              boxShadow: AppShadows.emphasizedListRow(emphasized: emphasized),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: iconBackground,
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                  ),
+                  child: Icon(
+                    icon,
+                    size: 20,
+                    color: emphasized
+                        ? AppColors.primaryDark
+                        : AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Text(
+                              label,
+                              style: Theme.of(context).textTheme.titleSmall
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: -0.2,
+                                  ),
+                            ),
+                          ),
+                          if (badgeLabel != null)
+                            ReportStatePill(
+                              label: badgeLabel!,
+                              tone: ReportSurfaceTone.accent,
+                              emphasized: true,
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        subtitle,
+                        style: AppTypographySurfaces.reportsBannerBody(
+                          Theme.of(context).textTheme,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Padding(
+                  padding: const EdgeInsets.only(top: AppSpacing.sm),
+                  child: Container(
+                    width: 28,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      color: chevronBackground,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.chevron_right_rounded,
+                      size: 18,
+                      color: chevronColor,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

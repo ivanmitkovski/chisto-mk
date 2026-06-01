@@ -1,10 +1,10 @@
-import 'package:chisto_mobile/core/config/app_config.dart';
-import 'package:chisto_mobile/features/auth/presentation/widgets/auth_otp_input.dart';
-import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
-import 'package:chisto_mobile/core/providers/app_providers.dart';
-import 'package:chisto_mobile/features/auth/domain/repositories/auth_repository.dart';
-import 'package:chisto_mobile/features/onboarding/domain/feature_guide_repository.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/core/bootstrap/app_bootstrap.dart';
+import 'package:chisto_infrastructure/core/config/app_config.dart';
+import 'package:chisto_infrastructure/core/providers/app_providers.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_auth/src/domain/repositories/auth_repository.dart';
+import 'package:feature_auth/src/presentation/widgets/auth_otp_input.dart';
+import 'package:feature_onboarding/src/domain/feature_guide_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -19,8 +19,8 @@ const Size kAuthTestSurfaceSize = Size(480, 900);
 
 const MediaQueryData kAuthTestMediaQuery = MediaQueryData(
   size: kAuthTestSurfaceSize,
-  devicePixelRatio: 1.0,
-  textScaler: TextScaler.linear(1.0),
+  devicePixelRatio: 1,
+  textScaler: TextScaler.linear(1),
   disableAnimations: true,
 );
 
@@ -36,11 +36,11 @@ class AuthTestOverrides {
     FeatureGuideRepository? featureGuideRepository,
     Map<String, Object>? preferenceValues,
     Locale? localeOverride,
-  })  : authRepository = authRepository ?? FakeAuthRepository(),
-        featureGuideRepository =
-            featureGuideRepository ?? FakeFeatureGuideRepository(),
-        preferenceValues = preferenceValues ?? <String, Object>{},
-        localeOverride = localeOverride;
+  }) : authRepository = authRepository ?? FakeAuthRepository(),
+       featureGuideRepository =
+           featureGuideRepository ?? FakeFeatureGuideRepository(),
+       preferenceValues = preferenceValues ?? <String, Object>{},
+       localeOverride = localeOverride;
 
   final AuthRepository authRepository;
   final FeatureGuideRepository featureGuideRepository;
@@ -68,9 +68,7 @@ Widget pumpAuthScreen({
   RouteFactory? onGenerateRoute,
   NavigatorObserver? navigatorObserver,
 }) {
-  final List<Override> allOverrides = <Override>[
-    ...?overrides,
-  ];
+  final List<Override> allOverrides = <Override>[...?overrides];
   return ProviderScope(
     overrides: allOverrides,
     child: MaterialApp(
@@ -82,10 +80,7 @@ Widget pumpAuthScreen({
       navigatorObservers: navigatorObserver != null
           ? <NavigatorObserver>[navigatorObserver]
           : const <NavigatorObserver>[],
-      home: MediaQuery(
-        data: kAuthTestMediaQuery,
-        child: home,
-      ),
+      home: MediaQuery(data: kAuthTestMediaQuery, child: home),
     ),
   );
 }

@@ -1,15 +1,17 @@
-import 'package:chisto_mobile/core/navigation/app_routes.dart';
-import 'package:chisto_mobile/core/validation/phone_display_formatter.dart';
-import 'package:chisto_mobile/features/auth/domain/repositories/auth_repository.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/otp_screen.dart';
-import 'package:chisto_mobile/features/auth/presentation/widgets/auth_otp_input.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/core/navigation/app_routes.dart';
+import 'package:chisto_infrastructure/core/validation/phone_display_formatter.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_auth/src/domain/models/auth_session_dtos.dart';
+import 'package:feature_auth/src/presentation/screens/otp_screen.dart';
+import 'package:feature_auth/src/presentation/widgets/auth_otp_input.dart';
+import 'package:feature_auth/src/presentation/widgets/auth_otp_resend_button.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+
 import '../../shared/pump_auth_app.dart';
 import '../../shared/widget_test_bootstrap.dart';
 import 'support/auth_test_helpers.dart';
 import 'support/fake_auth_repository.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   /// E.164 as passed from sign-up navigation.
@@ -33,10 +35,7 @@ void main() {
 
     await pumpAuthWidget(
       tester,
-      home: const OtpScreen(
-        phoneNumber: testPhoneE164,
-        requestOtpOnOpen: true,
-      ),
+      home: const OtpScreen(phoneNumber: testPhoneE164, requestOtpOnOpen: true),
       onGenerateRoute: AppRouter.onGenerateRoute,
       overrides: AuthTestOverrides(authRepository: repo).build(),
     );
@@ -66,13 +65,12 @@ void main() {
     await tester.pumpAndSettle();
 
     final BuildContext ctx = tester.element(find.byType(OtpScreen));
-    expect(
-      AppLocalizations.of(ctx)!.authOtpSubtitle(''),
-      contains('6'),
-    );
+    expect(AppLocalizations.of(ctx)!.authOtpSubtitle(''), contains('6'));
   });
 
-  testWidgets('shows the phone number in subtitle', (WidgetTester tester) async {
+  testWidgets('shows the phone number in subtitle', (
+    WidgetTester tester,
+  ) async {
     await pumpAuthWidget(
       tester,
       home: const OtpScreen(phoneNumber: testPhoneE164),
@@ -145,14 +143,18 @@ void main() {
 
     expect(find.text('Resend code in 45s'), findsOneWidget);
 
-    for (int i = 0; i < 46; i++) {
+    for (int i = 0; i < 45; i++) {
       await tester.pump(const Duration(seconds: 1));
     }
-    await tester.pumpAndSettle();
+    await tester.pump();
 
-    final Finder resendButton = find.byType(TextButton);
-    expect(resendButton, findsOneWidget);
-    final TextButton button = tester.widget<TextButton>(resendButton);
-    expect(button.onPressed, isNotNull);
+    expect(find.byType(AuthOtpResendButton), findsOneWidget);
+    final InkWell resend = tester.widget<InkWell>(
+      find.descendant(
+        of: find.byType(AuthOtpResendButton),
+        matching: find.byType(InkWell),
+      ),
+    );
+    expect(resend.onTap, isNotNull);
   });
 }

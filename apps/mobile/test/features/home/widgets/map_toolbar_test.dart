@@ -1,9 +1,8 @@
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_home/src/presentation/widgets/map/map_toolbar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'package:chisto_mobile/features/home/presentation/widgets/map/map_toolbar.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 import '../../../shared/widget_test_bootstrap.dart';
 
@@ -14,13 +13,15 @@ void main() {
     await bootstrapWidgetTests();
   });
 
-  testWidgets('renders search and filter controls', (WidgetTester tester) async {
+  testWidgets('renders search and filter controls', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
-      ProviderScope(
+      const ProviderScope(
         child: MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          locale: const Locale('en'),
+          locale: Locale('en'),
           home: Scaffold(
             body: MapToolbar(
               visibleCount: 3,

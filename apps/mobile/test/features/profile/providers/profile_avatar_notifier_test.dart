@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/features/profile/presentation/providers/profile_avatar_notifier.dart';
+import 'package:feature_profile/src/presentation/providers/profile_avatar_notifier.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -8,22 +8,28 @@ void main() {
       final ProviderContainer container = ProviderContainer();
       addTearDown(container.dispose);
 
-      final ProfileAvatarNotifier n =
-          container.read(profileAvatarNotifierProvider.notifier);
+      final ProfileAvatarNotifier n = container.read(
+        profileAvatarNotifierProvider.notifier,
+      );
       n.setLocalPath('/tmp/a.jpg');
-      expect(container.read(profileAvatarNotifierProvider).localPath,
-          '/tmp/a.jpg');
+      expect(
+        container.read(profileAvatarNotifierProvider).localPath,
+        '/tmp/a.jpg',
+      );
       n.setLocalPath('/tmp/a.jpg');
-      expect(container.read(profileAvatarNotifierProvider).localPath,
-          '/tmp/a.jpg');
+      expect(
+        container.read(profileAvatarNotifierProvider).localPath,
+        '/tmp/a.jpg',
+      );
     });
 
     test('setRemoteUrl and clearLocalPath compose', () {
       final ProviderContainer container = ProviderContainer();
       addTearDown(container.dispose);
 
-      final ProfileAvatarNotifier n =
-          container.read(profileAvatarNotifierProvider.notifier);
+      final ProfileAvatarNotifier n = container.read(
+        profileAvatarNotifierProvider.notifier,
+      );
       n.setRemoteUrl('https://cdn/x.png');
       n.setLocalPath('/local');
       n.clearLocalPath();
@@ -36,13 +42,16 @@ void main() {
       final ProviderContainer container = ProviderContainer();
       addTearDown(container.dispose);
 
-      final ProfileAvatarNotifier n =
-          container.read(profileAvatarNotifierProvider.notifier);
+      final ProfileAvatarNotifier n = container.read(
+        profileAvatarNotifierProvider.notifier,
+      );
       n.setRemoteUrl('u');
       n.setLocalPath('l');
       n.clearAll();
-      expect(container.read(profileAvatarNotifierProvider),
-          const ProfileAvatarData());
+      expect(
+        container.read(profileAvatarNotifierProvider),
+        const ProfileAvatarData(),
+      );
     });
   });
 }

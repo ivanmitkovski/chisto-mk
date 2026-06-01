@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/core/cache/user_avatars_cache.dart';
+import 'package:chisto_infrastructure/core/cache/user_avatars_cache.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

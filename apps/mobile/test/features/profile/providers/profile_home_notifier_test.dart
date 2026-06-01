@@ -1,9 +1,8 @@
-import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
-import 'package:chisto_mobile/features/profile/data/profile_me_json.dart';
-import 'package:chisto_mobile/features/profile/presentation/providers/profile_home_notifier.dart';
-import 'package:chisto_mobile/features/profile/presentation/providers/profile_providers.dart';
-import 'package:chisto_mobile/features/reports/domain/models/report_capacity.dart';
-import 'package:chisto_mobile/features/reports/domain/repositories/reports_api_repository.dart';
+import 'package:chisto_infrastructure/core/bootstrap/app_bootstrap.dart';
+import 'package:feature_profile/src/data/profile_me_json.dart';
+import 'package:feature_profile/src/presentation/providers/profile_home_notifier.dart';
+import 'package:feature_profile/src/presentation/providers/profile_providers.dart';
+import 'package:feature_reports/src/domain/models/report_capacity.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -26,7 +25,7 @@ void main() {
         displayName: 'Tester',
         accessToken: 't',
       );
-      final ReportCapacity capacity = ReportCapacity(
+      const ReportCapacity capacity = ReportCapacity(
         creditsAvailable: 1,
         emergencyAvailable: false,
         emergencyWindowDays: 7,

@@ -1,6 +1,6 @@
-import 'package:chisto_mobile/features/home/presentation/widgets/feed_filter_bar.dart';
-import 'package:chisto_mobile/features/home/presentation/widgets/feed_filter_sheet.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_home/src/presentation/widgets/feed_filter_bar.dart';
+import 'package:feature_home/src/presentation/widgets/feed_filter_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';

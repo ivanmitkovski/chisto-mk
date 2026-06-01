@@ -2,8 +2,8 @@
 import 'dart:io';
 
 import 'design_system_guard_util.dart';
+import 'feature_roots_guard_util.dart';
 
-const List<String> _roots = <String>['lib/features'];
 const List<String> _skip = <String>[
   'shared/widgets/atoms/app_loading_indicator.dart',
   'shared/widgets/atoms/primary_button.dart',
@@ -15,16 +15,23 @@ bool _matches(String line) {
       line.contains('LinearProgressIndicator(');
 }
 
-void main() {
+void main(List<String> args) {
   if (!Directory('lib').existsSync()) {
     stderr.writeln('lib/ not found (run from apps/mobile).');
     exit(2);
   }
   final List<String> hits = scanDartRoots(
-    roots: _roots,
+    roots: allFeatureLibRoots(),
     skipPathFragments: _skip,
     matchesLine: _matches,
   );
+  if (wantsStampBaseline(args)) {
+    stampAllowlist(
+      allowlistPath: 'tool/raw_progress_allowlist.txt',
+      hits: hits,
+    );
+    exit(0);
+  }
   exit(
     runRatchetingAllowlistCheck(
       patternDescription: 'Raw progress indicator',

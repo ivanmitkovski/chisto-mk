@@ -1,6 +1,6 @@
-import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
-import 'package:chisto_mobile/features/home/presentation/utils/map_cluster_engine.dart';
-import 'package:chisto_mobile/features/home/presentation/widgets/map/cluster_bucket.dart';
+import 'package:feature_home/src/domain/models/pollution_site.dart';
+import 'package:feature_home/src/presentation/utils/map_cluster_engine.dart';
+import 'package:feature_home/src/presentation/widgets/map/cluster_bucket.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
@@ -54,7 +54,7 @@ void main() {
   });
 
   test('selected site is never merged into another bucket', () {
-    final PollutionSite a = _site('a', lat: 41.0, lng: 21.0);
+    final PollutionSite a = _site('a', lat: 41, lng: 21);
     final PollutionSite b = _site('b', lat: 41.00001, lng: 21.00001);
     final Map<String, LatLng> coords = <String, LatLng>{
       'a': LatLng(a.latitude!, a.longitude!),
@@ -69,11 +69,16 @@ void main() {
       selectedSiteId: 'a',
     );
     expect(buckets.length, 2);
-    expect(buckets.any((ClusterBucket c) => c.sites.length == 1 && c.sites.single.id == 'a'), isTrue);
+    expect(
+      buckets.any(
+        (ClusterBucket c) => c.sites.length == 1 && c.sites.single.id == 'a',
+      ),
+      isTrue,
+    );
   });
 
   test('buildMapClusterBuckets is independent of input site order', () {
-    final PollutionSite a = _site('a', lat: 41.0, lng: 21.0);
+    final PollutionSite a = _site('a', lat: 41, lng: 21);
     final PollutionSite b = _site('b', lat: 41.00001, lng: 21.00001);
     final PollutionSite c = _site('c', lat: 41.00002, lng: 21.00002);
     final Map<String, LatLng> coords = <String, LatLng>{
@@ -81,11 +86,9 @@ void main() {
       'b': LatLng(b.latitude!, b.longitude!),
       'c': LatLng(c.latitude!, c.longitude!),
     };
-    String signature(List<ClusterBucket> buckets) {
-      final List<String> parts = buckets
-          .map((ClusterBucket e) => e.stableClusterId)
-          .toList()
-        ..sort();
+    String anchorSignature(List<ClusterBucket> buckets) {
+      final List<String> parts =
+          buckets.map((ClusterBucket e) => e.anchorId).toList()..sort();
       return parts.join(';');
     }
 
@@ -105,7 +108,38 @@ void main() {
       cameraCenterLng: 21,
       selectedSiteId: null,
     );
-    expect(signature(forward), signature(reversed));
+    expect(anchorSignature(forward), anchorSignature(reversed));
+  });
+
+  test('anchorId persists when one member joins cluster', () {
+    final PollutionSite a = _site('a', lat: 41, lng: 21);
+    final PollutionSite b = _site('b', lat: 41.00001, lng: 21.00001);
+    final PollutionSite c = _site('c', lat: 41.000005, lng: 21.000005);
+    final Map<String, LatLng> coords = <String, LatLng>{
+      'a': LatLng(a.latitude!, a.longitude!),
+      'b': LatLng(b.latitude!, b.longitude!),
+      'c': LatLng(c.latitude!, c.longitude!),
+    };
+    final List<ClusterBucket> ab = buildMapClusterBuckets(
+      displayedSites: <PollutionSite>[a, b],
+      coordinates: coords,
+      zoom: 14,
+      cameraCenterLat: 41,
+      cameraCenterLng: 21,
+      selectedSiteId: null,
+    );
+    final List<ClusterBucket> abc = buildMapClusterBuckets(
+      displayedSites: <PollutionSite>[a, b, c],
+      coordinates: coords,
+      zoom: 14,
+      cameraCenterLat: 41,
+      cameraCenterLng: 21,
+      selectedSiteId: null,
+    );
+    expect(ab.length, 1);
+    expect(abc.length, 1);
+    expect(ab.first.anchorId, 'a');
+    expect(abc.first.anchorId, 'a');
   });
 
   test('clusterSitesWithinMergeDistanceDegrees circumscribes legacy box', () {
@@ -124,7 +158,7 @@ void main() {
   test('buildMapClusterBucketsAdaptive uses sync path at threshold', () async {
     final List<PollutionSite> sites = List<PollutionSite>.generate(
       kMapClusterIsolateThreshold,
-      (int i) => _site('s$i', lat: 41.0 + i * 1e-4, lng: 21.0),
+      (int i) => _site('s$i', lat: 41.0 + i * 1e-4, lng: 21),
     );
     final Map<String, LatLng> coords = <String, LatLng>{
       for (final PollutionSite s in sites)
@@ -140,5 +174,8 @@ void main() {
       selectedSiteId: null,
     );
     expect(buckets.isNotEmpty, isTrue);
+    for (final ClusterBucket b in buckets) {
+      expect(b.anchorId, isNotEmpty);
+    }
   });
 }

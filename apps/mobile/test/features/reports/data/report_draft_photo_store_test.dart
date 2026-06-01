@@ -1,13 +1,15 @@
 import 'dart:io';
 
-import 'package:chisto_mobile/features/reports/data/outbox/report_draft_photo_store.dart';
+import 'package:feature_reports/src/data/outbox/report_draft_photo_store.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
 
 void main() {
   test('importPhoto deletePhoto prune clearAll', () async {
-    final Directory root = await Directory.systemTemp.createTemp('draft_photo_');
+    final Directory root = await Directory.systemTemp.createTemp(
+      'draft_photo_',
+    );
     final ReportDraftPhotoStore store = ReportDraftPhotoStore(
       rootOverride: Directory(p.join(root.path, 'managed')),
     );

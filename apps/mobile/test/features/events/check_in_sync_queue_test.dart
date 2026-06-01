@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/features/events/data/check_in_sync_queue.dart';
+import 'package:feature_events/src/data/check_in_sync_queue.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -23,7 +23,8 @@ void main() {
     );
     await CheckInSyncQueue.instance.enqueue(a);
     await CheckInSyncQueue.instance.enqueue(b);
-    final List<CheckInQueueEntry> peeked = await CheckInSyncQueue.instance.peek();
+    final List<CheckInQueueEntry> peeked = await CheckInSyncQueue.instance
+        .peek();
     expect(peeked, hasLength(1));
     expect(peeked.single.qrPayload, 'payload-a');
   });
@@ -45,7 +46,10 @@ void main() {
       ),
     );
     List<CheckInQueueEntry> list = await CheckInSyncQueue.instance.peek();
-    expect(list.map((CheckInQueueEntry e) => e.qrPayload).toList(), <String>['p1', 'p2']);
+    expect(list.map((CheckInQueueEntry e) => e.qrPayload).toList(), <String>[
+      'p1',
+      'p2',
+    ]);
 
     await CheckInSyncQueue.instance.remove('p1');
     list = await CheckInSyncQueue.instance.peek();

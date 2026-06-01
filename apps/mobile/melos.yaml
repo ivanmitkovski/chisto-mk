@@ -1,0 +1,81 @@
+name: chisto_mobile
+repository: https://github.com/chisto-mk/chisto-mk
+
+packages:
+  - .
+  - packages/**
+
+command:
+  bootstrap:
+    usePubspecOverrides: false
+
+scripts:
+  bootstrap:
+    run: melos bootstrap
+    description: Link workspace packages and run pub get everywhere.
+
+  analyze:
+    run: melos exec -- flutter analyze --fatal-infos lib
+    description: Run flutter analyze in all Flutter packages and the app.
+
+  analyze:core:
+    run: melos exec --scope=chisto_core -- dart analyze lib test
+    description: Analyze the pure-Dart core package.
+
+  test:
+    run: |
+      melos exec --ignore=chisto_mobile --ignore=chisto_core --fail-fast --dir-exists=test -- flutter test test/
+    description: Run package unit tests where test/ exists (not the app suite).
+
+  test:app:
+    run: flutter test test/
+    description: Run the main app test suite.
+
+  coverage:
+    run: bash tool/collect_coverage.sh
+    description: Collect merged line coverage across app and packages.
+
+  coverage:app:
+    run: flutter test --coverage test/
+    description: Collect line coverage from the main app test suite.
+
+  coverage:check:
+    run: dart run tool/check_coverage.dart --print-summary
+    description: Verify merged coverage meets tool/coverage_threshold.txt.
+
+  format:
+    run: melos exec -- dart format --set-exit-if-changed lib test
+    description: Format all workspace packages.
+
+  guards:
+    run: |
+      set -euo pipefail
+      dart format --set-exit-if-changed lib test tool packages
+      for f in tool/check_*.dart; do
+        case "$(basename "$f")" in
+          check_coverage.dart) continue ;;
+        esac
+        echo "Running $f"
+        dart run "$f"
+      done
+    description: Architecture and design-system guard scripts.
+
+  typography:check:
+    run: dart run tool/check_no_textstyle_in_features.dart
+    description: Verify no raw TextStyle/fontSize/fontFamily outside token files.
+
+  gen:
+    run: dart run build_runner build --delete-conflicting-outputs
+    description: Run code generation (freezed, json_serializable, riverpod) in packages that define targets.
+
+  ci:
+    run: |
+      melos bootstrap
+      melos run analyze:core
+      melos run analyze
+      melos run guards
+      melos run test
+      melos run test:app
+      melos run coverage:app
+      melos run coverage:check
+    description: CI entrypoint for workspace analyze, guards, tests, and coverage.

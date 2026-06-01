@@ -1,30 +1,39 @@
-lib/features/auth/presentation/screens/forgot_password_email_sent_screen.dart
-lib/features/auth/presentation/screens/forgot_password_otp_screen.dart
-lib/features/auth/presentation/screens/forgot_password_request_screen.dart
-lib/features/auth/presentation/screens/forgot_password_success_screen.dart
-lib/features/auth/presentation/screens/initial_route_screen.dart
-lib/features/auth/presentation/screens/onboarding_screen.dart
-lib/features/auth/presentation/screens/otp_screen.dart
-lib/features/auth/presentation/screens/sign_up_screen.dart
-lib/features/auth/presentation/screens/splash_screen.dart
-lib/features/events/presentation/screens/attendee_qr_scanner_screen.dart
-lib/features/events/presentation/screens/event_chat_screen.dart
-lib/features/events/presentation/screens/event_cleanup_evidence_screen.dart
-lib/features/events/presentation/screens/event_detail_screen.dart
-lib/features/events/presentation/screens/field_mode_screen.dart
-lib/features/events/presentation/screens/organizer_checkin_screen.dart
-lib/features/events/presentation/screens/organizer_toolkit/organizer_quiz/organizer_quiz_result_screen.dart
-lib/features/events/presentation/screens/organizer_toolkit/organizer_quiz_screen.dart
-lib/features/events/presentation/screens/organizer_toolkit/organizer_toolkit_screen.dart
-lib/features/home/presentation/screens/feed_site_comments_route_screen.dart
-lib/features/home/presentation/screens/feed_site_upvoters_route_screen.dart
-lib/features/home/presentation/screens/notifications_screen.dart
-lib/features/home/presentation/screens/pollution_map_screen.dart
-lib/features/home/presentation/screens/pollution_site_detail_screen.dart
-lib/features/home/presentation/screens/saved_map_areas_screen.dart
-lib/features/home/presentation/screens/site_detail_route_screen.dart
-lib/features/profile/presentation/screens/profile_general_info_screen.dart
-lib/features/profile/presentation/screens/profile_language_screen.dart
-lib/features/profile/presentation/screens/profile_password_screen.dart
-lib/features/profile/presentation/screens/profile_screen.dart
-lib/features/reports/presentation/screens/new_report_screen.dart
+# Documented exemptions for the loading/empty/error-triple heuristic.
+#
+# This guard scans screens for a recognizable loading + empty + error state
+# triple. The screens below are intentionally exempt because either:
+#  - they are static/form/flow screens with no async list to page through
+#    (auth onboarding/otp/forgot-password/sign-up/splash, profile settings
+#    forms, organizer toolkit/quiz flows, attendee QR scanner), or
+#  - they render async state through shared widgets the heuristic does not
+#    recognize (AppErrorView / skeletons / AppRefreshIndicator inside child
+#    widgets rather than the screen body).
+# The ratchet only allows this list to shrink; new screens must ship the triple.
+packages/feature_auth/lib/src/presentation/screens/forgot_password_email_sent_screen.dart
+packages/feature_auth/lib/src/presentation/screens/forgot_password_otp_screen.dart
+packages/feature_auth/lib/src/presentation/screens/forgot_password_request_screen.dart
+packages/feature_auth/lib/src/presentation/screens/forgot_password_success_screen.dart
+packages/feature_auth/lib/src/presentation/screens/initial_route_screen.dart
+packages/feature_auth/lib/src/presentation/screens/onboarding_screen.dart
+packages/feature_auth/lib/src/presentation/screens/otp_screen.dart
+packages/feature_auth/lib/src/presentation/screens/sign_up_screen.dart
+packages/feature_auth/lib/src/presentation/screens/splash_screen.dart
+packages/feature_events/lib/src/presentation/screens/attendee_qr_scanner_screen.dart
+packages/feature_events/lib/src/presentation/screens/event_chat_screen.dart
+packages/feature_events/lib/src/presentation/screens/event_cleanup_evidence_screen.dart
+packages/feature_events/lib/src/presentation/screens/event_detail_screen.dart
+packages/feature_events/lib/src/presentation/screens/field_mode_screen.dart
+packages/feature_events/lib/src/presentation/screens/organizer_checkin_screen.dart
+packages/feature_events/lib/src/presentation/screens/organizer_toolkit/organizer_quiz/organizer_quiz_result_screen.dart
+packages/feature_events/lib/src/presentation/screens/organizer_toolkit/organizer_quiz_screen.dart
+packages/feature_events/lib/src/presentation/screens/organizer_toolkit/organizer_toolkit_screen.dart
+packages/feature_home/lib/src/presentation/screens/feed_site_comments_route_screen.dart
+packages/feature_home/lib/src/presentation/screens/feed_site_upvoters_route_screen.dart
+packages/feature_home/lib/src/presentation/screens/notifications_screen.dart
+packages/feature_home/lib/src/presentation/screens/pollution_map_screen.dart
+packages/feature_home/lib/src/presentation/screens/pollution_site_detail_screen.dart
+packages/feature_home/lib/src/presentation/screens/site_detail_route_screen.dart
+packages/feature_profile/lib/src/presentation/screens/profile_general_info_screen.dart
+packages/feature_profile/lib/src/presentation/screens/profile_language_screen.dart
+packages/feature_profile/lib/src/presentation/screens/profile_password_screen.dart
+packages/feature_reports/lib/src/presentation/screens/new_report_screen.dart

@@ -1,6 +1,6 @@
-import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_capacity_summary_card.dart';
-import 'package:chisto_mobile/features/reports/domain/models/report_capacity.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_reports/src/domain/models/report_capacity.dart';
+import 'package:feature_reports/src/presentation/widgets/new_report/report_capacity_summary_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -17,7 +17,7 @@ void main() {
         home: Builder(
           builder: (BuildContext context) {
             l10n = AppLocalizations.of(context)!;
-            return Scaffold(
+            return const Scaffold(
               body: ReportCapacitySummaryCard(
                 capacity: ReportCapacity(
                   creditsAvailable: 10,
@@ -51,7 +51,7 @@ void main() {
         home: Builder(
           builder: (BuildContext context) {
             l10n = AppLocalizations.of(context)!;
-            return Scaffold(
+            return const Scaffold(
               body: ReportCapacitySummaryCard(
                 capacity: ReportCapacity(
                   creditsAvailable: 0,

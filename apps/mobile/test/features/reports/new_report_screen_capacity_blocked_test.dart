@@ -1,6 +1,6 @@
-import 'package:chisto_mobile/features/reports/domain/models/report_capacity.dart';
-import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/reporting_capacity_guard.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_reports/src/domain/models/report_capacity.dart';
+import 'package:feature_reports/src/presentation/widgets/new_report/reporting_capacity_guard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -11,7 +11,9 @@ void main() {
     await bootstrapWidgetTests();
   });
 
-  testWidgets('showReportingCooldownDialog is wired (smoke)', (WidgetTester tester) async {
+  testWidgets('showReportingCooldownDialog is wired (smoke)', (
+    WidgetTester tester,
+  ) async {
     const ReportCapacity capacity = ReportCapacity(
       creditsAvailable: 0,
       emergencyAvailable: false,

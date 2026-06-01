@@ -1,5 +1,5 @@
-import 'package:chisto_mobile/features/events/presentation/widgets/events_filter_chips.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_events/src/presentation/widgets/events_filter_chips.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

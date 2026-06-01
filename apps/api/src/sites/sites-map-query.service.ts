@@ -6,6 +6,7 @@ import { MapObservabilityService } from './map/map-observability.service';
 import { MapQueryValidatorService } from './map/map-query-validator.service';
 import { MapResponseProjectorService } from './map/map-response-projector.service';
 import { MapSiteRepositoryService } from './map/map-site-repository.service';
+import { MapViewerContext, mapViewerCacheKey } from './map/map-site-visibility.helper';
 
 const flags = loadFeatureFlags();
 
@@ -25,8 +26,9 @@ export class SitesMapQueryService {
     private readonly projector: MapResponseProjectorService,
   ) {}
 
-  async findAllForMap(query: ListSitesMapQueryDto) {
+  async findAllForMap(query: ListSitesMapQueryDto, viewer?: MapViewerContext) {
     const startedAt = Date.now();
+    const viewerUserId = viewer?.viewerUserId ?? null;
     this.validator.validateQuery(query);
     const zoom = query.zoom ?? 11;
     const zoomBucket = zoomBucketFromZoom(zoom);
@@ -49,6 +51,7 @@ export class SitesMapQueryService {
       query.maxLng?.toFixed(4) ?? '',
       zoom,
       tier,
+      mapViewerCacheKey(viewerUserId),
     ]);
 
     const memoryCached = flags.mapCacheEnabled ? this.cache.getFromMemory(cacheKey) : null;
@@ -76,7 +79,7 @@ export class SitesMapQueryService {
       return redisCached;
     }
 
-    const fetched = await this.repository.findSites(query, dynamicLimit);
+    const fetched = await this.repository.findSites(query, dynamicLimit, viewerUserId);
 
     const response = await this.projector.buildResponse({
       query,
@@ -100,7 +103,8 @@ export class SitesMapQueryService {
     return response;
   }
 
-  async resolveMapDataVersion(query: ListSitesMapQueryDto): Promise<string> {
+  async resolveMapDataVersion(query: ListSitesMapQueryDto, viewer?: MapViewerContext) {
+    const viewerUserId = viewer?.viewerUserId ?? null;
     this.validator.validateQuery(query);
     const zoom = query.zoom ?? 11;
     const tier: 'low' | 'mid' | 'high' = zoom <= 8 ? 'low' : zoom <= 12 ? 'mid' : 'high';
@@ -121,6 +125,7 @@ export class SitesMapQueryService {
       query.maxLng?.toFixed(4) ?? '',
       zoom,
       tier,
+      mapViewerCacheKey(viewerUserId),
     ]);
     const memoryCached = flags.mapCacheEnabled ? this.cache.getFromMemory(cacheKey) : null;
     if (memoryCached) {
@@ -130,10 +135,10 @@ export class SitesMapQueryService {
     if (redisCached) {
       return redisCached.meta.dataVersion;
     }
-    return this.repository.resolveDataVersion(query);
+    return this.repository.resolveDataVersion(query, viewerUserId);
   }
 
-  async findClustersForMap(query: ListSitesMapQueryDto): Promise<{
+  async findClustersForMap(query: ListSitesMapQueryDto, viewer?: MapViewerContext): Promise<{
     data: Array<{
       clusterKey: string;
       clusterId: string;
@@ -145,11 +150,12 @@ export class SitesMapQueryService {
     meta: { serverTime: string; zoom: number };
   }> {
     const startedAt = Date.now();
+    const viewerUserId = viewer?.viewerUserId ?? null;
     this.validator.validateQuery(query);
     const zoom = query.zoom ?? 11;
     const zoomBucket = zoomBucketFromZoom(zoom);
     this.metrics.recordZoomTier(zoom <= 8 ? 'low' : zoom <= 12 ? 'mid' : 'high');
-    const rows = await this.repository.findClusters(query, zoom);
+    const rows = await this.repository.findClusters(query, zoom, viewerUserId);
     this.metrics.recordRequest({
       durationMs: Date.now() - startedAt,
       candidatePoolSize: rows.length,
@@ -163,16 +169,17 @@ export class SitesMapQueryService {
     };
   }
 
-  async findHeatmapForMap(query: ListSitesMapQueryDto): Promise<{
+  async findHeatmapForMap(query: ListSitesMapQueryDto, viewer?: MapViewerContext): Promise<{
     data: Array<{ cellKey: string; latitude: number; longitude: number; intensity: number }>;
     meta: { serverTime: string; zoom: number };
   }> {
     const startedAt = Date.now();
+    const viewerUserId = viewer?.viewerUserId ?? null;
     this.validator.validateQuery(query);
     const zoom = query.zoom ?? 11;
     const zoomBucket = zoomBucketFromZoom(zoom);
     this.metrics.recordZoomTier(zoom <= 8 ? 'low' : zoom <= 12 ? 'mid' : 'high');
-    const rows = await this.repository.findHeatmap(query, zoom);
+    const rows = await this.repository.findHeatmap(query, zoom, viewerUserId);
     this.metrics.recordRequest({
       durationMs: Date.now() - startedAt,
       candidatePoolSize: rows.length,

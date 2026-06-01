@@ -1,53 +1,34 @@
 // Run from apps/mobile: dart run tool/check_screen_size.dart
+// Optional: dart run tool/check_screen_size.dart --stamp-baseline
 import 'dart:io';
+
+import 'design_system_guard_util.dart';
+import 'feature_roots_guard_util.dart';
 
 const int _hardLineLimit = 600;
 const int _warnLineLimit = 400;
+const String _allowlistPath = 'tool/screen_size_allowlist.txt';
 
-/// Screens under this path are checked for composition-only size budgets.
-const String _screensPrefix = 'lib/features/';
+bool _isScreenFile(String normalizedPath) {
+  return isPresentationPath(normalizedPath) &&
+      normalizedPath.contains('/screens/') &&
+      normalizedPath.endsWith('_screen.dart');
+}
 
-/// Legacy large screens tracked in docs/beta-followups.md (next decomposition pass).
-const Set<String> _legacyLargeScreenAllowlist = <String>{
-  // Wave 15 — decomposition backlog (ratchet; do not add entries).
-  'lib/features/events/presentation/organizer_checkin/organizer_checkin_screen_state.dart',
-};
-
-void main() {
-  final Directory libRoot = Directory('lib');
-  if (!libRoot.existsSync()) {
-    stderr.writeln('lib/ not found (run from apps/mobile).');
-    exit(2);
-  }
-
+List<String> _scanScreenSizes() {
   final List<String> hardViolations = <String>[];
   final List<String> warnings = <String>[];
 
-  for (final FileSystemEntity entity in libRoot.listSync(recursive: true)) {
-    if (entity is! File || !entity.path.endsWith('.dart')) {
+  for (final File file in iterFeatureDartFiles(roots: allFeatureLibRoots())) {
+    final String normalized = normalizePath(file.path);
+    if (!_isScreenFile(normalized)) {
       continue;
     }
-    final String normalized = entity.path.replaceAll(r'\', '/');
-    if (!normalized.contains('${_screensPrefix}') ||
-        !normalized.contains('/presentation/') ||
-        !normalized.contains('/screens/') ||
-        !normalized.endsWith('_screen.dart')) {
-      continue;
-    }
-
-    final int lines = entity.readAsLinesSync().length;
+    final int lines = file.readAsLinesSync().length;
     if (lines > _hardLineLimit) {
-      if (_legacyLargeScreenAllowlist.contains(normalized)) {
-        warnings.add(
-          '$normalized: $lines lines (legacy allowlist — see docs/beta-followups.md)',
-        );
-        continue;
-      }
-      hardViolations.add(
-        '$normalized: $lines lines (hard limit $_hardLineLimit)',
-      );
+      hardViolations.add('$normalized:$lines');
     } else if (lines > _warnLineLimit) {
-      warnings.add('$normalized: $lines lines (warn above $_warnLineLimit)');
+      warnings.add('$normalized:$lines');
     }
   }
 
@@ -57,15 +38,23 @@ void main() {
     );
   }
 
-  if (hardViolations.isNotEmpty) {
-    stderr.writeln(
-      'Screen size check failed (${hardViolations.length} file(s) > $_hardLineLimit LoC):\n'
-      '${hardViolations.join('\n')}',
-    );
-    exit(1);
+  return hardViolations..sort();
+}
+
+void main(List<String> args) {
+  if (wantsStampBaseline(args)) {
+    stampAllowlist(allowlistPath: _allowlistPath, hits: _scanScreenSizes());
+    exit(0);
   }
 
-  stdout.writeln(
-    'Screen size check passed (hard ≤$_hardLineLimit, warn ≤$_warnLineLimit).',
+  final List<String> hits = _scanScreenSizes();
+  exit(
+    runRatchetingAllowlistCheck(
+      patternDescription: 'Screen size (hard >$_hardLineLimit)',
+      hits: hits,
+      allowlistPath: _allowlistPath,
+      fixHint:
+          'Extract coordinators/widgets; stamp baseline only when count decreases.',
+    ),
   );
 }

@@ -147,27 +147,6 @@ export class ReportSubmitService {
           tx,
         );
 
-        if (
-          primaryReport &&
-          primaryReport.reporterId &&
-          primaryReport.reporterId !== user.userId
-        ) {
-          await tx.reportCoReporter.upsert({
-            where: {
-              reportId_userId: {
-                reportId: primaryReport.id,
-                userId: user.userId,
-              },
-            },
-            update: {},
-            create: {
-              reportId: primaryReport.id,
-              userId: user.userId,
-              reportedAt: newReport.createdAt,
-            },
-          });
-        }
-
         const reportNumber = getReportNumber(newReport);
         const notifCopy = adminSubmitNotificationCopy({
           locale: submitLocale,

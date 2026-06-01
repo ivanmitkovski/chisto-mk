@@ -1,10 +1,10 @@
 import 'dart:io';
 
-import 'package:chisto_mobile/features/reports/data/outbox/report_draft_photo_store.dart';
-import 'package:chisto_mobile/features/reports/data/outbox/report_draft_repository.dart';
-import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_database.dart';
-import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_repository.dart';
-import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
+import 'package:feature_reports/src/data/outbox/report_draft_photo_store.dart';
+import 'package:feature_reports/src/data/outbox/report_draft_repository.dart';
+import 'package:feature_reports/src/data/outbox/report_outbox_database.dart';
+import 'package:feature_reports/src/data/outbox/report_outbox_repository.dart';
+import 'package:feature_reports/src/domain/models/report_draft.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
@@ -66,53 +66,56 @@ void main() {
     await bootstrapWidgetTests();
   });
 
-  test('summaryListenable updates on save and clear; coalesces identical summary', () async {
-    final Directory tmp = await Directory.systemTemp.createTemp('draft_sum_');
-    final Database db = await _openTestDbIn(tmp, 's.db');
-    final ReportOutboxRepository outbox = SqfliteReportOutboxRepository(db);
-    final ReportDraftPhotoStore photoStore = ReportDraftPhotoStore(
-      rootOverride: Directory(p.join(tmp.path, 'media')),
-    );
-    final ReportDraftRepository repo = ReportDraftRepository(
-      outbox: outbox,
-      photoStore: photoStore,
-    );
+  test(
+    'summaryListenable updates on save and clear; coalesces identical summary',
+    () async {
+      final Directory tmp = await Directory.systemTemp.createTemp('draft_sum_');
+      final Database db = await _openTestDbIn(tmp, 's.db');
+      final ReportOutboxRepository outbox = SqfliteReportOutboxRepository(db);
+      final ReportDraftPhotoStore photoStore = ReportDraftPhotoStore(
+        rootOverride: Directory(p.join(tmp.path, 'media')),
+      );
+      final ReportDraftRepository repo = ReportDraftRepository(
+        outbox: outbox,
+        photoStore: photoStore,
+      );
 
-    int notifications = 0;
-    void onNotify() {
-      notifications++;
-    }
+      int notifications = 0;
+      void onNotify() {
+        notifications++;
+      }
 
-    repo.summaryListenable.addListener(onNotify);
-    expect(repo.summaryListenable.value.hasDraft, isFalse);
+      repo.summaryListenable.addListener(onNotify);
+      expect(repo.summaryListenable.value.hasDraft, isFalse);
 
-    await repo.save(
-      draft: ReportDraft(title: 'x'),
-      title: 'x',
-      description: '',
-      lastPersistedAtMs: 1,
-    );
-    expect(repo.summaryListenable.value.hasDraft, isTrue);
-    expect(repo.summaryListenable.value.titlePreview, 'x');
-    expect(notifications, greaterThan(0));
-    final int afterFirstSave = notifications;
+      await repo.save(
+        draft: ReportDraft(title: 'x'),
+        title: 'x',
+        description: '',
+        lastPersistedAtMs: 1,
+      );
+      expect(repo.summaryListenable.value.hasDraft, isTrue);
+      expect(repo.summaryListenable.value.titlePreview, 'x');
+      expect(notifications, greaterThan(0));
+      final int afterFirstSave = notifications;
 
-    await repo.save(
-      draft: ReportDraft(title: 'x'),
-      title: 'x',
-      description: '',
-      lastPersistedAtMs: 1,
-    );
-    expect(notifications, afterFirstSave);
+      await repo.save(
+        draft: ReportDraft(title: 'x'),
+        title: 'x',
+        description: '',
+        lastPersistedAtMs: 1,
+      );
+      expect(notifications, afterFirstSave);
 
-    await repo.clear();
-    expect(repo.summaryListenable.value.hasDraft, isFalse);
-    expect(notifications, greaterThan(afterFirstSave));
+      await repo.clear();
+      expect(repo.summaryListenable.value.hasDraft, isFalse);
+      expect(notifications, greaterThan(afterFirstSave));
 
-    await repo.hydrate();
-    repo.summaryListenable.removeListener(onNotify);
+      await repo.hydrate();
+      repo.summaryListenable.removeListener(onNotify);
 
-    await db.close();
-    await tmp.delete(recursive: true);
-  });
+      await db.close();
+      await tmp.delete(recursive: true);
+    },
+  );
 }

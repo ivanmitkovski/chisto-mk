@@ -1,5 +1,4 @@
-import 'package:chisto_mobile/core/errors/app_error.dart';
-import 'package:chisto_mobile/features/auth/application/sign_up_controller.dart';
+import 'package:feature_auth/src/application/sign_up_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -14,11 +13,15 @@ void main() {
 
   test('signUp returns register result on success', () async {
     final ProviderContainer container = ProviderContainer(
-      overrides: AuthTestOverrides(authRepository: FakeAuthRepository()).build(),
+      overrides: AuthTestOverrides(
+        authRepository: FakeAuthRepository(),
+      ).build(),
     );
     addTearDown(container.dispose);
 
-    final result = await container.read(signUpControllerProvider.notifier).signUp(
+    final result = await container
+        .read(signUpControllerProvider.notifier)
+        .signUp(
           firstName: 'Test',
           lastName: 'User',
           email: 't@example.com',

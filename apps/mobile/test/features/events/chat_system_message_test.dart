@@ -1,6 +1,6 @@
-import 'package:chisto_mobile/features/events/data/chat/event_chat_message.dart';
-import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_system_message.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_events/src/data/chat/event_chat_message.dart';
+import 'package:feature_events/src/presentation/widgets/chat/chat_system_message.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -17,7 +17,7 @@ void main() {
       isDeleted: false,
       isOwnMessage: false,
       messageType: EventChatMessageType.system,
-      systemPayload: <String, dynamic>{
+      systemPayload: const <String, dynamic>{
         'action': 'user_joined',
         'displayName': 'Alex',
       },
@@ -32,9 +32,7 @@ void main() {
           GlobalCupertinoLocalizations.delegate,
         ],
         supportedLocales: AppLocalizations.supportedLocales,
-        home: Scaffold(
-          body: ChatSystemMessage(message: msg),
-        ),
+        home: Scaffold(body: ChatSystemMessage(message: msg)),
       ),
     );
 

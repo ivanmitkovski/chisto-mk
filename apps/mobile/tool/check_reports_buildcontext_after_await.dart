@@ -2,18 +2,18 @@
 
 import 'dart:io';
 
+import 'feature_roots_guard_util.dart';
+
 /// Windowed guard: after `await`, the next few non-comment lines must not use
 /// [BuildContext] helpers without an intervening `mounted` / `context.mounted` guard.
 int runBuildContextAfterAwaitCheck() {
-  final Directory root = Directory('lib/features/reports');
+  final Directory root = Directory(reportsPackageRoot);
   if (!root.existsSync()) {
     stderr.writeln('Run from apps/mobile');
     return 2;
   }
   final RegExp awaitRe = RegExp(r'\bawait\b');
-  final RegExp mountedGuard = RegExp(
-    r'\b(mounted|context\.mounted)\b',
-  );
+  final RegExp mountedGuard = RegExp(r'\b(mounted|context\.mounted)\b');
   final RegExp ctxUse = RegExp(
     r'\b(context\.|Navigator\.of\s*\(\s*context|ScaffoldMessenger\.of\s*\(\s*context|Theme\.of\s*\(\s*context|MediaQuery\.of\s*\(\s*context|Localizations\.of\s*\(\s*context)',
   );
@@ -45,9 +45,7 @@ int runBuildContextAfterAwaitCheck() {
     }
   }
   if (violations.isNotEmpty) {
-    stderr.writeln(
-      'BuildContext-after-await:\n${violations.join('\n')}',
-    );
+    stderr.writeln('BuildContext-after-await:\n${violations.join('\n')}');
     return 1;
   }
   stdout.writeln('OK: no BuildContext-after-await in reports.');

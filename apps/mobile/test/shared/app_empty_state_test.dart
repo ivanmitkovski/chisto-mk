@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/shared/widgets/molecules/app_empty_state.dart';
+import 'package:chisto_infrastructure/shared/widgets/molecules/app_empty_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -6,7 +6,7 @@ void main() {
   group('AppEmptyState', () {
     testWidgets('renders icon and title', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: AppEmptyState(
               icon: Icons.inbox_outlined,
@@ -22,7 +22,7 @@ void main() {
 
     testWidgets('renders subtitle when provided', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: AppEmptyState(
               icon: Icons.inbox_outlined,
@@ -37,8 +37,9 @@ void main() {
       expect(find.text('Add something to get started'), findsOneWidget);
     });
 
-    testWidgets('renders action widget when provided',
-        (WidgetTester tester) async {
+    testWidgets('renders action widget when provided', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -58,15 +59,13 @@ void main() {
       expect(find.byType(ElevatedButton), findsOneWidget);
     });
 
-    testWidgets('does not render subtitle when null',
-        (WidgetTester tester) async {
+    testWidgets('does not render subtitle when null', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
-            body: AppEmptyState(
-              icon: Icons.inbox_outlined,
-              title: 'No items',
-            ),
+            body: AppEmptyState(icon: Icons.inbox_outlined, title: 'No items'),
           ),
         ),
       );
@@ -75,15 +74,13 @@ void main() {
       expect(find.text('Add something to get started'), findsNothing);
     });
 
-    testWidgets('does not render action when null',
-        (WidgetTester tester) async {
+    testWidgets('does not render action when null', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
-            body: AppEmptyState(
-              icon: Icons.inbox_outlined,
-              title: 'No items',
-            ),
+            body: AppEmptyState(icon: Icons.inbox_outlined, title: 'No items'),
           ),
         ),
       );

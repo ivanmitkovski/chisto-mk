@@ -3,6 +3,7 @@
 import 'dart:io';
 
 import 'design_system_guard_util.dart';
+import 'feature_roots_guard_util.dart';
 
 final RegExp _magicInsets = RegExp(
   r'EdgeInsets\.(all|symmetric|only|fromLTRB)\s*\([^)]*\d',
@@ -10,7 +11,7 @@ final RegExp _magicInsets = RegExp(
 
 void main() {
   final List<String> hits = scanDartRoots(
-    roots: <String>['lib/features'],
+    roots: allFeatureLibRoots(),
     skipPathFragments: <String>[],
     matchesLine: (String line) {
       if (!line.contains('EdgeInsets') || line.contains('AppSpacing')) {
@@ -19,8 +20,8 @@ void main() {
       return _magicInsets.hasMatch(line);
     },
   )..sort();
-  File('tool/magic_edge_insets_allowlist.txt').writeAsStringSync(
-    '${hits.join('\n')}\n',
-  );
+  File(
+    'tool/magic_edge_insets_allowlist.txt',
+  ).writeAsStringSync('${hits.join('\n')}\n');
   print('wrote ${hits.length} allowlist entries');
 }

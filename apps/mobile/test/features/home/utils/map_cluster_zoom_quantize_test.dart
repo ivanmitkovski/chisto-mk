@@ -1,6 +1,5 @@
+import 'package:feature_home/src/presentation/utils/map_cluster_engine.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:chisto_mobile/features/home/presentation/utils/map_cluster_engine.dart';
 
 void main() {
   test('quantizeZoomForClusterRecompute snaps to fixed steps', () {

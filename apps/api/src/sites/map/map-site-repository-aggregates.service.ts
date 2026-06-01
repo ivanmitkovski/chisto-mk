@@ -5,6 +5,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { ListSitesMapQueryDto } from '../dto/list-sites-map-query.dto';
 import { MapQueryValidatorService } from './map-query-validator.service';
 import { resolveMapSiteBounds } from './map-site-repository-bounds.util';
+import { mapSiteVisibilitySql } from './map-site-visibility.helper';
 
 @Injectable()
 export class MapSiteRepositoryAggregatesService {
@@ -16,6 +17,7 @@ export class MapSiteRepositoryAggregatesService {
   async findClusters(
     query: ListSitesMapQueryDto,
     zoom: number,
+    viewerUserId?: string | null,
   ): Promise<
     Array<{
       clusterKey: string;
@@ -41,6 +43,10 @@ export class MapSiteRepositoryAggregatesService {
       : Prisma.sql`"Site"`;
 
     const idCol = flags.mapUseProjection ? Prisma.sql`"siteId"` : Prisma.sql`"id"`;
+    const visibilityFilter = mapSiteVisibilitySql({
+      siteIdSql: idCol,
+      viewerUserId,
+    });
     const usePostgis = flags.mapPostgisEnabled;
     const geoWhere = usePostgis
       ? Prisma.sql`ST_Intersects(
@@ -71,6 +77,7 @@ export class MapSiteRepositoryAggregatesService {
         ${hotProjectionFilter}
         ${statusFragment}
         ${archivedFilter}
+        ${visibilityFilter}
       GROUP BY 1
       ORDER BY "count" DESC
       LIMIT 400
@@ -80,6 +87,7 @@ export class MapSiteRepositoryAggregatesService {
   async findHeatmap(
     query: ListSitesMapQueryDto,
     zoom: number,
+    viewerUserId?: string | null,
   ): Promise<Array<{ cellKey: string; latitude: number; longitude: number; intensity: number }>> {
     const flags = loadFeatureFlags();
     const bucketDivisor = Math.max(10, Math.floor(30 - zoom));
@@ -93,6 +101,11 @@ export class MapSiteRepositoryAggregatesService {
     const table = flags.mapUseProjection
       ? Prisma.sql`"MapSiteProjection"`
       : Prisma.sql`"Site"`;
+    const idCol = flags.mapUseProjection ? Prisma.sql`"siteId"` : Prisma.sql`"id"`;
+    const visibilityFilter = mapSiteVisibilitySql({
+      siteIdSql: idCol,
+      viewerUserId,
+    });
 
     const usePostgis = flags.mapPostgisEnabled;
     const geoWhere = usePostgis
@@ -116,6 +129,7 @@ export class MapSiteRepositoryAggregatesService {
         ${hotProjectionFilter}
         ${statusFragment}
         ${archivedFilter}
+        ${visibilityFilter}
       GROUP BY 1
       ORDER BY "intensity" DESC
       LIMIT 1200

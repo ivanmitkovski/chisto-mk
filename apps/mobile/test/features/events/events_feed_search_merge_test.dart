@@ -1,7 +1,7 @@
-import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
-import 'package:chisto_mobile/features/events/domain/models/eco_event_filter.dart';
-import 'package:chisto_mobile/features/events/domain/models/eco_event_search_params.dart';
-import 'package:chisto_mobile/features/events/presentation/utils/events_feed_search_merge.dart';
+import 'package:feature_events/src/domain/models/eco_event.dart';
+import 'package:feature_events/src/domain/models/eco_event_filter.dart';
+import 'package:feature_events/src/domain/models/eco_event_search_params.dart';
+import 'package:feature_events/src/presentation/utils/events_feed_search_merge.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -28,22 +28,23 @@ void main() {
     const EcoEventSearchParams sheet = EcoEventSearchParams(
       statuses: <EcoEventStatus>{EcoEventStatus.completed},
     );
-    final EcoEventSearchParams merged =
-        EventsFeedSearchMerge.mergedForChip(sheet, EcoEventFilter.upcoming);
+    final EcoEventSearchParams merged = EventsFeedSearchMerge.mergedForChip(
+      sheet,
+      EcoEventFilter.upcoming,
+    );
     expect(merged.statuses, <EcoEventStatus>{EcoEventStatus.upcoming});
     expect(merged.categories, isEmpty);
   });
 
   test('mergedForChip past sets completed and cancelled', () {
     const EcoEventSearchParams sheet = EcoEventSearchParams();
-    final EcoEventSearchParams merged =
-        EventsFeedSearchMerge.mergedForChip(sheet, EcoEventFilter.past);
-    expect(
-      merged.statuses,
-      <EcoEventStatus>{
-        EcoEventStatus.completed,
-        EcoEventStatus.cancelled,
-      },
+    final EcoEventSearchParams merged = EventsFeedSearchMerge.mergedForChip(
+      sheet,
+      EcoEventFilter.past,
     );
+    expect(merged.statuses, <EcoEventStatus>{
+      EcoEventStatus.completed,
+      EcoEventStatus.cancelled,
+    });
   });
 }

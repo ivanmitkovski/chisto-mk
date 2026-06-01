@@ -1,21 +1,18 @@
-import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
-import '../../support/events/in_memory_events_store.dart';
-import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
-import 'package:chisto_mobile/features/events/presentation/screens/edit_event_sheet.dart';
-import 'package:chisto_mobile/features/events/presentation/screens/event_detail_screen.dart';
-import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/hero_image_bar.dart'
+import 'package:chisto_infrastructure/core/providers/events_providers.dart';
+import 'package:feature_events/src/domain/models/eco_event.dart';
+import 'package:feature_events/src/presentation/screens/edit_event_sheet.dart';
+import 'package:feature_events/src/presentation/screens/event_detail_screen.dart';
+import 'package:feature_events/src/presentation/widgets/event_detail/date_time_section.dart';
+import 'package:feature_events/src/presentation/widgets/event_detail/hero_image_bar.dart'
     show kEventDetailHeroChatKey, kEventDetailHeroEditKey;
-import 'package:chisto_mobile/features/events/presentation/widgets/event_detail_skeleton.dart';
-import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/date_time_section.dart';
-import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/title_section.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
+import 'package:feature_events/src/presentation/widgets/event_detail/title_section.dart';
+import 'package:feature_events/src/presentation/widgets/event_detail_skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../shared/widget_test_bootstrap.dart';
+import '../../support/events/in_memory_events_store.dart';
 
 void main() {
   late InMemoryEventsStore store;
@@ -27,7 +24,7 @@ void main() {
   setUp(() async {
     SharedPreferences.setMockInitialValues(<String, Object>{});
     store = InMemoryEventsStore.instance;
-    EventsRepositoryRegistry.setTestOverride(store);
+    setEventsRepositoryTestOverride(store);
     store.resetToSeed();
     store.loadInitialIfNeeded();
     await store.ready;
@@ -35,7 +32,7 @@ void main() {
 
   tearDown(() {
     store.simulateDetailPrefetchFailureOnForce = false;
-    EventsRepositoryRegistry.setTestOverride(null);
+    setEventsRepositoryTestOverride(null);
   });
 
   EcoEvent buildEvent({
@@ -100,11 +97,8 @@ void main() {
       await store.create(event);
 
       await tester.pumpWidget(
-        MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          locale: const Locale('en'),
-          home: EventDetailScreen(eventsRepository: store, eventId: event.id),
+        wrapForWidgetTest(
+          EventDetailScreen(eventsRepository: store, eventId: event.id),
         ),
       );
       await tester.pumpAndSettle();
@@ -127,11 +121,8 @@ void main() {
     await store.create(event);
 
     await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: EventDetailScreen(eventsRepository: store, eventId: event.id),
+      wrapForWidgetTest(
+        EventDetailScreen(eventsRepository: store, eventId: event.id),
       ),
     );
     await tester.pumpAndSettle();
@@ -152,11 +143,8 @@ void main() {
     await store.create(event);
 
     await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: EventDetailScreen(eventsRepository: store, eventId: event.id),
+      wrapForWidgetTest(
+        EventDetailScreen(eventsRepository: store, eventId: event.id),
       ),
     );
     await tester.pumpAndSettle();
@@ -177,11 +165,8 @@ void main() {
     await store.create(event);
 
     await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: EventDetailScreen(eventsRepository: store, eventId: event.id),
+      wrapForWidgetTest(
+        EventDetailScreen(eventsRepository: store, eventId: event.id),
       ),
     );
     await tester.pumpAndSettle();
@@ -199,11 +184,8 @@ void main() {
     await store.create(event);
 
     await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: EventDetailScreen(eventsRepository: store, eventId: event.id),
+      wrapForWidgetTest(
+        EventDetailScreen(eventsRepository: store, eventId: event.id),
       ),
     );
     await tester.pumpAndSettle();
@@ -226,11 +208,8 @@ void main() {
     await store.create(event);
 
     await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: EventDetailScreen(eventsRepository: store, eventId: event.id),
+      wrapForWidgetTest(
+        EventDetailScreen(eventsRepository: store, eventId: event.id),
       ),
     );
     await tester.pumpAndSettle();
@@ -258,11 +237,8 @@ void main() {
       await store.create(event);
 
       await tester.pumpWidget(
-        MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          locale: const Locale('en'),
-          home: EventDetailScreen(eventsRepository: store, eventId: event.id),
+        wrapForWidgetTest(
+          EventDetailScreen(eventsRepository: store, eventId: event.id),
         ),
       );
       await tester.pumpAndSettle();
@@ -289,11 +265,8 @@ void main() {
     await store.create(event);
 
     await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: EventDetailScreen(eventsRepository: store, eventId: event.id),
+      wrapForWidgetTest(
+        EventDetailScreen(eventsRepository: store, eventId: event.id),
       ),
     );
     await tester.pumpAndSettle();
@@ -319,11 +292,8 @@ void main() {
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: MediaQuery(
+      wrapForWidgetTest(
+        MediaQuery(
           data: const MediaQueryData(
             size: Size(400, 800),
             disableAnimations: true,
@@ -354,11 +324,8 @@ void main() {
     await store.create(event);
 
     await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: EventDetailScreen(eventsRepository: store, eventId: event.id),
+      wrapForWidgetTest(
+        EventDetailScreen(eventsRepository: store, eventId: event.id),
       ),
     );
     await tester.pumpAndSettle();
@@ -379,11 +346,8 @@ void main() {
     await store.create(event);
 
     await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: EventDetailScreen(eventsRepository: store, eventId: event.id),
+      wrapForWidgetTest(
+        EventDetailScreen(eventsRepository: store, eventId: event.id),
       ),
     );
     await tester.pumpAndSettle();
@@ -412,11 +376,8 @@ void main() {
     await store.create(event);
 
     await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: EventDetailScreen(eventsRepository: store, eventId: event.id),
+      wrapForWidgetTest(
+        EventDetailScreen(eventsRepository: store, eventId: event.id),
       ),
     );
     await tester.pumpAndSettle();
@@ -443,11 +404,8 @@ void main() {
     await store.create(event);
 
     await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: EventDetailScreen(eventsRepository: store, eventId: event.id),
+      wrapForWidgetTest(
+        EventDetailScreen(eventsRepository: store, eventId: event.id),
       ),
     );
     await tester.pumpAndSettle();
@@ -483,13 +441,10 @@ void main() {
     await store.create(event);
 
     await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: MediaQuery(
-          data: MediaQueryData(
-            size: const Size(400, 900),
+      wrapForWidgetTest(
+        MediaQuery(
+          data: const MediaQueryData(
+            size: Size(400, 900),
             textScaler: TextScaler.linear(1.45),
           ),
           child: EventDetailScreen(eventsRepository: store, eventId: event.id),
@@ -514,11 +469,8 @@ void main() {
     await store.create(event);
 
     await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: EventDetailScreen(eventsRepository: store, eventId: event.id),
+      wrapForWidgetTest(
+        EventDetailScreen(eventsRepository: store, eventId: event.id),
       ),
     );
     await tester.pumpAndSettle();
@@ -538,11 +490,8 @@ void main() {
       await store.create(event);
 
       await tester.pumpWidget(
-        MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          locale: const Locale('en'),
-          home: EventDetailScreen(eventsRepository: store, eventId: event.id),
+        wrapForWidgetTest(
+          EventDetailScreen(eventsRepository: store, eventId: event.id),
         ),
       );
       await tester.pumpAndSettle();
@@ -564,11 +513,8 @@ void main() {
       await store.create(event);
 
       await tester.pumpWidget(
-        MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          locale: const Locale('en'),
-          home: EventDetailScreen(eventsRepository: store, eventId: event.id),
+        wrapForWidgetTest(
+          EventDetailScreen(eventsRepository: store, eventId: event.id),
         ),
       );
       await tester.pumpAndSettle();
@@ -589,11 +535,8 @@ void main() {
     await store.create(event);
 
     await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: MediaQuery(
+      wrapForWidgetTest(
+        MediaQuery(
           data: const MediaQueryData(
             size: Size(400, 800),
             disableAnimations: true,
@@ -625,11 +568,8 @@ void main() {
     'rapid detail route replacement with thumbnail hero off does not throw',
     (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          locale: const Locale('en'),
-          home: EventDetailScreen(
+        wrapForWidgetTest(
+          EventDetailScreen(
             eventsRepository: store,
             eventId: 'evt-1',
             enableThumbnailHero: false,

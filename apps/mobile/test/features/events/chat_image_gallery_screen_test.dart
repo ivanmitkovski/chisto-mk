@@ -1,12 +1,14 @@
-import 'package:chisto_mobile/features/events/data/chat/event_chat_message.dart';
-import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_image_gallery_screen.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_events/src/data/chat/event_chat_message.dart';
+import 'package:feature_events/src/presentation/widgets/chat/chat_image_gallery_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('ChatImageGalleryScreen shows page indicator', (WidgetTester tester) async {
+  testWidgets('ChatImageGalleryScreen shows page indicator', (
+    WidgetTester tester,
+  ) async {
     const List<EventChatAttachment> attachments = <EventChatAttachment>[
       EventChatAttachment(
         id: '1',
@@ -25,19 +27,16 @@ void main() {
     ];
 
     await tester.pumpWidget(
-      MaterialApp(
-        locale: const Locale('en'),
-        localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
+      const MaterialApp(
+        locale: Locale('en'),
+        localizationsDelegates: <LocalizationsDelegate<dynamic>>[
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
         supportedLocales: AppLocalizations.supportedLocales,
-        home: const ChatImageGalleryScreen(
-          attachments: attachments,
-          initialIndex: 0,
-        ),
+        home: ChatImageGalleryScreen(attachments: attachments, initialIndex: 0),
       ),
     );
     await tester.pump();

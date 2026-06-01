@@ -1,11 +1,18 @@
-import 'package:chisto_mobile/core/navigation/app_routes.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/sign_in_screen.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/sign_up_screen.dart';
+import 'package:chisto_infrastructure/core/bootstrap/app_bootstrap.dart';
+import 'package:chisto_infrastructure/core/navigation/app_routes.dart';
+import 'package:chisto_infrastructure/shared/widgets/atoms/primary_button.dart';
+import 'package:feature_auth/src/presentation/screens/sign_in_screen.dart';
+import 'package:feature_auth/src/presentation/screens/sign_up_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+
 import '../../shared/pump_auth_app.dart';
 import '../../shared/widget_test_bootstrap.dart';
-import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'support/auth_test_helpers.dart';
+import 'support/fake_auth_repository.dart';
+
+final List<Override> _authTestOverrides = AuthTestOverrides().build();
 
 Finder _primaryCta(String label) {
   return find.byWidgetPredicate(
@@ -29,7 +36,7 @@ void main() {
     await pumpAuthWidget(
       tester,
       home: const SignInScreen(),
-      onGenerateRoute: AppRouter.onGenerateRoute,
+      overrides: _authTestOverrides,
     );
     await tester.pumpAndSettle();
 
@@ -45,7 +52,7 @@ void main() {
     await pumpAuthWidget(
       tester,
       home: const SignInScreen(),
-      onGenerateRoute: AppRouter.onGenerateRoute,
+      overrides: _authTestOverrides,
     );
     await tester.pumpAndSettle();
 
@@ -61,7 +68,7 @@ void main() {
     await pumpAuthWidget(
       tester,
       home: const SignInScreen(),
-      onGenerateRoute: AppRouter.onGenerateRoute,
+      overrides: _authTestOverrides,
     );
     await tester.pumpAndSettle();
 
@@ -75,29 +82,30 @@ void main() {
     expect(signInButton.onPressed, isNotNull);
   });
 
-  testWidgets('shows validation error text when form is submitted with invalid data', (
-    WidgetTester tester,
-  ) async {
-    await pumpAuthWidget(
-      tester,
-      home: const SignInScreen(),
-      onGenerateRoute: AppRouter.onGenerateRoute,
-    );
-    await tester.pumpAndSettle();
+  testWidgets(
+    'shows validation error text when form is submitted with invalid data',
+    (WidgetTester tester) async {
+      await pumpAuthWidget(
+        tester,
+        home: const SignInScreen(),
+        overrides: _authTestOverrides,
+      );
+      await tester.pumpAndSettle();
 
-    await tester.enterText(find.byType(TextFormField).first, '70123456');
-    await tester.enterText(find.byType(TextFormField).last, 'short');
-    await tester.pump();
+      await tester.enterText(find.byType(TextFormField).first, '70123456');
+      await tester.enterText(find.byType(TextFormField).last, 'short');
+      await tester.pump();
 
-    await tester.ensureVisible(_primaryCtaElevated('Sign in'));
-    await tester.tap(_primaryCtaElevated('Sign in'));
-    await tester.pumpAndSettle();
+      await tester.ensureVisible(_primaryCtaElevated('Sign in'));
+      await tester.tap(_primaryCtaElevated('Sign in'));
+      await tester.pumpAndSettle();
 
-    expect(
-      find.text('Please check your phone number and password.'),
-      findsOneWidget,
-    );
-  });
+      expect(
+        find.text('Please check your phone number and password.'),
+        findsOneWidget,
+      );
+    },
+  );
 
   testWidgets("Don't have an account? Sign Up link is present", (
     WidgetTester tester,
@@ -105,24 +113,18 @@ void main() {
     await pumpAuthWidget(
       tester,
       home: const SignInScreen(),
-      onGenerateRoute: AppRouter.onGenerateRoute,
+      overrides: _authTestOverrides,
     );
     await tester.pumpAndSettle();
 
-    expect(
-      find.textContaining('Sign up', findRichText: true),
-      findsOneWidget,
-    );
+    expect(find.textContaining('Sign up', findRichText: true), findsOneWidget);
   });
 
   testWidgets('tapping Sign Up link navigates to Sign Up screen', (
     WidgetTester tester,
   ) async {
-    await pumpAuthWidget(
-      tester,
-      home: const SignInScreen(),
-      onGenerateRoute: AppRouter.onGenerateRoute,
-    );
+    AppBootstrap.instance.overrideAuthRepositoryForTests(FakeAuthRepository());
+    await pumpAppRouter(tester, initialLocation: AppRoutes.signIn);
     await tester.pumpAndSettle();
 
     await tester.tap(find.textContaining('Sign up', findRichText: true));

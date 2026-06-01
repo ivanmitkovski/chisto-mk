@@ -146,11 +146,17 @@ export class SitesController {
 
   @Idempotent('sites_sites_144')
   @Post('search')
-  @UseGuards(MapRateLimitGuard)
+  @UseGuards(MapRateLimitGuard, OptionalJwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Search sites for map (text + optional geo intent)' })
   @ApiOkResponse({ description: 'Search results' })
-  async searchSitesForMap(@Body() dto: SiteMapSearchDto) {
-    return this.sitesMapFacade.searchMapSites(dto);
+  async searchSitesForMap(
+    @Body() dto: SiteMapSearchDto,
+    @CurrentUser() user?: AuthenticatedUser,
+  ) {
+    return this.sitesMapFacade.searchMapSites(dto, {
+      viewerUserId: user?.userId ?? null,
+    });
   }
 
   @Idempotent('sites_sites_152')

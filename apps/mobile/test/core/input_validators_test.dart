@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/core/validation/input_validators.dart';
+import 'package:chisto_infrastructure/core/validation/input_validators.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -58,7 +58,9 @@ void main() {
           equals('Enter a valid phone number'),
         );
         expect(
-          InputValidators.validatePhone('123456789012345678'), // too long (> 17)
+          InputValidators.validatePhone(
+            '123456789012345678',
+          ), // too long (> 17)
           equals('Enter a valid phone number'),
         );
       });
@@ -76,10 +78,7 @@ void main() {
           InputValidators.validateEmail(null),
           equals('Email is required'),
         );
-        expect(
-          InputValidators.validateEmail(''),
-          equals('Email is required'),
-        );
+        expect(InputValidators.validateEmail(''), equals('Email is required'));
         expect(
           InputValidators.validateEmail('   '),
           equals('Email is required'),

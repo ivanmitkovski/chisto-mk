@@ -1,16 +1,17 @@
 import 'dart:io';
 
-import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
-import 'package:chisto_mobile/features/reports/application/report_wizard_submit_port.dart';
-import 'package:chisto_mobile/features/reports/data/outbox/report_draft_photo_store.dart';
-import 'package:chisto_mobile/features/reports/data/outbox/report_draft_repository.dart';
-import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_database.dart';
-import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_entry.dart';
-import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_repository.dart';
-import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
-import 'package:chisto_mobile/features/reports/presentation/controllers/new_report_controller.dart';
-import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_stage.dart';
-import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/resume_with_incoming_photo_dialog.dart';
+import 'package:chisto_infrastructure/core/bootstrap/app_bootstrap.dart';
+import 'package:feature_reports/src/application/report_wizard_submit_port.dart';
+import 'package:feature_reports/src/application/reports_providers.dart';
+import 'package:feature_reports/src/data/outbox/report_draft_photo_store.dart';
+import 'package:feature_reports/src/data/outbox/report_draft_repository.dart';
+import 'package:feature_reports/src/data/outbox/report_outbox_database.dart';
+import 'package:feature_reports/src/data/outbox/report_outbox_entry.dart';
+import 'package:feature_reports/src/data/outbox/report_outbox_repository.dart';
+import 'package:feature_reports/src/presentation/controllers/new_report_controller.dart';
+import 'package:feature_reports/src/presentation/widgets/new_report/report_stage.dart';
+import 'package:feature_reports/src/presentation/widgets/new_report/resume_with_incoming_photo_dialog.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
@@ -68,6 +69,30 @@ CREATE TABLE ${ReportOutboxDatabase.tableOutbox} (
   );
 }
 
+NewReportController _createTestController({
+  required ProviderContainer container,
+  XFile? initialPhoto,
+}) {
+  container.listen(newReportControllerProvider(initialPhoto), (_, __) {});
+  return container.read(newReportControllerProvider(initialPhoto).notifier);
+}
+
+ProviderContainer _testContainer(ReportDraftRepository draftRepo) {
+  return ProviderContainer(
+    overrides: <Override>[
+      reportDraftRepositoryProvider.overrideWithValue(draftRepo),
+      reportsApiRepositoryProvider.overrideWithValue(
+        AppBootstrap.instance.reportsApiRepository,
+      ),
+      reportWizardSubmitPortProvider.overrideWithValue(
+        ReportWizardSubmitPortImpl(
+          AppBootstrap.instance.reportOutboxCoordinator,
+        ),
+      ),
+    ],
+  );
+}
+
 void main() {
   setUpAll(() async {
     await bootstrapWidgetTests();
@@ -82,75 +107,69 @@ void main() {
         rootOverride: Directory(p.join(tmp.path, 'ph')),
       ),
     );
-    final NewReportController c = NewReportController(
-      draftRepository: draftRepo,
-      reportsApiRepository: AppBootstrap.instance.reportsApiRepository,
-      reportSubmitPort: ReportWizardSubmitPortImpl(
-        AppBootstrap.instance.reportOutboxCoordinator,
-      ),
-    );
+    final ProviderContainer container = _testContainer(draftRepo);
+    addTearDown(container.dispose);
+    final NewReportController c = _createTestController(container: container);
     c.updateTitle('deb');
     c.scheduleAutosave(titleText: 'deb', descriptionText: '');
     await Future<void>.delayed(const Duration(milliseconds: 400));
-    final ReportOutboxEntry? row =
-        await SqfliteReportOutboxRepository(db).getWizardDraftEntry();
+    final ReportOutboxEntry? row = await SqfliteReportOutboxRepository(
+      db,
+    ).getWizardDraftEntry();
     expect(row?.title, 'deb');
-    c.dispose();
     await db.close();
     await tmp.delete(recursive: true);
   });
 
-  test('restoreSavedDraft restores stage and flush after removePhoto', () async {
-    final Directory tmp = await Directory.systemTemp.createTemp('nr_ctrl2_');
-    final Database db = await _openTestDbIn(tmp, 'c.db');
-    final SqfliteReportOutboxRepository outbox = SqfliteReportOutboxRepository(db);
-    final ReportDraftRepository draftRepo = ReportDraftRepository(
-      outbox: outbox,
-      photoStore: ReportDraftPhotoStore(
-        rootOverride: Directory(p.join(tmp.path, 'ph')),
-      ),
-    );
+  test(
+    'restoreSavedDraft restores stage and flush after removePhoto',
+    () async {
+      final Directory tmp = await Directory.systemTemp.createTemp('nr_ctrl2_');
+      final Database db = await _openTestDbIn(tmp, 'c.db');
+      final SqfliteReportOutboxRepository outbox =
+          SqfliteReportOutboxRepository(db);
+      final ReportDraftRepository draftRepo = ReportDraftRepository(
+        outbox: outbox,
+        photoStore: ReportDraftPhotoStore(
+          rootOverride: Directory(p.join(tmp.path, 'ph')),
+        ),
+      );
 
-    final File f1 = File(p.join(tmp.path, 'p1.jpg'))..writeAsBytes(<int>[1]);
-    final File f2 = File(p.join(tmp.path, 'p2.jpg'))..writeAsBytes(<int>[2]);
-    final NewReportController c = NewReportController(
-      draftRepository: draftRepo,
-      reportsApiRepository: AppBootstrap.instance.reportsApiRepository,
-      reportSubmitPort: ReportWizardSubmitPortImpl(
-        AppBootstrap.instance.reportOutboxCoordinator,
-      ),
-    );
-    await c.addPhoto(XFile(f1.path));
-    await c.addPhoto(XFile(f2.path));
-    c.goToStage(ReportStage.details, unfocusFirst: false);
-    c.markStageAttempted(ReportStage.evidence);
-    await c.flushPendingPersist(titleText: 't', descriptionText: '');
-    c.dispose();
+      final File f1 = File(p.join(tmp.path, 'p1.jpg'))..writeAsBytes(<int>[1]);
+      final File f2 = File(p.join(tmp.path, 'p2.jpg'))..writeAsBytes(<int>[2]);
+      final ProviderContainer container1 = _testContainer(draftRepo);
+      addTearDown(container1.dispose);
+      final NewReportController c = _createTestController(
+        container: container1,
+      );
+      await c.addPhoto(XFile(f1.path));
+      await c.addPhoto(XFile(f2.path));
+      c.goToStage(ReportStage.details, unfocusFirst: false);
+      c.markStageAttempted(ReportStage.evidence);
+      await c.flushPendingPersist(titleText: 't', descriptionText: '');
 
-    final NewReportController c2 = NewReportController(
-      draftRepository: draftRepo,
-      reportsApiRepository: AppBootstrap.instance.reportsApiRepository,
-      reportSubmitPort: ReportWizardSubmitPortImpl(
-        AppBootstrap.instance.reportOutboxCoordinator,
-      ),
-    );
-    final ReportDraftLoadResult r = await c2.restoreSavedDraft();
-    expect(r.kind, ReportDraftRestoreKind.restored);
-    expect(c2.currentStage, ReportStage.details);
+      final ProviderContainer container2 = _testContainer(draftRepo);
+      addTearDown(container2.dispose);
+      final NewReportController c2 = _createTestController(
+        container: container2,
+      );
+      final ReportDraftLoadResult r = await c2.restoreSavedDraft();
+      expect(r.kind, ReportDraftRestoreKind.restored);
+      expect(c2.currentStage, ReportStage.details);
 
-    await c2.removePhoto(0);
-    await c2.flushPendingPersist(titleText: '', descriptionText: '');
-    final ReportOutboxEntry? row = await outbox.getWizardDraftEntry();
-    expect(row?.draft.photos.length, 1);
+      await c2.removePhoto(0);
+      await c2.flushPendingPersist(titleText: '', descriptionText: '');
+      final ReportOutboxEntry? row = await outbox.getWizardDraftEntry();
+      expect(row?.draft.photos.length, 1);
 
-    await c2.discardDraft();
-    final ReportDraftLoadResult cleared = await draftRepo.loadDraft();
-    expect(cleared.hasDraft, isFalse);
+      await c2.discardDraft();
+      final ReportDraftLoadResult cleared = await draftRepo.loadDraft();
+      expect(cleared.hasDraft, isFalse);
 
-    c2.dispose();
-    await db.close();
-    await tmp.delete(recursive: true);
-  });
+      await db.close();
+      await tmp.delete(recursive: true);
+    },
+  );
 
   test('initial photo is deferred until seedInitialPhotoFromPending', () async {
     final Directory tmp = await Directory.systemTemp.createTemp('nr_ctrl3_');
@@ -162,18 +181,15 @@ void main() {
       ),
     );
     final File f = File(p.join(tmp.path, 'cam.jpg'))..writeAsBytes(<int>[9]);
-    final NewReportController c = NewReportController(
-      draftRepository: draftRepo,
-      reportsApiRepository: AppBootstrap.instance.reportsApiRepository,
-      reportSubmitPort: ReportWizardSubmitPortImpl(
-        AppBootstrap.instance.reportOutboxCoordinator,
-      ),
+    final ProviderContainer container = _testContainer(draftRepo);
+    addTearDown(container.dispose);
+    final NewReportController c = _createTestController(
+      container: container,
       initialPhoto: XFile(f.path),
     );
     expect(c.draft.photos, isEmpty);
     await c.seedInitialPhotoFromPending();
     expect(c.draft.photos.length, 1);
-    c.dispose();
     await db.close();
     await tmp.delete(recursive: true);
   });
@@ -181,37 +197,34 @@ void main() {
   test('resolveIncomingPhotoMerge replace clears then seeds photo', () async {
     final Directory tmp = await Directory.systemTemp.createTemp('nr_ctrl4_');
     final Database db = await _openTestDbIn(tmp, 'c.db');
-    final SqfliteReportOutboxRepository outbox = SqfliteReportOutboxRepository(db);
+    final SqfliteReportOutboxRepository outbox = SqfliteReportOutboxRepository(
+      db,
+    );
     final ReportDraftRepository draftRepo = ReportDraftRepository(
       outbox: outbox,
       photoStore: ReportDraftPhotoStore(
         rootOverride: Directory(p.join(tmp.path, 'ph')),
       ),
     );
-    final NewReportController seed = NewReportController(
-      draftRepository: draftRepo,
-      reportsApiRepository: AppBootstrap.instance.reportsApiRepository,
-      reportSubmitPort: ReportWizardSubmitPortImpl(
-        AppBootstrap.instance.reportOutboxCoordinator,
-      ),
+    final ProviderContainer seedContainer = _testContainer(draftRepo);
+    addTearDown(seedContainer.dispose);
+    final NewReportController seed = _createTestController(
+      container: seedContainer,
     );
     seed.updateTitle('old');
     await seed.flushPendingPersist(titleText: 'old', descriptionText: '');
-    seed.dispose();
 
-    final File incoming = File(p.join(tmp.path, 'new.jpg'))..writeAsBytes(<int>[8]);
-    final NewReportController c = NewReportController(
-      draftRepository: draftRepo,
-      reportsApiRepository: AppBootstrap.instance.reportsApiRepository,
-      reportSubmitPort: ReportWizardSubmitPortImpl(
-        AppBootstrap.instance.reportOutboxCoordinator,
-      ),
+    final File incoming = File(p.join(tmp.path, 'new.jpg'))
+      ..writeAsBytes(<int>[8]);
+    final ProviderContainer container = _testContainer(draftRepo);
+    addTearDown(container.dispose);
+    final NewReportController c = _createTestController(
+      container: container,
       initialPhoto: XFile(incoming.path),
     );
     await c.resolveIncomingPhotoMerge(ResumeWithIncomingChoice.replaceDraft);
     expect(c.draft.title, '');
     expect(c.draft.photos.length, 1);
-    c.dispose();
     await db.close();
     await tmp.delete(recursive: true);
   });

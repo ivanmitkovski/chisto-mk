@@ -1,6 +1,5 @@
+import 'package:feature_home/src/domain/models/pollution_site.dart';
 import 'package:flutter/material.dart';
-
-import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 
 PollutionSite buildTestPollutionSite({
   required String id,

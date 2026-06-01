@@ -1,11 +1,10 @@
-import 'package:chisto_mobile/core/theme/app_spacing.dart';
-import 'package:chisto_mobile/features/home/domain/models/site_history_entry.dart';
-import 'package:chisto_mobile/features/home/presentation/widgets/site_detail/history/site_history_empty_state.dart';
-import 'package:chisto_mobile/features/home/presentation/widgets/site_detail/history/site_history_grouped_panel.dart';
-import 'package:chisto_mobile/features/home/presentation/widgets/site_detail/history/site_history_list_tile.dart';
-import 'package:chisto_mobile/features/home/presentation/widgets/site_detail/history/site_history_skeleton.dart';
-import 'package:chisto_mobile/features/home/presentation/widgets/site_detail/history/site_history_status_header.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:design_system/design_system.dart';
+import 'package:feature_home/src/domain/models/site_history_entry.dart';
+import 'package:feature_home/src/presentation/widgets/site_detail/history/site_history_empty_state.dart';
+import 'package:feature_home/src/presentation/widgets/site_detail/history/site_history_skeleton.dart';
+import 'package:feature_home/src/presentation/widgets/site_detail/history/site_history_status_header.dart';
+import 'package:feature_home/src/presentation/widgets/site_detail/history/site_history_timeline_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -33,7 +32,7 @@ void main() {
         home: MediaQuery(
           data: MediaQueryData(
             size: size,
-            devicePixelRatio: 1.0,
+            devicePixelRatio: 1,
             textScaler: TextScaler.noScaling,
             disableAnimations: true,
           ),
@@ -64,36 +63,37 @@ void main() {
         padding: const EdgeInsets.all(AppSpacing.lg),
         children: <Widget>[
           SiteHistoryStatusHeader(
-            site: buildTestPollutionSite(
-              id: 'golden',
-              statusCode: 'VERIFIED',
+            site: buildTestPollutionSite(id: 'golden', statusCode: 'VERIFIED'),
+            summary: SiteHistorySummary(
+              totalEntries: 2,
+              reportCount: 1,
+              cleanupCount: 1,
+              currentStatus: 'VERIFIED',
+              firstActivityAt: now.subtract(const Duration(days: 30)),
+              lastActivityAt: now,
             ),
             entryCount: 2,
             mostRecentEntryAt: now,
           ),
           const SizedBox(height: AppSpacing.lg),
-          SiteHistoryGroupedPanel(
-            child: Column(
-              children: <Widget>[
-                SiteHistoryListTile(
-                  entry: SiteHistoryEntry(
-                    id: 'g1',
-                    kind: SiteHistoryEntryKind.siteCreated,
-                    occurredAt: now.subtract(const Duration(days: 2)),
-                  ),
-                  showDividerBelow: true,
-                ),
-                SiteHistoryListTile(
-                  entry: SiteHistoryEntry(
-                    id: 'g2',
-                    kind: SiteHistoryEntryKind.cleanupEventScheduled,
-                    occurredAt: now.subtract(const Duration(days: 2)),
-                    cleanupEventId: 'evt-1',
-                  ),
-                  showDividerBelow: false,
-                ),
-              ],
+          SiteHistoryTimelineTile(
+            entry: SiteHistoryEntry(
+              id: 'g1',
+              kind: SiteHistoryEntryKind.siteCreated,
+              occurredAt: now.subtract(const Duration(days: 2)),
             ),
+            showLineAbove: false,
+            showLineBelow: true,
+          ),
+          SiteHistoryTimelineTile(
+            entry: SiteHistoryEntry(
+              id: 'g2',
+              kind: SiteHistoryEntryKind.cleanupEventScheduled,
+              occurredAt: now.subtract(const Duration(days: 2)),
+              cleanupEventId: 'evt-1',
+            ),
+            showLineAbove: true,
+            showLineBelow: false,
           ),
         ],
       ),
@@ -105,7 +105,11 @@ void main() {
   });
 
   testWidgets('SiteHistorySkeleton golden', (WidgetTester tester) async {
-    await pumpGolden(tester, const SiteHistorySkeleton());
+    await pumpGolden(
+      tester,
+      const SizedBox(height: 520, child: SiteHistorySkeleton()),
+      size: const Size(390, 520),
+    );
     await expectLater(
       find.byType(SiteHistorySkeleton),
       matchesGoldenFile('__goldens__/site_history_skeleton_en.png'),

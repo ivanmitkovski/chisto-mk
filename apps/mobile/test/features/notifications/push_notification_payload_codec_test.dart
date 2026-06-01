@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/features/notifications/data/push_notification_service.dart';
+import 'package:feature_notifications/src/data/push_notification_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
