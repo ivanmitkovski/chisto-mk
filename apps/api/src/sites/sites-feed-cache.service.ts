@@ -30,6 +30,7 @@ export class SitesFeedCacheService {
       query.lat?.toFixed(4) ?? '',
       query.lng?.toFixed(4) ?? '',
       query.radiusKm,
+      query.scope,
       query.cursor ?? '',
       query.explain ? 1 : 0,
     ].join('|');

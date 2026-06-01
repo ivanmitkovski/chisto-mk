@@ -6,23 +6,17 @@ export type PublicReporterView = {
   isSelf: boolean;
 };
 
-/** Redact reporter identity for public site detail (non-moderator). */
+/** Full reporter name for site detail (reporter row, hero, co-reporters). */
 export function projectPublicReporter(
   reporter: { userId: string; firstName: string; lastName: string } | null,
   viewer: AuthenticatedUser | undefined,
-  isModerator: boolean,
+  _isModerator: boolean,
 ): PublicReporterView | null {
   if (!reporter) return null;
-  if (isModerator || viewer?.userId === reporter.userId) {
-    return {
-      displayLabel: `${reporter.firstName} ${reporter.lastName}`.trim(),
-      isSelf: viewer?.userId === reporter.userId,
-    };
-  }
-  const initial = reporter.firstName.trim().charAt(0) || '?';
+  const fullName = `${reporter.firstName} ${reporter.lastName}`.trim();
   return {
-    displayLabel: `${initial}.`,
-    isSelf: false,
+    displayLabel: fullName.length > 0 ? fullName : 'Anonymous',
+    isSelf: viewer?.userId === reporter.userId,
   };
 }
 

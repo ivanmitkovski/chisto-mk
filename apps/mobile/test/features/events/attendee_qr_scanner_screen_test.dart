@@ -1,19 +1,20 @@
-import 'package:chisto_mobile/features/events/data/check_in_repository_registry.dart';
-import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
-import '../../support/events/in_memory_check_in_repository.dart';
-import '../../support/events/in_memory_events_store.dart';
-import 'package:chisto_mobile/features/events/domain/models/check_in_payload.dart';
-import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
-import 'package:chisto_mobile/features/events/domain/repositories/check_in_repository.dart';
-import 'package:chisto_mobile/features/events/presentation/screens/attendee_qr_scanner_screen.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/core/providers/events_providers.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_events/src/domain/models/check_in_payload.dart';
+import 'package:feature_events/src/domain/models/eco_event.dart';
+import 'package:feature_events/src/domain/repositories/check_in_repository.dart';
+import 'package:feature_events/src/presentation/screens/attendee_qr_scanner_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class _RateLimitedCheckInRepository extends ChangeNotifier implements CheckInRepository {
+import '../../support/events/in_memory_check_in_repository.dart';
+import '../../support/events/in_memory_events_store.dart';
+
+class _RateLimitedCheckInRepository extends ChangeNotifier
+    implements CheckInRepository {
   @override
   Duration get payloadTtl => const Duration(seconds: 60);
 
@@ -27,8 +28,7 @@ class _RateLimitedCheckInRepository extends ChangeNotifier implements CheckInRep
   Future<String> ensureSession({
     required EcoEvent event,
     bool openIfNeeded = true,
-  }) async =>
-      '';
+  }) async => '';
 
   @override
   Future<CheckInQrPayload> issuePayload({required String eventId}) async {
@@ -52,15 +52,13 @@ class _RateLimitedCheckInRepository extends ChangeNotifier implements CheckInRep
     required String eventId,
     required String attendeeId,
     required String attendeeName,
-  }) async =>
-      const ManualCheckInResult(recorded: false);
+  }) async => const ManualCheckInResult(recorded: false);
 
   @override
   Future<bool> removeCheckedInAttendee({
     required String eventId,
     required String attendeeId,
-  }) async =>
-      false;
+  }) async => false;
 
   @override
   Future<bool> pauseSession(String eventId) async => false;
@@ -88,7 +86,8 @@ class _RateLimitedCheckInRepository extends ChangeNotifier implements CheckInRep
   }) async => 'expired';
 
   @override
-  List<CheckedInAttendee> checkedInAttendees(String eventId) => <CheckedInAttendee>[];
+  List<CheckedInAttendee> checkedInAttendees(String eventId) =>
+      <CheckedInAttendee>[];
 
   @override
   int checkedInCount(String eventId) => 0;
@@ -120,7 +119,7 @@ void main() {
   setUp(() async {
     SharedPreferences.setMockInitialValues(<String, Object>{});
     eventsStore = InMemoryEventsStore.instance;
-    EventsRepositoryRegistry.setTestOverride(eventsStore);
+    setEventsRepositoryTestOverride(eventsStore);
     checkInRepository = InMemoryCheckInRepository.instance;
     checkInRepository.reset();
     eventsStore.resetToSeed();
@@ -146,12 +145,12 @@ void main() {
     );
     await eventsStore.create(event);
     await checkInRepository.ensureSession(event: event);
-    CheckInRepositoryRegistry.setTestOverride(checkInRepository);
+    setCheckInRepositoryTestOverride(checkInRepository);
   });
 
   tearDown(() {
-    EventsRepositoryRegistry.setTestOverride(null);
-    CheckInRepositoryRegistry.setTestOverride(null);
+    setEventsRepositoryTestOverride(null);
+    setCheckInRepositoryTestOverride(null);
   });
 
   testWidgets('camera error layer shows permission-blocked guidance in English', (
@@ -184,27 +183,33 @@ void main() {
       findsOneWidget,
     );
 
-    final SemanticsNode retryNode = tester.getSemantics(find.text('Retry camera'));
+    final SemanticsNode retryNode = tester.getSemantics(
+      find.text('Retry camera'),
+    );
     expect(retryNode.getSemanticsData().hasAction(SemanticsAction.tap), isTrue);
     expect(retryNode.label, 'Retry camera');
   });
 
-  testWidgets('simulated valid scan shows checked-in success', (WidgetTester tester) async {
-    final CheckInQrPayload payload =
-        await checkInRepository.issuePayload(eventId: event.id);
+  testWidgets('simulated valid scan shows checked-in success', (
+    WidgetTester tester,
+  ) async {
+    final CheckInQrPayload payload = await checkInRepository.issuePayload(
+      eventId: event.id,
+    );
 
     await tester.pumpWidget(
       _appWithReduceMotion(
         AttendeeQrScannerScreen(
           eventId: event.id,
-          scannerTestSlotBuilder: (BuildContext context, void Function(String) simulate) {
-            return Center(
-              child: TextButton(
-                onPressed: () => simulate(payload.encode()),
-                child: const Text('simulate_scan'),
-              ),
-            );
-          },
+          scannerTestSlotBuilder:
+              (BuildContext context, void Function(String) simulate) {
+                return Center(
+                  child: TextButton(
+                    onPressed: () => simulate(payload.encode()),
+                    child: const Text('simulate_scan'),
+                  ),
+                );
+              },
         ),
       ),
     );
@@ -217,22 +222,26 @@ void main() {
     expect(find.textContaining('QR widget test event'), findsOneWidget);
   });
 
-  testWidgets('wrong-event QR shows localized error', (WidgetTester tester) async {
-    final CheckInQrPayload payload =
-        await checkInRepository.issuePayload(eventId: event.id);
+  testWidgets('wrong-event QR shows localized error', (
+    WidgetTester tester,
+  ) async {
+    final CheckInQrPayload payload = await checkInRepository.issuePayload(
+      eventId: event.id,
+    );
 
     await tester.pumpWidget(
       _appWithReduceMotion(
         AttendeeQrScannerScreen(
           eventId: 'other-event-id',
-          scannerTestSlotBuilder: (BuildContext context, void Function(String) simulate) {
-            return Center(
-              child: TextButton(
-                onPressed: () => simulate(payload.encode()),
-                child: const Text('simulate_scan'),
-              ),
-            );
-          },
+          scannerTestSlotBuilder:
+              (BuildContext context, void Function(String) simulate) {
+                return Center(
+                  child: TextButton(
+                    onPressed: () => simulate(payload.encode()),
+                    child: const Text('simulate_scan'),
+                  ),
+                );
+              },
         ),
       ),
     );
@@ -244,19 +253,22 @@ void main() {
     expect(find.text('This QR belongs to another event.'), findsOneWidget);
   });
 
-  testWidgets('invalid payload shows invalid format error', (WidgetTester tester) async {
+  testWidgets('invalid payload shows invalid format error', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       _appWithReduceMotion(
         AttendeeQrScannerScreen(
           eventId: event.id,
-          scannerTestSlotBuilder: (BuildContext context, void Function(String) simulate) {
-            return Center(
-              child: TextButton(
-                onPressed: () => simulate('not-a-check-in-payload'),
-                child: const Text('simulate_scan'),
-              ),
-            );
-          },
+          scannerTestSlotBuilder:
+              (BuildContext context, void Function(String) simulate) {
+                return Center(
+                  child: TextButton(
+                    onPressed: () => simulate('not-a-check-in-payload'),
+                    child: const Text('simulate_scan'),
+                  ),
+                );
+              },
         ),
       ),
     );
@@ -268,21 +280,24 @@ void main() {
     expect(find.text('Invalid QR format.'), findsOneWidget);
   });
 
-  testWidgets('rate limited submission shows rate limit copy', (WidgetTester tester) async {
-    CheckInRepositoryRegistry.setTestOverride(_RateLimitedCheckInRepository());
+  testWidgets('rate limited submission shows rate limit copy', (
+    WidgetTester tester,
+  ) async {
+    setCheckInRepositoryTestOverride(_RateLimitedCheckInRepository());
 
     await tester.pumpWidget(
       _appWithReduceMotion(
         AttendeeQrScannerScreen(
           eventId: event.id,
-          scannerTestSlotBuilder: (BuildContext context, void Function(String) simulate) {
-            return Center(
-              child: TextButton(
-                onPressed: () => simulate('chisto:evt:v1:x:y:1:1'),
-                child: const Text('simulate_scan'),
-              ),
-            );
-          },
+          scannerTestSlotBuilder:
+              (BuildContext context, void Function(String) simulate) {
+                return Center(
+                  child: TextButton(
+                    onPressed: () => simulate('chisto:evt:v1:x:y:1:1'),
+                    child: const Text('simulate_scan'),
+                  ),
+                );
+              },
         ),
       ),
     );

@@ -1,11 +1,10 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:feature_home/src/domain/models/pollution_site.dart';
+import 'package:feature_home/src/presentation/providers/map_camera_notifier.dart';
+import 'package:feature_home/src/presentation/providers/map_clusters_provider.dart';
+import 'package:feature_home/src/presentation/providers/map_derived_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
-
-import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
-import 'package:chisto_mobile/features/home/presentation/providers/map_camera_notifier.dart';
-import 'package:chisto_mobile/features/home/presentation/providers/map_clusters_provider.dart';
-import 'package:chisto_mobile/features/home/presentation/providers/map_derived_providers.dart';
 
 import '../support/settle_map_cluster_zoom.dart';
 import '../support/test_pollution_site.dart';
@@ -87,5 +86,32 @@ void main() {
     final clusters = await container.read(mapClustersProvider.future);
     expect(clusters.length, 2);
     expect(clusters.every((bucket) => bucket.sites.length == 1), isTrue);
+  });
+
+  test('pan alone does not change cluster computation key', () async {
+    final siteA = buildTestPollutionSite(
+      id: 'a',
+      latitude: 41.60,
+      longitude: 21.70,
+    );
+    final ProviderContainer container = ProviderContainer(
+      overrides: <Override>[
+        mapFilteredSitesProvider.overrideWithValue(<PollutionSite>[siteA]),
+        mapSiteCoordinatesProvider.overrideWithValue(<String, LatLng>{
+          'a': const LatLng(41.60, 21.70),
+        }),
+      ],
+    );
+    addTearDown(container.dispose);
+    container
+        .read(mapCameraNotifierProvider.notifier)
+        .setCamera(centerLat: 41.6, centerLng: 21.7, zoom: 15);
+    await settleMapClusterEffectiveZoom(container, 15);
+    final int keyBefore = container.read(mapClusterComputationKeyProvider);
+    container
+        .read(mapCameraNotifierProvider.notifier)
+        .setCamera(centerLat: 42.0, centerLng: 22.0, zoom: 15);
+    final int keyAfterPan = container.read(mapClusterComputationKeyProvider);
+    expect(keyAfterPan, keyBefore);
   });
 }

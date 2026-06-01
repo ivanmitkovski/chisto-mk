@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/core/config/app_config.dart';
+import 'package:chisto_infrastructure/core/config/app_config.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -40,6 +40,36 @@ void main() {
       final config = AppConfig.fromEnvironment();
       expect(config, equals(AppConfig.dev));
       expect(config.environment, equals(AppEnvironment.dev));
+    });
+
+    test('assertReleaseTransportSecurity accepts HTTPS custom domain', () {
+      expect(
+        () => AppConfig.assertReleaseTransportSecurity('https://api.chisto.mk'),
+        returnsNormally,
+      );
+    });
+
+    test('assertReleaseTransportSecurity rejects HTTP', () {
+      expect(
+        () => AppConfig.assertReleaseTransportSecurity('http://api.chisto.mk'),
+        throwsStateError,
+      );
+    });
+
+    test('assertReleaseTransportSecurity rejects raw ELB hostname', () {
+      expect(
+        () => AppConfig.assertReleaseTransportSecurity(
+          'https://chisto-dev-alb-123.eu-central-1.elb.amazonaws.com',
+        ),
+        throwsStateError,
+      );
+    });
+
+    test('prod config passes transport security validation', () {
+      expect(
+        AppConfig.prod.assertTransportSecurityForEnvironment,
+        returnsNormally,
+      );
     });
   });
 }

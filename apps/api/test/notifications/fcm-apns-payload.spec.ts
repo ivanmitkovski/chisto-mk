@@ -39,6 +39,16 @@ describe('fcm-apns-payload', () => {
     expect(apns.payload.aps['interruption-level']).toBe('active');
   });
 
+  it('uses time-sensitive interruption for admin test_push kind', () => {
+    const apns = buildApnsConfig({
+      title: 'Chisto test push',
+      body: 'If you see this, push delivery is working.',
+      badge: 1,
+      data: { type: 'SYSTEM', notificationType: 'SYSTEM', kind: 'test_push' },
+    });
+    expect(apns.payload.aps['interruption-level']).toBe('time-sensitive');
+  });
+
   it('uses background push type for badge_sync', () => {
     const apns = buildApnsConfig({
       title: '',

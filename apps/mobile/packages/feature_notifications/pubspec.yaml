@@ -1,0 +1,39 @@
+name: feature_notifications
+description: Push notifications, inbox, and realtime notification sync for Chisto mobile.
+version: 0.0.1
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.11.0
+
+dependencies:
+  app_badge_plus: ^1.2.10
+  chisto_core:
+  chisto_infrastructure:
+  chisto_networking:
+  design_system:
+  feature_auth:
+  feature_events:
+  feature_home:
+  feature_reports:
+  firebase_core: ^3.13.0
+  firebase_messaging: ^15.2.4
+  flutter:
+    sdk: flutter
+  flutter_local_notifications: ^18.0.1
+  flutter_riverpod: ^2.6.1
+  go_router: ^14.8.1
+  http: ^1.2.2
+  permission_handler: ^12.0.0
+  shared_preferences: ^2.3.3
+  socket_io_client: ^3.1.4
+  timezone: ^0.10.0
+  package_info_plus: ^9.0.1
+  cached_network_image: ^3.4.1
+  intl: any
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0

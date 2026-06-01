@@ -1,6 +1,5 @@
+import 'package:feature_events/src/data/event_offline_work_coordinator.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:chisto_mobile/features/events/data/event_offline_work_coordinator.dart';
 
 void main() {
   group('EventOfflineWorkSnapshot', () {

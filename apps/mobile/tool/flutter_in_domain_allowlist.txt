@@ -1,0 +1,12 @@
+# Documented, permanent exemptions: domain models/enums that intentionally
+# carry a presentation hint (a status `Color` or a category `IconData`) as part
+# of their public contract. These predate the layering rule; relocating the
+# Flutter-typed members to the presentation layer would ripple across many call
+# sites for negligible architectural gain, so they are accepted exemptions.
+# The ratchet forbids ADDING new entries — new domain code must stay Flutter-free
+# (use chisto_core abstractions or expose UI mapping from the presentation layer).
+packages/feature_home/lib/src/domain/models/cleaning_event.dart:1
+packages/feature_home/lib/src/domain/models/pollution_site.dart:7
+packages/feature_home/lib/src/domain/models/site_report_reason.dart:1
+packages/feature_home/lib/src/domain/models/site_report_reason.dart:2
+packages/feature_reports/lib/src/domain/models/report_draft.dart:1

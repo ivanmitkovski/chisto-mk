@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/core/logging/app_log.dart';
+import 'package:chisto_infrastructure/core/logging/app_log.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

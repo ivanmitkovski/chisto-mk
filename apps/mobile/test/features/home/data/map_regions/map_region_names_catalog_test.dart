@@ -1,7 +1,6 @@
+import 'package:feature_home/src/data/map_regions/map_region_catalog.dart';
+import 'package:feature_home/src/data/map_regions/map_region_names_catalog.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:chisto_mobile/features/home/data/map_regions/map_region_catalog.dart';
-import 'package:chisto_mobile/features/home/data/map_regions/map_region_names_catalog.dart';
 
 void main() {
   test('all map region ids have explicit mk/sq/en names', () {
@@ -39,8 +38,17 @@ void main() {
   });
 
   test('unknown ids are not present in curated catalog', () {
-    expect(mapRegionNameForLocale(id: 'unknown_region', localeName: 'mk'), isNull);
-    expect(mapRegionNameForLocale(id: 'unknown_region', localeName: 'sq'), isNull);
-    expect(mapRegionNameForLocale(id: 'unknown_region', localeName: 'en'), isNull);
+    expect(
+      mapRegionNameForLocale(id: 'unknown_region', localeName: 'mk'),
+      isNull,
+    );
+    expect(
+      mapRegionNameForLocale(id: 'unknown_region', localeName: 'sq'),
+      isNull,
+    );
+    expect(
+      mapRegionNameForLocale(id: 'unknown_region', localeName: 'en'),
+      isNull,
+    );
   });
 }

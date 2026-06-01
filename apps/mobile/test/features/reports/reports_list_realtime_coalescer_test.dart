@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/reports_list_realtime_coalescer.dart';
+import 'package:feature_reports/src/presentation/widgets/reports_list/reports_list_realtime_coalescer.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

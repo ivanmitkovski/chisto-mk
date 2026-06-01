@@ -1,10 +1,15 @@
-import 'package:chisto_mobile/core/navigation/app_routes.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/sign_up_screen.dart';
+import 'package:chisto_infrastructure/core/navigation/app_routes.dart';
+import 'package:chisto_infrastructure/shared/widgets/atoms/primary_button.dart';
+import 'package:feature_auth/src/presentation/screens/sign_up_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+
 import '../../shared/pump_auth_app.dart';
 import '../../shared/widget_test_bootstrap.dart';
-import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'support/auth_test_helpers.dart';
+
+final List<Override> _authTestOverrides = AuthTestOverrides().build();
 
 Finder _primaryCta(String label) {
   return find.byWidgetPredicate(
@@ -30,7 +35,7 @@ void main() {
     await pumpAuthWidget(
       tester,
       home: const SignUpScreen(),
-      onGenerateRoute: AppRouter.onGenerateRoute,
+      overrides: _authTestOverrides,
     );
     await tester.pumpAndSettle();
 
@@ -47,7 +52,7 @@ void main() {
     await pumpAuthWidget(
       tester,
       home: const SignUpScreen(),
-      onGenerateRoute: AppRouter.onGenerateRoute,
+      overrides: _authTestOverrides,
     );
     await tester.pumpAndSettle();
 
@@ -63,7 +68,7 @@ void main() {
     await pumpAuthWidget(
       tester,
       home: const SignUpScreen(),
-      onGenerateRoute: AppRouter.onGenerateRoute,
+      overrides: _authTestOverrides,
     );
     await tester.pumpAndSettle();
 
@@ -72,7 +77,7 @@ void main() {
     await tester.enterText(textFields.at(1), 'john@chisto.mk');
     await tester.enterText(textFields.at(2), '70123456');
     await tester.enterText(textFields.at(3), 'Password123!');
-    final Finder termsCheckbox = find.byType(Checkbox);
+    final Finder termsCheckbox = find.byType(CheckboxListTile);
     await tester.ensureVisible(termsCheckbox);
     await tester.tap(termsCheckbox);
     await tester.pump();
@@ -89,7 +94,7 @@ void main() {
     await pumpAuthWidget(
       tester,
       home: const SignUpScreen(),
-      onGenerateRoute: AppRouter.onGenerateRoute,
+      overrides: _authTestOverrides,
     );
     await tester.pumpAndSettle();
 
@@ -112,7 +117,7 @@ void main() {
     await pumpAuthWidget(
       tester,
       home: const SignUpScreen(),
-      onGenerateRoute: AppRouter.onGenerateRoute,
+      overrides: _authTestOverrides,
     );
     await tester.pumpAndSettle();
 
@@ -133,7 +138,7 @@ void main() {
     await pumpAuthWidget(
       tester,
       home: const SignUpScreen(),
-      onGenerateRoute: AppRouter.onGenerateRoute,
+      overrides: _authTestOverrides,
     );
     await tester.pumpAndSettle();
 

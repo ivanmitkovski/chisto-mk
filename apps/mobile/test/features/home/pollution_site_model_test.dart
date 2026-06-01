@@ -1,7 +1,7 @@
-import 'package:chisto_mobile/features/home/domain/models/cleaning_event.dart';
-import 'package:chisto_mobile/features/home/domain/models/comment.dart';
-import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
-import 'package:chisto_mobile/features/home/presentation/utils/site_image_resolver.dart';
+import 'package:feature_home/src/domain/models/cleaning_event.dart';
+import 'package:feature_home/src/domain/models/comment.dart';
+import 'package:feature_home/src/domain/models/pollution_site.dart';
+import 'package:feature_home/src/presentation/utils/site_image_resolver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -51,16 +51,16 @@ void main() {
     });
 
     test('constructs with optional fields', () {
-      final PollutionSite site = PollutionSite(
+      const PollutionSite site = PollutionSite(
         id: 'site-2',
         title: 'Minimal',
         description: 'Minimal site',
         statusLabel: 'Pending',
         statusColor: Colors.orange,
-        distanceKm: 0.0,
+        distanceKm: 0,
         score: 0,
         participantCount: 0,
-        mediaUrls: const <String>[primaryUrl],
+        mediaUrls: <String>[primaryUrl],
       );
 
       expect(site.mediaUrls, isNotEmpty);
@@ -71,7 +71,9 @@ void main() {
     });
 
     test('gallery resolves to single provider when one asset url', () {
-      final PollutionSite site = buildSite(mediaUrls: const <String>[primaryUrl]);
+      final PollutionSite site = buildSite(
+        mediaUrls: const <String>[primaryUrl],
+      );
 
       expect(siteGalleryImageProviders(site).length, 1);
     });
@@ -129,20 +131,29 @@ void main() {
           ],
         ),
       ];
-      final PollutionSite site = buildSite(comments: comments, commentsCount: 3);
+      final PollutionSite site = buildSite(
+        comments: comments,
+        commentsCount: 3,
+      );
 
       expect(site.commentCount, 3);
     });
 
-    test('commentCount uses max of tree and server when tree under-reports', () {
-      final DateTime t = DateTime.utc(2026, 3, 1, 12);
-      final List<Comment> comments = <Comment>[
-        Comment(id: 'c1', authorName: 'A', text: 'Root only', createdAt: t),
-      ];
-      final PollutionSite site = buildSite(comments: comments, commentsCount: 3);
+    test(
+      'commentCount uses max of tree and server when tree under-reports',
+      () {
+        final DateTime t = DateTime.utc(2026, 3, 1, 12);
+        final List<Comment> comments = <Comment>[
+          Comment(id: 'c1', authorName: 'A', text: 'Root only', createdAt: t),
+        ];
+        final PollutionSite site = buildSite(
+          comments: comments,
+          commentsCount: 3,
+        );
 
-      expect(site.commentCount, 3);
-    });
+        expect(site.commentCount, 3);
+      },
+    );
 
     test('commentCount returns 0 when no comments', () {
       final PollutionSite site = buildSite();

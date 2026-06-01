@@ -1,8 +1,9 @@
-import '../../support/events/in_memory_events_store.dart';
-import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
-import 'package:chisto_mobile/features/events/domain/models/event_participant_row.dart';
+import 'package:feature_events/src/domain/models/eco_event.dart';
+import 'package:feature_events/src/domain/models/event_participant_row.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../support/events/in_memory_events_store.dart';
 
 void main() {
   late InMemoryEventsStore store;
@@ -35,8 +36,10 @@ void main() {
         scheduledAtUtc: DateTime.utc(2035, 7, 1, 8, 0),
       ),
     );
-    final bool ok =
-        await store.updateStatus('evt-too-early', EcoEventStatus.inProgress);
+    final bool ok = await store.updateStatus(
+      'evt-too-early',
+      EcoEventStatus.inProgress,
+    );
     expect(ok, isFalse);
     expect(store.findById('evt-too-early')!.status, EcoEventStatus.upcoming);
   });
@@ -46,16 +49,24 @@ void main() {
     expect(initial, isNotNull);
     expect(initial!.status, equals(EcoEventStatus.upcoming));
 
-    final bool skipToCompleted =
-        await store.updateStatus('evt-1', EcoEventStatus.completed);
+    final bool skipToCompleted = await store.updateStatus(
+      'evt-1',
+      EcoEventStatus.completed,
+    );
     expect(skipToCompleted, isFalse);
     expect(store.findById('evt-1')!.status, equals(EcoEventStatus.upcoming));
 
-    final bool start = await store.updateStatus('evt-1', EcoEventStatus.inProgress);
+    final bool start = await store.updateStatus(
+      'evt-1',
+      EcoEventStatus.inProgress,
+    );
     expect(start, isTrue);
     expect(store.findById('evt-1')!.status, equals(EcoEventStatus.inProgress));
 
-    final bool complete = await store.updateStatus('evt-1', EcoEventStatus.completed);
+    final bool complete = await store.updateStatus(
+      'evt-1',
+      EcoEventStatus.completed,
+    );
     expect(complete, isTrue);
     expect(store.findById('evt-1')!.status, equals(EcoEventStatus.completed));
   });
@@ -96,13 +107,18 @@ void main() {
     expect(noOp, isFalse);
   });
 
-  test('fetchParticipants returns synthetic rows from participantCount', () async {
-    final EventParticipantsPage page = await store.fetchParticipants('evt-1');
-    final int count = store.findById('evt-1')!.participantCount;
-    expect(page.items, hasLength(count));
-    expect(page.hasMore, isFalse);
-    final EventParticipantsPage second =
-        await store.fetchParticipants('evt-1', cursor: 'opaque');
-    expect(second.items, isEmpty);
-  });
+  test(
+    'fetchParticipants returns synthetic rows from participantCount',
+    () async {
+      final EventParticipantsPage page = await store.fetchParticipants('evt-1');
+      final int count = store.findById('evt-1')!.participantCount;
+      expect(page.items, hasLength(count));
+      expect(page.hasMore, isFalse);
+      final EventParticipantsPage second = await store.fetchParticipants(
+        'evt-1',
+        cursor: 'opaque',
+      );
+      expect(second.items, isEmpty);
+    },
+  );
 }

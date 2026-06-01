@@ -1,8 +1,8 @@
-import 'package:chisto_mobile/features/events/data/event_json.dart';
-import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
-import 'package:chisto_mobile/features/events/domain/models/check_in_payload.dart';
-import 'package:chisto_mobile/features/events/presentation/utils/events_localized_strings.dart';
-import 'package:chisto_mobile/shared/current_user.dart';
+import 'package:chisto_infrastructure/shared/current_user.dart';
+import 'package:feature_events/src/data/event_json.dart';
+import 'package:feature_events/src/domain/models/check_in_payload.dart';
+import 'package:feature_events/src/domain/models/eco_event.dart';
+import 'package:feature_events/src/presentation/utils/events_localized_strings.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -60,7 +60,7 @@ void main() {
         siteId: '1',
         siteName: 'Test site',
         siteImageUrl: 'assets/test.png',
-        siteDistanceKm: 5.0,
+        siteDistanceKm: 5,
         organizerId: organizerId,
         organizerName: 'Organizer',
         date: DateTime(2025, 6, 15),
@@ -82,7 +82,10 @@ void main() {
 
     test('copyWith produces different event when fields change', () {
       final EcoEvent original = buildEvent();
-      final EcoEvent joined = original.copyWith(isJoined: true, participantCount: 6);
+      final EcoEvent joined = original.copyWith(
+        isJoined: true,
+        participantCount: 6,
+      );
       expect(joined.isJoined, isTrue);
       expect(joined.participantCount, 6);
       expect(original, isNot(equals(joined)));
@@ -112,9 +115,7 @@ void main() {
     });
 
     test('canOpenAttendeeCheckIn requires moderation approval', () {
-      final EcoEvent openButPending = buildEvent(
-        organizerId: 'other',
-      ).copyWith(
+      final EcoEvent openButPending = buildEvent(organizerId: 'other').copyWith(
         moderationApproved: false,
         isJoined: true,
         status: EcoEventStatus.inProgress,
@@ -150,21 +151,27 @@ void main() {
       expect(pastUtc.isBeforeScheduledStart, isFalse);
     });
 
-    test('canVolunteerJoinNow is true before scheduledAtUtc when otherwise joinable', () {
-      final EcoEvent e = buildEvent().copyWith(
-        scheduledAtUtc: DateTime.utc(2035, 1, 1, 12),
-      );
-      expect(e.isJoinable, isTrue);
-      expect(e.canVolunteerJoinNow, isTrue);
-    });
+    test(
+      'canVolunteerJoinNow is true before scheduledAtUtc when otherwise joinable',
+      () {
+        final EcoEvent e = buildEvent().copyWith(
+          scheduledAtUtc: DateTime.utc(2035, 1, 1, 12),
+        );
+        expect(e.isJoinable, isTrue);
+        expect(e.canVolunteerJoinNow, isTrue);
+      },
+    );
 
-    test('canVolunteerJoinNow is false when joinable but join grace after start has ended', () {
-      final EcoEvent e = buildEvent().copyWith(
-        scheduledAtUtc: DateTime.utc(2020, 1, 1, 12, 0, 0),
-      );
-      expect(e.isJoinable, isTrue);
-      expect(e.canVolunteerJoinNow, isFalse);
-    });
+    test(
+      'canVolunteerJoinNow is false when joinable but join grace after start has ended',
+      () {
+        final EcoEvent e = buildEvent().copyWith(
+          scheduledAtUtc: DateTime.utc(2020, 1, 1, 12, 0, 0),
+        );
+        expect(e.isJoinable, isTrue);
+        expect(e.canVolunteerJoinNow, isFalse);
+      },
+    );
 
     test('isValidRange validates time ranges', () {
       expect(
@@ -413,10 +420,16 @@ void main() {
   group('CheckInQrPayload', () {
     test('equality works', () {
       const CheckInQrPayload a = CheckInQrPayload(
-        eventId: 'e1', sessionId: 's1', nonce: 'n1', issuedAtMs: 100,
+        eventId: 'e1',
+        sessionId: 's1',
+        nonce: 'n1',
+        issuedAtMs: 100,
       );
       const CheckInQrPayload b = CheckInQrPayload(
-        eventId: 'e1', sessionId: 's1', nonce: 'n1', issuedAtMs: 100,
+        eventId: 'e1',
+        sessionId: 's1',
+        nonce: 'n1',
+        issuedAtMs: 100,
       );
       expect(a, equals(b));
       expect(a.hashCode, equals(b.hashCode));
@@ -425,10 +438,16 @@ void main() {
     test('isExpired checks TTL correctly', () {
       final int now = DateTime.now().millisecondsSinceEpoch;
       final CheckInQrPayload fresh = CheckInQrPayload(
-        eventId: 'e1', sessionId: 's1', nonce: 'n1', issuedAtMs: now,
+        eventId: 'e1',
+        sessionId: 's1',
+        nonce: 'n1',
+        issuedAtMs: now,
       );
       final CheckInQrPayload old = CheckInQrPayload(
-        eventId: 'e1', sessionId: 's1', nonce: 'n1', issuedAtMs: now - 3600 * 1000,
+        eventId: 'e1',
+        sessionId: 's1',
+        nonce: 'n1',
+        issuedAtMs: now - 3600 * 1000,
       );
 
       expect(fresh.isExpired(const Duration(minutes: 10)), isFalse);
@@ -450,8 +469,10 @@ void main() {
       expect(decoded!.id, 'user-1');
       expect(decoded.name, 'Alice');
       expect(decoded.userId, isNull);
-      expect(decoded.checkedInAt.millisecondsSinceEpoch,
-          original.checkedInAt.millisecondsSinceEpoch);
+      expect(
+        decoded.checkedInAt.millisecondsSinceEpoch,
+        original.checkedInAt.millisecondsSinceEpoch,
+      );
     });
 
     test('toJson and fromJson preserves userId when set', () {
@@ -461,8 +482,9 @@ void main() {
         checkedInAt: DateTime(2025, 6, 15, 11, 0),
         userId: 'usr_abc',
       );
-      final CheckedInAttendee? decoded =
-          CheckedInAttendee.fromJson(original.toJson());
+      final CheckedInAttendee? decoded = CheckedInAttendee.fromJson(
+        original.toJson(),
+      );
       expect(decoded?.userId, 'usr_abc');
     });
 
@@ -474,17 +496,22 @@ void main() {
         userId: 'usr_abc',
         avatarUrl: 'https://example.com/a.jpg',
       );
-      final CheckedInAttendee? decoded =
-          CheckedInAttendee.fromJson(original.toJson());
+      final CheckedInAttendee? decoded = CheckedInAttendee.fromJson(
+        original.toJson(),
+      );
       expect(decoded?.avatarUrl, 'https://example.com/a.jpg');
     });
 
     test('equality is based on id', () {
       final CheckedInAttendee a = CheckedInAttendee(
-        id: 'u1', name: 'A', checkedInAt: DateTime(2025, 1, 1),
+        id: 'u1',
+        name: 'A',
+        checkedInAt: DateTime(2025, 1, 1),
       );
       final CheckedInAttendee b = CheckedInAttendee(
-        id: 'u1', name: 'B', checkedInAt: DateTime(2025, 6, 1),
+        id: 'u1',
+        name: 'B',
+        checkedInAt: DateTime(2025, 6, 1),
       );
       expect(a, equals(b));
     });

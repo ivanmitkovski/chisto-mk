@@ -1,6 +1,6 @@
-import 'package:chisto_mobile/features/reports/data/outbox/outbox_scheduler.dart';
-import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_entry.dart';
-import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
+import 'package:feature_reports/src/data/outbox/outbox_scheduler.dart';
+import 'package:feature_reports/src/data/outbox/report_outbox_entry.dart';
+import 'package:feature_reports/src/domain/models/report_draft.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 ReportOutboxEntry _entry(ReportOutboxState state) {
@@ -30,8 +30,14 @@ void main() {
     });
 
     test('continue when succeeded or failed', () {
-      expect(s.afterProcess(check: _entry(ReportOutboxState.succeeded)), OutboxAfterProcessInstruction.continueLoop);
-      expect(s.afterProcess(check: _entry(ReportOutboxState.failed)), OutboxAfterProcessInstruction.continueLoop);
+      expect(
+        s.afterProcess(check: _entry(ReportOutboxState.succeeded)),
+        OutboxAfterProcessInstruction.continueLoop,
+      );
+      expect(
+        s.afterProcess(check: _entry(ReportOutboxState.failed)),
+        OutboxAfterProcessInstruction.continueLoop,
+      );
     });
 
     test('break on cooldown', () {
@@ -42,9 +48,18 @@ void main() {
     });
 
     test('continue for pending, uploading, submitting', () {
-      expect(s.afterProcess(check: _entry(ReportOutboxState.pending)), OutboxAfterProcessInstruction.continueLoop);
-      expect(s.afterProcess(check: _entry(ReportOutboxState.uploading)), OutboxAfterProcessInstruction.continueLoop);
-      expect(s.afterProcess(check: _entry(ReportOutboxState.submitting)), OutboxAfterProcessInstruction.continueLoop);
+      expect(
+        s.afterProcess(check: _entry(ReportOutboxState.pending)),
+        OutboxAfterProcessInstruction.continueLoop,
+      );
+      expect(
+        s.afterProcess(check: _entry(ReportOutboxState.uploading)),
+        OutboxAfterProcessInstruction.continueLoop,
+      );
+      expect(
+        s.afterProcess(check: _entry(ReportOutboxState.submitting)),
+        OutboxAfterProcessInstruction.continueLoop,
+      );
     });
   });
 

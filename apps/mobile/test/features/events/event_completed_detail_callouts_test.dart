@@ -1,6 +1,6 @@
-import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
-import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_completed_detail_callouts.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_events/src/domain/models/eco_event.dart';
+import 'package:feature_events/src/presentation/widgets/event_detail/event_completed_detail_callouts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

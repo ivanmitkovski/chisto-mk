@@ -1,9 +1,9 @@
-import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_constants.dart';
-import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_entry.dart';
-import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_migration_from_sp.dart';
-import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_repository.dart';
-import 'package:chisto_mobile/features/reports/data/report_draft_local_store.dart';
-import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
+import 'package:feature_reports/src/data/outbox/report_outbox_constants.dart';
+import 'package:feature_reports/src/data/outbox/report_outbox_entry.dart';
+import 'package:feature_reports/src/data/outbox/report_outbox_migration_from_sp.dart';
+import 'package:feature_reports/src/data/outbox/report_outbox_repository.dart';
+import 'package:feature_reports/src/data/report_draft_local_store.dart';
+import 'package:feature_reports/src/domain/models/report_draft.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -19,6 +19,11 @@ class _FakeOutbox implements ReportOutboxRepository {
 
   @override
   Future<void> delete(String id) async {}
+
+  @override
+  Future<void> wipeAll() async {
+    wizard = null;
+  }
 
   @override
   Future<void> close() async {}
@@ -66,6 +71,24 @@ class _FakeOutbox implements ReportOutboxRepository {
 
   @override
   Future<void> update(ReportOutboxEntry entry) async {}
+
+  @override
+  Future<void> atomicEnqueueWizardSubmit({
+    required ReportDraft draft,
+    required String title,
+    required String description,
+    required String idempotencyKey,
+  }) async {
+    if (await countSubmitPipeline() > 0) {
+      throw StateError('An in-flight report submission already exists.');
+    }
+    await saveWizardDraft(draft: draft, title: title, description: description);
+    wizard = wizard!.copyWith(
+      idempotencyKey: idempotencyKey,
+      submitRequested: true,
+      state: ReportOutboxState.pending,
+    );
+  }
 }
 
 void main() {

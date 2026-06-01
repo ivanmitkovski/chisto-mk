@@ -1,5 +1,5 @@
-import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
-import 'package:chisto_mobile/features/events/presentation/utils/event_schedule_constraints.dart';
+import 'package:feature_events/src/domain/models/eco_event.dart';
+import 'package:feature_events/src/presentation/utils/event_schedule_constraints.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -69,20 +69,28 @@ void main() {
       );
     });
 
-    test('allows today start at ceil(now + lead) on grid with end same day', () {
-      final DateTime earliest = ceilToMinuteGrid(now.add(kEventScheduleMinLead));
-      final EventTime start = EventTime(hour: earliest.hour, minute: earliest.minute);
-      const EventTime end = EventTime(hour: 18, minute: 0);
-      expect(
-        validateCreateOrUpcomingEditSchedule(
-          dateOnly: today,
-          start: start,
-          end: end,
-          now: now,
-        ),
-        isNull,
-      );
-    });
+    test(
+      'allows today start at ceil(now + lead) on grid with end same day',
+      () {
+        final DateTime earliest = ceilToMinuteGrid(
+          now.add(kEventScheduleMinLead),
+        );
+        final EventTime start = EventTime(
+          hour: earliest.hour,
+          minute: earliest.minute,
+        );
+        const EventTime end = EventTime(hour: 18, minute: 0);
+        expect(
+          validateCreateOrUpcomingEditSchedule(
+            dateOnly: today,
+            start: start,
+            end: end,
+            now: now,
+          ),
+          isNull,
+        );
+      },
+    );
 
     test('rejects date in the past', () {
       final DateTime past = today.subtract(const Duration(days: 1));

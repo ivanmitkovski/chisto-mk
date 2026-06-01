@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/features/events/data/chat/chat_client_message_id.dart';
+import 'package:feature_events/src/data/chat/chat_client_message_id.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

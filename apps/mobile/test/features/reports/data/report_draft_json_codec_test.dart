@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:chisto_mobile/features/reports/data/outbox/report_draft_json_codec.dart';
-import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
+import 'package:feature_reports/src/data/outbox/report_draft_json_codec.dart';
+import 'package:feature_reports/src/domain/models/report_draft.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image_picker/image_picker.dart';
 

@@ -123,7 +123,7 @@ describe('SitesMapQueryService', () => {
       limit: 120,
       includeArchived: true,
     } as any);
-    expect(findSites).toHaveBeenCalledWith(expect.objectContaining({ includeArchived: true }), expect.any(Number));
+    expect(findSites).toHaveBeenCalledWith(expect.objectContaining({ includeArchived: true }), expect.any(Number), null);
     expect(cache.buildCacheKey).toHaveBeenCalledWith(expect.arrayContaining(['1']));
   });
 
@@ -139,7 +139,7 @@ describe('SitesMapQueryService', () => {
       limit: 100,
     } as any);
     expect(validator.validateQuery).toHaveBeenCalled();
-    expect(repository.findClusters).toHaveBeenCalledWith(expect.any(Object), 11);
+    expect(repository.findClusters).toHaveBeenCalledWith(expect.any(Object), 11, null);
     expect(result.data[0].clusterKey).toBe('1:1');
   });
 
@@ -156,7 +156,7 @@ describe('SitesMapQueryService', () => {
       limit: 100,
     } as any);
     expect(validator.validateQuery).toHaveBeenCalled();
-    expect(repository.findHeatmap).toHaveBeenCalledWith(expect.any(Object), 8);
+    expect(repository.findHeatmap).toHaveBeenCalledWith(expect.any(Object), 8, null);
     expect(result.data[0].intensity).toBe(7);
   });
 });

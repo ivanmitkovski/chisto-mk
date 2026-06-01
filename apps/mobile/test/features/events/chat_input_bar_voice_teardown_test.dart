@@ -1,6 +1,6 @@
-import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_input_bar.dart';
-import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_voice_recorder.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_events/src/presentation/widgets/chat/chat_input_bar.dart';
+import 'package:feature_events/src/presentation/widgets/chat/chat_voice_recorder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -28,7 +28,10 @@ class _SpyChatVoiceRecorder implements ChatVoiceRecorder {
   Future<bool> isRecording() async => _recording;
 
   @override
-  Future<void> start({required RecordConfig config, required String path}) async {}
+  Future<void> start({
+    required RecordConfig config,
+    required String path,
+  }) async {}
 
   @override
   Future<String?> stop() async => null;

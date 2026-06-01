@@ -1,11 +1,12 @@
 // Run from apps/mobile: dart run tool/check_no_hex_in_features.dart
 import 'dart:io';
 
+import 'feature_roots_guard_util.dart';
+
 const List<String> _scanRoots = <String>[
-  'lib/features/home',
-  'lib/features/events',
-  'lib/shared',
-  'lib/features/reports',
+  'packages/feature_home/lib/src',
+  'packages/feature_events/lib/src',
+  reportsPackageRoot,
 ];
 
 /// Returns `0` when clean, `1` when violations found.
@@ -43,7 +44,9 @@ int runNoHexInFeaturesCheck() {
     );
     return 1;
   }
-  stdout.writeln('OK: no stray Color(0x…) under home/events/shared/reports features.');
+  stdout.writeln(
+    'OK: no stray Color(0x…) under home/events/shared/reports features.',
+  );
   return 0;
 }
 

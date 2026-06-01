@@ -1,6 +1,6 @@
-import 'package:chisto_mobile/features/notifications/domain/models/user_notification.dart';
-import 'package:chisto_mobile/features/home/presentation/widgets/notifications/notification_tile.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_home/src/presentation/widgets/notifications/notification_tile.dart';
+import 'package:feature_notifications/src/domain/models/user_notification.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -38,7 +38,7 @@ void main() {
     );
 
     expect(find.text('New site update'), findsOneWidget);
-    expect(find.text('Comment'), findsOneWidget);
+    expect(find.text('Comments'), findsOneWidget);
     expect(find.byIcon(Icons.chat_bubble_rounded), findsOneWidget);
   });
 
@@ -58,7 +58,7 @@ void main() {
       wrapTile(NotificationTile(item: item, onTap: () {})),
     );
 
-    expect(find.text('Report'), findsOneWidget);
+    expect(find.text('Report status'), findsOneWidget);
     expect(find.byIcon(Icons.assignment_rounded), findsOneWidget);
   });
 

@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/features/home/domain/models/comment.dart';
+import 'package:feature_home/src/domain/models/comment.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -78,23 +78,26 @@ void main() {
       expect(updated.isLikedByMe, false);
     });
 
-    test('copyWith preserves original values when null passed for optional fields', () {
-      final Comment original = Comment(
-        id: 'c1',
-        authorName: 'Alice',
-        text: 'Text',
-        createdAt: t,
-        likeCount: 5,
-        isLikedByMe: true,
-      );
+    test(
+      'copyWith preserves original values when null passed for optional fields',
+      () {
+        final Comment original = Comment(
+          id: 'c1',
+          authorName: 'Alice',
+          text: 'Text',
+          createdAt: t,
+          likeCount: 5,
+          isLikedByMe: true,
+        );
 
-      final Comment same = original.copyWith(
-        likeCount: null,
-        isLikedByMe: null,
-      );
+        final Comment same = original.copyWith(
+          likeCount: null,
+          isLikedByMe: null,
+        );
 
-      expect(same.likeCount, 5);
-      expect(same.isLikedByMe, true);
-    });
+        expect(same.likeCount, 5);
+        expect(same.isLikedByMe, true);
+      },
+    );
   });
 }

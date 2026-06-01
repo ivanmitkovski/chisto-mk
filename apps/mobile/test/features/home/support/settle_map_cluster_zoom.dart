@@ -1,8 +1,7 @@
 import 'dart:async';
 
+import 'package:feature_home/src/presentation/providers/map_cluster_effective_zoom_notifier.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'package:chisto_mobile/features/home/presentation/providers/map_cluster_effective_zoom_notifier.dart';
 
 /// Waits until [mapClusterEffectiveZoomProvider] reaches [targetZoom] (ramp done).
 Future<void> settleMapClusterEffectiveZoom(

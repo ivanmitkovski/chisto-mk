@@ -1,12 +1,11 @@
+import 'package:feature_home/src/domain/models/pollution_site.dart';
+import 'package:feature_home/src/presentation/providers/map_derived_providers.dart';
+import 'package:feature_home/src/presentation/providers/map_filter_notifier.dart';
+import 'package:feature_home/src/presentation/providers/map_sites_notifier.dart';
+import 'package:feature_home/src/presentation/widgets/map/map_status_codes.dart';
+import 'package:feature_reports/src/domain/models/report_draft.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
-import 'package:chisto_mobile/features/home/presentation/providers/map_derived_providers.dart';
-import 'package:chisto_mobile/features/home/presentation/providers/map_filter_notifier.dart';
-import 'package:chisto_mobile/features/home/presentation/providers/map_sites_notifier.dart';
-import 'package:chisto_mobile/features/home/presentation/widgets/map/map_status_codes.dart';
-import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
 
 import '../support/test_pollution_site.dart';
 
@@ -43,7 +42,9 @@ void main() {
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
         mapSitesNotifierProvider.overrideWith(
-          () => _FakeMapSitesNotifier(MapSitesState(sites: <PollutionSite>[siteA, siteB])),
+          () => _FakeMapSitesNotifier(
+            MapSitesState(sites: <PollutionSite>[siteA, siteB]),
+          ),
         ),
         mapFilterNotifierProvider.overrideWith(
           () => _FakeMapFilterNotifier(
@@ -57,7 +58,9 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    final List<PollutionSite> filtered = container.read(mapFilteredSitesProvider);
+    final List<PollutionSite> filtered = container.read(
+      mapFilteredSitesProvider,
+    );
     expect(filtered.length, 1);
     expect(filtered.single.id, 'site_a');
   });
@@ -72,7 +75,7 @@ void main() {
     final PollutionSite inSkopje = buildTestPollutionSite(
       id: 'in_skopje',
       statusLabel: 'Reported',
-      latitude: 42.0,
+      latitude: 42,
       longitude: 21.43,
     );
 
@@ -103,7 +106,9 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    final List<PollutionSite> filtered = container.read(mapFilteredSitesProvider);
+    final List<PollutionSite> filtered = container.read(
+      mapFilteredSitesProvider,
+    );
     expect(filtered.length, 1);
     expect(filtered.single.id, 'in_bitola');
   });

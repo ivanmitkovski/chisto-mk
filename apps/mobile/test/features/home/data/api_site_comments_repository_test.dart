@@ -1,11 +1,13 @@
-import 'package:chisto_mobile/core/config/app_config.dart';
-import 'package:chisto_mobile/core/network/api_client.dart';
-import 'package:chisto_mobile/features/home/data/api_site_comments_repository.dart';
-import 'package:chisto_mobile/features/home/domain/repositories/sites_repository_types.dart';
+import 'package:chisto_infrastructure/core/config/app_config.dart';
+import 'package:chisto_infrastructure/core/network/api_client.dart';
+import 'package:chisto_networking/src/network/request_cancellation.dart';
+import 'package:feature_home/src/data/api_site_comments_repository.dart';
+import 'package:feature_home/src/domain/repositories/sites_repository_types.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class _StubApiClient extends ApiClient {
-  _StubApiClient() : super(
+  _StubApiClient()
+    : super(
         config: AppConfig.dev,
         accessToken: () => null,
         onUnauthorized: () {},
@@ -14,7 +16,11 @@ class _StubApiClient extends ApiClient {
   ApiResponse? nextGet;
 
   @override
-  Future<ApiResponse> get(String path, {Map<String, String>? headers, cancellation}) async {
+  Future<ApiResponse> get(
+    String path, {
+    Map<String, String>? headers,
+    RequestCancellationToken? cancellation,
+  }) async {
     return nextGet ??
         const ApiResponse(statusCode: 200, json: <String, dynamic>{});
   }
@@ -60,11 +66,7 @@ void main() {
             ],
           },
         ],
-        'meta': <String, dynamic>{
-          'page': 1,
-          'limit': 20,
-          'total': 1,
-        },
+        'meta': <String, dynamic>{'page': 1, 'limit': 20, 'total': 1},
       },
     );
 

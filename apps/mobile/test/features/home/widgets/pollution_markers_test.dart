@@ -1,7 +1,7 @@
-import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
-import 'package:chisto_mobile/features/home/presentation/widgets/map/cluster_bucket.dart';
-import 'package:chisto_mobile/features/home/presentation/widgets/map/pollution_markers.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_home/src/domain/models/pollution_site.dart';
+import 'package:feature_home/src/presentation/widgets/map/cluster_bucket.dart';
+import 'package:feature_home/src/presentation/widgets/map/pollution_markers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
@@ -12,7 +12,7 @@ void main() {
   testWidgets('PollutionMarker builds for asset-backed site', (
     WidgetTester tester,
   ) async {
-    final PollutionSite site = PollutionSite(
+    const PollutionSite site = PollutionSite(
       id: 'm1',
       title: 'Marker site',
       description: 'D',
@@ -21,7 +21,7 @@ void main() {
       distanceKm: 1,
       score: 1,
       participantCount: 0,
-      mediaUrls: const <String>['assets/images/content/people_cleaning.png'],
+      mediaUrls: <String>['assets/images/content/people_cleaning.png'],
       latitude: 41.6,
       longitude: 21.7,
     );
@@ -53,7 +53,7 @@ void main() {
     );
   });
 
-  Widget _goldenShell({required Widget child}) {
+  Widget goldenShell({required Widget child}) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -71,7 +71,7 @@ void main() {
     );
   }
 
-  PollutionSite _site({
+  PollutionSite site0({
     required String id,
     required Color statusColor,
     required String statusLabel,
@@ -91,11 +91,13 @@ void main() {
     );
   }
 
-  testWidgets('PollutionMarker golden — cold (blue) variant', (WidgetTester tester) async {
+  testWidgets('PollutionMarker golden — cold (blue) variant', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
-      _goldenShell(
+      goldenShell(
         child: PollutionMarker(
-          site: _site(
+          site: site0(
             id: 'g-cold',
             statusColor: Colors.blue,
             statusLabel: 'Moderate',
@@ -114,11 +116,13 @@ void main() {
     );
   });
 
-  testWidgets('PollutionMarker golden — hot (red) selected', (WidgetTester tester) async {
+  testWidgets('PollutionMarker golden — hot (red) selected', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
-      _goldenShell(
+      goldenShell(
         child: PollutionMarker(
-          site: _site(
+          site: site0(
             id: 'g-hot',
             statusColor: Colors.red,
             statusLabel: 'High',
@@ -137,8 +141,10 @@ void main() {
     );
   });
 
-  testWidgets('ClusterMarker golden — bucket of 12', (WidgetTester tester) async {
-    final PollutionSite a = _site(
+  testWidgets('ClusterMarker golden — bucket of 12', (
+    WidgetTester tester,
+  ) async {
+    final PollutionSite a = site0(
       id: 'c1',
       statusColor: Colors.orange,
       statusLabel: 'High',
@@ -146,9 +152,10 @@ void main() {
     final ClusterBucket bucket = ClusterBucket(
       center: const LatLng(41.6, 21.7),
       sites: List<PollutionSite>.generate(12, (int i) => a),
+      anchorId: 'c1',
     );
     await tester.pumpWidget(
-      _goldenShell(
+      goldenShell(
         child: ClusterMarker(
           bucket: bucket,
           count: 12,

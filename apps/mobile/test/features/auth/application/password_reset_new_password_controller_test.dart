@@ -1,5 +1,4 @@
-import 'package:chisto_mobile/core/errors/app_error.dart';
-import 'package:chisto_mobile/features/auth/application/password_reset_new_password_controller.dart';
+import 'package:feature_auth/src/application/password_reset_new_password_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -15,16 +14,17 @@ void main() {
   test('confirmByPhone completes without error', () async {
     var called = false;
     final FakeAuthRepository repo = FakeAuthRepository(
-      confirmPasswordResetImpl: ({
-        required String phoneNumberE164,
-        required String code,
-        required String newPassword,
-      }) async {
-        called = true;
-        expect(phoneNumberE164, '+38970123456');
-        expect(code, '123456');
-        expect(newPassword, 'newpass123');
-      },
+      confirmPasswordResetImpl:
+          ({
+            required String phoneNumberE164,
+            required String code,
+            required String newPassword,
+          }) async {
+            called = true;
+            expect(phoneNumberE164, '+38970123456');
+            expect(code, '123456');
+            expect(newPassword, 'newpass123');
+          },
     );
 
     final ProviderContainer container = ProviderContainer(
@@ -50,14 +50,12 @@ void main() {
   test('confirmByEmail calls repository', () async {
     var called = false;
     final FakeAuthRepository repo = FakeAuthRepository(
-      confirmPasswordResetByEmailImpl: ({
-        required String token,
-        required String newPassword,
-      }) async {
-        called = true;
-        expect(token, 'email-tok');
-        expect(newPassword, 'newpass123');
-      },
+      confirmPasswordResetByEmailImpl:
+          ({required String token, required String newPassword}) async {
+            called = true;
+            expect(token, 'email-tok');
+            expect(newPassword, 'newpass123');
+          },
     );
 
     final ProviderContainer container = ProviderContainer(

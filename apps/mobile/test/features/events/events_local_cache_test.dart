@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:chisto_mobile/features/events/data/events_local_cache.dart';
-import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
-import 'package:chisto_mobile/features/events/domain/models/eco_event_search_params.dart';
+import 'package:feature_events/src/data/events_local_cache.dart';
+import 'package:feature_events/src/domain/models/eco_event.dart';
+import 'package:feature_events/src/domain/models/eco_event_search_params.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -33,7 +33,10 @@ void main() {
   });
 
   test('storageKeyForListParams uses legacy key when params null or empty', () {
-    expect(EventsLocalCache.storageKeyForListParams(null), EventsLocalCache.legacyEventsCacheKey);
+    expect(
+      EventsLocalCache.storageKeyForListParams(null),
+      EventsLocalCache.legacyEventsCacheKey,
+    );
     expect(
       EventsLocalCache.storageKeyForListParams(const EcoEventSearchParams()),
       EventsLocalCache.legacyEventsCacheKey,
@@ -41,7 +44,7 @@ void main() {
   });
 
   test('storageKeyForListParams namespaces non-empty params', () {
-    final EcoEventSearchParams p = EcoEventSearchParams(
+    const EcoEventSearchParams p = EcoEventSearchParams(
       query: 'x',
       categories: <EcoEventCategory>{EcoEventCategory.riverAndLake},
     );
@@ -52,7 +55,7 @@ void main() {
 
   test('writeEvents and readEvents round-trip per params key', () async {
     const EventsLocalCache cache = EventsLocalCache();
-    final EcoEventSearchParams filtered = EcoEventSearchParams(
+    const EcoEventSearchParams filtered = EcoEventSearchParams(
       query: 'q',
       statuses: <EcoEventStatus>{EcoEventStatus.upcoming},
     );
@@ -62,9 +65,12 @@ void main() {
     await cache.writeEvents(globalList, forActiveListParams: null);
     await cache.writeEvents(filteredList, forActiveListParams: filtered);
 
-    final List<EcoEvent>? readGlobal = await cache.readEvents(forActiveListParams: null);
-    final List<EcoEvent>? readFiltered =
-        await cache.readEvents(forActiveListParams: filtered);
+    final List<EcoEvent>? readGlobal = await cache.readEvents(
+      forActiveListParams: null,
+    );
+    final List<EcoEvent>? readFiltered = await cache.readEvents(
+      forActiveListParams: filtered,
+    );
 
     expect(readGlobal?.single.id, 'g1');
     expect(readFiltered?.single.id, 'f1');
@@ -73,7 +79,7 @@ void main() {
   test('clear removes legacy and filtered keys', () async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     const EventsLocalCache cache = EventsLocalCache();
-    final EcoEventSearchParams filtered = const EcoEventSearchParams(query: 'z');
+    const EcoEventSearchParams filtered = EcoEventSearchParams(query: 'z');
 
     await prefs.setString(
       EventsLocalCache.legacyEventsCacheKey,
@@ -87,6 +93,9 @@ void main() {
     await cache.clear();
 
     expect(prefs.getString(EventsLocalCache.legacyEventsCacheKey), isNull);
-    expect(prefs.getString(EventsLocalCache.storageKeyForListParams(filtered)), isNull);
+    expect(
+      prefs.getString(EventsLocalCache.storageKeyForListParams(filtered)),
+      isNull,
+    );
   });
 }

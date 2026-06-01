@@ -1,6 +1,6 @@
-import 'package:chisto_mobile/core/providers/refresh_signals_providers.dart';
-import 'package:chisto_mobile/core/providers/root_container.dart';
-import 'package:chisto_mobile/features/notifications/data/notification_unread_publish.dart';
+import 'package:chisto_infrastructure/core/providers/refresh_signals_providers.dart';
+import 'package:chisto_infrastructure/core/providers/root_container.dart';
+import 'package:feature_notifications/src/data/notification_unread_publish.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -11,13 +11,16 @@ void main() {
     setNotificationsUnreadCount(2);
   });
 
-  test('publishNotificationsUnreadCountRespectingSuppress blocks increases', () {
-    beginSuppressUnreadBadgeIncreases();
-    publishNotificationsUnreadCountRespectingSuppress(5);
-    expect(readNotificationsUnreadCount(), 2);
-    publishNotificationsUnreadCountRespectingSuppress(0);
-    expect(readNotificationsUnreadCount(), 0);
-  });
+  test(
+    'publishNotificationsUnreadCountRespectingSuppress blocks increases',
+    () {
+      beginSuppressUnreadBadgeIncreases();
+      publishNotificationsUnreadCountRespectingSuppress(5);
+      expect(readNotificationsUnreadCount(), 2);
+      publishNotificationsUnreadCountRespectingSuppress(0);
+      expect(readNotificationsUnreadCount(), 0);
+    },
+  );
 
   test('shouldApplyServerUnreadCount allows sync outside suppress window', () {
     setNotificationsUnreadCount(0);

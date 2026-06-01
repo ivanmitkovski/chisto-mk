@@ -1,11 +1,13 @@
 // Run from apps/mobile: dart run tool/check_haptics_usage.dart
 import 'dart:io';
 
-const String _allowedFile = 'lib/shared/utils/app_haptics.dart';
+import 'feature_roots_guard_util.dart';
+
+const String _allowedFileSuffix = 'shared/utils/app_haptics.dart';
 const String _capAllowlistPath = 'tool/haptics_cap_allowlist.txt';
 
 /// Raw Flutter haptics and legacy [AppHaptics] API names — use the 6-method
-/// surface in [_allowedFile] instead.
+/// surface in app_haptics.dart instead.
 const List<String> _bannedPatterns = <String>[
   'HapticFeedback.',
   'AppHaptics.softTransition',
@@ -56,26 +58,17 @@ Map<String, int> _loadCapAllowlist() {
 }
 
 void main() {
-  final Directory libRoot = Directory('lib');
-  if (!libRoot.existsSync()) {
-    stderr.writeln('lib/ not found (run from apps/mobile).');
-    exit(2);
-  }
-
   final Map<String, int> capAllowlist = _loadCapAllowlist();
   final Map<String, int> usageCounts = <String, int>{};
   final List<String> violations = <String>[];
 
-  for (final FileSystemEntity entity in libRoot.listSync(recursive: true)) {
-    if (entity is! File || !entity.path.endsWith('.dart')) {
-      continue;
-    }
-    final String normalized = entity.path.replaceAll(r'\', '/');
-    if (normalized.endsWith(_allowedFile)) {
+  for (final File file in iterFeatureDartFiles(roots: allAppCodeRoots())) {
+    final String normalized = normalizePath(file.path);
+    if (normalized.endsWith(_allowedFileSuffix)) {
       continue;
     }
 
-    final List<String> lines = entity.readAsLinesSync();
+    final List<String> lines = file.readAsLinesSync();
     for (int i = 0; i < lines.length; i++) {
       final String line = lines[i];
       for (final String pattern in _bannedPatterns) {
@@ -93,7 +86,7 @@ void main() {
     final int? cap = capAllowlist[entry.key];
     if (cap != null && entry.value > cap) {
       violations.add(
-        '$entry.key: AppHaptics usage ${entry.value} exceeds cap $cap',
+        '${entry.key}: AppHaptics usage ${entry.value} exceeds cap $cap',
       );
     }
   }

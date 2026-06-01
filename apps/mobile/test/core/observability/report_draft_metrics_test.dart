@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/core/observability/report_draft_metrics.dart';
+import 'package:chisto_infrastructure/core/observability/report_draft_metrics.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

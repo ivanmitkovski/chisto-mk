@@ -1,13 +1,11 @@
 import 'dart:convert';
 
-import 'package:chisto_mobile/features/home/data/sites_local_cache.dart';
+import 'package:feature_home/src/data/sites_local_cache.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  setUpAll(() {
-    TestWidgetsFlutterBinding.ensureInitialized();
-  });
+  setUpAll(TestWidgetsFlutterBinding.ensureInitialized);
 
   setUp(() {
     SharedPreferences.setMockInitialValues(<String, Object>{});
@@ -28,10 +26,7 @@ void main() {
         jsonEncode(<String, dynamic>{
           'version': 2,
           'feeds': <String, dynamic>{
-            'scopeA': <String, dynamic>{
-              'updatedAtMs': 1,
-              'pages': <dynamic>[],
-            },
+            'scopeA': <String, dynamic>{'updatedAtMs': 1, 'pages': <dynamic>[]},
           },
         }),
       );
@@ -49,7 +44,9 @@ void main() {
       final DateTime now = DateTime.now();
       const String scopeKey = 's1';
       const String requestKey = 'rk1';
-      const Map<String, dynamic> payload = <String, dynamic>{'data': <dynamic>[]};
+      const Map<String, dynamic> payload = <String, dynamic>{
+        'data': <dynamic>[],
+      };
 
       await cache.persistFeedSnapshot(
         scopeKey: scopeKey,
@@ -61,11 +58,8 @@ void main() {
         nextCursor: 'n1',
       );
 
-      final ({
-        Map<String, dynamic> payload,
-        DateTime cachedAt,
-        int storedPage,
-      })? loaded = await cache.loadFeedPage(
+      final ({Map<String, dynamic> payload, DateTime cachedAt, int storedPage})?
+      loaded = await cache.loadFeedPage(
         requestKey: requestKey,
         scopeKey: scopeKey,
         page: 1,
@@ -106,11 +100,8 @@ void main() {
         }),
       );
 
-      final ({
-        Map<String, dynamic> payload,
-        DateTime cachedAt,
-        int storedPage,
-      })? loaded = await cache.loadFeedPage(
+      final ({Map<String, dynamic> payload, DateTime cachedAt, int storedPage})?
+      loaded = await cache.loadFeedPage(
         requestKey: 'old',
         scopeKey: 'expired',
         page: 1,

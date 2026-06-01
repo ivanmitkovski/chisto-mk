@@ -1,8 +1,8 @@
-import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
-import 'package:chisto_mobile/features/events/presentation/widgets/eco_event_card.dart';
-import 'package:chisto_mobile/features/events/presentation/widgets/events_feed/events_empty_states.dart';
-import 'package:chisto_mobile/features/events/presentation/widgets/events_filter_chips.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_events/src/domain/models/eco_event.dart';
+import 'package:feature_events/src/presentation/widgets/eco_event_card.dart';
+import 'package:feature_events/src/presentation/widgets/events_feed/events_empty_states.dart';
+import 'package:feature_events/src/presentation/widgets/events_filter_chips.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -16,7 +16,7 @@ void main() {
       siteId: '1',
       siteName: 'Community site near the old bridge and park entrance',
       siteImageUrl: 'assets/test.png',
-      siteDistanceKm: 5.0,
+      siteDistanceKm: 5,
       organizerId: 'org-1',
       organizerName: 'Organizer',
       date: DateTime(2025, 6, 15),
@@ -28,53 +28,55 @@ void main() {
     );
   }
 
-  testWidgets('feed empty state + filter chips + list card tolerate large text',
-      (WidgetTester tester) async {
-    EcoEventFilter? filter;
+  testWidgets(
+    'feed empty state + filter chips + list card tolerate large text',
+    (WidgetTester tester) async {
+      EcoEventFilter? filter;
 
-    await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        builder: (BuildContext context, Widget? child) {
-          return MediaQuery(
-            data: MediaQuery.of(context).copyWith(
-              textScaler: TextScaler.linear(1.45),
-            ),
-            child: child!,
-          );
-        },
-        home: Scaffold(
-          body: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                EventsFilterChips(
-                  active: EcoEventFilter.all,
-                  onSelected: (EcoEventFilter v) => filter = v,
-                ),
-                const SizedBox(height: 24),
-                const EventsEmptyState(filter: EcoEventFilter.all),
-                const SizedBox(height: 24),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: EcoEventCard(
-                    event: buildListCardEvent(),
-                    onTap: () {},
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
+          builder: (BuildContext context, Widget? child) {
+            return MediaQuery(
+              data: MediaQuery.of(
+                context,
+              ).copyWith(textScaler: const TextScaler.linear(1.45)),
+              child: child!,
+            );
+          },
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  EventsFilterChips(
+                    active: EcoEventFilter.all,
+                    onSelected: (EcoEventFilter v) => filter = v,
                   ),
-                ),
-              ],
+                  const SizedBox(height: 24),
+                  const EventsEmptyState(filter: EcoEventFilter.all),
+                  const SizedBox(height: 24),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: EcoEventCard(
+                      event: buildListCardEvent(),
+                      onTap: () {},
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-    );
+      );
 
-    await tester.pumpAndSettle();
-    expect(tester.takeException(), isNull);
-    await tester.tap(find.text('Upcoming'));
-    await tester.pumpAndSettle();
-    expect(filter, EcoEventFilter.upcoming);
-  });
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      await tester.tap(find.text('Upcoming'));
+      await tester.pumpAndSettle();
+      expect(filter, EcoEventFilter.upcoming);
+    },
+  );
 }

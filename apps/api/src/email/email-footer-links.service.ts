@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NotificationType } from '../prisma-client';
 import { EmailUnsubscribeTokenService } from './email-unsubscribe-token.service';
-import { resolveEmailLogoSrc } from './email-logo';
+import { resolveEmailLogo, type ResolvedEmailLogo } from './email-logo';
 import { resolveAppBaseUrl } from './email-urls';
 
 /**
@@ -26,13 +26,13 @@ export class EmailFooterLinksService {
     return `${this.publicApiBase()}/notifications/email/unsubscribe?token=${encodeURIComponent(token)}`;
   }
 
-  brandingUrls(): { appBaseUrl: string; logoUrl: string } {
+  brandingUrls(): { appBaseUrl: string } & ResolvedEmailLogo {
     return {
       appBaseUrl: resolveAppBaseUrl({
         emailApp: this.config.get<string>('EMAIL_APP_BASE_URL'),
         share: this.config.get<string>('SHARE_BASE_URL'),
       }),
-      logoUrl: resolveEmailLogoSrc({
+      ...resolveEmailLogo({
         logo: this.config.get<string>('EMAIL_LOGO_URL'),
       }),
     };

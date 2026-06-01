@@ -1,7 +1,7 @@
-import 'package:chisto_mobile/features/notifications/data/notification_inbox_actions.dart';
-import 'package:chisto_mobile/features/notifications/data/notification_inbox_router.dart';
-import 'package:chisto_mobile/features/notifications/domain/models/notification_inbox_highlight.dart';
-import 'package:chisto_mobile/features/notifications/domain/models/user_notification.dart';
+import 'package:feature_notifications/src/data/notification_inbox_actions.dart';
+import 'package:feature_notifications/src/data/notification_inbox_router.dart';
+import 'package:feature_notifications/src/domain/models/notification_inbox_highlight.dart';
+import 'package:feature_notifications/src/domain/models/user_notification.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 UserNotification _notification({

@@ -1,26 +1,19 @@
-import 'package:chisto_mobile/features/events/data/chat/event_chat_connection_status.dart';
-import 'package:chisto_mobile/features/events/data/chat/event_chat_fetch_result.dart';
-import 'package:chisto_mobile/features/events/data/chat/event_chat_message.dart';
-import 'package:chisto_mobile/features/events/data/chat/in_memory_event_chat_repository.dart';
-import 'package:chisto_mobile/features/events/presentation/screens/event_chat_screen.dart';
-import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_message_bubble.dart';
-import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_search_result_tile.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_events/src/data/chat/event_chat_connection_status.dart';
+import 'package:feature_events/src/data/chat/event_chat_fetch_result.dart';
+import 'package:feature_events/src/data/chat/event_chat_message.dart';
+import 'package:feature_events/src/data/chat/in_memory_event_chat_repository.dart';
+import 'package:feature_events/src/presentation/screens/event_chat_screen.dart';
+import 'package:feature_events/src/presentation/widgets/chat/chat_message_bubble.dart';
+import 'package:feature_events/src/presentation/widgets/chat/chat_search_result_tile.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../shared/widget_test_bootstrap.dart';
+
 Widget _app({required Widget child, double textScale = 1.0}) {
-  return MaterialApp(
-    locale: const Locale('en'),
-    localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
-      AppLocalizations.delegate,
-      GlobalMaterialLocalizations.delegate,
-      GlobalWidgetsLocalizations.delegate,
-      GlobalCupertinoLocalizations.delegate,
-    ],
-    supportedLocales: AppLocalizations.supportedLocales,
-    home: MediaQuery(
+  return wrapForWidgetTest(
+    MediaQuery(
       data: MediaQueryData(
         size: const Size(400, 800),
         textScaler: TextScaler.linear(textScale),
@@ -37,6 +30,11 @@ Future<void> _settle(WidgetTester tester) async {
   await tester.pump();
   await tester.pump();
   await tester.pump();
+}
+
+Future<void> _finishChatTest(WidgetTester tester) async {
+  await tester.pumpWidget(const SizedBox.shrink());
+  await tester.pump(const Duration(seconds: 11));
 }
 
 /// HTTP search always empty; history still loads from the same in-memory store.
@@ -57,6 +55,10 @@ class _EmptySearchInMemoryRepo extends InMemoryEventChatRepository {
 }
 
 void main() {
+  setUpAll(() async {
+    await bootstrapWidgetTests();
+  });
+
   testWidgets('shows system message from repo', (WidgetTester tester) async {
     final InMemoryEventChatRepository repo = InMemoryEventChatRepository();
     await repo.seedOtherMessage(
@@ -71,100 +73,124 @@ void main() {
       },
     );
 
-    await tester.pumpWidget(_app(
-      child: EventChatScreen(
-        eventId: 'e1',
-        eventTitle: 'River cleanup',
-        isOrganizer: true,
-        repository: repo,
+    await tester.pumpWidget(
+      _app(
+        child: EventChatScreen(
+          eventId: 'e1',
+          eventTitle: 'River cleanup',
+          isOrganizer: true,
+          repository: repo,
+        ),
       ),
-    ));
+    );
 
     await _settle(tester);
     expect(find.textContaining('Pat'), findsWidgets);
+    await _finishChatTest(tester);
     repo.dispose();
   });
 
   testWidgets('shows empty state', (WidgetTester tester) async {
     final InMemoryEventChatRepository repo = InMemoryEventChatRepository();
 
-    await tester.pumpWidget(_app(
-      textScale: 1.45,
-      child: EventChatScreen(
-        eventId: 'e1',
-        eventTitle: 'River cleanup',
-        isOrganizer: true,
-        repository: repo,
+    await tester.pumpWidget(
+      _app(
+        textScale: 1.45,
+        child: EventChatScreen(
+          eventId: 'e1',
+          eventTitle: 'River cleanup',
+          isOrganizer: true,
+          repository: repo,
+        ),
       ),
-    ));
+    );
 
     await _settle(tester);
     expect(find.textContaining('River cleanup'), findsOneWidget);
+    await _finishChatTest(tester);
     repo.dispose();
   });
 
-  testWidgets('connection banner hidden on initial connect', (WidgetTester tester) async {
+  testWidgets('connection banner hidden on initial connect', (
+    WidgetTester tester,
+  ) async {
     final InMemoryEventChatRepository repo = InMemoryEventChatRepository();
     repo.setConnectionStatusForTest('e1', EventChatConnectionStatus.connected);
 
-    await tester.pumpWidget(_app(
-      child: EventChatScreen(
-        eventId: 'e1',
-        eventTitle: 'Test',
-        isOrganizer: false,
-        repository: repo,
-      ),
-    ));
-
-    await _settle(tester);
-    expect(find.text('Reconnecting…'), findsNothing);
-    repo.dispose();
-  });
-
-  testWidgets(
-    'no network banner while disconnected before first connected',
-    (WidgetTester tester) async {
-      final InMemoryEventChatRepository repo = InMemoryEventChatRepository();
-      repo.setConnectionStatusForTest('e1', EventChatConnectionStatus.disconnected);
-
-      await tester.pumpWidget(_app(
+    await tester.pumpWidget(
+      _app(
         child: EventChatScreen(
           eventId: 'e1',
           eventTitle: 'Test',
           isOrganizer: false,
           repository: repo,
         ),
-      ));
+      ),
+    );
 
-      await _settle(tester);
-      expect(find.text('Check your connection and try again.'), findsNothing);
-      repo.dispose();
-    },
-  );
+    await _settle(tester);
+    expect(find.text('Reconnecting…'), findsNothing);
+    await _finishChatTest(tester);
+    repo.dispose();
+  });
+
+  testWidgets('no network banner while disconnected before first connected', (
+    WidgetTester tester,
+  ) async {
+    final InMemoryEventChatRepository repo = InMemoryEventChatRepository();
+    repo.setConnectionStatusForTest(
+      'e1',
+      EventChatConnectionStatus.disconnected,
+    );
+
+    await tester.pumpWidget(
+      _app(
+        child: EventChatScreen(
+          eventId: 'e1',
+          eventTitle: 'Test',
+          isOrganizer: false,
+          repository: repo,
+        ),
+      ),
+    );
+
+    await _settle(tester);
+    expect(find.text('Check your connection and try again.'), findsNothing);
+    await _finishChatTest(tester);
+    repo.dispose();
+  });
 
   testWidgets(
     'no reconnecting banner during first handshake reconnecting status',
     (WidgetTester tester) async {
       final InMemoryEventChatRepository repo = InMemoryEventChatRepository();
-      repo.setConnectionStatusForTest('e1', EventChatConnectionStatus.reconnecting);
+      repo.setConnectionStatusForTest(
+        'e1',
+        EventChatConnectionStatus.reconnecting,
+      );
 
-      await tester.pumpWidget(_app(
-        child: EventChatScreen(
-          eventId: 'e1',
-          eventTitle: 'Test',
-          isOrganizer: false,
-          repository: repo,
+      await tester.pumpWidget(
+        _app(
+          child: EventChatScreen(
+            eventId: 'e1',
+            eventTitle: 'Test',
+            isOrganizer: false,
+            repository: repo,
+          ),
         ),
-      ));
+      );
 
       await _settle(tester);
       await tester.pump(const Duration(seconds: 4));
       expect(find.text('Reconnecting…'), findsNothing);
+      await _finishChatTest(tester);
       repo.dispose();
     },
   );
 
-  testWidgets('pinned bar shows unpin button for organizer', (WidgetTester tester) async {
+  testWidgets('pinned bar shows unpin button for organizer', (
+    WidgetTester tester,
+  ) async {
     final InMemoryEventChatRepository repo = InMemoryEventChatRepository();
     final EventChatMessage seeded = await repo.seedOtherMessage(
       'e1',
@@ -174,21 +200,26 @@ void main() {
     );
     await repo.setPin('e1', seeded.id, pinned: true);
 
-    await tester.pumpWidget(_app(
-      child: EventChatScreen(
-        eventId: 'e1',
-        eventTitle: 'Cleanup',
-        isOrganizer: true,
-        repository: repo,
+    await tester.pumpWidget(
+      _app(
+        child: EventChatScreen(
+          eventId: 'e1',
+          eventTitle: 'Cleanup',
+          isOrganizer: true,
+          repository: repo,
+        ),
       ),
-    ));
+    );
 
     await _settle(tester);
     expect(find.textContaining('Important'), findsWidgets);
+    await _finishChatTest(tester);
     repo.dispose();
   });
 
-  testWidgets('swipe reply shows composer reply strip', (WidgetTester tester) async {
+  testWidgets('swipe reply shows composer reply strip', (
+    WidgetTester tester,
+  ) async {
     final InMemoryEventChatRepository repo = InMemoryEventChatRepository();
     await repo.seedOtherMessage(
       'e1',
@@ -197,26 +228,34 @@ void main() {
       body: 'Hello swipe',
     );
 
-    await tester.pumpWidget(_app(
-      child: EventChatScreen(
-        eventId: 'e1',
-        eventTitle: 'Test',
-        isOrganizer: false,
-        repository: repo,
+    await tester.pumpWidget(
+      _app(
+        child: EventChatScreen(
+          eventId: 'e1',
+          eventTitle: 'Test',
+          isOrganizer: false,
+          repository: repo,
+        ),
       ),
-    ));
+    );
 
     await _settle(tester);
     expect(find.textContaining('Hello swipe'), findsWidgets);
 
-    await tester.drag(find.textContaining('Hello swipe').first, const Offset(-80, 0));
+    await tester.drag(
+      find.textContaining('Hello swipe').first,
+      const Offset(-80, 0),
+    );
     await tester.pumpAndSettle();
 
     expect(find.textContaining('Replying to Pat'), findsOneWidget);
+    await _finishChatTest(tester);
     repo.dispose();
   });
 
-  testWidgets('tapping app bar title opens participants sheet', (WidgetTester tester) async {
+  testWidgets('tapping app bar title opens participants sheet', (
+    WidgetTester tester,
+  ) async {
     final InMemoryEventChatRepository repo = InMemoryEventChatRepository();
     await repo.seedOtherMessage(
       'e1',
@@ -225,14 +264,16 @@ void main() {
       body: 'Hi',
     );
 
-    await tester.pumpWidget(_app(
-      child: EventChatScreen(
-        eventId: 'e1',
-        eventTitle: 'River cleanup',
-        isOrganizer: true,
-        repository: repo,
+    await tester.pumpWidget(
+      _app(
+        child: EventChatScreen(
+          eventId: 'e1',
+          eventTitle: 'River cleanup',
+          isOrganizer: true,
+          repository: repo,
+        ),
       ),
-    ));
+    );
 
     await _settle(tester);
     // [_loadMeta] runs in an unawaited batch after initial load; allow it to finish.
@@ -250,20 +291,23 @@ void main() {
     expect(find.text(l10n.eventChatParticipantsSheetTitle), findsOneWidget);
     // Name also appears in the message list behind the sheet.
     expect(find.text('Pat Smith'), findsWidgets);
+    await _finishChatTest(tester);
     repo.dispose();
   });
 
   testWidgets('search opens and can be closed', (WidgetTester tester) async {
     final InMemoryEventChatRepository repo = InMemoryEventChatRepository();
 
-    await tester.pumpWidget(_app(
-      child: EventChatScreen(
-        eventId: 'e1',
-        eventTitle: 'Test',
-        isOrganizer: false,
-        repository: repo,
+    await tester.pumpWidget(
+      _app(
+        child: EventChatScreen(
+          eventId: 'e1',
+          eventTitle: 'Test',
+          isOrganizer: false,
+          repository: repo,
+        ),
       ),
-    ));
+    );
 
     await _settle(tester);
     final Finder searchButton = find.byIcon(Icons.search);
@@ -273,10 +317,13 @@ void main() {
       final Finder closeButton = find.byIcon(Icons.close);
       expect(closeButton, findsWidgets);
     }
+    await _finishChatTest(tester);
     repo.dispose();
   });
 
-  testWidgets('search mode does not show main chat bubbles', (WidgetTester tester) async {
+  testWidgets('search mode does not show main chat bubbles', (
+    WidgetTester tester,
+  ) async {
     final InMemoryEventChatRepository repo = InMemoryEventChatRepository();
     await repo.seedOtherMessage(
       'e1',
@@ -285,14 +332,16 @@ void main() {
       body: 'Visible in transcript',
     );
 
-    await tester.pumpWidget(_app(
-      child: EventChatScreen(
-        eventId: 'e1',
-        eventTitle: 'Test',
-        isOrganizer: false,
-        repository: repo,
+    await tester.pumpWidget(
+      _app(
+        child: EventChatScreen(
+          eventId: 'e1',
+          eventTitle: 'Test',
+          isOrganizer: false,
+          repository: repo,
+        ),
       ),
-    ));
+    );
 
     await _settle(tester);
     expect(find.byType(ChatMessageBubble), findsWidgets);
@@ -301,10 +350,13 @@ void main() {
     await _settle(tester);
 
     expect(find.byType(ChatMessageBubble), findsNothing);
+    await _finishChatTest(tester);
     repo.dispose();
   });
 
-  testWidgets('search shows local matches when API search returns empty', (WidgetTester tester) async {
+  testWidgets('search shows local matches when API search returns empty', (
+    WidgetTester tester,
+  ) async {
     final _EmptySearchInMemoryRepo repo = _EmptySearchInMemoryRepo();
     await repo.seedOtherMessage(
       'e1',
@@ -313,14 +365,16 @@ void main() {
       body: 'ZetaQuery99 unique',
     );
 
-    await tester.pumpWidget(_app(
-      child: EventChatScreen(
-        eventId: 'e1',
-        eventTitle: 'Test',
-        isOrganizer: false,
-        repository: repo,
+    await tester.pumpWidget(
+      _app(
+        child: EventChatScreen(
+          eventId: 'e1',
+          eventTitle: 'Test',
+          isOrganizer: false,
+          repository: repo,
+        ),
       ),
-    ));
+    );
 
     await _settle(tester);
     await tester.tap(find.byIcon(Icons.search).first);
@@ -332,6 +386,7 @@ void main() {
 
     expect(find.byType(ChatMessageBubble), findsNothing);
     expect(find.byType(ChatSearchResultTile), findsOneWidget);
+    await _finishChatTest(tester);
     repo.dispose();
   });
 }

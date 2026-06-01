@@ -12,7 +12,7 @@ void main() {
       if (entity is! File || !entity.path.endsWith('.dart')) {
         continue;
       }
-      final String normalized = entity.path.replaceAll('\\', '/');
+      final String normalized = entity.path.replaceAll(r'\', '/');
       if (normalized.contains('/lib/dev/')) {
         continue;
       }

@@ -90,6 +90,27 @@ describe('MapSiteRepositoryService', () => {
     expect(prisma.$queryRaw).toHaveBeenCalled();
     const text = sqlTextFromQueryRawCall(prisma.$queryRaw.mock.calls[0] as unknown[]);
     expect(text).toContain('"isHot" = true');
+    expect(text).toContain('APPROVED');
+  });
+
+  it('includes reporter visibility when viewerUserId is set', async () => {
+    const prisma = {
+      $queryRaw: jest.fn().mockResolvedValue([]),
+      site: { findMany: jest.fn() },
+    };
+    const validator = {
+      hasViewportBounds: jest.fn().mockReturnValue(false),
+    } as unknown as MapQueryValidatorService;
+
+    const sitesSvc = new MapSiteRepositorySitesService(prisma as never, validator);
+    const aggSvc = new MapSiteRepositoryAggregatesService(prisma as never, validator);
+    const svc = new MapSiteRepositoryService(sitesSvc, aggSvc);
+    const query = { lat: 41.9, lng: 21.4, radiusKm: 50 } as ListSitesMapQueryDto;
+    await svc.findSites(query, 10, 'user-abc');
+
+    const text = sqlTextFromQueryRawCall(prisma.$queryRaw.mock.calls[0] as unknown[]);
+    expect(text).toContain('reporterId');
+    expect(text).toContain('user-abc');
   });
 
   it('includes isHot filter for projection resolveDataVersion', async () => {

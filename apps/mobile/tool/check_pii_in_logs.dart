@@ -1,23 +1,20 @@
 // ignore_for_file: avoid_print
 import 'dart:io';
 
+import 'feature_roots_guard_util.dart';
+
 /// Fails if AppLog.warn/error messages embed obvious PII patterns.
 void main() {
   final RegExp pii = RegExp(
-    r"AppLog\.(warn|error)\([^)]*(@|\+\d{6,}|Bearer\s|accessToken|refreshToken|password)",
+    r'AppLog\.(warn|error)\([^)]*(@|\+\d{6,}|Bearer\s|accessToken|refreshToken|\bpassword\b)',
     caseSensitive: false,
   );
-  final Directory lib = Directory('lib');
-  if (!lib.existsSync()) {
-    stderr.writeln('Run from apps/mobile');
-    exit(1);
-  }
   final List<String> hits = <String>[];
-  for (final FileSystemEntity e in lib.listSync(recursive: true)) {
-    if (e is! File || !e.path.endsWith('.dart')) continue;
-    final String content = e.readAsStringSync();
+  for (final File file in iterFeatureDartFiles(roots: allAppCodeRoots())) {
+    final String normalized = normalizePath(file.path);
+    final String content = file.readAsStringSync();
     for (final RegExpMatch m in pii.allMatches(content)) {
-      hits.add('${e.path}: ${m.group(0)}');
+      hits.add('$normalized: ${m.group(0)}');
     }
   }
   if (hits.isNotEmpty) {

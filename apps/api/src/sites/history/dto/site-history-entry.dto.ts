@@ -44,10 +44,36 @@ export class SiteHistoryEntryDto {
   metadata!: Record<string, unknown> | null;
 }
 
+export class SiteHistorySummaryDto {
+  @ApiProperty()
+  totalEntries!: number;
+
+  @ApiProperty()
+  reportCount!: number;
+
+  @ApiProperty()
+  cleanupCount!: number;
+
+  @ApiProperty({ enum: SiteStatus })
+  currentStatus!: SiteStatus;
+
+  @ApiProperty()
+  firstActivityAt!: string;
+
+  @ApiProperty()
+  lastActivityAt!: string;
+}
+
 export class SiteHistoryListResponseDto {
   @ApiProperty({ type: [SiteHistoryEntryDto] })
   items!: SiteHistoryEntryDto[];
 
   @ApiPropertyOptional({ description: 'Cursor for the next page (entry id)' })
   nextBeforeId!: string | null;
+
+  @ApiPropertyOptional({
+    type: SiteHistorySummaryDto,
+    description: 'Present on the first page only; null on paginated follow-up requests.',
+  })
+  summary!: SiteHistorySummaryDto | null;
 }

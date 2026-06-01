@@ -1,5 +1,5 @@
-import 'package:chisto_mobile/core/errors/app_error.dart';
-import 'package:chisto_mobile/core/network/api_failure_mapper.dart';
+import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:chisto_infrastructure/core/network/api_failure_mapper.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

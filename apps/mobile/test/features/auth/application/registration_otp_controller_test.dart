@@ -1,6 +1,6 @@
-import 'package:chisto_mobile/core/errors/app_error.dart';
-import 'package:chisto_mobile/features/auth/application/registration_otp_controller.dart';
-import 'package:chisto_mobile/features/auth/presentation/constants/auth_otp_constants.dart';
+import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:feature_auth/src/application/registration_otp_controller.dart';
+import 'package:feature_auth/src/presentation/constants/auth_otp_constants.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -22,8 +22,9 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    final RegistrationOtpController notifier =
-        container.read(registrationOtpControllerProvider.notifier);
+    final RegistrationOtpController notifier = container.read(
+      registrationOtpControllerProvider.notifier,
+    );
 
     for (int i = 0; i < kAuthOtpMaxClientInvalidAttempts; i++) {
       await expectLater(
@@ -32,8 +33,9 @@ void main() {
       );
     }
 
-    final RegistrationOtpState state =
-        container.read(registrationOtpControllerProvider);
+    final RegistrationOtpState state = container.read(
+      registrationOtpControllerProvider,
+    );
     expect(state.otpLocked, isTrue);
     expect(state.verifyAttempts, kAuthOtpMaxClientInvalidAttempts);
     expect(state.error, isNull);
@@ -48,8 +50,9 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    final RegistrationOtpController notifier =
-        container.read(registrationOtpControllerProvider.notifier);
+    final RegistrationOtpController notifier = container.read(
+      registrationOtpControllerProvider.notifier,
+    );
 
     for (int i = 0; i < kAuthOtpMaxClientInvalidAttempts; i++) {
       await expectLater(
@@ -59,7 +62,10 @@ void main() {
     }
     notifier.resetAttempts();
 
-    expect(container.read(registrationOtpControllerProvider).otpLocked, isFalse);
+    expect(
+      container.read(registrationOtpControllerProvider).otpLocked,
+      isFalse,
+    );
     expect(container.read(registrationOtpControllerProvider).verifyAttempts, 0);
   });
 }

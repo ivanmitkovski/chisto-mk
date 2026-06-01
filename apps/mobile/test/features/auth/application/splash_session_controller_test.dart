@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/features/auth/application/splash_session_controller.dart';
+import 'package:feature_auth/src/application/splash_session_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -33,13 +33,18 @@ void main() {
 
     expect(restored, isTrue);
     expect(container.read(splashSessionControllerProvider).completed, isTrue);
-    expect(container.read(splashSessionControllerProvider).isRestoring, isFalse);
+    expect(
+      container.read(splashSessionControllerProvider).isRestoring,
+      isFalse,
+    );
   });
 
   test('pauseAfterRestore skips completed flag', () async {
     SplashSessionController.pauseAfterRestore = true;
     final ProviderContainer container = ProviderContainer(
-      overrides: AuthTestOverrides(authRepository: FakeAuthRepository()).build(),
+      overrides: AuthTestOverrides(
+        authRepository: FakeAuthRepository(),
+      ).build(),
     );
     addTearDown(container.dispose);
 

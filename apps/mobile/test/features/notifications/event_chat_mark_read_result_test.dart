@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/features/notifications/data/event_chat_mark_read_result.dart';
+import 'package:feature_notifications/src/data/event_chat_mark_read_result.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -19,7 +19,9 @@ void main() {
 
   test('fromResponseJson returns null without meta', () {
     expect(
-      EventChatMarkReadResult.fromResponseJson(<String, dynamic>{'data': <String, dynamic>{}}),
+      EventChatMarkReadResult.fromResponseJson(<String, dynamic>{
+        'data': <String, dynamic>{},
+      }),
       isNull,
     );
   });

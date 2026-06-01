@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:chisto_mobile/features/reports/domain/models/report_capacity.dart';
-import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/reporting_capacity_guard.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_reports/src/domain/models/report_capacity.dart';
+import 'package:feature_reports/src/presentation/widgets/new_report/reporting_capacity_guard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -11,11 +11,11 @@ void main() {
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: const Scaffold(body: SizedBox.shrink()),
+        locale: Locale('en'),
+        home: Scaffold(body: SizedBox.shrink()),
       ),
     );
 

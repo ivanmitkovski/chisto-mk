@@ -1,6 +1,6 @@
-import 'package:chisto_mobile/core/errors/app_error.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/widgets/molecules/app_error_view.dart';
+import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/shared/widgets/molecules/app_error_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -10,17 +10,14 @@ void main() {
       const errorMessage = 'Something went wrong';
 
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          locale: const Locale('en'),
+          locale: Locale('en'),
           home: Scaffold(
             body: AppErrorView(
               autoRecoverSession: false,
-              error: AppError(
-                code: 'ERR',
-                message: errorMessage,
-              ),
+              error: AppError(code: 'ERR', message: errorMessage),
             ),
           ),
         ),
@@ -29,8 +26,9 @@ void main() {
       expect(find.text(errorMessage), findsOneWidget);
     });
 
-    testWidgets('shows retry button for retryable errors',
-        (WidgetTester tester) async {
+    testWidgets('shows retry button for retryable errors', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -50,8 +48,9 @@ void main() {
       expect(find.byType(FilledButton), findsOneWidget);
     });
 
-    testWidgets('hides retry button for non-retryable errors',
-        (WidgetTester tester) async {
+    testWidgets('hides retry button for non-retryable errors', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -71,8 +70,9 @@ void main() {
       expect(find.text('Sign out'), findsOneWidget);
     });
 
-    testWidgets('shows logout button for session-invalid errors',
-        (WidgetTester tester) async {
+    testWidgets('shows logout button for session-invalid errors', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -93,17 +93,18 @@ void main() {
       expect(find.text('Try again'), findsNothing);
     });
 
-    testWidgets('shows logout for SESSION_REVOKED (revoked server session)',
-        (WidgetTester tester) async {
+    testWidgets('shows logout for SESSION_REVOKED (revoked server session)', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          locale: const Locale('en'),
+          locale: Locale('en'),
           home: Scaffold(
             body: AppErrorView(
               autoRecoverSession: false,
-              error: const AppError(
+              error: AppError(
                 code: 'SESSION_REVOKED',
                 message: 'Session is no longer valid',
               ),
@@ -113,16 +114,15 @@ void main() {
       );
 
       expect(
-        find.text(
-          'Session is no longer valid. Please sign in again.',
-        ),
+        find.text('Session is no longer valid. Please sign in again.'),
         findsOneWidget,
       );
       expect(find.text('Sign out'), findsOneWidget);
     });
 
-    testWidgets('does not show logout button for non-auth errors',
-        (WidgetTester tester) async {
+    testWidgets('does not show logout button for non-auth errors', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,

@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/features/onboarding/presentation/coach/coach_tour_layout.dart';
+import 'package:feature_onboarding/src/presentation/coach/coach_tour_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

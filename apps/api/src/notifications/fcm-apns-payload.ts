@@ -52,6 +52,8 @@ export function resolveThreadId(data?: FcmPushData): string | undefined {
 
 export function resolveInterruptionLevel(data?: FcmPushData): string {
   if (isSilentBadgeSync(data)) return 'passive';
+  // Admin test push and other explicit high-priority kinds must bypass quiet hours + passive delivery.
+  if (data?.['kind'] === 'test_push') return 'time-sensitive';
   const type = data?.['notificationType'] ?? data?.['type'];
   switch (type) {
     case 'EVENT_CHAT':

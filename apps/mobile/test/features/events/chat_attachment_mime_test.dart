@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_attachment_mime.dart';
+import 'package:feature_events/src/presentation/widgets/chat/chat_attachment_mime.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -15,7 +15,14 @@ void main() {
     });
 
     test('uses JPEG magic bytes when extension is wrong', () {
-      final Uint8List jpeg = Uint8List.fromList(<int>[0xff, 0xd8, 0xff, 0xe0, 0, 0]);
+      final Uint8List jpeg = Uint8List.fromList(<int>[
+        0xff,
+        0xd8,
+        0xff,
+        0xe0,
+        0,
+        0,
+      ]);
       expect(ChatAttachmentMime.infer('wrong.bin', jpeg), 'image/jpeg');
     });
   });

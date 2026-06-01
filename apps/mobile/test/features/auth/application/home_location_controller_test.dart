@@ -1,5 +1,5 @@
-import 'package:chisto_mobile/core/errors/app_error.dart';
-import 'package:chisto_mobile/features/auth/application/home_location_controller.dart';
+import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:feature_auth/src/application/home_location_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -16,15 +16,16 @@ void main() {
   test('saveHomeLocation succeeds', () async {
     var saved = false;
     final FakeAuthRepository repo = FakeAuthRepository(
-      updateHomeLocationImpl: ({
-        required double latitude,
-        required double longitude,
-        String? label,
-      }) async {
-        saved = true;
-        expect(latitude, 41.6);
-        expect(longitude, 21.7);
-      },
+      updateHomeLocationImpl:
+          ({
+            required double latitude,
+            required double longitude,
+            String? label,
+          }) async {
+            saved = true;
+            expect(latitude, 41.6);
+            expect(longitude, 21.7);
+          },
     );
     final FakeFeatureGuideRepository guide = FakeFeatureGuideRepository();
 
@@ -38,11 +39,9 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    await container.read(homeLocationControllerProvider.notifier).saveHomeLocation(
-          latitude: 41.6,
-          longitude: 21.7,
-          label: 'Skopje',
-        );
+    await container
+        .read(homeLocationControllerProvider.notifier)
+        .saveHomeLocation(latitude: 41.6, longitude: 21.7, label: 'Skopje');
 
     expect(saved, isTrue);
     expect(guide.postRegistrationPending, isTrue);
@@ -51,13 +50,14 @@ void main() {
 
   test('saveHomeLocation stores error on failure', () async {
     final FakeAuthRepository repo = FakeAuthRepository(
-      updateHomeLocationImpl: ({
-        required double latitude,
-        required double longitude,
-        String? label,
-      }) async {
-        throw const AppError(code: 'VALIDATION_ERROR', message: 'bad');
-      },
+      updateHomeLocationImpl:
+          ({
+            required double latitude,
+            required double longitude,
+            String? label,
+          }) async {
+            throw const AppError(code: 'VALIDATION_ERROR', message: 'bad');
+          },
     );
 
     final ProviderContainer container = ProviderContainer(
@@ -66,10 +66,9 @@ void main() {
     addTearDown(container.dispose);
 
     await expectLater(
-      container.read(homeLocationControllerProvider.notifier).saveHomeLocation(
-            latitude: 41.6,
-            longitude: 21.7,
-          ),
+      container
+          .read(homeLocationControllerProvider.notifier)
+          .saveHomeLocation(latitude: 41.6, longitude: 21.7),
       throwsA(isA<AppError>()),
     );
   });

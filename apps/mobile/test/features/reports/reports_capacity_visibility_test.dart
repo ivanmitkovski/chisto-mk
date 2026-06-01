@@ -1,7 +1,7 @@
-import 'package:chisto_mobile/features/reports/domain/models/report_capacity.dart';
-import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_capacity_ui_state.dart';
-import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
-import 'package:chisto_mobile/l10n/app_localizations_en.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations_en.dart';
+import 'package:chisto_infrastructure/shared/widgets/organisms/app_surface/report_surface_aliases.dart';
+import 'package:feature_reports/src/domain/models/report_capacity.dart';
+import 'package:feature_reports/src/presentation/widgets/new_report/report_capacity_ui_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

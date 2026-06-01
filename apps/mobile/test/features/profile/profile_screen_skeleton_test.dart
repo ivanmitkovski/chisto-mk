@@ -1,8 +1,9 @@
-import 'package:chisto_mobile/features/profile/presentation/widgets/profile_screen_skeleton.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
-import '../../shared/widget_test_bootstrap.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_profile/src/presentation/widgets/profile_screen_skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../../shared/widget_test_bootstrap.dart';
 
 void main() {
   setUpAll(() async {
@@ -17,9 +18,7 @@ void main() {
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         locale: Locale('en'),
-        home: Scaffold(
-          body: ProfileScreenSkeleton(),
-        ),
+        home: Scaffold(body: ProfileScreenSkeleton()),
       ),
     );
     await tester.pump();

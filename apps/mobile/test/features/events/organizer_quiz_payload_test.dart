@@ -1,13 +1,13 @@
 import 'dart:convert';
 
+import 'package:feature_events/src/data/organizer_quiz_payload.dart';
+import 'package:feature_events/src/domain/models/organizer_quiz_payload.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:chisto_mobile/features/events/data/organizer_quiz_payload.dart';
 
 void main() {
   group('parseOrganizerQuizPayload', () {
     test('parses camelCase top-level payload', () {
-      final OrganizerQuizApiPayload? out = parseOrganizerQuizPayload(
+      final OrganizerQuizPayload? out = parseOrganizerQuizPayload(
         <String, dynamic>{
           'quizSession': 'jwt-here',
           'questions': <Map<String, dynamic>>[
@@ -28,7 +28,7 @@ void main() {
     });
 
     test('parses snake_case session key', () {
-      final OrganizerQuizApiPayload? out = parseOrganizerQuizPayload(
+      final OrganizerQuizPayload? out = parseOrganizerQuizPayload(
         <String, dynamic>{
           'quiz_session': 'tok',
           'questions': <Map<String, dynamic>>[
@@ -48,7 +48,7 @@ void main() {
     });
 
     test('unwraps data envelope', () {
-      final OrganizerQuizApiPayload? out = parseOrganizerQuizPayload(
+      final OrganizerQuizPayload? out = parseOrganizerQuizPayload(
         <String, dynamic>{
           'data': <String, dynamic>{
             'quizSession': 's',
@@ -73,7 +73,7 @@ void main() {
       const String body =
           '{"quizSession":"x","questions":[{"id":"q1","text":"Hi","options":[{"id":"o1","text":"One"}]}]}';
 
-      final OrganizerQuizApiPayload? out = parseOrganizerQuizPayload(
+      final OrganizerQuizPayload? out = parseOrganizerQuizPayload(
         null,
         rawBody: body,
       );
@@ -84,9 +84,10 @@ void main() {
 
     test('returns null when questions empty', () {
       expect(
-        parseOrganizerQuizPayload(
-          <String, dynamic>{'quizSession': 'x', 'questions': <dynamic>[]},
-        ),
+        parseOrganizerQuizPayload(<String, dynamic>{
+          'quizSession': 'x',
+          'questions': <dynamic>[],
+        }),
         isNull,
       );
     });

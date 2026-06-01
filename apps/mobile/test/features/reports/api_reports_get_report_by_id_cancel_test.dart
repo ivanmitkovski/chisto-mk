@@ -1,8 +1,8 @@
-import 'package:chisto_mobile/core/config/app_config.dart';
-import 'package:chisto_mobile/core/errors/app_error.dart';
-import 'package:chisto_mobile/core/network/api_client.dart';
-import 'package:chisto_mobile/core/network/request_cancellation.dart';
-import 'package:chisto_mobile/features/reports/data/api_reports_repository.dart';
+import 'package:chisto_infrastructure/core/config/app_config.dart';
+import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:chisto_infrastructure/core/network/api_client.dart';
+import 'package:chisto_infrastructure/core/network/request_cancellation.dart';
+import 'package:feature_reports/src/data/api_reports_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -11,9 +11,16 @@ void main() {
 
     final ApiClient client = _CancellingRecordingApiClient(
       onGet: (String path, {RequestCancellationToken? cancellation}) async {
-        calls.add(<String, Object?>{'path': path, 'cancellation': cancellation});
+        calls.add(<String, Object?>{
+          'path': path,
+          'cancellation': cancellation,
+        });
         cancellation?.throwIfCancelled();
-        return ApiResponse(statusCode: 200, body: '{}', json: <String, dynamic>{});
+        return const ApiResponse(
+          statusCode: 200,
+          body: '{}',
+          json: <String, dynamic>{},
+        );
       },
     );
 
@@ -23,7 +30,9 @@ void main() {
 
     await expectLater(
       repo.getReportById('r1', cancellation: token),
-      throwsA(isA<AppError>().having((AppError e) => e.code, 'code', 'CANCELLED')),
+      throwsA(
+        isA<AppError>().having((AppError e) => e.code, 'code', 'CANCELLED'),
+      ),
     );
 
     expect(calls, hasLength(1));
@@ -31,11 +40,6 @@ void main() {
     expect(calls.single['cancellation'], same(token));
   });
 }
-
-typedef _GetImpl = Future<ApiResponse> Function(
-  String path, {
-  RequestCancellationToken? cancellation,
-});
 
 class _CancellingRecordingApiClient extends ApiClient {
   _CancellingRecordingApiClient({required this.onGet})
@@ -45,7 +49,11 @@ class _CancellingRecordingApiClient extends ApiClient {
         onUnauthorized: () {},
       );
 
-  final _GetImpl onGet;
+  final Future<ApiResponse> Function(
+    String, {
+    RequestCancellationToken? cancellation,
+  })
+  onGet;
 
   @override
   Future<ApiResponse> get(

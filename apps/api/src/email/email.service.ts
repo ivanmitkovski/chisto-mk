@@ -8,9 +8,11 @@ import { EmailSendEligibilityService } from './email-send-eligibility.service';
 import { EmailPostmarkTransportService } from './email-postmark-transport.service';
 import { EmailTemplateService } from './email-template.service';
 import { mapNotificationEventToEmail, resolveLocale } from './email-event-mapper';
+import { isImportantNotificationEmail } from './email-importance.policy';
 import type { NotificationEvent } from '../notifications/notification-event.types';
 import { notificationLocalesByUserId } from '../common/i18n/notification-locale.resolver';
 import type { EmailLocale, EmailTemplateId } from './email.types';
+import type { EmailSendPayload } from './email-transport.types';
 
 /**
  * Orchestrates transactional email: eligibility, templating, and Postmark delivery.
@@ -34,6 +36,7 @@ export class EmailService {
     event: Omit<NotificationEvent, 'recipientUserIds'>,
   ): Promise<void> {
     if (!(await this.eligibility.isGloballyEnabled())) return;
+    if (!isImportantNotificationEmail(event)) return;
 
     const mapped = mapNotificationEventToEmail(event);
     if (!mapped) return;
@@ -94,7 +97,7 @@ export class EmailService {
 
     const prefsUrl = this.footerLinks.preferencesUrl();
     const unsubscribeUrl = this.footerLinks.unsubscribeUrl(params.userId, params.notificationType);
-    const { appBaseUrl, logoUrl } = this.footerLinks.brandingUrls();
+    const { appBaseUrl, logoUrl, inlineAttachment } = this.footerLinks.brandingUrls();
 
     const { html, text, subject } = this.templates.render({
       templateId: params.templateId,
@@ -106,7 +109,7 @@ export class EmailService {
       logoUrl,
     });
 
-    await this.transport.send({
+    const sendPayload: EmailSendPayload = {
       fromHeader,
       to,
       subject,
@@ -114,7 +117,11 @@ export class EmailService {
       html,
       listUnsubscribeUrl: unsubscribeUrl,
       templateId: params.templateId,
-    });
+    };
+    if (inlineAttachment) {
+      sendPayload.inlineAttachments = [inlineAttachment];
+    }
+    await this.transport.send(sendPayload);
   }
 
   async sendAuthTemplate(params: {

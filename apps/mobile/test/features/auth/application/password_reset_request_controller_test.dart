@@ -1,6 +1,6 @@
-import 'package:chisto_mobile/core/errors/app_error.dart';
-import 'package:chisto_mobile/features/auth/application/password_reset_request_controller.dart';
-import 'package:chisto_mobile/features/auth/domain/models/register_result.dart';
+import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:feature_auth/src/application/password_reset_request_controller.dart';
+import 'package:feature_auth/src/domain/models/register_result.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -15,7 +15,9 @@ void main() {
 
   test('requestByPhone returns result on success', () async {
     final ProviderContainer container = ProviderContainer(
-      overrides: AuthTestOverrides(authRepository: FakeAuthRepository()).build(),
+      overrides: AuthTestOverrides(
+        authRepository: FakeAuthRepository(),
+      ).build(),
     );
     addTearDown(container.dispose);
 
@@ -24,7 +26,10 @@ void main() {
         .requestByPhone('+38970123456');
 
     expect(result.message, 'ok');
-    expect(container.read(passwordResetRequestControllerProvider).isLoading, isFalse);
+    expect(
+      container.read(passwordResetRequestControllerProvider).isLoading,
+      isFalse,
+    );
   });
 
   test('requestByEmail stores error on failure', () async {

@@ -1,6 +1,6 @@
-import 'package:chisto_mobile/core/cache/image_cache_diagnostics.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/widgets/organisms/app_smart_image.dart';
+import 'package:chisto_infrastructure/core/cache/image_cache_diagnostics.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/shared/widgets/organisms/app_smart_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -10,11 +10,11 @@ void main() {
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: const Scaffold(
+        locale: Locale('en'),
+        home: Scaffold(
           body: SizedBox(
             width: 240,
             height: 140,

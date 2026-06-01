@@ -1,23 +1,21 @@
-// Manual QA (create event): small phone (e.g. iPhone SE), large accessibility text,
-// dark mode; focus a text field — primary CTA stays fixed at bottom (may sit under keyboard; scroll form);
+// Manual QA (create event): small phone (e.g. iPhone SE), large accessibility text;
+// focus a text field — primary CTA stays fixed at bottom (may sit under keyboard; scroll form);
 // open the site picker and confirm loading, offline banner when applicable, and retry on error;
 // edit the form and use the system/back affordance to confirm the discard dialog;
 // exercise volunteer cap presets and custom values (2–5000);
 // open via named route (CupertinoPageRoute) and confirm iOS edge swipe-back matches discard rules;
 // brief bootstrap skeleton then form fade-in; reduced motion skips section stagger.
 
-import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
-import 'package:chisto_mobile/core/navigation/app_routes.dart';
-import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
-import '../../support/events/in_memory_events_store.dart';
-import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
-import 'package:chisto_mobile/features/events/presentation/screens/create_event_sheet.dart';
-import 'package:chisto_mobile/features/events/presentation/screens/organizer_toolkit/organizer_toolkit_screen.dart';
-import 'package:chisto_mobile/features/events/presentation/widgets/create_event/create_event_sticky_footer.dart';
-import 'package:chisto_mobile/features/events/presentation/widgets/event_calendar.dart';
-import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
+import 'package:chisto_infrastructure/core/bootstrap/app_bootstrap.dart';
+import 'package:chisto_infrastructure/core/navigation/app_routes.dart';
+import 'package:chisto_infrastructure/core/providers/events_providers.dart';
+import 'package:chisto_infrastructure/shared/widgets/atoms/primary_button.dart';
+import 'package:chisto_infrastructure/shared/widgets/organisms/app_surface/report_surface_aliases.dart';
+import 'package:feature_events/src/domain/models/eco_event.dart';
+import 'package:feature_events/src/presentation/screens/create_event_sheet.dart';
+import 'package:feature_events/src/presentation/screens/organizer_toolkit/organizer_toolkit_screen.dart';
+import 'package:feature_events/src/presentation/widgets/create_event/create_event_sticky_footer.dart';
+import 'package:feature_events/src/presentation/widgets/event_calendar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -25,6 +23,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../shared/pump_until_idle.dart';
 import '../../shared/widget_test_bootstrap.dart';
+import '../../support/events/in_memory_events_store.dart';
 
 /// Fixed wall time so schedule validation and step progress are CI-stable.
 DateTime createEventSheetTestClock() => DateTime(2026, 6, 15, 10, 0);
@@ -39,17 +38,20 @@ void main() {
     await bootstrapWidgetTests();
   });
 
-  test('AppRoutes.eventsCreate uses CupertinoPageRoute for interactive pop', () {
-    final Route<dynamic> route = AppRouter.onGenerateRoute(
-      const RouteSettings(name: AppRoutes.eventsCreate),
-    );
-    expect(route, isA<CupertinoPageRoute<Object?>>());
-  });
+  test(
+    'AppRoutes.eventsCreate uses CupertinoPageRoute for interactive pop',
+    () {
+      final Route<dynamic> route = AppRouter.onGenerateRoute(
+        const RouteSettings(name: AppRoutes.eventsCreate),
+      );
+      expect(route, isA<CupertinoPageRoute<Object?>>());
+    },
+  );
 
   setUp(() {
     SharedPreferences.setMockInitialValues(<String, Object>{});
     InMemoryEventsStore.instance.resetToSeed();
-    EventsRepositoryRegistry.setTestOverride(InMemoryEventsStore.instance);
+    setEventsRepositoryTestOverride(InMemoryEventsStore.instance);
     if (AppBootstrap.instance.isInitialized) {
       AppBootstrap.instance.authState.setAuthenticated(
         userId: 'u-test',
@@ -61,48 +63,43 @@ void main() {
   });
 
   tearDown(() {
-    EventsRepositoryRegistry.setTestOverride(null);
+    setEventsRepositoryTestOverride(null);
   });
 
-  testWidgets('uncertified user is redirected from CreateEventSheet to toolkit', (
-    WidgetTester tester,
-  ) async {
-    AppBootstrap.instance.authState.setAuthenticated(
-      userId: 'u1',
-      displayName: 'Tester',
-      organizerCertifiedAt: null,
-      syncOrganizerCertifiedAt: true,
-    );
+  testWidgets(
+    'uncertified user is redirected from CreateEventSheet to toolkit',
+    (WidgetTester tester) async {
+      AppBootstrap.instance.authState.setAuthenticated(
+        userId: 'u1',
+        displayName: 'Tester',
+        organizerCertifiedAt: null,
+        syncOrganizerCertifiedAt: true,
+      );
 
-    await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: const MediaQuery(
-          data: MediaQueryData(disableAnimations: true),
-          child: Scaffold(
-            body: CreateEventSheet(clock: createEventSheetTestClock),
+      await tester.pumpWidget(
+        wrapForWidgetTest(
+          const MediaQuery(
+            data: MediaQueryData(disableAnimations: true),
+            child: Scaffold(
+              body: CreateEventSheet(clock: createEventSheetTestClock),
+            ),
           ),
         ),
-      ),
-    );
-    await tester.pump();
-    await tester.pump();
+      );
+      await tester.pump();
+      await tester.pump();
 
-    expect(find.byType(OrganizerToolkitScreen), findsOneWidget);
-    await tester.pump(const Duration(milliseconds: 600));
-  });
+      expect(find.byType(OrganizerToolkitScreen), findsOneWidget);
+      await tester.pump(const Duration(milliseconds: 600));
+    },
+  );
 
   testWidgets('requires site selection before creating an event', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: Scaffold(
+      wrapForWidgetTest(
+        const Scaffold(
           body: CreateEventSheet(clock: createEventSheetTestClock),
         ),
       ),
@@ -126,11 +123,8 @@ void main() {
     EcoEvent? createdEvent;
 
     await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: Builder(
+      wrapForWidgetTest(
+        Builder(
           builder: (BuildContext context) {
             return Scaffold(
               body: Center(
@@ -138,10 +132,11 @@ void main() {
                   onPressed: () async {
                     createdEvent = await Navigator.of(context).push<EcoEvent>(
                       MaterialPageRoute<EcoEvent>(
-                        builder: (_) => CreateEventSheet(
+                        builder: (_) => const CreateEventSheet(
                           clock: createEventSheetTestClock,
                           preselectedSiteId: '1',
-                          preselectedSiteName: 'Illegal landfill near the river',
+                          preselectedSiteName:
+                              'Illegal landfill near the river',
                           preselectedSiteImageUrl:
                               'assets/images/references/onboarding_reference.png',
                           preselectedSiteDistanceKm: 15,
@@ -189,49 +184,44 @@ void main() {
     expect(createdEvent!.siteId, equals('1'));
   });
 
-  testWidgets('progress reflects validation milestones (not title length alone)', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: Scaffold(
-          body: CreateEventSheet(
-            clock: createEventSheetTestClock,
-            preselectedSiteId: '1',
-            preselectedSiteName: 'Illegal landfill near the river',
-            preselectedSiteImageUrl:
-                'assets/images/references/onboarding_reference.png',
-            preselectedSiteDistanceKm: 15,
+  testWidgets(
+    'progress reflects validation milestones (not title length alone)',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        wrapForWidgetTest(
+          const Scaffold(
+            body: CreateEventSheet(
+              clock: createEventSheetTestClock,
+              preselectedSiteId: '1',
+              preselectedSiteName: 'Illegal landfill near the river',
+              preselectedSiteImageUrl:
+                  'assets/images/references/onboarding_reference.png',
+              preselectedSiteDistanceKm: 15,
+            ),
           ),
         ),
-      ),
-    );
-    await tester.pumpAndSettle();
-    await settlePastCreateEventBootstrap(tester);
+      );
+      await tester.pumpAndSettle();
+      await settlePastCreateEventBootstrap(tester);
 
-    expect(find.text('Step 3 of 5'), findsOneWidget);
+      expect(find.text('Step 3 of 5'), findsOneWidget);
 
-    await tester.enterText(find.byType(TextField).first, 'ab');
-    await tester.pump();
-    expect(find.text('Step 3 of 5'), findsOneWidget);
+      await tester.enterText(find.byType(TextField).first, 'ab');
+      await tester.pump();
+      expect(find.text('Step 3 of 5'), findsOneWidget);
 
-    await tester.enterText(find.byType(TextField).first, 'abc');
-    await tester.pump();
-    expect(find.text('Step 4 of 5'), findsOneWidget);
-  });
+      await tester.enterText(find.byType(TextField).first, 'abc');
+      await tester.pump();
+      expect(find.text('Step 4 of 5'), findsOneWidget);
+    },
+  );
 
   testWidgets('short title shows min-length error on submit', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: Scaffold(
+      wrapForWidgetTest(
+        const Scaffold(
           body: CreateEventSheet(
             clock: createEventSheetTestClock,
             preselectedSiteId: '1',
@@ -269,11 +259,8 @@ void main() {
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: Scaffold(
+      wrapForWidgetTest(
+        const Scaffold(
           body: CreateEventSheet(
             clock: createEventSheetTestClock,
             preselectedSiteId: '1',
@@ -288,12 +275,14 @@ void main() {
     await tester.pumpAndSettle();
     await settlePastCreateEventBootstrap(tester);
 
-    final BuildContext calContext =
-        tester.element(find.byType(EventCalendar).first);
+    final BuildContext calContext = tester.element(
+      find.byType(EventCalendar).first,
+    );
     final MaterialLocalizations loc = MaterialLocalizations.of(calContext);
     final DateTime anchor = createEventSheetTestClock();
-    final String monthLabel =
-        loc.formatMonthYear(DateTime(anchor.year, anchor.month));
+    final String monthLabel = loc.formatMonthYear(
+      DateTime(anchor.year, anchor.month),
+    );
     expect(find.text(monthLabel), findsWidgets);
   });
 
@@ -306,11 +295,8 @@ void main() {
     });
 
     await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: Scaffold(
+      wrapForWidgetTest(
+        const Scaffold(
           body: CreateEventSheet(
             clock: createEventSheetTestClock,
             preselectedSiteId: '1',
@@ -342,14 +328,9 @@ void main() {
 
     await tester.pumpWidget(
       MediaQuery(
-        data: const MediaQueryData(
-          viewInsets: EdgeInsets.only(bottom: 280),
-        ),
-        child: MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          locale: const Locale('en'),
-          home: Scaffold(
+        data: const MediaQueryData(viewInsets: EdgeInsets.only(bottom: 280)),
+        child: wrapForWidgetTest(
+          const Scaffold(
             resizeToAvoidBottomInset: false,
             body: CreateEventSheet(
               clock: createEventSheetTestClock,
@@ -377,7 +358,8 @@ void main() {
     expect(
       buttonRect.bottom,
       greaterThan(screenH * 0.88),
-      reason: 'CTA should remain near the physical bottom, not lift with viewInsets',
+      reason:
+          'CTA should remain near the physical bottom, not lift with viewInsets',
     );
   });
 
@@ -392,11 +374,8 @@ void main() {
     EcoEvent? createdEvent;
 
     await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: Builder(
+      wrapForWidgetTest(
+        Builder(
           builder: (BuildContext context) {
             return Scaffold(
               body: Center(
@@ -404,10 +383,11 @@ void main() {
                   onPressed: () async {
                     createdEvent = await Navigator.of(context).push<EcoEvent>(
                       MaterialPageRoute<EcoEvent>(
-                        builder: (_) => CreateEventSheet(
+                        builder: (_) => const CreateEventSheet(
                           clock: createEventSheetTestClock,
                           preselectedSiteId: '1',
-                          preselectedSiteName: 'Illegal landfill near the river',
+                          preselectedSiteName:
+                              'Illegal landfill near the river',
                           preselectedSiteImageUrl:
                               'assets/images/references/onboarding_reference.png',
                           preselectedSiteDistanceKm: 15,
@@ -434,7 +414,9 @@ void main() {
       const Offset(0, -80),
     );
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const ValueKey<String>('create_event_volunteer_cap')));
+    await tester.tap(
+      find.byKey(const ValueKey<String>('create_event_volunteer_cap')),
+    );
     await tester.pumpAndSettle();
     final Finder preset15 = find.byWidgetPredicate(
       (Widget w) => w is ReportActionTile && w.title == '15',
@@ -470,26 +452,18 @@ void main() {
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        builder: (BuildContext context, Widget? child) {
-          return MediaQuery(
-            data: MediaQuery.of(context).copyWith(
-              textScaler: TextScaler.linear(1.45),
+      wrapForWidgetTest(
+        const MediaQuery(
+          data: MediaQueryData(textScaler: TextScaler.linear(1.45)),
+          child: Scaffold(
+            body: CreateEventSheet(
+              clock: createEventSheetTestClock,
+              preselectedSiteId: '1',
+              preselectedSiteName: 'Illegal landfill near the river',
+              preselectedSiteImageUrl:
+                  'assets/images/references/onboarding_reference.png',
+              preselectedSiteDistanceKm: 15,
             ),
-            child: child!,
-          );
-        },
-        home: Scaffold(
-          body: CreateEventSheet(
-            clock: createEventSheetTestClock,
-            preselectedSiteId: '1',
-            preselectedSiteName: 'Illegal landfill near the river',
-            preselectedSiteImageUrl:
-                'assets/images/references/onboarding_reference.png',
-            preselectedSiteDistanceKm: 15,
           ),
         ),
       ),

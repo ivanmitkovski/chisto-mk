@@ -1,8 +1,8 @@
-import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
-import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
-import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/report_detail_sheet.dart';
-import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/report_sheet_view_model.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/core/bootstrap/app_bootstrap.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_reports/src/domain/models/report_draft.dart';
+import 'package:feature_reports/src/presentation/widgets/reports_list/report_detail_sheet.dart';
+import 'package:feature_reports/src/presentation/widgets/reports_list/report_sheet_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -13,7 +13,7 @@ void main() {
     await bootstrapWidgetTests();
   });
 
-  ReportSheetViewModel _minimalVm() {
+  ReportSheetViewModel minimalVm() {
     return ReportSheetViewModel(
       reportId: 'rid-1',
       title: 'Title',
@@ -35,11 +35,10 @@ void main() {
         supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
           body: ReportDetailSheet(
-            report: _minimalVm(),
+            report: minimalVm(),
             reportsRealtimeService:
                 AppBootstrap.instance.reportsRealtimeService,
-            reportsApiRepository:
-                AppBootstrap.instance.reportsApiRepository,
+            reportsApiRepository: AppBootstrap.instance.reportsApiRepository,
           ),
         ),
       ),
@@ -57,11 +56,10 @@ void main() {
         supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
           body: ReportDetailSheet(
-            report: _minimalVm(),
+            report: minimalVm(),
             reportsRealtimeService:
                 AppBootstrap.instance.reportsRealtimeService,
-            reportsApiRepository:
-                AppBootstrap.instance.reportsApiRepository,
+            reportsApiRepository: AppBootstrap.instance.reportsApiRepository,
           ),
         ),
       ),

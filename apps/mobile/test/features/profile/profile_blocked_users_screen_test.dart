@@ -1,21 +1,19 @@
-import 'package:chisto_mobile/core/config/app_config.dart';
-import 'package:chisto_mobile/core/network/api_client.dart';
-import 'package:chisto_mobile/core/network/request_cancellation.dart';
-import 'package:chisto_mobile/features/profile/presentation/screens/profile_blocked_users_screen.dart';
-import 'package:chisto_mobile/features/safety/data/ugc_moderation_repository.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:chisto_infrastructure/core/config/app_config.dart';
+import 'package:chisto_infrastructure/core/network/api_client.dart';
+import 'package:chisto_infrastructure/core/network/request_cancellation.dart';
+import 'package:feature_profile/src/presentation/screens/profile_blocked_users_screen.dart';
+import 'package:feature_safety/feature_safety.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../shared/widget_test_bootstrap.dart';
 
 class _BlocksApiClient extends ApiClient {
   _BlocksApiClient({required this.body})
-      : super(
-          config: AppConfig.dev,
-          accessToken: () => 'token',
-          onUnauthorized: () {},
-        );
+    : super(
+        config: AppConfig.dev,
+        accessToken: () => 'token',
+        onUnauthorized: () {},
+      );
 
   final String body;
 
@@ -41,17 +39,15 @@ void main() {
     );
 
     await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: ProfileBlockedUsersScreen(repository: repo),
-      ),
+      wrapForWidgetTest(ProfileBlockedUsersScreen(repository: repo)),
     );
     await tester.pumpAndSettle();
 
     expect(find.text('You have not blocked anyone.'), findsOneWidget);
-    expect(find.textContaining('Block someone from event chat'), findsOneWidget);
+    expect(
+      find.textContaining('Block someone from event chat'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('lists blocked users with unblock action', (tester) async {
@@ -63,12 +59,7 @@ void main() {
     );
 
     await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: ProfileBlockedUsersScreen(repository: repo),
-      ),
+      wrapForWidgetTest(ProfileBlockedUsersScreen(repository: repo)),
     );
     await tester.pumpAndSettle();
 

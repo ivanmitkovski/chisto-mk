@@ -1,7 +1,7 @@
-import 'package:chisto_mobile/core/errors/app_error.dart';
-import 'package:chisto_mobile/features/profile/domain/models/points_history_page.dart';
-import 'package:chisto_mobile/features/profile/presentation/providers/points_history_notifier.dart';
-import 'package:chisto_mobile/features/profile/presentation/providers/profile_providers.dart';
+import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:feature_profile/src/domain/models/points_history_page.dart';
+import 'package:feature_profile/src/presentation/providers/points_history_notifier.dart';
+import 'package:feature_profile/src/presentation/providers/profile_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -36,8 +36,12 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      await container.read(pointsHistoryNotifierProvider.notifier).loadInitial();
-      final PointsHistoryUiState s = container.read(pointsHistoryNotifierProvider);
+      await container
+          .read(pointsHistoryNotifierProvider.notifier)
+          .loadInitial();
+      final PointsHistoryUiState s = container.read(
+        pointsHistoryNotifierProvider,
+      );
       expect(s.phase, PointsHistoryPhase.ready);
       expect(s.entries.length, 1);
       expect(s.nextCursor, 'c1');
@@ -74,10 +78,14 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      await container.read(pointsHistoryNotifierProvider.notifier).loadInitial();
+      await container
+          .read(pointsHistoryNotifierProvider.notifier)
+          .loadInitial();
       await container.read(pointsHistoryNotifierProvider.notifier).loadMore();
 
-      final PointsHistoryUiState s = container.read(pointsHistoryNotifierProvider);
+      final PointsHistoryUiState s = container.read(
+        pointsHistoryNotifierProvider,
+      );
       expect(s.entries.length, 1);
       expect(s.loadMoreError, isNotNull);
       expect(calls, 2);

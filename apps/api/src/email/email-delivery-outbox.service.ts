@@ -4,6 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import type { NotificationEvent } from '../notifications/notification-event.types';
 import { EmailService } from './email.service';
 import { mapNotificationEventToEmail } from './email-event-mapper';
+import { isImportantNotificationEmail } from './email-importance.policy';
 
 const MAX_ATTEMPTS = 5;
 const BATCH_SIZE = 25;
@@ -27,6 +28,9 @@ export class EmailDeliveryOutboxService {
     notificationId: string,
     event: Omit<NotificationEvent, 'recipientUserIds'>,
   ): Promise<void> {
+    if (!isImportantNotificationEmail(event)) {
+      return;
+    }
     const mapped = mapNotificationEventToEmail(event);
     if (!mapped) {
       return;

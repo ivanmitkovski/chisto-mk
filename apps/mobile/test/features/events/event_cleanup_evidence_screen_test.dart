@@ -1,18 +1,19 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:chisto_mobile/core/errors/app_error.dart';
-import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
-import '../../support/events/in_memory_events_store.dart';
-import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
-import 'package:chisto_mobile/features/events/presentation/screens/event_cleanup_evidence_screen.dart';
-import 'package:chisto_mobile/shared/widgets/atoms/app_back_button.dart';
-import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:chisto_infrastructure/core/providers/events_providers.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/shared/widgets/atoms/app_back_button.dart';
+import 'package:chisto_infrastructure/shared/widgets/atoms/primary_button.dart';
+import 'package:feature_events/src/domain/models/eco_event.dart';
+import 'package:feature_events/src/presentation/screens/event_cleanup_evidence_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../support/events/in_memory_events_store.dart';
 
 Future<void> _pumpUi(WidgetTester tester) async {
   await tester.pump();
@@ -42,7 +43,7 @@ void main() {
   setUp(() async {
     SharedPreferences.setMockInitialValues(<String, Object>{});
     store = InMemoryEventsStore.instance;
-    EventsRepositoryRegistry.setTestOverride(store);
+    setEventsRepositoryTestOverride(store);
     store.resetToSeed();
     // Match app order: [EventCleanupEvidenceScreen] calls [loadInitialIfNeeded] in
     // [initState]. If that runs before [_didStartLoad] is true, it replaces [_events]
@@ -73,28 +74,31 @@ void main() {
   });
 
   tearDown(() async {
-    EventsRepositoryRegistry.setTestOverride(null);
+    setEventsRepositoryTestOverride(null);
     if (tempDir.existsSync()) {
       await tempDir.delete(recursive: true);
     }
   });
 
-  testWidgets('upload semantic is present on empty after tab', (WidgetTester tester) async {
+  testWidgets('upload semantic is present on empty after tab', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
-      _reduceMotionApp(
-        EventCleanupEvidenceScreen(eventId: event.id),
-      ),
+      _reduceMotionApp(EventCleanupEvidenceScreen(eventId: event.id)),
     );
     await _pumpUi(tester);
 
     expect(find.text('Add photos of the cleaned site'), findsOneWidget);
-    final SemanticsNode node =
-        tester.getSemantics(find.text('Add photos of the cleaned site'));
+    final SemanticsNode node = tester.getSemantics(
+      find.text('Add photos of the cleaned site'),
+    );
     expect(node.label, contains('Upload after photos'));
     expect(node.getSemanticsData().hasAction(SemanticsAction.tap), isTrue);
   });
 
-  testWidgets('pick (test hook), save shows success dialog then dismisses', (WidgetTester tester) async {
+  testWidgets('pick (test hook), save shows success dialog then dismisses', (
+    WidgetTester tester,
+  ) async {
     const String assetPhoto =
         'assets/images/references/onboarding_reference.png';
 
@@ -112,7 +116,9 @@ void main() {
     await _pumpUi(tester);
 
     expect(find.text('Save'), findsOneWidget);
-    final Finder saveKey = find.byKey(const ValueKey<String>('cleanupEvidenceSave'));
+    final Finder saveKey = find.byKey(
+      const ValueKey<String>('cleanupEvidenceSave'),
+    );
     await tester.ensureVisible(saveKey);
     await tester.pump();
     await tester.tapAt(tester.getCenter(saveKey));
@@ -135,16 +141,19 @@ void main() {
           eventId: event.id,
           testPickAfterImagePathsOverride: () async => <String>[assetPhoto],
           testSetAfterImagesOverride:
-              ({required String eventId, required List<String> imagePaths}) async {
-            attempts++;
-            if (attempts == 1) {
-              throw AppError.server(message: 'Upload failed');
-            }
-            return store.setAfterImages(
-              eventId: eventId,
-              imagePaths: imagePaths,
-            );
-          },
+              ({
+                required String eventId,
+                required List<String> imagePaths,
+              }) async {
+                attempts++;
+                if (attempts == 1) {
+                  throw AppError.server(message: 'Upload failed');
+                }
+                return store.setAfterImages(
+                  eventId: eventId,
+                  imagePaths: imagePaths,
+                );
+              },
         ),
       ),
     );
@@ -152,7 +161,9 @@ void main() {
     await tester.tap(find.text('Add photos of the cleaned site'));
     await _pumpUi(tester);
 
-    final Finder saveKey = find.byKey(const ValueKey<String>('cleanupEvidenceSave'));
+    final Finder saveKey = find.byKey(
+      const ValueKey<String>('cleanupEvidenceSave'),
+    );
     await tester.ensureVisible(saveKey);
     await tester.tapAt(tester.getCenter(saveKey));
     await tester.pump();
@@ -174,7 +185,9 @@ void main() {
     await tester.pumpAndSettle();
   });
 
-  testWidgets('tapping back while saving shows in-progress hint', (WidgetTester tester) async {
+  testWidgets('tapping back while saving shows in-progress hint', (
+    WidgetTester tester,
+  ) async {
     const String assetPhoto =
         'assets/images/references/onboarding_reference.png';
     final Completer<bool> gate = Completer<bool>();
@@ -185,10 +198,16 @@ void main() {
           eventId: event.id,
           testPickAfterImagePathsOverride: () async => <String>[assetPhoto],
           testSetAfterImagesOverride:
-              ({required String eventId, required List<String> imagePaths}) async {
-            await gate.future;
-            return store.setAfterImages(eventId: eventId, imagePaths: imagePaths);
-          },
+              ({
+                required String eventId,
+                required List<String> imagePaths,
+              }) async {
+                await gate.future;
+                return store.setAfterImages(
+                  eventId: eventId,
+                  imagePaths: imagePaths,
+                );
+              },
         ),
       ),
     );
@@ -196,7 +215,9 @@ void main() {
     await tester.tap(find.text('Add photos of the cleaned site'));
     await _pumpUi(tester);
 
-    final Finder saveKey = find.byKey(const ValueKey<String>('cleanupEvidenceSave'));
+    final Finder saveKey = find.byKey(
+      const ValueKey<String>('cleanupEvidenceSave'),
+    );
     await tester.ensureVisible(saveKey);
     await tester.tapAt(tester.getCenter(saveKey));
     await tester.pump();
@@ -206,14 +227,19 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 
-    expect(find.text('Please wait until save finishes before leaving this screen.'), findsOneWidget);
+    expect(
+      find.text('Please wait until save finishes before leaving this screen.'),
+      findsOneWidget,
+    );
 
     gate.complete(true);
     await tester.pump(const Duration(milliseconds: 800));
     await tester.pumpAndSettle();
   });
 
-  testWidgets('save button exposes save semantics with hint', (WidgetTester tester) async {
+  testWidgets('save button exposes save semantics with hint', (
+    WidgetTester tester,
+  ) async {
     const String assetPhoto =
         'assets/images/references/onboarding_reference.png';
 

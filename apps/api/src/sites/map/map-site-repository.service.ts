@@ -14,17 +14,22 @@ export class MapSiteRepositoryService {
   findSites(
     query: ListSitesMapQueryDto,
     limit: number,
+    viewerUserId?: string | null,
   ): Promise<{ rows: MapProjectionRow[]; usedViewportBbox: boolean; usedFallback: boolean }> {
-    return this.sites.findSites(query, limit);
+    return this.sites.findSites(query, limit, viewerUserId);
   }
 
-  resolveDataVersion(query: ListSitesMapQueryDto): Promise<string> {
-    return this.sites.resolveDataVersion(query);
+  resolveDataVersion(
+    query: ListSitesMapQueryDto,
+    viewerUserId?: string | null,
+  ): Promise<string> {
+    return this.sites.resolveDataVersion(query, viewerUserId);
   }
 
   findClusters(
     query: ListSitesMapQueryDto,
     zoom: number,
+    viewerUserId?: string | null,
   ): Promise<
     Array<{
       clusterKey: string;
@@ -35,13 +40,14 @@ export class MapSiteRepositoryService {
       siteIds: string[];
     }>
   > {
-    return this.aggregates.findClusters(query, zoom);
+    return this.aggregates.findClusters(query, zoom, viewerUserId);
   }
 
   findHeatmap(
     query: ListSitesMapQueryDto,
     zoom: number,
+    viewerUserId?: string | null,
   ): Promise<Array<{ cellKey: string; latitude: number; longitude: number; intensity: number }>> {
-    return this.aggregates.findHeatmap(query, zoom);
+    return this.aggregates.findHeatmap(query, zoom, viewerUserId);
   }
 }

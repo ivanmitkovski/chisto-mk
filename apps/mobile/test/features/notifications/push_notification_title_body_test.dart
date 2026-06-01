@@ -1,12 +1,12 @@
-import 'package:chisto_mobile/features/notifications/data/push_notification_service.dart';
+import 'package:feature_notifications/src/data/push_notification_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('resolveNotificationTitleBodyForTest', () {
     test('uses notification block when present', () {
-      final RemoteMessage message = RemoteMessage(
-        notification: const RemoteNotification(
+      const RemoteMessage message = RemoteMessage(
+        notification: RemoteNotification(
           title: 'Site update',
           body: 'A site you follow changed.',
         ),
@@ -19,7 +19,7 @@ void main() {
     });
 
     test('falls back to data title and body', () {
-      final RemoteMessage message = RemoteMessage(
+      const RemoteMessage message = RemoteMessage(
         data: <String, dynamic>{
           'type': 'COMMENT',
           'title': 'New comment',
@@ -33,7 +33,7 @@ void main() {
     });
 
     test('EVENT_CHAT prefers messagePreview for body', () {
-      final RemoteMessage message = RemoteMessage(
+      const RemoteMessage message = RemoteMessage(
         data: <String, dynamic>{
           'type': 'EVENT_CHAT',
           'title': 'Event chat',
@@ -48,15 +48,12 @@ void main() {
     });
 
     test('notification block takes precedence over data', () {
-      final RemoteMessage message = RemoteMessage(
-        notification: const RemoteNotification(
+      const RemoteMessage message = RemoteMessage(
+        notification: RemoteNotification(
           title: 'From APNS',
           body: 'Alert body',
         ),
-        data: <String, dynamic>{
-          'title': 'From data',
-          'body': 'Data body',
-        },
+        data: <String, dynamic>{'title': 'From data', 'body': 'Data body'},
       );
       final ({String? title, String? body}) resolved =
           PushNotificationService.resolveNotificationTitleBodyForTest(message);

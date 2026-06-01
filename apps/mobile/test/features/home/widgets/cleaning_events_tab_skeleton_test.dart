@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
-import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
-import 'package:chisto_mobile/features/home/presentation/widgets/site_detail/cleaning_events_tab.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/core/providers/events_providers.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_events/src/domain/models/eco_event.dart';
+import 'package:feature_home/src/presentation/widgets/site_detail/cleaning_events_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -27,11 +27,11 @@ class _NotReadyEventsRepository extends RecordingEventsRepository {
 
 void main() {
   setUp(() {
-    EventsRepositoryRegistry.setTestOverride(_NotReadyEventsRepository());
+    setEventsRepositoryTestOverride(_NotReadyEventsRepository());
   });
 
   tearDown(() {
-    EventsRepositoryRegistry.setTestOverride(null);
+    setEventsRepositoryTestOverride(null);
   });
 
   testWidgets('renders high-fidelity loading skeleton with stable CTA area', (

@@ -1,9 +1,9 @@
-import 'package:chisto_mobile/core/network/connectivity_gate.dart';
-import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
-import 'package:chisto_mobile/features/events/presentation/utils/event_schedule_constraints.dart';
-import 'package:chisto_mobile/features/events/presentation/widgets/extend_event_end_sheet.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/core/network/connectivity_gate.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:feature_events/src/domain/models/eco_event.dart';
+import 'package:feature_events/src/presentation/utils/event_schedule_constraints.dart';
+import 'package:feature_events/src/presentation/widgets/extend_event_end_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -14,15 +14,15 @@ void main() {
     ConnectivityGate.check = () => Connectivity().checkConnectivity();
   });
 
-  testWidgets('+15 preset issues updateEventDetails with bumped endAtUtc',
-      (WidgetTester tester) async {
+  testWidgets('+15 preset issues updateEventDetails with bumped endAtUtc', (
+    WidgetTester tester,
+  ) async {
     ConnectivityGate.check = () async => <ConnectivityResult>[
       ConnectivityResult.wifi,
     ];
     // Tomorrow keeps schedule well above `now + minLead` so validation is not clock-sensitive.
     final DateTime now = DateTime.now();
-    final DateTime d =
-        DateUtils.dateOnly(now).add(const Duration(days: 1));
+    final DateTime d = DateUtils.dateOnly(now).add(const Duration(days: 1));
     const EventTime startT = EventTime(hour: 10, minute: 0);
     const EventTime endT = EventTime(hour: 18, minute: 0);
     expect(
@@ -54,8 +54,9 @@ void main() {
       isJoined: true,
       moderationApproved: true,
     );
-    final RecordingEventsRepository repo =
-        RecordingEventsRepository(seed: <EcoEvent>[event]);
+    final RecordingEventsRepository repo = RecordingEventsRepository(
+      seed: <EcoEvent>[event],
+    );
 
     await tester.pumpWidget(
       MaterialApp(

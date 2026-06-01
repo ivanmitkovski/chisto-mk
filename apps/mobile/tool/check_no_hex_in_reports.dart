@@ -1,9 +1,11 @@
 // Run from apps/mobile: dart run tool/check_no_hex_in_reports.dart
 import 'dart:io';
 
+import 'feature_roots_guard_util.dart';
+
 /// Returns `0` when clean, `1` when violations found, `2` when reports tree missing.
 int runNoHexInReportsCheck() {
-  final Directory root = Directory('lib/features/reports');
+  final Directory root = Directory(reportsPackageRoot);
   if (!root.existsSync()) {
     stderr.writeln('Directory ${root.path} not found (run from apps/mobile).');
     return 2;
@@ -24,13 +26,13 @@ int runNoHexInReportsCheck() {
 
   if (violations.isNotEmpty) {
     stderr.writeln(
-      'Forbidden Color(0x…) literal under lib/features/reports/:\n'
+      'Forbidden Color(0x…) literal under $reportsPackageRoot/:\n'
       '${violations.join('\n')}\n'
       'Use AppColors / ReportStatusPalette tokens instead.',
     );
     return 1;
   }
-  stdout.writeln('OK: no Color(0x…) in lib/features/reports/.');
+  stdout.writeln('OK: no Color(0x…) in $reportsPackageRoot/.');
   return 0;
 }
 

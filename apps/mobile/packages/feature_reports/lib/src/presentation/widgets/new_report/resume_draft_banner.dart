@@ -1,0 +1,157 @@
+import 'package:chisto_infrastructure/core/observability/chisto_sentry.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:design_system/design_system.dart';
+import 'package:feature_reports/src/data/outbox/report_draft_repository.dart';
+import 'package:feature_reports/src/domain/models/report_wizard_restore_snapshot.dart';
+import 'package:feature_reports/src/presentation/widgets/new_report/report_modal_dialog.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+/// User chose to keep the restored draft from the resume prompt.
+enum ResumeDraftBannerResult { continued, discarded }
+
+String _formatReportDraftSavedTimestamp(AppLocalizations l10n, int millis) {
+  final DateTime d = DateTime.fromMillisecondsSinceEpoch(millis);
+  return DateFormat.yMMMd(l10n.localeName).add_jm().format(d);
+}
+
+/// Blocking dialog: continue editing the restored draft or discard it (with confirm).
+Future<ResumeDraftBannerResult?> showResumeDraftBanner({
+  required BuildContext context,
+  required AppLocalizations l10n,
+  required ReportDraftLoadResult loadResult,
+}) async {
+  final ReportWizardRestoreSnapshot? snapshot = loadResult.restore;
+  if (snapshot == null) {
+    return ResumeDraftBannerResult.continued;
+  }
+  chistoReportsBreadcrumb(
+    'report_draft',
+    'resume_banner_shown',
+    data: <String, Object?>{
+      'photoCount': snapshot.draft.photos.length,
+      'hasTitle':
+          snapshot.title.trim().isNotEmpty ||
+          snapshot.draft.title.trim().isNotEmpty,
+    },
+  );
+
+  final TextStyle? bodyStyle = AppTypography.textTheme.bodyMedium?.copyWith(
+    color: AppColors.textSecondary,
+    height: 1.45,
+  );
+
+  while (context.mounted) {
+    final String? action = await showDialog<String>(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: AppColors.black.withValues(alpha: 0.45),
+      builder: (BuildContext ctx) {
+        final String titlePreviewRaw = snapshot.title.trim().isNotEmpty
+            ? snapshot.title
+            : snapshot.draft.title;
+        final String titlePreview = titlePreviewRaw.trim().isEmpty
+            ? '—'
+            : titlePreviewRaw.trim();
+        final int savedAt = snapshot.lastPersistedAtMs ?? snapshot.updatedAtMs;
+        return ReportModalDialog(
+          leading: DecoratedBox(
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.14),
+              shape: BoxShape.circle,
+            ),
+            child: const Padding(
+              padding: EdgeInsets.all(AppSpacing.radius14),
+              child: Icon(
+                Icons.edit_note_rounded,
+                size: 28,
+                color: AppColors.primaryDark,
+              ),
+            ),
+          ),
+          title: l10n.reportDraftResumeTitle,
+          footer: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              PrimaryButton(
+                label: l10n.reportDraftResumeContinue,
+                onPressed: () {
+                  Navigator.of(ctx).pop('continue');
+                },
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              AppButton.text(
+                label: l10n.reportDraftResumeDiscard,
+                onPressed: () {
+                  Navigator.of(ctx).pop('discard');
+                },
+              ),
+            ],
+          ),
+          child: SingleChildScrollView(
+            child: Text(
+              l10n.reportDraftResumeBody(
+                snapshot.draft.photos.length,
+                titlePreview,
+                _formatReportDraftSavedTimestamp(l10n, savedAt),
+              ),
+              style: bodyStyle,
+            ),
+          ),
+        );
+      },
+    );
+
+    if (!context.mounted) {
+      return null;
+    }
+
+    if (action == 'continue') {
+      chistoReportsBreadcrumb('report_draft', 'resume_banner_continue');
+      return ResumeDraftBannerResult.continued;
+    }
+
+    if (action == 'discard') {
+      final bool? confirmed = await showDialog<bool>(
+        context: context,
+        barrierColor: AppColors.black.withValues(alpha: 0.45),
+        builder: (BuildContext ctx) {
+          return ReportModalDialog(
+            title: l10n.reportDraftDiscardConfirmTitle,
+            footer: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                AppButton.text(
+                  label: MaterialLocalizations.of(ctx).cancelButtonLabel,
+                  onPressed: () {
+                    Navigator.of(ctx).pop(false);
+                  },
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                AppButton.destructive(
+                  label: l10n.reportDraftResumeDiscard,
+                  onPressed: () {
+                    Navigator.of(ctx).pop(true);
+                  },
+                  expand: false,
+                ),
+              ],
+            ),
+            child: Text(l10n.reportDraftDiscardConfirmBody, style: bodyStyle),
+          );
+        },
+      );
+      if (!context.mounted) {
+        return null;
+      }
+      if (confirmed ?? false) {
+        chistoReportsBreadcrumb('report_draft', 'resume_banner_discard');
+        return ResumeDraftBannerResult.discarded;
+      }
+      continue;
+    }
+
+    return ResumeDraftBannerResult.continued;
+  }
+  return null;
+}

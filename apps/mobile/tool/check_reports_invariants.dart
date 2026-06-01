@@ -6,6 +6,7 @@ import 'check_no_hex_in_reports.dart' as hex_check;
 import 'check_reports_buildcontext_after_await.dart' as ctx_check;
 import 'check_reports_hardcoded_strings.dart' as hardcoded_check;
 import 'check_reports_widget_size.dart' as widget_size_check;
+import 'feature_roots_guard_util.dart';
 
 Set<String> _arbMessageKeys(String path) {
   final File f = File(path);
@@ -24,9 +25,9 @@ Set<String> _arbMessageKeys(String path) {
 }
 
 int _runArbParityCheck() {
-  final Set<String> en = _arbMessageKeys('lib/l10n/app_en.arb');
-  final Set<String> mk = _arbMessageKeys('lib/l10n/app_mk.arb');
-  final Set<String> sq = _arbMessageKeys('lib/l10n/app_sq.arb');
+  final Set<String> en = _arbMessageKeys('$l10nRoot/app_en.arb');
+  final Set<String> mk = _arbMessageKeys('$l10nRoot/app_mk.arb');
+  final Set<String> sq = _arbMessageKeys('$l10nRoot/app_sq.arb');
   final List<String> violations = <String>[];
   for (final String k in en) {
     if (!mk.contains(k)) {
@@ -54,7 +55,7 @@ void main() {
     exit(arbCode);
   }
 
-  final Directory root = Directory('lib/features/reports');
+  final Directory root = Directory(reportsPackageRoot);
   if (!root.existsSync()) {
     stderr.writeln('Directory ${root.path} not found (run from apps/mobile).');
     exit(2);
@@ -96,7 +97,9 @@ void main() {
     exit(ctxCode);
   }
 
-  final int hardCode = hardcoded_check.runHardcodedEnglishCheck(stampBaseline: false);
+  final int hardCode = hardcoded_check.runHardcodedEnglishCheck(
+    stampBaseline: false,
+  );
   if (hardCode != 0) {
     exit(hardCode);
   }

@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/core/validation/phone_display_formatter.dart';
+import 'package:chisto_infrastructure/core/validation/phone_display_formatter.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

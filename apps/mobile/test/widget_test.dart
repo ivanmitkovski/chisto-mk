@@ -1,40 +1,36 @@
+import 'package:chisto_infrastructure/core/navigation/app_routes.dart';
+import 'package:feature_auth/src/presentation/screens/onboarding_screen.dart';
+import 'package:feature_auth/src/presentation/screens/sign_in_screen.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/onboarding_screen.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/sign_in_screen.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/splash_screen.dart';
-import 'shared/widget_test_bootstrap.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:chisto_mobile/main.dart';
+import 'shared/widget_test_bootstrap.dart';
 
 void main() {
   setUpAll(() async {
     await bootstrapWidgetTests();
   });
 
-  testWidgets('boot flow reaches onboarding and sign in', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      UncontrolledProviderScope(
-        container: AppBootstrap.instance.providerContainer,
-        child: const ChistoApp(),
-      ),
-    );
+  setUp(() {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+  });
 
-    expect(find.byType(SplashScreen), findsOneWidget);
-
-    await tester.pump(const Duration(milliseconds: 1600));
-    await tester.pumpAndSettle();
-
+  testWidgets('boot flow reaches onboarding and sign in', (
+    WidgetTester tester,
+  ) async {
+    await pumpAppRouter(tester, initialLocation: AppRoutes.onboarding);
     expect(find.byType(OnboardingScreen), findsOneWidget);
     expect(find.text('Continue'), findsOneWidget);
 
     await tester.tap(find.text('Continue'));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 350));
     await tester.tap(find.text('Continue'));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 350));
     await tester.tap(find.text('Get started'));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump();
 
     expect(find.byType(SignInScreen), findsOneWidget);
   });

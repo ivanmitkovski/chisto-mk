@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/features/home/domain/models/site_history_entry.dart';
+import 'package:feature_home/src/domain/models/site_history_entry.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -11,6 +11,9 @@ void main() {
       siteHistoryEntryKindFromApi('CLEANUP_EVENT_COMPLETED'),
       SiteHistoryEntryKind.cleanupEventCompleted,
     );
-    expect(siteHistoryEntryKindFromApi('unknown'), SiteHistoryEntryKind.unknown);
+    expect(
+      siteHistoryEntryKindFromApi('unknown'),
+      SiteHistoryEntryKind.unknown,
+    );
   });
 }

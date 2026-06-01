@@ -51,4 +51,25 @@ describe('buildEventAnalyticsPayload', () => {
     expect(out.checkInsByHour.reduce((s, h) => s + h.count, 0)).toBe(3);
     expect(out.attendanceRate).toBe(75);
   });
+
+  it('includes generatedAt and last activity timestamps', () => {
+    const out = buildEventAnalyticsPayload({
+      participantCount: 2,
+      participantsJoinedAt: [new Date('2026-06-01T10:00:00.000Z')],
+      checkInsCheckedAt: [new Date('2026-06-01T11:00:00.000Z')],
+    });
+    expect(out.generatedAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+    expect(out.lastJoinAt).toBe('2026-06-01T10:00:00.000Z');
+    expect(out.lastCheckInAt).toBe('2026-06-01T11:00:00.000Z');
+  });
+
+  it('returns null last activity when empty', () => {
+    const out = buildEventAnalyticsPayload({
+      participantCount: 0,
+      participantsJoinedAt: [],
+      checkInsCheckedAt: [],
+    });
+    expect(out.lastJoinAt).toBeNull();
+    expect(out.lastCheckInAt).toBeNull();
+  });
 });

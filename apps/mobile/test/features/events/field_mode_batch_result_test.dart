@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/features/events/data/field_mode_batch_result.dart';
+import 'package:feature_events/src/data/field_mode_batch_result.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

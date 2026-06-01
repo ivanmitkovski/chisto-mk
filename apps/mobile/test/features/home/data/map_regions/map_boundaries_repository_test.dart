@@ -1,6 +1,5 @@
+import 'package:feature_home/src/data/map_regions/map_boundaries_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:chisto_mobile/features/home/data/map_regions/map_boundaries_repository.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -29,13 +28,20 @@ void main() {
     expect(skopje!.polygons.length, greaterThan(1));
   });
 
-  test('returns null for unknown geometry and keeps fallback ring available', () async {
-    final MapBoundariesRepository repository = MapBoundariesRepository.instance;
-    await repository.warmup();
+  test(
+    'returns null for unknown geometry and keeps fallback ring available',
+    () async {
+      final MapBoundariesRepository repository =
+          MapBoundariesRepository.instance;
+      await repository.warmup();
 
-    expect(repository.geometryFor('unknown_id'), isNull);
-    expect(repository.fallbackRingFor('bitola').length, greaterThanOrEqualTo(4));
-  });
+      expect(repository.geometryFor('unknown_id'), isNull);
+      expect(
+        repository.fallbackRingFor('bitola').length,
+        greaterThanOrEqualTo(4),
+      );
+    },
+  );
 
   test('loads nationwide ADM2 coverage and leaves no unmapped names', () async {
     final MapBoundariesRepository repository = MapBoundariesRepository.instance;
@@ -76,4 +82,3 @@ void main() {
     }
   });
 }
-

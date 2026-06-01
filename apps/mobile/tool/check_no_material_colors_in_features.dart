@@ -1,10 +1,9 @@
 // Run from apps/mobile: dart run tool/check_no_material_colors_in_features.dart
 import 'dart:io';
 
-const List<String> _scanRoots = <String>[
-  'lib/features',
-  'lib/shared',
-];
+import 'feature_roots_guard_util.dart';
+
+List<String> _featureAndSharedRoots() => allFeatureLibRoots();
 
 /// Paths that may use Material [Colors] for true transparency / video chrome only.
 final List<String> _allowlistPathFragments = <String>[
@@ -14,7 +13,7 @@ final List<String> _allowlistPathFragments = <String>[
 /// Returns `0` when clean, `1` when violations found.
 int runNoMaterialColorsInFeaturesCheck() {
   final List<String> violations = <String>[];
-  for (final String rootPath in _scanRoots) {
+  for (final String rootPath in _featureAndSharedRoots()) {
     final Directory root = Directory(rootPath);
     if (!root.existsSync()) {
       continue;

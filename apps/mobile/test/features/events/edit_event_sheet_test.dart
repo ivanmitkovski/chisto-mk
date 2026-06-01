@@ -1,9 +1,9 @@
-import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
-import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
-import 'package:chisto_mobile/features/events/domain/models/event_schedule_conflict_preview.dart';
-import 'package:chisto_mobile/features/events/presentation/screens/edit_event_sheet.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
+import 'package:chisto_infrastructure/core/providers/events_providers.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/shared/widgets/atoms/primary_button.dart';
+import 'package:feature_events/src/domain/models/eco_event.dart';
+import 'package:feature_events/src/domain/models/event_schedule_conflict_preview.dart';
+import 'package:feature_events/src/presentation/screens/edit_event_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -52,14 +52,16 @@ void main() {
 
   setUp(() {
     repo = RecordingEventsRepository(seed: <EcoEvent>[_baseEvent()]);
-    EventsRepositoryRegistry.setTestOverride(repo);
+    setEventsRepositoryTestOverride(repo);
   });
 
   tearDown(() {
-    EventsRepositoryRegistry.setTestOverride(null);
+    setEventsRepositoryTestOverride(null);
   });
 
-  testWidgets('save is disabled when form is not dirty', (WidgetTester tester) async {
+  testWidgets('save is disabled when form is not dirty', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(_app(EditEventSheet(event: _baseEvent())));
     await tester.pump();
     await tester.pump();
@@ -74,7 +76,9 @@ void main() {
     expect(saveBtn.onPressed, isNull);
   });
 
-  testWidgets('shows title validation after save with short title', (WidgetTester tester) async {
+  testWidgets('shows title validation after save with short title', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(_app(EditEventSheet(event: _baseEvent())));
     await tester.pump();
     await tester.pump();
@@ -97,7 +101,9 @@ void main() {
     expect(find.textContaining('at least'), findsOneWidget);
   });
 
-  testWidgets('shows schedule conflict preview when API reports overlap', (WidgetTester tester) async {
+  testWidgets('shows schedule conflict preview when API reports overlap', (
+    WidgetTester tester,
+  ) async {
     repo.scheduleConflictOverride = EventScheduleConflictPreview(
       hasConflict: true,
       conflictingEvent: ConflictingEventInfo(
@@ -115,7 +121,9 @@ void main() {
     expect(find.textContaining('Other event'), findsOneWidget);
   });
 
-  testWidgets('system back when dirty shows discard dialog', (WidgetTester tester) async {
+  testWidgets('system back when dirty shows discard dialog', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(_app(EditEventSheet(event: _baseEvent())));
     await tester.pump();
     await tester.pump();

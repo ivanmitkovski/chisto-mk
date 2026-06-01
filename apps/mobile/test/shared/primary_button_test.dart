@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
+import 'package:chisto_infrastructure/shared/widgets/atoms/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -8,10 +8,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: PrimaryButton(
-              label: 'Submit',
-              onPressed: () {},
-            ),
+            body: PrimaryButton(label: 'Submit', onPressed: () {}),
           ),
         ),
       );
@@ -39,8 +36,9 @@ void main() {
       expect(pressed, isTrue);
     });
 
-    testWidgets('does not fire onPressed when disabled',
-        (WidgetTester tester) async {
+    testWidgets('does not fire onPressed when disabled', (
+      WidgetTester tester,
+    ) async {
       var pressed = false;
 
       await tester.pumpWidget(

@@ -1,13 +1,28 @@
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
-import { DEFAULT_EMAIL_LOGO_URL } from './email.constants';
+import { DEFAULT_EMAIL_LOGO_URL, EMAIL_LOGO_CONTENT_ID } from './email.constants';
 import { normalizeHttpsAbsoluteUrl } from './email-urls';
 
 const BRAND_LOGO_FILENAME = 'brand-logo.png';
 
-let cachedEmbeddedDataUri: string | null | undefined;
+let cachedLogoBytes: Buffer | null | undefined;
+
+export type EmailInlineAttachment = {
+  contentId: string;
+  name: string;
+  contentType: string;
+  contentBase64: string;
+};
+
+export type ResolvedEmailLogo = {
+  logoUrl: string;
+  inlineAttachment?: EmailInlineAttachment;
+};
 
 function readLogoPngBytes(): Buffer | null {
+  if (cachedLogoBytes !== undefined) {
+    return cachedLogoBytes;
+  }
   const candidates = [
     join(__dirname, 'assets', BRAND_LOGO_FILENAME),
     join(process.cwd(), 'dist', 'email', 'assets', BRAND_LOGO_FILENAME),
@@ -16,40 +31,59 @@ function readLogoPngBytes(): Buffer | null {
   ];
   for (const p of candidates) {
     if (existsSync(p)) {
-      return readFileSync(p);
+      cachedLogoBytes = readFileSync(p);
+      return cachedLogoBytes;
     }
   }
+  cachedLogoBytes = null;
   return null;
 }
 
-/** Inline PNG data URI — reliable in Gmail/Outlook (no redirect or hotlink). */
-export function getEmbeddedEmailLogoDataUri(): string | null {
-  if (cachedEmbeddedDataUri !== undefined) {
-    return cachedEmbeddedDataUri;
-  }
-  const bytes = readLogoPngBytes();
-  if (!bytes?.length) {
-    cachedEmbeddedDataUri = null;
-    return null;
-  }
-  cachedEmbeddedDataUri = `data:image/png;base64,${bytes.toString('base64')}`;
-  return cachedEmbeddedDataUri;
+function buildInlineLogoAttachment(bytes: Buffer): EmailInlineAttachment {
+  return {
+    contentId: EMAIL_LOGO_CONTENT_ID,
+    name: BRAND_LOGO_FILENAME,
+    contentType: 'image/png',
+    contentBase64: bytes.toString('base64'),
+  };
 }
 
 /**
- * Hosted HTTPS logo when EMAIL_LOGO_URL is set; otherwise embedded PNG (fallback: www landing URL).
+ * Resolves logo src for HTML email.
+ * Bundled PNG is sent as a CID inline attachment (Gmail/Outlook block data: URIs).
  */
-export function resolveEmailLogoSrc(cfg: { logo?: string | undefined }): string {
+export function resolveEmailLogo(cfg: { logo?: string | undefined }): ResolvedEmailLogo {
   const configured = normalizeHttpsAbsoluteUrl(cfg.logo);
-  if (configured) return configured;
+  if (configured) {
+    return { logoUrl: configured };
+  }
 
-  const embedded = getEmbeddedEmailLogoDataUri();
-  if (embedded) return embedded;
+  const bytes = readLogoPngBytes();
+  if (bytes?.length) {
+    return {
+      logoUrl: `cid:${EMAIL_LOGO_CONTENT_ID}`,
+      inlineAttachment: buildInlineLogoAttachment(bytes),
+    };
+  }
 
-  return DEFAULT_EMAIL_LOGO_URL;
+  return { logoUrl: DEFAULT_EMAIL_LOGO_URL };
+}
+
+/** Back-compat helper returning only the HTML img src. */
+export function resolveEmailLogoSrc(cfg: { logo?: string | undefined }): string {
+  return resolveEmailLogo(cfg).logoUrl;
+}
+
+/** Data URI for local HTML preview files (browser cannot resolve cid: without MIME). */
+export function resolveEmailLogoPreviewSrc(cfg: { logo?: string | undefined }): string {
+  const resolved = resolveEmailLogo(cfg);
+  if (resolved.inlineAttachment) {
+    return `data:image/png;base64,${resolved.inlineAttachment.contentBase64}`;
+  }
+  return resolved.logoUrl;
 }
 
 /** @internal test helper */
 export function resetEmbeddedEmailLogoCache(): void {
-  cachedEmbeddedDataUri = undefined;
+  cachedLogoBytes = undefined;
 }

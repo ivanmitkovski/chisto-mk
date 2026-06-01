@@ -1,7 +1,7 @@
-import 'package:chisto_mobile/features/reports/domain/models/report_upload_prep_progress.dart';
-import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/new_report_flow_bottom_bar.dart';
-import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_stage.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_reports/src/domain/models/report_upload_prep_progress.dart';
+import 'package:feature_reports/src/presentation/widgets/new_report/new_report_flow_bottom_bar.dart';
+import 'package:feature_reports/src/presentation/widgets/new_report/report_stage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -24,8 +24,8 @@ void main() {
         home: MediaQuery(
           data: const MediaQueryData(
             size: Size(420, 220),
-            devicePixelRatio: 1.0,
-            textScaler: TextScaler.linear(1.0),
+            devicePixelRatio: 1,
+            textScaler: TextScaler.linear(1),
             disableAnimations: true,
           ),
           child: Align(
@@ -34,7 +34,10 @@ void main() {
               currentStage: ReportStage.review,
               submitting: true,
               submitPhase: 'uploading',
-              uploadPrepProgress: const ReportUploadPrepProgress(completed: 2, total: 5),
+              uploadPrepProgress: const ReportUploadPrepProgress(
+                completed: 2,
+                total: 5,
+              ),
               onPrimary: () {},
               onBack: () {},
             ),
@@ -45,7 +48,9 @@ void main() {
     await tester.pump();
   }
 
-  testWidgets('NewReportFlowBottomBar prep progress golden en', (WidgetTester tester) async {
+  testWidgets('NewReportFlowBottomBar prep progress golden en', (
+    WidgetTester tester,
+  ) async {
     await pumpBottomBar(tester, const Locale('en'));
     await expectLater(
       find.byType(NewReportFlowBottomBar),
@@ -53,7 +58,9 @@ void main() {
     );
   });
 
-  testWidgets('NewReportFlowBottomBar prep progress golden mk', (WidgetTester tester) async {
+  testWidgets('NewReportFlowBottomBar prep progress golden mk', (
+    WidgetTester tester,
+  ) async {
     await pumpBottomBar(tester, const Locale('mk'));
     await expectLater(
       find.byType(NewReportFlowBottomBar),
@@ -61,7 +68,9 @@ void main() {
     );
   });
 
-  testWidgets('NewReportFlowBottomBar prep progress golden sq', (WidgetTester tester) async {
+  testWidgets('NewReportFlowBottomBar prep progress golden sq', (
+    WidgetTester tester,
+  ) async {
     await pumpBottomBar(tester, const Locale('sq'));
     await expectLater(
       find.byType(NewReportFlowBottomBar),

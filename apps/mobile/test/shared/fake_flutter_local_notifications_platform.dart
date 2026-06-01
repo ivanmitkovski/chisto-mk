@@ -3,7 +3,8 @@ import 'package:flutter_local_notifications_platform_interface/flutter_local_not
 /// No-op platform for widget/unit tests: the real plugin never registers in the
 /// test binding, so `FlutterLocalNotificationsPlatform.instance` would otherwise
 /// throw on first access.
-class FakeFlutterLocalNotificationsPlatform extends FlutterLocalNotificationsPlatform {
+class FakeFlutterLocalNotificationsPlatform
+    extends FlutterLocalNotificationsPlatform {
   @override
   Future<void> cancel(int id) async {}
 
@@ -11,15 +12,17 @@ class FakeFlutterLocalNotificationsPlatform extends FlutterLocalNotificationsPla
   Future<void> cancelAll() async {}
 
   @override
-  Future<List<ActiveNotification>> getActiveNotifications() async => const <ActiveNotification>[];
+  Future<List<ActiveNotification>> getActiveNotifications() async =>
+      const <ActiveNotification>[];
 
   @override
-  Future<NotificationAppLaunchDetails?> getNotificationAppLaunchDetails() async =>
+  Future<NotificationAppLaunchDetails?>
+  getNotificationAppLaunchDetails() async =>
       const NotificationAppLaunchDetails(false);
 
   @override
-  Future<List<PendingNotificationRequest>> pendingNotificationRequests() async =>
-      const <PendingNotificationRequest>[];
+  Future<List<PendingNotificationRequest>>
+  pendingNotificationRequests() async => const <PendingNotificationRequest>[];
 
   @override
   Future<void> periodicallyShow(
@@ -38,5 +41,10 @@ class FakeFlutterLocalNotificationsPlatform extends FlutterLocalNotificationsPla
   ) async {}
 
   @override
-  Future<void> show(int id, String? title, String? body, {String? payload}) async {}
+  Future<void> show(
+    int id,
+    String? title,
+    String? body, {
+    String? payload,
+  }) async {}
 }

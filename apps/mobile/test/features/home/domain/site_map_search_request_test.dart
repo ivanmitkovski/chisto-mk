@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/features/home/domain/repositories/sites_repository_types.dart';
+import 'package:feature_home/src/domain/repositories/sites_repository_types.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -6,8 +6,8 @@ void main() {
     const SiteMapSearchRequest req = SiteMapSearchRequest(
       query: 'test',
       limit: 10,
-      lat: 41.0,
-      lng: 21.0,
+      lat: 41,
+      lng: 21,
       statuses: <String>[],
       pollutionTypes: <String>[],
       includeArchived: false,
@@ -31,12 +31,15 @@ void main() {
     expect(json['includeArchived'], isTrue);
   });
 
-  test('SiteMapSearchRequest.toBodyJson drops ARCHIVED/UNKNOWN map chip codes', () {
-    const SiteMapSearchRequest req = SiteMapSearchRequest(
-      query: 'goce',
-      statuses: <String>['REPORTED', 'ARCHIVED', 'UNKNOWN', 'VERIFIED'],
-    );
-    final Map<String, dynamic> json = req.toBodyJson();
-    expect(json['statuses'], <String>['REPORTED', 'VERIFIED']);
-  });
+  test(
+    'SiteMapSearchRequest.toBodyJson drops ARCHIVED/UNKNOWN map chip codes',
+    () {
+      const SiteMapSearchRequest req = SiteMapSearchRequest(
+        query: 'goce',
+        statuses: <String>['REPORTED', 'ARCHIVED', 'UNKNOWN', 'VERIFIED'],
+      );
+      final Map<String, dynamic> json = req.toBodyJson();
+      expect(json['statuses'], <String>['REPORTED', 'VERIFIED']);
+    },
+  );
 }

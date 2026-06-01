@@ -1,11 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma, SiteHistoryEntryKind } from '../../prisma-client';
+import { Prisma, SiteHistoryEntryKind, SiteStatus } from '../../prisma-client';
 import { PrismaService } from '../../prisma/prisma.service';
 import type { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { ADMIN_PANEL_ROLES } from '../../auth/admin-roles';
 import {
   SiteHistoryEntryDto,
   SiteHistoryListResponseDto,
+  SiteHistorySummaryDto,
 } from './dto/site-history-entry.dto';
 
 const DEFAULT_LIMIT = 30;
@@ -51,7 +52,7 @@ export class SiteHistoryQueryService {
         select: { occurredAt: true },
       });
       if (!cursor) {
-        return { items: [], nextBeforeId: null };
+        return { items: [], nextBeforeId: null, summary: null };
       }
       cursorOccurredAt = cursor.occurredAt;
     }
@@ -153,6 +154,47 @@ export class SiteHistoryQueryService {
     }
 
     const nextBeforeId = hasMore ? page[page.length - 1]!.id : null;
-    return { items, nextBeforeId };
+    const summary =
+      beforeId == null ? await this.buildSummary(siteId, site) : null;
+    return { items, nextBeforeId, summary };
+  }
+
+  private async buildSummary(
+    siteId: string,
+    site: { createdAt: Date; status: SiteStatus },
+  ): Promise<SiteHistorySummaryDto> {
+    const [totalEntries, kindGroups, oldestEntry, newestEntry] = await Promise.all([
+      this.prisma.siteHistoryEntry.count({ where: { siteId } }),
+      this.prisma.siteHistoryEntry.groupBy({
+        by: ['kind'],
+        where: { siteId },
+        _count: { kind: true },
+      }),
+      this.prisma.siteHistoryEntry.findFirst({
+        where: { siteId },
+        orderBy: [{ occurredAt: 'asc' }, { id: 'asc' }],
+        select: { occurredAt: true },
+      }),
+      this.prisma.siteHistoryEntry.findFirst({
+        where: { siteId },
+        orderBy: [{ occurredAt: 'desc' }, { id: 'desc' }],
+        select: { occurredAt: true },
+      }),
+    ]);
+
+    const countForKind = (kind: SiteHistoryEntryKind): number =>
+      kindGroups.find((g) => g.kind === kind)?._count.kind ?? 0;
+
+    const firstActivityAt = oldestEntry?.occurredAt ?? site.createdAt;
+    const lastActivityAt = newestEntry?.occurredAt ?? site.createdAt;
+
+    return {
+      totalEntries,
+      reportCount: countForKind(SiteHistoryEntryKind.REPORT_SUBMITTED),
+      cleanupCount: countForKind(SiteHistoryEntryKind.CLEANUP_EVENT_COMPLETED),
+      currentStatus: site.status,
+      firstActivityAt: firstActivityAt.toISOString(),
+      lastActivityAt: lastActivityAt.toISOString(),
+    };
   }
 }

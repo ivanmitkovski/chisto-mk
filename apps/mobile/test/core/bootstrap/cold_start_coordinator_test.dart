@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/core/bootstrap/cold_start_coordinator.dart';
+import 'package:chisto_infrastructure/core/bootstrap/cold_start_coordinator.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -11,7 +11,9 @@ void main() {
     c.markSessionReady();
     c.queueDeepLink(Uri.parse('https://chisto.mk/events/evt-1'));
     c.queueColdStartPush(
-      const RemoteMessage(data: <String, String>{'type': 'EVENT_CHAT', 'eventId': 'evt-1'}),
+      const RemoteMessage(
+        data: <String, String>{'type': 'EVENT_CHAT', 'eventId': 'evt-1'},
+      ),
     );
     final LaunchIntent? intent = c.peekPendingIntent();
     expect(intent, isNotNull);

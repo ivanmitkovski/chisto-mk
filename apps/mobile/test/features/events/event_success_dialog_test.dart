@@ -1,5 +1,5 @@
-import 'package:chisto_mobile/features/events/presentation/widgets/event_success_dialog.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_events/src/presentation/widgets/event_success_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -31,10 +31,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 50));
 
     expect(find.text('Submitted for review'), findsOneWidget);
-    expect(
-      find.textContaining('moderator'),
-      findsOneWidget,
-    );
+    expect(find.textContaining('moderator'), findsOneWidget);
     expect(find.text('View event'), findsOneWidget);
     expect(find.text('Event created'), findsNothing);
   });

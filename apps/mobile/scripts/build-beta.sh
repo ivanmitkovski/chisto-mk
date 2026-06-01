@@ -43,4 +43,4 @@ case "$PLATFORM" in
     ;;
 esac
 
-echo "Done. Upload IPA/AAB per docs/beta-release-checklist.md"
+echo "Done. Upload IPA/AAB via TestFlight / Play internal testing (see apps/mobile/README.md)."

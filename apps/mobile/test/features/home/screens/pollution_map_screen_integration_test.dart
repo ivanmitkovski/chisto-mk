@@ -1,12 +1,12 @@
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_home/src/data/map_realtime/map_sync_coordinator.dart';
+import 'package:feature_home/src/domain/models/pollution_site.dart';
+import 'package:feature_home/src/presentation/providers/map_location_notifier.dart';
+import 'package:feature_home/src/presentation/providers/map_sites_notifier.dart';
+import 'package:feature_home/src/presentation/screens/pollution_map_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
-import 'package:chisto_mobile/features/home/presentation/providers/map_location_notifier.dart';
-import 'package:chisto_mobile/features/home/presentation/providers/map_sites_notifier.dart';
-import 'package:chisto_mobile/features/home/presentation/screens/pollution_map_screen.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
 
 import '../../../shared/widget_test_bootstrap.dart';
 import '../support/test_pollution_site.dart';
@@ -24,7 +24,7 @@ class _FakeMapSitesNotifier extends MapSitesNotifier {
   void setActive(bool active) {}
 
   @override
-  void updateViewport(query) {}
+  void updateViewport(MapViewportQuery query) {}
 
   @override
   void requestSync({required bool immediate}) {}
@@ -55,18 +55,25 @@ void main() {
   testWidgets('mounts full map screen and opens actions menu', (
     WidgetTester tester,
   ) async {
+    await tester.binding.setSurfaceSize(const Size(800, 1200));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
     final PollutionSite site = buildTestPollutionSite(id: 'integration-site');
 
     await tester.pumpWidget(
       ProviderScope(
         overrides: <Override>[
-          mapSitesNotifierProvider.overrideWith(() => _FakeMapSitesNotifier(site)),
-          mapLocationNotifierProvider.overrideWith(_FakeMapLocationNotifier.new),
+          mapSitesNotifierProvider.overrideWith(
+            () => _FakeMapSitesNotifier(site),
+          ),
+          mapLocationNotifierProvider.overrideWith(
+            _FakeMapLocationNotifier.new,
+          ),
         ],
-        child: MaterialApp(
+        child: const MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          home: const PollutionMapScreen(),
+          home: PollutionMapScreen(),
         ),
       ),
     );
@@ -74,7 +81,8 @@ void main() {
 
     expect(find.byType(PollutionMapScreen), findsOneWidget);
     await tester.tap(find.bySemanticsLabel('Open actions menu'));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 900));
     expect(find.bySemanticsLabel('Center map on my location'), findsOneWidget);
   });
 }

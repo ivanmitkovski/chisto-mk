@@ -1,20 +1,17 @@
-import 'package:chisto_mobile/features/events/presentation/screens/organizer_toolkit/organizer_toolkit_screen.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:feature_events/src/presentation/screens/organizer_toolkit/organizer_toolkit_screen.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../shared/widget_test_bootstrap.dart';
+
 void main() {
+  setUpAll(() async {
+    await bootstrapWidgetTests();
+  });
+
   testWidgets('OrganizerToolkitScreen shows eight chapters before quiz CTA', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(
-      const MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: Locale('en'),
-        home: OrganizerToolkitScreen(),
-      ),
-    );
+    await tester.pumpWidget(wrapForWidgetTest(const OrganizerToolkitScreen()));
     await tester.pumpAndSettle();
 
     expect(find.text('Plan ahead'), findsOneWidget);

@@ -1,7 +1,6 @@
-import 'package:chisto_mobile/core/errors/app_error.dart';
-import 'package:chisto_mobile/features/auth/domain/models/register_result.dart';
-import 'package:chisto_mobile/features/auth/domain/refresh_outcome.dart';
-import 'package:chisto_mobile/features/auth/domain/repositories/auth_repository.dart';
+import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:feature_auth/src/domain/models/auth_session_dtos.dart';
+import 'package:feature_auth/src/domain/repositories/auth_repository.dart';
 
 /// Configurable [AuthRepository] for widget and notifier tests.
 class FakeAuthRepository implements AuthRepository {
@@ -13,42 +12,43 @@ class FakeAuthRepository implements AuthRepository {
       required String phoneNumber,
       required String password,
       bool rememberMe,
-    })? signInImpl,
+    })?
+    signInImpl,
     Future<RegisterResult> Function()? signUpImpl,
     Future<SendOtpResult> Function(String phone)? requestOtpImpl,
     Future<void> Function(String phone, String code)? verifyOtpImpl,
     Future<PasswordResetRequestResult> Function(String phone)?
-        requestPasswordResetImpl,
+    requestPasswordResetImpl,
     Future<PasswordResetRequestResult> Function(String email)?
-        requestPasswordResetByEmailImpl,
+    requestPasswordResetByEmailImpl,
     Future<void> Function(String phone, String code)?
-        verifyPasswordResetCodeImpl,
+    verifyPasswordResetCodeImpl,
     Future<void> Function({
       required String phoneNumberE164,
       required String code,
       required String newPassword,
-    })? confirmPasswordResetImpl,
-    Future<void> Function({
-      required String token,
-      required String newPassword,
-    })? confirmPasswordResetByEmailImpl,
+    })?
+    confirmPasswordResetImpl,
+    Future<void> Function({required String token, required String newPassword})?
+    confirmPasswordResetByEmailImpl,
     Future<void> Function()? restoreSessionImpl,
     Future<void> Function({
       required double latitude,
       required double longitude,
       String? label,
-    })? updateHomeLocationImpl,
-  })  : _signInImpl = signInImpl,
-        _signUpImpl = signUpImpl,
-        _requestOtpImpl = requestOtpImpl,
-        _verifyOtpImpl = verifyOtpImpl,
-        _requestPasswordResetImpl = requestPasswordResetImpl,
-        _requestPasswordResetByEmailImpl = requestPasswordResetByEmailImpl,
-        _verifyPasswordResetCodeImpl = verifyPasswordResetCodeImpl,
-        _confirmPasswordResetImpl = confirmPasswordResetImpl,
-        _confirmPasswordResetByEmailImpl = confirmPasswordResetByEmailImpl,
-        _restoreSessionImpl = restoreSessionImpl,
-        _updateHomeLocationImpl = updateHomeLocationImpl;
+    })?
+    updateHomeLocationImpl,
+  }) : _signInImpl = signInImpl,
+       _signUpImpl = signUpImpl,
+       _requestOtpImpl = requestOtpImpl,
+       _verifyOtpImpl = verifyOtpImpl,
+       _requestPasswordResetImpl = requestPasswordResetImpl,
+       _requestPasswordResetByEmailImpl = requestPasswordResetByEmailImpl,
+       _verifyPasswordResetCodeImpl = verifyPasswordResetCodeImpl,
+       _confirmPasswordResetImpl = confirmPasswordResetImpl,
+       _confirmPasswordResetByEmailImpl = confirmPasswordResetByEmailImpl,
+       _restoreSessionImpl = restoreSessionImpl,
+       _updateHomeLocationImpl = updateHomeLocationImpl;
 
   @override
   bool isAuthenticated;
@@ -78,31 +78,35 @@ class FakeAuthRepository implements AuthRepository {
     required String phoneNumber,
     required String password,
     bool rememberMe,
-  })? _signInImpl;
+  })?
+  _signInImpl;
   final Future<RegisterResult> Function()? _signUpImpl;
   final Future<SendOtpResult> Function(String phone)? _requestOtpImpl;
   final Future<void> Function(String phone, String code)? _verifyOtpImpl;
   final Future<PasswordResetRequestResult> Function(String phone)?
-      _requestPasswordResetImpl;
+  _requestPasswordResetImpl;
   final Future<PasswordResetRequestResult> Function(String email)?
-      _requestPasswordResetByEmailImpl;
+  _requestPasswordResetByEmailImpl;
   final Future<void> Function(String phone, String code)?
-      _verifyPasswordResetCodeImpl;
+  _verifyPasswordResetCodeImpl;
   final Future<void> Function({
     required String phoneNumberE164,
     required String code,
     required String newPassword,
-  })? _confirmPasswordResetImpl;
+  })?
+  _confirmPasswordResetImpl;
   final Future<void> Function({
     required String token,
     required String newPassword,
-  })? _confirmPasswordResetByEmailImpl;
+  })?
+  _confirmPasswordResetByEmailImpl;
   final Future<void> Function()? _restoreSessionImpl;
   final Future<void> Function({
     required double latitude,
     required double longitude,
     String? label,
-  })? _updateHomeLocationImpl;
+  })?
+  _updateHomeLocationImpl;
 
   AppError? signInError;
   AppError? verifyOtpError;
@@ -253,7 +257,9 @@ class FakeAuthRepository implements AuthRepository {
     String? label,
   }) async {
     final f = _updateHomeLocationImpl;
-    if (f != null) await f(latitude: latitude, longitude: longitude, label: label);
+    if (f != null) {
+      await f(latitude: latitude, longitude: longitude, label: label);
+    }
   }
 
   @override

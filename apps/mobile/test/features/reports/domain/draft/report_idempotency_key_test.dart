@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/features/reports/domain/draft/report_idempotency_key.dart';
+import 'package:feature_reports/src/domain/draft/report_idempotency_key.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

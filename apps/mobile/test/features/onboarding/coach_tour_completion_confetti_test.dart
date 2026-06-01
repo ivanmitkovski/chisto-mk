@@ -1,5 +1,5 @@
-import 'package:chisto_mobile/features/onboarding/presentation/coach/coach_tour_completion_confetti.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_onboarding/src/presentation/coach/coach_tour_completion_confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';

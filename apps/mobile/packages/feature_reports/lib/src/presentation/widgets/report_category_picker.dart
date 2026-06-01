@@ -1,0 +1,79 @@
+import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/shared/widgets/organisms/app_surface/report_surface_aliases.dart';
+import 'package:design_system/design_system.dart';
+import 'package:feature_reports/src/domain/models/report_draft.dart';
+import 'package:feature_reports/src/presentation/l10n/report_category_l10n.dart';
+import 'package:flutter/cupertino.dart';
+
+/// Modal picker for report category with icons.
+void showReportCategoryPicker(
+  BuildContext context, {
+  required ReportCategory? selected,
+  required void Function(ReportCategory) onSelected,
+}) {
+  showAppActionSheet<void>(
+    context: context,
+    builder: (BuildContext context) {
+      final AppLocalizations l10n = context.l10n;
+      return ReportSheetScaffold(
+        title: l10n.reportCategoryPickerTitle,
+        subtitle: l10n.reportCategoryPickerSubtitle,
+        trailing: ReportCircleIconButton(
+          icon: CupertinoIcons.xmark,
+          semanticLabel: l10n.semanticsClose,
+          onTap: () => Navigator.of(context).pop(),
+        ),
+        maxHeightFactor: 0.95,
+        // One scrollable with chrome avoids nested ListView overscroll masks
+        // (white bands) clipping the first/last category rows.
+        scrollChromeWithBody: true,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            ReportInfoBanner(
+              title: l10n.reportCategoryPickerBannerTitle,
+              message: l10n.reportCategoryPickerBannerBody,
+              icon: CupertinoIcons.square_list,
+            ),
+            const SizedBox(height: AppSpacing.md),
+            ...ReportCategory.values.expand((ReportCategory cat) {
+              final bool isActive = cat == selected;
+              return <Widget>[
+                Semantics(
+                  button: true,
+                  selected: isActive,
+                  label: cat.localizedTitle(l10n),
+                  child: ReportActionTile(
+                    icon: cat.icon,
+                    title: cat.localizedTitle(l10n),
+                    subtitle: cat.localizedDescription(l10n),
+                    tone: isActive
+                        ? ReportSurfaceTone.accent
+                        : ReportSurfaceTone.neutral,
+                    trailing: Icon(
+                      isActive
+                          ? CupertinoIcons.checkmark_circle_fill
+                          : CupertinoIcons.circle,
+                      size: 22,
+                      color: isActive
+                          ? AppColors.primaryDark
+                          : AppColors.divider,
+                    ),
+                    onTap: () {
+                      onSelected(cat);
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ),
+                if (cat != ReportCategory.values.last)
+                  const SizedBox(height: AppSpacing.sm),
+              ];
+            }),
+          ],
+        ),
+      );
+    },
+  );
+}

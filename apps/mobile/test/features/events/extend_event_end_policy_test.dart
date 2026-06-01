@@ -1,5 +1,5 @@
-import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
-import 'package:chisto_mobile/features/events/presentation/utils/extend_event_end_policy.dart';
+import 'package:feature_events/src/domain/models/eco_event.dart';
+import 'package:feature_events/src/presentation/utils/extend_event_end_policy.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

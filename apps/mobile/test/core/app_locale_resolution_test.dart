@@ -1,6 +1,6 @@
 import 'dart:ui' show Locale;
 
-import 'package:chisto_mobile/core/l10n/app_locale_resolution.dart';
+import 'package:chisto_infrastructure/core/l10n/app_locale_resolution.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

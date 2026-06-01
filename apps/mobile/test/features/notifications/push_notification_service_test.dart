@@ -1,6 +1,9 @@
-import 'package:chisto_mobile/features/notifications/data/push_notification_service.dart';
-import 'package:chisto_mobile/features/notifications/domain/repositories/notifications_repository.dart';
+import 'package:feature_notifications/src/data/push_notification_service.dart';
+import 'package:feature_notifications/src/domain/repositories/notifications_repository.dart';
+import 'package:flutter_local_notifications_platform_interface/flutter_local_notifications_platform_interface.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../../shared/fake_flutter_local_notifications_platform.dart';
 
 class _FakeNotificationsRepository implements NotificationsRepository {
   int registerCalls = 0;
@@ -22,6 +25,13 @@ class _FakeNotificationsRepository implements NotificationsRepository {
 }
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  setUp(() {
+    FlutterLocalNotificationsPlatform.instance =
+        FakeFlutterLocalNotificationsPlatform();
+  });
+
   test('syncDeviceTokenWithBackend skips when not authenticated', () async {
     final _FakeNotificationsRepository repo = _FakeNotificationsRepository();
     final PushNotificationService push = PushNotificationService(
@@ -47,5 +57,36 @@ void main() {
 
     expect(repo.registerCalls, 2);
     expect(push.lastRegisteredTokenForTest, 'new-fcm-token');
+  });
+
+  test('initialize is idempotent when Firebase is not ready', () async {
+    final _FakeNotificationsRepository repo = _FakeNotificationsRepository();
+    final PushNotificationService push = PushNotificationService(
+      repository: repo,
+      isAuthenticated: () => true,
+    );
+
+    await push.initialize();
+    expect(push.isInitialized, isTrue);
+    expect(push.isFirebaseReady, isFalse);
+
+    await push.teardownFirebaseListeners();
+    await push.initialize();
+    expect(push.isInitialized, isTrue);
+  });
+
+  test('organizer end-soon payload encodes as JSON for local tap decode', () {
+    final String? encoded =
+        PushNotificationService.encodeNotificationPayloadForTest(
+          <String, dynamic>{
+            'type': 'CLEANUP_EVENT',
+            'eventId': '550e8400-e29b-41d4-a716-446655440000',
+          },
+        );
+    expect(encoded, isNotNull);
+    final Map<String, dynamic>? decoded =
+        PushNotificationService.decodeNotificationPayloadForTest(encoded);
+    expect(decoded?['type'], 'CLEANUP_EVENT');
+    expect(decoded?['eventId'], '550e8400-e29b-41d4-a716-446655440000');
   });
 }

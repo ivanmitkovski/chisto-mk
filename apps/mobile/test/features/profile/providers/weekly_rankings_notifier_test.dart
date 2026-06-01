@@ -1,7 +1,7 @@
-import 'package:chisto_mobile/core/errors/app_error.dart';
-import 'package:chisto_mobile/features/profile/domain/models/weekly_rankings_result.dart';
-import 'package:chisto_mobile/features/profile/presentation/providers/profile_providers.dart';
-import 'package:chisto_mobile/features/profile/presentation/providers/weekly_rankings_notifier.dart';
+import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:feature_profile/src/domain/models/weekly_rankings_result.dart';
+import 'package:feature_profile/src/presentation/providers/profile_providers.dart';
+import 'package:feature_profile/src/presentation/providers/weekly_rankings_notifier.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -10,10 +10,10 @@ import '../support/testing_profile_repository.dart';
 void main() {
   group('WeeklyRankingsNotifier', () {
     test('build loads rankings via repository', () async {
-      final WeeklyRankingsResult payload = WeeklyRankingsResult(
+      const WeeklyRankingsResult payload = WeeklyRankingsResult(
         weekStartsAt: '2026-01-01T00:00:00.000Z',
         weekEndsAt: '2026-01-07T23:59:59.000Z',
-        entries: const <WeeklyLeaderboardEntry>[
+        entries: <WeeklyLeaderboardEntry>[
           WeeklyLeaderboardEntry(
             rank: 1,
             userId: 'a',
@@ -38,8 +38,9 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      final WeeklyRankingsResult v =
-          await container.read(weeklyRankingsNotifierProvider.future);
+      final WeeklyRankingsResult v = await container.read(
+        weeklyRankingsNotifierProvider.future,
+      );
       expect(v.entries.length, 1);
       expect(v.entries.first.displayName, 'A');
     });
@@ -56,10 +57,10 @@ void main() {
                 if (calls == 1) {
                   throw AppError.unknown();
                 }
-                return WeeklyRankingsResult(
+                return const WeeklyRankingsResult(
                   weekStartsAt: '2026-01-01T00:00:00.000Z',
                   weekEndsAt: '2026-01-07T23:59:59.000Z',
-                  entries: const <WeeklyLeaderboardEntry>[],
+                  entries: <WeeklyLeaderboardEntry>[],
                   myRank: null,
                   myWeeklyPoints: 0,
                 );
@@ -75,12 +76,11 @@ void main() {
         throwsA(isA<AppError>()),
       );
 
-      await container
-          .read(weeklyRankingsNotifierProvider.notifier)
-          .refresh();
+      await container.read(weeklyRankingsNotifierProvider.notifier).refresh();
 
-      final WeeklyRankingsResult r =
-          await container.read(weeklyRankingsNotifierProvider.future);
+      final WeeklyRankingsResult r = await container.read(
+        weeklyRankingsNotifierProvider.future,
+      );
       expect(r.entries, isEmpty);
       expect(calls, 2);
     });

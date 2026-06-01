@@ -1,9 +1,9 @@
-import 'package:chisto_mobile/core/providers/refresh_signals_providers.dart';
-import 'package:chisto_mobile/core/providers/root_container.dart';
-import 'package:chisto_mobile/features/notifications/data/notification_inbox_refresh.dart';
-import 'package:chisto_mobile/features/notifications/data/notifications_inbox_coordinator.dart';
-import 'package:chisto_mobile/features/notifications/domain/models/user_notification.dart';
-import 'package:chisto_mobile/features/notifications/domain/repositories/notifications_repository.dart';
+import 'package:chisto_infrastructure/core/providers/refresh_signals_providers.dart';
+import 'package:chisto_infrastructure/core/providers/root_container.dart';
+import 'package:feature_notifications/src/data/notification_inbox_refresh.dart';
+import 'package:feature_notifications/src/data/notifications_inbox_coordinator.dart';
+import 'package:feature_notifications/src/domain/models/user_notification.dart';
+import 'package:feature_notifications/src/domain/repositories/notifications_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -24,8 +24,7 @@ class _RecordingNotificationsRepository implements NotificationsRepository {
     int page = 1,
     int limit = 20,
     bool onlyUnread = false,
-  }) =>
-      throw UnimplementedError();
+  }) => throw UnimplementedError();
 
   @override
   Future<void> markAsRead(String notificationId) => throw UnimplementedError();
@@ -42,8 +41,7 @@ class _RecordingNotificationsRepository implements NotificationsRepository {
     required UserNotificationType type,
     required bool muted,
     DateTime? mutedUntil,
-  }) =>
-      throw UnimplementedError();
+  }) => throw UnimplementedError();
 
   @override
   Future<void> registerDeviceToken({
@@ -51,8 +49,7 @@ class _RecordingNotificationsRepository implements NotificationsRepository {
     required String platform,
     String? appVersion,
     String? locale,
-  }) =>
-      throw UnimplementedError();
+  }) => throw UnimplementedError();
 
   @override
   Future<void> unregisterDeviceToken(String token) =>
@@ -70,14 +67,13 @@ class _RecordingNotificationsRepository implements NotificationsRepository {
   Future<void> archiveAllRead() => throw UnimplementedError();
 
   @override
-  Future<void> recordOpened(String notificationId) => throw UnimplementedError();
+  Future<void> recordOpened(String notificationId) =>
+      throw UnimplementedError();
 }
 
-class _DelayedNotificationsRepository extends _RecordingNotificationsRepository {
-  _DelayedNotificationsRepository({
-    required this.delay,
-    super.unreadCount,
-  });
+class _DelayedNotificationsRepository
+    extends _RecordingNotificationsRepository {
+  _DelayedNotificationsRepository({required this.delay, super.unreadCount});
 
   final Duration delay;
 
@@ -155,9 +151,9 @@ void main() {
     () async {
       final _DelayedNotificationsRepository delayedRepo =
           _DelayedNotificationsRepository(
-        delay: const Duration(milliseconds: 50),
-        unreadCount: 5,
-      );
+            delay: const Duration(milliseconds: 50),
+            unreadCount: 5,
+          );
       final NotificationsInboxCoordinator delayedCoordinator =
           NotificationsInboxCoordinator(repository: delayedRepo);
       publishNotificationsUnreadCount(0);

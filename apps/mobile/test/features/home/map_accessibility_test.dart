@@ -1,12 +1,12 @@
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_home/src/data/map_realtime/map_sync_coordinator.dart';
+import 'package:feature_home/src/domain/models/pollution_site.dart';
+import 'package:feature_home/src/presentation/providers/map_location_notifier.dart';
+import 'package:feature_home/src/presentation/providers/map_sites_notifier.dart';
+import 'package:feature_home/src/presentation/screens/pollution_map_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
-import 'package:chisto_mobile/features/home/presentation/providers/map_location_notifier.dart';
-import 'package:chisto_mobile/features/home/presentation/providers/map_sites_notifier.dart';
-import 'package:chisto_mobile/features/home/presentation/screens/pollution_map_screen.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
 
 import '../../shared/widget_test_bootstrap.dart';
 import 'support/test_pollution_site.dart';
@@ -22,7 +22,7 @@ class _A11yMapSitesNotifier extends MapSitesNotifier {
   void setActive(bool active) {}
 
   @override
-  void updateViewport(query) {}
+  void updateViewport(MapViewportQuery query) {}
 
   @override
   void requestSync({required bool immediate}) {}
@@ -53,14 +53,18 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: <Override>[
-          mapSitesNotifierProvider.overrideWith(() => _A11yMapSitesNotifier(site)),
-          mapLocationNotifierProvider.overrideWith(_A11yMapLocationNotifier.new),
+          mapSitesNotifierProvider.overrideWith(
+            () => _A11yMapSitesNotifier(site),
+          ),
+          mapLocationNotifierProvider.overrideWith(
+            _A11yMapLocationNotifier.new,
+          ),
         ],
-        child: MaterialApp(
+        child: const MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          locale: const Locale('en'),
-          home: const PollutionMapScreen(),
+          locale: Locale('en'),
+          home: PollutionMapScreen(),
         ),
       ),
     );
@@ -68,7 +72,10 @@ void main() {
 
     final SemanticsHandle semantics = tester.ensureSemantics();
     try {
-      expect(find.bySemanticsLabel('Pollution map. Tap pins to view site details.'), findsOneWidget);
+      expect(
+        find.bySemanticsLabel('Pollution map. Tap pins to view site details.'),
+        findsOneWidget,
+      );
       expect(find.bySemanticsLabel('Search sites'), findsOneWidget);
       expect(find.bySemanticsLabel('Open actions menu'), findsOneWidget);
       await expectLater(tester, meetsGuideline(androidTapTargetGuideline));

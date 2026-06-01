@@ -1,5 +1,5 @@
-import 'package:chisto_mobile/core/deep_links/deep_link_router.dart';
-import 'package:chisto_mobile/core/deep_links/share_token_from_route.dart';
+import 'package:chisto_infrastructure/core/deep_links/deep_link_router.dart';
+import 'package:chisto_infrastructure/core/deep_links/share_token_from_route.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

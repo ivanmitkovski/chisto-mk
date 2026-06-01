@@ -1,9 +1,10 @@
-import 'package:chisto_mobile/core/auth/auth_state.dart';
-import 'package:chisto_mobile/core/config/app_config.dart';
-import 'package:chisto_mobile/core/network/api_client.dart';
-import 'package:chisto_mobile/core/storage/secure_token_storage.dart';
+import 'package:chisto_infrastructure/core/auth/auth_state.dart';
+import 'package:chisto_infrastructure/core/config/app_config.dart';
+import 'package:chisto_infrastructure/core/network/api_client.dart';
+import 'package:chisto_infrastructure/core/network/request_cancellation.dart';
+import 'package:chisto_infrastructure/core/storage/secure_token_storage.dart';
+import 'package:feature_auth/src/data/api_auth_repository.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:chisto_mobile/features/auth/data/api_auth_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -11,11 +12,11 @@ import '../../shared/widget_test_bootstrap.dart';
 
 class _PathCapturingApiClient extends ApiClient {
   _PathCapturingApiClient()
-      : super(
-          config: AppConfig.dev,
-          accessToken: () => null,
-          onUnauthorized: () {},
-        );
+    : super(
+        config: AppConfig.dev,
+        accessToken: () => null,
+        onUnauthorized: () {},
+      );
 
   String? lastPostPath;
   Object? lastPostBody;
@@ -26,6 +27,7 @@ class _PathCapturingApiClient extends ApiClient {
     String path, {
     Map<String, String>? headers,
     Object? body,
+    RequestCancellationToken? cancellation,
   }) async {
     lastPostPath = path;
     lastPostBody = body;
@@ -56,39 +58,40 @@ void main() {
     final ApiAuthRepository repo = ApiAuthRepository(
       client: client,
       authState: AuthState(),
-      tokenStorage: SecureTokenStorage(
-        storage: const FlutterSecureStorage(),
-      ),
+      tokenStorage: SecureTokenStorage(storage: const FlutterSecureStorage()),
       preferences: await SharedPreferences.getInstance(),
     );
 
     final result = await repo.requestPasswordReset('+38970123456');
 
     expect(client.lastPostPath, '/auth/password-reset/request');
-    expect(client.lastPostBody, <String, dynamic>{'phoneNumber': '+38970123456'});
+    expect(client.lastPostBody, <String, dynamic>{
+      'phoneNumber': '+38970123456',
+    });
     expect(result.expiresInSeconds, 599);
   });
 
-  test('verifyPasswordResetCode posts to /auth/password-reset/verify-code', () async {
-    SharedPreferences.setMockInitialValues(<String, Object>{});
-    final _PathCapturingApiClient client = _PathCapturingApiClient();
-    final ApiAuthRepository repo = ApiAuthRepository(
-      client: client,
-      authState: AuthState(),
-      tokenStorage: SecureTokenStorage(
-        storage: const FlutterSecureStorage(),
-      ),
-      preferences: await SharedPreferences.getInstance(),
-    );
+  test(
+    'verifyPasswordResetCode posts to /auth/password-reset/verify-code',
+    () async {
+      SharedPreferences.setMockInitialValues(<String, Object>{});
+      final _PathCapturingApiClient client = _PathCapturingApiClient();
+      final ApiAuthRepository repo = ApiAuthRepository(
+        client: client,
+        authState: AuthState(),
+        tokenStorage: SecureTokenStorage(storage: const FlutterSecureStorage()),
+        preferences: await SharedPreferences.getInstance(),
+      );
 
-    await repo.verifyPasswordResetCode('+38970123456', '4829');
+      await repo.verifyPasswordResetCode('+38970123456', '4829');
 
-    expect(client.lastPostPath, '/auth/password-reset/verify-code');
-    expect(client.lastPostBody, <String, dynamic>{
-      'phoneNumber': '+38970123456',
-      'code': '4829',
-    });
-  });
+      expect(client.lastPostPath, '/auth/password-reset/verify-code');
+      expect(client.lastPostBody, <String, dynamic>{
+        'phoneNumber': '+38970123456',
+        'code': '4829',
+      });
+    },
+  );
 
   test('requestPasswordResetByEmail posts email body', () async {
     SharedPreferences.setMockInitialValues(<String, Object>{});
@@ -96,9 +99,7 @@ void main() {
     final ApiAuthRepository repo = ApiAuthRepository(
       client: client,
       authState: AuthState(),
-      tokenStorage: SecureTokenStorage(
-        storage: const FlutterSecureStorage(),
-      ),
+      tokenStorage: SecureTokenStorage(storage: const FlutterSecureStorage()),
       preferences: await SharedPreferences.getInstance(),
     );
 
@@ -114,9 +115,7 @@ void main() {
     final ApiAuthRepository repo = ApiAuthRepository(
       client: client,
       authState: AuthState(),
-      tokenStorage: SecureTokenStorage(
-        storage: const FlutterSecureStorage(),
-      ),
+      tokenStorage: SecureTokenStorage(storage: const FlutterSecureStorage()),
       preferences: await SharedPreferences.getInstance(),
     );
 
@@ -139,9 +138,7 @@ void main() {
     final ApiAuthRepository repo = ApiAuthRepository(
       client: client,
       authState: AuthState(),
-      tokenStorage: SecureTokenStorage(
-        storage: const FlutterSecureStorage(),
-      ),
+      tokenStorage: SecureTokenStorage(storage: const FlutterSecureStorage()),
       preferences: await SharedPreferences.getInstance(),
     );
 
@@ -166,6 +163,7 @@ void main() {
       'phoneNumber': '+38970123456',
       'password': 'secret123',
       'rememberMe': false,
+      'deviceId': isA<String>(),
     });
   });
 }

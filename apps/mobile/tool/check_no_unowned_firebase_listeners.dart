@@ -2,13 +2,10 @@
 
 import 'dart:io';
 
+import 'feature_roots_guard_util.dart';
+
 /// Fails when FirebaseMessaging listener `.listen` results are not assigned.
 int runNoUnownedFirebaseListenersCheck() {
-  final Directory root = Directory('lib');
-  if (!root.existsSync()) {
-    stderr.writeln('Run from apps/mobile');
-    return 2;
-  }
   final RegExp bad = RegExp(
     r'FirebaseMessaging\.(onMessage|onMessageOpenedApp)\.listen\s*\(',
   );
@@ -19,23 +16,27 @@ int runNoUnownedFirebaseListenersCheck() {
     r'=\s*FirebaseMessaging\.instance\.onTokenRefresh\.listen\s*\(',
   );
   final List<String> violations = <String>[];
-  for (final FileSystemEntity e in root.listSync(recursive: true)) {
-    if (e is! File || !e.path.endsWith('.dart')) continue;
-    final List<String> lines = e.readAsLinesSync();
+  for (final File file in iterFeatureDartFiles(roots: allAppCodeRoots())) {
+    final String normalized = normalizePath(file.path);
+    final List<String> lines = file.readAsLinesSync();
     for (int i = 0; i < lines.length; i++) {
       final String ln = lines[i];
-      if (!bad.hasMatch(ln) && !ln.contains('onTokenRefresh.listen')) continue;
+      if (!bad.hasMatch(ln) && !ln.contains('onTokenRefresh.listen')) {
+        continue;
+      }
       if (ln.contains('onTokenRefresh.listen') && tokenAssigned.hasMatch(ln)) {
         continue;
       }
       if (bad.hasMatch(ln) && assigned.hasMatch(ln)) {
         continue;
       }
-      if (ln.trim().startsWith('//')) continue;
+      if (ln.trim().startsWith('//')) {
+        continue;
+      }
       if (ln.contains('onTokenRefresh.listen') && !tokenAssigned.hasMatch(ln)) {
-        violations.add('${e.path}:${i + 1}: $ln');
+        violations.add('$normalized:${i + 1}: $ln');
       } else if (bad.hasMatch(ln) && !assigned.hasMatch(ln)) {
-        violations.add('${e.path}:${i + 1}: $ln');
+        violations.add('$normalized:${i + 1}: $ln');
       }
     }
   }

@@ -1,19 +1,21 @@
 import 'dart:async';
 
-import 'package:chisto_mobile/core/errors/app_error.dart';
-import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
-import 'package:chisto_mobile/features/events/domain/models/eco_event_join_toggle_result.dart';
-import 'package:chisto_mobile/features/events/domain/models/eco_event_search_params.dart';
-import 'package:chisto_mobile/features/events/domain/models/event_participant_row.dart';
-import 'package:chisto_mobile/features/events/domain/models/event_schedule_conflict_preview.dart';
-import 'package:chisto_mobile/features/events/domain/models/event_update_payload.dart';
-import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
+import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:feature_events/src/domain/models/eco_event.dart';
+import 'package:feature_events/src/domain/models/eco_event_join_toggle_result.dart';
+import 'package:feature_events/src/domain/models/eco_event_search_params.dart';
+import 'package:feature_events/src/domain/models/event_impact_receipt.dart';
+import 'package:feature_events/src/domain/models/event_participant_row.dart';
+import 'package:feature_events/src/domain/models/event_schedule_conflict_preview.dart';
+import 'package:feature_events/src/domain/models/event_update_payload.dart';
+import 'package:feature_events/src/domain/repositories/events_repository.dart';
 import 'package:flutter/foundation.dart';
 
 /// Minimal [EventsRepository] for unit tests: records calls to key methods.
-class RecordingEventsRepository extends ChangeNotifier implements EventsRepository {
+class RecordingEventsRepository extends ChangeNotifier
+    implements EventsRepository {
   RecordingEventsRepository({List<EcoEvent>? seed})
-      : _events = List<EcoEvent>.from(seed ?? const <EcoEvent>[]);
+    : _events = List<EcoEvent>.from(seed ?? const <EcoEvent>[]);
 
   List<EcoEvent> _events;
   EcoEventSearchParams? lastRefreshParams;
@@ -117,8 +119,7 @@ class RecordingEventsRepository extends ChangeNotifier implements EventsReposito
   EcoEvent? findBySiteAndTitle({
     required String siteId,
     required String title,
-  }) =>
-      null;
+  }) => null;
 
   @override
   Future<EcoEvent> create(EcoEvent event) async {
@@ -134,7 +135,8 @@ class RecordingEventsRepository extends ChangeNotifier implements EventsReposito
     DateTime? endAt,
     String? excludeEventId,
   }) async =>
-      scheduleConflictOverride ?? const EventScheduleConflictPreview(hasConflict: false);
+      scheduleConflictOverride ??
+      const EventScheduleConflictPreview(hasConflict: false);
 
   @override
   Future<EcoEvent> updateEventDetails(
@@ -170,25 +172,19 @@ class RecordingEventsRepository extends ChangeNotifier implements EventsReposito
   }
 
   @override
-  bool setCheckInOpen({
-    required String eventId,
-    required bool isOpen,
-  }) =>
-      false;
+  bool setCheckInOpen({required String eventId, required bool isOpen}) => false;
 
   @override
   bool rotateCheckInSession({
     required String eventId,
     required String sessionId,
-  }) =>
-      false;
+  }) => false;
 
   @override
   bool setCheckedInCount({
     required String eventId,
     required int checkedInCount,
-  }) =>
-      false;
+  }) => false;
 
   @override
   bool setAttendeeCheckInStatus({
@@ -200,6 +196,14 @@ class RecordingEventsRepository extends ChangeNotifier implements EventsReposito
     lastSetAttendeeCheckInStatusEventId = eventId;
     lastSetAttendeeCheckInStatusValue = status;
     lastSetAttendeeCheckInStatusAt = checkedInAt;
+    final int index = _events.indexWhere((EcoEvent e) => e.id == eventId);
+    if (index >= 0) {
+      _events[index] = _events[index].copyWith(
+        attendeeCheckInStatus: status,
+        attendeeCheckedInAt: checkedInAt,
+      );
+      notifyListeners();
+    }
     return true;
   }
 
@@ -208,15 +212,13 @@ class RecordingEventsRepository extends ChangeNotifier implements EventsReposito
     required String eventId,
     required bool enabled,
     DateTime? reminderAt,
-  }) async =>
-      false;
+  }) async => false;
 
   @override
   Future<bool> setAfterImages({
     required String eventId,
     required List<String> imagePaths,
-  }) async =>
-      false;
+  }) async => false;
 
   @override
   Future<void> loadMore() async {
@@ -236,17 +238,17 @@ class RecordingEventsRepository extends ChangeNotifier implements EventsReposito
   int fetchParticipantsCallCount = 0;
 
   @override
-  Future<List<EcoEvent>> fetchEventsSnapshot(EcoEventSearchParams params) async {
+  Future<List<EcoEvent>> fetchEventsSnapshot(
+    EcoEventSearchParams params,
+  ) async {
     fetchEventsSnapshotCallCount++;
     lastSnapshotParams = params;
-    return _events
-        .where((EcoEvent e) {
-          if (params.statuses.isNotEmpty && !params.statuses.contains(e.status)) {
-            return false;
-          }
-          return true;
-        })
-        .toList();
+    return _events.where((EcoEvent e) {
+      if (params.statuses.isNotEmpty && !params.statuses.contains(e.status)) {
+        return false;
+      }
+      return true;
+    }).toList();
   }
 
   @override
@@ -256,6 +258,22 @@ class RecordingEventsRepository extends ChangeNotifier implements EventsReposito
   }) async {
     fetchParticipantsCallCount++;
     return participantsPageStub ??
-        const EventParticipantsPage(items: <EventParticipantRow>[], hasMore: false);
+        const EventParticipantsPage(
+          items: <EventParticipantRow>[],
+          hasMore: false,
+        );
+  }
+
+  @override
+  Future<EventImpactReceipt> fetchImpactReceipt(String eventId) async {
+    throw UnimplementedError('fetchImpactReceipt');
+  }
+
+  @override
+  Future<bool> pushLiveImpactBags(
+    String eventId,
+    int reportedBagsCollected,
+  ) async {
+    return true;
   }
 }

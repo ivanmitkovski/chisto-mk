@@ -1,5 +1,5 @@
-import 'package:chisto_mobile/core/errors/app_error.dart';
-import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_error_classifier.dart';
+import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:feature_reports/src/data/outbox/report_outbox_error_classifier.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -7,7 +7,7 @@ void main() {
     test('cooldown', () {
       expect(
         classifyReportSubmitError(
-          AppError(code: 'REPORTING_COOLDOWN', message: 'x'),
+          const AppError(code: 'REPORTING_COOLDOWN', message: 'x'),
         ),
         ReportOutboxErrorKind.cooldown,
       );
@@ -16,7 +16,7 @@ void main() {
     test('retryable by code', () {
       expect(
         classifyReportSubmitError(
-          AppError(code: 'NETWORK_ERROR', message: 'x'),
+          const AppError(code: 'NETWORK_ERROR', message: 'x'),
         ),
         ReportOutboxErrorKind.retryable,
       );
@@ -25,7 +25,11 @@ void main() {
     test('terminal default', () {
       expect(
         classifyReportSubmitError(
-          AppError(code: 'VALIDATION_ERROR', message: 'x', retryable: false),
+          const AppError(
+            code: 'VALIDATION_ERROR',
+            message: 'x',
+            retryable: false,
+          ),
         ),
         ReportOutboxErrorKind.terminal,
       );
@@ -59,7 +63,7 @@ void main() {
     test('TIMEOUT', () {
       expect(
         classifyReportSubmitError(
-          AppError(code: 'TIMEOUT', message: 'x', retryable: true),
+          const AppError(code: 'TIMEOUT', message: 'x', retryable: true),
         ),
         ReportOutboxErrorKind.retryable,
       );
@@ -82,7 +86,7 @@ void main() {
     test('generic retryable flag', () {
       expect(
         classifyReportSubmitError(
-          AppError(code: 'CUSTOM', message: 'x', retryable: true),
+          const AppError(code: 'CUSTOM', message: 'x', retryable: true),
         ),
         ReportOutboxErrorKind.retryable,
       );
@@ -96,7 +100,7 @@ void main() {
 
     test('malformed details defaults to ~60s ahead', () {
       final int? until = cooldownUntilMsFromAppError(
-        AppError(
+        const AppError(
           code: 'REPORTING_COOLDOWN',
           message: 'x',
           details: 'not-a-map',
@@ -111,7 +115,7 @@ void main() {
 
     test('retryAfterSeconds', () {
       final int? until = cooldownUntilMsFromAppError(
-        AppError(
+        const AppError(
           code: 'REPORTING_COOLDOWN',
           message: 'x',
           details: <String, dynamic>{'retryAfterSeconds': 42},

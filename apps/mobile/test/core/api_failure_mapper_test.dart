@@ -1,6 +1,6 @@
+import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:chisto_infrastructure/core/network/api_failure_mapper.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:chisto_mobile/core/errors/app_error.dart';
-import 'package:chisto_mobile/core/network/api_failure_mapper.dart';
 
 void main() {
   test('appErrorFromFailedResponse parses ISO timestamp from API JSON', () {
@@ -20,18 +20,18 @@ void main() {
     expect(err.serverTimestamp!.toUtc().day, 14);
   });
 
-  test('appErrorFromFailedResponse leaves serverTimestamp null when absent', () {
-    final AppError err = appErrorFromFailedResponse(
-      statusCode: 404,
-      json: <String, dynamic>{
-        'code': 'NOT_FOUND',
-        'message': 'Missing',
-      },
-      bodyStr: null,
-      retryAfterHeader: null,
-    );
-    expect(err.serverTimestamp, isNull);
-  });
+  test(
+    'appErrorFromFailedResponse leaves serverTimestamp null when absent',
+    () {
+      final AppError err = appErrorFromFailedResponse(
+        statusCode: 404,
+        json: <String, dynamic>{'code': 'NOT_FOUND', 'message': 'Missing'},
+        bodyStr: null,
+        retryAfterHeader: null,
+      );
+      expect(err.serverTimestamp, isNull);
+    },
+  );
 
   test('404 preserves API error code such as SITE_NOT_FOUND', () {
     final AppError err = appErrorFromFailedResponse(
@@ -68,7 +68,11 @@ void main() {
       json: <String, dynamic>{
         'code': 'MAP_RATE_LIMITED',
         'message': 'Too many map requests',
-        'details': <String, dynamic>{'ttlSeconds': 60, 'limit': 480, 'mode': 'redis'},
+        'details': <String, dynamic>{
+          'ttlSeconds': 60,
+          'limit': 480,
+          'mode': 'redis',
+        },
       },
       bodyStr: null,
       retryAfterHeader: null,

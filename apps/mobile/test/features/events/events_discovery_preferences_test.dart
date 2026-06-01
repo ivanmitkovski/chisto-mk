@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/features/events/data/events_discovery_preferences.dart';
+import 'package:feature_events/src/data/events_discovery_preferences.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -37,21 +37,24 @@ void main() {
       expect(result[2], 'third');
     });
 
-    test('writeRecentSearches trims and deduplicates case-insensitively', () async {
-      const List<String> queries = <String>[
-        '  beach  ',
-        'Beach',
-        'park',
-        '  PARK  ',
-      ];
+    test(
+      'writeRecentSearches trims and deduplicates case-insensitively',
+      () async {
+        const List<String> queries = <String>[
+          '  beach  ',
+          'Beach',
+          'park',
+          '  PARK  ',
+        ];
 
-      await prefs.writeRecentSearches(queries);
-      final List<String> result = await prefs.readRecentSearches();
+        await prefs.writeRecentSearches(queries);
+        final List<String> result = await prefs.readRecentSearches();
 
-      expect(result.length, 2);
-      expect(result[0], 'beach');
-      expect(result[1], 'park');
-    });
+        expect(result.length, 2);
+        expect(result[0], 'beach');
+        expect(result[1], 'park');
+      },
+    );
 
     test('writeRecentSearches skips empty strings', () async {
       const List<String> queries = <String>['valid', '', '  ', 'another'];
@@ -65,10 +68,7 @@ void main() {
     });
 
     test('writeRecentSearches caps at max recent searches', () async {
-      final List<String> many = List<String>.generate(
-        20,
-        (int i) => 'query$i',
-      );
+      final List<String> many = List<String>.generate(20, (int i) => 'query$i');
 
       await prefs.writeRecentSearches(many);
       final List<String> result = await prefs.readRecentSearches();

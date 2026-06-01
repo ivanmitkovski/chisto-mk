@@ -1,12 +1,13 @@
-import 'package:chisto_mobile/features/reports/presentation/widgets/draft/draft_choice_sheet.dart';
-import 'package:chisto_mobile/features/reports/data/outbox/report_draft_summary_projector.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_reports/src/domain/models/report_draft_summary.dart';
+import 'package:feature_reports/src/presentation/widgets/draft/draft_choice_sheet.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('central FAB draft sheet continue pops with choice', (WidgetTester tester) async {
+  testWidgets('central FAB draft sheet continue pops with choice', (
+    WidgetTester tester,
+  ) async {
     TestWidgetsFlutterBinding.ensureInitialized();
     CentralFabDraftChoice? result;
     await tester.pumpWidget(

@@ -1,15 +1,14 @@
-import 'package:chisto_mobile/core/errors/app_error.dart';
-import 'package:chisto_mobile/core/navigation/app_routes.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/forgot_password_new_screen.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/forgot_password_otp_screen.dart';
-import 'package:chisto_mobile/features/auth/presentation/widgets/auth_otp_input.dart';
-import 'package:chisto_mobile/shared/widgets/molecules/api_error_banner.dart';
+import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:chisto_infrastructure/shared/widgets/molecules/api_error_banner.dart';
+import 'package:feature_auth/src/presentation/screens/forgot_password_otp_screen.dart';
+import 'package:feature_auth/src/presentation/widgets/auth_otp_input.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+
 import '../../shared/pump_auth_app.dart';
 import '../../shared/widget_test_bootstrap.dart';
 import 'support/auth_test_helpers.dart';
 import 'support/fake_auth_repository.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   const String phone = '+38970123456';
@@ -18,7 +17,9 @@ void main() {
     await bootstrapWidgetTests();
   });
 
-  testWidgets('renders six OTP boxes via AuthOtpInput', (WidgetTester tester) async {
+  testWidgets('renders six OTP boxes via AuthOtpInput', (
+    WidgetTester tester,
+  ) async {
     await pumpAuthWidget(
       tester,
       home: const ForgotPasswordOtpScreen(phoneNumberE164: phone),
@@ -49,7 +50,9 @@ void main() {
     expect(find.byType(ApiErrorBanner), findsOneWidget);
   });
 
-  testWidgets('locks after repeated invalid codes', (WidgetTester tester) async {
+  testWidgets('locks after repeated invalid codes', (
+    WidgetTester tester,
+  ) async {
     final FakeAuthRepository repo = FakeAuthRepository()
       ..verifyPasswordResetCodeError = const AppError(
         code: 'OTP_INVALID',
@@ -73,14 +76,21 @@ void main() {
     }
     await tester.pumpAndSettle();
 
-    expect(find.text('Too many wrong codes. Request a new code.'), findsOneWidget);
+    expect(
+      find.text('Too many wrong codes. Request a new code.'),
+      findsOneWidget,
+    );
   });
 
-  testWidgets('valid code enables continue and verifies', (WidgetTester tester) async {
+  testWidgets('valid code enables continue and verifies', (
+    WidgetTester tester,
+  ) async {
     await pumpAuthWidget(
       tester,
       home: const ForgotPasswordOtpScreen(phoneNumberE164: phone),
-      overrides: AuthTestOverrides(authRepository: FakeAuthRepository()).build(),
+      overrides: AuthTestOverrides(
+        authRepository: FakeAuthRepository(),
+      ).build(),
     );
     await tester.pumpAndSettle();
 

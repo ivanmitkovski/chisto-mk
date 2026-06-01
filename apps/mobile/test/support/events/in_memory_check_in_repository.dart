@@ -1,26 +1,28 @@
 import 'dart:math';
 
-import 'package:chisto_mobile/core/errors/app_error.dart';
-import 'package:chisto_mobile/features/events/data/check_in_local_cache.dart';
-import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
-import 'package:chisto_mobile/features/events/domain/models/check_in_payload.dart';
-import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
-import 'package:chisto_mobile/features/events/domain/models/event_participant_row.dart';
-import 'package:chisto_mobile/features/events/domain/repositories/check_in_repository.dart';
-import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
-import 'package:chisto_mobile/shared/current_user.dart';
+import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:chisto_infrastructure/core/providers/events_providers.dart';
+import 'package:chisto_infrastructure/shared/current_user.dart';
+import 'package:feature_events/src/data/check_in_local_cache.dart';
+import 'package:feature_events/src/domain/models/check_in_payload.dart';
+import 'package:feature_events/src/domain/models/eco_event.dart';
+import 'package:feature_events/src/domain/models/event_participant_row.dart';
+import 'package:feature_events/src/domain/repositories/check_in_repository.dart';
+import 'package:feature_events/src/domain/repositories/events_repository.dart';
 import 'package:flutter/foundation.dart';
 
-class InMemoryCheckInRepository extends ChangeNotifier implements CheckInRepository {
+class InMemoryCheckInRepository extends ChangeNotifier
+    implements CheckInRepository {
   InMemoryCheckInRepository._();
 
-  static final InMemoryCheckInRepository instance = InMemoryCheckInRepository._();
+  static final InMemoryCheckInRepository instance =
+      InMemoryCheckInRepository._();
 
   static const int _ttlMs = 45000;
   final Random _random = Random();
   final CheckInLocalCache _localCache = const CheckInLocalCache();
 
-  EventsRepository get _eventsRepository => EventsRepositoryRegistry.instance;
+  EventsRepository get _eventsRepository => readEventsRepository();
 
   @override
   bool get supportsOrganizerSimulate => true;
@@ -28,7 +30,8 @@ class InMemoryCheckInRepository extends ChangeNotifier implements CheckInReposit
   @override
   Future<void> refreshAttendees(String eventId) async {}
 
-  final Map<String, _CheckInSessionState> _sessions = <String, _CheckInSessionState>{};
+  final Map<String, _CheckInSessionState> _sessions =
+      <String, _CheckInSessionState>{};
   bool _isHydrating = false;
   bool _didHydrate = false;
 
@@ -50,20 +53,23 @@ class InMemoryCheckInRepository extends ChangeNotifier implements CheckInReposit
     }
     _didHydrate = true;
     _isHydrating = true;
-    _localCache.readSessions().then((List<PersistedCheckInSession> sessions) {
-      for (final PersistedCheckInSession session in sessions) {
-        final _CheckInSessionState state = _CheckInSessionState(
-          sessionId: session.sessionId,
-          isOpen: session.isOpen,
-        );
-        state.attendees.addAll(session.attendees);
-        _sessions[session.eventId] = state;
-        _syncCheckInToEvents(eventId: session.eventId, state: state);
-      }
-      notifyListeners();
-    }).whenComplete(() {
-      _isHydrating = false;
-    });
+    _localCache
+        .readSessions()
+        .then((List<PersistedCheckInSession> sessions) {
+          for (final PersistedCheckInSession session in sessions) {
+            final _CheckInSessionState state = _CheckInSessionState(
+              sessionId: session.sessionId,
+              isOpen: session.isOpen,
+            );
+            state.attendees.addAll(session.attendees);
+            _sessions[session.eventId] = state;
+            _syncCheckInToEvents(eventId: session.eventId, state: state);
+          }
+          notifyListeners();
+        })
+        .whenComplete(() {
+          _isHydrating = false;
+        });
   }
 
   @override
@@ -94,16 +100,12 @@ class InMemoryCheckInRepository extends ChangeNotifier implements CheckInReposit
   }
 
   @override
-  Future<CheckInQrPayload> issuePayload({
-    required String eventId,
-  }) async {
+  Future<CheckInQrPayload> issuePayload({required String eventId}) async {
     _hydrateIfNeeded();
     final _CheckInSessionState state = _sessions.putIfAbsent(
       eventId,
-      () => _CheckInSessionState(
-        sessionId: _newSessionId(eventId),
-        isOpen: true,
-      ),
+      () =>
+          _CheckInSessionState(sessionId: _newSessionId(eventId), isOpen: true),
     );
 
     final int now = DateTime.now().millisecondsSinceEpoch;
@@ -147,7 +149,9 @@ class InMemoryCheckInRepository extends ChangeNotifier implements CheckInReposit
     }
 
     final _CheckInSessionState? state = _sessions[payload.eventId];
-    if (state == null || !state.isOpen || state.sessionId != payload.sessionId) {
+    if (state == null ||
+        !state.isOpen ||
+        state.sessionId != payload.sessionId) {
       return const CheckInSubmissionResult(
         status: CheckInSubmissionStatus.sessionClosed,
       );
@@ -213,10 +217,8 @@ class InMemoryCheckInRepository extends ChangeNotifier implements CheckInReposit
     _hydrateIfNeeded();
     final _CheckInSessionState state = _sessions.putIfAbsent(
       eventId,
-      () => _CheckInSessionState(
-        sessionId: _newSessionId(eventId),
-        isOpen: true,
-      ),
+      () =>
+          _CheckInSessionState(sessionId: _newSessionId(eventId), isOpen: true),
     );
     if (state.isOpen) {
       return false;
@@ -291,8 +293,10 @@ class InMemoryCheckInRepository extends ChangeNotifier implements CheckInReposit
     final List<EventParticipantRow> joiners = <EventParticipantRow>[];
     String? cursor;
     for (int page = 0; page < 50; page++) {
-      final EventParticipantsPage p =
-          await _eventsRepository.fetchParticipants(eventId, cursor: cursor);
+      final EventParticipantsPage p = await _eventsRepository.fetchParticipants(
+        eventId,
+        cursor: cursor,
+      );
       joiners.addAll(p.items);
       if (!p.hasMore) {
         break;
@@ -303,8 +307,9 @@ class InMemoryCheckInRepository extends ChangeNotifier implements CheckInReposit
       }
       cursor = next;
     }
-    final bool isJoined =
-        joiners.any((EventParticipantRow r) => r.userId == attendeeId);
+    final bool isJoined = joiners.any(
+      (EventParticipantRow r) => r.userId == attendeeId,
+    );
     if (!isJoined) {
       throw const AppError(
         code: 'CHECK_IN_REQUIRES_JOIN',
@@ -313,12 +318,12 @@ class InMemoryCheckInRepository extends ChangeNotifier implements CheckInReposit
     }
     final _CheckInSessionState state = _sessions.putIfAbsent(
       eventId,
-      () => _CheckInSessionState(
-        sessionId: _newSessionId(eventId),
-        isOpen: true,
-      ),
+      () =>
+          _CheckInSessionState(sessionId: _newSessionId(eventId), isOpen: true),
     );
-    final bool exists = state.attendees.any((CheckedInAttendee e) => e.id == attendeeId);
+    final bool exists = state.attendees.any(
+      (CheckedInAttendee e) => e.id == attendeeId,
+    );
     if (exists) {
       return const ManualCheckInResult(recorded: false);
     }
@@ -399,8 +404,8 @@ class InMemoryCheckInRepository extends ChangeNotifier implements CheckInReposit
           : AttendeeCheckInStatus.notCheckedIn,
       checkedInAt: currentUserCheckedIn
           ? state.attendees
-              .firstWhere((CheckedInAttendee e) => e.id == CurrentUser.id)
-              .checkedInAt
+                .firstWhere((CheckedInAttendee e) => e.id == CurrentUser.id)
+                .checkedInAt
           : null,
     );
   }
@@ -436,10 +441,7 @@ class InMemoryCheckInRepository extends ChangeNotifier implements CheckInReposit
 }
 
 class _CheckInSessionState {
-  _CheckInSessionState({
-    required this.sessionId,
-    required this.isOpen,
-  });
+  _CheckInSessionState({required this.sessionId, required this.isOpen});
 
   String sessionId;
   bool isOpen;

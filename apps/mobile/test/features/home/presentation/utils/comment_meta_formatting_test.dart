@@ -1,5 +1,5 @@
-import 'package:chisto_mobile/features/home/presentation/utils/comment_meta_formatting.dart';
-import 'package:chisto_mobile/l10n/app_localizations_en.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations_en.dart';
+import 'package:feature_home/src/presentation/utils/comment_meta_formatting.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 

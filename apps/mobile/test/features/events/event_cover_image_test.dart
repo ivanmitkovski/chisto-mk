@@ -1,11 +1,14 @@
-import 'package:chisto_mobile/features/events/presentation/widgets/event_cover_image.dart';
+import 'package:feature_events/src/presentation/widgets/event_cover_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('EcoEventCoverImage', () {
     test('isNetworkUrl', () {
-      expect(EcoEventCoverImage.isNetworkUrl('https://example.com/a.jpg'), isTrue);
+      expect(
+        EcoEventCoverImage.isNetworkUrl('https://example.com/a.jpg'),
+        isTrue,
+      );
       expect(EcoEventCoverImage.isNetworkUrl('http://x/y'), isTrue);
       expect(EcoEventCoverImage.isNetworkUrl('  HTTPS://x '), isTrue);
       expect(EcoEventCoverImage.isNetworkUrl('assets/x.png'), isFalse);

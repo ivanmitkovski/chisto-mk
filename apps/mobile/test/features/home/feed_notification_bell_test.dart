@@ -1,10 +1,12 @@
-import 'package:chisto_mobile/features/home/presentation/widgets/feed_notification_bell.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_home/src/presentation/widgets/feed_notification_bell.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('plays swing when unread count increases', (WidgetTester tester) async {
+  testWidgets('plays swing when unread count increases', (
+    WidgetTester tester,
+  ) async {
     final GlobalKey<FeedNotificationBellState> bellKey =
         GlobalKey<FeedNotificationBellState>();
 
@@ -15,21 +17,24 @@ void main() {
         disableAnimations: false,
       ),
     );
-    final ValueNotifier<int> count =
-        tester.widget<_BellTestHarness>(find.byType(_BellTestHarness)).unreadCount;
+    final ValueNotifier<int> count = tester
+        .widget<_BellTestHarness>(find.byType(_BellTestHarness))
+        .unreadCount;
     count.value = 1;
     await tester.pump();
-    expect(bellKey.currentState!.swingController.isAnimating, isTrue);
+    expect(bellKey.currentState!.testSwingController.isAnimating, isTrue);
 
     await tester.pump(const Duration(milliseconds: 140));
-    expect(bellKey.currentState!.swingRotation.value, lessThan(0));
+    expect(bellKey.currentState!.testSwingRotation.value, lessThan(0));
     expect(
-      bellKey.currentState!.swingRotation.value.abs(),
+      bellKey.currentState!.testSwingRotation.value.abs(),
       greaterThan(0.08),
     );
   });
 
-  testWidgets('skips swing when reduce motion is enabled', (WidgetTester tester) async {
+  testWidgets('skips swing when reduce motion is enabled', (
+    WidgetTester tester,
+  ) async {
     final GlobalKey<FeedNotificationBellState> bellKey =
         GlobalKey<FeedNotificationBellState>();
 
@@ -40,17 +45,20 @@ void main() {
         disableAnimations: true,
       ),
     );
-    final ValueNotifier<int> count =
-        tester.widget<_BellTestHarness>(find.byType(_BellTestHarness)).unreadCount;
+    final ValueNotifier<int> count = tester
+        .widget<_BellTestHarness>(find.byType(_BellTestHarness))
+        .unreadCount;
     count.value = 2;
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 140));
 
-    expect(bellKey.currentState!.swingController.isAnimating, isFalse);
-    expect(bellKey.currentState!.swingRotation.value, 0);
+    expect(bellKey.currentState!.testSwingController.isAnimating, isFalse);
+    expect(bellKey.currentState!.testSwingRotation.value, 0);
   });
 
-  testWidgets('badge is not inside rotating transform', (WidgetTester tester) async {
+  testWidgets('badge is not inside rotating transform', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       _BellTestHarness(
         bellKey: GlobalKey<FeedNotificationBellState>(),

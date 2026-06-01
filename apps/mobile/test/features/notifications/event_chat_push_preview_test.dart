@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/features/notifications/data/event_chat_push_preview.dart';
+import 'package:feature_notifications/src/data/event_chat_push_preview.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

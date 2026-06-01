@@ -37,6 +37,14 @@ export class EmailPostmarkTransportService implements EmailTransport {
         { Name: 'List-Unsubscribe-Post', Value: 'List-Unsubscribe=One-Click' },
       ];
     }
+    if (payload.inlineAttachments?.length) {
+      body.Attachments = payload.inlineAttachments.map((attachment) => ({
+        Name: attachment.name,
+        Content: attachment.contentBase64,
+        ContentType: attachment.contentType,
+        ContentID: attachment.contentId,
+      }));
+    }
 
     return this.sendWithRetry(serverToken, body, payload.templateId);
   }

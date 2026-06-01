@@ -12,11 +12,15 @@ import {
 import type { Response } from 'express';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
   ApiTooManyRequestsResponse,
 } from '@nestjs/swagger';
+import { CurrentUser } from '../auth/current-user.decorator';
+import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
+import { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { ListSitesMapQueryDto } from './dto/list-sites-map-query.dto';
 import { SitesMapFacadeService } from './sites-map-facade.service';
 import { loadFeatureFlags } from '../config/feature-flags';
@@ -24,6 +28,7 @@ import { weakEtagForJson } from './http/map-etag';
 import { MapRateLimitGuard } from './http/map-rate-limit.guard';
 import { MapHttpTracingInterceptor } from '../observability/map-http-tracing.interceptor';
 import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-error-responses.decorator';
+import { MapViewerContext } from './map/map-site-visibility.helper';
 
 const featureFlags = loadFeatureFlags();
 
@@ -35,7 +40,8 @@ export class SitesMapController {
 
   @Get('map')
   @UseInterceptors(new MapHttpTracingInterceptor())
-  @UseGuards(MapRateLimitGuard)
+  @UseGuards(MapRateLimitGuard, OptionalJwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'List sites for map view with geo bounds and high limit' })
   @ApiOkResponse({ description: 'Sites for map fetched successfully' })
   @ApiBadRequestResponse({ description: 'Invalid map viewport or geo params' })
@@ -44,9 +50,11 @@ export class SitesMapController {
     @Query() query: ListSitesMapQueryDto,
     @Headers('if-none-match') ifNoneMatch: string | undefined,
     @Res({ passthrough: true }) res: Response,
+    @CurrentUser() user?: AuthenticatedUser,
   ) {
+    const viewer: MapViewerContext = { viewerUserId: user?.userId ?? null };
     if (featureFlags.mapEtagEnabled) {
-      const mapDataVersion = await this.sitesMapFacade.resolveMapDataVersion(query);
+      const mapDataVersion = await this.sitesMapFacade.resolveMapDataVersion(query, viewer);
       const etag = weakEtagForJson({
         kind: 'map',
         version: mapDataVersion,
@@ -74,13 +82,14 @@ export class SitesMapController {
       res.setHeader('ETag', etag);
       res.setHeader('Cache-Control', 'private, max-age=4, stale-while-revalidate=20');
     }
-    const body = await this.sitesMapFacade.findAllForMap(query);
+    const body = await this.sitesMapFacade.findAllForMap(query, viewer);
     return body;
   }
 
   @Get('map/clusters')
   @UseInterceptors(new MapHttpTracingInterceptor())
-  @UseGuards(MapRateLimitGuard)
+  @UseGuards(MapRateLimitGuard, OptionalJwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get aggregated map clusters for dense marker view' })
   @ApiOkResponse({ description: 'Map clusters fetched successfully' })
   @ApiBadRequestResponse({ description: 'Invalid map viewport or geo params' })
@@ -88,8 +97,10 @@ export class SitesMapController {
     @Query() query: ListSitesMapQueryDto,
     @Headers('if-none-match') ifNoneMatch: string | undefined,
     @Res({ passthrough: true }) res: Response,
+    @CurrentUser() user?: AuthenticatedUser,
   ) {
-    const body = await this.sitesMapFacade.findClustersForMap(query);
+    const viewer: MapViewerContext = { viewerUserId: user?.userId ?? null };
+    const body = await this.sitesMapFacade.findClustersForMap(query, viewer);
     if (featureFlags.mapEtagEnabled) {
       const etag = weakEtagForJson(body);
       if (ifNoneMatch?.trim() === etag) {
@@ -104,7 +115,8 @@ export class SitesMapController {
 
   @Get('map/heatmap')
   @UseInterceptors(new MapHttpTracingInterceptor())
-  @UseGuards(MapRateLimitGuard)
+  @UseGuards(MapRateLimitGuard, OptionalJwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get map heatmap density cells by viewport/zoom' })
   @ApiOkResponse({ description: 'Map heatmap fetched successfully' })
   @ApiBadRequestResponse({ description: 'Invalid map viewport or geo params' })
@@ -112,8 +124,10 @@ export class SitesMapController {
     @Query() query: ListSitesMapQueryDto,
     @Headers('if-none-match') ifNoneMatch: string | undefined,
     @Res({ passthrough: true }) res: Response,
+    @CurrentUser() user?: AuthenticatedUser,
   ) {
-    const body = await this.sitesMapFacade.findHeatmapForMap(query);
+    const viewer: MapViewerContext = { viewerUserId: user?.userId ?? null };
+    const body = await this.sitesMapFacade.findHeatmapForMap(query, viewer);
     if (featureFlags.mapEtagEnabled) {
       const etag = weakEtagForJson(body);
       if (ifNoneMatch?.trim() === etag) {

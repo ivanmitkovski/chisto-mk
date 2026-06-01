@@ -1,6 +1,6 @@
-import 'package:chisto_mobile/core/errors/app_error.dart';
-import 'package:chisto_mobile/features/auth/application/password_reset_otp_controller.dart';
-import 'package:chisto_mobile/features/auth/presentation/constants/auth_otp_constants.dart';
+import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:feature_auth/src/application/password_reset_otp_controller.dart';
+import 'package:feature_auth/src/presentation/constants/auth_otp_constants.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -25,10 +25,9 @@ void main() {
     addTearDown(container.dispose);
 
     await expectLater(
-      container.read(passwordResetOtpControllerProvider.notifier).verifyCode(
-            '+38970123456',
-            '000000',
-          ),
+      container
+          .read(passwordResetOtpControllerProvider.notifier)
+          .verifyCode('+38970123456', '000000'),
       throwsA(isA<AppError>()),
     );
     expect(
@@ -48,8 +47,9 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    final PasswordResetOtpController notifier =
-        container.read(passwordResetOtpControllerProvider.notifier);
+    final PasswordResetOtpController notifier = container.read(
+      passwordResetOtpControllerProvider.notifier,
+    );
 
     for (int i = 0; i < kAuthOtpMaxClientInvalidAttempts; i++) {
       await expectLater(
@@ -58,8 +58,9 @@ void main() {
       );
     }
 
-    final PasswordResetOtpState state =
-        container.read(passwordResetOtpControllerProvider);
+    final PasswordResetOtpState state = container.read(
+      passwordResetOtpControllerProvider,
+    );
     expect(state.otpLocked, isTrue);
     expect(state.error, isNull);
   });

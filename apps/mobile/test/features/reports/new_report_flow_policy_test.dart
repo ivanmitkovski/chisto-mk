@@ -1,7 +1,7 @@
+import 'package:feature_reports/src/domain/draft/new_report_flow_policy.dart';
+import 'package:feature_reports/src/domain/models/report_draft.dart';
+import 'package:feature_reports/src/presentation/widgets/new_report/report_stage.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
-import 'package:chisto_mobile/features/reports/domain/draft/new_report_flow_policy.dart';
-import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_stage.dart';
 
 void main() {
   group('NewReportFlowPolicy', () {

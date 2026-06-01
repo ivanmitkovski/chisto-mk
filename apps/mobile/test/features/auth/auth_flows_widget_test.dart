@@ -1,14 +1,18 @@
-import 'package:chisto_mobile/core/deep_links/deep_link_router.dart';
-import 'package:chisto_mobile/core/errors/app_error.dart';
-import 'package:chisto_mobile/core/navigation/app_routes.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/forgot_password_new_screen.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/forgot_password_otp_screen.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/otp_screen.dart';
-import 'package:chisto_mobile/features/auth/domain/repositories/auth_repository.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/sign_in_screen.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/widgets/molecules/api_error_banner.dart';
-import 'package:chisto_mobile/shared/widgets/atoms/primary_button.dart';
+import 'package:chisto_infrastructure/core/bootstrap/app_bootstrap.dart';
+import 'package:chisto_infrastructure/core/deep_links/deep_link_router.dart';
+import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:chisto_infrastructure/core/navigation/app_go_router.dart';
+import 'package:chisto_infrastructure/core/navigation/app_routes.dart';
+import 'package:chisto_infrastructure/core/providers/app_providers.dart';
+import 'package:chisto_infrastructure/core/providers/root_container.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/shared/widgets/atoms/primary_button.dart';
+import 'package:chisto_infrastructure/shared/widgets/molecules/api_error_banner.dart';
+import 'package:feature_auth/src/domain/models/auth_session_dtos.dart';
+import 'package:feature_auth/src/presentation/screens/forgot_password_new_screen.dart';
+import 'package:feature_auth/src/presentation/screens/otp_screen.dart';
+import 'package:feature_auth/src/presentation/screens/sign_in_screen.dart';
+import 'package:feature_home/src/application/home_shell_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -35,6 +39,18 @@ void main() {
     await bootstrapWidgetTests();
   });
 
+  setUpAll(() async {
+    await bootstrapWidgetTests();
+  });
+
+  tearDown(() {
+    AppBootstrap.instance.authState.setUnauthenticated();
+    if (AppBootstrap.instance.isInitialized) {
+      readRoot(homeShellControllerProvider.notifier);
+      buildAppGoRouter(initialLocation: AppRoutes.signIn);
+    }
+  });
+
   testWidgets('sign in shows ApiErrorBanner on invalid credentials', (
     WidgetTester tester,
   ) async {
@@ -57,10 +73,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(ApiErrorBanner), findsOneWidget);
-    expect(
-      find.text('Wrong phone number or password.'),
-      findsOneWidget,
-    );
+    expect(find.text('Wrong phone number or password.'), findsOneWidget);
   });
 
   testWidgets('password reset OTP step navigates to new password screen', (
@@ -68,12 +81,10 @@ void main() {
   ) async {
     const String phone = '+38970123456';
 
-    await pumpAuthWidget(
-      tester,
-      home: const ForgotPasswordOtpScreen(phoneNumberE164: phone),
-      onGenerateRoute: AppRouter.onGenerateRoute,
-      overrides: AuthTestOverrides(authRepository: FakeAuthRepository()).build(),
-    );
+    AppBootstrap.instance.overrideAuthRepositoryForTests(FakeAuthRepository());
+    AppBootstrap.instance.providerContainer.invalidate(authRepositoryProvider);
+    await pumpAppRouter(tester, initialLocation: AppRoutes.signIn);
+    appGoRouter.push(AppRoutes.forgotPasswordOtp, extra: phone);
     await tester.pumpAndSettle();
 
     await enterOtpCode(tester, '123456');
@@ -88,23 +99,22 @@ void main() {
   ) async {
     const String phoneE164 = '+38970123456';
     int requestOtpCalls = 0;
-    final FakeAuthRepository repo = FakeAuthRepository(
-      requestOtpImpl: (String phone) async {
-        requestOtpCalls++;
-        expect(phone, phoneE164);
-        return const SendOtpResult(expiresInSeconds: 300);
-      },
-    )..signInError = const AppError(
-        code: 'PHONE_NOT_VERIFIED',
-        message: 'not verified',
-      );
+    final FakeAuthRepository repo =
+        FakeAuthRepository(
+            requestOtpImpl: (String phone) async {
+              requestOtpCalls++;
+              expect(phone, phoneE164);
+              return const SendOtpResult(expiresInSeconds: 300);
+            },
+          )
+          ..signInError = const AppError(
+            code: 'PHONE_NOT_VERIFIED',
+            message: 'not verified',
+          );
 
-    await pumpAuthWidget(
-      tester,
-      home: const SignInScreen(),
-      onGenerateRoute: AppRouter.onGenerateRoute,
-      overrides: AuthTestOverrides(authRepository: repo).build(),
-    );
+    AppBootstrap.instance.overrideAuthRepositoryForTests(repo);
+    AppBootstrap.instance.providerContainer.invalidate(authRepositoryProvider);
+    await pumpAppRouter(tester, initialLocation: AppRoutes.signIn);
     await tester.pumpAndSettle();
 
     await tester.enterText(find.byType(TextFormField).first, '70123456');
@@ -134,27 +144,18 @@ void main() {
   ) async {
     const String token = 'email-reset-token-test';
 
-    await pumpAuthWidget(
-      tester,
-      home: const SignInScreen(),
-      onGenerateRoute: AppRouter.onGenerateRoute,
-      overrides: AuthTestOverrides(authRepository: FakeAuthRepository()).build(),
-    );
+    await pumpAppRouter(tester, initialLocation: AppRoutes.signIn);
     await tester.pumpAndSettle();
 
-    final NavigatorState nav = Navigator.of(
-      tester.element(find.byType(SignInScreen)),
-    );
     DeepLinkRouter.handleUri(
-      nav,
+      appGoRouter,
       Uri.parse('https://chisto.mk/reset-password?token=$token'),
       isAuthenticated: false,
     );
     await tester.pumpAndSettle();
 
-    final ForgotPasswordNewScreen screen = tester.widget<ForgotPasswordNewScreen>(
-      find.byType(ForgotPasswordNewScreen),
-    );
+    final ForgotPasswordNewScreen screen = tester
+        .widget<ForgotPasswordNewScreen>(find.byType(ForgotPasswordNewScreen));
     expect(screen.emailResetToken, token);
   });
 
@@ -164,19 +165,17 @@ void main() {
     const String token = 'reset-tok';
     var emailConfirmed = false;
     final FakeAuthRepository repo = FakeAuthRepository(
-      confirmPasswordResetByEmailImpl: ({
-        required String token,
-        required String newPassword,
-      }) async {
-        emailConfirmed = true;
-        expect(token, 'reset-tok');
-        expect(newPassword, 'Newpass123');
-      },
+      confirmPasswordResetByEmailImpl:
+          ({required String token, required String newPassword}) async {
+            emailConfirmed = true;
+            expect(token, 'reset-tok');
+            expect(newPassword, 'Newpass123');
+          },
     );
 
     await pumpAuthWidget(
       tester,
-      home: ForgotPasswordNewScreen(emailResetToken: token),
+      home: const ForgotPasswordNewScreen(emailResetToken: token),
       onGenerateRoute: AppRouter.onGenerateRoute,
       overrides: AuthTestOverrides(authRepository: repo).build(),
     );

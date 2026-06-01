@@ -9,7 +9,21 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
-RADIUS_ROOTS = ("lib/features", "lib/shared")
+
+def feature_and_shared_roots() -> tuple[str, ...]:
+    roots: list[str] = [
+        "packages/chisto_infrastructure/lib/shared/widgets",
+    ]
+    packages = ROOT / "packages"
+    if packages.is_dir():
+        for pkg in sorted(packages.iterdir()):
+            if pkg.is_dir() and pkg.name.startswith("feature_"):
+                lib = pkg / "lib"
+                if lib.is_dir():
+                    roots.append(str(lib.relative_to(ROOT)).replace("\\", "/"))
+    return tuple(roots)
+
+
 RADIUS_SKIP = (
     "app_radii.dart",
     "app_spacing.dart",
@@ -18,8 +32,7 @@ RADIUS_SKIP = (
 )
 RADIUS_RE = re.compile(r"BorderRadius\.circular\(\s*\d")
 
-SHADOW_ROOTS = ("lib/features", "lib/shared")
-SHADOW_SKIP = ("core/theme/", "app_shadows.dart", "app_card_chrome.dart")
+SHADOW_SKIP = ("core/theme/", "app_shadows.dart", "app_card_chrome.dart", "/src/theme/")
 
 
 def scan(roots: tuple[str, ...], skip: tuple[str, ...], match_line) -> list[str]:
@@ -46,9 +59,10 @@ def write_allowlist(path: Path, hits: list[str]) -> None:
 
 
 def main() -> int:
-    radius_hits = scan(RADIUS_ROOTS, RADIUS_SKIP, lambda line: bool(RADIUS_RE.search(line)))
+    roots = feature_and_shared_roots()
+    radius_hits = scan(roots, RADIUS_SKIP, lambda line: bool(RADIUS_RE.search(line)))
     shadow_hits = scan(
-        SHADOW_ROOTS,
+        roots,
         SHADOW_SKIP,
         lambda line: "BoxShadow(" in line,
     )

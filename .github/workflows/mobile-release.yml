@@ -26,9 +26,11 @@ jobs:
         run: dart run tool/check_release_env.dart
       - name: Analyze and test
         run: |
-          flutter analyze --no-fatal-infos lib
+          flutter analyze --fatal-infos lib
           dart run tool/check_pii_in_logs.dart
           flutter test test/features/auth/api_auth_repository_logout_cleanup_test.dart test/core/observability/chisto_sentry_test.dart
+          flutter test --coverage test/
+          dart run tool/check_coverage.dart --print-summary
       - name: Build IPA (prod)
         env:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}

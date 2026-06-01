@@ -1,0 +1,596 @@
+import 'dart:async';
+
+import 'package:chisto_infrastructure/core/deep_links/deep_link_router.dart';
+import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:chisto_infrastructure/core/navigation/app_go_router.dart';
+import 'package:chisto_infrastructure/core/navigation/app_navigation.dart';
+import 'package:chisto_infrastructure/core/navigation/app_routes.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/shared/utils/app_haptics.dart';
+import 'package:chisto_infrastructure/shared/utils/cached_tile_provider.dart';
+import 'package:chisto_infrastructure/shared/widgets/widgets.dart';
+import 'package:design_system/design_system.dart';
+import 'package:feature_auth/src/application/home_location_controller.dart';
+import 'package:feature_auth/src/presentation/constants/auth_error_messages.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:latlong2/latlong.dart';
+
+/// Shown only after OTP verification in the sign-up flow.
+/// User picks location, then taps "Confirm and continue" to go to the feed.
+/// Sign-in and returning users skip this and go straight to home.
+class LocationScreen extends ConsumerStatefulWidget {
+  const LocationScreen({super.key, this.tileProviderOverride});
+
+  /// Test/golden hook: flat tile layer without network fetches.
+  final TileProvider? tileProviderOverride;
+
+  @override
+  ConsumerState<LocationScreen> createState() => _LocationScreenState();
+}
+
+class _LocationScreenState extends ConsumerState<LocationScreen> {
+  String? _currentAddress;
+  bool _resolvingLocation = false;
+  final LatLng _mapCenter = const LatLng(
+    41.6086,
+    21.7453,
+  ); // Approx center of Macedonia
+  LatLng? _selectedPosition;
+  final MapController _mapController = MapController();
+  bool _showTileLoadingOverlay = true;
+  Timer? _tileLoadingTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _tileLoadingTimer = Timer(const Duration(milliseconds: 900), () {
+      if (mounted) setState(() => _showTileLoadingOverlay = false);
+    });
+  }
+
+  @override
+  void dispose() {
+    _tileLoadingTimer?.cancel();
+    _mapController.dispose();
+    super.dispose();
+  }
+
+  bool _isInMacedonia(double lat, double lng) {
+    // Rough bounding box for Macedonia.
+    return lat >= 40.8 && lat <= 42.4 && lng >= 20.4 && lng <= 23.1;
+  }
+
+  Future<bool> _ensurePermission() async {
+    final bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      if (mounted) {
+        AppSnack.show(
+          context,
+          message: AppLocalizations.of(context)!.authLocationServicesDisabled,
+          type: AppSnackType.warning,
+        );
+      }
+      return false;
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+
+    if (permission == LocationPermission.denied) {
+      if (mounted) {
+        AppSnack.show(
+          context,
+          message: AppLocalizations.of(context)!.authLocationPermissionDenied,
+          type: AppSnackType.warning,
+        );
+      }
+      return false;
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      if (mounted) {
+        AppSnack.show(
+          context,
+          message: AppLocalizations.of(context)!.authLocationPermissionForever,
+          type: AppSnackType.warning,
+          duration: const Duration(seconds: 3),
+        );
+      }
+      await Geolocator.openAppSettings();
+      return false;
+    }
+
+    return true;
+  }
+
+  Future<void> _useCurrentLocation() async {
+    if (_resolvingLocation) {
+      return;
+    }
+    setState(() => _resolvingLocation = true);
+
+    try {
+      final bool ok = await _ensurePermission();
+      if (!ok) {
+        if (mounted) {
+          setState(() => _resolvingLocation = false);
+        }
+        return;
+      }
+
+      final Position pos = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      if (!_isInMacedonia(pos.latitude, pos.longitude)) {
+        if (mounted) {
+          AppSnack.show(
+            context,
+            message: AppLocalizations.of(context)!.authLocationMacedoniaOnly,
+            type: AppSnackType.info,
+          );
+        }
+        setState(() => _resolvingLocation = false);
+        return;
+      }
+      // Fallback label in case reverse geocoding fails.
+      String label =
+          'Lat ${pos.latitude.toStringAsFixed(4)}, Lng ${pos.longitude.toStringAsFixed(4)}';
+      try {
+        final List<Placemark> placemarks = await placemarkFromCoordinates(
+          pos.latitude,
+          pos.longitude,
+        );
+        if (placemarks.isNotEmpty) {
+          final Placemark p = placemarks.first;
+          final String street = p.street ?? '';
+          final String locality = p.locality ?? '';
+          final String country = p.country ?? '';
+          final List<String> parts = <String>[
+            street,
+            locality,
+            country,
+          ].where((String s) => s.trim().isNotEmpty).toList();
+          if (parts.isNotEmpty) {
+            label = parts.join(', ');
+          }
+        }
+      } catch (_) {
+        // Keep the coordinates-based fallback label.
+      }
+
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _currentAddress = label;
+        _selectedPosition = LatLng(pos.latitude, pos.longitude);
+        _resolvingLocation = false;
+      });
+      // Move map after layout so tiles load correctly; zoom 15 = neighborhood view (avoids over-zoom).
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _selectedPosition != null) {
+          _mapController.move(_selectedPosition!, 15);
+        }
+      });
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      setState(() => _resolvingLocation = false);
+      AppSnack.show(
+        context,
+        message: AppLocalizations.of(context)!.authLocationResolveFailed,
+        type: AppSnackType.error,
+      );
+    }
+  }
+
+  Future<void> _confirmAndGoToFeed() async {
+    if (_selectedPosition == null) return;
+    final bool isSaving = ref.read(homeLocationControllerProvider).isLoading;
+    if (isSaving) return;
+    try {
+      await ref
+          .read(homeLocationControllerProvider.notifier)
+          .saveHomeLocation(
+            latitude: _selectedPosition!.latitude,
+            longitude: _selectedPosition!.longitude,
+            label: _currentAddress,
+          );
+      if (!mounted) return;
+      AppHaptics.success(context);
+      await _navigateHomeWithCoachPending();
+    } on AppError {
+      if (!mounted) return;
+      AppHaptics.warning(context);
+    }
+  }
+
+  Future<void> _navigateHomeWithCoachPending() async {
+    if (!mounted) {
+      return;
+    }
+    AppNavigation.navigateToHome(
+      args: const HomeRouteArgs(startCoachTour: true),
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      DeepLinkRouter.replayPendingAuthenticatedRoute(appGoRouter);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    final locationState = ref.watch(homeLocationControllerProvider);
+    final bool isSaving = locationState.isLoading;
+    final String? apiError = locationState.error != null
+        ? messageForAuthError(l10n, locationState.error!)
+        : null;
+    final double keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
+
+    return Stack(
+      children: <Widget>[
+        PopScope(
+          canPop: false,
+          child: Scaffold(
+            resizeToAvoidBottomInset: false,
+            backgroundColor: AppColors.panelBackground,
+            body: GestureDetector(
+              onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+              behavior: HitTestBehavior.translucent,
+              child: SafeArea(
+                child: AnimatedPadding(
+                  duration: AppMotion.medium,
+                  curve: AppMotion.emphasized,
+                  padding: EdgeInsets.only(bottom: keyboardInset),
+                  child: SingleChildScrollView(
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.lg,
+                      AppSpacing.sm,
+                      AppSpacing.lg,
+                      AppSpacing.lg,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: AppSpacing.radiusSm),
+                        Text(
+                          l10n.authLocationTitle,
+                          style: AppTypography.authScreenTitle(textTheme),
+                        ),
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          l10n.authLocationSubtitle,
+                          style: AppTypography.authScreenSubtitle(textTheme),
+                        ),
+                        if (apiError != null) ...<Widget>[
+                          const SizedBox(height: AppSpacing.md),
+                          ApiErrorBanner(
+                            message: apiError,
+                            onDismiss: () => ref
+                                .read(homeLocationControllerProvider.notifier)
+                                .clearError(),
+                          ),
+                        ],
+                        const SizedBox(height: AppSpacing.lg),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusLg,
+                          ),
+                          child: SizedBox(
+                            height: 260,
+                            width: double.infinity,
+                            child: Stack(
+                              children: [
+                                FlutterMap(
+                                  key: ValueKey<bool>(
+                                    _selectedPosition != null,
+                                  ),
+                                  mapController: _mapController,
+                                  options: MapOptions(
+                                    initialCenter:
+                                        _selectedPosition ?? _mapCenter,
+                                    initialZoom: _selectedPosition != null
+                                        ? 15
+                                        : 7,
+                                    minZoom: 1.5,
+                                    maxZoom: 18,
+                                    interactionOptions:
+                                        const InteractionOptions(
+                                          flags: InteractiveFlag.none,
+                                        ),
+                                  ),
+                                  children: [
+                                    TileLayer(
+                                      urlTemplate:
+                                          'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+                                      subdomains: const <String>[
+                                        'a',
+                                        'b',
+                                        'c',
+                                        'd',
+                                      ],
+                                      maxNativeZoom: 20,
+                                      userAgentPackageName: 'chisto_mobile',
+                                      retinaMode: false,
+                                      tileProvider:
+                                          widget.tileProviderOverride ??
+                                          createCachedTileProvider(
+                                            maxStaleDays: 30,
+                                          ),
+                                      tileDisplay:
+                                          const TileDisplay.instantaneous(),
+                                    ),
+                                    if (_selectedPosition != null)
+                                      MarkerLayer(
+                                        markers: <Marker>[
+                                          Marker(
+                                            point: _selectedPosition!,
+                                            width: 30,
+                                            height: 30,
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                // Keep the green pin but soften it so
+                                                // underlying imagery stays readable.
+                                                color: AppColors.primaryDark
+                                                    .withValues(alpha: 0.82),
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                  color: AppColors.white,
+                                                  width: 2,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                  ],
+                                ),
+                                if (_showTileLoadingOverlay ||
+                                    (_resolvingLocation &&
+                                        _selectedPosition == null))
+                                  const Positioned.fill(
+                                    child: IgnorePointer(
+                                      child: _MapTileSkeleton(),
+                                    ),
+                                  ),
+                                Positioned(
+                                  left: AppSpacing.md,
+                                  right: AppSpacing.md,
+                                  top: AppSpacing.md,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: AppSpacing.sm,
+                                      vertical: AppSpacing.radiusSm,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.white.withValues(
+                                        alpha: 0.94,
+                                      ),
+                                      borderRadius: BorderRadius.circular(
+                                        AppSpacing.radiusMd,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      _currentAddress ??
+                                          l10n.authLocationMapPlaceholder,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: AppTypography.pillLabel(textTheme),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.radiusPill),
+                        Semantics(
+                          button: true,
+                          label: _resolvingLocation
+                              ? l10n.authLocationDetecting
+                              : _selectedPosition != null
+                              ? l10n.authLocationContinue
+                              : l10n.authLocationUseCurrent,
+                          child: AppButton.primary(
+                            label: _resolvingLocation
+                                ? l10n.authLocationDetecting
+                                : _selectedPosition != null
+                                ? l10n.authLocationContinue
+                                : l10n.authLocationUseCurrent,
+                            enabled: !_resolvingLocation && !isSaving,
+                            onPressed: _resolvingLocation || isSaving
+                                ? null
+                                : _selectedPosition != null
+                                ? () => unawaited(_confirmAndGoToFeed())
+                                : _useCurrentLocation,
+                          ),
+                        ),
+                        AnimatedSize(
+                          duration: AppMotion.standard,
+                          curve: AppMotion.emphasized,
+                          alignment: Alignment.topCenter,
+                          child:
+                              _selectedPosition != null && !_resolvingLocation
+                              ? Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    const SizedBox(height: AppSpacing.sm),
+                                    Center(
+                                      child: Semantics(
+                                        button: true,
+                                        label: l10n.authLocationUseDifferent,
+                                        child: CupertinoButton(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: AppSpacing.sm,
+                                            vertical: AppSpacing.xs,
+                                          ),
+                                          minimumSize: const Size(44, 44),
+                                          onPressed: _useCurrentLocation,
+                                          child: Text(
+                                            l10n.authLocationUseDifferent,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall
+                                                ?.copyWith(
+                                                  color: AppColors.primaryDark,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : const SizedBox.shrink(),
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        Text(
+                          l10n.authLocationPrivacyNote,
+                          style: AppTypography.cardSubtitle(
+                            textTheme,
+                          ).copyWith(height: 1.35),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        LoadingOverlay(visible: isSaving),
+      ],
+    );
+  }
+}
+
+/// Apple-style tile skeleton: grid of rounded tiles with a subtle left-to-right shimmer.
+class _MapTileSkeleton extends StatefulWidget {
+  const _MapTileSkeleton();
+
+  @override
+  State<_MapTileSkeleton> createState() => _MapTileSkeletonState();
+}
+
+class _MapTileSkeletonState extends State<_MapTileSkeleton>
+    with SingleTickerProviderStateMixin {
+  static const int _columns = 4;
+  static const double _gap = AppSpacing.xs;
+  static const double _radius = 8;
+
+  late final AnimationController _shimmerController;
+  bool _didConfigureMotion = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _shimmerController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_didConfigureMotion) return;
+    _didConfigureMotion = true;
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _shimmerController.value = 0;
+    } else {
+      _shimmerController.repeat();
+    }
+  }
+
+  @override
+  void dispose() {
+    _shimmerController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _shimmerController,
+      builder: (BuildContext context, Widget? child) {
+        final double t = _shimmerController.value;
+        return ShaderMask(
+          shaderCallback: (Rect bounds) {
+            return LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: const <Color>[
+                AppColors.inputFill,
+                AppColors.panelBackground,
+                AppColors.inputFill,
+              ],
+              stops: <double>[
+                (t - 0.25).clamp(0.0, 1.0),
+                t,
+                (t + 0.25).clamp(0.0, 1.0),
+              ],
+            ).createShader(bounds);
+          },
+          blendMode: BlendMode.srcATop,
+          child: child,
+        );
+      },
+      child: Container(
+        width: double.infinity,
+        height: double.infinity,
+        color: AppColors.panelBackground,
+        padding: const EdgeInsets.all(AppSpacing.insetTight),
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            final double w = constraints.maxWidth;
+            final double h = constraints.maxHeight;
+            const double totalGapW = _gap * (_columns - 1);
+            final double tileW = (w - totalGapW - _gap) / _columns;
+            final int rows = ((h + _gap) / (tileW + _gap)).floor().clamp(2, 6);
+            final double totalGapH = _gap * (rows - 1);
+            final double tileH = (h - totalGapH - _gap) / rows;
+            return Column(
+              children: List<Widget>.generate(rows, (int row) {
+                return Padding(
+                  padding: row < rows - 1
+                      ? const EdgeInsets.only(bottom: AppSpacing.xs)
+                      : EdgeInsets.zero,
+                  child: Row(
+                    children: List<Widget>.generate(_columns, (int col) {
+                      return Padding(
+                        padding: col < _columns - 1
+                            ? const EdgeInsets.only(right: AppSpacing.xs)
+                            : EdgeInsets.zero,
+                        child: Container(
+                          width: tileW,
+                          height: tileH,
+                          decoration: BoxDecoration(
+                            color: AppColors.inputFill,
+                            borderRadius: BorderRadius.circular(_radius),
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                );
+              }),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}

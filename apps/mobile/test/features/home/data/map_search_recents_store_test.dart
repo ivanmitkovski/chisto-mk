@@ -1,4 +1,4 @@
-import 'package:chisto_mobile/features/home/data/map_search_recents_store.dart';
+import 'package:feature_home/src/data/map_search_recents_store.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

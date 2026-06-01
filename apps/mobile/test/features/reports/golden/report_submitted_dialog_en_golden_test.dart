@@ -1,5 +1,5 @@
-import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_submitted_dialog.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_reports/src/presentation/widgets/new_report/report_submitted_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -15,16 +15,16 @@ void main() {
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         debugShowCheckedModeBanner: false,
-        locale: const Locale('en'),
+        locale: Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: const MediaQuery(
+        home: MediaQuery(
           data: MediaQueryData(
             size: Size(420, 900),
-            devicePixelRatio: 1.0,
-            textScaler: TextScaler.linear(1.0),
+            devicePixelRatio: 1,
+            textScaler: TextScaler.linear(1),
             disableAnimations: true,
           ),
           child: Center(

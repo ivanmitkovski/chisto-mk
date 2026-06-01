@@ -1,18 +1,15 @@
-import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
-import 'package:chisto_mobile/shared/widgets/atoms/app_button.dart';
-import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
-import 'package:chisto_mobile/features/home/presentation/widgets/site_detail/cleaning_events_tab.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/core/providers/events_providers.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/shared/widgets/atoms/app_button.dart';
+import 'package:feature_events/src/domain/models/eco_event.dart';
+import 'package:feature_home/src/presentation/widgets/site_detail/cleaning_events_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../events/recording_events_repository.dart';
 import '../support/test_pollution_site.dart';
 
-EcoEvent _siteEvent({
-  required String siteId,
-  required bool isJoined,
-}) {
+EcoEvent _siteEvent({required String siteId, required bool isJoined}) {
   return EcoEvent(
     id: 'event-1',
     title: 'Clean it',
@@ -37,17 +34,15 @@ EcoEvent _siteEvent({
 
 void main() {
   tearDown(() {
-    EventsRepositoryRegistry.setTestOverride(null);
+    setEventsRepositoryTestOverride(null);
   });
 
   testWidgets('shows Join action when user has not joined', (
     WidgetTester tester,
   ) async {
-    EventsRepositoryRegistry.setTestOverride(
+    setEventsRepositoryTestOverride(
       RecordingEventsRepository(
-        seed: <EcoEvent>[
-          _siteEvent(siteId: 'site-1', isJoined: false),
-        ],
+        seed: <EcoEvent>[_siteEvent(siteId: 'site-1', isJoined: false)],
       ),
     );
 
@@ -77,11 +72,9 @@ void main() {
   testWidgets('shows disabled Joined when user already joined', (
     WidgetTester tester,
   ) async {
-    EventsRepositoryRegistry.setTestOverride(
+    setEventsRepositoryTestOverride(
       RecordingEventsRepository(
-        seed: <EcoEvent>[
-          _siteEvent(siteId: 'site-1', isJoined: true),
-        ],
+        seed: <EcoEvent>[_siteEvent(siteId: 'site-1', isJoined: true)],
       ),
     );
 
@@ -107,8 +100,9 @@ void main() {
     expect(find.text('Joined'), findsOneWidget);
     expect(find.text('Join action'), findsNothing);
 
-    final AppButton joinedButton =
-        tester.widget<AppButton>(find.widgetWithText(AppButton, 'Joined'));
+    final AppButton joinedButton = tester.widget<AppButton>(
+      find.widgetWithText(AppButton, 'Joined'),
+    );
     expect(joinedButton.enabled, isFalse);
   });
 }

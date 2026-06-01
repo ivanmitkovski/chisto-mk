@@ -5,7 +5,7 @@
  */
 import { mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import { resolveEmailLogoSrc } from '../src/email/email-logo';
+import { resolveEmailLogoPreviewSrc } from '../src/email/email-logo';
 import { EmailTemplateService } from '../src/email/email-template.service';
 import type { EmailTemplateId } from '../src/email/email.types';
 
@@ -49,7 +49,7 @@ function main(): void {
   const prefsUrl = 'https://chisto.mk/account/notifications';
   const unsubscribeUrl = 'https://api.chisto.mk/notifications/email/unsubscribe?token=preview';
   const appBaseUrl = 'https://chisto.mk';
-  const logoUrl = resolveEmailLogoSrc({});
+  const logoUrl = resolveEmailLogoPreviewSrc({});
 
   for (const templateId of ids) {
     for (const locale of ['en', 'mk'] as const) {

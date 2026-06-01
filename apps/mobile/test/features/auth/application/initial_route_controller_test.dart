@@ -1,9 +1,8 @@
-import 'package:chisto_mobile/core/bootstrap/app_bootstrap.dart';
-import 'package:chisto_mobile/features/auth/application/initial_route_controller.dart';
-import 'package:chisto_mobile/features/auth/data/marketing_onboarding_store.dart';
+import 'package:chisto_infrastructure/core/bootstrap/app_bootstrap.dart';
+import 'package:feature_auth/src/application/initial_route_controller.dart';
+import 'package:feature_auth/src/data/marketing_onboarding_store.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../shared/widget_test_bootstrap.dart';
 import '../support/auth_test_helpers.dart';
@@ -27,11 +26,15 @@ void main() {
     AppBootstrap.instance.authState.setUnauthenticated();
 
     final ProviderContainer container = ProviderContainer(
-      overrides: AuthTestOverrides(authRepository: FakeAuthRepository()).build(),
+      overrides: AuthTestOverrides(
+        authRepository: FakeAuthRepository(),
+      ).build(),
     );
     addTearDown(container.dispose);
 
-    await container.read(initialRouteControllerProvider.notifier).resolveRoute();
+    await container
+        .read(initialRouteControllerProvider.notifier)
+        .resolveRoute();
 
     expect(
       container.read(initialRouteControllerProvider).destination,
@@ -47,11 +50,15 @@ void main() {
     AppBootstrap.instance.authState.setUnauthenticated();
 
     final ProviderContainer container = ProviderContainer(
-      overrides: AuthTestOverrides(authRepository: FakeAuthRepository()).build(),
+      overrides: AuthTestOverrides(
+        authRepository: FakeAuthRepository(),
+      ).build(),
     );
     addTearDown(container.dispose);
 
-    await container.read(initialRouteControllerProvider.notifier).resolveRoute();
+    await container
+        .read(initialRouteControllerProvider.notifier)
+        .resolveRoute();
 
     expect(
       container.read(initialRouteControllerProvider).destination,

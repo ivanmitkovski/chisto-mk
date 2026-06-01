@@ -1,17 +1,20 @@
-import 'package:chisto_mobile/features/home/presentation/widgets/site_card/share_sheet.dart';
-import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/shared/widgets/organisms/app_surface/report_surface_aliases.dart';
+import 'package:feature_home/src/presentation/widgets/site_card/share_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const String _kSiteTitle = 'Test pollution site';
-const String _kShareUrl = 'https://chisto.mk/sites/550e8400-e29b-41d4-a716-446655440000';
+const String _kShareUrl =
+    'https://chisto.mk/sites/550e8400-e29b-41d4-a716-446655440000';
 
-const List<LocalizationsDelegate<dynamic>> _delegates = <LocalizationsDelegate<dynamic>>[
-  AppLocalizations.delegate,
-  GlobalMaterialLocalizations.delegate,
-  GlobalWidgetsLocalizations.delegate,
-];
+const List<LocalizationsDelegate<dynamic>> _delegates =
+    <LocalizationsDelegate<dynamic>>[
+      AppLocalizations.delegate,
+      GlobalMaterialLocalizations.delegate,
+      GlobalWidgetsLocalizations.delegate,
+    ];
 
 MaterialApp _wrapSheet({required WidgetBuilder builder}) {
   return MaterialApp(
@@ -22,32 +25,38 @@ MaterialApp _wrapSheet({required WidgetBuilder builder}) {
 }
 
 ShareSheet _defaultSheet({String? imageUrl}) => ShareSheet(
-      title: 'Share site',
-      subtitle: 'Help others discover this site',
-      siteTitle: _kSiteTitle,
-      shareUrl: _kShareUrl,
-      siteImageUrl: imageUrl,
-    );
+  title: 'Share site',
+  subtitle: 'Help others discover this site',
+  siteTitle: _kSiteTitle,
+  shareUrl: _kShareUrl,
+  siteImageUrl: imageUrl,
+);
 
 void main() {
   group('ShareSheet', () {
-    testWidgets('renders copy link and send tiles (only 2 tiles)', (WidgetTester tester) async {
+    testWidgets('renders copy link and send tiles (only 2 tiles)', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_wrapSheet(builder: (_) => _defaultSheet()));
       await tester.pumpAndSettle();
 
-      expect(find.byType(ShareActionTile), findsNWidgets(2));
+      expect(find.byType(AppActionTile), findsNWidgets(2));
       expect(find.text('Copy link'), findsOneWidget);
       expect(find.text('Send to people'), findsOneWidget);
     });
 
-    testWidgets('does not contain shareProfile option', (WidgetTester tester) async {
+    testWidgets('does not contain shareProfile option', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_wrapSheet(builder: (_) => _defaultSheet()));
       await tester.pumpAndSettle();
 
       expect(find.text('Share to profile'), findsNothing);
     });
 
-    testWidgets('shows link preview with site title and host', (WidgetTester tester) async {
+    testWidgets('shows link preview with site title and host', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_wrapSheet(builder: (_) => _defaultSheet()));
       await tester.pumpAndSettle();
 
@@ -55,23 +64,30 @@ void main() {
       expect(find.text('chisto.mk'), findsOneWidget);
     });
 
-    testWidgets('renders without site image gracefully', (WidgetTester tester) async {
-      await tester.pumpWidget(_wrapSheet(builder: (_) => _defaultSheet(imageUrl: null)));
+    testWidgets('renders without site image gracefully', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _wrapSheet(builder: (_) => _defaultSheet(imageUrl: null)),
+      );
       await tester.pumpAndSettle();
 
       expect(find.byType(Image), findsNothing);
       expect(find.text(_kSiteTitle), findsOneWidget);
     });
 
-    testWidgets('drag handle has semantics label', (WidgetTester tester) async {
+    testWidgets('uses shared sheet scaffold with drag handle', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(_wrapSheet(builder: (_) => _defaultSheet()));
       await tester.pumpAndSettle();
 
-      final Finder semantics = find.bySemanticsLabel('Drag to resize or dismiss');
-      expect(semantics, findsOneWidget);
+      expect(find.byType(AppSheetScaffold), findsOneWidget);
     });
 
-    testWidgets('pops ShareAction.copyLink on copy link tap', (WidgetTester tester) async {
+    testWidgets('pops ShareAction.copyLink on copy link tap', (
+      WidgetTester tester,
+    ) async {
       // Use a larger viewport so the sheet content fits.
       tester.view.physicalSize = const Size(800, 1200);
       tester.view.devicePixelRatio = 1.0;
@@ -81,17 +97,21 @@ void main() {
       });
 
       ShareAction? poppedAction;
-      await tester.pumpWidget(_wrapSheet(builder: (BuildContext ctx) {
-        return ElevatedButton(
-          onPressed: () async {
-            poppedAction = await showModalBottomSheet<ShareAction>(
-              context: ctx,
-              builder: (_) => _defaultSheet(),
+      await tester.pumpWidget(
+        _wrapSheet(
+          builder: (BuildContext ctx) {
+            return ElevatedButton(
+              onPressed: () async {
+                poppedAction = await showModalBottomSheet<ShareAction>(
+                  context: ctx,
+                  builder: (_) => _defaultSheet(),
+                );
+              },
+              child: const Text('Open'),
             );
           },
-          child: const Text('Open'),
-        );
-      }));
+        ),
+      );
 
       await tester.tap(find.text('Open'));
       await tester.pumpAndSettle();
@@ -102,7 +122,9 @@ void main() {
       expect(poppedAction, ShareAction.copyLink);
     });
 
-    testWidgets('pops ShareAction.sendMessage on send tile tap', (WidgetTester tester) async {
+    testWidgets('pops ShareAction.sendMessage on send tile tap', (
+      WidgetTester tester,
+    ) async {
       tester.view.physicalSize = const Size(800, 1200);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {
@@ -111,17 +133,21 @@ void main() {
       });
 
       ShareAction? poppedAction;
-      await tester.pumpWidget(_wrapSheet(builder: (BuildContext ctx) {
-        return ElevatedButton(
-          onPressed: () async {
-            poppedAction = await showModalBottomSheet<ShareAction>(
-              context: ctx,
-              builder: (_) => _defaultSheet(),
+      await tester.pumpWidget(
+        _wrapSheet(
+          builder: (BuildContext ctx) {
+            return ElevatedButton(
+              onPressed: () async {
+                poppedAction = await showModalBottomSheet<ShareAction>(
+                  context: ctx,
+                  builder: (_) => _defaultSheet(),
+                );
+              },
+              child: const Text('Open'),
             );
           },
-          child: const Text('Open'),
-        );
-      }));
+        ),
+      );
 
       await tester.tap(find.text('Open'));
       await tester.pumpAndSettle();
@@ -132,7 +158,9 @@ void main() {
       expect(poppedAction, ShareAction.sendMessage);
     });
 
-    testWidgets('returns null when sheet is dismissed via barrier', (WidgetTester tester) async {
+    testWidgets('returns null when sheet is dismissed via barrier', (
+      WidgetTester tester,
+    ) async {
       tester.view.physicalSize = const Size(800, 1200);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {
@@ -142,18 +170,22 @@ void main() {
 
       // Non-null sentinel so we can detect the null assignment.
       ShareAction? poppedAction = ShareAction.copyLink;
-      await tester.pumpWidget(_wrapSheet(builder: (BuildContext ctx) {
-        return ElevatedButton(
-          onPressed: () async {
-            poppedAction = await showModalBottomSheet<ShareAction>(
-              context: ctx,
-              isDismissible: true,
-              builder: (_) => _defaultSheet(),
+      await tester.pumpWidget(
+        _wrapSheet(
+          builder: (BuildContext ctx) {
+            return ElevatedButton(
+              onPressed: () async {
+                poppedAction = await showModalBottomSheet<ShareAction>(
+                  context: ctx,
+                  isDismissible: true,
+                  builder: (_) => _defaultSheet(),
+                );
+              },
+              child: const Text('Open'),
             );
           },
-          child: const Text('Open'),
-        );
-      }));
+        ),
+      );
 
       await tester.tap(find.text('Open'));
       await tester.pumpAndSettle();

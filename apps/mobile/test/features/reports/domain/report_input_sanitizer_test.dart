@@ -1,5 +1,5 @@
-import 'package:chisto_mobile/features/reports/domain/report_field_limits.dart';
-import 'package:chisto_mobile/features/reports/domain/report_input_sanitizer.dart';
+import 'package:feature_reports/src/domain/report_field_limits.dart';
+import 'package:feature_reports/src/domain/report_input_sanitizer.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -16,10 +16,7 @@ void main() {
     });
 
     test('description keeps newlines and strips other controls', () {
-      expect(
-        ReportInputSanitizer.sanitizeDescription('a\u0000b\nc'),
-        'ab\nc',
-      );
+      expect(ReportInputSanitizer.sanitizeDescription('a\u0000b\nc'), 'ab\nc');
     });
 
     test('description preserves RTL mark and ZWSP (non-control)', () {
@@ -32,7 +29,8 @@ void main() {
     });
 
     test('description clamp applies after sanitize', () {
-      final String long = '${'z' * (ReportFieldLimits.maxDescriptionLength + 4)}\nend';
+      final String long =
+          '${'z' * (ReportFieldLimits.maxDescriptionLength + 4)}\nend';
       final String got = ReportInputSanitizer.clampDescription(long);
       expect(got.length, ReportFieldLimits.maxDescriptionLength);
     });
