@@ -97,11 +97,14 @@ class AppSnack {
           AppSpacing.lg,
         ),
         padding: EdgeInsets.zero,
-        content: _AppSnackCard(
-          message: message,
-          type: type,
-          actionLabel: actionLabel,
-          onAction: onAction,
+        content: DefaultTextStyle.merge(
+          style: const TextStyle(decoration: TextDecoration.none),
+          child: _AppSnackCard(
+            message: message,
+            type: type,
+            actionLabel: actionLabel,
+            onAction: onAction,
+          ),
         ),
       ),
     );
@@ -147,90 +150,121 @@ class _AppSnackCard extends StatelessWidget {
       color: AppColors.textPrimary,
       fontWeight: FontWeight.w500,
       height: 1.35,
+      decoration: TextDecoration.none,
+      decorationColor: AppColors.transparent,
     );
     final bool hasAction = actionLabel != null && onAction != null;
 
     return Semantics(
       liveRegion: true,
       container: true,
-      label: message,
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.panelBackground,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-          border: Border.all(color: palette.borderColor, width: 1),
-          boxShadow: const <BoxShadow>[
-            BoxShadow(
-              color: AppColors.shadowLight,
-              blurRadius: 18,
-              offset: Offset(0, AppSpacing.radiusSm),
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.sm),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.only(top: AppSpacing.xxs),
-                child: Container(
-                  width: 28,
-                  height: 28,
-                  decoration: BoxDecoration(
-                    color: palette.iconBackground,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    palette.icon,
-                    size: AppSpacing.iconSm,
-                    color: palette.iconColor,
-                  ),
-                ),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Text(message, style: messageStyle, softWrap: true),
-                    if (hasAction) ...<Widget>[
-                      const SizedBox(height: AppSpacing.xxs),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () {
-                            ScaffoldMessenger.maybeOf(
-                              context,
-                            )?.hideCurrentSnackBar(
-                              reason: SnackBarClosedReason.hide,
-                            );
-                            onAction!();
-                          },
-                          style: TextButton.styleFrom(
-                            foregroundColor: AppColors.primaryDark,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.sm,
-                            ),
-                            minimumSize: Size.zero,
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          ),
-                          child: Text(
-                            actionLabel!,
-                            style: AppTypography.textTheme.labelLarge!.copyWith(
-                              color: AppColors.primaryDark,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
+      child: Material(
+        color: AppColors.transparent,
+        child: Container(
+          decoration: BoxDecoration(
+            color: AppColors.panelBackground,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+            border: Border.all(color: palette.borderColor, width: 1),
+            boxShadow: const <BoxShadow>[
+              BoxShadow(
+                color: AppColors.shadowLight,
+                blurRadius: 18,
+                offset: Offset(0, AppSpacing.radiusSm),
               ),
             ],
           ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.sm,
+              vertical: AppSpacing.sm,
+            ),
+            child: DefaultTextStyle(
+              style: messageStyle,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  _SnackLeadingIcon(palette: palette),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Text(
+                          message,
+                          style: messageStyle,
+                          textHeightBehavior: const TextHeightBehavior(
+                            applyHeightToFirstAscent: true,
+                            applyHeightToLastDescent: false,
+                          ),
+                        ),
+                        if (hasAction) ...<Widget>[
+                          const SizedBox(height: AppSpacing.xxs),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton(
+                              onPressed: () {
+                                ScaffoldMessenger.maybeOf(
+                                  context,
+                                )?.hideCurrentSnackBar(
+                                  reason: SnackBarClosedReason.hide,
+                                );
+                                onAction!();
+                              },
+                              style: TextButton.styleFrom(
+                                foregroundColor: AppColors.primaryDark,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: AppSpacing.sm,
+                                ),
+                                minimumSize: Size.zero,
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              ),
+                              child: Text(
+                                actionLabel!,
+                                style: AppTypography.textTheme.labelLarge!
+                                    .copyWith(
+                                      color: AppColors.primaryDark,
+                                      fontWeight: FontWeight.w600,
+                                      decoration: TextDecoration.none,
+                                    ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SnackLeadingIcon extends StatelessWidget {
+  const _SnackLeadingIcon({required this.palette});
+
+  final _SnackPalette palette;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      hidden: true,
+      child: Container(
+        width: 28,
+        height: 28,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: palette.iconBackground,
+          shape: BoxShape.circle,
+        ),
+        child: Icon(
+          palette.icon,
+          size: AppSpacing.iconSm,
+          color: palette.iconColor,
         ),
       ),
     );
