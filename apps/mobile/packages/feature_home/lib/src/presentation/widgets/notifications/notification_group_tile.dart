@@ -1,5 +1,6 @@
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:design_system/design_system.dart';
+import 'package:feature_home/src/presentation/widgets/notifications/notification_preview_text.dart';
 import 'package:feature_home/src/presentation/widgets/notifications/notification_tile.dart';
 import 'package:feature_notifications/feature_notifications.dart';
 import 'package:flutter/material.dart';
@@ -44,6 +45,31 @@ class NotificationGroupTile extends StatelessWidget {
       actorNames: actorNames,
       totalCount: group.isGrouped ? group.items.length : group.totalActorCount,
     );
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final Widget? expandTrailing = group.isGrouped
+        ? Semantics(
+            button: true,
+            label: expanded
+                ? context.l10n.notificationsGroupCollapseHint
+                : context.l10n.notificationsGroupExpandHint,
+            child: IconButton(
+              visualDensity: VisualDensity.compact,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+              onPressed: onToggleExpanded,
+              icon: AnimatedRotation(
+                turns: expanded ? 0.25 : 0,
+                duration: animDuration,
+                curve: AppMotion.standardCurve,
+                child: const Icon(
+                  Icons.expand_more_rounded,
+                  size: 22,
+                  color: AppColors.textMuted,
+                ),
+              ),
+            ),
+          )
+        : null;
 
     final Widget header = Material(
       color: hasUnread
@@ -62,30 +88,22 @@ class NotificationGroupTile extends StatelessWidget {
         onTap: group.isGrouped ? onToggleExpanded : () => onOpenItem(item),
         borderRadius: BorderRadius.circular(AppSpacing.radius18),
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.md,
-            AppSpacing.md,
-            AppSpacing.sm,
-            AppSpacing.md,
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              if (group.topActors.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(right: AppSpacing.sm),
-                  child: NotificationActorAvatarStack(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: NotificationInboxRowLayout(
+            trailingAccessory: expandTrailing,
+            timestamp: notificationRelativeTime(
+              context.l10n,
+              group.latestAt,
+            ),
+            leading: group.topActors.isNotEmpty
+                ? NotificationActorAvatarStack(
                     actors: group.topActors,
                     overflowCount:
                         group.totalActorCount > group.topActors.length
                         ? group.totalActorCount - group.topActors.length
                         : 0,
-                  ),
-                )
-              else
-                Padding(
-                  padding: const EdgeInsets.only(right: AppSpacing.sm),
-                  child: Container(
+                  )
+                : Container(
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
@@ -94,102 +112,59 @@ class NotificationGroupTile extends StatelessWidget {
                     ),
                     child: Icon(visual.icon, color: visual.iconColor, size: 20),
                   ),
-                ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      summary,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppTypographySurfaces.homeNotificationTileTitle(
-                        Theme.of(context).textTheme,
-                        unread: hasUnread,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      item.body,
-                      maxLines: expanded ? 3 : 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppTypographySurfaces.homeNotificationTileBody(
-                        Theme.of(context).textTheme,
-                      ),
-                    ),
-                    if (group.isGrouped && !expanded) ...<Widget>[
-                      const SizedBox(height: 4),
-                      Text(
-                        item.type == UserNotificationType.eventChat
-                            ? context.l10n.notificationsGroupMessageCount(
-                                notificationDisplayCount(
-                                  item,
-                                  collapsedRows: group.items.length,
-                                ),
-                              )
-                            : context.l10n.notificationsGroupSimilarCount(
-                                group.items.length - 1,
-                              ),
-                        style:
-                            AppTypographySurfaces.homeNotificationTileGroupCount(
-                              Theme.of(context).textTheme,
-                              color: visual.iconColor,
-                            ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: <Widget>[
-                  if (hasUnread)
-                    Container(
-                      width: 8,
-                      height: 8,
-                      margin: const EdgeInsets.only(bottom: AppSpacing.xxs),
-                      decoration: const BoxDecoration(
-                        color: AppColors.primaryDark,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  Text(
-                    notificationRelativeTime(context.l10n, group.latestAt),
-                    style: AppTypographySurfaces.homeNotificationTileTimestamp(
-                      Theme.of(context).textTheme,
-                    ),
+            content: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                NotificationTileMetaRow(
+                  badge: NotificationTypeBadge(
+                    label: visual.label,
+                    backgroundColor: visual.iconBackground,
+                    labelColor: visual.iconColor,
                   ),
-                  if (group.isGrouped) ...<Widget>[
-                    const SizedBox(height: 4),
-                    Semantics(
-                      button: true,
-                      label: expanded
-                          ? context.l10n.notificationsGroupCollapseHint
-                          : context.l10n.notificationsGroupExpandHint,
-                      child: IconButton(
-                        visualDensity: VisualDensity.compact,
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(
-                          minWidth: 44,
-                          minHeight: 44,
-                        ),
-                        onPressed: onToggleExpanded,
-                        icon: AnimatedRotation(
-                          turns: expanded ? 0.25 : 0,
-                          duration: animDuration,
-                          curve: AppMotion.standardCurve,
-                          child: const Icon(
-                            Icons.expand_more_rounded,
-                            size: 22,
-                            color: AppColors.textMuted,
+                  showUnreadDot: hasUnread,
+                ),
+                const SizedBox(height: 6),
+                NotificationPreviewText(
+                  text: summary,
+                  maxLines: notificationTitleMaxLines,
+                  style: AppTypographySurfaces.homeNotificationTileTitle(
+                    textTheme,
+                    unread: hasUnread,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                NotificationPreviewText(
+                  text: item.body,
+                  maxLines: notificationGroupBodyMaxLines(
+                    context,
+                    expanded: expanded,
+                  ),
+                  style: AppTypographySurfaces.homeNotificationTileBody(
+                    textTheme,
+                  ),
+                ),
+                if (group.isGrouped && !expanded) ...<Widget>[
+                  const SizedBox(height: 4),
+                  Text(
+                    item.type == UserNotificationType.eventChat
+                        ? context.l10n.notificationsGroupMessageCount(
+                            notificationDisplayCount(
+                              item,
+                              collapsedRows: group.items.length,
+                            ),
+                          )
+                        : context.l10n.notificationsGroupSimilarCount(
+                            group.items.length - 1,
                           ),
+                    style:
+                        AppTypographySurfaces.homeNotificationTileGroupCount(
+                          textTheme,
+                          color: visual.iconColor,
                         ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ],
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -201,7 +176,7 @@ class NotificationGroupTile extends StatelessWidget {
         Semantics(
           button: group.isGrouped,
           expanded: group.isGrouped ? expanded : null,
-          label: summary,
+          label: '$summary. ${item.body}',
           hint: group.isGrouped
               ? (expanded
                     ? context.l10n.notificationsGroupCollapseHint

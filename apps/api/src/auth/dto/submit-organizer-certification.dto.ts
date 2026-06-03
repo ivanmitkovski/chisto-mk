@@ -9,7 +9,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { OrganizerQuizAnswerItemDto } from './organizer-quiz-answer-item.dto';
-import { ORGANIZER_QUIZ_DRAW_SIZE } from '../organizer-quiz-bank';
+import { ORGANIZER_QUIZ_DRAW_SIZE } from '../util/organizer-quiz-bank';
 
 export class SubmitOrganizerCertificationDto {
   @ApiProperty({

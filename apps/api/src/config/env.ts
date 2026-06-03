@@ -110,9 +110,18 @@ export function validateEnv(): void {
   }
 
   const smsProvider = (process.env.SMS_PROVIDER ?? 'none').toLowerCase();
+  if ((nodeEnv === 'production' || nodeEnv === 'staging') && smsProvider === 'none') {
+    console.error(
+      'SMS_PROVIDER must be "twilio" in production/staging (phone OTP and password-reset SMS require delivery)',
+    );
+    process.exit(1);
+  }
   if (smsProvider === 'twilio') {
     requireEnv('TWILIO_ACCOUNT_SID');
     requireEnv('TWILIO_AUTH_TOKEN');
+    if (nodeEnv === 'production' || nodeEnv === 'staging') {
+      requireEnv('TWILIO_WEBHOOK_BASE_URL');
+    }
     const messagingSid = process.env.TWILIO_MESSAGING_SERVICE_SID?.trim();
     const fromNumber = process.env.TWILIO_PHONE_NUMBER?.trim();
     const alphaSender = process.env.TWILIO_ALPHANUMERIC_SENDER?.trim();
@@ -184,5 +193,25 @@ export function validateEnv(): void {
     }
 
     requireEnv('METRICS_BEARER_TOKEN');
+  }
+
+  const mapSearchTypesense =
+    (process.env.MAP_SEARCH_TYPESENSE ?? '').trim().toLowerCase() === 'true';
+  if (mapSearchTypesense && (nodeEnv === 'production' || nodeEnv === 'staging')) {
+    requireEnv('TYPESENSE_HOST');
+    requireEnv('TYPESENSE_API_KEY');
+  }
+
+  const mapOfflineRegions =
+    (process.env.MAP_OFFLINE_REGIONS ?? '').trim().toLowerCase() === 'true';
+  if (mapOfflineRegions && (nodeEnv === 'production' || nodeEnv === 'staging')) {
+    const hasInlineManifest = Boolean(process.env.MAP_OFFLINE_REGIONS_MANIFEST_JSON?.trim());
+    const bucket = process.env.S3_BUCKET_NAME?.trim();
+    if (!hasInlineManifest && !bucket) {
+      console.error(
+        'When MAP_OFFLINE_REGIONS=true in production/staging, set MAP_OFFLINE_REGIONS_MANIFEST_JSON and/or S3_BUCKET_NAME with a manifest object under MAP_OFFLINE_REGIONS_S3_PREFIX.',
+      );
+      process.exit(1);
+    }
   }
 }

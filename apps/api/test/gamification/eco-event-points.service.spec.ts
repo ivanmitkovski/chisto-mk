@@ -1,7 +1,7 @@
 /// <reference types="jest" />
 
 import { Prisma } from '../../src/prisma-client';
-import { EcoEventPointsService } from '../../src/gamification/eco-event-points.service';
+import { EcoEventPointsService } from '../../src/gamification/services/eco-event-points.service';
 
 describe('EcoEventPointsService', () => {
   let service: EcoEventPointsService;
@@ -38,7 +38,12 @@ describe('EcoEventPointsService', () => {
   it('returns 0 when user missing', async () => {
     const { tx, pointTransaction, user } = makeTx();
     pointTransaction.findFirst.mockResolvedValue(null);
-    user.update.mockRejectedValue(new Error('not found'));
+    user.update.mockRejectedValue(
+      new Prisma.PrismaClientKnownRequestError('Record to update not found', {
+        code: 'P2025',
+        clientVersion: 'test',
+      }),
+    );
     const r = await service.creditIfNew(tx as never, {
       userId: 'missing',
       delta: 10,

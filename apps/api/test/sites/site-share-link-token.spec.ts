@@ -2,7 +2,7 @@ import {
   SITE_SHARE_LINK_TTL_SEC,
   signSiteShareLinkToken,
   verifySiteShareLinkToken,
-} from '../../src/sites/site-share-link-token';
+} from '../../src/sites/types/site-share-link-token';
 
 describe('site-share-link-token', () => {
   const secret = Buffer.from('unit_test_site_share_token_secret_24', 'utf8');

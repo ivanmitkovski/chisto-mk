@@ -21,9 +21,18 @@ describe('Cluster Redis (e2e)', () => {
       console.warn('[e2e] Skipping Redis readiness assertion — REDIS_URL unset');
       return;
     }
-    const res = await request(app.getHttpServer()).get('/health/ready').expect(200);
-    expect(res.body.status).toBe('ok');
-    expect(res.body.redis).toBe('ok');
+    let lastBody: unknown;
+    for (let attempt = 0; attempt < 30; attempt += 1) {
+      const res = await request(app.getHttpServer()).get('/health/ready');
+      lastBody = res.body;
+      if (res.status === 200) {
+        expect(res.body.status).toBe('ok');
+        expect(res.body.redis).toBe('ok');
+        return;
+      }
+      await new Promise((r) => setTimeout(r, 500));
+    }
+    throw new Error(`ready never returned 200: ${JSON.stringify(lastBody)}`);
   });
 
   it('GET /health/ready returns s3 ok when bucket + MinIO-style endpoint are set', async () => {
@@ -33,8 +42,17 @@ describe('Cluster Redis (e2e)', () => {
       );
       return;
     }
-    const res = await request(app.getHttpServer()).get('/health/ready').expect(200);
-    expect(res.body.status).toBe('ok');
-    expect(res.body.s3).toBe('ok');
+    let lastBody: unknown;
+    for (let attempt = 0; attempt < 30; attempt += 1) {
+      const res = await request(app.getHttpServer()).get('/health/ready');
+      lastBody = res.body;
+      if (res.status === 200) {
+        expect(res.body.status).toBe('ok');
+        expect(res.body.s3).toBe('ok');
+        return;
+      }
+      await new Promise((r) => setTimeout(r, 500));
+    }
+    throw new Error(`ready never returned 200: ${JSON.stringify(lastBody)}`);
   });
 });

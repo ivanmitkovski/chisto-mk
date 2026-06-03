@@ -1,6 +1,6 @@
 /// <reference types="jest" />
 import { SiteStatus } from '../../src/prisma-client';
-import { FeedTrainerWorker } from '../../src/workers/feed-trainer.worker';
+import { FeedTrainerWorker } from '../../scripts/feed-trainer.worker';
 
 function makeSite(i: number) {
   return {

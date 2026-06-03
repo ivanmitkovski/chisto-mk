@@ -23,13 +23,19 @@ class FakeAuthRepository implements AuthRepository {
     requestPasswordResetByEmailImpl,
     Future<void> Function(String phone, String code)?
     verifyPasswordResetCodeImpl,
+    Future<void> Function(String email, String code)?
+    verifyPasswordResetCodeByEmailImpl,
     Future<void> Function({
       required String phoneNumberE164,
       required String code,
       required String newPassword,
     })?
     confirmPasswordResetImpl,
-    Future<void> Function({required String token, required String newPassword})?
+    Future<void> Function({
+      required String email,
+      required String code,
+      required String newPassword,
+    })?
     confirmPasswordResetByEmailImpl,
     Future<void> Function()? restoreSessionImpl,
     Future<void> Function({
@@ -45,6 +51,7 @@ class FakeAuthRepository implements AuthRepository {
        _requestPasswordResetImpl = requestPasswordResetImpl,
        _requestPasswordResetByEmailImpl = requestPasswordResetByEmailImpl,
        _verifyPasswordResetCodeImpl = verifyPasswordResetCodeImpl,
+       _verifyPasswordResetCodeByEmailImpl = verifyPasswordResetCodeByEmailImpl,
        _confirmPasswordResetImpl = confirmPasswordResetImpl,
        _confirmPasswordResetByEmailImpl = confirmPasswordResetByEmailImpl,
        _restoreSessionImpl = restoreSessionImpl,
@@ -89,6 +96,8 @@ class FakeAuthRepository implements AuthRepository {
   _requestPasswordResetByEmailImpl;
   final Future<void> Function(String phone, String code)?
   _verifyPasswordResetCodeImpl;
+  final Future<void> Function(String email, String code)?
+  _verifyPasswordResetCodeByEmailImpl;
   final Future<void> Function({
     required String phoneNumberE164,
     required String code,
@@ -96,7 +105,8 @@ class FakeAuthRepository implements AuthRepository {
   })?
   _confirmPasswordResetImpl;
   final Future<void> Function({
-    required String token,
+    required String email,
+    required String code,
     required String newPassword,
   })?
   _confirmPasswordResetByEmailImpl;
@@ -213,6 +223,15 @@ class FakeAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<void> verifyPasswordResetCodeByEmail(String email, String code) async {
+    if (verifyPasswordResetCodeError != null) {
+      throw verifyPasswordResetCodeError!;
+    }
+    final f = _verifyPasswordResetCodeByEmailImpl;
+    if (f != null) await f(email, code);
+  }
+
+  @override
   Future<void> confirmPasswordReset({
     required String phoneNumberE164,
     required String code,
@@ -230,11 +249,14 @@ class FakeAuthRepository implements AuthRepository {
 
   @override
   Future<void> confirmPasswordResetByEmail({
-    required String token,
+    required String email,
+    required String code,
     required String newPassword,
   }) async {
     final f = _confirmPasswordResetByEmailImpl;
-    if (f != null) await f(token: token, newPassword: newPassword);
+    if (f != null) {
+      await f(email: email, code: code, newPassword: newPassword);
+    }
   }
 
   @override

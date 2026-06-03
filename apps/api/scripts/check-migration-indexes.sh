@@ -14,7 +14,7 @@ while IFS= read -r -d '' file; do
     fi
   fi
   if grep -Ei 'CREATE[[:space:]]+(UNIQUE[[:space:]]+)?INDEX[[:space:]]' "$file" | grep -vi 'CONCURRENTLY' | grep -q .; then
-    echo "::error file=$file::CREATE INDEX must use CONCURRENTLY (see apps/api/docs/runbooks/deploy.md)"
+    echo "::error file=$file::CREATE INDEX must use CONCURRENTLY"
     FAILED=1
   fi
 done < <(find "$ROOT/prisma/migrations" -name 'migration.sql' -print0 2>/dev/null)

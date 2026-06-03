@@ -1,6 +1,6 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
-import { SitesAdminService } from '../../src/sites/sites-admin.service';
-import { SitesAdminBulkService } from '../../src/sites/sites-admin-bulk.service';
+import { SitesAdminService } from '../../src/sites/services/sites-admin.service';
+import { SitesAdminBulkService } from '../../src/sites/services/sites-admin-bulk.service';
 
 function makeService(input?: {
   site?: any;

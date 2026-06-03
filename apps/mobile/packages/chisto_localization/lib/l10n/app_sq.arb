@@ -202,12 +202,10 @@
   "authVerifyPhoneCta": "Verifiko telefonin",
   "authResetViaEmail": "Rivendos me email",
   "authResetViaSms": "Rivendos me SMS",
-  "authForgotPasswordEmailSubtitle": "Vendosni emailin e llogarisë. Do të dërgojmë një lidhje nëse ekziston llogaria.",
-  "authForgotPasswordEmailSentTitle": "Kontrolloni emailin",
-  "authForgotPasswordEmailSentBody": "Nëse ekziston një llogari për atë email, dërguam një lidhje për fjalëkalimin e ri.",
+  "authForgotPasswordEmailSubtitle": "Vendosni emailin e llogarisë. Do të dërgojmë një kod nëse ekziston llogaria.",
   "authForgotPasswordEmailField": "Email",
   "authErrorPhoneNotVerified": "Telefoni nuk është verifikuar ende.",
-  "authErrorPasswordResetTokenInvalid": "Lidhja e rivendosjes është e pavlefshme ose ka skaduar.",
+  "authErrorPasswordResetTokenInvalid": "Kodi i rivendosjes është i pavlefshëm ose ka skaduar.",
   "authForgotPassword": "Harrove fjalëkalimin?",
   "authSignInCta": "Hyr",
   "authValidationCheckPhonePassword": "Kontrollo numrin e telefonit dhe fjalëkalimin.",
@@ -303,9 +301,17 @@
   "authForgotPasswordRequestSemantic": "Dërgo kod për rivendosje",
   "authForgotPasswordOtpTitle": "Shkruaj kodin",
   "authForgotPasswordOtpSubtitle": "Dërguam një kod me 6 shifra te {phone}",
+  "authForgotPasswordOtpEmailSubtitle": "Dërguam një kod me 6 shifra te {email}",
   "@authForgotPasswordOtpSubtitle": {
     "placeholders": {
       "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "@authForgotPasswordOtpEmailSubtitle": {
+    "placeholders": {
+      "email": {
         "type": "String"
       }
     }

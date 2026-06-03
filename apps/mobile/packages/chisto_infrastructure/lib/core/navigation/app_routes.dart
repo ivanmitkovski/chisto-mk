@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:chisto_infrastructure/core/logging/app_log.dart';
 import 'package:chisto_infrastructure/core/navigation/unknown_route_screen.dart';
+import 'package:feature_auth/src/domain/models/password_reset_target.dart';
 import 'package:feature_auth/src/presentation/constants/splash_constants.dart';
-import 'package:feature_auth/src/presentation/screens/forgot_password_email_sent_screen.dart';
 import 'package:feature_auth/src/presentation/screens/forgot_password_new_screen.dart';
 import 'package:feature_auth/src/presentation/screens/forgot_password_otp_screen.dart';
 import 'package:feature_auth/src/presentation/screens/forgot_password_request_screen.dart';
@@ -45,8 +45,6 @@ class AppRoutes {
   static const String forgotPasswordRequest = '/auth/forgot-password';
   static const String forgotPasswordOtp = '/auth/forgot-password/otp';
   static const String forgotPasswordNew = '/auth/forgot-password/new';
-  static const String forgotPasswordEmailSent =
-      '/auth/forgot-password/email-sent';
   static const String forgotPasswordSuccess = '/auth/forgot-password/success';
   static const String location = '/auth/location';
 
@@ -73,18 +71,12 @@ class AppRoutes {
 
 class ForgotPasswordNewRouteArgs {
   const ForgotPasswordNewRouteArgs({
-    required this.phoneNumberE164,
+    required this.target,
     required this.code,
   });
 
-  final String phoneNumberE164;
+  final PasswordResetTarget target;
   final String code;
-}
-
-class EmailPasswordResetRouteArgs {
-  const EmailPasswordResetRouteArgs({required this.token});
-
-  final String token;
 }
 
 /// OTP screen route: [phoneNumberE164] and whether to call `/auth/otp/send` on open.
@@ -303,10 +295,10 @@ class AppRouter {
           settings: settings,
         );
       case AppRoutes.forgotPasswordOtp:
-        if (settings.arguments is! String) {
+        if (settings.arguments is! PasswordResetTarget) {
           if (kDebugMode) {
             AppLog.warn(
-              '[AppRouter] AppRoutes.forgot_pw_otp expected String; got '
+              '[AppRouter] AppRoutes.forgot_pw_otp expected PasswordResetTarget; got '
               '${settings.arguments?.runtimeType}. Restarting credential recovery flow.',
             );
           }
@@ -315,21 +307,13 @@ class AppRouter {
             settings: settings,
           );
         }
-        final String fpPhoneE164 = settings.arguments! as String;
+        final PasswordResetTarget fpTarget =
+            settings.arguments! as PasswordResetTarget;
         return MaterialPageRoute<void>(
-          builder: (_) => ForgotPasswordOtpScreen(phoneNumberE164: fpPhoneE164),
+          builder: (_) => ForgotPasswordOtpScreen(target: fpTarget),
           settings: settings,
         );
       case AppRoutes.forgotPasswordNew:
-        if (settings.arguments is EmailPasswordResetRouteArgs) {
-          final EmailPasswordResetRouteArgs emailArgs =
-              settings.arguments! as EmailPasswordResetRouteArgs;
-          return MaterialPageRoute<void>(
-            builder: (_) =>
-                ForgotPasswordNewScreen(emailResetToken: emailArgs.token),
-            settings: settings,
-          );
-        }
         if (settings.arguments is! ForgotPasswordNewRouteArgs) {
           if (kDebugMode) {
             AppLog.warn(
@@ -346,14 +330,9 @@ class AppRouter {
             settings.arguments! as ForgotPasswordNewRouteArgs;
         return MaterialPageRoute<void>(
           builder: (_) => ForgotPasswordNewScreen(
-            phoneNumberE164: fpArgs.phoneNumberE164,
+            target: fpArgs.target,
             code: fpArgs.code,
           ),
-          settings: settings,
-        );
-      case AppRoutes.forgotPasswordEmailSent:
-        return MaterialPageRoute<void>(
-          builder: (_) => const ForgotPasswordEmailSentScreen(),
           settings: settings,
         );
       case AppRoutes.forgotPasswordSuccess:
@@ -432,7 +411,7 @@ class AppRouter {
         final XFile? photo = settings.arguments is XFile
             ? settings.arguments! as XFile
             : null;
-        return MaterialPageRoute<bool>(
+        return MaterialPageRoute<Object?>(
           builder: (_) => NewReportScreen(initialPhoto: photo),
           settings: settings,
         );

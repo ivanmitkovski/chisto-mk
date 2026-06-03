@@ -1,7 +1,7 @@
 /// <reference types="jest" />
 import { ReportCleanupEffort } from '../../src/prisma-client';
-import { ReportApprovalPointsService } from '../../src/reports/report-approval-points.service';
-import { ReportPointsService } from '../../src/reports/report-points.service';
+import { ReportApprovalPointsService } from '../../src/reports/services/report-approval-points.service';
+import { ReportPointsService } from '../../src/reports/services/report-points.service';
 
 describe('ReportApprovalPointsService', () => {
   const report = {

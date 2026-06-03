@@ -1,7 +1,7 @@
 /// <reference types="jest" />
-import { NotificationInboxService } from '../../src/notifications/notification-inbox.service';
-import { NotificationInboxAdminService } from '../../src/notifications/notification-inbox-admin.service';
-import { NotificationInboxActorsService } from '../../src/notifications/notification-inbox-actors.service';
+import { NotificationInboxService } from '../../src/notifications/services/notification-inbox.service';
+import { NotificationInboxAdminService } from '../../src/notifications/services/notification-inbox-admin.service';
+import { NotificationInboxActorsService } from '../../src/notifications/services/notification-inbox-actors.service';
 
 function makePrisma() {
   return {

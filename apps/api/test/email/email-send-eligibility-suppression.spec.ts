@@ -1,4 +1,4 @@
-import { EmailSendEligibilityService } from '../../src/email/email-send-eligibility.service';
+import { EmailSendEligibilityService } from '../../src/email/services/email-send-eligibility.service';
 
 describe('EmailSendEligibilityService.canSendToAddress', () => {
   it('returns false when suppressed', async () => {

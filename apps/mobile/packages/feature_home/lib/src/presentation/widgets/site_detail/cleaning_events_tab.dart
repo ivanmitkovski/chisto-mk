@@ -196,58 +196,14 @@ class _CleaningEventsTabState extends State<CleaningEventsTab>
   }
 
   Widget _buildEmptyState(BuildContext context) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    return Material(
-      color: AppColors.transparent,
-      child: InkWell(
-        onTap: () {
-          widget.onCreateEvent();
-        },
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  color: colorScheme.primary.withValues(alpha: 0.08),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.groups_rounded,
-                  size: 32,
-                  color: colorScheme.primary,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Text(
-                context.l10n.homeSiteCleaningEmptyTitle,
-                style: AppTypographySurfaces.homeCleaningEmptyTitle(
-                  Theme.of(context).textTheme,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                context.l10n.homeSiteCleaningEmptyBody,
-                textAlign: TextAlign.center,
-                style: AppTypographySurfaces.homeCleaningEmptyBody(
-                  Theme.of(context).textTheme,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                context.l10n.homeSiteCleaningTapToCreate,
-                style: AppTypographySurfaces.homeCleaningEmptyCta(
-                  Theme.of(context).textTheme,
-                  color: colorScheme.primary,
-                ),
-              ),
-            ],
-          ),
-        ),
+    return AppEmptyState(
+      icon: Icons.groups_rounded,
+      title: context.l10n.homeSiteCleaningEmptyTitle,
+      subtitle: context.l10n.homeSiteCleaningEmptyBody,
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      action: AppButton.text(
+        label: context.l10n.homeSiteCleaningTapToCreate,
+        onPressed: widget.onCreateEvent,
       ),
     );
   }

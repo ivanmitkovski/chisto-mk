@@ -249,15 +249,10 @@ class _FieldModeScreenState extends ConsumerState<FieldModeScreen>
               child: _loading
                   ? const Center(child: CupertinoActivityIndicator())
                   : _rows.isEmpty
-                  ? Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(AppSpacing.lg),
-                        child: Text(
-                          context.l10n.eventsFieldModeEmpty,
-                          textAlign: TextAlign.center,
-                          style: AppTypography.eventsBodyMuted(textTheme),
-                        ),
-                      ),
+                  ? AppEmptyState(
+                      icon: Icons.cloud_sync_outlined,
+                      title: context.l10n.eventsFieldModeEmpty,
+                      padding: const EdgeInsets.all(AppSpacing.lg),
                     )
                   : ListView.builder(
                       padding: EdgeInsets.only(

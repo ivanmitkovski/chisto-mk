@@ -1,9 +1,9 @@
-import { SitesController } from '../../src/sites/sites.controller';
-import { SitesMapFacadeService } from '../../src/sites/sites-map-facade.service';
-import { SitesAdminService } from '../../src/sites/sites-admin.service';
-import { SitesFeedService } from '../../src/sites/sites-feed.service';
-import { SiteEngagementService } from '../../src/sites/site-engagement.service';
-import { SiteEventsService } from '../../src/admin-realtime/site-events.service';
+import { SitesController } from '../../src/sites/controllers/sites.controller';
+import { SitesMapFacadeService } from '../../src/sites/services/sites-map-facade.service';
+import { SitesAdminService } from '../../src/sites/services/sites-admin.service';
+import { SitesFeedService } from '../../src/sites/services/sites-feed.service';
+import { SiteEngagementService } from '../../src/sites/services/site-engagement.service';
+import { SiteEventsService } from '../../src/admin-realtime/services/site-events.service';
 
 describe('Share attribution controller/service integration', () => {
   it('keeps normalized click/open fields through controller delegation', async () => {

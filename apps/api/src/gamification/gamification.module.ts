@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from '../prisma/prisma.module';
-import { EcoEventPointsService } from './eco-event-points.service';
-import { GamificationService } from './gamification.service';
-import { PointHistoryService } from './point-history.service';
-import { RankingsController } from './rankings.controller';
-import { RankingsService } from './rankings.service';
+import { EcoEventPointsService } from './services/eco-event-points.service';
+import { GamificationService } from './services/gamification.service';
+import { PointHistoryService } from './services/point-history.service';
+import { RankingsController } from './controllers/rankings.controller';
+import { RankingsService } from './services/rankings.service';
 
 @Module({
   imports: [PrismaModule],

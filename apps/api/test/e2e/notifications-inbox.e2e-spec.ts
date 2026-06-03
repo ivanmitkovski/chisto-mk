@@ -20,14 +20,18 @@ describe('Notifications inbox (e2e)', () => {
 
   it('lists inbox and registers a device token', async () => {
     const u = await registerCitizen(app, 'notif_inbox');
-    const agent = request(app.getHttpServer()).set('Authorization', `Bearer ${u.accessToken}`);
 
-    const list = await agent.get(apiPath('/notifications')).query({ page: 1, limit: 10 }).expect(200);
+    const list = await request(app.getHttpServer())
+      .get(apiPath('/notifications'))
+      .set('Authorization', `Bearer ${u.accessToken}`)
+      .query({ page: 1, limit: 10 })
+      .expect(200);
     expect(list.body).toHaveProperty('data');
     expect(list.body).toHaveProperty('meta');
 
-    await agent
+    await request(app.getHttpServer())
       .post(apiPath('/notifications/devices'))
+      .set('Authorization', `Bearer ${u.accessToken}`)
       .set('X-Idempotency-Key', `e2e-device-${Date.now()}`)
       .send({
         token: `e2e-fcm-${Date.now()}`,

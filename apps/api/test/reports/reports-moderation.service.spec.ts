@@ -1,9 +1,9 @@
 /// <reference types="jest" />
 import { BadRequestException } from '@nestjs/common';
-import { ReportsModerationDetailService } from '../../src/reports/reports-moderation-detail.service';
-import { ReportsModerationListService } from '../../src/reports/reports-moderation-list.service';
-import { ReportsModerationService } from '../../src/reports/reports-moderation.service';
-import { ReportsModerationStatusService } from '../../src/reports/reports-moderation-status.service';
+import { ReportsModerationDetailService } from '../../src/reports/services/reports-moderation-detail.service';
+import { ReportsModerationListService } from '../../src/reports/services/reports-moderation-list.service';
+import { ReportsModerationService } from '../../src/reports/services/reports-moderation.service';
+import { ReportsModerationStatusService } from '../../src/reports/services/reports-moderation-status.service';
 import { UpdateReportStatusDto } from '../../src/reports/dto/update-report-status.dto';
 import { Role } from '../../src/prisma-client';
 

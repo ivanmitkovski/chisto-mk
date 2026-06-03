@@ -5,7 +5,7 @@ import {
   requiresTermsAcceptance,
   termsConsentPayload,
   userHasCurrentTermsAcceptance,
-} from '../../src/auth/terms-consent.util';
+} from '../../src/auth/util/terms-consent.util';
 
 describe('terms-consent.util', () => {
   const current = '1';

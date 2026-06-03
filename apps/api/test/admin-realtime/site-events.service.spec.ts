@@ -1,7 +1,7 @@
-import { SiteEventsService } from '../../src/admin-realtime/site-events.service';
-import { SiteEventOutboxDispatcherService } from '../../src/admin-realtime/site-event-outbox-dispatcher.service';
-import { SiteEventPublisherService } from '../../src/admin-realtime/site-event-publisher.service';
-import { SiteEventReplayStoreService } from '../../src/admin-realtime/site-event-replay-store.service';
+import { SiteEventsService } from '../../src/admin-realtime/services/site-events.service';
+import { SiteEventOutboxDispatcherService } from '../../src/admin-realtime/services/site-event-outbox-dispatcher.service';
+import { SiteEventPublisherService } from '../../src/admin-realtime/services/site-event-publisher.service';
+import { SiteEventReplayStoreService } from '../../src/admin-realtime/services/site-event-replay-store.service';
 
 describe('SiteEventsService', () => {
   const originalRedisUrl = process.env.REDIS_URL;

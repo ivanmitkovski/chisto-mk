@@ -1,7 +1,7 @@
 /// <reference types="jest" />
 
 import { ExecutionContext, ForbiddenException, UnauthorizedException } from '@nestjs/common';
-import { PhoneVerifiedGuard } from '../../src/auth/phone-verified.guard';
+import { PhoneVerifiedGuard } from '../../src/auth/guards/phone-verified.guard';
 
 function mockContext(user?: { userId: string }): ExecutionContext {
   return {

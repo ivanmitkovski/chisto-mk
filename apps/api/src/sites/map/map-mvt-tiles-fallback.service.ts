@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { Prisma } from '../../prisma-client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { computeMvtTileEtag, latToTileY, lonToTileX } from './map-mvt-tile-screen.util';
-import { tile2lat, tile2lon } from './map-mvt-tile-bounds.util';
+import { assertValidMvtTileCoords, tile2lat, tile2lon } from './map-mvt-tile-bounds.util';
+import { siteVisibilitySql } from '../util/site-visibility.helper';
 import { encodeMvt } from './map-mvt-wireformat';
 import type { MvtTileResult } from './map-mvt-tiles.types';
 
@@ -27,7 +28,26 @@ interface ClusterRow {
 export class MapMvtTilesFallbackService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async generateTile(z: number, x: number, y: number): Promise<MvtTileResult> {
+  async generateTile(
+    z: number,
+    x: number,
+    y: number,
+    viewerUserId?: string | null,
+  ): Promise<MvtTileResult> {
+    try {
+      assertValidMvtTileCoords(z, x, y);
+    } catch {
+      throw new BadRequestException({
+        code: 'INVALID_MVT_TILE',
+        message: 'Invalid map tile coordinates',
+      });
+    }
+
+    const visibility = siteVisibilitySql({
+      siteIdSql: Prisma.raw('"siteId"'),
+      siteStatusSql: Prisma.raw('"status"'),
+      viewerUserId,
+    });
     const minLon = tile2lon(x, z);
     const maxLon = tile2lon(x + 1, z);
     const maxLat = tile2lat(y, z);
@@ -47,6 +67,7 @@ export class MapMvtTilesFallbackService {
         WHERE "latitude" BETWEEN ${minLat} AND ${maxLat}
           AND "longitude" BETWEEN ${minLon} AND ${maxLon}
           AND "isArchivedByAdmin" = false
+          ${visibility}
       `);
 
       const maxUpdated = sites.reduce<Date | null>(
@@ -82,6 +103,7 @@ export class MapMvtTilesFallbackService {
       WHERE "latitude" BETWEEN ${minLat} AND ${maxLat}
         AND "longitude" BETWEEN ${minLon} AND ${maxLon}
         AND "isArchivedByAdmin" = false
+        ${visibility}
       GROUP BY 1
     `);
 
@@ -93,6 +115,7 @@ export class MapMvtTilesFallbackService {
       WHERE "latitude" BETWEEN ${minLat} AND ${maxLat}
         AND "longitude" BETWEEN ${minLon} AND ${maxLon}
         AND "isArchivedByAdmin" = false
+        ${visibility}
     `);
 
     const features = clusters.map((c) => ({

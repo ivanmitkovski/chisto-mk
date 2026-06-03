@@ -3,7 +3,7 @@
 import * as jwt from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
 import { NotificationType } from '../../src/prisma-client';
-import { EmailUnsubscribeTokenService } from '../../src/email/email-unsubscribe-token.service';
+import { EmailUnsubscribeTokenService } from '../../src/email/services/email-unsubscribe-token.service';
 
 describe('EmailUnsubscribeTokenService', () => {
   const secret = 'test-jwt-secret-for-email-unsubscribe-32';

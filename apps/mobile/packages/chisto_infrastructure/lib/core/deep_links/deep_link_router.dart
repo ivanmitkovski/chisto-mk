@@ -38,13 +38,6 @@ final class DeepLinkHomeEvents extends DeepLinkRoute {
   const DeepLinkHomeEvents();
 }
 
-/// Password reset from email: `/reset-password?token=...`
-final class DeepLinkPasswordReset extends DeepLinkRoute {
-  const DeepLinkPasswordReset(this.token);
-
-  final String token;
-}
-
 /// Public share URL: `https://chisto.mk/sites/<id>` opens the site detail screen.
 final class DeepLinkSiteDetail extends DeepLinkRoute {
   const DeepLinkSiteDetail(this.siteId, {this.shareToken, this.cid});
@@ -124,13 +117,6 @@ class DeepLinkRouter {
     final List<String> raw = uri.pathSegments
         .where((String s) => s.isNotEmpty)
         .toList();
-
-    if (raw.length == 1 && raw[0] == 'reset-password') {
-      final String? token = uri.queryParameters['token']?.trim();
-      if (token != null && token.isNotEmpty) {
-        return DeepLinkPasswordReset(token);
-      }
-    }
 
     if (raw.length == 2 && raw[0] == 'sites') {
       final String id = raw[1].trim();
@@ -226,12 +212,6 @@ class DeepLinkRouter {
           return true;
         }
         AppNavigation.pushNewReport();
-        return true;
-      case DeepLinkPasswordReset(:final String token):
-        _markHandled(uri);
-        AppNavigation.goForgotPasswordNewFromEmail(
-          EmailPasswordResetRouteArgs(token: token),
-        );
         return true;
       case DeepLinkHomeMapFocus(:final String siteId):
         _markHandled(uri);

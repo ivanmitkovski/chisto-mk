@@ -33,17 +33,20 @@ import { DiscoveryAnalyticsModule } from './discovery-analytics/discovery-analyt
 import { ModerationModule } from './moderation/moderation.module';
 import { LoggerModule } from 'nestjs-pino';
 import { safePinoReqSerializer } from './common/logging/safe-pino-req.serializer';
+import { pinoLogMixin, resolveLogLevel } from './common/logging/pino-log-context';
 import { StorageModule } from './storage/storage.module';
 import { IdempotencyInterceptor } from './common/idempotency/idempotency.interceptor';
 import { IdempotencyResponseStore } from './common/idempotency/idempotency-response.store';
-import { RequestMetricsInterceptor } from './observability/request-metrics.interceptor';
+import { RequestMetricsInterceptor } from './observability/util/request-metrics.interceptor';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     LoggerModule.forRoot({
       pinoHttp: {
+        level: resolveLogLevel(),
         autoLogging: false,
+        mixin: pinoLogMixin,
         serializers: {
           req: safePinoReqSerializer,
         },

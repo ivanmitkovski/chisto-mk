@@ -1,7 +1,7 @@
 /// <reference types="jest" />
 
-import { EventsCheckInController } from '../../src/events/events-check-in.controller';
-import { EventsCheckInService } from '../../src/events/events-check-in.service';
+import { EventsCheckInController } from '../../src/events/controllers/events-check-in.controller';
+import { EventsCheckInService } from '../../src/events/services/events-check-in.service';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
 import { Role } from '../../src/prisma-client';
 

@@ -77,73 +77,24 @@ class FeedEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.xl,
-        vertical: AppSpacing.xxl,
-      ),
-      child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            AnimatedSwitcher(
-              duration: AppMotion.fast,
-              switchInCurve: AppMotion.emphasized,
-              switchOutCurve: AppMotion.emphasized,
-              child: Container(
-                key: ValueKey<FeedFilter>(activeFilter),
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  color: AppColors.inputFill,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
-                ),
-                child: Icon(_icon(), size: 30, color: AppColors.textMuted),
-              ),
+    final AppLocalizations l10n = context.l10n;
+    return AppEmptyState(
+      icon: _icon(),
+      iconKey: activeFilter,
+      animateIconChanges: true,
+      title: _title(context),
+      subtitle: _hint(context),
+      action: activeFilter != FeedFilter.all
+          ? AppButton.secondary(
+              label: l10n.feedShowAllSites,
+              onPressed: onShowAllSites,
+              expand: false,
+            )
+          : AppButton.outlined(
+              label: l10n.feedPullToRefreshSemantic,
+              onPressed: onRefresh,
+              expand: false,
             ),
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              _title(context),
-              textAlign: TextAlign.center,
-              style: AppTypography.emptyStateTitle(textTheme),
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            Text(
-              _hint(context),
-              textAlign: TextAlign.center,
-              style: AppTypography.emptyStateSubtitle(
-                textTheme,
-              ).copyWith(height: 1.4),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            if (activeFilter != FeedFilter.all)
-              FilledButton.tonal(
-                onPressed: onShowAllSites,
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.primaryDark.withValues(
-                    alpha: 0.12,
-                  ),
-                  foregroundColor: AppColors.primaryDark,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.lg,
-                    vertical: AppSpacing.sm,
-                  ),
-                ),
-                child: Text(context.l10n.feedShowAllSites),
-              )
-            else
-              AppButton.outlined(
-                label: context.l10n.feedPullToRefreshSemantic,
-                onPressed: onRefresh,
-                expand: false,
-              ),
-          ],
-        ),
-      ),
     );
   }
 }

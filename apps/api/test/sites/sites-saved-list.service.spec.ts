@@ -1,4 +1,4 @@
-import { SitesSavedListService } from '../../src/sites/sites-saved-list.service';
+import { SitesSavedListService } from '../../src/sites/services/sites-saved-list.service';
 
 describe('SitesSavedListService', () => {
   function buildService() {

@@ -2,10 +2,13 @@
 
 import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { createHash } from 'crypto';
-import { PasswordResetService } from '../../src/auth/password-reset.service';
-import { loadAuthEnvRuntime } from '../../src/auth/auth-env.config';
-import { OtpService } from '../../src/otp/otp.service';
+import { PasswordResetService } from '../../src/auth/services/password-reset.service';
+import { PasswordResetCompletionService } from '../../src/auth/services/password-reset-completion.service';
+import { PasswordResetSmsFlowService } from '../../src/auth/services/password-reset-sms-flow.service';
+import { PasswordResetEmailFlowService } from '../../src/auth/services/password-reset-email-flow.service';
+import { loadAuthEnvRuntime } from '../../src/auth/constants/auth-env.config';
+import { OtpService } from '../../src/otp/services/otp.service';
+import { EmailOtpService } from '../../src/otp/services/email-otp.service';
 
 describe('PasswordResetService', () => {
   const envWithDevCode = {
@@ -17,8 +20,10 @@ describe('PasswordResetService', () => {
   function makeService(overrides?: {
     prisma?: Record<string, unknown>;
     otp?: Partial<OtpService>;
+    emailOtp?: Partial<EmailOtpService>;
     email?: { sendAuthTemplate: jest.Mock };
     eligibility?: { isGloballyEnabled: jest.Mock };
+    audit?: { log: jest.Mock };
   }) {
     const prisma = {
       user: {
@@ -27,23 +32,36 @@ describe('PasswordResetService', () => {
       },
       userDeviceToken: { findMany: jest.fn().mockResolvedValue([]) },
       phoneOtp: { findUnique: jest.fn().mockResolvedValue(null), upsert: jest.fn().mockResolvedValue({}) },
-      passwordResetEmailToken: {
-        deleteMany: jest.fn().mockResolvedValue({ count: 0 }),
-        create: jest.fn().mockResolvedValue({}),
-        findFirst: jest.fn(),
-        update: jest.fn(),
+      passwordResetEmailCode: {
+        findUnique: jest.fn().mockResolvedValue(null),
+        upsert: jest.fn().mockResolvedValue({}),
       },
       userSession: { updateMany: jest.fn().mockResolvedValue({ count: 0 }) },
       loginFailure: { deleteMany: jest.fn().mockResolvedValue({ count: 0 }) },
-      $transaction: jest.fn((ops: unknown[]) => Promise.all(ops as Promise<unknown>[])),
+      $transaction: jest.fn(async (fn: (tx: unknown) => Promise<unknown>) => {
+        const tx = {
+          user: { update: jest.fn() },
+          userSession: { updateMany: jest.fn().mockResolvedValue({ count: 0 }) },
+          loginFailure: { deleteMany: jest.fn().mockResolvedValue({ count: 0 }) },
+          phoneOtp: { delete: jest.fn() },
+          passwordResetEmailCode: { delete: jest.fn() },
+        };
+        return fn(tx);
+      }),
       ...overrides?.prisma,
     };
 
     const otpService = {
       assertOtpMatches: jest.fn().mockResolvedValue(undefined),
-      verifyAndConsumeOtp: jest.fn().mockResolvedValue(undefined),
+      verifyAndConsume: jest.fn().mockResolvedValue(undefined),
       ...overrides?.otp,
     } as unknown as OtpService;
+
+    const emailOtpService = {
+      assertMatches: jest.fn().mockResolvedValue(undefined),
+      verifyAndConsume: jest.fn().mockResolvedValue(undefined),
+      ...overrides?.emailOtp,
+    } as unknown as EmailOtpService;
 
     const email = overrides?.email ?? {
       sendAuthTemplate: jest.fn().mockResolvedValue(undefined),
@@ -53,26 +71,38 @@ describe('PasswordResetService', () => {
       isGloballyEnabled: jest.fn().mockResolvedValue(true),
     };
 
-    const config = {
-      get: jest.fn((key: string) => {
-        if (key === 'PASSWORD_RESET_URL') return 'https://chisto.mk';
-        return undefined;
-      }),
-    } as unknown as ConfigService;
+    const audit = overrides?.audit ?? { log: jest.fn().mockResolvedValue(undefined) };
 
     const identifierThrottle = { assertAllowed: jest.fn().mockResolvedValue(undefined) };
-    const svc = new PasswordResetService(
+    const completion = new PasswordResetCompletionService(
+      prisma as never,
+      email as never,
+      audit as never,
+      envWithDevCode,
+    );
+    const smsFlow = new PasswordResetSmsFlowService(
       prisma as never,
       otpService,
       { sendOtp: jest.fn().mockResolvedValue(undefined) } as never,
-      email as never,
-      eligibility as never,
-      config,
       envWithDevCode,
+      completion,
+    );
+    const emailFlow = new PasswordResetEmailFlowService(
+      prisma as never,
+      emailOtpService,
+      email as never,
+      envWithDevCode,
+      completion,
+    );
+    const svc = new PasswordResetService(
+      prisma as never,
+      eligibility as never,
       identifierThrottle as never,
+      smsFlow,
+      emailFlow,
     );
 
-    return { svc, prisma, otpService, email };
+    return { svc, prisma, otpService, emailOtpService, email, audit };
   }
 
   it('request rejects both phone and email', async () => {
@@ -82,20 +112,21 @@ describe('PasswordResetService', () => {
     ).rejects.toBeInstanceOf(BadRequestException);
   });
 
-  it('request returns generic message for unknown phone', async () => {
+  it('request returns generic message for unknown phone without channel or devCode', async () => {
     const { svc, prisma } = makeService();
     (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
     const result = await svc.request({ phoneNumber: '+15559999999' });
     expect(result.message).toContain('If an account exists');
     expect(result.devCode).toBeUndefined();
+    expect(result).not.toHaveProperty('channel');
   });
 
   it('request returns devCode for known phone when env allows', async () => {
     const { svc, prisma } = makeService();
     (prisma.user.findUnique as jest.Mock).mockResolvedValue({ id: 'u1' });
     const result = await svc.request({ phoneNumber: '+15551234567' });
-    expect(result.channel).toBe('sms');
     expect(result.devCode).toMatch(/^\d{6}$/);
+    expect(result).not.toHaveProperty('channel');
   });
 
   it('verifyPasswordResetCode delegates to OtpService', async () => {
@@ -104,46 +135,56 @@ describe('PasswordResetService', () => {
     expect(otpService.assertOtpMatches).toHaveBeenCalledWith('+15551234567', '123456');
   });
 
-  it('confirmSmsReset applies password and clears login failures', async () => {
-    const { svc, prisma } = makeService();
-    (prisma.user.findUnique as jest.Mock).mockResolvedValue({
-      id: 'u1',
-    });
+  it('verifyPasswordResetCodeByEmail delegates to EmailOtpService', async () => {
+    const { svc, prisma, emailOtpService } = makeService();
+    (prisma.user.findUnique as jest.Mock).mockResolvedValue({ id: 'u1' });
+    await svc.verifyPasswordResetCodeByEmail('user@test.local', '123456');
+    expect(emailOtpService.assertMatches).toHaveBeenCalledWith('u1', '123456');
+  });
+
+  it('confirmSmsReset applies password inside transaction with audit', async () => {
+    const { svc, prisma, otpService, audit } = makeService();
+    (prisma.user.findUnique as jest.Mock).mockResolvedValue({ id: 'u1' });
     const result = await svc.confirmSmsReset({
       phoneNumber: '+15551234567',
       code: '123456',
       newPassword: 'NewPass123!',
     });
     expect(result.message).toContain('successful');
-    expect(prisma.user.update).toHaveBeenCalled();
-    expect(prisma.loginFailure.deleteMany).toHaveBeenCalled();
+    expect(otpService.verifyAndConsume).toHaveBeenCalled();
+    expect(audit.log).toHaveBeenCalledWith(
+      expect.objectContaining({ action: 'PASSWORD_RESET' }),
+    );
   });
 
-  it('confirmEmailReset rejects invalid token', async () => {
+  it('confirmEmailReset rejects unknown email', async () => {
     const { svc, prisma } = makeService();
-    (prisma.passwordResetEmailToken.findFirst as jest.Mock).mockResolvedValue(null);
+    (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
     await expect(
-      svc.confirmEmailReset('bad-token', 'NewPass123!'),
+      svc.confirmEmailReset('nobody@test.local', '123456', 'NewPass123!'),
     ).rejects.toBeInstanceOf(UnauthorizedException);
   });
 
-  it('confirmEmailReset succeeds with valid token', async () => {
-    const token = 'valid-email-reset-token-16ch';
-    const tokenHash = createHash('sha256').update(token).digest('hex');
-    const { svc, prisma } = makeService();
-    (prisma.passwordResetEmailToken.findFirst as jest.Mock).mockResolvedValue({
-      id: 'tok1',
-      userId: 'u1',
-      user: { phoneNumber: '+15551234567' },
+  it('confirmEmailReset succeeds with valid code', async () => {
+    const { svc, prisma, emailOtpService, audit } = makeService();
+    (prisma.user.findUnique as jest.Mock).mockResolvedValue({
+      id: 'u1',
+      phoneNumber: '+15551234567',
     });
 
-    const result = await svc.confirmEmailReset(token, 'NewPass123!');
+    const result = await svc.confirmEmailReset(
+      'user@test.local',
+      '123456',
+      'NewPass123!',
+    );
     expect(result.message).toContain('successful');
-    expect(prisma.passwordResetEmailToken.update).toHaveBeenCalled();
-    expect(tokenHash.length).toBeGreaterThan(0);
+    expect(emailOtpService.verifyAndConsume).toHaveBeenCalled();
+    expect(audit.log).toHaveBeenCalledWith(
+      expect.objectContaining({ action: 'PASSWORD_RESET' }),
+    );
   });
 
-  it('request email sends template when user exists', async () => {
+  it('request email sends code template when user exists', async () => {
     const { svc, prisma, email } = makeService();
     (prisma.user.findUnique as jest.Mock).mockResolvedValue({
       id: 'u1',
@@ -151,14 +192,22 @@ describe('PasswordResetService', () => {
       firstName: 'Test',
     });
     const result = await svc.request({ email: 'user@test.local' });
-    expect(result.channel).toBe('email');
+    expect(result).not.toHaveProperty('channel');
     expect(email.sendAuthTemplate).toHaveBeenCalledWith(
       expect.objectContaining({
         templateId: 'password_reset',
         context: expect.objectContaining({
-          resetUrl: expect.stringContaining('reset-password?token='),
+          code: expect.stringMatching(/^\d{6}$/),
         }),
       }),
     );
+  });
+
+  it('request email returns generic response for unknown email', async () => {
+    const { svc, prisma, email } = makeService();
+    (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
+    const result = await svc.request({ email: 'nobody@test.local' });
+    expect(result.message).toContain('If an account exists');
+    expect(email.sendAuthTemplate).not.toHaveBeenCalled();
   });
 });

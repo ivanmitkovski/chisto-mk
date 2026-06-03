@@ -23,6 +23,7 @@ import 'package:feature_reports/src/presentation/l10n/report_status_l10n.dart';
 import 'package:feature_reports/src/presentation/widgets/draft/draft_choice_sheet.dart';
 import 'package:feature_reports/src/presentation/widgets/reports_list/reports_list_actions.dart';
 import 'package:feature_reports/src/presentation/widgets/reports_list/reports_list_realtime_coalescer.dart';
+import 'package:feature_reports/src/presentation/widgets/reports_list/reports_list_empty_state.dart';
 import 'package:feature_reports/src/presentation/widgets/reports_list/reports_list_screen_slivers.dart';
 import 'package:feature_reports/src/presentation/widgets/reports_list/reports_list_widgets.dart';
 import 'package:flutter/material.dart';
@@ -412,7 +413,6 @@ class _ReportsListScreenState extends ConsumerState<ReportsListScreen>
   }
 
   Widget _buildFilterEmptyState(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
     final AppLocalizations l10n = context.l10n;
     final bool hasSearch = _searchQuery.isNotEmpty;
     final bool hasFilter = _statusFilter != null;
@@ -428,52 +428,19 @@ class _ReportsListScreenState extends ConsumerState<ReportsListScreen>
         ? l10n.reportListNoMatchesHintSearchOnly
         : l10n.reportListNoMatchesHintFilterOnly;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Icon(icon, size: 48, color: AppColors.textMuted),
-          const SizedBox(height: AppSpacing.md),
-          Text(message, style: AppTypography.emptyStateTitle(textTheme)),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            hint,
-            textAlign: TextAlign.center,
-            style: AppTypography.emptyStateSubtitle(
-              textTheme,
-            ).copyWith(height: 1.4),
-          ),
-          if (hasSearch) ...[
-            const SizedBox(height: AppSpacing.lg),
-            Material(
-              color: AppColors.transparent,
-              child: InkWell(
-                onTap: () {
-                  _searchDebounce?.cancel();
-                  _searchController.clear();
-                  _searchFocusNode.unfocus();
-                  setState(() => _searchQuery = '');
-                },
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                    vertical: AppSpacing.xs,
-                  ),
-                  child: Text(
-                    l10n.reportListClearSearch,
-                    style: AppTypographySurfaces.reportsListFilterActive(
-                      Theme.of(context).textTheme,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ],
-      ),
+    return ReportsListFilterEmptyState(
+      message: message,
+      hint: hint,
+      icon: icon,
+      clearSearchLabel: hasSearch ? l10n.reportListClearSearch : null,
+      onClearSearch: hasSearch
+          ? () {
+              _searchDebounce?.cancel();
+              _searchController.clear();
+              _searchFocusNode.unfocus();
+              setState(() => _searchQuery = '');
+            }
+          : null,
     );
   }
 
@@ -513,68 +480,24 @@ class _ReportsListScreenState extends ConsumerState<ReportsListScreen>
       context,
       entryLabel: newReportEntryLabel,
     );
-    if (result != null && mounted) {
-      await _loadReports();
+    if (!mounted || result == null) {
+      return;
     }
+    ReportEntryFlow.handleNewReportWizardPopResult(
+      result,
+      onViewSubmittedReport: (String reportId) async {
+        await _loadReports();
+        if (mounted) {
+          await _openReportDetailById(reportId);
+        }
+      },
+      onViewReportsList: () async {
+        await _loadReports();
+      },
+    );
   }
 
   Widget _buildEmptyState(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              color: AppColors.inputFill,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
-            ),
-            child: const Icon(
-              Icons.description_outlined,
-              size: 30,
-              color: AppColors.textMuted,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Text(
-            context.l10n.reportListEmptyTitle,
-            style: AppTypography.emptyStateTitle(textTheme),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            context.l10n.reportListEmptySubtitle,
-            textAlign: TextAlign.center,
-            style: AppTypography.emptyStateSubtitle(
-              textTheme,
-            ).copyWith(height: 1.4),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          Semantics(
-            button: true,
-            label: context.l10n.reportListFabLabel,
-            child: SizedBox(
-              width: double.infinity,
-              child: FilledButton.icon(
-                onPressed: _startNewReport,
-                icon: const Icon(Icons.add_rounded, size: 20),
-                label: Text(context.l10n.reportListFabLabel),
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: AppColors.white,
-                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radius18),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+    return ReportsListEmptyState(onReportPollution: _startNewReport);
   }
 }

@@ -2,15 +2,11 @@ import 'dart:async';
 
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
-import 'package:chisto_infrastructure/core/theme/app_colors.dart';
-import 'package:chisto_infrastructure/core/theme/app_shadows.dart';
-import 'package:chisto_infrastructure/core/theme/app_spacing.dart';
-import 'package:chisto_infrastructure/core/theme/app_typography.dart';
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
-import 'package:chisto_infrastructure/shared/widgets/atoms/app_loading_indicator.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
 import 'package:chisto_infrastructure/shared/widgets/molecules/app_error_view.dart';
 import 'package:chisto_infrastructure/shared/widgets/organisms/app_confirm_dialog.dart';
+import 'package:design_system/design_system.dart';
 import 'package:feature_profile/src/presentation/widgets/blocked_user_list_tile.dart';
 import 'package:feature_profile/src/presentation/widgets/profile_sub_screen_header.dart';
 import 'package:feature_safety/feature_safety.dart';
@@ -128,7 +124,8 @@ class _ProfileBlockedUsersScreenState
       return AppErrorView(error: _error!, onRetry: _load);
     }
     if (_blocks.isEmpty) {
-      return _BlockedUsersEmptyState(
+      return AppEmptyState(
+        icon: Icons.block_flipped,
         title: l10n.profileBlockedUsersEmpty,
         subtitle: l10n.profileBlockedUsersEmptySubtitle,
       );
@@ -158,56 +155,6 @@ class _ProfileBlockedUsersScreenState
                 : null,
           );
         },
-      ),
-    );
-  }
-}
-
-class _BlockedUsersEmptyState extends StatelessWidget {
-  const _BlockedUsersEmptyState({required this.title, required this.subtitle});
-
-  final String title;
-  final String subtitle;
-
-  @override
-  Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                color: AppColors.inputFill,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
-                boxShadow: AppShadows.panel(Theme.of(context).colorScheme),
-              ),
-              child: const Icon(
-                Icons.block_flipped,
-                size: 30,
-                color: AppColors.textMuted,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: AppTypography.emptyStateTitle(
-                textTheme,
-              ).copyWith(fontWeight: FontWeight.w700, letterSpacing: -0.25),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              subtitle,
-              textAlign: TextAlign.center,
-              style: AppTypography.emptyStateSubtitle(textTheme),
-            ),
-          ],
-        ),
       ),
     );
   }

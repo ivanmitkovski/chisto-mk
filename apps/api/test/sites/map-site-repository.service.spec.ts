@@ -90,7 +90,8 @@ describe('MapSiteRepositoryService', () => {
     expect(prisma.$queryRaw).toHaveBeenCalled();
     const text = sqlTextFromQueryRawCall(prisma.$queryRaw.mock.calls[0] as unknown[]);
     expect(text).toContain('"isHot" = true');
-    expect(text).toContain('APPROVED');
+    expect(text).toContain(`<> 'REPORTED'`);
+    expect(text).not.toContain('APPROVED');
   });
 
   it('includes reporter visibility when viewerUserId is set', async () => {

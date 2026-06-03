@@ -412,12 +412,32 @@ class FeedSitesNotifier extends AutoDisposeNotifier<FeedSitesState> {
   }) async {
     final sitesRepo = ref.read(sitesRepositoryProvider);
     if (filter == FeedFilter.saved) {
-      return sitesRepo.getSavedSites(
+      final SitesListResult saved = await sitesRepo.getSavedSites(
         page: page,
         limit: 24,
         latitude: state.userLatitude,
         longitude: state.userLongitude,
       );
+      if (saved.sites.isEmpty) {
+        final List<PollutionSite> bookmarked = state.allSites
+            .where((PollutionSite s) => s.isSavedByMe)
+            .toList(growable: false);
+        if (bookmarked.isNotEmpty) {
+          return SitesListResult(
+            sites: bookmarked,
+            total: bookmarked.length,
+            page: page,
+            limit: 24,
+            nextCursor: null,
+            servedFromCache: saved.servedFromCache,
+            isStaleFallback: saved.isStaleFallback,
+            cachedAt: saved.cachedAt,
+            lastSuccessfulRefreshAt: saved.lastSuccessfulRefreshAt,
+            feedVariant: saved.feedVariant,
+          );
+        }
+      }
+      return saved;
     }
     final ({String sort, String mode, double radiusKm, String scope}) api =
         feedApiParamsForFilter(filter);

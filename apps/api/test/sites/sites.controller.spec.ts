@@ -1,14 +1,14 @@
 /// <reference types="jest" />
 
-import { SitesController } from '../../src/sites/sites.controller';
-import { SitesDetailController } from '../../src/sites/sites-detail.controller';
-import { SitesMapController } from '../../src/sites/sites-map.controller';
-import { SitesMapFacadeService } from '../../src/sites/sites-map-facade.service';
-import { SitesAdminService } from '../../src/sites/sites-admin.service';
-import { SitesFeedService } from '../../src/sites/sites-feed.service';
-import { SitesSavedListService } from '../../src/sites/sites-saved-list.service';
-import { SiteEngagementService } from '../../src/sites/site-engagement.service';
-import { SiteEventsService } from '../../src/admin-realtime/site-events.service';
+import { SitesController } from '../../src/sites/controllers/sites.controller';
+import { SitesDetailController } from '../../src/sites/controllers/sites-detail.controller';
+import { SitesMapController } from '../../src/sites/controllers/sites-map.controller';
+import { SitesMapFacadeService } from '../../src/sites/services/sites-map-facade.service';
+import { SitesAdminService } from '../../src/sites/services/sites-admin.service';
+import { SitesFeedService } from '../../src/sites/services/sites-feed.service';
+import { SitesSavedListService } from '../../src/sites/services/sites-saved-list.service';
+import { SiteEngagementService } from '../../src/sites/services/site-engagement.service';
+import { SiteEventsService } from '../../src/admin-realtime/services/site-events.service';
 import { weakEtagForJson } from '../../src/sites/http/map-etag';
 
 describe('SitesController', () => {
@@ -82,7 +82,11 @@ describe('SitesController', () => {
       findHeatmapForMap: jest.fn(),
       getMapMvtTile: jest.fn(),
     } as unknown as SitesMapFacadeService;
-    return { mapController: new SitesMapController(mapFacade), mapFacade };
+    const offlineRegions = {
+      getManifest: jest.fn(),
+      getRegionDownloadUrl: jest.fn(),
+    } as never;
+    return { mapController: new SitesMapController(mapFacade, offlineRegions), mapFacade };
   }
 
   it('delegates findAll to SitesFeedService', async () => {

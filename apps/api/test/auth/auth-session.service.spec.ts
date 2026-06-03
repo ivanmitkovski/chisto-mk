@@ -3,8 +3,9 @@
 import { UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { AuthSessionService } from '../../src/auth/auth-session.service';
-import { loadAuthEnvRuntime } from '../../src/auth/auth-env.config';
+import { AuthSessionService } from '../../src/auth/services/auth-session.service';
+import { RefreshTokenRotationService } from '../../src/auth/services/refresh-token-rotation.service';
+import { loadAuthEnvRuntime } from '../../src/auth/constants/auth-env.config';
 
 describe('AuthSessionService', () => {
   it('refresh rejects token without dot separator', async () => {
@@ -18,16 +19,22 @@ describe('AuthSessionService', () => {
     const configService = {
       get: jest.fn((key: string) => (key === 'TERMS_VERSION' ? '1' : undefined)),
     } as unknown as ConfigService;
-    const session = new AuthSessionService(
+    const rotation = new RefreshTokenRotationService(
       prisma,
-      jwt,
-      uploads as never,
       audit as never,
       emitter as never,
       sessionRevocation,
       env,
-      configService,
       { get: jest.fn(), set: jest.fn() } as never,
+    );
+    const session = new AuthSessionService(
+      prisma,
+      jwt,
+      uploads as never,
+      sessionRevocation,
+      env,
+      configService,
+      rotation,
     );
     await expect(session.refresh('nodotseparator')).rejects.toBeInstanceOf(UnauthorizedException);
   });

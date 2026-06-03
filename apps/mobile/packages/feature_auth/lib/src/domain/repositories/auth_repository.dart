@@ -49,6 +49,9 @@ abstract class AuthRepository {
   /// Validates the SMS code for password reset without consuming the OTP.
   Future<void> verifyPasswordResetCode(String phoneNumberE164, String code);
 
+  /// Validates the email code for password reset without consuming the OTP.
+  Future<void> verifyPasswordResetCodeByEmail(String email, String code);
+
   Future<void> confirmPasswordReset({
     required String phoneNumberE164,
     required String code,
@@ -56,7 +59,8 @@ abstract class AuthRepository {
   });
 
   Future<void> confirmPasswordResetByEmail({
-    required String token,
+    required String email,
+    required String code,
     required String newPassword,
   });
 

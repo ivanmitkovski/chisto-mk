@@ -1,62 +1,64 @@
+import 'package:flutter/material.dart';
+
 enum EcoEventCategory {
   generalCleanup(
     'General cleanup',
     'Pick up litter, sweep debris, and restore the area.',
-    0xf643,
+    IconData(0xf643, fontFamily: 'MaterialIcons'),
   ),
   riverAndLake(
     'River & lake cleanup',
     'Remove waste from waterways, shores, and drainage channels.',
-    0xf02a6,
+    IconData(0xf02a6, fontFamily: 'MaterialIcons'),
   ),
   treeAndGreen(
     'Tree planting & greening',
     'Plant trees, restore green spaces, and build garden beds.',
-    0xf004e,
+    IconData(0xf004e, fontFamily: 'MaterialIcons'),
   ),
   recyclingDrive(
     'Recycling drive',
     'Sort, collect, and transport recyclables to processing centers.',
-    0xf0370,
+    IconData(0xf0370, fontFamily: 'MaterialIcons'),
   ),
   hazardousRemoval(
     'Hazardous waste removal',
     'Safely collect chemicals, tires, batteries, or asbestos.',
-    0xf02a0,
+    IconData(0xf02a0, fontFamily: 'MaterialIcons'),
   ),
   awarenessAndEducation(
     'Awareness & education',
     'Workshops, talks, or community engagement on eco practices.',
-    0xf012e,
+    IconData(0xf012e, fontFamily: 'MaterialIcons'),
   ),
   other(
     'Other',
     "Custom event that doesn't match the categories above.",
-    0xf8d9,
+    IconData(0xf8d9, fontFamily: 'MaterialIcons'),
   );
 
-  const EcoEventCategory(this.label, this.description, this.iconCodePoint);
+  const EcoEventCategory(this.label, this.description, this.icon);
   final String label;
   final String description;
-  final int iconCodePoint;
+  final IconData icon;
 
   /// The camelCase key sent to/received from the API `category` query param.
   String get key => name;
 }
 
 enum EventGear {
-  trashBags('Trash bags', 0xf37d),
-  gloves('Gloves', 0xf05c0),
-  rakes('Rakes & shovels', 0xf7be),
-  wheelbarrow('Wheelbarrow', 0xf06f2),
-  waterBoots('Water boots', 0xefde),
-  safetyVest('Safety vest', 0xf379),
-  firstAid('First aid kit', 0xf1be),
-  sunscreen('Sunscreen & water', 0xf4bc);
+  trashBags('Trash bags', IconData(0xf37d, fontFamily: 'MaterialIcons')),
+  gloves('Gloves', IconData(0xf05c0, fontFamily: 'MaterialIcons')),
+  rakes('Rakes & shovels', IconData(0xf7be, fontFamily: 'MaterialIcons')),
+  wheelbarrow('Wheelbarrow', IconData(0xf06f2, fontFamily: 'MaterialIcons')),
+  waterBoots('Water boots', IconData(0xefde, fontFamily: 'MaterialIcons')),
+  safetyVest('Safety vest', IconData(0xf379, fontFamily: 'MaterialIcons')),
+  firstAid('First aid kit', IconData(0xf1be, fontFamily: 'MaterialIcons')),
+  sunscreen('Sunscreen & water', IconData(0xf4bc, fontFamily: 'MaterialIcons'));
 
-  const EventGear(this.label, this.iconCodePoint);
+  const EventGear(this.label, this.icon);
   final String label;
-  final int iconCodePoint;
+  final IconData icon;
 }
 
 enum CleanupScale {

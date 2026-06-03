@@ -27,8 +27,7 @@ class RegisterResult with _$RegisterResult {
 class PasswordResetRequestResult with _$PasswordResetRequestResult {
   const factory PasswordResetRequestResult({
     required String message,
-    String? channel,
-    int? expiresInSeconds,
+    String? devCode,
   }) = _PasswordResetRequestResult;
 }
 

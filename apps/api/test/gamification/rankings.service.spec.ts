@@ -1,7 +1,7 @@
 /// <reference types="jest" />
 
 import { Role } from '../../src/prisma-client';
-import { RankingsService } from '../../src/gamification/rankings.service';
+import { RankingsService } from '../../src/gamification/services/rankings.service';
 import type { PrismaService } from '../../src/prisma/prisma.service';
 
 describe('RankingsService', () => {

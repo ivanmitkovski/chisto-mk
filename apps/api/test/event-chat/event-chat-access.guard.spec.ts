@@ -3,8 +3,8 @@
 import { ExecutionContext, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../src/prisma/prisma.service';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
-import { EventChatAccessGuard } from '../../src/event-chat/event-chat-access.guard';
-import { EventChatAccessService } from '../../src/event-chat/event-chat-access.service';
+import { EventChatAccessGuard } from '../../src/event-chat/guards/event-chat-access.guard';
+import { EventChatAccessService } from '../../src/event-chat/services/event-chat-access.service';
 
 function ctx(user: AuthenticatedUser | undefined, eventId: string): ExecutionContext {
   return {

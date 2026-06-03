@@ -6,6 +6,10 @@
 	<string>Add cleanup events to your calendar so you don't miss them.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>We use your location while you use the app to show nearby cleanups and reports, and to improve report accuracy.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>We use your location while you use the app to show nearby cleanups and reports, and to improve report accuracy. We do not track your location when the app is closed.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>We use your location while you use the app to show nearby cleanups and reports, and to improve report accuracy. We do not track your location when the app is closed.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>We use the camera for profile photos, pollution reports, event check-in, and event evidence.</string>
 	<key>NSMicrophoneUsageDescription</key>

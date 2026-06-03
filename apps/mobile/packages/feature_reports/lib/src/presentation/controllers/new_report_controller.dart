@@ -10,6 +10,7 @@ import 'package:feature_reports/src/application/report_wizard_submit_port.dart';
 import 'package:feature_reports/src/application/reports_providers.dart';
 import 'package:feature_reports/src/data/outbox/report_draft_repository.dart';
 import 'package:feature_reports/src/data/report_flow_preferences.dart';
+import 'package:feature_reports/src/data/outbox/report_outbox_entry.dart';
 import 'package:feature_reports/src/domain/draft/new_report_flow_policy.dart';
 import 'package:feature_reports/src/domain/models/report_capacity.dart';
 import 'package:feature_reports/src/domain/models/report_draft.dart';
@@ -18,6 +19,7 @@ import 'package:feature_reports/src/domain/models/report_wizard_restore_snapshot
 import 'package:feature_reports/src/domain/report_field_limits.dart';
 import 'package:feature_reports/src/domain/report_input_sanitizer.dart';
 import 'package:feature_reports/src/domain/repositories/reports_api_repository.dart';
+import 'package:feature_reports/src/presentation/controllers/new_report_submit_error_display.dart';
 import 'package:feature_reports/src/presentation/controllers/new_report_wizard_state.dart';
 import 'package:feature_reports/src/presentation/controllers/wizard_autosave_debouncer.dart';
 import 'package:feature_reports/src/presentation/widgets/location_picker.dart';
@@ -119,6 +121,7 @@ class NewReportController extends _$NewReportController {
   bool get hasValidLocation =>
       NewReportFlowPolicy.hasValidLocation(state.draft);
   bool get canSubmit => NewReportFlowPolicy.canSubmit(state.draft);
+  bool get wizardSubmitLocked => state.wizardSubmitLocked;
   int get currentStageIndex =>
       NewReportFlowPolicy.currentStageIndex(state.currentStage);
 
@@ -381,6 +384,38 @@ class NewReportController extends _$NewReportController {
     state = state.copyWith(submitting: false, clearSubmitPhase: true);
   }
 
+  void markSubmitSucceeded(ReportSubmitResult result) {
+    state = state.copyWith(
+      submittedReportId: result.reportId,
+      lastSubmitResult: result,
+    );
+  }
+
+  /// When [submitReportAndAwait] times out but the outbox row already succeeded.
+  Future<ReportSubmitResult?> recoverResultIfWizardSucceeded() async {
+    if (state.lastSubmitResult != null) {
+      return state.lastSubmitResult;
+    }
+    final ReportOutboxEntry? row = await _draftRepo.getWizardDraftEntry();
+    if (row == null || row.state != ReportOutboxState.succeeded) {
+      return null;
+    }
+    final String? reportId = row.reportId;
+    if (reportId == null || reportId.isEmpty) {
+      return null;
+    }
+    final ReportSubmitResult recovered = ReportSubmitResult(
+      reportId: reportId,
+      siteId: '',
+      isNewSite: false,
+      pointsAwarded: 0,
+    );
+    if (_alive) {
+      markSubmitSucceeded(recovered);
+    }
+    return recovered;
+  }
+
   void resetDraftAndStartOver() {
     state = NewReportWizardState();
   }
@@ -389,7 +424,11 @@ class NewReportController extends _$NewReportController {
     required String titleText,
     required String descriptionText,
   }) {
-    if (state.suppressLocalDraftPersist || state.submitting) return;
+    if (state.suppressLocalDraftPersist ||
+        state.submitting ||
+        state.wizardSubmitLocked) {
+      return;
+    }
     if (!_shouldPersistWizardDraft(titleText, descriptionText)) {
       return;
     }
@@ -433,7 +472,11 @@ class NewReportController extends _$NewReportController {
     required String titleText,
     required String descriptionText,
   }) async {
-    if (state.suppressLocalDraftPersist || state.submitting) return;
+    if (state.suppressLocalDraftPersist ||
+        state.submitting ||
+        state.wizardSubmitLocked) {
+      return;
+    }
     if (!_shouldPersistWizardDraft(titleText, descriptionText)) {
       return;
     }
@@ -474,6 +517,7 @@ class NewReportController extends _$NewReportController {
   }) {
     return !state.suppressLocalDraftPersist &&
         !state.submitting &&
+        !state.wizardSubmitLocked &&
         _shouldPersistWizardDraft(titleText, descriptionText);
   }
 
@@ -493,7 +537,9 @@ class NewReportController extends _$NewReportController {
 
   /// Synchronous guard against double-tap before any async flush/submit work.
   bool tryBeginSubmit() {
-    if (state.submitting || _submitFlight.isRunning) {
+    if (state.wizardSubmitLocked ||
+        state.submitting ||
+        _submitFlight.isRunning) {
       return false;
     }
     beginSubmittingPhase();
@@ -504,7 +550,41 @@ class NewReportController extends _$NewReportController {
     state = state.copyWith(submitPhase: 'sent');
   }
 
-  Future<ReportSubmitResult> submitReport() {
+  /// Drops draft photos whose managed files are missing (e.g. after a failed
+  /// in-place compress). Submit proceeds text-only; upload phase surfaces skips.
+  Future<void> pruneUnreachableDraftPhotos() async {
+    final List<XFile> photos = state.draft.photos;
+    if (photos.isEmpty) {
+      return;
+    }
+    final List<XFile> kept = <XFile>[];
+    for (final XFile x in photos) {
+      try {
+        final File f = File(x.path);
+        if (f.existsSync() && f.lengthSync() > 0) {
+          kept.add(x);
+        }
+      } on Object catch (err, st) {
+        AppLog.warn(
+          'pruneUnreachableDraftPhotos: skip ${x.path}',
+          error: err,
+          stackTrace: st,
+          category: 'reports_wizard',
+        );
+      }
+    }
+    if (kept.length != photos.length) {
+      _setDraft(state.draft.copyWith(photos: kept));
+      AppLog.warn(
+        'pruneUnreachableDraftPhotos: removed ${photos.length - kept.length} '
+        'missing photo(s)',
+        category: 'reports_wizard',
+      );
+    }
+  }
+
+  Future<ReportSubmitResult> submitReport() async {
+    await pruneUnreachableDraftPhotos();
     return _submitFlight.run(
       () => _reportSubmitPort.submitReportAndAwait(
         draft: state.draft,
@@ -517,16 +597,36 @@ class NewReportController extends _$NewReportController {
   }
 
   void endSubmitWithError(Object e) {
+    final AppError err = switch (e) {
+      AppError() => NewReportSubmitErrorDisplay.humanizeSubmitErrorForBanner(e),
+      TimeoutException() => AppError.timeout(),
+      SocketException() => AppError.network(message: e.message, cause: e),
+      HandshakeException() => AppError.network(message: e.message, cause: e),
+      StateError(message: final String m) when m.contains('in-flight') =>
+        const AppError(
+          code: 'SUBMIT_IN_PROGRESS',
+          message:
+              'Your report is still being submitted. Please wait a moment.',
+          retryable: true,
+        ),
+      StateError(message: final String m) when m.contains('disposed') =>
+        const AppError(
+          code: 'SUBMIT_FAILED_RETRYABLE',
+          message: NewReportSubmitErrorDisplay.genericSubmitFailureMessage,
+          retryable: true,
+        ),
+      _ => AppError(
+        code: 'SUBMIT_FAILED_RETRYABLE',
+        message: e.toString().isNotEmpty
+            ? e.toString()
+            : NewReportSubmitErrorDisplay.genericSubmitFailureMessage,
+        retryable: true,
+      ),
+    };
     state = state.copyWith(
       submitting: false,
       clearSubmitPhase: true,
-      apiError: e is AppError
-          ? e
-          : e is TimeoutException
-          ? AppError.timeout()
-          : e is SocketException
-          ? AppError.network(message: e.message, cause: e)
-          : AppError.unknown(cause: e),
+      apiError: err,
     );
   }
 }

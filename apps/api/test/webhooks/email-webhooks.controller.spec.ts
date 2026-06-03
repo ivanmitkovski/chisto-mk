@@ -1,4 +1,4 @@
-import { EmailWebhooksController } from '../../src/webhooks/email-webhooks.controller';
+import { EmailWebhooksController } from '../../src/webhooks/controllers/email-webhooks.controller';
 
 describe('EmailWebhooksController', () => {
   it('returns ok after handling event', async () => {

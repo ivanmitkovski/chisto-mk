@@ -11,11 +11,11 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
-import { ADMIN_PANEL_ROLES } from '../../auth/admin-roles';
-import { CurrentUser } from '../../auth/current-user.decorator';
-import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
-import { Roles } from '../../auth/roles.decorator';
-import { RolesGuard } from '../../auth/roles.guard';
+import { ADMIN_PANEL_ROLES } from '../../auth/constants/admin-roles';
+import { CurrentUser } from '../../auth/decorators/current-user.decorator';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { Roles } from '../../auth/decorators/roles.decorator';
+import { RolesGuard } from '../../auth/guards/roles.guard';
 import type { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { ParseCuidPipe } from '../../common/pipes/parse-cuid.pipe';
 import { ApiStandardHttpErrorResponses } from '../../common/openapi/standard-http-error-responses.decorator';

@@ -2,16 +2,16 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from '../prisma/prisma.module';
 import { FeatureFlagsModule } from '../feature-flags/feature-flags.module';
-import { EmailFooterLinksService } from './email-footer-links.service';
-import { EmailPostmarkTransportService } from './email-postmark-transport.service';
-import { EmailSendEligibilityService } from './email-send-eligibility.service';
-import { EmailSuppressionService } from './email-suppression.service';
-import { EmailService } from './email.service';
-import { EmailTemplateService } from './email-template.service';
-import { EmailUnsubscribeController } from './email-unsubscribe.controller';
-import { EmailUnsubscribeTokenService } from './email-unsubscribe-token.service';
-import { EmailDeliveryOutboxService } from './email-delivery-outbox.service';
-import { EmailDeliveryWorkerService } from './email-delivery-worker.service';
+import { EmailFooterLinksService } from './services/email-footer-links.service';
+import { EmailPostmarkTransportService } from './services/email-postmark-transport.service';
+import { EmailSendEligibilityService } from './services/email-send-eligibility.service';
+import { EmailSuppressionService } from './services/email-suppression.service';
+import { EmailService } from './services/email.service';
+import { EmailTemplateService } from './services/email-template.service';
+import { EmailUnsubscribeController } from './controllers/email-unsubscribe.controller';
+import { EmailUnsubscribeTokenService } from './services/email-unsubscribe-token.service';
+import { EmailDeliveryOutboxService } from './services/email-delivery-outbox.service';
+import { EmailDeliveryWorkerService } from './services/email-delivery-worker.service';
 
 @Module({
   imports: [PrismaModule, ConfigModule, FeatureFlagsModule],

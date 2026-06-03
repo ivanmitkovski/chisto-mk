@@ -1,6 +1,6 @@
 /// <reference types="jest" />
 import { UserStatus } from '../../src/prisma-client';
-import { AccountErasureService } from '../../src/auth/account-erasure.service';
+import { AccountErasureService } from '../../src/auth/services/account-erasure.service';
 
 describe('AccountErasureService', () => {
   it('anonymizes user and clears device tokens', async () => {
@@ -8,7 +8,10 @@ describe('AccountErasureService', () => {
     const tx = {
       userDeviceToken: { deleteMany: jest.fn().mockResolvedValue({ count: 1 }) },
       userNotification: {
-        findMany: jest.fn().mockResolvedValue([{ id: 'n1' }]),
+        findMany: jest
+          .fn()
+          .mockResolvedValueOnce([{ id: 'n1' }])
+          .mockResolvedValue([]),
         deleteMany: jest.fn().mockResolvedValue({ count: 1 }),
       },
       notificationOutbox: { deleteMany: jest.fn().mockResolvedValue({ count: 0 }) },

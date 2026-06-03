@@ -8,42 +8,14 @@ class CommentsThreadEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        final Widget content = Padding(
+        final Widget content = AppEmptyState(
+          icon: Icons.chat_bubble_outline,
+          title: context.l10n.siteCommentsEmptyBody,
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.lg,
             vertical: AppSpacing.sm,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Icon(
-                Icons.chat_bubble_outline,
-                color: AppColors.textMuted,
-                size: constraints.maxHeight < 120 ? 24 : 32,
-              ),
-              SizedBox(
-                height: constraints.maxHeight < 120
-                    ? AppSpacing.xs
-                    : AppSpacing.sm,
-              ),
-              Text(
-                context.l10n.siteCommentsEmptyBody,
-                textAlign: TextAlign.center,
-                style: constraints.maxHeight < 120
-                    ? AppTypography.cardSubtitle(textTheme).copyWith(
-                        color: AppColors.textMuted,
-                        height: 1.35,
-                        fontSize: 12,
-                      )
-                    : AppTypography.cardSubtitle(
-                        textTheme,
-                      ).copyWith(color: AppColors.textMuted, height: 1.35),
-              ),
-            ],
           ),
         );
 

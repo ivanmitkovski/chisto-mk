@@ -72,6 +72,7 @@ class ApiFeedSitesRepository implements FeedSitesRepository {
   Future<void> clearAllCaches() async {
     _memoryFeedCache.clear();
     _memoryMapCache.clear();
+    _mapEtagCache.clear();
     await _localCache.clearFeedAndMapSnapshots();
   }
 
@@ -202,6 +203,38 @@ class ApiFeedSitesRepository implements FeedSitesRepository {
     final List<PollutionSite> sites = await _applyLocalUpvotePersistence(
       result.sites,
     );
+    return SitesListResult(
+      sites: sites,
+      total: result.total,
+      page: result.page,
+      limit: result.limit,
+      nextCursor: result.nextCursor,
+      servedFromCache: result.servedFromCache,
+      isStaleFallback: result.isStaleFallback,
+      cachedAt: result.cachedAt,
+      lastSuccessfulRefreshAt: result.lastSuccessfulRefreshAt,
+      feedVariant: result.feedVariant,
+    );
+  }
+
+  /// Saved feed rows must carry [PollutionSite.isSavedByMe] for cards and engagement.
+  SitesListResult _withSavedSitesMarked(SitesListResult result) {
+    if (result.sites.isEmpty) {
+      return result;
+    }
+    bool changed = false;
+    final List<PollutionSite> sites = <PollutionSite>[];
+    for (final PollutionSite site in result.sites) {
+      if (site.isSavedByMe) {
+        sites.add(site);
+      } else {
+        changed = true;
+        sites.add(site.copyWith(isSavedByMe: true));
+      }
+    }
+    if (!changed) {
+      return result;
+    }
     return SitesListResult(
       sites: sites,
       total: result.total,
@@ -401,18 +434,20 @@ class ApiFeedSitesRepository implements FeedSitesRepository {
         page: page,
         limit: limit,
       );
-      final SitesListResult result = await _mergeUpvotesIntoSitesList(
-        SitesListResult(
-          sites: parsed.sites,
-          total: parsed.total,
-          page: parsed.page,
-          limit: parsed.limit,
-          nextCursor: parsed.nextCursor,
-          servedFromCache: false,
-          isStaleFallback: false,
-          cachedAt: now,
-          lastSuccessfulRefreshAt: now,
-          feedVariant: 'v1',
+      final SitesListResult result = _withSavedSitesMarked(
+        await _mergeUpvotesIntoSitesList(
+          SitesListResult(
+            sites: parsed.sites,
+            total: parsed.total,
+            page: parsed.page,
+            limit: parsed.limit,
+            nextCursor: parsed.nextCursor,
+            servedFromCache: false,
+            isStaleFallback: false,
+            cachedAt: now,
+            lastSuccessfulRefreshAt: now,
+            feedVariant: 'v1',
+          ),
         ),
       );
       unawaited(
@@ -441,8 +476,8 @@ class ApiFeedSitesRepository implements FeedSitesRepository {
       );
       if (fallback != null) {
         final DateTime fallbackCachedAt = fallback.cachedAt ?? now;
-        final SitesListResult merged = await _mergeUpvotesIntoSitesList(
-          fallback,
+        final SitesListResult merged = _withSavedSitesMarked(
+          await _mergeUpvotesIntoSitesList(fallback),
         );
         return SitesListResult(
           sites: merged.sites,
@@ -627,6 +662,7 @@ class ApiFeedSitesRepository implements FeedSitesRepository {
     final double? qMinLng = _snapMapGeoMinEdge(minLongitude);
     final double? qMaxLng = _snapMapGeoMaxEdge(maxLongitude);
     final String mapKey = [
+      _feedAuthCacheSegment(),
       qLat.toStringAsFixed(4),
       qLng.toStringAsFixed(4),
       radiusKm.toStringAsFixed(1),

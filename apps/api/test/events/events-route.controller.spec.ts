@@ -2,8 +2,8 @@
 
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
 import { Role } from '../../src/prisma-client';
-import { EventsRouteController } from '../../src/events/events-route.controller';
-import { EventRouteSegmentsService } from '../../src/events/event-route-segments.service';
+import { EventsRouteController } from '../../src/events/controllers/events-route.controller';
+import { EventRouteSegmentsService } from '../../src/events/services/event-route-segments.service';
 
 function user(id: string): AuthenticatedUser {
   return {

@@ -4,10 +4,11 @@
  * shape as the original submit, reconstructed from the report + points ledger (no second create).
  * If create path later reads the ledger for points on first response too, update this test.
  */
-import { ReportSubmitIdempotencyService } from '../../src/reports/report-submit-idempotency.service';
-import { ReportSubmitMediaAppendService } from '../../src/reports/report-submit-media-append.service';
-import { ReportSubmitService } from '../../src/reports/report-submit.service';
-import { ReportCapacityService } from '../../src/reports/report-capacity.service';
+import { ReportSubmitIdempotencyService } from '../../src/reports/services/report-submit-idempotency.service';
+import { ReportSubmitMediaAppendService } from '../../src/reports/services/report-submit-media-append.service';
+import { ReportSubmitService } from '../../src/reports/services/report-submit.service';
+import { ReportSubmitPersistenceService } from '../../src/reports/services/report-submit-persistence.service';
+import { ReportCapacityService } from '../../src/reports/services/report-capacity.service';
 import { Role } from '../../src/prisma-client';
 
 describe('ReportSubmitService idempotency replay', () => {
@@ -118,18 +119,23 @@ describe('ReportSubmitService idempotency replay', () => {
       reportsUploadService as never,
       reportsOwnerEventsService as never,
     );
-    const svc = new ReportSubmitService(
+    const siteHistoryWriter = { recordSiteCreated: jest.fn(), emitHistoryAppended: jest.fn() };
+    const persistence = new ReportSubmitPersistenceService(
       prisma as never,
+      reportCapacity as unknown as ReportCapacityService,
+      nearbySiteResolver as never,
+      siteHistoryWriter as never,
+      { recordReportSubmitted: jest.fn() } as never,
+    );
+    const svc = new ReportSubmitService(
       postCreateEvents as never,
       reportsOwnerEventsService as never,
-      reportCapacity as unknown as ReportCapacityService,
       reportsUploadService as never,
-      nearbySiteResolver as never,
       idempotency,
       mediaAppend,
+      persistence,
       { emit: jest.fn() } as never,
-      { recordSiteCreated: jest.fn(), emitHistoryAppended: jest.fn() } as never,
-      { recordReportSubmitted: jest.fn() } as never,
+      siteHistoryWriter as never,
     );
 
     const key = 'idem-key-abc1234567';

@@ -204,52 +204,21 @@ class _OrganizerDashboardScreenState
                 else if (_myEvents.isEmpty)
                   SliverFillRemaining(
                     hasScrollBody: false,
-                    child: Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Container(
-                            width: 72,
-                            height: 72,
-                            decoration: BoxDecoration(
-                              color: AppColors.primary.withValues(alpha: 0.1),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              CupertinoIcons.calendar_badge_plus,
-                              size: 32,
-                              color: AppColors.primaryDark,
-                            ),
-                          ),
-                          const SizedBox(height: AppSpacing.md),
-                          Text(
-                            context.l10n.eventsOrganizerDashboardEmpty,
-                            style: AppTypography.eventsBodyMuted(
-                              Theme.of(context).textTheme,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: AppSpacing.lg),
-                          FilledButton.icon(
-                            onPressed: () => EventsNavigation.openCreate(
-                              context,
-                              auth: ref.read(authStateProvider),
-                            ),
-                            icon: const Icon(CupertinoIcons.add, size: 16),
-                            label: Text(
-                              context.l10n.eventsOrganizerDashboardEmptyAction,
-                            ),
-                            style: FilledButton.styleFrom(
-                              backgroundColor: AppColors.primary,
-                              foregroundColor: AppColors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(
-                                  AppSpacing.radiusPill,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+                    child: AppEmptyState(
+                      icon: CupertinoIcons.calendar_badge_plus,
+                      title: context.l10n.eventsOrganizerDashboardEmpty,
+                      action: AppButton.primary(
+                        label: context
+                            .l10n.eventsOrganizerDashboardEmptyAction,
+                        onPressed: () => EventsNavigation.openCreate(
+                          context,
+                          auth: ref.read(authStateProvider),
+                        ),
+                        leadingIcon: const Icon(
+                          CupertinoIcons.add,
+                          size: 16,
+                          color: AppColors.textPrimary,
+                        ),
                       ),
                     ),
                   )

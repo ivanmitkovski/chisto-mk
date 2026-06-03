@@ -70,4 +70,16 @@ class AppSpacing {
   static const double avatarSm = 36;
   static const double avatarMd = 44;
   static const double avatarLg = 64;
+
+  /// [AppEmptyStateIcon] container width and height.
+  static const double emptyStateIconBox = 64;
+
+  /// Icon glyph size inside [AppEmptyStateIcon].
+  static const double emptyStateIconSize = 30;
+
+  /// Corner radius for [AppEmptyStateIcon] (same as [radiusXl]).
+  static const double emptyStateIconRadius = radiusXl;
+
+  /// Default max content width for feed-style empty states.
+  static const double emptyStateMaxWidth = 400;
 }

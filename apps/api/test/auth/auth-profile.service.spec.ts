@@ -1,9 +1,9 @@
 /// <reference types="jest" />
 
 import { UnauthorizedException } from '@nestjs/common';
-import { AuthProfileService } from '../../src/auth/auth-profile.service';
-import { AuthProfileReadService } from '../../src/auth/auth-profile-read.service';
-import { AuthProfileAvatarService } from '../../src/auth/auth-profile-avatar.service';
+import { AuthProfileService } from '../../src/auth/services/auth-profile.service';
+import { AuthProfileReadService } from '../../src/auth/services/auth-profile-read.service';
+import { AuthProfileAvatarService } from '../../src/auth/services/auth-profile-avatar.service';
 import { buildAuthenticatedUser } from '../factories';
 
 describe('AuthProfileService', () => {

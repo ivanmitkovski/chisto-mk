@@ -1,5 +1,5 @@
 import { BadRequestException, INestApplication, ValidationPipe } from '@nestjs/common';
-import { json, type Request } from 'express';
+import express, { json, type Request } from 'express';
 import { GlobalExceptionFilter } from '../common/filters/global-exception.filter';
 import { RequestLoggingInterceptor } from '../common/interceptors/request-logging.interceptor';
 
@@ -11,6 +11,11 @@ import { RequestLoggingInterceptor } from '../common/interceptors/request-loggin
  * if introducing cookie sessions, add a double-submit token or SameSite+Origin checks on mutating routes.
  */
 export function configureHttpApplication(app: INestApplication): void {
+  const expressApp = app.getHttpAdapter().getInstance() as express.Application;
+  expressApp.set('trust proxy', true);
+  expressApp.use(express.json({ limit: '1mb' }));
+  expressApp.use(express.urlencoded({ extended: true, limit: '1mb' }));
+
   const captureRawBody = json({
     verify: (req: Request & { rawBody?: Buffer }, _res, buf) => {
       req.rawBody = buf;

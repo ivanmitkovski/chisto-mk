@@ -1,5 +1,6 @@
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:design_system/design_system.dart';
+import 'package:feature_home/src/presentation/widgets/notifications/notification_preview_text.dart';
 import 'package:feature_notifications/feature_notifications.dart';
 import 'package:flutter/material.dart';
 
@@ -127,13 +128,13 @@ class NotificationTile extends StatelessWidget {
     final String readState = item.isRead
         ? context.l10n.notificationsSemanticReadState
         : context.l10n.notificationsSemanticUnreadState;
+    final String semanticLabel =
+        '${context.l10n.notificationsTileSemanticLabel(readState, visual.label, item.title)}. ${item.body}';
+    final TextTheme textTheme = Theme.of(context).textTheme;
+
     return Semantics(
       button: true,
-      label: context.l10n.notificationsTileSemanticLabel(
-        readState,
-        visual.label,
-        item.title,
-      ),
+      label: semanticLabel,
       hint: hasTarget ? context.l10n.notificationsTileOpenRelatedHint : null,
       child: Material(
         color: item.isRead
@@ -153,153 +154,64 @@ class NotificationTile extends StatelessWidget {
           onTap: onTap,
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.md),
-            child: IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+            child: NotificationInboxRowLayout(
+              showNavigationChevron: hasTarget,
+              timestamp: notificationRelativeTime(
+                context.l10n,
+                item.createdAt,
+              ),
+              leading: Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: visual.iconBackground,
+                  borderRadius: BorderRadius.circular(AppSpacing.radius10),
+                ),
+                child: Icon(visual.icon, size: 18, color: visual.iconColor),
+              ),
+              content: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Align(
-                    alignment: Alignment.topCenter,
-                    child: Container(
-                      width: 34,
-                      height: 34,
-                      decoration: BoxDecoration(
-                        color: visual.iconBackground,
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radius10,
-                        ),
-                      ),
-                      child: Icon(
-                        visual.icon,
-                        size: 18,
+                  NotificationTileMetaRow(
+                    badge: NotificationTypeBadge(
+                      label: visual.label,
+                      backgroundColor: visual.iconBackground,
+                      labelColor: visual.iconColor,
+                    ),
+                    showUnreadDot: !item.isRead,
+                  ),
+                  const SizedBox(height: 6),
+                  NotificationPreviewText(
+                    text: item.title,
+                    maxLines: notificationTitleMaxLines,
+                    style: AppTypographySurfaces.homeNotificationTileTitle(
+                      textTheme,
+                      unread: !item.isRead,
+                    ),
+                  ),
+                  if (groupCount > 1) ...<Widget>[
+                    const SizedBox(height: 4),
+                    Text(
+                      item.type == UserNotificationType.eventChat
+                          ? context.l10n.notificationsGroupMessageCount(
+                              groupCount,
+                            )
+                          : context.l10n.notificationsGroupSimilarCount(
+                              groupCount - 1,
+                            ),
+                      style: textTheme.bodySmall?.copyWith(
                         color: visual.iconColor,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 11,
                       ),
                     ),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: visual.iconBackground,
-                            borderRadius: AppRadii.circle,
-                          ),
-                          child: Text(
-                            visual.label,
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(
-                                  color: visual.iconColor,
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 11,
-                                  height: 1.1,
-                                ),
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          item.title,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(
-                                color: AppColors.textPrimary,
-                                fontWeight: item.isRead
-                                    ? FontWeight.w500
-                                    : FontWeight.w700,
-                                height: 1.2,
-                              ),
-                        ),
-                        const SizedBox(height: 4),
-                        if (groupCount > 1)
-                          Padding(
-                            padding: const EdgeInsets.only(
-                              bottom: AppSpacing.xxs,
-                            ),
-                            child: Text(
-                              item.type == UserNotificationType.eventChat
-                                  ? context.l10n.notificationsGroupMessageCount(
-                                      groupCount,
-                                    )
-                                  : context.l10n.notificationsGroupSimilarCount(
-                                      groupCount - 1,
-                                    ),
-                              style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(
-                                    color: visual.iconColor,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 11,
-                                  ),
-                            ),
-                          ),
-                        Text(
-                          item.body,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(
-                                color: AppColors.textSecondary,
-                                height: 1.25,
-                              ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    width: hasTarget ? 44 : 52,
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: <Widget>[
-                        Positioned(
-                          top: 0,
-                          right: 0,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-                              if (!item.isRead) ...<Widget>[
-                                Container(
-                                  width: 8,
-                                  height: 8,
-                                  decoration: const BoxDecoration(
-                                    color: AppColors.primaryDark,
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                                const SizedBox(width: 6),
-                              ],
-                              Text(
-                                notificationRelativeTime(
-                                  context.l10n,
-                                  item.createdAt,
-                                ),
-                                textAlign: TextAlign.right,
-                                style: Theme.of(context).textTheme.bodySmall
-                                    ?.copyWith(
-                                      color: AppColors.textMuted,
-                                      fontSize: 12,
-                                      height: 1.15,
-                                      fontFeatures: const <FontFeature>[
-                                        FontFeature.tabularFigures(),
-                                      ],
-                                    ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        if (hasTarget)
-                          const Center(
-                            child: Icon(
-                              Icons.chevron_right_rounded,
-                              size: 20,
-                              color: AppColors.textMuted,
-                            ),
-                          ),
-                      ],
+                  ],
+                  const SizedBox(height: 4),
+                  NotificationPreviewText(
+                    text: item.body,
+                    maxLines: notificationBodyMaxLines(context),
+                    style: AppTypographySurfaces.homeNotificationTileBody(
+                      textTheme,
                     ),
                   ),
                 ],

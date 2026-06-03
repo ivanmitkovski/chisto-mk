@@ -4,14 +4,14 @@ import { BadRequestException, ConflictException, NotFoundException } from '@nest
 import { CleanupEventStatus, EcoEventLifecycleStatus, Role } from '../../src/prisma-client';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
 import type { PatchCleanupEventDto } from '../../src/cleanup-events/dto/patch-cleanup-event.dto';
-import { CleanupEventsAnalyticsService } from '../../src/cleanup-events/cleanup-events-analytics.service';
-import { CleanupEventsListService } from '../../src/cleanup-events/cleanup-events-list.service';
-import { CleanupEventsBulkModerateMutationService } from '../../src/cleanup-events/cleanup-events-mutation-bulk.service';
-import { CleanupEventsCheckInRiskSignalsService } from '../../src/cleanup-events/cleanup-events-check-in-risk-signals.service';
-import { CleanupEventsCreateMutationService } from '../../src/cleanup-events/cleanup-events-mutation-create.service';
-import { CleanupEventsPatchMutationService } from '../../src/cleanup-events/cleanup-events-mutation-patch.service';
-import { CleanupEventsMutationsService } from '../../src/cleanup-events/cleanup-events-mutations.service';
-import { CleanupEventsService } from '../../src/cleanup-events/cleanup-events.service';
+import { CleanupEventsAnalyticsService } from '../../src/cleanup-events/services/cleanup-events-analytics.service';
+import { CleanupEventsListService } from '../../src/cleanup-events/services/cleanup-events-list.service';
+import { CleanupEventsBulkModerateMutationService } from '../../src/cleanup-events/services/cleanup-events-mutation-bulk.service';
+import { CleanupEventsCheckInRiskSignalsService } from '../../src/cleanup-events/services/cleanup-events-check-in-risk-signals.service';
+import { CleanupEventsCreateMutationService } from '../../src/cleanup-events/services/cleanup-events-mutation-create.service';
+import { CleanupEventsPatchMutationService } from '../../src/cleanup-events/services/cleanup-events-mutation-patch.service';
+import { CleanupEventsMutationsService } from '../../src/cleanup-events/services/cleanup-events-mutations.service';
+import { CleanupEventsService } from '../../src/cleanup-events/services/cleanup-events.service';
 
 function actor(id: string): AuthenticatedUser {
   return {

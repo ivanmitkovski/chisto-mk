@@ -1,12 +1,22 @@
-import { SiteCommentsListService } from '../../src/sites/site-comments-list.service';
-import { SiteCommentsMutationsService } from '../../src/sites/site-comments-mutations.service';
-import { SiteCommentsService } from '../../src/sites/site-comments.service';
-import { SitesDetailService } from '../../src/sites/sites-detail.service';
-import { SitesFeedCandidatesService } from '../../src/sites/sites-feed-candidates.service';
-import { SitesFeedEnrichmentService } from '../../src/sites/sites-feed-enrichment.service';
-import { SitesFeedQueryService } from '../../src/sites/sites-feed-query.service';
-import { SitesFeedService } from '../../src/sites/sites-feed.service';
-import { SitesReporterNotificationService } from '../../src/sites/sites-reporter-notification.service';
+import { SiteCommentsListService } from '../../src/sites/services/site-comments-list.service';
+import { SiteCommentsMutationsService } from '../../src/sites/services/site-comments-mutations.service';
+import { SiteCommentsService } from '../../src/sites/services/site-comments.service';
+import { SitesDetailService } from '../../src/sites/services/sites-detail.service';
+import { SitesFeedCandidatesService } from '../../src/sites/services/sites-feed-candidates.service';
+import { SitesFeedEnrichmentService } from '../../src/sites/services/sites-feed-enrichment.service';
+import { SitesFeedQueryService } from '../../src/sites/services/sites-feed-query.service';
+import { SitesFeedService } from '../../src/sites/services/sites-feed.service';
+import { SitesReporterNotificationService } from '../../src/sites/services/sites-reporter-notification.service';
+
+function withVelocityPrisma(base: Record<string, unknown>) {
+  const emptyGroupBy = jest.fn().mockResolvedValue([]);
+  return {
+    ...base,
+    siteVote: { groupBy: emptyGroupBy },
+    siteSave: { groupBy: emptyGroupBy },
+    siteShareEvent: { groupBy: emptyGroupBy },
+  };
+}
 
 function makeSitesService(
   prisma: any,
@@ -214,12 +224,12 @@ describe('Sites public feed and comment engagement', () => {
       _count: { reports: 1 },
     };
     const feedScore = jest.fn((input: any) => input.upvotesCount + input.commentsCount * 2);
-    const prismaMock = {
+    const prismaMock = withVelocityPrisma({
       site: {
         findMany: jest.fn(async () => [siteNear, siteFarHighQuality]),
         count: jest.fn(async () => 2),
       },
-    } as any;
+    }) as any;
     const service = makeSitesService(prismaMock, {
       feedRanking: {
         score: feedScore,
@@ -281,12 +291,12 @@ describe('Sites public feed and comment engagement', () => {
       id: 'site_b',
       reports: [{ ...s1.reports[0], title: 'B' }],
     };
-    const prismaMock = {
+    const prismaMock = withVelocityPrisma({
       site: {
         findMany: jest.fn(async () => [s1, s2]),
         count: jest.fn(async () => 2),
       },
-    } as any;
+    }) as any;
     const service = makeSitesService(prismaMock, {
       feedRanking: {
         score: jest.fn(() => 1),
@@ -332,12 +342,12 @@ describe('Sites public feed and comment engagement', () => {
       createdAt: new Date('2026-03-27T08:00:00.000Z'),
       reports: [{ ...older.reports[0], title: 'New', createdAt: new Date('2026-03-27T08:00:00.000Z') }],
     };
-    const prismaMock = {
+    const prismaMock = withVelocityPrisma({
       site: {
         findMany: jest.fn(async () => [older, newer]),
         count: jest.fn(async () => 2),
       },
-    } as any;
+    }) as any;
     const service = buildService(prismaMock);
     const result = await service.findAll({
       page: 1,

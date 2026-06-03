@@ -7,7 +7,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
-import { EventsCheckInSharedService } from '../../src/events/events-check-in-shared.service';
+import { EventsCheckInSharedService } from '../../src/events/services/events-check-in-shared.service';
 
 function auth(userId: string): AuthenticatedUser {
   return {

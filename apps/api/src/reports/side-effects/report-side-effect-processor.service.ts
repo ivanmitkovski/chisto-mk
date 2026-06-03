@@ -1,13 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { ReportSideEffectKind, ReportSideEffectStatus, ReportStatus, SiteStatus } from '../../prisma-client';
+import { ReportSideEffectKind, ReportSideEffectStatus } from '../../prisma-client';
+import type { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { PrismaService } from '../../prisma/prisma.service';
-import { AuditService } from '../../audit/audit.service';
-import { reportStatusCopy } from '../../notifications/notification-templates';
-import { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
-import { ReportEventsService } from '../../admin-realtime/report-events.service';
-import { SiteEventsService } from '../../admin-realtime/site-events.service';
-import { ReportsOwnerEventsService } from '../reports-owner-events.service';
+import { AuditService } from '../../audit/services/audit.service';
+import { reportStatusCopy } from '../../notifications/util/notification-templates';
+import { ReportEventsService } from '../../admin-realtime/services/report-events.service';
+import { SiteEventsService } from '../../admin-realtime/services/site-events.service';
+import { ReportsOwnerEventsService } from '../services/reports-owner-events.service';
 import {
   DuplicateMergePostTxInput,
   DuplicateMergeSideEffectsService,
@@ -18,49 +18,15 @@ import {
   claimReportSideEffect,
   reportSideEffectLeaseOwner,
 } from './report-side-effect-claim.util';
+import {
+  parseMergeDuplicateSideEffectPayload,
+  parseModerationStatusSideEffectPayload,
+} from './report-side-effect-payload.schema';
 
-/** JSON shape stored for [ReportSideEffectKind.MERGE_DUPLICATE_POST]. */
-export type MergeDuplicateSideEffectPayload = {
-  moderator: AuthenticatedUser;
-  primaryReport: {
-    id: string;
-    siteId: string;
-    reporterId: string | null;
-    reportNumber: string | null;
-    createdAt: string;
-    mediaUrls: string[];
-  };
-  selectedChildIds: string[];
-  selectedChildren: { id: string; reporterId: string | null }[];
-  plannedNewCoReporterIds: string[];
-  duplicateMediaUrls: string[];
-  siteStatusEvent: {
-    id: string;
-    status: SiteStatus;
-    latitude: number;
-    longitude: number;
-    updatedAt: string;
-  } | null;
-};
-
-/** JSON shape stored for [ReportSideEffectKind.MODERATION_STATUS_POST]. */
-export type ModerationStatusSideEffectPayload = {
-  moderatorUserId: string;
-  reportId: string;
-  fromStatus: ReportStatus;
-  toStatus: ReportStatus;
-  reason: string | null;
-  siteId: string;
-  reporterId: string | null;
-  coReporterUserIds: string[];
-  siteStatusEvent: {
-    id: string;
-    status: SiteStatus;
-    latitude: number;
-    longitude: number;
-    updatedAt: string;
-  } | null;
-};
+export type {
+  MergeDuplicateSideEffectPayload,
+  ModerationStatusSideEffectPayload,
+} from './report-side-effect-payload.schema';
 
 @Injectable()
 export class ReportSideEffectProcessorService {
@@ -94,7 +60,7 @@ export class ReportSideEffectProcessorService {
       return 0;
     }
 
-    const raw = row.payload as unknown as MergeDuplicateSideEffectPayload;
+    const raw = parseMergeDuplicateSideEffectPayload(row.payload);
     try {
       const siteStatusEvent: DuplicateMergeSiteStatusEvent | null =
         raw.siteStatusEvent == null
@@ -108,7 +74,7 @@ export class ReportSideEffectProcessorService {
             };
 
       const input: DuplicateMergePostTxInput = {
-        moderator: raw.moderator,
+        moderator: raw.moderator as AuthenticatedUser,
         primaryReport: {
           ...raw.primaryReport,
           createdAt: new Date(raw.primaryReport.createdAt),
@@ -170,7 +136,7 @@ export class ReportSideEffectProcessorService {
       return;
     }
 
-    const raw = row.payload as unknown as ModerationStatusSideEffectPayload;
+    const raw = parseModerationStatusSideEffectPayload(row.payload);
     try {
       if (raw.siteStatusEvent != null) {
         this.siteEventsService.emitSiteUpdated(raw.siteStatusEvent.id, {

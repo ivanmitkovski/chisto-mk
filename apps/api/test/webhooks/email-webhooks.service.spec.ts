@@ -1,4 +1,4 @@
-import { EmailWebhooksService } from '../../src/webhooks/email-webhooks.service';
+import { EmailWebhooksService } from '../../src/webhooks/services/email-webhooks.service';
 
 describe('EmailWebhooksService', () => {
   const suppression = {

@@ -13,11 +13,11 @@ export class ResetPasswordConfirmDto {
   })
   phoneNumber!: string;
 
-  @ApiProperty({ example: '1234', minLength: 4, maxLength: 4 })
+  @ApiProperty({ example: '123456', minLength: 6, maxLength: 6 })
   @IsString()
-  @MinLength(4)
-  @MaxLength(4)
-  @Matches(/^\d{4}$/, { message: 'code must be exactly 4 digits' })
+  @MinLength(6)
+  @MaxLength(6)
+  @Matches(/^\d{6}$/, { message: 'code must be exactly 6 digits' })
   code!: string;
 
   @ApiProperty({ minLength: 8, maxLength: 72, example: 'NewStrong123!' })

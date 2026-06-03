@@ -1,6 +1,6 @@
 /// <reference types="jest" />
 import { ConflictException } from '@nestjs/common';
-import { ModerationService } from '../../src/moderation/moderation.service';
+import { ModerationService } from '../../src/moderation/services/moderation.service';
 import { Role } from '../../src/prisma-client';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
 

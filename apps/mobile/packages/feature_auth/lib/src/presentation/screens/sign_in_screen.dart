@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui' show PlatformDispatcher;
 
 import 'package:chisto_infrastructure/core/deep_links/deep_link_router.dart';
@@ -162,7 +163,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
   }
 
   void _handleForgotPassword() {
-    AppNavigation.goForgotPasswordRequest();
+    unawaited(AppNavigation.pushForgotPasswordRequest());
   }
 
   void _handleSignUp() {

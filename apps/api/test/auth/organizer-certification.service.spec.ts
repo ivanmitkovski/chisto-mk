@@ -2,11 +2,11 @@
 
 import { BadRequestException, ForbiddenException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { OrganizerCertificationService } from '../../src/auth/organizer-certification.service';
+import { OrganizerCertificationService } from '../../src/auth/services/organizer-certification.service';
 import {
   ORGANIZER_QUIZ_DRAW_SIZE,
   getOrganizerQuizQuestionById,
-} from '../../src/auth/organizer-quiz-bank';
+} from '../../src/auth/util/organizer-quiz-bank';
 
 describe('OrganizerCertificationService', () => {
   const jwtSecret = 'organizer-cert-test-secret';

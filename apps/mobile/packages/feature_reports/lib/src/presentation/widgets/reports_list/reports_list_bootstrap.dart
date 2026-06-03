@@ -205,7 +205,11 @@ extension ReportsListBootstrap on _ReportsListScreenState {
     if (event.type == 'report_updated' &&
         event.mutationKind == 'status_changed' &&
         (event.status != null && event.status!.isNotEmpty)) {
-      _list.applyStatusFromApi(event.reportId, event.status!);
+      if (event.status!.toUpperCase() == 'DELETED') {
+        _realtimeCoalescer.schedule();
+      } else {
+        _list.applyStatusFromApi(event.reportId, event.status!);
+      }
       return;
     }
     _realtimeCoalescer.schedule();

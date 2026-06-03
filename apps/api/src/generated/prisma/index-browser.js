@@ -175,13 +175,17 @@ exports.Prisma.UgcContentReportScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.PasswordResetEmailTokenScalarFieldEnum = {
+exports.Prisma.PasswordResetEmailCodeScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
-  tokenHash: 'tokenHash',
+  codeHash: 'codeHash',
   expiresAt: 'expiresAt',
-  usedAt: 'usedAt',
-  createdAt: 'createdAt'
+  attemptCount: 'attemptCount',
+  lastSentAt: 'lastSentAt',
+  sendCountInWindow: 'sendCountInWindow',
+  sendWindowStartedAt: 'sendWindowStartedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.UserSessionScalarFieldEnum = {
@@ -1014,7 +1018,7 @@ exports.Prisma.ModelName = {
   User: 'User',
   UserBlock: 'UserBlock',
   UgcContentReport: 'UgcContentReport',
-  PasswordResetEmailToken: 'PasswordResetEmailToken',
+  PasswordResetEmailCode: 'PasswordResetEmailCode',
   UserSession: 'UserSession',
   PhoneOtp: 'PhoneOtp',
   LoginFailure: 'LoginFailure',

@@ -202,9 +202,7 @@
   "authVerifyPhoneCta": "Verify phone",
   "authResetViaEmail": "Reset via email",
   "authResetViaSms": "Reset via SMS",
-  "authForgotPasswordEmailSubtitle": "Enter the email on your account and we'll send a reset link if it exists.",
-  "authForgotPasswordEmailSentTitle": "Check your email",
-  "authForgotPasswordEmailSentBody": "If an account exists for that email, we sent a link to reset your password.",
+  "authForgotPasswordEmailSubtitle": "Enter the email on your account and we'll send a reset code if it exists.",
   "authForgotPasswordEmailField": "Email",
   "authForgotPassword": "Forgot password?",
   "authSignInCta": "Sign in",
@@ -301,11 +299,19 @@
   "authForgotPasswordRequestSemantic": "Send reset code",
   "authForgotPasswordOtpTitle": "Enter code",
   "authForgotPasswordOtpSubtitle": "We sent a 6-digit code to {phone}",
+  "authForgotPasswordOtpEmailSubtitle": "We sent a 6-digit code to {email}",
   "authErrorPhoneNotVerified": "Your phone number is not verified yet.",
-  "authErrorPasswordResetTokenInvalid": "This reset link is invalid or has expired.",
+  "authErrorPasswordResetTokenInvalid": "This reset code is invalid or has expired.",
   "@authForgotPasswordOtpSubtitle": {
     "placeholders": {
       "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "@authForgotPasswordOtpEmailSubtitle": {
+    "placeholders": {
+      "email": {
         "type": "String"
       }
     }

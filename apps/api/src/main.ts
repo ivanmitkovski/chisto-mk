@@ -10,7 +10,7 @@ import express from 'express';
 import helmet from 'helmet';
 import { RedisIoAdapter } from './common/adapters/redis-io.adapter';
 import { RedisIoAdapterLifecycle } from './common/adapters/redis-io-adapter.lifecycle';
-import { EventChatClusterConfig } from './event-chat/event-chat-cluster.config';
+import { EventChatClusterConfig } from './event-chat/constants/event-chat-cluster.config';
 import { AppModule } from './app.module';
 import { validateEnv } from './config/env';
 import { ObservabilityStore } from './observability/observability.store';
@@ -39,8 +39,6 @@ async function bootstrap() {
   const bootstrapLog = new NestLogger('Bootstrap');
 
   const expressApp = app.getHttpAdapter().getInstance() as express.Application;
-  // Required so req.ip is derived from trusted proxy headers (ALB / ingress).
-  expressApp.set('trust proxy', true);
   expressApp.use((req, _res, next) => {
     const raw = req.headers.traceparent ?? req.headers.Traceparent;
     const traceparent =
@@ -59,9 +57,6 @@ async function bootstrap() {
       crossOriginEmbedderPolicy: false,
     }),
   );
-  expressApp.use(express.json({ limit: '1mb' }));
-  expressApp.use(express.urlencoded({ extended: true, limit: '1mb' }));
-
   const redisUrl = process.env.REDIS_URL?.trim();
   if (redisUrl) {
     try {

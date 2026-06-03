@@ -62,6 +62,27 @@ void main() {
     expect(err.details, isA<Map<String, dynamic>>());
   });
 
+  test('409 honors retryable and retryAfterSeconds', () {
+    final AppError err = appErrorFromFailedResponse(
+      statusCode: 409,
+      json: <String, dynamic>{
+        'code': 'DUPLICATE_SUBMIT_INFLIGHT',
+        'message': 'Another submission is in progress',
+        'retryable': true,
+        'retryAfterSeconds': 5,
+      },
+      bodyStr: null,
+      retryAfterHeader: null,
+    );
+    expect(err.code, 'DUPLICATE_SUBMIT_INFLIGHT');
+    expect(err.retryable, isTrue);
+    expect(err.details, isA<Map<String, dynamic>>());
+    expect(
+      (err.details! as Map<String, dynamic>)['retryAfterSeconds'],
+      5,
+    );
+  });
+
   test('appErrorFromFailedResponse merges API details for 429', () {
     final AppError err = appErrorFromFailedResponse(
       statusCode: 429,

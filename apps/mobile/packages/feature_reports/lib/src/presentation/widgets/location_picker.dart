@@ -31,15 +31,20 @@ class LocationPicker extends ConsumerStatefulWidget {
 }
 
 class _LocationPickerState extends ConsumerState<LocationPicker> {
+  late final double? _familyInitialLatitude;
+  late final double? _familyInitialLongitude;
+
   LocationPickerControllerProvider get _provider =>
       locationPickerControllerProvider(
-        widget.initialLatitude,
-        widget.initialLongitude,
+        _familyInitialLatitude,
+        _familyInitialLongitude,
       );
 
   @override
   void initState() {
     super.initState();
+    _familyInitialLatitude = widget.initialLatitude;
+    _familyInitialLongitude = widget.initialLongitude;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) {
         return;
@@ -48,8 +53,8 @@ class _LocationPickerState extends ConsumerState<LocationPicker> {
       ref
           .read(_provider.notifier)
           .startInitialFlow(
-            initialLatitude: widget.initialLatitude,
-            initialLongitude: widget.initialLongitude,
+            initialLatitude: _familyInitialLatitude,
+            initialLongitude: _familyInitialLongitude,
           );
     });
   }

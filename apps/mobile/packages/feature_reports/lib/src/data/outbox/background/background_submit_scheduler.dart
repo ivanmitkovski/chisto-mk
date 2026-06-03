@@ -11,13 +11,23 @@ import 'dart:async';
 abstract class BackgroundSubmitScheduler {
   /// Fire-and-forget: coordinator should call [scheduleDrain] instead of awaiting
   /// long-running work on the UI isolate for large uploads.
-  void scheduleDrain(Future<void> Function() drain);
+  ///
+  /// When [requestNativeFollowUp] is true, [PlatformBackgroundSubmitScheduler]
+  /// also registers a Workmanager one-off (offline/cooldown deferral or app
+  /// background) so work can resume outside the foreground isolate.
+  void scheduleDrain(
+    Future<void> Function() drain, {
+    bool requestNativeFollowUp = false,
+  });
 }
 
 /// Current production behavior: drain runs on the calling isolate via microtask.
 class InProcessBackgroundSubmitScheduler implements BackgroundSubmitScheduler {
   @override
-  void scheduleDrain(Future<void> Function() drain) {
+  void scheduleDrain(
+    Future<void> Function() drain, {
+    bool requestNativeFollowUp = false,
+  }) {
     unawaited(Future<void>.microtask(drain));
   }
 }

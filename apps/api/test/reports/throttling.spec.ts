@@ -1,6 +1,6 @@
 /// <reference types="jest" />
 import 'reflect-metadata';
-import { ReportsController } from '../../src/reports/reports.controller';
+import { ReportsController } from '../../src/reports/controllers/reports.controller';
 
 /** @nestjs/throttler v6 stores per-name keys as prefix + bucket name (e.g. `default`). */
 const limitMetaKey = (name: string): string => `THROTTLER:LIMIT${name}`;

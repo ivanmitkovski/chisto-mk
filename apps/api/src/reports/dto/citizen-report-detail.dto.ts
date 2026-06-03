@@ -79,4 +79,11 @@ export class CitizenReportDetailDto {
     description: 'Viewer is primary reporter or co-reporter (points apply to primary only)',
   })
   viewerRole!: UserReportViewerRole;
+
+  @ApiProperty({
+    nullable: true,
+    description:
+      'Moderator rejection reason and optional notes when status is DELETED; null for other statuses',
+  })
+  moderationReason!: string | null;
 }

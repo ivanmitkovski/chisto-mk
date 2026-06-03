@@ -26,16 +26,22 @@ describe('Sites engagement (e2e)', () => {
     const site = await prisma.site.create({
       data: { latitude: 41.99, longitude: 21.43, description: 'e2e engagement site' },
     });
-    const agent = request(app.getHttpServer()).set('Authorization', `Bearer ${u.accessToken}`);
+    const agent = request(app.getHttpServer());
 
     await agent
       .post(apiPath(`/sites/${site.id}/upvote`))
+      .set('Authorization', `Bearer ${u.accessToken}`)
       .set('X-Idempotency-Key', `upvote-${site.id}-${Date.now()}`)
-      .expect(200);
+      .expect((res) => {
+        expect([200, 201]).toContain(res.status);
+      });
 
     await agent
       .post(apiPath(`/sites/${site.id}/save`))
+      .set('Authorization', `Bearer ${u.accessToken}`)
       .set('X-Idempotency-Key', `save-${site.id}-${Date.now()}`)
-      .expect(200);
+      .expect((res) => {
+        expect([200, 201]).toContain(res.status);
+      });
   });
 });

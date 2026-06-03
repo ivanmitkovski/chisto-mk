@@ -4,7 +4,7 @@ import {
   isEventChatClientDisplayed,
   resolveCollapseId,
   resolveThreadId,
-} from '../../src/notifications/fcm-apns-payload';
+} from '../../src/notifications/util/fcm-apns-payload';
 
 describe('fcm-apns-payload', () => {
   it('EVENT_CHAT uses client-displayed APNS (no alert, wakes app)', () => {

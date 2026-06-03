@@ -1,6 +1,6 @@
 /// <reference types="jest" />
 
-import { CleanupEventRealtimeService } from '../../src/admin-realtime/cleanup-event-realtime.service';
+import { CleanupEventRealtimeService } from '../../src/admin-realtime/services/cleanup-event-realtime.service';
 
 describe('CleanupEventRealtimeService', () => {
   it('emits cleanup_event_pending with eventId', (done) => {

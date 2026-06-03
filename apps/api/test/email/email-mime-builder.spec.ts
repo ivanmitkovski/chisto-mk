@@ -1,6 +1,6 @@
 /// <reference types="jest" />
 
-import { buildMultipartAlternativeMime } from '../../src/email/email-mime-builder';
+import { buildMultipartAlternativeMime } from '../../src/email/util/email-mime-builder';
 
 describe('buildMultipartAlternativeMime', () => {
   it('includes ASCII subject as-is', () => {

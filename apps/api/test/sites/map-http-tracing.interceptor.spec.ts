@@ -1,5 +1,5 @@
 import { of } from 'rxjs';
-import { MapHttpTracingInterceptor } from '../../src/observability/map-http-tracing.interceptor';
+import { MapHttpTracingInterceptor } from '../../src/observability/util/map-http-tracing.interceptor';
 
 describe('MapHttpTracingInterceptor', () => {
   it('sets traceparent header and completes', (done) => {

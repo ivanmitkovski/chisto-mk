@@ -8,8 +8,8 @@ import {
   ApiTooManyRequestsResponse,
 } from '@nestjs/swagger';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
-import { OptionalJwtAuthGuard } from '../../auth/optional-jwt-auth.guard';
-import { CurrentUser } from '../../auth/current-user.decorator';
+import { OptionalJwtAuthGuard } from '../../auth/guards/optional-jwt-auth.guard';
+import { CurrentUser } from '../../auth/decorators/current-user.decorator';
 import type { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { ParseCuidPipe } from '../../common/pipes/parse-cuid.pipe';
 import { ApiStandardHttpErrorResponses } from '../../common/openapi/standard-http-error-responses.decorator';

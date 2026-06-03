@@ -7,7 +7,7 @@ class ReportOutboxDatabase {
   ReportOutboxDatabase._();
 
   static const String _dbName = 'chisto_reports_outbox.db';
-  static const int _version = 4;
+  static const int _version = 5;
   static const String tableOutbox = 'report_outbox';
 
   static Future<Database> open() async {
@@ -34,7 +34,9 @@ CREATE TABLE $tableOutbox (
   updated_at_ms INTEGER NOT NULL,
   current_stage TEXT,
   attempted_stages_json TEXT,
-  last_persisted_at_ms INTEGER
+  last_persisted_at_ms INTEGER,
+  processing_owner TEXT,
+  processing_lease_until_ms INTEGER
 )''');
         await db.execute(
           'CREATE INDEX idx_report_outbox_state ON $tableOutbox (state, updated_at_ms)',
@@ -67,7 +69,38 @@ WHERE id = ? AND state = 'pending'
             <Object>[kReportWizardDraftRowId],
           );
         }
+        if (oldVersion < 5) {
+          await _addColumnIfMissing(
+            db,
+            column: 'processing_owner',
+            definition: 'TEXT',
+          );
+          await _addColumnIfMissing(
+            db,
+            column: 'processing_lease_until_ms',
+            definition: 'INTEGER',
+          );
+        }
       },
     );
+  }
+
+  /// Safe for devices that partially applied v5 (ALTER ran but version not bumped).
+  static Future<void> _addColumnIfMissing(
+    Database db, {
+    required String column,
+    required String definition,
+  }) async {
+    final List<Map<String, Object?>> info = await db.rawQuery(
+      'PRAGMA table_info($tableOutbox)',
+    );
+    final bool exists = info.any(
+      (Map<String, Object?> row) => row['name'] == column,
+    );
+    if (!exists) {
+      await db.execute(
+        'ALTER TABLE $tableOutbox ADD COLUMN $column $definition',
+      );
+    }
   }
 }

@@ -125,10 +125,22 @@ class HomeShellController extends _$HomeShellController {
   }
 
   void _afterReportWizard(BuildContext context, Object navResult) {
-    GoRouter.of(context).go('/reports');
-    state = state.copyWith(
-      reportsRefreshTrigger: state.reportsRefreshTrigger + 1,
-      reportIdToOpen: navResult is String ? navResult : state.reportIdToOpen,
+    ReportEntryFlow.handleNewReportWizardPopResult(
+      navResult,
+      onViewSubmittedReport: (String reportId) {
+        state = state.copyWith(
+          reportsRefreshTrigger: state.reportsRefreshTrigger + 1,
+          reportIdToOpen: reportId,
+        );
+        GoRouter.of(context).go('/reports');
+      },
+      onViewReportsList: () {
+        state = state.copyWith(
+          reportsRefreshTrigger: state.reportsRefreshTrigger + 1,
+          clearReportIdToOpen: navResult is! NewReportWizardViewReport,
+        );
+        GoRouter.of(context).go('/reports');
+      },
     );
   }
 

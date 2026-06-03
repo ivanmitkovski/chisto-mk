@@ -1,7 +1,7 @@
 import 'package:feature_auth/src/application/initial_route_controller.dart';
 import 'package:feature_auth/src/application/splash_session_controller.dart';
+import 'package:feature_auth/src/domain/models/password_reset_target.dart';
 import 'package:feature_auth/src/presentation/constants/splash_constants.dart';
-import 'package:feature_auth/src/presentation/screens/forgot_password_email_sent_screen.dart';
 import 'package:feature_auth/src/presentation/screens/forgot_password_new_screen.dart';
 import 'package:feature_auth/src/presentation/screens/forgot_password_success_screen.dart';
 import 'package:feature_auth/src/presentation/screens/initial_route_screen.dart';
@@ -50,14 +50,6 @@ void main() {
     expect(find.text('Continue'), findsOneWidget);
   });
 
-  testWidgets('forgot password email sent screen renders', (
-    WidgetTester tester,
-  ) async {
-    await pumpAuthWidget(tester, home: const ForgotPasswordEmailSentScreen());
-    await tester.pumpAndSettle();
-    expect(find.byType(ForgotPasswordEmailSentScreen), findsOneWidget);
-  });
-
   testWidgets('forgot password success screen renders', (
     WidgetTester tester,
   ) async {
@@ -72,7 +64,10 @@ void main() {
     await pumpAuthWidget(
       tester,
       home: const ForgotPasswordNewScreen(
-        phoneNumberE164: '+38970123456',
+        target: PasswordResetTarget(
+          channel: PasswordResetChannel.sms,
+          value: '+38970123456',
+        ),
         code: '123456',
       ),
     );

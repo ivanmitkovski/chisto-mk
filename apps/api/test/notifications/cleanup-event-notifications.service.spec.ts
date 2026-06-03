@@ -1,7 +1,7 @@
 /// <reference types="jest" />
 
 import { NotificationType } from '../../src/prisma-client';
-import { CleanupEventNotificationsService } from '../../src/notifications/cleanup-event-notifications.service';
+import { CleanupEventNotificationsService } from '../../src/notifications/services/cleanup-event-notifications.service';
 
 describe('CleanupEventNotificationsService', () => {
   let prisma: { user: { findMany: jest.Mock }; userDeviceToken: { findMany: jest.Mock } };

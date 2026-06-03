@@ -1,6 +1,6 @@
 import { SiteMapSearchDto } from '../../src/sites/dto/site-map-search.dto';
-import { SitesMapSearchQueryService } from '../../src/sites/sites-map-search-query.service';
-import { SitesSearchService } from '../../src/sites/sites-search.service';
+import { SitesMapSearchQueryService } from '../../src/sites/services/sites-map-search-query.service';
+import { SitesSearchService } from '../../src/sites/services/sites-search.service';
 
 describe('SitesSearchService', () => {
   function makeService() {

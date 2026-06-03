@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:16-alpine
+        image: postgis/postgis:16-3.5
         env:
           POSTGRES_DB: chisto_ci
           POSTGRES_USER: chisto
@@ -66,9 +66,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Validate Prometheus alerting rules (promtool)
-        run: docker run --rm -v "${GITHUB_WORKSPACE}:/work:ro" prom/prometheus:v2.55.1 promtool check rules /work/apps/api/docs/alerting-rules.yml
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -118,6 +115,9 @@ jobs:
 
       - name: API circular dependency check (madge)
         run: pnpm --filter @chisto/api run check:cycles
+
+      - name: API module structure check
+        run: pnpm --filter @chisto/api run check:structure
 
       - name: Build workspace
         run: pnpm build
@@ -246,7 +246,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:16-alpine
+        image: postgis/postgis:16-3.5
         env:
           POSTGRES_DB: chisto_e2e
           POSTGRES_USER: chisto
@@ -306,7 +306,7 @@ jobs:
             fi
             sleep 1
           done
-          docker run --rm --network host minio/mc:latest sh -c \
+          docker run --rm --network host --entrypoint /bin/sh minio/mc:latest -c \
             "mc alias set ci http://127.0.0.1:9000 minioadmin minioadmin && mc mb --ignore-existing ci/chisto-e2e"
 
       - name: Generate Prisma client

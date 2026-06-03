@@ -25,13 +25,13 @@ describe('Event chat (e2e)', () => {
   });
 
   it('list messages returns 401 without bearer token', async () => {
-    await request(app.getHttpServer()).get(`/events/${FAKE_EVENT_CUID}/chat`).expect(401);
+    await request(app.getHttpServer()).get(`/v1/events/${FAKE_EVENT_CUID}/chat`).expect(401);
   });
 
   it('list messages returns structured response for unknown event when authenticated', async () => {
     const u = await registerCitizen(app, 'chat');
     const res = await request(app.getHttpServer())
-      .get(`/events/${FAKE_EVENT_CUID}/chat`)
+      .get(`/v1/events/${FAKE_EVENT_CUID}/chat`)
       .set('Authorization', `Bearer ${u.accessToken}`);
     expect([401, 403, 404]).toContain(res.status);
   });

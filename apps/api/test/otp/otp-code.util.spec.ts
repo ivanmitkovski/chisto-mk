@@ -3,7 +3,7 @@ import {
   hashOtpCode,
   otpCodesMatch,
   verifyOtpCode,
-} from '../../src/otp/otp-code.util';
+} from '../../src/otp/util/otp-code.util';
 
 describe('otp-code.util', () => {
   it('generateOtpCode returns 6 digits', () => {

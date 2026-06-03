@@ -1,6 +1,6 @@
 /// <reference types="jest" />
 import { EventChatMessageType } from '../../src/prisma-client';
-import { buildEventChatPushPreview } from '../../src/event-chat/event-chat-push-preview';
+import { buildEventChatPushPreview } from '../../src/event-chat/util/event-chat-push-preview';
 
 describe('buildEventChatPushPreview', () => {
   const base = {

@@ -1,6 +1,6 @@
 /// <reference types="jest" />
 import { NotificationType } from '../../src/prisma-client';
-import { buildFcmDataPayload } from '../../src/notifications/notification-push-data';
+import { buildFcmDataPayload } from '../../src/notifications/util/notification-push-data';
 
 describe('buildFcmDataPayload', () => {
   it('includes notificationId, string type, and stringified custom data', () => {

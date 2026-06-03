@@ -14,6 +14,7 @@ class AuthScreenHeader extends StatelessWidget {
     this.subtitle,
     this.showLogo = false,
     this.showBackButton = false,
+    this.onBack,
     this.centered = false,
     this.subtitleMaxLines,
   }) : assert(
@@ -25,6 +26,7 @@ class AuthScreenHeader extends StatelessWidget {
   final String? subtitle;
   final bool showLogo;
   final bool showBackButton;
+  final VoidCallback? onBack;
   final bool centered;
   final int? subtitleMaxLines;
 
@@ -39,7 +41,7 @@ class AuthScreenHeader extends StatelessWidget {
       crossAxisAlignment: crossAxisAlignment,
       children: <Widget>[
         if (showBackButton) ...<Widget>[
-          const AppBackButton(),
+          AppBackButton(onPressed: onBack),
           const SizedBox(height: AppSpacing.md),
         ],
         if (showLogo) ...<Widget>[

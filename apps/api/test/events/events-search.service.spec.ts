@@ -3,10 +3,10 @@
 import { BadRequestException } from '@nestjs/common';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
 import { EventSearchDto } from '../../src/events/dto/event-search.dto';
-import { EventsSearchQueryService } from '../../src/events/events-search-query.service';
-import { EventsSearchService } from '../../src/events/events-search.service';
-import { EventsMobileMapperService } from '../../src/events/events-mobile-mapper.service';
-import { EventsRepository } from '../../src/events/events.repository';
+import { EventsSearchQueryService } from '../../src/events/services/events-search-query.service';
+import { EventsSearchService } from '../../src/events/services/events-search.service';
+import { EventsMobileMapperService } from '../../src/events/services/events-mobile-mapper.service';
+import { EventsRepository } from '../../src/events/repositories/events.repository';
 
 function user(): AuthenticatedUser {
   return {

@@ -1,5 +1,5 @@
 import { Logger } from '@nestjs/common';
-import { auditWriteFailedTotal } from '../../observability/prom-registry';
+import { auditWriteFailedTotal } from '../../observability/util/prom-registry';
 
 const auditFailureLogger = new Logger('AuditLog');
 

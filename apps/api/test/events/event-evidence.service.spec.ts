@@ -3,10 +3,10 @@
 import { NotFoundException } from '@nestjs/common';
 import { Role } from '../../src/prisma-client';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
-import { EventEvidenceService } from '../../src/events/event-evidence.service';
+import { EventEvidenceService } from '../../src/events/services/event-evidence.service';
 import { PrismaService } from '../../src/prisma/prisma.service';
-import { EventsCleanupMediaUploadService } from '../../src/events/events-cleanup-media-upload.service';
-import { ReportsUploadService } from '../../src/reports/reports-upload.service';
+import { EventsCleanupMediaUploadService } from '../../src/events/services/events-cleanup-media-upload.service';
+import { ReportsUploadService } from '../../src/reports/services/reports-upload.service';
 
 function user(): AuthenticatedUser {
   return {

@@ -1,4 +1,4 @@
-import { SitesMapQueryService } from '../../src/sites/sites-map-query.service';
+import { SitesMapQueryService } from '../../src/sites/services/sites-map-query.service';
 import { MapCacheService } from '../../src/sites/map/map-cache.service';
 import { MapObservabilityService } from '../../src/sites/map/map-observability.service';
 import { MapQueryValidatorService } from '../../src/sites/map/map-query-validator.service';

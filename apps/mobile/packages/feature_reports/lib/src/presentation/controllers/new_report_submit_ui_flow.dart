@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:chisto_infrastructure/core/debug/chisto_submit_debug_log.dart';
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/core/navigation/app_navigation.dart';
@@ -13,8 +16,10 @@ import 'package:feature_reports/src/domain/report_input_sanitizer.dart';
 import 'package:feature_reports/src/presentation/controllers/new_report_controller.dart';
 import 'package:feature_reports/src/presentation/controllers/new_report_submit_support.dart';
 import 'package:feature_reports/src/presentation/l10n/report_category_l10n.dart';
+import 'package:feature_reports/src/presentation/navigation/new_report_wizard_pop_result.dart';
 import 'package:feature_reports/src/presentation/widgets/new_report/report_submitted_dialog.dart';
 import 'package:feature_reports/src/presentation/widgets/new_report/reporting_capacity_guard.dart';
+import 'package:feature_reports/src/presentation/controllers/new_report_submit_error_display.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/semantics.dart';
@@ -30,10 +35,10 @@ final class NewReportPostSubmitReportAnother
   const NewReportPostSubmitReportAnother() : super._();
 }
 
-/// User finished — caller should [Navigator.pop] with [popResult].
+/// User finished — caller should pop the wizard route with [result].
 final class NewReportPostSubmitExit extends NewReportPostSubmitNavigation {
-  const NewReportPostSubmitExit(this.popResult) : super._();
-  final Object? popResult;
+  const NewReportPostSubmitExit(this.result) : super._();
+  final NewReportWizardPopResult result;
 }
 
 /// Dependencies for post-submit side effects (injected at the screen boundary).
@@ -59,6 +64,9 @@ abstract final class NewReportSubmitUiFlow {
   }) async {
     if (!controller.tryBeginSubmit()) return;
 
+    ReportSubmitResult? submitResult;
+    Object? submitFailure;
+
     try {
       await controller.flushPendingPersist(
         titleText: titleController.text,
@@ -73,10 +81,64 @@ abstract final class NewReportSubmitUiFlow {
         return;
       }
 
-      final String trimmedTitle = ReportInputSanitizer.clampTitle(
-        controller.draft.title,
+      submitResult = await controller.submitReport();
+    } on AppError catch (e, st) {
+      chistoSubmitDebugLog(
+        'runSubmit AppError code=${e.code} retryable=${e.retryable} msg=${e.message}',
+        error: e,
+        stack: st,
       );
-      final ReportSubmitResult result = await controller.submitReport();
+      submitFailure = e;
+    } catch (e, st) {
+      chistoSubmitDebugLog(
+        'runSubmit non-AppError type=${e.runtimeType}',
+        error: e,
+        stack: st,
+      );
+      submitFailure = e;
+    }
+
+    if (submitFailure != null || submitResult == null) {
+      if (submitFailure is TimeoutException ||
+          (submitFailure is AppError && submitFailure.code == 'TIMEOUT')) {
+        final ReportSubmitResult? recovered =
+            await controller.recoverResultIfWizardSucceeded();
+        if (recovered != null) {
+          submitResult = recovered;
+          submitFailure = null;
+        }
+      }
+    }
+
+    if (submitFailure != null || submitResult == null) {
+      if (!context.mounted) return;
+      controller.resetSubmittingUi();
+      if (submitFailure is AppError) {
+        final AppError appErr = submitFailure;
+        final bool handled = await NewReportSubmitUiFlow.handleSubmitAppError(
+          context,
+          appErr,
+          controller.loadReportingCapacity,
+        );
+        if (!context.mounted) return;
+        if (!handled) {
+          controller.setApiError(
+            NewReportSubmitErrorDisplay.humanizeSubmitErrorForBanner(appErr),
+          );
+        }
+      } else if (submitFailure != null) {
+        controller.endSubmitWithError(submitFailure);
+      }
+      return;
+    }
+
+    final ReportSubmitResult result = submitResult;
+    controller.markSubmitSucceeded(result);
+    final String trimmedTitle = ReportInputSanitizer.clampTitle(
+      controller.draft.title,
+    );
+
+    try {
       if (!context.mounted) return;
       bindings.reportsListSession.onSubmitSucceeded(
         result: result,
@@ -115,33 +177,37 @@ abstract final class NewReportSubmitUiFlow {
       if (!context.mounted || nav == null) {
         return;
       }
-      await bindings.reportDraftRepository.clear();
-      if (!context.mounted) {
-        return;
-      }
       switch (nav) {
         case NewReportPostSubmitReportAnother():
+          await bindings.reportDraftRepository.clear();
+          if (!context.mounted) {
+            return;
+          }
           controller.resetDraftAndStartOver();
           titleController.text = '';
           descriptionController.text = '';
-        case NewReportPostSubmitExit(:final Object? popResult):
-          Navigator.of(context).pop(popResult);
+        case NewReportPostSubmitExit(:final NewReportWizardPopResult result):
+          await bindings.reportDraftRepository.clear();
+          if (!context.mounted) {
+            return;
+          }
+          Navigator.of(context).pop(result);
       }
-    } on AppError catch (e) {
-      if (!context.mounted) return;
-      controller.resetSubmittingUi();
-      final bool handled = await NewReportSubmitUiFlow.handleSubmitAppError(
-        context,
-        e,
-        controller.loadReportingCapacity,
+    } catch (e, st) {
+      chistoSubmitDebugLog(
+        'runSubmit post-success failure (report already submitted) '
+        'type=${e.runtimeType}',
+        error: e,
+        stack: st,
       );
-      if (!context.mounted) return;
-      if (!handled) {
-        controller.setApiError(e);
+      if (context.mounted) {
+        AppSnack.show(
+          context,
+          message: context.l10n.reportSubmitSentPending,
+          type: AppSnackType.info,
+        );
+        controller.resetSubmittingUi();
       }
-    } catch (e) {
-      if (!context.mounted) return;
-      controller.endSubmitWithError(e);
     }
   }
 
@@ -178,12 +244,14 @@ abstract final class NewReportSubmitUiFlow {
     if (!context.mounted) {
       return null;
     }
-    if (dialogResult == SubmittedDialogResult.reportAnother) {
-      return const NewReportPostSubmitReportAnother();
-    }
-    return NewReportPostSubmitExit(
-      dialogResult is String ? dialogResult : true,
-    );
+    return switch (dialogResult) {
+      NewReportWizardReportAnother() => const NewReportPostSubmitReportAnother(),
+      NewReportWizardViewReport(:final String reportId) =>
+        NewReportPostSubmitExit(NewReportWizardViewReport(reportId)),
+      NewReportWizardViewReports() =>
+        const NewReportPostSubmitExit(NewReportWizardViewReports()),
+      _ => const NewReportPostSubmitExit(NewReportWizardViewReports()),
+    };
   }
 
   /// Auth redirect, cooldown dialog, or `false` if the screen should surface [error] as [_apiError].

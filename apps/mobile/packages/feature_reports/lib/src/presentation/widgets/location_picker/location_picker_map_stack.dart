@@ -1,3 +1,4 @@
+import 'package:chisto_infrastructure/shared/utils/cached_tile_provider.dart';
 import 'package:design_system/design_system.dart';
 import 'package:feature_reports/src/presentation/widgets/location_picker/location_picker_map_tiles_fallback.dart';
 import 'package:flutter/material.dart';
@@ -55,6 +56,9 @@ class LocationPickerMapStack extends StatelessWidget {
                   urlTemplate:
                       'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
                   maxNativeZoom: 19,
+                  keepBuffer: 3,
+                  panBuffer: 2,
+                  tileProvider: createCachedTileProvider(maxStaleDays: 30),
                   userAgentPackageName: 'chisto_mobile',
                 ),
               ],

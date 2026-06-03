@@ -1,4 +1,4 @@
-import { computeQuietHoursDeferral } from '../../src/notifications/notification-quiet-hours';
+import { computeQuietHoursDeferral } from '../../src/notifications/util/notification-quiet-hours';
 
 describe('notification-quiet-hours', () => {
   it('defers non-time-sensitive pushes during quiet window', () => {

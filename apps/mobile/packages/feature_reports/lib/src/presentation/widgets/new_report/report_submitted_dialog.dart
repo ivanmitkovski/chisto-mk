@@ -5,6 +5,7 @@ import 'package:chisto_infrastructure/l10n/app_localizations.dart';
 import 'package:chisto_infrastructure/shared/utils/app_haptics.dart';
 import 'package:chisto_infrastructure/shared/widgets/organisms/app_surface/report_surface_aliases.dart';
 import 'package:design_system/design_system.dart';
+import 'package:feature_reports/src/presentation/navigation/new_report_wizard_pop_result.dart';
 import 'package:feature_reports/src/presentation/widgets/new_report/report_submitted_checkmark_painter.dart';
 import 'package:feature_reports/src/presentation/widgets/new_report/report_submitted_dialog_action_button.dart';
 import 'package:flutter/material.dart';
@@ -369,7 +370,9 @@ class _ReportSubmittedDialogState extends State<ReportSubmittedDialog>
                           label: l10n.reportSubmittedViewThisReport,
                           primary: true,
                           onPressed: () {
-                            Navigator.of(context).pop(widget.reportId);
+                            Navigator.of(context).pop(
+                              NewReportWizardViewReport(widget.reportId!),
+                            );
                           },
                         ),
                         const SizedBox(height: AppSpacing.sm),
@@ -378,9 +381,9 @@ class _ReportSubmittedDialogState extends State<ReportSubmittedDialog>
                           primary: false,
                           outlined: true,
                           onPressed: () {
-                            Navigator.of(
-                              context,
-                            ).pop(SubmittedDialogResult.viewReports);
+                            Navigator.of(context).pop(
+                              const NewReportWizardViewReports(),
+                            );
                           },
                         ),
                       ] else
@@ -388,9 +391,9 @@ class _ReportSubmittedDialogState extends State<ReportSubmittedDialog>
                           label: l10n.reportSubmittedViewInMyReports,
                           primary: true,
                           onPressed: () {
-                            Navigator.of(
-                              context,
-                            ).pop(SubmittedDialogResult.viewReports);
+                            Navigator.of(context).pop(
+                              const NewReportWizardViewReports(),
+                            );
                           },
                         ),
                       const SizedBox(height: AppSpacing.sm),
@@ -398,9 +401,9 @@ class _ReportSubmittedDialogState extends State<ReportSubmittedDialog>
                         label: l10n.reportSubmittedReportAnother,
                         primary: false,
                         onPressed: () {
-                          Navigator.of(
-                            context,
-                          ).pop(SubmittedDialogResult.reportAnother);
+                          Navigator.of(context).pop(
+                            const NewReportWizardReportAnother(),
+                          );
                         },
                       ),
                     ],
@@ -412,9 +415,9 @@ class _ReportSubmittedDialogState extends State<ReportSubmittedDialog>
                       icon: Icons.close_rounded,
                       semanticLabel: l10n.semanticsClose,
                       onTap: () {
-                        Navigator.of(
-                          context,
-                        ).pop(SubmittedDialogResult.viewReports);
+                        Navigator.of(context).pop(
+                          const NewReportWizardViewReports(),
+                        );
                       },
                     ),
                   ),

@@ -3,7 +3,7 @@
 import { Reflector } from '@nestjs/core';
 import type { ThrottlerStorage } from '@nestjs/throttler/dist/throttler-storage.interface';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
-import { EventChatThrottlerGuard } from '../../src/event-chat/event-chat-throttler.guard';
+import { EventChatThrottlerGuard } from '../../src/event-chat/guards/event-chat-throttler.guard';
 
 describe('EventChatThrottlerGuard', () => {
   const storage: ThrottlerStorage = {

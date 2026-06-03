@@ -10,6 +10,7 @@ import 'package:chisto_infrastructure/shared/widgets/organisms/auth_shell.dart';
 import 'package:chisto_infrastructure/shared/widgets/organisms/loading_overlay.dart';
 import 'package:design_system/design_system.dart';
 import 'package:feature_auth/src/application/password_reset_request_controller.dart';
+import 'package:feature_auth/src/domain/models/password_reset_target.dart';
 import 'package:feature_auth/src/presentation/constants/auth_error_messages.dart';
 import 'package:feature_auth/src/presentation/utils/auth_validators.dart';
 import 'package:feature_auth/src/presentation/widgets/auth_form_scaffold.dart';
@@ -55,6 +56,7 @@ class _ForgotPasswordRequestScreenState
 
   void _onInputChanged() {
     if (!mounted) return;
+    setState(() {});
     ref.read(passwordResetRequestControllerProvider.notifier).clearError();
   }
 
@@ -80,26 +82,33 @@ class _ForgotPasswordRequestScreenState
 
     try {
       if (_useEmail) {
+        final String email = _emailController.text.trim();
         await ref
             .read(passwordResetRequestControllerProvider.notifier)
-            .requestByEmail(_emailController.text.trim());
+            .requestByEmail(email);
         if (!mounted) return;
         AppHaptics.success(context);
-        AppNavigation.goForgotPasswordEmailSent();
+        await AppNavigation.pushForgotPasswordOtp(
+          PasswordResetTarget(
+            channel: PasswordResetChannel.email,
+            value: email,
+          ),
+        );
         return;
       }
 
       final String phoneE164 = normalizeToE164(_phoneController.text);
-      final result = await ref
+      await ref
           .read(passwordResetRequestControllerProvider.notifier)
           .requestByPhone(phoneE164);
       if (!mounted) return;
       AppHaptics.success(context);
-      if (result.channel == 'email') {
-        AppNavigation.goForgotPasswordEmailSent();
-        return;
-      }
-      AppNavigation.goForgotPasswordOtp(phoneE164);
+      await AppNavigation.pushForgotPasswordOtp(
+        PasswordResetTarget(
+          channel: PasswordResetChannel.sms,
+          value: phoneE164,
+        ),
+      );
     } on AppError {
       if (!mounted) return;
       AppHaptics.warning(context);
@@ -178,9 +187,7 @@ class _ForgotPasswordRequestScreenState
                   ],
                   const SizedBox(height: AppSpacing.xl),
                   AppButton.primary(
-                    label: _useEmail
-                        ? l10n.authForgotPasswordSendLink
-                        : l10n.authForgotPasswordSendCode,
+                    label: l10n.authForgotPasswordSendCode,
                     enabled: canSubmit && !isLoading,
                     onPressed: isLoading ? null : _handleSendCode,
                   ),

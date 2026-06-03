@@ -1,9 +1,10 @@
 import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { OTP_SENDER, OtpSender } from './otp-sender.interface';
-import { NoopOtpSenderService } from './noop-otp-sender.service';
+import { OTP_SENDER, OtpSender } from './types/otp-sender.interface';
+import { NoopOtpSenderService } from './services/noop-otp-sender.service';
 import { TwilioOtpSender } from './senders/twilio.sender';
-import { OtpService } from './otp.service';
+import { OtpService } from './services/otp.service';
+import { EmailOtpService } from './services/email-otp.service';
 
 @Module({
   imports: [ConfigModule],
@@ -44,7 +45,8 @@ import { OtpService } from './otp.service';
       },
     },
     OtpService,
+    EmailOtpService,
   ],
-  exports: [OTP_SENDER, OtpService],
+  exports: [OTP_SENDER, OtpService, EmailOtpService],
 })
 export class OtpModule {}

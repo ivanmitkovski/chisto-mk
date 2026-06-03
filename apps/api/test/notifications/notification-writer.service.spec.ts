@@ -1,8 +1,8 @@
 import { NotificationType } from '../../src/prisma-client';
 import { PrismaService } from '../../src/prisma/prisma.service';
-import { FeatureFlagsService } from '../../src/feature-flags/feature-flags.service';
-import { NotificationPreferencesService } from '../../src/notifications/notification-preferences.service';
-import { NotificationWriterService } from '../../src/notifications/notification-writer.service';
+import { FeatureFlagsService } from '../../src/feature-flags/services/feature-flags.service';
+import { NotificationPreferencesService } from '../../src/notifications/services/notification-preferences.service';
+import { NotificationWriterService } from '../../src/notifications/services/notification-writer.service';
 
 describe('NotificationWriterService', () => {
   const userId = 'user-1';

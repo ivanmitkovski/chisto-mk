@@ -78,8 +78,6 @@ describe('Event chat WebSocket journey (e2e)', () => {
           if (connected !== 2) {
             return;
           }
-          listener.emit('join', { eventId: fixture.eventId });
-          emitter.emit('join', { eventId: fixture.eventId });
 
           listener.once('typing:update', (payload: { eventId?: string; userId?: string; typing?: boolean }) => {
             try {
@@ -94,6 +92,11 @@ describe('Event chat WebSocket journey (e2e)', () => {
           });
 
           void (async () => {
+            // `connect` fires before gateway JWT auth finishes; join/typing need userId on socket.data.
+            await new Promise((r) => setTimeout(r, 500));
+            listener.emit('join', { eventId: fixture.eventId });
+            emitter.emit('join', { eventId: fixture.eventId });
+            await new Promise((r) => setTimeout(r, 750));
             await new Promise((r) => setTimeout(r, TYPING_THROTTLE_MS));
             emitter.emit('typing', { eventId: fixture.eventId, typing: true });
           })();

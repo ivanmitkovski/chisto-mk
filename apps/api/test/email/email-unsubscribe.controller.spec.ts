@@ -2,7 +2,7 @@
 
 import type { Response } from 'express';
 import { HttpStatus } from '@nestjs/common';
-import { EmailUnsubscribeController } from '../../src/email/email-unsubscribe.controller';
+import { EmailUnsubscribeController } from '../../src/email/controllers/email-unsubscribe.controller';
 
 describe('EmailUnsubscribeController', () => {
   it('GET unsubscribe without token responds with invalid message HTML', async () => {

@@ -1,6 +1,6 @@
 import { ConfigService } from '@nestjs/config';
-import { EmailPostmarkTransportService } from '../../src/email/email-postmark-transport.service';
-import type { EmailSendPayload } from '../../src/email/email-transport.types';
+import { EmailPostmarkTransportService } from '../../src/email/services/email-postmark-transport.service';
+import type { EmailSendPayload } from '../../src/email/types/email-transport.types';
 
 describe('EmailPostmarkTransportService', () => {
   const basePayload: EmailSendPayload = {

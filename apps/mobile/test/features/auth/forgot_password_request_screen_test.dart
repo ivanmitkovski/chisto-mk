@@ -12,6 +12,17 @@ Finder _primaryCta(String label) {
   );
 }
 
+Finder _primaryCtaElevated(String label) {
+  return find.descendant(
+    of: _primaryCta(label),
+    matching: find.byType(ElevatedButton),
+  );
+}
+
+ElevatedButton primaryElevatedWidget(WidgetTester tester, String label) {
+  return tester.widget<ElevatedButton>(_primaryCtaElevated(label));
+}
+
 void main() {
   setUpAll(() async {
     await bootstrapWidgetTests();
@@ -54,10 +65,10 @@ void main() {
 
     expect(find.text('Email'), findsOneWidget);
     expect(find.text('Phone number'), findsNothing);
-    expect(_primaryCta('Send reset link'), findsOneWidget);
+    expect(_primaryCta('Send reset code'), findsOneWidget);
     expect(
       find.text(
-        "Enter the email on your account and we'll send a reset link if it exists.",
+        "Enter the email on your account and we'll send a reset code if it exists.",
       ),
       findsOneWidget,
     );
@@ -85,6 +96,55 @@ void main() {
     expect(
       find.byKey(const Key('auth_forgot_password_alternate_method')),
       findsOneWidget,
+    );
+  });
+
+  testWidgets('Send reset code enables after 8-digit phone entry', (
+    WidgetTester tester,
+  ) async {
+    await pumpAuthWidget(tester, home: const ForgotPasswordRequestScreen());
+    await tester.pumpAndSettle();
+
+    expect(
+      primaryElevatedWidget(tester, 'Send reset code').onPressed,
+      isNull,
+    );
+
+    await tester.enterText(find.byType(TextFormField), '75770803');
+    await tester.pump();
+
+    expect(
+      primaryElevatedWidget(tester, 'Send reset code').onPressed,
+      isNotNull,
+    );
+  });
+
+  testWidgets('Send reset code enables for valid email only', (
+    WidgetTester tester,
+  ) async {
+    await pumpAuthWidget(tester, home: const ForgotPasswordRequestScreen());
+    await tester.pumpAndSettle();
+
+    await tapAlternateMethod(tester);
+    await tester.pumpAndSettle();
+
+    expect(
+      primaryElevatedWidget(tester, 'Send reset code').onPressed,
+      isNull,
+    );
+
+    await tester.enterText(find.byType(TextFormField), 'not-an-email');
+    await tester.pump();
+    expect(
+      primaryElevatedWidget(tester, 'Send reset code').onPressed,
+      isNull,
+    );
+
+    await tester.enterText(find.byType(TextFormField), 'user@example.com');
+    await tester.pump();
+    expect(
+      primaryElevatedWidget(tester, 'Send reset code').onPressed,
+      isNotNull,
     );
   });
 }

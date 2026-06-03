@@ -464,14 +464,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get authForgotPasswordEmailSubtitle =>
-      'Enter the email on your account and we\'ll send a reset link if it exists.';
-
-  @override
-  String get authForgotPasswordEmailSentTitle => 'Check your email';
-
-  @override
-  String get authForgotPasswordEmailSentBody =>
-      'If an account exists for that email, we sent a link to reset your password.';
+      'Enter the email on your account and we\'ll send a reset code if it exists.';
 
   @override
   String get authForgotPasswordEmailField => 'Email';
@@ -685,12 +678,17 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String authForgotPasswordOtpEmailSubtitle(String email) {
+    return 'We sent a 6-digit code to $email';
+  }
+
+  @override
   String get authErrorPhoneNotVerified =>
       'Your phone number is not verified yet.';
 
   @override
   String get authErrorPasswordResetTokenInvalid =>
-      'This reset link is invalid or has expired.';
+      'This reset code is invalid or has expired.';
 
   @override
   String get authNewPasswordTitle => 'Create new password';

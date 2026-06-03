@@ -47,6 +47,73 @@ void main() {
       expect(s.nextCursor, 'c1');
     });
 
+    test('refresh keeps ready phase and entries while reloading', () async {
+      int calls = 0;
+      final ProviderContainer container = ProviderContainer(
+        overrides: <Override>[
+          profileRepositoryProvider.overrideWithValue(
+            TestingProfileRepository(
+              getMeImpl: () async => throw UnimplementedError(),
+              getPointsHistoryImpl: ({int limit = 30, String? cursor}) async {
+                calls++;
+                if (calls == 1) {
+                  return PointsHistoryPage(
+                    items: <PointsHistoryEntry>[
+                      PointsHistoryEntry(
+                        id: '1',
+                        createdAt: DateTime.utc(2026, 1, 1),
+                        delta: 1,
+                        reasonCode: 'OTHER',
+                      ),
+                    ],
+                    milestones: const <PointsHistoryMilestone>[],
+                    nextCursor: 'c1',
+                  );
+                }
+                await Future<void>.delayed(const Duration(milliseconds: 50));
+                return PointsHistoryPage(
+                  items: <PointsHistoryEntry>[
+                    PointsHistoryEntry(
+                      id: '2',
+                      createdAt: DateTime.utc(2026, 1, 2),
+                      delta: 3,
+                      reasonCode: 'OTHER',
+                    ),
+                  ],
+                  milestones: const <PointsHistoryMilestone>[],
+                );
+              },
+            ),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      container.listen(pointsHistoryNotifierProvider, (_, __) {});
+
+      await container
+          .read(pointsHistoryNotifierProvider.notifier)
+          .loadInitial();
+
+      final Future<void> refreshFuture = container
+          .read(pointsHistoryNotifierProvider.notifier)
+          .refresh();
+
+      final PointsHistoryUiState mid = container.read(
+        pointsHistoryNotifierProvider,
+      );
+      expect(mid.phase, PointsHistoryPhase.ready);
+      expect(mid.entries.single.id, '1');
+
+      await refreshFuture;
+      final PointsHistoryUiState after = container.read(
+        pointsHistoryNotifierProvider,
+      );
+      expect(after.phase, PointsHistoryPhase.ready);
+      expect(after.entries.single.id, '2');
+      expect(calls, 2);
+    });
+
     test('loadMore appends and surfaces loadMoreError on failure', () async {
       int calls = 0;
       final ProviderContainer container = ProviderContainer(
@@ -77,6 +144,8 @@ void main() {
         ],
       );
       addTearDown(container.dispose);
+
+      container.listen(pointsHistoryNotifierProvider, (_, __) {});
 
       await container
           .read(pointsHistoryNotifierProvider.notifier)

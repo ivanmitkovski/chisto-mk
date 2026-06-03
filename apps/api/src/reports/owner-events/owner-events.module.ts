@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ReportsOwnerEventsService } from '../reports-owner-events.service';
+import { ReportsOwnerEventsService } from '../services/reports-owner-events.service';
 import { InMemoryReportEventBus, RedisReportEventBus, ReportEventBus } from './report-event-bus';
 
 @Module({

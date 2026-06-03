@@ -1,4 +1,4 @@
-import { MapCdnPurgeService } from '../../src/observability/map-cdn-purge.service';
+import { MapCdnPurgeService } from '../../src/observability/services/map-cdn-purge.service';
 
 describe('MapCdnPurgeService', () => {
   const originalEnv = process.env;

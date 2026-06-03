@@ -1,7 +1,7 @@
 /// <reference types="jest" />
 
 import { NotificationType } from '../../src/prisma-client';
-import { isImportantNotificationEmail } from '../../src/email/email-importance.policy';
+import { isImportantNotificationEmail } from '../../src/email/util/email-importance.policy';
 
 describe('isImportantNotificationEmail', () => {
   it('returns true for event completion points awarded', () => {

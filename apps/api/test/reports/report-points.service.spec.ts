@@ -1,6 +1,6 @@
 /// <reference types="jest" />
 import { ReportCleanupEffort } from '../../src/prisma-client';
-import { ReportPointsService } from '../../src/reports/report-points.service';
+import { ReportPointsService } from '../../src/reports/services/report-points.service';
 
 describe('ReportPointsService.computeApprovalPoints', () => {
   const svc = new ReportPointsService();

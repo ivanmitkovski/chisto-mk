@@ -1,5 +1,5 @@
 import { UnauthorizedException } from '@nestjs/common';
-import { MetricsController } from '../../src/observability/metrics.controller';
+import { MetricsController } from '../../src/observability/controllers/metrics.controller';
 
 describe('MetricsController', () => {
   const originalToken = process.env.METRICS_BEARER_TOKEN;

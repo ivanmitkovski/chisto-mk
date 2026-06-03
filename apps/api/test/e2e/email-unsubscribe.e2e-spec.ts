@@ -3,7 +3,7 @@
 import type { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { NotificationType } from '../../src/prisma-client';
-import { EmailUnsubscribeTokenService } from '../../src/email/email-unsubscribe-token.service';
+import { EmailUnsubscribeTokenService } from '../../src/email/services/email-unsubscribe-token.service';
 import { PrismaService } from '../../src/prisma/prisma.service';
 import { createE2eApplication } from './helpers/bootstrap-app';
 import { registerCitizen } from './helpers/auth-helper';

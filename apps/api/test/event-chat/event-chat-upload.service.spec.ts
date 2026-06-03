@@ -1,9 +1,9 @@
 /// <reference types="jest" />
 
 import { ConfigService } from '@nestjs/config';
-import { EventChatUploadService } from '../../src/event-chat/event-chat-upload.service';
+import { EventChatUploadService } from '../../src/event-chat/services/event-chat-upload.service';
 import type { PrismaService } from '../../src/prisma/prisma.service';
-import { S3StorageClient } from '../../src/storage/s3-storage.client';
+import { S3StorageClient } from '../../src/storage/util/s3-storage.client';
 
 describe('EventChatUploadService', () => {
   function buildService(bucket: string | null, region = 'eu-central-1'): EventChatUploadService {

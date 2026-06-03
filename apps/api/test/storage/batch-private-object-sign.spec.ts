@@ -2,7 +2,7 @@
 import {
   signPrivateObjectKeysDeduped,
   signPublicMediaUrlsDeduped,
-} from '../../src/storage/batch-private-object-sign';
+} from '../../src/storage/util/batch-private-object-sign';
 
 describe('signPrivateObjectKeysDeduped', () => {
   it('dedupes keys and calls signer once per unique key', async () => {

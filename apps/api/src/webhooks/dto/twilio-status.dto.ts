@@ -38,6 +38,11 @@ export class TwilioStatusDto {
   @IsString()
   ErrorCode?: string;
 
+  @ApiPropertyOptional({ description: 'Twilio callback timestamp (RFC2822 or ISO8601)' })
+  @IsOptional()
+  @IsString()
+  Timestamp?: string;
+
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()

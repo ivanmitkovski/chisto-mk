@@ -4,8 +4,8 @@ import { BadRequestException } from '@nestjs/common';
 import { Role } from '../../src/prisma-client';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
 import { FieldBatchDto } from '../../src/events/dto/field-batch.dto';
-import { EventsFieldBatchService } from '../../src/events/events-field-batch.service';
-import { EventLiveImpactService } from '../../src/events/event-live-impact.service';
+import { EventsFieldBatchService } from '../../src/events/services/events-field-batch.service';
+import { EventLiveImpactService } from '../../src/events/services/event-live-impact.service';
 
 function user(): AuthenticatedUser {
   return {

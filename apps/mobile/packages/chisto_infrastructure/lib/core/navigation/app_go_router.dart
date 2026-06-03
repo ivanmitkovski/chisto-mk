@@ -4,8 +4,8 @@ import 'package:chisto_infrastructure/core/navigation/app_routes.dart';
 import 'package:chisto_infrastructure/core/navigation/unknown_route_screen.dart';
 import 'package:chisto_infrastructure/core/providers/app_providers.dart';
 import 'package:chisto_infrastructure/core/providers/root_container.dart';
+import 'package:feature_auth/src/domain/models/password_reset_target.dart';
 import 'package:feature_auth/src/presentation/constants/splash_constants.dart';
-import 'package:feature_auth/src/presentation/screens/forgot_password_email_sent_screen.dart';
 import 'package:feature_auth/src/presentation/screens/forgot_password_new_screen.dart';
 import 'package:feature_auth/src/presentation/screens/forgot_password_otp_screen.dart';
 import 'package:feature_auth/src/presentation/screens/forgot_password_request_screen.dart';
@@ -113,17 +113,17 @@ GoRouter buildAppGoRouter({String initialLocation = AppRoutes.splash}) {
       GoRoute(
         path: AppRoutes.forgotPasswordOtp,
         builder: (_, GoRouterState state) {
-          if (state.extra is! String) {
+          if (state.extra is! PasswordResetTarget) {
             if (kDebugMode) {
               AppLog.warn(
-                '[AppGoRouter] ${AppRoutes.forgotPasswordOtp} expected String; '
+                '[AppGoRouter] ${AppRoutes.forgotPasswordOtp} expected PasswordResetTarget; '
                 'got ${state.extra?.runtimeType}. Restarting credential recovery flow.',
               );
             }
             return const ForgotPasswordRequestScreen();
           }
           return ForgotPasswordOtpScreen(
-            phoneNumberE164: state.extra! as String,
+            target: state.extra! as PasswordResetTarget,
           );
         },
       ),
@@ -131,10 +131,6 @@ GoRouter buildAppGoRouter({String initialLocation = AppRoutes.splash}) {
         path: AppRoutes.forgotPasswordNew,
         builder: (_, GoRouterState state) =>
             _buildForgotPasswordNewScreen(state.extra),
-      ),
-      GoRoute(
-        path: AppRoutes.forgotPasswordEmailSent,
-        builder: (_, _) => const ForgotPasswordEmailSentScreen(),
       ),
       GoRoute(
         path: AppRoutes.forgotPasswordSuccess,
@@ -185,7 +181,7 @@ GoRouter buildAppGoRouter({String initialLocation = AppRoutes.splash}) {
           } else if (extra is XFile) {
             photo = extra;
           }
-          return MaterialPage<bool>(
+          return MaterialPage<Object?>(
             key: state.pageKey,
             child: NewReportScreen(
               initialPhoto: photo,
@@ -289,9 +285,6 @@ Widget _buildOtpScreen(Object? extra) {
 }
 
 Widget _buildForgotPasswordNewScreen(Object? extra) {
-  if (extra is EmailPasswordResetRouteArgs) {
-    return ForgotPasswordNewScreen(emailResetToken: extra.token);
-  }
   if (extra is! ForgotPasswordNewRouteArgs) {
     if (kDebugMode) {
       AppLog.warn(
@@ -302,7 +295,7 @@ Widget _buildForgotPasswordNewScreen(Object? extra) {
     return const ForgotPasswordRequestScreen();
   }
   return ForgotPasswordNewScreen(
-    phoneNumberE164: extra.phoneNumberE164,
+    target: extra.target,
     code: extra.code,
   );
 }

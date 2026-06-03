@@ -1,5 +1,5 @@
 /// <reference types="jest" />
-import { moderationQueueMetaForStatus } from '../../src/reports/report-moderation-queue-meta';
+import { moderationQueueMetaForStatus } from '../../src/reports/util/report-moderation-queue-meta';
 
 describe('moderationQueueMetaForStatus', () => {
   it('maps NEW and IN_REVIEW to SLA hints', () => {

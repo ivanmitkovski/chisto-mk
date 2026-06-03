@@ -68,26 +68,11 @@ extension _OrganizerCheckInAttendeeSlivers on _OrganizerCheckInScreenState {
                   color: AppColors.divider.withValues(alpha: 0.7),
                 ),
               ),
-              child: Column(
-                children: <Widget>[
-                  Icon(
-                    CupertinoIcons.person_2,
-                    size: 44,
-                    color: AppColors.textMuted.withValues(alpha: 0.45),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  Text(
-                    context.l10n.eventsOrganizerEmptyListTitle,
-                    style: AppTypography.eventsFeedSectionTitle(textTheme),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(
-                    context.l10n.eventsOrganizerEmptyListSubtitle,
-                    style: AppTypography.eventsSupportingCaption(textTheme),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+              child: AppEmptyState(
+                icon: CupertinoIcons.person_2,
+                title: context.l10n.eventsOrganizerEmptyListTitle,
+                subtitle: context.l10n.eventsOrganizerEmptyListSubtitle,
+                padding: EdgeInsets.zero,
               ),
             ),
           ),

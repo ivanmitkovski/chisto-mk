@@ -1,5 +1,5 @@
 /// <reference types="jest" />
-import { NotificationPreferencesService } from '../../src/notifications/notification-preferences.service';
+import { NotificationPreferencesService } from '../../src/notifications/services/notification-preferences.service';
 
 function makePrisma() {
   return {

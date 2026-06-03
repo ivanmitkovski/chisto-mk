@@ -1,4 +1,4 @@
-import { buildEventAnalyticsPayload } from '../../src/events/event-analytics.aggregation';
+import { buildEventAnalyticsPayload } from '../../src/events/util/event-analytics.aggregation';
 
 describe('buildEventAnalyticsPayload', () => {
   it('returns 24 hourly buckets in UTC with zero defaults', () => {

@@ -18,24 +18,24 @@ import { CheckEventConflictQueryDto } from '../../src/events/dto/check-event-con
 import { ListEventParticipantsQueryDto } from '../../src/events/dto/list-event-participants-query.dto';
 import { ListEventsQueryDto } from '../../src/events/dto/list-events-query.dto';
 import { PatchEventReminderDto } from '../../src/events/dto/patch-event-reminder.dto';
-import { EventsAfterImagesService } from '../../src/events/events-after-images.service';
-import { EventsAnalyticsService } from '../../src/events/events-analytics.service';
-import { EventCreationPersistenceService } from '../../src/events/event-creation-persistence.service';
-import { EventCreationValidationService } from '../../src/events/event-creation-validation.service';
-import { EventUpdateValidationService } from '../../src/events/event-update-validation.service';
-import { EventsCreationService } from '../../src/events/events-creation.service';
-import { EventsLifecycleService } from '../../src/events/events-lifecycle.service';
-import { EventsParticipationService } from '../../src/events/events-participation.service';
-import { EventsDetailQueryService } from '../../src/events/events-detail-query.service';
-import { EventsListQueryService } from '../../src/events/events-list-query.service';
-import { EventsMobileMapperService } from '../../src/events/events-mobile-mapper.service';
-import { EventsQueryService } from '../../src/events/events-query.service';
-import { EventsRepository } from '../../src/events/events.repository';
-import { EventsScheduleConflictPreviewQueryService } from '../../src/events/events-schedule-conflict-preview-query.service';
-import { EventsSearchQueryService } from '../../src/events/events-search-query.service';
-import { EventsSearchService } from '../../src/events/events-search.service';
-import { EventsShareCardQueryService } from '../../src/events/events-share-card-query.service';
-import { EventsUpdateService } from '../../src/events/events-update.service';
+import { EventsAfterImagesService } from '../../src/events/services/events-after-images.service';
+import { EventsAnalyticsService } from '../../src/events/services/events-analytics.service';
+import { EventCreationPersistenceService } from '../../src/events/services/event-creation-persistence.service';
+import { EventCreationValidationService } from '../../src/events/services/event-creation-validation.service';
+import { EventUpdateValidationService } from '../../src/events/services/event-update-validation.service';
+import { EventsCreationService } from '../../src/events/services/events-creation.service';
+import { EventsLifecycleService } from '../../src/events/services/events-lifecycle.service';
+import { EventsParticipationService } from '../../src/events/services/events-participation.service';
+import { EventsDetailQueryService } from '../../src/events/services/events-detail-query.service';
+import { EventsListQueryService } from '../../src/events/services/events-list-query.service';
+import { EventsMobileMapperService } from '../../src/events/services/events-mobile-mapper.service';
+import { EventsQueryService } from '../../src/events/services/events-query.service';
+import { EventsRepository } from '../../src/events/repositories/events.repository';
+import { EventsScheduleConflictPreviewQueryService } from '../../src/events/services/events-schedule-conflict-preview-query.service';
+import { EventsSearchQueryService } from '../../src/events/services/events-search-query.service';
+import { EventsSearchService } from '../../src/events/services/events-search.service';
+import { EventsShareCardQueryService } from '../../src/events/services/events-share-card-query.service';
+import { EventsUpdateService } from '../../src/events/services/events-update.service';
 
 function user(id: string, role: Role = Role.USER): AuthenticatedUser {
   return {

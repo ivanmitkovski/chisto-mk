@@ -202,12 +202,10 @@
   "authVerifyPhoneCta": "Потврди телефон",
   "authResetViaEmail": "Ресетирај преку е-пошта",
   "authResetViaSms": "Ресетирај преку SMS",
-  "authForgotPasswordEmailSubtitle": "Внесете ја е-поштата на сметката. Ќе испратиме врска за ресетирање ако постои сметка.",
-  "authForgotPasswordEmailSentTitle": "Проверете ја е-поштата",
-  "authForgotPasswordEmailSentBody": "Ако постои сметка за таа е-пошта, испративме врска за нова лозинка.",
+  "authForgotPasswordEmailSubtitle": "Внесете ја е-поштата на сметката. Ќе испратиме код за ресетирање ако постои сметка.",
   "authForgotPasswordEmailField": "Е-пошта",
   "authErrorPhoneNotVerified": "Телефонот сè уште не е потврден.",
-  "authErrorPasswordResetTokenInvalid": "Врската за ресетирање е невалидна или истечена.",
+  "authErrorPasswordResetTokenInvalid": "Кодот за ресетирање е невалиден или истечен.",
   "authForgotPassword": "Заборавена лозинка?",
   "authSignInCta": "Најави се",
   "authValidationCheckPhonePassword": "Проверете го телефонот и лозинката.",
@@ -303,9 +301,17 @@
   "authForgotPasswordRequestSemantic": "Испрати код за ресет",
   "authForgotPasswordOtpTitle": "Внесете код",
   "authForgotPasswordOtpSubtitle": "Испративме 6-цифрен код на {phone}",
+  "authForgotPasswordOtpEmailSubtitle": "Испративме 6-цифрен код на {email}",
   "@authForgotPasswordOtpSubtitle": {
     "placeholders": {
       "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "@authForgotPasswordOtpEmailSubtitle": {
+    "placeholders": {
+      "email": {
         "type": "String"
       }
     }

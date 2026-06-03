@@ -1,5 +1,5 @@
 /// <reference types="jest" />
-import { UserDsarExportService } from '../../src/auth/user-dsar-export.service';
+import { UserDsarExportService } from '../../src/auth/services/user-dsar-export.service';
 
 describe('UserDsarExportService', () => {
   it('buildExport includes profile and sections', async () => {

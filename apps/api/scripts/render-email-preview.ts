@@ -5,9 +5,9 @@
  */
 import { mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import { resolveEmailLogoPreviewSrc } from '../src/email/email-logo';
-import { EmailTemplateService } from '../src/email/email-template.service';
-import type { EmailTemplateId } from '../src/email/email.types';
+import { resolveEmailLogoPreviewSrc } from '../src/email/util/email-logo';
+import { EmailTemplateService } from '../src/email/services/email-template.service';
+import type { EmailTemplateId } from '../src/email/types/email.types';
 
 const TEMPLATE_IDS: EmailTemplateId[] = [
   'welcome',

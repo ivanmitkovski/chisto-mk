@@ -153,13 +153,20 @@ List<PollutionSite> computeVisibleSitesForFilter({
     case FeedFilter.recent:
       return List<PollutionSite>.from(source);
     case FeedFilter.saved:
-      if (source.isNotEmpty &&
-          source.every((PollutionSite s) => s.isSavedByMe)) {
+      if (source.isEmpty) {
+        return const <PollutionSite>[];
+      }
+      if (source.every((PollutionSite s) => s.isSavedByMe)) {
         return List<PollutionSite>.from(source);
       }
-      return source
+      final List<PollutionSite> bookmarked = source
           .where((PollutionSite s) => s.isSavedByMe)
           .toList(growable: false);
+      if (bookmarked.isNotEmpty) {
+        return bookmarked;
+      }
+      // GET /sites/saved (or stale cache) may omit isSavedByMe; trust the list.
+      return List<PollutionSite>.from(source);
   }
 }
 

@@ -2,7 +2,7 @@ import {
   CHECK_IN_QR_TTL_SEC,
   signCheckInQrToken,
   verifyCheckInQrToken,
-} from '../../src/events/check-in-qr-token';
+} from '../../src/events/types/check-in-qr-token';
 
 describe('check-in-qr-token', () => {
   const secret = Buffer.from('test_secret_at_least_24_chars_x', 'utf8');

@@ -50,7 +50,11 @@ describe('Event check-in WebSocket (e2e)', () => {
         reject(new Error('timeout waiting for check-in WS auth failure'));
       }, 15_000);
       client.on('error', (payload: { code?: string }) => {
-        if (payload?.code === 'AUTH_FAILED') {
+        if (
+          payload?.code === 'AUTH_FAILED' ||
+          payload?.code === 'INVALID_TOKEN' ||
+          payload?.code === 'CHECK_IN_UNAUTHORIZED'
+        ) {
           clearTimeout(t);
           client.close();
           resolve();

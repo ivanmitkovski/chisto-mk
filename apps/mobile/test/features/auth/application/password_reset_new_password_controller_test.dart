@@ -1,4 +1,5 @@
 import 'package:feature_auth/src/application/password_reset_new_password_controller.dart';
+import 'package:feature_auth/src/domain/models/password_reset_target.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -11,7 +12,7 @@ void main() {
     await bootstrapWidgetTests();
   });
 
-  test('confirmByPhone completes without error', () async {
+  test('confirm with SMS target completes without error', () async {
     var called = false;
     final FakeAuthRepository repo = FakeAuthRepository(
       confirmPasswordResetImpl:
@@ -34,8 +35,11 @@ void main() {
 
     await container
         .read(passwordResetNewPasswordControllerProvider.notifier)
-        .confirmByPhone(
-          phoneNumberE164: '+38970123456',
+        .confirm(
+          target: const PasswordResetTarget(
+            channel: PasswordResetChannel.sms,
+            value: '+38970123456',
+          ),
           code: '123456',
           newPassword: 'newpass123',
         );
@@ -47,13 +51,18 @@ void main() {
     );
   });
 
-  test('confirmByEmail calls repository', () async {
+  test('confirm with email target calls repository', () async {
     var called = false;
     final FakeAuthRepository repo = FakeAuthRepository(
       confirmPasswordResetByEmailImpl:
-          ({required String token, required String newPassword}) async {
+          ({
+            required String email,
+            required String code,
+            required String newPassword,
+          }) async {
             called = true;
-            expect(token, 'email-tok');
+            expect(email, 'user@example.com');
+            expect(code, '123456');
             expect(newPassword, 'newpass123');
           },
     );
@@ -65,7 +74,14 @@ void main() {
 
     await container
         .read(passwordResetNewPasswordControllerProvider.notifier)
-        .confirmByEmail(token: 'email-tok', newPassword: 'newpass123');
+        .confirm(
+          target: const PasswordResetTarget(
+            channel: PasswordResetChannel.email,
+            value: 'user@example.com',
+          ),
+          code: '123456',
+          newPassword: 'newpass123',
+        );
 
     expect(called, isTrue);
   });

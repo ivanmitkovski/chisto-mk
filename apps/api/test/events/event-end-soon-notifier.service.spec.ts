@@ -1,6 +1,6 @@
 import { NotificationType } from '../../src/prisma-client';
-import { EventEndSoonNotifierService } from '../../src/events/event-end-soon-notifier.service';
-import { NotificationDispatcherService } from '../../src/notifications/notification-dispatcher.service';
+import { EventEndSoonNotifierService } from '../../src/events/services/event-end-soon-notifier.service';
+import { NotificationDispatcherService } from '../../src/notifications/services/notification-dispatcher.service';
 import { PrismaService } from '../../src/prisma/prisma.service';
 
 describe(EventEndSoonNotifierService.name, () => {

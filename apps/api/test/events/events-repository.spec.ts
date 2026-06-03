@@ -1,6 +1,6 @@
 /// <reference types="jest" />
 
-import { EventsRepository } from '../../src/events/events.repository';
+import { EventsRepository } from '../../src/events/repositories/events.repository';
 
 describe('EventsRepository', () => {
   it('listRecurrenceSeriesEventsBatch returns empty map for empty input', async () => {

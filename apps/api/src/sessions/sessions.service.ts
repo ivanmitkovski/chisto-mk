@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
-import { AuditService } from '../audit/audit.service';
+import { AuditService } from '../audit/services/audit.service';
 
 export type AdminSessionRow = {
   id: string;

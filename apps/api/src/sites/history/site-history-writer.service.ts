@@ -5,7 +5,7 @@ import {
   SiteStatus,
 } from '../../prisma-client';
 import { PrismaService } from '../../prisma/prisma.service';
-import { SiteEventsService } from '../../admin-realtime/site-events.service';
+import { SiteEventsService } from '../../admin-realtime/services/site-events.service';
 import {
   compactSiteHistoryInput,
   type SiteHistoryActor,

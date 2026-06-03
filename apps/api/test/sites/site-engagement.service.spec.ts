@@ -1,10 +1,10 @@
 import { ConfigService } from '@nestjs/config';
 
-import { SiteBookmarkService } from '../../src/sites/site-bookmark.service';
-import { SiteEngagementService } from '../../src/sites/site-engagement.service';
-import { SiteShareLinkService } from '../../src/sites/site-share-link.service';
-import { SiteUpvoteService } from '../../src/sites/site-upvote.service';
-import { signSiteShareLinkToken } from '../../src/sites/site-share-link-token';
+import { SiteBookmarkService } from '../../src/sites/services/site-bookmark.service';
+import { SiteEngagementService } from '../../src/sites/services/site-engagement.service';
+import { SiteShareLinkService } from '../../src/sites/services/site-share-link.service';
+import { SiteUpvoteService } from '../../src/sites/services/site-upvote.service';
+import { signSiteShareLinkToken } from '../../src/sites/types/site-share-link-token';
 
 const TOKEN_SECRET = 'unit_test_site_share_token_secret_24';
 const FINGERPRINT_SECRET = 'unit_test_site_share_fingerprint_24';

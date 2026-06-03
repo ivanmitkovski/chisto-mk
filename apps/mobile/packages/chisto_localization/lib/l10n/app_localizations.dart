@@ -919,20 +919,8 @@ abstract class AppLocalizations {
   /// No description provided for @authForgotPasswordEmailSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Enter the email on your account and we\'ll send a reset link if it exists.'**
+  /// **'Enter the email on your account and we\'ll send a reset code if it exists.'**
   String get authForgotPasswordEmailSubtitle;
-
-  /// No description provided for @authForgotPasswordEmailSentTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Check your email'**
-  String get authForgotPasswordEmailSentTitle;
-
-  /// No description provided for @authForgotPasswordEmailSentBody.
-  ///
-  /// In en, this message translates to:
-  /// **'If an account exists for that email, we sent a link to reset your password.'**
-  String get authForgotPasswordEmailSentBody;
 
   /// No description provided for @authForgotPasswordEmailField.
   ///
@@ -1300,6 +1288,12 @@ abstract class AppLocalizations {
   /// **'We sent a 6-digit code to {phone}'**
   String authForgotPasswordOtpSubtitle(String phone);
 
+  /// No description provided for @authForgotPasswordOtpEmailSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'We sent a 6-digit code to {email}'**
+  String authForgotPasswordOtpEmailSubtitle(String email);
+
   /// No description provided for @authErrorPhoneNotVerified.
   ///
   /// In en, this message translates to:
@@ -1309,7 +1303,7 @@ abstract class AppLocalizations {
   /// No description provided for @authErrorPasswordResetTokenInvalid.
   ///
   /// In en, this message translates to:
-  /// **'This reset link is invalid or has expired.'**
+  /// **'This reset code is invalid or has expired.'**
   String get authErrorPasswordResetTokenInvalid;
 
   /// No description provided for @authNewPasswordTitle.

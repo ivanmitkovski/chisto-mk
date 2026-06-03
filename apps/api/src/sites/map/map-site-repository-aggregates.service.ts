@@ -5,7 +5,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { ListSitesMapQueryDto } from '../dto/list-sites-map-query.dto';
 import { MapQueryValidatorService } from './map-query-validator.service';
 import { resolveMapSiteBounds } from './map-site-repository-bounds.util';
-import { mapSiteVisibilitySql } from './map-site-visibility.helper';
+import { siteVisibilitySql } from '../util/site-visibility.helper';
 
 @Injectable()
 export class MapSiteRepositoryAggregatesService {
@@ -43,8 +43,9 @@ export class MapSiteRepositoryAggregatesService {
       : Prisma.sql`"Site"`;
 
     const idCol = flags.mapUseProjection ? Prisma.sql`"siteId"` : Prisma.sql`"id"`;
-    const visibilityFilter = mapSiteVisibilitySql({
+    const visibilityFilter = siteVisibilitySql({
       siteIdSql: idCol,
+      siteStatusSql: Prisma.sql`"status"`,
       viewerUserId,
     });
     const usePostgis = flags.mapPostgisEnabled;
@@ -102,8 +103,9 @@ export class MapSiteRepositoryAggregatesService {
       ? Prisma.sql`"MapSiteProjection"`
       : Prisma.sql`"Site"`;
     const idCol = flags.mapUseProjection ? Prisma.sql`"siteId"` : Prisma.sql`"id"`;
-    const visibilityFilter = mapSiteVisibilitySql({
+    const visibilityFilter = siteVisibilitySql({
       siteIdSql: idCol,
+      siteStatusSql: Prisma.sql`"status"`,
       viewerUserId,
     });
 

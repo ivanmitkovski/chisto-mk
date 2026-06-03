@@ -1,4 +1,4 @@
-import { stripCategoryLabelPrefix } from '../../src/reports/report-category-narrative';
+import { stripCategoryLabelPrefix } from '../../src/reports/util/report-category-narrative';
 
 describe('stripCategoryLabelPrefix', () => {
   it('returns empty string for null or empty input', () => {

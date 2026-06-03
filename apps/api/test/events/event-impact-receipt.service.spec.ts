@@ -3,8 +3,8 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
 import { Role } from '../../src/prisma-client';
-import { EventImpactReceiptService } from '../../src/events/event-impact-receipt.service';
-import { EventsTelemetryService } from '../../src/events/events-telemetry.service';
+import { EventImpactReceiptService } from '../../src/events/services/event-impact-receipt.service';
+import { EventsTelemetryService } from '../../src/events/services/events-telemetry.service';
 import { EcoEventLifecycleStatus, EventEvidenceKind } from '../../src/prisma-client';
 
 function user(id: string): AuthenticatedUser {

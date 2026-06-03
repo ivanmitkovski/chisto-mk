@@ -32,6 +32,7 @@ class AppButton extends StatefulWidget {
     bool enabled = true,
     bool isLoading = false,
     bool expand = true,
+    Widget? leadingIcon,
   }) => AppButton(
     key: key,
     label: label,
@@ -40,6 +41,7 @@ class AppButton extends StatefulWidget {
     enabled: enabled,
     isLoading: isLoading,
     expand: expand,
+    leadingIcon: leadingIcon,
   );
 
   factory AppButton.secondary({
@@ -141,6 +143,7 @@ class _AppButtonState extends State<AppButton> {
         onPressed: widget.onPressed,
         enabled: widget.enabled,
         isLoading: widget.isLoading,
+        leadingIcon: widget.leadingIcon,
       );
     }
 

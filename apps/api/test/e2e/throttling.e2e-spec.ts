@@ -28,6 +28,8 @@ describe('HTTP throttling (e2e)', () => {
         email: `e2e_throttle_${Date.now()}_${i}@test.local`,
         phoneNumber: uniquePhone(),
         password,
+        termsAcceptedAt: new Date().toISOString(),
+        termsVersion: '1',
       });
       lastStatus = res.status;
       if (res.status === 429) {

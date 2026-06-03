@@ -1,4 +1,6 @@
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:chisto_infrastructure/core/debug/chisto_submit_debug_log.dart';
+import 'package:chisto_infrastructure/core/logging/app_log.dart';
 import 'package:chisto_infrastructure/core/network/api_client.dart';
 import 'package:chisto_infrastructure/core/network/request_cancellation.dart';
 import 'package:chisto_infrastructure/core/observability/chisto_sentry.dart';
@@ -113,7 +115,21 @@ class ApiReportsRepository implements ReportsApiRepository {
       headers: headers,
     );
     final Map<String, dynamic>? json = response.json;
-    if (json == null) throw AppError.unknown();
+    if (json == null) {
+      final String? raw = response.body;
+      final String snippet = raw == null
+          ? '<null>'
+          : (raw.length > 256 ? '${raw.substring(0, 256)}...' : raw);
+      chistoSubmitDebugLog(
+        'submitReport empty/non-JSON status=${response.statusCode} body=$snippet',
+      );
+      AppLog.warn(
+        'submitReport: empty/non-JSON body status=${response.statusCode} '
+        'body=$snippet',
+        category: 'reports_api',
+      );
+      throw AppError.unknown();
+    }
     final Map<String, dynamic> payload = createReportSubmitPayload(json);
     final String reportId = payload['reportId'] as String? ?? '';
     if (reportId.isEmpty) {

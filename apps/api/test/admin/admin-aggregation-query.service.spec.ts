@@ -1,9 +1,9 @@
 /// <reference types="jest" />
 
-import { AdminAggregationQueryService } from '../../src/admin/admin-aggregation-query.service';
-import type { AdminRawOverviewBundle } from '../../src/admin/admin-dashboard-stats.service';
+import { AdminAggregationQueryService } from '../../src/admin/services/admin-aggregation-query.service';
+import type { AdminRawOverviewBundle } from '../../src/admin/services/admin-dashboard-stats.service';
 
-import { FeedRankingService } from '../../src/sites/feed-ranking.service';
+import { FeedRankingService } from '../../src/sites/services/feed-ranking.service';
 
 describe('AdminAggregationQueryService', () => {
   const scoreDetailed = jest.fn().mockReturnValue({

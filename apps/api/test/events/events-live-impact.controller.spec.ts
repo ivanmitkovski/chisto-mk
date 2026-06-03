@@ -4,9 +4,9 @@ import { firstValueFrom, of } from 'rxjs';
 import { take } from 'rxjs/operators';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
 import { Role } from '../../src/prisma-client';
-import { EventsLiveImpactController } from '../../src/events/events-live-impact.controller';
-import { EventLiveImpactService } from '../../src/events/event-live-impact.service';
-import { EventsQueryService } from '../../src/events/events-query.service';
+import { EventsLiveImpactController } from '../../src/events/controllers/events-live-impact.controller';
+import { EventLiveImpactService } from '../../src/events/services/event-live-impact.service';
+import { EventsQueryService } from '../../src/events/services/events-query.service';
 
 function user(id: string): AuthenticatedUser {
   return {

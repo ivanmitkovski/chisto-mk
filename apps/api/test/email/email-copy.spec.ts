@@ -1,7 +1,7 @@
 /// <reference types="jest" />
 
-import { buildBodyHtml, getCopy } from '../../src/email/email-copy';
-import type { EmailTemplateId } from '../../src/email/email.types';
+import { buildBodyHtml, getCopy } from '../../src/email/util/email-copy';
+import type { EmailTemplateId } from '../../src/email/types/email.types';
 
 const TEMPLATE_IDS: EmailTemplateId[] = [
   'welcome',

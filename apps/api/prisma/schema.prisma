@@ -84,7 +84,7 @@ model User {
   routeSegmentsClaimed        EventRouteSegment[] @relation("RouteSegmentClaims")
   checkInRiskSignals          CheckInRiskSignal[]
   archivedSites               Site[] @relation("SiteArchivedBy")
-  passwordResetEmailTokens    PasswordResetEmailToken[]
+  passwordResetEmailCode      PasswordResetEmailCode?
   blocksInitiated             UserBlock[]              @relation("BlockBlocker")
   blocksReceived              UserBlock[]              @relation("BlockBlocked")
   ugcReportsFiled             UgcContentReport[]       @relation("UgcReporter")
@@ -127,18 +127,21 @@ model UgcContentReport {
   @@index([reporterId])
 }
 
-model PasswordResetEmailToken {
-  id        String    @id @default(cuid())
-  userId    String
-  tokenHash String
-  expiresAt DateTime
-  usedAt    DateTime?
-  createdAt DateTime  @default(now())
+model PasswordResetEmailCode {
+  id                  String    @id @default(cuid())
+  userId              String    @unique
+  codeHash            String
+  expiresAt           DateTime
+  attemptCount        Int       @default(0)
+  lastSentAt          DateTime?
+  sendCountInWindow   Int       @default(0)
+  sendWindowStartedAt DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId])
-  @@index([tokenHash])
+  @@index([expiresAt])
 }
 
 model UserSession {

@@ -1,5 +1,5 @@
 /// <reference types="jest" />
-import { AuthSessionRevocationService } from '../../src/auth/auth-session-revocation.service';
+import { AuthSessionRevocationService } from '../../src/auth/services/auth-session-revocation.service';
 
 describe('AuthSessionRevocationService', () => {
   it('revokeAllForUser marks active sessions revoked', async () => {

@@ -34,6 +34,7 @@ ReportListItem reportListItemFromApiJson(Map<String, dynamic> json) {
     severity: severityNum?.toInt(),
     cleanupEffort: CleanupEffort.fromApiString(cleanupStr),
     viewerRole: viewerRole,
+    moderationReason: json['moderationReason'] as String?,
   );
 }
 
@@ -84,5 +85,6 @@ ReportDetail reportDetailFromApiJson(Map<String, dynamic> json) {
     severity: severityNum?.toInt(),
     cleanupEffort: CleanupEffort.fromApiString(cleanupStr),
     viewerRole: viewerRole,
+    moderationReason: json['moderationReason'] as String?,
   );
 }

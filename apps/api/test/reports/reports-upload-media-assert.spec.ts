@@ -1,10 +1,10 @@
 /// <reference types="jest" />
 import { BadRequestException, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ReportsUploadService } from '../../src/reports/reports-upload.service';
-import { ImageContentValidator } from '../../src/storage/image-content-validator';
-import { ReportMediaSignedUrlService } from '../../src/storage/report-media-signed-url.service';
-import { S3StorageClient } from '../../src/storage/s3-storage.client';
+import { ReportsUploadService } from '../../src/reports/services/reports-upload.service';
+import { ImageContentValidator } from '../../src/storage/util/image-content-validator';
+import { ReportMediaSignedUrlService } from '../../src/storage/services/report-media-signed-url.service';
+import { S3StorageClient } from '../../src/storage/util/s3-storage.client';
 
 describe('ReportsUploadService.assertReportMediaUrlsFromOurBucket', () => {
   function makeService(bucket: string | null) {

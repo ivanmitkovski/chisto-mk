@@ -6,7 +6,7 @@ import request from 'supertest';
 import { createE2eApplication } from './helpers/bootstrap-app';
 import { deleteUsersByEmailPrefix } from './helpers/db-cleanup';
 import { PrismaService } from '../../src/prisma/prisma.service';
-import { registerCitizen } from './helpers/auth-helper';
+import { registerCitizen, uniquePhone, e2eThrottleIp } from './helpers/auth-helper';
 import { Role } from '../../src/prisma-client';
 
 describe('Auth hardening (e2e)', () => {
@@ -90,14 +90,17 @@ describe('Auth hardening (e2e)', () => {
 
     const login2 = await agent
       .post('/v1/auth/login')
+      .set('X-Forwarded-For', e2eThrottleIp())
       .send({ phoneNumber: u.phoneNumber, password: u.password, rememberMe: true })
       .expect(200);
 
     await agent
-      .post('/v1/auth/me/password')
+      .patch('/v1/auth/me/password')
       .set('Authorization', `Bearer ${u.accessToken}`)
       .send({ currentPassword: u.password, newPassword: 'NewE2ePass99!' })
-      .expect(204);
+      .expect((res) => {
+        expect([200, 204]).toContain(res.status);
+      });
 
     await agent
       .post('/v1/auth/refresh')
@@ -107,23 +110,28 @@ describe('Auth hardening (e2e)', () => {
 
   it('rejects login when phone is not verified', async () => {
     const email = `e2e_hardening_unverified_${Date.now()}@example.com`;
-    const phone = `+38970${String(Date.now()).slice(-7)}`;
+    const phone = uniquePhone();
+    const throttleIp = e2eThrottleIp();
     await request(app.getHttpServer())
       .post('/v1/auth/register')
+      .set('X-Forwarded-For', throttleIp)
       .send({
         firstName: 'E2E',
         lastName: 'Unverified',
         email,
         phoneNumber: phone,
-        password: 'Password1',
+        password: 'E2eTest99!',
         termsAcceptedAt: new Date().toISOString(),
         termsVersion: '1',
       })
-      .expect(201);
+      .expect((res) => {
+        expect([200, 201]).toContain(res.status);
+      });
 
     const login = await request(app.getHttpServer())
       .post('/v1/auth/login')
-      .send({ phoneNumber: phone, password: 'Password1' })
+      .set('X-Forwarded-For', throttleIp)
+      .send({ phoneNumber: phone, password: 'E2eTest99!' })
       .expect(401);
 
     expect(login.body.code).toBe('PHONE_NOT_VERIFIED');

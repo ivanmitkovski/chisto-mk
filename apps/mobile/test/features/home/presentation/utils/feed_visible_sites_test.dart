@@ -115,6 +115,24 @@ void main() {
     expect(out.map((PollutionSite s) => s.id).toList(), <String>['1', '3']);
   });
 
+  test(
+    'computeVisibleSitesForFilter saved trusts server list when flags missing',
+    () {
+      final List<PollutionSite> sites = <PollutionSite>[
+        _dummy(id: 'saved-a', isSavedByMe: false),
+        _dummy(id: 'saved-b', isSavedByMe: false),
+      ];
+      final List<PollutionSite> out = computeVisibleSitesForFilter(
+        source: sites,
+        filter: FeedFilter.saved,
+      );
+      expect(out.map((PollutionSite s) => s.id).toList(), <String>[
+        'saved-a',
+        'saved-b',
+      ]);
+    },
+  );
+
   test('patchPollutionSitesSavedFlag updates matching id only', () {
     final List<PollutionSite> sites = <PollutionSite>[
       _dummy(id: '1', isSavedByMe: false),

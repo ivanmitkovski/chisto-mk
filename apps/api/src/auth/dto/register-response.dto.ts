@@ -12,4 +12,7 @@ export class RegisterResponseDto {
 
   @ApiProperty({ example: 600, description: 'OTP validity in seconds' })
   otpExpiresIn!: number;
+
+  @ApiProperty({ required: false, description: 'Development-only OTP when OTP_DEV_RETURN_CODE is enabled' })
+  devCode?: string;
 }
