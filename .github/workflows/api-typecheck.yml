@@ -8,6 +8,11 @@ on:
   push:
     branches: [develop, main]
 
+env:
+  # prisma.config.ts requires DATABASE_URL at config load time (generate does not connect).
+  DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/ci
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   typecheck:
     runs-on: ubuntu-latest
