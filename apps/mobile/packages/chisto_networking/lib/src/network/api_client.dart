@@ -549,10 +549,7 @@ class ApiClient {
     } on AppError {
       rethrow;
     } on Exception catch (e) {
-      if (e is http.ClientException) {
-        throw AppError.network(message: e.message, cause: e);
-      }
-      rethrow;
+      throw _networkErrorFromTransportException(e);
     }
   }
 
@@ -706,11 +703,26 @@ class ApiClient {
     } on AppError {
       rethrow;
     } on Exception catch (e) {
-      if (e is http.ClientException) {
-        throw AppError.network(message: e.message, cause: e);
-      }
-      rethrow;
+      throw _networkErrorFromTransportException(e);
     }
+  }
+
+  /// Maps low-level socket/TLS failures to [AppError.network] instead of
+  /// rethrowing (which becomes [AppError.unknown] upstream and hides the cause).
+  static Never _networkErrorFromTransportException(Object e) {
+    final String raw = switch (e) {
+      SocketException(:final String message) => message,
+      HandshakeException(:final String message) => message,
+      TlsException(:final String message) => message,
+      http.ClientException(:final String message) => message,
+      _ => e.toString(),
+    };
+    final String lower = raw.toLowerCase();
+    final String message = lower.contains('cleartext') ||
+            raw.contains('Cleartext HTTP')
+        ? 'Connection blocked (cleartext). Rebuild the app after pulling the latest Android network config.'
+        : (raw.isNotEmpty ? raw : 'Unable to reach the server.');
+    throw AppError.network(message: message, cause: e);
   }
 
   static Map<String, dynamic>? _decodeJsonObject(String bodyStr) {

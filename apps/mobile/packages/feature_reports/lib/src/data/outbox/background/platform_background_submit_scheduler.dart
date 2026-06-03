@@ -20,15 +20,26 @@ import 'package:workmanager/workmanager.dart';
 /// policy (same as today).
 class PlatformBackgroundSubmitScheduler implements BackgroundSubmitScheduler {
   @override
-  void scheduleDrain(Future<void> Function() drain) {
+  void scheduleDrain(
+    Future<void> Function() drain, {
+    bool requestNativeFollowUp = false,
+  }) {
     InProcessBackgroundSubmitScheduler().scheduleDrain(drain);
+    if (!requestNativeFollowUp) {
+      return;
+    }
+    unawaited(enqueueNativeDrain());
+  }
+
+  /// Schedules a native outbox drain (e.g. when the app moves to background).
+  static Future<void> enqueueNativeDrain() async {
     if (kIsWeb) {
       return;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
       case TargetPlatform.iOS:
-        unawaited(_enqueueNativeDrain());
+        await _enqueueNativeDrain();
         return;
       case TargetPlatform.fuchsia:
       case TargetPlatform.linux:

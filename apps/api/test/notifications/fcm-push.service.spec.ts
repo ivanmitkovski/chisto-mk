@@ -1,4 +1,4 @@
-import { FcmPushService } from '../../src/notifications/fcm-push.service';
+import { FcmPushService } from '../../src/notifications/services/fcm-push.service';
 
 describe('FcmPushService badge count', () => {
   const prisma = {

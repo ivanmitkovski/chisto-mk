@@ -3,7 +3,7 @@ import {
   DISCOVERY_DISTANCE_RADIUS_FLOOR_KM,
   discoveryRankingRadiusKm,
   resolveFeedGeoScope,
-} from '../../src/sites/sites-feed-geo-scope.util';
+} from '../../src/sites/util/sites-feed-geo-scope.util';
 
 describe('sites-feed-geo-scope.util', () => {
   const originalEnv = process.env.FEED_DISCOVERY_ENABLED;

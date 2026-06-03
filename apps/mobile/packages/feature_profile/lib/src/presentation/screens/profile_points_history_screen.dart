@@ -410,7 +410,7 @@ class _ProfilePointsHistoryScreenState
             child: AppRefreshIndicator(
               onRefresh: () => ref
                   .read(pointsHistoryNotifierProvider.notifier)
-                  .loadInitial(),
+                  .refresh(),
               child: CustomScrollView(
                 clipBehavior: Clip.none,
                 physics: const AlwaysScrollableScrollPhysics(

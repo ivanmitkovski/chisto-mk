@@ -8,6 +8,7 @@ import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
 import 'package:design_system/design_system.dart';
 import 'package:feature_reports/src/domain/models/report_capacity.dart';
 import 'package:feature_reports/src/domain/models/report_draft_summary.dart';
+import 'package:feature_reports/src/presentation/navigation/new_report_wizard_pop_result.dart';
 import 'package:feature_reports/src/presentation/navigation/reports_navigation.dart';
 import 'package:feature_reports/src/presentation/screens/new_report_screen.dart';
 import 'package:feature_reports/src/presentation/widgets/draft/draft_choice_sheet.dart'
@@ -151,5 +152,22 @@ class ReportEntryFlow {
       entryLabel: entryLabel,
       entryHint: entryHint,
     );
+  }
+
+  /// Applies the pop result from [NewReportScreen] after a successful submit.
+  static void handleNewReportWizardPopResult(
+    Object? result, {
+    required void Function(String reportId) onViewSubmittedReport,
+    required VoidCallback onViewReportsList,
+  }) {
+    switch (result) {
+      case null:
+      case NewReportWizardReportAnother():
+        return;
+      case NewReportWizardViewReport(:final String reportId):
+        onViewSubmittedReport(reportId);
+      case NewReportWizardViewReports():
+        onViewReportsList();
+    }
   }
 }

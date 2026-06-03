@@ -1,8 +1,8 @@
 /// <reference types="jest" />
 
 import { ServiceUnavailableException } from '@nestjs/common';
-import { MediaAssetService } from '../../src/storage/media-asset.service';
-import type { S3StorageClient } from '../../src/storage/s3-storage.client';
+import { MediaAssetService } from '../../src/storage/services/media-asset.service';
+import type { S3StorageClient } from '../../src/storage/util/s3-storage.client';
 
 describe('MediaAssetService', () => {
   it('rejects presigned PUT when S3 is disabled', async () => {

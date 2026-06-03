@@ -7,9 +7,9 @@ import { MapQueryValidatorService } from './map-query-validator.service';
 import { MapProjectionRow } from './map-types';
 import { resolveMapSiteBounds } from './map-site-repository-bounds.util';
 import {
-  mapSiteVisibilityPrismaWhere,
-  mapSiteVisibilitySql,
-} from './map-site-visibility.helper';
+  siteVisibilityPrismaWhere,
+  siteVisibilitySql,
+} from '../util/site-visibility.helper';
 
 type FallbackSiteRow = {
   id: string;
@@ -58,8 +58,9 @@ export class MapSiteRepositorySitesService {
     const includeArchived = query.includeArchived === true;
     const archivedFilter = includeArchived ? Prisma.empty : Prisma.sql`AND "isArchivedByAdmin" = false`;
     const hotProjectionFilter = Prisma.sql`AND "isHot" = true`;
-    const visibilityFilter = mapSiteVisibilitySql({
+    const visibilityFilter = siteVisibilitySql({
       siteIdSql: Prisma.sql`"siteId"`,
+      siteStatusSql: Prisma.sql`"status"`,
       viewerUserId,
     });
     const usePostgis = flags.mapPostgisEnabled;
@@ -125,8 +126,9 @@ export class MapSiteRepositorySitesService {
       ? Prisma.empty
       : Prisma.sql`AND "isArchivedByAdmin" = false`;
     const hotProjectionFilter = Prisma.sql`AND "isHot" = true`;
-    const visibilityFilter = mapSiteVisibilitySql({
+    const visibilityFilter = siteVisibilitySql({
       siteIdSql: Prisma.sql`"siteId"`,
+      siteStatusSql: Prisma.sql`"status"`,
       viewerUserId,
     });
 
@@ -162,8 +164,9 @@ export class MapSiteRepositorySitesService {
       return `${row?.count ?? 0}:${row?.latestUpdatedAt?.getTime() ?? 0}`;
     }
 
-    const siteVisibilityFilter = mapSiteVisibilitySql({
+    const siteVisibilityFilter = siteVisibilitySql({
       siteIdSql: Prisma.sql`"Site"."id"`,
+      siteStatusSql: Prisma.sql`"Site"."status"`,
       viewerUserId,
     });
     const [row] = await this.prisma.$queryRaw<
@@ -189,7 +192,7 @@ export class MapSiteRepositorySitesService {
   ): Promise<{ rows: MapProjectionRow[]; usedViewportBbox: boolean; usedFallback: boolean }> {
     const where: Prisma.SiteWhereInput = {
       ...(query.status ? { status: query.status } : {}),
-      ...mapSiteVisibilityPrismaWhere(viewerUserId),
+      ...siteVisibilityPrismaWhere(viewerUserId),
     };
     if (!query.includeArchived) {
       (where as Record<string, unknown>).isArchivedByAdmin = false;

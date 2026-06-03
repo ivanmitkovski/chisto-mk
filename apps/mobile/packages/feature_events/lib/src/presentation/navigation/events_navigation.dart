@@ -4,6 +4,7 @@ import 'package:chisto_infrastructure/core/auth/auth_state.dart';
 import 'package:chisto_infrastructure/core/navigation/app_navigation.dart';
 import 'package:chisto_infrastructure/core/navigation/app_routes.dart';
 import 'package:feature_events/src/domain/models/eco_event.dart';
+import 'package:feature_events/src/presentation/navigation/organizer_certification_navigation.dart';
 import 'package:feature_events/src/presentation/screens/organizer_toolkit/organizer_toolkit_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -18,7 +19,7 @@ class EventsNavigation {
     String? preselectedSiteName,
     String? preselectedSiteImageUrl,
     double? preselectedSiteDistanceKm,
-  }) {
+  }) async {
     final EventCreateRouteArguments createArgs = EventCreateRouteArguments(
       preselectedSiteId: preselectedSiteId,
       preselectedSiteName: preselectedSiteName,
@@ -26,15 +27,17 @@ class EventsNavigation {
       preselectedSiteDistanceKm: preselectedSiteDistanceKm,
     );
     if (!auth.isOrganizerCertified) {
-      return Navigator.of(context, rootNavigator: true).push<EcoEvent?>(
-        MaterialPageRoute<EcoEvent?>(
-          builder: (_) => OrganizerToolkitScreen(
-            onCertified: () {
-              AppNavigation.pushCreateEvent(args: createArgs);
-            },
+      await Navigator.of(context, rootNavigator: true).push<void>(
+        MaterialPageRoute<void>(
+          settings: const RouteSettings(
+            name: organizerCertificationToolkitRouteName,
           ),
+          builder: (_) => const OrganizerToolkitScreen(),
         ),
       );
+      if (!context.mounted || !auth.isOrganizerCertified) {
+        return Future<EcoEvent?>.value(null);
+      }
     }
     return AppNavigation.pushCreateEvent(args: createArgs);
   }

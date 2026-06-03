@@ -2,7 +2,7 @@
 // Only `describe.skip` in apps/api/test: skipped when REDIS_URL is unset (expected in CI without Redis for unit jobs).
 import { filter, firstValueFrom, take, timeout } from 'rxjs';
 import { RedisReportEventBus } from '../../src/reports/owner-events/report-event-bus';
-import type { OwnerReportEvent } from '../../src/reports/reports-owner-events.types';
+import type { OwnerReportEvent } from '../../src/reports/types/reports-owner-events.types';
 
 const redisUrl = process.env.REDIS_URL?.trim();
 

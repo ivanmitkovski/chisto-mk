@@ -26,7 +26,7 @@ describe('Map Redis rate limit (e2e)', () => {
     }
     const res = await request(app.getHttpServer())
       .get('/v1/sites/map')
-      .query({ lat: 41.9973, lng: 21.4254, limit: 10 })
+      .query({ lat: 41.9973, lng: 21.4254, zoom: 13, limit: 50 })
       .expect(200);
     expect(Array.isArray(res.body) || typeof res.body === 'object').toBe(true);
   });

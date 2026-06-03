@@ -1,4 +1,4 @@
-import 'package:chisto_infrastructure/core/navigation/app_routes.dart';
+import 'package:chisto_infrastructure/core/navigation/app_navigation.dart';
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
@@ -61,12 +61,7 @@ class ForgotPasswordSuccessScreen extends StatelessWidget {
                 label: l10n.authBackToSignIn,
                 child: AppButton.primary(
                   label: l10n.authBackToSignIn,
-                  onPressed: () {
-                    Navigator.of(context).popUntil(
-                      (Route<dynamic> route) =>
-                          route.settings.name == AppRoutes.signIn,
-                    );
-                  },
+                  onPressed: AppNavigation.goSignIn,
                 ),
               ),
             ],

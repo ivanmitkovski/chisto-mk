@@ -1,6 +1,6 @@
 /// <reference types="jest" />
 
-import { AdminDashboardStatsService } from '../../src/admin/admin-dashboard-stats.service';
+import { AdminDashboardStatsService } from '../../src/admin/services/admin-dashboard-stats.service';
 
 describe('AdminDashboardStatsService', () => {
   it('reportDailyCountsSince delegates to $queryRaw', async () => {

@@ -14,7 +14,7 @@ import {
 } from 'class-validator';
 
 import { GeoPointLatitudeLongitudeDto } from '../../common/dto/geo-point.dto';
-import { REPORT_CLEANUP_EFFORT_KEYS } from '../report-cleanup-effort';
+import { REPORT_CLEANUP_EFFORT_KEYS } from '../util/report-cleanup-effort';
 import { SanitizePlainText } from '../../common/sanitize/sanitize-transform.decorator';
 
 export class CreateReportWithLocationDto extends GeoPointLatitudeLongitudeDto {

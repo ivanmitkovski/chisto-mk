@@ -75,5 +75,12 @@ export class UserReportListItemDto {
     description: 'Whether this row is owned as primary reporter or visible as a co-reporter on the canonical report',
   })
   viewerRole!: UserReportViewerRole;
+
+  @ApiProperty({
+    nullable: true,
+    description:
+      'Moderator rejection reason and optional notes when status is DELETED; null for other statuses',
+  })
+  moderationReason!: string | null;
 }
 

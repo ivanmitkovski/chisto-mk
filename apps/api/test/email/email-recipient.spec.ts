@@ -1,6 +1,6 @@
 /// <reference types="jest" />
 
-import { isValidRecipientEmail } from '../../src/email/email-recipient';
+import { isValidRecipientEmail } from '../../src/email/util/email-recipient';
 
 describe('isValidRecipientEmail', () => {
   it('accepts typical addresses', () => {

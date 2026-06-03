@@ -10,16 +10,17 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Role, UserStatus } from '../../src/prisma-client';
 import * as bcrypt from 'bcrypt';
-import { AuthAdminLoginService } from '../../src/auth/auth-admin-login.service';
-import { AuthProfileService } from '../../src/auth/auth-profile.service';
-import { AuthProfileReadService } from '../../src/auth/auth-profile-read.service';
-import { AuthProfileAvatarService } from '../../src/auth/auth-profile-avatar.service';
-import { AuthRegistrationService } from '../../src/auth/auth-registration.service';
-import { AuthLoginService } from '../../src/auth/auth-login.service';
-import { LOGIN_MAX_ATTEMPTS } from '../../src/auth/auth.constants';
-import { AuthOtpService } from '../../src/auth/auth-otp.service';
-import { AuthSessionService } from '../../src/auth/auth-session.service';
-import { loadAuthEnvRuntime } from '../../src/auth/auth-env.config';
+import { AuthAdminLoginService } from '../../src/auth/services/auth-admin-login.service';
+import { AuthProfileService } from '../../src/auth/services/auth-profile.service';
+import { AuthProfileReadService } from '../../src/auth/services/auth-profile-read.service';
+import { AuthProfileAvatarService } from '../../src/auth/services/auth-profile-avatar.service';
+import { AuthRegistrationService } from '../../src/auth/services/auth-registration.service';
+import { AuthLoginService } from '../../src/auth/services/auth-login.service';
+import { LOGIN_MAX_ATTEMPTS } from '../../src/auth/constants/auth.constants';
+import { AuthOtpService } from '../../src/auth/services/auth-otp.service';
+import { AuthSessionService } from '../../src/auth/services/auth-session.service';
+import { RefreshTokenRotationService } from '../../src/auth/services/refresh-token-rotation.service';
+import { loadAuthEnvRuntime } from '../../src/auth/constants/auth-env.config';
 import { is2FAResponse } from '../../src/auth/types/auth-response.type';
 
 const mockUser = {
@@ -78,8 +79,8 @@ function makePrisma() {
     loginFailure: {
       findUnique: jest.fn(),
       deleteMany: jest.fn().mockResolvedValue(undefined),
-      update: jest.fn(),
-      create: jest.fn(),
+      update: jest.fn().mockResolvedValue({}),
+      create: jest.fn().mockResolvedValue({}),
     },
     pointTransaction: {
       aggregate: jest.fn().mockResolvedValue({ _sum: { delta: null } }),
@@ -181,12 +182,17 @@ describe('Auth stack (registration, session, profile)', () => {
       prisma as any,
       jwt as unknown as JwtService,
       reportsUploadService as any,
-      audit as any,
-      eventEmitter as any,
       sessionRevocation as never,
       env,
       config as unknown as ConfigService,
-      replayCache as never,
+      new RefreshTokenRotationService(
+        prisma as any,
+        audit as any,
+        eventEmitter as any,
+        sessionRevocation as never,
+        env,
+        replayCache as never,
+      ),
     );
     const authOtp = {
       sendPhoneVerificationOtp: jest.fn().mockResolvedValue({ expiresIn: 600 }),
@@ -312,20 +318,80 @@ describe('Auth stack (registration, session, profile)', () => {
       expect(result.user.avatarUrl).toBe('https://signed.example/avatar');
     });
 
-    it('rejects invalid phone number', async () => {
+    it('rejects invalid phone number with INVALID_CREDENTIALS and records failure', async () => {
       prisma.user.findUnique.mockResolvedValue(null);
+      prisma.loginFailure.findUnique
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce(null);
 
       await expect(
         login.citizenLogin({ phoneNumber: '+38999999999', password: 'any' }),
-      ).rejects.toThrow(UnauthorizedException);
+      ).rejects.toMatchObject({
+        response: expect.objectContaining({ code: 'INVALID_CREDENTIALS' }),
+      });
+      expect(prisma.loginFailure.create).toHaveBeenCalledWith({
+        data: {
+          phoneNumber: '+38999999999',
+          firstFailedAt: expect.any(Date),
+          attemptCount: 1,
+        },
+      });
     });
 
-    it('rejects wrong password', async () => {
+    it('rejects wrong password with INVALID_CREDENTIALS and records failure', async () => {
       prisma.user.findUnique.mockResolvedValue(mockUser);
+      prisma.loginFailure.findUnique
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce(null);
 
       await expect(
         login.citizenLogin({ phoneNumber: '+38970123456', password: 'WrongPass!' }),
-      ).rejects.toThrow(UnauthorizedException);
+      ).rejects.toMatchObject({
+        response: expect.objectContaining({ code: 'INVALID_CREDENTIALS' }),
+      });
+      expect(prisma.loginFailure.create).toHaveBeenCalledWith({
+        data: {
+          phoneNumber: '+38970123456',
+          firstFailedAt: expect.any(Date),
+          attemptCount: 1,
+        },
+      });
+    });
+
+    it('increments loginFailure when wrong password within lockout window', async () => {
+      prisma.user.findUnique.mockResolvedValue(mockUser);
+      const recentFailure = {
+        phoneNumber: '+38970123456',
+        attemptCount: 2,
+        firstFailedAt: new Date(),
+      };
+      prisma.loginFailure.findUnique
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce(recentFailure);
+
+      await expect(
+        login.citizenLogin({ phoneNumber: '+38970123456', password: 'WrongPass!' }),
+      ).rejects.toMatchObject({
+        response: expect.objectContaining({ code: 'INVALID_CREDENTIALS' }),
+      });
+      expect(prisma.loginFailure.update).toHaveBeenCalledWith({
+        where: { phoneNumber: '+38970123456' },
+        data: { attemptCount: { increment: 1 } },
+      });
+    });
+
+    it('returns INVALID_CREDENTIALS when loginFailure persistence fails', async () => {
+      prisma.user.findUnique.mockResolvedValue(mockUser);
+      prisma.loginFailure.findUnique
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce(null);
+      prisma.loginFailure.create.mockRejectedValue(new Error('db unavailable'));
+
+      await expect(
+        login.citizenLogin({ phoneNumber: '+38970123456', password: 'WrongPass!' }),
+      ).rejects.toMatchObject({
+        response: expect.objectContaining({ code: 'INVALID_CREDENTIALS' }),
+      });
     });
 
     it('rejects suspended user', async () => {

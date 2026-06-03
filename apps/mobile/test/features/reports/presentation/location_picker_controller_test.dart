@@ -90,4 +90,32 @@ void main() {
       expect(state.resolvingGps, isFalse);
     },
   );
+
+  test(
+    'stable provider family keeps street zoom when draft coords would change key',
+    () {
+      const double kLat = 41.99;
+      const double kLng = 21.43;
+      final ProviderContainer container = _container(
+        _FakeLocationService(serviceEnabled: true),
+      );
+      addTearDown(container.dispose);
+      final LocationPickerControllerProvider stable =
+          locationPickerControllerProvider(kLat, kLng);
+      final LocationPickerController notifier = container.read(
+        stable.notifier,
+      );
+      notifier.startInitialFlow(
+        initialLatitude: kLat,
+        initialLongitude: kLng,
+      );
+      expect(container.read(stable).currentZoom, 16);
+
+      final LocationPickerControllerProvider shifted =
+          locationPickerControllerProvider(kLat + 0.01, kLng + 0.01);
+      expect(container.read(shifted).currentZoom, 7);
+
+      expect(container.read(stable).currentZoom, 16);
+    },
+  );
 }

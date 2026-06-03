@@ -1,10 +1,10 @@
 import { Controller, Get } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { SystemConfigService } from '../system-config/system-config.service';
-import { FeatureFlagsService } from '../feature-flags/feature-flags.service';
+import { SystemConfigService } from '../system-config/services/system-config.service';
+import { FeatureFlagsService } from '../feature-flags/services/feature-flags.service';
 import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-error-responses.decorator';
-import { resolveTermsVersionFromEnv } from '../auth/terms-consent.util';
+import { resolveTermsVersionFromEnv } from '../auth/util/terms-consent.util';
 
 @ApiTags('config')
 @ApiStandardHttpErrorResponses()

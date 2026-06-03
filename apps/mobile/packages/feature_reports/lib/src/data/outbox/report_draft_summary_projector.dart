@@ -17,8 +17,20 @@ ReportWizardRestoreSnapshot reportWizardRestoreSnapshotOf(
   );
 }
 
+/// Wizard row finished submit successfully — must not resume or autosave over.
+bool isReportWizardDraftTerminalSubmit(ReportOutboxEntry row) {
+  if (row.state == ReportOutboxState.succeeded) {
+    return true;
+  }
+  final String? id = row.reportId;
+  return id != null && id.isNotEmpty;
+}
+
 /// True if the SQLite wizard row should drive resume UI / block SP import, etc.
 bool isReportWizardDraftEntryResumable(ReportOutboxEntry row) {
+  if (isReportWizardDraftTerminalSubmit(row)) {
+    return false;
+  }
   return reportWizardRestoreSnapshotOf(row).isResumableWizardBody;
 }
 

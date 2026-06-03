@@ -46,19 +46,28 @@ for _ in $(seq 1 45); do
 done
 curl -sf "http://127.0.0.1:9000/minio/health/live" >/dev/null
 
-docker run --rm --add-host=host.docker.internal:host-gateway minio/mc:latest sh -c \
-  "mc alias set ci http://host.docker.internal:9000 minioadmin minioadmin && mc mb --ignore-existing ci/chisto-e2e" >/dev/null
+docker run --rm --network host --entrypoint /bin/sh minio/mc:latest -c \
+  "mc alias set ci http://127.0.0.1:9000 minioadmin minioadmin && mc mb --ignore-existing ci/chisto-e2e" >/dev/null
 
-export DATABASE_URL="${DATABASE_URL:-postgresql://chisto:chisto@127.0.0.1:5432/chisto}"
+docker exec chisto-e2e-redis redis-cli FLUSHDB >/dev/null 2>&1 || true
+
+# Isolated local infra — do not use dev .env RDS
+export DATABASE_URL="postgresql://chisto:chisto@127.0.0.1:5432/chisto"
 export JWT_SECRET="${JWT_SECRET:-e2e_jwt_secret_must_be_at_least_thirty_two_chars}"
 export NODE_ENV=test
-export REDIS_URL="${REDIS_URL:-redis://127.0.0.1:6379}"
-export S3_BUCKET_NAME="${S3_BUCKET_NAME:-chisto-e2e}"
-export S3_ENDPOINT_URL="${S3_ENDPOINT_URL:-http://127.0.0.1:9000}"
-export S3_FORCE_PATH_STYLE="${S3_FORCE_PATH_STYLE:-true}"
-export AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID:-minioadmin}"
-export AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY:-minioadmin}"
+export REDIS_URL="redis://127.0.0.1:6379"
+export S3_BUCKET_NAME="chisto-e2e"
+export S3_ENDPOINT_URL="http://127.0.0.1:9000"
+export S3_FORCE_PATH_STYLE="true"
+export AWS_ACCESS_KEY_ID="minioadmin"
+export AWS_SECRET_ACCESS_KEY="minioadmin"
 export AWS_REGION="${AWS_REGION:-us-east-1}"
+export SMS_PROVIDER="none"
+export OTP_DEV_RETURN_CODE="true"
+export REFRESH_TOKEN_ROTATION_GRACE_SECONDS="0"
+export EMAIL_ENABLED="true"
+export POSTMARK_SERVER_TOKEN="ci-placeholder-not-used-in-e2e"
+export NODE_OPTIONS="${NODE_OPTIONS:+$NODE_OPTIONS }--experimental-vm-modules"
 
 echo "[e2e-local] prisma generate + migrate deploy…"
 cd "${API_ROOT}"

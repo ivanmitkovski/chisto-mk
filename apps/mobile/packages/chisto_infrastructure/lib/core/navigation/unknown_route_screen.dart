@@ -24,7 +24,6 @@ class UnknownRouteScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
     final AppLocalizations l10n = AppLocalizations.of(context)!;
     final String? rawName = attemptedRouteName?.trim();
     final String debugRouteLabel = (rawName == null || rawName.isEmpty)
@@ -34,40 +33,34 @@ class UnknownRouteScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.appBackground,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              const Spacer(),
-              Text(
-                l10n.unknownRouteTitle,
-                style: AppTypography.emptyStateTitle(textTheme),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Text(
-                l10n.unknownRouteMessage,
-                style: AppTypography.emptyStateSubtitle(
-                  textTheme,
-                ).copyWith(color: AppColors.textSecondary),
-                textAlign: TextAlign.center,
-              ),
-              if (kDebugMode) ...<Widget>[
-                const SizedBox(height: AppSpacing.lg),
-                Text(
-                  l10n.unknownRouteDebugRoute(debugRouteLabel),
-                  style: AppTypography.cardSubtitle(textTheme),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-              const Spacer(),
-              PrimaryButton(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            const Spacer(),
+            AppEmptyState(
+              icon: Icons.link_off_rounded,
+              title: l10n.unknownRouteTitle,
+              subtitle: l10n.unknownRouteMessage,
+              contentBelowSubtitle: kDebugMode
+                  ? Text(
+                      l10n.unknownRouteDebugRoute(debugRouteLabel),
+                      textAlign: TextAlign.center,
+                      style: AppTypography.cardSubtitle(
+                        Theme.of(context).textTheme,
+                      ),
+                    )
+                  : null,
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+            ),
+            const Spacer(),
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: AppButton.primary(
                 label: l10n.unknownRouteContinueButton,
                 onPressed: () => _continueToApp(context),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

@@ -2,7 +2,7 @@
 
 import { UnauthorizedException } from '@nestjs/common';
 import { UserStatus, Role } from '../../src/prisma-client';
-import { JwtStrategy } from '../../src/auth/jwt.strategy';
+import { JwtStrategy } from '../../src/auth/strategies/jwt.strategy';
 
 describe('JwtStrategy', () => {
   const authSnapshotCache = {

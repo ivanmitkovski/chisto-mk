@@ -11,6 +11,7 @@ import 'package:chisto_infrastructure/shared/widgets/organisms/auth_shell.dart';
 import 'package:chisto_infrastructure/shared/widgets/organisms/loading_overlay.dart';
 import 'package:design_system/design_system.dart';
 import 'package:feature_auth/src/application/password_reset_new_password_controller.dart';
+import 'package:feature_auth/src/domain/models/password_reset_target.dart';
 import 'package:feature_auth/src/presentation/constants/auth_error_messages.dart';
 import 'package:feature_auth/src/presentation/utils/auth_validators.dart';
 import 'package:feature_auth/src/presentation/widgets/auth_form_scaffold.dart';
@@ -20,17 +21,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class ForgotPasswordNewScreen extends ConsumerStatefulWidget {
   const ForgotPasswordNewScreen({
     super.key,
-    this.phoneNumberE164 = '',
-    this.code = '',
-    this.emailResetToken,
+    required this.target,
+    required this.code,
   });
 
-  final String phoneNumberE164;
+  final PasswordResetTarget target;
   final String code;
-  final String? emailResetToken;
-
-  bool get _isEmailReset =>
-      emailResetToken != null && emailResetToken!.trim().isNotEmpty;
 
   @override
   ConsumerState<ForgotPasswordNewScreen> createState() =>
@@ -88,22 +84,13 @@ class _ForgotPasswordNewScreenState
     }
 
     try {
-      if (widget._isEmailReset) {
-        await ref
-            .read(passwordResetNewPasswordControllerProvider.notifier)
-            .confirmByEmail(
-              token: widget.emailResetToken!.trim(),
-              newPassword: _passwordController.text.trim(),
-            );
-      } else {
-        await ref
-            .read(passwordResetNewPasswordControllerProvider.notifier)
-            .confirmByPhone(
-              phoneNumberE164: widget.phoneNumberE164,
-              code: widget.code,
-              newPassword: _passwordController.text.trim(),
-            );
-      }
+      await ref
+          .read(passwordResetNewPasswordControllerProvider.notifier)
+          .confirm(
+            target: widget.target,
+            code: widget.code,
+            newPassword: _passwordController.text.trim(),
+          );
       if (!mounted) return;
       AppHaptics.success(context);
       AppNavigation.goForgotPasswordSuccess();
@@ -127,6 +114,13 @@ class _ForgotPasswordNewScreenState
         AuthShell(
           header: AuthScreenHeader(
             showBackButton: true,
+            onBack: () {
+              if (Navigator.of(context).canPop()) {
+                Navigator.of(context).pop();
+              } else {
+                AppNavigation.goSignIn();
+              }
+            },
             title: l10n.authNewPasswordTitle,
             subtitle: l10n.authNewPasswordSubtitle,
           ),

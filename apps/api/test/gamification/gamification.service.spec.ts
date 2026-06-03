@@ -1,4 +1,4 @@
-import { GamificationService } from '../../src/gamification/gamification.service';
+import { GamificationService } from '../../src/gamification/services/gamification.service';
 
 describe('GamificationService', () => {
   const service = new GamificationService();

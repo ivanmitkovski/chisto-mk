@@ -1,6 +1,6 @@
 /// <reference types="jest" />
 
-import { presignedUrlExpiresAtMs } from '../../src/storage/report-media-signed-url.service';
+import { presignedUrlExpiresAtMs } from '../../src/storage/services/report-media-signed-url.service';
 
 describe('presignedUrlExpiresAtMs', () => {
   it('parses X-Amz-Date and X-Amz-Expires', () => {

@@ -1,7 +1,7 @@
 /// <reference types="jest" />
 
-import { SiteEventOutboxDispatcherService } from '../../src/admin-realtime/site-event-outbox-dispatcher.service';
-import type { SiteEvent } from '../../src/admin-realtime/site-events.types';
+import { SiteEventOutboxDispatcherService } from '../../src/admin-realtime/services/site-event-outbox-dispatcher.service';
+import type { SiteEvent } from '../../src/admin-realtime/types/site-events.types';
 
 describe('SiteEventOutboxDispatcherService', () => {
   const sampleEvent: SiteEvent = {

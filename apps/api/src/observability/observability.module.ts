@@ -1,5 +1,5 @@
 import { DynamicModule, Module } from '@nestjs/common';
-import { MetricsController } from './metrics.controller';
+import { MetricsController } from './controllers/metrics.controller';
 
 @Module({})
 export class ObservabilityModule {

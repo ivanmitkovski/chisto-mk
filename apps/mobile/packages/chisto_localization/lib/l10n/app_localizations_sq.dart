@@ -463,14 +463,7 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String get authForgotPasswordEmailSubtitle =>
-      'Vendosni emailin e llogarisë. Do të dërgojmë një lidhje nëse ekziston llogaria.';
-
-  @override
-  String get authForgotPasswordEmailSentTitle => 'Kontrolloni emailin';
-
-  @override
-  String get authForgotPasswordEmailSentBody =>
-      'Nëse ekziston një llogari për atë email, dërguam një lidhje për fjalëkalimin e ri.';
+      'Vendosni emailin e llogarisë. Do të dërgojmë një kod nëse ekziston llogaria.';
 
   @override
   String get authForgotPasswordEmailField => 'Email';
@@ -686,11 +679,16 @@ class AppLocalizationsSq extends AppLocalizations {
   }
 
   @override
+  String authForgotPasswordOtpEmailSubtitle(String email) {
+    return 'Dërguam një kod me 6 shifra te $email';
+  }
+
+  @override
   String get authErrorPhoneNotVerified => 'Telefoni nuk është verifikuar ende.';
 
   @override
   String get authErrorPasswordResetTokenInvalid =>
-      'Lidhja e rivendosjes është e pavlefshme ose ka skaduar.';
+      'Kodi i rivendosjes është i pavlefshëm ose ka skaduar.';
 
   @override
   String get authNewPasswordTitle => 'Fjalëkalim i ri';

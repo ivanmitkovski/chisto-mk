@@ -1,4 +1,4 @@
-import { WebhooksService } from '../../src/webhooks/webhooks.service';
+import { WebhooksService } from '../../src/webhooks/services/webhooks.service';
 import type { TwilioStatusDto } from '../../src/webhooks/dto/twilio-status.dto';
 
 describe('WebhooksService', () => {

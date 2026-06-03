@@ -207,10 +207,7 @@ class _EventsFilterSheetState extends State<EventsFilterSheet> {
                         final bool selected = _categories.contains(cat);
                         return AppToggleChip(
                           label: cat.localizedLabel(context.l10n),
-                          icon: IconData(
-                            cat.iconCodePoint,
-                            fontFamily: 'MaterialIcons',
-                          ),
+                          icon: cat.icon,
                           isActive: selected,
                           onTap: () => _toggleCategory(cat),
                         );

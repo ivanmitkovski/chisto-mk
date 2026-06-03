@@ -6,7 +6,7 @@ import {
   reportMergePrimaryCopy,
   reportMergeChildCopy,
   reportCoReporterCreditCopy,
-} from '../../src/notifications/notification-templates';
+} from '../../src/notifications/util/notification-templates';
 
 describe('notification-templates', () => {
   describe('siteUpvoteCopy', () => {

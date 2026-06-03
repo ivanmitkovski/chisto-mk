@@ -1,6 +1,6 @@
 /// <reference types="jest" />
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { SitesReporterNotificationService } from '../../src/sites/sites-reporter-notification.service';
+import { SitesReporterNotificationService } from '../../src/sites/services/sites-reporter-notification.service';
 
 describe('SitesReporterNotificationService', () => {
   it('includes actorUserId and targetAction in UPVOTE notification data', async () => {
@@ -11,6 +11,9 @@ describe('SitesReporterNotificationService', () => {
           id: 'site-1',
           reports: [{ reporterId: 'reporter-1' }],
         }),
+      },
+      userDeviceToken: {
+        findMany: jest.fn().mockResolvedValue([{ userId: 'reporter-1', locale: 'mk' }]),
       },
     } as never;
 
@@ -40,6 +43,9 @@ describe('SitesReporterNotificationService', () => {
           id: 'site-1',
           reports: [{ reporterId: 'reporter-1' }],
         }),
+      },
+      userDeviceToken: {
+        findMany: jest.fn().mockResolvedValue([{ userId: 'reporter-1', locale: 'mk' }]),
       },
     } as never;
 

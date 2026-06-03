@@ -7,11 +7,11 @@ jest.mock('otplib', () => ({
 
 import { UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AuthAdminLoginService } from '../../src/auth/auth-admin-login.service';
-import { loadAuthEnvRuntime } from '../../src/auth/auth-env.config';
-import { AuthSessionService } from '../../src/auth/auth-session.service';
-import { AuditService } from '../../src/audit/audit.service';
-import { LOGIN_MAX_ATTEMPTS } from '../../src/auth/auth.constants';
+import { AuthAdminLoginService } from '../../src/auth/services/auth-admin-login.service';
+import { loadAuthEnvRuntime } from '../../src/auth/constants/auth-env.config';
+import { AuthSessionService } from '../../src/auth/services/auth-session.service';
+import { AuditService } from '../../src/audit/services/audit.service';
+import { LOGIN_MAX_ATTEMPTS } from '../../src/auth/constants/auth.constants';
 
 describe('AuthAdminLoginService', () => {
   const audit = { log: jest.fn().mockResolvedValue(undefined) } as unknown as AuditService;

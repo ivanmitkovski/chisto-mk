@@ -4,8 +4,8 @@ import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:feature_auth/src/application/initial_route_controller.dart';
 import 'package:feature_auth/src/application/sign_in_controller.dart';
 import 'package:feature_auth/src/application/splash_session_controller.dart';
+import 'package:feature_auth/src/domain/models/password_reset_target.dart';
 import 'package:feature_auth/src/presentation/constants/splash_constants.dart';
-import 'package:feature_auth/src/presentation/screens/forgot_password_email_sent_screen.dart';
 import 'package:feature_auth/src/presentation/screens/forgot_password_new_screen.dart';
 import 'package:feature_auth/src/presentation/screens/forgot_password_otp_screen.dart';
 import 'package:feature_auth/src/presentation/screens/forgot_password_request_screen.dart';
@@ -136,13 +136,19 @@ void main() {
     'sign_up': () => const SignUpScreen(),
     'otp': () => const OtpScreen(phoneNumber: '+38970123456'),
     'forgot_request': () => const ForgotPasswordRequestScreen(),
-    'forgot_otp': () =>
-        const ForgotPasswordOtpScreen(phoneNumberE164: '+38970123456'),
+    'forgot_otp': () => const ForgotPasswordOtpScreen(
+      target: PasswordResetTarget(
+        channel: PasswordResetChannel.sms,
+        value: '+38970123456',
+      ),
+    ),
     'forgot_new': () => const ForgotPasswordNewScreen(
-      phoneNumberE164: '+38970123456',
+      target: PasswordResetTarget(
+        channel: PasswordResetChannel.sms,
+        value: '+38970123456',
+      ),
       code: '123456',
     ),
-    'forgot_email_sent': () => const ForgotPasswordEmailSentScreen(),
     'forgot_success': () => const ForgotPasswordSuccessScreen(),
     'onboarding': () => const OnboardingScreen(),
     'splash': () => const SplashScreen(),

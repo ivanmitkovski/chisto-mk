@@ -54,8 +54,12 @@ describe('GlobalExceptionFilter', () => {
         timestamp: expect.any(String),
       }),
     );
-    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('"context":"GlobalExceptionFilter"'));
-    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('rid-2'));
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        msg: 'unhandled_exception',
+        requestId: 'rid-2',
+      }),
+    );
     logSpy.mockRestore();
   });
 

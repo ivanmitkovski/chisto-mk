@@ -4,7 +4,11 @@ import 'package:chisto_infrastructure/core/errors/app_error.dart';
 enum ReportOutboxErrorKind { terminal, cooldown, retryable }
 
 ReportOutboxErrorKind classifyReportSubmitError(AppError e) {
-  if (e.code == 'REPORTING_COOLDOWN') {
+  if (e.code == 'REPORTING_COOLDOWN' ||
+      e.code == 'DUPLICATE_SUBMIT_INFLIGHT') {
+    return ReportOutboxErrorKind.cooldown;
+  }
+  if (e.retryable && e.code == 'CONFLICT') {
     return ReportOutboxErrorKind.cooldown;
   }
   if (e.retryable ||
@@ -14,16 +18,27 @@ ReportOutboxErrorKind classifyReportSubmitError(AppError e) {
       e.code == 'TOO_MANY_REQUESTS') {
     return ReportOutboxErrorKind.retryable;
   }
+  // A bare `UNKNOWN` (empty/non-JSON 2xx body, platform cleartext block, or
+  // a non-AppError thrown deep in submit) almost always reflects a transient
+  // transport problem rather than a server-rejected payload. Retry with the
+  // **same** idempotency key so the user does not burn a slot on noise.
+  if (e.code == 'UNKNOWN') {
+    return ReportOutboxErrorKind.retryable;
+  }
   return ReportOutboxErrorKind.terminal;
 }
 
 int? cooldownUntilMsFromAppError(AppError e) {
-  if (e.code != 'REPORTING_COOLDOWN') {
+  final bool usesRetryAfter = e.code == 'REPORTING_COOLDOWN' ||
+      e.code == 'DUPLICATE_SUBMIT_INFLIGHT' ||
+      (e.retryable && e.code == 'CONFLICT');
+  if (!usesRetryAfter) {
     return null;
   }
   final dynamic d = e.details;
   if (d is! Map<String, dynamic>) {
-    return DateTime.now().millisecondsSinceEpoch + 60 * 1000;
+    return DateTime.now().millisecondsSinceEpoch +
+        (e.code == 'DUPLICATE_SUBMIT_INFLIGHT' ? 5 : 60) * 1000;
   }
   final int? sec = (d['retryAfterSeconds'] as num?)?.toInt();
   if (sec != null && sec > 0) {

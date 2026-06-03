@@ -6,10 +6,10 @@ import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.
 import { Role } from '../../src/prisma-client';
 import { FindEventQueryDto } from '../../src/events/dto/find-event-query.dto';
 import { ListEventsQueryDto } from '../../src/events/dto/list-events-query.dto';
-import { EventsCheckInController } from '../../src/events/events-check-in.controller';
-import { EventsCheckInService } from '../../src/events/events-check-in.service';
-import { EventsController } from '../../src/events/events.controller';
-import { EventsListController } from '../../src/events/events-list.controller';
+import { EventsCheckInController } from '../../src/events/controllers/events-check-in.controller';
+import { EventsCheckInService } from '../../src/events/services/events-check-in.service';
+import { EventsController } from '../../src/events/controllers/events.controller';
+import { EventsListController } from '../../src/events/controllers/events-list.controller';
 
 function user(id: string): AuthenticatedUser {
   return {

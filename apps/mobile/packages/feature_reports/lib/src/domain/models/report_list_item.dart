@@ -25,6 +25,7 @@ class ReportListItem {
     this.description,
     this.viewerRole = ReportViewerRole.primary,
     this.isOptimistic = false,
+    this.moderationReason,
   });
 
   final String id;
@@ -48,6 +49,9 @@ class ReportListItem {
   /// True until SSE `report_created` reconciles this row with the server list.
   final bool isOptimistic;
 
+  /// Moderator rejection reason + notes when [status] is [ApiReportStatus.deleted].
+  final String? moderationReason;
+
   ReportListItem copyWith({
     String? id,
     String? reportNumber,
@@ -65,6 +69,8 @@ class ReportListItem {
     String? description,
     ReportViewerRole? viewerRole,
     bool? isOptimistic,
+    String? moderationReason,
+    bool clearModerationReason = false,
   }) {
     return ReportListItem(
       id: id ?? this.id,
@@ -83,6 +89,9 @@ class ReportListItem {
       description: description ?? this.description,
       viewerRole: viewerRole ?? this.viewerRole,
       isOptimistic: isOptimistic ?? this.isOptimistic,
+      moderationReason: clearModerationReason
+          ? null
+          : (moderationReason ?? this.moderationReason),
     );
   }
 }

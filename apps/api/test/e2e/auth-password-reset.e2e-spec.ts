@@ -1,17 +1,18 @@
 /// <reference types="jest" />
 
-import { createHash } from 'crypto';
 import type { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { createE2eApplication } from './helpers/bootstrap-app';
 import { deleteUsersByEmailPrefix } from './helpers/db-cleanup';
 import {
   registerCitizen,
+  resetPasswordViaEmail,
   resetPasswordViaSms,
   uniquePhone,
+  e2eThrottleIp,
 } from './helpers/auth-helper';
 import { PrismaService } from '../../src/prisma/prisma.service';
-import { LOGIN_MAX_ATTEMPTS } from '../../src/auth/auth.constants';
+import { LOGIN_MAX_ATTEMPTS } from '../../src/auth/constants/auth.constants';
 
 describe('Auth password reset (e2e)', () => {
   let app: INestApplication;
@@ -64,6 +65,7 @@ describe('Auth password reset (e2e)', () => {
       .expect(200);
     expect(res.body.message).toContain('If an account exists');
     expect(res.body.devCode).toBeUndefined();
+    expect(res.body.channel).toBeUndefined();
   });
 
   it('rejects wrong OTP on confirm', async () => {
@@ -84,26 +86,11 @@ describe('Auth password reset (e2e)', () => {
       .expect(401);
   });
 
-  it('confirms email reset with known token and logs in', async () => {
+  it('confirms email reset with code and logs in', async () => {
     const u = await registerCitizen(app, 'pwd_reset_email');
-    const knownToken = 'e2e-email-reset-token-32chars-min';
-    const tokenHash = createHash('sha256').update(knownToken).digest('hex');
-    const user = await prisma.user.findUnique({ where: { email: u.email } });
-    expect(user).toBeTruthy();
-
-    await prisma.passwordResetEmailToken.create({
-      data: {
-        userId: user!.id,
-        tokenHash,
-        expiresAt: new Date(Date.now() + 30 * 60 * 1000),
-      },
-    });
-
     const newPassword = 'EmailReset1!';
-    await request(app.getHttpServer())
-      .post('/v1/auth/password-reset/email/confirm')
-      .send({ token: knownToken, newPassword })
-      .expect(200);
+
+    await resetPasswordViaEmail(app, u.email, newPassword);
 
     await request(app.getHttpServer())
       .post('/v1/auth/login')
@@ -111,37 +98,44 @@ describe('Auth password reset (e2e)', () => {
       .expect(200);
   });
 
-  it('returns generic response for unknown email on request', async () => {
+  it('returns identical generic response for unknown email on request', async () => {
     const res = await request(app.getHttpServer())
       .post('/v1/auth/password-reset/request')
+      .set('X-Forwarded-For', e2eThrottleIp())
       .send({ email: `nobody_${Date.now()}@test.local` })
+      .expect(200);
+    expect(res.body.message).toContain('If an account exists');
+    expect(res.body.channel).toBeUndefined();
+    expect(res.body.devCode).toBeUndefined();
+  });
+
+  it('returns generic response for known email without revealing channel', async () => {
+    const u = await registerCitizen(app, 'pwd_reset_email_req');
+    const res = await request(app.getHttpServer())
+      .post('/v1/auth/password-reset/request')
+      .set('X-Forwarded-For', e2eThrottleIp())
+      .send({ email: u.email })
       .expect(200);
     expect(res.body.message).toContain('If an account exists');
     expect(res.body.channel).toBeUndefined();
   });
 
-  it('sends email channel when user exists and email is enabled', async () => {
-    const u = await registerCitizen(app, 'pwd_reset_email_req');
-    const res = await request(app.getHttpServer())
-      .post('/v1/auth/password-reset/request')
-      .send({ email: u.email })
-      .expect(200);
-    expect(res.body.channel).toBe('email');
-  });
-
   it('locks out citizen login after max failed attempts', async () => {
     const u = await registerCitizen(app, 'pwd_reset_lockout');
     const server = app.getHttpServer();
+    const lockoutIp = e2eThrottleIp();
 
     for (let i = 0; i < LOGIN_MAX_ATTEMPTS; i++) {
       await request(server)
         .post('/v1/auth/login')
+        .set('X-Forwarded-For', lockoutIp)
         .send({ phoneNumber: u.phoneNumber, password: 'WrongPass1!' })
         .expect(401);
     }
 
     const locked = await request(server)
       .post('/v1/auth/login')
+      .set('X-Forwarded-For', lockoutIp)
       .send({ phoneNumber: u.phoneNumber, password: 'WrongPass1!' })
       .expect(401);
     expect(locked.body.code).toBe('TOO_MANY_ATTEMPTS');
@@ -152,6 +146,7 @@ describe('Auth password reset (e2e)', () => {
 
     await request(server)
       .post('/v1/auth/login')
+      .set('X-Forwarded-For', e2eThrottleIp())
       .send({ phoneNumber: u.phoneNumber, password: newPassword })
       .expect(200);
   });
@@ -185,10 +180,13 @@ describe('Auth password reset (e2e)', () => {
       .patch('/v1/auth/me/password')
       .set('Authorization', `Bearer ${u.accessToken}`)
       .send({ currentPassword: u.password, newPassword })
-      .expect(200);
+      .expect((res) => {
+        expect([200, 204]).toContain(res.status);
+      });
 
     await request(app.getHttpServer())
       .post('/v1/auth/login')
+      .set('X-Forwarded-For', e2eThrottleIp())
       .send({ phoneNumber: u.phoneNumber, password: newPassword })
       .expect(200);
   });

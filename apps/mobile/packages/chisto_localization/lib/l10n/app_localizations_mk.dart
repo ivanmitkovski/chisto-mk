@@ -469,14 +469,7 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get authForgotPasswordEmailSubtitle =>
-      'Внесете ја е-поштата на сметката. Ќе испратиме врска за ресетирање ако постои сметка.';
-
-  @override
-  String get authForgotPasswordEmailSentTitle => 'Проверете ја е-поштата';
-
-  @override
-  String get authForgotPasswordEmailSentBody =>
-      'Ако постои сметка за таа е-пошта, испративме врска за нова лозинка.';
+      'Внесете ја е-поштата на сметката. Ќе испратиме код за ресетирање ако постои сметка.';
 
   @override
   String get authForgotPasswordEmailField => 'Е-пошта';
@@ -688,11 +681,16 @@ class AppLocalizationsMk extends AppLocalizations {
   }
 
   @override
+  String authForgotPasswordOtpEmailSubtitle(String email) {
+    return 'Испративме 6-цифрен код на $email';
+  }
+
+  @override
   String get authErrorPhoneNotVerified => 'Телефонот сè уште не е потврден.';
 
   @override
   String get authErrorPasswordResetTokenInvalid =>
-      'Врската за ресетирање е невалидна или истечена.';
+      'Кодот за ресетирање е невалиден или истечен.';
 
   @override
   String get authNewPasswordTitle => 'Нова лозинка';

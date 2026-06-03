@@ -33,7 +33,7 @@ class _PathCapturingApiClient extends ApiClient {
     lastPostBody = body;
     return ApiResponse(
       statusCode: 200,
-      json: jsonOverride ?? <String, dynamic>{'expiresIn': 599},
+      json: jsonOverride ?? <String, dynamic>{'message': 'ok'},
     );
   }
 
@@ -68,7 +68,7 @@ void main() {
     expect(client.lastPostBody, <String, dynamic>{
       'phoneNumber': '+38970123456',
     });
-    expect(result.expiresInSeconds, 599);
+    expect(result.message, 'ok');
   });
 
   test(
@@ -83,15 +83,34 @@ void main() {
         preferences: await SharedPreferences.getInstance(),
       );
 
-      await repo.verifyPasswordResetCode('+38970123456', '4829');
+      await repo.verifyPasswordResetCode('+38970123456', '482916');
 
       expect(client.lastPostPath, '/auth/password-reset/verify-code');
       expect(client.lastPostBody, <String, dynamic>{
         'phoneNumber': '+38970123456',
-        'code': '4829',
+        'code': '482916',
       });
     },
   );
+
+  test('verifyPasswordResetCodeByEmail posts to email verify-code', () async {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+    final _PathCapturingApiClient client = _PathCapturingApiClient();
+    final ApiAuthRepository repo = ApiAuthRepository(
+      client: client,
+      authState: AuthState(),
+      tokenStorage: SecureTokenStorage(storage: const FlutterSecureStorage()),
+      preferences: await SharedPreferences.getInstance(),
+    );
+
+    await repo.verifyPasswordResetCodeByEmail('user@example.com', '482916');
+
+    expect(client.lastPostPath, '/auth/password-reset/email/verify-code');
+    expect(client.lastPostBody, <String, dynamic>{
+      'email': 'user@example.com',
+      'code': '482916',
+    });
+  });
 
   test('requestPasswordResetByEmail posts email body', () async {
     SharedPreferences.setMockInitialValues(<String, Object>{});
@@ -120,13 +139,15 @@ void main() {
     );
 
     await repo.confirmPasswordResetByEmail(
-      token: 'opaque-token',
+      email: 'user@example.com',
+      code: '482916',
       newPassword: 'NewPass123!',
     );
 
     expect(client.lastPostPath, '/auth/password-reset/email/confirm');
     expect(client.lastPostBody, <String, dynamic>{
-      'token': 'opaque-token',
+      'email': 'user@example.com',
+      'code': '482916',
       'newPassword': 'NewPass123!',
     });
   });

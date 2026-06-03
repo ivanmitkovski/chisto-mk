@@ -674,7 +674,7 @@
         },
         "responses": {
           "200": {
-            "description": "Generic success message. When an account exists, SMS OTP or email link is sent. devCode returned in development when SMS is used."
+            "description": "Generic success message. When an account exists, a 6-digit code is sent. devCode returned in development only."
           },
           "400": {
             "description": "Validation or bad request"
@@ -692,7 +692,7 @@
             "description": "Rate limited"
           }
         },
-        "summary": "Request password reset via SMS (phone) or email link",
+        "summary": "Request password reset via SMS or email code",
         "tags": [
           "auth"
         ]
@@ -778,6 +778,46 @@
         ]
       }
     },
+    "/auth/password-reset/email/verify-code": {
+      "post": {
+        "operationId": "AuthPasswordController_verifyEmailPasswordResetCode",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordResetEmailVerifyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Code is valid; OTP is not consumed until confirm"
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "summary": "Verify password-reset email code before setting a new password",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
     "/auth/password-reset/email/confirm": {
       "post": {
         "operationId": "AuthPasswordController_confirmEmailPasswordReset",
@@ -812,7 +852,7 @@
             "description": "Rate limited"
           }
         },
-        "summary": "Confirm password reset using token from email link",
+        "summary": "Confirm password reset with email code and new password",
         "tags": [
           "auth"
         ]
@@ -2075,565 +2115,6 @@
         ]
       }
     },
-    "/sites/map": {
-      "get": {
-        "operationId": "SitesMapController_findAllForMap",
-        "parameters": [
-          {
-            "name": "lat",
-            "required": true,
-            "in": "query",
-            "description": "Center latitude for map-style queries (or chat location pins)",
-            "schema": {
-              "example": 41.6086,
-              "type": "number"
-            }
-          },
-          {
-            "name": "lng",
-            "required": true,
-            "in": "query",
-            "description": "Center longitude for map-style queries (or chat location pins)",
-            "schema": {
-              "example": 21.7453,
-              "type": "number"
-            }
-          },
-          {
-            "name": "zoom",
-            "required": false,
-            "in": "query",
-            "description": "Map zoom level (used for server-side query safety limits and future clustering)",
-            "schema": {
-              "minimum": 1,
-              "maximum": 22,
-              "example": 13,
-              "type": "number"
-            }
-          },
-          {
-            "name": "radiusKm",
-            "required": false,
-            "in": "query",
-            "description": "Search radius in km",
-            "schema": {
-              "$ref": "#/components/schemas/Object"
-            }
-          },
-          {
-            "name": "status",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "enum": [
-                "REPORTED",
-                "VERIFIED",
-                "CLEANUP_SCHEDULED",
-                "IN_PROGRESS",
-                "CLEANED",
-                "DISPUTED"
-              ],
-              "type": "string"
-            }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "$ref": "#/components/schemas/Object"
-            }
-          },
-          {
-            "name": "detail",
-            "required": false,
-            "in": "query",
-            "description": "lite: smaller map JSON (one thumbnail URL, no engagement fields). full: default shape.",
-            "schema": {
-              "default": "full",
-              "enum": [
-                "full",
-                "lite"
-              ],
-              "type": "string"
-            }
-          },
-          {
-            "name": "minLat",
-            "required": false,
-            "in": "query",
-            "description": "Optional visible bounds south edge for viewport-based map fetches",
-            "schema": {
-              "example": 41.55,
-              "type": "number"
-            }
-          },
-          {
-            "name": "maxLat",
-            "required": false,
-            "in": "query",
-            "description": "Optional visible bounds north edge for viewport-based map fetches",
-            "schema": {
-              "example": 41.68,
-              "type": "number"
-            }
-          },
-          {
-            "name": "minLng",
-            "required": false,
-            "in": "query",
-            "description": "Optional visible bounds west edge for viewport-based map fetches",
-            "schema": {
-              "example": 21.62,
-              "type": "number"
-            }
-          },
-          {
-            "name": "maxLng",
-            "required": false,
-            "in": "query",
-            "description": "Optional visible bounds east edge for viewport-based map fetches",
-            "schema": {
-              "example": 21.88,
-              "type": "number"
-            }
-          },
-          {
-            "name": "includeArchived",
-            "required": false,
-            "in": "query",
-            "description": "Include archived/cold cleaned sites in map results",
-            "schema": {
-              "$ref": "#/components/schemas/Object"
-            }
-          },
-          {
-            "name": "prefetch",
-            "required": false,
-            "in": "query",
-            "description": "Low-priority speculative fetch (e.g. pan extrapolation). Same response shape; included in cache keys.",
-            "schema": {
-              "$ref": "#/components/schemas/Object"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Sites for map fetched successfully"
-          },
-          "400": {
-            "description": "Invalid map viewport or geo params"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Too many requests"
-          }
-        },
-        "summary": "List sites for map view with geo bounds and high limit",
-        "tags": [
-          "sites"
-        ]
-      }
-    },
-    "/sites/map/clusters": {
-      "get": {
-        "operationId": "SitesMapController_findClustersForMap",
-        "parameters": [
-          {
-            "name": "lat",
-            "required": true,
-            "in": "query",
-            "description": "Center latitude for map-style queries (or chat location pins)",
-            "schema": {
-              "example": 41.6086,
-              "type": "number"
-            }
-          },
-          {
-            "name": "lng",
-            "required": true,
-            "in": "query",
-            "description": "Center longitude for map-style queries (or chat location pins)",
-            "schema": {
-              "example": 21.7453,
-              "type": "number"
-            }
-          },
-          {
-            "name": "zoom",
-            "required": false,
-            "in": "query",
-            "description": "Map zoom level (used for server-side query safety limits and future clustering)",
-            "schema": {
-              "minimum": 1,
-              "maximum": 22,
-              "example": 13,
-              "type": "number"
-            }
-          },
-          {
-            "name": "radiusKm",
-            "required": false,
-            "in": "query",
-            "description": "Search radius in km",
-            "schema": {
-              "$ref": "#/components/schemas/Object"
-            }
-          },
-          {
-            "name": "status",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "enum": [
-                "REPORTED",
-                "VERIFIED",
-                "CLEANUP_SCHEDULED",
-                "IN_PROGRESS",
-                "CLEANED",
-                "DISPUTED"
-              ],
-              "type": "string"
-            }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "$ref": "#/components/schemas/Object"
-            }
-          },
-          {
-            "name": "detail",
-            "required": false,
-            "in": "query",
-            "description": "lite: smaller map JSON (one thumbnail URL, no engagement fields). full: default shape.",
-            "schema": {
-              "default": "full",
-              "enum": [
-                "full",
-                "lite"
-              ],
-              "type": "string"
-            }
-          },
-          {
-            "name": "minLat",
-            "required": false,
-            "in": "query",
-            "description": "Optional visible bounds south edge for viewport-based map fetches",
-            "schema": {
-              "example": 41.55,
-              "type": "number"
-            }
-          },
-          {
-            "name": "maxLat",
-            "required": false,
-            "in": "query",
-            "description": "Optional visible bounds north edge for viewport-based map fetches",
-            "schema": {
-              "example": 41.68,
-              "type": "number"
-            }
-          },
-          {
-            "name": "minLng",
-            "required": false,
-            "in": "query",
-            "description": "Optional visible bounds west edge for viewport-based map fetches",
-            "schema": {
-              "example": 21.62,
-              "type": "number"
-            }
-          },
-          {
-            "name": "maxLng",
-            "required": false,
-            "in": "query",
-            "description": "Optional visible bounds east edge for viewport-based map fetches",
-            "schema": {
-              "example": 21.88,
-              "type": "number"
-            }
-          },
-          {
-            "name": "includeArchived",
-            "required": false,
-            "in": "query",
-            "description": "Include archived/cold cleaned sites in map results",
-            "schema": {
-              "$ref": "#/components/schemas/Object"
-            }
-          },
-          {
-            "name": "prefetch",
-            "required": false,
-            "in": "query",
-            "description": "Low-priority speculative fetch (e.g. pan extrapolation). Same response shape; included in cache keys.",
-            "schema": {
-              "$ref": "#/components/schemas/Object"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Map clusters fetched successfully"
-          },
-          "400": {
-            "description": "Invalid map viewport or geo params"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "summary": "Get aggregated map clusters for dense marker view",
-        "tags": [
-          "sites"
-        ]
-      }
-    },
-    "/sites/map/heatmap": {
-      "get": {
-        "operationId": "SitesMapController_findHeatmapForMap",
-        "parameters": [
-          {
-            "name": "lat",
-            "required": true,
-            "in": "query",
-            "description": "Center latitude for map-style queries (or chat location pins)",
-            "schema": {
-              "example": 41.6086,
-              "type": "number"
-            }
-          },
-          {
-            "name": "lng",
-            "required": true,
-            "in": "query",
-            "description": "Center longitude for map-style queries (or chat location pins)",
-            "schema": {
-              "example": 21.7453,
-              "type": "number"
-            }
-          },
-          {
-            "name": "zoom",
-            "required": false,
-            "in": "query",
-            "description": "Map zoom level (used for server-side query safety limits and future clustering)",
-            "schema": {
-              "minimum": 1,
-              "maximum": 22,
-              "example": 13,
-              "type": "number"
-            }
-          },
-          {
-            "name": "radiusKm",
-            "required": false,
-            "in": "query",
-            "description": "Search radius in km",
-            "schema": {
-              "$ref": "#/components/schemas/Object"
-            }
-          },
-          {
-            "name": "status",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "enum": [
-                "REPORTED",
-                "VERIFIED",
-                "CLEANUP_SCHEDULED",
-                "IN_PROGRESS",
-                "CLEANED",
-                "DISPUTED"
-              ],
-              "type": "string"
-            }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "$ref": "#/components/schemas/Object"
-            }
-          },
-          {
-            "name": "detail",
-            "required": false,
-            "in": "query",
-            "description": "lite: smaller map JSON (one thumbnail URL, no engagement fields). full: default shape.",
-            "schema": {
-              "default": "full",
-              "enum": [
-                "full",
-                "lite"
-              ],
-              "type": "string"
-            }
-          },
-          {
-            "name": "minLat",
-            "required": false,
-            "in": "query",
-            "description": "Optional visible bounds south edge for viewport-based map fetches",
-            "schema": {
-              "example": 41.55,
-              "type": "number"
-            }
-          },
-          {
-            "name": "maxLat",
-            "required": false,
-            "in": "query",
-            "description": "Optional visible bounds north edge for viewport-based map fetches",
-            "schema": {
-              "example": 41.68,
-              "type": "number"
-            }
-          },
-          {
-            "name": "minLng",
-            "required": false,
-            "in": "query",
-            "description": "Optional visible bounds west edge for viewport-based map fetches",
-            "schema": {
-              "example": 21.62,
-              "type": "number"
-            }
-          },
-          {
-            "name": "maxLng",
-            "required": false,
-            "in": "query",
-            "description": "Optional visible bounds east edge for viewport-based map fetches",
-            "schema": {
-              "example": 21.88,
-              "type": "number"
-            }
-          },
-          {
-            "name": "includeArchived",
-            "required": false,
-            "in": "query",
-            "description": "Include archived/cold cleaned sites in map results",
-            "schema": {
-              "$ref": "#/components/schemas/Object"
-            }
-          },
-          {
-            "name": "prefetch",
-            "required": false,
-            "in": "query",
-            "description": "Low-priority speculative fetch (e.g. pan extrapolation). Same response shape; included in cache keys.",
-            "schema": {
-              "$ref": "#/components/schemas/Object"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Map heatmap fetched successfully"
-          },
-          "400": {
-            "description": "Invalid map viewport or geo params"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "summary": "Get map heatmap density cells by viewport/zoom",
-        "tags": [
-          "sites"
-        ]
-      }
-    },
-    "/sites/map/tiles/{z}/{x}/{y}.mvt": {
-      "get": {
-        "operationId": "SitesMapController_getMapMvtTile",
-        "parameters": [
-          {
-            "name": "z",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "x",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "y",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "summary": "Mapbox vector tile (MVT) for sites/clusters overlay",
-        "tags": [
-          "sites"
-        ]
-      }
-    },
     "/sites": {
       "post": {
         "operationId": "SitesController_create",
@@ -2766,6 +2247,20 @@
               "enum": [
                 "for_you",
                 "latest"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "scope",
+            "required": false,
+            "in": "query",
+            "description": "Geo scope: local = strict radius filter; discovery = country-wide candidates with soft distance ranking.",
+            "schema": {
+              "default": "local",
+              "enum": [
+                "local",
+                "discovery"
               ],
               "type": "string"
             }
@@ -2982,6 +2477,11 @@
             "description": "Rate limited"
           }
         },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
         "summary": "Search sites for map (text + optional geo intent)",
         "tags": [
           "sites"
@@ -3461,6 +2961,1097 @@
           }
         ],
         "summary": "Archive or unarchive site from default map visibility",
+        "tags": [
+          "sites"
+        ]
+      }
+    },
+    "/admin/events": {
+      "get": {
+        "operationId": "AdminRealtimeController_stream",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Server-Sent Events stream for real-time dashboard updates",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/sites/{id}/history": {
+      "get": {
+        "operationId": "SiteHistoryController_listHistory",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maximum": 100,
+              "default": 30,
+              "type": "number"
+            }
+          },
+          {
+            "name": "beforeId",
+            "required": false,
+            "in": "query",
+            "description": "Return entries older than this entry id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteHistoryListResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Site not found"
+          },
+          "429": {
+            "description": "Too many requests"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List chronological site history entries",
+        "tags": [
+          "sites"
+        ]
+      }
+    },
+    "/sites/{id}/history/notes": {
+      "post": {
+        "operationId": "SiteHistoryAdminController_postNote",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostSiteHistoryNoteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteHistoryEntryDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid JWT"
+          },
+          "403": {
+            "description": "Caller is not an admin"
+          },
+          "404": {
+            "description": "Site not found"
+          },
+          "429": {
+            "description": "Too many requests"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Add an admin note to the site timeline",
+        "tags": [
+          "sites"
+        ]
+      }
+    },
+    "/admin/moderation/ugc-reports": {
+      "get": {
+        "operationId": "ModerationController_listAdminUgcReports",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "OPEN",
+                "REVIEWED",
+                "DISMISSED",
+                "ESCALATED",
+                "HIDDEN"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "subjectType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "site_comment",
+                "event_chat_message",
+                "user",
+                "site",
+                "event",
+                "safety_issue"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "reporterId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List UGC reports for admin moderation",
+        "tags": [
+          "moderation"
+        ]
+      }
+    },
+    "/admin/moderation/ugc-reports/{id}": {
+      "get": {
+        "operationId": "ModerationController_getAdminUgcReport",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get UGC report detail for admin moderation",
+        "tags": [
+          "moderation"
+        ]
+      },
+      "patch": {
+        "operationId": "ModerationController_patchAdminUgcReport",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatchAdminUgcReportDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Moderate a UGC report",
+        "tags": [
+          "moderation"
+        ]
+      }
+    },
+    "/moderation/reports": {
+      "post": {
+        "operationId": "ModerationController_submitReport",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostUgcReportDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Report UGC (comment, chat message, user, site, event)",
+        "tags": [
+          "moderation"
+        ]
+      }
+    },
+    "/users/me/blocks": {
+      "post": {
+        "operationId": "ModerationController_blockUser",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostUserBlockDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Block a user",
+        "tags": [
+          "moderation"
+        ]
+      },
+      "get": {
+        "operationId": "ModerationController_listBlocks",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List blocked users",
+        "tags": [
+          "moderation"
+        ]
+      }
+    },
+    "/users/me/blocks/{blockedUserId}": {
+      "delete": {
+        "operationId": "ModerationController_unblock",
+        "parameters": [
+          {
+            "name": "blockedUserId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Unblock a user",
+        "tags": [
+          "moderation"
+        ]
+      }
+    },
+    "/sites/map": {
+      "get": {
+        "operationId": "SitesMapController_findAllForMap",
+        "parameters": [
+          {
+            "name": "lat",
+            "required": true,
+            "in": "query",
+            "description": "Center latitude for map-style queries (or chat location pins)",
+            "schema": {
+              "example": 41.6086,
+              "type": "number"
+            }
+          },
+          {
+            "name": "lng",
+            "required": true,
+            "in": "query",
+            "description": "Center longitude for map-style queries (or chat location pins)",
+            "schema": {
+              "example": 21.7453,
+              "type": "number"
+            }
+          },
+          {
+            "name": "zoom",
+            "required": false,
+            "in": "query",
+            "description": "Map zoom level (used for server-side query safety limits and future clustering)",
+            "schema": {
+              "minimum": 1,
+              "maximum": 22,
+              "example": 13,
+              "type": "number"
+            }
+          },
+          {
+            "name": "radiusKm",
+            "required": false,
+            "in": "query",
+            "description": "Search radius in km",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "REPORTED",
+                "VERIFIED",
+                "CLEANUP_SCHEDULED",
+                "IN_PROGRESS",
+                "CLEANED",
+                "DISPUTED"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "detail",
+            "required": false,
+            "in": "query",
+            "description": "lite: smaller map JSON (one thumbnail URL, no engagement fields). full: default shape.",
+            "schema": {
+              "default": "full",
+              "enum": [
+                "full",
+                "lite"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "minLat",
+            "required": false,
+            "in": "query",
+            "description": "Optional visible bounds south edge for viewport-based map fetches",
+            "schema": {
+              "example": 41.55,
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxLat",
+            "required": false,
+            "in": "query",
+            "description": "Optional visible bounds north edge for viewport-based map fetches",
+            "schema": {
+              "example": 41.68,
+              "type": "number"
+            }
+          },
+          {
+            "name": "minLng",
+            "required": false,
+            "in": "query",
+            "description": "Optional visible bounds west edge for viewport-based map fetches",
+            "schema": {
+              "example": 21.62,
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxLng",
+            "required": false,
+            "in": "query",
+            "description": "Optional visible bounds east edge for viewport-based map fetches",
+            "schema": {
+              "example": 21.88,
+              "type": "number"
+            }
+          },
+          {
+            "name": "includeArchived",
+            "required": false,
+            "in": "query",
+            "description": "Include archived/cold cleaned sites in map results",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "prefetch",
+            "required": false,
+            "in": "query",
+            "description": "Low-priority speculative fetch (e.g. pan extrapolation). Same response shape; included in cache keys.",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sites for map fetched successfully"
+          },
+          "400": {
+            "description": "Invalid map viewport or geo params"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Too many requests"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List sites for map view with geo bounds and high limit",
+        "tags": [
+          "sites"
+        ]
+      }
+    },
+    "/sites/map/clusters": {
+      "get": {
+        "operationId": "SitesMapController_findClustersForMap",
+        "parameters": [
+          {
+            "name": "lat",
+            "required": true,
+            "in": "query",
+            "description": "Center latitude for map-style queries (or chat location pins)",
+            "schema": {
+              "example": 41.6086,
+              "type": "number"
+            }
+          },
+          {
+            "name": "lng",
+            "required": true,
+            "in": "query",
+            "description": "Center longitude for map-style queries (or chat location pins)",
+            "schema": {
+              "example": 21.7453,
+              "type": "number"
+            }
+          },
+          {
+            "name": "zoom",
+            "required": false,
+            "in": "query",
+            "description": "Map zoom level (used for server-side query safety limits and future clustering)",
+            "schema": {
+              "minimum": 1,
+              "maximum": 22,
+              "example": 13,
+              "type": "number"
+            }
+          },
+          {
+            "name": "radiusKm",
+            "required": false,
+            "in": "query",
+            "description": "Search radius in km",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "REPORTED",
+                "VERIFIED",
+                "CLEANUP_SCHEDULED",
+                "IN_PROGRESS",
+                "CLEANED",
+                "DISPUTED"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "detail",
+            "required": false,
+            "in": "query",
+            "description": "lite: smaller map JSON (one thumbnail URL, no engagement fields). full: default shape.",
+            "schema": {
+              "default": "full",
+              "enum": [
+                "full",
+                "lite"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "minLat",
+            "required": false,
+            "in": "query",
+            "description": "Optional visible bounds south edge for viewport-based map fetches",
+            "schema": {
+              "example": 41.55,
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxLat",
+            "required": false,
+            "in": "query",
+            "description": "Optional visible bounds north edge for viewport-based map fetches",
+            "schema": {
+              "example": 41.68,
+              "type": "number"
+            }
+          },
+          {
+            "name": "minLng",
+            "required": false,
+            "in": "query",
+            "description": "Optional visible bounds west edge for viewport-based map fetches",
+            "schema": {
+              "example": 21.62,
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxLng",
+            "required": false,
+            "in": "query",
+            "description": "Optional visible bounds east edge for viewport-based map fetches",
+            "schema": {
+              "example": 21.88,
+              "type": "number"
+            }
+          },
+          {
+            "name": "includeArchived",
+            "required": false,
+            "in": "query",
+            "description": "Include archived/cold cleaned sites in map results",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "prefetch",
+            "required": false,
+            "in": "query",
+            "description": "Low-priority speculative fetch (e.g. pan extrapolation). Same response shape; included in cache keys.",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Map clusters fetched successfully"
+          },
+          "400": {
+            "description": "Invalid map viewport or geo params"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get aggregated map clusters for dense marker view",
+        "tags": [
+          "sites"
+        ]
+      }
+    },
+    "/sites/map/heatmap": {
+      "get": {
+        "operationId": "SitesMapController_findHeatmapForMap",
+        "parameters": [
+          {
+            "name": "lat",
+            "required": true,
+            "in": "query",
+            "description": "Center latitude for map-style queries (or chat location pins)",
+            "schema": {
+              "example": 41.6086,
+              "type": "number"
+            }
+          },
+          {
+            "name": "lng",
+            "required": true,
+            "in": "query",
+            "description": "Center longitude for map-style queries (or chat location pins)",
+            "schema": {
+              "example": 21.7453,
+              "type": "number"
+            }
+          },
+          {
+            "name": "zoom",
+            "required": false,
+            "in": "query",
+            "description": "Map zoom level (used for server-side query safety limits and future clustering)",
+            "schema": {
+              "minimum": 1,
+              "maximum": 22,
+              "example": 13,
+              "type": "number"
+            }
+          },
+          {
+            "name": "radiusKm",
+            "required": false,
+            "in": "query",
+            "description": "Search radius in km",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "REPORTED",
+                "VERIFIED",
+                "CLEANUP_SCHEDULED",
+                "IN_PROGRESS",
+                "CLEANED",
+                "DISPUTED"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "detail",
+            "required": false,
+            "in": "query",
+            "description": "lite: smaller map JSON (one thumbnail URL, no engagement fields). full: default shape.",
+            "schema": {
+              "default": "full",
+              "enum": [
+                "full",
+                "lite"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "minLat",
+            "required": false,
+            "in": "query",
+            "description": "Optional visible bounds south edge for viewport-based map fetches",
+            "schema": {
+              "example": 41.55,
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxLat",
+            "required": false,
+            "in": "query",
+            "description": "Optional visible bounds north edge for viewport-based map fetches",
+            "schema": {
+              "example": 41.68,
+              "type": "number"
+            }
+          },
+          {
+            "name": "minLng",
+            "required": false,
+            "in": "query",
+            "description": "Optional visible bounds west edge for viewport-based map fetches",
+            "schema": {
+              "example": 21.62,
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxLng",
+            "required": false,
+            "in": "query",
+            "description": "Optional visible bounds east edge for viewport-based map fetches",
+            "schema": {
+              "example": 21.88,
+              "type": "number"
+            }
+          },
+          {
+            "name": "includeArchived",
+            "required": false,
+            "in": "query",
+            "description": "Include archived/cold cleaned sites in map results",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "prefetch",
+            "required": false,
+            "in": "query",
+            "description": "Low-priority speculative fetch (e.g. pan extrapolation). Same response shape; included in cache keys.",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Map heatmap fetched successfully"
+          },
+          "400": {
+            "description": "Invalid map viewport or geo params"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get map heatmap density cells by viewport/zoom",
+        "tags": [
+          "sites"
+        ]
+      }
+    },
+    "/sites/map/tiles/{z}/{x}/{y}.mvt": {
+      "get": {
+        "operationId": "SitesMapController_getMapMvtTile",
+        "parameters": [
+          {
+            "name": "z",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "x",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "y",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "summary": "Mapbox vector tile (MVT) for sites/clusters overlay",
+        "tags": [
+          "sites"
+        ]
+      }
+    },
+    "/sites/map/offline/manifest": {
+      "get": {
+        "operationId": "SitesMapController_getOfflineMapManifest",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Offline regions manifest"
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Offline map region package manifest (flag-gated)",
+        "tags": [
+          "sites"
+        ]
+      }
+    },
+    "/sites/map/offline/regions/{regionId}/download-url": {
+      "get": {
+        "operationId": "SitesMapController_getOfflineMapRegionDownloadUrl",
+        "parameters": [
+          {
+            "name": "regionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "example": "mk-north-west",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Signed region package URL"
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Presigned download URL for an offline map region package",
         "tags": [
           "sites"
         ]
@@ -4288,279 +4879,6 @@
           }
         ],
         "summary": "Submit feed relevance feedback for a site",
-        "tags": [
-          "sites"
-        ]
-      }
-    },
-    "/admin/events": {
-      "get": {
-        "operationId": "AdminRealtimeController_stream",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Server-Sent Events stream for real-time dashboard updates",
-        "tags": [
-          "admin"
-        ]
-      }
-    },
-    "/moderation/reports": {
-      "post": {
-        "operationId": "ModerationController_submitReport",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PostUgcReportDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Report UGC (comment, chat message, user, site, event)",
-        "tags": [
-          "moderation"
-        ]
-      }
-    },
-    "/users/me/blocks": {
-      "post": {
-        "operationId": "ModerationController_blockUser",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PostUserBlockDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Block a user",
-        "tags": [
-          "moderation"
-        ]
-      },
-      "get": {
-        "operationId": "ModerationController_listBlocks",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "List blocked users",
-        "tags": [
-          "moderation"
-        ]
-      }
-    },
-    "/users/me/blocks/{blockedUserId}": {
-      "delete": {
-        "operationId": "ModerationController_unblock",
-        "parameters": [
-          {
-            "name": "blockedUserId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Unblock a user",
-        "tags": [
-          "moderation"
-        ]
-      }
-    },
-    "/sites/{id}/history": {
-      "get": {
-        "operationId": "SiteHistoryController_listHistory",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "maximum": 100,
-              "default": 30,
-              "type": "number"
-            }
-          },
-          {
-            "name": "beforeId",
-            "required": false,
-            "in": "query",
-            "description": "Return entries older than this entry id",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SiteHistoryListResponseDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Site not found"
-          },
-          "429": {
-            "description": "Too many requests"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "List chronological site history entries",
-        "tags": [
-          "sites"
-        ]
-      }
-    },
-    "/sites/{id}/history/notes": {
-      "post": {
-        "operationId": "SiteHistoryAdminController_postNote",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PostSiteHistoryNoteDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SiteHistoryEntryDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid JWT"
-          },
-          "403": {
-            "description": "Caller is not an admin"
-          },
-          "404": {
-            "description": "Site not found"
-          },
-          "429": {
-            "description": "Too many requests"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Add an admin note to the site timeline",
         "tags": [
           "sites"
         ]
@@ -13912,6 +14230,11 @@
           "privacyAcceptedAt": {
             "type": "string",
             "example": "2026-06-01"
+          },
+          "deviceId": {
+            "type": "string",
+            "description": "Stable per-install device identifier.",
+            "maxLength": 128
           }
         },
         "required": [
@@ -13942,6 +14265,10 @@
             "type": "number",
             "example": 600,
             "description": "OTP validity in seconds"
+          },
+          "devCode": {
+            "type": "string",
+            "description": "Development-only OTP when OTP_DEV_RETURN_CODE is enabled"
           }
         },
         "required": [
@@ -13969,6 +14296,11 @@
             "type": "boolean",
             "description": "If true, refresh token lasts longer (e.g. 30 days). If false, short-lived (e.g. 1 day).",
             "default": true
+          },
+          "deviceId": {
+            "type": "string",
+            "description": "Stable per-install device identifier used to keep one active session per device.",
+            "maxLength": 128
           }
         },
         "required": [
@@ -14092,6 +14424,11 @@
             "minLength": 8,
             "maxLength": 72,
             "example": "StrongPass123!"
+          },
+          "deviceId": {
+            "type": "string",
+            "description": "Stable browser/device identifier used to keep one active admin session per device.",
+            "maxLength": 128
           }
         },
         "required": [
@@ -14111,6 +14448,11 @@
             "description": "6-digit TOTP code or backup code (alphanumeric)",
             "minLength": 6,
             "maxLength": 32
+          },
+          "deviceId": {
+            "type": "string",
+            "description": "Stable browser/device identifier used to keep one active admin session per device.",
+            "maxLength": 128
           }
         },
         "required": [
@@ -14124,6 +14466,11 @@
           "refreshToken": {
             "type": "string",
             "description": "Refresh token from the previous auth response"
+          },
+          "deviceId": {
+            "type": "string",
+            "description": "Stable per-install device identifier for session deduplication.",
+            "maxLength": 128
           }
         },
         "required": [
@@ -14157,6 +14504,11 @@
             "description": "6-digit code received via SMS",
             "minLength": 6,
             "maxLength": 6
+          },
+          "deviceId": {
+            "type": "string",
+            "description": "Stable per-install device identifier used to keep one active session per device.",
+            "maxLength": 128
           }
         },
         "required": [
@@ -14187,9 +14539,9 @@
           },
           "code": {
             "type": "string",
-            "example": "1234",
-            "minLength": 4,
-            "maxLength": 4
+            "example": "123456",
+            "minLength": 6,
+            "maxLength": 6
           },
           "newPassword": {
             "type": "string",
@@ -14204,12 +14556,37 @@
           "newPassword"
         ]
       },
+      "PasswordResetEmailVerifyDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "user@example.com"
+          },
+          "code": {
+            "type": "string",
+            "example": "123456",
+            "minLength": 6,
+            "maxLength": 6
+          }
+        },
+        "required": [
+          "email",
+          "code"
+        ]
+      },
       "PasswordResetEmailConfirmDto": {
         "type": "object",
         "properties": {
-          "token": {
+          "email": {
             "type": "string",
-            "description": "Opaque token from the password reset email link"
+            "example": "user@example.com"
+          },
+          "code": {
+            "type": "string",
+            "example": "123456",
+            "minLength": 6,
+            "maxLength": 6
           },
           "newPassword": {
             "type": "string",
@@ -14218,7 +14595,8 @@
           }
         },
         "required": [
-          "token",
+          "email",
+          "code",
           "newPassword"
         ]
       },
@@ -15506,6 +15884,246 @@
           "archived"
         ]
       },
+      "SiteHistoryActorDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "object"
+          },
+          "role": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "SiteHistoryEntryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "SITE_CREATED",
+              "REPORT_SUBMITTED",
+              "REPORT_APPROVED",
+              "REPORT_REJECTED",
+              "REPORT_MERGED",
+              "STATUS_CHANGED",
+              "CLEANUP_EVENT_SCHEDULED",
+              "CLEANUP_EVENT_STARTED",
+              "CLEANUP_EVENT_COMPLETED",
+              "CLEANUP_EVENT_CANCELLED",
+              "ARCHIVED_BY_ADMIN",
+              "UNARCHIVED_BY_ADMIN",
+              "ADMIN_NOTE"
+            ]
+          },
+          "occurredAt": {
+            "type": "string"
+          },
+          "fromStatus": {
+            "type": "string",
+            "enum": [
+              "REPORTED",
+              "VERIFIED",
+              "CLEANUP_SCHEDULED",
+              "IN_PROGRESS",
+              "CLEANED",
+              "DISPUTED"
+            ]
+          },
+          "toStatus": {
+            "type": "string",
+            "enum": [
+              "REPORTED",
+              "VERIFIED",
+              "CLEANUP_SCHEDULED",
+              "IN_PROGRESS",
+              "CLEANED",
+              "DISPUTED"
+            ]
+          },
+          "reportId": {
+            "type": "object"
+          },
+          "cleanupEventId": {
+            "type": "object"
+          },
+          "actor": {
+            "$ref": "#/components/schemas/SiteHistoryActorDto"
+          },
+          "note": {
+            "type": "object"
+          },
+          "metadata": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "occurredAt"
+        ]
+      },
+      "SiteHistorySummaryDto": {
+        "type": "object",
+        "properties": {
+          "totalEntries": {
+            "type": "number"
+          },
+          "reportCount": {
+            "type": "number"
+          },
+          "cleanupCount": {
+            "type": "number"
+          },
+          "currentStatus": {
+            "type": "string",
+            "enum": [
+              "REPORTED",
+              "VERIFIED",
+              "CLEANUP_SCHEDULED",
+              "IN_PROGRESS",
+              "CLEANED",
+              "DISPUTED"
+            ]
+          },
+          "firstActivityAt": {
+            "type": "string"
+          },
+          "lastActivityAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "totalEntries",
+          "reportCount",
+          "cleanupCount",
+          "currentStatus",
+          "firstActivityAt",
+          "lastActivityAt"
+        ]
+      },
+      "SiteHistoryListResponseDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SiteHistoryEntryDto"
+            }
+          },
+          "nextBeforeId": {
+            "type": "object",
+            "description": "Cursor for the next page (entry id)"
+          },
+          "summary": {
+            "description": "Present on the first page only; null on paginated follow-up requests.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SiteHistorySummaryDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "PostSiteHistoryNoteDto": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": "string",
+            "description": "Free-form admin note shown on the site timeline"
+          },
+          "occurredAt": {
+            "type": "string",
+            "description": "Optional ISO-8601 timestamp for when the note occurred"
+          }
+        },
+        "required": [
+          "note"
+        ]
+      },
+      "PatchAdminUgcReportDto": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "mark_reviewed",
+              "dismiss",
+              "escalate",
+              "hide_subject",
+              "restore_subject"
+            ]
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action"
+        ]
+      },
+      "PostUgcReportDto": {
+        "type": "object",
+        "properties": {
+          "subjectType": {
+            "type": "string",
+            "enum": [
+              "site_comment",
+              "event_chat_message",
+              "user",
+              "site",
+              "event",
+              "safety_issue"
+            ]
+          },
+          "subjectId": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "spam",
+              "harassment",
+              "hate",
+              "violence",
+              "nudity",
+              "other"
+            ]
+          },
+          "details": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "subjectType",
+          "subjectId",
+          "reason"
+        ]
+      },
+      "PostUserBlockDto": {
+        "type": "object",
+        "properties": {
+          "blockedUserId": {
+            "type": "string",
+            "description": "User id to block"
+          }
+        },
+        "required": [
+          "blockedUserId"
+        ]
+      },
       "SiteCommentTreeNodeResponseDto": {
         "type": "object",
         "properties": {
@@ -15848,178 +16466,6 @@
           "feedbackType"
         ]
       },
-      "PostUgcReportDto": {
-        "type": "object",
-        "properties": {
-          "subjectType": {
-            "type": "string",
-            "enum": [
-              "site_comment",
-              "event_chat_message",
-              "user",
-              "site",
-              "event",
-              "safety_issue"
-            ]
-          },
-          "subjectId": {
-            "type": "string"
-          },
-          "reason": {
-            "type": "string",
-            "enum": [
-              "spam",
-              "harassment",
-              "hate",
-              "violence",
-              "nudity",
-              "other"
-            ]
-          },
-          "details": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "subjectType",
-          "subjectId",
-          "reason"
-        ]
-      },
-      "PostUserBlockDto": {
-        "type": "object",
-        "properties": {
-          "blockedUserId": {
-            "type": "string",
-            "description": "User id to block"
-          }
-        },
-        "required": [
-          "blockedUserId"
-        ]
-      },
-      "SiteHistoryActorDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "displayName": {
-            "type": "object"
-          },
-          "role": {
-            "type": "object"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
-      "SiteHistoryEntryDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "kind": {
-            "type": "string",
-            "enum": [
-              "SITE_CREATED",
-              "REPORT_SUBMITTED",
-              "REPORT_APPROVED",
-              "REPORT_REJECTED",
-              "REPORT_MERGED",
-              "STATUS_CHANGED",
-              "CLEANUP_EVENT_SCHEDULED",
-              "CLEANUP_EVENT_STARTED",
-              "CLEANUP_EVENT_COMPLETED",
-              "CLEANUP_EVENT_CANCELLED",
-              "ARCHIVED_BY_ADMIN",
-              "UNARCHIVED_BY_ADMIN",
-              "ADMIN_NOTE"
-            ]
-          },
-          "occurredAt": {
-            "type": "string"
-          },
-          "fromStatus": {
-            "type": "string",
-            "enum": [
-              "REPORTED",
-              "VERIFIED",
-              "CLEANUP_SCHEDULED",
-              "IN_PROGRESS",
-              "CLEANED",
-              "DISPUTED"
-            ]
-          },
-          "toStatus": {
-            "type": "string",
-            "enum": [
-              "REPORTED",
-              "VERIFIED",
-              "CLEANUP_SCHEDULED",
-              "IN_PROGRESS",
-              "CLEANED",
-              "DISPUTED"
-            ]
-          },
-          "reportId": {
-            "type": "object"
-          },
-          "cleanupEventId": {
-            "type": "object"
-          },
-          "actor": {
-            "$ref": "#/components/schemas/SiteHistoryActorDto"
-          },
-          "note": {
-            "type": "object"
-          },
-          "metadata": {
-            "type": "object"
-          }
-        },
-        "required": [
-          "id",
-          "kind",
-          "occurredAt"
-        ]
-      },
-      "SiteHistoryListResponseDto": {
-        "type": "object",
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SiteHistoryEntryDto"
-            }
-          },
-          "nextBeforeId": {
-            "type": "object",
-            "description": "Cursor for the next page (entry id)"
-          }
-        },
-        "required": [
-          "items"
-        ]
-      },
-      "PostSiteHistoryNoteDto": {
-        "type": "object",
-        "properties": {
-          "note": {
-            "type": "string",
-            "description": "Free-form admin note shown on the site timeline"
-          },
-          "occurredAt": {
-            "type": "string",
-            "description": "Optional ISO-8601 timestamp for when the note occurred"
-          }
-        },
-        "required": [
-          "note"
-        ]
-      },
       "AdminReportEvidenceDto": {
         "type": "object",
         "properties": {
@@ -16356,6 +16802,11 @@
               "co_reporter"
             ],
             "description": "Viewer is primary reporter or co-reporter (points apply to primary only)"
+          },
+          "moderationReason": {
+            "type": "object",
+            "nullable": true,
+            "description": "Moderator rejection reason and optional notes when status is DELETED; null for other statuses"
           }
         },
         "required": [
@@ -16374,7 +16825,8 @@
           "category",
           "severity",
           "cleanupEffort",
-          "viewerRole"
+          "viewerRole",
+          "moderationReason"
         ]
       },
       "CreateReportWithLocationDto": {
@@ -17288,6 +17740,20 @@
             "items": {
               "$ref": "#/components/schemas/CheckInsByHourEntryDto"
             }
+          },
+          "generatedAt": {
+            "type": "string",
+            "description": "ISO-8601 instant when this analytics snapshot was generated"
+          },
+          "lastJoinAt": {
+            "type": "object",
+            "nullable": true,
+            "description": "ISO-8601 instant of the most recent participant join"
+          },
+          "lastCheckInAt": {
+            "type": "object",
+            "nullable": true,
+            "description": "ISO-8601 instant of the most recent check-in"
           }
         },
         "required": [
@@ -17295,7 +17761,8 @@
           "checkedInCount",
           "attendanceRate",
           "joinersCumulative",
-          "checkInsByHour"
+          "checkInsByHour",
+          "generatedAt"
         ]
       },
       "BulkModerateCleanupEventsDto": {
@@ -19412,6 +19879,10 @@
           "ErrorCode": {
             "type": "string",
             "example": "30007"
+          },
+          "Timestamp": {
+            "type": "string",
+            "description": "Twilio callback timestamp (RFC2822 or ISO8601)"
           },
           "ErrorMessage": {
             "type": "string"

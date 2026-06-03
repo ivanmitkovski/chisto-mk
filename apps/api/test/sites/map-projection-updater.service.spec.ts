@@ -1,8 +1,8 @@
 /// <reference types="jest" />
 
 import { Subject } from 'rxjs';
-import { SiteEventsService } from '../../src/admin-realtime/site-events.service';
-import type { SiteEvent } from '../../src/admin-realtime/site-events.types';
+import { SiteEventsService } from '../../src/admin-realtime/services/site-events.service';
+import type { SiteEvent } from '../../src/admin-realtime/types/site-events.types';
 import { MapProjectionDiffService } from '../../src/sites/map/map-projection-diff.service';
 import { MapProjectionUpdaterService } from '../../src/sites/map/map-projection-updater.service';
 import { MapProjectionWriterService } from '../../src/sites/map/map-projection-writer.service';

@@ -1,7 +1,7 @@
 import {
   resetPushRateLimitForTest,
   shouldDeferVisiblePush,
-} from '../../src/notifications/notification-push-rate-limit';
+} from '../../src/notifications/util/notification-push-rate-limit';
 
 describe('notification-push-rate-limit', () => {
   beforeEach(() => {

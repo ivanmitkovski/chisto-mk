@@ -33,8 +33,6 @@ class EventChatSearchPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
-
     if (searchLoading && merged.isEmpty && !searchError) {
       return const Center(
         child: SizedBox(
@@ -46,53 +44,32 @@ class EventChatSearchPanel extends StatelessWidget {
     }
 
     if (searchError && merged.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Text(
-                context.l10n.eventChatSearchFailed,
-                textAlign: TextAlign.center,
-                style: AppTypography.eventsBodyMediumSecondary(textTheme),
-              ),
-              const SizedBox(height: AppSpacing.md),
-              AppButton.primary(
-                label: context.l10n.eventsDetailRetryRefresh,
-                onPressed: () => unawaited(onRetrySearch()),
-                enabled: lastSearchQuery.length >= 2,
-                expand: false,
-              ),
-            ],
-          ),
+      return AppEmptyState(
+        icon: Icons.cloud_off_outlined,
+        title: context.l10n.eventChatSearchFailed,
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        action: AppButton.primary(
+          label: context.l10n.eventsDetailRetryRefresh,
+          onPressed: () => unawaited(onRetrySearch()),
+          enabled: lastSearchQuery.length >= 2,
+          expand: false,
         ),
       );
     }
 
     if (lastSearchQuery.length < 2) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Text(
-            context.l10n.eventChatSearchMinChars,
-            textAlign: TextAlign.center,
-            style: AppTypography.eventsBodyMuted(textTheme),
-          ),
-        ),
+      return AppEmptyState(
+        icon: Icons.search_rounded,
+        title: context.l10n.eventChatSearchMinChars,
+        padding: const EdgeInsets.all(AppSpacing.lg),
       );
     }
 
     if (!searchLoading && merged.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Text(
-            context.l10n.eventChatSearchNoResults,
-            textAlign: TextAlign.center,
-            style: AppTypography.eventsBodyMuted(textTheme),
-          ),
-        ),
+      return AppEmptyState(
+        icon: Icons.search_off_rounded,
+        title: context.l10n.eventChatSearchNoResults,
+        padding: const EdgeInsets.all(AppSpacing.lg),
       );
     }
 
@@ -120,7 +97,7 @@ class EventChatSearchPanel extends StatelessWidget {
                 child: Text(
                   context.l10n.eventChatSearchIncludingLocalMatches,
                   style: AppTypography.eventsCaptionStrong(
-                    textTheme,
+                    Theme.of(context).textTheme,
                     color: AppColors.textSecondary,
                   ),
                 ),

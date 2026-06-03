@@ -1,4 +1,4 @@
-import { SitesMapController } from '../../src/sites/sites-map.controller';
+import { SitesMapController } from '../../src/sites/controllers/sites-map.controller';
 
 describe('SitesController map routes', () => {
   function makeController() {
@@ -13,7 +13,11 @@ describe('SitesController map routes', () => {
         .fn()
         .mockResolvedValue({ at: new Date().toISOString(), revisionCount: 0, hint: 'stub' }),
     } as never;
-    const controller = new SitesMapController(sitesService);
+    const offlineRegions = {
+      getManifest: jest.fn(),
+      getRegionDownloadUrl: jest.fn(),
+    } as never;
+    const controller = new SitesMapController(sitesService, offlineRegions);
     return { controller, sitesService };
   }
 
@@ -34,7 +38,7 @@ describe('SitesController map routes', () => {
       end: jest.fn(),
     } as never;
 
-    await controller.getMapMvtTile(12, 2236, 1530, undefined, res);
+    await controller.getMapMvtTile(12, 2236, 1530, undefined, undefined, res);
     expect(statusCode).toBe(200);
     expect(headers.get('Content-Type')).toBe('application/vnd.mapbox-vector-tile');
     expect((sent as Uint8Array).length).toBeGreaterThan(0);
@@ -52,7 +56,7 @@ describe('SitesController map routes', () => {
       send: jest.fn(),
       end: jest.fn(),
     } as never;
-    await controller.getMapMvtTile(12, 2236, 1530, '"abc"', res);
+    await controller.getMapMvtTile(12, 2236, 1530, '"abc"', undefined, res);
     expect(statusCode).toBe(304);
   });
 });

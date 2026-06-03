@@ -1,15 +1,18 @@
 import 'package:chisto_infrastructure/core/bootstrap/app_bootstrap.dart';
-import 'package:chisto_infrastructure/core/deep_links/deep_link_router.dart';
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/navigation/app_go_router.dart';
 import 'package:chisto_infrastructure/core/navigation/app_routes.dart';
 import 'package:chisto_infrastructure/core/providers/app_providers.dart';
 import 'package:chisto_infrastructure/core/providers/root_container.dart';
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/shared/widgets/atoms/app_back_button.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/primary_button.dart';
 import 'package:chisto_infrastructure/shared/widgets/molecules/api_error_banner.dart';
 import 'package:feature_auth/src/domain/models/auth_session_dtos.dart';
+import 'package:feature_auth/src/domain/models/password_reset_target.dart';
 import 'package:feature_auth/src/presentation/screens/forgot_password_new_screen.dart';
+import 'package:feature_auth/src/presentation/screens/forgot_password_request_screen.dart';
+import 'package:feature_auth/src/presentation/screens/forgot_password_success_screen.dart';
 import 'package:feature_auth/src/presentation/screens/otp_screen.dart';
 import 'package:feature_auth/src/presentation/screens/sign_in_screen.dart';
 import 'package:feature_home/src/application/home_shell_controller.dart';
@@ -35,10 +38,6 @@ Finder _primaryCtaElevated(String label) {
 }
 
 void main() {
-  setUpAll(() async {
-    await bootstrapWidgetTests();
-  });
-
   setUpAll(() async {
     await bootstrapWidgetTests();
   });
@@ -79,12 +78,15 @@ void main() {
   testWidgets('password reset OTP step navigates to new password screen', (
     WidgetTester tester,
   ) async {
-    const String phone = '+38970123456';
+    const PasswordResetTarget target = PasswordResetTarget(
+      channel: PasswordResetChannel.sms,
+      value: '+38970123456',
+    );
 
     AppBootstrap.instance.overrideAuthRepositoryForTests(FakeAuthRepository());
     AppBootstrap.instance.providerContainer.invalidate(authRepositoryProvider);
     await pumpAppRouter(tester, initialLocation: AppRoutes.signIn);
-    appGoRouter.push(AppRoutes.forgotPasswordOtp, extra: phone);
+    appGoRouter.push(AppRoutes.forgotPasswordOtp, extra: target);
     await tester.pumpAndSettle();
 
     await enterOtpCode(tester, '123456');
@@ -139,43 +141,32 @@ void main() {
     expect(requestOtpCalls, 1);
   });
 
-  testWidgets('email reset deep link opens ForgotPasswordNewScreen', (
-    WidgetTester tester,
-  ) async {
-    const String token = 'email-reset-token-test';
-
-    await pumpAppRouter(tester, initialLocation: AppRoutes.signIn);
-    await tester.pumpAndSettle();
-
-    DeepLinkRouter.handleUri(
-      appGoRouter,
-      Uri.parse('https://chisto.mk/reset-password?token=$token'),
-      isAuthenticated: false,
+  testWidgets('email reset form submits via confirm', (WidgetTester tester) async {
+    const PasswordResetTarget target = PasswordResetTarget(
+      channel: PasswordResetChannel.email,
+      value: 'user@example.com',
     );
-    await tester.pumpAndSettle();
-
-    final ForgotPasswordNewScreen screen = tester
-        .widget<ForgotPasswordNewScreen>(find.byType(ForgotPasswordNewScreen));
-    expect(screen.emailResetToken, token);
-  });
-
-  testWidgets('email reset form submits via confirmByEmail', (
-    WidgetTester tester,
-  ) async {
-    const String token = 'reset-tok';
     var emailConfirmed = false;
     final FakeAuthRepository repo = FakeAuthRepository(
       confirmPasswordResetByEmailImpl:
-          ({required String token, required String newPassword}) async {
+          ({
+            required String email,
+            required String code,
+            required String newPassword,
+          }) async {
             emailConfirmed = true;
-            expect(token, 'reset-tok');
+            expect(email, 'user@example.com');
+            expect(code, '123456');
             expect(newPassword, 'Newpass123');
           },
     );
 
     await pumpAuthWidget(
       tester,
-      home: const ForgotPasswordNewScreen(emailResetToken: token),
+      home: const ForgotPasswordNewScreen(
+        target: target,
+        code: '123456',
+      ),
       onGenerateRoute: AppRouter.onGenerateRoute,
       overrides: AuthTestOverrides(authRepository: repo).build(),
     );
@@ -194,5 +185,48 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(emailConfirmed, isTrue);
+  });
+
+  testWidgets('forgot password request back returns to sign in', (
+    WidgetTester tester,
+  ) async {
+    AppBootstrap.instance.overrideAuthRepositoryForTests(FakeAuthRepository());
+    await pumpAppRouter(tester, initialLocation: AppRoutes.signIn);
+    await tester.pumpAndSettle();
+
+    final AppLocalizations l10n = AppLocalizations.of(
+      tester.element(find.byType(SignInScreen)),
+    )!;
+
+    await tester.tap(find.text(l10n.authForgotPassword));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ForgotPasswordRequestScreen), findsOneWidget);
+
+    await tester.tap(find.byType(AppBackButton));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SignInScreen), findsOneWidget);
+    expect(find.byType(ForgotPasswordRequestScreen), findsNothing);
+  });
+
+  testWidgets('password reset success navigates to sign in', (
+    WidgetTester tester,
+  ) async {
+    await pumpAppRouter(
+      tester,
+      initialLocation: AppRoutes.forgotPasswordSuccess,
+    );
+    await tester.pumpAndSettle();
+
+    final AppLocalizations l10n = AppLocalizations.of(
+      tester.element(find.byType(ForgotPasswordSuccessScreen)),
+    )!;
+
+    await tester.tap(_primaryCtaElevated(l10n.authBackToSignIn));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SignInScreen), findsOneWidget);
+    expect(find.byType(ForgotPasswordSuccessScreen), findsNothing);
   });
 }

@@ -25,6 +25,7 @@ export 'report_draft_summary_projector.dart'
     show
         ReportDraftSummaryProjector,
         isReportWizardDraftEntryResumable,
+        isReportWizardDraftTerminalSubmit,
         reportWizardRestoreSnapshotOf;
 
 /// Outcome of loading a wizard draft from SQLite + photo store.
@@ -125,6 +126,17 @@ class ReportDraftRepository {
     return ReportDraftSummaryProjector.fromWizardRow(row);
   }
 
+  Future<ReportOutboxEntry?> getWizardDraftEntry() =>
+      _outbox.getWizardDraftEntry();
+
+  /// Clears the wizard row when submit finished but the user left without [clear].
+  Future<void> clearTerminalSubmitIfPresent() async {
+    final ReportOutboxEntry? row = await _outbox.getWizardDraftEntry();
+    if (row != null && isReportWizardDraftTerminalSubmit(row)) {
+      await clear();
+    }
+  }
+
   /// Loads wizard draft, migrates legacy absolute paths into the managed store,
   /// prunes missing files, and re-writes the row when migration or prune ran.
   Future<ReportDraftLoadResult> loadDraft() async {
@@ -156,6 +168,11 @@ class ReportDraftRepository {
       final ReportOutboxEntry? raw = await _outbox.getWizardDraftEntry();
       if (raw == null) {
         chistoReportsBreadcrumb('report_draft', 'restore_empty');
+        return const ReportDraftLoadResult.empty();
+      }
+      if (isReportWizardDraftTerminalSubmit(raw)) {
+        chistoReportsBreadcrumb('report_draft', 'restore_clear_terminal_submit');
+        await clear();
         return const ReportDraftLoadResult.empty();
       }
 
@@ -355,20 +372,22 @@ class ReportDraftRepository {
       return;
     }
     await _outbox.update(
-      ReportOutboxEntry(
-        id: kReportWizardDraftRowId,
-        idempotencyKey: 'idem_$kReportWizardDraftRowId',
+      existing.copyWith(
         draft: ReportDraft(),
         title: '',
         description: '',
+        idempotencyKey: wizardDraftPlaceholderIdempotencyKey(),
         submitRequested: false,
         state: ReportOutboxState.pending,
         attemptCount: 0,
-        createdAtMs: existing.createdAtMs,
-        updatedAtMs: t,
-        currentStageName: null,
+        clearReportId: true,
+        clearMediaUrls: true,
+        clearLastError: true,
+        clearCooldownUntil: true,
+        clearWizardStage: true,
         attemptedStageNames: const <String>[],
-        lastPersistedAtMs: null,
+        clearLastPersistedAt: true,
+        updatedAtMs: t,
       ),
     );
     chistoReportsBreadcrumb('report_draft', 'clear');

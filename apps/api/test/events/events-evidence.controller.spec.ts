@@ -2,8 +2,8 @@
 
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
 import { Role } from '../../src/prisma-client';
-import { EventsEvidenceController } from '../../src/events/events-evidence.controller';
-import { EventEvidenceService } from '../../src/events/event-evidence.service';
+import { EventsEvidenceController } from '../../src/events/controllers/events-evidence.controller';
+import { EventEvidenceService } from '../../src/events/services/event-evidence.service';
 
 function user(id: string): AuthenticatedUser {
   return {

@@ -3,7 +3,7 @@ import {
   getSkopjeDayBoundsUtc,
   getSkopjeWeekBoundsUtc,
   SKOPJE_TZ,
-} from '../../src/gamification/week-skopje';
+} from '../../src/gamification/util/week-skopje';
 
 describe('getSkopjeWeekBoundsUtc', () => {
   it('matches Luxon Monday start and Sunday end in Europe/Skopje', () => {

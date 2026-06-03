@@ -1,5 +1,5 @@
 /// <reference types="jest" />
-import { DeviceTokenService } from '../../src/notifications/device-token.service';
+import { DeviceTokenService } from '../../src/notifications/services/device-token.service';
 
 function makePrisma() {
   return {

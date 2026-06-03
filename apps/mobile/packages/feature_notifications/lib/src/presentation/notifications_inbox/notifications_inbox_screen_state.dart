@@ -555,56 +555,20 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
     final String message = _inboxUnreadOnly
         ? context.l10n.notificationsEmptyUnreadBody
         : context.l10n.notificationsEmptyAllBody;
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.08),
-                borderRadius: AppRadii.xl,
-              ),
-              child: Icon(
-                _inboxUnreadOnly
-                    ? Icons.mark_email_read_rounded
-                    : Icons.notifications_none_rounded,
-                color: AppColors.primaryDark,
-                size: 32,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: AppTypographySurfaces.notificationsEmptyTitle(
-                Theme.of(context).textTheme,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: AppTypographySurfaces.notificationsScreenSubtitle(
-                Theme.of(context).textTheme,
-              ),
-            ),
-            if (_inboxUnreadOnly) ...<Widget>[
-              const SizedBox(height: AppSpacing.md),
-              AppButton.outlined(
-                label: context.l10n.notificationsShowAll,
-                onPressed: () {
-                  _loadNotifications(reset: true, onlyUnread: false);
-                },
-                expand: true,
-              ),
-            ],
-          ],
-        ),
-      ),
+    return AppEmptyState(
+      icon: _inboxUnreadOnly
+          ? Icons.mark_email_read_rounded
+          : Icons.notifications_none_rounded,
+      title: title,
+      subtitle: message,
+      action: _inboxUnreadOnly
+          ? AppButton.outlined(
+              label: context.l10n.notificationsShowAll,
+              onPressed: () {
+                _loadNotifications(reset: true, onlyUnread: false);
+              },
+            )
+          : null,
     );
   }
 

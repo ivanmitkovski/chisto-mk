@@ -1,7 +1,7 @@
 /// <reference types="jest" />
 
-import { CleanupEventsController } from '../../src/cleanup-events/cleanup-events.controller';
-import { CleanupEventsService } from '../../src/cleanup-events/cleanup-events.service';
+import { CleanupEventsController } from '../../src/cleanup-events/controllers/cleanup-events.controller';
+import { CleanupEventsService } from '../../src/cleanup-events/services/cleanup-events.service';
 
 describe('CleanupEventsController', () => {
   let controller: CleanupEventsController;

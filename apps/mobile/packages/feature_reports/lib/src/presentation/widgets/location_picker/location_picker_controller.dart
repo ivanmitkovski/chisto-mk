@@ -148,6 +148,12 @@ class LocationPickerController extends _$LocationPickerController {
 
   Timer? _geocodeDebounce;
   Timer? _stableAutoConfirmTimer;
+  Timer? _mapMoveThrottle;
+  LatLng? _pendingMapCenter;
+  double? _pendingMapZoom;
+  bool _pendingAtFence = false;
+  bool _pendingAtMaxZoom = false;
+  int _pendingGeocodeRequestId = 0;
   bool _disposed = false;
 
   static final LatLngBounds macedoniaBounds = locationPickerMacedoniaBounds();
@@ -162,6 +168,7 @@ class LocationPickerController extends _$LocationPickerController {
       _disposed = true;
       _geocodeDebounce?.cancel();
       _stableAutoConfirmTimer?.cancel();
+      _mapMoveThrottle?.cancel();
       mapController.dispose();
     });
 
@@ -307,9 +314,32 @@ class LocationPickerController extends _$LocationPickerController {
     }
   }
 
+  void _flushThrottledMapMove() {
+    final LatLng? center = _pendingMapCenter;
+    final double? zoom = _pendingMapZoom;
+    if (center == null || zoom == null || _disposed) {
+      return;
+    }
+    state = state.copyWith(
+      currentZoom: zoom,
+      wasAtFenceLastMove: _pendingAtFence,
+      wasAtMaxZoomLastMove: _pendingAtMaxZoom,
+      currentCenter: center,
+      needsConfirmation: !locationPickerSameLatLng(
+        center,
+        state.confirmedCenter,
+      ),
+      gpsOutsideCoverage: false,
+      gpsNeedsReview: false,
+      geocodeRequestId: _pendingGeocodeRequestId,
+    );
+  }
+
   // ignore: avoid_positional_boolean_parameters, flutter_map PositionCallback signature
   void onMapMoved(MapCamera position, bool hasGesture) {
     if (!hasGesture) {
+      _mapMoveThrottle?.cancel();
+      _mapMoveThrottle = null;
       state = state.copyWith(
         wasAtFenceLastMove: false,
         wasAtMaxZoomLastMove: false,
@@ -333,24 +363,26 @@ class LocationPickerController extends _$LocationPickerController {
 
     if (_disposed) return;
     final int requestId = state.geocodeRequestId + 1;
-    state = state.copyWith(
-      currentZoom: newZoom,
-      wasAtFenceLastMove: atFence,
-      wasAtMaxZoomLastMove: atMaxZoom,
-      currentCenter: newCenter,
-      needsConfirmation: !locationPickerSameLatLng(
-        newCenter,
-        state.confirmedCenter,
-      ),
-      gpsOutsideCoverage: false,
-      gpsNeedsReview: false,
-      geocodingInProgress: true,
-      geocodeRequestId: requestId,
-    );
+    _pendingMapCenter = newCenter;
+    _pendingMapZoom = newZoom;
+    _pendingAtFence = atFence;
+    _pendingAtMaxZoom = atMaxZoom;
+    _pendingGeocodeRequestId = requestId;
+
+    if (_mapMoveThrottle == null) {
+      _flushThrottledMapMove();
+      _mapMoveThrottle = Timer(const Duration(milliseconds: 100), () {
+        _mapMoveThrottle = null;
+        _flushThrottledMapMove();
+      });
+    }
+
     _geocodeDebounce?.cancel();
     _stableAutoConfirmTimer?.cancel();
     _geocodeDebounce = Timer(ReportTokens.locationGeocodeDebounceMap, () {
+      if (_disposed) return;
       if (state.currentCenter != null) {
+        state = state.copyWith(geocodingInProgress: true);
         unawaited(
           reverseGeocode(
             state.currentCenter!,
@@ -358,8 +390,6 @@ class LocationPickerController extends _$LocationPickerController {
             requestId: requestId,
           ),
         );
-      } else if (!_disposed) {
-        state = state.copyWith(geocodingInProgress: false);
       }
     });
     _scheduleStableAutoConfirm(newCenter);

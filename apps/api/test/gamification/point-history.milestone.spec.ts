@@ -1,5 +1,5 @@
-import { GamificationService } from '../../src/gamification/gamification.service';
-import { computeLevelMilestonesFromAscRows } from '../../src/gamification/point-history.service';
+import { GamificationService } from '../../src/gamification/services/gamification.service';
+import { computeLevelMilestonesFromAscRows } from '../../src/gamification/services/point-history.service';
 
 describe('computeLevelMilestonesFromAscRows', () => {
   const gamification = new GamificationService();

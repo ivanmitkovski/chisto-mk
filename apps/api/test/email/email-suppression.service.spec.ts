@@ -1,4 +1,4 @@
-import { EmailSuppressionService } from '../../src/email/email-suppression.service';
+import { EmailSuppressionService } from '../../src/email/services/email-suppression.service';
 
 describe('EmailSuppressionService', () => {
   const prisma = {

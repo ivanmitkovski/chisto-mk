@@ -1,17 +1,18 @@
+import 'dart:async';
+
 import 'package:chisto_infrastructure/core/auth/auth_state.dart';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/core/providers/app_providers.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_back_button.dart';
 import 'package:design_system/design_system.dart';
+import 'package:feature_events/src/presentation/navigation/organizer_certification_navigation.dart';
 import 'package:feature_events/src/presentation/screens/organizer_toolkit/organizer_quiz_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class OrganizerToolkitScreen extends ConsumerStatefulWidget {
-  const OrganizerToolkitScreen({super.key, this.onCertified});
-
-  final VoidCallback? onCertified;
+  const OrganizerToolkitScreen({super.key});
 
   @override
   ConsumerState<OrganizerToolkitScreen> createState() =>
@@ -23,6 +24,7 @@ class _OrganizerToolkitScreenState
   final PageController _pageController = PageController();
   int _currentPage = 0;
   bool _authListenerAttached = false;
+  bool _quizRouteOpen = false;
   late final AuthState _authState;
 
   static const int _totalPages = 8;
@@ -50,12 +52,12 @@ class _OrganizerToolkitScreenState
     if (!ref.read(authStateProvider).isOrganizerCertified) {
       return;
     }
-    _detachAuthListener();
-    final VoidCallback? onCertified = widget.onCertified;
-    Navigator.of(context).pop();
-    if (onCertified != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => onCertified());
+    // Quiz dismissal + create-event handoff is handled on the result screen.
+    if (_quizRouteOpen) {
+      return;
     }
+    _detachAuthListener();
+    Navigator.of(context).pop();
   }
 
   @override
@@ -86,10 +88,22 @@ class _OrganizerToolkitScreenState
     if (_currentPage < _totalPages - 1) {
       _pageController.nextPage(duration: duration, curve: curve);
     } else {
-      Navigator.of(context).push(
-        MaterialPageRoute<void>(
-          builder: (_) => OrganizerQuizScreen(onCertified: widget.onCertified),
-        ),
+      setState(() => _quizRouteOpen = true);
+      unawaited(
+        Navigator.of(context)
+            .push<void>(
+              MaterialPageRoute<void>(
+                settings: const RouteSettings(
+                  name: organizerCertificationQuizRouteName,
+                ),
+                builder: (_) => const OrganizerQuizScreen(),
+              ),
+            )
+            .whenComplete(() {
+              if (mounted) {
+                setState(() => _quizRouteOpen = false);
+              }
+            }),
       );
     }
   }

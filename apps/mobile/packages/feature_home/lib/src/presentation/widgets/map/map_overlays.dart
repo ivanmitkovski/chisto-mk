@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:design_system/design_system.dart';
 import 'package:feature_home/src/presentation/widgets/map/map_loading_progress_bar.dart';
@@ -153,75 +151,17 @@ class EmptyFilterOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color panelFill = useDarkTiles
-        ? AppColors.glassDark.withValues(alpha: 0.58)
-        : AppColors.white.withValues(alpha: 0.9);
-    final Color panelBorder = useDarkTiles
-        ? AppColors.white.withValues(alpha: 0.14)
-        : AppColors.white.withValues(alpha: 0.7);
-    final Color titleColor = useDarkTiles
-        ? AppColors.textOnDark
-        : AppColors.textPrimary;
-    final Color bodyColor = useDarkTiles
-        ? AppColors.textOnDarkMuted
-        : AppColors.textMuted;
-    final Color iconColor = useDarkTiles
-        ? AppColors.textOnDarkMuted
-        : AppColors.textMuted;
-
-    return Semantics(
-      liveRegion: true,
-      label: context.l10n.mapEmptyFiltersLiveRegion,
-      child: Center(
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-            child: Container(
-              margin: const EdgeInsets.all(AppSpacing.lg),
-              padding: const EdgeInsets.all(AppSpacing.xl),
-              decoration: BoxDecoration(
-                color: panelFill,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-                border: Border.all(color: panelBorder),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Icon(
-                    Icons.filter_list_off_rounded,
-                    size: 48,
-                    color: iconColor,
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  Text(
-                    context.l10n.mapEmptyFiltersTitle,
-                    style: AppTypographySurfaces.homeMapOverlayTitle(
-                      Theme.of(context).textTheme,
-                      color: titleColor,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(
-                    context.l10n.mapEmptyFiltersSubtitle,
-                    style: AppTypographySurfaces.homeMapOverlayBody(
-                      Theme.of(context).textTheme,
-                      color: bodyColor,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  FilledButton.icon(
-                    onPressed: onResetFilters,
-                    icon: const Icon(Icons.refresh_rounded, size: 18),
-                    label: Text(context.l10n.mapResetFiltersSemantic),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
+    return AppEmptyStatePanel(
+      icon: Icons.filter_list_off_rounded,
+      title: context.l10n.mapEmptyFiltersTitle,
+      subtitle: context.l10n.mapEmptyFiltersSubtitle,
+      useDarkTiles: useDarkTiles,
+      semanticsLabel: context.l10n.mapEmptyFiltersLiveRegion,
+      action: AppButton.secondary(
+        label: context.l10n.mapResetFiltersSemantic,
+        onPressed: onResetFilters,
+        leadingIcon: const Icon(Icons.refresh_rounded, size: 18),
+        expand: false,
       ),
     );
   }

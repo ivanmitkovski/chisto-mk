@@ -62,6 +62,49 @@ void main() {
     expect(find.byIcon(Icons.assignment_rounded), findsOneWidget);
   });
 
+  testWidgets('long system body wraps with readable preview at inbox width', (
+    WidgetTester tester,
+  ) async {
+    const String body =
+        'Thank you. We received your report CH-000048. Our team will review it soon.';
+    final UserNotification item = UserNotification(
+      id: 'n-long',
+      title: 'We received CH-000048',
+      body: body,
+      createdAt: DateTime(2026, 6, 1, 12, 0),
+      type: UserNotificationType.system,
+      isRead: true,
+      data: <String, dynamic>{
+        'kind': 'report_received',
+        'reportId': 'r48',
+        'siteId': 'site-1',
+      },
+    );
+
+    await tester.binding.setSurfaceSize(const Size(390, 220));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('en'),
+        home: MediaQuery(
+          data: const MediaQueryData(
+            size: Size(390, 220),
+            textScaler: TextScaler.linear(1),
+          ),
+          child: Scaffold(
+            body: NotificationTile(item: item, onTap: () {}),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.textContaining('Our team will review'), findsOneWidget);
+    expect(find.text(body), findsOneWidget);
+  });
+
   testWidgets('renders all notification types without error', (
     WidgetTester tester,
   ) async {

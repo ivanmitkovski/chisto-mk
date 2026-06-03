@@ -1,5 +1,5 @@
 import { BadRequestException } from '@nestjs/common';
-import { SitesAdminBulkService } from '../../src/sites/sites-admin-bulk.service';
+import { SitesAdminBulkService } from '../../src/sites/services/sites-admin-bulk.service';
 
 describe('SitesAdminBulkService bulkSites', () => {
   function makeService() {

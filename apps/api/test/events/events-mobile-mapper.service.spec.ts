@@ -1,9 +1,9 @@
 /// <reference types="jest" />
 
 import { CleanupEventStatus, EcoEventCategory, EcoEventDifficulty, EcoEventLifecycleStatus } from '../../src/prisma-client';
-import { ReportsUploadService } from '../../src/reports/reports-upload.service';
-import { EventsMobileMapperService } from '../../src/events/events-mobile-mapper.service';
-import { EventsRepository } from '../../src/events/events.repository';
+import { ReportsUploadService } from '../../src/reports/services/reports-upload.service';
+import { EventsMobileMapperService } from '../../src/events/services/events-mobile-mapper.service';
+import { EventsRepository } from '../../src/events/repositories/events.repository';
 
 describe('EventsMobileMapperService', () => {
   it('maps a minimal loaded row to EventMobileResponseDto', async () => {

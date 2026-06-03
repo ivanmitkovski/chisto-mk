@@ -2,7 +2,7 @@
 
 import { NotFoundException } from '@nestjs/common';
 import { Role } from '../../src/prisma-client';
-import { AdminNotificationsService } from '../../src/admin-notifications/admin-notifications.service';
+import { AdminNotificationsService } from '../../src/admin-notifications/services/admin-notifications.service';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
 import type { ListAdminNotificationsQueryDto } from '../../src/admin-notifications/dto/list-admin-notifications.dto';
 

@@ -1,7 +1,7 @@
 /// <reference types="jest" />
 
 import { NotificationType } from '../../src/prisma-client';
-import { EmailDeliveryOutboxService } from '../../src/email/email-delivery-outbox.service';
+import { EmailDeliveryOutboxService } from '../../src/email/services/email-delivery-outbox.service';
 
 describe('EmailDeliveryOutboxService.enqueue', () => {
   const importantEvent = {

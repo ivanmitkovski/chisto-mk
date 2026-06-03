@@ -3,4 +3,5 @@ export type RegisterResponse = {
   phoneNumber: string;
   requiresPhoneVerification: true;
   otpExpiresIn: number;
+  devCode?: string;
 };

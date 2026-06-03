@@ -1,9 +1,9 @@
 /// <reference types="jest" />
 
 import { BadRequestException } from '@nestjs/common';
-import { ReportSubmitIdempotencyService } from '../../src/reports/report-submit-idempotency.service';
-import { ReportSubmitMediaAppendService } from '../../src/reports/report-submit-media-append.service';
-import { ReportSubmitService } from '../../src/reports/report-submit.service';
+import { ReportSubmitIdempotencyService } from '../../src/reports/services/report-submit-idempotency.service';
+import { ReportSubmitMediaAppendService } from '../../src/reports/services/report-submit-media-append.service';
+import { ReportSubmitService } from '../../src/reports/services/report-submit.service';
 import { Role } from '../../src/prisma-client';
 
 describe('ReportSubmitService idempotency key validation', () => {
@@ -32,9 +32,7 @@ describe('ReportSubmitService idempotency key validation', () => {
 
   const postCreateEvents = { emit: jest.fn() };
   const reportsOwnerEventsService = { emit: jest.fn(), emitToReportInterestedParties: jest.fn() };
-  const reportCapacity = { spendWithinTransaction: jest.fn() };
   const reportsUpload = { assertReportMediaUrlsFromOurBucket: jest.fn() };
-  const nearbySiteResolver = { resolveEarliestReportAnchor: jest.fn() };
 
   const idempotency = new ReportSubmitIdempotencyService(prisma as never);
   const mediaAppend = new ReportSubmitMediaAppendService(
@@ -43,17 +41,14 @@ describe('ReportSubmitService idempotency key validation', () => {
     reportsOwnerEventsService as never,
   );
   const svc = new ReportSubmitService(
-    prisma as never,
     postCreateEvents as never,
     reportsOwnerEventsService as never,
-    reportCapacity as never,
     reportsUpload as never,
-    nearbySiteResolver as never,
     idempotency,
     mediaAppend,
+    { persistReportWithLocation: jest.fn() } as never,
     { emit: jest.fn() } as never,
-    { recordSiteCreated: jest.fn(), emitHistoryAppended: jest.fn() } as never,
-    { recordReportSubmitted: jest.fn() } as never,
+    { emitHistoryAppended: jest.fn() } as never,
   );
 
   it('throws INVALID_IDEMPOTENCY_KEY when key is shorter than 16', async () => {

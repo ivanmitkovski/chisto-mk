@@ -2,9 +2,9 @@
 
 import { NotFoundException } from '@nestjs/common';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
-import { EventsParticipationService } from '../../src/events/events-participation.service';
-import { EventsMobileMapperService } from '../../src/events/events-mobile-mapper.service';
-import { EventsRepository } from '../../src/events/events.repository';
+import { EventsParticipationService } from '../../src/events/services/events-participation.service';
+import { EventsMobileMapperService } from '../../src/events/services/events-mobile-mapper.service';
+import { EventsRepository } from '../../src/events/repositories/events.repository';
 
 function auth(userId: string): AuthenticatedUser {
   return {

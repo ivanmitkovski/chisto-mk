@@ -12,6 +12,8 @@ import { MulterError } from 'multer';
 import { Prisma } from '../../prisma-client';
 import { ObservabilityStore } from '../../observability/observability.store';
 import { ErrorResponse } from '../errors/error-response.type';
+import { shouldSampleClientErrorLog } from '../logging/sampled-warn.util';
+import { normalizeHttpPath } from '../logging/metrics-skip-paths';
 
 type HttpExceptionPayload = {
   code?: unknown;
@@ -35,6 +37,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const request = context.getRequest<{ method?: string; url?: string; requestId?: string }>();
 
     if (exception instanceof ThrottlerException) {
+      this.logClientError(request, HttpStatus.TOO_MANY_REQUESTS, 'TOO_MANY_REQUESTS');
       response.status(HttpStatus.TOO_MANY_REQUESTS).json(
         GlobalExceptionFilter.stamp({
           code: 'TOO_MANY_REQUESTS',
@@ -65,6 +68,9 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       const status = exception.getStatus();
       const payload = exception.getResponse();
       const normalized = this.normalizeHttpPayload(status, payload);
+      if (status >= 400 && status < 500) {
+        this.logClientError(request, status, normalized.code);
+      }
 
       response.status(status).json(GlobalExceptionFilter.stamp(normalized));
       return;
@@ -72,25 +78,41 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
     const prismaMapped = this.tryMapPrismaError(exception);
     if (prismaMapped) {
+      if (prismaMapped.status >= 500) {
+        GlobalExceptionFilter.log.error({
+          msg: 'prisma_infrastructure_error',
+          requestId: request?.requestId ?? null,
+          method: request?.method ?? null,
+          route: normalizeHttpPath(request?.url ?? '/'),
+          status: prismaMapped.status,
+          code: prismaMapped.body.code,
+          error:
+            exception instanceof Error
+              ? { name: exception.name, message: exception.message, stack: exception.stack }
+              : { message: String(exception) },
+        });
+      } else if (prismaMapped.status >= 400) {
+        this.logClientError(request, prismaMapped.status, prismaMapped.body.code);
+      }
       response.status(prismaMapped.status).json(GlobalExceptionFilter.stamp(prismaMapped.body));
       return;
     }
 
-    // Structured JSON log line (Nest Logger); no raw client bodies.
-    const errPayload =
-      exception instanceof Error
-        ? { name: exception.name, message: exception.message }
-        : { message: String(exception) };
-    GlobalExceptionFilter.log.error(
-      JSON.stringify({
-        context: 'GlobalExceptionFilter',
-        requestId: request?.requestId ?? null,
-        method: request?.method ?? null,
-        route: request?.url?.split('?')[0] ?? null,
-        message: 'Unhandled exception in request pipeline',
-        error: errPayload,
-      }),
-    );
+    const isProd = process.env.NODE_ENV === 'production';
+    GlobalExceptionFilter.log.error({
+      msg: 'unhandled_exception',
+      requestId: request?.requestId ?? null,
+      method: request?.method ?? null,
+      route: normalizeHttpPath(request?.url ?? '/'),
+      error:
+        exception instanceof Error
+          ? {
+              name: exception.name,
+              message: exception.message,
+              ...(isProd ? {} : { stack: exception.stack }),
+            }
+          : { message: String(exception) },
+    });
 
     Sentry.withScope((scope) => {
       scope.setTag('requestId', request?.requestId ?? 'unknown');
@@ -109,6 +131,24 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         message: 'Internal server error',
       }),
     );
+  }
+
+  private logClientError(
+    request: { method?: string; url?: string; requestId?: string } | undefined,
+    status: number,
+    code: string,
+  ): void {
+    if (!shouldSampleClientErrorLog()) {
+      return;
+    }
+    GlobalExceptionFilter.log.warn({
+      msg: 'client_error',
+      requestId: request?.requestId ?? null,
+      method: request?.method ?? null,
+      route: normalizeHttpPath(request?.url ?? '/'),
+      status,
+      code,
+    });
   }
 
   private tryMapPrismaError(exception: unknown): { status: number; body: ErrorResponse } | null {

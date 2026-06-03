@@ -45,20 +45,80 @@ class ReportOutboxDao {
     );
   }
 
-  Future<List<Map<String, Object?>>> rawQueryNextProcessable(int nowMs) async {
-    return _db.rawQuery(
-      '''
-SELECT * FROM ${ReportOutboxDatabase.tableOutbox}
-WHERE state IN ('pending', 'uploading', 'submitting', 'cooldown')
+  static const String _processableWhere = '''
+state IN ('pending', 'uploading', 'submitting', 'cooldown')
   AND (cooldown_until_ms IS NULL OR cooldown_until_ms <= ?)
   AND (
     state IN ('uploading', 'submitting', 'cooldown')
     OR (state = 'pending' AND submit_requested = 1)
   )
+  AND (processing_lease_until_ms IS NULL OR processing_lease_until_ms <= ?)
+''';
+
+  Future<List<Map<String, Object?>>> rawQueryNextProcessable(int nowMs) async {
+    return _db.rawQuery(
+      '''
+SELECT * FROM ${ReportOutboxDatabase.tableOutbox}
+WHERE $_processableWhere
 ORDER BY created_at_ms ASC
 LIMIT 1
 ''',
-      <Object>[nowMs],
+      <Object>[nowMs, nowMs],
+    );
+  }
+
+  /// Atomically claims the next processable row for [ownerId] until [leaseUntilMs].
+  Future<Map<String, Object?>?> rawClaimNextProcessable({
+    required int nowMs,
+    required String ownerId,
+    required int leaseUntilMs,
+  }) async {
+    Map<String, Object?>? claimed;
+    await _db.transaction((Transaction txn) async {
+      final List<Map<String, Object?>> rows = await txn.rawQuery(
+        '''
+SELECT * FROM ${ReportOutboxDatabase.tableOutbox}
+WHERE $_processableWhere
+ORDER BY created_at_ms ASC
+LIMIT 1
+''',
+        <Object>[nowMs, nowMs],
+      );
+      if (rows.isEmpty) {
+        return;
+      }
+      final String id = rows.first['id']! as String;
+      final int updated = await txn.rawUpdate(
+        '''
+UPDATE ${ReportOutboxDatabase.tableOutbox}
+SET processing_owner = ?, processing_lease_until_ms = ?, updated_at_ms = ?
+WHERE id = ?
+  AND (processing_lease_until_ms IS NULL OR processing_lease_until_ms <= ?)
+''',
+        <Object>[ownerId, leaseUntilMs, nowMs, id, nowMs],
+      );
+      if (updated == 0) {
+        return;
+      }
+      claimed = Map<String, Object?>.from(rows.first)
+        ..['processing_owner'] = ownerId
+        ..['processing_lease_until_ms'] = leaseUntilMs
+        ..['updated_at_ms'] = nowMs;
+    });
+    return claimed;
+  }
+
+  Future<void> rawReleaseLease(String id) async {
+    final int now = DateTime.now().millisecondsSinceEpoch;
+    await _db.update(
+      ReportOutboxDatabase.tableOutbox,
+      <String, Object?>{
+        'processing_owner': null,
+        'processing_lease_until_ms': null,
+        'updated_at_ms': now,
+      },
+      where: 'id = ?',
+      whereArgs: <Object>[id],
     );
   }
 

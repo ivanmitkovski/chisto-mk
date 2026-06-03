@@ -1,4 +1,4 @@
-import { Injectable, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, OnModuleDestroy, Logger } from '@nestjs/common';
 import { ThrottlerStorage } from '@nestjs/throttler';
 import Redis from 'ioredis';
 
@@ -6,6 +6,7 @@ type RecordEntry = { totalHits: number; timeToExpire: number; isBlocked: boolean
 
 @Injectable()
 export class RedisThrottlerStorage implements ThrottlerStorage, OnModuleDestroy {
+  private readonly logger = new Logger(RedisThrottlerStorage.name);
   private readonly redis: Redis | null;
 
   constructor() {
@@ -29,6 +30,11 @@ export class RedisThrottlerStorage implements ThrottlerStorage, OnModuleDestroy 
       const nodeEnv = (process.env.NODE_ENV ?? 'development').trim().toLowerCase();
       const failClosed = nodeEnv === 'production' || nodeEnv === 'staging';
       if (failClosed) {
+        this.logger.error({
+          msg: 'throttle_redis_unavailable_fail_closed',
+          throttlerName,
+          key,
+        });
         return {
           totalHits: limit + 1,
           timeToExpire: ttl,

@@ -46,75 +46,38 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
 
   @override
   Widget build(BuildContext context) {
+    final Widget icon = AnimatedBuilder(
+      animation: _pulse,
+      builder: (BuildContext context, Widget? child) {
+        final double s = 1.0 + _pulse.value * 0.04;
+        return Transform.scale(scale: s, child: child);
+      },
+      child: const AppEmptyStateIcon(icon: CupertinoIcons.bubble_left_bubble_right),
+    );
+
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.xl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            AnimatedBuilder(
-              animation: _pulse,
-              builder: (BuildContext context, Widget? child) {
-                final double s = 1.0 + _pulse.value * 0.04;
-                return Transform.scale(scale: s, child: child);
-              },
-              child: SizedBox(
-                width: 80,
-                height: 80,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: <Widget>[
-                    Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: RadialGradient(
-                          colors: <Color>[
-                            AppColors.primary.withValues(alpha: 0.08),
-                            AppColors.transparent,
-                          ],
-                          stops: const <double>[0, 1],
-                        ),
-                      ),
-                    ),
-                    Icon(
-                      CupertinoIcons.bubble_left_bubble_right,
-                      size: 40,
-                      color: AppColors.textMuted.withValues(alpha: 0.5),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            icon,
             const SizedBox(height: AppSpacing.lg),
-            Text(
+            AppText.emptyTitle(
               context.l10n.eventChatEmptyTitle,
-              style: AppTypography.eventsListCardTitle(
-                Theme.of(context).textTheme,
-              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.xs),
-            Text(
+            AppText.emptySubtitle(
               context.l10n.eventChatEmptyBody,
-              style: AppTypography.eventsCalloutSubtitle(
-                Theme.of(context).textTheme,
-              ),
               textAlign: TextAlign.center,
             ),
             if (widget.onSayHello != null) ...<Widget>[
               const SizedBox(height: AppSpacing.lg),
-              FilledButton.tonal(
+              AppButton.secondary(
+                label: context.l10n.eventChatEmptySayHello,
                 onPressed: widget.onSayHello,
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                  foregroundColor: AppColors.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-                  ),
-                ),
-                child: Text(context.l10n.eventChatEmptySayHello),
+                expand: false,
               ),
             ],
           ],

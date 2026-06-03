@@ -1,4 +1,4 @@
-import { FeedRankingService } from '../../src/sites/feed-ranking.service';
+import { FeedRankingService } from '../../src/sites/services/feed-ranking.service';
 
 describe('FeedRankingService', () => {
   const service = new FeedRankingService();

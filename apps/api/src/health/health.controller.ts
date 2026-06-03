@@ -7,16 +7,16 @@ import {
   ServiceUnavailableException,
   UseGuards,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { ADMIN_PANEL_ROLES } from '../auth/admin-roles';
-import { Roles } from '../auth/roles.decorator';
-import { RolesGuard } from '../auth/roles.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { ADMIN_PANEL_ROLES } from '../auth/constants/admin-roles';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { RolesGuard } from '../auth/guards/roles.guard';
 import { SkipThrottle } from '@nestjs/throttler';
 import { ApiTags } from '@nestjs/swagger';
 import Redis from 'ioredis';
 import { loadFeatureFlags } from '../config/feature-flags';
 import { PrismaService } from '../prisma/prisma.service';
-import { S3StorageClient } from '../storage/s3-storage.client';
+import { S3StorageClient } from '../storage/util/s3-storage.client';
 import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-error-responses.decorator';
 
 @ApiTags('health')
@@ -78,6 +78,9 @@ export class HealthController implements OnModuleDestroy {
     const redisClient = this.getHealthRedis();
     if (redisClient) {
       try {
+        if (redisClient.status !== 'ready') {
+          await redisClient.connect().catch(() => undefined);
+        }
         await redisClient.ping();
         redis = 'ok';
       } catch {

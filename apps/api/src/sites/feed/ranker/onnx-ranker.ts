@@ -73,7 +73,11 @@ export class OnnxRanker implements RankerProvider {
       ObservabilityStore.setFeedV2RankerMode('onnx_loaded');
       return Array.from(output.data as ArrayLike<unknown>).map((v: unknown) => Number(v));
     } catch (error) {
-      this.logger.warn(`ONNX scoring failed, falling back to rules ranker: ${String(error)}`);
+      this.logger.warn({
+        msg: 'feed_onnx_ranker_fallback',
+        reason: String(error),
+        modelVersion: this.currentVersion,
+      });
       this.session = null;
       this.currentVersion = this.fallback.modelVersion();
       ObservabilityStore.setFeedV2RankerMode('rules_fallback_error');

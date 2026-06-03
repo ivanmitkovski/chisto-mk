@@ -1,5 +1,5 @@
 import { EcoEventLifecycleStatus, SiteStatus } from '../../src/prisma-client';
-import { SiteLifecycleFromEventsService } from '../../src/sites/site-lifecycle-from-events.service';
+import { SiteLifecycleFromEventsService } from '../../src/sites/services/site-lifecycle-from-events.service';
 
 describe('SiteLifecycleFromEventsService', () => {
   const featureFlags = { getPublicMap: jest.fn().mockResolvedValue({ site_lifecycle_from_events: true }) };

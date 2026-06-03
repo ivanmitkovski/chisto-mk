@@ -21,11 +21,10 @@ class EventsEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
+    final AppLocalizations l10n = context.l10n;
     final String title;
     final String subtitle;
     final IconData icon;
-    final AppLocalizations l10n = context.l10n;
     switch (filter) {
       case EcoEventFilter.all:
         title = l10n.eventsEmptyAllTitle;
@@ -50,73 +49,41 @@ class EventsEmptyState extends StatelessWidget {
     }
 
     final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
+    final Widget empty = AppEmptyState(
+      icon: icon,
+      title: title,
+      subtitle: subtitle,
+      alignment: AppEmptyStateAlignment.topCenter,
+      maxWidth: AppSpacing.emptyStateMaxWidth,
+      secondaryAction: showClearFilters && onClearFilters != null
+          ? AppButton.text(
+              label: l10n.eventsEmptyActionClearFilters,
+              onPressed: onClearFilters,
+            )
+          : null,
+      action: onCreateEvent != null
+          ? AppButton.primary(
+              label: l10n.eventsEmptyActionCreateEvent,
+              onPressed: onCreateEvent,
+            )
+          : null,
+    );
 
-    // Top-align so when the shell shrinks for the keyboard, this block does not
-    // re-center vertically (which looks like the content "jumping").
-    return Align(
-      alignment: Alignment.topCenter,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(
-          AppSpacing.xl,
-          AppSpacing.xxl,
-          AppSpacing.xl,
-          AppSpacing.xxl,
-        ),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 400),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              if (reduceMotion)
-                _FeedEmptyIllustration(icon: icon)
-              else
-                TweenAnimationBuilder<double>(
-                  tween: Tween<double>(begin: 0.92, end: 1),
-                  duration: AppMotion.slow,
-                  curve: AppMotion.emphasized,
-                  builder: (_, double value, Widget? child) {
-                    return Opacity(
-                      opacity: value,
-                      child: Transform.scale(scale: value, child: child),
-                    );
-                  },
-                  child: _FeedEmptyIllustration(icon: icon),
-                ),
-              const SizedBox(height: AppSpacing.lg),
-              Text(
-                title,
-                textAlign: TextAlign.center,
-                style: AppTypography.emptyStateTitle(textTheme),
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                subtitle,
-                textAlign: TextAlign.center,
-                style: AppTypography.emptyStateSubtitle(textTheme),
-              ),
-              if (showClearFilters && onClearFilters != null) ...<Widget>[
-                const SizedBox(height: AppSpacing.lg),
-                AppButton.text(
-                  label: l10n.eventsEmptyActionClearFilters,
-                  onPressed: onClearFilters,
-                ),
-              ],
-              if (onCreateEvent != null) ...<Widget>[
-                SizedBox(
-                  height: showClearFilters ? AppSpacing.md : AppSpacing.lg,
-                ),
-                SizedBox(
-                  width: double.infinity,
-                  child: PrimaryButton(
-                    label: l10n.eventsEmptyActionCreateEvent,
-                    onPressed: onCreateEvent,
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ),
-      ),
+    if (reduceMotion) {
+      return empty;
+    }
+
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0.92, end: 1),
+      duration: AppMotion.slow,
+      curve: AppMotion.emphasized,
+      builder: (_, double value, Widget? child) {
+        return Opacity(
+          opacity: value,
+          child: Transform.scale(scale: value, child: child),
+        );
+      },
+      child: empty,
     );
   }
 }
@@ -135,89 +102,33 @@ class SearchEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
     final AppLocalizations l10n = context.l10n;
-    return Align(
-      alignment: Alignment.topCenter,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(
-          AppSpacing.xl,
-          AppSpacing.xxl,
-          AppSpacing.xl,
-          AppSpacing.xxl,
-        ),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 400),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              const _FeedEmptyIllustration(icon: CupertinoIcons.search),
-              const SizedBox(height: AppSpacing.lg),
-              Text(
-                l10n.eventsSearchEmptyTitle(query),
-                textAlign: TextAlign.center,
-                style: AppTypography.emptyStateTitle(textTheme),
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                l10n.eventsSearchEmptySubtitle,
-                textAlign: TextAlign.center,
-                style: AppTypography.emptyStateSubtitle(textTheme),
-              ),
-              if (query.trim().length >= 2) ...<Widget>[
-                const SizedBox(height: AppSpacing.md),
-                Text(
-                  l10n.eventsSearchEmptyScopeHint,
-                  textAlign: TextAlign.center,
-                  style: AppTypography.eventsSupportingCaption(
-                    Theme.of(context).textTheme,
-                  ),
-                ),
-              ],
-              if (onClearSearch != null) ...<Widget>[
-                const SizedBox(height: AppSpacing.lg),
-                AppButton.text(
-                  label: l10n.eventsSearchEmptyClearSearch,
-                  onPressed: onClearSearch,
-                ),
-              ],
-              if (onCreateEvent != null) ...<Widget>[
-                SizedBox(
-                  height: onClearSearch != null ? AppSpacing.md : AppSpacing.lg,
-                ),
-                SizedBox(
-                  width: double.infinity,
-                  child: PrimaryButton(
-                    label: l10n.eventsEmptyActionCreateEvent,
-                    onPressed: onCreateEvent,
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Same visual language as [AppEmptyState] (inputFill circle, muted icon).
-class _FeedEmptyIllustration extends StatelessWidget {
-  const _FeedEmptyIllustration({required this.icon});
-
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    const double diameter = AppSpacing.avatarLg + AppSpacing.xs;
-    return Container(
-      width: diameter,
-      height: diameter,
-      decoration: const BoxDecoration(
-        color: AppColors.inputFill,
-        shape: BoxShape.circle,
-      ),
-      child: Icon(icon, size: AppSpacing.xl, color: AppColors.textMuted),
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    return AppEmptyState(
+      icon: CupertinoIcons.search,
+      title: l10n.eventsSearchEmptyTitle(query),
+      subtitle: l10n.eventsSearchEmptySubtitle,
+      alignment: AppEmptyStateAlignment.topCenter,
+      maxWidth: AppSpacing.emptyStateMaxWidth,
+      contentBelowSubtitle: query.trim().length >= 2
+          ? Text(
+              l10n.eventsSearchEmptyScopeHint,
+              textAlign: TextAlign.center,
+              style: AppTypography.eventsSupportingCaption(textTheme),
+            )
+          : null,
+      secondaryAction: onClearSearch != null
+          ? AppButton.text(
+              label: l10n.eventsSearchEmptyClearSearch,
+              onPressed: onClearSearch,
+            )
+          : null,
+      action: onCreateEvent != null
+          ? AppButton.primary(
+              label: l10n.eventsEmptyActionCreateEvent,
+              onPressed: onCreateEvent,
+            )
+          : null,
     );
   }
 }

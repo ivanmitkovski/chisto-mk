@@ -2,7 +2,7 @@
 
 import { NotFoundException } from '@nestjs/common';
 import { Role, UserStatus } from '../../src/prisma-client';
-import { AdminUsersQueryService } from '../../src/admin-users/admin-users-query.service';
+import { AdminUsersQueryService } from '../../src/admin-users/services/admin-users-query.service';
 import type { ListAdminUsersQueryDto } from '../../src/admin-users/dto/list-admin-users-query.dto';
 
 describe('AdminUsersQueryService', () => {

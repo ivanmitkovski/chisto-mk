@@ -4,9 +4,9 @@ import 'package:design_system/design_system.dart';
 import 'package:feature_reports/src/domain/models/report_draft.dart';
 import 'package:feature_reports/src/presentation/l10n/report_category_l10n.dart';
 import 'package:feature_reports/src/presentation/l10n/report_severity_l10n.dart';
+import 'package:feature_reports/src/presentation/widgets/new_report/report_severity_slider.dart';
 import 'package:feature_reports/src/presentation/widgets/new_report/report_stage.dart';
 import 'package:feature_reports/src/presentation/widgets/report_category_picker.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class NewReportDetailsCategoryField extends StatelessWidget {
@@ -121,37 +121,18 @@ class NewReportDetailsSeverityField extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: AppSpacing.sm),
-              Semantics(
-                slider: true,
-                label: context.l10n.reportReviewSeverityTitle,
-                value: reportSeverityDisplayLabel(context.l10n, draft.severity),
-                child: CupertinoSlider(
-                  value: draft.severity.toDouble(),
-                  min: 1,
-                  max: 5,
-                  divisions: 4,
-                  activeColor: AppColors.primary,
-                  onChanged: (double value) {
-                    onSeverityChanged(value.round().clamp(1, 5));
-                  },
+              ReportSeveritySlider(
+                value: draft.severity,
+                semanticsLabel: context.l10n.reportReviewSeverityTitle,
+                semanticsValue: reportSeverityDisplayLabel(
+                  context.l10n,
+                  draft.severity,
                 ),
+                onChanged: onSeverityChanged,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text(
-                    context.l10n.reportSeverityLow,
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
-                  ),
-                  Text(
-                    context.l10n.reportSeverityCritical,
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
-                  ),
-                ],
+              ReportSeveritySliderLabels(
+                lowLabel: context.l10n.reportSeverityLow,
+                criticalLabel: context.l10n.reportSeverityCritical,
               ),
             ],
           ),

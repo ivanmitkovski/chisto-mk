@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, SiteHistoryEntryKind, SiteStatus } from '../../prisma-client';
 import { PrismaService } from '../../prisma/prisma.service';
 import type { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
-import { ADMIN_PANEL_ROLES } from '../../auth/admin-roles';
+import { ADMIN_PANEL_ROLES } from '../../auth/constants/admin-roles';
 import {
   SiteHistoryEntryDto,
   SiteHistoryListResponseDto,

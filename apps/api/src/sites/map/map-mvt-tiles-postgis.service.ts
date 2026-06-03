@@ -1,14 +1,35 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
+import { Prisma } from '../../prisma-client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { computeMvtTileEtag } from './map-mvt-tile-screen.util';
-import { tile2lat, tile2lon } from './map-mvt-tile-bounds.util';
+import { assertValidMvtTileCoords, tile2lat, tile2lon } from './map-mvt-tile-bounds.util';
+import { siteVisibilitySql } from '../util/site-visibility.helper';
 import type { MvtTileResult } from './map-mvt-tiles.types';
 
 @Injectable()
 export class MapMvtTilesPostgisService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async generateTile(z: number, x: number, y: number): Promise<MvtTileResult> {
+  async generateTile(
+    z: number,
+    x: number,
+    y: number,
+    viewerUserId?: string | null,
+  ): Promise<MvtTileResult> {
+    try {
+      assertValidMvtTileCoords(z, x, y);
+    } catch {
+      throw new BadRequestException({
+        code: 'INVALID_MVT_TILE',
+        message: 'Invalid map tile coordinates',
+      });
+    }
+
+    const visibility = siteVisibilitySql({
+      siteIdSql: Prisma.raw('"siteId"'),
+      siteStatusSql: Prisma.raw('"status"'),
+      viewerUserId,
+    });
     const minLon = tile2lon(x, z);
     const maxLon = tile2lon(x + 1, z);
     const maxLat = tile2lat(y, z);
@@ -32,6 +53,7 @@ export class MapMvtTilesPostgisService {
           WHERE "latitude" BETWEEN ${minLat} AND ${maxLat}
             AND "longitude" BETWEEN ${minLon} AND ${maxLon}
             AND "isArchivedByAdmin" = false
+            ${visibility}
         )
         SELECT
           COALESCE(
@@ -73,6 +95,7 @@ export class MapMvtTilesPostgisService {
           WHERE "latitude" BETWEEN ${minLat} AND ${maxLat}
             AND "longitude" BETWEEN ${minLon} AND ${maxLon}
             AND "isArchivedByAdmin" = false
+            ${visibility}
           GROUP BY
             FLOOR(("latitude" + 90.0) * ${bucketDivisor}),
             FLOOR(("longitude" + 180.0) * ${bucketDivisor})

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:chisto_infrastructure/core/navigation/app_go_router.dart';
 import 'package:chisto_infrastructure/core/navigation/app_routes.dart';
+import 'package:feature_auth/src/domain/models/password_reset_target.dart';
 import 'package:feature_events/src/data/discovery_analytics.dart';
 import 'package:feature_events/src/domain/models/eco_event.dart';
 import 'package:feature_home/src/application/home_shell_controller.dart';
@@ -37,17 +38,20 @@ class AppNavigation {
   static void goForgotPasswordRequest() =>
       _router.go(AppRoutes.forgotPasswordRequest);
 
-  static void goForgotPasswordOtp(String phoneNumberE164) =>
-      _router.go(AppRoutes.forgotPasswordOtp, extra: phoneNumberE164);
+  static Future<void> pushForgotPasswordRequest() =>
+      _router.push<void>(AppRoutes.forgotPasswordRequest);
+
+  static void goForgotPasswordOtp(PasswordResetTarget target) =>
+      _router.go(AppRoutes.forgotPasswordOtp, extra: target);
+
+  static Future<void> pushForgotPasswordOtp(PasswordResetTarget target) =>
+      _router.push<void>(AppRoutes.forgotPasswordOtp, extra: target);
 
   static void goForgotPasswordNew(ForgotPasswordNewRouteArgs args) =>
       _router.go(AppRoutes.forgotPasswordNew, extra: args);
 
-  static void goForgotPasswordNewFromEmail(EmailPasswordResetRouteArgs args) =>
-      _router.go(AppRoutes.forgotPasswordNew, extra: args);
-
-  static void goForgotPasswordEmailSent() =>
-      _router.go(AppRoutes.forgotPasswordEmailSent);
+  static Future<void> pushForgotPasswordNew(ForgotPasswordNewRouteArgs args) =>
+      _router.push<void>(AppRoutes.forgotPasswordNew, extra: args);
 
   static void goForgotPasswordSuccess() =>
       _router.go(AppRoutes.forgotPasswordSuccess);
@@ -160,8 +164,8 @@ class AppNavigation {
     );
   }
 
-  static Future<bool?> pushNewReport({XFile? initialPhoto}) {
-    return _router.push<bool>(AppRoutes.newReport, extra: initialPhoto);
+  static Future<Object?> pushNewReport({XFile? initialPhoto}) {
+    return _router.push<Object?>(AppRoutes.newReport, extra: initialPhoto);
   }
 
   static void goSignInAndClearStack() {
@@ -181,12 +185,12 @@ class AppNavigation {
     );
   }
 
-  static Future<bool?> pushNewReportWizard({
+  static Future<Object?> pushNewReportWizard({
     XFile? initialPhoto,
     String? entryLabel,
     String? entryHint,
   }) {
-    return _router.push<bool>(
+    return _router.push<Object?>(
       AppRoutes.newReport,
       extra: NewReportRouteExtra(
         initialPhoto: initialPhoto,

@@ -13,11 +13,45 @@ void main() {
       );
     });
 
+    test('DUPLICATE_SUBMIT_INFLIGHT', () {
+      expect(
+        classifyReportSubmitError(
+          const AppError(
+            code: 'DUPLICATE_SUBMIT_INFLIGHT',
+            message: 'busy',
+            retryable: true,
+          ),
+        ),
+        ReportOutboxErrorKind.cooldown,
+      );
+    });
+
+    test('retryable CONFLICT', () {
+      expect(
+        classifyReportSubmitError(
+          const AppError(
+            code: 'CONFLICT',
+            message: 'conflict',
+            retryable: true,
+            details: <String, dynamic>{'retryAfterSeconds': 5},
+          ),
+        ),
+        ReportOutboxErrorKind.cooldown,
+      );
+    });
+
     test('retryable by code', () {
       expect(
         classifyReportSubmitError(
           const AppError(code: 'NETWORK_ERROR', message: 'x'),
         ),
+        ReportOutboxErrorKind.retryable,
+      );
+    });
+
+    test('UNKNOWN treated as retryable so the same idempotency key replays', () {
+      expect(
+        classifyReportSubmitError(AppError.unknown()),
         ReportOutboxErrorKind.retryable,
       );
     });
@@ -110,6 +144,21 @@ void main() {
       expect(
         until! - DateTime.now().millisecondsSinceEpoch,
         inInclusiveRange(59 * 1000, 61 * 1000),
+      );
+    });
+
+    test('DUPLICATE_SUBMIT_INFLIGHT retryAfterSeconds', () {
+      final int? until = cooldownUntilMsFromAppError(
+        const AppError(
+          code: 'DUPLICATE_SUBMIT_INFLIGHT',
+          message: 'busy',
+          details: <String, dynamic>{'retryAfterSeconds': 5},
+        ),
+      );
+      expect(until, isNotNull);
+      expect(
+        until! - DateTime.now().millisecondsSinceEpoch,
+        inInclusiveRange(4 * 1000, 6 * 1000),
       );
     });
 

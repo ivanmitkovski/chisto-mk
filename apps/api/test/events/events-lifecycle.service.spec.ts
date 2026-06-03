@@ -7,9 +7,9 @@ import {
 } from '../../src/prisma-client';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
 import { PatchEventLifecycleDto } from '../../src/events/dto/patch-event-lifecycle.dto';
-import { EventsLifecycleService } from '../../src/events/events-lifecycle.service';
-import { EventsMobileMapperService } from '../../src/events/events-mobile-mapper.service';
-import { EventsRepository } from '../../src/events/events.repository';
+import { EventsLifecycleService } from '../../src/events/services/events-lifecycle.service';
+import { EventsMobileMapperService } from '../../src/events/services/events-mobile-mapper.service';
+import { EventsRepository } from '../../src/events/repositories/events.repository';
 
 function auth(userId: string): AuthenticatedUser {
   return {

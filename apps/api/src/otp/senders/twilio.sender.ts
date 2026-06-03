@@ -1,8 +1,8 @@
 import { ServiceUnavailableException } from '@nestjs/common';
 import Twilio from 'twilio';
 import { CircuitBreaker, CircuitBreakerOpenError } from '../../common/resilience/circuit-breaker';
-import { buildOtpSmsBody, otpSmsLocaleFromHint } from '../otp-sms-body';
-import { OtpSender, SendOtpSmsOptions } from '../otp-sender.interface';
+import { buildOtpSmsBody, otpSmsLocaleFromHint } from '../util/otp-sms-body';
+import { OtpSender, SendOtpSmsOptions } from '../types/otp-sender.interface';
 
 /** Twilio REST API only accepts `MessagingServiceSid` for values matching this pattern. */
 const TWILIO_MESSAGING_SERVICE_SID_PATTERN = /^MG[0-9a-fA-F]{32}$/i;

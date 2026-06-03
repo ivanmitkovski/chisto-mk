@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Observable, Subject } from 'rxjs';
 import Redis, { type RedisOptions } from 'ioredis';
-import { OwnerReportEvent } from '../reports-owner-events.types';
+import { OwnerReportEvent } from '../types/reports-owner-events.types';
 
 const REPORT_OWNER_EVENTS_CHANNEL = 'reports.owner.events';
 
@@ -35,6 +35,8 @@ export class InMemoryReportEventBus extends ReportEventBus {
 
 @Injectable()
 export class RedisReportEventBus extends ReportEventBus {
+  private readonly logger = new Logger(RedisReportEventBus.name);
+
   private readonly publisher: Redis;
 
   private readonly subscriber: Redis;
@@ -46,7 +48,11 @@ export class RedisReportEventBus extends ReportEventBus {
     const options: RedisOptions = { maxRetriesPerRequest: null, enableReadyCheck: true };
     this.publisher = new Redis(redisUrl, options);
     this.subscriber = new Redis(redisUrl, options);
-    void this.subscriber.subscribe(REPORT_OWNER_EVENTS_CHANNEL).catch(() => undefined);
+    void this.subscriber.subscribe(REPORT_OWNER_EVENTS_CHANNEL).catch((err: unknown) => {
+      this.logger.warn(
+        `report owner events subscribe failed: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    });
     this.subscriber.on('message', (channel: string, message: string) => {
       if (channel !== REPORT_OWNER_EVENTS_CHANNEL) {
         return;
@@ -54,14 +60,20 @@ export class RedisReportEventBus extends ReportEventBus {
       try {
         const parsed = JSON.parse(message) as OwnerReportEvent;
         this.inbound.next(parsed);
-      } catch {
-        // Ignore malformed payloads.
+      } catch (err: unknown) {
+        this.logger.warn(
+          `report owner events malformed payload: ${err instanceof Error ? err.message : String(err)}`,
+        );
       }
     });
   }
 
   publish(event: OwnerReportEvent): void {
-    void this.publisher.publish(REPORT_OWNER_EVENTS_CHANNEL, JSON.stringify(event));
+    void this.publisher.publish(REPORT_OWNER_EVENTS_CHANNEL, JSON.stringify(event)).catch((err: unknown) => {
+      this.logger.warn(
+        `report owner events publish failed: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    });
   }
 
   subscribe(): Observable<OwnerReportEvent> {

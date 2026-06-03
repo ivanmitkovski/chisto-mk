@@ -4,7 +4,7 @@ import { Reflector } from '@nestjs/core';
 import type { ThrottlerModuleOptions } from '@nestjs/throttler';
 import type { ThrottlerStorage } from '@nestjs/throttler';
 import { Role } from '../../src/prisma-client';
-import { EventsCheckInThrottlerGuard } from '../../src/events/events-check-in-throttler.guard';
+import { EventsCheckInThrottlerGuard } from '../../src/events/guards/events-check-in-throttler.guard';
 
 describe('EventsCheckInThrottlerGuard', () => {
   const storage: ThrottlerStorage = {

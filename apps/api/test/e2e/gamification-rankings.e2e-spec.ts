@@ -20,7 +20,7 @@ describe('Gamification rankings (e2e)', () => {
   it('GET /gamification/rankings/weekly returns leaderboard payload', async () => {
     const u = await registerCitizen(app, 'rankings_weekly');
     const res = await request(app.getHttpServer())
-      .get(apiPath('/gamification/rankings/weekly'))
+      .get(apiPath('/rankings/weekly'))
       .set('Authorization', `Bearer ${u.accessToken}`)
       .expect(200);
     expect(res.body).toHaveProperty('entries');

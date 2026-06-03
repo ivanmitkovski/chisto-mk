@@ -1,6 +1,6 @@
 /// <reference types="jest" />
 import { NotFoundException } from '@nestjs/common';
-import { ReportCitizenQueryService } from '../../src/reports/report-citizen-query.service';
+import { ReportCitizenQueryService } from '../../src/reports/services/report-citizen-query.service';
 import { Role } from '../../src/prisma-client';
 
 describe('ReportCitizenQueryService co-reporter access', () => {

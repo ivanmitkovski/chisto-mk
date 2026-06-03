@@ -16,7 +16,7 @@ Future<Database> _openTestDb(String fileName) async {
   final String path = p.join(root.path, fileName);
   return openDatabase(
     path,
-    version: 3,
+    version: 5,
     onCreate: (Database db, int v) async {
       await db.execute('''
 CREATE TABLE ${ReportOutboxDatabase.tableOutbox} (
@@ -35,7 +35,9 @@ CREATE TABLE ${ReportOutboxDatabase.tableOutbox} (
   updated_at_ms INTEGER NOT NULL,
   current_stage TEXT,
   attempted_stages_json TEXT,
-  last_persisted_at_ms INTEGER
+  last_persisted_at_ms INTEGER,
+  processing_owner TEXT,
+  processing_lease_until_ms INTEGER
 )''');
       await db.execute(
         'CREATE INDEX idx_report_outbox_state ON ${ReportOutboxDatabase.tableOutbox} (state, updated_at_ms)',
@@ -56,6 +58,14 @@ CREATE TABLE ${ReportOutboxDatabase.tableOutbox} (
         );
         await db.execute(
           'ALTER TABLE ${ReportOutboxDatabase.tableOutbox} ADD COLUMN last_persisted_at_ms INTEGER',
+        );
+      }
+      if (oldVersion < 5) {
+        await db.execute(
+          'ALTER TABLE ${ReportOutboxDatabase.tableOutbox} ADD COLUMN processing_owner TEXT',
+        );
+        await db.execute(
+          'ALTER TABLE ${ReportOutboxDatabase.tableOutbox} ADD COLUMN processing_lease_until_ms INTEGER',
         );
       }
     },
@@ -320,6 +330,44 @@ void main() {
       );
       final ReportOutboxEntry? next = await repo.getNextProcessable();
       expect(next?.id, 'first');
+      await db.close();
+    });
+
+    test('saveWizardDraft no-ops when wizard row already succeeded', () async {
+      final Database db = await _openTestDb('r_succeeded.db');
+      final SqfliteReportOutboxRepository repo = SqfliteReportOutboxRepository(
+        db,
+      );
+      final int t = DateTime.now().millisecondsSinceEpoch;
+      await repo.insert(
+        ReportOutboxEntry(
+          id: kReportWizardDraftRowId,
+          idempotencyKey: 'submit-key-stable1',
+          draft: ReportDraft(
+            title: 't',
+            category: ReportCategory.other,
+            latitude: 41.99,
+            longitude: 21.43,
+          ),
+          title: 'Original',
+          description: '',
+          submitRequested: false,
+          state: ReportOutboxState.succeeded,
+          reportId: 'report-99',
+          attemptCount: 1,
+          createdAtMs: t,
+          updatedAtMs: t,
+        ),
+      );
+      await repo.saveWizardDraft(
+        draft: ReportDraft(title: 'Changed'),
+        title: 'Changed',
+        description: 'new',
+      );
+      final ReportOutboxEntry? row = await repo.getById(kReportWizardDraftRowId);
+      expect(row?.state, ReportOutboxState.succeeded);
+      expect(row?.reportId, 'report-99');
+      expect(row?.title, 'Original');
       await db.close();
     });
 

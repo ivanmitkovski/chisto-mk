@@ -40,8 +40,6 @@
                 <data android:scheme="https" android:host="www.chisto.mk" android:pathPrefix="/sites"/>
                 <data android:scheme="https" android:host="chisto.mk" android:pathPrefix="/events"/>
                 <data android:scheme="https" android:host="www.chisto.mk" android:pathPrefix="/events"/>
-                <data android:scheme="https" android:host="chisto.mk" android:pathPrefix="/reset-password"/>
-                <data android:scheme="https" android:host="www.chisto.mk" android:pathPrefix="/reset-password"/>
             </intent-filter>
             <!-- Custom scheme for dev / marketing short links: chisto://app/... -->
             <intent-filter>

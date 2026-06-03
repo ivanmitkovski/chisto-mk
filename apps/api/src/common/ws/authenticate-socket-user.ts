@@ -4,7 +4,7 @@ import { Socket } from 'socket.io';
 import * as jwt from 'jsonwebtoken';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UserStatus } from '../../prisma-client';
-import { resolveJwtSecretsFromEnv, secretForKid } from '../../auth/jwt-secret.resolver';
+import { resolveJwtSecretsFromEnv, secretForKid } from '../../auth/util/jwt-secret.resolver';
 
 export type AuthenticatedSocketUser = {
   userId: string;

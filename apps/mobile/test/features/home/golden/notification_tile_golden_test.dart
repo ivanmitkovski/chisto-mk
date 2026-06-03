@@ -14,13 +14,14 @@ void main() {
   testWidgets('NotificationTile golden unread comment', (
     WidgetTester tester,
   ) async {
-    await tester.binding.setSurfaceSize(const Size(390, 140));
+    await tester.binding.setSurfaceSize(const Size(390, 180));
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
     final UserNotification item = UserNotification(
       id: 'n-golden',
       title: 'New comment on your report',
-      body: 'Someone replied on the site you follow.',
+      body:
+          'Someone replied on the site you follow with a longer message preview.',
       createdAt: DateTime(2026, 5, 19, 10, 30),
       type: UserNotificationType.comment,
       isRead: false,
@@ -35,7 +36,7 @@ void main() {
         supportedLocales: AppLocalizations.supportedLocales,
         home: MediaQuery(
           data: const MediaQueryData(
-            size: Size(390, 140),
+            size: Size(390, 180),
             devicePixelRatio: 1,
             textScaler: TextScaler.linear(1),
             disableAnimations: true,

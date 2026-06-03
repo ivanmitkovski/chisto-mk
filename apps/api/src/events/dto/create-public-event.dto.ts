@@ -16,7 +16,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { PRISMA_CUID_REGEX } from '../../common/validators/is-cuid.validator';
-import { MOBILE_CATEGORY_KEYS } from '../events-mobile.mapper';
+import { MOBILE_CATEGORY_KEYS } from '../util/events-mobile.mapper';
 import { EventRouteWaypointDto } from './event-route-waypoint.dto';
 import { SanitizePlainText } from '../../common/sanitize/sanitize-transform.decorator';
 

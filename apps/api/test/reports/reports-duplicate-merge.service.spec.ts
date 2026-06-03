@@ -3,9 +3,9 @@ import { ReportSideEffectKind, ReportSideEffectStatus, Role } from '../../src/pr
 import { DuplicateGroupQueryService } from '../../src/reports/duplicates/duplicate-group-query.service';
 import { DuplicateMergeSideEffectsService } from '../../src/reports/duplicates/duplicate-merge-side-effects.service';
 import { ReportSideEffectProcessorService } from '../../src/reports/side-effects/report-side-effect-processor.service';
-import { DuplicateMergeSnapshotService } from '../../src/reports/duplicate-merge-snapshot.service';
-import { DuplicateMergeTransactionService } from '../../src/reports/duplicate-merge-transaction.service';
-import { ReportsDuplicateMergeService } from '../../src/reports/reports-duplicate-merge.service';
+import { DuplicateMergeSnapshotService } from '../../src/reports/services/duplicate-merge-snapshot.service';
+import { DuplicateMergeTransactionService } from '../../src/reports/services/duplicate-merge-transaction.service';
+import { ReportsDuplicateMergeService } from '../../src/reports/services/reports-duplicate-merge.service';
 
 function createMergeServiceWithMocks(
   prisma: unknown,
@@ -57,7 +57,12 @@ function createMergeServiceWithMocks(
 
 describe('ReportsDuplicateMergeService mergeDuplicateReports', () => {
   it('does not append child media to primary; hard-deletes children; deletes duplicate media from storage', async () => {
-    const moderator = { userId: 'mod-1', role: Role.ADMIN };
+    const moderator = {
+      userId: 'mod-1',
+      role: Role.ADMIN,
+      email: 'mod@test.local',
+      phoneNumber: '+38970000000',
+    };
     const primaryId = 'primary-1';
     const childId = 'child-1';
     const childMedia = ['https://test-bucket.s3.eu-central-1.amazonaws.com/reports/u1/a.jpg'];
@@ -262,7 +267,12 @@ describe('ReportsDuplicateMergeService mergeDuplicateReports', () => {
   });
 
   it('is idempotent when child reports were already removed (no duplicate co-reporter rows on retry)', async () => {
-    const moderator = { userId: 'mod-1', role: Role.ADMIN };
+    const moderator = {
+      userId: 'mod-1',
+      role: Role.ADMIN,
+      email: 'mod@test.local',
+      phoneNumber: '+38970000000',
+    };
     const primaryId = 'primary-1';
     const childId = 'child-1';
 
@@ -325,7 +335,12 @@ describe('ReportsDuplicateMergeService mergeDuplicateReports', () => {
   });
 
   it('notifies co-reporter-only users credited on merge (not duplicate of child reporter)', async () => {
-    const moderator = { userId: 'mod-1', role: Role.ADMIN };
+    const moderator = {
+      userId: 'mod-1',
+      role: Role.ADMIN,
+      email: 'mod@test.local',
+      phoneNumber: '+38970000000',
+    };
     const primaryId = 'primary-1';
     const childId = 'child-1';
     const coOnlyUserId = 'user-co-only';

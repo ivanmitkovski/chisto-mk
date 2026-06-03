@@ -39,7 +39,7 @@ describe('Site history (e2e)', () => {
     expect(siteId).toBeDefined();
 
     const history = await agent
-      .get(`/sites/${siteId}/history`)
+      .get(`/v1/sites/${siteId}/history`)
       .set('Authorization', `Bearer ${citizen.accessToken}`)
       .expect(200);
 

@@ -1,16 +1,16 @@
 import { Prisma } from '../../src/prisma-client';
 import { PrismaService } from '../../src/prisma/prisma.service';
-import { NotificationDispatcherService } from '../../src/notifications/notification-dispatcher.service';
-import { ChatEncryptionService } from '../../src/event-chat/chat-encryption.service';
-import { EventChatMessageDtoService } from '../../src/event-chat/event-chat-message-dto.service';
-import { EventChatMutationModerateService } from '../../src/event-chat/event-chat-mutation-moderate.service';
-import { EventChatMutationSendService } from '../../src/event-chat/event-chat-mutation-send.service';
-import { EventChatMutationsService } from '../../src/event-chat/event-chat-mutations.service';
-import { EventChatNotificationsService } from '../../src/event-chat/event-chat-notifications.service';
-import { EventChatPushAggregatorService } from '../../src/event-chat/event-chat-push-aggregator.service';
-import { FeatureFlagsService } from '../../src/feature-flags/feature-flags.service';
-import { EventChatSseService } from '../../src/event-chat/event-chat-sse.service';
-import { EventChatTelemetryService } from '../../src/event-chat/event-chat-telemetry.service';
+import { NotificationDispatcherService } from '../../src/notifications/services/notification-dispatcher.service';
+import { ChatEncryptionService } from '../../src/event-chat/services/chat-encryption.service';
+import { EventChatMessageDtoService } from '../../src/event-chat/services/event-chat-message-dto.service';
+import { EventChatMutationModerateService } from '../../src/event-chat/services/event-chat-mutation-moderate.service';
+import { EventChatMutationSendService } from '../../src/event-chat/services/event-chat-mutation-send.service';
+import { EventChatMutationsService } from '../../src/event-chat/services/event-chat-mutations.service';
+import { EventChatNotificationsService } from '../../src/event-chat/services/event-chat-notifications.service';
+import { EventChatPushAggregatorService } from '../../src/event-chat/services/event-chat-push-aggregator.service';
+import { FeatureFlagsService } from '../../src/feature-flags/services/feature-flags.service';
+import { EventChatSseService } from '../../src/event-chat/services/event-chat-sse.service';
+import { EventChatTelemetryService } from '../../src/event-chat/services/event-chat-telemetry.service';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
 
 describe('EventChatService send failures', () => {

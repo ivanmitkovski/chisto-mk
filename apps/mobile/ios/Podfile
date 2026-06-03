@@ -51,8 +51,10 @@ post_install do |installer|
         'PERMISSION_CAMERA=1',
         'PERMISSION_MICROPHONE=1',
         'PERMISSION_PHOTOS=1',
-        'PERMISSION_LOCATION=1',
-        'PERMISSION_LOCATION_WHENINUSE=0',
+        ## Foreground location only (map, feed, reports). Avoids linking "Always" APIs
+        ## unless needed; geolocator may still require Always* keys in Info.plist.
+        'PERMISSION_LOCATION=0',
+        'PERMISSION_LOCATION_WHENINUSE=1',
       ]
     end
   end

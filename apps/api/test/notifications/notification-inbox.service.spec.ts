@@ -1,5 +1,5 @@
 /// <reference types="jest" />
-import { NotificationInboxService } from '../../src/notifications/notification-inbox.service';
+import { NotificationInboxService } from '../../src/notifications/services/notification-inbox.service';
 
 function makePrisma() {
   return {
@@ -35,12 +35,12 @@ function makeFlags(inboxEnabled: boolean) {
 }
 
 function makeInboxActors(prisma: ReturnType<typeof makePrisma>, upload = makeReportsUpload()) {
-  const { NotificationInboxActorsService } = require('../../src/notifications/notification-inbox-actors.service');
+  const { NotificationInboxActorsService } = require('../../src/notifications/services/notification-inbox-actors.service');
   return new NotificationInboxActorsService(prisma as any, upload as any);
 }
 
 function makeInboxAdmin(prisma: ReturnType<typeof makePrisma>) {
-  const { NotificationInboxAdminService } = require('../../src/notifications/notification-inbox-admin.service');
+  const { NotificationInboxAdminService } = require('../../src/notifications/services/notification-inbox-admin.service');
   return new NotificationInboxAdminService(prisma as any);
 }
 

@@ -36,6 +36,16 @@ class _FakeOutbox implements ReportOutboxRepository {
   Future<ReportOutboxEntry?> getNextProcessable() async => null;
 
   @override
+  Future<ReportOutboxEntry?> claimNextProcessable({
+    required String ownerId,
+    required Duration leaseDuration,
+  }) async =>
+      null;
+
+  @override
+  Future<void> releaseLease(String id) async {}
+
+  @override
   Future<ReportOutboxEntry?> getWizardDraftEntry() async => wizard;
 
   @override

@@ -11,7 +11,7 @@ import {
   displayReportTitle,
   getReportNumber,
   listLocationLabel,
-} from '../report-copy.helpers';
+} from '../util/report-copy.helpers';
 
 @Injectable()
 export class DuplicateGroupQueryService {

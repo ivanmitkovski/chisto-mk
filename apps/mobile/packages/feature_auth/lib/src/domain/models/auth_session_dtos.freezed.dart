@@ -438,8 +438,7 @@ abstract class _RegisterResult implements RegisterResult {
 /// @nodoc
 mixin _$PasswordResetRequestResult {
   String get message => throw _privateConstructorUsedError;
-  String? get channel => throw _privateConstructorUsedError;
-  int? get expiresInSeconds => throw _privateConstructorUsedError;
+  String? get devCode => throw _privateConstructorUsedError;
 
   /// Create a copy of PasswordResetRequestResult
   /// with the given fields replaced by the non-null parameter values.
@@ -459,7 +458,7 @@ abstract class $PasswordResetRequestResultCopyWith<$Res> {
         PasswordResetRequestResult
       >;
   @useResult
-  $Res call({String message, String? channel, int? expiresInSeconds});
+  $Res call({String message, String? devCode});
 }
 
 /// @nodoc
@@ -479,25 +478,17 @@ class _$PasswordResetRequestResultCopyWithImpl<
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? message = null,
-    Object? channel = freezed,
-    Object? expiresInSeconds = freezed,
-  }) {
+  $Res call({Object? message = null, Object? devCode = freezed}) {
     return _then(
       _value.copyWith(
             message: null == message
                 ? _value.message
                 : message // ignore: cast_nullable_to_non_nullable
                       as String,
-            channel: freezed == channel
-                ? _value.channel
-                : channel // ignore: cast_nullable_to_non_nullable
+            devCode: freezed == devCode
+                ? _value.devCode
+                : devCode // ignore: cast_nullable_to_non_nullable
                       as String?,
-            expiresInSeconds: freezed == expiresInSeconds
-                ? _value.expiresInSeconds
-                : expiresInSeconds // ignore: cast_nullable_to_non_nullable
-                      as int?,
           )
           as $Val,
     );
@@ -513,7 +504,7 @@ abstract class _$$PasswordResetRequestResultImplCopyWith<$Res>
   ) = __$$PasswordResetRequestResultImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String message, String? channel, int? expiresInSeconds});
+  $Res call({String message, String? devCode});
 }
 
 /// @nodoc
@@ -533,25 +524,17 @@ class __$$PasswordResetRequestResultImplCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? message = null,
-    Object? channel = freezed,
-    Object? expiresInSeconds = freezed,
-  }) {
+  $Res call({Object? message = null, Object? devCode = freezed}) {
     return _then(
       _$PasswordResetRequestResultImpl(
         message: null == message
             ? _value.message
             : message // ignore: cast_nullable_to_non_nullable
                   as String,
-        channel: freezed == channel
-            ? _value.channel
-            : channel // ignore: cast_nullable_to_non_nullable
+        devCode: freezed == devCode
+            ? _value.devCode
+            : devCode // ignore: cast_nullable_to_non_nullable
                   as String?,
-        expiresInSeconds: freezed == expiresInSeconds
-            ? _value.expiresInSeconds
-            : expiresInSeconds // ignore: cast_nullable_to_non_nullable
-                  as int?,
       ),
     );
   }
@@ -560,22 +543,16 @@ class __$$PasswordResetRequestResultImplCopyWithImpl<$Res>
 /// @nodoc
 
 class _$PasswordResetRequestResultImpl implements _PasswordResetRequestResult {
-  const _$PasswordResetRequestResultImpl({
-    required this.message,
-    this.channel,
-    this.expiresInSeconds,
-  });
+  const _$PasswordResetRequestResultImpl({required this.message, this.devCode});
 
   @override
   final String message;
   @override
-  final String? channel;
-  @override
-  final int? expiresInSeconds;
+  final String? devCode;
 
   @override
   String toString() {
-    return 'PasswordResetRequestResult(message: $message, channel: $channel, expiresInSeconds: $expiresInSeconds)';
+    return 'PasswordResetRequestResult(message: $message, devCode: $devCode)';
   }
 
   @override
@@ -584,14 +561,11 @@ class _$PasswordResetRequestResultImpl implements _PasswordResetRequestResult {
         (other.runtimeType == runtimeType &&
             other is _$PasswordResetRequestResultImpl &&
             (identical(other.message, message) || other.message == message) &&
-            (identical(other.channel, channel) || other.channel == channel) &&
-            (identical(other.expiresInSeconds, expiresInSeconds) ||
-                other.expiresInSeconds == expiresInSeconds));
+            (identical(other.devCode, devCode) || other.devCode == devCode));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, message, channel, expiresInSeconds);
+  int get hashCode => Object.hash(runtimeType, message, devCode);
 
   /// Create a copy of PasswordResetRequestResult
   /// with the given fields replaced by the non-null parameter values.
@@ -609,16 +583,13 @@ abstract class _PasswordResetRequestResult
     implements PasswordResetRequestResult {
   const factory _PasswordResetRequestResult({
     required final String message,
-    final String? channel,
-    final int? expiresInSeconds,
+    final String? devCode,
   }) = _$PasswordResetRequestResultImpl;
 
   @override
   String get message;
   @override
-  String? get channel;
-  @override
-  int? get expiresInSeconds;
+  String? get devCode;
 
   /// Create a copy of PasswordResetRequestResult
   /// with the given fields replaced by the non-null parameter values.

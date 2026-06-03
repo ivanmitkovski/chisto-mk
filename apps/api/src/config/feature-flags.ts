@@ -29,7 +29,7 @@ export function loadFeatureFlags(): FeatureFlags {
     mapPostgisEnabled: envBool('MAP_POSTGIS_ENABLED', false),
     mapTileFormatVector: envBool('MAP_TILE_FORMAT_VECTOR', false),
     mapSearchTypesense: envBool('MAP_SEARCH_TYPESENSE', false),
-    mapAdminTimeMachine: envBool('MAP_ADMIN_TIME_MACHINE', false),
+    mapAdminTimeMachine: envBool('MAP_ADMIN_TIME_MACHINE', true),
     mapOfflineRegions: envBool('MAP_OFFLINE_REGIONS', false),
   };
 }

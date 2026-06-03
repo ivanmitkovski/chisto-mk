@@ -339,6 +339,7 @@ class NewReportWizardView extends StatelessWidget {
                             : null,
                         currentStage: s.currentStage,
                         submitting: s.submitting,
+                        wizardSubmitLocked: s.wizardSubmitLocked,
                         submitPhase: s.submitPhase,
                         uploadPrepProgress: prep,
                         onPrimary: onPrimary,

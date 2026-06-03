@@ -12,6 +12,7 @@ class NewReportFlowBottomBar extends StatelessWidget {
     this.draftAutosaveLabel,
     required this.currentStage,
     required this.submitting,
+    this.wizardSubmitLocked = false,
     required this.submitPhase,
     this.uploadPrepProgress,
     required this.onPrimary,
@@ -23,6 +24,9 @@ class NewReportFlowBottomBar extends StatelessWidget {
 
   final ReportStage currentStage;
   final bool submitting;
+
+  /// After success, blocks another submit until the wizard is cleared.
+  final bool wizardSubmitLocked;
 
   /// `'uploading' | 'creating' | 'sent' | null` while [submitting].
   final String? submitPhase;
@@ -36,7 +40,7 @@ class NewReportFlowBottomBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool showBack = currentStage != ReportStage.evidence;
     final bool isReviewStage = currentStage == ReportStage.review;
-    final bool primaryLocked = submitting;
+    final bool primaryLocked = submitting || wizardSubmitLocked;
     final String? prepLabel =
         (uploadPrepProgress != null &&
             submitPhase == 'uploading' &&

@@ -24,6 +24,7 @@ Map<String, dynamic> _listItemFixture() {
     'severity': 4,
     'cleanupEffort': 'THREE_TO_FIVE',
     'viewerRole': 'co_reporter',
+    'moderationReason': null,
   };
 }
 
@@ -65,6 +66,23 @@ void main() {
       expect(item.severity, 4);
       expect(item.cleanupEffort, CleanupEffort.threeToFive);
       expect(item.viewerRole, ReportViewerRole.coReporter);
+      expect(item.moderationReason, isNull);
+    });
+
+    test('maps moderationReason for deleted status', () {
+      final ReportListItem item = reportListItemFromApiJson(
+        <String, dynamic>{
+          ..._listItemFixture(),
+          'status': 'DELETED',
+          'moderationReason':
+              'Insufficient evidence. Notes: The evidence is not enough',
+        },
+      );
+      expect(item.status, ApiReportStatus.deleted);
+      expect(
+        item.moderationReason,
+        'Insufficient evidence. Notes: The evidence is not enough',
+      );
     });
 
     test('defaults missing optional fields', () {
@@ -86,6 +104,7 @@ void main() {
       expect(item.severity, isNull);
       expect(item.cleanupEffort, isNull);
       expect(item.viewerRole, ReportViewerRole.primary);
+      expect(item.moderationReason, isNull);
     });
   });
 
@@ -116,6 +135,17 @@ void main() {
         'https://cdn.example/a.jpg',
         'https://cdn.example/b.jpg',
       ]);
+      expect(detail.moderationReason, isNull);
+    });
+
+    test('maps moderationReason when status is DELETED', () {
+      final ReportDetail detail = reportDetailFromApiJson(<String, dynamic>{
+        ..._detailFixture(),
+        'status': 'DELETED',
+        'moderationReason': 'False report. Notes: Duplicate of CH-001',
+      });
+      expect(detail.status, ApiReportStatus.deleted);
+      expect(detail.moderationReason, 'False report. Notes: Duplicate of CH-001');
     });
 
     test('uses empty site defaults when site is missing', () {

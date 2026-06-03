@@ -260,14 +260,10 @@ class ApiAuthRepository implements AuthRepository {
     final String message =
         json['message']?.toString() ??
         'If an account exists, instructions were sent.';
-    final String? channel = json['channel']?.toString();
-    final int? expiresIn = json['expiresIn'] is int
-        ? json['expiresIn'] as int
-        : null;
+    final String? devCode = json['devCode']?.toString();
     return PasswordResetRequestResult(
       message: message,
-      channel: channel,
-      expiresInSeconds: expiresIn,
+      devCode: devCode,
     );
   }
 
@@ -279,6 +275,17 @@ class ApiAuthRepository implements AuthRepository {
     await _client.post(
       '/auth/password-reset/verify-code',
       body: <String, dynamic>{'phoneNumber': phoneNumberE164, 'code': code},
+    );
+  }
+
+  @override
+  Future<void> verifyPasswordResetCodeByEmail(String email, String code) async {
+    await _client.post(
+      '/auth/password-reset/email/verify-code',
+      body: <String, dynamic>{
+        'email': email.trim().toLowerCase(),
+        'code': code,
+      },
     );
   }
 
@@ -300,12 +307,17 @@ class ApiAuthRepository implements AuthRepository {
 
   @override
   Future<void> confirmPasswordResetByEmail({
-    required String token,
+    required String email,
+    required String code,
     required String newPassword,
   }) async {
     await _client.post(
       '/auth/password-reset/email/confirm',
-      body: <String, dynamic>{'token': token, 'newPassword': newPassword},
+      body: <String, dynamic>{
+        'email': email.trim().toLowerCase(),
+        'code': code,
+        'newPassword': newPassword,
+      },
     );
   }
 

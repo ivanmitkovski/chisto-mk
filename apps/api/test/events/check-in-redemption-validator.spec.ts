@@ -6,7 +6,7 @@ import {
 import {
   assertQrTokenVerifiedForRedeem,
   assertRedeemEligibleEventAndUser,
-} from '../../src/events/check-in-redemption-validator';
+} from '../../src/events/types/check-in-redemption-validator';
 
 describe('check-in-redemption-validator', () => {
   const baseEvent = {

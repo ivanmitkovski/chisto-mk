@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:feature_reports/src/data/outbox/report_draft_photo_store.dart';
 import 'package:feature_reports/src/data/outbox/report_draft_repository.dart';
 import 'package:feature_reports/src/data/outbox/report_outbox_database.dart';
+import 'package:feature_reports/src/data/outbox/report_outbox_constants.dart';
 import 'package:feature_reports/src/data/outbox/report_outbox_entry.dart';
 import 'package:feature_reports/src/data/outbox/report_outbox_repository.dart';
 import 'package:feature_reports/src/domain/models/report_draft.dart';
@@ -36,7 +37,9 @@ CREATE TABLE ${ReportOutboxDatabase.tableOutbox} (
   updated_at_ms INTEGER NOT NULL,
   current_stage TEXT,
   attempted_stages_json TEXT,
-  last_persisted_at_ms INTEGER
+  last_persisted_at_ms INTEGER,
+  processing_owner TEXT,
+  processing_lease_until_ms INTEGER
 )''');
       await db.execute(
         'CREATE INDEX idx_report_outbox_state ON ${ReportOutboxDatabase.tableOutbox} (state, updated_at_ms)',
@@ -121,6 +124,74 @@ void main() {
 
     await db.close();
     await tmp.delete(recursive: true);
+  });
+
+  test('loadDraft clears terminal succeeded row and returns empty', () async {
+    final Directory tmp = await Directory.systemTemp.createTemp('draft_term_');
+    final Database db = await _openTestDbIn(tmp, 'term.db');
+    final ReportOutboxRepository outbox = SqfliteReportOutboxRepository(db);
+    final ReportDraftPhotoStore photoStore = ReportDraftPhotoStore(
+      rootOverride: Directory(p.join(tmp.path, 'media')),
+    );
+    final ReportDraftRepository repo = ReportDraftRepository(
+      outbox: outbox,
+      photoStore: photoStore,
+    );
+    final int t = DateTime.now().millisecondsSinceEpoch;
+    await outbox.insert(
+      ReportOutboxEntry(
+        id: kReportWizardDraftRowId,
+        idempotencyKey: 'done-key-12',
+        draft: ReportDraft(
+          title: 'Done',
+          category: ReportCategory.other,
+          latitude: 41.99,
+          longitude: 21.43,
+        ),
+        title: 'Done',
+        description: 'x',
+        submitRequested: false,
+        state: ReportOutboxState.succeeded,
+        reportId: 'r-done',
+        attemptCount: 1,
+        createdAtMs: t,
+        updatedAtMs: t,
+      ),
+    );
+
+    final ReportDraftLoadResult loaded = await repo.loadDraft();
+    expect(loaded.hasDraft, isFalse);
+    final ReportDraftSummary summary = await repo.summary();
+    expect(summary.hasDraft, isFalse);
+    final ReportOutboxEntry? row = await outbox.getById(kReportWizardDraftRowId);
+    expect(row?.reportId, isNull);
+    expect(row?.state, ReportOutboxState.pending);
+
+    await db.close();
+    await tmp.delete(recursive: true);
+  });
+
+  test('isReportWizardDraftEntryResumable false for succeeded submit', () {
+    final int t = 1;
+    final ReportOutboxEntry succeeded = ReportOutboxEntry(
+      id: kReportWizardDraftRowId,
+      idempotencyKey: 'k',
+      draft: ReportDraft(
+        title: 't',
+        category: ReportCategory.other,
+        latitude: 41.99,
+        longitude: 21.43,
+      ),
+      title: 't',
+      description: '',
+      submitRequested: false,
+      state: ReportOutboxState.succeeded,
+      reportId: 'r1',
+      attemptCount: 1,
+      createdAtMs: t,
+      updatedAtMs: t,
+    );
+    expect(isReportWizardDraftEntryResumable(succeeded), isFalse);
   });
 
   test('isReportWizardDraftEntryResumable respects stage metadata', () {

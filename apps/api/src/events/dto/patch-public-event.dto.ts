@@ -14,7 +14,7 @@ import {
   MinLength,
   ValidateNested,
 } from 'class-validator';
-import { MOBILE_CATEGORY_KEYS } from '../events-mobile.mapper';
+import { MOBILE_CATEGORY_KEYS } from '../util/events-mobile.mapper';
 import { EventRouteWaypointDto } from './event-route-waypoint.dto';
 
 export class PatchPublicEventDto {

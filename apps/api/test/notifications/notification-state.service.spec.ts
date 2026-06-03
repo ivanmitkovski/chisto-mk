@@ -1,5 +1,5 @@
 /// <reference types="jest" />
-import { NotificationStateService } from '../../src/notifications/notification-state.service';
+import { NotificationStateService } from '../../src/notifications/services/notification-state.service';
 
 function makePrisma() {
   return {

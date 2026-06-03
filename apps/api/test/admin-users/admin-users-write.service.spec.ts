@@ -2,7 +2,7 @@
 
 import { ConflictException, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Role, UserStatus } from '../../src/prisma-client';
-import { AdminUsersWriteService } from '../../src/admin-users/admin-users-write.service';
+import { AdminUsersWriteService } from '../../src/admin-users/services/admin-users-write.service';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
 
 function actor(overrides: Partial<AuthenticatedUser> = {}): AuthenticatedUser {

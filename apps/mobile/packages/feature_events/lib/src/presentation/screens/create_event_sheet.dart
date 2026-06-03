@@ -18,6 +18,7 @@ import 'package:feature_events/src/application/schedule_conflict_preview_control
 import 'package:feature_events/src/data/event_site_resolver.dart';
 import 'package:feature_events/src/domain/models/eco_event.dart';
 import 'package:feature_events/src/presentation/event_ui_mappers.dart';
+import 'package:feature_events/src/presentation/navigation/organizer_certification_navigation.dart';
 import 'package:feature_events/src/presentation/screens/organizer_toolkit/organizer_toolkit_screen.dart';
 import 'package:feature_events/src/presentation/utils/create_event_form_snapshot.dart';
 import 'package:feature_events/src/presentation/utils/create_event_form_validation.dart';
@@ -223,14 +224,14 @@ class _CreateEventSheetState extends ConsumerState<CreateEventSheet>
       duration: const Duration(milliseconds: 400),
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _redirectIfOrganizerNotCertified();
+      unawaited(_redirectIfOrganizerNotCertified());
       unawaited(_completeBootstrapSkeleton());
     });
   }
 
   /// Deep link to [AppRoutes.eventsCreate] bypasses [EventsNavigation.openCreate];
   /// uncertified organizers are sent through the toolkit first.
-  void _redirectIfOrganizerNotCertified() {
+  Future<void> _redirectIfOrganizerNotCertified() async {
     if (!mounted) {
       return;
     }
@@ -240,23 +241,20 @@ class _CreateEventSheetState extends ConsumerState<CreateEventSheet>
     if (ref.read(authStateProvider).isOrganizerCertified) {
       return;
     }
-    final NavigatorState nav = Navigator.of(context);
-    nav.pushReplacement(
+    await Navigator.of(context, rootNavigator: true).push<void>(
       MaterialPageRoute<void>(
-        builder: (BuildContext toolkitContext) => OrganizerToolkitScreen(
-          onCertified: () {
-            AppNavigation.pushCreateEvent(
-              args: EventCreateRouteArguments(
-                preselectedSiteId: widget.preselectedSiteId,
-                preselectedSiteName: widget.preselectedSiteName,
-                preselectedSiteImageUrl: widget.preselectedSiteImageUrl,
-                preselectedSiteDistanceKm: widget.preselectedSiteDistanceKm,
-              ),
-            );
-          },
+        settings: const RouteSettings(
+          name: organizerCertificationToolkitRouteName,
         ),
+        builder: (_) => const OrganizerToolkitScreen(),
       ),
     );
+    if (!mounted) {
+      return;
+    }
+    if (!ref.read(authStateProvider).isOrganizerCertified) {
+      Navigator.of(context).pop();
+    }
   }
 
   @override

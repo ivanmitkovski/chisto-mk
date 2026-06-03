@@ -1,8 +1,8 @@
 /// <reference types="jest" />
 import { BadRequestException } from '@nestjs/common';
-import { SiteCommentsListService } from '../../src/sites/site-comments-list.service';
-import { SiteCommentsMutationsService } from '../../src/sites/site-comments-mutations.service';
-import { SiteCommentsService } from '../../src/sites/site-comments.service';
+import { SiteCommentsListService } from '../../src/sites/services/site-comments-list.service';
+import { SiteCommentsMutationsService } from '../../src/sites/services/site-comments-mutations.service';
+import { SiteCommentsService } from '../../src/sites/services/site-comments.service';
 import { SiteCommentsSort } from '../../src/sites/dto/list-site-comments-query.dto';
 import { Role } from '../../src/prisma-client';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';

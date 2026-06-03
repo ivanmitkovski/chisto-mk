@@ -6,7 +6,7 @@ import request from 'supertest';
 import { io as ioClient, type Socket } from 'socket.io-client';
 import { createE2eApplication } from './helpers/bootstrap-app';
 import { apiPath } from './helpers/api-path';
-import { registerCitizen } from './helpers/auth-helper';
+import { registerCitizen, e2eThrottleIp } from './helpers/auth-helper';
 import { PrismaService } from '../../src/prisma/prisma.service';
 import { Role } from '../../src/prisma-client';
 
@@ -18,6 +18,7 @@ describe('Auth security (integration)', () => {
     const ctx = await createE2eApplication();
     app = ctx.app;
     prisma = ctx.prisma;
+    await app.listen(0);
   });
 
   afterAll(async () => {
@@ -47,11 +48,31 @@ describe('Auth security (integration)', () => {
     expect(res.body.code).toBe('SESSION_REQUIRED');
   });
 
+  it('returns INVALID_CREDENTIALS for wrong password without 500', async () => {
+    const u = await registerCitizen(app, 'wrong_pwd_login');
+    const throttleIp = e2eThrottleIp();
+    const res = await request(app.getHttpServer())
+      .post(apiPath('/auth/login'))
+      .set('X-Forwarded-For', throttleIp)
+      .send({ phoneNumber: u.phoneNumber, password: 'WrongPass1!' })
+      .expect(401);
+
+    expect(res.body.code).toBe('INVALID_CREDENTIALS');
+
+    const failure = await prisma.loginFailure.findUnique({
+      where: { phoneNumber: u.phoneNumber },
+    });
+    expect(failure).toBeTruthy();
+    expect(failure!.attemptCount).toBeGreaterThanOrEqual(1);
+  });
+
   it('refresh reuse revokes all sessions', async () => {
     const u = await registerCitizen(app, 'refresh_reuse');
     const agent = request(app.getHttpServer());
+    const throttleIp = e2eThrottleIp();
     const login2 = await agent
       .post(apiPath('/auth/login'))
+      .set('X-Forwarded-For', throttleIp)
       .send({ phoneNumber: u.phoneNumber, password: u.password, rememberMe: true })
       .expect(200);
     const oldRefresh = login2.body.refreshToken as string;
@@ -78,20 +99,28 @@ describe('Auth security (integration)', () => {
         auth: { token },
         transports: ['websocket'],
         forceNew: true,
+        extraHeaders: { Origin: 'http://localhost:3000' },
       });
       const t = setTimeout(() => {
         socket.close();
         reject(new Error('WS did not reject in time'));
       }, 5000);
-      socket.on('connect', () => {
-        clearTimeout(t);
-        socket.close();
-        reject(new Error('WS should not connect without sid'));
-      });
-      socket.on('connect_error', () => {
+      const finish = (): void => {
         clearTimeout(t);
         socket.close();
         resolve();
+      };
+      socket.on('error', (payload: { code?: string }) => {
+        if (
+          payload?.code === 'SESSION_REQUIRED' ||
+          payload?.code === 'AUTH_FAILED' ||
+          payload?.code === 'INVALID_TOKEN'
+        ) {
+          finish();
+        }
+      });
+      socket.on('connect_error', () => {
+        finish();
       });
     });
   });

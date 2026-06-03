@@ -2,8 +2,8 @@
 
 import { NotFoundException } from '@nestjs/common';
 import { EcoEventLifecycleStatus } from '../../src/prisma-client';
-import { EventsRepository } from '../../src/events/events.repository';
-import { EventsShareCardQueryService } from '../../src/events/events-share-card-query.service';
+import { EventsRepository } from '../../src/events/repositories/events.repository';
+import { EventsShareCardQueryService } from '../../src/events/services/events-share-card-query.service';
 import type { PrismaService } from '../../src/prisma/prisma.service';
 
 describe('EventsShareCardQueryService.findPublicShareCard', () => {

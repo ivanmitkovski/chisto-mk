@@ -76,7 +76,9 @@ CREATE TABLE ${ReportOutboxDatabase.tableOutbox} (
   updated_at_ms INTEGER NOT NULL,
   current_stage TEXT,
   attempted_stages_json TEXT,
-  last_persisted_at_ms INTEGER
+  last_persisted_at_ms INTEGER,
+  processing_owner TEXT,
+  processing_lease_until_ms INTEGER
 )''');
     },
   );

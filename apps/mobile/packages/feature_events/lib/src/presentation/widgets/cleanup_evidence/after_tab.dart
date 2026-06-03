@@ -1,6 +1,5 @@
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:design_system/design_system.dart';
-import 'package:feature_events/src/presentation/widgets/cleanup_evidence/dashed_border_painter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -47,19 +46,14 @@ class AfterTab extends StatelessWidget {
     if (afterImages.isEmpty) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-        child: Semantics(
-          button: true,
-          label: context.l10n.eventsCleanupAfterUploadSemantic,
-          child: AddPhotosEmptyState(
-            maxImages: maxImages,
-            onTap: onPick,
-            textTheme: textTheme,
-            emptyTitle: context.l10n.eventsCleanupAfterEmptyTitle,
-            emptyMaxPhotosLine: context.l10n.eventsCleanupAfterEmptyMaxPhotos(
-              maxImages,
-            ),
-            emptyTapHint: context.l10n.eventsCleanupAfterEmptyTapGallery,
+        child: AddPhotosEmptyState(
+          onTap: onPick,
+          emptyTitle: context.l10n.eventsCleanupAfterEmptyTitle,
+          emptyMaxPhotosLine: context.l10n.eventsCleanupAfterEmptyMaxPhotos(
+            maxImages,
           ),
+          emptyTapHint: context.l10n.eventsCleanupAfterEmptyTapGallery,
+          semanticsLabel: context.l10n.eventsCleanupAfterUploadSemantic,
         ),
       );
     }
@@ -260,149 +254,31 @@ class AfterTab extends StatelessWidget {
   }
 }
 
-class AddPhotosEmptyState extends StatefulWidget {
+class AddPhotosEmptyState extends StatelessWidget {
   const AddPhotosEmptyState({
     super.key,
-    required this.maxImages,
     required this.onTap,
-    required this.textTheme,
     required this.emptyTitle,
     required this.emptyMaxPhotosLine,
     required this.emptyTapHint,
+    this.semanticsLabel,
   });
 
-  final int maxImages;
   final VoidCallback onTap;
-  final TextTheme textTheme;
   final String emptyTitle;
   final String emptyMaxPhotosLine;
   final String emptyTapHint;
-
-  @override
-  State<AddPhotosEmptyState> createState() => _AddPhotosEmptyStateState();
-}
-
-class _AddPhotosEmptyStateState extends State<AddPhotosEmptyState>
-    with SingleTickerProviderStateMixin {
-  bool _pressed = false;
-  late final AnimationController _pulseController;
-  late final Animation<double> _pulseAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _pulseController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    );
-    _pulseAnimation = Tween<double>(begin: 0.6, end: 1).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
-    );
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) {
-        return;
-      }
-      if (MediaQuery.disableAnimationsOf(context)) {
-        _pulseController.value = 1.0;
-      } else {
-        _pulseController.repeat(reverse: true);
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _pulseController.dispose();
-    super.dispose();
-  }
+  final String? semanticsLabel;
 
   @override
   Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _pressed = true),
-      onTapUp: (_) => setState(() => _pressed = false),
-      onTapCancel: () => setState(() => _pressed = false),
-      onTap: widget.onTap,
-      child: FadeTransition(
-        opacity: _pulseAnimation,
-        child: AnimatedContainer(
-          duration: AppMotion.xFast,
-          curve: AppMotion.emphasized,
-          transform: Matrix4.diagonal3Values(
-            _pressed ? 0.98 : 1.0,
-            _pressed ? 0.98 : 1.0,
-            1,
-          ),
-          child: CustomPaint(
-            painter: DashedBorderPainter(
-              color: AppColors.primary.withValues(alpha: 0.45),
-              borderRadius: AppSpacing.radiusXl,
-            ),
-            child: Container(
-              width: double.infinity,
-              constraints: const BoxConstraints(minHeight: 220),
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.xl,
-                vertical: AppSpacing.xl,
-              ),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.05),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Container(
-                    width: 72,
-                    height: 72,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.12),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      CupertinoIcons.photo_on_rectangle,
-                      size: 32,
-                      color: AppColors.primaryDark,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  Text(
-                    widget.emptyTitle,
-                    style: AppTypography.eventsSheetTitle(widget.textTheme),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    widget.emptyMaxPhotosLine,
-                    style: AppTypography.eventsSupportingCaption(
-                      widget.textTheme,
-                    ).copyWith(height: 1.4),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Icon(
-                        Icons.touch_app_rounded,
-                        size: 14,
-                        color: AppColors.primaryDark.withValues(alpha: 0.8),
-                      ),
-                      const SizedBox(width: AppSpacing.xs),
-                      Text(
-                        widget.emptyTapHint,
-                        style: AppTypography.eventsSheetTextLink(
-                          widget.textTheme,
-                        ).copyWith(color: AppColors.primaryDark, fontSize: 13),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
+    return AppEmptyStateDropZone(
+      icon: CupertinoIcons.photo_on_rectangle,
+      title: emptyTitle,
+      subtitle: emptyMaxPhotosLine,
+      hint: emptyTapHint,
+      onTap: onTap,
+      semanticsLabel: semanticsLabel,
     );
   }
 }

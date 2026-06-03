@@ -5,15 +5,15 @@ import { EventScheduleConflictModule } from '../event-schedule-conflict/event-sc
 import { GamificationModule } from '../gamification/gamification.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { ReportsUploadModule } from '../reports/reports-upload.module';
-import { CleanupEventsAnalyticsService } from './cleanup-events-analytics.service';
-import { CleanupEventsController } from './cleanup-events.controller';
-import { CleanupEventsListService } from './cleanup-events-list.service';
-import { CleanupEventsBulkModerateMutationService } from './cleanup-events-mutation-bulk.service';
-import { CleanupEventsCheckInRiskSignalsService } from './cleanup-events-check-in-risk-signals.service';
-import { CleanupEventsCreateMutationService } from './cleanup-events-mutation-create.service';
-import { CleanupEventsPatchMutationService } from './cleanup-events-mutation-patch.service';
-import { CleanupEventsMutationsService } from './cleanup-events-mutations.service';
-import { CleanupEventsService } from './cleanup-events.service';
+import { CleanupEventsAnalyticsService } from './services/cleanup-events-analytics.service';
+import { CleanupEventsController } from './controllers/cleanup-events.controller';
+import { CleanupEventsListService } from './services/cleanup-events-list.service';
+import { CleanupEventsBulkModerateMutationService } from './services/cleanup-events-mutation-bulk.service';
+import { CleanupEventsCheckInRiskSignalsService } from './services/cleanup-events-check-in-risk-signals.service';
+import { CleanupEventsCreateMutationService } from './services/cleanup-events-mutation-create.service';
+import { CleanupEventsPatchMutationService } from './services/cleanup-events-mutation-patch.service';
+import { CleanupEventsMutationsService } from './services/cleanup-events-mutations.service';
+import { CleanupEventsService } from './services/cleanup-events.service';
 
 @Module({
   imports: [

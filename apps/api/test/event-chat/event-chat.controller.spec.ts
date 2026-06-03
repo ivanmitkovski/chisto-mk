@@ -1,8 +1,8 @@
 import { Role } from '../../src/prisma-client';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
-import { EventChatReadController } from '../../src/event-chat/event-chat-read.controller';
-import { EventChatListService } from '../../src/event-chat/event-chat-list.service';
-import { EventChatPresenceService } from '../../src/event-chat/event-chat-presence.service';
+import { EventChatReadController } from '../../src/event-chat/controllers/event-chat-read.controller';
+import { EventChatListService } from '../../src/event-chat/services/event-chat-list.service';
+import { EventChatPresenceService } from '../../src/event-chat/services/event-chat-presence.service';
 
 describe('EventChatReadController', () => {
   const user: AuthenticatedUser = {

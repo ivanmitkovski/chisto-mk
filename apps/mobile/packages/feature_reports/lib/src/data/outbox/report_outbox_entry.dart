@@ -32,6 +32,8 @@ class ReportOutboxEntry {
     this.currentStageName,
     this.attemptedStageNames = const <String>[],
     this.lastPersistedAtMs,
+    this.processingOwner,
+    this.processingLeaseUntilMs,
   });
 
   final String id;
@@ -61,8 +63,21 @@ class ReportOutboxEntry {
   /// When the wizard draft was last persisted (autosave). Wizard-only.
   final int? lastPersistedAtMs;
 
+  /// Isolate that claimed this row for processing (cross-isolate lease).
+  final String? processingOwner;
+
+  /// Epoch ms until [processingOwner] holds the lease; null when unclaimed.
+  final int? processingLeaseUntilMs;
+
   bool get isTerminal =>
       state == ReportOutboxState.succeeded || state == ReportOutboxState.failed;
+
+  /// Row is eligible for the submit pipeline (upload / POST / cooldown retry).
+  bool get occupiesSubmitPipeline =>
+      state == ReportOutboxState.uploading ||
+      state == ReportOutboxState.submitting ||
+      state == ReportOutboxState.cooldown ||
+      (state == ReportOutboxState.pending && submitRequested);
 
   ReportOutboxEntry copyWith({
     ReportDraft? draft,
@@ -80,12 +95,16 @@ class ReportOutboxEntry {
     int? cooldownUntilMs,
     bool clearCooldownUntil = false,
     String? reportId,
+    bool clearReportId = false,
     int? updatedAtMs,
     String? currentStageName,
     List<String>? attemptedStageNames,
     bool clearWizardStage = false,
     int? lastPersistedAtMs,
     bool clearLastPersistedAt = false,
+    String? processingOwner,
+    int? processingLeaseUntilMs,
+    bool clearProcessingLease = false,
   }) {
     final int now = DateTime.now().millisecondsSinceEpoch;
     return ReportOutboxEntry(
@@ -107,7 +126,7 @@ class ReportOutboxEntry {
       cooldownUntilMs: clearCooldownUntil
           ? null
           : (cooldownUntilMs ?? this.cooldownUntilMs),
-      reportId: reportId ?? this.reportId,
+      reportId: clearReportId ? null : (reportId ?? this.reportId),
       createdAtMs: createdAtMs,
       updatedAtMs: updatedAtMs ?? now,
       currentStageName: clearWizardStage
@@ -117,6 +136,12 @@ class ReportOutboxEntry {
       lastPersistedAtMs: clearLastPersistedAt
           ? null
           : (lastPersistedAtMs ?? this.lastPersistedAtMs),
+      processingOwner: clearProcessingLease
+          ? null
+          : (processingOwner ?? this.processingOwner),
+      processingLeaseUntilMs: clearProcessingLease
+          ? null
+          : (processingLeaseUntilMs ?? this.processingLeaseUntilMs),
     );
   }
 }

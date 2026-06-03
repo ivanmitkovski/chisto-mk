@@ -3,9 +3,9 @@
 import { UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
-import { AuthCredentialService } from '../../src/auth/auth-credential.service';
-import { loadAuthEnvRuntime } from '../../src/auth/auth-env.config';
-import { AuditService } from '../../src/audit/audit.service';
+import { AuthCredentialService } from '../../src/auth/services/auth-credential.service';
+import { loadAuthEnvRuntime } from '../../src/auth/constants/auth-env.config';
+import { AuditService } from '../../src/audit/services/audit.service';
 
 describe('AuthCredentialService', () => {
   const audit = { log: jest.fn().mockResolvedValue(undefined) } as unknown as AuditService;

@@ -1,6 +1,7 @@
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:feature_reports/src/domain/models/report_capacity.dart';
 import 'package:feature_reports/src/domain/models/report_draft.dart';
+import 'package:feature_reports/src/domain/models/report_submit_result.dart';
 import 'package:feature_reports/src/presentation/widgets/new_report/report_stage.dart';
 
 /// Immutable wizard UI state for [NewReportController].
@@ -23,6 +24,8 @@ class NewReportWizardState {
     this.restoreError,
     this.incomingPhotoMergeResolved = true,
     this.suppressLocalDraftPersist = false,
+    this.submittedReportId,
+    this.lastSubmitResult,
   }) : draft = draft ?? ReportDraft(),
        attemptedStages = attemptedStages ?? <ReportStage>{};
 
@@ -43,6 +46,15 @@ class NewReportWizardState {
   final Object? restoreError;
   final bool incomingPhotoMergeResolved;
   final bool suppressLocalDraftPersist;
+
+  /// Set after a successful POST; blocks re-submit until [clear] / reset.
+  final String? submittedReportId;
+
+  /// Last successful submit payload for dialog / timeout recovery.
+  final ReportSubmitResult? lastSubmitResult;
+
+  bool get wizardSubmitLocked =>
+      submittedReportId != null && submittedReportId!.isNotEmpty;
 
   NewReportWizardState copyWith({
     ReportDraft? draft,
@@ -66,6 +78,9 @@ class NewReportWizardState {
     bool clearRestoreError = false,
     bool? incomingPhotoMergeResolved,
     bool? suppressLocalDraftPersist,
+    String? submittedReportId,
+    ReportSubmitResult? lastSubmitResult,
+    bool clearSubmittedReport = false,
   }) {
     return NewReportWizardState(
       draft: draft ?? this.draft,
@@ -95,6 +110,12 @@ class NewReportWizardState {
           incomingPhotoMergeResolved ?? this.incomingPhotoMergeResolved,
       suppressLocalDraftPersist:
           suppressLocalDraftPersist ?? this.suppressLocalDraftPersist,
+      submittedReportId: clearSubmittedReport
+          ? null
+          : (submittedReportId ?? this.submittedReportId),
+      lastSubmitResult: clearSubmittedReport
+          ? null
+          : (lastSubmitResult ?? this.lastSubmitResult),
     );
   }
 }

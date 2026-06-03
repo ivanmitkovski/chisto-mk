@@ -303,6 +303,9 @@ class _NewReportScreenState extends ConsumerState<NewReportScreen>
           titleText: _titleController.text,
           descriptionText: _descriptionController.text,
         );
+        await ref
+            .read(reportDraftRepositoryProvider)
+            .clearTerminalSubmitIfPresent();
         if (!context.mounted) {
           return;
         }

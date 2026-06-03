@@ -2,8 +2,8 @@
 import { ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Role } from '../../src/prisma-client';
-import { RolesGuard } from '../../src/auth/roles.guard';
-import { ROLES_KEY } from '../../src/auth/roles.decorator';
+import { RolesGuard } from '../../src/auth/guards/roles.guard';
+import { ROLES_KEY } from '../../src/auth/decorators/roles.decorator';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
 
 describe('RolesGuard', () => {

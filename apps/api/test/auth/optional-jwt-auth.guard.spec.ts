@@ -4,7 +4,7 @@ import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import {
   OPTIONAL_JWT_BEARER_ENFORCED,
   OptionalJwtAuthGuard,
-} from '../../src/auth/optional-jwt-auth.guard';
+} from '../../src/auth/guards/optional-jwt-auth.guard';
 
 function ctx(
   req: Record<string, unknown> & { headers: Record<string, string>; [OPTIONAL_JWT_BEARER_ENFORCED]?: boolean },

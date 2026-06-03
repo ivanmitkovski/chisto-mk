@@ -13,7 +13,12 @@ export class MapMvtTilesService {
     private readonly fallback: MapMvtTilesFallbackService,
   ) {}
 
-  async getTileOrThrow(z: number, x: number, y: number): Promise<MvtTileResult> {
+  async getTileOrThrow(
+    z: number,
+    x: number,
+    y: number,
+    viewerUserId?: string | null,
+  ): Promise<MvtTileResult> {
     const flags = loadFeatureFlags();
     if (!flags.mapTileFormatVector) {
       throw new NotFoundException({
@@ -24,8 +29,8 @@ export class MapMvtTilesService {
     }
 
     if (flags.mapPostgisEnabled) {
-      return this.postgis.generateTile(z, x, y);
+      return this.postgis.generateTile(z, x, y, viewerUserId);
     }
-    return this.fallback.generateTile(z, x, y);
+    return this.fallback.generateTile(z, x, y, viewerUserId);
   }
 }

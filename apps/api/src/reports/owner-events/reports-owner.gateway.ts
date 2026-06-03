@@ -12,8 +12,8 @@ import { Subscription } from 'rxjs';
 import { PrismaService } from '../../prisma/prisma.service';
 import { authenticateSocketUser } from '../../common/ws/authenticate-socket-user';
 import { resolveSocketIoCorsOrigin } from '../../common/ws/ws-cors';
-import { ReportsOwnerEventsService } from '../reports-owner-events.service';
-import type { OwnerReportEvent } from '../reports-owner-events.types';
+import { ReportsOwnerEventsService } from '../services/reports-owner-events.service';
+import type { OwnerReportEvent } from '../types/reports-owner-events.types';
 
 interface ReportsOwnerSocketData {
   userId?: string;

@@ -19,19 +19,19 @@ import {
   CHECK_IN_QR_TTL_SEC,
   newCheckInJti,
   signCheckInQrToken,
-} from '../../src/events/check-in-qr-token';
-import { CheckInRepository } from '../../src/events/check-in.repository';
-import { EventsCheckInAttendeesService } from '../../src/events/events-check-in-attendees.service';
-import { EventsCheckInQrService } from '../../src/events/events-check-in-qr.service';
-import { EventsCheckInRedeemService } from '../../src/events/events-check-in-redeem.service';
-import { EventsCheckInResolveService } from '../../src/events/events-check-in-resolve.service';
-import { EventsCheckInRedemptionService } from '../../src/events/events-check-in-redemption.service';
-import { EventsCheckInService } from '../../src/events/events-check-in.service';
-import { EventsCheckInSharedService } from '../../src/events/events-check-in-shared.service';
+} from '../../src/events/types/check-in-qr-token';
+import { CheckInRepository } from '../../src/events/repositories/check-in.repository';
+import { EventsCheckInAttendeesService } from '../../src/events/services/events-check-in-attendees.service';
+import { EventsCheckInQrService } from '../../src/events/services/events-check-in-qr.service';
+import { EventsCheckInRedeemService } from '../../src/events/services/events-check-in-redeem.service';
+import { EventsCheckInResolveService } from '../../src/events/services/events-check-in-resolve.service';
+import { EventsCheckInRedemptionService } from '../../src/events/services/events-check-in-redemption.service';
+import { EventsCheckInService } from '../../src/events/services/events-check-in.service';
+import { EventsCheckInSharedService } from '../../src/events/services/events-check-in-shared.service';
 import {
   POINTS_EVENT_CHECK_IN,
   REASON_EVENT_CHECK_IN,
-} from '../../src/gamification/gamification.constants';
+} from '../../src/gamification/constants/gamification.constants';
 
 function user(id: string, role: Role = Role.USER): AuthenticatedUser {
   return {

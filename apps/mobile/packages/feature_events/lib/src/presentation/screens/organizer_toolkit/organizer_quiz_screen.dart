@@ -14,6 +14,7 @@ import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
 import 'package:design_system/design_system.dart';
 import 'package:feature_events/src/application/events_providers.dart';
 import 'package:feature_events/src/data/organizer_quiz_payload.dart';
+import 'package:feature_events/src/presentation/navigation/organizer_certification_navigation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -49,9 +50,7 @@ Future<void> _persistOrganizerCertifiedAt(WidgetRef ref, DateTime at) async {
 }
 
 class OrganizerQuizScreen extends ConsumerStatefulWidget {
-  const OrganizerQuizScreen({super.key, this.onCertified});
-
-  final VoidCallback? onCertified;
+  const OrganizerQuizScreen({super.key});
 
   @override
   ConsumerState<OrganizerQuizScreen> createState() =>
@@ -459,10 +458,7 @@ class _OrganizerQuizScreenState extends ConsumerState<OrganizerQuizScreen>
         result: result,
         onRetry: _retryAfterResult,
         onCreateEvent: () {
-          widget.onCertified?.call();
-          Navigator.of(
-            context,
-          ).popUntil((Route<dynamic> route) => route.isFirst);
+          dismissOrganizerCertificationFlow(context);
         },
       );
     }

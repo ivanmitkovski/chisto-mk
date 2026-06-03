@@ -1,7 +1,7 @@
-import { ReportUploadOrphanGcService } from '../../src/reports/report-upload-orphan-gc.service';
+import { ReportUploadOrphanGcService } from '../../src/reports/services/report-upload-orphan-gc.service';
 import type { PrismaService } from '../../src/prisma/prisma.service';
-import type { S3StorageClient } from '../../src/storage/s3-storage.client';
-import type { ReportsUploadService } from '../../src/reports/reports-upload.service';
+import type { S3StorageClient } from '../../src/storage/util/s3-storage.client';
+import type { ReportsUploadService } from '../../src/reports/services/reports-upload.service';
 
 describe('ReportUploadOrphanGcService', () => {
   it('deletes old report media keys not referenced by any report', async () => {

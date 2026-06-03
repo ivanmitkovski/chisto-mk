@@ -9,51 +9,14 @@ class FeedNoLocationState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.xl,
-        vertical: AppSpacing.xxl,
-      ),
-      child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                color: AppColors.inputFill,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
-              ),
-              child: const Icon(
-                Icons.location_off_rounded,
-                size: 30,
-                color: AppColors.textMuted,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              context.l10n.feedNoLocationTitle,
-              textAlign: TextAlign.center,
-              style: AppTypography.emptyStateTitle(textTheme),
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            Text(
-              context.l10n.feedNoLocationHint,
-              textAlign: TextAlign.center,
-              style: AppTypography.emptyStateSubtitle(
-                textTheme,
-              ).copyWith(height: 1.4),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            AppButton.primary(
-              label: context.l10n.feedNoLocationOpenSettings,
-              onPressed: onOpenSettings,
-              expand: false,
-            ),
-          ],
-        ),
+    return AppEmptyState(
+      icon: Icons.location_off_rounded,
+      title: context.l10n.feedNoLocationTitle,
+      subtitle: context.l10n.feedNoLocationHint,
+      action: AppButton.primary(
+        label: context.l10n.feedNoLocationOpenSettings,
+        onPressed: onOpenSettings,
+        expand: false,
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/shared/widgets/molecules/api_error_banner.dart';
+import 'package:feature_auth/src/domain/models/password_reset_target.dart';
 import 'package:feature_auth/src/presentation/screens/forgot_password_otp_screen.dart';
 import 'package:feature_auth/src/presentation/widgets/auth_otp_input.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +12,10 @@ import 'support/auth_test_helpers.dart';
 import 'support/fake_auth_repository.dart';
 
 void main() {
-  const String phone = '+38970123456';
+  const PasswordResetTarget target = PasswordResetTarget(
+    channel: PasswordResetChannel.sms,
+    value: '+38970123456',
+  );
 
   setUpAll(() async {
     await bootstrapWidgetTests();
@@ -22,7 +26,7 @@ void main() {
   ) async {
     await pumpAuthWidget(
       tester,
-      home: const ForgotPasswordOtpScreen(phoneNumberE164: phone),
+      home: const ForgotPasswordOtpScreen(target: target),
     );
     await tester.pumpAndSettle();
 
@@ -39,7 +43,7 @@ void main() {
 
     await pumpAuthWidget(
       tester,
-      home: const ForgotPasswordOtpScreen(phoneNumberE164: phone),
+      home: const ForgotPasswordOtpScreen(target: target),
       overrides: AuthTestOverrides(authRepository: repo).build(),
     );
     await tester.pumpAndSettle();
@@ -61,7 +65,7 @@ void main() {
 
     await pumpAuthWidget(
       tester,
-      home: const ForgotPasswordOtpScreen(phoneNumberE164: phone),
+      home: const ForgotPasswordOtpScreen(target: target),
       overrides: AuthTestOverrides(authRepository: repo).build(),
     );
     await tester.pumpAndSettle();
@@ -87,7 +91,7 @@ void main() {
   ) async {
     await pumpAuthWidget(
       tester,
-      home: const ForgotPasswordOtpScreen(phoneNumberE164: phone),
+      home: const ForgotPasswordOtpScreen(target: target),
       overrides: AuthTestOverrides(
         authRepository: FakeAuthRepository(),
       ).build(),

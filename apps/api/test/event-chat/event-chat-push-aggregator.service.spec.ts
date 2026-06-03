@@ -1,6 +1,6 @@
 import { EventChatMessageType, NotificationType } from '../../src/prisma-client';
-import { NotificationDispatcherService } from '../../src/notifications/notification-dispatcher.service';
-import { EventChatPushAggregatorService } from '../../src/event-chat/event-chat-push-aggregator.service';
+import { NotificationDispatcherService } from '../../src/notifications/services/notification-dispatcher.service';
+import { EventChatPushAggregatorService } from '../../src/event-chat/services/event-chat-push-aggregator.service';
 
 describe('EventChatPushAggregatorService', () => {
   beforeEach(() => {

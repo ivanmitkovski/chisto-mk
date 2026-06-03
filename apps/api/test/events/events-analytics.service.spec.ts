@@ -2,8 +2,8 @@
 
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
-import { EventsAnalyticsService } from '../../src/events/events-analytics.service';
-import { EventsRepository } from '../../src/events/events.repository';
+import { EventsAnalyticsService } from '../../src/events/services/events-analytics.service';
+import { EventsRepository } from '../../src/events/repositories/events.repository';
 
 function auth(userId: string, role: string = 'USER'): AuthenticatedUser {
   return {

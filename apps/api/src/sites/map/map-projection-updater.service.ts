@@ -2,7 +2,7 @@ import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/commo
 import Redis from 'ioredis';
 import { Subscription } from 'rxjs';
 import { loadMapConfig } from '../../config/map.config';
-import { SiteEventsService } from '../../admin-realtime/site-events.service';
+import { SiteEventsService } from '../../admin-realtime/services/site-events.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { MapProjectionDiffService } from './map-projection-diff.service';
 import { MapProjectionWriterService } from './map-projection-writer.service';

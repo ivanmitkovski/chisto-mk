@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import type { Prisma } from '../../prisma-client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { distanceInMeters } from '../../common/utils/distance';
-import { SITE_NEARBY_RADIUS_METERS } from '../reports.constants';
+import { SITE_NEARBY_RADIUS_METERS } from '../constants/reports.constants';
 
 export type EarliestReportOnSite = {
   id: string;

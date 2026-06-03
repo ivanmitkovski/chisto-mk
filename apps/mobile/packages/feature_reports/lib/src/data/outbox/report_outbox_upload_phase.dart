@@ -1,4 +1,6 @@
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:chisto_infrastructure/core/debug/chisto_submit_debug_log.dart';
+import 'package:chisto_infrastructure/core/logging/app_log.dart';
 import 'package:chisto_infrastructure/core/observability/chisto_sentry.dart';
 import 'package:feature_reports/src/data/outbox/report_outbox_entry.dart';
 import 'package:feature_reports/src/data/outbox/report_outbox_error_classifier.dart';
@@ -78,6 +80,28 @@ class ReportOutboxUploadPhase {
       _onUploadPrepProgressClear?.call();
     }
     final List<String> prepared = prep.paths;
+    // All photo sources vanished (e.g. orphaned by a prior failed compress
+    // rename). Submit text-only and surface the skip count to the UI rather
+    // than failing the whole submit with "No readable photo files to upload".
+    if (prepared.isEmpty && prep.missingSourceCount > 0) {
+      cur = cur.copyWith(
+        state: ReportOutboxState.submitting,
+        mediaUrls: const <String>[],
+        clearLastError: true,
+      );
+      await _repo.update(cur);
+      chistoReportsBreadcrumb(
+        'report_outbox',
+        'upload_skipped_all_missing',
+        data: <String, Object?>{'missing': prep.missingSourceCount},
+      );
+      return (
+        entry: cur,
+        uploadTemps: prepared,
+        compressionFallbackCount: prep.compressionFallbackCount,
+        skippedPhotoCount: prep.missingSourceCount,
+      );
+    }
     try {
       int uploadTry = 0;
       while (true) {
@@ -97,7 +121,7 @@ class ReportOutboxUploadPhase {
             'upload_ok',
             data: <String, Object?>{
               'n': upload.urls.length,
-              'skipped': upload.skippedPhotoCount,
+              'skipped': upload.skippedPhotoCount + prep.missingSourceCount,
               'compressionFallbacks': prep.compressionFallbackCount,
             },
           );
@@ -105,9 +129,15 @@ class ReportOutboxUploadPhase {
             entry: cur,
             uploadTemps: prepared,
             compressionFallbackCount: prep.compressionFallbackCount,
-            skippedPhotoCount: upload.skippedPhotoCount,
+            skippedPhotoCount:
+                upload.skippedPhotoCount + prep.missingSourceCount,
           );
         } on AppError catch (err) {
+          chistoSubmitDebugLog(
+            'upload AppError code=${err.code} retryable=${err.retryable} '
+            'msg=${err.message}',
+            error: err,
+          );
           if (uploadTry >= _uploadAutoRetries ||
               classifyReportSubmitError(err) ==
                   ReportOutboxErrorKind.terminal) {
@@ -131,7 +161,19 @@ class ReportOutboxUploadPhase {
           );
         }
       }
-    } catch (err) {
+    } catch (err, st) {
+      chistoSubmitDebugLog(
+        'upload phase non-AppError type=${err.runtimeType}',
+        error: err,
+        stack: st,
+      );
+      AppLog.error(
+        'report upload phase failed (non-AppError): '
+        'type=${err.runtimeType} message=$err',
+        error: err,
+        stackTrace: st,
+        category: 'reports_outbox',
+      );
       final ReportOutboxEntry failed = cur.copyWith(
         state: ReportOutboxState.failed,
         lastErrorCode: 'UPLOAD_ERROR',

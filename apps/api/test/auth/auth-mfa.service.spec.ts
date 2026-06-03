@@ -7,9 +7,9 @@ jest.mock('otplib', () => ({
 
 import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AuthMfaService } from '../../src/auth/auth-mfa.service';
-import { loadAuthEnvRuntime } from '../../src/auth/auth-env.config';
-import { AuditService } from '../../src/audit/audit.service';
+import { AuthMfaService } from '../../src/auth/services/auth-mfa.service';
+import { loadAuthEnvRuntime } from '../../src/auth/constants/auth-env.config';
+import { AuditService } from '../../src/audit/services/audit.service';
 
 describe('AuthMfaService', () => {
   const audit = { log: jest.fn().mockResolvedValue(undefined) } as unknown as AuditService;

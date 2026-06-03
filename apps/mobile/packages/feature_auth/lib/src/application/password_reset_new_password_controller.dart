@@ -1,6 +1,7 @@
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/providers/app_providers.dart';
 import 'package:feature_auth/src/application/auth_form_state.dart';
+import 'package:feature_auth/src/domain/models/password_reset_target.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class PasswordResetNewPasswordController extends Notifier<AuthFormState> {
@@ -13,36 +14,27 @@ class PasswordResetNewPasswordController extends Notifier<AuthFormState> {
     }
   }
 
-  Future<void> confirmByPhone({
-    required String phoneNumberE164,
+  Future<void> confirm({
+    required PasswordResetTarget target,
     required String code,
     required String newPassword,
   }) async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
-      await ref
-          .read(authRepositoryProvider)
-          .confirmPasswordReset(
-            phoneNumberE164: phoneNumberE164,
-            code: code,
-            newPassword: newPassword,
-          );
-      state = state.copyWith(isLoading: false);
-    } on AppError catch (e) {
-      state = state.copyWith(isLoading: false, error: e);
-      rethrow;
-    }
-  }
-
-  Future<void> confirmByEmail({
-    required String token,
-    required String newPassword,
-  }) async {
-    state = state.copyWith(isLoading: true, clearError: true);
-    try {
-      await ref
-          .read(authRepositoryProvider)
-          .confirmPasswordResetByEmail(token: token, newPassword: newPassword);
+      final repo = ref.read(authRepositoryProvider);
+      if (target.isSms) {
+        await repo.confirmPasswordReset(
+          phoneNumberE164: target.value,
+          code: code,
+          newPassword: newPassword,
+        );
+      } else {
+        await repo.confirmPasswordResetByEmail(
+          email: target.value,
+          code: code,
+          newPassword: newPassword,
+        );
+      }
       state = state.copyWith(isLoading: false);
     } on AppError catch (e) {
       state = state.copyWith(isLoading: false, error: e);

@@ -12,6 +12,7 @@ import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { DiscoveryAnalyticsIngestDto } from './discovery-analytics-ingest.dto';
 import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-error-responses.decorator';
+import { timingSafeEqualString } from '../common/security/timing-safe-equal.util';
 
 @ApiTags('discovery-analytics')
 @ApiStandardHttpErrorResponses()
@@ -37,7 +38,7 @@ export class DiscoveryAnalyticsController {
     @Headers('x-chisto-analytics-key') ingestKey?: string,
   ): { ok: true; accepted: boolean } {
     const secret = this.configService.get<string>('DISCOVERY_ANALYTICS_INGEST_SECRET', '').trim();
-    if (secret === '' || ingestKey !== secret) {
+    if (secret === '' || !ingestKey || !timingSafeEqualString(ingestKey, secret)) {
       throw new UnauthorizedException({
         code: 'DISCOVERY_ANALYTICS_UNAUTHORIZED',
         message: 'Invalid or missing analytics ingest key',

@@ -1,7 +1,7 @@
 /// <reference types="jest" />
 import { BadRequestException } from '@nestjs/common';
 import sharp from 'sharp';
-import { ImageContentValidator } from '../../src/storage/image-content-validator';
+import { ImageContentValidator } from '../../src/storage/util/image-content-validator';
 
 describe('ImageContentValidator', () => {
   const validator = new ImageContentValidator();

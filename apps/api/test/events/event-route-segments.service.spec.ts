@@ -3,7 +3,7 @@
 import { NotFoundException } from '@nestjs/common';
 import { Role } from '../../src/prisma-client';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
-import { EventRouteSegmentsService } from '../../src/events/event-route-segments.service';
+import { EventRouteSegmentsService } from '../../src/events/services/event-route-segments.service';
 import { PrismaService } from '../../src/prisma/prisma.service';
 
 function user(): AuthenticatedUser {

@@ -1,10 +1,11 @@
 /// <reference types="jest" />
-import { ReportCitizenQueryService } from '../../src/reports/report-citizen-query.service';
-import { ReportSubmitIdempotencyService } from '../../src/reports/report-submit-idempotency.service';
-import { ReportSubmitMediaAppendService } from '../../src/reports/report-submit-media-append.service';
-import { ReportSubmitService } from '../../src/reports/report-submit.service';
-import { ReportCapacityService } from '../../src/reports/report-capacity.service';
-import { ReportsService } from '../../src/reports/reports.service';
+import { ReportCitizenQueryService } from '../../src/reports/services/report-citizen-query.service';
+import { ReportSubmitIdempotencyService } from '../../src/reports/services/report-submit-idempotency.service';
+import { ReportSubmitMediaAppendService } from '../../src/reports/services/report-submit-media-append.service';
+import { ReportSubmitService } from '../../src/reports/services/report-submit.service';
+import { ReportSubmitPersistenceService } from '../../src/reports/services/report-submit-persistence.service';
+import { ReportCapacityService } from '../../src/reports/services/report-capacity.service';
+import { ReportsService } from '../../src/reports/services/reports.service';
 import { Role } from '../../src/prisma-client';
 
 function makeService(overrides?: {
@@ -62,18 +63,23 @@ function makeService(overrides?: {
     reportsUploadService as never,
     reportsOwnerEventsService as never,
   );
-  const reportSubmit = new ReportSubmitService(
+  const siteHistoryWriter = { recordSiteCreated: jest.fn(), emitHistoryAppended: jest.fn() };
+  const persistence = new ReportSubmitPersistenceService(
     prisma as never,
+    reportCapacity,
+    nearbySiteResolver as never,
+    siteHistoryWriter as never,
+    { recordReportSubmitted: jest.fn() } as never,
+  );
+  const reportSubmit = new ReportSubmitService(
     postCreateEvents as never,
     reportsOwnerEventsService as never,
-    reportCapacity,
     reportsUploadService as never,
-    nearbySiteResolver as never,
     idempotency,
     mediaAppend,
+    persistence,
     { emit: jest.fn() } as never,
-    { recordSiteCreated: jest.fn(), emitHistoryAppended: jest.fn() } as never,
-    { recordReportSubmitted: jest.fn() } as never,
+    siteHistoryWriter as never,
   );
   const reportCitizenQuery = new ReportCitizenQueryService(prisma as never, reportsUploadService as never);
 

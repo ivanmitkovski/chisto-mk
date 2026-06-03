@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "mk.chisto.chisto_mobile"
+    namespace = "mk.chisto.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -33,7 +33,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "mk.chisto.chisto_mobile"
+        applicationId = "mk.chisto.app"
         minSdk = maxOf(flutter.minSdkVersion, 23)
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

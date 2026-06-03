@@ -50,7 +50,7 @@ CREATE TABLE $table (
 
     final Database upgraded = await openDatabase(
       path,
-      version: 4,
+      version: 5,
       onUpgrade: (Database db, int oldVersion, int newVersion) async {
         if (oldVersion < 2) {
           await db.execute(
@@ -66,6 +66,14 @@ WHERE id = ? AND state = 'pending'
             <Object>[kReportWizardDraftRowId],
           );
         }
+        if (oldVersion < 5) {
+          await db.execute(
+            'ALTER TABLE $table ADD COLUMN processing_owner TEXT',
+          );
+          await db.execute(
+            'ALTER TABLE $table ADD COLUMN processing_lease_until_ms INTEGER',
+          );
+        }
       },
     );
     try {
@@ -76,6 +84,8 @@ WHERE id = ? AND state = 'pending'
       );
       expect(rows, hasLength(1));
       expect(rows.first['submit_requested'], 0);
+      expect(rows.first.containsKey('processing_owner'), isTrue);
+      expect(rows.first.containsKey('processing_lease_until_ms'), isTrue);
     } finally {
       await upgraded.close();
       await File(path).delete();

@@ -1,7 +1,7 @@
 /// <reference types="jest" />
-import { PushDeliveryWorkerService } from '../../src/notifications/push-delivery-worker.service';
-import { PushDeliveryOutboxService } from '../../src/notifications/push-delivery-outbox.service';
-import { PushDeliverySenderService } from '../../src/notifications/push-delivery-sender.service';
+import { PushDeliveryWorkerService } from '../../src/notifications/services/push-delivery-worker.service';
+import { PushDeliveryOutboxService } from '../../src/notifications/services/push-delivery-outbox.service';
+import { PushDeliverySenderService } from '../../src/notifications/services/push-delivery-sender.service';
 
 function makePrisma() {
   const notificationOutbox = {

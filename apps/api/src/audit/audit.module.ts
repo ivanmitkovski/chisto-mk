@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { AuditController } from './audit.controller';
-import { AuditService } from './audit.service';
+import { AuditController } from './controllers/audit.controller';
+import { AuditService } from './services/audit.service';
 import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({

@@ -67,66 +67,35 @@ class _AppErrorViewState extends State<AppErrorView> {
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.xl,
-          vertical: AppSpacing.xxl,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Container(
-              width: AppSpacing.avatarLg,
-              height: AppSpacing.avatarLg,
-              decoration: BoxDecoration(
-                color: AppColors.accentDanger.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.error_outline_rounded,
-                size: AppSpacing.xl,
-                color: AppColors.accentDanger,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            Text(
-              localizedAppErrorMessage(context.l10n, widget.error),
-              style: AppTypography.emptyStateTitle(textTheme),
+    return AppEmptyState(
+      icon: Icons.error_outline_rounded,
+      iconVariant: AppEmptyStateIconVariant.error,
+      title: localizedAppErrorMessage(context.l10n, widget.error),
+      contentBelowSubtitle: widget.retryFootnote != null &&
+              widget.error.retryable &&
+              widget.onRetry != null
+          ? Text(
+              widget.retryFootnote!,
               textAlign: TextAlign.center,
-            ),
-            if (_isSessionInvalidError) ...<Widget>[
-              const SizedBox(height: AppSpacing.lg),
-              FilledButton.icon(
-                onPressed: () => unawaited(_handleLogoutTap()),
-                icon: const Icon(Icons.logout_rounded),
-                label: Text(context.l10n.profileSignOutTile),
+              style: textTheme.bodySmall?.copyWith(
+                color: AppColors.textMuted,
+                height: 1.35,
               ),
-            ],
-            if (widget.error.retryable && widget.onRetry != null) ...<Widget>[
-              const SizedBox(height: AppSpacing.lg),
-              FilledButton.icon(
-                onPressed: widget.onRetry,
-                icon: const Icon(Icons.refresh_rounded),
-                label: Text(context.l10n.commonTryAgain),
-              ),
-            ],
-            if (widget.retryFootnote != null &&
-                widget.error.retryable &&
-                widget.onRetry != null) ...<Widget>[
-              const SizedBox(height: AppSpacing.md),
-              Text(
-                widget.retryFootnote!,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.textMuted,
-                  height: 1.35,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ],
-        ),
-      ),
+            )
+          : null,
+      action: _isSessionInvalidError
+          ? AppButton.primary(
+              label: context.l10n.profileSignOutTile,
+              onPressed: () => unawaited(_handleLogoutTap()),
+              leadingIcon: const Icon(Icons.logout_rounded, size: 20),
+            )
+          : widget.error.retryable && widget.onRetry != null
+          ? AppButton.primary(
+              label: context.l10n.commonTryAgain,
+              onPressed: widget.onRetry,
+              leadingIcon: const Icon(Icons.refresh_rounded, size: 20),
+            )
+          : null,
     );
   }
 }

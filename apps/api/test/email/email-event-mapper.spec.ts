@@ -1,7 +1,7 @@
 /// <reference types="jest" />
 
 import { NotificationType } from '../../src/prisma-client';
-import { mapNotificationEventToEmail } from '../../src/email/email-event-mapper';
+import { mapNotificationEventToEmail } from '../../src/email/util/email-event-mapper';
 
 describe('mapNotificationEventToEmail', () => {
   it('maps SYSTEM report_received', () => {

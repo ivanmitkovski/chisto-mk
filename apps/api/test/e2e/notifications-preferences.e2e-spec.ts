@@ -20,16 +20,20 @@ describe('Notification preferences (e2e)', () => {
 
   it('lists and updates preferences for authenticated user', async () => {
     const citizen = await registerCitizen(app, 'notif_prefs');
-    const agent = request(app.getHttpServer()).set('Authorization', `Bearer ${citizen.accessToken}`);
+    const agent = request(app.getHttpServer());
 
-    const list = await agent.get('/v1/notifications/preferences').expect(200);
-    expect(Array.isArray(list.body)).toBe(true);
+    const list = await agent
+      .get('/v1/notifications/preferences')
+      .set('Authorization', `Bearer ${citizen.accessToken}`)
+      .expect(200);
+    expect(Array.isArray(list.body.data)).toBe(true);
 
     const patch = await agent
-      .patch(`/notifications/preferences/${NotificationType.COMMENT}`)
-      .send({ pushEnabled: false, emailEnabled: false })
+      .patch(`/v1/notifications/preferences/${NotificationType.COMMENT}`)
+      .set('Authorization', `Bearer ${citizen.accessToken}`)
+      .send({ muted: true, emailMuted: true })
       .expect(200);
     expect(patch.body.type).toBe(NotificationType.COMMENT);
-    expect(patch.body.pushEnabled).toBe(false);
+    expect(patch.body.muted).toBe(true);
   });
 });

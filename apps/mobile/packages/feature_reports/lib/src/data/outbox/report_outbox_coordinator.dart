@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:chisto_infrastructure/core/debug/chisto_submit_debug_log.dart';
+import 'package:chisto_infrastructure/core/logging/app_log.dart';
 import 'package:chisto_infrastructure/core/network/connectivity_gate.dart';
 import 'package:chisto_infrastructure/core/observability/chisto_sentry.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -14,6 +16,7 @@ import 'package:feature_reports/src/data/outbox/report_outbox_repository.dart';
 import 'package:feature_reports/src/data/outbox/report_outbox_submit_error_handler.dart';
 import 'package:feature_reports/src/data/outbox/report_outbox_upload_phase.dart';
 import 'package:feature_reports/src/data/report_photo_upload_prep.dart';
+import 'package:feature_reports/src/domain/draft/new_report_flow_policy.dart';
 import 'package:feature_reports/src/domain/draft/report_idempotency_key.dart';
 import 'package:feature_reports/src/domain/models/report_draft.dart';
 import 'package:feature_reports/src/domain/models/report_submit_result.dart';
@@ -43,6 +46,9 @@ class ReportOutboxCoordinator {
   final OutboxConfig _config;
   final OutboxScheduler _scheduler;
   final BackgroundSubmitScheduler _background;
+
+  final String _ownerId =
+      '${DateTime.now().microsecondsSinceEpoch}_${identityHashCode(Object())}';
 
   final StreamController<ReportOutboxEntry?> _active =
       StreamController<ReportOutboxEntry?>.broadcast();
@@ -140,15 +146,62 @@ class ReportOutboxCoordinator {
   bool _started = false;
   bool _busy = false;
 
-  Future<void> start() {
+  Future<void> start() async {
     if (_started) {
-      return Future<void>.value();
+      return;
     }
     _started = true;
+    await _selfHealStuckWizardRow();
     _connSub = ConnectivityGate.watch().listen((_) {
       _background.scheduleDrain(scheduleProcess);
     });
-    return scheduleProcess();
+    await scheduleProcess();
+  }
+
+  /// Recovers a wizard row stuck in `uploading` / `submitting` from a prior
+  /// crashed isolate. We only reset rows whose lease has expired (or is
+  /// unset); a live owner is left alone.
+  Future<void> _selfHealStuckWizardRow() async {
+    try {
+      final ReportOutboxEntry? wizard = await _repo.getById(
+        kReportWizardDraftRowId,
+      );
+      if (wizard == null) {
+        return;
+      }
+      final bool stuckState =
+          wizard.state == ReportOutboxState.uploading ||
+          wizard.state == ReportOutboxState.submitting;
+      if (!stuckState) {
+        return;
+      }
+      final int now = DateTime.now().millisecondsSinceEpoch;
+      final bool leaseExpired = wizard.processingLeaseUntilMs == null ||
+          wizard.processingLeaseUntilMs! <= now;
+      if (!leaseExpired) {
+        return;
+      }
+      AppLog.warn(
+        'report outbox: self-heal stuck wizard row state=${wizard.state.name} '
+        'attempt=${wizard.attemptCount}',
+        category: 'reports_outbox',
+      );
+      await _repo.update(
+        wizard.copyWith(
+          state: ReportOutboxState.pending,
+          clearProcessingLease: true,
+          clearLastError: true,
+          clearCooldownUntil: true,
+        ),
+      );
+    } on Object catch (err, st) {
+      AppLog.warn(
+        'report outbox: self-heal failed: $err',
+        error: err,
+        stackTrace: st,
+        category: 'reports_outbox',
+      );
+    }
   }
 
   Future<void> dispose() async {
@@ -175,9 +228,47 @@ class ReportOutboxCoordinator {
     required String description,
   }) async {
     const String rowId = kReportWizardDraftRowId;
+    final ReportOutboxEntry? wizard = await _repo.getById(rowId);
+    final ReportSubmitResult? alreadySucceeded =
+        _resultIfWizardAlreadySucceeded(wizard);
+    if (alreadySucceeded != null) {
+      chistoSubmitDebugLog(
+        'submitReportAndAwait: wizard already succeeded reportId=${alreadySucceeded.reportId}',
+      );
+      return alreadySucceeded;
+    }
+    if (_wizardSubmitInFlight(wizard)) {
+      _background.scheduleDrain(scheduleProcess);
+      return waitForSubmitResult(rowId).timeout(_config.submitAwaitTimeout);
+    }
     final Future<ReportSubmitResult> outcome = waitForSubmitResult(rowId);
     await enqueueSubmit(draft: draft, title: title, description: description);
     return outcome.timeout(_config.submitAwaitTimeout);
+  }
+
+  /// Prevents a second POST after the pipeline already succeeded but before
+  /// [ReportDraftRepository.clear] (coordinator used to reset the row immediately).
+  ReportSubmitResult? _resultIfWizardAlreadySucceeded(ReportOutboxEntry? wizard) {
+    final String? reportId = wizard?.reportId;
+    if (wizard == null ||
+        wizard.state != ReportOutboxState.succeeded ||
+        reportId == null ||
+        reportId.isEmpty) {
+      return null;
+    }
+    return ReportSubmitResult(
+      reportId: reportId,
+      siteId: '',
+      isNewSite: false,
+      pointsAwarded: 0,
+    );
+  }
+
+  bool _wizardSubmitInFlight(ReportOutboxEntry? wizard) {
+    if (wizard == null) {
+      return false;
+    }
+    return wizard.occupiesSubmitPipeline;
   }
 
   /// Marks the wizard draft row ready for the outbox pipeline ([kReportWizardDraftRowId]).
@@ -188,6 +279,14 @@ class ReportOutboxCoordinator {
   }) async {
     uploadPrepProgress.value = null;
     ReportOutboxEntry? wizard = await _repo.getById(kReportWizardDraftRowId);
+    if (wizard != null &&
+        wizard.state == ReportOutboxState.succeeded &&
+        (wizard.reportId?.isNotEmpty ?? false)) {
+      throw StateError(
+        'Report already submitted (${wizard.reportId}). '
+        'Start a new report after leaving the wizard.',
+      );
+    }
     if (wizard == null) {
       await _repo.saveWizardDraft(
         draft: draft,
@@ -217,18 +316,14 @@ class ReportOutboxCoordinator {
     _background.scheduleDrain(scheduleProcess);
   }
 
-  /// Reuses the persisted submit key when retrying a failed wizard row or when
-  /// a concurrent enqueue already claimed the pipeline for this wizard row.
+  /// Reuses any valid persisted submit key (failed, in-flight, or cooldown) so
+  /// retries and duplicate taps do not mint a new [Idempotency-Key] and create
+  /// another report server-side.
   String _resolveSubmitIdempotencyKey(ReportOutboxEntry wizard) {
-    if (wizard.state == ReportOutboxState.failed &&
-        !isWizardDraftPlaceholderIdempotencyKey(wizard.idempotencyKey) &&
-        ReportIdempotencyKey.isValidShape(wizard.idempotencyKey)) {
-      return wizard.idempotencyKey;
-    }
-    if (wizard.submitRequested &&
-        !isWizardDraftPlaceholderIdempotencyKey(wizard.idempotencyKey) &&
-        ReportIdempotencyKey.isValidShape(wizard.idempotencyKey)) {
-      return wizard.idempotencyKey;
+    final String key = wizard.idempotencyKey;
+    if (!isWizardDraftPlaceholderIdempotencyKey(key) &&
+        ReportIdempotencyKey.isValidShape(key)) {
+      return key;
     }
     return ReportIdempotencyKey.generate();
   }
@@ -259,7 +354,10 @@ class ReportOutboxCoordinator {
     _busy = true;
     try {
       while (true) {
-        final ReportOutboxEntry? raw = await _repo.getNextProcessable();
+        final ReportOutboxEntry? raw = await _repo.claimNextProcessable(
+          ownerId: _ownerId,
+          leaseDuration: _config.processingLeaseDuration,
+        );
         if (raw == null) {
           if (!_disposed) {
             if (!_active.isClosed) {
@@ -271,50 +369,63 @@ class ReportOutboxCoordinator {
           break;
         }
         if (_disposed) {
+          await _repo.releaseLease(raw.id);
           break;
         }
-        final List<ConnectivityResult> conn = await ConnectivityGate.check();
-        if (_disposed) {
-          break;
-        }
-        if (_scheduler.shouldStopAfterFetch(
-          online: ConnectivityGate.isOnline(conn),
-          foundRow: true,
-        )) {
-          if (!_disposed && !_active.isClosed) {
-            _active.add(raw);
+        try {
+          final List<ConnectivityResult> conn = await ConnectivityGate.check();
+          if (_disposed) {
+            break;
           }
-          chistoReportSentrySyncOutboxScope(
-            outboxState: raw.state.name,
-            outboxId: raw.id,
-          );
-          _emitPhase(ReportOutboxPipelinePhase.offlineWait);
-          chistoOutboxBreadcrumb(
-            phase: 'offline_wait',
-            attempt: raw.attemptCount,
-          );
-          break;
-        }
-        _emitPhase(ReportOutboxPipelinePhase.active);
-        final ReportOutboxEntry? latest = await _repo.getById(raw.id);
-        if (latest == null) {
-          continue;
-        }
-        await _processEntry(latest);
-        final ReportOutboxEntry? check = await _repo.getById(raw.id);
-        final OutboxAfterProcessInstruction next = _scheduler.afterProcess(
-          check: check,
-        );
-        if (next == OutboxAfterProcessInstruction.breakOnCooldown) {
-          if (check != null) {
-            _active.add(check);
+          if (_scheduler.shouldStopAfterFetch(
+            online: ConnectivityGate.isOnline(conn),
+            foundRow: true,
+          )) {
+            if (!_disposed && !_active.isClosed) {
+              _active.add(raw);
+            }
             chistoReportSentrySyncOutboxScope(
-              outboxState: check.state.name,
-              outboxId: check.id,
+              outboxState: raw.state.name,
+              outboxId: raw.id,
             );
+            _emitPhase(ReportOutboxPipelinePhase.offlineWait);
+            chistoOutboxBreadcrumb(
+              phase: 'offline_wait',
+              attempt: raw.attemptCount,
+            );
+            _background.scheduleDrain(
+              scheduleProcess,
+              requestNativeFollowUp: true,
+            );
+            break;
           }
-          _emitPhase(ReportOutboxPipelinePhase.cooldownWait);
-          break;
+          _emitPhase(ReportOutboxPipelinePhase.active);
+          final ReportOutboxEntry? latest = await _repo.getById(raw.id);
+          if (latest == null) {
+            continue;
+          }
+          await _processEntry(latest);
+          final ReportOutboxEntry? check = await _repo.getById(raw.id);
+          final OutboxAfterProcessInstruction next = _scheduler.afterProcess(
+            check: check,
+          );
+          if (next == OutboxAfterProcessInstruction.breakOnCooldown) {
+            if (check != null) {
+              _active.add(check);
+              chistoReportSentrySyncOutboxScope(
+                outboxState: check.state.name,
+                outboxId: check.id,
+              );
+            }
+            _emitPhase(ReportOutboxPipelinePhase.cooldownWait);
+            _background.scheduleDrain(
+              scheduleProcess,
+              requestNativeFollowUp: true,
+            );
+            break;
+          }
+        } finally {
+          await _repo.releaseLease(raw.id);
         }
       }
     } finally {
@@ -372,6 +483,18 @@ class ReportOutboxCoordinator {
         return;
       }
 
+      if (!NewReportFlowPolicy.hasValidLocation(e.draft)) {
+        final AppError locationErr = AppError.validation(
+          message: 'Report location is missing or outside coverage.',
+        );
+        await _submitErrors.handle(e, locationErr);
+        chistoOutboxBreadcrumb(
+          phase: 'submit_invalid_location',
+          attempt: e.attemptCount,
+        );
+        return;
+      }
+
       try {
         final ReportSubmitResult apiResult = await _api.submitReport(
           latitude: e.draft.latitude!,
@@ -404,20 +527,12 @@ class ReportOutboxCoordinator {
         final int t = DateTime.now().millisecondsSinceEpoch;
         if (e.id == kReportWizardDraftRowId) {
           await _repo.update(
-            ReportOutboxEntry(
-              id: kReportWizardDraftRowId,
-              idempotencyKey: wizardDraftPlaceholderIdempotencyKey(),
-              draft: ReportDraft(),
-              title: '',
-              description: '',
+            e.copyWith(
+              state: ReportOutboxState.succeeded,
+              reportId: result.reportId,
               submitRequested: false,
-              state: ReportOutboxState.pending,
-              attemptCount: 0,
-              createdAtMs: t,
+              clearMediaUrls: true,
               updatedAtMs: t,
-              currentStageName: null,
-              attemptedStageNames: const <String>[],
-              lastPersistedAtMs: null,
             ),
           );
         } else {
@@ -434,7 +549,20 @@ class ReportOutboxCoordinator {
         _active.add(null);
         chistoReportSentryClearOutboxEntryScope();
         _emitPhase(ReportOutboxPipelinePhase.idle);
-      } on AppError catch (err) {
+      } on AppError catch (err, st) {
+        chistoSubmitDebugLog(
+          'outbox submit AppError code=${err.code} retryable=${err.retryable} '
+          'attempt=${e.attemptCount} msg=${err.message}',
+          error: err,
+          stack: st,
+        );
+        AppLog.warn(
+          'report submit failed: code=${err.code} retryable=${err.retryable} '
+          'attempt=${e.attemptCount} message=${err.message}',
+          error: err,
+          stackTrace: st,
+          category: 'reports_outbox',
+        );
         await _submitErrors.handle(e, err);
         chistoOutboxBreadcrumb(
           phase: 'submit_err',
@@ -442,7 +570,20 @@ class ReportOutboxCoordinator {
           retryable: err.retryable,
           code: err.code,
         );
-      } catch (err) {
+      } catch (err, st) {
+        chistoSubmitDebugLog(
+          'outbox submit non-AppError type=${err.runtimeType} attempt=${e.attemptCount}',
+          error: err,
+          stack: st,
+        );
+        AppLog.error(
+          'report submit threw non-AppError (wrapped UNKNOWN): '
+          'type=${err.runtimeType} attempt=${e.attemptCount} message=$err',
+          error: err,
+          stackTrace: st,
+          category: 'reports_outbox',
+        );
+        unawaited(Sentry.captureException(err, stackTrace: st));
         final AppError wrapped = AppError.unknown(cause: err);
         await _submitErrors.handle(e, wrapped);
         chistoOutboxBreadcrumb(

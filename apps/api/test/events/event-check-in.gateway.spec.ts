@@ -1,8 +1,8 @@
 /// <reference types="jest" />
 
-import { EventCheckInGateway } from '../../src/events/event-check-in.gateway';
+import { EventCheckInGateway } from '../../src/events/gateways/event-check-in.gateway';
 import { ConfigService } from '@nestjs/config';
-import { CheckInRepository } from '../../src/events/check-in.repository';
+import { CheckInRepository } from '../../src/events/repositories/check-in.repository';
 import { PrismaService } from '../../src/prisma/prisma.service';
 
 describe('EventCheckInGateway', () => {

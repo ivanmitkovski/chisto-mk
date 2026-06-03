@@ -11,6 +11,7 @@ class PrimaryButton extends StatefulWidget {
     required this.onPressed,
     this.enabled = true,
     this.isLoading = false,
+    this.leadingIcon,
   });
 
   final String label;
@@ -19,6 +20,7 @@ class PrimaryButton extends StatefulWidget {
 
   /// When true, shows a spinner and ignores presses (unless [enabled] is false).
   final bool isLoading;
+  final Widget? leadingIcon;
 
   @override
   State<PrimaryButton> createState() => _PrimaryButtonState();
@@ -86,19 +88,34 @@ class _PrimaryButtonState extends State<PrimaryButton> {
                     ),
                   )
                 : Center(
-                    child: Text(
-                      widget.label,
-                      textAlign: TextAlign.center,
-                      textHeightBehavior: const TextHeightBehavior(
-                        applyHeightToFirstAscent: false,
-                        applyHeightToLastDescent: false,
-                      ),
-                      style: AppTypography.buttonLabel(textTheme).copyWith(
-                        color: inactive
-                            ? AppColors.textSecondary
-                            : AppColors.textPrimary,
-                        height: 1,
-                      ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        if (widget.leadingIcon != null) ...<Widget>[
+                          widget.leadingIcon!,
+                          const SizedBox(width: AppSpacing.xs),
+                        ],
+                        Flexible(
+                          child: Text(
+                            widget.label,
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textHeightBehavior: const TextHeightBehavior(
+                              applyHeightToFirstAscent: false,
+                              applyHeightToLastDescent: false,
+                            ),
+                            style: AppTypography.buttonLabel(textTheme)
+                                .copyWith(
+                              color: inactive
+                                  ? AppColors.textSecondary
+                                  : AppColors.textPrimary,
+                              height: 1,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
           ),

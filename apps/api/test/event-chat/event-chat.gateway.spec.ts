@@ -1,5 +1,5 @@
-import { EventChatSseService } from '../../src/event-chat/event-chat-sse.service';
-import { EventChatGateway } from '../../src/event-chat/event-chat.gateway';
+import { EventChatSseService } from '../../src/event-chat/services/event-chat-sse.service';
+import { EventChatGateway } from '../../src/event-chat/gateways/event-chat.gateway';
 
 describe('EventChatGateway replay on join', () => {
   it('emits sync when replay buffer has events after lastStreamEventId', async () => {

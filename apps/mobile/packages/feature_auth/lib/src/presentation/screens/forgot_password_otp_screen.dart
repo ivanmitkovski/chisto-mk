@@ -10,6 +10,7 @@ import 'package:chisto_infrastructure/shared/widgets/molecules/api_error_banner.
 import 'package:chisto_infrastructure/shared/widgets/organisms/loading_overlay.dart';
 import 'package:design_system/design_system.dart';
 import 'package:feature_auth/src/application/password_reset_otp_controller.dart';
+import 'package:feature_auth/src/domain/models/password_reset_target.dart';
 import 'package:feature_auth/src/presentation/constants/auth_error_messages.dart';
 import 'package:feature_auth/src/presentation/constants/auth_otp_constants.dart';
 import 'package:feature_auth/src/presentation/widgets/auth_otp_input.dart';
@@ -19,9 +20,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ForgotPasswordOtpScreen extends ConsumerStatefulWidget {
-  const ForgotPasswordOtpScreen({super.key, required this.phoneNumberE164});
+  const ForgotPasswordOtpScreen({super.key, required this.target});
 
-  final String phoneNumberE164;
+  final PasswordResetTarget target;
 
   @override
   ConsumerState<ForgotPasswordOtpScreen> createState() =>
@@ -98,6 +99,15 @@ class _ForgotPasswordOtpScreenState
     }
   }
 
+  String _subtitle(AppLocalizations l10n) {
+    if (widget.target.isSms) {
+      return l10n.authForgotPasswordOtpSubtitle(
+        formatPhoneForDisplay(widget.target.value),
+      );
+    }
+    return l10n.authForgotPasswordOtpEmailSubtitle(widget.target.value);
+  }
+
   Future<void> _onContinue() async {
     if (!_isComplete || _isLoading || _otpLocked) return;
 
@@ -110,7 +120,7 @@ class _ForgotPasswordOtpScreenState
     try {
       await ref
           .read(passwordResetOtpControllerProvider.notifier)
-          .verifyCode(widget.phoneNumberE164, _codeController.text.trim());
+          .verifyCode(widget.target, _codeController.text.trim());
     } on AppError {
       if (!mounted) return;
       if (_otpLocked) {
@@ -123,9 +133,9 @@ class _ForgotPasswordOtpScreenState
     if (!mounted) return;
     AppHaptics.success(context);
 
-    AppNavigation.goForgotPasswordNew(
+    await AppNavigation.pushForgotPasswordNew(
       ForgotPasswordNewRouteArgs(
-        phoneNumberE164: widget.phoneNumberE164,
+        target: widget.target,
         code: _codeController.text.trim(),
       ),
     );
@@ -136,7 +146,7 @@ class _ForgotPasswordOtpScreenState
     try {
       await ref
           .read(passwordResetOtpControllerProvider.notifier)
-          .resend(widget.phoneNumberE164);
+          .resend(widget.target);
       if (!mounted) return;
       ref.read(passwordResetOtpControllerProvider.notifier).resetAttempts();
       _codeController.clear();
@@ -164,9 +174,7 @@ class _ForgotPasswordOtpScreenState
             )
           : null,
       title: l10n.authForgotPasswordOtpTitle,
-      subtitle: l10n.authForgotPasswordOtpSubtitle(
-        formatPhoneForDisplay(widget.phoneNumberE164),
-      ),
+      subtitle: _subtitle(l10n),
       otpInput: AuthOtpInput(
         controller: _codeController,
         focusNode: _codeFocusNode,

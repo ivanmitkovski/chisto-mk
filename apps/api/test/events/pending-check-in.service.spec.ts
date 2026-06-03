@@ -2,7 +2,7 @@
 
 import { InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PendingCheckInService } from '../../src/events/pending-check-in.service';
+import { PendingCheckInService } from '../../src/events/services/pending-check-in.service';
 
 describe('PendingCheckInService', () => {
   it('allows in-memory fallback when NODE_ENV is test and CHECK_IN_REQUIRE_REDIS is unset', () => {

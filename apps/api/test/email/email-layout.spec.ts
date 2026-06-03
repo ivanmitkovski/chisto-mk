@@ -1,12 +1,12 @@
 /// <reference types="jest" />
 
-import { EMAIL_BRAND } from '../../src/email/email.constants';
+import { EMAIL_BRAND } from '../../src/email/constants/email.constants';
 import {
   accentBorderColor,
   buildDetailCardHtml,
   EMAIL_LAYOUT,
   type EmailAccent,
-} from '../../src/email/email-layout';
+} from '../../src/email/util/email-layout';
 
 describe('email-layout', () => {
   it('buildDetailCardHtml escapes HTML in labels and values', () => {

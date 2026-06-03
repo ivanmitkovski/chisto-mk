@@ -1,5 +1,5 @@
 import { ForbiddenException } from '@nestjs/common';
-import { FeatureFlagsService } from '../../src/feature-flags/feature-flags.service';
+import { FeatureFlagsService } from '../../src/feature-flags/services/feature-flags.service';
 import { Role } from '../../src/prisma-client';
 
 describe('FeatureFlagsService', () => {

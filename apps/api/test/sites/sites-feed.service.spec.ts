@@ -1,5 +1,5 @@
 import { BadRequestException } from '@nestjs/common';
-import { SitesFeedService } from '../../src/sites/sites-feed.service';
+import { SitesFeedService } from '../../src/sites/services/sites-feed.service';
 
 describe('SitesFeedService', () => {
   it('rejects partial geo query (lat without lng)', async () => {

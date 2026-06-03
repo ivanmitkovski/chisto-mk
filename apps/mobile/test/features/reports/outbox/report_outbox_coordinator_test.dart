@@ -77,6 +77,10 @@ class _FakeOutboxRepo implements ReportOutboxRepository {
       if (e.cooldownUntilMs != null && e.cooldownUntilMs! > now) {
         return false;
       }
+      if (e.processingLeaseUntilMs != null &&
+          e.processingLeaseUntilMs! > now) {
+        return false;
+      }
       if (e.state == ReportOutboxState.pending && !e.submitRequested) {
         return false;
       }
@@ -88,6 +92,33 @@ class _FakeOutboxRepo implements ReportOutboxRepository {
           a.createdAtMs.compareTo(b.createdAtMs),
     );
     return candidates.first;
+  }
+
+  @override
+  Future<ReportOutboxEntry?> claimNextProcessable({
+    required String ownerId,
+    required Duration leaseDuration,
+  }) async {
+    final ReportOutboxEntry? next = await getNextProcessable();
+    if (next == null) {
+      return null;
+    }
+    final int now = DateTime.now().millisecondsSinceEpoch;
+    final ReportOutboxEntry leased = next.copyWith(
+      processingOwner: ownerId,
+      processingLeaseUntilMs: now + leaseDuration.inMilliseconds,
+    );
+    _rows[next.id] = leased;
+    return leased;
+  }
+
+  @override
+  Future<void> releaseLease(String id) async {
+    final ReportOutboxEntry? row = _rows[id];
+    if (row == null) {
+      return;
+    }
+    _rows[id] = row.copyWith(clearProcessingLease: true);
   }
 
   @override
@@ -122,12 +153,34 @@ class _FakeOutboxRepo implements ReportOutboxRepository {
         pipelineCount++;
       }
     }
-    if (pipelineCount > 0) {
-      throw StateError('An in-flight report submission already exists.');
-    }
-
     final int now = DateTime.now().millisecondsSinceEpoch;
     ReportOutboxEntry? wizard = _rows[kReportWizardDraftRowId];
+    if (pipelineCount > 0) {
+      if (wizard == null || !wizard.occupiesSubmitPipeline) {
+        throw StateError('An in-flight report submission already exists.');
+      }
+      if (wizard.state == ReportOutboxState.failed) {
+        wizard = wizard.copyWith(
+          state: ReportOutboxState.pending,
+          attemptCount: 0,
+          clearLastError: true,
+          clearCooldownUntil: true,
+        );
+      }
+      _rows[kReportWizardDraftRowId] = wizard.copyWith(
+        draft: draft,
+        title: title.trim(),
+        description: description.trim(),
+        idempotencyKey: idempotencyKey,
+        submitRequested: true,
+        clearMediaUrls: true,
+        clearLastError: true,
+        clearCooldownUntil: true,
+        updatedAtMs: now,
+      );
+      return;
+    }
+
     if (wizard == null) {
       wizard = ReportOutboxEntry(
         id: kReportWizardDraftRowId,
@@ -505,6 +558,38 @@ void main() {
       await c.dispose();
     });
 
+    test('enqueueSubmit is idempotent when wizard row is already in pipeline', () async {
+      final _FakeOutboxRepo repo = _FakeOutboxRepo();
+      final int t = DateTime.now().millisecondsSinceEpoch;
+      await repo.insert(
+        ReportOutboxEntry(
+          id: kReportWizardDraftRowId,
+          idempotencyKey: 'stable-key-1234567890',
+          draft: _validDraft(),
+          title: 'Title',
+          description: 'Desc',
+          submitRequested: true,
+          state: ReportOutboxState.submitting,
+          attemptCount: 0,
+          createdAtMs: t,
+          updatedAtMs: t,
+        ),
+      );
+      final ReportOutboxCoordinator c = ReportOutboxCoordinator(
+        repository: repo,
+        reportsApi: _StubApi(),
+      );
+      await c.enqueueSubmit(
+        draft: _validDraft(),
+        title: 'Title',
+        description: 'Desc',
+      );
+      final ReportOutboxEntry? row = await repo.getById(kReportWizardDraftRowId);
+      expect(row?.state, ReportOutboxState.submitting);
+      expect(row?.submitRequested, isTrue);
+      await c.dispose();
+    });
+
     test('enqueueSubmit rejects when pipeline already active', () async {
       final _FakeOutboxRepo repo = _FakeOutboxRepo();
       final int t = DateTime.now().millisecondsSinceEpoch;
@@ -573,6 +658,75 @@ void main() {
         expect(retried?.submitRequested, isTrue);
       },
     );
+
+    test('start() self-heals stuck submitting wizard row with expired lease', () async {
+      final _FakeOutboxRepo repo = _FakeOutboxRepo();
+      final int t = DateTime.now().millisecondsSinceEpoch;
+      await repo.insert(
+        ReportOutboxEntry(
+          id: kReportWizardDraftRowId,
+          idempotencyKey: 'self-heal-stable-key1234',
+          draft: _validDraft(),
+          title: 'Title',
+          description: 'Desc',
+          submitRequested: true,
+          state: ReportOutboxState.submitting,
+          attemptCount: 1,
+          lastErrorCode: 'UNKNOWN',
+          lastErrorMessage: 'An unexpected error occurred.',
+          createdAtMs: t,
+          updatedAtMs: t,
+          processingOwner: 'dead-isolate-12345',
+          processingLeaseUntilMs: t - 1000,
+        ),
+      );
+      final _StubApi api = _StubApi();
+      final ReportOutboxCoordinator c = ReportOutboxCoordinator(
+        repository: repo,
+        reportsApi: api,
+      );
+      final Future<ReportOutboxSuccess> done = c.successStream.first;
+      await c.start();
+      final ReportOutboxSuccess ev = await done.timeout(
+        const Duration(seconds: 10),
+      );
+      expect(ev.outboxId, kReportWizardDraftRowId);
+      // The stuck row's persisted idempotency key replays end-to-end.
+      expect(api.recordedIdempotencyKeys, <String>['self-heal-stable-key1234']);
+      await c.dispose();
+    });
+
+    test('start() leaves a live-leased wizard row untouched', () async {
+      final _FakeOutboxRepo repo = _FakeOutboxRepo();
+      final int now = DateTime.now().millisecondsSinceEpoch;
+      await repo.insert(
+        ReportOutboxEntry(
+          id: kReportWizardDraftRowId,
+          idempotencyKey: 'live-lease-stable-key123',
+          draft: _validDraft(),
+          title: 'Title',
+          description: 'Desc',
+          submitRequested: true,
+          state: ReportOutboxState.submitting,
+          attemptCount: 0,
+          createdAtMs: now,
+          updatedAtMs: now,
+          processingOwner: 'other-isolate',
+          processingLeaseUntilMs: now + 60 * 1000,
+        ),
+      );
+      final ReportOutboxCoordinator c = ReportOutboxCoordinator(
+        repository: repo,
+        reportsApi: _StubApi(),
+      );
+      await c.start();
+      final ReportOutboxEntry? row = await repo.getById(
+        kReportWizardDraftRowId,
+      );
+      expect(row?.state, ReportOutboxState.submitting);
+      expect(row?.processingOwner, 'other-isolate');
+      await c.dispose();
+    });
 
     test('resetFailedToPending only mutates failed rows', () async {
       final _FakeOutboxRepo repo = _FakeOutboxRepo();
@@ -681,6 +835,170 @@ void main() {
       expect(ev.outboxId, kReportWizardDraftRowId);
       expect(api.recordedIdempotencyKeys, isNotEmpty);
       await second.dispose();
+    });
+
+    test('submitReportAndAwait re-attaches when wizard submit in flight', () async {
+      final _FakeOutboxRepo repo = _FakeOutboxRepo();
+      final Completer<void> gate = Completer<void>();
+      final _StubApi api = _StubApi(
+        onSubmit:
+            ({
+              required double latitude,
+              required double longitude,
+              required String title,
+              String? description,
+              List<String>? mediaUrls,
+              String? category,
+              int? severity,
+              String? address,
+              String? cleanupEffort,
+              String? idempotencyKey,
+            }) async {
+              await gate.future;
+              return const ReportSubmitResult(
+                reportId: 'r1',
+                reportNumber: 'R-1',
+                siteId: 's1',
+                isNewSite: false,
+                pointsAwarded: 0,
+              );
+            },
+      );
+      final ReportOutboxCoordinator c = ReportOutboxCoordinator(
+        repository: repo,
+        reportsApi: api,
+      );
+      await c.start();
+      final Future<ReportSubmitResult> first = c.submitReportAndAwait(
+        draft: _validDraft(),
+        title: 'Title',
+        description: 'Desc',
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      final int submitsBeforeRetap = api.recordedIdempotencyKeys.length;
+      final Future<ReportSubmitResult> second = c.submitReportAndAwait(
+        draft: _validDraft(),
+        title: 'Title',
+        description: 'Desc',
+      );
+      expect(api.recordedIdempotencyKeys.length, submitsBeforeRetap);
+      gate.complete();
+      final ReportSubmitResult a = await first;
+      final ReportSubmitResult b = await second;
+      expect(a.reportId, 'r1');
+      expect(b.reportId, 'r1');
+      expect(api.recordedIdempotencyKeys.length, 1);
+      await c.dispose();
+    });
+
+    test(
+      'submitReportAndAwait after wizard succeeded does not POST again',
+      () async {
+        final _FakeOutboxRepo repo = _FakeOutboxRepo();
+        final _StubApi api = _StubApi();
+        final int t = DateTime.now().millisecondsSinceEpoch;
+        await repo.insert(
+          ReportOutboxEntry(
+            id: kReportWizardDraftRowId,
+            idempotencyKey: 'already-done-key-1',
+            draft: _validDraft(),
+            title: 'Title',
+            description: 'Desc',
+            submitRequested: false,
+            state: ReportOutboxState.succeeded,
+            reportId: 'existing-report',
+            attemptCount: 1,
+            createdAtMs: t,
+            updatedAtMs: t,
+          ),
+        );
+        final ReportOutboxCoordinator c = ReportOutboxCoordinator(
+          repository: repo,
+          reportsApi: api,
+        );
+        final ReportSubmitResult result = await c.submitReportAndAwait(
+          draft: _validDraft(),
+          title: 'Title',
+          description: 'Desc',
+        );
+        expect(result.reportId, 'existing-report');
+        expect(api.recordedIdempotencyKeys, isEmpty);
+        await c.dispose();
+      },
+    );
+
+    test('DUPLICATE_SUBMIT_INFLIGHT cooldown retries with same key', () async {
+      final _FakeOutboxRepo repo = _FakeOutboxRepo();
+      var attempts = 0;
+      const String idem = 'stable-inflight-key12';
+      final _StubApi api = _StubApi(
+        onSubmit:
+            ({
+              required double latitude,
+              required double longitude,
+              required String title,
+              String? description,
+              List<String>? mediaUrls,
+              String? category,
+              int? severity,
+              String? address,
+              String? cleanupEffort,
+              String? idempotencyKey,
+            }) async {
+              attempts++;
+              if (attempts == 1) {
+                throw const AppError(
+                  code: 'DUPLICATE_SUBMIT_INFLIGHT',
+                  message: 'busy',
+                  retryable: true,
+                  details: <String, dynamic>{'retryAfterSeconds': 1},
+                );
+              }
+              return const ReportSubmitResult(
+                reportId: 'r1',
+                reportNumber: 'R-1',
+                siteId: 's1',
+                isNewSite: false,
+                pointsAwarded: 0,
+              );
+            },
+      );
+      final int t = DateTime.now().millisecondsSinceEpoch;
+      await repo.insert(
+        ReportOutboxEntry(
+          id: kReportWizardDraftRowId,
+          idempotencyKey: idem,
+          draft: _validDraft(),
+          title: 'Title',
+          description: 'Desc',
+          submitRequested: true,
+          state: ReportOutboxState.submitting,
+          attemptCount: 0,
+          createdAtMs: t,
+          updatedAtMs: t,
+        ),
+      );
+      final ReportOutboxCoordinator c = ReportOutboxCoordinator(
+        repository: repo,
+        reportsApi: api,
+      );
+      final Future<ReportOutboxSuccess> done = c.successStream.first;
+      await c.start();
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+      final ReportOutboxEntry? cooled = await repo.getById(
+        kReportWizardDraftRowId,
+      );
+      expect(cooled?.state, ReportOutboxState.cooldown);
+      await repo.update(
+        cooled!.copyWith(
+          cooldownUntilMs: DateTime.now().millisecondsSinceEpoch - 1,
+        ),
+      );
+      await c.scheduleProcess();
+      await done.timeout(const Duration(seconds: 10));
+      expect(attempts, greaterThanOrEqualTo(2));
+      expect(api.recordedIdempotencyKeys.every((String? k) => k == idem), isTrue);
+      await c.dispose();
     });
 
     test('concurrent enqueueSubmit allows only one pipeline claim', () async {

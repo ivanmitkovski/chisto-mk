@@ -3,6 +3,7 @@ import 'package:design_system/design_system.dart';
 import 'package:feature_reports/src/domain/models/report_detail.dart';
 import 'package:feature_reports/src/domain/models/report_draft.dart';
 import 'package:feature_reports/src/domain/models/report_list_item.dart';
+import 'package:feature_reports/src/presentation/widgets/reports_list/report_moderation_display.dart';
 import 'package:flutter/material.dart';
 
 /// UI status chip for a report in sheets and cards (distinct from [ApiReportStatus]).
@@ -128,6 +129,7 @@ class ReportSheetViewModelMapper {
       severity: r.severity,
       createdAt: r.submittedAt,
       isOptimistic: r.isOptimistic,
+      declineReason: declineReasonFromApi(r.status, r.moderationReason),
     );
   }
 
@@ -182,6 +184,7 @@ class ReportSheetViewModelMapper {
       longitude: lng,
       siteId: siteId,
       isOptimistic: false,
+      declineReason: declineReasonFromApi(r.status, r.moderationReason),
     );
   }
 }

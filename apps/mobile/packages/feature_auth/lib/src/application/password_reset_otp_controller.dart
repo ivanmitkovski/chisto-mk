@@ -1,6 +1,7 @@
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/providers/app_providers.dart';
 import 'package:feature_auth/src/application/auth_form_state.dart';
+import 'package:feature_auth/src/domain/models/password_reset_target.dart';
 import 'package:feature_auth/src/presentation/constants/auth_otp_constants.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -42,13 +43,16 @@ class PasswordResetOtpController extends Notifier<PasswordResetOtpState> {
     }
   }
 
-  Future<void> verifyCode(String phoneE164, String code) async {
+  Future<void> verifyCode(PasswordResetTarget target, String code) async {
     if (state.otpLocked || state.isLoading) return;
     state = state.copyWith(isLoading: true, clearError: true);
     try {
-      await ref
-          .read(authRepositoryProvider)
-          .verifyPasswordResetCode(phoneE164, code);
+      final repo = ref.read(authRepositoryProvider);
+      if (target.isSms) {
+        await repo.verifyPasswordResetCode(target.value, code);
+      } else {
+        await repo.verifyPasswordResetCodeByEmail(target.value, code);
+      }
       state = state.copyWith(isLoading: false);
     } on AppError catch (e) {
       if (e.code == 'OTP_INVALID') {
@@ -67,10 +71,15 @@ class PasswordResetOtpController extends Notifier<PasswordResetOtpState> {
     }
   }
 
-  Future<void> resend(String phoneE164) async {
+  Future<void> resend(PasswordResetTarget target) async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
-      await ref.read(authRepositoryProvider).requestPasswordReset(phoneE164);
+      final repo = ref.read(authRepositoryProvider);
+      if (target.isSms) {
+        await repo.requestPasswordReset(target.value);
+      } else {
+        await repo.requestPasswordResetByEmail(target.value);
+      }
       state = state.copyWith(
         isLoading: false,
         verifyAttempts: 0,

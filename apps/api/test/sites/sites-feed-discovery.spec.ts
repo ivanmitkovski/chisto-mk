@@ -1,9 +1,9 @@
-import { FeedRankingService } from '../../src/sites/feed-ranking.service';
+import { FeedRankingService } from '../../src/sites/services/feed-ranking.service';
 import { SiteFeedGeoScope } from '../../src/sites/dto/list-sites-query.dto';
-import { SitesFeedCandidatesService } from '../../src/sites/sites-feed-candidates.service';
-import { SitesFeedEnrichmentService } from '../../src/sites/sites-feed-enrichment.service';
-import { SitesFeedQueryService } from '../../src/sites/sites-feed-query.service';
-import { SitesFeedService } from '../../src/sites/sites-feed.service';
+import { SitesFeedCandidatesService } from '../../src/sites/services/sites-feed-candidates.service';
+import { SitesFeedEnrichmentService } from '../../src/sites/services/sites-feed-enrichment.service';
+import { SitesFeedQueryService } from '../../src/sites/services/sites-feed-query.service';
+import { SitesFeedService } from '../../src/sites/services/sites-feed.service';
 
 function makeSiteRow(
   id: string,
@@ -35,6 +35,19 @@ function makeSiteRow(
     votes: [],
     saves: [],
     _count: { reports: 1 },
+  };
+}
+
+function emptyGroupBy() {
+  return jest.fn().mockResolvedValue([]);
+}
+
+function withVelocityPrisma(base: Record<string, unknown>) {
+  return {
+    ...base,
+    siteVote: { groupBy: emptyGroupBy() },
+    siteSave: { groupBy: emptyGroupBy() },
+    siteShareEvent: { groupBy: emptyGroupBy() },
   };
 }
 
@@ -98,9 +111,9 @@ describe('Sites feed discovery scope', () => {
       }
       return [nearSite, farSite];
     });
-    const prismaMock = {
+    const prismaMock = withVelocityPrisma({
       site: { findMany, count: jest.fn(async () => 1) },
-    } as any;
+    }) as any;
     const { findAll } = makeFeedStack(prismaMock);
 
     const result = await findAll({
@@ -127,9 +140,9 @@ describe('Sites feed discovery scope', () => {
       }
       return [farSite];
     });
-    const prismaMock = {
+    const prismaMock = withVelocityPrisma({
       site: { findMany, count: jest.fn(async () => 2) },
-    } as any;
+    }) as any;
     const { findAll } = makeFeedStack(prismaMock, new FeedRankingService());
 
     const result = await findAll({
@@ -148,9 +161,9 @@ describe('Sites feed discovery scope', () => {
 
   it('discovery ranks far high-engagement above near low-engagement', async () => {
     const findMany = jest.fn(async () => [nearSite, farSite]);
-    const prismaMock = {
+    const prismaMock = withVelocityPrisma({
       site: { findMany, count: jest.fn(async () => 2) },
-    } as any;
+    }) as any;
     const { findAll } = makeFeedStack(prismaMock, new FeedRankingService());
 
     const result = await findAll({
@@ -174,9 +187,9 @@ describe('Sites feed discovery scope', () => {
       }
       return [nearSite, farSite];
     });
-    const prismaMock = {
+    const prismaMock = withVelocityPrisma({
       site: { findMany, count: jest.fn(async () => 1) },
-    } as any;
+    }) as any;
     const { findAll } = makeFeedStack(prismaMock);
 
     const result = await findAll({
@@ -208,9 +221,9 @@ describe('SitesFeedCandidatesService discovery merge', () => {
       }
       return [freshSite, nearbySite];
     });
-    const prismaMock = {
+    const prismaMock = withVelocityPrisma({
       site: { findMany },
-    } as any;
+    }) as any;
     const service = new SitesFeedCandidatesService(prismaMock);
 
     const bundle = await service.loadCandidateSites(

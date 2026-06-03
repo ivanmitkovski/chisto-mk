@@ -1,6 +1,6 @@
 /// <reference types="jest" />
-import { buildOtpSmsBody, otpSmsLocaleFromHint } from '../../src/otp/otp-sms-body';
-import { OtpSmsPurpose } from '../../src/otp/otp-sender.interface';
+import { buildOtpSmsBody, otpSmsLocaleFromHint } from '../../src/otp/util/otp-sms-body';
+import { OtpSmsPurpose } from '../../src/otp/types/otp-sender.interface';
 
 describe('otpSmsLocaleFromHint', () => {
   it.each([

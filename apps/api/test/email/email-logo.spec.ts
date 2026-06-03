@@ -1,12 +1,12 @@
 /// <reference types="jest" />
 
-import { EMAIL_LOGO_CONTENT_ID } from '../../src/email/email.constants';
+import { EMAIL_LOGO_CONTENT_ID } from '../../src/email/constants/email.constants';
 import {
   resolveEmailLogo,
   resolveEmailLogoPreviewSrc,
   resetEmbeddedEmailLogoCache,
   resolveEmailLogoSrc,
-} from '../../src/email/email-logo';
+} from '../../src/email/util/email-logo';
 
 describe('email-logo', () => {
   beforeEach(() => {

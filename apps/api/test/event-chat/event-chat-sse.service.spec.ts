@@ -1,7 +1,7 @@
-import { EventChatClusterConfig } from '../../src/event-chat/event-chat-cluster.config';
-import { EventChatRoomEmitterService } from '../../src/event-chat/event-chat-room-emitter.service';
-import { EventChatSseService } from '../../src/event-chat/event-chat-sse.service';
-import { EventChatTelemetryService } from '../../src/event-chat/event-chat-telemetry.service';
+import { EventChatClusterConfig } from '../../src/event-chat/constants/event-chat-cluster.config';
+import { EventChatRoomEmitterService } from '../../src/event-chat/services/event-chat-room-emitter.service';
+import { EventChatSseService } from '../../src/event-chat/services/event-chat-sse.service';
+import { EventChatTelemetryService } from '../../src/event-chat/services/event-chat-telemetry.service';
 
 describe('EventChatSseService', () => {
   const originalRedis = process.env.REDIS_URL;

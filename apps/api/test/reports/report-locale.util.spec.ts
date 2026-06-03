@@ -1,4 +1,4 @@
-import { reportLocaleFromAcceptLanguage } from '../../src/reports/report-locale.util';
+import { reportLocaleFromAcceptLanguage } from '../../src/reports/util/report-locale.util';
 
 describe('reportLocaleFromAcceptLanguage', () => {
   it('defaults to mk when header is undefined', () => {

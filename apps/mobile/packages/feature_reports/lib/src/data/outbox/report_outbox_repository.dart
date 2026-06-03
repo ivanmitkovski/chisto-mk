@@ -3,9 +3,11 @@ import 'dart:convert';
 import 'package:chisto_infrastructure/core/logging/app_log.dart';
 
 import 'package:feature_reports/src/data/outbox/report_draft_json_codec.dart';
+import 'package:feature_reports/src/data/outbox/report_draft_summary_projector.dart';
 import 'package:feature_reports/src/data/outbox/report_outbox_constants.dart';
 import 'package:feature_reports/src/data/outbox/report_outbox_dao.dart';
 import 'package:feature_reports/src/data/outbox/report_outbox_database.dart';
+import 'package:feature_reports/src/domain/draft/report_idempotency_key.dart';
 import 'package:feature_reports/src/data/outbox/report_outbox_entry.dart';
 import 'package:feature_reports/src/domain/models/report_draft.dart';
 import 'package:sqflite/sqflite.dart';
@@ -15,6 +17,11 @@ abstract class ReportOutboxRepository {
   Future<void> update(ReportOutboxEntry entry);
   Future<ReportOutboxEntry?> getById(String id);
   Future<ReportOutboxEntry?> getNextProcessable();
+  Future<ReportOutboxEntry?> claimNextProcessable({
+    required String ownerId,
+    required Duration leaseDuration,
+  });
+  Future<void> releaseLease(String id);
   Future<ReportOutboxEntry?> getWizardDraftEntry();
   Future<int> countSubmitPipeline();
   Future<int> countAllRows();
@@ -128,6 +135,8 @@ class SqfliteReportOutboxRepository implements ReportOutboxRepository {
         row['attempted_stages_json'] as String?,
       ),
       lastPersistedAtMs: row['last_persisted_at_ms'] as int?,
+      processingOwner: row['processing_owner'] as String?,
+      processingLeaseUntilMs: row['processing_lease_until_ms'] as int?,
     );
   }
 
@@ -180,6 +189,8 @@ class SqfliteReportOutboxRepository implements ReportOutboxRepository {
           ? null
           : jsonEncode(e.attemptedStageNames),
       'last_persisted_at_ms': e.lastPersistedAtMs,
+      'processing_owner': e.processingOwner,
+      'processing_lease_until_ms': e.processingLeaseUntilMs,
     };
   }
 
@@ -215,6 +226,28 @@ class SqfliteReportOutboxRepository implements ReportOutboxRepository {
   }
 
   @override
+  Future<ReportOutboxEntry?> claimNextProcessable({
+    required String ownerId,
+    required Duration leaseDuration,
+  }) async {
+    final int now = DateTime.now().millisecondsSinceEpoch;
+    final Map<String, Object?>? row = await _dao.rawClaimNextProcessable(
+      nowMs: now,
+      ownerId: ownerId,
+      leaseUntilMs: now + leaseDuration.inMilliseconds,
+    );
+    if (row == null) {
+      return null;
+    }
+    return _fromRow(row);
+  }
+
+  @override
+  Future<void> releaseLease(String id) async {
+    await _dao.rawReleaseLease(id);
+  }
+
+  @override
   Future<ReportOutboxEntry?> getWizardDraftEntry() async {
     return getById(kReportWizardDraftRowId);
   }
@@ -244,6 +277,9 @@ class SqfliteReportOutboxRepository implements ReportOutboxRepository {
       final ReportOutboxEntry? existing = existingRows.isEmpty
           ? null
           : _fromRow(existingRows.first);
+      if (existing != null && isReportWizardDraftTerminalSubmit(existing)) {
+        return;
+      }
       if (existing == null) {
         final ReportOutboxEntry entry = ReportOutboxEntry(
           id: kReportWizardDraftRowId,
@@ -315,9 +351,6 @@ class SqfliteReportOutboxRepository implements ReportOutboxRepository {
     final String safeDescription = description.trim();
     await _dao.runTransaction((Transaction txn) async {
       final int pipelineCount = await _dao.rawCountSubmitPipelineTxn(txn);
-      if (pipelineCount > 0) {
-        throw StateError('An in-flight report submission already exists.');
-      }
 
       final List<Map<String, Object?>> existingRows = await _dao.queryByIdTxn(
         txn,
@@ -325,6 +358,9 @@ class SqfliteReportOutboxRepository implements ReportOutboxRepository {
       );
       ReportOutboxEntry wizard;
       if (existingRows.isEmpty) {
+        if (pipelineCount > 0) {
+          throw StateError('An in-flight report submission already exists.');
+        }
         wizard = ReportOutboxEntry(
           id: kReportWizardDraftRowId,
           idempotencyKey: wizardDraftPlaceholderIdempotencyKey(),
@@ -346,6 +382,44 @@ class SqfliteReportOutboxRepository implements ReportOutboxRepository {
         wizard = _fromRow(existingRows.first);
       }
 
+      final String pipelineIdempotencyKey = _pipelineIdempotencyKey(
+        wizard: wizard,
+        requested: idempotencyKey,
+      );
+
+      if (pipelineCount > 0) {
+        if (!wizard.occupiesSubmitPipeline) {
+          throw StateError('An in-flight report submission already exists.');
+        }
+        if (wizard.state == ReportOutboxState.failed) {
+          wizard = wizard.copyWith(
+            state: ReportOutboxState.pending,
+            attemptCount: 0,
+            clearLastError: true,
+            clearCooldownUntil: true,
+          );
+        }
+        await txn.update(
+          ReportOutboxDatabase.tableOutbox,
+          _toRow(
+            wizard.copyWith(
+              draft: draft,
+              title: safeTitle,
+              description: safeDescription,
+              idempotencyKey: pipelineIdempotencyKey,
+              submitRequested: true,
+              clearMediaUrls: true,
+              clearLastError: true,
+              clearCooldownUntil: true,
+              updatedAtMs: now,
+            ),
+          ),
+          where: 'id = ?',
+          whereArgs: <Object>[kReportWizardDraftRowId],
+        );
+        return;
+      }
+
       if (wizard.state == ReportOutboxState.failed) {
         wizard = wizard.copyWith(
           state: ReportOutboxState.pending,
@@ -362,7 +436,7 @@ class SqfliteReportOutboxRepository implements ReportOutboxRepository {
             draft: draft,
             title: safeTitle,
             description: safeDescription,
-            idempotencyKey: idempotencyKey,
+            idempotencyKey: pipelineIdempotencyKey,
             submitRequested: true,
             state: ReportOutboxState.pending,
             attemptCount: 0,
@@ -377,4 +451,17 @@ class SqfliteReportOutboxRepository implements ReportOutboxRepository {
       );
     });
   }
+}
+
+/// Keeps the first valid submit key when a second enqueue races the pipeline.
+String _pipelineIdempotencyKey({
+  required ReportOutboxEntry wizard,
+  required String requested,
+}) {
+  final String existing = wizard.idempotencyKey;
+  if (!isWizardDraftPlaceholderIdempotencyKey(existing) &&
+      ReportIdempotencyKey.isValidShape(existing)) {
+    return existing;
+  }
+  return requested;
 }

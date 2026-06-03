@@ -1,4 +1,4 @@
-import { ReportSubmitIdempotencyCleanupService } from '../../src/reports/report-submit-idempotency-cleanup.service';
+import { ReportSubmitIdempotencyCleanupService } from '../../src/reports/services/report-submit-idempotency-cleanup.service';
 
 describe('ReportSubmitIdempotencyCleanupService', () => {
   const prisma = {

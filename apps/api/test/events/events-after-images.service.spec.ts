@@ -3,9 +3,9 @@
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { CleanupEventStatus } from '../../src/prisma-client';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
-import { EventsAfterImagesService } from '../../src/events/events-after-images.service';
-import { EventsMobileMapperService } from '../../src/events/events-mobile-mapper.service';
-import { EventsRepository } from '../../src/events/events.repository';
+import { EventsAfterImagesService } from '../../src/events/services/events-after-images.service';
+import { EventsMobileMapperService } from '../../src/events/services/events-mobile-mapper.service';
+import { EventsRepository } from '../../src/events/repositories/events.repository';
 
 function auth(userId: string): AuthenticatedUser {
   return {

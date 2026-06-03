@@ -1,7 +1,7 @@
 /// <reference types="jest" />
 
-import { EMAIL_BRAND } from '../../src/email/email.constants';
-import { EmailTemplateService } from '../../src/email/email-template.service';
+import { EMAIL_BRAND } from '../../src/email/constants/email.constants';
+import { EmailTemplateService } from '../../src/email/services/email-template.service';
 
 describe('EmailTemplateService', () => {
   let svc: EmailTemplateService;

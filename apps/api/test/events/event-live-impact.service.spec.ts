@@ -3,9 +3,9 @@
 import { NotFoundException } from '@nestjs/common';
 import { Role } from '../../src/prisma-client';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
-import { EventCheckInRoomEmitterService } from '../../src/events/event-check-in-room-emitter.service';
-import { EventLiveImpactEventsService } from '../../src/events/event-live-impact-events.service';
-import { EventLiveImpactService } from '../../src/events/event-live-impact.service';
+import { EventCheckInRoomEmitterService } from '../../src/events/services/event-check-in-room-emitter.service';
+import { EventLiveImpactEventsService } from '../../src/events/services/event-live-impact-events.service';
+import { EventLiveImpactService } from '../../src/events/services/event-live-impact.service';
 import { PrismaService } from '../../src/prisma/prisma.service';
 
 function user(): AuthenticatedUser {

@@ -1,14 +1,6 @@
 import 'package:feature_events/src/domain/models/eco_event.dart';
 import 'package:flutter/material.dart';
 
-extension EcoEventCategoryUI on EcoEventCategory {
-  IconData get icon => IconData(iconCodePoint, fontFamily: 'MaterialIcons');
-}
-
-extension EventGearUI on EventGear {
-  IconData get icon => IconData(iconCodePoint, fontFamily: 'MaterialIcons');
-}
-
 extension EventDifficultyUI on EventDifficulty {
   Color get color => Color(colorValue);
 }
