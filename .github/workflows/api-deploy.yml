@@ -46,13 +46,26 @@ jobs:
       - name: Smoke health (no DB)
         run: |
           docker run -d --name api-smoke \
+            -e NODE_ENV=test \
             -e DATABASE_URL=postgresql://u:p@127.0.0.1:5432/db \
             -e JWT_SECRET=01234567890123456789012345678901 \
             -e SKIP_MIGRATE_STATUS_CHECK=1 \
             -p 3099:3000 \
             chisto-api:${{ github.sha }}
-          sleep 4
-          curl -sf http://127.0.0.1:3099/health
+          ok=0
+          for _ in $(seq 1 30); do
+            if curl -sf http://127.0.0.1:3099/health >/dev/null; then
+              ok=1
+              break
+            fi
+            sleep 2
+          done
+          if [ "$ok" != "1" ]; then
+            echo "::error::GET /health did not return 200 within 60s"
+            docker logs api-smoke 2>&1 || true
+            docker rm -f api-smoke
+            exit 1
+          fi
           docker rm -f api-smoke
 
   push-ecr:
