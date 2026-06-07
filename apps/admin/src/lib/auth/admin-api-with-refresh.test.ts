@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { NextRequest } from 'next/server';
-import { ADMIN_AUTH_COOKIE_KEY, ADMIN_CSRF_HEADER, ADMIN_REFRESH_COOKIE_KEY } from '@/lib/auth/auth-constants';
+import { ADMIN_AUTH_COOKIE_KEY, ADMIN_CSRF_HEADER, ADMIN_REFRESH_COOKIE_KEY, ADMIN_REMEMBER_DEVICE_COOKIE_KEY } from '@/lib/auth/auth-constants';
+import { REFRESH_COOKIE_REMEMBER_MAX_AGE } from './admin-session';
 import {
   createBackendProxyHeaders,
   fetchBackendWithRefresh,
@@ -72,8 +73,8 @@ describe('fetchBackendWithRefresh', () => {
     vi.stubGlobal('fetch', fetchMock);
 
     vi.spyOn(await import('./admin-session'), 'refreshAdminTokens').mockResolvedValue({
-      accessToken: 'fresh-access',
-      refreshToken: 'fresh-refresh',
+      ok: true,
+      tokens: { accessToken: 'fresh-access', refreshToken: 'fresh-refresh' },
     });
 
     const request = requestWithCookies(
@@ -88,13 +89,39 @@ describe('fetchBackendWithRefresh', () => {
     expect(nextResponse.headers.getSetCookie().join('\n')).toContain(ADMIN_AUTH_COOKIE_KEY);
   });
 
+  it('preserves remember refresh maxAge after 401 refresh retry', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify({ code: 'UNAUTHORIZED' }), { status: 401 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    vi.spyOn(await import('./admin-session'), 'refreshAdminTokens').mockResolvedValue({
+      ok: true,
+      tokens: { accessToken: 'fresh-access', refreshToken: 'fresh-refresh' },
+    });
+
+    const request = requestWithCookies(
+      `${ADMIN_AUTH_COOKIE_KEY}=stale-access; ${ADMIN_REFRESH_COOKIE_KEY}=refresh-token; ${ADMIN_REMEMBER_DEVICE_COOKIE_KEY}=1`,
+      'https://admin.chisto.mk/api/auth/me',
+    );
+
+    const { nextResponse } = await fetchBackendWithRefresh('/auth/me', request, { method: 'GET' });
+
+    expect(nextResponse.status).toBe(200);
+    expect(nextResponse.headers.getSetCookie().join('\n')).toContain(`Max-Age=${REFRESH_COOKIE_REMEMBER_MAX_AGE}`);
+  });
+
   it('clears auth cookies when refresh fails after 401', async () => {
     const fetchMock = vi
       .fn()
       .mockResolvedValue(new Response(JSON.stringify({ code: 'UNAUTHORIZED' }), { status: 401 }));
     vi.stubGlobal('fetch', fetchMock);
 
-    vi.spyOn(await import('./admin-session'), 'refreshAdminTokens').mockResolvedValue(null);
+    vi.spyOn(await import('./admin-session'), 'refreshAdminTokens').mockResolvedValue({
+      ok: false,
+      reason: 'unauthorized',
+    });
 
     const request = requestWithCookies(
       `${ADMIN_AUTH_COOKIE_KEY}=stale-access; ${ADMIN_REFRESH_COOKIE_KEY}=refresh-token`,

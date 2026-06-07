@@ -1,6 +1,7 @@
 import { fetchWithTimeout } from '../common/resilience/fetch-with-timeout';
 import { legacySnapshotGauges, metricsPushFailedTotal } from './util/prom-registry';
 import * as CleanupEventsRecorder from './recorders/cleanup-events.recorder';
+import * as EmailRecorder from './recorders/email.recorder';
 import * as FeedRecorder from './recorders/feed.recorder';
 import * as MapRecorder from './recorders/map.recorder';
 import * as MiscRecorder from './recorders/misc.recorder';
@@ -131,6 +132,7 @@ export class ObservabilityStore {
   static recordMapZoomTierRequest = MapRecorder.recordMapZoomTierRequest;
   static recordMapQueryRowCount = MapRecorder.recordMapQueryRowCount;
   static setPushQueueStats = PushRecorder.setPushQueueStats;
+  static setEmailQueueStats = EmailRecorder.setEmailQueueStats;
 
   static syncLegacyPromGauges(): void {
     const snap = this.snapshot();
@@ -147,6 +149,7 @@ export class ObservabilityStore {
       ...RequestRecorder.snapshot(),
       ...FeedRecorder.snapshot(),
       ...PushRecorder.snapshot(),
+      ...EmailRecorder.snapshot(),
       ...MapRecorder.snapshot(),
       ...ShareRecorder.snapshot(),
       ...ReportsRecorder.snapshot(),

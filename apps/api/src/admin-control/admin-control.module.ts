@@ -5,6 +5,7 @@ import { EmailModule } from '../email/email.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { GamificationModule } from '../gamification/gamification.module';
 import { ReportsModule } from '../reports/reports.module';
+import { StorageModule } from '../storage/storage.module';
 import { AdminBroadcastsController } from './controllers/admin-broadcasts.controller';
 import { AdminGamificationController } from './controllers/admin-gamification.controller';
 import { AdminAppConfigController } from './controllers/admin-app-config.controller';
@@ -16,9 +17,10 @@ import { AdminBroadcastScheduleWorkerService } from './services/admin-broadcast-
 import { AdminGamificationService } from './services/admin-gamification.service';
 import { AdminAppConfigService } from './services/admin-app-config.service';
 import { AdminCommsService } from './services/admin-comms.service';
+import { OperationsStatusService } from './services/operations-status.service';
 
 @Module({
-  imports: [PrismaModule, AuditModule, EmailModule, NotificationsModule, GamificationModule, ReportsModule],
+  imports: [PrismaModule, AuditModule, EmailModule, NotificationsModule, GamificationModule, ReportsModule, StorageModule],
   controllers: [
     AdminBroadcastsController,
     AdminGamificationController,
@@ -33,6 +35,7 @@ import { AdminCommsService } from './services/admin-comms.service';
     AdminGamificationService,
     AdminAppConfigService,
     AdminCommsService,
+    OperationsStatusService,
   ],
 })
 export class AdminControlModule {}

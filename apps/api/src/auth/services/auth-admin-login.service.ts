@@ -118,13 +118,16 @@ export class AuthAdminLoginService {
       })
       .catch((err) => recordAuditWriteFailure('ADMIN_LOGIN_SUCCESS', err));
 
-    return this.sessionService.buildAuthResponse(user, true, { deviceId: dto.deviceId });
+    return this.sessionService.buildAuthResponse(user, dto.rememberMe !== false, {
+      deviceId: dto.deviceId,
+    });
   }
 
   async completeAdmin2FALogin(
     tempToken: string,
     code: string,
     deviceId?: string,
+    rememberMe?: boolean,
   ): Promise<AuthResponse> {
     const trimmedToken = tempToken.trim();
     const trimmedCode = code.trim();
@@ -225,7 +228,7 @@ export class AuthAdminLoginService {
         message: 'User not found',
       });
     }
-    return this.sessionService.buildAuthResponse(freshUser, true, { deviceId });
+    return this.sessionService.buildAuthResponse(freshUser, rememberMe !== false, { deviceId });
   }
 
   private async recordAdminLoginFailure(email: string): Promise<void> {

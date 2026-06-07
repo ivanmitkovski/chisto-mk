@@ -5,8 +5,10 @@ import { NOTIFICATION_OUTBOX_ENQUEUED_CHANNEL } from '../../common/pg/outbox-pg-
 import { endPgOutboxListener, startPgOutboxListener } from '../../common/pg/start-pg-outbox-listener';
 import { FcmPushService } from './fcm-push.service';
 import { PushDeliveryOutboxService } from './push-delivery-outbox.service';
+import { WorkerHeartbeatRegistry } from '../../observability/worker-heartbeat.registry';
 
 const POLL_ACTIVE_MS = 5_000;
+const WORKER_NAME = 'push-delivery';
 const POLL_IDLE_MAX_MS = 60_000;
 const POLL_SAFETY_LISTEN_IDLE_MS = 60_000;
 
@@ -33,12 +35,14 @@ export class PushDeliveryWorkerService implements OnModuleInit, OnModuleDestroy 
     }
 
     void this.startPgListener();
+    WorkerHeartbeatRegistry.markStarted({ name: WORKER_NAME, intervalMs: POLL_ACTIVE_MS });
     this.scheduleNextTick(2_000);
     this.logger.log('Push delivery worker started');
   }
 
   async onModuleDestroy() {
     this.shuttingDown = true;
+    WorkerHeartbeatRegistry.markStopped(WORKER_NAME);
     if (this.listenWakeTimer) {
       clearTimeout(this.listenWakeTimer);
       this.listenWakeTimer = null;
@@ -96,8 +100,13 @@ export class PushDeliveryWorkerService implements OnModuleInit, OnModuleDestroy 
     let delivered = 0;
     try {
       delivered = await this.outbox.processOutbox(this.workerId);
+      WorkerHeartbeatRegistry.record(WORKER_NAME, { ok: true });
     } catch (err) {
       this.logger.error('Outbox processing error', err);
+      WorkerHeartbeatRegistry.record(WORKER_NAME, {
+        ok: false,
+        error: err instanceof Error ? err.message : String(err),
+      });
     }
     if (delivered > 0) {
       this.consecutiveIdleTicks = 0;

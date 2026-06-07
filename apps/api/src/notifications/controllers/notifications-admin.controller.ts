@@ -14,6 +14,11 @@ import { NotificationInboxService } from '../services/notification-inbox.service
 import { NotificationDispatcherService } from '../services/notification-dispatcher.service';
 import { NotificationType } from '../../prisma-client';
 import { ObservabilityStore } from '../../observability/observability.store';
+import {
+  DeadLetterPageDto,
+  DeliveryReportDto,
+  PushStatsDto,
+} from '../dto/push-operations.dto';
 import { ApiStandardHttpErrorResponses } from '../../common/openapi/standard-http-error-responses.decorator';
 
 @ApiTags('notifications')
@@ -48,8 +53,8 @@ export class NotificationsAdminController {
   @Get('admin/push-stats')
   @RequirePermission(ADMIN_PERMISSIONS['operations:read'])
   @ApiOperation({ summary: 'Push delivery statistics (admin only)' })
-  @ApiOkResponse({ description: 'Push delivery stats' })
-  pushStats() {
+  @ApiOkResponse({ type: PushStatsDto })
+  pushStats(): PushStatsDto {
     const s = ObservabilityStore.snapshot();
     return {
       sendsTotal: s.pushSendsTotal,
@@ -69,8 +74,8 @@ export class NotificationsAdminController {
   @Get('admin/delivery-report')
   @RequirePermission(ADMIN_PERMISSIONS['operations:read'])
   @ApiOperation({ summary: 'Push delivery funnel (admin only)' })
-  @ApiOkResponse({ description: 'Delivery and open metrics' })
-  async deliveryReport() {
+  @ApiOkResponse({ type: DeliveryReportDto })
+  async deliveryReport(): Promise<DeliveryReportDto> {
     const s = ObservabilityStore.snapshot();
     const [sent, opened] = await Promise.all([
       this.inbox.countSentNotifications(),
@@ -101,7 +106,7 @@ export class NotificationsAdminController {
   @Get('admin/dead-letters')
   @RequirePermission(ADMIN_PERMISSIONS['operations:read'])
   @ApiOperation({ summary: 'List dead-letter push outbox entries (admin only)' })
-  @ApiOkResponse({ description: 'Dead-letter queue entries' })
+  @ApiOkResponse({ type: DeadLetterPageDto })
   deadLetters(
     @Query('page') page?: string,
     @Query('limit') limit?: string,

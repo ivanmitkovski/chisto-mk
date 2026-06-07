@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 import { getTranslations } from 'next-intl/server';
 import { AdminShell } from '@/features/admin-shell';
 import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell';
-import { OperationsWorkspace } from '@/features/operations';
+import { OperationsLiveProvider, OperationsWorkspace } from '@/features/operations';
 import { getOperationsSnapshot } from '@/features/operations';
 import { ADMIN_PERMISSIONS } from '@/lib/auth/rbac/permissions';
 import { requirePagePermission } from '@/lib/auth/rbac/server';
@@ -17,7 +17,9 @@ export default async function OperationsPage() {
 
   return (
     <AdminShell title={t('pageTitle')} activeItem="operations" initialSidebarCollapsed={initialSidebarCollapsed}>
-      <OperationsWorkspace snapshot={snapshot} />
+      <OperationsLiveProvider>
+        <OperationsWorkspace snapshot={snapshot} />
+      </OperationsLiveProvider>
     </AdminShell>
   );
 }

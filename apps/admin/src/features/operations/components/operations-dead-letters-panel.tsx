@@ -2,9 +2,10 @@
 
 import { useCallback, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Pagination, SectionState } from '@/components/ui';
+import { EmptyState, Pagination, SectionState } from '@/components/ui';
 import { adminBrowserFetch } from '@/lib/api';
 import { formatAdminDateTime, useAdminBcp47Locale } from '@/lib/i18n';
+import { OPS_DEAD_LETTERS_PAGE_SIZE } from '../config';
 import styles from './operations-workspace.module.css';
 
 type DeadLetterRow = {
@@ -22,8 +23,6 @@ type DeadLettersResponse = {
   data: DeadLetterRow[];
   meta: { page: number; limit: number; total: number };
 };
-
-const PAGE_SIZE = 5;
 
 export function OperationsDeadLettersPanel({
   initialData,
@@ -45,7 +44,7 @@ export function OperationsDeadLettersPanel({
     setError(null);
     try {
       const response = await adminBrowserFetch<DeadLettersResponse>(
-        `/notifications/admin/dead-letters?page=${nextPage}&limit=${PAGE_SIZE}`,
+        `/notifications/admin/dead-letters?page=${nextPage}&limit=${OPS_DEAD_LETTERS_PAGE_SIZE}`,
         { method: 'GET' },
       );
       setRows(response.data);
@@ -65,7 +64,9 @@ export function OperationsDeadLettersPanel({
   return (
     <>
       <p>{t('metrics.deadLettersTotal', { count: meta.total })}</p>
-      {rows.length > 0 ? (
+      {rows.length === 0 ? (
+        <EmptyState title={t('deadLetters.emptyTitle')} description={t('deadLetters.emptyDescription')} />
+      ) : (
         <ul className={styles.deadLetterList} aria-busy={loading}>
           {rows.map((row) => (
             <li key={row.id} className={styles.deadLetterItem}>
@@ -80,7 +81,7 @@ export function OperationsDeadLettersPanel({
             </li>
           ))}
         </ul>
-      ) : null}
+      )}
       {meta.total > meta.limit ? (
         <div className={styles.deadLetterPagination}>
           <Pagination

@@ -129,8 +129,118 @@ describe('PushDeliveryWorkerService', () => {
         data: expect.objectContaining({
           nextRetryAt: expect.any(Date),
           lastErrorCode: 'FCM_SEND_FAILED',
+          lastErrorMessage: 'FCM error FCM_SEND_FAILED after attempt 2',
           processingAt: null,
           leaseOwner: null,
+        }),
+      }),
+    );
+  });
+
+  it('persists real FCM error code on transient send failure', async () => {
+    const prisma = makePrisma() as any;
+    const fcm = makeFcm() as any;
+
+    prisma.notificationOutbox.count.mockResolvedValue(0);
+    prisma.notificationOutbox.findMany
+      .mockResolvedValueOnce([
+        {
+          id: 'out_3',
+          userNotificationId: 'n_3',
+          deviceToken: 'token-servererr',
+          payload: { title: 'T', body: 'B', data: {} },
+          attempts: 2,
+          lastAttemptAt: null,
+          deliveredAt: null,
+          failedPermanently: false,
+        },
+      ])
+      .mockResolvedValueOnce([
+        {
+          id: 'out_3',
+          userNotificationId: 'n_3',
+          deviceToken: 'token-servererr',
+          payload: { title: 'T', body: 'B', data: {} },
+          attempts: 2,
+          lastAttemptAt: null,
+          deliveredAt: null,
+          failedPermanently: false,
+        },
+      ]);
+    prisma.notificationOutbox.updateMany.mockResolvedValue({ count: 1 });
+    fcm.sendToToken.mockResolvedValue({
+      success: false,
+      shouldRevoke: false,
+      errorCode: 'messaging/server-unavailable',
+    });
+
+    const sender = new PushDeliverySenderService(prisma, fcm);
+    const outbox = new PushDeliveryOutboxService(prisma, fcm, sender);
+    const service = new PushDeliveryWorkerService(fcm, outbox);
+    await service.processOutbox();
+
+    expect(prisma.notificationOutbox.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 'out_3' },
+        data: expect.objectContaining({
+          lastErrorCode: 'messaging/server-unavailable',
+          lastErrorMessage: 'FCM error messaging/server-unavailable after attempt 3',
+        }),
+      }),
+    );
+  });
+
+  it('revokes token immediately on mismatched-credential without retry increment path', async () => {
+    const prisma = makePrisma() as any;
+    const fcm = makeFcm() as any;
+
+    prisma.notificationOutbox.count.mockResolvedValue(0);
+    prisma.notificationOutbox.findMany
+      .mockResolvedValueOnce([
+        {
+          id: 'out_4',
+          userNotificationId: 'n_4',
+          deviceToken: 'token-mismatch',
+          payload: { title: 'T', body: 'B', data: {} },
+          attempts: 0,
+          lastAttemptAt: null,
+          deliveredAt: null,
+          failedPermanently: false,
+        },
+      ])
+      .mockResolvedValueOnce([
+        {
+          id: 'out_4',
+          userNotificationId: 'n_4',
+          deviceToken: 'token-mismatch',
+          payload: { title: 'T', body: 'B', data: {} },
+          attempts: 0,
+          lastAttemptAt: null,
+          deliveredAt: null,
+          failedPermanently: false,
+        },
+      ]);
+    prisma.notificationOutbox.updateMany.mockResolvedValue({ count: 1 });
+    fcm.sendToToken.mockResolvedValue({
+      success: false,
+      shouldRevoke: true,
+      errorCode: 'messaging/mismatched-credential',
+    });
+
+    const sender = new PushDeliverySenderService(prisma, fcm);
+    const outbox = new PushDeliveryOutboxService(prisma, fcm, sender);
+    const service = new PushDeliveryWorkerService(fcm, outbox);
+    await service.processOutbox();
+
+    expect(fcm.revokeToken).toHaveBeenCalledWith('token-mismatch');
+    expect(fcm.incrementFailureCount).not.toHaveBeenCalled();
+    expect(prisma.notificationOutbox.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 'out_4' },
+        data: expect.objectContaining({
+          failedPermanently: true,
+          lastErrorCode: 'messaging/mismatched-credential',
+          lastErrorMessage: 'Push token revoked or invalid (messaging/mismatched-credential)',
         }),
       }),
     );

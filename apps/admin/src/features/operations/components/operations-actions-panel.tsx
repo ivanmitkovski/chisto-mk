@@ -6,6 +6,8 @@ import { Button, useToast } from '@/components/ui';
 import { ActionConfirmModal } from '@/features/reports/components/action-confirm-modal';
 import { Can } from '@/lib/auth/rbac';
 import { adminBrowserFetch } from '@/lib/api';
+import { OperationsDiagnosticsDrawer } from './operations-diagnostics-drawer';
+import { OperationsMetricsDrawer } from './operations-metrics-drawer';
 import styles from './operations-actions-panel.module.css';
 
 export function OperationsActionsPanel() {
@@ -43,17 +45,8 @@ export function OperationsActionsPanel() {
             {t('testPush.button')}
           </Button>
         </Can>
-        <a className="btnLink" href="/api/diag/backend" target="_blank" rel="noreferrer">
-          {t('links.backendDiag')}
-        </a>
-        <a
-          className="btnLink"
-          href={`${process.env.NEXT_PUBLIC_API_ORIGIN ?? 'http://localhost:3000'}/metrics`}
-          target="_blank"
-          rel="noreferrer"
-        >
-          {t('links.prometheusMetrics')}
-        </a>
+        <OperationsDiagnosticsDrawer />
+        <OperationsMetricsDrawer />
       </div>
 
       <ActionConfirmModal

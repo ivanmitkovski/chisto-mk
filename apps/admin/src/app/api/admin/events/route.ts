@@ -8,6 +8,7 @@ import {
   getAdminAccessToken,
   getAdminRefreshToken,
   getOrCreateAdminDeviceId,
+  isRememberDeviceEnabled,
   refreshAdminTokens,
   setAdminAuthCookies,
 } from '@/lib/auth';
@@ -20,12 +21,14 @@ export async function GET(request: NextRequest) {
   let accessToken = getAdminAccessToken(request);
   const refreshToken = getAdminRefreshToken(request);
   const deviceId = getOrCreateAdminDeviceId(request);
-  let refreshedTokens: Awaited<ReturnType<typeof refreshAdminTokens>> = null;
+  let refreshedTokens: Extract<Awaited<ReturnType<typeof refreshAdminTokens>>, { ok: true }> | null =
+    null;
 
   if (!accessToken && refreshToken) {
-    refreshedTokens = await refreshAdminTokens(refreshToken, deviceId);
-    if (refreshedTokens) {
-      accessToken = refreshedTokens.accessToken;
+    const result = await refreshAdminTokens(refreshToken, deviceId);
+    if (result.ok) {
+      refreshedTokens = result;
+      accessToken = result.tokens.accessToken;
     }
   }
 
@@ -66,13 +69,22 @@ export async function GET(request: NextRequest) {
   }
 
   if (backendResponse.status === 401 && refreshToken) {
-    refreshedTokens = await refreshAdminTokens(refreshToken, deviceId);
-    if (refreshedTokens) {
+    const result = await refreshAdminTokens(refreshToken, deviceId);
+    if (result.ok) {
+      refreshedTokens = result;
       try {
-        backendResponse = await run(refreshedTokens.accessToken);
+        backendResponse = await run(result.tokens.accessToken);
       } catch (error) {
         return bffConnectionErrorResponse(request, error);
       }
+    } else if (result.reason === 'unauthorized') {
+      const response = NextResponse.json(
+        { code: 'UNAUTHORIZED', message: 'Admin session expired. Please sign in again.' },
+        { status: 401 },
+      );
+      clearAdminAuthCookies(response, request);
+      ensureAdminCsrfCookie(request, response);
+      return response;
     }
   }
 
@@ -95,7 +107,10 @@ export async function GET(request: NextRequest) {
   });
 
   if (refreshedTokens) {
-    setAdminAuthCookies(response, refreshedTokens, request, { deviceId });
+    setAdminAuthCookies(response, refreshedTokens.tokens, request, {
+      rememberDevice: isRememberDeviceEnabled(request),
+      deviceId,
+    });
   }
   ensureAdminCsrfCookie(request, response);
   return response;
