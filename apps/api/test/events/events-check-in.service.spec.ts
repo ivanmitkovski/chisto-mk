@@ -124,6 +124,8 @@ describe('EventsCheckInService', () => {
       emitSpan: jest.fn(),
       emitAudit: jest.fn(),
     };
+    const moderationEmailNotifier = { notify: jest.fn() };
+    const checkInRiskSignalRealtime = { emitCreated: jest.fn() };
     prisma = {
       cleanupEvent: {
         findFirst: jest.fn(),
@@ -164,6 +166,8 @@ describe('EventsCheckInService', () => {
         checkInGateway as never,
         reportsUpload as never,
         checkInTelemetry as never,
+        moderationEmailNotifier as never,
+        checkInRiskSignalRealtime as never,
       ),
       new EventsCheckInResolveService(
         repo,

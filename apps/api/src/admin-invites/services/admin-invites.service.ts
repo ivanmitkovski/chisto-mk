@@ -19,6 +19,7 @@ import {
 } from '../../auth/constants/auth.constants';
 import { AUTH_ENV_RUNTIME, type AuthEnvRuntime } from '../../auth/constants/auth-env.config';
 import { CreateAdminInviteDto } from '../dto/create-admin-invite.dto';
+import { buildAdminAcceptInviteUrl } from '../../email/util/admin-app-url';
 
 const STAFF_ROLES: Role[] = [Role.SUPPORT, Role.ADMIN, Role.SUPER_ADMIN];
 
@@ -250,13 +251,7 @@ export class AdminInvitesService {
   }
 
   private buildInviteUrl(id: string, token: string): string {
-    const base =
-      this.config.get<string>('ADMIN_APP_BASE_URL')?.replace(/\/+$/, '') ??
-      'http://localhost:3001';
-    const url = new URL('/accept-invite', base);
-    url.searchParams.set('id', id);
-    url.searchParams.set('token', token);
-    return url.toString();
+    return buildAdminAcceptInviteUrl(this.config, id, token);
   }
 
   private async sendInviteEmail(

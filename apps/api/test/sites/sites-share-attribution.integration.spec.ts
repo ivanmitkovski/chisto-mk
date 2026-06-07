@@ -21,8 +21,10 @@ describe('Share attribution controller/service integration', () => {
       getAdminMapTimeline: jest.fn(),
     } as unknown as SitesMapFacadeService;
     const sitesSavedList = { listSavedForUser: jest.fn() } as never;
+    const sitesAdminList = { list: jest.fn() } as never;
     const controller = new SitesController(
       sitesAdmin,
+      sitesAdminList,
       sitesFeed,
       sitesSavedList,
       siteEngagement,

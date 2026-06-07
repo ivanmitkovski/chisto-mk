@@ -8,6 +8,8 @@ import { CleanupEventsAnalyticsService } from '../../src/cleanup-events/services
 import { CleanupEventsListService } from '../../src/cleanup-events/services/cleanup-events-list.service';
 import { CleanupEventsBulkModerateMutationService } from '../../src/cleanup-events/services/cleanup-events-mutation-bulk.service';
 import { CleanupEventsCheckInRiskSignalsService } from '../../src/cleanup-events/services/cleanup-events-check-in-risk-signals.service';
+import { CleanupEventsModerationNotesService } from '../../src/cleanup-events/services/cleanup-events-moderation-notes.service';
+import { CleanupEventsParticipantsAdminService } from '../../src/cleanup-events/services/cleanup-events-participants-admin.service';
 import { CleanupEventsCreateMutationService } from '../../src/cleanup-events/services/cleanup-events-mutation-create.service';
 import { CleanupEventsPatchMutationService } from '../../src/cleanup-events/services/cleanup-events-mutation-patch.service';
 import { CleanupEventsMutationsService } from '../../src/cleanup-events/services/cleanup-events-mutations.service';
@@ -85,6 +87,7 @@ describe('CleanupEventsService duplicate schedule', () => {
     prisma.cleanupEvent.findUnique.mockResolvedValue({
       id: 'new-1',
       createdAt: new Date('2025-01-01T00:00:00.000Z'),
+      updatedAt: new Date('2025-01-01T00:00:00.000Z'),
       title: 'Cleanup event',
       description: '',
       siteId: 'site-1',
@@ -135,7 +138,10 @@ describe('CleanupEventsService duplicate schedule', () => {
       cleanupEventNotifications as never,
       list,
     );
-    const riskSignals = new CleanupEventsCheckInRiskSignalsService(prisma as never);
+    const riskSignals = new CleanupEventsCheckInRiskSignalsService(
+      prisma as never,
+      { emitUpdated: jest.fn() } as never,
+    );
     const mutations = new CleanupEventsMutationsService(
       createMutation,
       patchMutation,
@@ -143,7 +149,13 @@ describe('CleanupEventsService duplicate schedule', () => {
       riskSignals,
     );
     const analytics = new CleanupEventsAnalyticsService(prisma as never, audit as never);
-    service = new CleanupEventsService(list, mutations, analytics);
+    const notes = new CleanupEventsModerationNotesService(prisma as never, audit as never);
+    const participantsAdmin = new CleanupEventsParticipantsAdminService(
+      prisma as never,
+      audit as never,
+      list,
+    );
+    service = new CleanupEventsService(list, mutations, analytics, notes, participantsAdmin);
   });
 
   it('throws ConflictException on create when conflict exists', async () => {
@@ -197,6 +209,7 @@ describe('CleanupEventsService duplicate schedule', () => {
     prisma.cleanupEvent.findUnique.mockResolvedValue({
       id: 'evt-1',
       createdAt: new Date('2025-01-01T00:00:00.000Z'),
+      updatedAt: new Date('2025-01-01T00:00:00.000Z'),
       title: 'Cleanup event',
       description: '',
       siteId: 'site-1',
@@ -229,6 +242,7 @@ describe('CleanupEventsService duplicate schedule', () => {
     const patchRow = {
       id: 'evt-1',
       createdAt: new Date('2025-01-01T00:00:00.000Z'),
+      updatedAt: new Date('2025-01-01T00:00:00.000Z'),
       siteId: 'site-1',
       status: CleanupEventStatus.APPROVED,
       organizerId: 'o1',
@@ -240,6 +254,7 @@ describe('CleanupEventsService duplicate schedule', () => {
       .mockResolvedValueOnce({
         ...patchRow,
         createdAt: new Date('2025-01-01T00:00:00.000Z'),
+        updatedAt: new Date('2025-01-01T00:00:00.000Z'),
         title: 'Cleanup event',
         description: '',
         completedAt: null,
@@ -290,6 +305,7 @@ describe('CleanupEventsService duplicate schedule', () => {
       .mockResolvedValueOnce({
         id: pendingId,
         createdAt: new Date('2025-01-01T00:00:00.000Z'),
+        updatedAt: new Date('2025-01-01T00:00:00.000Z'),
         title: 'River cleanup',
         description: '',
         siteId: 'site-1',
@@ -315,6 +331,7 @@ describe('CleanupEventsService duplicate schedule', () => {
       .mockResolvedValueOnce({
         id: pendingId,
         createdAt: new Date('2025-01-01T00:00:00.000Z'),
+        updatedAt: new Date('2025-01-01T00:00:00.000Z'),
         title: 'River cleanup',
         description: '',
         siteId: 'site-1',
@@ -359,6 +376,7 @@ describe('CleanupEventsService duplicate schedule', () => {
       .mockResolvedValueOnce({
         id: pendingId,
         createdAt: new Date('2025-01-01T00:00:00.000Z'),
+        updatedAt: new Date('2025-01-01T00:00:00.000Z'),
         title: 'River cleanup',
         description: '',
         siteId: 'site-1',
@@ -384,6 +402,7 @@ describe('CleanupEventsService duplicate schedule', () => {
       .mockResolvedValueOnce({
         id: pendingId,
         createdAt: new Date('2025-01-01T00:00:00.000Z'),
+        updatedAt: new Date('2025-01-01T00:00:00.000Z'),
         title: 'River cleanup',
         description: '',
         siteId: 'site-1',

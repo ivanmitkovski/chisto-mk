@@ -9,6 +9,7 @@ describe('AdminInvitesService', () => {
   let users: Array<Record<string, unknown>>;
   let auditActions: string[];
   let emailSent: boolean;
+  let lastInviteUrl: string | undefined;
 
   const env = { saltRounds: 4 };
   const actor = { userId: 'super-1', role: Role.SUPER_ADMIN, email: 'sa@chisto.mk' };
@@ -18,6 +19,7 @@ describe('AdminInvitesService', () => {
     users = [];
     auditActions = [];
     emailSent = false;
+    lastInviteUrl = undefined;
 
     const prisma = {
       adminInvite: {
@@ -80,8 +82,9 @@ describe('AdminInvitesService', () => {
     };
 
     const email = {
-      sendAdminInviteEmail: async () => {
+      sendAdminInviteEmail: async (_to: string, ctx: { inviteUrl: string }) => {
         emailSent = true;
+        lastInviteUrl = ctx.inviteUrl;
       },
     };
 
@@ -108,6 +111,8 @@ describe('AdminInvitesService', () => {
     expect(result.status).toBe(AdminInviteStatus.PENDING);
     expect(result.email).toBe('mod@chisto.mk');
     expect(emailSent).toBe(true);
+    expect(lastInviteUrl).toMatch(/^https:\/\/admin\.chisto\.mk\/accept-invite\?/);
+    expect(lastInviteUrl).not.toContain('localhost');
     expect(auditActions).toContain('ADMIN_INVITE_CREATED');
   });
 
@@ -168,6 +173,49 @@ describe('AdminInvitesService', () => {
         actor as never,
       ),
     ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it('uses production admin URL when ADMIN_APP_BASE_URL is unset', async () => {
+    const configWithoutAdminUrl = {
+      get: (key: string) => (key === 'ADMIN_INVITE_TTL_HOURS' ? '72' : undefined),
+    };
+    const email = {
+      sendAdminInviteEmail: async (_to: string, ctx: { inviteUrl: string }) => {
+        lastInviteUrl = ctx.inviteUrl;
+      },
+    };
+    const svc = new AdminInvitesService(
+      {
+        adminInvite: {
+          findMany: async () => [],
+          findFirst: async () => null,
+          findUnique: async () => null,
+          create: async ({ data }: { data: Record<string, unknown> }) => ({
+            id: 'inv-new',
+            createdAt: new Date(),
+            acceptedAt: null,
+            revokedAt: null,
+            status: AdminInviteStatus.PENDING,
+            invitedBy: { id: actor.userId, email: actor.email, firstName: 'Super', lastName: 'Admin' },
+            ...data,
+          }),
+          update: async () => ({}),
+        },
+        user: { findUnique: async () => null },
+      } as never,
+      configWithoutAdminUrl as never,
+      email as never,
+      { log: async () => {} } as never,
+      env as never,
+    );
+
+    await svc.create(
+      { email: 'new@chisto.mk', firstName: 'New', lastName: 'Mod', role: Role.SUPPORT },
+      actor as never,
+    );
+
+    expect(lastInviteUrl).toMatch(/^https:\/\/admin\.chisto\.mk\/accept-invite\?/);
+    expect(lastInviteUrl).not.toContain('localhost');
   });
 
   it('revokes a pending invite', async () => {

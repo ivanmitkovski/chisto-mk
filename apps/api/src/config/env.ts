@@ -196,7 +196,11 @@ export function validateEnv(): void {
     }
 
     requireEnv('METRICS_BEARER_TOKEN');
-    requireEnv('ADMIN_APP_BASE_URL');
+    const adminAppBaseUrl = requireEnv('ADMIN_APP_BASE_URL');
+    if (/localhost|127\.0\.0\.1/i.test(adminAppBaseUrl)) {
+      console.error('ADMIN_APP_BASE_URL must not point to localhost in production/staging');
+      process.exit(1);
+    }
   }
 
   const mapSearchTypesense =
