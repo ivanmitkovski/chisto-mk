@@ -92,6 +92,7 @@
   "pagination": "Pagination",
   "previousPage": "Previous page",
   "nextPage": "Next page",
+  "pageOf": "Page {page} of {total}",
   "bulkActions": "Bulk actions",
   "filtersAndActions": "Filters and actions",
   "filterAndSearch": "Filter and search",

@@ -60,6 +60,7 @@ import { NotificationsRoomEmitterService } from './services/notifications-room-e
     CleanupEventNotificationsService,
     NotificationWriterService,
     DeviceTokenService,
+    FcmPushService,
     NotificationInboxService,
     NotificationStateService,
     NotificationPreferencesService,

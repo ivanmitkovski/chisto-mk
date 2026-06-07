@@ -85,6 +85,7 @@ export function OperationsDeadLettersPanel({
       {meta.total > meta.limit ? (
         <div className={styles.deadLetterPagination}>
           <Pagination
+            compact
             totalPages={Math.ceil(meta.total / meta.limit)}
             currentPage={page}
             onPageChange={(nextPage) => void loadPage(nextPage)}

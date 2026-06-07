@@ -9,6 +9,8 @@ type PaginationProps = {
   currentPage: number;
   onPageChange: (page: number) => void;
   className?: string;
+  /** Prev/next only — fits narrow panels without horizontal scroll. */
+  compact?: boolean;
 };
 
 type PageItem = number | 'ellipsis-left' | 'ellipsis-right';
@@ -29,10 +31,44 @@ function pageItems(totalPages: number, currentPage: number): PageItem[] {
   return [1, 'ellipsis-left', currentPage - 1, currentPage, currentPage + 1, 'ellipsis-right', totalPages];
 }
 
-export function Pagination({ totalPages, currentPage, onPageChange, className }: PaginationProps) {
+export function Pagination({
+  totalPages,
+  currentPage,
+  onPageChange,
+  className,
+  compact = false,
+}: PaginationProps) {
   const t = useTranslations('common');
-  const rootClassName = [styles.root, className ?? ''].join(' ').trim();
+  const rootClassName = [styles.root, compact ? styles.compact : '', className ?? ''].join(' ').trim();
   const items = pageItems(totalPages, currentPage);
+
+  if (compact) {
+    return (
+      <nav className={rootClassName} aria-label={t('pagination')}>
+        <button
+          type="button"
+          className={styles.item}
+          onClick={() => onPageChange(currentPage - 1)}
+          disabled={currentPage <= 1}
+          aria-label={t('previousPage')}
+        >
+          <Icon name="chevron-left" size={14} />
+        </button>
+        <span className={styles.compactLabel}>
+          {t('pageOf', { page: currentPage, total: totalPages })}
+        </span>
+        <button
+          type="button"
+          className={styles.item}
+          onClick={() => onPageChange(currentPage + 1)}
+          disabled={currentPage >= totalPages}
+          aria-label={t('nextPage')}
+        >
+          <Icon name="chevron-right" size={14} />
+        </button>
+      </nav>
+    );
+  }
 
   return (
     <nav className={rootClassName} aria-label={t('pagination')}>

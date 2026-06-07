@@ -92,6 +92,7 @@
   "pagination": "Faqëzimi",
   "previousPage": "Faqja e mëparshme",
   "nextPage": "Faqja tjetër",
+  "pageOf": "Faqja {page} nga {total}",
   "bulkActions": "Veprime masive",
   "filtersAndActions": "Filtra dhe veprime",
   "filterAndSearch": "Filtro dhe kërko",
