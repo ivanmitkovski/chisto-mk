@@ -30,6 +30,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { OptionalJwtAuthGuard } from './guards/optional-jwt-auth.guard';
 import { OrganizerCertificationService } from './services/organizer-certification.service';
+import { PermissionsGuard } from './guards/permissions.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { EmailModule } from '../email/email.module';
 import { OtpModule } from '../otp/otp.module';
@@ -114,18 +115,22 @@ import { AuthRefreshReplayCacheService } from './services/auth-refresh-replay-ca
     JwtStrategy,
     JwtAuthGuard,
     RolesGuard,
+    PermissionsGuard,
     OptionalJwtAuthGuard,
     OrganizerCertificationService,
   ],
   exports: [
     JwtAuthGuard,
     RolesGuard,
+    PermissionsGuard,
     OptionalJwtAuthGuard,
     PhoneVerifiedGuard,
     AuditModule,
+    AUTH_ENV_RUNTIME,
     AuthSessionRevocationService,
     UserAuthSnapshotCacheService,
     AuthIdentifierThrottleService,
+    AuthSessionService,
   ],
 })
 export class AuthModule {}

@@ -1,5 +1,13 @@
+import path from 'node:path';
+import { loadEnvConfig } from '@next/env';
 import type { NextConfig } from 'next';
 import bundleAnalyzer from '@next/bundle-analyzer';
+import createNextIntlPlugin from 'next-intl/plugin';
+
+// Inherit shared API URL (and other vars) from the monorepo root `.env` when admin-local env is unset.
+loadEnvConfig(path.resolve(__dirname, '../..'));
+
+const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
@@ -61,5 +69,5 @@ const nextConfig: NextConfig = {
   },
 };
 
-const exportedConfig: NextConfig = withBundleAnalyzer(nextConfig);
+const exportedConfig: NextConfig = withNextIntl(withBundleAnalyzer(nextConfig));
 export default exportedConfig;

@@ -1,9 +1,10 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { Card, Icon, SectionState } from '@/components/ui';
-import { adminBrowserFetch } from '@/lib/admin-browser-api';
+import { Card, Icon, Pagination, SectionState, useToast } from '@/components/ui';
+import { adminBrowserFetch } from '@/lib/api';
 import { useNotifications } from '../context/notifications-context';
 import { NotificationRelativeTime } from './notification-relative-time';
 import { AdminNotification } from '../types';
@@ -13,15 +14,15 @@ type FilterKey = 'all' | 'unread' | 'reports' | 'system' | 'analytics';
 
 type FilterOption = {
   key: FilterKey;
-  label: string;
+  labelKey: FilterKey;
 };
 
 const FILTERS: ReadonlyArray<FilterOption> = [
-  { key: 'all', label: 'All' },
-  { key: 'unread', label: 'Unread' },
-  { key: 'reports', label: 'Reports' },
-  { key: 'system', label: 'System' },
-  { key: 'analytics', label: 'Analytics' },
+  { key: 'all', labelKey: 'all' },
+  { key: 'unread', labelKey: 'unread' },
+  { key: 'reports', labelKey: 'reports' },
+  { key: 'system', labelKey: 'system' },
+  { key: 'analytics', labelKey: 'analytics' },
 ];
 
 function toneClassName(tone: AdminNotification['tone']) {
@@ -32,26 +33,38 @@ function toneClassName(tone: AdminNotification['tone']) {
 }
 
 type NotificationsCenterProps = {
-  initialItems: AdminNotification[];
+  items: AdminNotification[];
+  unreadCount: number;
+  total: number;
+  page: number;
+  limit: number;
+  filter: FilterKey;
+  onFilterChange: (filter: FilterKey) => void;
+  onPageChange: (page: number) => void;
+  onRefetch: () => void;
 };
 
-export function NotificationsCenter({ initialItems }: NotificationsCenterProps) {
+export function NotificationsCenter({
+  items: initialItems,
+  unreadCount,
+  total,
+  page,
+  limit,
+  filter,
+  onFilterChange,
+  onPageChange,
+  onRefetch,
+}: NotificationsCenterProps) {
+  const t = useTranslations('notifications');
+  const tCommon = useTranslations('common');
   const router = useRouter();
   const notificationsCtx = useNotifications();
-  const [filter, setFilter] = useState<FilterKey>('all');
+  const { showToast } = useToast();
   const [items, setItems] = useState<AdminNotification[]>(() => initialItems.map((item) => ({ ...item })));
 
-  const { filtered, unreadCount } = useMemo(() => {
-    const unread = items.filter((item) => item.isUnread).length;
-
-    const filteredItems = items.filter((item) => {
-      if (filter === 'all') return true;
-      if (filter === 'unread') return item.isUnread;
-      return item.category === filter;
-    });
-
-    return { filtered: filteredItems, unreadCount: unread };
-  }, [filter, items]);
+  useEffect(() => {
+    setItems(initialItems.map((item) => ({ ...item })));
+  }, [initialItems]);
 
   const markAllRead = useCallback(async () => {
     const previous = items;
@@ -62,10 +75,16 @@ export function NotificationsCenter({ initialItems }: NotificationsCenterProps) 
       } else {
         await adminBrowserFetch('/admin/notifications/read-all', { method: 'PATCH' });
       }
+      onRefetch();
     } catch {
       setItems(previous);
+      showToast({
+        tone: 'warning',
+        title: tCommon('couldNotMarkRead'),
+        message: tCommon('changesRevertedTryAgain'),
+      });
     }
-  }, [items, notificationsCtx]);
+  }, [items, notificationsCtx, onRefetch, showToast, tCommon]);
 
   const markOneRead = useCallback(
     async (id: string) => {
@@ -83,56 +102,61 @@ export function NotificationsCenter({ initialItems }: NotificationsCenterProps) 
         notificationsCtx?.applyNotificationRead(id, wasUnread);
       } catch {
         setItems(previous);
+        showToast({
+          tone: 'warning',
+          title: tCommon('couldNotMarkRead'),
+          message: tCommon('changesRevertedTryAgain'),
+        });
       }
     },
-    [items, notificationsCtx],
+    [items, notificationsCtx, showToast, tCommon],
   );
+
+  const totalPages = Math.max(1, Math.ceil(total / limit));
 
   return (
     <div className={styles.root}>
       <header className={styles.header}>
         <div>
-          <h1 className={styles.title}>Notifications</h1>
-          <p className={styles.subtitle}>
-            {unreadCount} unread • {items.length} total
-          </p>
+          <h2 className={styles.title}>{t('title')}</h2>
+          <p className={styles.subtitle}>{t('subtitle', { unread: unreadCount, total })}</p>
         </div>
-        <div className={styles.filters} role="toolbar" aria-label="Notification filters">
+        <div className={styles.filters} role="toolbar" aria-label={t('filtersAria')}>
           {FILTERS.map((option) => (
             <button
               key={option.key}
               type="button"
               className={`${styles.filterChip} ${filter === option.key ? styles.filterChipActive : ''}`}
-              onClick={() => setFilter(option.key)}
+              onClick={() => onFilterChange(option.key)}
               aria-pressed={filter === option.key}
             >
-              {option.label}
+              {t(`filters.${option.labelKey}`)}
             </button>
           ))}
         </div>
       </header>
 
-      <Card className={styles.listCard} aria-label="Notifications list">
+      <Card className={styles.listCard} aria-label={t('listAria')}>
         <div className={styles.listHeader}>
-          <h2 className={styles.listTitle}>Activity</h2>
+          <h2 className={styles.listTitle}>{t('activity')}</h2>
           <button
             type="button"
             className={styles.markAllButton}
-            onClick={markAllRead}
+            onClick={() => void markAllRead()}
             disabled={unreadCount === 0}
           >
-            Mark all as read
+            {tCommon('markAllAsRead')}
           </button>
         </div>
 
-        {filtered.length === 0 ? (
+        {items.length === 0 ? (
           <SectionState
             variant="empty"
-            message={filter === 'unread' ? 'You are all caught up.' : 'No notifications in this view yet.'}
+            message={filter === 'unread' ? t('emptyUnread') : t('emptyAll')}
           />
         ) : (
           <ul className={styles.items}>
-            {filtered.map((notification) => (
+            {items.map((notification) => (
               <li key={notification.id} className={styles.item}>
                 <button
                   type="button"
@@ -154,11 +178,13 @@ export function NotificationsCenter({ initialItems }: NotificationsCenterProps) 
                       <p className={styles.templateKey}>{notification.messageTemplateKey}</p>
                     ) : null}
                     {notification.href ? (
-                      <span className={styles.link}>View details</span>
+                      <span className={styles.link}>{t('viewDetails')}</span>
                     ) : null}
                   </div>
                   <div className={styles.meta}>
-                    {notification.isUnread ? <span className={styles.unreadDot} aria-label="Unread" /> : null}
+                    {notification.isUnread ? (
+                      <span className={styles.unreadDot} aria-label={tCommon('unreadDotAria')} />
+                    ) : null}
                     <NotificationRelativeTime
                       fallbackLabel={notification.timeLabel}
                       {...(notification.createdAt != null && notification.createdAt !== ''
@@ -171,6 +197,12 @@ export function NotificationsCenter({ initialItems }: NotificationsCenterProps) 
             ))}
           </ul>
         )}
+
+        {total > limit ? (
+          <div className={styles.pagination}>
+            <Pagination totalPages={totalPages} currentPage={page} onPageChange={onPageChange} />
+          </div>
+        ) : null}
       </Card>
     </div>
   );

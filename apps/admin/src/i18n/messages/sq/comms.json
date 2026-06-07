@@ -1,0 +1,73 @@
+{
+  "emailSuppressions": {
+    "pageTitle": "Bllokimet e emailit",
+    "searchPlaceholder": "Kërko sipas emailit…",
+    "searchAria": "Kërko bllokime",
+    "filterReasonAria": "Filtro sipas arsyes",
+    "filterSourceAria": "Filtro sipas burimit",
+    "columns": {
+      "email": "Email",
+      "reason": "Arsyeja",
+      "source": "Burimi",
+      "created": "Krijuar",
+      "actions": "Veprimet"
+    },
+    "empty": "Asnjë bllokim emaili nuk përputhet me kërkimin tuaj.",
+    "meta": "{count} bllokime · faqe {page}",
+    "remove": "Hiq",
+    "removing": "Duke hequr…",
+    "confirmRemoveTitle": "Të hiqet bllokimi?",
+    "confirmRemoveDescription": "Të hiqet bllokimi për {email}? Ata do të mund të marrin email përsëri.",
+    "toast": {
+      "removedTitle": "U hoq",
+      "removedMessage": "{email} mund të marrë email përsëri.",
+      "removeFailedTitle": "Heqja dështoi",
+      "removeFailedMessage": "Nuk mund të hiqet bllokimi.",
+      "createdTitle": "Bllokimi u shtua",
+      "createdMessage": "{email} nuk do të marrë email.",
+      "createFailedTitle": "Shtimi dështoi",
+      "createFailedMessage": "Nuk mund të shtohet bllokimi."
+    },
+    "reasons": {
+      "all": "Të gjitha arsyet",
+      "hardBounce": "Kthim i përhershëm",
+      "spamComplaint": "Ankesë për spam",
+      "manualSuppression": "Bllokim manual",
+      "subscriptionChange": "Ndryshim abonimi"
+    },
+    "sources": {
+      "all": "Të gjithë burimet",
+      "postmark": "Postmark"
+    },
+    "pageDescription": "Adresa email të bllokuara dhe shtypje dërgese.",
+    "create": {
+      "button": "Shto bllokim",
+      "title": "Shto bllokim emaili",
+      "description": "Blloko manualisht një adresë nga marrja e emailit.",
+      "submit": "Shto bllokim",
+      "invalidEmail": "Shkruani një adresë email të vlefshme."
+    }
+  },
+  "webhookLogs": {
+    "pageTitle": "Regjistrat e webhook",
+    "filterActionAria": "Filtro sipas veprimit",
+    "payloadTitle": "Ngarkesa webhook",
+    "empty": "Ende pa regjistra dorëzimi webhook.",
+    "meta": "{count} regjistr(a) · faqe {page}",
+    "viewPayload": "Shiko payload",
+    "copyJson": "Kopjo JSON",
+    "columns": {
+      "when": "Kur",
+      "action": "Veprimi",
+      "resource": "Burimi",
+      "details": "Detajet"
+    },
+    "actions": {
+      "all": "Të gjitha veprimet",
+      "twilioStatus": "Statusi Twilio",
+      "postmark": "Postmark",
+      "suppressionCreated": "Bllokim i krijuar"
+    },
+    "pageDescription": "Webhook dërgese dhe gjurmë auditimi komunikimesh."
+  }
+}

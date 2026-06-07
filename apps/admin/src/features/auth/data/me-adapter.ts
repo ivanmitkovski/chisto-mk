@@ -1,5 +1,4 @@
-import { apiFetch } from '@/lib/api';
-import { getAdminAuthTokenFromCookies } from '@/features/auth/lib/admin-auth-server';
+import { serverAuthenticatedFetch } from '@/lib/auth/server-api-with-refresh';
 
 export type MeProfile = {
   id: string;
@@ -12,9 +11,7 @@ export type MeProfile = {
 };
 
 export async function getMeProfile(): Promise<MeProfile> {
-  const token = await getAdminAuthTokenFromCookies();
-  return apiFetch<MeProfile>('/auth/me', {
+  return serverAuthenticatedFetch<MeProfile>('/auth/me', {
     method: 'GET',
-    authToken: token,
   });
 }

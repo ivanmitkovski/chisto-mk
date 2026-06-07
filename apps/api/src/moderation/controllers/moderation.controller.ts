@@ -6,7 +6,10 @@ import { CurrentUser } from '../../auth/decorators/current-user.decorator';
 import { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { RolesGuard } from '../../auth/guards/roles.guard';
+import { PermissionsGuard } from '../../auth/guards/permissions.guard';
+import { RequirePermission } from '../../auth/decorators/require-permission.decorator';
 import { ADMIN_PANEL_ROLES, ADMIN_WRITE_ROLES } from '../../auth/constants/admin-roles';
+import { ADMIN_PERMISSIONS } from '../../auth/constants/admin-permissions';
 import { ModerationService } from '../services/moderation.service';
 import { ListAdminUgcReportsQueryDto } from '../dto/list-admin-ugc-reports-query.dto';
 import { PatchAdminUgcReportDto } from '../dto/patch-admin-ugc-report.dto';
@@ -40,8 +43,9 @@ export class ModerationController {
 
   @Idempotent('moderation_admin_ugc_patch')
   @Patch('admin/moderation/ugc-reports/:id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(...ADMIN_WRITE_ROLES)
+  @RequirePermission(ADMIN_PERMISSIONS['moderation:write'])
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Moderate a UGC report' })
   patchAdminUgcReport(

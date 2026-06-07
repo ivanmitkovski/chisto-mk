@@ -1,0 +1,189 @@
+{
+  "pageTitle": "Cilësimet",
+  "skipToContent": "Kalo te përmbajtja e cilësimeve",
+  "sidebarAria": "Seksionet e cilësimeve",
+  "groups": {
+    "account": "Llogaria",
+    "system": "Sistemi",
+    "preferences": "Preferencat"
+  },
+  "sections": {
+    "profile": "Profili",
+    "security": "Siguria",
+    "environment": "Mjedisi",
+    "featureFlags": "Flamujt e funksioneve",
+    "moderationEmails": "Email për moderim",
+    "preferences": "Preferencat"
+  },
+  "profile": {
+    "title": "Profili",
+    "description": "Informacionet e llogarisë suaj.",
+    "firstName": "Emri",
+    "lastName": "Mbiemri",
+    "unsavedChanges": "Ndryshime të paruajtura",
+    "saveChanges": "Ruaj ndryshimet",
+    "saving": "Duke ruajtur…",
+    "savedToast": "Profili u përditësua.",
+    "errorToast": "Gabim"
+  },
+  "security": {
+    "title": "Siguria",
+    "description": "Sesionet, fjalëkalimi dhe aktiviteti.",
+    "sessionsLabel": "Sesionet",
+    "activeSessionsTitle": "Sesione aktive",
+    "activeSessionsHint": "Pajisjet e kyçura aktualisht në llogarinë tuaj.",
+    "thisDevice": "Kjo pajisje",
+    "signOutOtherSessions": "Dil nga sesionet e tjera",
+    "passwordLabel": "Fjalëkalimi",
+    "changePasswordTitle": "Ndrysho fjalëkalimin",
+    "currentPassword": "Fjalëkalimi aktual",
+    "newPassword": "Fjalëkalimi i ri",
+    "confirmNewPassword": "Konfirmo fjalëkalimin e ri",
+    "changePasswordButton": "Ndrysho fjalëkalimin",
+    "activityLabel": "Aktiviteti",
+    "recentActivityTitle": "Aktiviteti i fundit",
+    "recentActivityHint": "Ngjarjet e lidhura me sigurinë në llogarinë tuaj.",
+    "noActivityYet": "Ende pa aktivitet."
+  },
+  "mfa": {
+    "sectionLabel": "Autentifikim me dy faktorë",
+    "title": "2FA",
+    "hint": "Shtoni një shtresë shtesë sigurie duke kërkuar një kod nga aplikacioni i autentifikimit kur hyni.",
+    "recommendedBadge": "E rekomanduar",
+    "recommendedCopy": "Mbro llogarinë tënde admin me një kod nga aplikacioni i autentifikimit. Mund ta konfigurosh brenda një minute.",
+    "banner": {
+      "title": "Forco sigurinë e llogarisë",
+      "message": "Autentifikimi me dy faktorë nuk është aktiv ende. Shtoje te Cilësimet kur të jesh gati.",
+      "action": "Shiko cilësimet e sigurisë",
+      "dismiss": "Jo tani"
+    },
+    "enabled": "Autentifikimi me dy faktorë është aktiv",
+    "disabled": "Autentifikimi me dy faktorë është joaktiv",
+    "enable2fa": "Aktivizo 2FA",
+    "starting": "Duke filluar…",
+    "disable2fa": "Çaktivizo 2FA",
+    "disableHint": "Shkruani fjalëkalimin për të çaktivizuar autentifikimin me dy faktorë.",
+    "passwordRequiredTitle": "Kërkohet fjalëkalimi",
+    "passwordRequiredMessage": "Shkruani fjalëkalimin aktual për të çaktivizuar 2FA.",
+    "disabling": "Duke çaktivizuar…",
+    "setupStep": "Skanoni me aplikacionin e autentifikimit (p.sh. Google Authenticator, 1Password)",
+    "qrAlt": "Kodi QR për konfigurimin e autentifikuesit",
+    "manualKey": "Ose shkruani këtë kod manualisht: {secret}",
+    "enterSixDigitCode": "Shkruani kodin 6-shifror",
+    "codePlaceholder": "000000",
+    "verifyAndEnable": "Verifiko dhe aktivizo",
+    "verifying": "Duke verifikuar…",
+    "backupCodesTitle": "Ruani kodet rezervë",
+    "backupCodesHint": "Ruajini këto kode në një vend të sigurt. Secili mund të përdoret një herë nëse humbisni aplikacionin e autentifikimit.",
+    "copyBackupCodes": "Kopjo të gjitha kodet",
+    "downloadBackupCodes": "Shkarko kodet",
+    "backupCodesAttestation": "I kam ruajtur këto kode rezervë në mënyrë të sigurt",
+    "copyBackupCodesSuccessTitle": "U kopjua",
+    "copyBackupCodesSuccessMessage": "Kodet rezervë u kopjuan.",
+    "copyBackupCodesFailedMessage": "Nuk mund të kopjohen kodet. Provoni shkarkimin.",
+    "done": "U krye",
+    "toast": {
+      "setupError": "Nuk mund të fillonte konfigurimi",
+      "enterCodeTitle": "Shkruani kodin",
+      "enterCodeMessage": "Shkruani kodin 6-shifror nga aplikacioni i autentifikimit.",
+      "verificationFailedTitle": "Verifikimi dështoi",
+      "invalidCodeMessage": "Kod i pavlefshëm. Provo përsëri.",
+      "disabledTitle": "2FA u çaktivizua",
+      "disabledMessage": "Autentifikimi me dy faktorë u çaktivizua.",
+      "failedTitle": "Dështoi",
+      "incorrectPassword": "Fjalëkalim i gabuar."
+    },
+    "disableConfirmTitle": "Çaktivizo autentifikimin me dy faktorë?"
+  },
+  "preferences": {
+    "title": "Preferencat",
+    "description": "Opsionet e shfaqjes për këtë shfletues. Pajisjet e tjera nuk preken.",
+    "displayLabel": "Shfaqja",
+    "interfaceMotionTitle": "Lëvizja e ndërfaqes",
+    "interfaceMotionHint": "Shkurton tranzicionet në aplikacionin admin duke përdorur tokenët e dizajnit. Ruhet vetëm në këtë pajisje.",
+    "reduceMotionTitle": "Redukto lëvizjen",
+    "reduceMotionCaption": "Minimizo animacionet dhe tranzicionet",
+    "notificationsLabel": "Njoftimet",
+    "deliveryPreferencesTitle": "Preferencat e dorëzimit",
+    "deliveryPreferencesHint": "Çelësat për shfletues për sinjalizimet e raporteve live. Kjo nuk ndryshon cilësimet në pajisje të tjera.",
+    "soundOnNewReportsTitle": "Tingull për raporte të reja",
+    "soundOnNewReportsCaption": "Luan një tingull të lehtë kur mbërrin një raport i ri në kohë reale",
+    "playTestSound": "Luaj tingull testues",
+    "serverAlertsNote": "Sinjalizimet e menaxhuara nga serveri shfaqen ende në shiritin e sipërm dhe në faqen e Njoftimeve.",
+    "languageLabel": "Gjuha",
+    "localeTitle": "Lokali",
+    "localeHint": "Gjuha e ndërfaqes admin.",
+    "displayLanguage": "Gjuha e shfaqjes",
+    "localeEnglish": "English",
+    "localeMacedonian": "Македонски",
+    "localeAlbanian": "Shqip",
+    "localeFootnote": "Preferenca e gjuhës ruhet në këtë shfletues.",
+    "reduceMotionToggleAria": "Redukto lëvizjen",
+    "soundOnNewReportsToggleAria": "Tingull për raporte të reja"
+  },
+  "environment": {
+    "title": "Mjedisi",
+    "description": "Konfigurimi i sistemit. Vetëm për super administratorët.",
+    "restricted": "Ky seksion është i kufizuar për super administratorët.",
+    "configEntriesTitle": "Hyrjet e konfigurimit",
+    "saveConfiguration": "Ruaj konfigurimin",
+    "confirmSaveTitle": "Të ruhen ndryshimet e konfigurimit?",
+    "confirmSaveDescription": "Vlerat e përditësuara hyjnë në fuqi menjëherë në platformë.",
+    "savedToast": "Konfigurimi u përditësua."
+  },
+  "featureFlags": {
+    "title": "Flamujt e funksioneve",
+    "description": "Aktivizo ose çaktivizo funksione në platformë.",
+    "empty": "Nuk ka flamuj funksionesh të konfiguruar.",
+    "updateError": "Nuk mund të përditësohej flamuri",
+    "toggleAria": "Ndrysho funksionin {name}",
+    "confirmToggleTitle": "Të ndryshohet flamuri i funksionit?",
+    "confirmToggleDescription": "Vendos {key} në {state}.",
+    "confirmEnable": "aktiv",
+    "confirmDisable": "joaktiv"
+  },
+  "moderationEmails": {
+    "title": "Email për moderim",
+    "description": "Email i menjëhershëm kur veprimet e përdoruesve kërkojnë shqyrtim admin. Dorëzimi kërkon email të platformës (`EMAIL_ENABLED`, `email_enabled` dhe flamujt `admin_moderation_email_enabled`).",
+    "loadError": "Nuk mund të ngarkoheshin preferencat. Provo të rifreskosh faqen.",
+    "defaultForRole": "Parazgjedhja për rolin tuaj",
+    "notificationsAria": "Njoftime me email për {title}",
+    "categories": {
+      "NEW_REPORT": {
+        "title": "Raporte të reja për ndotje",
+        "description": "Kur një qytetar parashtron një raport që hyn në radhën e moderimit."
+      },
+      "EVENT_PENDING": {
+        "title": "Ngjarje në pritje të miratimit",
+        "description": "Kur krijohet një ngjarje pastrimi ose kthehet në shqyrtim në pritje."
+      },
+      "UGC_REPORT": {
+        "title": "Raporte UGC",
+        "description": "Kur një përdorues raporton përmbajtje (komente, bisedë, profile, vende, ngjarje)."
+      },
+      "CHECKIN_RISK": {
+        "title": "Sinjale rreziku të check-in",
+        "description": "Kur një pjesëmarrës bën check-in larg vendit të ngjarjes."
+      }
+    }
+  },
+  "securityModals": {
+    "signOutOthersTitle": "Dil nga sesionet e tjera",
+    "signOutOthersDescription": "Kjo do të revokojë qasjen për të gjitha pajisjet e tjera. Do të qëndroni të kyçur në këtë pajisje.",
+    "signOutOthersConfirm": "Revoko të gjitha",
+    "updatePasswordTitle": "Përditëso fjalëkalimin",
+    "updatePasswordDescription": "Fjalëkalimi i ri do të hyjë në fuqi në hyrjen tjetër.",
+    "updatePasswordConfirm": "Përditëso fjalëkalimin"
+  },
+  "securityToast": {
+    "signedOutTitle": "U dol",
+    "signedOutMessage": "Sesionet e tjera u revokuan.",
+    "passwordUpdatedTitle": "Fjalëkalimi u përditësua",
+    "passwordUpdatedMessage": "Përdorni fjalëkalimin e ri në hyrjen tjetër."
+  },
+  "passwordValidation": {
+    "required": "E detyrueshme",
+    "minLength": "Min. 8 karaktere",
+    "mustMatch": "Duhet të përputhet"
+  }
+}

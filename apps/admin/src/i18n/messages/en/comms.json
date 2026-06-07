@@ -1,0 +1,73 @@
+{
+  "emailSuppressions": {
+    "pageTitle": "Email suppressions",
+    "searchPlaceholder": "Search by email…",
+    "searchAria": "Search suppressions",
+    "filterReasonAria": "Filter by reason",
+    "filterSourceAria": "Filter by source",
+    "columns": {
+      "email": "Email",
+      "reason": "Reason",
+      "source": "Source",
+      "created": "Created",
+      "actions": "Actions"
+    },
+    "empty": "No email suppressions match your search.",
+    "meta": "{count} suppression(s) · page {page}",
+    "remove": "Remove",
+    "removing": "Removing…",
+    "confirmRemoveTitle": "Remove suppression?",
+    "confirmRemoveDescription": "Remove suppression for {email}? They will be able to receive email again.",
+    "toast": {
+      "removedTitle": "Removed",
+      "removedMessage": "{email} can receive email again.",
+      "removeFailedTitle": "Remove failed",
+      "removeFailedMessage": "Unable to remove suppression.",
+      "createdTitle": "Suppression added",
+      "createdMessage": "{email} will not receive email.",
+      "createFailedTitle": "Create failed",
+      "createFailedMessage": "Unable to add suppression."
+    },
+    "reasons": {
+      "all": "All reasons",
+      "hardBounce": "Hard bounce",
+      "spamComplaint": "Spam complaint",
+      "manualSuppression": "Manual suppression",
+      "subscriptionChange": "Subscription change"
+    },
+    "sources": {
+      "all": "All sources",
+      "postmark": "Postmark"
+    },
+    "pageDescription": "Blocked email addresses and delivery suppressions.",
+    "create": {
+      "button": "Add suppression",
+      "title": "Add email suppression",
+      "description": "Manually suppress an address from receiving email.",
+      "submit": "Add suppression",
+      "invalidEmail": "Enter a valid email address."
+    }
+  },
+  "webhookLogs": {
+    "pageTitle": "Webhook logs",
+    "filterActionAria": "Filter by action",
+    "payloadTitle": "Webhook payload",
+    "empty": "No webhook delivery logs yet.",
+    "meta": "{count} log(s) · page {page}",
+    "viewPayload": "View payload",
+    "copyJson": "Copy JSON",
+    "columns": {
+      "when": "When",
+      "action": "Action",
+      "resource": "Resource",
+      "details": "Details"
+    },
+    "actions": {
+      "all": "All actions",
+      "twilioStatus": "Twilio status",
+      "postmark": "Postmark",
+      "suppressionCreated": "Suppression created"
+    },
+    "pageDescription": "Delivery webhooks and communications audit trail."
+  }
+}

@@ -1,16 +1,10 @@
-import { apiFetch } from '@/lib/api';
-import { getAdminAuthTokenFromCookies } from '@/features/auth/lib/admin-auth-server';
+import { serverAuthenticatedFetch } from '@/lib/auth/server-api-with-refresh';
+import type { Schema } from '@/lib/api';
 
-export type ConfigEntry = {
-  key: string;
-  value: string;
-  updatedAt: string;
-};
+export type ConfigEntry = Schema<'SystemConfigEntryDto'> & { updatedAt?: string };
 
 export async function getSystemConfig(): Promise<ConfigEntry[]> {
-  const token = await getAdminAuthTokenFromCookies();
-  return apiFetch<ConfigEntry[]>('/admin/config', {
+  return serverAuthenticatedFetch<ConfigEntry[]>('/admin/config', {
     method: 'GET',
-    authToken: token,
   });
 }

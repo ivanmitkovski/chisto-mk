@@ -1,5 +1,7 @@
 import { NextRequest } from 'next/server';
-import { fetchBackendWithRefresh } from '@/lib/admin-api-with-refresh';
+import { fetchBackendWithRefresh } from '@/lib/auth';
+
+export const dynamic = 'force-dynamic';
 
 export async function PATCH(
   request: NextRequest,

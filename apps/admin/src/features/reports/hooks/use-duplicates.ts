@@ -1,13 +1,18 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { SnackState } from '@/components/ui';
+import { useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { useToast } from '@/components/ui';
 import { getAdminCsrfHeaders } from '@/features/auth/lib/admin-auth';
 import { DuplicateReportGroup, MergeDuplicateReportsResult } from '../types';
 
+type DuplicateGroupsMeta = { page: number; limit: number; total: number };
+
 type UseDuplicatesOptions = {
-  initialGroups: DuplicateReportGroup[];
+  groups: DuplicateReportGroup[];
+  setGroups: React.Dispatch<React.SetStateAction<DuplicateReportGroup[]>>;
   initialSelectedGroupId?: string | null;
+  pagination: DuplicateGroupsMeta;
 };
 
 function defaultSelection(groups: DuplicateReportGroup[]): Record<string, string[]> {
@@ -18,18 +23,50 @@ function defaultSelection(groups: DuplicateReportGroup[]): Record<string, string
   return selection;
 }
 
-export function useDuplicates({ initialGroups, initialSelectedGroupId = null }: UseDuplicatesOptions) {
+async function fetchDuplicateGroupsFromApi(
+  page: number,
+  limit: number,
+): Promise<{ data: DuplicateReportGroup[]; meta: DuplicateGroupsMeta } | null> {
+  try {
+    const search = new URLSearchParams({ page: String(page), limit: String(limit) });
+    const res = await fetch(`/api/reports/duplicates?${search.toString()}`, { credentials: 'include' });
+    if (!res.ok) {
+      return null;
+    }
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+function isStaleMergeConflict(status: number, body: unknown): boolean {
+  if (status === 409) {
+    return true;
+  }
+  if (status !== 400 || !body || typeof body !== 'object') {
+    return false;
+  }
+  const code = 'code' in body && typeof body.code === 'string' ? body.code : null;
+  return code === 'INVALID_DUPLICATE_SELECTION';
+}
+
+export function useDuplicates({
+  groups,
+  setGroups,
+  initialSelectedGroupId = null,
+  pagination,
+}: UseDuplicatesOptions) {
   const defaultSelectedGroupId =
-    initialSelectedGroupId && initialGroups.some((group) => group.primaryReport.id === initialSelectedGroupId)
+    initialSelectedGroupId && groups.some((group) => group.primaryReport.id === initialSelectedGroupId)
       ? initialSelectedGroupId
-      : initialGroups[0]?.primaryReport.id ?? null;
-  const [groups, setGroups] = useState<DuplicateReportGroup[]>(initialGroups);
+      : groups[0]?.primaryReport.id ?? null;
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(defaultSelectedGroupId);
   const [selectedChildIdsByGroup, setSelectedChildIdsByGroup] = useState<Record<string, string[]>>(
-    defaultSelection(initialGroups),
+    defaultSelection(groups),
   );
   const [isMerging, setIsMerging] = useState(false);
-  const [snack, setSnack] = useState<SnackState | null>(null);
+  const { showToast } = useToast();
+  const t = useTranslations('reports.duplicates.toast');
 
   const selectedGroup = useMemo(
     () => groups.find((group) => group.primaryReport.id === selectedGroupId) ?? null,
@@ -37,6 +74,39 @@ export function useDuplicates({ initialGroups, initialSelectedGroupId = null }: 
   );
 
   const selectedChildIds = selectedGroup ? selectedChildIdsByGroup[selectedGroup.primaryReport.id] ?? [] : [];
+
+  useEffect(() => {
+    if (selectedGroupId && groups.some((group) => group.primaryReport.id === selectedGroupId)) {
+      return;
+    }
+    setSelectedGroupId(groups[0]?.primaryReport.id ?? null);
+  }, [groups, selectedGroupId]);
+
+  async function refetchGroups(): Promise<boolean> {
+    const refreshed = await fetchDuplicateGroupsFromApi(pagination.page, pagination.limit);
+    if (!refreshed) {
+      return false;
+    }
+
+    setGroups(refreshed.data);
+    setSelectedChildIdsByGroup((prev) => {
+      const next = { ...prev };
+      for (const group of refreshed.data) {
+        if (!next[group.primaryReport.id]) {
+          next[group.primaryReport.id] = group.duplicateReports.map((duplicate) => duplicate.id);
+        }
+      }
+      return next;
+    });
+
+    if (refreshed.data.length === 0) {
+      setSelectedGroupId(null);
+    } else if (!refreshed.data.some((group) => group.primaryReport.id === selectedGroupId)) {
+      setSelectedGroupId(refreshed.data[0]?.primaryReport.id ?? null);
+    }
+
+    return true;
+  }
 
   function toggleChildSelection(childId: string) {
     if (!selectedGroup) {
@@ -79,10 +149,10 @@ export function useDuplicates({ initialGroups, initialSelectedGroupId = null }: 
 
     const mergeChildIds = selectedChildIdsByGroup[selectedGroup.primaryReport.id] ?? [];
     if (mergeChildIds.length === 0) {
-      setSnack({
+      showToast({
         tone: 'warning',
-        title: 'No duplicates selected',
-        message: 'Select at least one duplicate report before merging.',
+        title: t('noSelectionTitle'),
+        message: t('noSelectionMessage'),
       });
       return false;
     }
@@ -103,14 +173,23 @@ export function useDuplicates({ initialGroups, initialSelectedGroupId = null }: 
       const message =
         body && typeof body.message === 'string'
           ? body.message
-          : 'Unable to merge duplicate reports right now.';
+          : t('mergeFailedMessage');
 
       if (!res.ok) {
-        setSnack({
-          tone: 'error',
-          title: 'Merge failed',
-          message,
-        });
+        if (isStaleMergeConflict(res.status, body)) {
+          const didRefetch = await refetchGroups();
+          showToast({
+            tone: 'warning',
+            title: t('groupChangedTitle'),
+            message: didRefetch ? t('groupChangedMessage') : t('groupChangedRefreshMessage'),
+          });
+        } else {
+          showToast({
+            tone: 'error',
+            title: t('mergeFailedTitle'),
+            message,
+          });
+        }
         return false;
       }
 
@@ -146,7 +225,7 @@ export function useDuplicates({ initialGroups, initialSelectedGroupId = null }: 
         if (nextGroups.length === 0) {
           setSelectedGroupId(null);
         } else if (!nextGroups.some((group) => group.primaryReport.id === selectedGroup.primaryReport.id)) {
-          setSelectedGroupId(nextGroups[0].primaryReport.id);
+          setSelectedGroupId(nextGroups[0]?.primaryReport.id ?? null);
         }
 
         return nextGroups;
@@ -164,17 +243,20 @@ export function useDuplicates({ initialGroups, initialSelectedGroupId = null }: 
         };
       });
 
-      setSnack({
+      showToast({
         tone: 'success',
-        title: 'Duplicates merged',
-        message: `Merged ${mergeResult.mergedChildCount} duplicate report(s) into ${selectedGroup.primaryReport.reportNumber}.`,
+        title: t('mergeSuccessTitle'),
+        message: t('mergeSuccessMessage', {
+          count: mergeResult.mergedChildCount,
+          reportNumber: selectedGroup.primaryReport.reportNumber,
+        }),
       });
       return true;
     } catch {
-      setSnack({
+      showToast({
         tone: 'error',
-        title: 'Merge failed',
-        message: 'Unable to merge duplicate reports right now.',
+        title: t('mergeFailedTitle'),
+        message: t('mergeFailedMessage'),
       });
       return false;
     } finally {
@@ -188,11 +270,10 @@ export function useDuplicates({ initialGroups, initialSelectedGroupId = null }: 
     selectedGroup,
     selectedChildIds,
     isMerging,
-    snack,
     setSelectedGroupId,
     toggleChildSelection,
     selectAllChildren,
     mergeSelected,
-    clearSnack: () => setSnack(null),
+    refetchGroups,
   };
 }

@@ -1,10 +1,12 @@
 'use client';
 
 import { ReactNode, useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Modal } from '@/components/ui';
 import { adminNavigation } from '../config/navigation';
+import { NAV_PERMISSIONS } from '@/lib/auth/rbac';
+import { usePermissions } from '@/lib/auth/rbac';
 import { DESKTOP_SIDEBAR_COOKIE_KEY, DESKTOP_SIDEBAR_STORAGE_KEY } from '../constants';
 import { NavItemKey } from '../types';
 import { SidebarNav } from './sidebar-nav';
@@ -36,7 +38,12 @@ export function AdminShell({
   initialTopBarNotifications,
   contentMode = 'default',
 }: AdminShellProps) {
-  const pathname = usePathname();
+  const tCommon = useTranslations('common');
+  const { can } = usePermissions();
+  const visibleNavigation = adminNavigation.filter((item) => {
+    const permission = NAV_PERMISSIONS[item.key];
+    return permission ? can(permission) : true;
+  });
   const [isMobile, setIsMobile] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(initialSidebarCollapsed);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -156,9 +163,12 @@ export function AdminShell({
 
   return (
     <div className={styles.appFrame}>
+      <a href="#admin-main" className="skipLink">
+        {tCommon('skipToMain')}
+      </a>
       <div className={shellClassName}>
         <SidebarNav
-          items={adminNavigation}
+          items={visibleNavigation}
           activeItem={activeItem}
           isCollapsed={isSidebarCollapsed && !isMobile}
           isMobile={isMobile}
@@ -171,7 +181,7 @@ export function AdminShell({
             <motion.button
               type="button"
               className={styles.sidebarBackdrop}
-              aria-label="Close navigation menu"
+              aria-label={tCommon('closeNavigationMenu')}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -180,7 +190,7 @@ export function AdminShell({
             />
           ) : null}
         </AnimatePresence>
-        <main className={styles.main}>
+        <main id="admin-main" className={styles.main} tabIndex={-1}>
           <TopBar
             title={title}
             isMobile={isMobile}
@@ -188,40 +198,25 @@ export function AdminShell({
             isMobileSidebarOpen={isMobileSidebarOpen}
             onMenuToggle={toggleSidebar}
             initialNotifications={initialTopBarNotifications ?? []}
-            searchPlaceholder={
-              pathname === '/dashboard/reports'
-                ? 'Commands'
-                : pathname?.startsWith('/dashboard/users')
-                  ? 'Search users'
-                  : pathname?.startsWith('/dashboard/sites')
-                    ? 'Search sites'
-                    : pathname?.startsWith('/dashboard/events')
-                      ? 'Search events'
-                      : pathname?.startsWith('/dashboard/audit')
-                        ? 'Search logs'
-                        : pathname?.startsWith('/dashboard/settings')
-                          ? 'Search settings'
-                          : 'Search reports'
-            }
           />
           <div className={`${styles.content} ${contentMode === 'immersive' ? styles.contentImmersive : ''}`}>
-            {children}
+            <div className={styles.contentFrame}>{children}</div>
           </div>
         </main>
       </div>
-      <Modal open={showShortcuts} title="Keyboard shortcuts" onClose={() => setShowShortcuts(false)}>
+      <Modal open={showShortcuts} title={tCommon('keyboardShortcuts')} onClose={() => setShowShortcuts(false)}>
         <dl className={styles.shortcuts}>
           <div>
             <dt>?</dt>
-            <dd>Show this shortcuts panel</dd>
+            <dd>{tCommon('shortcutShowPanel')}</dd>
           </div>
           <div>
             <dt>Esc</dt>
-            <dd>Close drawers, dialogs, or the mobile navigation</dd>
+            <dd>{tCommon('shortcutCloseOverlays')}</dd>
           </div>
           <div>
             <dt>Tab</dt>
-            <dd>Move through controls; dialogs keep focus inside</dd>
+            <dd>{tCommon('shortcutFocusTrap')}</dd>
           </div>
         </dl>
       </Modal>

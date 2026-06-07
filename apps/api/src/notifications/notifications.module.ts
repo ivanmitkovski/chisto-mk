@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { FeatureFlagsModule } from '../feature-flags/feature-flags.module';
 import { PrismaModule } from '../prisma/prisma.module';
 import { EmailModule } from '../email/email.module';
+import { AdminModerationEmailModule } from '../admin-moderation-email/admin-moderation-email.module';
 import { ReportsUploadModule } from '../reports/reports-upload.module';
 import { NotificationsInboxController } from './controllers/notifications-inbox.controller';
 import { NotificationsStateController } from './controllers/notifications-state.controller';
@@ -29,6 +30,7 @@ import { NotificationsRoomEmitterService } from './services/notifications-room-e
     ConfigModule,
     FeatureFlagsModule,
     EmailModule,
+    AdminModerationEmailModule,
     ReportsUploadModule,
   ],
   controllers: [

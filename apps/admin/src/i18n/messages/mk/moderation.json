@@ -1,0 +1,71 @@
+{
+  "pageTitle": "UGC модерација",
+  "pageHeaderTitle": "UGC модерација",
+  "pageDescription": "Триажирајте граѓански пријави за коментари, разговори, корисници, локалитети и настани.",
+  "empty": "Нема UGC пријави што одговараат на тековните филтри.",
+  "queueAria": "Ред за UGC пријави",
+  "reportsCount": "{total} пријави",
+  "openOnPage": "{count} отворени на оваа страница",
+  "statusFilter": "Статус",
+  "statusOptions": {
+    "all": "Сите статуси",
+    "open": "Отворени",
+    "escalated": "Ескалирани",
+    "reviewed": "Прегледани",
+    "dismissed": "Отфрлени",
+    "hidden": "Скриени"
+  },
+  "detail": {
+    "kicker": "UGC пријава",
+    "subjectPreview": "Преглед на предмет",
+    "openRecord": "Отвори запис {subjectType}",
+    "noDetailPage": "Овој тип предмет сè уште нема посветена админ страница за детали.",
+    "caseStatus": "Статус на случај",
+    "contentStatus": "Статус на содржина",
+    "reason": "Причина",
+    "reporter": "Пријавувач",
+    "created": "Креирано",
+    "reporterProfile": "Профил на пријавувач",
+    "viewReporter": "Прикажи пријавувач",
+    "reporterDetails": "Детали за пријавувач",
+    "actionUnavailable": "Недостапно за тековниот статус на пријавата"
+  },
+  "subjectTypes": {
+    "user": "Кориснички профил",
+    "site": "Запис за локалитет",
+    "event": "Настан за чистење",
+    "site_comment": "Коментар на локалитет",
+    "event_chat_message": "Порака од разговор на настан",
+    "safety_issue": "Безбедносен проблем"
+  },
+  "actions": {
+    "markReviewed": "Означи како прегледано",
+    "dismiss": "Отфрли",
+    "escalate": "Ескалирај",
+    "hideSubject": "Сокриј предмет",
+    "restoreSubject": "Врати предмет",
+    "moderateReport": "Модерирај пријава"
+  },
+  "modal": {
+    "description": "Оваа акција ќе биде ревизирана и видлива за други админи.",
+    "policyReasonLabel": "Причина по политика (задолжително за отфрлање/ескалација/скривање/враќање)",
+    "policyReasonRequired": "Потребна е причина по политика за оваа акција.",
+    "moderatorNoteLabel": "Белешка од модератор",
+    "hideSubjectConfirmTitle": "Сокриј пријавен предмет?",
+    "hideSubjectConfirmDescription": "Ова го крие предметот од јавноста. Потврдете само ако го крши policy."
+  },
+  "toast": {
+    "savedTitle": "Модерацијата е зачувана",
+    "savedMessage": "UGC пријавата е ажурирана.",
+    "failedTitle": "Модерацијата не успеа",
+    "failedMessage": "Не може да се ажурира оваа UGC пријава."
+  },
+  "emptyFiltered": "Нема UGC извештаи што одговараат на филтрите. Обидете се да ги исчистите.",
+  "readOnlyBanner": "Имате read-only пристап до UGC модерација.",
+  "searchPlaceholder": "Пребарај извештаи…",
+  "searchAria": "Пребарај UGC извештаи",
+  "subjectTypeFilter": "Тип на предмет",
+  "subjectTypeOptions": {
+    "all": "Сите типови"
+  }
+}

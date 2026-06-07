@@ -1,0 +1,50 @@
+{
+  "pageTitle": "Gamifikimi",
+  "description": "Konfiguro nivelet, vlerat e pikëve dhe shqyrto renditjet javore.",
+  "tabs": {
+    "config": "Konfigurimi",
+    "weeklyRankings": "Renditjet javore"
+  },
+  "config": {
+    "levelThresholds": "Pragjet e niveleve (të ndara me presje)",
+    "pointValues": "Vlerat e pikëve",
+    "action": "Veprimi",
+    "points": "Pikët",
+    "remove": "Hiq",
+    "addAction": "Shto veprim",
+    "saveConfig": "Ruaj konfigurimin",
+    "saving": "Duke ruajtur…"
+  },
+  "validation": {
+    "thresholdRequired": "Shto të paktën një prag niveli.",
+    "thresholdNonNegative": "Pragjet duhet të jenë numra të plotë jo-negativë.",
+    "thresholdIncreasing": "Pragjet duhet të rriten rreptësisht.",
+    "actionRequired": "Shto të paktën një veprim pikësh.",
+    "actionKeyFormat": "Çelësat e veprimeve duhet të jenë UPPER_SNAKE_CASE.",
+    "pointsNonNegative": "Vlerat e pikëve duhet të jenë numra jo-negativë."
+  },
+  "rankings": {
+    "previousWeek": "Java e kaluar",
+    "nextWeek": "Java tjetër",
+    "currentWeek": "Java aktuale",
+    "weekRange": "Java {start} - {end}",
+    "empty": "Ende pa renditje për këtë javë.",
+    "columns": {
+      "rank": "Renditja",
+      "user": "Përdoruesi",
+      "email": "Email",
+      "points": "Pikët",
+      "leaderboard": "Renditja"
+    },
+    "showOnLeaderboardYes": "Po",
+    "showOnLeaderboardNo": "Jo"
+  },
+  "toast": {
+    "invalidConfigTitle": "Konfigurim i pavlefshëm",
+    "savedMessage": "Konfigurimi i gamifikimit u përditësua.",
+    "saveFailedTitle": "Ruajtja dështoi",
+    "saveFailedMessage": "Nuk mund të ruhet konfigurimi.",
+    "loadFailedMessage": "Nuk mund të ngarkohen renditjet."
+  },
+  "tabsAria": "Seksionet e gamifikimit"
+}

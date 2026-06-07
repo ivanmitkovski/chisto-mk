@@ -5,6 +5,15 @@
   align-items: start;
 }
 
+.readOnlyBanner {
+  grid-column: 1 / -1;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-warning) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-warning) 35%, transparent);
+  font-size: 0.875rem;
+}
+
 .queue,
 .detail {
   min-width: 0;
@@ -152,7 +161,91 @@
   box-shadow: var(--focus-ring);
 }
 
-@media (max-width: 56rem) {
+.filters {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+}
+
+.searchForm {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-end;
+}
+
+.filterLabel {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-secondary);
+}
+
+.filterSelect {
+  width: 100%;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-app);
+  color: var(--text-primary);
+  font: inherit;
+}
+
+.paginationWrap {
+  padding-top: var(--space-2);
+}
+
+.subjectPreview {
+  padding: var(--space-4);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--surface-subtle);
+}
+
+.subjectPreview h3 {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+}
+
+.subjectPreviewType {
+  margin: var(--space-2) 0 0;
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+.subjectPreviewId {
+  margin: var(--space-1) 0 0;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.subjectPreviewId code {
+  font-family: var(--font-mono, monospace);
+}
+
+.subjectLink {
+  display: inline-block;
+  margin-top: var(--space-3);
+  color: var(--color-green-700);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+}
+
+.subjectLink:hover {
+  text-decoration: underline;
+}
+
+.subjectPreviewHint {
+  margin: var(--space-3) 0 0;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+@media (max-width: 48rem) {
   .layout {
     grid-template-columns: 1fr;
   }

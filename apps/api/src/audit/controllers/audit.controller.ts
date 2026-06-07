@@ -8,7 +8,10 @@ import {
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { RolesGuard } from '../../auth/guards/roles.guard';
+import { PermissionsGuard } from '../../auth/guards/permissions.guard';
+import { RequirePermission } from '../../auth/decorators/require-permission.decorator';
 import { ADMIN_PANEL_ROLES } from '../../auth/constants/admin-roles';
+import { ADMIN_PERMISSIONS } from '../../auth/constants/admin-permissions';
 import { AuditService } from '../services/audit.service';
 import { ListAuditQueryDto } from '../dto/list-audit-query.dto';
 import { ApiStandardHttpErrorResponses } from '../../common/openapi/standard-http-error-responses.decorator';
@@ -20,8 +23,9 @@ export class AuditController {
   constructor(private readonly auditService: AuditService) {}
 
   @Get()
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
   @Roles(...ADMIN_PANEL_ROLES)
+  @RequirePermission(ADMIN_PERMISSIONS['audit:read'])
   @ApiBearerAuth()
   @ApiOperation({ summary: 'List audit log entries' })
   @ApiOkResponse({ description: 'Audit log' })

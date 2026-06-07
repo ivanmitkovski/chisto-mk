@@ -1,12 +1,14 @@
-import { ProfileMenuAction, TopBarCommand } from '../types/top-bar';
+import { ADMIN_PERMISSIONS } from '@/lib/auth/rbac/permissions';
+import { ProfileMenuAction, TopBarCommandDefinition } from '../types/top-bar';
 
-export const topBarCommands: ReadonlyArray<TopBarCommand> = [
+export const topBarCommands: ReadonlyArray<TopBarCommandDefinition> = [
   {
     id: 'go-dashboard',
-    label: 'Go to Dashboard',
-    description: 'Open admin overview metrics and report table',
+    labelKey: 'commands.goDashboard.label',
+    descriptionKey: 'commands.goDashboard.description',
     icon: 'home',
     keywords: ['overview', 'home', 'stats'],
+    permission: ADMIN_PERMISSIONS['dashboard:view'],
     action: {
       type: 'navigate',
       href: '/dashboard',
@@ -14,10 +16,11 @@ export const topBarCommands: ReadonlyArray<TopBarCommand> = [
   },
   {
     id: 'go-reports',
-    label: 'Go to Reports',
-    description: 'Review incoming pollution reports',
+    labelKey: 'commands.goReports.label',
+    descriptionKey: 'commands.goReports.description',
     icon: 'document-text',
     keywords: ['moderation', 'review', 'incidents'],
+    permission: ADMIN_PERMISSIONS['reports:read'],
     action: {
       type: 'navigate',
       href: '/dashboard/reports',
@@ -25,10 +28,11 @@ export const topBarCommands: ReadonlyArray<TopBarCommand> = [
   },
   {
     id: 'go-duplicates',
-    label: 'Go to Duplicate Reports',
-    description: 'Merge duplicate report groups',
+    labelKey: 'commands.goDuplicates.label',
+    descriptionKey: 'commands.goDuplicates.description',
     icon: 'document-forward',
     keywords: ['merge', 'duplicates', 'groups'],
+    permission: ADMIN_PERMISSIONS['reports:merge'],
     action: {
       type: 'navigate',
       href: '/dashboard/reports/duplicates',
@@ -36,10 +40,11 @@ export const topBarCommands: ReadonlyArray<TopBarCommand> = [
   },
   {
     id: 'go-users',
-    label: 'Go to Users',
-    description: 'Browse and manage admin users',
+    labelKey: 'commands.goUsers.label',
+    descriptionKey: 'commands.goUsers.description',
     icon: 'users',
     keywords: ['accounts', 'moderators', 'people'],
+    permission: ADMIN_PERMISSIONS['users:read'],
     action: {
       type: 'navigate',
       href: '/dashboard/users',
@@ -47,10 +52,11 @@ export const topBarCommands: ReadonlyArray<TopBarCommand> = [
   },
   {
     id: 'go-sites',
-    label: 'Go to Sites',
-    description: 'Pollution sites and lifecycle status',
+    labelKey: 'commands.goSites.label',
+    descriptionKey: 'commands.goSites.description',
     icon: 'location',
     keywords: ['places', 'locations', 'canonical'],
+    permission: ADMIN_PERMISSIONS['sites:read'],
     action: {
       type: 'navigate',
       href: '/dashboard/sites',
@@ -58,10 +64,11 @@ export const topBarCommands: ReadonlyArray<TopBarCommand> = [
   },
   {
     id: 'go-map',
-    label: 'Go to Map',
-    description: 'Sites on the map',
+    labelKey: 'commands.goMap.label',
+    descriptionKey: 'commands.goMap.description',
     icon: 'map',
     keywords: ['geo', 'markers', 'clusters'],
+    permission: ADMIN_PERMISSIONS['map:read'],
     action: {
       type: 'navigate',
       href: '/dashboard/map',
@@ -69,21 +76,131 @@ export const topBarCommands: ReadonlyArray<TopBarCommand> = [
   },
   {
     id: 'go-events',
-    label: 'Go to Cleanup Events',
-    description: 'Schedule and review cleanup events',
+    labelKey: 'commands.goEvents.label',
+    descriptionKey: 'commands.goEvents.description',
     icon: 'calendar',
     keywords: ['cleanups', 'volunteers'],
+    permission: ADMIN_PERMISSIONS['events:read'],
     action: {
       type: 'navigate',
       href: '/dashboard/events',
     },
   },
   {
+    id: 'go-risk-signals',
+    labelKey: 'commands.goRiskSignals.label',
+    descriptionKey: 'commands.goRiskSignals.description',
+    icon: 'alert-triangle',
+    keywords: ['fraud', 'check-in', 'risk'],
+    permission: ADMIN_PERMISSIONS['events:read'],
+    action: {
+      type: 'navigate',
+      href: '/dashboard/events/risk-signals',
+    },
+  },
+  {
+    id: 'go-moderation',
+    labelKey: 'commands.goModeration.label',
+    descriptionKey: 'commands.goModeration.description',
+    icon: 'clipboard-close',
+    keywords: ['ugc', 'abuse', 'content'],
+    permission: ADMIN_PERMISSIONS['moderation:read'],
+    action: {
+      type: 'navigate',
+      href: '/dashboard/moderation/ugc',
+    },
+  },
+  {
+    id: 'go-broadcasts',
+    labelKey: 'commands.goBroadcasts.label',
+    descriptionKey: 'commands.goBroadcasts.description',
+    icon: 'megaphone',
+    keywords: ['campaign', 'push', 'announcement'],
+    permission: ADMIN_PERMISSIONS['notifications:broadcast'],
+    action: {
+      type: 'navigate',
+      href: '/dashboard/broadcasts',
+    },
+  },
+  {
+    id: 'go-team',
+    labelKey: 'commands.goTeam.label',
+    descriptionKey: 'commands.goTeam.description',
+    icon: 'user-cog',
+    keywords: ['invite', 'staff', 'super admin', 'moderator'],
+    permission: ADMIN_PERMISSIONS['team:read'],
+    action: {
+      type: 'navigate',
+      href: '/dashboard/team',
+    },
+  },
+  {
+    id: 'go-gamification',
+    labelKey: 'commands.goGamification.label',
+    descriptionKey: 'commands.goGamification.description',
+    icon: 'trophy',
+    keywords: ['points', 'leaderboard', 'rewards'],
+    permission: ADMIN_PERMISSIONS['gamification:read'],
+    action: {
+      type: 'navigate',
+      href: '/dashboard/gamification',
+    },
+  },
+  {
+    id: 'go-app-config',
+    labelKey: 'commands.goAppConfig.label',
+    descriptionKey: 'commands.goAppConfig.description',
+    icon: 'sliders',
+    keywords: ['config', 'quiz', 'terms', 'feed'],
+    permission: ADMIN_PERMISSIONS['app-config:read'],
+    action: {
+      type: 'navigate',
+      href: '/dashboard/app-config',
+    },
+  },
+  {
+    id: 'go-operations',
+    labelKey: 'commands.goOperations.label',
+    descriptionKey: 'commands.goOperations.description',
+    icon: 'info',
+    keywords: ['health', 'push', 'metrics'],
+    permission: ADMIN_PERMISSIONS['operations:read'],
+    action: {
+      type: 'navigate',
+      href: '/dashboard/operations',
+    },
+  },
+  {
+    id: 'go-email-suppressions',
+    labelKey: 'commands.goEmailSuppressions.label',
+    descriptionKey: 'commands.goEmailSuppressions.description',
+    icon: 'mail-x',
+    keywords: ['comms', 'bounce', 'postmark', 'suppression'],
+    permission: ADMIN_PERMISSIONS['comms:read'],
+    action: {
+      type: 'navigate',
+      href: '/dashboard/comms/email-suppressions',
+    },
+  },
+  {
+    id: 'go-webhook-logs',
+    labelKey: 'commands.goWebhookLogs.label',
+    descriptionKey: 'commands.goWebhookLogs.description',
+    icon: 'webhook',
+    keywords: ['comms', 'twilio', 'postmark', 'webhook'],
+    permission: ADMIN_PERMISSIONS['comms:read'],
+    action: {
+      type: 'navigate',
+      href: '/dashboard/comms/webhook-logs',
+    },
+  },
+  {
     id: 'go-audit',
-    label: 'Go to Audit Log',
-    description: 'Admin activity and changes',
+    labelKey: 'commands.goAudit.label',
+    descriptionKey: 'commands.goAudit.description',
     icon: 'scroll-text',
     keywords: ['history', 'compliance', 'trail'],
+    permission: ADMIN_PERMISSIONS['audit:read'],
     action: {
       type: 'navigate',
       href: '/dashboard/audit',
@@ -91,10 +208,11 @@ export const topBarCommands: ReadonlyArray<TopBarCommand> = [
   },
   {
     id: 'go-settings',
-    label: 'Go to Settings',
-    description: 'Manage profile and admin preferences',
+    labelKey: 'commands.goSettings.label',
+    descriptionKey: 'commands.goSettings.description',
     icon: 'setting',
     keywords: ['profile', 'preferences'],
+    permission: ADMIN_PERMISSIONS['settings:read'],
     action: {
       type: 'navigate',
       href: '/dashboard/settings',
@@ -102,10 +220,11 @@ export const topBarCommands: ReadonlyArray<TopBarCommand> = [
   },
   {
     id: 'open-notifications',
-    label: 'Go to Notifications',
-    description: 'Open the notifications activity center',
+    labelKey: 'commands.goNotifications.label',
+    descriptionKey: 'commands.goNotifications.description',
     icon: 'notification-bing',
     keywords: ['alerts', 'activity', 'updates'],
+    permission: ADMIN_PERMISSIONS['notifications:read'],
     action: {
       type: 'navigate',
       href: '/dashboard/notifications',
@@ -113,8 +232,9 @@ export const topBarCommands: ReadonlyArray<TopBarCommand> = [
   },
   {
     id: 'open-profile',
-    label: 'Open Profile Menu',
-    description: 'Quick access to account actions',
+    labelKey: 'openProfileMenu',
+    descriptionKey: 'openProfileMenuDescription',
+    messageNamespace: 'common',
     icon: 'user',
     keywords: ['account', 'user'],
     action: {
@@ -123,8 +243,9 @@ export const topBarCommands: ReadonlyArray<TopBarCommand> = [
   },
   {
     id: 'open-preferences',
-    label: 'Open Preferences',
-    description: 'Display and notification preferences',
+    labelKey: 'openPreferences',
+    descriptionKey: 'openPreferencesDescription',
+    messageNamespace: 'common',
     icon: 'setting',
     keywords: ['theme', 'controls', 'locale', 'motion'],
     action: {
@@ -134,8 +255,9 @@ export const topBarCommands: ReadonlyArray<TopBarCommand> = [
   },
   {
     id: 'sign-out',
-    label: 'Sign out',
-    description: 'Return to login screen',
+    labelKey: 'signOutCommand',
+    descriptionKey: 'signOutDescription',
+    messageNamespace: 'common',
     icon: 'log-out',
     keywords: ['logout', 'exit'],
     action: {
@@ -147,19 +269,19 @@ export const topBarCommands: ReadonlyArray<TopBarCommand> = [
 export const profileMenuActions: ReadonlyArray<ProfileMenuAction> = [
   {
     id: 'profile-settings',
-    label: 'Profile settings',
+    labelKey: 'profileSettings',
     icon: 'setting',
     action: 'go-to-settings',
   },
   {
     id: 'profile-preferences',
-    label: 'Preferences',
+    labelKey: 'preferences',
     icon: 'user',
     action: 'open-preferences',
   },
   {
     id: 'profile-signout',
-    label: 'Sign out',
+    labelKey: 'signOut',
     icon: 'log-out',
     action: 'sign-out',
   },

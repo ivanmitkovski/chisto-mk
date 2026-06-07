@@ -30,3 +30,11 @@
   border-color: var(--color-error);
   color: var(--color-error);
 }
+
+.loading {
+  border-style: solid;
+  border-color: var(--border-default);
+  background: var(--bg-surface);
+  text-align: left;
+  align-items: stretch;
+}

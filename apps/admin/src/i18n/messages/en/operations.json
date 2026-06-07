@@ -1,0 +1,62 @@
+{
+  "pageTitle": "Operations",
+  "description": "Production health surfaces for push delivery, map pipeline, feed diagnostics, side effects, and GDPR observability.",
+  "links": {
+    "emailSuppressions": "Email suppressions",
+    "webhookLogs": "Webhook logs",
+    "backendDiag": "Backend diag",
+    "prometheusMetrics": "Prometheus metrics"
+  },
+  "refreshBar": {
+    "refreshAll": "Refresh all",
+    "autoRefreshHint": "Auto-refreshes every 60s"
+  },
+  "testPush": {
+    "button": "Send test push",
+    "confirmTitle": "Send test push",
+    "confirmDescription": "This sends a test notification to your registered admin device. Continue?",
+    "confirmLabel": "Send test push",
+    "successTitle": "Test push sent",
+    "successMessage": "Check your device for the test notification.",
+    "failedTitle": "Test push failed",
+    "failedMessage": "Unable to send test push."
+  },
+  "cards": {
+    "pushDelivery": "Push delivery",
+    "deliveryFunnel": "Delivery funnel",
+    "mapPipeline": "Map pipeline",
+    "mapDeepProbe": "Map deep probe",
+    "pushDeadLetters": "Push dead letters",
+    "feedDiagnostics": "Feed diagnostics",
+    "sideEffectsQueue": "Side effects queue",
+    "emailSuppressions": "Email suppressions",
+    "gdprAuditWatch": "GDPR audit watch"
+  },
+  "metrics": {
+    "totalSends": "Total sends",
+    "success": "Success",
+    "failures": "Failures",
+    "deadLetters": "Dead letters",
+    "sent": "Sent",
+    "opened": "Opened",
+    "openRate": "Open rate",
+    "queueDepth": "Queue depth",
+    "status": "Status",
+    "outboxPending": "Outbox pending",
+    "staleHotRows": "Stale hot rows",
+    "latency": "Latency",
+    "matches": "Matches",
+    "path": "Path",
+    "reasonCodes": "Reason codes",
+    "rankDriftRows": "Rank drift rows",
+    "integrityDemotions": "Integrity demotions",
+    "deadLettersTotal": "{count} dead-letter(s) total",
+    "attempts": "{count} attempt(s)",
+    "pendingSideEffects": "{count} pending report side-effect jobs.",
+    "suppressedEmails": "{count} suppressed email addresses.",
+    "gdprEntries": "{count} recent user audit entries available for privacy review."
+  },
+  "deadLetters": {
+    "loadFailed": "Unable to load dead letters."
+  }
+}

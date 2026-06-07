@@ -2,9 +2,12 @@
   position: relative;
   display: grid;
   gap: var(--space-2);
-  color: var(--text-primary);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
+}
+
+.control {
+  position: relative;
+  display: grid;
+  gap: var(--space-2);
 }
 
 .root input {
@@ -23,6 +26,11 @@
   box-shadow: var(--focus-ring);
 }
 
+.root input:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
 .options {
   display: grid;
   max-height: 14rem;
@@ -30,6 +38,7 @@
   border: 1px solid var(--border-default);
   border-radius: var(--radius-lg);
   background: var(--bg-surface);
+  box-shadow: var(--shadow-md);
 }
 
 .options button {
@@ -42,6 +51,13 @@
 }
 
 .options button:hover,
-.options button[aria-selected='true'] {
+.options button[aria-selected='true'],
+.optionActive {
   background: rgba(8, 54, 39, 0.08);
+}
+
+.emptyOption {
+  padding: var(--space-2) var(--space-3);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
 }

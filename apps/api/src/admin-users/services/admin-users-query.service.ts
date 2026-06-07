@@ -2,7 +2,11 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, Role, UserStatus } from '../../prisma-client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../../audit/services/audit.service';
-import { ListAdminUsersQueryDto } from '../dto/list-admin-users-query.dto';
+import {
+  AdminUsersSortDir,
+  AdminUsersSortField,
+  ListAdminUsersQueryDto,
+} from '../dto/list-admin-users-query.dto';
 
 @Injectable()
 export class AdminUsersQueryService {
@@ -54,10 +58,14 @@ export class AdminUsersQueryService {
       (where.lastActiveAt as Record<string, unknown>).gte = new Date(query.lastActiveAfter);
     }
 
+    const sortField = query.sort ?? AdminUsersSortField.CREATED;
+    const sortDir = query.dir ?? AdminUsersSortDir.DESC;
+    const orderBy = this.buildOrderBy(sortField, sortDir);
+
     const [rows, total] = await this.prisma.$transaction([
       this.prisma.user.findMany({
         where,
-        orderBy: { createdAt: 'desc' },
+        orderBy,
         skip,
         take: limit,
         select: {
@@ -82,6 +90,25 @@ export class AdminUsersQueryService {
       })),
       meta: { page, limit, total },
     };
+  }
+
+  private buildOrderBy(
+    sort: AdminUsersSortField,
+    dir: AdminUsersSortDir,
+  ): Prisma.UserOrderByWithRelationInput | Prisma.UserOrderByWithRelationInput[] {
+    switch (sort) {
+      case AdminUsersSortField.LAST_ACTIVE:
+        return { lastActiveAt: dir };
+      case AdminUsersSortField.NAME:
+        return [{ lastName: dir }, { firstName: dir }];
+      case AdminUsersSortField.EMAIL:
+        return { email: dir };
+      case AdminUsersSortField.POINTS:
+        return { pointsBalance: dir };
+      case AdminUsersSortField.CREATED:
+      default:
+        return { createdAt: dir };
+    }
   }
 
   async findOne(id: string): Promise<{

@@ -1,20 +1,24 @@
 import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 import { AdminShell } from '@/features/admin-shell';
-import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell/constants';
+import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell';
 import { SectionState } from '@/components/ui';
-import { getMeProfile } from '@/features/auth/data/me-adapter';
-import { getCleanupEvents, getEventsStats } from '@/features/events/data/events-adapter';
-import { EventsWorkspace } from '@/features/events/components/events-workspace';
-import { SectionRefreshButton } from '@/features/events/components/section-refresh-button';
-import { canWriteCleanupEvents } from '@/features/events/lib/cleanup-events-write-access';
-import { ApiError } from '@/lib/api';
+import { getMeProfile } from '@/features/auth';
+import { getCleanupEvents, getEventsStats } from '@/features/events';
+import { EventsWorkspace } from '@/features/events';
+import { SectionRefreshButton } from '@/features/events';
+import { canWriteCleanupEvents } from '@/features/events';
+import { ADMIN_PERMISSIONS } from '@/lib/auth/rbac/permissions';
+import { requirePagePermission } from '@/lib/auth/rbac/server';
+import { handleServerLoadError } from '@/lib/server/handle-server-load-error';
 
 type PageProps = {
   searchParams: Promise<{ status?: string; moderationStatus?: string; page?: string; q?: string }>;
 };
 
 export default async function EventsPage(props: PageProps) {
+  await requirePagePermission(ADMIN_PERMISSIONS['events:read']);
+  const tNav = await getTranslations('nav');
   const cookieStore = await cookies();
   const initialSidebarCollapsed = cookieStore.get(DESKTOP_SIDEBAR_COOKIE_KEY)?.value === '1';
   const params = await props.searchParams;
@@ -46,12 +50,10 @@ export default async function EventsPage(props: PageProps) {
     result = listResult;
     stats = statsResult;
   } catch (error) {
-    if (error instanceof ApiError && (error.status === 401 || error.status === 403)) {
-      redirect('/login');
-    }
+    const message = await handleServerLoadError(error, { fallbackMessageKey: 'unableToLoadEvents' });
     return (
-      <AdminShell title="Cleanup events" activeItem="events" initialSidebarCollapsed={initialSidebarCollapsed}>
-        <SectionState variant="error" message="Unable to load events. Check your connection or sign in again.">
+      <AdminShell title={tNav('events')} activeItem="events" initialSidebarCollapsed={initialSidebarCollapsed}>
+        <SectionState variant="error" message={message}>
           <SectionRefreshButton />
         </SectionState>
       </AdminShell>
@@ -59,7 +61,7 @@ export default async function EventsPage(props: PageProps) {
   }
 
   return (
-    <AdminShell title="Cleanup events" activeItem="events" initialSidebarCollapsed={initialSidebarCollapsed}>
+    <AdminShell title={tNav('events')} activeItem="events" initialSidebarCollapsed={initialSidebarCollapsed}>
       <EventsWorkspace
         initialData={result.data}
         initialMeta={result.meta}

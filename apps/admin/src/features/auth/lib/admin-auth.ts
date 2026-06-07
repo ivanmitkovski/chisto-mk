@@ -1,27 +1,14 @@
 import { ApiError } from '@/lib/api';
+import { getAdminCsrfHeaders } from '@/lib/auth/csrf-headers';
 import {
   ADMIN_AUTH_COOKIE_KEY,
-  ADMIN_CSRF_COOKIE_KEY,
-  ADMIN_CSRF_HEADER,
   ADMIN_REFRESH_COOKIE_KEY,
 } from './auth-constants';
 import type { AdminLoginResponse, AuthResponse } from './types';
 import { is2FAResponse } from './types';
 
 export { ADMIN_AUTH_COOKIE_KEY, ADMIN_REFRESH_COOKIE_KEY };
-
-function readCookie(name: string): string | null {
-  if (typeof document === 'undefined') return null;
-  const match = document.cookie.match(
-    new RegExp(`(?:^|;\\s*)${encodeURIComponent(name)}=([^;]*)`),
-  );
-  return match ? decodeURIComponent(match[1]) : null;
-}
-
-export function getAdminCsrfHeaders(): Record<string, string> {
-  const token = readCookie(ADMIN_CSRF_COOKIE_KEY);
-  return token ? { [ADMIN_CSRF_HEADER]: token } : {};
-}
+export { getAdminCsrfHeaders };
 
 export type LoginAdminResult =
   | { success: true }
@@ -96,12 +83,23 @@ async function fetchAdminAuth<TResponse>(
   return payload as TResponse;
 }
 
-export function logoutAdmin(): void {
-  fetch('/api/auth/logout', {
-    method: 'POST',
-    headers: getAdminCsrfHeaders(),
-    credentials: 'include',
-  }).catch(() => {});
+/** Clears admin session cookies via the Next.js auth route. */
+export async function logoutAdmin(): Promise<void> {
+  try {
+    await fetch('/api/auth/logout', {
+      method: 'POST',
+      headers: getAdminCsrfHeaders(),
+      credentials: 'include',
+    });
+  } catch {
+    // Still redirect — route may have partially cleared cookies.
+  }
+}
+
+/** Ends the session and reloads login so middleware sees cleared cookies. */
+export async function signOutAndRedirectToLogin(): Promise<void> {
+  await logoutAdmin();
+  window.location.assign('/login');
 }
 
 export async function refreshAdminSession(): Promise<boolean> {

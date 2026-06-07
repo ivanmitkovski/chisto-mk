@@ -18,6 +18,7 @@ const DEFAULT_FLAGS: Array<{ key: string; enabled: boolean }> = [
   { key: 'push_realtime_socket_enabled', enabled: true },
   { key: 'push_quiet_hours_enabled', enabled: false },
   { key: 'email_enabled', enabled: false },
+  { key: 'admin_moderation_email_enabled', enabled: false },
   { key: 'site_lifecycle_from_events', enabled: true },
   { key: 'event_chat_push_coalesce_v2', enabled: false },
 ];
@@ -145,6 +146,15 @@ export class FeatureFlagsService {
     await this.ensureDefaults();
     const row = await this.prisma.featureFlag.findUnique({
       where: { key: 'push_quiet_hours_enabled' },
+      select: { enabled: true },
+    });
+    return row?.enabled ?? false;
+  }
+
+  async isAdminModerationEmailEnabled(): Promise<boolean> {
+    await this.ensureDefaults();
+    const row = await this.prisma.featureFlag.findUnique({
+      where: { key: 'admin_moderation_email_enabled' },
       select: { enabled: true },
     });
     return row?.enabled ?? false;

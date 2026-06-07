@@ -1,0 +1,62 @@
+{
+  "pageTitle": "Операции",
+  "description": "Продукциски површини за здравје на push достава, процес на карта, feed дијагностика, споредни ефекти и GDPR набљудување.",
+  "links": {
+    "emailSuppressions": "Блокирани е-пошти",
+    "webhookLogs": "Webhook дневници",
+    "backendDiag": "Backend дијагностика",
+    "prometheusMetrics": "Prometheus метрики"
+  },
+  "refreshBar": {
+    "refreshAll": "Освежи сè",
+    "autoRefreshHint": "Автоматско освежување на секои 60s"
+  },
+  "testPush": {
+    "button": "Испрати тест push",
+    "confirmTitle": "Испрати тест push",
+    "confirmDescription": "Ова испраќа тест известување на вашиот регистриран админ уред. Да продолжиме?",
+    "confirmLabel": "Испрати тест push",
+    "successTitle": "Тест push е испратен",
+    "successMessage": "Проверете го вашиот уред за тест известувањето.",
+    "failedTitle": "Тест push не успеа",
+    "failedMessage": "Не може да се испрати тест push."
+  },
+  "cards": {
+    "pushDelivery": "Push достава",
+    "deliveryFunnel": "Левак за достава",
+    "mapPipeline": "Процес на карта",
+    "mapDeepProbe": "Длабока проба на карта",
+    "pushDeadLetters": "Недоставени push пораки",
+    "feedDiagnostics": "Feed дијагностика",
+    "sideEffectsQueue": "Ред за споредни ефекти",
+    "emailSuppressions": "Блокирани е-пошти",
+    "gdprAuditWatch": "GDPR надзор на ревизија"
+  },
+  "metrics": {
+    "totalSends": "Вкупно испратени",
+    "success": "Успех",
+    "failures": "Неуспешни",
+    "deadLetters": "Мртви писма",
+    "sent": "Испратено",
+    "opened": "Отворено",
+    "openRate": "Стапка на отворање",
+    "queueDepth": "Длабочина на ред",
+    "status": "Статус",
+    "outboxPending": "Outbox во очекување",
+    "staleHotRows": "Застарени hot редови",
+    "latency": "Латентност",
+    "matches": "Совпаѓања",
+    "path": "Патека",
+    "reasonCodes": "Кодови на причини",
+    "rankDriftRows": "Редови со отстапување на ранг",
+    "integrityDemotions": "Деградации на интегритет",
+    "deadLettersTotal": "{count} мртви писма вкупно",
+    "attempts": "{count} обид(и)",
+    "pendingSideEffects": "{count} задачи за споредни ефекти на пријави во очекување.",
+    "suppressedEmails": "{count} блокирани адреси за е-пошта.",
+    "gdprEntries": "{count} неодамнешни записи за ревизија на корисници достапни за преглед на приватност."
+  },
+  "deadLetters": {
+    "loadFailed": "Не може да се вчитаат dead letters."
+  }
+}

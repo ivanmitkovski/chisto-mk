@@ -367,47 +367,26 @@
   outline-offset: 2px;
 }
 
-/* Skeleton */
+/* Skeleton — shimmer from ui/skeleton kit */
 .titleSkeleton {
+  composes: shimmerBlock from '../../../components/ui/skeleton/skeleton.module.css';
   width: 8rem;
   height: 1.25rem;
   border-radius: var(--radius-sm);
-  background: linear-gradient(
-    90deg,
-    var(--color-green-010) 25%,
-    rgba(37, 219, 134, 0.12) 50%,
-    var(--color-green-010) 75%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.5s ease-in-out infinite;
 }
 
 .subtitleSkeleton {
+  composes: shimmerBlock from '../../../components/ui/skeleton/skeleton.module.css';
   width: 6rem;
   height: 1rem;
   border-radius: var(--radius-sm);
-  background: linear-gradient(
-    90deg,
-    var(--color-green-010) 25%,
-    rgba(37, 219, 134, 0.12) 50%,
-    var(--color-green-010) 75%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.5s ease-in-out infinite;
 }
 
 .filterChipSkeleton {
+  composes: shimmerBlock from '../../../components/ui/skeleton/skeleton.module.css';
   width: 4.5rem;
   height: 1.75rem;
   border-radius: var(--radius-full);
-  background: linear-gradient(
-    90deg,
-    var(--color-green-010) 25%,
-    rgba(37, 219, 134, 0.12) 50%,
-    var(--color-green-010) 75%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.5s ease-in-out infinite;
 }
 
 .tableSkeleton {
@@ -417,28 +396,12 @@
 }
 
 .rowSkeleton {
+  composes: shimmerBlock from '../../../components/ui/skeleton/skeleton.module.css';
   height: 3.25rem;
   border-bottom: 1px solid var(--border-default);
-  background: linear-gradient(
-    90deg,
-    var(--color-green-010) 25%,
-    rgba(37, 219, 134, 0.08) 50%,
-    var(--color-green-010) 75%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.5s ease-in-out infinite;
 }
 
-@keyframes shimmer {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
-}
-
-@media (max-width: 56rem) {
+@media (max-width: 48rem) {
   .reportsHeader {
     flex-direction: column;
     align-items: flex-start;
@@ -455,7 +418,7 @@
   }
 }
 
-@media (max-width: 52rem) {
+@media (max-width: 48rem) {
   .tableWrapper {
     display: none;
   }

@@ -1,4 +1,4 @@
-import { adminBrowserFetch } from '@/lib/admin-browser-api';
+import { adminBrowserFetch } from '@/lib/api';
 import { ApiError } from '@/lib/api';
 
 export type ConflictingEventInfo = {

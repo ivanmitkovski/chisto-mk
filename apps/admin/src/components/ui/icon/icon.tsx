@@ -24,6 +24,8 @@ import {
   PanelLeftOpen,
   LogOut,
   AlertTriangle,
+  CircleAlert,
+  CircleCheck,
   Calendar,
   Users,
   ScrollText,
@@ -34,6 +36,13 @@ import {
   ExternalLink,
   Plus,
   Minus,
+  Megaphone,
+  Trophy,
+  SlidersHorizontal,
+  MailX,
+  Webhook,
+  UserCog,
+  Download,
 } from 'lucide-react';
 
 export type IconName =
@@ -61,6 +70,8 @@ export type IconName =
   | 'panel-left-open'
   | 'log-out'
   | 'alert-triangle'
+  | 'alert-circle'
+  | 'check-circle'
   | 'calendar'
   | 'users'
   | 'scroll-text'
@@ -70,7 +81,14 @@ export type IconName =
   | 'copy'
   | 'external-link'
   | 'plus'
-  | 'minus';
+  | 'minus'
+  | 'megaphone'
+  | 'trophy'
+  | 'sliders'
+  | 'mail-x'
+  | 'webhook'
+  | 'user-cog'
+  | 'download';
 
 const iconByName: Record<IconName, LucideIcon> = {
   home: House,
@@ -97,6 +115,8 @@ const iconByName: Record<IconName, LucideIcon> = {
   'panel-left-open': PanelLeftOpen,
   'log-out': LogOut,
   'alert-triangle': AlertTriangle,
+  'alert-circle': CircleAlert,
+  'check-circle': CircleCheck,
   calendar: Calendar,
   users: Users,
   'scroll-text': ScrollText,
@@ -107,6 +127,13 @@ const iconByName: Record<IconName, LucideIcon> = {
   'external-link': ExternalLink,
   plus: Plus,
   minus: Minus,
+  megaphone: Megaphone,
+  trophy: Trophy,
+  sliders: SlidersHorizontal,
+  'mail-x': MailX,
+  webhook: Webhook,
+  'user-cog': UserCog,
+  download: Download,
 };
 
 type IconProps = {

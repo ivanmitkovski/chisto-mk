@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useRef } from 'react';
-import { adminQueryKeys, fetchNotifications } from '@/lib/admin-api-client';
+import { adminQueryKeys, fetchNotifications } from '@/lib/api';
 import { useNotifications } from '../context/notifications-context';
 
 /**
@@ -17,8 +17,8 @@ export function NotificationsQuerySync() {
   setUnreadCountRef.current = ctx?.setUnreadCount;
 
   const { data } = useQuery({
-    queryKey: adminQueryKeys.notifications,
-    queryFn: fetchNotifications,
+    queryKey: adminQueryKeys.notifications({ page: 1, limit: 10 }),
+    queryFn: () => fetchNotifications({ page: 1, limit: 10 }),
     staleTime: 0,
     gcTime: 600_000,
     retry: 1,

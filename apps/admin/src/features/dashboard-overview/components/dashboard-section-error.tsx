@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { SectionState } from '@/components/ui';
 import { DashboardRefreshButton } from './dashboard-refresh-button';
 import styles from './dashboard-error-boundary.module.css';
@@ -9,16 +12,19 @@ type DashboardSectionErrorProps = {
 };
 
 export function DashboardSectionError({ message, showSignInLink }: DashboardSectionErrorProps) {
+  const t = useTranslations('dashboard.errors');
+  const tBoundary = useTranslations('dashboard.errorBoundary');
+
   return (
     <div className={styles.wrap}>
       <SectionState variant="error" message={message} />
       <div className={styles.actions}>
-        <DashboardRefreshButton label="Retry" variant="ghost" className={styles.retryButton} />
+        <DashboardRefreshButton label={tBoundary('retry')} variant="ghost" className={styles.retryButton} />
         {showSignInLink ? (
           <>
             <span className={styles.separator}>·</span>
             <Link href="/login" className={styles.signInLink}>
-              Sign in again
+              {t('signInAgain')}
             </Link>
           </>
         ) : null}

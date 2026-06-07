@@ -1,7 +1,9 @@
-export const rejectionReasonOptions = [
-  { value: 'False report', label: 'False report' },
-  { value: 'Duplicate submission', label: 'Duplicate submission' },
-  { value: 'Insufficient evidence', label: 'Insufficient evidence' },
-  { value: 'Out of jurisdiction', label: 'Out of jurisdiction' },
-  { value: 'Policy violation', label: 'Policy violation' },
+export const REJECTION_REASON_VALUES = [
+  'False report',
+  'Duplicate submission',
+  'Insufficient evidence',
+  'Out of jurisdiction',
+  'Policy violation',
 ] as const;
+
+export type RejectionReasonValue = (typeof REJECTION_REASON_VALUES)[number];

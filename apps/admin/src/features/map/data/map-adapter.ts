@@ -5,6 +5,7 @@ import type {
   MapListApiRow,
 } from '@chisto/map-contracts';
 import { getAdminCsrfHeaders } from '@/features/auth/lib/admin-auth';
+import { MAP_SITE_FETCH_LIMIT } from '../map-constants';
 
 export class MapAdapterError extends Error {
   readonly status: number;
@@ -117,7 +118,7 @@ export async function fetchSitesForMap(params: {
     lat: String(params.lat),
     lng: String(params.lng),
     radiusKm: String(params.radiusKm),
-    limit: '200',
+    limit: String(MAP_SITE_FETCH_LIMIT),
     detail: params.detail ?? 'lite',
   });
   if (params.zoom != null) {
@@ -178,7 +179,7 @@ export async function fetchClustersForMap(params: {
     lat: String(params.lat),
     lng: String(params.lng),
     radiusKm: String(params.radiusKm),
-    limit: '200',
+    limit: String(MAP_SITE_FETCH_LIMIT),
   });
   if (params.zoom != null) {
     search.set('zoom', String(params.zoom));
@@ -274,7 +275,18 @@ export async function fetchHeatmapForMap(params: {
       body,
     });
   }
-  return (await response.json()) as MapHeatmapResponse;
+  const raw = (await response.json()) as {
+    data: Array<{ latitude: number; longitude: number; intensity?: number; weight?: number }>;
+    meta: MapHeatmapResponse['meta'];
+  };
+  return {
+    data: raw.data.map((point) => ({
+      latitude: point.latitude,
+      longitude: point.longitude,
+      weight: point.weight ?? point.intensity ?? 1,
+    })),
+    meta: raw.meta,
+  };
 }
 
 export async function searchSitesForMap(query: string): Promise<MapResponse> {

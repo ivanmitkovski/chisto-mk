@@ -1,0 +1,104 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  user-select: none;
+}
+
+.rootAlignStart {
+  align-items: flex-start;
+}
+
+.rootDisabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.wrap {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.input {
+  position: absolute;
+  inset: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+
+.box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border-default);
+  background-color: var(--bg-surface);
+  color: var(--color-on-primary);
+  transition:
+    border-color var(--motion-duration-fast) var(--motion-ease-out),
+    background-color var(--motion-duration-fast) var(--motion-ease-out),
+    box-shadow var(--motion-duration-fast) var(--motion-ease-out);
+}
+
+.checkIcon {
+  opacity: 0;
+  transform: scale(0.85);
+  transition:
+    opacity var(--motion-duration-fast) var(--motion-ease-out),
+    transform var(--motion-duration-fast) var(--motion-ease-out);
+}
+
+.input:checked + .box {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary);
+}
+
+.input:checked + .box .checkIcon {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.input:indeterminate + .box {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary);
+}
+
+.input:indeterminate + .box .checkIcon {
+  opacity: 0;
+  transform: scale(0.85);
+}
+
+.input:indeterminate + .box::after {
+  content: '';
+  position: absolute;
+  width: 0.625rem;
+  height: 2px;
+  border-radius: 1px;
+  background-color: var(--color-on-primary);
+}
+
+.input:focus-visible + .box {
+  box-shadow: var(--focus-ring);
+}
+
+.input:disabled + .box {
+  border-color: var(--border-default);
+  background-color: var(--surface-subtle);
+}
+
+.label {
+  min-width: 0;
+}

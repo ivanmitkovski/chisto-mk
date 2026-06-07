@@ -1,8 +1,13 @@
 import type { ReactNode } from 'react';
+import { Badge, type BadgeTone } from '../badge';
 import styles from './tag.module.css';
 
-type TagTone = 'neutral' | 'success' | 'warning' | 'danger' | 'info';
+type TagTone = BadgeTone;
 
 export function Tag({ children, tone = 'neutral' }: { children: ReactNode; tone?: TagTone }) {
-  return <span className={`${styles.tag} ${styles[tone]}`}>{children}</span>;
+  return (
+    <Badge tone={tone} className={styles.bold}>
+      {children}
+    </Badge>
+  );
 }

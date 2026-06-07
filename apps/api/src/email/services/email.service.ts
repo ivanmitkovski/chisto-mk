@@ -150,4 +150,120 @@ export class EmailService {
       skipPreferenceCheck: isSecurity,
     });
   }
+
+  async sendAdminInviteEmail(
+    to: string,
+    ctx: {
+      firstName: string;
+      lastName: string;
+      roleLabel: string;
+      inviteUrl: string;
+      expiresAt: string;
+    },
+  ): Promise<void> {
+    if (!(await this.eligibility.isGloballyEnabled())) return;
+
+    const trimmed = to.trim();
+    if (!(await this.eligibility.canSendToAddress(trimmed))) {
+      this.logger.warn(
+        `Skipping admin invite email: suppressed or invalid recipient address=${trimmed}`,
+      );
+      return;
+    }
+
+    const fromAddress = DEFAULT_EMAIL_FROM_ADDRESS;
+    const fromName = this.config.get<string>('EMAIL_FROM_NAME')?.trim() || DEFAULT_EMAIL_FROM_NAME;
+    const fromHeader = `${fromName.replace(/"/g, '')} <${fromAddress}>`;
+
+    const { appBaseUrl, logoUrl, inlineAttachment } = this.footerLinks.brandingUrls();
+    const locale: EmailLocale = 'en';
+
+    const { html, text, subject } = this.templates.render({
+      templateId: 'admin_invite',
+      locale,
+      context: {
+        firstName: ctx.firstName,
+        lastName: ctx.lastName,
+        roleLabel: ctx.roleLabel,
+        inviteUrl: ctx.inviteUrl,
+        expiresAt: ctx.expiresAt,
+      },
+      prefsUrl: this.footerLinks.preferencesUrl(),
+      unsubscribeUrl: this.footerLinks.preferencesUrl(),
+      appBaseUrl,
+      logoUrl,
+    });
+
+    const sendPayload: EmailSendPayload = {
+      fromHeader,
+      to: trimmed,
+      subject,
+      text,
+      html,
+      templateId: 'admin_invite',
+    };
+    if (inlineAttachment) {
+      sendPayload.inlineAttachments = [inlineAttachment];
+    }
+    const sent = await this.transport.send(sendPayload);
+    emailSendTotal.inc({
+      result: sent ? 'success' : 'failure',
+      template: 'admin_invite',
+    });
+  }
+
+  async sendAdminModerationEmail(
+    to: string,
+    ctx: {
+      firstName: string;
+      templateId: EmailTemplateId;
+      locale: EmailLocale;
+      context: Record<string, unknown>;
+      unsubscribeUrl: string;
+    },
+  ): Promise<void> {
+    if (!(await this.eligibility.isGloballyEnabled())) return;
+
+    const trimmed = to.trim();
+    if (!(await this.eligibility.canSendToAddress(trimmed))) {
+      this.logger.warn(
+        `Skipping admin moderation email: suppressed or invalid recipient address=${trimmed} template=${ctx.templateId}`,
+      );
+      return;
+    }
+
+    const fromAddress = DEFAULT_EMAIL_FROM_ADDRESS;
+    const fromName = this.config.get<string>('EMAIL_FROM_NAME')?.trim() || DEFAULT_EMAIL_FROM_NAME;
+    const fromHeader = `${fromName.replace(/"/g, '')} <${fromAddress}>`;
+
+    const { appBaseUrl, logoUrl, inlineAttachment } = this.footerLinks.brandingUrls();
+
+    const { html, text, subject } = this.templates.render({
+      templateId: ctx.templateId,
+      locale: ctx.locale,
+      context: ctx.context,
+      prefsUrl: this.footerLinks.preferencesUrl(),
+      unsubscribeUrl: ctx.unsubscribeUrl,
+      appBaseUrl,
+      logoUrl,
+    });
+
+    const sendPayload: EmailSendPayload = {
+      fromHeader,
+      to: trimmed,
+      subject,
+      text,
+      html,
+      templateId: ctx.templateId,
+      listUnsubscribeUrl: ctx.unsubscribeUrl,
+    };
+    if (inlineAttachment) {
+      sendPayload.inlineAttachments = [inlineAttachment];
+    }
+    const sent = await this.transport.send(sendPayload);
+    emailSendTotal.inc({
+      result: sent ? 'success' : 'failure',
+      template: ctx.templateId,
+    });
+  }
 }

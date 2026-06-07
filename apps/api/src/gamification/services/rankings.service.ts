@@ -28,6 +28,21 @@ export type UserWeeklySummary = {
   weekEndsAt: string;
 };
 
+export type AdminWeeklyLeaderboardEntry = {
+  rank: number;
+  userId: string;
+  displayName: string;
+  email: string;
+  weeklyPoints: number;
+  showOnLeaderboard: boolean;
+};
+
+export type AdminWeeklyLeaderboardResult = {
+  weekStartsAt: string;
+  weekEndsAt: string;
+  entries: AdminWeeklyLeaderboardEntry[];
+};
+
 @Injectable()
 export class RankingsService {
   constructor(private readonly prisma: PrismaService) {}
@@ -112,6 +127,54 @@ export class RankingsService {
       entries,
       myRank,
       myWeeklyPoints,
+    };
+  }
+
+  async getAdminWeeklyLeaderboard(limit: number, now: Date = new Date()): Promise<AdminWeeklyLeaderboardResult> {
+    const bounds = getSkopjeWeekBoundsUtc(now);
+    const capped = Math.min(100, Math.max(1, Math.floor(limit)));
+
+    const rows = await this.prisma.$queryRaw<
+      Array<{
+        userId: string;
+        pts: number;
+        firstName: string;
+        lastName: string;
+        email: string;
+        showOnLeaderboard: boolean;
+      }>
+    >`
+      SELECT pt."userId",
+             SUM(pt.delta)::int AS pts,
+             u."firstName",
+             u."lastName",
+             u."email",
+             u."showOnLeaderboard"
+      FROM "PointTransaction" pt
+      INNER JOIN "User" u ON u.id = pt."userId"
+      WHERE pt."createdAt" >= ${bounds.weekStartsAt}
+        AND pt."createdAt" <= ${bounds.weekEndsAt}
+        AND pt.delta > 0
+        AND u.role = 'USER'::"Role"
+      GROUP BY pt."userId", u."firstName", u."lastName", u."email", u."showOnLeaderboard"
+      HAVING SUM(pt.delta) > 0
+      ORDER BY pts DESC
+      LIMIT ${capped}
+    `;
+
+    const entries: AdminWeeklyLeaderboardEntry[] = rows.map((row, index) => ({
+      rank: index + 1,
+      userId: row.userId,
+      displayName: `${row.firstName} ${row.lastName}`.trim(),
+      email: row.email,
+      weeklyPoints: row.pts,
+      showOnLeaderboard: row.showOnLeaderboard,
+    }));
+
+    return {
+      weekStartsAt: bounds.weekStartsAtIso,
+      weekEndsAt: bounds.weekEndsAtIso,
+      entries,
     };
   }
 

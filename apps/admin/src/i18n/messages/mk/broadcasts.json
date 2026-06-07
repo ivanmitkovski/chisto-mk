@@ -1,0 +1,85 @@
+{
+  "pageTitle": "Емитувања",
+  "description": "Составувајте, уредувајте, испраќајте и управувајте со системски кампањи за известувања.",
+  "form": {
+    "newCampaign": "Нова кампања",
+    "editCampaign": "Уреди кампања",
+    "title": "Наслов",
+    "body": "Содржина",
+    "deeplink": "Deeplink (опционално)",
+    "audience": "Публика",
+    "userIds": "ID на корисници (одделени со запирка или празно место)",
+    "schedule": "Закажи за подоцна (опционално)",
+    "saveDraft": "Зачувај нацрт",
+    "cancelEdit": "Откажи уредување"
+  },
+  "actions": {
+    "edit": "Уреди"
+  },
+  "card": {
+    "audienceLabel": "Публика: {audience}",
+    "userCount": "{count} корисник(и)",
+    "scheduledAt": "Закажано {date}",
+    "sentAt": "Испратено {date}",
+    "updatedAt": "Ажурирано {date}",
+    "deliveredTo": "Доставено до {count} корисници"
+  },
+  "audiencePreview": {
+    "recipientCap": "{label} (до 5.000 примачи)",
+    "userIdCount": "{label} ({count} ID на корисник)",
+    "userIdCountPlural": "{label} ({count} ID на корисници)"
+  },
+  "validation": {
+    "titleRequired": "Насловот е задолжителен.",
+    "bodyRequired": "Содржината е задолжителна.",
+    "userIdsRequired": "Внесете барем еден ID на корисник за конкретна публика.",
+    "deeplinkInvalid": "Deeplink мора да започнува со / и да содржи само букви, бројки, /, _ или -.",
+    "scheduleInvalid": "Закажаното време не е валиден датум."
+  },
+  "audience": {
+    "all": "Сите корисници",
+    "active": "Активни корисници (30 дена)",
+    "specific": "Конкретни ID на корисници"
+  },
+  "status": {
+    "draft": "Нацрт",
+    "scheduled": "Закажано",
+    "sent": "Испратено",
+    "cancelled": "Откажано"
+  },
+  "empty": "Сè уште нема кампањи за емитување.",
+  "confirmSendTitle": "Да се испрати емитувањето сега?",
+  "confirmSendDescription": "Да се испрати \"{title}\" до {audience}? Ова не може да се врати.",
+  "confirmSendPhrase": "SEND",
+  "sendNow": "Испрати сега",
+  "confirmDeleteTitle": "Да се избрише кампањата?",
+  "confirmDeleteDescription": "Трајно да се отстрани \"{title}\"? Ова не може да се врати.",
+  "toast": {
+    "validationTitle": "Валидација",
+    "draftCreatedTitle": "Нацртот е креиран",
+    "draftCreatedMessage": "Кампањата е зачувана како нацрт.",
+    "savedTitle": "Зачувано",
+    "savedMessage": "Кампањата е ажурирана.",
+    "cancelledTitle": "Откажано",
+    "cancelledMessage": "Кампањата е откажана.",
+    "deletedTitle": "Избришано",
+    "deletedMessage": "Кампањата е отстранета.",
+    "createFailedTitle": "Креирањето не успеа",
+    "createFailedMessage": "Не може да се креира кампања.",
+    "broadcastSentTitle": "Емитувањето е испратено",
+    "broadcastSentMessage": "Доставено до {sentCount} корисници{failedSuffix}.",
+    "broadcastSentFailedSuffix": " ({failedCount} неуспешни)",
+    "updateFailedTitle": "Ажурирањето не успеа",
+    "updateFailedMessage": "Не може да се ажурира кампањата.",
+    "sendFailedTitle": "Испраќањето не успеа",
+    "sendFailedMessage": "Не може да се испрати кампањата.",
+    "cancelFailedTitle": "Откажувањето не успеа",
+    "cancelFailedMessage": "Не може да се откаже кампањата.",
+    "deleteFailedTitle": "Бришењето не успеа",
+    "deleteFailedMessage": "Не може да се избрише кампањата."
+  },
+  "confirmCancelTitle": "Откажи закажан broadcast?",
+  "confirmCancelDescription": "Откажи „{title}\"? Нема да биде испратен.",
+  "confirmDiscardEditTitle": "Отфрли измени на кампањата?",
+  "confirmDiscardEditDescription": "Незачуваните измени во формата ќе се изгубат."
+}

@@ -14,7 +14,7 @@
   background: var(--bg-surface);
 }
 
-@media (max-width: 640px) {
+@media (max-width: 48rem) {
   .footer {
     flex-direction: column-reverse;
   }

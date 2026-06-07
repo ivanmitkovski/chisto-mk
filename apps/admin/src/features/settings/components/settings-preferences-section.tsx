@@ -1,18 +1,26 @@
 'use client';
 
-import { useCallback, useEffect, useState, type RefObject } from 'react';
+import { useCallback, useEffect, useState, useTransition, type RefObject } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
 import { Icon } from '@/components/ui';
+import { setAdminLocale } from '@/i18n/locale-actions';
 import {
+  ADMIN_LOCALE_DISPLAY_NAMES,
+  ADMIN_LOCALES,
   getReducedMotionPreference,
   getReportSoundPreference,
   setReducedMotionPreference,
   setReportSoundPreference,
-} from '@/lib/admin-preferences';
+  writeLocaleToStorage,
+  type AdminLocale,
+} from '@/lib/preferences';
 import {
   playReportChimePreview,
   unlockReportAudioFromUserGesture,
-} from '@/lib/admin-report-audio';
-import styles from './settings-console.module.css';
+} from '@/lib/realtime';
+import styles from './settings-preferences-section.module.css';
+import panelStyles from './settings-panel.module.css';
 
 const DEBUG_REALTIME_FLAG = 'chisto:debug-realtime';
 
@@ -26,6 +34,10 @@ type SettingsPreferencesSectionProps = {
 };
 
 export function SettingsPreferencesSection({ panelTitleRef }: SettingsPreferencesSectionProps) {
+  const t = useTranslations('settings.preferences');
+  const locale = useLocale() as AdminLocale;
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const [reduceMotion, setReduceMotion] = useState(false);
   const [reportSound, setReportSound] = useState(false);
   const [hydrated, setHydrated] = useState(false);
@@ -84,32 +96,43 @@ export function SettingsPreferencesSection({ panelTitleRef }: SettingsPreference
     });
   }, []);
 
+  const onLocaleChange = useCallback(
+    (nextLocale: AdminLocale) => {
+      if (nextLocale === locale) return;
+      writeLocaleToStorage(nextLocale);
+      startTransition(async () => {
+        const result = await setAdminLocale(nextLocale);
+        if (result.ok) {
+          router.refresh();
+        }
+      });
+    },
+    [locale, router],
+  );
+
   return (
     <>
-      <header className={styles.panelHeader}>
-        <h2 ref={panelTitleRef} className={styles.panelTitle} tabIndex={-1}>
-          Preferences
+      <header className={panelStyles.panelHeader}>
+        <h2 ref={panelTitleRef} className={panelStyles.panelTitle} tabIndex={-1}>
+          {t('title')}
         </h2>
-        <p className={styles.panelDescription}>
-          Display options for this browser. Other devices are not affected.
-        </p>
+        <p className={panelStyles.panelDescription}>{t('description')}</p>
       </header>
 
-      <section className={styles.section}>
-        <span className={styles.sectionLabel}>Display</span>
-        <h3 className={styles.sectionTitle}>Interface motion</h3>
-        <p className={styles.sectionHint}>
-          Shortens transitions across the admin app using design tokens. Stored only on this device.
-        </p>
+      <section className={panelStyles.section}>
+        <span className={panelStyles.sectionLabel}>{t('displayLabel')}</span>
+        <h3 className={panelStyles.sectionTitle}>{t('interfaceMotionTitle')}</h3>
+        <p className={panelStyles.sectionHint}>{t('interfaceMotionHint')}</p>
         <div className={styles.preferenceRow}>
           <div className={styles.preferenceText}>
-            <span className={styles.preferenceTitle}>Reduce motion</span>
-            <span className={styles.preferenceCaption}>Minimize animations and transitions</span>
+            <span className={styles.preferenceTitle}>{t('reduceMotionTitle')}</span>
+            <span className={styles.preferenceCaption}>{t('reduceMotionCaption')}</span>
           </div>
           <button
             type="button"
             role="switch"
             aria-checked={reduceMotion}
+            aria-label={t('reduceMotionToggleAria')}
             disabled={!hydrated}
             className={`${styles.toggle} ${reduceMotion ? styles.toggleOn : ''}`}
             onClick={() => onToggleReduceMotion(!reduceMotion)}
@@ -119,23 +142,20 @@ export function SettingsPreferencesSection({ panelTitleRef }: SettingsPreference
         </div>
       </section>
 
-      <section className={styles.section}>
-        <span className={styles.sectionLabel}>Notifications</span>
-        <h3 className={styles.sectionTitle}>Delivery preferences</h3>
-        <p className={styles.sectionHint}>
-          Per-browser toggles for live report alerts. This does not change settings on other devices.
-        </p>
+      <section className={panelStyles.section}>
+        <span className={panelStyles.sectionLabel}>{t('notificationsLabel')}</span>
+        <h3 className={panelStyles.sectionTitle}>{t('deliveryPreferencesTitle')}</h3>
+        <p className={panelStyles.sectionHint}>{t('deliveryPreferencesHint')}</p>
         <div className={styles.preferenceRow}>
           <div className={styles.preferenceText}>
-            <span className={styles.preferenceTitle}>Sound on new reports</span>
-            <span className={styles.preferenceCaption}>
-              Plays a subtle chime when a new report arrives in real time
-            </span>
+            <span className={styles.preferenceTitle}>{t('soundOnNewReportsTitle')}</span>
+            <span className={styles.preferenceCaption}>{t('soundOnNewReportsCaption')}</span>
           </div>
           <button
             type="button"
             role="switch"
             aria-checked={reportSound}
+            aria-label={t('soundOnNewReportsToggleAria')}
             disabled={!hydrated}
             className={`${styles.toggle} ${reportSound ? styles.toggleOn : ''}`}
             onClick={() => onToggleReportSound(!reportSound)}
@@ -150,26 +170,36 @@ export function SettingsPreferencesSection({ panelTitleRef }: SettingsPreference
             disabled={!hydrated}
             onClick={onTestReportSound}
           >
-            Play test sound
+            {t('playTestSound')}
           </button>
         ) : null}
         <div className={styles.preferenceNote}>
           <Icon name="info" size={18} />
-          <p>Server-managed alerts still appear in the top bar and Notifications page.</p>
+          <p>{t('serverAlertsNote')}</p>
         </div>
       </section>
 
-      <section className={styles.section}>
-        <span className={styles.sectionLabel}>Language</span>
-        <h3 className={styles.sectionTitle}>Locale</h3>
-        <p className={styles.sectionHint}>Admin UI language.</p>
+      <section className={panelStyles.section}>
+        <span className={panelStyles.sectionLabel}>{t('languageLabel')}</span>
+        <h3 className={panelStyles.sectionTitle}>{t('localeTitle')}</h3>
+        <p className={panelStyles.sectionHint}>{t('localeHint')}</p>
         <label className={styles.preferenceSelectLabel} htmlFor="settings-locale">
-          Display language
+          {t('displayLanguage')}
         </label>
-        <select id="settings-locale" className={styles.preferenceSelect} disabled defaultValue="en">
-          <option value="en">English</option>
+        <select
+          id="settings-locale"
+          className={styles.preferenceSelect}
+          value={locale}
+          disabled={!hydrated || isPending}
+          onChange={(event) => onLocaleChange(event.target.value as AdminLocale)}
+        >
+          {ADMIN_LOCALES.map((code) => (
+            <option key={code} value={code}>
+              {ADMIN_LOCALE_DISPLAY_NAMES[code]}
+            </option>
+          ))}
         </select>
-        <p className={styles.preferenceFootnote}>Additional locales when product i18n ships.</p>
+        <p className={styles.preferenceFootnote}>{t('localeFootnote')}</p>
       </section>
     </>
   );

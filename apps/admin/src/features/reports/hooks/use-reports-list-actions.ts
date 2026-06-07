@@ -1,55 +1,92 @@
-import { useCallback, useEffect, useState } from 'react';
+'use client';
+
+import { useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import type { SnackState } from '@/components/ui';
+import { useToast } from '@/components/ui';
+import { useOptimisticMutation } from '@/features/admin-shell';
 import { patchReportStatus } from '../lib/patch-report-status';
 import type { ReportStatus } from '../types';
 
 type ActionKind = 'approve' | 'reject';
 
-export function useReportsListActions() {
-  const router = useRouter();
-  const [snack, setSnack] = useState<SnackState | null>(null);
+type StatusMutationVariables = {
+  id: string;
+  status: ReportStatus;
+  action: ActionKind;
+  reason?: string | undefined;
+};
 
-  useEffect(() => {
-    if (!snack) return;
-    const t = window.setTimeout(() => setSnack(null), 2400);
-    return () => window.clearTimeout(t);
-  }, [snack]);
+type UseReportsListActionsOptions = {
+  onOptimisticStatus?: (id: string, status: ReportStatus) => void;
+  onRollbackStatus?: (id: string, status: ReportStatus) => void;
+};
+
+export function useReportsListActions(options: UseReportsListActionsOptions = {}) {
+  const t = useTranslations('reports.toast');
+  const router = useRouter();
+  const { showToast } = useToast();
+  const { onOptimisticStatus, onRollbackStatus } = options;
+
+  const { run, isPending } = useOptimisticMutation({
+    mutate: async ({ id, status, action, reason }: StatusMutationVariables) => {
+      const result = await patchReportStatus(id, status, action, reason);
+      if (!result.ok) {
+        throw new Error(result.message);
+      }
+      return { ...result, action };
+    },
+    onSuccess: (result) => {
+      if (result.action === 'approve') {
+        showToast({
+          tone: 'success',
+          title: t('approvedTitle'),
+          message: t('approvedMessage'),
+        });
+      } else if (result.action === 'reject') {
+        showToast({
+          tone: 'success',
+          title: t('rejectedTitle'),
+          message: t('rejectedMessage'),
+        });
+      }
+      router.refresh();
+    },
+    errorToast: {
+      title: t('actionFailedTitle'),
+    },
+  });
 
   const updateStatus = useCallback(
-    async (id: string, status: ReportStatus, action: ActionKind, reason?: string) => {
-      const result = await patchReportStatus(id, status, action, reason);
+    async (id: string, status: ReportStatus, action: ActionKind, reason?: string, previousStatus?: ReportStatus) => {
+      const prior = previousStatus ?? status;
+      const result = await run(
+        { id, status, action, reason },
+        {
+          optimistic: () => onOptimisticStatus?.(id, status),
+          rollback: () => onRollbackStatus?.(id, prior),
+        },
+      );
 
-      if (!result.ok) {
-        setSnack({ tone: 'error', title: 'Action failed', message: result.message });
+      if (result == null) {
         return false;
-      }
-
-      router.refresh();
-
-      if (action === 'approve') {
-        setSnack({
-          tone: 'success',
-          title: 'Report approved',
-          message: 'The report has been accepted and moved to approved state.',
-        });
-      } else {
-        setSnack({
-          tone: 'warning',
-          title: 'Report rejected',
-          message: reason ? `The report has been rejected. Reason: ${reason}` : 'The report has been rejected.',
-        });
       }
 
       return true;
     },
-    [router],
+    [onOptimisticStatus, onRollbackStatus, run],
   );
 
   return {
-    approveReport: useCallback((id: string) => updateStatus(id, 'APPROVED', 'approve'), [updateStatus]),
-    rejectReport: useCallback((id: string, reason?: string) => updateStatus(id, 'DELETED', 'reject', reason), [updateStatus]),
-    snack,
-    clearSnack: useCallback(() => setSnack(null), []),
+    isPending,
+    approveReport: useCallback(
+      (id: string, previousStatus?: ReportStatus) => updateStatus(id, 'APPROVED', 'approve', undefined, previousStatus),
+      [updateStatus],
+    ),
+    rejectReport: useCallback(
+      (id: string, reason?: string, previousStatus?: ReportStatus) =>
+        updateStatus(id, 'DELETED', 'reject', reason, previousStatus),
+      [updateStatus],
+    ),
   };
 }

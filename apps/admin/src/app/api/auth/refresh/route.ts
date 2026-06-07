@@ -7,7 +7,7 @@ import {
   refreshAdminTokens,
   setAdminAuthCookies,
   verifyAdminCsrf,
-} from '@/lib/server/admin-session';
+} from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 

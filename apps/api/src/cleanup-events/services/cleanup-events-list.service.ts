@@ -25,6 +25,9 @@ export class CleanupEventsListService {
       organizer: {
         select: { id: true, firstName: true, lastName: true, email: true },
       },
+      moderatedBy: {
+        select: { id: true, email: true },
+      },
       _count: { select: { seriesChildren: true } },
     } as const;
   }
@@ -52,6 +55,10 @@ export class CleanupEventsListService {
     participantCount: number;
     status: CleanupEventStatus;
     lifecycleStatus: EcoEventLifecycleStatus;
+    moderatedById: string | null;
+    moderatedAt: Date | null;
+    declineReason: string | null;
+    updatedAt: Date;
     recurrenceRule: string | null;
     recurrenceIndex: number | null;
     parentEventId: string | null;
@@ -70,11 +77,13 @@ export class CleanupEventsListService {
       status: string;
     };
     organizer: { id: string; firstName: string; lastName: string; email: string } | null;
+    moderatedBy: { id: string; email: string } | null;
     _count: { seriesChildren: number };
   }) {
     return {
       id: e.id,
       createdAt: e.createdAt.toISOString(),
+      updatedAt: e.updatedAt.toISOString(),
       title: e.title,
       description: e.description,
       siteId: e.siteId,
@@ -85,6 +94,9 @@ export class CleanupEventsListService {
       participantCount: e.participantCount,
       status: e.status,
       lifecycleStatus: e.lifecycleStatus,
+      moderatedAt: e.moderatedAt?.toISOString() ?? null,
+      moderatedBy: e.moderatedBy ? { id: e.moderatedBy.id, email: e.moderatedBy.email } : null,
+      declineReason: e.declineReason ?? null,
       recurrenceRule: e.recurrenceRule ?? null,
       recurrenceIndex: e.recurrenceIndex ?? null,
       parentEventId: e.parentEventId ?? null,

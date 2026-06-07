@@ -1,10 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getApiBaseUrl } from '@/lib/api-base-url';
-import { clearAdminAuthCookies, getAdminRefreshToken } from '@/lib/server/admin-session';
+import { getApiBaseUrl } from '@/lib/api';
+import { clearAdminAuthCookies, ensureAdminCsrfCookie, getAdminRefreshToken, verifyAdminCsrf } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
+  if (!verifyAdminCsrf(request)) {
+    const response = NextResponse.json(
+      { code: 'CSRF_TOKEN_INVALID', message: 'Invalid CSRF token.' },
+      { status: 403 },
+    );
+    ensureAdminCsrfCookie(request, response);
+    return response;
+  }
+
   const refreshToken = getAdminRefreshToken(request);
   if (refreshToken) {
     await fetch(`${getApiBaseUrl()}/auth/logout`, {

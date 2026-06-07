@@ -1,6 +1,17 @@
 import { DEFAULT_EMAIL_APP_BASE_URL, EMAIL_BRAND } from '../constants/email.constants';
 import { buildDetailCardHtml, EMAIL_LAYOUT, type EmailAccent } from './email-layout';
 import type { EmailLocale, EmailTemplateId } from '../types/email.types';
+import { formatDateRange, formatDateTime } from './email-datetime';
+import {
+  formatLocationLabel,
+  humanizeEventCategory,
+  humanizeEventScale,
+  humanizeReportCategory,
+  humanizeReportSeverity,
+  humanizeUgcReason,
+  humanizeUgcSubjectType,
+  truncatePreview,
+} from './email-labels';
 
 export type EmailCopyBlock = {
   subject: string;
@@ -31,6 +42,8 @@ const CTA_LABELS = {
   viewReport: { en: 'View report', mk: 'Види пријава' },
   openEvent: { en: 'Open event', mk: 'Отвори настан' },
   openApp: { en: 'Open in app', mk: 'Отвори во апликација' },
+  acceptInvite: { en: 'Accept invite', mk: 'Прифати покана' },
+  reviewInAdmin: { en: 'Review in admin', mk: 'Прегледај во админ' },
 } as const;
 
 function lbl(en: boolean, pair: { en: string; mk: string }): string {
@@ -643,6 +656,281 @@ export function getCopy(
             en,
             'openApp',
           );
+
+    case 'admin_invite': {
+      const inviteUrl = typeof ctx.inviteUrl === 'string' ? ctx.inviteUrl.trim() : url;
+      const roleLabel = typeof ctx.roleLabel === 'string' ? ctx.roleLabel : '';
+      const expiresAt = typeof ctx.expiresAt === 'string' ? ctx.expiresAt : '';
+      const expiryText =
+        expiresAt.length > 0
+          ? new Date(expiresAt).toLocaleString(en ? 'en-GB' : 'mk-MK', {
+              dateStyle: 'medium',
+              timeStyle: 'short',
+            })
+          : '';
+      const detailRows = [
+        ...(roleLabel ? [{ label: en ? 'Role' : 'Улога', value: roleLabel }] : []),
+        ...(expiryText ? [{ label: en ? 'Expires' : 'Истекува', value: expiryText }] : []),
+      ];
+      return {
+        subject: en ? 'You are invited to Chisto.mk Admin' : 'Покана за Chisto.mk Admin',
+        headline: en
+          ? `Welcome${firstName ? `, ${firstName}` : ''}`
+          : `Добредојде${firstName ? `, ${firstName}` : ''}`,
+        lead: en
+          ? 'You have been invited to join the Chisto.mk admin team. Set your password and enable two-factor authentication to get started.'
+          : 'Поканети сте да се приклучите на админ тимот на Chisto.mk. Поставете лозинка и овозможете двофакторска автентикација.',
+        ...(detailRows.length ? { detailRows } : {}),
+        extraLines: en
+          ? [
+              'This link is single-use and expires automatically.',
+              'If you did not expect this invite, you can ignore this email.',
+            ]
+          : [
+              'Линкот е за еднократна употреба и автоматски истекува.',
+              'Ако не очекувавте покана, игнорирајте ја пораката.',
+            ],
+        ctaUrl: inviteUrl,
+        ctaLabel: lbl(en, CTA_LABELS.acceptInvite),
+      };
+    }
+
+    case 'admin_moderation_new_report': {
+      const actionUrl = typeof ctx.actionUrl === 'string' ? ctx.actionUrl.trim() : url;
+      const reportNumber = typeof ctx.reportNumber === 'string' ? ctx.reportNumber : '';
+      const reportTitle = typeof ctx.reportTitle === 'string' ? ctx.reportTitle.trim() : '';
+      const isNewSite = ctx.isNewSite === true;
+      const categoryRaw = typeof ctx.category === 'string' ? ctx.category : '';
+      const severityRaw = typeof ctx.severity === 'number' ? ctx.severity : null;
+      const address = typeof ctx.address === 'string' ? ctx.address : null;
+      const latitude = typeof ctx.latitude === 'number' ? ctx.latitude : null;
+      const longitude = typeof ctx.longitude === 'number' ? ctx.longitude : null;
+      const reporterEmail = typeof ctx.reporterEmail === 'string' ? ctx.reporterEmail.trim() : '';
+      const submittedAt = ctx.submittedAt;
+      const descriptionPreview = truncatePreview(
+        typeof ctx.descriptionPreview === 'string' ? ctx.descriptionPreview : '',
+      );
+
+      const categoryLabel = humanizeReportCategory(locale, categoryRaw);
+      const severityLabel = humanizeReportSeverity(locale, severityRaw);
+      const locationLabel = formatLocationLabel(locale, { address, latitude, longitude });
+      const submittedLabel = formatDateTime(locale, submittedAt);
+
+      const detailRows: { label: string; value: string }[] = [];
+      if (reportNumber) {
+        detailRows.push({ label: en ? 'Report' : 'Пријава', value: reportNumber });
+      }
+      if (reportTitle) {
+        detailRows.push({ label: en ? 'Title' : 'Наслов', value: reportTitle });
+      }
+      detailRows.push({
+        label: en ? 'Type' : 'Тип',
+        value: isNewSite
+          ? en
+            ? 'New site'
+            : 'Нов локалитет'
+          : en
+            ? 'Report at existing site'
+            : 'Пријава на постоечки локалитет',
+      });
+      if (categoryLabel) {
+        detailRows.push({ label: en ? 'Category' : 'Категорија', value: categoryLabel });
+      }
+      if (severityLabel) {
+        detailRows.push({ label: en ? 'Severity' : 'Тежина', value: severityLabel });
+      }
+      detailRows.push({ label: en ? 'Location' : 'Локација', value: locationLabel });
+      if (reporterEmail) {
+        detailRows.push({ label: en ? 'Reported by' : 'Пријавил', value: reporterEmail });
+      }
+      if (submittedLabel) {
+        detailRows.push({ label: en ? 'Submitted' : 'Поднесено', value: submittedLabel });
+      }
+
+      const lead = reportNumber
+        ? en
+          ? `Report ${reportNumber}${reportTitle ? ` (“${reportTitle}”)` : ''} is waiting in the moderation queue.`
+          : `Пријавата ${reportNumber}${reportTitle ? ` („${reportTitle}")` : ''} чека во редот за модерација.`
+        : en
+          ? 'A citizen submitted a report that is waiting in the moderation queue.'
+          : 'Граѓанин поднесе пријава која чека во редот за модерација.';
+
+      const extraLines = descriptionPreview
+        ? [
+            en
+              ? `Description: “${descriptionPreview}”`
+              : `Опис: „${descriptionPreview}"`,
+          ]
+        : undefined;
+
+      return {
+        subject: en ? 'New report needs review' : 'Нова пријава бара преглед',
+        headline: en ? 'New pollution report' : 'Нова пријава за загадување',
+        lead,
+        detailRows,
+        ...(extraLines ? { extraLines } : {}),
+        ctaUrl: actionUrl,
+        ctaLabel: lbl(en, CTA_LABELS.reviewInAdmin),
+        accent: 'info',
+      };
+    }
+
+    case 'admin_moderation_event_pending': {
+      const actionUrl = typeof ctx.actionUrl === 'string' ? ctx.actionUrl.trim() : url;
+      const eventTitle = typeof ctx.eventTitle === 'string' ? ctx.eventTitle.trim() : '';
+      const organizerName = typeof ctx.organizerName === 'string' ? ctx.organizerName.trim() : '';
+      const scheduledAt = ctx.scheduledAt;
+      const endAt = ctx.endAt;
+      const eventCategory = humanizeEventCategory(
+        locale,
+        typeof ctx.eventCategory === 'string' ? ctx.eventCategory : '',
+      );
+      const eventScale = humanizeEventScale(
+        locale,
+        typeof ctx.eventScale === 'string' ? ctx.eventScale : '',
+      );
+      const siteAddress = typeof ctx.siteAddress === 'string' ? ctx.siteAddress.trim() : '';
+      const whenLabel = formatDateRange(locale, scheduledAt, endAt);
+
+      const detailRows: { label: string; value: string }[] = [];
+      if (eventTitle) {
+        detailRows.push({ label: en ? 'Event' : 'Настан', value: eventTitle });
+      }
+      if (organizerName) {
+        detailRows.push({ label: en ? 'Organizer' : 'Организатор', value: organizerName });
+      }
+      if (whenLabel) {
+        detailRows.push({ label: en ? 'When' : 'Кога', value: whenLabel });
+      }
+      if (eventCategory) {
+        detailRows.push({ label: en ? 'Category' : 'Категорија', value: eventCategory });
+      }
+      if (eventScale) {
+        detailRows.push({ label: en ? 'Scale' : 'Опфат', value: eventScale });
+      }
+      if (siteAddress) {
+        detailRows.push({ label: en ? 'Location' : 'Локација', value: siteAddress });
+      }
+
+      const lead = eventTitle
+        ? en
+          ? `“${eventTitle}” needs admin approval before volunteers can see it.`
+          : `„${eventTitle}" бара админско одобрување пред доброволците да го видат.`
+        : en
+          ? 'A cleanup event was submitted and needs admin approval before it is visible to users.'
+          : 'Поднесен е настан за чистење и треба админско одобрување пред да биде видлив за корисниците.';
+
+      return {
+        subject: en ? 'Cleanup event pending approval' : 'Чистење чека одобрување',
+        headline: en ? 'Event needs review' : 'Настан бара преглед',
+        lead,
+        ...(detailRows.length ? { detailRows } : {}),
+        ctaUrl: actionUrl,
+        ctaLabel: lbl(en, CTA_LABELS.reviewInAdmin),
+        accent: 'warning',
+      };
+    }
+
+    case 'admin_moderation_ugc_report': {
+      const actionUrl = typeof ctx.actionUrl === 'string' ? ctx.actionUrl.trim() : url;
+      const subjectTypeRaw = typeof ctx.subjectType === 'string' ? ctx.subjectType : '';
+      const reasonRaw = typeof ctx.reason === 'string' ? ctx.reason : '';
+      const subjectId = typeof ctx.subjectId === 'string' ? ctx.subjectId.trim() : '';
+      const reporterEmail = typeof ctx.reporterEmail === 'string' ? ctx.reporterEmail.trim() : '';
+      const reportedAt = ctx.reportedAt;
+      const detailsPreview = truncatePreview(
+        typeof ctx.detailsPreview === 'string' ? ctx.detailsPreview : '',
+      );
+
+      const subjectTypeLabel = humanizeUgcSubjectType(locale, subjectTypeRaw);
+      const reasonLabel = humanizeUgcReason(locale, reasonRaw);
+      const reportedLabel = formatDateTime(locale, reportedAt);
+
+      const detailRows: { label: string; value: string }[] = [];
+      if (subjectTypeLabel) {
+        detailRows.push({ label: en ? 'Content type' : 'Тип на содржина', value: subjectTypeLabel });
+      }
+      if (reasonLabel) {
+        detailRows.push({ label: en ? 'Reason' : 'Причина', value: reasonLabel });
+      }
+      if (subjectId) {
+        detailRows.push({ label: en ? 'Content ID' : 'ID на содржина', value: subjectId });
+      }
+      if (reporterEmail) {
+        detailRows.push({ label: en ? 'Reported by' : 'Пријавил', value: reporterEmail });
+      }
+      if (reportedLabel) {
+        detailRows.push({ label: en ? 'Reported' : 'Пријавено', value: reportedLabel });
+      }
+
+      const lead =
+        subjectTypeLabel && reasonLabel
+          ? en
+            ? `A user flagged ${subjectTypeLabel.toLowerCase()} for ${reasonLabel.toLowerCase()}. Review it in the admin console.`
+            : `Корисник пријави ${subjectTypeLabel.toLowerCase()} поради ${reasonLabel.toLowerCase()}. Прегледајте ја во админ конзолата.`
+          : en
+            ? 'A user reported content that may violate community guidelines.'
+            : 'Корисник пријави содржина која може да ги крши правилата на заедницата.';
+
+      const extraLines = detailsPreview
+        ? [
+            en
+              ? `Reporter note: “${detailsPreview}”`
+              : `Забелешка: „${detailsPreview}"`,
+          ]
+        : undefined;
+
+      return {
+        subject: en ? 'UGC report needs review' : 'Пријава за содржина бара преглед',
+        headline: en ? 'Content flagged' : 'Пријавена содржина',
+        lead,
+        ...(detailRows.length ? { detailRows } : {}),
+        ...(extraLines ? { extraLines } : {}),
+        ctaUrl: actionUrl,
+        ctaLabel: lbl(en, CTA_LABELS.reviewInAdmin),
+        accent: 'danger',
+      };
+    }
+
+    case 'admin_moderation_checkin_risk': {
+      const actionUrl = typeof ctx.actionUrl === 'string' ? ctx.actionUrl.trim() : url;
+      const eventTitle = typeof ctx.eventTitle === 'string' ? ctx.eventTitle.trim() : '';
+      const distanceMeters =
+        typeof ctx.distanceMeters === 'number' ? String(Math.round(ctx.distanceMeters)) : '';
+      const occurredLabel = formatDateTime(locale, ctx.occurredAt);
+
+      const detailRows: { label: string; value: string }[] = [];
+      if (eventTitle) {
+        detailRows.push({ label: en ? 'Event' : 'Настан', value: eventTitle });
+      }
+      if (distanceMeters) {
+        detailRows.push({
+          label: en ? 'Distance from site' : 'Растојание од локалитет',
+          value: `${distanceMeters} m`,
+        });
+      }
+      if (occurredLabel) {
+        detailRows.push({ label: en ? 'When' : 'Кога', value: occurredLabel });
+      }
+
+      const lead = eventTitle
+        ? en
+          ? `A participant checked in far from the site for “${eventTitle}”. Review the risk signal in the admin console.`
+          : `Учесник се пријави далеку од локалитетот за „${eventTitle}". Прегледајте го сигналот во админ конзолата.`
+        : en
+          ? 'A participant checked in far from the event site. Review the risk signal in the admin console.'
+          : 'Учесник се пријави далеку од локалитетот на настанот. Прегледајте го сигналот во админ конзолата.';
+
+      return {
+        subject: en ? 'Suspicious event check-in' : 'Сомнително пријавување на настан',
+        headline: en ? 'Check-in risk signal' : 'Сигнал за ризик при пријава',
+        lead,
+        ...(detailRows.length ? { detailRows } : {}),
+        ctaUrl: actionUrl,
+        ctaLabel: lbl(en, CTA_LABELS.reviewInAdmin),
+        accent: 'warning',
+      };
+    }
 
     default:
       return en

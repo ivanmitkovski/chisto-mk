@@ -2,7 +2,7 @@ import { ButtonHTMLAttributes, forwardRef } from 'react';
 import { Spinner } from '../spinner';
 import styles from './button.module.css';
 
-type ButtonVariant = 'solid' | 'outline' | 'ghost' | 'icon';
+type ButtonVariant = 'solid' | 'outline' | 'ghost' | 'icon' | 'danger';
 type ButtonSize = 'sm' | 'md';
 
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -17,6 +17,7 @@ const variantClassByName: Record<ButtonVariant, string> = {
   outline: styles.variantOutline,
   ghost: styles.variantGhost,
   icon: styles.variantIcon,
+  danger: styles.variantDanger,
 };
 
 const sizeClassByName: Record<ButtonSize, string> = {

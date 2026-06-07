@@ -1,1 +1,17 @@
-export { SettingsProfile } from './components/settings-profile';
+export { SettingsConsole } from './components/settings-console';
+export { SettingsSidebar } from './components/settings-sidebar';
+export { SettingsProfilePanel } from './components/settings-profile-panel';
+export { SettingsSecurityPanel } from './components/settings-security-panel';
+export { SettingsEnvironmentPanel } from './components/settings-environment-panel';
+export { SettingsFeatureFlagsPanel } from './components/settings-feature-flags-panel';
+export { SECTION_IDS, SIDEBAR_GROUPS } from './config/settings-sections';
+export type { SectionId } from './config/settings-sections';
+export { useProfileSettings } from './hooks/use-profile-settings';
+export { useSecuritySettings } from './hooks/use-security-settings';
+export { useEnvironmentConfig } from './hooks/use-environment-config';
+export { useFeatureFlags } from './hooks/use-feature-flags';
+export { getAdminSecurityOverview } from './data/security-adapter';
+export { getSystemConfig } from './data/config-adapter';
+export { getFeatureFlags } from './data/feature-flags-adapter';
+export { getModerationEmailPreferences } from './data/moderation-email-preferences-adapter';
+export type { AdminSession, SecurityActivityEvent } from './data/security-types';

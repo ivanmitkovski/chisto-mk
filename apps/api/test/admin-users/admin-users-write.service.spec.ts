@@ -18,7 +18,7 @@ function actor(overrides: Partial<AuthenticatedUser> = {}): AuthenticatedUser {
 function makeSvc(prisma: never) {
   const audit = { log: jest.fn().mockResolvedValue(undefined) } as never;
   const userEvents = { emitUserUpdated: jest.fn() } as never;
-  const sessionRevocation = { revokeAllForUser: jest.fn().mockResolvedValue(undefined) };
+  const sessionRevocation = { revokeAllForUser: jest.fn().mockResolvedValue(undefined), revokeSessionForUser: jest.fn().mockResolvedValue({ ok: true }) };
   const authSnapshotCache = { invalidate: jest.fn() } as never;
   return {
     svc: new AdminUsersWriteService(
@@ -169,5 +169,17 @@ describe('AdminUsersWriteService', () => {
     await svc.patch('u1', { status: UserStatus.SUSPENDED } as never, actor());
 
     expect(sessionRevocation.revokeAllForUser).toHaveBeenCalledWith('u1', 'status_changed');
+  });
+
+  it('revokeSession delegates to session revocation service', async () => {
+    const prisma = {
+      user: {
+        findUnique: jest.fn().mockResolvedValue({ id: 'u1', role: Role.USER }),
+      },
+    } as never;
+    const { svc, sessionRevocation } = makeSvc(prisma);
+
+    await expect(svc.revokeSession('u1', 'session-1', actor())).resolves.toEqual({ ok: true });
+    expect(sessionRevocation.revokeSessionForUser).toHaveBeenCalledWith('u1', 'session-1', 'actor-1');
   });
 });

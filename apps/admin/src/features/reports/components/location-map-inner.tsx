@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -30,6 +31,7 @@ function RecenterControl({
   center: [number, number];
   onRecenter: () => void;
 }) {
+  const t = useTranslations('map');
   const map = useMap();
 
   return (
@@ -40,8 +42,8 @@ function RecenterControl({
         map.flyTo(center, 15, { duration: 0.5 });
         onRecenter();
       }}
-      aria-label="Recenter map on report location"
-      title="Recenter map"
+      aria-label={t('recenter')}
+      title={t('recenter')}
     >
       <Icon name="location" size={18} />
     </button>

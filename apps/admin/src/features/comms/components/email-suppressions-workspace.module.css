@@ -1,0 +1,105 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-4);
+}
+
+.searchForm {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1;
+  min-width: 12rem;
+}
+
+.searchInput {
+  flex: 1;
+  max-width: 20rem;
+}
+
+.filterSelect {
+  min-width: 9rem;
+  padding-block: var(--space-2);
+  padding-inline: var(--space-3) var(--native-select-chevron-padding-end);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background-color: var(--surface-default);
+  font-size: 0.8125rem;
+}
+
+.tableWrap {
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(8, 54, 39, 0.06);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid rgba(8, 54, 39, 0.06);
+}
+
+.table th {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(8, 54, 39, 0.5);
+}
+
+.emailCell {
+  font-weight: 600;
+  color: rgba(8, 54, 39, 0.9);
+  word-break: break-all;
+}
+
+.reasonPill {
+  display: inline-flex;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  background: rgba(248, 187, 0, 0.18);
+  color: #8b6914;
+}
+
+.thActions,
+.tdActions {
+  text-align: right;
+}
+
+.empty {
+  padding: var(--space-10);
+  text-align: center;
+  color: rgba(8, 54, 39, 0.55);
+}
+
+.footer {
+  margin-top: var(--space-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.meta {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: rgba(8, 54, 39, 0.55);
+}

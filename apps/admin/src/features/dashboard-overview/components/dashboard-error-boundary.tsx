@@ -1,7 +1,9 @@
 'use client';
 
 import { Component, type ReactNode } from 'react';
+import { useTranslations } from 'next-intl';
 import { SectionState } from '@/components/ui';
+import { clientLogger, getErrorReference } from '@/lib/observability';
 import { DashboardRefreshButton } from './dashboard-refresh-button';
 import styles from './dashboard-error-boundary.module.css';
 
@@ -13,7 +15,32 @@ type Props = {
 
 type State = {
   hasError: boolean;
+  reference?: string;
 };
+
+function DashboardErrorFallback({
+  sectionName,
+  reference,
+}: {
+  sectionName?: string;
+  reference?: string;
+}) {
+  const t = useTranslations('dashboard.errorBoundary');
+  const tCommon = useTranslations('common');
+
+  const message = sectionName
+    ? t('sectionFailed', { sectionName }) +
+      (reference ? ` ${tCommon('reference', { id: reference })}` : '')
+    : t('sectionFailed', { sectionName: tCommon('unknown') }) +
+      (reference ? ` ${tCommon('reference', { id: reference })}` : '');
+
+  return (
+    <div className={styles.wrap}>
+      <SectionState variant="error" message={message} />
+      <DashboardRefreshButton label={t('retry')} variant="ghost" className={styles.retryButton} />
+    </div>
+  );
+}
 
 export class DashboardErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
@@ -21,12 +48,19 @@ export class DashboardErrorBoundary extends Component<Props, State> {
     this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError(): State {
-    return { hasError: true };
+  static getDerivedStateFromError(error: Error): State {
+    const reference = getErrorReference(error);
+    return reference ? { hasError: true, reference } : { hasError: true };
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('Dashboard section error:', error, errorInfo);
+    const reference = getErrorReference(error);
+    clientLogger.error('dashboard_section_error', {
+      section: this.props.sectionName,
+      message: error.message,
+      ...(reference !== undefined ? { requestId: reference } : {}),
+      componentStack: errorInfo.componentStack,
+    });
   }
 
   render() {
@@ -35,13 +69,10 @@ export class DashboardErrorBoundary extends Component<Props, State> {
         return this.props.fallback;
       }
       return (
-        <div className={styles.wrap}>
-          <SectionState
-            variant="error"
-            message={this.props.sectionName ? `${this.props.sectionName} failed to load.` : 'This section failed to load.'}
-          />
-          <DashboardRefreshButton label="Retry" variant="ghost" className={styles.retryButton} />
-        </div>
+        <DashboardErrorFallback
+          {...(this.props.sectionName !== undefined ? { sectionName: this.props.sectionName } : {})}
+          {...(this.state.reference !== undefined ? { reference: this.state.reference } : {})}
+        />
       );
     }
     return this.props.children;

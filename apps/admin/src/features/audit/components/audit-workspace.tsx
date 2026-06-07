@@ -1,49 +1,17 @@
 'use client';
 
-import { Fragment } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Button, Card, Icon, Pagination, Snack } from '@/components/ui';
+import { useTranslations } from 'next-intl';
+import { Button, Card, Icon, PageHeader, Pagination, useToast } from '@/components/ui';
+import { WorkspaceRefreshOverlay } from '@/features/admin-shell/components/workspace-refresh-overlay';
+import { useWorkspaceRefresh } from '@/features/admin-shell/hooks/use-workspace-refresh';
 import type { AuditRow } from '@/features/audit/data/audit-adapter';
+import { buildAuditExportCsv, validateAuditDateRange } from '@/features/audit/lib/audit-filters';
+import { adminBrowserFetch } from '@/lib/api';
+import { AuditTable } from './audit-table';
 import styles from './audit-workspace.module.css';
-
-function formatAction(action: string): string {
-  return action.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
-function actionPillClass(action: string): string {
-  if (action.includes('LOGIN')) return styles.pillAuth;
-  if (action.includes('CREATED') || action.includes('CREATE')) return styles.pillCreate;
-  if (action.includes('UPDATED') || action.includes('UPDATE')) return styles.pillUpdate;
-  if (action.includes('DELETED') || action.includes('DELETE') || action.includes('REJECT')) return styles.pillDelete;
-  if (action.includes('MERGE')) return styles.pillMerge;
-  if (action.includes('REVOKE') || action.includes('FAILED')) return styles.pillWarning;
-  return styles.pillDefault;
-}
-
-function resourceHref(row: AuditRow): string | null {
-  if (!row.resourceId) return null;
-  switch (row.resourceType) {
-    case 'User':
-      return `/dashboard/users/${row.resourceId}`;
-    case 'Report':
-      return `/dashboard/reports/${row.resourceId}`;
-    case 'Site':
-      return `/dashboard/sites/${row.resourceId}`;
-    case 'CleanupEvent':
-      return `/dashboard/events/${row.resourceId}`;
-    default:
-      return null;
-  }
-}
-
-function truncateId(id: string | null, max = 12): string {
-  if (!id) return '—';
-  if (id.length <= max) return id;
-  return `${id.slice(0, 6)}…${id.slice(-4)}`;
-}
 
 type AuditWorkspaceProps = {
   initialData: AuditRow[];
@@ -51,26 +19,36 @@ type AuditWorkspaceProps = {
 };
 
 export function AuditWorkspace({ initialData, initialMeta }: AuditWorkspaceProps) {
+  const t = useTranslations('audit');
+  const tCommon = useTranslations('common');
   const router = useRouter();
+  const { refresh: refreshPage, isRefreshing } = useWorkspaceRefresh();
   const reduceMotion = useReducedMotion();
   const searchParams = useSearchParams();
   const [data, setData] = useState(initialData);
   const [meta, setMeta] = useState(initialMeta);
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [snack, setSnack] = useState<{ tone: 'success'; message: string } | null>(null);
+  const { showToast } = useToast();
 
   const [action, setAction] = useState(searchParams.get('action') ?? '');
   const [resourceType, setResourceType] = useState(searchParams.get('resourceType') ?? '');
+  const [resourceId, setResourceId] = useState(searchParams.get('resourceId') ?? '');
   const [actorId, setActorId] = useState(searchParams.get('actorId') ?? '');
   const [from, setFrom] = useState(searchParams.get('from') ?? '');
   const [to, setTo] = useState(searchParams.get('to') ?? '');
+  const [dateError, setDateError] = useState<string | null>(null);
+  const [exporting, setExporting] = useState(false);
+  const translateDateError = (key: 'invalidDates' | 'fromBeforeTo') =>
+    key === 'invalidDates' ? t('filters.invalidDates') : t('filters.fromBeforeTo');
 
   useEffect(() => {
     setAction(searchParams.get('action') ?? '');
     setResourceType(searchParams.get('resourceType') ?? '');
+    setResourceId(searchParams.get('resourceId') ?? '');
     setActorId(searchParams.get('actorId') ?? '');
     setFrom(searchParams.get('from') ?? '');
     setTo(searchParams.get('to') ?? '');
+    setDateError(null);
   }, [searchParams]);
 
   useEffect(() => {
@@ -82,13 +60,14 @@ export function AuditWorkspace({ initialData, initialMeta }: AuditWorkspaceProps
     (updates: {
       action?: string;
       resourceType?: string;
+      resourceId?: string;
       actorId?: string;
       from?: string;
       to?: string;
       page?: number;
     }) => {
       const sp = new URLSearchParams(searchParams.toString());
-      const keys = ['action', 'resourceType', 'actorId', 'from', 'to'] as const;
+      const keys = ['action', 'resourceType', 'resourceId', 'actorId', 'from', 'to'] as const;
       keys.forEach((k) => {
         const v = updates[k];
         if (v !== undefined) {
@@ -107,31 +86,83 @@ export function AuditWorkspace({ initialData, initialMeta }: AuditWorkspaceProps
   );
 
   const applyFilters = useCallback(() => {
-    router.push(buildUrl({ action, resourceType, actorId, from, to, page: 1 }));
-  }, [router, buildUrl, action, resourceType, actorId, from, to]);
+    const validationError = validateAuditDateRange(from, to, translateDateError);
+    if (validationError) {
+      setDateError(validationError);
+      return;
+    }
+    setDateError(null);
+    router.push(buildUrl({ action, resourceType, resourceId, actorId, from, to, page: 1 }));
+  }, [router, buildUrl, action, resourceType, resourceId, actorId, from, to, translateDateError]);
 
   const clearFilters = useCallback(() => {
     setAction('');
     setResourceType('');
+    setResourceId('');
     setActorId('');
     setFrom('');
     setTo('');
+    setDateError(null);
     router.push('/dashboard/audit');
   }, [router]);
 
   const copyId = (id: string) => {
     navigator.clipboard.writeText(id).then(() => {
-      setSnack({ tone: 'success', message: 'ID copied to clipboard' });
-      setTimeout(() => setSnack(null), 2000);
+      showToast({ tone: 'success', title: tCommon('copied'), message: tCommon('idCopiedToClipboard') });
     });
   };
 
-  const hasFilters = !!(action || resourceType || actorId || from || to);
+  const hasFilters = !!(action || resourceType || resourceId || actorId || from || to);
+
+  const exportCsv = useCallback(async () => {
+    const validationError = validateAuditDateRange(from, to, translateDateError);
+    if (validationError) {
+      setDateError(validationError);
+      showToast({ tone: 'warning', title: tCommon('exportBlocked'), message: validationError });
+      return;
+    }
+
+    setExporting(true);
+    try {
+      const sp = new URLSearchParams({ page: '1', limit: '500' });
+      if (action) sp.set('action', action);
+      if (resourceType) sp.set('resourceType', resourceType);
+      if (resourceId) sp.set('resourceId', resourceId);
+      if (actorId) sp.set('actorId', actorId);
+      if (from) sp.set('from', from);
+      if (to) sp.set('to', to);
+
+      const result = await adminBrowserFetch<{ data: AuditRow[] }>(`/admin/audit?${sp.toString()}`);
+      const csv = buildAuditExportCsv(result.data);
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = `audit-export-${new Date().toISOString().slice(0, 10)}.csv`;
+      anchor.click();
+      URL.revokeObjectURL(url);
+      showToast({
+        tone: 'success',
+        title: tCommon('exportReady'),
+        message: tCommon('exportedRows', { count: result.data.length }),
+      });
+    } catch (error) {
+      showToast({
+        tone: 'warning',
+        title: tCommon('exportFailed'),
+        message: error instanceof Error ? error.message : tCommon('exportFailed'),
+      });
+    } finally {
+      setExporting(false);
+    }
+  }, [action, actorId, from, resourceId, resourceType, showToast, tCommon, to, translateDateError]);
 
   return (
+    <WorkspaceRefreshOverlay isRefreshing={isRefreshing}>
     <div className={styles.layout}>
+      <PageHeader title={t('pageTitle')} description={t('pageDescription')} />
       <a href="#audit-table" className="skipLink">
-        Skip to audit table
+        {t('skipToTable')}
       </a>
       <div className={styles.statsBar}>
         <motion.div
@@ -145,7 +176,7 @@ export function AuditWorkspace({ initialData, initialMeta }: AuditWorkspaceProps
           </span>
           <span className={styles.statValue}>{meta.total}</span>
           <span className={styles.statLabel}>
-            {hasFilters ? 'Entries (filtered)' : 'Total entries'}
+            {hasFilters ? t('stats.entriesFiltered') : t('stats.totalEntries')}
           </span>
         </motion.div>
         <motion.div
@@ -160,19 +191,19 @@ export function AuditWorkspace({ initialData, initialMeta }: AuditWorkspaceProps
           <span className={styles.statValue}>
             {Math.ceil(meta.total / meta.limit) || 1}
           </span>
-          <span className={styles.statLabel}>Pages</span>
+          <span className={styles.statLabel}>{t('stats.pages')}</span>
         </motion.div>
       </div>
 
       <Card className={styles.filtersCard}>
-        <span className={styles.filtersLabel}>Filters</span>
+        <span className={styles.filtersLabel}>{t('filters.label')}</span>
         <div className={styles.filtersGrid}>
           <div className={styles.field}>
-            <label htmlFor="audit-action">Action</label>
+            <label htmlFor="audit-action">{t('filters.action')}</label>
             <input
               id="audit-action"
               type="text"
-              placeholder="e.g. USER_UPDATED"
+              placeholder={t('filters.actionPlaceholder')}
               value={action}
               onChange={(e) => setAction(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && applyFilters()}
@@ -180,11 +211,11 @@ export function AuditWorkspace({ initialData, initialMeta }: AuditWorkspaceProps
             />
           </div>
           <div className={styles.field}>
-            <label htmlFor="audit-resource">Resource type</label>
+            <label htmlFor="audit-resource">{t('filters.resourceType')}</label>
             <input
               id="audit-resource"
               type="text"
-              placeholder="e.g. User, Report"
+              placeholder={t('filters.resourceTypePlaceholder')}
               value={resourceType}
               onChange={(e) => setResourceType(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && applyFilters()}
@@ -192,11 +223,23 @@ export function AuditWorkspace({ initialData, initialMeta }: AuditWorkspaceProps
             />
           </div>
           <div className={styles.field}>
-            <label htmlFor="audit-actor">Actor ID</label>
+            <label htmlFor="audit-resource-id">{t('filters.resourceId')}</label>
+            <input
+              id="audit-resource-id"
+              type="text"
+              placeholder={t('filters.resourceIdPlaceholder')}
+              value={resourceId}
+              onChange={(e) => setResourceId(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && applyFilters()}
+              className={styles.input}
+            />
+          </div>
+          <div className={styles.field}>
+            <label htmlFor="audit-actor">{t('filters.actorId')}</label>
             <input
               id="audit-actor"
               type="text"
-              placeholder="User ID"
+              placeholder={t('filters.actorIdPlaceholder')}
               value={actorId}
               onChange={(e) => setActorId(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && applyFilters()}
@@ -204,7 +247,7 @@ export function AuditWorkspace({ initialData, initialMeta }: AuditWorkspaceProps
             />
           </div>
           <div className={styles.field}>
-            <label htmlFor="audit-from">From</label>
+            <label htmlFor="audit-from">{t('filters.from')}</label>
             <input
               id="audit-from"
               type="date"
@@ -214,7 +257,7 @@ export function AuditWorkspace({ initialData, initialMeta }: AuditWorkspaceProps
             />
           </div>
           <div className={styles.field}>
-            <label htmlFor="audit-to">To</label>
+            <label htmlFor="audit-to">{t('filters.to')}</label>
             <input
               id="audit-to"
               type="date"
@@ -224,10 +267,11 @@ export function AuditWorkspace({ initialData, initialMeta }: AuditWorkspaceProps
             />
           </div>
         </div>
+        {dateError ? <p className={styles.dateError} role="alert">{dateError}</p> : null}
         <div className={styles.filterActions}>
-          <Button onClick={applyFilters}>Apply filters</Button>
+          <Button onClick={applyFilters}>{t('filters.apply')}</Button>
           <Button variant="outline" onClick={clearFilters}>
-            Clear
+            {t('filters.clear')}
           </Button>
         </div>
       </Card>
@@ -235,109 +279,27 @@ export function AuditWorkspace({ initialData, initialMeta }: AuditWorkspaceProps
       <Card className={styles.tableCard} id="audit-table">
         <div className={styles.toolbar}>
           <span className={styles.toolbarHint}>
-            {meta.total} entr{meta.total !== 1 ? 'ies' : 'y'} · page {meta.page}
+            {t('table.entriesMeta', { count: meta.total, page: meta.page })}
           </span>
-          <Button variant="outline" size="sm" onClick={() => router.refresh()}>
-            Refresh
+          <Button variant="outline" size="sm" onClick={() => void exportCsv()} disabled={exporting} aria-busy={exporting}>
+            {exporting ? tCommon('exporting') : tCommon('exportCsv')}
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => refreshPage()}>
+            {tCommon('refresh')}
           </Button>
         </div>
 
-        <div className={styles.tableWrap}>
-          {data.length === 0 ? (
-            <div className={styles.empty}>No audit entries match your filters.</div>
-          ) : (
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>Time</th>
-                  <th>Action</th>
-                  <th>Resource</th>
-                  <th>Actor</th>
-                  <th className={styles.thDetails}></th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.map((row) => {
-                  const href = resourceHref(row);
-                  const isExpanded = expandedId === row.id;
-                  const hasMetadata = row.metadata != null;
-                  return (
-                    <Fragment key={row.id}>
-                      <tr className={styles.row}>
-                        <td className={styles.cellTime}>
-                          {new Date(row.createdAt).toLocaleString(undefined, {
-                            dateStyle: 'medium',
-                            timeStyle: 'short',
-                          })}
-                        </td>
-                        <td>
-                          <span className={actionPillClass(row.action)}>
-                            {formatAction(row.action)}
-                          </span>
-                        </td>
-                        <td>
-                          <div className={styles.resourceCell}>
-                            <span className={styles.resourceType}>{row.resourceType}</span>
-                            {row.resourceId && (
-                              <>
-                                <span className={styles.resourceSep}>·</span>
-                                {href ? (
-                                  <Link href={href} className={styles.resourceLink}>
-                                    {truncateId(row.resourceId)}
-                                  </Link>
-                                ) : (
-                                  <button
-                                    type="button"
-                                    className={styles.resourceIdBtn}
-                                    onClick={() => copyId(row.resourceId!)}
-                                    title="Copy ID"
-                                  >
-                                    {truncateId(row.resourceId)}
-                                  </button>
-                                )}
-                              </>
-                            )}
-                          </div>
-                        </td>
-                        <td>
-                          <span className={styles.actor}>
-                            {row.actorEmail ?? <em>System</em>}
-                          </span>
-                        </td>
-                        <td className={styles.tdDetails}>
-                          {hasMetadata && (
-                            <button
-                              type="button"
-                              className={styles.detailsBtn}
-                              onClick={() => setExpandedId(isExpanded ? null : row.id)}
-                              aria-expanded={isExpanded}
-                            >
-                              {isExpanded ? 'Hide' : 'Details'}
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                      {isExpanded && hasMetadata && (
-                        <tr className={styles.metaRow}>
-                          <td colSpan={5}>
-                            <pre className={styles.metaPre}>
-                              {JSON.stringify(row.metadata, null, 2)}
-                            </pre>
-                          </td>
-                        </tr>
-                      )}
-                    </Fragment>
-                  );
-                })}
-              </tbody>
-            </table>
-          )}
-        </div>
+        <AuditTable
+          data={data}
+          expandedId={expandedId}
+          onToggleExpanded={(id) => setExpandedId((current) => (current === id ? null : id))}
+          onCopyId={copyId}
+        />
 
         {meta.total > meta.limit && (
           <div className={styles.footer}>
             <p className={styles.meta}>
-              {meta.total} entr{meta.total !== 1 ? 'ies' : 'y'} · page {meta.page}
+              {t('table.entriesMeta', { count: meta.total, page: meta.page })}
             </p>
             <Pagination
               totalPages={Math.ceil(meta.total / meta.limit)}
@@ -347,13 +309,7 @@ export function AuditWorkspace({ initialData, initialMeta }: AuditWorkspaceProps
           </div>
         )}
       </Card>
-
-      {snack && (
-        <Snack
-          snack={{ tone: snack.tone, title: snack.message, message: '' }}
-          onClose={() => setSnack(null)}
-        />
-      )}
     </div>
+    </WorkspaceRefreshOverlay>
   );
 }

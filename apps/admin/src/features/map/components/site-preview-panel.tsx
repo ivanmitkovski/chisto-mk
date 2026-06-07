@@ -4,7 +4,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Icon } from '@/components/ui';
+import { useAdminBcp47Locale } from '@/lib/i18n';
 import type { SiteMapRow } from '../data/map-adapter';
 import styles from './site-preview-panel.module.css';
 
@@ -21,10 +23,13 @@ function formatStatus(status: string): string {
   return status.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-function formatDistanceKm(km: number | undefined): string | null {
+function formatDistanceKm(
+  km: number | undefined,
+  t: (key: 'distanceMeters' | 'distanceKm', values: { distance: string | number }) => string,
+): string | null {
   if (km == null || Number.isNaN(km)) return null;
-  if (km < 1) return `${Math.round(km * 1000)} m from map center`;
-  return `${km < 10 ? km.toFixed(1) : Math.round(km)} km from map center`;
+  if (km < 1) return t('distanceMeters', { distance: Math.round(km * 1000) });
+  return t('distanceKm', { distance: km < 10 ? km.toFixed(1) : Math.round(km) });
 }
 
 function humanizeCategory(raw: string | null | undefined): string | null {
@@ -40,7 +45,20 @@ type SitePreviewPanelProps = {
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])';
 
+const STATUS_LABEL_KEY_BY_VALUE: Record<string, string> = {
+  REPORTED: 'statusFilters.reported',
+  VERIFIED: 'statusFilters.verified',
+  CLEANUP_SCHEDULED: 'statusFilters.cleanupScheduled',
+  IN_PROGRESS: 'statusFilters.inProgress',
+  CLEANED: 'statusFilters.cleaned',
+  DISPUTED: 'statusFilters.disputed',
+};
+
 export function SitePreviewPanel({ site, onClose }: SitePreviewPanelProps) {
+  const t = useTranslations('map');
+  const tPreview = useTranslations('map.preview');
+  const tCommon = useTranslations('common');
+  const locale = useAdminBcp47Locale();
   const reduceMotion = useReducedMotion();
   const sheetRef = useRef<HTMLElement | null>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -65,26 +83,26 @@ export function SitePreviewPanel({ site, onClose }: SitePreviewPanelProps) {
     .trim();
   const longDescription = description.length > 280;
   const badgeClass = BADGE_CLASS[site.status] ?? styles.badgeDefault;
-  const created = new Date(site.createdAt).toLocaleString(undefined, {
+  const created = new Date(site.createdAt).toLocaleString(locale, {
     dateStyle: 'medium',
     timeStyle: 'short',
   });
   const updated =
     site.updatedAt != null
-      ? new Date(site.updatedAt).toLocaleString(undefined, {
+      ? new Date(site.updatedAt).toLocaleString(locale, {
           dateStyle: 'medium',
           timeStyle: 'short',
         })
       : null;
   const latestReportAt =
     site.latestReportCreatedAt != null
-      ? new Date(site.latestReportCreatedAt).toLocaleString(undefined, {
+      ? new Date(site.latestReportCreatedAt).toLocaleString(locale, {
           dateStyle: 'medium',
           timeStyle: 'short',
         })
       : null;
   const categoryLabel = humanizeCategory(site.latestReportCategory);
-  const distanceLabel = formatDistanceKm(site.distanceKm);
+  const distanceLabel = formatDistanceKm(site.distanceKm, (key, values) => tPreview(key, values));
   const isCluster = site.isCluster === true;
 
   const latStr = site.latitude.toFixed(5);
@@ -93,6 +111,10 @@ export function SitePreviewPanel({ site, onClose }: SitePreviewPanelProps) {
 
   const appleMapsHref = `https://maps.apple.com/?ll=${site.latitude},${site.longitude}&q=${encodeURIComponent(`Site ${site.id.slice(0, 8)}`)}`;
   const googleMapsHref = `https://www.google.com/maps/search/?api=1&query=${site.latitude},${site.longitude}`;
+  const statusLabel = (() => {
+    const labelKey = STATUS_LABEL_KEY_BY_VALUE[site.status];
+    return labelKey ? t(labelKey) : formatStatus(site.status);
+  })();
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -158,13 +180,13 @@ export function SitePreviewPanel({ site, onClose }: SitePreviewPanelProps) {
   const copyCoords = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(coordClipboard);
-      setCopyAnnounced('Coordinates copied');
+      setCopyAnnounced(tPreview('coordsCopied'));
       window.setTimeout(() => setCopyAnnounced(''), 2500);
     } catch {
-      setCopyAnnounced('Could not copy');
+      setCopyAnnounced(tPreview('copyFailed'));
       window.setTimeout(() => setCopyAnnounced(''), 2500);
     }
-  }, [coordClipboard]);
+  }, [coordClipboard, tPreview]);
 
   const transition = reduceMotion
     ? { duration: 0 }
@@ -181,7 +203,7 @@ export function SitePreviewPanel({ site, onClose }: SitePreviewPanelProps) {
       <motion.button
         type="button"
         className={styles.scrim}
-        aria-label="Close site details"
+        aria-label={tPreview('closeSiteDetails')}
         onClick={onClose}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -225,14 +247,16 @@ export function SitePreviewPanel({ site, onClose }: SitePreviewPanelProps) {
 
         <header className={styles.header}>
           <div className={styles.headerText}>
-            <p className={styles.kicker}>{isCluster ? 'Site cluster' : 'Pollution site'}</p>
+            <p className={styles.kicker}>{isCluster ? tPreview('siteCluster') : tPreview('pollutionSite')}</p>
             <h2 id="site-preview-title" className={styles.title}>
               {isCluster
-                ? `${site.reportCount} sites in cluster`
-                : `Site #${site.id.slice(0, 8).toUpperCase()}`}
+                ? tPreview('clusterTitle', { count: site.reportCount })
+                : tPreview('siteTitle', { id: site.id.slice(0, 8).toUpperCase() })}
             </h2>
             <p className={styles.subtitle}>
-              <span>{isCluster ? 'Zoom in to inspect individual sites' : `Created ${created}`}</span>
+              <span>
+                {isCluster ? tPreview('zoomToInspect') : tPreview('created', { date: created })}
+              </span>
               {site.latestReportNumber ? (
                 <>
                   <span aria-hidden>·</span>
@@ -246,7 +270,7 @@ export function SitePreviewPanel({ site, onClose }: SitePreviewPanelProps) {
             type="button"
             className={styles.closeBtn}
             onClick={onClose}
-            aria-label="Close"
+            aria-label={tPreview('close')}
           >
             <Icon name="x" size={18} />
           </button>
@@ -269,10 +293,10 @@ export function SitePreviewPanel({ site, onClose }: SitePreviewPanelProps) {
             ) : (
               <div className={styles.heroFallback}>
                 <Icon name="location" size={28} />
-                <span>{hasMedia ? 'Image unavailable' : 'No photos yet'}</span>
+                <span>{hasMedia ? tPreview('imageUnavailable') : tPreview('noPhotos')}</span>
               </div>
             )}
-            <span className={styles.heroBadge}>{site.reportCount} report{site.reportCount !== 1 ? 's' : ''}</span>
+            <span className={styles.heroBadge}>{tPreview('reportCount', { count: site.reportCount })}</span>
           </div>
 
           {media.length > 1 ? (
@@ -286,7 +310,7 @@ export function SitePreviewPanel({ site, onClose }: SitePreviewPanelProps) {
                     setPhotoIndex(i);
                     setHeroFailed(false);
                   }}
-                  aria-label={`Show photo ${i + 1} of ${media.length}`}
+                  aria-label={tPreview('showPhoto', { index: i + 1, total: media.length })}
                 >
                   <Image
                     src={url}
@@ -303,14 +327,14 @@ export function SitePreviewPanel({ site, onClose }: SitePreviewPanelProps) {
 
         <div className={styles.body}>
           <div className={styles.statusRow}>
-            <span className={`${styles.badge} ${badgeClass}`}>{formatStatus(site.status)}</span>
+            <span className={`${styles.badge} ${badgeClass}`}>{statusLabel}</span>
             {categoryLabel ? <span className={styles.metaMuted}>{categoryLabel}</span> : null}
             {distanceLabel ? <span className={styles.metaMuted}>{distanceLabel}</span> : null}
           </div>
 
           {description ? (
             <div className={styles.detailGroup}>
-              <p className={styles.detailLabel}>Details</p>
+              <p className={styles.detailLabel}>{tPreview('details')}</p>
               <p
                 className={`${styles.detailText} ${!descExpanded && longDescription ? styles.detailTextClamp : ''}`}
               >
@@ -322,17 +346,17 @@ export function SitePreviewPanel({ site, onClose }: SitePreviewPanelProps) {
                   className={styles.expandBtn}
                   onClick={() => setDescExpanded((v) => !v)}
                 >
-                  {descExpanded ? 'Show less' : 'Show more'}
+                  {descExpanded ? tCommon('showLess') : tCommon('viewAll')}
                 </button>
               ) : null}
             </div>
           ) : null}
 
           <div className={styles.detailGroup}>
-            <p className={styles.detailLabel}>Facts</p>
+            <p className={styles.detailLabel}>{tPreview('facts')}</p>
             <div className={styles.rows}>
               <div className={styles.row}>
-                <span className={styles.rowLabel}>Coordinates</span>
+                <span className={styles.rowLabel}>{tPreview('coordinates')}</span>
                 <span className={styles.rowValue}>
                   <span className={styles.rowValueMono}>
                     {latStr}, {lngStr}
@@ -341,7 +365,7 @@ export function SitePreviewPanel({ site, onClose }: SitePreviewPanelProps) {
                     type="button"
                     className={styles.iconBtn}
                     onClick={() => void copyCoords()}
-                    aria-label="Copy coordinates"
+                    aria-label={tPreview('copyCoordinates')}
                   >
                     <Icon name="copy" size={16} />
                   </button>
@@ -349,13 +373,13 @@ export function SitePreviewPanel({ site, onClose }: SitePreviewPanelProps) {
               </div>
               {updated ? (
                 <div className={styles.row}>
-                  <span className={styles.rowLabel}>Last updated</span>
+                  <span className={styles.rowLabel}>{tPreview('lastUpdated')}</span>
                   <span className={styles.rowValue}>{updated}</span>
                 </div>
               ) : null}
               {latestReportAt ? (
                 <div className={styles.row}>
-                  <span className={styles.rowLabel}>Latest report</span>
+                  <span className={styles.rowLabel}>{tPreview('latestReport')}</span>
                   <span className={styles.rowValue}>{latestReportAt}</span>
                 </div>
               ) : null}
@@ -370,7 +394,7 @@ export function SitePreviewPanel({ site, onClose }: SitePreviewPanelProps) {
               rel="noopener noreferrer"
             >
               <Icon name="map" size={14} />
-              Apple Maps
+              {tCommon('appleMaps')}
             </a>
             <a
               className={styles.mapsLink}
@@ -379,25 +403,28 @@ export function SitePreviewPanel({ site, onClose }: SitePreviewPanelProps) {
               rel="noopener noreferrer"
             >
               <Icon name="external-link" size={14} />
-              Google Maps
+              {tCommon('googleMaps')}
             </a>
           </div>
         </div>
 
         <footer className={styles.footer}>
           {isCluster ? (
-            <span className={styles.linkPrimary}>Zoom in to view site details</span>
+            <span className={styles.linkPrimary}>{tPreview('zoomToView')}</span>
           ) : (
             <>
               <Link href={`/dashboard/sites/${site.id}`} className={styles.linkPrimary}>
-                View full site
+                {tPreview('viewFullSite')}
               </Link>
               <div className={styles.pillRow}>
+                <Link href={`/dashboard/sites/${site.id}`} className={styles.linkSecondary}>
+                  {tPreview('viewTimeline')}
+                </Link>
                 <Link href={`/dashboard/reports?siteId=${site.id}`} className={styles.linkSecondary}>
-                  Reports
+                  {tPreview('reports')}
                 </Link>
                 <Link href={`/dashboard/events/new?siteId=${site.id}`} className={styles.linkSecondary}>
-                  New event
+                  {tPreview('newEvent')}
                 </Link>
               </div>
             </>

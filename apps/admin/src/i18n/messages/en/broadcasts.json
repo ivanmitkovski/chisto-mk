@@ -1,0 +1,85 @@
+{
+  "pageTitle": "Broadcasts",
+  "description": "Compose, edit, send, and manage system notification campaigns.",
+  "form": {
+    "newCampaign": "New campaign",
+    "editCampaign": "Edit campaign",
+    "title": "Title",
+    "body": "Body",
+    "deeplink": "Deeplink (optional)",
+    "audience": "Audience",
+    "userIds": "User IDs (comma or space separated)",
+    "schedule": "Schedule for later (optional)",
+    "saveDraft": "Save draft",
+    "cancelEdit": "Cancel edit"
+  },
+  "actions": {
+    "edit": "Edit"
+  },
+  "card": {
+    "audienceLabel": "Audience: {audience}",
+    "userCount": "{count} user(s)",
+    "scheduledAt": "Scheduled {date}",
+    "sentAt": "Sent {date}",
+    "updatedAt": "Updated {date}",
+    "deliveredTo": "Delivered to {count} users"
+  },
+  "audiencePreview": {
+    "recipientCap": "{label} (up to 5,000 recipients)",
+    "userIdCount": "{label} ({count} user ID)",
+    "userIdCountPlural": "{label} ({count} user IDs)"
+  },
+  "validation": {
+    "titleRequired": "Title is required.",
+    "bodyRequired": "Body is required.",
+    "userIdsRequired": "Enter at least one user ID for a specific audience.",
+    "deeplinkInvalid": "Deeplink must start with / and contain only letters, numbers, /, _, or -.",
+    "scheduleInvalid": "Scheduled time is not a valid date."
+  },
+  "audience": {
+    "all": "All users",
+    "active": "Active users (30 days)",
+    "specific": "Specific user IDs"
+  },
+  "status": {
+    "draft": "Draft",
+    "scheduled": "Scheduled",
+    "sent": "Sent",
+    "cancelled": "Cancelled"
+  },
+  "empty": "No broadcast campaigns yet.",
+  "confirmSendTitle": "Send broadcast now?",
+  "confirmSendDescription": "Send \"{title}\" to {audience}? This cannot be undone.",
+  "confirmSendPhrase": "SEND",
+  "sendNow": "Send now",
+  "confirmDeleteTitle": "Delete campaign?",
+  "confirmDeleteDescription": "Permanently remove \"{title}\"? This cannot be undone.",
+  "confirmCancelTitle": "Cancel scheduled broadcast?",
+  "confirmCancelDescription": "Cancel \"{title}\"? It will not be sent.",
+  "confirmDiscardEditTitle": "Discard campaign edits?",
+  "confirmDiscardEditDescription": "Unsaved changes in the form will be lost.",
+  "toast": {
+    "validationTitle": "Validation",
+    "draftCreatedTitle": "Draft created",
+    "draftCreatedMessage": "Campaign saved as draft.",
+    "savedTitle": "Saved",
+    "savedMessage": "Campaign updated.",
+    "cancelledTitle": "Cancelled",
+    "cancelledMessage": "Campaign cancelled.",
+    "deletedTitle": "Deleted",
+    "deletedMessage": "Campaign removed.",
+    "createFailedTitle": "Create failed",
+    "createFailedMessage": "Unable to create campaign.",
+    "broadcastSentTitle": "Broadcast sent",
+    "broadcastSentMessage": "Delivered to {sentCount} users{failedSuffix}.",
+    "broadcastSentFailedSuffix": " ({failedCount} failed)",
+    "updateFailedTitle": "Update failed",
+    "updateFailedMessage": "Unable to update campaign.",
+    "sendFailedTitle": "Send failed",
+    "sendFailedMessage": "Unable to send campaign.",
+    "cancelFailedTitle": "Cancel failed",
+    "cancelFailedMessage": "Unable to cancel campaign.",
+    "deleteFailedTitle": "Delete failed",
+    "deleteFailedMessage": "Unable to delete campaign."
+  }
+}

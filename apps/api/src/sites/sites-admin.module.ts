@@ -3,6 +3,7 @@ import { AdminRealtimeModule } from '../admin-realtime/admin-realtime.module';
 import { AuditModule } from '../audit/audit.module';
 import { SiteHistoryModule } from './history/site-history.module';
 import { SitesAdminBulkService } from './services/sites-admin-bulk.service';
+import { SitesAdminListService } from './services/sites-admin-list.service';
 import { SitesAdminService } from './services/sites-admin.service';
 import { SitesFeedModule } from './sites-feed.module';
 import { SitesMapModule } from './sites-map.module';
@@ -15,7 +16,7 @@ import { SitesMapModule } from './sites-map.module';
     forwardRef(() => SitesFeedModule),
     forwardRef(() => SitesMapModule),
   ],
-  providers: [SitesAdminService, SitesAdminBulkService],
-  exports: [SitesAdminService, SitesAdminBulkService],
+  providers: [SitesAdminService, SitesAdminBulkService, SitesAdminListService],
+  exports: [SitesAdminService, SitesAdminBulkService, SitesAdminListService],
 })
 export class SitesAdminModule {}

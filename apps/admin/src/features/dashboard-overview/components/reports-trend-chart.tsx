@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import { Icon } from '@/components/ui';
 import type { ReportsTrendItem } from '../types';
@@ -38,13 +39,10 @@ type ReportsTrendChartProps = {
   data: ReportsTrendItem[];
 };
 
-const RANGE_OPTIONS: { value: TrendRange; label: string }[] = [
-  { value: 7, label: '7d' },
-  { value: 14, label: '14d' },
-  { value: 30, label: '30d' },
-];
+const RANGE_OPTIONS: TrendRange[] = [7, 14, 30];
 
 export function ReportsTrendChart({ data }: ReportsTrendChartProps) {
+  const t = useTranslations('dashboard.reportsTrend');
   const [range, setRange] = useState<TrendRange>(30);
   const filteredData = filterByRange(data, range);
   const chartData = filteredData.map((item) => ({
@@ -56,27 +54,27 @@ export function ReportsTrendChart({ data }: ReportsTrendChartProps) {
   const chartHeight = chartData.length < 7 ? 120 : 140;
 
   return (
-    <div className={styles.card} role="region" aria-label={`Reports trend over the last ${range} days`}>
-      <span className={styles.sectionLabel}>Analytics</span>
+    <div className={styles.card} role="region" aria-label={t('chartAria', { range })}>
+      <span className={styles.sectionLabel}>{t('sectionLabel')}</span>
       <div className={styles.header}>
-        <h3 className={styles.title}>Reports trend</h3>
+        <h3 className={styles.title}>{t('title')}</h3>
         <div className={styles.headerRight}>
-          <div className={styles.rangeTabs} role="tablist" aria-label="Time range">
+          <div className={styles.rangeTabs} role="tablist" aria-label={t('timeRangeAria')}>
             {RANGE_OPTIONS.map((opt) => (
               <button
-                key={opt.value}
+                key={opt}
                 type="button"
                 role="tab"
-                aria-selected={range === opt.value}
-                className={range === opt.value ? styles.rangeTabActive : styles.rangeTab}
-                onClick={() => setRange(opt.value)}
+                aria-selected={range === opt}
+                className={range === opt ? styles.rangeTabActive : styles.rangeTab}
+                onClick={() => setRange(opt)}
               >
-                {opt.label}
+                {`${opt}d`}
               </button>
             ))}
           </div>
           <Link href="/dashboard/reports" className={styles.viewLink}>
-            View reports
+            {t('viewReports')}
             <Icon name="chevron-right" size={12} className={styles.viewChevron} />
           </Link>
         </div>
@@ -84,18 +82,18 @@ export function ReportsTrendChart({ data }: ReportsTrendChartProps) {
       {!showChart ? (
         <p className={styles.emptyHint}>
           {data.length === 0
-            ? `No reports submitted in the last ${range} days.`
-            : 'Submit more reports to see the trend.'}
+            ? t('emptyNoData', { range })
+            : t('emptyNeedMore')}
         </p>
       ) : (
         <div className={styles.chartWrap} aria-hidden="true">
           <ReportsTrendChartInner data={chartData} height={chartHeight} />
           <table className={styles.srOnly}>
-            <caption>Reports trend over the last {range} days</caption>
+            <caption>{t('tableCaption', { range })}</caption>
             <thead>
               <tr>
-                <th scope="col">Date</th>
-                <th scope="col">Reports</th>
+                <th scope="col">{t('dateColumn')}</th>
+                <th scope="col">{t('reportsColumn')}</th>
               </tr>
             </thead>
             <tbody>

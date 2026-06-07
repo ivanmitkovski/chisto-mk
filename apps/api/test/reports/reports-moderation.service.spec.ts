@@ -1,5 +1,6 @@
 /// <reference types="jest" />
 import { BadRequestException } from '@nestjs/common';
+import { ReportsModerationAssignService } from '../../src/reports/services/reports-moderation-assign.service';
 import { ReportsModerationDetailService } from '../../src/reports/services/reports-moderation-detail.service';
 import { ReportsModerationListService } from '../../src/reports/services/reports-moderation-list.service';
 import { ReportsModerationService } from '../../src/reports/services/reports-moderation.service';
@@ -35,7 +36,8 @@ function createModerationService(
     siteHistoryReportRecorder as never,
   );
   const detail = new ReportsModerationDetailService(prisma as never, reportsUploadService as never);
-  const service = new ReportsModerationService(list, status, detail);
+  const assign = new ReportsModerationAssignService(prisma as never);
+  const service = new ReportsModerationService(list, status, detail, assign);
   return { service, reportSideEffectProcessor };
 }
 

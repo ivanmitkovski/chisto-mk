@@ -19,4 +19,10 @@ export class PatchAdminUgcReportDto {
   @IsString()
   @MaxLength(1000)
   note?: string;
+
+  @ApiPropertyOptional({ description: 'Policy reason for audit trail (required for dismiss/escalate/hide/restore)' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  policyReason?: string;
 }

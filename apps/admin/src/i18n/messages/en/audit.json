@@ -1,0 +1,41 @@
+{
+  "pageTitle": "Audit log",
+  "skipToTable": "Skip to audit table",
+  "stats": {
+    "totalEntries": "Total entries",
+    "entriesFiltered": "Entries (filtered)",
+    "pages": "Pages"
+  },
+  "filters": {
+    "label": "Filters",
+    "action": "Action",
+    "actionPlaceholder": "e.g. USER_UPDATED",
+    "resourceType": "Resource type",
+    "resourceTypePlaceholder": "e.g. User, Report",
+    "resourceId": "Resource ID",
+    "resourceIdPlaceholder": "e.g. user or report UUID",
+    "actorId": "Actor ID",
+    "actorIdPlaceholder": "User ID",
+    "from": "From",
+    "to": "To",
+    "apply": "Apply filters",
+    "clear": "Clear",
+    "invalidDates": "Enter valid dates.",
+    "fromBeforeTo": "\"From\" must be on or before \"To\"."
+  },
+  "table": {
+    "time": "Time",
+    "copyId": "Copy ID",
+    "action": "Action",
+    "resource": "Resource",
+    "actor": "Actor",
+    "system": "System",
+    "details": "Details",
+    "hide": "Hide",
+    "hideDetails": "Hide details",
+    "showDetails": "Show details",
+    "empty": "No audit entries match your filters.",
+    "entriesMeta": "{count} entr(y/ies) · page {page}"
+  },
+  "pageDescription": "Review admin activity and configuration changes."
+}

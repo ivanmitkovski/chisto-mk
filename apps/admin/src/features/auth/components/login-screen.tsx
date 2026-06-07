@@ -2,8 +2,9 @@
 
 import { FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { Brand, Button, Input, Snack } from '@/components/ui';
+import { Brand, Button, Checkbox, Input } from '@/components/ui';
 import { useLoginForm } from '../hooks/use-login-form';
 import { OtpInput } from './otp-input';
 import { PasswordInput } from './password-input';
@@ -13,6 +14,7 @@ const motionDuration = 0.22;
 const motionEase = [0.22, 1, 0.36, 1] as const;
 
 export function LoginScreen() {
+  const t = useTranslations('auth');
   const router = useRouter();
   const shouldReduceMotion = useReducedMotion();
   const duration = shouldReduceMotion ? 0 : motionDuration;
@@ -21,7 +23,6 @@ export function LoginScreen() {
   const {
     values,
     errors,
-    snack,
     step,
     totpCode,
     setTotpCode,
@@ -34,7 +35,6 @@ export function LoginScreen() {
     handleSubmit,
     handleTotpSubmit,
     resetToCredentials,
-    clearSnack,
   } = useLoginForm();
   const currentYear = new Date().getFullYear();
 
@@ -86,41 +86,39 @@ export function LoginScreen() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration, delay: shouldReduceMotion ? 0 : 0.04, ease: motionEase }}
               >
-                Sign in
+                {t('signInTitle')}
               </motion.h1>
 
               <form className={styles.form} onSubmit={onSubmit}>
                 <Input
                   id="login-email"
-                  label="Email"
+                  label={t('email')}
                   type="email"
                   autoComplete="email"
                   autoFocus
-                  placeholder="admin@chisto.mk"
+                  placeholder={t('emailPlaceholder')}
                   value={values.email}
                   onChange={(event) => updateField('email', event.target.value)}
                   errorText={errors.email}
                 />
                 <PasswordInput
                   id="login-password"
-                  label="Password"
+                  label={t('password')}
                   autoComplete="current-password"
-                  placeholder="••••••••••••"
+                  placeholder={t('passwordPlaceholder')}
                   value={values.password}
                   onChange={(event) => updateField('password', event.target.value)}
                   errorText={errors.password}
                 />
-                <label className={styles.checkboxRow}>
-                  <input
-                    type="checkbox"
-                    checked={values.rememberDevice}
-                    onChange={(event) => updateField('rememberDevice', event.target.checked)}
-                  />
-                  <span>Remember this trusted device</span>
-                </label>
+                <Checkbox
+                  className={styles.checkboxRow}
+                  checked={values.rememberDevice}
+                  onChange={(event) => updateField('rememberDevice', event.target.checked)}
+                  label={t('rememberDevice')}
+                />
                 {isLockedOut ? (
                   <p className={styles.lockout} role="status" aria-live="polite">
-                    Too many attempts. Try again in {formatCountdown(lockoutRemainingSeconds)}.
+                    {t('lockout', { time: formatCountdown(lockoutRemainingSeconds) })}
                   </p>
                 ) : null}
                 <div className={styles.actionsRow}>
@@ -130,10 +128,10 @@ export function LoginScreen() {
                     isLoading={isSubmitting}
                     disabled={isLockedOut}
                   >
-                    Sign in
+                    {t('signIn')}
                   </Button>
                   <a className={styles.helpLink} href="mailto:support@chisto.mk?subject=Admin%20login%20help">
-                    Forgot password?
+                    {t('forgotPassword')}
                   </a>
                 </div>
               </form>
@@ -147,23 +145,21 @@ export function LoginScreen() {
               transition={{ duration, ease: motionEase }}
               className={styles.stepContent}
             >
-              <h1 className={styles.title}>Enter verification code</h1>
+              <h1 className={styles.title}>{t('enterVerificationCode')}</h1>
               <p className={styles.totpSubtitle}>
-                {useBackupCode
-                  ? 'Enter one of your backup codes.'
-                  : 'Open your authenticator app and enter the 6-digit code.'}
+                {useBackupCode ? t('totpSubtitleBackup') : t('totpSubtitleAuthenticator')}
               </p>
 
               <form className={styles.form} onSubmit={onTotpSubmit}>
                 {useBackupCode ? (
                   <Input
                     id="login-totp"
-                    label="Backup code"
+                    label={t('backupCode')}
                     type="text"
                     inputMode="text"
                     autoComplete="one-time-code"
                     autoFocus
-                    placeholder="xxxxxxxx-xxxxxxxx"
+                    placeholder={t('backupCodePlaceholder')}
                     value={totpCode}
                     onChange={(event) => setTotpCode(event.target.value.slice(0, 32))}
                     maxLength={32}
@@ -172,7 +168,7 @@ export function LoginScreen() {
                 ) : (
                   <OtpInput
                     id="login-totp"
-                    label="Verification code"
+                    label={t('verificationCode')}
                     value={totpCode}
                     onChange={setTotpCode}
                     disabled={isSubmitting}
@@ -180,7 +176,7 @@ export function LoginScreen() {
                   />
                 )}
                 <Button className={styles.button} type="submit" isLoading={isSubmitting}>
-                  Verify
+                  {t('verify')}
                 </Button>
               </form>
 
@@ -193,7 +189,7 @@ export function LoginScreen() {
                 }}
                 disabled={isSubmitting}
               >
-                {useBackupCode ? 'Use authenticator app' : 'Use backup code'}
+                {useBackupCode ? t('useAuthenticatorApp') : t('useBackupCode')}
               </button>
 
               <button
@@ -202,13 +198,13 @@ export function LoginScreen() {
                 onClick={resetToCredentials}
                 disabled={isSubmitting}
               >
-                Use a different account
+                {t('useDifferentAccount')}
               </button>
             </motion.div>
           )}
         </AnimatePresence>
 
-        <p className={styles.footer}>Copyright {currentYear} Chisto.mk. All rights reserved.</p>
+        <p className={styles.footer}>{t('copyright', { year: currentYear })}</p>
       </motion.section>
 
       <motion.section
@@ -218,7 +214,6 @@ export function LoginScreen() {
         transition={{ duration: shouldReduceMotion ? 0 : 0.32, ease: motionEase }}
       />
 
-      <Snack snack={snack} onClose={clearSnack} />
     </main>
   );
 }

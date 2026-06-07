@@ -1,6 +1,7 @@
 'use client';
 
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { Icon } from '../icon';
 import styles from './pagination.module.css';
 
 type PaginationProps = {
@@ -29,19 +30,20 @@ function pageItems(totalPages: number, currentPage: number): PageItem[] {
 }
 
 export function Pagination({ totalPages, currentPage, onPageChange, className }: PaginationProps) {
+  const t = useTranslations('common');
   const rootClassName = [styles.root, className ?? ''].join(' ').trim();
   const items = pageItems(totalPages, currentPage);
 
   return (
-    <nav className={rootClassName} aria-label="Pagination">
+    <nav className={rootClassName} aria-label={t('pagination')}>
       <button
         type="button"
         className={styles.item}
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage <= 1}
-        aria-label="Previous page"
+        aria-label={t('previousPage')}
       >
-        <ChevronLeft size={14} />
+        <Icon name="chevron-left" size={14} />
       </button>
 
       {items.map((item, index) => {
@@ -71,9 +73,9 @@ export function Pagination({ totalPages, currentPage, onPageChange, className }:
         className={styles.item}
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage >= totalPages}
-        aria-label="Next page"
+        aria-label={t('nextPage')}
       >
-        <ChevronRight size={14} />
+        <Icon name="chevron-right" size={14} />
       </button>
     </nav>
   );

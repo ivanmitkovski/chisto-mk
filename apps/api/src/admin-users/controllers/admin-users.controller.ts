@@ -1,5 +1,5 @@
 import { Idempotent } from '../../common/idempotency/idempotency.decorator';
-import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOkResponse,
@@ -68,6 +68,20 @@ export class AdminUsersController {
   @ApiOkResponse({ description: 'User sessions' })
   getSessions(@Param('id') id: string) {
     return this.adminUsersService.getSessions(id);
+  }
+
+  @Delete(':id/sessions/:sessionId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(...ADMIN_WRITE_ROLES)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Revoke a user session' })
+  @ApiOkResponse({ description: 'Session revoked' })
+  revokeSession(
+    @Param('id') id: string,
+    @Param('sessionId') sessionId: string,
+    @CurrentUser() actor: AuthenticatedUser,
+  ) {
+    return this.adminUsersService.revokeSession(id, sessionId, actor);
   }
 
   @Get(':id')

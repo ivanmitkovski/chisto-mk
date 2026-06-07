@@ -37,6 +37,8 @@ export function validateEnv(): void {
     EMAIL_APP_BASE_URL: Joi.string().trim().uri().optional(),
     EMAIL_LOGO_URL: Joi.string().trim().uri().optional(),
     PASSWORD_RESET_URL: Joi.string().trim().uri().optional(),
+    ADMIN_APP_BASE_URL: Joi.string().trim().uri().optional(),
+    ADMIN_INVITE_TTL_HOURS: Joi.number().integer().min(1).max(720).default(72),
     TERMS_VERSION: Joi.string().trim().min(1).max(32).default('1'),
   });
 
@@ -57,6 +59,7 @@ export function validateEnv(): void {
     'JWT_REFRESH_EXPIRES_DAYS',
     'MAX_SESSIONS_PER_USER',
     'REFRESH_TOKEN_ROTATION_GRACE_SECONDS',
+    'ADMIN_INVITE_TTL_HOURS',
   ] as const) {
     process.env[key] = String(value[key]);
   }
@@ -193,6 +196,7 @@ export function validateEnv(): void {
     }
 
     requireEnv('METRICS_BEARER_TOKEN');
+    requireEnv('ADMIN_APP_BASE_URL');
   }
 
   const mapSearchTypesense =

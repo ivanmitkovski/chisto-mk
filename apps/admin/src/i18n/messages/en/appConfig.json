@@ -1,0 +1,48 @@
+{
+  "pageTitle": "App config",
+  "description": "Control mobile app flows: report credits, feed ranking, quiz, and legal version.",
+  "reportCredits": {
+    "title": "Report credits",
+    "dailyCredits": "Daily credits",
+    "emergencyWindowHours": "Emergency window (hours)",
+    "refillIntervalHours": "Refill interval (hours)",
+    "validationError": "All credit fields must be positive integers.",
+    "save": "Save report credits",
+    "savedMessage": "Report credits config updated.",
+    "invalidValuesMessage": "Credits fields must be positive integers."
+  },
+  "feedRanking": {
+    "title": "Feed ranking",
+    "defaultVariant": "Default variant",
+    "experimentEnabled": "Experiment enabled",
+    "experimentConfirmTitle": "Enable feed experiment?",
+    "experimentConfirmDescription": "This turns on A/B feed ranking for mobile clients. Confirm before enabling.",
+    "experimentConfirmAction": "Enable experiment",
+    "save": "Save feed ranking",
+    "savedMessage": "Feed ranking config updated.",
+    "defaultVariantRequired": "Default variant is required."
+  },
+  "organizerQuiz": {
+    "title": "Organizer quiz",
+    "locale": "Locale",
+    "localeEnglish": "English (en)",
+    "localeMacedonian": "Macedonian (mk)",
+    "jsonAria": "Organizer quiz JSON",
+    "loading": "Loading quiz for {locale}…",
+    "invalidObject": "Quiz JSON must be an object.",
+    "save": "Save organizer quiz",
+    "savedMessage": "Organizer quiz updated.",
+    "loadFailedMessage": "Unable to load organizer quiz.",
+    "discardLocaleTitle": "Discard quiz edits?",
+    "discardLocaleDescription": "You have unsaved quiz changes. Switch locale without saving?",
+    "discardLocaleConfirm": "Switch locale"
+  },
+  "terms": {
+    "title": "Terms version",
+    "version": "Version",
+    "validationError": "Use 1-32 characters: letters, numbers, dots, underscores, or hyphens.",
+    "invalidVersionMessage": "Terms version format is invalid.",
+    "save": "Save terms version",
+    "savedMessage": "Terms version updated."
+  }
+}

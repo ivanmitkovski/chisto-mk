@@ -1,0 +1,189 @@
+{
+  "pageTitle": "Поставки",
+  "skipToContent": "Прескокни до содржината на поставките",
+  "sidebarAria": "Секции на поставките",
+  "groups": {
+    "account": "Сметка",
+    "system": "Систем",
+    "preferences": "Преференци"
+  },
+  "sections": {
+    "profile": "Профил",
+    "security": "Безбедност",
+    "environment": "Околина",
+    "featureFlags": "Ознаки за функции",
+    "moderationEmails": "Е-пошта за модерација",
+    "preferences": "Преференци"
+  },
+  "profile": {
+    "title": "Профил",
+    "description": "Информации за вашата сметка.",
+    "firstName": "Име",
+    "lastName": "Презиме",
+    "unsavedChanges": "Незачувани промени",
+    "saveChanges": "Зачувај промени",
+    "saving": "Зачувување…",
+    "savedToast": "Профилот е ажуриран.",
+    "errorToast": "Грешка"
+  },
+  "security": {
+    "title": "Безбедност",
+    "description": "Сесии, лозинка и активност.",
+    "sessionsLabel": "Сесии",
+    "activeSessionsTitle": "Активни сесии",
+    "activeSessionsHint": "Уреди кои се моментално најавени на вашата сметка.",
+    "thisDevice": "Овој уред",
+    "signOutOtherSessions": "Одјави ги другите сесии",
+    "passwordLabel": "Лозинка",
+    "changePasswordTitle": "Промени лозинка",
+    "currentPassword": "Тековна лозинка",
+    "newPassword": "Нова лозинка",
+    "confirmNewPassword": "Потврди нова лозинка",
+    "changePasswordButton": "Промени лозинка",
+    "activityLabel": "Активност",
+    "recentActivityTitle": "Неодамнешна активност",
+    "recentActivityHint": "Настани поврзани со безбедноста на вашата сметка.",
+    "noActivityYet": "Сè уште нема активност."
+  },
+  "mfa": {
+    "sectionLabel": "Двофакторска автентикација",
+    "title": "2FA",
+    "hint": "Додајте дополнителен слој на безбедност со барање код од вашата апликација за автентикација при најава.",
+    "recommendedBadge": "Препорачано",
+    "recommendedCopy": "Заштитете ја вашата админ сметка со код од апликацијата за автентикација. Можете да го поставите за една минута.",
+    "banner": {
+      "title": "Засилете ја безбедноста на вашата сметка",
+      "message": "Двофакторската автентикација сè уште не е вклучена. Додајте ја во Поставки кога сте подготвени.",
+      "action": "Прегледај ги безбедносните поставки",
+      "dismiss": "Не сега"
+    },
+    "enabled": "Двофакторската автентикација е вклучена",
+    "disabled": "Двофакторската автентикација е исклучена",
+    "enable2fa": "Овозможи 2FA",
+    "starting": "Се започнува…",
+    "disable2fa": "Оневозможи 2FA",
+    "disableHint": "Внесете ја вашата лозинка за да ја исклучите двофакторската автентикација.",
+    "passwordRequiredTitle": "Потребна е лозинка",
+    "passwordRequiredMessage": "Внесете ја тековната лозинка за да ја оневозможите 2FA.",
+    "disabling": "Се оневозможува…",
+    "setupStep": "Скенирајте со вашата апликација за автентикација (на пр. Google Authenticator, 1Password)",
+    "qrAlt": "QR код за поставување автентикатор",
+    "manualKey": "Или внесете го овој код рачно: {secret}",
+    "enterSixDigitCode": "Внесете го 6-цифрениот код",
+    "codePlaceholder": "000000",
+    "verifyAndEnable": "Потврди и овозможи",
+    "verifying": "Проверување…",
+    "backupCodesTitle": "Зачувајте ги вашите резервни кодови",
+    "backupCodesHint": "Чувајте ги овие кодови на безбедно место. Секој може да се користи еднаш ако ја изгубите апликацијата за автентикација.",
+    "copyBackupCodes": "Копирај ги сите кодови",
+    "downloadBackupCodes": "Преземи кодови",
+    "backupCodesAttestation": "Ги зачував овие резервни кодови на безбедно место",
+    "copyBackupCodesSuccessTitle": "Копирано",
+    "copyBackupCodesSuccessMessage": "Резервните кодови се копирани.",
+    "copyBackupCodesFailedMessage": "Не може да се копираат кодовите. Обидете се со преземање.",
+    "done": "Готово",
+    "toast": {
+      "setupError": "Не може да се започне поставувањето",
+      "enterCodeTitle": "Внесете код",
+      "enterCodeMessage": "Внесете го 6-цифрениот код од вашата апликација за автентикација.",
+      "verificationFailedTitle": "Верификацијата не успеа",
+      "invalidCodeMessage": "Невалиден код. Обидете се повторно.",
+      "disabledTitle": "2FA е оневозможена",
+      "disabledMessage": "Двофакторската автентикација е исклучена.",
+      "failedTitle": "Неуспешно",
+      "incorrectPassword": "Погрешна лозинка."
+    },
+    "disableConfirmTitle": "Исклучи двофакторска автентикација?"
+  },
+  "preferences": {
+    "title": "Преференци",
+    "description": "Опции за приказ во овој прелистувач. Другите уреди не се засегнати.",
+    "displayLabel": "Приказ",
+    "interfaceMotionTitle": "Движење на интерфејсот",
+    "interfaceMotionHint": "Ги скратува транзициите низ админ апликацијата со дизајн токени. Се чува само на овој уред.",
+    "reduceMotionTitle": "Намали движење",
+    "reduceMotionCaption": "Минимизирај анимации и транзиции",
+    "notificationsLabel": "Известувања",
+    "deliveryPreferencesTitle": "Преференци за достава",
+    "deliveryPreferencesHint": "Прекинувачи по прелистувач за известувања за пријави во живо. Ова не ги менува поставките на други уреди.",
+    "soundOnNewReportsTitle": "Звук при нови пријави",
+    "soundOnNewReportsCaption": "Пушта суптилен звук кога пристигнува нова пријава во реално време",
+    "playTestSound": "Пушти тест звук",
+    "serverAlertsNote": "Известувањата управувани од серверот сè уште се појавуваат во горната лента и на страницата Известувања.",
+    "languageLabel": "Јазик",
+    "localeTitle": "Локал",
+    "localeHint": "Јазик на админ интерфејсот.",
+    "displayLanguage": "Јазик за приказ",
+    "localeEnglish": "English",
+    "localeMacedonian": "Македонски",
+    "localeAlbanian": "Shqip",
+    "localeFootnote": "Поставката за јазик се зачувува во овој прелистувач.",
+    "reduceMotionToggleAria": "Намали движење",
+    "soundOnNewReportsToggleAria": "Звук за нови пријави"
+  },
+  "environment": {
+    "title": "Околина",
+    "description": "Системска конфигурација. Само за супер администратори.",
+    "restricted": "Оваа секција е ограничена за супер администратори.",
+    "configEntriesTitle": "Ставки за конфигурација",
+    "saveConfiguration": "Зачувај конфигурација",
+    "confirmSaveTitle": "Да се зачуваат промените во конфигурацијата?",
+    "confirmSaveDescription": "Ажурираните вредности стапуваат на сила веднаш низ платформата.",
+    "savedToast": "Конфигурацијата е ажурирана."
+  },
+  "featureFlags": {
+    "title": "Ознаки за функции",
+    "description": "Овозможете или оневозможете функции низ платформата.",
+    "empty": "Нема конфигурирани ознаки за функции.",
+    "updateError": "Не може да се ажурира ознаката",
+    "toggleAria": "Вклучи/исклучи функција {name}",
+    "confirmToggleTitle": "Да се промени ознаката за функција?",
+    "confirmToggleDescription": "Постави {key} на {state}.",
+    "confirmEnable": "овозможено",
+    "confirmDisable": "оневозможено"
+  },
+  "moderationEmails": {
+    "title": "Е-пошта за модерација",
+    "description": "Итна е-пошта кога корисничките акции бараат админ преглед. Доставата бара платформска е-пошта (`EMAIL_ENABLED`, `email_enabled` и `admin_moderation_email_enabled` ознаки).",
+    "loadError": "Не може да се вчитаат преференците. Обидете се да ја освежите страницата.",
+    "defaultForRole": "Стандардно за вашата улога",
+    "notificationsAria": "Известувања по е-пошта за {title}",
+    "categories": {
+      "NEW_REPORT": {
+        "title": "Нови пријави за загадување",
+        "description": "Кога граѓанин поднесува пријава што влегува во редот за модерација."
+      },
+      "EVENT_PENDING": {
+        "title": "Настани што чекаат одобрување",
+        "description": "Кога се креира настан за чистење или се враќа на преглед во очекување."
+      },
+      "UGC_REPORT": {
+        "title": "UGC пријави",
+        "description": "Кога корисник пријавува содржина (коментари, разговор, профили, локалитети, настани)."
+      },
+      "CHECKIN_RISK": {
+        "title": "Сигнали за ризик при пријава",
+        "description": "Кога учесник се пријавува далеку од локалитетот на настанот."
+      }
+    }
+  },
+  "securityModals": {
+    "signOutOthersTitle": "Одјави ги другите сесии",
+    "signOutOthersDescription": "Ова ќе го отповика пристапот за сите други уреди. Ќе останете најавени на овој уред.",
+    "signOutOthersConfirm": "Отповикај ги сите",
+    "updatePasswordTitle": "Ажурирај лозинка",
+    "updatePasswordDescription": "Вашата нова лозинка ќе стапи на сила при следната најава.",
+    "updatePasswordConfirm": "Ажурирај лозинка"
+  },
+  "securityToast": {
+    "signedOutTitle": "Одјавено",
+    "signedOutMessage": "Другите сесии беа отповикани.",
+    "passwordUpdatedTitle": "Лозинката е ажурирана",
+    "passwordUpdatedMessage": "Користете ја новата лозинка при следната најава."
+  },
+  "passwordValidation": {
+    "required": "Задолжително",
+    "minLength": "Мин. 8 знаци",
+    "mustMatch": "Мора да се совпаѓа"
+  }
+}

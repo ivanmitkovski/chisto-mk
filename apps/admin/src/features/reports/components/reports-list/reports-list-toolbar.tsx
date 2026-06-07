@@ -1,9 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { Icon, Input } from '@/components/ui';
-import type { SortDirection, SortKey } from '@/features/reports/types';
-import { buildReportsUrl } from '../reports-list-utils';
 import styles from '../reports-list.module.css';
 
 type FilterOption = { key: string; label: string };
@@ -13,12 +12,10 @@ type ReportsListToolbarProps = {
   searchTerm: string;
   onSearchTermChange: (value: string) => void;
   onClearSearch: () => void;
-  statusFilters: FilterOption[];
+  statusFilters: readonly FilterOption[];
   activeFilter: string;
   onOverviewFilterSelect: (key: string) => void;
-  sortKey: SortKey;
-  sortDirection: SortDirection;
-  safePage: number;
+  filterHref: (filterKey: string) => string;
 };
 
 export function ReportsListToolbar({
@@ -29,15 +26,16 @@ export function ReportsListToolbar({
   statusFilters,
   activeFilter,
   onOverviewFilterSelect,
-  sortKey,
-  sortDirection,
-  safePage,
+  filterHref,
 }: ReportsListToolbarProps) {
+  const t = useTranslations('reports.toolbar');
+  const tCommon = useTranslations('common');
+
   return (
-    <div className={styles.toolbar} role="toolbar" aria-label="Filter and search">
+    <div className={styles.toolbar} role="toolbar" aria-label={tCommon('filterAndSearch')}>
       <Input
-        aria-label="Search reports by name, location, or number"
-        placeholder="Search reports…"
+        aria-label={t('searchAria')}
+        placeholder={t('searchPlaceholder')}
         value={searchTerm}
         onChange={(e) => onSearchTermChange(e.target.value)}
         className={styles.search}
@@ -48,14 +46,14 @@ export function ReportsListToolbar({
               type="button"
               className={styles.clearSearchBtn}
               onClick={onClearSearch}
-              aria-label="Clear search"
+              aria-label={tCommon('clearSearch')}
             >
               <Icon name="x" size={14} aria-hidden />
             </button>
           ) : null
         }
       />
-      <div className={styles.filterRow} role="group" aria-label="Filter by status">
+      <div className={styles.filterRow} role="group" aria-label={t('filterByStatusAria')}>
         <div className={styles.filterChips}>
           {statusFilters.map((opt) =>
             isOverview ? (
@@ -71,12 +69,7 @@ export function ReportsListToolbar({
             ) : (
               <Link
                 key={opt.key}
-                href={buildReportsUrl({
-                  status: opt.key !== 'ALL' ? opt.key : undefined,
-                  sort: sortKey,
-                  dir: sortDirection,
-                  page: safePage > 1 ? safePage : undefined,
-                })}
+                href={filterHref(opt.key)}
                 className={`${styles.filterChip} ${activeFilter === opt.key ? styles.filterChipActive : ''}`}
                 aria-current={activeFilter === opt.key ? 'page' : undefined}
               >

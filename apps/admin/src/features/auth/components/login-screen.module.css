@@ -78,7 +78,7 @@
 .form {
   display: grid;
   gap: var(--space-4);
-  max-width: 22rem;
+  max-width: 36rem;
   width: 100%;
 }
 
@@ -96,18 +96,7 @@
 }
 
 .checkboxRow {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
   color: var(--text-secondary);
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-normal);
-}
-
-.checkboxRow input {
-  width: 1rem;
-  height: 1rem;
-  accent-color: var(--color-primary);
 }
 
 .helpLink {
@@ -167,7 +156,7 @@
 }
 
 /* Tablet: stack form above image */
-@media (max-width: 54rem) {
+@media (max-width: 48rem) {
   .root {
     grid-template-columns: 1fr;
     grid-template-rows: 1fr auto;
@@ -194,7 +183,7 @@
 }
 
 /* Mobile: compact padding, smaller image */
-@media (max-width: 30rem) {
+@media (max-width: 36rem) {
   .root {
     grid-template-rows: 1fr auto;
   }
@@ -236,7 +225,7 @@
 }
 
 /* Extra small: minimal decorative area */
-@media (max-width: 22rem) {
+@media (max-width: 36rem) {
   .left {
     padding-left: var(--space-3);
     padding-right: var(--space-3);

@@ -4,16 +4,19 @@ import { useQueryClient } from '@tanstack/react-query';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef } from 'react';
-import { adminQueryKeys } from '@/lib/admin-api-client';
-import { emitNewReportSignal } from '@/lib/realtime-signals';
-import { refreshAdminSession } from '@/features/auth/lib/admin-auth';
+import { useTranslations } from 'next-intl';
+import { adminQueryKeys } from '@/lib/api';
+import { emitNewReportSignal, emitCheckInRiskSignal, emitReportViewersUpdated } from '@/lib/realtime';
+import { refreshAdminSession, signOutAndRedirectToLogin } from '@/features/auth/lib/admin-auth';
 import { useDashboardSSE } from '../context/dashboard-sse-context';
 
 const SSE_URL = '/api/admin/events';
 const MAX_RETRIES = 10;
 const MAX_RETRY_DELAY_MS = 30_000;
+const PERIODIC_RECONNECT_MS = 60_000;
 const DEBUG_REALTIME_FLAG = 'chisto:debug-realtime';
 const MAX_AUTH_RECONNECTS = 2;
+const REFRESH_DEBOUNCE_MS = 500;
 
 function getRetryDelayMs(retryCount: number): number {
   const delay = Math.min(1000 * 2 ** retryCount, MAX_RETRY_DELAY_MS);
@@ -28,6 +31,12 @@ function isRealtimeDebugEnabled(): boolean {
 type ReportEventPayload = {
   type: 'report_created' | 'report_updated';
   reportId: string;
+};
+
+type ReportViewersUpdatedPayload = {
+  type: 'report_viewers_updated';
+  reportId: string;
+  viewers: { sessionId: string; userId: string; displayName: string }[];
 };
 
 type NotificationEventPayload = {
@@ -53,6 +62,23 @@ type CleanupEventSsePayload = {
   lifecycleStatus?: string;
 };
 
+type CheckInRiskSignalSsePayload = {
+  type: 'check_in_risk_signal_created' | 'check_in_risk_signal_updated';
+  signalId: string;
+  eventId?: string;
+};
+
+function isCheckInRiskSignalEvent(data: unknown): data is CheckInRiskSignalSsePayload {
+  const d = data as Partial<CheckInRiskSignalSsePayload>;
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    typeof d.type === 'string' &&
+    (d.type === 'check_in_risk_signal_created' || d.type === 'check_in_risk_signal_updated') &&
+    typeof d.signalId === 'string'
+  );
+}
+
 function isReportEvent(data: unknown): data is ReportEventPayload {
   const d = data as Partial<ReportEventPayload>;
   return (
@@ -60,6 +86,17 @@ function isReportEvent(data: unknown): data is ReportEventPayload {
     data !== null &&
     typeof d.type === 'string' &&
     (d.type === 'report_created' || d.type === 'report_updated')
+  );
+}
+
+function isReportViewersUpdatedEvent(data: unknown): data is ReportViewersUpdatedPayload {
+  const d = data as Partial<ReportViewersUpdatedPayload>;
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    d.type === 'report_viewers_updated' &&
+    typeof d.reportId === 'string' &&
+    Array.isArray(d.viewers)
   );
 }
 
@@ -106,7 +143,14 @@ function isCleanupEventSse(data: unknown): data is CleanupEventSsePayload {
   );
 }
 
+function invalidateAllAdminQueries(
+  qc: ReturnType<typeof useQueryClient>,
+): void {
+  void qc.invalidateQueries({ queryKey: adminQueryKeys.root });
+}
+
 export function DashboardSSEClient() {
+  const t = useTranslations('dashboard');
   const router = useRouter();
   const queryClient = useQueryClient();
   const sseCtx = useDashboardSSE();
@@ -118,14 +162,51 @@ export function DashboardSSEClient() {
   const mapInvalidateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const retryCountRef = useRef(0);
   const authReconnectCountRef = useRef(0);
+  const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const periodicReconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const sseCtxRef = useRef(sseCtx);
   sseCtxRef.current = sseCtx;
+
+  const clearRefreshTimer = useCallback(() => {
+    if (refreshTimerRef.current != null) {
+      clearTimeout(refreshTimerRef.current);
+      refreshTimerRef.current = null;
+    }
+  }, []);
+
+  const clearPeriodicReconnect = useCallback(() => {
+    if (periodicReconnectTimerRef.current != null) {
+      clearTimeout(periodicReconnectTimerRef.current);
+      periodicReconnectTimerRef.current = null;
+    }
+  }, []);
+
+  const schedulePeriodicReconnect = useCallback((connect: () => void) => {
+    clearPeriodicReconnect();
+    periodicReconnectTimerRef.current = setTimeout(() => {
+      periodicReconnectTimerRef.current = null;
+      retryCountRef.current = 0;
+      connect();
+    }, PERIODIC_RECONNECT_MS);
+  }, [clearPeriodicReconnect]);
+
+  const scheduleRefresh = useCallback(() => {
+    if (refreshTimerRef.current != null) return;
+    refreshTimerRef.current = setTimeout(() => {
+      refreshTimerRef.current = null;
+      sseCtxRef.current?.touchLastUpdated();
+      routerRef.current.refresh();
+    }, REFRESH_DEBOUNCE_MS);
+  }, []);
+
   const connect = useCallback(() => {
     void (async () => {
       if (abortRef.current) {
         abortRef.current.abort();
       }
+      clearRefreshTimer();
+      clearPeriodicReconnect();
       const controller = new AbortController();
       abortRef.current = controller;
 
@@ -142,6 +223,7 @@ export function DashboardSSEClient() {
               retryCountRef.current = 0;
               authReconnectCountRef.current = 0;
               sseCtxRef.current?.setConnected(true);
+              sseCtxRef.current?.setDisconnected(false);
               if (isRealtimeDebugEnabled()) {
                 console.debug('[realtime] sse-connected', { url: SSE_URL });
               }
@@ -153,10 +235,10 @@ export function DashboardSSEClient() {
                 authReconnectCountRef.current += 1;
                 throw new Error('SSE_AUTH_REFRESHED');
               }
-              throw new Error('Unauthorized');
+              throw new Error('SSE_UNAUTHORIZED');
             }
             if (response.status === 403) {
-              throw new Error('Unauthorized');
+              throw new Error('SSE_FORBIDDEN');
             }
             throw new Error(`SSE connection failed: ${response.status}`);
           },
@@ -172,24 +254,20 @@ export function DashboardSSEClient() {
                   emitNewReportSignal(data.reportId);
                   sseCtxRef.current?.showRefreshToast('New report received');
                 }
-                void qc.invalidateQueries({ queryKey: adminQueryKeys.reportsAll });
-                void qc.invalidateQueries({ queryKey: adminQueryKeys.overview });
-                routerRef.current.refresh();
+                invalidateAllAdminQueries(qc);
+                scheduleRefresh();
               } else if (isNotificationEvent(data)) {
                 const message = data.title
                   ? `New notification: ${data.title}`
                   : 'New notification';
                 sseCtxRef.current?.showRefreshToast(message);
-                void qc.invalidateQueries({ queryKey: adminQueryKeys.notifications });
-                void qc.invalidateQueries({ queryKey: adminQueryKeys.overview });
-                routerRef.current.refresh();
+                invalidateAllAdminQueries(qc);
+                scheduleRefresh();
               } else if (isSiteEvent(data)) {
                 sseCtxRef.current?.showRefreshToast(
                   data.type === 'site_created' ? 'New site created' : 'Site updated',
                 );
-                void qc.invalidateQueries({ queryKey: adminQueryKeys.sitesAll });
-                void qc.invalidateQueries({ queryKey: adminQueryKeys.sitesStats });
-                void qc.invalidateQueries({ queryKey: adminQueryKeys.overview });
+                invalidateAllAdminQueries(qc);
                 if (mapInvalidateTimerRef.current != null) {
                   clearTimeout(mapInvalidateTimerRef.current);
                 }
@@ -198,25 +276,29 @@ export function DashboardSSEClient() {
                     predicate: (query) => query.queryKey[0] === 'sites-map',
                   });
                 }, 750);
-                routerRef.current.refresh();
+                scheduleRefresh();
               } else if (isUserEvent(data)) {
                 sseCtxRef.current?.showRefreshToast(
-                  data.type === 'user_created' ? 'New user registered' : 'User updated',
+                  data.type === 'user_created' ? t('sse.newUserRegistered') : t('sse.userUpdated'),
                 );
-                void qc.invalidateQueries({ queryKey: adminQueryKeys.usersAll });
-                void qc.invalidateQueries({ queryKey: adminQueryKeys.usersStats });
-                void qc.invalidateQueries({ queryKey: adminQueryKeys.overview });
-                routerRef.current.refresh();
+                invalidateAllAdminQueries(qc);
+                scheduleRefresh();
               } else if (isCleanupEventSse(data)) {
                 const label =
                   data.type === 'cleanup_event_pending'
-                    ? 'Cleanup event pending review'
+                    ? t('sse.cleanupEventPending')
                     : data.type === 'cleanup_event_created'
-                      ? 'New cleanup event'
-                      : 'Cleanup event updated';
+                      ? t('sse.cleanupEventCreated')
+                      : t('sse.cleanupEventUpdated');
                 sseCtxRef.current?.showRefreshToast(label);
-                void qc.invalidateQueries({ queryKey: adminQueryKeys.overview });
-                void qc.invalidateQueries({ queryKey: adminQueryKeys.cleanupEventsAll });
+                invalidateAllAdminQueries(qc);
+                scheduleRefresh();
+              } else if (isCheckInRiskSignalEvent(data)) {
+                emitCheckInRiskSignal(data.signalId);
+                sseCtxRef.current?.showRefreshToast(t('sse.newCheckInRiskSignal'));
+                scheduleRefresh();
+              } else if (isReportViewersUpdatedEvent(data)) {
+                emitReportViewersUpdated(data.reportId, data.viewers);
               }
             } catch {
               // Ignore parse errors (e.g. heartbeat)
@@ -226,11 +308,14 @@ export function DashboardSSEClient() {
             if (err instanceof Error && err.message === 'SSE_AUTH_REFRESHED') {
               throw err;
             }
-            if (err instanceof Error && err.message === 'Unauthorized') {
+            if (
+              err instanceof Error &&
+              (err.message === 'SSE_UNAUTHORIZED' || err.message === 'SSE_FORBIDDEN')
+            ) {
               throw err;
             }
             if (retryCountRef.current >= MAX_RETRIES) {
-              throw err;
+              return PERIODIC_RECONNECT_MS;
             }
             retryCountRef.current += 1;
             return getRetryDelayMs(retryCountRef.current);
@@ -240,15 +325,28 @@ export function DashboardSSEClient() {
         sseCtxRef.current?.setConnected(false);
         if (error instanceof Error && error.message === 'SSE_AUTH_REFRESHED') {
           window.setTimeout(() => connect(), 0);
+          return;
+        }
+        if (
+          error instanceof Error &&
+          (error.message === 'SSE_UNAUTHORIZED' || error.message === 'SSE_FORBIDDEN')
+        ) {
+          void signOutAndRedirectToLogin();
+          return;
+        }
+        if (retryCountRef.current >= MAX_RETRIES) {
+          sseCtxRef.current?.setDisconnected(true);
+          schedulePeriodicReconnect(connect);
         }
       }
     })();
-  }, []);
+  }, [clearPeriodicReconnect, clearRefreshTimer, schedulePeriodicReconnect, scheduleRefresh]);
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
     if (document.hidden) return;
 
+    retryCountRef.current = 0;
     connect();
 
     const onVisibilityChange = () => {
@@ -260,10 +358,19 @@ export function DashboardSSEClient() {
       }
     };
 
+    const onOnline = () => {
+      retryCountRef.current = 0;
+      authReconnectCountRef.current = 0;
+      clearPeriodicReconnect();
+      connect();
+    };
+
     document.addEventListener('visibilitychange', onVisibilityChange);
+    window.addEventListener('online', onOnline);
 
     return () => {
       document.removeEventListener('visibilitychange', onVisibilityChange);
+      window.removeEventListener('online', onOnline);
       if (abortRef.current) {
         abortRef.current.abort();
         abortRef.current = null;
@@ -272,8 +379,10 @@ export function DashboardSSEClient() {
         clearTimeout(mapInvalidateTimerRef.current);
         mapInvalidateTimerRef.current = null;
       }
+      clearRefreshTimer();
+      clearPeriodicReconnect();
     };
-  }, [connect]);
+  }, [clearPeriodicReconnect, clearRefreshTimer, connect, sseCtx?.reconnectNonce]);
 
   return null;
 }

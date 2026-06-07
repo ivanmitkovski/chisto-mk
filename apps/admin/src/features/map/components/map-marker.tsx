@@ -1,9 +1,10 @@
 'use client';
 
 import { memo, useCallback, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { Marker } from 'react-leaflet';
 import L from 'leaflet';
-import { sanitizeDisplayText } from '@/lib/sanitize';
+import { sanitizeDisplayText } from '@/lib/security';
 import type { SiteMapRow } from '../data/map-adapter';
 import styles from './sites-map.module.css';
 
@@ -25,12 +26,12 @@ function escapeHtml(value: string): string {
     .replaceAll("'", '&#39;');
 }
 
-function createMarkerIcon(site: SiteMapRow, selected: boolean): L.DivIcon {
+function createMarkerIcon(site: SiteMapRow, selected: boolean, ariaLabel: string): L.DivIcon {
   const statusClass = STATUS_CLASS[site.status] ?? styles.markerDefault;
   const reportCount = site.reportCount > 0 ? site.reportCount : '';
   const pinClass = selected ? `${styles.markerPin} ${statusClass} ${styles.markerPinSelected}` : `${styles.markerPin} ${statusClass}`;
 
-  const safeAriaLabel = escapeHtml(`Site ${site.id}, ${site.reportCount} reports`);
+  const safeAriaLabel = escapeHtml(ariaLabel);
   return L.divIcon({
     className: styles.markerIcon,
     html: `<span class="${pinClass}" aria-label="${safeAriaLabel}">${reportCount}</span>`,
@@ -46,9 +47,16 @@ type MapMarkerProps = {
 };
 
 export const MapMarker = memo(function MapMarker({ site, selected, onClick }: MapMarkerProps) {
+  const t = useTranslations('map');
+  const markerLabel = site.address?.trim() || `${site.latitude.toFixed(5)}, ${site.longitude.toFixed(5)}`;
   const icon = useMemo(
-    () => createMarkerIcon(site, selected),
-    [site.id, site.status, site.reportCount, selected],
+    () =>
+      createMarkerIcon(
+        site,
+        selected,
+        t('markerAria', { label: markerLabel, count: site.reportCount }),
+      ),
+    [markerLabel, selected, site, t],
   );
 
   const handleClick = useCallback(

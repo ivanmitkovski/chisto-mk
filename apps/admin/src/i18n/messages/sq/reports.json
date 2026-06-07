@@ -1,0 +1,296 @@
+{
+  "pageTitle": "Raportet",
+  "detailTitle": "Raport",
+  "backToReportsList": "Kthehu te lista e raporteve",
+  "backToReports": "Raportet",
+  "refreshReportAria": "Rifresko raportin",
+  "outbox": "Outbox",
+  "prioritySuffix": "prioritet {priority}",
+  "duplicateNotice": "Ky raport mund të jetë i dyfishtë{ofReport}.",
+  "duplicateOfReport": " i raportit {reportNumber}",
+  "reviewDuplicateGroups": "Shqyrto grupet e dyfishta",
+  "viewers": {
+    "oneOther": "{name} po e shikon këtë raport",
+    "twoOthers": "{firstName} dhe {secondName} po e shikojnë këtë raport",
+    "manyOthers": "{firstName} dhe {count} të tjerë po e shikojnë këtë raport"
+  },
+  "moderationWorkspace": "Hapësira e moderimit",
+  "duplicateOfAnother": "Ky raport mund të jetë i dyfishtë i një tjetri.",
+  "duplicateOfSpecific": "Ky raport mund të jetë i dyfishtë i {reportNumber}.",
+  "alsoReportedBy": " Gjithashtu raportuar nga {names}.",
+  "viewAllDuplicateReports": "Shiko të gjitha raportet e dyfishta",
+  "severity": {
+    "LOW": "E ulët",
+    "MEDIUM": "E moderuar",
+    "SIGNIFICANT": "E ndjeshme",
+    "HIGH": "E lartë",
+    "CRITICAL": "Kritike"
+  },
+  "status": {
+    "NEW": "E re",
+    "IN_REVIEW": "Në shqyrtim",
+    "APPROVED": "E miratuar",
+    "DELETED": "E refuzuar"
+  },
+  "queuePriority": {
+    "Critical": "Kritike",
+    "High": "E lartë",
+    "Normal": "Normale"
+  },
+  "sla": {
+    "newRemaining": "2 orë të mbetura",
+    "inReviewRemaining": "1 orë e mbetur",
+    "completed": "E përfunduar"
+  },
+  "filters": {
+    "all": "Të gjitha",
+    "duplicates": "Të dyfishta",
+    "new": "Të reja",
+    "inReview": "Në shqyrtim",
+    "approved": "Të miratuara",
+    "rejected": "Të refuzuara"
+  },
+  "columns": {
+    "reportNumber": "Raport #",
+    "name": "Emri",
+    "location": "Vendndodhja",
+    "dateReported": "Data e raportimit",
+    "status": "Statusi"
+  },
+  "toolbar": {
+    "searchAria": "Kërko raporte sipas emrit, vendndodhjes ose numrit",
+    "searchPlaceholder": "Kërko raporte…",
+    "filterByStatusAria": "Filtro sipas statusit"
+  },
+  "queue": {
+    "reportsCount": "{count} raporte",
+    "reportsCountFiltered": "{shown} nga {total} raport(e)",
+    "needAttention": "{count} kërkojnë vëmendje",
+    "duplicatesLink": "{count} i dyfishtë(e)",
+    "title": "Raportet",
+    "refreshAria": "Rifresko raportet",
+    "potentialDuplicates": "{count} i dyfishtë(e) potencial(e)",
+    "duplicates": "Të dyfishta",
+    "showingRange": "Duke shfaqur {from}-{to} nga {total}"
+  },
+  "empty": "Asnjë raport nuk përputhet me filtrat tuaj.",
+  "emptyStates": {
+    "noReportsYet": "Ende pa raporte. Ndani aplikacionin Chisto ose lidhjen e raportimit me qytetarët për të filluar.",
+    "noFilterMatch": "Asnjë raport nuk përputhet me filtrin e zgjedhur.",
+    "noSearchMatch": "Asnjë raport nuk përputhet me \"{query}\".",
+    "searchHint": "Provo një term tjetër kërkimi ose pastro kërkimin."
+  },
+  "siteFilter": {
+    "banner": "Filtruar sipas vendit.",
+    "showAll": "Shfaq të gjitha raportet"
+  },
+  "columnsActions": "Veprimet",
+  "confirmList": {
+    "rejectDescription": "Refuzo \"{name}\"? Kërkohet një arsye.",
+    "approveDescription": "Mirato \"{name}\" dhe zhvendose në statusin e miratuar?"
+  },
+  "contextDetail": {
+    "close": "Mbyll",
+    "submitted": {
+      "title": "Parashtruar",
+      "description": "Ky raport u parashtrua më {value}.",
+      "body": "Koha e parashtrimit regjistrohet kur qytetari përfundon dhe dërgon raportin. Të gjitha vulat kohore përdorin zonën kohore të serverit për konsistencë midis moderatorëve dhe regjistrave të auditimit."
+    },
+    "reporter": {
+      "title": "Raportuesi",
+      "description": "Raporti u parashtrua nga {value}.",
+      "body": "Identiteti i raportuesit anonimizohet për të mbrojtur privatësinë. Pseudonimi i shfaqur përdoret vetëm për gjurmueshmëri në moderim. Detajet personale nuk janë të dukshme për moderatorët."
+    },
+    "coReporters": {
+      "title": "Gjithashtu raportuar nga",
+      "description": "Koraportuesit: {value}.",
+      "body": "Disa qytetarë raportuan të njëjtin problem. Problemet e koraportuara mund të tregojnë urgjencë më të lartë ose shqetësim komunitar. Çdo koraportues kontribuon në dukshmërinë e raportit në radhën e moderimit."
+    },
+    "trustTier": {
+      "title": "Niveli i besimit",
+      "description": "Niveli i besimit të raportuesit: {value}.",
+      "body": "Nivelet e besimit (Bronz, Argjend, Ar) pasqyrojnë historinë e verifikimit dhe cilësinë e raporteve të mëparshme. Nivelet më të larta tregojnë kontribues më të konsoliduar dhe të verifikuar. Kjo i ndihmon moderatorët të vlerësojnë besueshmërinë e raportit."
+    },
+    "queue": {
+      "title": "Radha",
+      "description": "Radha aktuale: {value}.",
+      "body": "Raportet organizohen në radha sipas urgjencës, llojit ose fazës së rrjedhës së punës. Radhat i ndihmojnë moderatorët të fokusohen në grupin e duhur dhe të përmbushin objektivat SLA. Ky raport është në rrjedhën e punës {value}."
+    }
+  },
+  "list": {
+    "approve": "Mirato",
+    "reject": "Refuzo",
+    "noFurtherActions": "Pa veprime të mëtejshme",
+    "estimatedCleanupTeamSize": "Madhësia e vlerësuar e ekipit të pastrimit",
+    "approveAria": "Mirato {reportNumber}",
+    "rejectAria": "Refuzo {reportNumber}",
+    "finalDecisionAria": "{reportNumber} ka tashmë një vendim përfundimtar"
+  },
+  "operationalContext": {
+    "title": "Konteksti operativ",
+    "legendAria": "Shfaq legjendën e kontekstit operativ",
+    "legendTitle": "Çfarë nënkuptojnë këto fusha?",
+    "legendRegionAria": "Legjenda e kontekstit operativ",
+    "assignedModeratorTerm": "Moderatori i caktuar",
+    "assignedModeratorDesc": "Anëtari i stafit aktualisht përgjegjës për shqyrtimin e këtij raporti. Adminët mund të caktojnë nga zgjedhësi më poshtë; kushdo me qasje moderimi mund ta marrë me „Cakto mua“ ose ta lëshojë kur ia kalon tjetrit.",
+    "slaTerm": "SLA",
+    "slaDesc": "Marrëveshja për nivelin e shërbimit: koha e mbetur para se të pritet një përgjigje ose vendim.",
+    "queueTerm": "Radha aktuale",
+    "queueDesc": "Rrjedha e punës ose kategoria ku i përket ky raport.",
+    "assignedModerator": "Moderatori i caktuar",
+    "sla": "SLA",
+    "currentQueue": "Radha aktuale",
+    "assignedModeratorFallback": "Moderatori i caktuar",
+    "unassigned": "I pacaktuar",
+    "assignToMe": "Cakto mua",
+    "releaseAssignment": "Lësho caktimin",
+    "reassignHint": "Aktualisht i caktuar te {name}. Ricakto duke lëshuar pastaj duke marrë, ose kontakto një admin.",
+    "takeOverAssignment": "Merr përsipër caktimin",
+    "assignModeratorLabel": "Cakto moderator",
+    "assignModeratorPlaceholder": "Kërko stafin…",
+    "confirmAssignTitle": "Konfirmo caktimin",
+    "confirmAssignDescription": "Ta caktosh këtë raport te {name}?",
+    "confirmUnassignTitle": "Hiq caktimin",
+    "confirmUnassignDescription": "Të hiqet moderatori i caktuar për këtë raport?",
+    "confirmAssignLabel": "Konfirmo",
+    "roleSupport": "Mbështetje",
+    "roleAdmin": "Admin",
+    "roleSuperAdmin": "Super admin"
+  },
+  "moderationActions": {
+    "title": "Veprimet e moderimit",
+    "toolbarAria": "Veprimet e moderimit",
+    "reportApproved": "Raporti u miratua",
+    "reportRejected": "Raporti u refuzua",
+    "lifecycleComplete": "Nuk ka veprime të mëtejshme të disponueshme. Cikli jetësor për këtë raport është i plotë.",
+    "hint": "Zbato një vendim eksplicit dhe mbaj ciklin jetësor të pastër. Çdo veprim shkruan një hyrje në kronologji.",
+    "shortcutHint": "Këshillë: përdorni tastet shigjetë për të lëvizur midis veprimeve.",
+    "setInReview": "Vendos në shqyrtim",
+    "approveReport": "Mirato raportin",
+    "rejectReport": "Refuzo raportin",
+    "aria": {
+      "setInReview": "Vendos në shqyrtim",
+      "setInReviewAlready": "Vendos në shqyrtim (tashmë në shqyrtim)",
+      "setInReviewDisabled": "Vendos në shqyrtim (pa veprime të mëtejshme)",
+      "approve": "Mirato raportin",
+      "approveDisabled": "Mirato raportin (pa veprime të mëtejshme)",
+      "reject": "Refuzo raportin",
+      "rejectDisabled": "Refuzo raportin (pa veprime të mëtejshme)"
+    }
+  },
+  "evidence": {
+    "title": "Dëshmitë",
+    "filesCount": "{count} skedarë",
+    "filesAria": "Skedarët e dëshmive",
+    "empty": "Nuk u bashkangjitën skedarë dëshmie në këtë raport.",
+    "photoPreviewAria": "Parapamje e fotos së dëshmisë",
+    "closePhotoAria": "Mbyll parapamjen e fotos",
+    "previousPhotoAria": "Foto e mëparshme",
+    "nextPhotoAria": "Foto tjetër",
+    "thumbnailsAria": "Miniaturat e fotove",
+    "openFullscreenAria": "Hap foton në ekran të plotë",
+    "summaryAria": "Përmbledhja e raportit",
+    "reportNumber": "Raporti {reportNumber}",
+    "viewSubmittedAria": "Shiko detajet e dorëzimit",
+    "viewReporterAria": "Shiko detajet e raportuesit",
+    "cleanupEffortAria": "Përpjekja e pastrimit nga qytetari",
+    "viewCoReportersAria": "Shiko detajet e bashkëraportuesve",
+    "viewTrustTierAria": "Shiko detajet e nivelit të besimit",
+    "viewQueueAria": "Shiko detajet e radhës",
+    "metaSubmitted": "Dorëzuar",
+    "metaReporter": "Raportues",
+    "metaCleanupEffort": "Përpjekje pastrimi",
+    "metaCoReporters": "Gjithashtu raportuar nga",
+    "metaTrustTier": "Nivel besimi",
+    "metaQueue": "Radhë"
+  },
+  "timeline": {
+    "sectionTitle": "Kronologjia e ciklit jetësor",
+    "eventsCount": "{count} ngjarje",
+    "byActor": "Nga {actor}",
+    "ariaLabel": "Kronologjia e raportit",
+    "empty": "Hyrjet e kronologjisë do të shfaqen ndërsa kryhen veprimet e moderimit.",
+    "approvedTitle": "Raporti u miratua",
+    "approvedDetail": "Moderatori pranoi raportin dhe e zhvendosi në statusin e miratuar të ciklit jetësor.",
+    "rejectedTitle": "Raporti u refuzua",
+    "rejectedDetail": "Raporti u refuzua dhe u shënua si i hequr.",
+    "rejectedDetailWithReason": "Raporti u refuzua dhe u shënua si i hequr. Arsyeja: {reason}",
+    "inReviewTitle": "U zhvendos në shqyrtim",
+    "inReviewDetail": "Statusi i raportit u zhvendos në shqyrtim për kontrolle më të thella të moderimit."
+  },
+  "rejectionReasons": {
+    "label": "Arsyeja e refuzimit",
+    "selectPlaceholder": "Zgjidh arsyen e refuzimit",
+    "falseReport": "Raport i rremë",
+    "duplicateSubmission": "Parashtrim i dyfishtë",
+    "insufficientEvidence": "Dëshmi të pamjaftueshme",
+    "outOfJurisdiction": "Jashtë juridiksionit",
+    "policyViolation": "Shkelje e politikës",
+    "required": "Zgjidh një arsye refuzimi.",
+    "notesLabel": "Shënime shtesë (opsionale)",
+    "notesPlaceholder": "Shto kontekst opsional për auditimin"
+  },
+  "confirm": {
+    "approvalTitle": "Konfirmo miratimin",
+    "approvalDescription": "Mirato këtë raport dhe zhvendose në statusin e miratuar të ciklit jetësor?",
+    "rejectionTitle": "Konfirmo refuzimin",
+    "rejectionDescription": "Refuzo këtë raport. Kërkohet një arsye refuzimi për gjurmueshmëri në moderim.",
+    "statusUpdateTitle": "Konfirmo përditësimin e statusit",
+    "statusUpdateDescription": "Zhvendose këtë raport në statusin në shqyrtim për kontrolle më të thella të moderimit?",
+    "approveLabel": "Mirato raportin",
+    "rejectLabel": "Refuzo raportin",
+    "setInReviewLabel": "Vendos në shqyrtim",
+    "concurrentViewersWarning": "{count, plural, one {1 moderator tjetër po e shikon këtë raport tani. Vazhdo vetëm nëse jeni koordinuar.} other {# moderatorë të tjerë po e shikojnë këtë raport tani. Vazhdo vetëm nëse jeni koordinuar.}}"
+  },
+  "toast": {
+    "approvedTitle": "Raporti u miratua",
+    "approvedMessage": "Ky raport u pranua me sukses.",
+    "inReviewTitle": "Statusi u përditësua",
+    "inReviewMessage": "Ky raport tani është shënuar si në shqyrtim.",
+    "rejectedTitle": "Raporti u refuzua",
+    "rejectedMessage": "Ky raport u refuzua dhe u shënua si i hequr.",
+    "rejectedWithReasonMessage": "Ky raport u refuzua. Arsyeja: {reason}",
+    "actionFailedTitle": "Veprimi dështoi",
+    "assignmentUpdatedTitle": "Caktimi u përditësua",
+    "assignmentUpdatedMessage": "Caktimi i raportit u ruajt.",
+    "assignmentFailedTitle": "Caktimi dështoi"
+  },
+  "duplicates": {
+    "pageTitle": "Raportet e dyfishta",
+    "empty": "Aktualisht nuk ka grupe raportesh të dyfishta që presin moderim.",
+    "groupsTitle": "Grupet e dyfishta",
+    "groupsCount": "{count} grup(e)",
+    "selectGroupEmpty": "Zgjidh një grup të dyfishtë për shqyrtim dhe bashkim.",
+    "mergeWorkspaceTitle": "Hapësira e bashkimit",
+    "mergeWorkspaceSubtitle": "Primar {reportNumber} · {count} raporte",
+    "primaryReport": "Raporti primar",
+    "viewReport": "Shiko raportin",
+    "duplicatesToMerge": "Të dyfishta për bashkim ({count})",
+    "selectAllDuplicatesAria": "Zgjidh të gjitha të dyfishta",
+    "deselectAllDuplicatesAria": "Çzgjidh të gjitha të dyfishta",
+    "selectDuplicateAria": "Zgjidh të dyfishtë {reportNumber}",
+    "mediaCount": "{count} skedarë media",
+    "selectionHint": "{count} nga {total} të zgjedhura",
+    "approveAndMerge": "Mirato dhe bashko",
+    "confirmMergeTitle": "Konfirmo bashkimin e të dyfishtëve",
+    "confirmMergeDescription": "Kjo do të miratojë raportin primar, do të bashkojë dëshmitë dhe koraportuesit e zgjedhur fëmijë, pastaj do të mbyllë raportet fëmijë të zgjedhura si të dyfishta të bashkuara.",
+    "mergeReasonLabel": "Arsyeja e bashkimit (opsionale)",
+    "mergeReasonPlaceholder": "Shto kontekst opsional të bashkimit për auditimin",
+    "toast": {
+      "noSelectionTitle": "Asnjë dublikatë e zgjedhur",
+      "noSelectionMessage": "Zgjidhni të paktën një raport dublikatë para bashkimit.",
+      "groupChangedTitle": "Grupi i dublikatave ndryshoi",
+      "groupChangedMessage": "Një moderator tjetër mund ta ketë përditësuar grupin. Lista u rifreskua. Shqyrtoni dhe provoni përsëri.",
+      "groupChangedRefreshMessage": "Ky grup dublikatash ndryshoi. Rifreskoni faqen dhe provoni përsëri.",
+      "mergeFailedTitle": "Bashkimi dështoi",
+      "mergeFailedMessage": "Nuk mund të bashkohen raportet dublikatë tani.",
+      "mergeSuccessTitle": "Dublikatat u bashkuan",
+      "mergeSuccessMessage": "U bashkuan {count} raporte dublikatë në {reportNumber}."
+    }
+  },
+  "pageDescription": "Shqyrtoni dhe moderoni raportet.",
+  "locationMap": {
+    "title": "Harta e vendndodhjes",
+    "openInOpenStreetMap": "Hape në OpenStreetMap"
+  }
+}

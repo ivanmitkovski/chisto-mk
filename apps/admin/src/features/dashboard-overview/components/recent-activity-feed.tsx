@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { Card, Icon, SectionState } from '@/components/ui';
 import type { IconName } from '@/components/ui';
 import type { RecentActivityItem } from '../types';
@@ -29,24 +30,27 @@ function getActionLink(item: RecentActivityItem): string | null {
   return null;
 }
 
-function getDayLabel(dateStr: string): string {
-  const date = new Date(dateStr);
-  const now = new Date();
-  const diffDay = Math.floor((now.getTime() - date.getTime()) / (24 * 60 * 60 * 1000));
-  if (diffDay === 0) return 'Today';
-  if (diffDay === 1) return 'Yesterday';
-  return date.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
-}
-
 const DISPLAY_LIMIT = 5;
 
 export function RecentActivityFeed({ items }: RecentActivityFeedProps) {
+  const t = useTranslations('dashboard.activity');
+  const tCommon = useTranslations('common');
+
+  function getDayLabel(dateStr: string): string {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffDay = Math.floor((now.getTime() - date.getTime()) / (24 * 60 * 60 * 1000));
+    if (diffDay === 0) return tCommon('today');
+    if (diffDay === 1) return tCommon('yesterday');
+    return date.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
+  }
+
   if (items.length === 0) {
     return (
       <Card padding="md" className={styles.card}>
-        <span className={styles.sectionLabel}>Activity</span>
-        <h3 className={styles.title}>Recent Activity</h3>
-        <SectionState variant="empty" message="No recent activity yet. Actions will appear here as they occur." />
+        <span className={styles.sectionLabel}>{t('sectionLabel')}</span>
+        <h3 className={styles.title}>{t('title')}</h3>
+        <SectionState variant="empty" message={t('empty')} />
       </Card>
     );
   }
@@ -62,8 +66,8 @@ export function RecentActivityFeed({ items }: RecentActivityFeedProps) {
 
   return (
     <Card padding="md" className={styles.card} aria-live="polite">
-      <span className={styles.sectionLabel}>Activity</span>
-      <h3 className={styles.title}>Recent Activity</h3>
+      <span className={styles.sectionLabel}>{t('sectionLabel')}</span>
+      <h3 className={styles.title}>{t('title')}</h3>
       <div className={styles.groups}>
         {Array.from(groups.entries()).map(([dayLabel, dayItems]) => (
           <div key={dayLabel} className={styles.dayGroup}>
@@ -106,7 +110,7 @@ export function RecentActivityFeed({ items }: RecentActivityFeedProps) {
         ))}
       </div>
       <Link href="/dashboard/audit" className={styles.viewAll}>
-        <span>View all audit log</span>
+        <span>{t('viewAllAuditLog')}</span>
         <Icon name="chevron-right" size={14} className={styles.viewAllChevron} />
       </Link>
     </Card>

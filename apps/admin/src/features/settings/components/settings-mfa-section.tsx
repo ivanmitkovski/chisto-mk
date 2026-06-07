@@ -1,9 +1,10 @@
 'use client';
 
 import { FormEvent, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import QRCode from 'qrcode';
-import { Button, Icon, Input, Snack, type SnackState } from '@/components/ui';
-import { adminBrowserFetch } from '@/lib/admin-browser-api';
+import { Button, Checkbox, ConfirmDialog, Icon, Input, useToast, Badge } from '@/components/ui';
+import { adminBrowserFetch } from '@/lib/api';
 import { ApiError } from '@/lib/api';
 import styles from './settings-mfa-section.module.css';
 
@@ -15,15 +16,19 @@ type SettingsMfaSectionProps = {
 };
 
 export function SettingsMfaSection({ mfaEnabled, onMfaChange }: SettingsMfaSectionProps) {
+  const t = useTranslations('settings.mfa');
+  const tSecurity = useTranslations('settings.security');
+  const tCommon = useTranslations('common');
   const [status, setStatus] = useState<MfaStatus>('idle');
   const [setupUri, setSetupUri] = useState<string | null>(null);
   const [setupSecret, setSetupSecret] = useState<string | null>(null);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [code, setCode] = useState('');
   const [backupCodes, setBackupCodes] = useState<string[]>([]);
+  const [backupCodesStored, setBackupCodesStored] = useState(false);
   const [disablePassword, setDisablePassword] = useState('');
   const [showDisableModal, setShowDisableModal] = useState(false);
-  const [snack, setSnack] = useState<SnackState | null>(null);
+  const { showToast, clearToast } = useToast();
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -38,7 +43,7 @@ export function SettingsMfaSection({ mfaEnabled, onMfaChange }: SettingsMfaSecti
 
   async function startSetup() {
     setBusy(true);
-    setSnack(null);
+    clearToast();
     try {
       const res = await adminBrowserFetch<{ uri: string; secret: string }>('/auth/me/2fa/setup', {
         method: 'POST',
@@ -48,10 +53,10 @@ export function SettingsMfaSection({ mfaEnabled, onMfaChange }: SettingsMfaSecti
       setCode('');
       setStatus('setup');
     } catch (err) {
-      setSnack({
+      showToast({
         tone: 'error',
-        title: 'Error',
-        message: err instanceof ApiError ? err.message : 'Could not start setup',
+        title: tCommon('errorGeneric'),
+        message: err instanceof ApiError ? err.message : t('toast.setupError'),
       });
     } finally {
       setBusy(false);
@@ -68,29 +73,30 @@ export function SettingsMfaSection({ mfaEnabled, onMfaChange }: SettingsMfaSecti
   async function enableMfa(e: FormEvent) {
     e.preventDefault();
     if (!code.trim() || code.trim().length !== 6) {
-      setSnack({
+      showToast({
         tone: 'warning',
-        title: 'Enter code',
-        message: 'Please enter the 6-digit code from your authenticator app.',
+        title: t('toast.enterCodeTitle'),
+        message: t('toast.enterCodeMessage'),
       });
       return;
     }
 
     setBusy(true);
-    setSnack(null);
+    clearToast();
     try {
       const res = await adminBrowserFetch<{ backupCodes: string[] }>('/auth/me/2fa/enable', {
         method: 'POST',
         body: { code: code.trim() },
       });
       setBackupCodes(res.backupCodes);
+      setBackupCodesStored(false);
       setStatus('success');
       onMfaChange(true);
     } catch (err) {
-      setSnack({
+      showToast({
         tone: 'error',
-        title: 'Verification failed',
-        message: err instanceof ApiError ? err.message : 'Invalid code. Please try again.',
+        title: t('toast.verificationFailedTitle'),
+        message: err instanceof ApiError ? err.message : t('toast.invalidCodeMessage'),
       });
     } finally {
       setBusy(false);
@@ -102,6 +108,36 @@ export function SettingsMfaSection({ mfaEnabled, onMfaChange }: SettingsMfaSecti
     setSetupUri(null);
     setSetupSecret(null);
     setBackupCodes([]);
+    setBackupCodesStored(false);
+  }
+
+  async function copyBackupCodes() {
+    if (backupCodes.length === 0) return;
+    try {
+      await navigator.clipboard.writeText(backupCodes.join('\n'));
+      showToast({
+        tone: 'success',
+        title: t('copyBackupCodesSuccessTitle'),
+        message: t('copyBackupCodesSuccessMessage'),
+      });
+    } catch {
+      showToast({
+        tone: 'warning',
+        title: tCommon('errorGeneric'),
+        message: t('copyBackupCodesFailedMessage'),
+      });
+    }
+  }
+
+  function downloadBackupCodes() {
+    if (backupCodes.length === 0) return;
+    const blob = new Blob([`${backupCodes.join('\n')}\n`], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = 'chisto-admin-2fa-backup-codes.txt';
+    anchor.click();
+    URL.revokeObjectURL(url);
   }
 
   function openDisableModal() {
@@ -111,16 +147,16 @@ export function SettingsMfaSection({ mfaEnabled, onMfaChange }: SettingsMfaSecti
 
   async function confirmDisable() {
     if (!disablePassword.trim()) {
-      setSnack({
+      showToast({
         tone: 'warning',
-        title: 'Password required',
-        message: 'Please enter your current password to disable 2FA.',
+        title: t('passwordRequiredTitle'),
+        message: t('passwordRequiredMessage'),
       });
       return;
     }
 
     setBusy(true);
-    setSnack(null);
+    clearToast();
     try {
       await adminBrowserFetch('/auth/me/2fa/disable', {
         method: 'POST',
@@ -128,17 +164,17 @@ export function SettingsMfaSection({ mfaEnabled, onMfaChange }: SettingsMfaSecti
       });
       setShowDisableModal(false);
       setDisablePassword('');
-      setSnack({
+      showToast({
         tone: 'success',
-        title: '2FA disabled',
-        message: 'Two-factor authentication has been turned off.',
+        title: t('toast.disabledTitle'),
+        message: t('toast.disabledMessage'),
       });
       onMfaChange(false);
     } catch (err) {
-      setSnack({
+      showToast({
         tone: 'error',
-        title: 'Failed',
-        message: err instanceof ApiError ? err.message : 'Incorrect password.',
+        title: t('toast.failedTitle'),
+        message: err instanceof ApiError ? err.message : t('toast.incorrectPassword'),
       });
     } finally {
       setBusy(false);
@@ -148,92 +184,93 @@ export function SettingsMfaSection({ mfaEnabled, onMfaChange }: SettingsMfaSecti
   return (
     <>
       <section className={styles.section}>
-        <span className={styles.sectionLabel}>Two-factor authentication</span>
-        <h3 className={styles.sectionTitle}>2FA</h3>
-        <p className={styles.sectionHint}>
-          Add an extra layer of security by requiring a code from your authenticator app when signing in.
-        </p>
+        <span className={styles.sectionLabel}>{t('sectionLabel')}</span>
+        <h3 className={styles.sectionTitle}>{t('title')}</h3>
+        <p className={styles.sectionHint}>{t('hint')}</p>
+
+        {!mfaEnabled ? (
+          <div className={styles.recommendedCallout}>
+            <Badge tone="success">{t('recommendedBadge')}</Badge>
+            <p className={styles.recommendedCopy}>{t('recommendedCopy')}</p>
+          </div>
+        ) : null}
 
         {status === 'idle' && !showDisableModal && (
           <div className={styles.mfaStatus}>
             <div className={styles.mfaStatusRow}>
               <Icon name="shield" size={20} aria-hidden />
-              <span>
-                {mfaEnabled ? (
-                  'Two-factor authentication is on'
-                ) : (
-                  'Two-factor authentication is off'
-                )}
-              </span>
+              <span>{mfaEnabled ? t('enabled') : t('disabled')}</span>
             </div>
             {mfaEnabled ? (
               <Button variant="outline" size="sm" onClick={openDisableModal} disabled={busy}>
-                Disable 2FA
+                {t('disable2fa')}
               </Button>
             ) : (
               <Button size="sm" onClick={() => void startSetup()} disabled={busy}>
-                {busy ? 'Starting…' : 'Enable 2FA'}
+                {busy ? t('starting') : t('enable2fa')}
               </Button>
             )}
           </div>
         )}
 
-        {status === 'idle' && showDisableModal && (
-          <form className={styles.disableForm} onSubmit={(e) => { e.preventDefault(); void confirmDisable(); }}>
-            <p className={styles.disableHint}>Enter your password to turn off two-factor authentication.</p>
-            <Input
-              id="disable-pwd"
-              label="Current password"
-              type="password"
-              autoComplete="current-password"
-              value={disablePassword}
-              onChange={(e) => setDisablePassword(e.target.value)}
-            />
-            <div className={styles.disableActions}>
-              <Button type="submit" disabled={busy || !disablePassword.trim()}>
-                {busy ? 'Disabling…' : 'Disable 2FA'}
-              </Button>
-              <Button type="button" variant="outline" onClick={() => { setShowDisableModal(false); setDisablePassword(''); }} disabled={busy}>
-                Cancel
-              </Button>
-            </div>
-          </form>
-        )}
+        <ConfirmDialog
+          open={status === 'idle' && showDisableModal}
+          title={t('disableConfirmTitle')}
+          description={t('disableHint')}
+          tone="danger"
+          confirmLabel={busy ? t('disabling') : t('disable2fa')}
+          isLoading={busy}
+          onConfirm={() => void confirmDisable()}
+          onClose={() => {
+            if (busy) return;
+            setShowDisableModal(false);
+            setDisablePassword('');
+          }}
+        >
+          <Input
+            id="disable-pwd"
+            label={tSecurity('currentPassword')}
+            type="password"
+            autoComplete="current-password"
+            value={disablePassword}
+            onChange={(e) => setDisablePassword(e.target.value)}
+          />
+        </ConfirmDialog>
 
         {status === 'setup' && setupUri && (
           <div className={styles.setupFlow}>
-            <p className={styles.setupStep}>Scan with your authenticator app (e.g. Google Authenticator, 1Password)</p>
+            <p className={styles.setupStep}>{t('setupStep')}</p>
             <div className={styles.qrWrap}>
               {qrDataUrl ? (
                 /* eslint-disable-next-line @next/next/no-img-element -- QR data URL, not static asset */
-                <img src={qrDataUrl} alt="QR code for authenticator setup" className={styles.qr} />
+                <img src={qrDataUrl} alt={t('qrAlt')} className={styles.qr} />
               ) : (
                 <div className={styles.qrPlaceholder} aria-hidden />
               )}
             </div>
             {setupSecret && (
               <p className={styles.secretHint}>
-                Or enter this code manually: <code className={styles.secret}>{setupSecret}</code>
+                {t('manualKey', { secret: setupSecret })}
               </p>
             )}
             <form onSubmit={enableMfa} className={styles.confirmForm}>
               <Input
                 id="mfa-code"
-                label="Enter the 6-digit code"
+                label={t('enterSixDigitCode')}
                 type="text"
                 inputMode="numeric"
                 autoComplete="one-time-code"
-                placeholder="000000"
+                placeholder={t('codePlaceholder')}
                 value={code}
                 onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                 maxLength={6}
               />
               <div className={styles.setupActions}>
                 <Button type="submit" disabled={busy || code.length !== 6}>
-                  {busy ? 'Verifying…' : 'Verify and enable'}
+                  {busy ? t('verifying') : t('verifyAndEnable')}
                 </Button>
                 <Button type="button" variant="outline" onClick={cancelSetup} disabled={busy}>
-                  Cancel
+                  {tCommon('cancel')}
                 </Button>
               </div>
             </form>
@@ -242,10 +279,8 @@ export function SettingsMfaSection({ mfaEnabled, onMfaChange }: SettingsMfaSecti
 
         {status === 'success' && backupCodes.length > 0 && (
           <div className={styles.backupCodesFlow}>
-            <p className={styles.backupTitle}>Save your backup codes</p>
-            <p className={styles.backupHint}>
-              Store these codes in a safe place. Each can be used once if you lose access to your authenticator app.
-            </p>
+            <p className={styles.backupTitle}>{t('backupCodesTitle')}</p>
+            <p className={styles.backupHint}>{t('backupCodesHint')}</p>
             <div className={styles.backupCodesGrid}>
               {backupCodes.map((c, i) => (
                 <code key={i} className={styles.backupCode}>
@@ -253,12 +288,26 @@ export function SettingsMfaSection({ mfaEnabled, onMfaChange }: SettingsMfaSecti
                 </code>
               ))}
             </div>
-            <Button onClick={finishSetup}>Done</Button>
+            <div className={styles.backupActions}>
+              <Button type="button" variant="outline" size="sm" onClick={() => void copyBackupCodes()}>
+                {t('copyBackupCodes')}
+              </Button>
+              <Button type="button" variant="outline" size="sm" onClick={downloadBackupCodes}>
+                {t('downloadBackupCodes')}
+              </Button>
+            </div>
+            <Checkbox
+              id="mfa-backup-attestation"
+              checked={backupCodesStored}
+              onChange={(event) => setBackupCodesStored(event.target.checked)}
+              label={t('backupCodesAttestation')}
+            />
+            <Button onClick={finishSetup} disabled={!backupCodesStored}>
+              {t('done')}
+            </Button>
           </div>
         )}
       </section>
-
-      <Snack snack={snack} onClose={() => setSnack(null)} />
     </>
   );
 }

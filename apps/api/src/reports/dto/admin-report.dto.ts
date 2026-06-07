@@ -123,6 +123,12 @@ export class AdminReportModerationMetaDto {
 
   @ApiProperty()
   assignedTeam!: string;
+
+  @ApiProperty({ required: false, nullable: true })
+  assignedModeratorId?: string | null;
+
+  @ApiProperty({ required: false, nullable: true })
+  assignedModeratorName?: string | null;
 }
 
 export class AdminReportMapPinDto {

@@ -89,6 +89,7 @@ export class SystemConfigService {
   > {
     await this.ensureDefaults();
     const rows = await this.prisma.systemConfig.findMany({
+      where: { key: { in: [...ALLOWED_KEYS] } },
       orderBy: { key: 'asc' },
     });
     return rows.map((r) => ({

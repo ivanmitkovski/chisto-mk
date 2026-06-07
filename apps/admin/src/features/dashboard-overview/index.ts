@@ -22,11 +22,10 @@ export {
   StatsSection,
 } from './components/dashboard-async-sections';
 export { DashboardOfflineBanner } from './components/dashboard-offline-banner';
-export { QuickActions } from './components/quick-actions';
 export { QuickActionsDropdown } from './components/quick-actions-dropdown';
 export { RecentActivityFeed } from './components/recent-activity-feed';
 export { ReportsTrendChart } from './components/reports-trend-chart';
 export { UpcomingCleanupsCard } from './components/upcoming-cleanups-card';
 export { StatsOverview } from './components/stats-overview';
-export { getDashboardStats, getDashboardOverview } from './data/adapters/dashboard-adapter';
+export { getDashboardStats, getDashboardOverview } from './data/dashboard-adapter';
 export type { RecentActivityItem, ReportsTrendItem, StatCard } from './types';

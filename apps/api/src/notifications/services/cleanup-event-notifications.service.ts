@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { NotificationType, Role, UserStatus } from '../../prisma-client';
+import { AdminModerationCategory, NotificationType, Role, UserStatus } from '../../prisma-client';
+import { AdminModerationNotifierService } from '../../admin-moderation-email/services/admin-moderation-notifier.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ObservabilityStore } from '../../observability/observability.store';
 import { NotificationDispatcherService } from './notification-dispatcher.service';
@@ -22,6 +23,7 @@ export class CleanupEventNotificationsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly dispatcher: NotificationDispatcherService,
+    private readonly moderationEmailNotifier: AdminModerationNotifierService,
   ) {}
 
   private static formatDispatchErr(err: unknown): string {
@@ -33,6 +35,18 @@ export class CleanupEventNotificationsService {
     siteId: string;
     title: string;
   }): Promise<void> {
+    const eventDetails = await this.prisma.cleanupEvent.findUnique({
+      where: { id: params.eventId },
+      select: {
+        scheduledAt: true,
+        endAt: true,
+        category: true,
+        scale: true,
+        organizer: { select: { firstName: true, lastName: true } },
+        site: { select: { address: true } },
+      },
+    });
+
     const staff = await this.prisma.user.findMany({
       where: { role: { in: STAFF_ROLES }, status: UserStatus.ACTIVE },
       select: { id: true },
@@ -66,6 +80,23 @@ export class CleanupEventNotificationsService {
         });
     }
     ObservabilityStore.recordCleanupEventStaffPendingSignals(staff.length);
+
+    this.moderationEmailNotifier.notify({
+      category: AdminModerationCategory.EVENT_PENDING,
+      resourceId: params.eventId,
+      deepLinkPath: `/dashboard/events/${params.eventId}`,
+      emailContext: {
+        eventTitle: params.title,
+        organizerName: eventDetails?.organizer
+          ? `${eventDetails.organizer.firstName} ${eventDetails.organizer.lastName}`.trim()
+          : '',
+        scheduledAt: eventDetails?.scheduledAt?.toISOString() ?? null,
+        endAt: eventDetails?.endAt?.toISOString() ?? null,
+        eventCategory: eventDetails?.category ?? null,
+        eventScale: eventDetails?.scale ?? null,
+        siteAddress: eventDetails?.site?.address?.trim() ?? null,
+      },
+    });
   }
 
   async notifyOrganizerReturnedToPending(params: {
@@ -156,10 +187,11 @@ export class CleanupEventNotificationsService {
     organizerId: string;
     eventId: string;
     title: string;
+    declineReason?: string;
   }): Promise<void> {
     const localeByUser = await notificationLocalesByUserId(this.prisma, [params.organizerId]);
     const locale = localeByUser.get(params.organizerId) ?? 'mk';
-    const { title, body } = cleanupOrganizerDeclinedPush(locale, params.title);
+    const { title, body } = cleanupOrganizerDeclinedPush(locale, params.title, params.declineReason);
     void this.dispatcher
       .dispatchToUser(params.organizerId, {
         title,

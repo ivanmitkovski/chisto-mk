@@ -1,1 +1,1 @@
-export { ConfirmDialog } from './confirm-dialog';
+export { ConfirmDialog, type ConfirmDialogTone } from './confirm-dialog';

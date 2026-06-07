@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AdminRealtimeModule } from '../admin-realtime/admin-realtime.module';
+import { AdminModerationEmailModule } from '../admin-moderation-email/admin-moderation-email.module';
 import { AuditModule } from '../audit/audit.module';
 import { SiteHistoryModule } from '../sites/history/site-history.module';
 import { SiteHistoryWriterService } from '../sites/history/site-history-writer.service';
@@ -19,6 +20,8 @@ import { ReportsModerationDetailService } from './services/reports-moderation-de
 import { ReportsModerationListService } from './services/reports-moderation-list.service';
 import { ReportsModerationService } from './services/reports-moderation.service';
 import { ReportsModerationStatusService } from './services/reports-moderation-status.service';
+import { ReportsModerationAssignService } from './services/reports-moderation-assign.service';
+import { ReportViewerPresenceService } from './services/report-viewer-presence.service';
 import { DuplicateMergeSnapshotService } from './services/duplicate-merge-snapshot.service';
 import { DuplicateMergeTransactionService } from './services/duplicate-merge-transaction.service';
 import { ReportsDuplicateMergeService } from './services/reports-duplicate-merge.service';
@@ -26,6 +29,7 @@ import { DuplicateGroupQueryService } from './duplicates/duplicate-group-query.s
 import { DuplicateMergeSideEffectsService } from './duplicates/duplicate-merge-side-effects.service';
 import { ReportSideEffectProcessorService } from './side-effects/report-side-effect-processor.service';
 import { ReportSideEffectRetryService } from './side-effects/report-side-effect-retry.service';
+import { ReportSideEffectQueryService } from './side-effects/report-side-effect-query.service';
 import { ReportCapacityService } from './services/report-capacity.service';
 import { ReportsUploadModule } from './reports-upload.module';
 import { ReportSubmitIdempotencyCleanupService } from './services/report-submit-idempotency-cleanup.service';
@@ -37,6 +41,7 @@ import { SITE_HISTORY_WRITER } from './ports/site-history-writer.port';
 @Module({
   imports: [
     AdminRealtimeModule,
+    AdminModerationEmailModule,
     AuditModule,
     GamificationModule,
     ReportsUploadModule,
@@ -47,12 +52,15 @@ import { SITE_HISTORY_WRITER } from './ports/site-history-writer.port';
   providers: [
     ReportsModerationListService,
     ReportsModerationStatusService,
+    ReportsModerationAssignService,
+    ReportViewerPresenceService,
     ReportsModerationDetailService,
     ReportsModerationService,
     DuplicateGroupQueryService,
     DuplicateMergeSideEffectsService,
     ReportSideEffectProcessorService,
     ReportSideEffectRetryService,
+    ReportSideEffectQueryService,
     DuplicateMergeSnapshotService,
     DuplicateMergeTransactionService,
     ReportsDuplicateMergeService,
@@ -75,6 +83,6 @@ import { SITE_HISTORY_WRITER } from './ports/site-history-writer.port';
       useExisting: SiteHistoryWriterService,
     },
   ],
-  exports: [ReportsUploadModule],
+  exports: [ReportsUploadModule, ReportSideEffectQueryService],
 })
 export class ReportsModule {}

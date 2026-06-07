@@ -1,8 +1,24 @@
 import type { Metadata, Viewport } from 'next';
+import { cookies } from 'next/headers';
+import { getLocale, getMessages, getTranslations } from 'next-intl/server';
 import { Roboto } from 'next/font/google';
-import '@/lib/server-dns-init';
+import '@/lib/utils/server-dns-init';
+import { IntlProvider } from '@/components/providers/intl-provider';
+import { LocaleSync } from '@/components/providers/locale-sync';
+import { MotionProvider } from '@/components/providers/motion-provider';
+import { ReducedMotionSync } from '@/components/providers/reduced-motion-sync';
 import { QueryProvider } from '@/components/providers/query-provider';
 import { ToastProvider } from '@/components/ui';
+import { GlobalErrorReporter } from '@/lib/observability';
+import {
+  ADMIN_LOCALE_OPEN_GRAPH,
+  isAdminLocale,
+  type AdminLocale,
+} from '@/lib/preferences/admin-locale';
+import {
+  ADMIN_REDUCED_MOTION_CLASS,
+  ADMIN_REDUCED_MOTION_COOKIE,
+} from '@/lib/preferences/admin-preferences';
 import './globals.css';
 
 const roboto = Roboto({
@@ -25,27 +41,33 @@ function resolveMetadataBase(): URL {
   return new URL('http://localhost:3001');
 }
 
-export const metadata: Metadata = {
-  metadataBase: resolveMetadataBase(),
-  title: {
-    default: 'Chisto Admin',
-    template: '%s · Chisto Admin',
-  },
-  description: 'Admin panel for Chisto.mk civic environmental platform',
-  applicationName: 'Chisto Admin',
-  robots: {
-    index: false,
-    follow: false,
-    googleBot: { index: false, follow: false },
-  },
-  openGraph: {
-    type: 'website',
-    siteName: 'Chisto.mk Admin',
-    locale: 'en_US',
-    title: 'Chisto.mk Admin',
-    description: 'Admin panel for Chisto.mk civic environmental platform',
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  const t = await getTranslations({ locale, namespace: 'common' });
+  const ogLocale = isAdminLocale(locale) ? ADMIN_LOCALE_OPEN_GRAPH[locale] : ADMIN_LOCALE_OPEN_GRAPH.en;
+
+  return {
+    metadataBase: resolveMetadataBase(),
+    title: {
+      default: t('appName'),
+      template: `%s · ${t('appName')}`,
+    },
+    description: t('appDescription'),
+    applicationName: t('appName'),
+    robots: {
+      index: false,
+      follow: false,
+      googleBot: { index: false, follow: false },
+    },
+    openGraph: {
+      type: 'website',
+      siteName: t('appName'),
+      locale: ogLocale,
+      title: t('appName'),
+      description: t('appDescription'),
+    },
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: '#f7f8fe',
@@ -57,17 +79,32 @@ export const viewport: Viewport = {
 /** Required for per-request CSP nonces on routes outside `dashboard` (e.g. `/login`). */
 export const dynamic = 'force-dynamic';
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const cookieStore = await cookies();
+  const serverReducedMotion = cookieStore.get(ADMIN_REDUCED_MOTION_COOKIE)?.value === '1';
+  const locale = (await getLocale()) as AdminLocale;
+  const messages = await getMessages();
+  const htmlClassName = [roboto.variable, serverReducedMotion ? ADMIN_REDUCED_MOTION_CLASS : '']
+    .filter(Boolean)
+    .join(' ');
+
   return (
-    <html lang="en" className={roboto.variable}>
+    <html lang={locale} className={htmlClassName} suppressHydrationWarning>
       <body className={roboto.className}>
-        <QueryProvider>
-          <ToastProvider>{children}</ToastProvider>
-        </QueryProvider>
+        <LocaleSync serverLocale={locale} />
+        <GlobalErrorReporter />
+        <ReducedMotionSync serverReducedMotion={serverReducedMotion} />
+        <IntlProvider locale={locale} messages={messages}>
+          <MotionProvider>
+            <QueryProvider>
+              <ToastProvider>{children}</ToastProvider>
+            </QueryProvider>
+          </MotionProvider>
+        </IntlProvider>
       </body>
     </html>
   );

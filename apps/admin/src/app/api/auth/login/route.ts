@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getApiBaseUrl } from '@/lib/api-base-url';
+import { ApiConnectionError, getApiConnectionErrorMessage } from '@/lib/api';
+import { fetchBackendResponse } from '@/lib/api/admin-fetch';
 import {
   ensureAdminCsrfCookie,
   getOrCreateAdminDeviceId,
   setAdminAuthCookies,
-} from '@/lib/server/admin-session';
-import { is2FAResponse, type AdminLoginResponse, type AuthResponse } from '@/features/auth/lib/types';
+} from '@/lib/auth';
+import { is2FAResponse, type AdminLoginResponse, type AuthResponse } from '@/features/auth';
+import { getServerAcceptLanguage } from '@/lib/i18n/server-locale';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,12 +29,33 @@ export async function POST(request: NextRequest) {
   }
 
   const deviceId = getOrCreateAdminDeviceId(request);
-  const backendResponse = await fetch(`${getApiBaseUrl()}/auth/admin/login`, {
-    method: 'POST',
-    headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password, deviceId }),
-    cache: 'no-store',
-  });
+  const acceptLanguage = await getServerAcceptLanguage();
+  let backendResponse: Response;
+  try {
+    backendResponse = await fetchBackendResponse('/auth/admin/login', {
+      method: 'POST',
+      body: { email, password, deviceId },
+      retryOnGatewayError: false,
+      timeoutMs: 15_000,
+      acceptLanguage,
+    });
+  } catch (error) {
+    const cause =
+      error instanceof ApiConnectionError && error.cause instanceof Error ? error.cause : error;
+    const isTimeout =
+      (cause instanceof DOMException && cause.name === 'TimeoutError') ||
+      (cause instanceof Error && cause.name === 'TimeoutError');
+
+    const response = NextResponse.json(
+      {
+        code: isTimeout ? 'BACKEND_TIMEOUT' : error instanceof ApiConnectionError ? error.code : 'API_CONNECTION_FAILED',
+        message: getApiConnectionErrorMessage(isTimeout),
+      },
+      { status: 502 },
+    );
+    ensureAdminCsrfCookie(request, response);
+    return response;
+  }
   const payload = (await backendResponse.json().catch(() => ({}))) as AdminLoginResponse | Record<string, unknown>;
   const response = NextResponse.json(payload, { status: backendResponse.status });
 

@@ -1,0 +1,119 @@
+{
+  "pageTitle": "Преглед",
+  "statsEmpty": "Сè уште нема достапни статистики за контролната табла.",
+  "statGroups": {
+    "reports": "Пријави",
+    "platform": "Платформа",
+    "cleanups": "Чистења"
+  },
+  "stats": {
+    "newReports": "Нови пријави",
+    "inReview": "Во преглед",
+    "approved": "Одобрени",
+    "deleted": "Избришани",
+    "duplicateGroups": "Групи дупликати",
+    "sites": "Локалитети",
+    "upcoming": "Претстојни",
+    "completed": "Завршени",
+    "users": "Корисници",
+    "activeSessions": "Активни сесии",
+    "usersTrend": "+{count} последните 7 дена"
+  },
+  "reportsTrend": {
+    "sectionLabel": "Аналитика",
+    "title": "Тренд на пријави",
+    "timeRangeAria": "Временски опсег",
+    "viewReports": "Прикажи пријави",
+    "emptyNoData": "Нема поднесени пријави во последните {range} дена.",
+    "emptyNeedMore": "Поднесете повеќе пријави за да го видите трендот.",
+    "chartAria": "Тренд на пријави во последните {range} дена",
+    "tableCaption": "Тренд на пријави во последните {range} дена",
+    "dateColumn": "Датум",
+    "reportsColumn": "Пријави"
+  },
+  "sections": {
+    "statistics": "Статистики",
+    "reportsTable": "Табела со пријави",
+    "reportsTrend": "Тренд на пријави",
+    "recentActivity": "Неодамнешна активност",
+    "cleanupEvents": "Настани за чистење",
+    "feedDiagnostics": "Дијагностика на фид",
+    "insights": "Увиди",
+    "dashboard": "Контролна табла"
+  },
+  "errors": {
+    "sessionExpired": "Сесијата истече или пристапот е одбиен. Токенот може да е истечен (стандардно 15 мин). Најавете се повторно.",
+    "apiServerError": "Грешка на API серверот. Обидете се повторно подоцна.",
+    "statisticsFailed": "Статистиките не се вчитаа.",
+    "reportsTableFailed": "Табелата со пријави не се вчита.",
+    "insightsFailed": "Увидите не се вчитаа.",
+    "dashboardFailed": "Контролната табла не се вчита.",
+    "signInAgain": "Најавете се повторно"
+  },
+  "reportsSection": {
+    "queue": "Ред",
+    "title": "Пријави",
+    "needAttention": "{count} пријава(и) бараат внимание",
+    "viewAllReports": "Прикажи ги сите пријави",
+    "refreshReportsAria": "Освежи пријави"
+  },
+  "insights": {
+    "title": "Увиди",
+    "feedOps": "Операции на фид",
+    "feedDiagnosticsTitle": "Дијагностика на фид",
+    "integrityDemotions": "Деградации на интегритет (7д): {count}"
+  },
+  "activity": {
+    "sectionLabel": "Активност",
+    "title": "Неодамнешна активност",
+    "empty": "Сè уште нема неодамнешна активност. Акциите ќе се појават тука како што се случуваат.",
+    "viewAllAuditLog": "Прикажи го целиот дневник за ревизија"
+  },
+  "events": {
+    "sectionLabel": "Настани",
+    "upcoming": "{count} претстојни",
+    "completed": "{count} завршени",
+    "viewAll": "Прикажи ги сите"
+  },
+  "sse": {
+    "connected": "Ажурирањата во реално време се поврзани",
+    "reconnecting": "Повторно поврзување со ажурирања во реално време",
+    "live": "Во живо",
+    "disconnected": "Исклучено",
+    "reconnect": "Поврзи повторно",
+    "liveConnectedAria": "Ажурирањата во живо се поврзани",
+    "reconnectingLabel": "Повторно поврзување",
+    "disconnectedAria": "Ажурирањата во живо се исклучени",
+    "newUserRegistered": "Регистриран нов корисник",
+    "userUpdated": "Корисникот е ажуриран",
+    "cleanupEventPending": "Настан за чистење чека преглед",
+    "cleanupEventCreated": "Нов настан за чистење",
+    "cleanupEventUpdated": "Настанот за чистење е ажуриран",
+    "newCheckInRiskSignal": "Нов сигнал за ризик при пријава"
+  },
+  "errorBoundary": {
+    "retry": "Обиди се повторно",
+    "sectionFailed": "{sectionName} не се вчита."
+  },
+  "pollingFallback": {
+    "message": "Ажурирањата во живо се паузирани. Податоците се освежуваат периодично."
+  },
+  "timeAgo": {
+    "justNow": "токму сега",
+    "minuteAgo": "пред 1 минута",
+    "minutesAgo": "пред {count} минути",
+    "hourAgo": "пред 1 час",
+    "hoursAgo": "пред {count} часа"
+  },
+  "quickActions": {
+    "menuAria": "Мени за брзи акции",
+    "title": "Брзи акции",
+    "panelAria": "Брзи акции",
+    "newReports": "Нови пријави",
+    "inReview": "Во преглед",
+    "users": "Корисници",
+    "sites": "Локалитети",
+    "events": "Настани",
+    "auditLog": "Дневник за ревизија"
+  }
+}

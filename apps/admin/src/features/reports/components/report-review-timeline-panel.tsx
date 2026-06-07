@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { SectionState } from '@/components/ui';
 import type { ReportTimelineEntry } from '../types';
@@ -22,23 +23,22 @@ type ReportReviewTimelinePanelProps = {
 };
 
 export function ReportReviewTimelinePanel({ entries }: ReportReviewTimelinePanelProps) {
+  const t = useTranslations('reports.timeline');
+
   return (
     <motion.article
       className={styles.panel}
       whileHover={{ y: -2 }}
       transition={{ duration: 0.15 }}
-      aria-label="Report timeline"
+      aria-label={t('ariaLabel')}
     >
       <div className={styles.sectionHeader}>
-        <h3>Lifecycle timeline</h3>
-        <span>{entries.length} events</span>
+        <h3>{t('sectionTitle')}</h3>
+        <span>{t('eventsCount', { count: entries.length })}</span>
       </div>
       {entries.length === 0 ? (
         <div className={styles.sectionEmpty}>
-          <SectionState
-            variant="empty"
-            message="Timeline entries will appear as moderation actions are performed."
-          />
+          <SectionState variant="empty" message={t('empty')} />
         </div>
       ) : (
         <ol className={styles.timeline}>
@@ -54,7 +54,7 @@ export function ReportReviewTimelinePanel({ entries }: ReportReviewTimelinePanel
                   <time>{formatDateTime(entry.occurredAt)}</time>
                 </div>
                 <p>{entry.detail}</p>
-                <span>By {entry.actor}</span>
+                <span>{t('byActor', { actor: entry.actor })}</span>
               </div>
             </li>
           ))}

@@ -13,14 +13,16 @@ export function useScheduleConflictPreview(options: {
   endAtIso?: string | null;
   excludeEventId?: string;
   debounceMs?: number;
-}): { hint: ConflictingEventInfo | null; checking: boolean } {
+}): { hint: ConflictingEventInfo | null; checking: boolean; fetchFailed: boolean } {
   const { siteId, scheduledAtIso, endAtIso, excludeEventId, debounceMs = 480 } = options;
   const [hint, setHint] = useState<ConflictingEventInfo | null>(null);
   const [checking, setChecking] = useState(false);
+  const [fetchFailed, setFetchFailed] = useState(false);
 
   useEffect(() => {
     if (!siteId || !scheduledAtIso) {
       setHint(null);
+      setFetchFailed(false);
       return;
     }
 
@@ -28,6 +30,7 @@ export function useScheduleConflictPreview(options: {
     const timer = setTimeout(() => {
       void (async () => {
         setChecking(true);
+        setFetchFailed(false);
         try {
           const res = await fetchEventScheduleConflict({
             siteId,
@@ -46,6 +49,7 @@ export function useScheduleConflictPreview(options: {
         } catch {
           if (!cancelled) {
             setHint(null);
+            setFetchFailed(true);
           }
         } finally {
           if (!cancelled) {
@@ -61,5 +65,5 @@ export function useScheduleConflictPreview(options: {
     };
   }, [siteId, scheduledAtIso, endAtIso, excludeEventId, debounceMs]);
 
-  return { hint, checking };
+  return { hint, checking, fetchFailed };
 }

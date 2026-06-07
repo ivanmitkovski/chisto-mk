@@ -1,5 +1,6 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma } from '../../prisma-client';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { AdminModerationCategory, Prisma } from '../../prisma-client';
+import { AdminModerationNotifierService } from '../../admin-moderation-email/services/admin-moderation-notifier.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { AuditService } from '../../audit/services/audit.service';
@@ -7,11 +8,14 @@ import { ListAdminUgcReportsQueryDto } from '../dto/list-admin-ugc-reports-query
 import { PatchAdminUgcReportDto } from '../dto/patch-admin-ugc-report.dto';
 import { PostUgcReportDto } from '../dto/post-ugc-report.dto';
 import { PostUserBlockDto } from '../dto/post-user-block.dto';
+import { UgcSubjectVisibilityService } from './ugc-subject-visibility.service';
 
 @Injectable()
 export class ModerationService {
   constructor(
     private readonly prisma: PrismaService,
+    private readonly subjectVisibility: UgcSubjectVisibilityService,
+    private readonly moderationEmailNotifier: AdminModerationNotifierService,
     private readonly audit?: AuditService,
   ) {}
 
@@ -41,6 +45,19 @@ export class ModerationService {
           subjectId: dto.subjectId,
           reason: dto.reason,
         },
+      },
+    });
+    this.moderationEmailNotifier.notify({
+      category: AdminModerationCategory.UGC_REPORT,
+      resourceId: report.id,
+      deepLinkPath: `/dashboard/moderation/ugc?reportId=${report.id}`,
+      emailContext: {
+        subjectType: dto.subjectType,
+        reason: dto.reason,
+        subjectId: dto.subjectId,
+        detailsPreview: details,
+        reporterEmail: user.email,
+        reportedAt: report.createdAt.toISOString(),
       },
     });
     return report;
@@ -80,7 +97,7 @@ export class ModerationService {
     ]);
 
     return {
-      data: rows.map((row) => this.toAdminUgcReport(row)),
+      data: await Promise.all(rows.map((row) => this.toAdminUgcReport(row))),
       meta: { page, limit, total },
     };
   }
@@ -101,6 +118,19 @@ export class ModerationService {
   }
 
   async patchAdminUgcReport(id: string, dto: PatchAdminUgcReportDto, actor: AuthenticatedUser) {
+    const requiresPolicy =
+      dto.action === 'hide_subject' ||
+      dto.action === 'dismiss' ||
+      dto.action === 'escalate' ||
+      dto.action === 'restore_subject';
+    const policyReason = dto.policyReason?.trim() || dto.note?.trim() || null;
+    if (requiresPolicy && !policyReason) {
+      throw new BadRequestException({
+        code: 'POLICY_REASON_REQUIRED',
+        message: 'A policy reason is required for this moderation action',
+      });
+    }
+
     const statusByAction: Record<PatchAdminUgcReportDto['action'], string> = {
       mark_reviewed: 'REVIEWED',
       dismiss: 'DISMISSED',
@@ -114,6 +144,12 @@ export class ModerationService {
     });
     if (!existing) {
       throw new NotFoundException('UGC report not found');
+    }
+
+    if (dto.action === 'hide_subject') {
+      await this.subjectVisibility.applySubjectVisibility(existing.subjectType, existing.subjectId, true);
+    } else if (dto.action === 'restore_subject') {
+      await this.subjectVisibility.applySubjectVisibility(existing.subjectType, existing.subjectId, false);
     }
 
     const row = await this.prisma.ugcContentReport.update({
@@ -133,6 +169,7 @@ export class ModerationService {
       metadata: {
         action: dto.action,
         note: dto.note?.trim() || null,
+        policyReason,
         previousStatus: existing.status,
         nextStatus: row.status,
         subjectType: existing.subjectType,
@@ -197,7 +234,14 @@ export class ModerationService {
     return rows.map((r) => r.blockedUserId);
   }
 
-  private toAdminUgcReport(row: {
+  private caseStatusFromReportStatus(status: string): string {
+    if (status === 'OPEN' || status === 'ESCALATED') return 'open';
+    if (status === 'REVIEWED' || status === 'DISMISSED') return 'closed';
+    if (status === 'HIDDEN') return 'closed';
+    return 'in_review';
+  }
+
+  private async toAdminUgcReport(row: {
     id: string;
     reporterId: string;
     subjectType: string;
@@ -216,6 +260,7 @@ export class ModerationService {
       status: string;
     };
   }) {
+    const contentStatus = await this.subjectVisibility.resolveContentStatus(row.subjectType, row.subjectId);
     return {
       id: row.id,
       reporterId: row.reporterId,
@@ -228,6 +273,8 @@ export class ModerationService {
       reason: row.reason,
       details: row.details,
       status: row.status,
+      caseStatus: this.caseStatusFromReportStatus(row.status),
+      contentStatus,
       createdAt: row.createdAt.toISOString(),
       updatedAt: row.updatedAt.toISOString(),
     };

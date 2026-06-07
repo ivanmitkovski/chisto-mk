@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getApiBaseUrl } from '@/lib/api-base-url';
+import { bffConnectionErrorResponse } from '@/lib/api/bff-route-utils';
+import { executeAdminFetch } from '@/lib/api/admin-fetch';
+import { getApiBaseUrl } from '@/lib/api';
 import {
   clearAdminAuthCookies,
   ensureAdminCsrfCookie,
@@ -8,9 +10,11 @@ import {
   getOrCreateAdminDeviceId,
   refreshAdminTokens,
   setAdminAuthCookies,
-} from '@/lib/server/admin-session';
+} from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
+
+const SSE_TIMEOUT_MS = 60_000;
 
 export async function GET(request: NextRequest) {
   let accessToken = getAdminAccessToken(request);
@@ -31,20 +35,44 @@ export async function GET(request: NextRequest) {
     return response;
   }
 
-  const run = (token: string) =>
-    fetch(`${getApiBaseUrl()}/admin/events`, {
-      headers: {
-        Accept: 'text/event-stream',
-        Authorization: `Bearer ${token}`,
+  const run = async (token: string) => {
+    const url = `${getApiBaseUrl()}/admin/events`;
+    const requestId = request.headers.get('x-request-id') ?? crypto.randomUUID();
+    return executeAdminFetch(
+      url,
+      {
+        method: 'GET',
+        headers: {
+          Accept: 'text/event-stream',
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
       },
-      cache: 'no-store',
-    });
+      {
+        path: '/admin/events',
+        timeoutMs: SSE_TIMEOUT_MS,
+        method: 'GET',
+        retryOnGatewayError: false,
+        requestId,
+      },
+    );
+  };
 
-  let backendResponse = await run(accessToken);
+  let backendResponse: Response;
+  try {
+    backendResponse = await run(accessToken);
+  } catch (error) {
+    return bffConnectionErrorResponse(request, error);
+  }
+
   if (backendResponse.status === 401 && refreshToken) {
     refreshedTokens = await refreshAdminTokens(refreshToken, deviceId);
     if (refreshedTokens) {
-      backendResponse = await run(refreshedTokens.accessToken);
+      try {
+        backendResponse = await run(refreshedTokens.accessToken);
+      } catch (error) {
+        return bffConnectionErrorResponse(request, error);
+      }
     }
   }
 

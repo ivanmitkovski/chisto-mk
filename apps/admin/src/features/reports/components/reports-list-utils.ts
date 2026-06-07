@@ -23,12 +23,19 @@ export function buildReportsUrl(params: {
   sort?: SortKey | undefined;
   dir?: SortDirection | undefined;
   page?: number | undefined;
+  search?: string | undefined;
+  siteId?: string | undefined;
+  duplicatesOnly?: boolean | undefined;
 }) {
   const sp = new URLSearchParams();
+  if (params.siteId) sp.set('siteId', params.siteId);
   if (params.status && params.status !== 'ALL') sp.set('status', params.status);
   if (params.sort) sp.set('sort', params.sort);
   if (params.dir) sp.set('dir', params.dir);
+  if (params.duplicatesOnly) sp.set('duplicatesOnly', 'true');
   if (params.page && params.page > 1) sp.set('page', String(params.page));
+  const trimmedSearch = params.search?.trim();
+  if (trimmedSearch) sp.set('search', trimmedSearch);
   const q = sp.toString();
   return `/dashboard/reports${q ? `?${q}` : ''}`;
 }

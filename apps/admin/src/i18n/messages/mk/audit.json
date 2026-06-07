@@ -1,0 +1,41 @@
+{
+  "pageTitle": "Дневник за ревизија",
+  "skipToTable": "Прескокни на табелата за ревизија",
+  "stats": {
+    "totalEntries": "Вкупно записи",
+    "entriesFiltered": "Записи (филтрирани)",
+    "pages": "Страници"
+  },
+  "filters": {
+    "label": "Филтри",
+    "action": "Акција",
+    "actionPlaceholder": "на пр. USER_UPDATED",
+    "resourceType": "Тип на ресурс",
+    "resourceTypePlaceholder": "на пр. User, Report",
+    "resourceId": "ID на ресурс",
+    "resourceIdPlaceholder": "на пр. UUID на корисник или пријава",
+    "actorId": "ID на актер",
+    "actorIdPlaceholder": "ID на корисник",
+    "from": "Од",
+    "to": "До",
+    "apply": "Примени филтри",
+    "clear": "Исчисти",
+    "invalidDates": "Внесете важечки датуми.",
+    "fromBeforeTo": "„Од“ мора да биде на или пред „До“."
+  },
+  "table": {
+    "time": "Време",
+    "copyId": "Копирај ID",
+    "action": "Акција",
+    "resource": "Ресурс",
+    "actor": "Актер",
+    "system": "Систем",
+    "details": "Детали",
+    "hide": "Сокриј",
+    "hideDetails": "Сокриј детали",
+    "showDetails": "Прикажи детали",
+    "empty": "Нема записи за ревизија што одговараат на вашите филтри.",
+    "entriesMeta": "{count} запис(и) · страница {page}"
+  },
+  "pageDescription": "Преглед на админ активност и промени."
+}

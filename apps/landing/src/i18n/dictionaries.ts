@@ -51,10 +51,10 @@ export type WipDictionary = {
 };
 
 const mk: WipDictionary = {
-  metaTitle: "Chisto.mk · 1 јуни 2026",
+  metaTitle: "Chisto.mk · 12 јуни 2026",
   metaDescription:
-    "Платформа за граѓанска екологија во Македонија. Пријавување, мапа и акции за чистење. Стартува на 1 јуни 2026.",
-  launchDate: "Стартува на 1 јуни 2026",
+    "Платформа за граѓанска екологија во Македонија. Пријавување, мапа и акции за чистење. Стартува на 12 јуни 2026.",
+  launchDate: "Стартува на 12 јуни 2026",
   badge: "Во подготовка",
   lead:
     "Подготвуваме нов јавен простор за пријавување на еколошки проблеми, преглед на мапа и учество во акции за чистење низ Македонија.",
@@ -92,10 +92,10 @@ const mk: WipDictionary = {
 };
 
 const en: WipDictionary = {
-  metaTitle: "Chisto.mk · June 1, 2026",
+  metaTitle: "Chisto.mk · June 12, 2026",
   metaDescription:
-    "Civic environmental platform for Macedonia. Report issues, explore the map, and join clean-ups. Launching June 1, 2026.",
-  launchDate: "Launching June 1, 2026",
+    "Civic environmental platform for Macedonia. Report issues, explore the map, and join clean-ups. Launching June 12, 2026.",
+  launchDate: "Launching June 12, 2026",
   badge: "Work in progress",
   lead:
     "We are preparing a new public space to report environmental issues, see them on a map, and join clean-up efforts across Macedonia.",
@@ -133,10 +133,10 @@ const en: WipDictionary = {
 };
 
 const sq: WipDictionary = {
-  metaTitle: "Chisto.mk · 1 qershor 2026",
+  metaTitle: "Chisto.mk · 12 qershor 2026",
   metaDescription:
-    "Platformë qytetare mjedisore për Maqedoninë. Raportoni, hartë dhe aksione pastrimi. Nis më 1 qershor 2026.",
-  launchDate: "Nis më 1 qershor 2026",
+    "Platformë qytetare mjedisore për Maqedoninë. Raportoni, hartë dhe aksione pastrimi. Nis më 12 qershor 2026.",
+  launchDate: "Nis më 12 qershor 2026",
   badge: "Në punë",
   lead:
     "Po përgatisim një hapësirë të re publike për të raportuar çështje mjedisore, t’i shihni në hartë dhe të bashkoheni në aksione pastrimi nëpër Maqedoni.",
@@ -175,10 +175,10 @@ const sq: WipDictionary = {
 
 /** Romani (Latin script, Balkan varieties vary; refine with native speakers if needed.) */
 const rom: WipDictionary = {
-  metaTitle: "Chisto.mk · 1 juni 2026",
+  metaTitle: "Chisto.mk · 12 juni 2026",
   metaDescription:
-    "Platforma thaj ekologjia andre Makedonia. Raporto, dikhe mapa, zhuti khere. Startis 1 juni 2026.",
-  launchDate: "Startis 1 juni 2026",
+    "Platforma thaj ekologjia andre Makedonia. Raporto, dikhe mapa, zhuti khere. Startis 12 juni 2026.",
+  launchDate: "Startis 12 juni 2026",
   badge: "Kam taj kerava",
   lead:
     "Kam taj kerava nevo thano, te raportes ekologisarja, te dikhes pe mapa, thaj te zhutes andre akcia andre Makedonia.",
@@ -215,10 +215,10 @@ const rom: WipDictionary = {
 };
 
 const sr: WipDictionary = {
-  metaTitle: "Chisto.mk · 1. јун 2026.",
+  metaTitle: "Chisto.mk · 12. јун 2026.",
   metaDescription:
-    "Грађанска еколошка платформа за Македонију. Пријаве, мапа и акције чишћења. Почетак 1. јуна 2026.",
-  launchDate: "Почетак 1. јуна 2026.",
+    "Грађанска еколошка платформа за Македонију. Пријаве, мапа и акције чишћења. Почетак 12. јуна 2026.",
+  launchDate: "Почетак 12. јуна 2026.",
   badge: "У припреми",
   lead:
     "Припремамо нови јавни простор за пријаву еколошких проблема, преглед на мапи и учешће у акцијама чишћења широм Македоније.",

@@ -4,7 +4,7 @@
   position: absolute;
   inset: 0;
   /* Above map toolbar (1000), below global top bar (1200) */
-  z-index: 1101;
+  z-index: var(--z-map-overlay);
   display: flex;
   align-items: stretch;
   justify-content: flex-end;
@@ -484,7 +484,7 @@
   border: 0;
 }
 
-@media (max-width: 920px) {
+@media (max-width: 64rem) {
   .overlayRoot {
     align-items: flex-end;
     justify-content: center;

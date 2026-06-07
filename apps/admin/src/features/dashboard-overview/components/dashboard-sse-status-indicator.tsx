@@ -1,12 +1,16 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { Button } from '@/components/ui';
 import { useDashboardSSE } from '../context/dashboard-sse-context';
 import styles from './dashboard-sse-status-indicator.module.css';
 
 const HIDE_LIVE_AFTER_MS = 5000;
 
 export function DashboardSSEStatusIndicator() {
+  const t = useTranslations('dashboard.sse');
+  const tCommon = useTranslations('common');
   const ctx = useDashboardSSE();
   const [showLive, setShowLive] = useState(false);
   const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -38,16 +42,28 @@ export function DashboardSSEStatusIndicator() {
 
   if (!ctx) return null;
 
+  if (ctx.disconnected) {
+    return (
+      <span className={styles.pillDisconnected} role="status" aria-label={t('disconnectedAria')}>
+        <span className={styles.dotDisconnected} aria-hidden />
+        {t('disconnected')}
+        <Button variant="ghost" size="sm" onClick={() => ctx.requestReconnect()}>
+          {t('reconnect')}
+        </Button>
+      </span>
+    );
+  }
+
   if (ctx.connected && showLive) {
     return (
       <span
         className={styles.pill}
-        title="Real-time updates connected"
+        title={t('connected')}
         role="status"
-        aria-label="Live updates connected"
+        aria-label={t('liveConnectedAria')}
       >
         <span className={styles.dot} aria-hidden />
-        Live
+        {tCommon('live')}
       </span>
     );
   }
@@ -56,12 +72,12 @@ export function DashboardSSEStatusIndicator() {
     return (
       <span
         className={styles.pillReconnecting}
-        title="Reconnecting to real-time updates"
+        title={t('reconnecting')}
         role="status"
-        aria-label="Reconnecting"
+        aria-label={t('reconnectingLabel')}
       >
         <span className={styles.dotReconnecting} aria-hidden />
-        Reconnecting
+        {t('reconnectingLabel')}
       </span>
     );
   }

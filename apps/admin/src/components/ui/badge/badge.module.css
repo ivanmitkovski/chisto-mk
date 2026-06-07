@@ -21,8 +21,8 @@
 }
 
 .warning {
-  background: rgba(245, 158, 11, 0.14);
-  color: var(--color-warning);
+  background: var(--color-yellow-100);
+  color: var(--color-status-warning-fg);
 }
 
 .danger {

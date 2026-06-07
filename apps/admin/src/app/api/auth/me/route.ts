@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { proxyBackendWithRefresh } from '@/lib/admin-api-with-refresh';
+import { proxyBackendWithRefresh } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 

@@ -1,34 +1,3 @@
-.tag {
-  display: inline-flex;
-  align-items: center;
-  min-height: 1.5rem;
-  padding: 0 var(--space-2);
-  border-radius: var(--radius-full);
-  font-size: var(--font-size-xs);
+.bold {
   font-weight: var(--font-weight-bold);
-}
-
-.neutral {
-  background: rgba(8, 54, 39, 0.08);
-  color: var(--text-secondary);
-}
-
-.success {
-  background: rgba(37, 219, 134, 0.16);
-  color: var(--color-green-900);
-}
-
-.warning {
-  background: var(--color-yellow-100);
-  color: var(--color-status-warning-fg);
-}
-
-.danger {
-  background: var(--color-red-050);
-  color: var(--color-error);
-}
-
-.info {
-  background: rgba(36, 172, 249, 0.14);
-  color: var(--color-status-info-fg);
 }

@@ -1,27 +1,34 @@
 import { Suspense } from 'react';
 import { cookies } from 'next/headers';
+import { getTranslations } from 'next-intl/server';
 import { AdminShell } from '@/features/admin-shell';
-import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell/constants';
+import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell';
 import {
-  DashboardContentFallback,
-  DashboardDataOrError,
   DashboardKeyboardShortcuts,
   DashboardOfflineBanner,
   DashboardRealtimeSync,
+  InsightsFallback,
   InsightsSection,
-  QuickActionsDropdown,
+  ReportsFallback,
   ReportsSection,
+  StatsFallback,
   StatsSection,
 } from '@/features/dashboard-overview';
+import { QuickActionsDropdown } from '@/features/dashboard-overview';
+import { ADMIN_PERMISSIONS } from '@/lib/auth/rbac/permissions';
+import { requirePagePermission } from '@/lib/auth/rbac/server';
 import styles from './dashboard.module.css';
 
 export default async function DashboardPage() {
+  await requirePagePermission(ADMIN_PERMISSIONS['dashboard:view']);
+  const t = await getTranslations('dashboard');
+  const tCommon = await getTranslations('common');
   const cookieStore = await cookies();
   const initialSidebarCollapsed = cookieStore.get(DESKTOP_SIDEBAR_COOKIE_KEY)?.value === '1';
 
   return (
     <AdminShell
-      title="Overview"
+      title={t('pageTitle')}
       activeItem="dashboard"
       initialSidebarCollapsed={initialSidebarCollapsed}
     >
@@ -29,26 +36,28 @@ export default async function DashboardPage() {
         <DashboardOfflineBanner />
         <DashboardKeyboardShortcuts />
         <a href="#reports-section" className="skipLink">
-          Skip to reports
+          {tCommon('skipToReports')}
         </a>
         <a href="#insights-section" className="skipLink">
-          Skip to insights
+          {tCommon('skipToInsights')}
         </a>
-        <Suspense fallback={<DashboardContentFallback />}>
-          <DashboardDataOrError>
-            <header className={styles.topBar} role="banner">
-              <div className={styles.statsWrap}>
-                <StatsSection />
-              </div>
-              <QuickActionsDropdown />
-            </header>
-            <DashboardRealtimeSync />
-              <main>
-                <ReportsSection />
-                <InsightsSection />
-              </main>
-            </DashboardDataOrError>
+        <Suspense fallback={<StatsFallback />}>
+          <header className={styles.topBar} role="banner">
+            <div className={styles.statsWrap}>
+              <StatsSection />
+            </div>
+            <QuickActionsDropdown />
+          </header>
+        </Suspense>
+        <DashboardRealtimeSync />
+        <main>
+          <Suspense fallback={<ReportsFallback />}>
+            <ReportsSection />
           </Suspense>
+          <Suspense fallback={<InsightsFallback />}>
+            <InsightsSection />
+          </Suspense>
+        </main>
       </div>
     </AdminShell>
   );

@@ -1,5 +1,8 @@
+'use client';
+
 import { FormEvent, useEffect, useState } from 'react';
-import { SnackState } from '@/components/ui';
+import { useTranslations } from 'next-intl';
+import { useToast } from '@/components/ui';
 import { ApiError } from '@/lib/api';
 import { completeTotpLogin, loginAdmin } from '../lib/admin-auth';
 
@@ -13,20 +16,22 @@ type LoginErrors = Partial<Record<'email' | 'password' | 'totp', string>>;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-function validate(values: LoginValues): LoginErrors {
+type AuthTranslator = ReturnType<typeof useTranslations<'auth'>>;
+
+function validate(values: LoginValues, t: AuthTranslator): LoginErrors {
   const errors: LoginErrors = {};
 
   const email = values.email.trim();
   if (!email) {
-    errors.email = 'Email is required.';
+    errors.email = t('validation.emailRequired');
   } else if (!EMAIL_RE.test(email)) {
-    errors.email = 'Please enter a valid email address.';
+    errors.email = t('validation.emailInvalid');
   }
 
   if (!values.password) {
-    errors.password = 'Password is required.';
+    errors.password = t('validation.passwordRequired');
   } else if (values.password.length < 8) {
-    errors.password = 'Password must contain at least 8 characters.';
+    errors.password = t('validation.passwordMinLength');
   }
 
   return errors;
@@ -35,6 +40,8 @@ function validate(values: LoginValues): LoginErrors {
 export type LoginStep = 'credentials' | 'totp';
 
 export function useLoginForm() {
+  const t = useTranslations('auth');
+  const { showToast, clearToast } = useToast();
   const [values, setValues] = useState<LoginValues>({
     email: '',
     password: '',
@@ -46,7 +53,6 @@ export function useLoginForm() {
   const [useBackupCode, setUseBackupCode] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<LoginErrors>({});
-  const [snack, setSnack] = useState<SnackState | null>(null);
   const [lockoutUntilMs, setLockoutUntilMs] = useState<number | null>(null);
   const [lockoutRemainingSeconds, setLockoutRemainingSeconds] = useState(0);
 
@@ -76,7 +82,7 @@ export function useLoginForm() {
         return next;
       });
     }
-    setSnack(null);
+    clearToast();
   }
 
   function updateTotpCode(value: string) {
@@ -86,27 +92,27 @@ export function useLoginForm() {
       delete next.totp;
       return next;
     });
-    setSnack(null);
+    clearToast();
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>): Promise<boolean> {
     event.preventDefault();
-    const nextErrors = validate(values);
+    const nextErrors = validate(values, t);
     setErrors(nextErrors);
 
     if (Object.keys(nextErrors).length > 0) {
-      setSnack({
+      showToast({
         tone: 'warning',
-        title: 'Check required fields',
-        message: 'Please resolve the highlighted fields before continuing.',
+        title: t('toast.checkRequiredFieldsTitle'),
+        message: t('toast.checkRequiredFieldsMessage'),
       });
       return false;
     }
     if (lockoutRemainingSeconds > 0) {
-      setSnack({
+      showToast({
         tone: 'warning',
-        title: 'Account locked',
-        message: `Try again in ${formatCountdown(lockoutRemainingSeconds)}.`,
+        title: t('toast.accountLockedTitle'),
+        message: t('toast.accountLockedMessage', { time: formatCountdown(lockoutRemainingSeconds) }),
       });
       return false;
     }
@@ -124,10 +130,10 @@ export function useLoginForm() {
         return false;
       }
 
-      setSnack({
+      showToast({
         tone: 'success',
-        title: 'Welcome back',
-        message: 'Login successful. Opening your admin dashboard...',
+        title: t('toast.welcomeBackTitle'),
+        message: t('toast.welcomeBackMessage'),
       });
 
       return true;
@@ -138,40 +144,51 @@ export function useLoginForm() {
         const isLockout = error.code === 'TOO_MANY_ATTEMPTS';
         const isAccountInactive = error.code === 'ACCOUNT_NOT_ACTIVE' || error.code === 'ACCOUNT_SUSPENDED';
 
+        const isBackendUnavailable =
+          error.code === 'API_CONNECTION_FAILED' || error.code === 'BACKEND_TIMEOUT';
+
         let message: string;
         if (isAdminError) {
-          message = 'This account does not have admin privileges for the console.';
+          message = t('toast.adminAccessRequiredMessage');
         } else if (isLockout) {
           const retryAfter = (
             error.details as { retryAfterSeconds?: number } | undefined
           )?.retryAfterSeconds;
           const minutes = retryAfter != null ? Math.ceil(retryAfter / 60) : 15;
           setLockoutUntilMs(Date.now() + (retryAfter ?? minutes * 60) * 1000);
-          message = `Too many attempts. Try again in ${minutes} minute${minutes !== 1 ? 's' : ''}.`;
+          message = t('toast.tooManyAttemptsMessage', { minutes });
         } else if (isAccountInactive) {
-          message = error.message || 'This account is not active. Contact support for assistance.';
+          message = error.message || t('toast.accountInactiveMessage');
         } else if (isDbError) {
-          message = error.message || 'The service is temporarily unavailable. Please try again in a moment.';
+          message = error.message || t('toast.serviceTemporarilyUnavailableMessage');
+        } else if (isBackendUnavailable) {
+          message = error.message;
         } else if (error.code === 'INVALID_CREDENTIALS') {
-          message = 'Wrong email or password. Please try again.';
+          message = t('toast.invalidCredentialsMessage');
         } else if (error.status >= 500) {
-          message = error.message || 'The server is temporarily unavailable. Please try again.';
+          message = error.message || t('toast.serverUnavailableMessage');
         } else {
-          message = error.message || 'Wrong email or password. Please try again.';
+          message = error.message || t('toast.invalidCredentialsMessage');
         }
 
-        setSnack({
+        showToast({
           tone: 'error',
-          title: isAdminError ? 'Admin access required' : isLockout ? 'Account locked' : 'Login failed',
+          title: isAdminError
+            ? t('toast.adminAccessRequiredTitle')
+            : isLockout
+              ? t('toast.accountLockedTitle')
+              : isBackendUnavailable
+                ? t('toast.serviceUnavailableTitle')
+                : t('toast.loginFailedTitle'),
           message,
         });
         return false;
       }
 
-      setSnack({
+      showToast({
         tone: 'error',
-        title: 'Login failed',
-        message: 'Unexpected error while logging in. Please try again.',
+        title: t('toast.loginFailedTitle'),
+        message: t('toast.unexpectedLoginErrorMessage'),
       });
       return false;
     } finally {
@@ -182,19 +199,19 @@ export function useLoginForm() {
   async function handleTotpSubmit(event: FormEvent<HTMLFormElement>): Promise<boolean> {
     event.preventDefault();
     const code = totpCode.trim();
+    const totpRequiredMessage = useBackupCode
+      ? t('validation.totpBackupRequired')
+      : t('validation.totpCodeRequired');
+
     if (!tempToken || code.length < 6) {
       setErrors((prev) => ({
         ...prev,
-        totp: useBackupCode
-          ? 'Please enter your backup code.'
-          : 'Please enter the 6-digit code from your authenticator app.',
+        totp: totpRequiredMessage,
       }));
-      setSnack({
+      showToast({
         tone: 'warning',
-        title: 'Enter code',
-        message: useBackupCode
-          ? 'Please enter your backup code.'
-          : 'Please enter the 6-digit code from your authenticator app.',
+        title: t('toast.enterCodeTitle'),
+        message: totpRequiredMessage,
       });
       return false;
     }
@@ -203,10 +220,10 @@ export function useLoginForm() {
     try {
       await completeTotpLogin(tempToken, code, { rememberDevice: values.rememberDevice });
 
-      setSnack({
+      showToast({
         tone: 'success',
-        title: 'Welcome back',
-        message: 'Login successful. Opening your admin dashboard...',
+        title: t('toast.welcomeBackTitle'),
+        message: t('toast.welcomeBackMessage'),
       });
 
       return true;
@@ -214,26 +231,27 @@ export function useLoginForm() {
       if (error instanceof ApiError) {
         if (error.code === 'INVALID_TEMP_TOKEN') {
           resetToCredentials();
-          setSnack({
+          showToast({
             tone: 'error',
-            title: 'Session expired',
-            message: 'Verification timed out. Please sign in again.',
+            title: t('toast.sessionExpiredTitle'),
+            message: t('toast.sessionExpiredMessage'),
           });
           return false;
         }
-        setSnack({
+        const invalidCodeMessage = error.message || t('toast.invalidCodeMessage');
+        showToast({
           tone: 'error',
-          title: 'Verification failed',
-          message: error.message || 'Invalid code. Please try again.',
+          title: t('toast.verificationFailedTitle'),
+          message: invalidCodeMessage,
         });
-        setErrors((prev) => ({ ...prev, totp: error.message || 'Invalid code. Please try again.' }));
+        setErrors((prev) => ({ ...prev, totp: invalidCodeMessage }));
         return false;
       }
 
-      setSnack({
+      showToast({
         tone: 'error',
-        title: 'Verification failed',
-        message: 'Unexpected error. Please try again.',
+        title: t('toast.verificationFailedTitle'),
+        message: t('toast.unexpectedVerificationErrorMessage'),
       });
       return false;
     } finally {
@@ -247,13 +265,12 @@ export function useLoginForm() {
     setTotpCode('');
     setUseBackupCode(false);
     setErrors({});
-    setSnack(null);
+    clearToast();
   }
 
   return {
     values,
     errors,
-    snack,
     step,
     tempToken,
     totpCode,
@@ -267,7 +284,6 @@ export function useLoginForm() {
     handleSubmit,
     handleTotpSubmit,
     resetToCredentials,
-    clearSnack: () => setSnack(null),
   };
 }
 

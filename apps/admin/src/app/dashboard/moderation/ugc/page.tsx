@@ -1,45 +1,91 @@
 import { cookies } from 'next/headers';
+import { getTranslations } from 'next-intl/server';
 import { AdminShell } from '@/features/admin-shell';
-import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell/constants';
+import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell';
 import { PageHeader, SectionState } from '@/components/ui';
-import { ApiError } from '@/lib/api';
-import { getUgcModerationReports } from '@/features/moderation/data/ugc-moderation-adapter';
-import { UgcModerationWorkspace } from '@/features/moderation/components/ugc-moderation-workspace';
+import {
+  getUgcModerationReport,
+  getUgcModerationReports,
+  UgcModerationWorkspace,
+} from '@/features/moderation';
+import { ADMIN_PERMISSIONS } from '@/lib/auth/rbac/permissions';
+import { requirePagePermission } from '@/lib/auth/rbac/server';
+import { handleServerLoadError } from '@/lib/server/handle-server-load-error';
 
-export default async function UgcModerationPage() {
+const UGC_PAGE_SIZE = 50;
+
+type UgcModerationPageProps = {
+  searchParams: Promise<{
+    reportId?: string;
+    page?: string;
+    status?: string;
+    subjectType?: string;
+    search?: string;
+  }>;
+};
+
+export default async function UgcModerationPage({ searchParams }: UgcModerationPageProps) {
+  await requirePagePermission(ADMIN_PERMISSIONS['moderation:read']);
+  const tNav = await getTranslations('nav');
+  const t = await getTranslations('moderation');
   const cookieStore = await cookies();
   const initialSidebarCollapsed = cookieStore.get(DESKTOP_SIDEBAR_COOKIE_KEY)?.value === '1';
+  const params = await searchParams;
+  const page = Math.max(1, Number.parseInt(params.page ?? '1', 10) || 1);
+  const status = params.status ?? '';
+  const subjectType = params.subjectType ?? '';
+  const search = params.search?.trim() ?? '';
+  const targetReportId = params.reportId ?? null;
 
   let content: React.ReactNode;
   try {
-    const reports = await getUgcModerationReports();
+    const reportsResult = await getUgcModerationReports({
+      page,
+      limit: UGC_PAGE_SIZE,
+      ...(status ? { status } : {}),
+      ...(subjectType ? { subjectType } : {}),
+      ...(search ? { search } : {}),
+    });
+
+    let reports = reportsResult.data;
+    let initialSelectedReportId: string | null = null;
+
+    if (targetReportId) {
+      const inList = reports.some((report) => report.id === targetReportId);
+      if (inList) {
+        initialSelectedReportId = targetReportId;
+      } else {
+        try {
+          const targetReport = await getUgcModerationReport(targetReportId);
+          reports = [targetReport, ...reports];
+          initialSelectedReportId = targetReport.id;
+        } catch {
+          // Ignore deep-link preselect failure and keep default list behavior.
+        }
+      }
+    }
+
     content =
-      reports.data.length === 0 ? (
-        <SectionState variant="empty" message="No UGC reports are waiting for review." />
+      reports.length === 0 ? (
+        <SectionState variant="empty" message={t('empty')} />
       ) : (
-        <UgcModerationWorkspace initialReports={reports.data} />
+        <UgcModerationWorkspace
+          initialReports={reports}
+          initialMeta={reportsResult.meta}
+          initialSelectedReportId={initialSelectedReportId}
+          initialStatusFilter={status}
+          initialSubjectTypeFilter={subjectType}
+          initialSearch={search}
+        />
       );
   } catch (error) {
-    const missingEndpoint =
-      error instanceof ApiError && (error.status === 404 || error.code === 'NOT_FOUND');
-    content = (
-      <SectionState
-        variant="error"
-        message={
-          missingEndpoint
-            ? 'UGC moderation API is not available yet. The admin route is ready and will activate when /admin/moderation/ugc-reports ships.'
-            : 'Unable to load UGC reports.'
-        }
-      />
-    );
+    const message = await handleServerLoadError(error, { fallbackMessageKey: 'unableToLoadUgcReports' });
+    content = <SectionState variant="error" message={message} />;
   }
 
   return (
-    <AdminShell title="UGC Moderation" activeItem="moderation" initialSidebarCollapsed={initialSidebarCollapsed}>
-      <PageHeader
-        title="UGC moderation"
-        description="Triage citizen reports for comments, chats, users, sites, and events."
-      />
+    <AdminShell title={tNav('moderation')} activeItem="moderation" initialSidebarCollapsed={initialSidebarCollapsed}>
+      <PageHeader title={t('pageHeaderTitle')} description={t('pageDescription')} />
       {content}
     </AdminShell>
   );

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Headers,
   Param,
@@ -33,6 +34,7 @@ import { CurrentUser } from '../../auth/decorators/current-user.decorator';
 import { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { AdminReportDetailDto, AdminReportListResponseDto } from '../dto/admin-report.dto';
+import { AdminReportsQueueSummaryDto } from '../dto/admin-reports-queue-summary.dto';
 import { CitizenReportDetailDto } from '../dto/citizen-report-detail.dto';
 import {
   AdminDuplicateReportGroupDto,
@@ -41,6 +43,9 @@ import {
   MergeDuplicateReportsResponseDto,
 } from '../dto/admin-duplicate-report.dto';
 import { RolesGuard } from '../../auth/guards/roles.guard';
+import { PermissionsGuard } from '../../auth/guards/permissions.guard';
+import { RequirePermission } from '../../auth/decorators/require-permission.decorator';
+import { ADMIN_PERMISSIONS } from '../../auth/constants/admin-permissions';
 import { CreateReportWithLocationDto } from '../dto/create-report-with-location.dto';
 import { ReportCapacityDto } from '../dto/report-capacity.dto';
 import { ReportMediaUrlsResponseDto } from '../dto/report-media-urls-response.dto';
@@ -48,8 +53,14 @@ import { ReportSubmitResponseDto } from '../dto/report-submit-response.dto';
 import { ListMyReportsQueryDto } from '../dto/list-my-reports-query.dto';
 import { ListReportsQueryDto } from '../dto/list-reports-query.dto';
 import { UpdateReportStatusDto } from '../dto/update-report-status.dto';
+import { AssignReportDto, AssignReportResponseDto } from '../dto/assign-report.dto';
+import {
+  ReportViewerHeartbeatDto,
+  ReportViewerPresenceResponseDto,
+} from '../dto/report-viewer-presence.dto';
 import { reportLocaleFromAcceptLanguage } from '../util/report-locale.util';
 import { ReportsService } from '../services/reports.service';
+import { ReportViewerPresenceService } from '../services/report-viewer-presence.service';
 import { ReportsUploadService } from '../services/reports-upload.service';
 import { ReportSubmitMediaAppendService } from '../services/report-submit-media-append.service';
 import { NonEmptyUploadedFilesPipe } from '../pipes/non-empty-uploaded-files.pipe';
@@ -66,6 +77,7 @@ export class ReportsController {
     private readonly reportsService: ReportsService,
     private readonly reportsUploadService: ReportsUploadService,
     private readonly reportMediaAppend: ReportSubmitMediaAppendService,
+    private readonly reportViewerPresenceService: ReportViewerPresenceService,
   ) {}
 
   @Idempotent('reports_reports_68')
@@ -180,6 +192,17 @@ export class ReportsController {
     return this.reportsService.findAllForModeration(query);
   }
 
+  @Get('queue-summary')
+  @Throttle({ default: { limit: 60, ttl: 60_000 } })
+  @UseGuards(JwtAuthGuard, RolesGuard, ReportsUserThrottlerGuard)
+  @Roles(...ADMIN_PANEL_ROLES)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Global moderation queue counts for admin dashboard' })
+  @ApiOkResponse({ description: 'Queue summary', type: AdminReportsQueueSummaryDto })
+  getQueueSummary(): Promise<AdminReportsQueueSummaryDto> {
+    return this.reportsService.getReportsQueueSummary();
+  }
+
   @Get('duplicates')
   @Throttle({ default: { limit: 60, ttl: 60_000 } })
   @UseGuards(JwtAuthGuard, RolesGuard, ReportsUserThrottlerGuard)
@@ -210,6 +233,55 @@ export class ReportsController {
     return this.reportsService.findDuplicateGroupByReport(id);
   }
 
+  @Get(':id/viewers')
+  @Throttle({ default: { limit: 60, ttl: 60_000 } })
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard, ReportsUserThrottlerGuard)
+  @Roles(...ADMIN_PANEL_ROLES)
+  @RequirePermission(ADMIN_PERMISSIONS['reports:read'])
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'List admins currently viewing a report' })
+  @ApiOkResponse({ description: 'Active report viewers', type: ReportViewerPresenceResponseDto })
+  async listReportViewers(
+    @Param('id', ParseCuidPipe) id: string,
+  ): Promise<ReportViewerPresenceResponseDto> {
+    const viewers = await this.reportViewerPresenceService.list(id);
+    return { viewers };
+  }
+
+  @Post(':id/viewers/heartbeat')
+  @Throttle({ default: { limit: 30, ttl: 60_000 } })
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard, ReportsUserThrottlerGuard)
+  @Roles(...ADMIN_PANEL_ROLES)
+  @RequirePermission(ADMIN_PERMISSIONS['reports:read'])
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Register or refresh admin presence while viewing a report' })
+  @ApiOkResponse({ description: 'Active report viewers after heartbeat', type: ReportViewerPresenceResponseDto })
+  async heartbeatReportViewer(
+    @Param('id', ParseCuidPipe) id: string,
+    @Body() dto: ReportViewerHeartbeatDto,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<ReportViewerPresenceResponseDto> {
+    const viewers = await this.reportViewerPresenceService.heartbeat(id, user, dto);
+    return { viewers };
+  }
+
+  @Delete(':id/viewers/:sessionId')
+  @Throttle({ default: { limit: 30, ttl: 60_000 } })
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard, ReportsUserThrottlerGuard)
+  @Roles(...ADMIN_PANEL_ROLES)
+  @RequirePermission(ADMIN_PERMISSIONS['reports:read'])
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Remove admin presence when leaving a report view' })
+  @ApiOkResponse({ description: 'Active report viewers after leave', type: ReportViewerPresenceResponseDto })
+  async leaveReportViewer(
+    @Param('id', ParseCuidPipe) id: string,
+    @Param('sessionId') sessionId: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<ReportViewerPresenceResponseDto> {
+    const viewers = await this.reportViewerPresenceService.leave(id, sessionId, user.userId);
+    return { viewers };
+  }
+
   // SECURITY: Authorization (moderator vs owner vs co-reporter) is enforced in ReportsService.findOne — never trust the client alone.
   @Get(':id')
   @UseGuards(JwtAuthGuard, ReportsUserThrottlerGuard)
@@ -236,8 +308,9 @@ export class ReportsController {
   // safe-to-retry: repeated Patch is acceptable
   @Patch(':id/status')
   @Throttle({ default: { limit: 60, ttl: 60_000 } })
-  @UseGuards(JwtAuthGuard, RolesGuard, ReportsUserThrottlerGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard, ReportsUserThrottlerGuard)
   @Roles(...ADMIN_PANEL_ROLES)
+  @RequirePermission(ADMIN_PERMISSIONS['reports:moderate'])
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update report moderation status' })
   @ApiOkResponse({ description: 'Report status updated successfully' })
@@ -249,11 +322,28 @@ export class ReportsController {
     return this.reportsService.updateStatus(id, dto, moderator);
   }
 
+  @Patch(':id/assign')
+  @Throttle({ default: { limit: 60, ttl: 60_000 } })
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard, ReportsUserThrottlerGuard)
+  @Roles(...ADMIN_PANEL_ROLES)
+  @RequirePermission(ADMIN_PERMISSIONS['reports:moderate'])
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Assign or release a report for moderation review' })
+  @ApiOkResponse({ description: 'Report assignment updated', type: AssignReportResponseDto })
+  assignReport(
+    @Param('id', ParseCuidPipe) id: string,
+    @Body() dto: AssignReportDto,
+    @CurrentUser() moderator: AuthenticatedUser,
+  ): Promise<AssignReportResponseDto> {
+    return this.reportsService.assignReport(id, dto, moderator);
+  }
+
   @Idempotent('reports_reports_244')
   @Post(':id/merge')
   @Throttle({ default: { limit: 60, ttl: 60_000 } })
-  @UseGuards(JwtAuthGuard, RolesGuard, ReportsUserThrottlerGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard, ReportsUserThrottlerGuard)
   @Roles(...ADMIN_PANEL_ROLES)
+  @RequirePermission(ADMIN_PERMISSIONS['reports:merge'])
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Approve and merge child duplicate reports into a primary report' })
   @ApiOkResponse({

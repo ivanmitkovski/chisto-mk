@@ -1,6 +1,5 @@
 import type { IconName } from '@/components/ui';
-import { apiFetch } from '@/lib/api';
-import { getAdminAuthTokenFromCookies } from '@/features/auth/lib/admin-auth-server';
+import { serverAuthenticatedFetch } from '@/lib/auth/server-api-with-refresh';
 import type { AdminNotification, NotificationTone } from '../types';
 
 type AdminNotificationApiItem = {
@@ -61,11 +60,9 @@ export async function getAdminNotifications(): Promise<{
   items: AdminNotification[];
   unreadCount: number;
 }> {
-  const token = await getAdminAuthTokenFromCookies();
 
-  const response = await apiFetch<AdminNotificationsListResponse>('/admin/notifications', {
+  const response = await serverAuthenticatedFetch<AdminNotificationsListResponse>('/admin/notifications', {
     method: 'GET',
-    authToken: token,
   });
 
   return {

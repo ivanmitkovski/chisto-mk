@@ -58,6 +58,7 @@ export class ReportsModerationDetailService {
             lastName: true,
           },
         },
+        moderatedById: true,
         coReporters: {
           select: {
             userId: true,
@@ -169,6 +170,16 @@ export class ReportsModerationDetailService {
       ? getReportNumber(report.potentialDuplicateOf)
       : null;
 
+    const assignedModerator =
+      report.moderatedById && (report.status === 'NEW' || report.status === 'IN_REVIEW')
+        ? {
+            id: report.moderatedById,
+            name: report.moderatedBy
+              ? `${report.moderatedBy.firstName} ${report.moderatedBy.lastName}`.trim()
+              : 'Moderator',
+          }
+        : null;
+
     return {
       id: report.id,
       reportNumber,
@@ -185,7 +196,9 @@ export class ReportsModerationDetailService {
       moderation: {
         queueLabel: moderationQueueLabel,
         slaLabel: moderationSlaLabel,
-        assignedTeam: moderationAssignedTeam,
+        assignedTeam: assignedModerator?.name ?? moderationAssignedTeam,
+        assignedModeratorId: assignedModerator?.id ?? null,
+        assignedModeratorName: assignedModerator?.name ?? null,
       },
       mapPin: {
         latitude: report.site.latitude,

@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import { useTranslations } from 'next-intl';
 import { Icon } from '@/components/ui';
 import type { ReportMapPin } from '../types';
 import styles from './location-map-card.module.css';
@@ -19,12 +20,14 @@ export type LocationMapCardProps = {
 };
 
 export function LocationMapCard({ mapPin, locationLabel }: LocationMapCardProps) {
+  const t = useTranslations('reports.locationMap');
+  const tCommon = useTranslations('common');
   const osmUrl = `https://www.openstreetmap.org/?mlat=${mapPin.latitude}&mlon=${mapPin.longitude}#map=15/${mapPin.latitude}/${mapPin.longitude}`;
   const googleUrl = `https://www.google.com/maps?q=${mapPin.latitude},${mapPin.longitude}`;
 
   return (
     <div className={styles.card}>
-      <h3 className={styles.title}>Location map</h3>
+      <h3 className={styles.title}>{t('title')}</h3>
       <p className={styles.subtitle}>{locationLabel}</p>
       <LocationMapInner mapPin={mapPin} locationLabel={locationLabel} />
       <div className={styles.links}>
@@ -34,7 +37,7 @@ export function LocationMapCard({ mapPin, locationLabel }: LocationMapCardProps)
           rel="noreferrer noopener"
           className={styles.link}
         >
-          Open in Google Maps
+          {tCommon('openInGoogleMaps')}
           <Icon name="document-forward" size={14} />
         </a>
         <a
@@ -43,7 +46,7 @@ export function LocationMapCard({ mapPin, locationLabel }: LocationMapCardProps)
           rel="noreferrer noopener"
           className={styles.linkSecondary}
         >
-          Open in OpenStreetMap
+          {t('openInOpenStreetMap')}
           <Icon name="document-forward" size={14} />
         </a>
       </div>

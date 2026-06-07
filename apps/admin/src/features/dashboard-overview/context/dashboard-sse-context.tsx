@@ -7,20 +7,24 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { Snack } from '@/components/ui';
-import type { SnackState } from '@/components/ui';
+import { useToast } from '@/components/ui';
 
 type DashboardSSEContextValue = {
   connected: boolean;
-  setConnected: (v: boolean) => void;
+  disconnected: boolean;
+  setConnected: (value: boolean) => void;
+  setDisconnected: (value: boolean) => void;
+  reconnectNonce: number;
+  requestReconnect: () => void;
+  lastUpdatedAt: number;
+  touchLastUpdated: () => void;
   showRefreshToast: (message: string) => void;
 };
 
 const DashboardSSEContext = createContext<DashboardSSEContextValue | null>(null);
 
 export function useDashboardSSE() {
-  const ctx = useContext(DashboardSSEContext);
-  return ctx;
+  return useContext(DashboardSSEContext);
 }
 
 type DashboardSSEProviderProps = {
@@ -28,29 +32,48 @@ type DashboardSSEProviderProps = {
 };
 
 export function DashboardSSEProvider({ children }: DashboardSSEProviderProps) {
+  const { showToast } = useToast();
   const [connected, setConnected] = useState(false);
-  const [snack, setSnack] = useState<SnackState | null>(null);
+  const [disconnected, setDisconnected] = useState(false);
+  const [reconnectNonce, setReconnectNonce] = useState(0);
+  const [lastUpdatedAt, setLastUpdatedAt] = useState(() => Date.now());
 
-  const showRefreshToast = useCallback((message: string) => {
-    setSnack({
-      tone: 'success',
-      title: 'Live update',
-      message,
-    });
+  const touchLastUpdated = useCallback(() => {
+    setLastUpdatedAt(Date.now());
   }, []);
 
-  const clearSnack = useCallback(() => setSnack(null), []);
+  const requestReconnect = useCallback(() => {
+    setDisconnected(false);
+    setReconnectNonce((value) => value + 1);
+  }, []);
+
+  const showRefreshToast = useCallback(
+    (message: string) => {
+      touchLastUpdated();
+      showToast({
+        tone: 'success',
+        title: 'Live update',
+        message,
+      });
+    },
+    [showToast, touchLastUpdated],
+  );
 
   const value: DashboardSSEContextValue = {
     connected,
+    disconnected,
     setConnected,
+    setDisconnected,
+    reconnectNonce,
+    requestReconnect,
+    lastUpdatedAt,
+    touchLastUpdated,
     showRefreshToast,
   };
 
   return (
     <DashboardSSEContext.Provider value={value}>
       {children}
-      <Snack snack={snack} onClose={clearSnack} durationMs={2500} />
     </DashboardSSEContext.Provider>
   );
 }

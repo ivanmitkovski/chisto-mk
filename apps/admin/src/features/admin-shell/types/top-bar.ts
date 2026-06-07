@@ -1,4 +1,5 @@
 import { IconName } from '@/components/ui';
+import type { AdminPermission } from '@/lib/auth/rbac/permissions';
 
 export type TopBarCommandAction =
   | {
@@ -12,13 +13,22 @@ export type TopBarCommandAction =
       type: 'sign-out';
     };
 
-export type TopBarCommand = {
+export type TopBarCommandDefinition = {
   id: string;
-  label: string;
-  description?: string | undefined;
+  labelKey: string;
+  descriptionKey?: string;
+  /** Defaults to `nav`. Use `common` for global command palette entries. */
+  messageNamespace?: 'nav' | 'common';
   icon: IconName;
   keywords: readonly string[];
+  /** When set, command is hidden unless the user has this permission. */
+  permission?: AdminPermission;
   action: TopBarCommandAction;
+};
+
+export type TopBarCommand = TopBarCommandDefinition & {
+  label: string;
+  description?: string;
 };
 
 export type TopBarNotification = {
@@ -34,7 +44,7 @@ export type TopBarNotification = {
 
 export type ProfileMenuAction = {
   id: string;
-  label: string;
+  labelKey: 'profileSettings' | 'preferences' | 'signOut';
   icon: IconName;
   action: 'go-to-settings' | 'open-preferences' | 'sign-out';
 };

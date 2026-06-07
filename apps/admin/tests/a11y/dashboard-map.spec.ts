@@ -1,8 +1,8 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, test } from '@playwright/test';
+import { authenticatedTest as test, expect } from '../fixtures/authenticated.fixture';
 
 test.describe('Admin map accessibility', () => {
-  test('dashboard map route has no serious or critical axe violations', async ({ page }) => {
+  test('dashboard map route has no serious or critical axe violations', async ({ authenticatedPage: page }) => {
     await page.goto('/dashboard/map');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(700);

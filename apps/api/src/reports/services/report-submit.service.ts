@@ -77,11 +77,19 @@ export class ReportSubmitService {
         reportId: result.reportId,
         siteId: result.siteId,
         isNewSite: result.isNewSite,
+        reportNumber: result.reportNumber,
         notificationId: result.notificationId,
         notificationTitle: result.notificationTitle,
         siteUpdatedAt: result.siteUpdatedAt,
         latitude: dto.latitude,
         longitude: dto.longitude,
+        reportTitle: dto.title.trim(),
+        category: dto.category ?? null,
+        severity: dto.severity ?? null,
+        address: dto.address?.trim() || null,
+        descriptionPreview: dto.description?.trim() || null,
+        reporterEmail: user.email,
+        submittedAt: new Date().toISOString(),
       });
 
       const inboxLocale = locale === 'en' ? 'en' : 'mk';

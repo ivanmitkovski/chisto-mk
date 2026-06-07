@@ -1,24 +1,29 @@
 'use client';
 
 import { ReactNode, useEffect, useRef } from 'react';
-import { useFocusTrap } from '@/lib/use-focus-trap';
+import { createPortal } from 'react-dom';
+import { useTranslations } from 'next-intl';
+import { useFocusTrap } from '@/lib/utils';
+import { useOverlayAnimation } from '@/lib/utils/use-overlay-animation';
 import styles from './modal.module.css';
 
 type ModalProps = {
   open: boolean;
   title: string;
   description?: string;
-  children: ReactNode;
+  children?: ReactNode;
   footer?: ReactNode;
   onClose: () => void;
 };
 
 export function Modal({ open, title, description, children, footer, onClose }: ModalProps) {
+  const t = useTranslations('common');
   const dialogRef = useRef<HTMLDivElement | null>(null);
-  useFocusTrap(open, dialogRef);
+  const { mounted, phase, finishExit } = useOverlayAnimation(open);
+  useFocusTrap(mounted && phase !== 'exit', dialogRef);
 
   useEffect(() => {
-    if (!open) return undefined;
+    if (!mounted || phase === 'exit') return undefined;
     const previous = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     const onKeyDown = (event: KeyboardEvent) => {
@@ -30,13 +35,22 @@ export function Modal({ open, title, description, children, footer, onClose }: M
       document.body.style.overflow = previous;
       document.removeEventListener('keydown', onKeyDown);
     };
-  }, [onClose, open]);
+  }, [mounted, onClose, phase]);
 
-  if (!open) return null;
+  const handlePanelAnimationEnd = (event: React.AnimationEvent<HTMLDivElement>) => {
+    if (phase !== 'exit' || event.target !== dialogRef.current) return;
+    finishExit();
+  };
 
-  return (
-    <div className={styles.root}>
-      <button type="button" className={styles.scrim} aria-label="Close dialog" onClick={onClose} />
+  if (!mounted) return null;
+
+  if (typeof document === 'undefined' || !document.body) {
+    return null;
+  }
+
+  return createPortal(
+    <div className={styles.root} data-state={phase}>
+      <button type="button" className={styles.scrim} aria-label={t('closeDialog')} onClick={onClose} />
       <div
         ref={dialogRef}
         className={styles.dialog}
@@ -45,6 +59,7 @@ export function Modal({ open, title, description, children, footer, onClose }: M
         aria-labelledby="admin-modal-title"
         aria-describedby={description ? 'admin-modal-description' : undefined}
         tabIndex={-1}
+        onAnimationEnd={handlePanelAnimationEnd}
       >
         <header className={styles.header}>
           <div>
@@ -57,13 +72,14 @@ export function Modal({ open, title, description, children, footer, onClose }: M
               </p>
             ) : null}
           </div>
-          <button type="button" className={styles.close} aria-label="Close dialog" onClick={onClose}>
+          <button type="button" className={styles.close} aria-label={t('closeDialog')} onClick={onClose}>
             ×
           </button>
         </header>
-        <div className={styles.body}>{children}</div>
+        {children != null ? <div className={styles.body}>{children}</div> : null}
         {footer ? <footer className={styles.footer}>{footer}</footer> : null}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

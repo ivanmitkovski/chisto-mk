@@ -51,3 +51,24 @@
   background: var(--color-warning);
   opacity: 0.8;
 }
+
+.pillDisconnected {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.5rem;
+  font-size: var(--overview-label-size);
+  font-weight: var(--overview-label-weight);
+  color: var(--color-status-danger-fg);
+  background: rgba(220, 38, 38, 0.08);
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.dotDisconnected {
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 50%;
+  background: var(--color-status-danger-fg);
+}
