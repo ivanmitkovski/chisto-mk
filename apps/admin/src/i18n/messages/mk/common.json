@@ -92,6 +92,7 @@
   "pagination": "Страници",
   "previousPage": "Претходна страница",
   "nextPage": "Следна страница",
+  "pageOf": "Страница {page} од {total}",
   "bulkActions": "Масовни акции",
   "filtersAndActions": "Филтри и акции",
   "filterAndSearch": "Филтрирај и пребарај",
