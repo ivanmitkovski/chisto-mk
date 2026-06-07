@@ -37,7 +37,7 @@
   color: var(--color-green-900);
 }
 
-@media (min-width: 49rem) {
+@media (min-width: 48rem) {
   .badge {
     display: none;
   }

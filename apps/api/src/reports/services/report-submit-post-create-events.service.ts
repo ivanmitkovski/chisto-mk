@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { SiteStatus } from '../../prisma-client';
+import { AdminModerationCategory, SiteStatus } from '../../prisma-client';
+import { AdminModerationNotifierService } from '../../admin-moderation-email/services/admin-moderation-notifier.service';
 import { NotificationEventsService } from '../../admin-realtime/services/notification-events.service';
 import { ReportEventsService } from '../../admin-realtime/services/report-events.service';
 import { SiteEventsService } from '../../admin-realtime/services/site-events.service';
@@ -10,11 +11,19 @@ export type ReportSubmitPostCreateEventsInput = {
   reportId: string;
   siteId: string;
   isNewSite: boolean;
+  reportNumber: string;
   notificationId: string;
   notificationTitle: string;
   siteUpdatedAt?: Date | null;
   latitude: number;
   longitude: number;
+  reportTitle: string;
+  category?: string | null;
+  severity?: number | null;
+  address?: string | null;
+  descriptionPreview?: string | null;
+  reporterEmail: string;
+  submittedAt: string;
 };
 
 /**
@@ -30,6 +39,7 @@ export class ReportSubmitPostCreateEventsService {
     private readonly reportsOwnerEventsService: ReportsOwnerEventsService,
     private readonly notificationEventsService: NotificationEventsService,
     private readonly siteEventsService: SiteEventsService,
+    private readonly moderationEmailNotifier: AdminModerationNotifierService,
   ) {}
 
   emit(input: ReportSubmitPostCreateEventsInput): void {
@@ -38,6 +48,7 @@ export class ReportSubmitPostCreateEventsService {
       reportId,
       siteId,
       isNewSite,
+      reportNumber,
       notificationId,
       notificationTitle,
       siteUpdatedAt,
@@ -60,6 +71,25 @@ export class ReportSubmitPostCreateEventsService {
     } else {
       this.siteEventsService.emitSiteUpdated(siteId, { kind: 'updated' });
     }
+    this.moderationEmailNotifier.notify({
+      category: AdminModerationCategory.NEW_REPORT,
+      resourceId: reportId,
+      deepLinkPath: `/dashboard/reports?reportId=${reportId}`,
+      emailContext: {
+        reportNumber,
+        isNewSite,
+        reportTitle: input.reportTitle,
+        category: input.category ?? null,
+        severity: input.severity ?? null,
+        address: input.address ?? null,
+        latitude: input.latitude,
+        longitude: input.longitude,
+        descriptionPreview: input.descriptionPreview ?? null,
+        reporterEmail: input.reporterEmail,
+        submittedAt: input.submittedAt,
+      },
+    });
+
     this.logger.log(`report.submit ok reportId=${reportId} siteId=${siteId} isNewSite=${isNewSite}`);
   }
 }

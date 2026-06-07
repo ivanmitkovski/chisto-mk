@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { formatNotificationRelativeTimeFromIso } from '@/lib/format-notification-relative-time';
+import { formatNotificationRelativeTimeFromIso } from '@/lib/utils';
 
 type NotificationRelativeTimeProps = {
   createdAt?: string;

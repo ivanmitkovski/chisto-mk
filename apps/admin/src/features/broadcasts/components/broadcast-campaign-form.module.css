@@ -1,0 +1,67 @@
+.card {
+  margin-bottom: var(--space-2);
+}
+
+.heading {
+  margin: 0 0 var(--space-4);
+  font-size: var(--font-size-lg);
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.bodyField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.bodyLabel {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+}
+
+.bodyTextarea {
+  width: 100%;
+  min-height: 7rem;
+  padding: var(--space-3);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-app);
+  color: var(--text-primary);
+  font: inherit;
+  resize: vertical;
+}
+
+.audienceRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.audienceRow label {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.audienceSelect {
+  width: 100%;
+  max-width: 28rem;
+  padding-block: var(--space-2);
+  padding-inline: var(--space-3) var(--native-select-chevron-padding-end);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background-color: var(--surface-default);
+  line-height: 1.5;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}

@@ -1,7 +1,8 @@
 'use client';
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState } from 'react';
+import { handleQueryUnauthorized } from '@/lib/auth/client-auth-recovery';
 
 /** Semi-static admin lists: longer stale window; disable focus refetch by default to avoid dashboard churn (override per query if needed). */
 const defaultOptions = {
@@ -16,7 +17,17 @@ const defaultOptions = {
 };
 
 export function QueryProvider({ children }: { children: React.ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient(defaultOptions));
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        ...defaultOptions,
+        queryCache: new QueryCache({
+          onError: (error) => {
+            void handleQueryUnauthorized(error);
+          },
+        }),
+      }),
+  );
   return (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );

@@ -1,6 +1,7 @@
 'use client';
 
 import type { KeyboardEvent as ReactKeyboardEvent, MutableRefObject } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { Button, Icon } from '@/components/ui';
 import type { ReportDetail } from '../../types';
@@ -34,6 +35,7 @@ export function ReportReviewModerationActionRail({
   onActionRailKeyDown,
   onSelectAction,
 }: ReportReviewModerationActionRailProps) {
+  const t = useTranslations('reports.moderationActions');
   const statusPillClass = reportStatusPillClass(currentReport.status, pillStyles);
 
   return (
@@ -42,27 +44,23 @@ export function ReportReviewModerationActionRail({
       {...(!allActionsDisabled && { whileHover: { y: -2 } })}
       transition={{ duration: 0.15 }}
     >
-      <h3 className={styles.railTitle}>Moderation actions</h3>
+      <h3 className={styles.railTitle}>{t('title')}</h3>
       {allActionsDisabled ? (
         <div className={styles.resolvedState} role="status">
           <span className={statusPillClass}>
             <Icon name={statusIconName(currentReport.status)} size={14} />
-            {currentReport.status === 'APPROVED' ? 'Report approved' : 'Report rejected'}
+            {currentReport.status === 'APPROVED' ? t('reportApproved') : t('reportRejected')}
           </span>
-          <p className={styles.railText}>
-            No further actions available. The lifecycle for this report is complete.
-          </p>
+          <p className={styles.railText}>{t('lifecycleComplete')}</p>
         </div>
       ) : (
         <>
-          <p className={styles.railText}>
-            Apply an explicit decision and keep the lifecycle clean. Every action writes a timeline entry.
-          </p>
-          <p className={styles.shortcutHint}>Tip: use Arrow keys to move between actions.</p>
+          <p className={styles.railText}>{t('hint')}</p>
+          <p className={styles.shortcutHint}>{t('shortcutHint')}</p>
           <div
             className={styles.actions}
             role="toolbar"
-            aria-label="Moderation actions"
+            aria-label={t('toolbarAria')}
             aria-disabled={allActionsDisabled}
             onKeyDown={onActionRailKeyDown}
           >
@@ -74,41 +72,41 @@ export function ReportReviewModerationActionRail({
               aria-label={
                 isSetInReviewDisabled
                   ? currentReport.status === 'IN_REVIEW'
-                    ? 'Set in review (already in review)'
-                    : 'Set in review (no further actions)'
-                  : 'Set in review'
+                    ? t('aria.setInReviewAlready')
+                    : t('aria.setInReviewDisabled')
+                  : t('aria.setInReview')
               }
               ref={(element) => {
                 actionButtonsRef.current[0] = element;
               }}
             >
               <Icon name="document-text" size={14} />
-              Set in review
+              {t('setInReview')}
             </Button>
             <Button
               onClick={() => onSelectAction('approve')}
               isLoading={isUpdating}
               disabled={isApproveDisabled}
-              aria-label={isApproveDisabled ? 'Approve report (no further actions)' : 'Approve report'}
+              aria-label={isApproveDisabled ? t('aria.approveDisabled') : t('aria.approve')}
               ref={(element) => {
                 actionButtonsRef.current[1] = element;
               }}
             >
               <Icon name="check" size={14} />
-              Approve report
+              {t('approveReport')}
             </Button>
             <Button
               variant="outline"
               onClick={() => onSelectAction('reject')}
               isLoading={isUpdating}
               disabled={isRejectDisabled}
-              aria-label={isRejectDisabled ? 'Reject report (no further actions)' : 'Reject report'}
+              aria-label={isRejectDisabled ? t('aria.rejectDisabled') : t('aria.reject')}
               ref={(element) => {
                 actionButtonsRef.current[2] = element;
               }}
             >
               <Icon name="trash" size={14} />
-              Reject report
+              {t('rejectReport')}
             </Button>
           </div>
         </>

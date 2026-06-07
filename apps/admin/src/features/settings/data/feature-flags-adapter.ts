@@ -1,5 +1,4 @@
-import { apiFetch } from '@/lib/api';
-import { getAdminAuthTokenFromCookies } from '@/features/auth/lib/admin-auth-server';
+import { serverAuthenticatedFetch } from '@/lib/auth/server-api-with-refresh';
 
 export type FeatureFlagRow = {
   key: string;
@@ -9,9 +8,7 @@ export type FeatureFlagRow = {
 };
 
 export async function getFeatureFlags(): Promise<FeatureFlagRow[]> {
-  const token = await getAdminAuthTokenFromCookies();
-  return apiFetch<FeatureFlagRow[]>('/admin/feature-flags', {
+  return serverAuthenticatedFetch<FeatureFlagRow[]>('/admin/feature-flags', {
     method: 'GET',
-    authToken: token,
   });
 }

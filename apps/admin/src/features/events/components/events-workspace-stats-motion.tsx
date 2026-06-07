@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Icon } from '@/components/ui';
 import type { EventsStats } from '@/features/events/data/events-adapter';
@@ -12,6 +13,7 @@ export function EventsWorkspaceStatsMotion(props: {
   moderationQueueHref: string;
 }) {
   const { stats, totalParticipants, moderationQueueHref } = props;
+  const t = useTranslations('events');
   const reduceMotion = useReducedMotion();
   const transition = (delay = 0) =>
     reduceMotion ? { duration: 0 } : { duration: 0.2, delay };
@@ -28,7 +30,7 @@ export function EventsWorkspaceStatsMotion(props: {
           <Icon name="calendar" size={18} aria-hidden />
         </span>
         <span className={styles.statValue}>{stats.total}</span>
-        <span className={styles.statLabel}>Overview total</span>
+        <span className={styles.statLabel}>{t('stats.overviewTotal')}</span>
       </motion.div>
       <motion.div
         className={styles.statCard}
@@ -40,7 +42,7 @@ export function EventsWorkspaceStatsMotion(props: {
           <Icon name="document-forward" size={18} aria-hidden />
         </span>
         <span className={styles.statValue}>{stats.upcoming}</span>
-        <span className={styles.statLabel}>Upcoming</span>
+        <span className={styles.statLabel}>{t('stats.upcoming')}</span>
       </motion.div>
       <motion.div
         className={styles.statCard}
@@ -52,10 +54,10 @@ export function EventsWorkspaceStatsMotion(props: {
           <Icon name="document-text" size={18} aria-hidden />
         </span>
         <span className={styles.statValue}>{stats.pending}</span>
-        <span className={styles.statLabel}>Pending</span>
+        <span className={styles.statLabel}>{t('stats.pending')}</span>
         {stats.pending > 0 ? (
           <Link className={styles.queueLink} href={moderationQueueHref}>
-            Open moderation queue
+            {t('stats.openModerationQueue')}
           </Link>
         ) : null}
       </motion.div>
@@ -69,7 +71,7 @@ export function EventsWorkspaceStatsMotion(props: {
           <Icon name="check" size={18} aria-hidden />
         </span>
         <span className={styles.statValue}>{stats.completed}</span>
-        <span className={styles.statLabel}>Completed</span>
+        <span className={styles.statLabel}>{t('stats.completed')}</span>
       </motion.div>
       <motion.div
         className={styles.statCard}
@@ -81,7 +83,7 @@ export function EventsWorkspaceStatsMotion(props: {
           <Icon name="users" size={18} aria-hidden />
         </span>
         <span className={styles.statValue}>{totalParticipants}</span>
-        <span className={styles.statLabel}>Participants (this page)</span>
+        <span className={styles.statLabel}>{t('stats.totalParticipants')}</span>
       </motion.div>
     </div>
   );

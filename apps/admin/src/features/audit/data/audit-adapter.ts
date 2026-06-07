@@ -1,5 +1,4 @@
-import { apiFetch } from '@/lib/api';
-import { getAdminAuthTokenFromCookies } from '@/features/auth/lib/admin-auth-server';
+import { serverAuthenticatedFetch } from '@/lib/auth/server-api-with-refresh';
 
 export type AuditRow = {
   id: string;
@@ -28,7 +27,6 @@ export async function getAuditLog(
     to?: string;
   },
 ): Promise<ListResponse> {
-  const token = await getAdminAuthTokenFromCookies();
   const search = new URLSearchParams({ page: String(page), limit: String(limit) });
   if (params?.action) search.set('action', params.action);
   if (params?.resourceType) search.set('resourceType', params.resourceType);
@@ -36,8 +34,7 @@ export async function getAuditLog(
   if (params?.actorId) search.set('actorId', params.actorId);
   if (params?.from) search.set('from', params.from);
   if (params?.to) search.set('to', params.to);
-  return apiFetch<ListResponse>(`/admin/audit?${search.toString()}`, {
+  return serverAuthenticatedFetch<ListResponse>(`/admin/audit?${search.toString()}`, {
     method: 'GET',
-    authToken: token,
   });
 }

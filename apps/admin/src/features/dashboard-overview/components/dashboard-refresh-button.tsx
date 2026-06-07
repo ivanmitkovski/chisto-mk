@@ -1,25 +1,30 @@
 'use client';
 
-import { useCallback, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useCallback, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button, Icon } from '@/components/ui';
+import { useWorkspaceRefresh } from '@/features/admin-shell/hooks/use-workspace-refresh';
+import { useDashboardSSE } from '../context/dashboard-sse-context';
 import styles from './dashboard-refresh-button.module.css';
 
 const DEBOUNCE_MS = 800;
 
 type DashboardRefreshButtonProps = {
-  label?: 'Refresh' | 'Retry' | 'Try again';
+  label?: string;
   variant?: 'icon' | 'ghost';
   className?: string;
 };
 
 export function DashboardRefreshButton({
-  label = 'Refresh',
+  label,
   variant = 'icon',
   className,
 }: DashboardRefreshButtonProps) {
-  const router = useRouter();
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const tCommon = useTranslations('common');
+  const tBoundary = useTranslations('dashboard.errorBoundary');
+  const resolvedLabel = label ?? tCommon('refresh');
+  const { refresh, isRefreshing } = useWorkspaceRefresh();
+  const sseCtx = useDashboardSSE();
   const lastClickRef = useRef(0);
 
   const handleClick = useCallback(() => {
@@ -28,19 +33,19 @@ export function DashboardRefreshButton({
       return;
     }
     lastClickRef.current = now;
-    setIsRefreshing(true);
-    router.refresh();
-    window.setTimeout(() => setIsRefreshing(false), DEBOUNCE_MS);
-  }, [router]);
+    sseCtx?.touchLastUpdated();
+    refresh();
+  }, [refresh, sseCtx]);
 
   if (variant === 'icon') {
     return (
       <Button
         variant="icon"
-        aria-label={label}
+        aria-label={resolvedLabel}
         className={className}
         onClick={handleClick}
         disabled={isRefreshing}
+        aria-busy={isRefreshing}
       >
         <Icon
           name="refresh"
@@ -58,8 +63,9 @@ export function DashboardRefreshButton({
       className={className}
       onClick={handleClick}
       disabled={isRefreshing}
+      aria-busy={isRefreshing}
     >
-      {isRefreshing ? 'Refreshing…' : label}
+      {isRefreshing ? tCommon('refreshing') : (label ?? tBoundary('retry'))}
     </Button>
   );
 }

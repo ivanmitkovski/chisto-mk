@@ -9,6 +9,10 @@ describe('CleanupEventsController', () => {
   const findOne = jest.fn();
   const getAnalytics = jest.fn();
   const listParticipants = jest.fn();
+  const removeParticipant = jest.fn();
+  const listNotes = jest.fn();
+  const createNote = jest.fn();
+  const deleteNote = jest.fn();
   const listAuditTrail = jest.fn();
   const create = jest.fn();
   const patch = jest.fn();
@@ -20,6 +24,10 @@ describe('CleanupEventsController', () => {
     findOne.mockReset();
     getAnalytics.mockReset();
     listParticipants.mockReset();
+    removeParticipant.mockReset();
+    listNotes.mockReset();
+    createNote.mockReset();
+    deleteNote.mockReset();
     listAuditTrail.mockReset();
     create.mockReset();
     patch.mockReset();
@@ -31,6 +39,10 @@ describe('CleanupEventsController', () => {
       findOne,
       getAnalytics,
       listParticipants,
+      removeParticipant,
+      listNotes,
+      createNote,
+      deleteNote,
       listAuditTrail,
       create,
       patch,
@@ -56,6 +68,19 @@ describe('CleanupEventsController', () => {
     listAuditTrail.mockReturnValue('audit');
     expect(controller.listAudit('evt-1', { page: 2, limit: 25 } as never)).toBe('audit');
     expect(listAuditTrail).toHaveBeenCalledWith('evt-1', { page: 2, limit: 25 });
+  });
+
+  it('removeParticipant delegates to service', () => {
+    removeParticipant.mockReturnValue('removed');
+    const actor = { userId: 'admin-1' } as never;
+    expect(controller.removeParticipant('evt-1', 'user-1', actor)).toBe('removed');
+    expect(removeParticipant).toHaveBeenCalledWith('evt-1', 'user-1', actor);
+  });
+
+  it('listNotes delegates to service', () => {
+    listNotes.mockReturnValue('notes');
+    expect(controller.listNotes('evt-1')).toBe('notes');
+    expect(listNotes).toHaveBeenCalledWith('evt-1');
   });
 
   it('bulkModerate passes dto and actor', () => {

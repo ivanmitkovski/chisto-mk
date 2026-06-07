@@ -1,0 +1,22 @@
+.root {
+  margin: 0;
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  color: rgba(8, 54, 39, 0.8);
+}
+
+.compact {
+  display: block;
+  max-width: 14rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-secondary);
+}
+
+.block {
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 12rem;
+  overflow-y: auto;
+}

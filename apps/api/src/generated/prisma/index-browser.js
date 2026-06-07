@@ -239,6 +239,54 @@ exports.Prisma.AdminTempTokenScalarFieldEnum = {
   expiresAt: 'expiresAt'
 };
 
+exports.Prisma.AdminInviteScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  email: 'email',
+  firstName: 'firstName',
+  lastName: 'lastName',
+  role: 'role',
+  tokenHash: 'tokenHash',
+  mfaSecret: 'mfaSecret',
+  status: 'status',
+  invitedById: 'invitedById',
+  acceptedUserId: 'acceptedUserId',
+  expiresAt: 'expiresAt',
+  acceptedAt: 'acceptedAt',
+  revokedAt: 'revokedAt',
+  attemptCount: 'attemptCount'
+};
+
+exports.Prisma.AdminEmailPreferenceScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId',
+  category: 'category',
+  enabled: 'enabled'
+};
+
+exports.Prisma.AdminEmailOutboxScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  recipientUserId: 'recipientUserId',
+  recipientEmail: 'recipientEmail',
+  category: 'category',
+  templateId: 'templateId',
+  payload: 'payload',
+  status: 'status',
+  attempts: 'attempts',
+  maxAttempts: 'maxAttempts',
+  nextAttemptAt: 'nextAttemptAt',
+  processingAt: 'processingAt',
+  leaseOwner: 'leaseOwner',
+  lastAttemptAt: 'lastAttemptAt',
+  lastError: 'lastError',
+  idempotencyKey: 'idempotencyKey'
+};
+
 exports.Prisma.AdminPendingMfaScalarFieldEnum = {
   id: 'id',
   createdAt: 'createdAt',
@@ -368,6 +416,23 @@ exports.Prisma.SystemConfigScalarFieldEnum = {
   value: 'value'
 };
 
+exports.Prisma.BroadcastCampaignScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  title: 'title',
+  body: 'body',
+  type: 'type',
+  deeplink: 'deeplink',
+  audience: 'audience',
+  audienceUserIds: 'audienceUserIds',
+  status: 'status',
+  scheduledAt: 'scheduledAt',
+  sentAt: 'sentAt',
+  sentCount: 'sentCount',
+  createdById: 'createdById'
+};
+
 exports.Prisma.FeatureFlagScalarFieldEnum = {
   id: 'id',
   createdAt: 'createdAt',
@@ -410,6 +475,9 @@ exports.Prisma.CleanupEventScalarFieldEnum = {
   endSoonNotifiedForEndAt: 'endSoonNotifiedForEndAt',
   completedAt: 'completedAt',
   status: 'status',
+  moderatedById: 'moderatedById',
+  moderatedAt: 'moderatedAt',
+  declineReason: 'declineReason',
   lifecycleStatus: 'lifecycleStatus',
   organizerId: 'organizerId',
   participantCount: 'participantCount',
@@ -424,6 +492,16 @@ exports.Prisma.CleanupEventScalarFieldEnum = {
   recurrenceRule: 'recurrenceRule',
   parentEventId: 'parentEventId',
   recurrenceIndex: 'recurrenceIndex'
+};
+
+exports.Prisma.CleanupEventModerationNoteScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  eventId: 'eventId',
+  authorId: 'authorId',
+  authorEmailSnapshot: 'authorEmailSnapshot',
+  body: 'body'
 };
 
 exports.Prisma.EventParticipantScalarFieldEnum = {
@@ -544,7 +622,10 @@ exports.Prisma.CheckInRiskSignalScalarFieldEnum = {
   eventId: 'eventId',
   userId: 'userId',
   signalType: 'signalType',
-  metadata: 'metadata'
+  metadata: 'metadata',
+  resolvedAt: 'resolvedAt',
+  resolvedByUserId: 'resolvedByUserId',
+  resolutionAction: 'resolutionAction'
 };
 
 exports.Prisma.SiteVoteScalarFieldEnum = {
@@ -806,12 +887,12 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
-exports.Prisma.NullableJsonNullValueInput = {
-  DbNull: Prisma.DbNull,
+exports.Prisma.JsonNullValueInput = {
   JsonNull: Prisma.JsonNull
 };
 
-exports.Prisma.JsonNullValueInput = {
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
   JsonNull: Prisma.JsonNull
 };
 
@@ -841,6 +922,26 @@ exports.UserStatus = exports.$Enums.UserStatus = {
   ACTIVE: 'ACTIVE',
   SUSPENDED: 'SUSPENDED',
   DELETED: 'DELETED'
+};
+
+exports.AdminInviteStatus = exports.$Enums.AdminInviteStatus = {
+  PENDING: 'PENDING',
+  ACCEPTED: 'ACCEPTED',
+  REVOKED: 'REVOKED',
+  EXPIRED: 'EXPIRED'
+};
+
+exports.AdminModerationCategory = exports.$Enums.AdminModerationCategory = {
+  NEW_REPORT: 'NEW_REPORT',
+  EVENT_PENDING: 'EVENT_PENDING',
+  UGC_REPORT: 'UGC_REPORT',
+  CHECKIN_RISK: 'CHECKIN_RISK'
+};
+
+exports.AdminEmailOutboxStatus = exports.$Enums.AdminEmailOutboxStatus = {
+  PENDING: 'PENDING',
+  SENT: 'SENT',
+  FAILED: 'FAILED'
 };
 
 exports.AdminNotificationTone = exports.$Enums.AdminNotificationTone = {
@@ -906,6 +1007,20 @@ exports.ReportSideEffectStatus = exports.$Enums.ReportSideEffectStatus = {
   PROCESSING: 'PROCESSING',
   COMPLETED: 'COMPLETED',
   FAILED: 'FAILED'
+};
+
+exports.BroadcastAudience = exports.$Enums.BroadcastAudience = {
+  ALL: 'ALL',
+  ACTIVE: 'ACTIVE',
+  AREA: 'AREA',
+  USERS: 'USERS'
+};
+
+exports.BroadcastCampaignStatus = exports.$Enums.BroadcastCampaignStatus = {
+  DRAFT: 'DRAFT',
+  SCHEDULED: 'SCHEDULED',
+  SENT: 'SENT',
+  CANCELLED: 'CANCELLED'
 };
 
 exports.EcoEventCategory = exports.$Enums.EcoEventCategory = {
@@ -1024,6 +1139,9 @@ exports.Prisma.ModelName = {
   LoginFailure: 'LoginFailure',
   AdminLoginFailure: 'AdminLoginFailure',
   AdminTempToken: 'AdminTempToken',
+  AdminInvite: 'AdminInvite',
+  AdminEmailPreference: 'AdminEmailPreference',
+  AdminEmailOutbox: 'AdminEmailOutbox',
   AdminPendingMfa: 'AdminPendingMfa',
   AdminNotification: 'AdminNotification',
   PointTransaction: 'PointTransaction',
@@ -1034,10 +1152,12 @@ exports.Prisma.ModelName = {
   ReportSubmitIdempotency: 'ReportSubmitIdempotency',
   ReportSideEffect: 'ReportSideEffect',
   SystemConfig: 'SystemConfig',
+  BroadcastCampaign: 'BroadcastCampaign',
   FeatureFlag: 'FeatureFlag',
   EmailSuppression: 'EmailSuppression',
   AuditLog: 'AuditLog',
   CleanupEvent: 'CleanupEvent',
+  CleanupEventModerationNote: 'CleanupEventModerationNote',
   EventParticipant: 'EventParticipant',
   EventChatMessage: 'EventChatMessage',
   EventChatAttachment: 'EventChatAttachment',

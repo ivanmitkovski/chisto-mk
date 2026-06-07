@@ -1,0 +1,28 @@
+.balance {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  margin: 0 0 var(--space-4);
+}
+
+.form {
+  display: grid;
+  gap: var(--space-3);
+  max-width: 24rem;
+  margin-bottom: var(--space-4);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border-default);
+  text-align: left;
+}
+
+.empty {
+  color: var(--text-secondary);
+}

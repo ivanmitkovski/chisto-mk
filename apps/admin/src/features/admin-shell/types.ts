@@ -8,15 +8,23 @@ export type NavItemKey =
   | 'sites'
   | 'map'
   | 'events'
+  | 'risk-signals'
   | 'moderation'
   | 'operations'
+  | 'broadcasts'
+  | 'gamification'
+  | 'app-config'
   | 'audit'
   | 'notifications'
+  | 'email-suppressions'
+  | 'webhook-logs'
+  | 'team'
   | 'settings';
 
 export type NavItem = {
   key: NavItemKey;
-  label: string;
+  /** Translation key under the `nav` namespace (defaults to `key`). */
+  labelKey?: NavItemKey | string;
   href: string;
   icon: IconName;
 };

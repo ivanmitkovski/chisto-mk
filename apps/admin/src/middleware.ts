@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 import {
   buildAdminContentSecurityPolicy,
   buildAdminReportOnlyContentSecurityPolicy,
-} from '@/lib/content-security-policy';
+} from '@/lib/security/content-security-policy';
 import {
   getAdminAccessToken,
   getAdminRefreshToken,
@@ -11,7 +11,8 @@ import {
   getTokenExpiryMs,
   refreshAdminTokens,
   setAdminAuthCookies,
-} from '@/lib/server/admin-session';
+  clearAdminAuthCookies,
+} from '@/lib/auth/admin-session';
 
 const REFRESH_THRESHOLD_MS = 60 * 1000; // Refresh if token expires in < 1 min
 
@@ -60,7 +61,9 @@ export async function middleware(request: NextRequest) {
           return applyCspHeaders(response, csp, reportOnlyCsp);
         }
       }
-      return applyCspHeaders(NextResponse.redirect(new URL('/login', request.url)), csp, reportOnlyCsp);
+      const response = NextResponse.redirect(new URL('/login', request.url));
+      clearAdminAuthCookies(response, request);
+      return applyCspHeaders(response, csp, reportOnlyCsp);
     }
 
     const expMs = getTokenExpiryMs(token);
@@ -71,6 +74,9 @@ export async function middleware(request: NextRequest) {
         setAdminAuthCookies(response, tokens, request, { deviceId });
         return applyCspHeaders(response, csp, reportOnlyCsp);
       }
+      const response = NextResponse.redirect(new URL('/login', request.url));
+      clearAdminAuthCookies(response, request);
+      return applyCspHeaders(response, csp, reportOnlyCsp);
     }
   }
 

@@ -1,0 +1,43 @@
+.banner {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-warning) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-warning) 35%, transparent);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--text-primary);
+}
+
+.bannerWithMargin {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-warning) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-warning) 35%, transparent);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--text-primary);
+  margin-bottom: var(--space-4);
+}
+
+.banner a {
+  font-weight: 600;
+  color: var(--color-green-700);
+}
+
+.bannerError {
+  background: color-mix(in srgb, var(--color-danger) 10%, transparent);
+  border-color: color-mix(in srgb, var(--color-danger) 35%, transparent);
+}
+
+.overrideRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.overrideRow input {
+  margin-top: 0.15rem;
+}

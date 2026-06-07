@@ -1,15 +1,9 @@
-import { cookies } from 'next/headers';
-import { AdminShell } from '@/features/admin-shell';
-import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell/constants';
-import { SkeletonTable } from '@/components/ui';
+import { AuditWorkspaceSkeleton } from '@/components/ui';
+import { createDashboardLoadingPage } from '@/features/admin-shell/server';
 
 export default async function AuditLoading() {
-  const cookieStore = await cookies();
-  const initialSidebarCollapsed = cookieStore.get(DESKTOP_SIDEBAR_COOKIE_KEY)?.value === '1';
-
-  return (
-    <AdminShell title="Audit log" activeItem="audit" initialSidebarCollapsed={initialSidebarCollapsed}>
-      <SkeletonTable rows={8} cols={4} />
-    </AdminShell>
-  );
+  return createDashboardLoadingPage({
+    activeItem: 'audit',
+    children: <AuditWorkspaceSkeleton />,
+  });
 }

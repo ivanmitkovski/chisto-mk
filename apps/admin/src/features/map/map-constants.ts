@@ -9,3 +9,6 @@ export const INITIAL_ZOOM = 8;
 
 /** Server returns synthetic cluster rows at this zoom and below (see `useSitesMap`). */
 export const SERVER_CLUSTER_MAX_ZOOM = 8;
+
+/** Client request cap for `/sites/map` list queries (matches map-adapter). */
+export const MAP_SITE_FETCH_LIMIT = 200;

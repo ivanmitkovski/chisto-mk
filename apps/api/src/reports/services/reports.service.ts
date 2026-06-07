@@ -7,6 +7,7 @@ import { assertReportVisibleToUser } from '../../common/helpers/assert-ownership
 import { CreateReportWithLocationDto } from '../dto/create-report-with-location.dto';
 import { ReportSubmitResponseDto } from '../dto/report-submit-response.dto';
 import { AdminReportDetailDto, AdminReportListResponseDto } from '../dto/admin-report.dto';
+import { AdminReportsQueueSummaryDto } from '../dto/admin-reports-queue-summary.dto';
 import {
   AdminDuplicateReportGroupDto,
   AdminDuplicateReportGroupsResponseDto,
@@ -17,6 +18,7 @@ import { ListMyReportsQueryDto } from '../dto/list-my-reports-query.dto';
 import { ListReportsQueryDto } from '../dto/list-reports-query.dto';
 import { ReportCapacityDto } from '../dto/report-capacity.dto';
 import { ReportCapacityService } from './report-capacity.service';
+import { AssignReportDto, AssignReportResponseDto } from '../dto/assign-report.dto';
 import { UpdateReportStatusDto } from '../dto/update-report-status.dto';
 import { CitizenReportDetailDto } from '../dto/citizen-report-detail.dto';
 import { UserReportListItemDto } from '../dto/user-report.dto';
@@ -74,6 +76,10 @@ export class ReportsService {
     return this.reportsModeration.findAllForModeration(query);
   }
 
+  getReportsQueueSummary(): Promise<AdminReportsQueueSummaryDto> {
+    return this.reportsModeration.getQueueSummary();
+  }
+
   findDuplicateGroups(query: ListReportsQueryDto): Promise<AdminDuplicateReportGroupsResponseDto> {
     return this.reportsDuplicateMerge.findDuplicateGroups(query);
   }
@@ -96,6 +102,14 @@ export class ReportsService {
     moderator: AuthenticatedUser,
   ): Promise<Report> {
     return this.reportsModeration.updateStatus(reportId, dto, moderator);
+  }
+
+  assignReport(
+    reportId: string,
+    dto: AssignReportDto,
+    moderator: AuthenticatedUser,
+  ): Promise<AssignReportResponseDto> {
+    return this.reportsModeration.assignReport(reportId, dto, moderator);
   }
 
   findOneForModeration(reportId: string): Promise<AdminReportDetailDto> {

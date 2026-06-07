@@ -1,16 +1,28 @@
-import { Suspense } from 'react';
 import { cookies } from 'next/headers';
+import { getTranslations } from 'next-intl/server';
 import { AdminShell } from '@/features/admin-shell';
-import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell/constants';
+import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell';
 import { SectionState } from '@/components/ui';
-import { getUsers, getUsersStats } from '@/features/users/data/users-adapter';
-import { UsersWorkspace } from '@/features/users/components/users-workspace';
+import { getUsers, getUsersStats } from '@/features/users';
+import { UsersWorkspace } from '@/features/users';
+import { ADMIN_PERMISSIONS } from '@/lib/auth/rbac/permissions';
+import { requirePagePermission } from '@/lib/auth/rbac/server';
 
 type UsersPageProps = {
-  searchParams: Promise<{ search?: string; role?: string; status?: string; page?: string }>;
+  searchParams: Promise<{
+    search?: string;
+    role?: string;
+    status?: string;
+    page?: string;
+    sort?: string;
+    dir?: string;
+  }>;
 };
 
 export default async function UsersPage({ searchParams }: UsersPageProps) {
+  await requirePagePermission(ADMIN_PERMISSIONS['users:read']);
+  const tNav = await getTranslations('nav');
+  const tErrors = await getTranslations('errors');
   const cookieStore = await cookies();
   const initialSidebarCollapsed = cookieStore.get(DESKTOP_SIDEBAR_COOKIE_KEY)?.value === '1';
   const params = await searchParams;
@@ -22,6 +34,8 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
     const search = params.search?.trim();
     const role = params.role;
     const status = params.status;
+    const sort = params.sort;
+    const dir = params.dir;
     const page = params.page ? Math.max(1, parseInt(params.page, 10)) : 1;
 
     [result, stats] = await Promise.all([
@@ -31,26 +45,26 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
         ...(search ? { search } : {}),
         ...(role ? { role } : {}),
         ...(status ? { status } : {}),
+        ...(sort ? { sort } : {}),
+        ...(dir ? { dir } : {}),
       }),
       getUsersStats(),
     ]);
   } catch {
     return (
-      <AdminShell title="Users" activeItem="users" initialSidebarCollapsed={initialSidebarCollapsed}>
-        <SectionState variant="error" message="Unable to load users. Please sign in again." />
+      <AdminShell title={tNav('users')} activeItem="users" initialSidebarCollapsed={initialSidebarCollapsed}>
+        <SectionState variant="error" message={tErrors('unableToLoadUsers')} />
       </AdminShell>
     );
   }
 
   return (
-    <AdminShell title="Users" activeItem="users" initialSidebarCollapsed={initialSidebarCollapsed}>
-      <Suspense fallback={<SectionState variant="loading" message="Loading users…" />}>
-        <UsersWorkspace
-          initialData={result.data}
-          initialMeta={result.meta}
-          initialStats={stats}
-        />
-      </Suspense>
+    <AdminShell title={tNav('users')} activeItem="users" initialSidebarCollapsed={initialSidebarCollapsed}>
+      <UsersWorkspace
+        initialData={result.data}
+        initialMeta={result.meta}
+        initialStats={stats}
+      />
     </AdminShell>
   );
 }

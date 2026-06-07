@@ -1,4 +1,5 @@
 import { InputHTMLAttributes, ReactNode, RefObject, useId } from 'react';
+import { Field, fieldDescriptionId } from '../field';
 import styles from './input.module.css';
 
 export type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> & {
@@ -19,12 +20,13 @@ export function Input({
   rightSlot,
   inputRef,
   className,
+  required,
   ...rest
 }: InputProps) {
   const fallbackId = useId();
   const inputId = id ?? fallbackId;
   const hasError = Boolean(errorText);
-  const descriptionId = hasError ? `${inputId}-error` : helperText ? `${inputId}-help` : undefined;
+  const descriptionId = fieldDescriptionId(inputId, errorText, helperText);
 
   const inputClassName = [
     styles.input,
@@ -37,12 +39,13 @@ export function Input({
     .trim();
 
   return (
-    <div className={styles.field}>
-      {label ? (
-        <label className={styles.label} htmlFor={inputId}>
-          {label}
-        </label>
-      ) : null}
+    <Field
+      label={label}
+      htmlFor={inputId}
+      helperText={helperText}
+      errorText={errorText}
+      required={required}
+    >
       <div className={styles.inputWrap}>
         {leftSlot ? <span className={styles.leftSlot}>{leftSlot}</span> : null}
         <input
@@ -50,20 +53,12 @@ export function Input({
           id={inputId}
           ref={inputRef}
           className={inputClassName}
+          required={required}
           aria-invalid={hasError}
           aria-describedby={descriptionId}
         />
         {rightSlot ? <span className={styles.rightSlot}>{rightSlot}</span> : null}
       </div>
-      {hasError ? (
-        <p id={`${inputId}-error`} className={`${styles.message} ${styles.messageError}`}>
-          {errorText}
-        </p>
-      ) : helperText ? (
-        <p id={`${inputId}-help`} className={styles.message}>
-          {helperText}
-        </p>
-      ) : null}
-    </div>
+    </Field>
   );
 }

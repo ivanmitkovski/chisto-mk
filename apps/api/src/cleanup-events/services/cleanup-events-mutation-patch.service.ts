@@ -63,6 +63,9 @@ export class CleanupEventsPatchMutationService {
       participantCount?: number;
       status?: CleanupEventStatus;
       lifecycleStatus?: EcoEventLifecycleStatus;
+      moderatedById?: string | null;
+      moderatedAt?: Date | null;
+      declineReason?: string | null;
     } = {};
     if (dto.title != null) {
       data.title = dto.title.trim() || 'Cleanup event';
@@ -118,6 +121,27 @@ export class CleanupEventsPatchMutationService {
         });
       }
       data.status = dto.status;
+      data.moderatedById = actor.userId;
+      data.moderatedAt = new Date();
+      if (dto.status === CleanupEventStatus.DECLINED) {
+        data.declineReason = dto.declineReason?.trim() ?? null;
+      } else {
+        data.declineReason = null;
+      }
+    } else if (dto.status === CleanupEventStatus.PENDING) {
+      if (
+        existing.status !== CleanupEventStatus.APPROVED &&
+        existing.status !== CleanupEventStatus.DECLINED
+      ) {
+        throw new BadRequestException({
+          code: 'EVENT_NOT_MODERATED',
+          message: 'Only APPROVED or DECLINED events can be returned to pending',
+        });
+      }
+      data.status = CleanupEventStatus.PENDING;
+      data.moderatedById = null;
+      data.moderatedAt = null;
+      data.declineReason = null;
     }
 
     const endAtPatchHasValue =
@@ -125,7 +149,9 @@ export class CleanupEventsPatchMutationService {
       dto.endAt != null &&
       String(dto.endAt).trim() !== '';
     const isModerationStatusOnly =
-      (dto.status === CleanupEventStatus.APPROVED || dto.status === CleanupEventStatus.DECLINED) &&
+      (dto.status === CleanupEventStatus.APPROVED ||
+        dto.status === CleanupEventStatus.DECLINED ||
+        dto.status === CleanupEventStatus.PENDING) &&
       dto.scheduledAt == null &&
       !endAtPatchHasValue;
 
@@ -220,7 +246,9 @@ export class CleanupEventsPatchMutationService {
         ? 'CLEANUP_EVENT_APPROVED'
         : data.status === CleanupEventStatus.DECLINED
           ? 'CLEANUP_EVENT_DECLINED'
-          : 'CLEANUP_EVENT_UPDATED';
+          : data.status === CleanupEventStatus.PENDING
+            ? 'CLEANUP_EVENT_RETURNED_TO_PENDING'
+            : 'CLEANUP_EVENT_UPDATED';
     const auditMetadata = { ...dto } as Record<string, unknown>;
     await this.audit.log({
       actorId: actor.userId,
@@ -239,6 +267,7 @@ export class CleanupEventsPatchMutationService {
     const wasPending = existing.status === CleanupEventStatus.PENDING;
     const approvedNow = data.status === CleanupEventStatus.APPROVED;
     const declinedNow = data.status === CleanupEventStatus.DECLINED;
+    const returnedToPendingNow = data.status === CleanupEventStatus.PENDING;
 
     if (wasPending && approvedNow) {
       ObservabilityStore.recordCleanupEventModerationApproved();
@@ -272,15 +301,30 @@ export class CleanupEventsPatchMutationService {
     }
 
     if (wasPending && declinedNow && existing.organizerId != null) {
+      const trimmedDeclineReason = dto.declineReason?.trim() ?? '';
       void this.cleanupEventNotifications
         .notifyOrganizerDeclined({
           organizerId: existing.organizerId,
           eventId: id,
           title: out.title,
+          ...(trimmedDeclineReason.length > 0 ? { declineReason: trimmedDeclineReason } : {}),
         })
         .catch((err: unknown) => {
           this.logger.warn(
             `notify organizer declined failed for ${id}: ${err instanceof Error ? err.message : String(err)}`,
+          );
+        });
+    }
+
+    if (returnedToPendingNow && existing.organizerId != null) {
+      void this.cleanupEventNotifications
+        .notifyOrganizerReturnedToPending({
+          organizerId: existing.organizerId,
+          eventId: id,
+        })
+        .catch((err: unknown) => {
+          this.logger.warn(
+            `notify organizer returned to pending failed for ${id}: ${err instanceof Error ? err.message : String(err)}`,
           );
         });
     }

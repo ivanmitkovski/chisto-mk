@@ -85,15 +85,6 @@ export class AuthAdminLoginService {
       });
     }
 
-    const nodeEnv = (process.env.NODE_ENV ?? 'development').trim().toLowerCase();
-    const mfaRequiredInDeployed = nodeEnv === 'production' || nodeEnv === 'staging';
-    if (mfaRequiredInDeployed && !user.totpSecret) {
-      throw new UnauthorizedException({
-        code: 'ADMIN_MFA_REQUIRED',
-        message: 'Admin accounts must enroll MFA before signing in',
-      });
-    }
-
     if (user.totpSecret) {
       const tempToken = randomBytes(32).toString('hex');
       const tokenHash = await bcrypt.hash(tempToken, this.env.saltRounds);

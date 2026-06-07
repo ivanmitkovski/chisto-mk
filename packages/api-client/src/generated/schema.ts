@@ -263,7 +263,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Request password reset via SMS (phone) or email link */
+        /** Request password reset via SMS or email code */
         post: operations["AuthPasswordController_requestPasswordReset"];
         delete?: never;
         options?: never;
@@ -305,6 +305,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/password-reset/email/verify-code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Verify password-reset email code before setting a new password */
+        post: operations["AuthPasswordController_verifyEmailPasswordResetCode"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/password-reset/email/confirm": {
         parameters: {
             query?: never;
@@ -314,7 +331,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Confirm password reset using token from email link */
+        /** Confirm password reset with email code and new password */
         post: operations["AuthPasswordController_confirmEmailPasswordReset"];
         delete?: never;
         options?: never;
@@ -751,74 +768,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/sites/map": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List sites for map view with geo bounds and high limit */
-        get: operations["SitesMapController_findAllForMap"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/sites/map/clusters": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get aggregated map clusters for dense marker view */
-        get: operations["SitesMapController_findClustersForMap"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/sites/map/heatmap": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get map heatmap density cells by viewport/zoom */
-        get: operations["SitesMapController_findHeatmapForMap"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/sites/map/tiles/{z}/{x}/{y}.mvt": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Mapbox vector tile (MVT) for sites/clusters overlay */
-        get: operations["SitesMapController_getMapMvtTile"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/sites": {
         parameters: {
             query?: never;
@@ -882,6 +831,23 @@ export interface paths {
         put?: never;
         /** Search sites for map (text + optional geo intent) */
         post: operations["SitesController_searchSitesForMap"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sites/admin/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Admin panel: paginated site list with search */
+        get: operations["SitesController_adminList"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -967,6 +933,281 @@ export interface paths {
         put?: never;
         /** Ingest an app open attribution event for a site share link */
         post: operations["SitesController_ingestShareOpen"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Server-Sent Events stream for real-time dashboard updates */
+        get: operations["AdminRealtimeController_stream"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sites/{id}/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List chronological site history entries */
+        get: operations["SiteHistoryController_listHistory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sites/{id}/history/notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add an admin note to the site timeline */
+        post: operations["SiteHistoryAdminController_postNote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/moderation/ugc-reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List UGC reports for admin moderation */
+        get: operations["ModerationController_listAdminUgcReports"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/moderation/ugc-reports/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get UGC report detail for admin moderation */
+        get: operations["ModerationController_getAdminUgcReport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Moderate a UGC report */
+        patch: operations["ModerationController_patchAdminUgcReport"];
+        trace?: never;
+    };
+    "/moderation/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Report UGC (comment, chat message, user, site, event) */
+        post: operations["ModerationController_submitReport"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/me/blocks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List blocked users */
+        get: operations["ModerationController_listBlocks"];
+        put?: never;
+        /** Block a user */
+        post: operations["ModerationController_blockUser"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/me/blocks/{blockedUserId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Unblock a user */
+        delete: operations["ModerationController_unblock"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/me/moderation-email-preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List moderation email preferences for the current admin */
+        get: operations["AdminModerationEmailPreferencesController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update one moderation email preference for the current admin */
+        patch: operations["AdminModerationEmailPreferencesController_patch"];
+        trace?: never;
+    };
+    "/admin/moderation-email/unsubscribe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Unsubscribe from admin moderation emails for one category (browser) */
+        get: operations["AdminModerationEmailUnsubscribeController_unsubscribeGet"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sites/map": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List sites for map view with geo bounds and high limit */
+        get: operations["SitesMapController_findAllForMap"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sites/map/clusters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get aggregated map clusters for dense marker view */
+        get: operations["SitesMapController_findClustersForMap"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sites/map/heatmap": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get map heatmap density cells by viewport/zoom */
+        get: operations["SitesMapController_findHeatmapForMap"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sites/map/tiles/{z}/{x}/{y}.mvt": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Mapbox vector tile (MVT) for sites/clusters overlay */
+        get: operations["SitesMapController_getMapMvtTile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sites/map/offline/manifest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Offline map region package manifest (flag-gated) */
+        get: operations["SitesMapController_getOfflineMapManifest"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sites/map/offline/regions/{regionId}/download-url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Presigned download URL for an offline map region package */
+        get: operations["SitesMapController_getOfflineMapRegionDownloadUrl"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1199,109 +1440,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/admin/events": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Server-Sent Events stream for real-time dashboard updates */
-        get: operations["AdminRealtimeController_stream"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/moderation/reports": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Report UGC (comment, chat message, user, site, event) */
-        post: operations["ModerationController_submitReport"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/users/me/blocks": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List blocked users */
-        get: operations["ModerationController_listBlocks"];
-        put?: never;
-        /** Block a user */
-        post: operations["ModerationController_blockUser"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/users/me/blocks/{blockedUserId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /** Unblock a user */
-        delete: operations["ModerationController_unblock"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/sites/{id}/history": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List chronological site history entries */
-        get: operations["SiteHistoryController_listHistory"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/sites/{id}/history/notes": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Add an admin note to the site timeline */
-        post: operations["SiteHistoryAdminController_postNote"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/reports": {
         parameters: {
             query?: never;
@@ -1388,6 +1526,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/reports/queue-summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Global moderation queue counts for admin dashboard */
+        get: operations["ReportsController_getQueueSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/reports/duplicates": {
         parameters: {
             query?: never;
@@ -1456,6 +1611,23 @@ export interface paths {
         patch: operations["ReportsController_updateStatus"];
         trace?: never;
     };
+    "/reports/{id}/assign": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Assign or release a report for moderation review */
+        patch: operations["ReportsController_assignReport"];
+        trace?: never;
+    };
     "/reports/{id}/merge": {
         parameters: {
             query?: never;
@@ -1499,6 +1671,23 @@ export interface paths {
         };
         /** Get admin security overview (sessions and recent activity) */
         get: operations["AdminController_getSecurityOverview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/me/permissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List permissions for the current admin session */
+        get: operations["AdminController_getMyPermissions"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1626,6 +1815,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/users/{id}/sessions/{sessionId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Revoke a user session */
+        delete: operations["AdminUsersController_revokeSession"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/admin/users/{id}": {
         parameters: {
             query?: never;
@@ -1659,6 +1865,109 @@ export interface paths {
         head?: never;
         /** Change user role (super admin only) */
         patch: operations["AdminUsersController_patchRole"];
+        trace?: never;
+    };
+    "/admin/invites/validate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Validate admin invite token (public) */
+        get: operations["AdminInviteAcceptController_validate"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/invites/begin-mfa": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Begin TOTP enrollment for invite accept (public) */
+        post: operations["AdminInviteAcceptController_beginMfa"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/invites/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Accept admin invite and create account (public) */
+        post: operations["AdminInviteAcceptController_accept"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/invites": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List admin invites (super admin only) */
+        get: operations["AdminInvitesController_list"];
+        put?: never;
+        /** Create admin invite (super admin only) */
+        post: operations["AdminInvitesController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/invites/{id}/resend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Resend admin invite (super admin only) */
+        post: operations["AdminInvitesController_resend"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/invites/{id}/revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Revoke admin invite (super admin only) */
+        post: operations["AdminInvitesController_revoke"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/admin/config": {
@@ -1755,7 +2064,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List active check-in risk signals (non-expired) */
+        /** List check-in risk signals */
         get: operations["CleanupEventsController_listCheckInRiskSignals"];
         put?: never;
         post?: never;
@@ -1763,6 +2072,23 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/admin/cleanup-events/check-in-risk-signals/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Resolve or dismiss a check-in risk signal */
+        patch: operations["CleanupEventsController_patchCheckInRiskSignal"];
         trace?: never;
     };
     "/admin/cleanup-events/{id}/participants": {
@@ -1777,6 +2103,58 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/cleanup-events/{id}/participants/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove a participant from a cleanup event */
+        delete: operations["CleanupEventsController_removeParticipant"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/cleanup-events/{id}/notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List internal moderation notes for a cleanup event */
+        get: operations["CleanupEventsController_listNotes"];
+        put?: never;
+        /** Add an internal moderation note */
+        post: operations["CleanupEventsController_createNote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/cleanup-events/{id}/notes/{noteId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete an internal moderation note */
+        delete: operations["CleanupEventsController_deleteNote"];
         options?: never;
         head?: never;
         patch?: never;
@@ -2900,6 +3278,279 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/broadcasts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List broadcast campaigns */
+        get: operations["AdminBroadcastsController_list"];
+        put?: never;
+        /** Create broadcast campaign */
+        post: operations["AdminBroadcastsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/broadcasts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get broadcast campaign by id */
+        get: operations["AdminBroadcastsController_getById"];
+        put?: never;
+        post?: never;
+        /** Delete broadcast campaign */
+        delete: operations["AdminBroadcastsController_remove"];
+        options?: never;
+        head?: never;
+        /** Update broadcast campaign */
+        patch: operations["AdminBroadcastsController_update"];
+        trace?: never;
+    };
+    "/admin/broadcasts/{id}/send": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Send broadcast campaign */
+        post: operations["AdminBroadcastsController_send"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/broadcasts/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Cancel broadcast campaign */
+        patch: operations["AdminBroadcastsController_cancel"];
+        trace?: never;
+    };
+    "/admin/gamification/config": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get gamification config */
+        get: operations["AdminGamificationController_getConfig"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update gamification config */
+        patch: operations["AdminGamificationController_updateConfig"];
+        trace?: never;
+    };
+    "/admin/gamification/users/{userId}/points": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List user point ledger */
+        get: operations["AdminGamificationController_listUserPoints"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/gamification/users/{userId}/points/adjust": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Adjust user points */
+        post: operations["AdminGamificationController_adjustPoints"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/gamification/rankings/weekly": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Weekly rankings snapshot (admin view with full user identity) */
+        get: operations["AdminGamificationController_weeklyRankings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/app-config/report-credits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdminAppConfigController_getReportCredits"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["AdminAppConfigController_updateReportCredits"];
+        trace?: never;
+    };
+    "/admin/app-config/feed-ranking": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdminAppConfigController_getFeedRanking"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["AdminAppConfigController_updateFeedRanking"];
+        trace?: never;
+    };
+    "/admin/app-config/organizer-quiz": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdminAppConfigController_getOrganizerQuiz"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["AdminAppConfigController_updateOrganizerQuiz"];
+        trace?: never;
+    };
+    "/admin/app-config/terms-version": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdminAppConfigController_getTermsVersion"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["AdminAppConfigController_updateTermsVersion"];
+        trace?: never;
+    };
+    "/admin/comms/email-suppressions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List email suppressions */
+        get: operations["AdminCommsController_listSuppressions"];
+        put?: never;
+        /** Create or update a manual email suppression */
+        post: operations["AdminCommsController_createSuppression"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/comms/email-suppressions/{email}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove email suppression */
+        delete: operations["AdminCommsController_removeSuppression"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/comms/webhook-logs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List webhook delivery logs */
+        get: operations["AdminCommsController_listWebhookLogs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/operations/report-side-effects/pending-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Count pending report side-effect outbox jobs */
+        get: operations["AdminOperationsController_reportSideEffectPendingCount"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2931,6 +3582,8 @@ export interface components {
             termsVersion: string;
             /** @example 2026-06-01 */
             privacyAcceptedAt?: string;
+            /** @description Stable per-install device identifier. */
+            deviceId?: string;
         };
         RegisterResponseDto: {
             userId: string;
@@ -2943,6 +3596,8 @@ export interface components {
              * @example 600
              */
             otpExpiresIn: number;
+            /** @description Development-only OTP when OTP_DEV_RETURN_CODE is enabled */
+            devCode?: string;
         };
         CitizenLoginDto: {
             /**
@@ -2957,6 +3612,8 @@ export interface components {
              * @default true
              */
             rememberMe: boolean;
+            /** @description Stable per-install device identifier used to keep one active session per device. */
+            deviceId?: string;
         };
         AuthUserDto: {
             id: string;
@@ -2993,16 +3650,22 @@ export interface components {
             email: string;
             /** @example StrongPass123! */
             password: string;
+            /** @description Stable browser/device identifier used to keep one active admin session per device. */
+            deviceId?: string;
         };
         Complete2FALoginDto: {
             /** @description Short-lived temp token from admin login when 2FA is required */
             tempToken: string;
             /** @description 6-digit TOTP code or backup code (alphanumeric) */
             code: string;
+            /** @description Stable browser/device identifier used to keep one active admin session per device. */
+            deviceId?: string;
         };
         RefreshTokenDto: {
             /** @description Refresh token from the previous auth response */
             refreshToken: string;
+            /** @description Stable per-install device identifier for session deduplication. */
+            deviceId?: string;
         };
         SendOtpDto: {
             /**
@@ -3022,6 +3685,8 @@ export interface components {
              * @example 123456
              */
             code: string;
+            /** @description Stable per-install device identifier used to keep one active session per device. */
+            deviceId?: string;
         };
         PasswordResetRequestDto: {
             /** @example +38970123456 */
@@ -3035,14 +3700,22 @@ export interface components {
              * @example +38970123456
              */
             phoneNumber: string;
-            /** @example 1234 */
+            /** @example 123456 */
             code: string;
             /** @example NewStrong123! */
             newPassword: string;
         };
+        PasswordResetEmailVerifyDto: {
+            /** @example user@example.com */
+            email: string;
+            /** @example 123456 */
+            code: string;
+        };
         PasswordResetEmailConfirmDto: {
-            /** @description Opaque token from the password reset email link */
-            token: string;
+            /** @example user@example.com */
+            email: string;
+            /** @example 123456 */
+            code: string;
             newPassword: string;
         };
         ChangePasswordDto: {
@@ -3354,6 +4027,72 @@ export interface components {
              */
             source: "WEB" | "APP" | "OTHER";
         };
+        SiteHistoryActorDto: {
+            id: string;
+            displayName?: Record<string, never>;
+            role?: Record<string, never>;
+        };
+        SiteHistoryEntryDto: {
+            id: string;
+            /** @enum {string} */
+            kind: "SITE_CREATED" | "REPORT_SUBMITTED" | "REPORT_APPROVED" | "REPORT_REJECTED" | "REPORT_MERGED" | "STATUS_CHANGED" | "CLEANUP_EVENT_SCHEDULED" | "CLEANUP_EVENT_STARTED" | "CLEANUP_EVENT_COMPLETED" | "CLEANUP_EVENT_CANCELLED" | "ARCHIVED_BY_ADMIN" | "UNARCHIVED_BY_ADMIN" | "ADMIN_NOTE";
+            occurredAt: string;
+            /** @enum {string} */
+            fromStatus?: "REPORTED" | "VERIFIED" | "CLEANUP_SCHEDULED" | "IN_PROGRESS" | "CLEANED" | "DISPUTED";
+            /** @enum {string} */
+            toStatus?: "REPORTED" | "VERIFIED" | "CLEANUP_SCHEDULED" | "IN_PROGRESS" | "CLEANED" | "DISPUTED";
+            reportId?: Record<string, never>;
+            cleanupEventId?: Record<string, never>;
+            actor?: components["schemas"]["SiteHistoryActorDto"];
+            note?: Record<string, never>;
+            metadata?: Record<string, never>;
+        };
+        SiteHistorySummaryDto: {
+            totalEntries: number;
+            reportCount: number;
+            cleanupCount: number;
+            /** @enum {string} */
+            currentStatus: "REPORTED" | "VERIFIED" | "CLEANUP_SCHEDULED" | "IN_PROGRESS" | "CLEANED" | "DISPUTED";
+            firstActivityAt: string;
+            lastActivityAt: string;
+        };
+        SiteHistoryListResponseDto: {
+            items: components["schemas"]["SiteHistoryEntryDto"][];
+            /** @description Cursor for the next page (entry id) */
+            nextBeforeId?: Record<string, never>;
+            /** @description Present on the first page only; null on paginated follow-up requests. */
+            summary?: components["schemas"]["SiteHistorySummaryDto"];
+        };
+        PostSiteHistoryNoteDto: {
+            /** @description Free-form admin note shown on the site timeline */
+            note: string;
+            /** @description Optional ISO-8601 timestamp for when the note occurred */
+            occurredAt?: string;
+        };
+        PatchAdminUgcReportDto: {
+            /** @enum {string} */
+            action: "mark_reviewed" | "dismiss" | "escalate" | "hide_subject" | "restore_subject";
+            note?: string;
+            /** @description Policy reason for audit trail (required for dismiss/escalate/hide/restore) */
+            policyReason?: string;
+        };
+        PostUgcReportDto: {
+            /** @enum {string} */
+            subjectType: "site_comment" | "event_chat_message" | "user" | "site" | "event" | "safety_issue";
+            subjectId: string;
+            /** @enum {string} */
+            reason: "spam" | "harassment" | "hate" | "violence" | "nudity" | "other";
+            details?: string;
+        };
+        PostUserBlockDto: {
+            /** @description User id to block */
+            blockedUserId: string;
+        };
+        PatchModerationEmailPreferenceDto: {
+            /** @enum {string} */
+            category: "NEW_REPORT" | "EVENT_PENDING" | "UGC_REPORT" | "CHECKIN_RISK";
+            enabled: boolean;
+        };
         SiteDetailReporterDto: {
             firstName: string;
             lastName: string;
@@ -3550,49 +4289,6 @@ export interface components {
             sessionId?: string;
             metadata?: Record<string, never>;
         };
-        PostUgcReportDto: {
-            /** @enum {string} */
-            subjectType: "site_comment" | "event_chat_message" | "user" | "site" | "event" | "safety_issue";
-            subjectId: string;
-            /** @enum {string} */
-            reason: "spam" | "harassment" | "hate" | "violence" | "nudity" | "other";
-            details?: string;
-        };
-        PostUserBlockDto: {
-            /** @description User id to block */
-            blockedUserId: string;
-        };
-        SiteHistoryActorDto: {
-            id: string;
-            displayName?: Record<string, never>;
-            role?: Record<string, never>;
-        };
-        SiteHistoryEntryDto: {
-            id: string;
-            /** @enum {string} */
-            kind: "SITE_CREATED" | "REPORT_SUBMITTED" | "REPORT_APPROVED" | "REPORT_REJECTED" | "REPORT_MERGED" | "STATUS_CHANGED" | "CLEANUP_EVENT_SCHEDULED" | "CLEANUP_EVENT_STARTED" | "CLEANUP_EVENT_COMPLETED" | "CLEANUP_EVENT_CANCELLED" | "ARCHIVED_BY_ADMIN" | "UNARCHIVED_BY_ADMIN" | "ADMIN_NOTE";
-            occurredAt: string;
-            /** @enum {string} */
-            fromStatus?: "REPORTED" | "VERIFIED" | "CLEANUP_SCHEDULED" | "IN_PROGRESS" | "CLEANED" | "DISPUTED";
-            /** @enum {string} */
-            toStatus?: "REPORTED" | "VERIFIED" | "CLEANUP_SCHEDULED" | "IN_PROGRESS" | "CLEANED" | "DISPUTED";
-            reportId?: Record<string, never>;
-            cleanupEventId?: Record<string, never>;
-            actor?: components["schemas"]["SiteHistoryActorDto"];
-            note?: Record<string, never>;
-            metadata?: Record<string, never>;
-        };
-        SiteHistoryListResponseDto: {
-            items: components["schemas"]["SiteHistoryEntryDto"][];
-            /** @description Cursor for the next page (entry id) */
-            nextBeforeId?: Record<string, never>;
-        };
-        PostSiteHistoryNoteDto: {
-            /** @description Free-form admin note shown on the site timeline */
-            note: string;
-            /** @description Optional ISO-8601 timestamp for when the note occurred */
-            occurredAt?: string;
-        };
         AdminReportEvidenceDto: {
             id: string;
             label: string;
@@ -3616,6 +4312,8 @@ export interface components {
             queueLabel: string;
             slaLabel: string;
             assignedTeam: string;
+            assignedModeratorId?: Record<string, never> | null;
+            assignedModeratorName?: Record<string, never> | null;
         };
         AdminReportMapPinDto: {
             latitude: number;
@@ -3695,6 +4393,8 @@ export interface components {
              * @enum {string}
              */
             viewerRole: "primary" | "co_reporter";
+            /** @description Moderator rejection reason and optional notes when status is DELETED; null for other statuses */
+            moderationReason: Record<string, never> | null;
         };
         CreateReportWithLocationDto: {
             /**
@@ -3831,6 +4531,14 @@ export interface components {
             data: components["schemas"]["AdminReportListItemDto"][];
             meta: components["schemas"]["AdminReportListMetaDto"];
         };
+        AdminReportsQueueSummaryDto: {
+            total: number;
+            needAttentionCount: number;
+            duplicatesCount: number;
+            byStatus: {
+                [key: string]: number;
+            };
+        };
         AdminDuplicateReportItemDto: {
             id: string;
             /**
@@ -3892,6 +4600,25 @@ export interface components {
              * @example Evidence was insufficient to verify this report.
              */
             reason?: string;
+        };
+        AssignReportDto: {
+            /**
+             * @description Target moderator user id; omit to assign to the authenticated moderator
+             * @example cm1234567890abcdefghijkl
+             */
+            moderatorId?: string;
+            /**
+             * @description When true, clears the current assignee without changing report status
+             * @default false
+             */
+            unassign: boolean;
+        };
+        AssignReportResponseDto: {
+            reportId: string;
+            assignedModeratorId: Record<string, never> | null;
+            assignedModeratorName: Record<string, never> | null;
+            /** @enum {string} */
+            status: "NEW" | "IN_REVIEW" | "APPROVED" | "DELETED";
         };
         MergeDuplicateReportsDto: {
             /** @description IDs of child duplicate reports to merge into the primary report */
@@ -4003,12 +4730,47 @@ export interface components {
             /** @enum {string} */
             role: "USER" | "SUPPORT" | "ADMIN" | "SUPER_ADMIN";
         };
+        BeginInviteMfaDto: {
+            id: string;
+            /** @description Single-use invite token from the email link */
+            token: string;
+        };
+        AcceptAdminInviteDto: {
+            id: string;
+            token: string;
+            password: string;
+            /** @example +38970123456 */
+            phoneNumber: string;
+            /** @example 123456 */
+            totpCode: string;
+            deviceId?: string;
+        };
+        CreateAdminInviteDto: {
+            /** @example moderator@chisto.mk */
+            email: string;
+            /** @example Ana */
+            firstName: string;
+            /** @example Petrova */
+            lastName: string;
+            /**
+             * @example SUPPORT
+             * @enum {string}
+             */
+            role: "SUPPORT" | "ADMIN" | "SUPER_ADMIN";
+        };
         SystemConfigEntryDto: {
             key: string;
             value: string;
         };
         PatchSystemConfigDto: {
             entries: components["schemas"]["SystemConfigEntryDto"][];
+        };
+        PatchCheckInRiskSignalDto: {
+            /** @enum {string} */
+            action: "resolve" | "dismiss";
+        };
+        CreateCleanupEventModerationNoteDto: {
+            body: string;
         };
         JoinersCumulativeEntryDto: {
             /** @description ISO-8601 instant when the participant joined */
@@ -4029,6 +4791,12 @@ export interface components {
             joinersCumulative: components["schemas"]["JoinersCumulativeEntryDto"][];
             /** @description Exactly 24 entries (hours 0–23 UTC), zeros where no check-ins */
             checkInsByHour: components["schemas"]["CheckInsByHourEntryDto"][];
+            /** @description ISO-8601 instant when this analytics snapshot was generated */
+            generatedAt: string;
+            /** @description ISO-8601 instant of the most recent participant join */
+            lastJoinAt?: Record<string, never> | null;
+            /** @description ISO-8601 instant of the most recent check-in */
+            lastCheckInAt?: Record<string, never> | null;
         };
         BulkModerateCleanupEventsDto: {
             /** @description Cleanup event ids (Prisma cuid) */
@@ -4075,11 +4843,11 @@ export interface components {
              */
             lifecycleStatus?: "UPCOMING" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
             /**
-             * @description Moderation status: APPROVED or DECLINED
+             * @description Moderation status: APPROVED, DECLINED, or PENDING (return-to-pending)
              * @enum {string}
              */
-            status?: "APPROVED" | "DECLINED";
-            /** @description Required when declining a pending event (stored in audit metadata) */
+            status?: "APPROVED" | "DECLINED" | "PENDING";
+            /** @description Required when declining a pending event (stored on event and in audit metadata) */
             declineReason?: string;
         };
         UpdateNotificationPreferenceDto: {
@@ -4714,9 +5482,59 @@ export interface components {
             From: string;
             /** @example 30007 */
             ErrorCode?: string;
+            /** @description Twilio callback timestamp (RFC2822 or ISO8601) */
+            Timestamp?: string;
             ErrorMessage?: string;
         };
         PostmarkWebhookDto: Record<string, never>;
+        CreateBroadcastDto: {
+            title: string;
+            body: string;
+            type?: string;
+            deeplink?: string;
+            /** @enum {string} */
+            audience: "all" | "active" | "area" | "users";
+            audienceUserIds?: string[];
+            scheduledAt?: string;
+        };
+        UpdateBroadcastDto: {
+            title?: string;
+            body?: string;
+            type?: string;
+            deeplink?: string;
+            /** @enum {string} */
+            audience?: "all" | "active" | "area" | "users";
+            audienceUserIds?: string[];
+            scheduledAt?: Record<string, never> | null;
+        };
+        AdminWeeklyLeaderboardEntryDto: {
+            rank: number;
+            userId: string;
+            displayName: string;
+            email: string;
+            weeklyPoints: number;
+            showOnLeaderboard: boolean;
+        };
+        AdminWeeklyRankingsResponseDto: {
+            /** @description Week start (Monday 00:00 Europe/Skopje), ISO-8601 */
+            weekStartsAt: string;
+            /** @description Week end (Sunday end of day Europe/Skopje), ISO-8601 */
+            weekEndsAt: string;
+            entries: components["schemas"]["AdminWeeklyLeaderboardEntryDto"][];
+        };
+        CreateEmailSuppressionDto: {
+            /** @example user@example.com */
+            email: string;
+            /**
+             * @default ManualSuppression
+             * @enum {string}
+             */
+            reason: "ManualSuppression" | "HardBounce" | "SpamComplaint";
+        };
+        ReportSideEffectPendingCountDto: {
+            /** @description Report side-effect outbox rows awaiting processing */
+            pendingCount: number;
+        };
     };
     responses: never;
     parameters: never;
@@ -5585,7 +6403,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Generic success message. When an account exists, SMS OTP or email link is sent. devCode returned in development when SMS is used. */
+            /** @description Generic success message. When an account exists, a 6-digit code is sent. devCode returned in development only. */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -5701,6 +6519,63 @@ export interface operations {
         responses: {
             /** @description Password reset successful; all sessions invalidated. A password-changed confirmation email may be sent when transactional email is enabled. */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AuthPasswordController_verifyEmailPasswordResetCode: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PasswordResetEmailVerifyDto"];
+            };
+        };
+        responses: {
+            /** @description Code is valid; OTP is not consumed until confirm */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -7460,296 +8335,6 @@ export interface operations {
             };
         };
     };
-    SitesMapController_findAllForMap: {
-        parameters: {
-            query: {
-                /** @description Center latitude for map-style queries (or chat location pins) */
-                lat: number;
-                /** @description Center longitude for map-style queries (or chat location pins) */
-                lng: number;
-                /** @description Map zoom level (used for server-side query safety limits and future clustering) */
-                zoom?: number;
-                /** @description Search radius in km */
-                radiusKm?: components["schemas"]["Object"];
-                status?: "REPORTED" | "VERIFIED" | "CLEANUP_SCHEDULED" | "IN_PROGRESS" | "CLEANED" | "DISPUTED";
-                limit?: components["schemas"]["Object"];
-                /** @description lite: smaller map JSON (one thumbnail URL, no engagement fields). full: default shape. */
-                detail?: "full" | "lite";
-                /** @description Optional visible bounds south edge for viewport-based map fetches */
-                minLat?: number;
-                /** @description Optional visible bounds north edge for viewport-based map fetches */
-                maxLat?: number;
-                /** @description Optional visible bounds west edge for viewport-based map fetches */
-                minLng?: number;
-                /** @description Optional visible bounds east edge for viewport-based map fetches */
-                maxLng?: number;
-                /** @description Include archived/cold cleaned sites in map results */
-                includeArchived?: components["schemas"]["Object"];
-                /** @description Low-priority speculative fetch (e.g. pan extrapolation). Same response shape; included in cache keys. */
-                prefetch?: components["schemas"]["Object"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Sites for map fetched successfully */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Invalid map viewport or geo params */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Missing or invalid bearer token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Insufficient permissions */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Resource not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Too many requests */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    SitesMapController_findClustersForMap: {
-        parameters: {
-            query: {
-                /** @description Center latitude for map-style queries (or chat location pins) */
-                lat: number;
-                /** @description Center longitude for map-style queries (or chat location pins) */
-                lng: number;
-                /** @description Map zoom level (used for server-side query safety limits and future clustering) */
-                zoom?: number;
-                /** @description Search radius in km */
-                radiusKm?: components["schemas"]["Object"];
-                status?: "REPORTED" | "VERIFIED" | "CLEANUP_SCHEDULED" | "IN_PROGRESS" | "CLEANED" | "DISPUTED";
-                limit?: components["schemas"]["Object"];
-                /** @description lite: smaller map JSON (one thumbnail URL, no engagement fields). full: default shape. */
-                detail?: "full" | "lite";
-                /** @description Optional visible bounds south edge for viewport-based map fetches */
-                minLat?: number;
-                /** @description Optional visible bounds north edge for viewport-based map fetches */
-                maxLat?: number;
-                /** @description Optional visible bounds west edge for viewport-based map fetches */
-                minLng?: number;
-                /** @description Optional visible bounds east edge for viewport-based map fetches */
-                maxLng?: number;
-                /** @description Include archived/cold cleaned sites in map results */
-                includeArchived?: components["schemas"]["Object"];
-                /** @description Low-priority speculative fetch (e.g. pan extrapolation). Same response shape; included in cache keys. */
-                prefetch?: components["schemas"]["Object"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Map clusters fetched successfully */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Invalid map viewport or geo params */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Missing or invalid bearer token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Insufficient permissions */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Resource not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Rate limited */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    SitesMapController_findHeatmapForMap: {
-        parameters: {
-            query: {
-                /** @description Center latitude for map-style queries (or chat location pins) */
-                lat: number;
-                /** @description Center longitude for map-style queries (or chat location pins) */
-                lng: number;
-                /** @description Map zoom level (used for server-side query safety limits and future clustering) */
-                zoom?: number;
-                /** @description Search radius in km */
-                radiusKm?: components["schemas"]["Object"];
-                status?: "REPORTED" | "VERIFIED" | "CLEANUP_SCHEDULED" | "IN_PROGRESS" | "CLEANED" | "DISPUTED";
-                limit?: components["schemas"]["Object"];
-                /** @description lite: smaller map JSON (one thumbnail URL, no engagement fields). full: default shape. */
-                detail?: "full" | "lite";
-                /** @description Optional visible bounds south edge for viewport-based map fetches */
-                minLat?: number;
-                /** @description Optional visible bounds north edge for viewport-based map fetches */
-                maxLat?: number;
-                /** @description Optional visible bounds west edge for viewport-based map fetches */
-                minLng?: number;
-                /** @description Optional visible bounds east edge for viewport-based map fetches */
-                maxLng?: number;
-                /** @description Include archived/cold cleaned sites in map results */
-                includeArchived?: components["schemas"]["Object"];
-                /** @description Low-priority speculative fetch (e.g. pan extrapolation). Same response shape; included in cache keys. */
-                prefetch?: components["schemas"]["Object"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Map heatmap fetched successfully */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Invalid map viewport or geo params */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Missing or invalid bearer token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Insufficient permissions */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Resource not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Rate limited */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    SitesMapController_getMapMvtTile: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                z: number;
-                x: number;
-                y: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Validation or bad request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Missing or invalid bearer token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Insufficient permissions */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Resource not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Rate limited */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
     SitesController_findAll: {
         parameters: {
             query?: {
@@ -7766,6 +8351,8 @@ export interface operations {
                 sort?: "hybrid" | "recent";
                 /** @description Feed mode for personalized vs latest ranking. */
                 mode?: "for_you" | "latest";
+                /** @description Geo scope: local = strict radius filter; discovery = country-wide candidates with soft distance ranking. */
+                scope?: "local" | "discovery";
                 /** @description Include ranking explainability metadata in each feed item. */
                 explain?: components["schemas"]["Object"];
                 /** @description Cursor token for feed pagination. When set, server ignores page offset and returns next window. */
@@ -8011,6 +8598,65 @@ export interface operations {
         };
         responses: {
             /** @description Search results */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SitesController_adminList: {
+        parameters: {
+            query?: {
+                page?: components["schemas"]["Object"];
+                limit?: components["schemas"]["Object"];
+                status?: "REPORTED" | "VERIFIED" | "CLEANUP_SCHEDULED" | "IN_PROGRESS" | "CLEANED" | "DISPUTED";
+                /** @description Search by site id or description */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Sites listed for admin workspace */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -8331,6 +8977,882 @@ export interface operations {
                 content?: never;
             };
             /** @description Too many requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminRealtimeController_stream: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SiteHistoryController_listHistory: {
+        parameters: {
+            query?: {
+                limit?: number;
+                /** @description Return entries older than this entry id */
+                beforeId?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteHistoryListResponseDto"];
+                };
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Site not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SiteHistoryAdminController_postNote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PostSiteHistoryNoteDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteHistoryEntryDto"];
+                };
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid JWT */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Caller is not an admin */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Site not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ModerationController_listAdminUgcReports: {
+        parameters: {
+            query?: {
+                page?: number;
+                limit?: number;
+                status?: "OPEN" | "REVIEWED" | "DISMISSED" | "ESCALATED" | "HIDDEN";
+                subjectType?: "site_comment" | "event_chat_message" | "user" | "site" | "event" | "safety_issue";
+                search?: string;
+                reporterId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ModerationController_getAdminUgcReport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ModerationController_patchAdminUgcReport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PatchAdminUgcReportDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ModerationController_submitReport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PostUgcReportDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ModerationController_listBlocks: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ModerationController_blockUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PostUserBlockDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ModerationController_unblock: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                blockedUserId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminModerationEmailPreferencesController_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Preferences listed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminModerationEmailPreferencesController_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PatchModerationEmailPreferenceDto"];
+            };
+        };
+        responses: {
+            /** @description Preference updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminModerationEmailUnsubscribeController_unsubscribeGet: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SitesMapController_findAllForMap: {
+        parameters: {
+            query: {
+                /** @description Center latitude for map-style queries (or chat location pins) */
+                lat: number;
+                /** @description Center longitude for map-style queries (or chat location pins) */
+                lng: number;
+                /** @description Map zoom level (used for server-side query safety limits and future clustering) */
+                zoom?: number;
+                /** @description Search radius in km */
+                radiusKm?: components["schemas"]["Object"];
+                status?: "REPORTED" | "VERIFIED" | "CLEANUP_SCHEDULED" | "IN_PROGRESS" | "CLEANED" | "DISPUTED";
+                limit?: components["schemas"]["Object"];
+                /** @description lite: smaller map JSON (one thumbnail URL, no engagement fields). full: default shape. */
+                detail?: "full" | "lite";
+                /** @description Optional visible bounds south edge for viewport-based map fetches */
+                minLat?: number;
+                /** @description Optional visible bounds north edge for viewport-based map fetches */
+                maxLat?: number;
+                /** @description Optional visible bounds west edge for viewport-based map fetches */
+                minLng?: number;
+                /** @description Optional visible bounds east edge for viewport-based map fetches */
+                maxLng?: number;
+                /** @description Include archived/cold cleaned sites in map results */
+                includeArchived?: components["schemas"]["Object"];
+                /** @description Low-priority speculative fetch (e.g. pan extrapolation). Same response shape; included in cache keys. */
+                prefetch?: components["schemas"]["Object"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Sites for map fetched successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid map viewport or geo params */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SitesMapController_findClustersForMap: {
+        parameters: {
+            query: {
+                /** @description Center latitude for map-style queries (or chat location pins) */
+                lat: number;
+                /** @description Center longitude for map-style queries (or chat location pins) */
+                lng: number;
+                /** @description Map zoom level (used for server-side query safety limits and future clustering) */
+                zoom?: number;
+                /** @description Search radius in km */
+                radiusKm?: components["schemas"]["Object"];
+                status?: "REPORTED" | "VERIFIED" | "CLEANUP_SCHEDULED" | "IN_PROGRESS" | "CLEANED" | "DISPUTED";
+                limit?: components["schemas"]["Object"];
+                /** @description lite: smaller map JSON (one thumbnail URL, no engagement fields). full: default shape. */
+                detail?: "full" | "lite";
+                /** @description Optional visible bounds south edge for viewport-based map fetches */
+                minLat?: number;
+                /** @description Optional visible bounds north edge for viewport-based map fetches */
+                maxLat?: number;
+                /** @description Optional visible bounds west edge for viewport-based map fetches */
+                minLng?: number;
+                /** @description Optional visible bounds east edge for viewport-based map fetches */
+                maxLng?: number;
+                /** @description Include archived/cold cleaned sites in map results */
+                includeArchived?: components["schemas"]["Object"];
+                /** @description Low-priority speculative fetch (e.g. pan extrapolation). Same response shape; included in cache keys. */
+                prefetch?: components["schemas"]["Object"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Map clusters fetched successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid map viewport or geo params */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SitesMapController_findHeatmapForMap: {
+        parameters: {
+            query: {
+                /** @description Center latitude for map-style queries (or chat location pins) */
+                lat: number;
+                /** @description Center longitude for map-style queries (or chat location pins) */
+                lng: number;
+                /** @description Map zoom level (used for server-side query safety limits and future clustering) */
+                zoom?: number;
+                /** @description Search radius in km */
+                radiusKm?: components["schemas"]["Object"];
+                status?: "REPORTED" | "VERIFIED" | "CLEANUP_SCHEDULED" | "IN_PROGRESS" | "CLEANED" | "DISPUTED";
+                limit?: components["schemas"]["Object"];
+                /** @description lite: smaller map JSON (one thumbnail URL, no engagement fields). full: default shape. */
+                detail?: "full" | "lite";
+                /** @description Optional visible bounds south edge for viewport-based map fetches */
+                minLat?: number;
+                /** @description Optional visible bounds north edge for viewport-based map fetches */
+                maxLat?: number;
+                /** @description Optional visible bounds west edge for viewport-based map fetches */
+                minLng?: number;
+                /** @description Optional visible bounds east edge for viewport-based map fetches */
+                maxLng?: number;
+                /** @description Include archived/cold cleaned sites in map results */
+                includeArchived?: components["schemas"]["Object"];
+                /** @description Low-priority speculative fetch (e.g. pan extrapolation). Same response shape; included in cache keys. */
+                prefetch?: components["schemas"]["Object"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Map heatmap fetched successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid map viewport or geo params */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SitesMapController_getMapMvtTile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                z: number;
+                x: number;
+                y: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SitesMapController_getOfflineMapManifest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Offline regions manifest */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SitesMapController_getOfflineMapRegionDownloadUrl: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                regionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Signed region package URL */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -9401,256 +10923,6 @@ export interface operations {
             };
         };
     };
-    AdminRealtimeController_stream: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Validation or bad request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Missing or invalid bearer token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Insufficient permissions */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Resource not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Rate limited */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    ModerationController_submitReport: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PostUgcReportDto"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    ModerationController_listBlocks: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    ModerationController_blockUser: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PostUserBlockDto"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    ModerationController_unblock: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                blockedUserId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    SiteHistoryController_listHistory: {
-        parameters: {
-            query?: {
-                limit?: number;
-                /** @description Return entries older than this entry id */
-                beforeId?: string;
-            };
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SiteHistoryListResponseDto"];
-                };
-            };
-            /** @description Validation or bad request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Missing or invalid bearer token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Insufficient permissions */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Site not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Too many requests */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    SiteHistoryAdminController_postNote: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PostSiteHistoryNoteDto"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SiteHistoryEntryDto"];
-                };
-            };
-            /** @description Validation or bad request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Missing or invalid JWT */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Caller is not an admin */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Site not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Too many requests */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
     ReportsController_findAllForModeration: {
         parameters: {
             query?: {
@@ -9661,6 +10933,12 @@ export interface operations {
                 siteId?: string;
                 /** @description When true, returns only reports that are in a duplicate relationship */
                 duplicatesOnly?: boolean;
+                /** @description Case-insensitive search on name, location, or report number */
+                search?: string;
+                /** @description Alias for search (case-insensitive name, location, or report number) */
+                q?: string;
+                sort?: "dateReportedAt" | "reportNumber" | "name" | "status";
+                dir?: "asc" | "desc";
             };
             header?: never;
             path?: never;
@@ -9996,6 +11274,61 @@ export interface operations {
             };
         };
     };
+    ReportsController_getQueueSummary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Queue summary */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminReportsQueueSummaryDto"];
+                };
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     ReportsController_findDuplicateGroups: {
         parameters: {
             query?: {
@@ -10006,6 +11339,12 @@ export interface operations {
                 siteId?: string;
                 /** @description When true, returns only reports that are in a duplicate relationship */
                 duplicatesOnly?: boolean;
+                /** @description Case-insensitive search on name, location, or report number */
+                search?: string;
+                /** @description Alias for search (case-insensitive name, location, or report number) */
+                q?: string;
+                sort?: "dateReportedAt" | "reportNumber" | "name" | "status";
+                dir?: "asc" | "desc";
             };
             header?: never;
             path?: never;
@@ -10232,6 +11571,67 @@ export interface operations {
             };
         };
     };
+    ReportsController_assignReport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssignReportDto"];
+            };
+        };
+        responses: {
+            /** @description Report assignment updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssignReportResponseDto"];
+                };
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     ReportsController_mergeDuplicates: {
         parameters: {
             query?: never;
@@ -10358,6 +11758,59 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description Security overview fetched successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminController_getMyPermissions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Permissions listed */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -10581,6 +12034,8 @@ export interface operations {
                 lastActiveBefore?: string;
                 /** @description Filter users last active after this ISO date */
                 lastActiveAfter?: string;
+                sort?: "lastActiveAt" | "name" | "email" | "pointsBalance" | "createdAt";
+                dir?: "asc" | "desc";
             };
             header?: never;
             path?: never;
@@ -10802,6 +12257,62 @@ export interface operations {
             };
         };
     };
+    AdminUsersController_revokeSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                sessionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Session revoked */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     AdminUsersController_findOne: {
         parameters: {
             query?: never;
@@ -10932,6 +12443,396 @@ export interface operations {
         };
         responses: {
             /** @description User role updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminInviteAcceptController_validate: {
+        parameters: {
+            query: {
+                id: string;
+                token: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Invite is valid */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminInviteAcceptController_beginMfa: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BeginInviteMfaDto"];
+            };
+        };
+        responses: {
+            /** @description MFA setup URI returned */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminInviteAcceptController_accept: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AcceptAdminInviteDto"];
+            };
+        };
+        responses: {
+            /** @description Account created and session issued */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminInvitesController_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Invites listed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminInvitesController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateAdminInviteDto"];
+            };
+        };
+        responses: {
+            /** @description Invite created */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminInvitesController_resend: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Invite resent */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminInvitesController_revoke: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Invite revoked */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -11410,6 +13311,10 @@ export interface operations {
             query?: {
                 page?: components["schemas"]["Object"];
                 limit?: components["schemas"]["Object"];
+                /** @description active = unresolved and not expired; resolved = handled; all = no status filter */
+                status?: "active" | "resolved" | "all";
+                /** @description Filter signals for a specific cleanup event */
+                eventId?: string;
             };
             header?: never;
             path?: never;
@@ -11418,6 +13323,84 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description Paginated risk signals */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or business rule failure */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Insufficient role for this admin action */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Cleanup event not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description State conflict (e.g. duplicate bulk job id) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Too many requests (throttled) */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    CleanupEventsController_patchCheckInRiskSignal: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PatchCheckInRiskSignalDto"];
+            };
+        };
+        responses: {
+            /** @description Updated risk signal */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -11492,6 +13475,308 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description Participant rows */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or business rule failure */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Insufficient role for this admin action */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Cleanup event not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description State conflict (e.g. duplicate bulk job id) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Too many requests (throttled) */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    CleanupEventsController_removeParticipant: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Updated cleanup event */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or business rule failure */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Insufficient role for this admin action */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Cleanup event not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description State conflict (e.g. duplicate bulk job id) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Too many requests (throttled) */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    CleanupEventsController_listNotes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Moderation notes */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or business rule failure */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Insufficient role for this admin action */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Cleanup event not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description State conflict (e.g. duplicate bulk job id) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Too many requests (throttled) */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    CleanupEventsController_createNote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCleanupEventModerationNoteDto"];
+            };
+        };
+        responses: {
+            /** @description Created note */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or business rule failure */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Insufficient role for this admin action */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Cleanup event not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description State conflict (e.g. duplicate bulk job id) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Too many requests (throttled) */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    CleanupEventsController_deleteNote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                noteId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deletion result */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -16475,6 +18760,484 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    AdminBroadcastsController_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminBroadcastsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateBroadcastDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminBroadcastsController_getById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminBroadcastsController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminBroadcastsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateBroadcastDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminBroadcastsController_send: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminBroadcastsController_cancel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminGamificationController_getConfig: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminGamificationController_updateConfig: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminGamificationController_listUserPoints: {
+        parameters: {
+            query: {
+                page: string;
+                limit: string;
+            };
+            header?: never;
+            path: {
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminGamificationController_adjustPoints: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminGamificationController_weeklyRankings: {
+        parameters: {
+            query?: {
+                /** @description Max leaderboard rows (1–100) */
+                limit?: number;
+                /** @description Any date within the target Skopje week (ISO-8601). Defaults to the current week. */
+                weekStartsAt?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminWeeklyRankingsResponseDto"];
+                };
+            };
+        };
+    };
+    AdminAppConfigController_getReportCredits: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminAppConfigController_updateReportCredits: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminAppConfigController_getFeedRanking: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminAppConfigController_updateFeedRanking: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminAppConfigController_getOrganizerQuiz: {
+        parameters: {
+            query: {
+                locale: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminAppConfigController_updateOrganizerQuiz: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminAppConfigController_getTermsVersion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminAppConfigController_updateTermsVersion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminCommsController_listSuppressions: {
+        parameters: {
+            query: {
+                page: string;
+                limit: string;
+                search: string;
+                reason: string;
+                source: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminCommsController_createSuppression: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateEmailSuppressionDto"];
+            };
+        };
+        responses: {
+            /** @description Suppression created */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminCommsController_removeSuppression: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                email: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminCommsController_listWebhookLogs: {
+        parameters: {
+            query: {
+                page: string;
+                limit: string;
+                action: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminOperationsController_reportSideEffectPendingCount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportSideEffectPendingCountDto"];
+                };
             };
         };
     };

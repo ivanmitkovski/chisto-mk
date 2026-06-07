@@ -1,0 +1,83 @@
+.flagList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.flagItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.flagItem:last-child {
+  border-bottom: none;
+}
+
+.flagInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.flagKey {
+  font-size: 0.9375rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+}
+
+.flagDesc {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+.toggle {
+  position: relative;
+  width: 51px;
+  height: 31px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--bg-muted);
+  cursor: pointer;
+  transition: background var(--motion-duration-fast) var(--motion-ease-out);
+}
+
+.toggle:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+.toggle:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.toggleThumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toggleThumb {
+    transition: none;
+  }
+}
+
+.toggleOn {
+  background: var(--color-primary);
+}
+
+.toggleOn .toggleThumb {
+  transform: translateX(20px);
+}

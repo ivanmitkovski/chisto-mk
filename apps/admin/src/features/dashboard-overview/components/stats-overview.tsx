@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Icon, SectionState } from '@/components/ui';
@@ -9,11 +10,6 @@ import styles from './stats-overview.module.css';
 
 const SPRING = { type: 'spring' as const, stiffness: 400, damping: 30 };
 const INITIAL_COUNT = 4;
-const GROUP_LABELS: Record<StatCardGroup, string> = {
-  reports: 'Reports',
-  platform: 'Platform',
-  cleanups: 'Cleanups',
-};
 
 type StatsOverviewProps = {
   stats: StatCard[];
@@ -58,6 +54,8 @@ function groupStats(stats: StatCard[]): Map<StatCardGroup | 'other', StatCard[]>
 }
 
 export function StatsOverview({ stats }: StatsOverviewProps) {
+  const t = useTranslations('dashboard');
+  const tCommon = useTranslations('common');
   const [isExpanded, setIsExpanded] = useState(false);
   const reducedMotion = useReducedMotion();
   const groups = groupStats(stats);
@@ -65,8 +63,14 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
   const visibleStats = isExpanded ? flatStats : flatStats.slice(0, INITIAL_COUNT);
   const hasMore = flatStats.length > INITIAL_COUNT;
 
+  const groupLabels: Record<StatCardGroup, string> = {
+    reports: t('statGroups.reports'),
+    platform: t('statGroups.platform'),
+    cleanups: t('statGroups.cleanups'),
+  };
+
   if (stats.length === 0) {
-    return <SectionState variant="empty" message="No dashboard statistics available yet." />;
+    return <SectionState variant="empty" message={t('statsEmpty')} />;
   }
 
   const visibleIds = new Set(visibleStats.map((s) => s.id));
@@ -77,7 +81,7 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
       {entries.map(([groupKey, groupCards], entryIdx) => {
         const visibleInGroup = groupCards.filter((c) => visibleIds.has(c.id));
         if (visibleInGroup.length === 0) return null;
-        const label = groupKey !== 'other' ? GROUP_LABELS[groupKey] : null;
+        const label = groupKey !== 'other' ? groupLabels[groupKey] : null;
         return (
           <div key={groupKey} className={styles.group}>
             {entryIdx > 0 ? <span className={styles.groupDivider} aria-hidden /> : null}
@@ -133,12 +137,12 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
             {isExpanded ? (
               <>
                 <Icon name="chevron-up" size={14} aria-hidden />
-                Show less
+                {tCommon('showLess')}
               </>
             ) : (
               <>
                 <Icon name="chevron-down" size={14} aria-hidden />
-                Show all stats ({flatStats.length})
+                {tCommon('showAllStats', { count: flatStats.length })}
               </>
             )}
           </motion.button>

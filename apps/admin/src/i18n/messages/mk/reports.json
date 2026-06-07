@@ -1,0 +1,296 @@
+{
+  "pageTitle": "Пријави",
+  "detailTitle": "Пријава",
+  "backToReportsList": "Назад на листата со пријави",
+  "backToReports": "Пријави",
+  "refreshReportAria": "Освежи пријава",
+  "outbox": "Outbox",
+  "prioritySuffix": "{priority} приоритет",
+  "duplicateNotice": "Оваа пријава може да е дупликат{ofReport}.",
+  "duplicateOfReport": " на пријава {reportNumber}",
+  "reviewDuplicateGroups": "Прегледај групи дупликати",
+  "viewers": {
+    "oneOther": "{name} ја прегледува оваа пријава",
+    "twoOthers": "{firstName} и {secondName} ја прегледуваат оваа пријава",
+    "manyOthers": "{firstName} и уште {count} други ја прегледуваат оваа пријава"
+  },
+  "moderationWorkspace": "Работен простор за модерација",
+  "duplicateOfAnother": "Оваа пријава може да е дупликат на друга.",
+  "duplicateOfSpecific": "Оваа пријава може да е дупликат на {reportNumber}.",
+  "alsoReportedBy": " Исто така пријавено од {names}.",
+  "viewAllDuplicateReports": "Прикажи ги сите дупликат пријави",
+  "severity": {
+    "LOW": "Ниска",
+    "MEDIUM": "Умерена",
+    "SIGNIFICANT": "Значајна",
+    "HIGH": "Висока",
+    "CRITICAL": "Критична"
+  },
+  "status": {
+    "NEW": "Нова",
+    "IN_REVIEW": "Во преглед",
+    "APPROVED": "Одобрена",
+    "DELETED": "Одбиена"
+  },
+  "queuePriority": {
+    "Critical": "Критична",
+    "High": "Висока",
+    "Normal": "Нормална"
+  },
+  "sla": {
+    "newRemaining": "2ч преостануваат",
+    "inReviewRemaining": "1ч преостануваат",
+    "completed": "Завршено"
+  },
+  "filters": {
+    "all": "Сите",
+    "duplicates": "Дупликати",
+    "new": "Нови",
+    "inReview": "Во преглед",
+    "approved": "Одобрени",
+    "rejected": "Одбиени"
+  },
+  "columns": {
+    "reportNumber": "Пријава #",
+    "name": "Име",
+    "location": "Локација",
+    "dateReported": "Датум на пријава",
+    "status": "Статус"
+  },
+  "toolbar": {
+    "searchAria": "Пребарај пријави по име, локација или број",
+    "searchPlaceholder": "Пребарај пријави…",
+    "filterByStatusAria": "Филтрирај по статус"
+  },
+  "queue": {
+    "reportsCount": "{count} пријави",
+    "reportsCountFiltered": "{shown} од {total} пријава(и)",
+    "needAttention": "{count} бараат внимание",
+    "duplicatesLink": "{count} дупликат(и)",
+    "title": "Пријави",
+    "refreshAria": "Освежи пријави",
+    "potentialDuplicates": "{count} потенцијален(и) дупликат(и)",
+    "duplicates": "Дупликати",
+    "showingRange": "Прикажани {from}-{to} од {total}"
+  },
+  "empty": "Нема пријави што одговараат на вашите филтри.",
+  "emptyStates": {
+    "noReportsYet": "Сè уште нема пријави. Споделете ја Chisto апликацијата или врската за пријавување со граѓаните за да започнете.",
+    "noFilterMatch": "Нема пријави што одговараат на избраниот филтер.",
+    "noSearchMatch": "Нема пријави што одговараат на \"{query}\".",
+    "searchHint": "Обидете се со друг термин за пребарување или исчистете го пребарувањето."
+  },
+  "siteFilter": {
+    "banner": "Филтрирано по локалитет.",
+    "showAll": "Прикажи ги сите пријави"
+  },
+  "columnsActions": "Акции",
+  "confirmList": {
+    "rejectDescription": "Одбиј \"{name}\"? Потребна е причина.",
+    "approveDescription": "Одобри \"{name}\" и премести во одобрен статус?"
+  },
+  "contextDetail": {
+    "close": "Затвори",
+    "submitted": {
+      "title": "Поднесено",
+      "description": "Оваа пријава е поднесена на {value}.",
+      "body": "Времето на поднесување се евидентира кога граѓанинот ја завршува и ја испраќа пријавата. Сите временски ознаки користат временска зона на серверот за конзистентност меѓу модератори и дневници за ревизија."
+    },
+    "reporter": {
+      "title": "Пријавител",
+      "description": "Пријавата е поднесена од {value}.",
+      "body": "Идентитетот на пријавителот е анонимизиран за заштита на приватноста. Покажаниот псевдоним се користи само за следливост при модерација. Личните податоци не се видливи за модераторите."
+    },
+    "coReporters": {
+      "title": "Исто така пријавено од",
+      "description": "Сопријавители: {value}.",
+      "body": "Повеќе граѓани ја пријавиле истата работа. Сопријавените проблеми можат да укажуваат на поголема итност или загриженост на заедницата. Секој сопријавител придонесува за видливоста на пријавата во редот за модерација."
+    },
+    "trustTier": {
+      "title": "Ниво на доверба",
+      "description": "Ниво на доверба на пријавителот: {value}.",
+      "body": "Нивоата на доверба (Бронза, Сребро, Злато) ја одразуваат историјата на верификација и квалитетот на претходните пријави. Повисоките нивоа укажуваат на поустановени, верификувани придонесувачи. Ова им помага на модераторите да ја проценат доверливоста на пријавата."
+    },
+    "queue": {
+      "title": "Ред",
+      "description": "Тековен ред: {value}.",
+      "body": "Пријавите се организирани во редови по итност, тип или фаза на работен тек. Редовите им помагаат на модераторите да се фокусираат на соодветната група и да ги исполнат SLA целите. Оваа пријава е во работниот тек {value}."
+    }
+  },
+  "list": {
+    "approve": "Одобри",
+    "reject": "Одбиј",
+    "noFurtherActions": "Нема понатамошни акции",
+    "estimatedCleanupTeamSize": "Проценета големина на тим за чистење",
+    "approveAria": "Одобри {reportNumber}",
+    "rejectAria": "Одбиј {reportNumber}",
+    "finalDecisionAria": "{reportNumber} веќе има конечна одлука"
+  },
+  "operationalContext": {
+    "title": "Оперативен контекст",
+    "legendAria": "Прикажи легенда за оперативен контекст",
+    "legendTitle": "Што значат овие полиња?",
+    "legendRegionAria": "Легенда за оперативен контекст",
+    "assignedModeratorTerm": "Доделен модератор",
+    "assignedModeratorDesc": "Членот на персоналот кој моментално е одговорен за преглед на оваа пријава. Админите можат да доделат од изборникот подолу; секој со пристап за модерација може да преземе со „Додели ми“ или да ослободи при предавање.",
+    "slaTerm": "SLA",
+    "slaDesc": "Договор за ниво на услуга: преостанатото време пред да се очекува одговор или одлука.",
+    "queueTerm": "Тековен ред",
+    "queueDesc": "Работниот тек или категорија на која припаѓа оваа пријава.",
+    "assignedModerator": "Доделен модератор",
+    "sla": "SLA",
+    "currentQueue": "Тековен ред",
+    "assignedModeratorFallback": "Доделен модератор",
+    "unassigned": "Недоделено",
+    "assignToMe": "Додели ми",
+    "releaseAssignment": "Ослободи доделување",
+    "reassignHint": "Моментално доделено на {name}. Предоделете со ослободување па преземање, или контактирајте админ.",
+    "takeOverAssignment": "Преземи задача",
+    "assignModeratorLabel": "Додели модератор",
+    "assignModeratorPlaceholder": "Пребарај персонал…",
+    "confirmAssignTitle": "Потврди доделување",
+    "confirmAssignDescription": "Додели ја оваа пријава на {name}?",
+    "confirmUnassignTitle": "Отстрани доделување",
+    "confirmUnassignDescription": "Да се отстрани доделениот модератор за оваа пријава?",
+    "confirmAssignLabel": "Потврди",
+    "roleSupport": "Поддршка",
+    "roleAdmin": "Админ",
+    "roleSuperAdmin": "Super admin"
+  },
+  "moderationActions": {
+    "title": "Акции за модерација",
+    "toolbarAria": "Акции за модерација",
+    "reportApproved": "Пријавата е одобрена",
+    "reportRejected": "Пријавата е одбиена",
+    "lifecycleComplete": "Нема понатамошни достапни акции. Животниот циклус за оваа пријава е завршен.",
+    "hint": "Применете експлицитна одлука и одржувајте чист животен циклус. Секоја акција создава запис во временската линија.",
+    "shortcutHint": "Совет: користете ги стрелките за движење меѓу акциите.",
+    "setInReview": "Постави во преглед",
+    "approveReport": "Одобри пријава",
+    "rejectReport": "Одбиј пријава",
+    "aria": {
+      "setInReview": "Постави во преглед",
+      "setInReviewAlready": "Постави во преглед (веќе во преглед)",
+      "setInReviewDisabled": "Постави во преглед (нема понатамошни акции)",
+      "approve": "Одобри пријава",
+      "approveDisabled": "Одобри пријава (нема понатамошни акции)",
+      "reject": "Одбиј пријава",
+      "rejectDisabled": "Одбиј пријава (нема понатамошни акции)"
+    }
+  },
+  "evidence": {
+    "title": "Докази",
+    "filesCount": "{count} датотеки",
+    "filesAria": "Датотеки со докази",
+    "empty": "На оваа пријава не се прикачени датотеки со докази.",
+    "photoPreviewAria": "Преглед на фотографија од доказ",
+    "closePhotoAria": "Затвори преглед на фотографија",
+    "previousPhotoAria": "Претходна фотографија",
+    "nextPhotoAria": "Следна фотографија",
+    "thumbnailsAria": "Сликички на фотографии",
+    "openFullscreenAria": "Отвори фотографија на цел екран",
+    "summaryAria": "Резиме на пријавата",
+    "reportNumber": "Пријава {reportNumber}",
+    "viewSubmittedAria": "Преглед на детали за поднесување",
+    "viewReporterAria": "Преглед на детали за пријавител",
+    "cleanupEffortAria": "Труд за чистење од граѓанин",
+    "viewCoReportersAria": "Преглед на со-пријавители",
+    "viewTrustTierAria": "Преглед на ниво на доверба",
+    "viewQueueAria": "Преглед на детали за ред",
+    "metaSubmitted": "Поднесено",
+    "metaReporter": "Пријавител",
+    "metaCleanupEffort": "Труд за чистење",
+    "metaCoReporters": "Исто така пријавено од",
+    "metaTrustTier": "Ниво на доверба",
+    "metaQueue": "Ред"
+  },
+  "timeline": {
+    "sectionTitle": "Временска линија на животен циклус",
+    "eventsCount": "{count} настани",
+    "byActor": "Од {actor}",
+    "ariaLabel": "Временска линија на пријавата",
+    "empty": "Записите во временската линија ќе се појават како што се извршуваат акциите за модерација.",
+    "approvedTitle": "Пријавата е одобрена",
+    "approvedDetail": "Модераторот ја прифати пријавата и ја премести во одобрен статус на животен циклус.",
+    "rejectedTitle": "Пријавата е одбиена",
+    "rejectedDetail": "Пријавата е одбиена и означена како отстранета.",
+    "rejectedDetailWithReason": "Пријавата е одбиена и означена како отстранета. Причина: {reason}",
+    "inReviewTitle": "Преместено во преглед",
+    "inReviewDetail": "Статусот на пријавата е преместен во преглед за подлабоки проверки при модерација."
+  },
+  "rejectionReasons": {
+    "label": "Причина за одбивање",
+    "selectPlaceholder": "Изберете причина за одбивање",
+    "falseReport": "Лажна пријава",
+    "duplicateSubmission": "Дупликат поднесување",
+    "insufficientEvidence": "Недоволни докази",
+    "outOfJurisdiction": "Надвор од надлежност",
+    "policyViolation": "Прекршување на политика",
+    "required": "Изберете причина за одбивање.",
+    "notesLabel": "Дополнителни белешки (опционално)",
+    "notesPlaceholder": "Додајте опционален контекст за ревизија"
+  },
+  "confirm": {
+    "approvalTitle": "Потврди одобрување",
+    "approvalDescription": "Одобри ја оваа пријава и премести ја во одобрен статус на животен циклус?",
+    "rejectionTitle": "Потврди одбивање",
+    "rejectionDescription": "Одбиј ја оваа пријава. Потребна е причина за одбивање за следливост при модерација.",
+    "statusUpdateTitle": "Потврди ажурирање на статус",
+    "statusUpdateDescription": "Премести ја оваа пријава во статус во преглед за подлабоки проверки при модерација?",
+    "approveLabel": "Одобри пријава",
+    "rejectLabel": "Одбиј пријава",
+    "setInReviewLabel": "Постави во преглед",
+    "concurrentViewersWarning": "{count, plural, one {Уште 1 друг модератор ја прегледува оваа пријава. Продолжете само ако сте се координирани.} other {Уште # други модератори ја прегледуваат оваа пријава. Продолжете само ако сте се координирани.}}"
+  },
+  "toast": {
+    "approvedTitle": "Пријавата е одобрена",
+    "approvedMessage": "Оваа пријава е успешно прифатена.",
+    "inReviewTitle": "Статусот е ажуриран",
+    "inReviewMessage": "Оваа пријава сега е означена како во преглед.",
+    "rejectedTitle": "Пријавата е одбиена",
+    "rejectedMessage": "Оваа пријава е одбиена и означена како отстранета.",
+    "rejectedWithReasonMessage": "Оваа пријава е одбиена. Причина: {reason}",
+    "actionFailedTitle": "Акцијата не успеа",
+    "assignmentUpdatedTitle": "Доделувањето е ажурирано",
+    "assignmentUpdatedMessage": "Доделувањето на пријавата е зачувано.",
+    "assignmentFailedTitle": "Доделувањето не успеа"
+  },
+  "duplicates": {
+    "pageTitle": "Дупликат пријави",
+    "empty": "Моментално нема групи дупликат пријави што чекаат модерација.",
+    "groupsTitle": "Групи дупликати",
+    "groupsCount": "{count} група(и)",
+    "selectGroupEmpty": "Изберете група дупликати за преглед и спојување.",
+    "mergeWorkspaceTitle": "Работен простор за спојување",
+    "mergeWorkspaceSubtitle": "Примарна {reportNumber} · {count} пријави",
+    "primaryReport": "Примарна пријава",
+    "viewReport": "Прикажи пријава",
+    "duplicatesToMerge": "Дупликати за спојување ({count})",
+    "selectAllDuplicatesAria": "Избери ги сите дупликати",
+    "deselectAllDuplicatesAria": "Поништи ги сите дупликати",
+    "selectDuplicateAria": "Избери дупликат {reportNumber}",
+    "mediaCount": "{count} медиуми",
+    "selectionHint": "{count} од {total} избрани",
+    "approveAndMerge": "Одобри и спој",
+    "confirmMergeTitle": "Потврди спојување дупликати",
+    "confirmMergeDescription": "Ова ќе ја одобри примарната пријава, ќе ги спои избраните детски докази и сопријавители, па ќе ги затвори избраните детски пријави како споени дупликати.",
+    "mergeReasonLabel": "Причина за спојување (опционално)",
+    "mergeReasonPlaceholder": "Додајте опционален контекст за спојување за ревизија",
+    "toast": {
+      "noSelectionTitle": "Нема избрани дупликати",
+      "noSelectionMessage": "Изберете барем една дупликат пријава пред спојување.",
+      "groupChangedTitle": "Групата дупликати се промени",
+      "groupChangedMessage": "Друг модератор можеби ја ажурираше групата. Листата е освежена. Прегледајте и обидете се повторно.",
+      "groupChangedRefreshMessage": "Оваа група дупликати се промени. Освежете ја страницата и обидете се повторно.",
+      "mergeFailedTitle": "Спојувањето не успеа",
+      "mergeFailedMessage": "Не може да се спојат дупликат пријави сега.",
+      "mergeSuccessTitle": "Дупликатите се споени",
+      "mergeSuccessMessage": "Споени {count} дупликат пријава во {reportNumber}."
+    }
+  },
+  "pageDescription": "Преглед и модерација на пријави.",
+  "locationMap": {
+    "title": "Мапа на локација",
+    "openInOpenStreetMap": "Отвори во OpenStreetMap"
+  }
+}

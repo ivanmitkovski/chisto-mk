@@ -1,4 +1,5 @@
-import { SelectHTMLAttributes } from 'react';
+import { SelectHTMLAttributes, useId } from 'react';
+import { Field, fieldDescriptionId } from '../field';
 import { InputProps } from '../input';
 import styles from './select.module.css';
 
@@ -14,15 +15,34 @@ type SelectProps = Omit<SelectHTMLAttributes<HTMLSelectElement>, 'size'> & {
   helperText?: InputProps['helperText'];
 };
 
-export function Select({ id, label, options, errorText, helperText, className, ...rest }: SelectProps) {
-  const descriptionId = errorText ? `${id}-error` : helperText ? `${id}-help` : undefined;
+export function Select({
+  id,
+  label,
+  options,
+  errorText,
+  helperText,
+  className,
+  required,
+  ...rest
+}: SelectProps) {
+  const fallbackId = useId();
+  const selectId = id ?? fallbackId;
+  const descriptionId = fieldDescriptionId(selectId, errorText, helperText);
+
   return (
-    <label className={styles.field} htmlFor={id}>
-      <span className={styles.label}>{label}</span>
+    <Field
+      label={label}
+      htmlFor={selectId}
+      errorText={errorText}
+      helperText={helperText}
+      required={required}
+      className={styles.field}
+    >
       <select
         {...rest}
-        id={id}
+        id={selectId}
         className={[styles.select, className ?? ''].join(' ').trim()}
+        required={required}
         aria-invalid={Boolean(errorText)}
         aria-describedby={descriptionId}
       >
@@ -32,15 +52,6 @@ export function Select({ id, label, options, errorText, helperText, className, .
           </option>
         ))}
       </select>
-      {errorText ? (
-        <span id={`${id}-error`} className={styles.error}>
-          {errorText}
-        </span>
-      ) : helperText ? (
-        <span id={`${id}-help`} className={styles.helper}>
-          {helperText}
-        </span>
-      ) : null}
-    </label>
+    </Field>
   );
 }

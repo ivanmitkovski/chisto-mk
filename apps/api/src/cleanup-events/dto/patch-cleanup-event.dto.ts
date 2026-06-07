@@ -77,15 +77,15 @@ export class PatchCleanupEventDto {
   lifecycleStatus?: EcoEventLifecycleStatus;
 
   @ApiPropertyOptional({
-    description: 'Moderation status: APPROVED or DECLINED',
-    enum: ['APPROVED', 'DECLINED'],
+    description: 'Moderation status: APPROVED, DECLINED, or PENDING (return-to-pending)',
+    enum: ['APPROVED', 'DECLINED', 'PENDING'],
   })
   @IsOptional()
-  @IsIn([CleanupEventStatus.APPROVED, CleanupEventStatus.DECLINED])
+  @IsIn([CleanupEventStatus.APPROVED, CleanupEventStatus.DECLINED, CleanupEventStatus.PENDING])
   status?: CleanupEventStatus;
 
   @ApiPropertyOptional({
-    description: 'Required when declining a pending event (stored in audit metadata)',
+    description: 'Required when declining a pending event (stored on event and in audit metadata)',
     maxLength: 2000,
   })
   @ValidateIf((o) => o.status === CleanupEventStatus.DECLINED)

@@ -3,6 +3,7 @@ import type { AuthenticatedUser } from '../../auth/types/authenticated-user.type
 import { BulkModerateCleanupEventsDto } from '../dto/bulk-moderate-cleanup-events.dto';
 import { CreateCleanupEventDto } from '../dto/create-cleanup-event.dto';
 import { ListCheckInRiskSignalsQueryDto } from '../dto/list-check-in-risk-signals-query.dto';
+import { PatchCheckInRiskSignalDto } from '../dto/patch-check-in-risk-signal.dto';
 import { PatchCleanupEventDto } from '../dto/patch-cleanup-event.dto';
 import { CleanupEventsBulkModerateMutationService } from '../services/cleanup-events-mutation-bulk.service';
 import { CleanupEventsCheckInRiskSignalsService } from '../services/cleanup-events-check-in-risk-signals.service';
@@ -32,5 +33,13 @@ export class CleanupEventsMutationsService {
 
   listCheckInRiskSignals(query: ListCheckInRiskSignalsQueryDto) {
     return this.checkInRiskSignals.listCheckInRiskSignals(query);
+  }
+
+  patchCheckInRiskSignal(
+    id: string,
+    dto: PatchCheckInRiskSignalDto,
+    actor: AuthenticatedUser,
+  ) {
+    return this.checkInRiskSignals.patchCheckInRiskSignal(id, dto, actor);
   }
 }

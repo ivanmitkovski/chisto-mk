@@ -4,8 +4,13 @@ import { NotificationType } from '../../src/prisma-client';
 import { CleanupEventNotificationsService } from '../../src/notifications/services/cleanup-event-notifications.service';
 
 describe('CleanupEventNotificationsService', () => {
-  let prisma: { user: { findMany: jest.Mock }; userDeviceToken: { findMany: jest.Mock } };
+  let prisma: {
+    user: { findMany: jest.Mock };
+    userDeviceToken: { findMany: jest.Mock };
+    cleanupEvent: { findUnique: jest.Mock };
+  };
   let dispatcher: { dispatchToUser: jest.Mock };
+  let moderationEmailNotifier: { notify: jest.Mock };
   let service: CleanupEventNotificationsService;
 
   beforeEach(() => {
@@ -14,11 +19,26 @@ describe('CleanupEventNotificationsService', () => {
         findMany: jest.fn().mockResolvedValue([{ id: 's1' }, { id: 's2' }]),
       },
       userDeviceToken: { findMany: jest.fn().mockResolvedValue([]) },
+      cleanupEvent: {
+        findUnique: jest.fn().mockResolvedValue({
+          scheduledAt: new Date('2026-06-10T09:00:00.000Z'),
+          endAt: new Date('2026-06-10T12:00:00.000Z'),
+          category: 'GENERAL_CLEANUP',
+          scale: 'MEDIUM',
+          organizer: { firstName: 'Ivan', lastName: 'M' },
+          site: { address: 'Park' },
+        }),
+      },
     };
     dispatcher = {
       dispatchToUser: jest.fn().mockResolvedValue(undefined),
     };
-    service = new CleanupEventNotificationsService(prisma as never, dispatcher as never);
+    moderationEmailNotifier = { notify: jest.fn() };
+    service = new CleanupEventNotificationsService(
+      prisma as never,
+      dispatcher as never,
+      moderationEmailNotifier as never,
+    );
   });
 
   it('notifyStaffPendingReview queries staff with take 200 and dispatches per user', async () => {

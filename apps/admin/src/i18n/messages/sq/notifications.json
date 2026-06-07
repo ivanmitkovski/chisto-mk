@@ -1,0 +1,20 @@
+{
+  "pageTitle": "Njoftimet",
+  "title": "Njoftimet",
+  "subtitle": "{unread} të palexuara · {total} gjithsej",
+  "filtersAria": "Filtrat e njoftimeve",
+  "listAria": "Lista e njoftimeve",
+  "activity": "Aktiviteti",
+  "filters": {
+    "all": "Të gjitha",
+    "unread": "Të palexuara",
+    "reports": "Raportet",
+    "system": "Sistemi",
+    "analytics": "Analitika"
+  },
+  "emptyAll": "Ende pa njoftime në këtë pamje.",
+  "emptyUnread": "Jeni në rregull.",
+  "loading": "Duke ngarkuar njoftimet…",
+  "emptyDashboard": "Ende pa njoftime të disponueshme.",
+  "viewDetails": "Shiko detajet"
+}

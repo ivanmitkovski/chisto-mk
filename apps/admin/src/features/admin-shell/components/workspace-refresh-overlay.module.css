@@ -1,0 +1,27 @@
+.wrap {
+  position: relative;
+  min-width: 0;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-sticky);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: var(--space-8);
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(2px);
+  pointer-events: none;
+}
+
+.label {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
+}

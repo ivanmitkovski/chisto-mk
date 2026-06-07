@@ -2,12 +2,13 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { SectionState } from '@/components/ui';
+import { useTranslations } from 'next-intl';
+import { SectionState, PanelSkeleton } from '@/components/ui';
 import {
   fetchSiteHistory,
   type SiteHistoryEntryRow,
-} from '@/lib/api/site-history';
-import { formatDateTime } from '@/features/reports/utils/report-display';
+} from '@/lib/api';
+import { formatAdminDateTime, useAdminBcp47Locale } from '@/lib/i18n';
 import styles from '@/features/reports/components/report-review-card.module.css';
 
 function timelineToneClassName(kind: string): string {
@@ -38,9 +39,13 @@ type SiteTimelinePanelProps = {
 };
 
 export function SiteTimelinePanel({ siteId, refreshToken = 0 }: SiteTimelinePanelProps) {
+  const t = useTranslations('sites');
+  const locale = useAdminBcp47Locale();
   const [entries, setEntries] = useState<SiteHistoryEntryRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const formatDateTime = (value: string) => formatAdminDateTime(value, locale);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -49,11 +54,11 @@ export function SiteTimelinePanel({ siteId, refreshToken = 0 }: SiteTimelinePane
       const res = await fetchSiteHistory(siteId, { limit: 50 });
       setEntries(res.items);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to load timeline');
+      setError(e instanceof Error ? e.message : t('detail.timelineLoadFailed'));
     } finally {
       setLoading(false);
     }
-  }, [siteId]);
+  }, [siteId, t]);
 
   useEffect(() => {
     void load();
@@ -64,16 +69,14 @@ export function SiteTimelinePanel({ siteId, refreshToken = 0 }: SiteTimelinePane
       className={styles.panel}
       whileHover={{ y: -2 }}
       transition={{ duration: 0.15 }}
-      aria-label="Site timeline"
+      aria-label={t('detail.timelineTitle')}
     >
       <div className={styles.sectionHeader}>
-        <h3>Site timeline</h3>
-        <span>{entries.length} events</span>
+        <h3>{t('detail.timelineTitle')}</h3>
+        <span>{t('detail.timelineEvents', { count: entries.length })}</span>
       </div>
       {loading ? (
-        <div className={styles.sectionEmpty}>
-          <SectionState variant="loading" message="Loading timeline…" />
-        </div>
+        <PanelSkeleton variant="list" listItems={4} />
       ) : error ? (
         <div className={styles.sectionEmpty}>
           <SectionState variant="error" message={error} />
@@ -82,7 +85,7 @@ export function SiteTimelinePanel({ siteId, refreshToken = 0 }: SiteTimelinePane
         <div className={styles.sectionEmpty}>
           <SectionState
             variant="empty"
-            message="Timeline entries will appear as reports, events, and status changes occur."
+            message={t('detail.timelineEmpty')}
           />
         </div>
       ) : (
@@ -100,7 +103,7 @@ export function SiteTimelinePanel({ siteId, refreshToken = 0 }: SiteTimelinePane
                 </div>
                 {entry.note ? <p>{entry.note}</p> : null}
                 {entry.actor?.displayName ? (
-                  <span>By {entry.actor.displayName}</span>
+                  <span>{t('detail.timelineBy', { name: entry.actor.displayName })}</span>
                 ) : null}
               </div>
             </li>

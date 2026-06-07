@@ -24,6 +24,8 @@ export type ReportModerationMeta = {
   queueLabel: string;
   slaLabel: string;
   assignedTeam: string;
+  assignedModeratorId?: string | null;
+  assignedModeratorName?: string | null;
 };
 
 export type ReportMapPin = {

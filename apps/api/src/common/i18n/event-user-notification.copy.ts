@@ -136,16 +136,27 @@ export function cleanupOrganizerApprovedPush(
 export function cleanupOrganizerDeclinedPush(
   locale: EventNotificationLocale,
   title: string,
+  declineReason?: string,
 ): { title: string; body: string } {
   const t = title.length > 80 ? `${title.slice(0, 77)}…` : title;
+  const reason =
+    declineReason != null && declineReason.trim().length > 0
+      ? declineReason.trim().length > 160
+        ? `${declineReason.trim().slice(0, 157)}…`
+        : declineReason.trim()
+      : null;
   if (locale === 'en') {
     return {
       title: 'Event not approved',
-      body: `“${t}” did not meet the criteria. Edit and submit again.`,
+      body: reason
+        ? `“${t}” was not approved. Reason: ${reason}`
+        : `“${t}” did not meet the criteria. Edit and submit again.`,
     };
   }
   return {
     title: 'Настанот не е одобрен',
-    body: `«${t}» не ги исполни критериумите. Уредете и поднесете повторно.`,
+    body: reason
+      ? `«${t}» не е одобрен. Причина: ${reason}`
+      : `«${t}» не ги исполни критериумите. Уредете и поднесете повторно.`,
   };
 }

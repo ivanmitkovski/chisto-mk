@@ -80,14 +80,16 @@
 }
 
 .filterSelect {
-  padding: var(--space-2) var(--space-3);
+  padding-block: var(--space-2);
+  padding-inline: var(--space-3) var(--native-select-chevron-padding-end);
   border-radius: var(--radius-md);
   border: 1px solid rgba(8, 54, 39, 0.14);
-  background: rgba(255, 255, 255, 0.9);
+  background-color: rgba(255, 255, 255, 0.9);
   font-size: 0.8125rem;
   font-weight: 500;
   color: rgba(8, 54, 39, 0.9);
   cursor: pointer;
+  line-height: 1.5;
   transition: border-color var(--motion-duration-fast) var(--motion-ease-out);
 }
 
@@ -145,12 +147,6 @@
   color: rgba(8, 54, 39, 0.9);
 }
 
-.tableWrap {
-  overflow-x: auto;
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(8, 54, 39, 0.06);
-}
-
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -184,20 +180,45 @@
   background: rgba(37, 219, 134, 0.06);
 }
 
-.thCheck,
-.tdCheck {
+.mobileCardSelected {
+  border-color: rgba(37, 219, 134, 0.35);
+  background: rgba(37, 219, 134, 0.06);
+}
+
+.mobileCardHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.mobileCardHeader input {
+  accent-color: var(--color-green-700);
+  flex-shrink: 0;
+}
+
+.mobileCardActions {
+  margin-top: var(--space-1);
+}
+
+.mobileCardActions a {
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.table th:first-child,
+.table td:first-child {
   width: 2.5rem;
   padding-right: 0;
 }
 
-.thCheck input,
-.tdCheck input {
+.table th:first-child input,
+.table td:first-child input {
   accent-color: var(--color-green-700);
   cursor: pointer;
 }
 
-.thActions,
-.tdActions {
+.table th:last-child,
+.table td:last-child {
   text-align: right;
 }
 
@@ -228,6 +249,15 @@
 .statusSuspended {
   background: var(--color-red-050);
   color: var(--color-error);
+}
+
+.statusDeleted {
+  background: rgba(8, 54, 39, 0.12);
+  color: rgba(8, 54, 39, 0.65);
+}
+
+.tableWithBulk {
+  /* checkbox column */
 }
 
 .statusDefault {

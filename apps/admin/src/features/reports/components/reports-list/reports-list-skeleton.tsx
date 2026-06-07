@@ -1,6 +1,7 @@
 'use client';
 
 import { Card } from '@/components/ui';
+import skeletonStyles from '@/components/ui/skeleton/skeleton.module.css';
 import styles from '../reports-list.module.css';
 
 type ReportsListSkeletonProps = {
@@ -33,13 +34,11 @@ export function ReportsListSkeleton({ embedded = false }: ReportsListSkeletonPro
   return (
     <section className={styles.section} aria-busy="true">
       <div className={styles.summaryStrip}>
-        <span className={styles.summaryValue}>—</span>
-        <span className={styles.summarySep}>·</span>
-        <span className={styles.summaryValue}>—</span>
-        <span className={styles.summarySep}>·</span>
-        <span className={styles.summaryValue}>—</span>
+        {Array.from({ length: 3 }).map((_, i) => (
+          <span key={i} className={`${skeletonStyles.shimmerBlock} ${skeletonStyles.summaryBar}`} />
+        ))}
       </div>
-      <span className={styles.sectionLabel}>Queue</span>
+      <span className={`${skeletonStyles.shimmerBlock} ${skeletonStyles.sectionLabelBar}`} />
       <div className={styles.reportsHeader}>
         <div>
           <div className={styles.titleSkeleton} />

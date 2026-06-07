@@ -1,5 +1,9 @@
+'use client';
+
 import { useEffect, useState } from 'react';
-import { SnackState } from '@/components/ui';
+import { useTranslations } from 'next-intl';
+import { useToast } from '@/components/ui';
+import { useOptimisticMutation } from '@/features/admin-shell';
 import { patchReportStatus } from '../lib/patch-report-status';
 import { ReportDetail, ReportStatus, ReportTimelineEntry } from '../types';
 
@@ -13,13 +17,20 @@ function createEntryId() {
   return `tl-${Date.now()}-${Math.round(Math.random() * 10000)}`;
 }
 
-function createTimelineEntry(status: ReportStatus, reason?: string): ReportTimelineEntry {
+type TimelineTranslator = (key: string, values?: Record<string, string>) => string;
+
+function createTimelineEntry(
+  status: ReportStatus,
+  actor: string,
+  tTimeline: TimelineTranslator,
+  reason?: string,
+): ReportTimelineEntry {
   if (status === 'APPROVED') {
     return {
       id: createEntryId(),
-      title: 'Report approved',
-      detail: 'Moderator accepted the report and moved it to approved lifecycle state.',
-      actor: 'Current moderator',
+      title: tTimeline('approvedTitle'),
+      detail: tTimeline('approvedDetail'),
+      actor,
       occurredAt: nowIsoString(),
       tone: 'success',
     };
@@ -28,11 +39,11 @@ function createTimelineEntry(status: ReportStatus, reason?: string): ReportTimel
   if (status === 'DELETED') {
     return {
       id: createEntryId(),
-      title: 'Report rejected',
+      title: tTimeline('rejectedTitle'),
       detail: reason
-        ? `Report was rejected and marked as removed. Reason: ${reason}`
-        : 'Report was rejected and marked as removed after moderation review.',
-      actor: 'Current moderator',
+        ? tTimeline('rejectedDetailWithReason', { reason })
+        : tTimeline('rejectedDetail'),
+      actor,
       occurredAt: nowIsoString(),
       tone: 'warning',
     };
@@ -40,15 +51,16 @@ function createTimelineEntry(status: ReportStatus, reason?: string): ReportTimel
 
   return {
     id: createEntryId(),
-    title: 'Moved to in-review',
-    detail: 'Report status moved to in-review for deeper moderation checks.',
-    actor: 'Current moderator',
+    title: tTimeline('inReviewTitle'),
+    detail: tTimeline('inReviewDetail'),
+    actor,
     occurredAt: nowIsoString(),
     tone: 'neutral',
   };
 }
 
 type UseReportReviewOptions = {
+  moderatorDisplayName?: string;
   onReportUpdated?: () => void;
 };
 
@@ -62,91 +74,114 @@ function reportReviewServerSyncKey(r: ReportDetail): string {
     t0?.id ?? '',
     t0?.occurredAt ?? '',
     r.priority,
+    r.moderation.assignedModeratorId ?? '',
   ].join('|');
 }
 
 export function useReportReview(initialReport: ReportDetail, options?: UseReportReviewOptions) {
+  const tToast = useTranslations('reports.toast');
+  const tTimeline = useTranslations('reports.timeline');
   const onReportUpdated = options?.onReportUpdated;
+  const moderatorDisplayName = options?.moderatorDisplayName ?? 'Current moderator';
   const [report, setReport] = useState<ReportDetail>(initialReport);
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [snack, setSnack] = useState<SnackState | null>(null);
+  const { showToast } = useToast();
 
   const serverSyncKey = reportReviewServerSyncKey(initialReport);
   useEffect(() => {
     setReport(initialReport);
   }, [initialReport, serverSyncKey]);
 
+  const { run, isPending: isUpdating } = useOptimisticMutation({
+    mutate: async ({
+      nextStatus,
+      action,
+      reason,
+    }: {
+      nextStatus: ReportStatus;
+      action: ReviewAction;
+      reason?: string | undefined;
+    }) => {
+      const result = await patchReportStatus(report.id, nextStatus, action, reason);
+      if (!result.ok) {
+        throw new Error(result.message);
+      }
+      return { nextStatus, action, reason };
+    },
+    onSuccess: () => {
+      onReportUpdated?.();
+    },
+    errorToast: {
+      title: tToast('actionFailedTitle'),
+    },
+  });
+
   async function mutateStatus(
     nextStatus: ReportStatus,
     action: ReviewAction,
     reason?: string,
   ): Promise<boolean> {
-    setIsUpdating(true);
     const trimmed = (reason ?? '').trim();
     const rejectDefault = 'Rejected by moderator.';
+    const snapshot = report;
 
-    const result = await patchReportStatus(report.id, nextStatus, action, reason);
+    const result = await run(
+      { nextStatus, action, reason },
+      {
+        optimistic: () => {
+          const timelineEntry = createTimelineEntry(
+            nextStatus,
+            moderatorDisplayName,
+            tTimeline,
+            action === 'reject' ? (trimmed.length > 0 ? trimmed : rejectDefault) : reason,
+          );
+          setReport((prev) => ({
+            ...prev,
+            status: nextStatus,
+            timeline: [timelineEntry, ...prev.timeline],
+          }));
+        },
+        rollback: () => setReport(snapshot),
+      },
+    );
 
-    if (!result.ok) {
-      setSnack({
-        tone: 'error',
-        title: 'Action failed',
-        message: result.message,
-      });
-      setIsUpdating(false);
+    if (result == null) {
       return false;
     }
 
-    const timelineEntry = createTimelineEntry(
-      nextStatus,
-      action === 'reject' ? (trimmed.length > 0 ? trimmed : rejectDefault) : reason,
-    );
-    setReport((prev) => ({
-      ...prev,
-      status: nextStatus,
-      timeline: [timelineEntry, ...prev.timeline],
-    }));
-
-    onReportUpdated?.();
-
     if (action === 'approve') {
-      setSnack({
+      showToast({
         tone: 'success',
-        title: 'Report approved',
-        message: 'This report has been accepted successfully.',
+        title: tToast('approvedTitle'),
+        message: tToast('approvedMessage'),
       });
-      setIsUpdating(false);
       return true;
     }
 
     if (action === 'in-review') {
-      setSnack({
+      showToast({
         tone: 'info',
-        title: 'Status updated',
-        message: 'This report is now marked as in review.',
+        title: tToast('inReviewTitle'),
+        message: tToast('inReviewMessage'),
       });
-      setIsUpdating(false);
       return true;
     }
 
-    setSnack({
+    showToast({
       tone: 'warning',
-      title: 'Report rejected',
+      title: tToast('rejectedTitle'),
       message: reason
-        ? `This report has been rejected. Reason: ${reason}`
-        : 'This report has been rejected and marked removed.',
+        ? tToast('rejectedWithReasonMessage', { reason })
+        : tToast('rejectedMessage'),
     });
-    setIsUpdating(false);
     return true;
   }
 
   return {
     report,
+    setReport,
     isUpdating,
-    snack,
     setInReview: () => mutateStatus('IN_REVIEW', 'in-review'),
     approveReport: () => mutateStatus('APPROVED', 'approve'),
     rejectReport: (reason?: string) => mutateStatus('DELETED', 'reject', reason),
-    clearSnack: () => setSnack(null),
   };
 }

@@ -1,4 +1,6 @@
 import { IconName } from '@/components/ui';
+import { formatAdminDate } from '@/lib/i18n/format-admin-datetime';
+import { ADMIN_LOCALE_BCP47, DEFAULT_ADMIN_LOCALE } from '@/lib/preferences/admin-locale';
 import { ReportStatus } from '../types';
 
 /** Report statuses that represent a final decision (no further approve/reject actions). */
@@ -8,20 +10,11 @@ export function isReportFinalStatus(status: ReportStatus): boolean {
   return FINAL_STATUSES.includes(status);
 }
 
-export function formatReportDate(value: string) {
-  return new Intl.DateTimeFormat('en-GB').format(new Date(value));
-}
-
-export function formatReportStatus(status: ReportStatus) {
-  if (status === 'IN_REVIEW') {
-    return 'In review';
-  }
-
-  if (status === 'DELETED') {
-    return 'Rejected';
-  }
-
-  return status.charAt(0) + status.slice(1).toLowerCase();
+export function formatReportDate(
+  value: string,
+  locale: string = ADMIN_LOCALE_BCP47[DEFAULT_ADMIN_LOCALE],
+) {
+  return formatAdminDate(value, locale);
 }
 
 export function statusIconName(status: ReportStatus): IconName {

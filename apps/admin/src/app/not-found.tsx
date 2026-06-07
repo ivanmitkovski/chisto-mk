@@ -1,8 +1,11 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
 import styles from './not-found.module.css';
 
-export default function NotFound() {
+export default async function NotFound() {
+  const t = await getTranslations('common');
+
   return (
     <main className={styles.wrapper}>
       <div className={styles.content}>
@@ -15,17 +18,14 @@ export default function NotFound() {
           className={styles.illustration}
           sizes="(max-width: 480px) 100vw, 232px"
         />
-        <h1 className={styles.title}>Page not found</h1>
-        <p className={styles.subtitle}>
-          The link may be broken or the page has been moved. Try returning to
-          the dashboard or login.
-        </p>
+        <h1 className={styles.title}>{t('pageNotFound')}</h1>
+        <p className={styles.subtitle}>{t('pageNotFoundDescription')}</p>
         <div className={styles.actions}>
           <Link href="/login" className={styles.primary}>
-            Back to Login
+            {t('backToLogin')}
           </Link>
           <Link href="/dashboard" className={styles.secondary}>
-            Go to Dashboard
+            {t('goToDashboard')}
           </Link>
         </div>
       </div>

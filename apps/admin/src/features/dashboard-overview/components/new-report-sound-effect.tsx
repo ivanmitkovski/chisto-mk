@@ -1,14 +1,14 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { getReportSoundPreference } from '@/lib/admin-preferences';
+import { getReportSoundPreference } from '@/lib/preferences';
 import {
   isReportAudioUnlocked,
   playReportChime,
   teardownReportAudio,
   unlockReportAudioFromUserGesture,
-} from '@/lib/admin-report-audio';
-import { subscribeNewReportSignal } from '@/lib/realtime-signals';
+} from '@/lib/realtime';
+import { subscribeNewReportSignal } from '@/lib/realtime';
 
 const MIN_SOUND_INTERVAL_MS = 4000;
 const DEBUG_REALTIME_FLAG = 'chisto:debug-realtime';

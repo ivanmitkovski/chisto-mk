@@ -1,0 +1,71 @@
+{
+  "pageTitle": "Moderimi UGC",
+  "pageHeaderTitle": "Moderimi UGC",
+  "pageDescription": "Triage raportet e qytetarëve për komente, biseda, përdorues, vende dhe ngjarje.",
+  "empty": "Asnjë raport UGC nuk përputhet me filtrat aktualë.",
+  "queueAria": "Radha e raporteve UGC",
+  "reportsCount": "{total} raporte",
+  "openOnPage": "{count} të hapura në këtë faqe",
+  "statusFilter": "Statusi",
+  "statusOptions": {
+    "all": "Të gjitha statuset",
+    "open": "Të hapura",
+    "escalated": "Të eskaluara",
+    "reviewed": "Të shqyrtuara",
+    "dismissed": "Të hequra",
+    "hidden": "Të fshehura"
+  },
+  "detail": {
+    "kicker": "Raport UGC",
+    "subjectPreview": "Parapamje e subjektit",
+    "openRecord": "Hap regjistrin {subjectType}",
+    "noDetailPage": "Ky lloj subjekti ende nuk ka faqe admin të dedikuar për detaje.",
+    "caseStatus": "Statusi i rastit",
+    "contentStatus": "Statusi i përmbajtjes",
+    "reason": "Arsyeja",
+    "reporter": "Raportuesi",
+    "created": "Krijuar",
+    "reporterProfile": "Profili i raportuesit",
+    "viewReporter": "Shiko raportuesin",
+    "reporterDetails": "Detajet e raportuesit",
+    "actionUnavailable": "Nuk disponohet për statusin aktual të raportit"
+  },
+  "subjectTypes": {
+    "user": "Profili i përdoruesit",
+    "site": "Regjistri i vendit",
+    "event": "Ngjarje pastrimi",
+    "site_comment": "Koment i vendit",
+    "event_chat_message": "Mesazh bisede ngjarjeje",
+    "safety_issue": "Problem sigurie"
+  },
+  "actions": {
+    "markReviewed": "Shëno si të shqyrtuar",
+    "dismiss": "Hiq",
+    "escalate": "Eskalo",
+    "hideSubject": "Fshih subjektin",
+    "restoreSubject": "Rikthe subjektin",
+    "moderateReport": "Modero raportin"
+  },
+  "modal": {
+    "description": "Ky veprim do të auditohet dhe do të jetë i dukshëm për adminët e tjerë.",
+    "policyReasonLabel": "Arsyeja e politikës (e detyrueshme për hiq/eskalo/fshih/rikthe)",
+    "policyReasonRequired": "Kërkohet arsye e politikës për këtë veprim.",
+    "moderatorNoteLabel": "Shënimi i moderatorit",
+    "hideSubjectConfirmTitle": "Fshih subjektin e raportuar?",
+    "hideSubjectConfirmDescription": "Kjo e fsheh subjektin nga publiku. Konfirmoni vetëm nëse shkel policy."
+  },
+  "toast": {
+    "savedTitle": "Moderimi u ruajt",
+    "savedMessage": "Raporti UGC u përditësua.",
+    "failedTitle": "Moderimi dështoi",
+    "failedMessage": "Nuk mund të përditësohet ky raport UGC."
+  },
+  "emptyFiltered": "Asnjë raport UGC nuk përputhet me filtrat. Provoni t'i pastroni.",
+  "readOnlyBanner": "Keni qasje vetëm leximi në moderimin UGC.",
+  "searchPlaceholder": "Kërko raporte…",
+  "searchAria": "Kërko raporte UGC",
+  "subjectTypeFilter": "Lloji i subjektit",
+  "subjectTypeOptions": {
+    "all": "Të gjitha llojet"
+  }
+}

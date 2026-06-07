@@ -3,12 +3,6 @@
   gap: var(--space-2);
 }
 
-.label {
-  color: var(--text-primary);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-}
-
 .input {
   min-height: 2.75rem;
   border: 1px solid var(--color-green-010);
@@ -23,9 +17,4 @@
   border-color: var(--border-focus);
   outline: none;
   box-shadow: var(--focus-ring);
-}
-
-.error {
-  color: var(--color-error);
-  font-size: var(--font-size-sm);
 }

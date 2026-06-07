@@ -1,22 +1,54 @@
 /*
- * Layout breakpoints (align with AdminShell matchMedia + CSS):
- * - --bp-phone-sm 20rem (~320px) — minimum width QA
- * - --bp-phone-md 24.375rem (~390px) — common phone
- * - --bp-mobile 48rem (768px) — drawer nav, tight shell padding
- * - --bp-tablet 64rem (1024px) — relaxed padding; data tables drop sticky-first-column helper
+ * Layout breakpoints (canonical — use only these in @media queries):
+ * - 36rem (~576px) — small phone / tight top bar
+ * - 48rem (768px) — mobile drawer nav, table card fallback
+ * - 64rem (1024px) — laptop / tablet padding, sticky table helper
+ * - 90rem (1440px) — large desktop
+ *
+ * Documented aliases (for JS matchMedia, not usable in @media):
+ * - --bp-phone-sm 20rem (~320px)
+ * - --bp-phone-md 24.375rem (~390px)
+ * - --bp-mobile 48rem
+ * - --bp-tablet 64rem
  */
 :root {
   color-scheme: light;
 
-  /** Command palette / global overlays — above sticky topbar (1200) and map chrome (≤1101). */
+  /** Typography — --font-roboto set by next/font on html; sans/mono aliases for CSS modules. */
+  --font-sans: var(--font-roboto, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+
+  /** Z-index ladder (low → high). Use var(--z-*) for overlay-level stacking. */
+  --z-sticky: 24;
+  --z-mobile-scrim: 22;
+  --z-topbar-panel: 26;
+  --z-dropdown: 50;
+  --z-map-loading: 500;
+  --z-map-refresh: 700;
+  --z-map-controls: 998;
+  --z-map-toolbar: 1000;
+  --z-map-attribution: 999;
+  --z-map-overlay: 1101;
+  --z-topbar: 1200;
+  --z-drawer: 1250;
+  --z-modal: 1300;
+  --z-lightbox: 1400;
+  --z-toast: 1500;
+  --z-tooltip: 1600;
+  --z-skip-link: 9999;
   --z-command-palette: 10000;
 
   --bp-phone-sm: 20rem;
   --bp-phone-md: 24.375rem;
   --bp-mobile: 48rem;
   --bp-tablet: 64rem;
+  --bp-phone: 36rem;
+  --bp-laptop: 64rem;
+  --bp-desktop: 90rem;
   --content-max-width: 80rem;
   --touch-target-min: 2.75rem;
+  /** Shared height for list-page filters: selects, search fields, outline buttons */
+  --filter-control-min-height: 2.5rem;
 
   --elevation-page: var(--elevation-1);
   --elevation-sticky: 0 4px 12px rgba(8, 54, 39, 0.06);
@@ -41,6 +73,12 @@
   --color-green-900: #083627;
   --color-green-700: #168d63;
   --color-green-600: #24966d;
+  --color-green-400: #3fce8f;
+
+  /** Mint aliases (green family) for newer feature modules. */
+  --color-mint-100: var(--color-green-010);
+  --color-mint-300: var(--color-primary);
+  --color-mint-700: var(--color-green-700);
 
   --color-yellow-100: #fff0c8;
   --color-red-100: #ffd7d4;
@@ -50,19 +88,71 @@
   --color-danger: var(--color-error);
   --color-muted: #6b7b7a;
   --border-default: rgba(8, 54, 39, 0.12);
+  --border-subtle: var(--color-green-010);
   --border-focus: var(--color-primary);
 
   --bg-app: #f7f8fe;
   --bg-surface: #ffffff;
   --surface-subtle: #f8faf9;
+  --surface-raised: var(--bg-surface);
+  --surface-elevated: var(--bg-surface);
+  --surface-default: var(--bg-surface);
   --bg-muted: #cccccc;
 
   --color-error: #f14336;
+  --color-error-hover: #d93b30;
+  --color-error-shadow: rgba(241, 67, 54, 0.28);
+  --color-error-shadow-hover: rgba(241, 67, 54, 0.36);
+  --color-on-primary: #062d21;
+  --color-primary-hover: #1fcb79;
+  --color-primary-shadow: rgba(37, 219, 134, 0.26);
+  --color-primary-shadow-hover: rgba(37, 219, 134, 0.34);
+  --color-on-danger: #ffffff;
+  --color-button-outline-border: var(--color-green-700);
+  --color-button-outline-fg: var(--color-green-600);
+  --color-button-outline-hover-bg: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  --color-button-icon-bg: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  --color-button-icon-border: color-mix(in srgb, var(--color-primary) 28%, transparent);
+  --color-button-icon-fg: var(--color-green-600);
+  --color-button-icon-hover-bg: color-mix(in srgb, var(--color-primary) 20%, transparent);
+  --color-button-icon-hover-border: color-mix(in srgb, var(--color-primary) 40%, transparent);
+  --color-button-ghost-hover-bg: color-mix(in srgb, var(--color-green-900) 6%, transparent);
+  --color-snack-glass-bg: color-mix(in srgb, var(--bg-surface) 82%, transparent);
+  --color-snack-glass-border: color-mix(in srgb, var(--bg-surface) 58%, transparent);
+  /** Snack/toast — solid surface for readable text over busy backgrounds. */
+  --color-snack-surface-bg: var(--bg-surface);
+  --color-snack-surface-border: var(--border-default);
+  --color-snack-title-fg: var(--color-text-strong);
+  --color-snack-message-fg: var(--text-secondary);
+  --color-snack-close: var(--text-secondary);
+  --color-snack-close-hover: var(--color-text-strong);
+  --color-snack-success-surface: color-mix(in srgb, var(--color-green-010) 72%, var(--bg-surface));
+  --color-snack-success-border: color-mix(in srgb, var(--color-success) 28%, transparent);
+  --color-snack-success-bg: color-mix(in srgb, var(--color-success) 16%, transparent);
+  --color-snack-danger-surface: color-mix(in srgb, var(--color-red-050) 55%, var(--bg-surface));
+  --color-snack-danger-border: color-mix(in srgb, var(--color-error) 30%, transparent);
+  --color-snack-danger-bg: color-mix(in srgb, var(--color-error) 16%, transparent);
+  --color-snack-warning-surface: color-mix(in srgb, var(--color-yellow-100) 62%, var(--bg-surface));
+  --color-snack-warning-border: color-mix(in srgb, var(--color-warning) 34%, transparent);
+  --color-snack-warning-bg: color-mix(in srgb, var(--color-warning) 18%, transparent);
+  --color-snack-info-surface: color-mix(in srgb, var(--color-info) 10%, var(--bg-surface));
+  --color-snack-info-border: color-mix(in srgb, var(--color-info) 28%, transparent);
+  --color-snack-info-bg: color-mix(in srgb, var(--color-info) 16%, transparent);
+  --color-snack-danger-fg: var(--color-error);
+  --color-snack-warning-fg: var(--color-status-warning-fg);
+  --color-snack-info-fg: var(--color-status-info-fg);
+  --shadow-snack: 0 12px 28px rgba(8, 54, 39, 0.14), 0 2px 8px rgba(8, 54, 39, 0.08);
+  --snack-viewport-inset: var(--space-6);
   --color-warning: #f8bb00;
   --color-info: #24acf9;
+  --color-text-strong: #0f172a;
+  --color-text-muted: #334155;
+  --color-success-fg: #15803d;
   /** Darker foreground on tinted info / warning badges (events admin). */
   --color-status-info-fg: #155a7a;
   --color-status-warning-fg: #8b6914;
+  --color-status-danger-fg: var(--color-error);
+  --color-warning-foreground: var(--color-status-warning-fg);
   /** Participants stat icon (events workspace). */
   --color-stat-participants-fg: #5b21b6;
 
@@ -105,10 +195,12 @@
   --overview-stat-label-weight: 500;
 
   --line-height-tight: 1.2;
+  --line-height-snug: 1.35;
   --line-height-normal: 1.5;
   --line-height-relaxed: 1.65;
 
   --font-weight-medium: 500;
+  --font-weight-regular: 400;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
 
@@ -131,10 +223,12 @@
   --radius-card: 0.75rem; /* 12px - Apple-like card corners */
   --radius-lg: 0.875rem;
   --radius-xl: 1.125rem;
+  --radius-2xl: 1.375rem;
   --radius-full: 999px;
 
   --shadow-sm: 0 1px 2px rgba(8, 54, 39, 0.08);
   --shadow-md: 0 6px 18px rgba(8, 54, 39, 0.08);
+  --shadow-xl: 0 24px 60px -12px rgba(8, 54, 39, 0.3);
   --elevation-1: 0 1px 2px rgba(8, 54, 39, 0.08);
   --elevation-2: 0 6px 18px rgba(8, 54, 39, 0.08);
 
@@ -142,6 +236,16 @@
   --motion-duration-fast: 150ms;
   --motion-duration-medium: 220ms;
   --motion-duration-slow: 280ms;
+
+  /** Skeleton loaders — Apple-style opacity pulse (size-independent, compositor-friendly) */
+  --skeleton-base: var(--color-green-010);
+  --skeleton-surface: rgba(255, 255, 255, 0.92);
+  --skeleton-surface-border: rgba(8, 54, 39, 0.08);
+  --skeleton-radius: var(--radius-sm);
+  --skeleton-duration: 1.5s;
+  --skeleton-ease: ease-in-out;
+  --skeleton-pulse-min: 0.5;
+  --skeleton-fade-duration: 160ms;
   --motion-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --motion-ease-emphasized: cubic-bezier(0.22, 1, 0.36, 1);
   --motion-ease-standard: ease-out;
@@ -168,4 +272,12 @@
    */
   --map-tile-template-light: 'https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}{r}.png';
   --map-tile-template-dark: 'https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}{r}.png';
+
+  /** Native <select> chevron (replaces OS arrow; vertically centered via background-position). */
+  --native-select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234c6361' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  --native-select-chevron-size: 1rem;
+  --native-select-chevron-inset: var(--space-3);
+  --native-select-chevron-padding-end: calc(
+    var(--native-select-chevron-inset) + var(--native-select-chevron-size) + 0.125rem
+  );
 }

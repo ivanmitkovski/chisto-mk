@@ -5,6 +5,15 @@ import { Role } from '../../src/prisma-client';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
 
 describe('ModerationService', () => {
+  const subjectVisibility = {
+    resolveContentStatus: jest.fn(),
+    applySubjectVisibility: jest.fn(),
+  };
+
+  function makeService(prisma: unknown) {
+    return new ModerationService(prisma as never, subjectVisibility as never);
+  }
+
   const user: AuthenticatedUser = {
     userId: 'u-blocker',
     email: 'blocker@test.mk',
@@ -21,7 +30,7 @@ describe('ModerationService', () => {
         ]),
       },
     };
-    const svc = new ModerationService(prisma as never);
+    const svc = makeService(prisma);
     await expect(svc.blockedUserIdsFor(user.userId)).resolves.toEqual(['u-b1', 'u-b2']);
     expect(prisma.userBlock.findMany).toHaveBeenCalledWith({
       where: { blockerId: user.userId },
@@ -31,7 +40,7 @@ describe('ModerationService', () => {
 
   it('blockUser rejects self-block', async () => {
     const prisma = { userBlock: { upsert: jest.fn() } };
-    const svc = new ModerationService(prisma as never);
+    const svc = makeService(prisma);
     await expect(
       svc.blockUser(user, { blockedUserId: user.userId }),
     ).rejects.toBeInstanceOf(ConflictException);
@@ -48,7 +57,7 @@ describe('ModerationService', () => {
         }),
       },
     };
-    const svc = new ModerationService(prisma as never);
+    const svc = makeService(prisma);
     await svc.blockUser(user, { blockedUserId: 'u-peer' });
     expect(prisma.userBlock.upsert).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -64,7 +73,7 @@ describe('ModerationService', () => {
     const prisma = {
       userBlock: { deleteMany: jest.fn().mockResolvedValue({ count: 1 }) },
     };
-    const svc = new ModerationService(prisma as never);
+    const svc = makeService(prisma);
     await svc.unblock(user, 'u-peer');
     expect(prisma.userBlock.deleteMany).toHaveBeenCalledWith({
       where: { blockerId: user.userId, blockedUserId: 'u-peer' },

@@ -35,12 +35,14 @@ import { Roles } from '../../auth/decorators/roles.decorator';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { BulkSitesDto } from '../dto/bulk-sites.dto';
 import { CreateSiteDto } from '../dto/create-site.dto';
+import { ListAdminSitesQueryDto } from '../dto/list-admin-sites-query.dto';
 import { ListSitesQueryDto } from '../dto/list-sites-query.dto';
 import { SiteMapSearchDto } from '../dto/site-map-search.dto';
 import { SiteShareAttributionEventDto } from '../dto/site-share-attribution-event.dto';
 import { TrackFeedEventDto } from '../dto/track-feed-event.dto';
 import { SiteFeedListResponseDto } from '../dto/site-list-item-response.dto';
 import { SitesAdminService } from '../services/sites-admin.service';
+import { SitesAdminListService } from '../services/sites-admin-list.service';
 import { SitesFeedService } from '../services/sites-feed.service';
 import { SitesSavedListService } from '../services/sites-saved-list.service';
 import { SiteEngagementService } from '../services/site-engagement.service';
@@ -65,6 +67,7 @@ import { ApiStandardHttpErrorResponses } from '../../common/openapi/standard-htt
 export class SitesController {
   constructor(
     private readonly sitesAdmin: SitesAdminService,
+    private readonly sitesAdminList: SitesAdminListService,
     private readonly sitesFeed: SitesFeedService,
     private readonly sitesSavedList: SitesSavedListService,
     private readonly siteEngagement: SiteEngagementService,
@@ -157,6 +160,16 @@ export class SitesController {
     return this.sitesMapFacade.searchMapSites(dto, {
       viewerUserId: user?.userId ?? null,
     });
+  }
+
+  @Get('admin/list')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(...ADMIN_PANEL_ROLES)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Admin panel: paginated site list with search' })
+  @ApiOkResponse({ description: 'Sites listed for admin workspace' })
+  adminList(@Query() query: ListAdminSitesQueryDto) {
+    return this.sitesAdminList.list(query);
   }
 
   @Idempotent('sites_sites_152')

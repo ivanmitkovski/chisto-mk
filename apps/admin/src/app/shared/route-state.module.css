@@ -258,7 +258,7 @@
   }
 }
 
-@media (max-width: 52rem) {
+@media (max-width: 48rem) {
   .wrapper {
     padding: var(--space-4);
   }

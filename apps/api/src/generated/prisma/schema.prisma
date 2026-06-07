@@ -60,6 +60,11 @@ model User {
   auditLogs                   AuditLog[]
   adminTempTokens             AdminTempToken[]
   adminPendingMfa             AdminPendingMfa?
+  adminInvitesSent            AdminInvite[]                @relation("AdminInviteInviter")
+  adminInviteAccepted         AdminInvite?                 @relation("AdminInviteAcceptedUser")
+  adminEmailPreferences       AdminEmailPreference[]
+  adminEmailOutboxRows        AdminEmailOutbox[]           @relation("AdminEmailOutboxRecipient")
+  broadcastCampaignsCreated   BroadcastCampaign[]          @relation("BroadcastCampaignCreator")
   siteVotes                   SiteVote[]
   siteSaves                   SiteSave[]
   siteComments                SiteComment[]
@@ -73,6 +78,8 @@ model User {
   userNotifications           UserNotification[]
   notificationPreferences     UserNotificationPreference[]
   organizedCleanupEvents      CleanupEvent[]               @relation("CleanupEventOrganizer")
+  moderatedCleanupEvents      CleanupEvent[]               @relation("CleanupEventModerator")
+  cleanupEventModerationNotes CleanupEventModerationNote[]
   eventParticipations         EventParticipant[]
   eventCheckIns               EventCheckIn[]
   eventChatMessages           EventChatMessage[]           @relation("EventChatMessages")
@@ -83,6 +90,7 @@ model User {
   eventEvidencePhotosUploaded EventEvidencePhoto[]
   routeSegmentsClaimed        EventRouteSegment[]          @relation("RouteSegmentClaims")
   checkInRiskSignals          CheckInRiskSignal[]
+  resolvedCheckInRiskSignals  CheckInRiskSignal[]          @relation("CheckInRiskSignalResolvedBy")
   archivedSites               Site[]                       @relation("SiteArchivedBy")
   passwordResetEmailCode      PasswordResetEmailCode?
   blocksInitiated             UserBlock[]                  @relation("BlockBlocker")
@@ -214,6 +222,90 @@ model AdminTempToken {
 
   @@index([expiresAt])
   @@index([userId])
+}
+
+enum AdminInviteStatus {
+  PENDING
+  ACCEPTED
+  REVOKED
+  EXPIRED
+}
+
+model AdminInvite {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  email          String
+  firstName      String
+  lastName       String
+  role           Role
+  tokenHash      String            @unique
+  mfaSecret      String?
+  status         AdminInviteStatus @default(PENDING)
+  invitedById    String
+  invitedBy      User              @relation("AdminInviteInviter", fields: [invitedById], references: [id], onDelete: Cascade)
+  acceptedUserId String?           @unique
+  acceptedUser   User?             @relation("AdminInviteAcceptedUser", fields: [acceptedUserId], references: [id], onDelete: SetNull)
+  expiresAt      DateTime
+  acceptedAt     DateTime?
+  revokedAt      DateTime?
+  attemptCount   Int               @default(0)
+
+  @@index([email])
+  @@index([status])
+}
+
+enum AdminModerationCategory {
+  NEW_REPORT
+  EVENT_PENDING
+  UGC_REPORT
+  CHECKIN_RISK
+}
+
+model AdminEmailPreference {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId   String
+  user     User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category AdminModerationCategory
+  enabled  Boolean
+
+  @@unique([userId, category])
+  @@index([userId])
+}
+
+enum AdminEmailOutboxStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+model AdminEmailOutbox {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  recipientUserId String
+  recipientUser   User                    @relation("AdminEmailOutboxRecipient", fields: [recipientUserId], references: [id], onDelete: Cascade)
+  recipientEmail  String
+  category        AdminModerationCategory
+  templateId      String
+  payload         Json
+  status          AdminEmailOutboxStatus  @default(PENDING)
+  attempts        Int                     @default(0)
+  maxAttempts     Int                     @default(5)
+  nextAttemptAt   DateTime?
+  processingAt    DateTime?
+  leaseOwner      String?
+  lastAttemptAt   DateTime?
+  lastError       String?
+  idempotencyKey  String                  @unique
+
+  @@index([status, nextAttemptAt, processingAt])
+  @@index([createdAt])
 }
 
 model AdminPendingMfa {
@@ -531,6 +623,43 @@ model SystemConfig {
   @@index([key])
 }
 
+enum BroadcastCampaignStatus {
+  DRAFT
+  SCHEDULED
+  SENT
+  CANCELLED
+}
+
+enum BroadcastAudience {
+  ALL
+  ACTIVE
+  AREA
+  USERS
+}
+
+model BroadcastCampaign {
+  id        String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title           String
+  body            String
+  type            String                  @default("SYSTEM")
+  deeplink        String?
+  audience        BroadcastAudience
+  audienceUserIds String[]                @default([])
+  status          BroadcastCampaignStatus @default(DRAFT)
+  scheduledAt     DateTime?
+  sentAt          DateTime?
+  sentCount       Int?
+
+  createdById String?
+  createdBy   User?   @relation("BroadcastCampaignCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([status, scheduledAt])
+  @@index([createdAt(sort: Desc)])
+}
+
 model FeatureFlag {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
@@ -631,6 +760,13 @@ model CleanupEvent {
   /// Moderation (admin approval for user-created events).
   status CleanupEventStatus @default(APPROVED)
 
+  /// Admin who last approved or declined (null while pending or after return-to-pending).
+  moderatedById String?
+  moderatedBy   User?     @relation("CleanupEventModerator", fields: [moderatedById], references: [id], onDelete: SetNull)
+  moderatedAt   DateTime?
+  /// Persisted decline reason (also mirrored in audit metadata).
+  declineReason String?   @db.Text
+
   /// Lifecycle shown in the mobile app when event is APPROVED.
   lifecycleStatus EcoEventLifecycleStatus @default(UPCOMING)
 
@@ -661,6 +797,7 @@ model CleanupEvent {
   evidencePhotos     EventEvidencePhoto[]
   routeSegments      EventRouteSegment[]
   checkInRiskSignals CheckInRiskSignal[]
+  moderationNotes    CleanupEventModerationNote[]
 
   /// PostgreSQL `tsvector` for ranked full-text search (generated column + GIN index in migration).
   /// Declared as [Unsupported] so Prisma Client does not expose it and migrations stay aligned with the DB.
@@ -686,6 +823,26 @@ model CleanupEvent {
   @@index([lifecycleStatus, endAt])
   @@index([organizerId])
   @@index([parentEventId])
+  @@index([moderatedById])
+}
+
+/// Internal admin-only notes on a cleanup event (not visible to organizers).
+model CleanupEventModerationNote {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  eventId String
+  event   CleanupEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  authorId            String?
+  author              User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  authorEmailSnapshot String?
+
+  body String @db.Text
+
+  @@index([eventId, createdAt])
+  @@index([authorId])
 }
 
 enum EventChatMessageType {
@@ -941,9 +1098,18 @@ model CheckInRiskSignal {
   signalType CheckInRiskSignalType
   metadata   Json?
 
+  resolvedAt       DateTime?
+  resolvedByUserId String?
+  resolvedBy       User?     @relation("CheckInRiskSignalResolvedBy", fields: [resolvedByUserId], references: [id], onDelete: SetNull)
+  /**
+   * Admin action when resolved: resolve | dismiss
+   */
+  resolutionAction String?
+
   @@index([eventId, createdAt])
   @@index([userId, createdAt])
   @@index([expiresAt])
+  @@index([resolvedAt])
 }
 
 model SiteVote {

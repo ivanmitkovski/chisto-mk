@@ -17,7 +17,7 @@
   display: grid;
   grid-template-columns: repeat(6, minmax(2.25rem, 1fr));
   gap: var(--space-2);
-  max-width: 22rem;
+  max-width: 36rem;
 }
 
 .cell {
@@ -48,7 +48,7 @@
   font-size: var(--font-size-sm);
 }
 
-@media (max-width: 22rem) {
+@media (max-width: 36rem) {
   .cells {
     gap: var(--space-1);
   }

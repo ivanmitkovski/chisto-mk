@@ -1,6 +1,7 @@
 'use client';
 
 import { ClipboardEvent, KeyboardEvent, useMemo, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import styles from './otp-input.module.css';
 
 type OtpInputProps = {
@@ -15,6 +16,7 @@ type OtpInputProps = {
 const OTP_LENGTH = 6;
 
 export function OtpInput({ id, label, value, onChange, disabled, errorText }: OtpInputProps) {
+  const t = useTranslations('auth');
   const refs = useRef<Array<HTMLInputElement | null>>([]);
   const digits = useMemo(() => value.padEnd(OTP_LENGTH, ' ').slice(0, OTP_LENGTH).split(''), [value]);
 
@@ -64,7 +66,7 @@ export function OtpInput({ id, label, value, onChange, disabled, errorText }: Ot
               refs.current[index] = node;
             }}
             className={styles.cell}
-            aria-label={`Digit ${index + 1}`}
+            aria-label={t('digitLabel', { index: index + 1 })}
             aria-invalid={Boolean(errorText)}
             inputMode="numeric"
             autoComplete={index === 0 ? 'one-time-code' : 'off'}

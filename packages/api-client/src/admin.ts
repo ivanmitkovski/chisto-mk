@@ -1,6 +1,7 @@
 import { ApiClient, type ApiClientOptions } from './client';
+import type { components } from './generated/schema';
 
-export type AdminOverview = Record<string, unknown>;
+export type AdminOverview = components['schemas']['AdminOverviewResponseDto'];
 
 export class AdminApiClient {
   private readonly client: ApiClient;

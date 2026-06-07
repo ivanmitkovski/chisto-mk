@@ -1,15 +1,18 @@
 import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { AdminShell } from '@/features/admin-shell';
-import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell/constants';
+import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell';
 import { SectionState } from '@/components/ui';
 import { ApiError } from '@/lib/api';
-import { getSiteDetail } from '@/features/sites/data/sites-adapter';
-import { SiteDetailClient } from '@/app/dashboard/sites/[id]/site-detail-client';
+import { ADMIN_PERMISSIONS } from '@/lib/auth/rbac/permissions';
+import { requirePagePermission } from '@/lib/auth/rbac/server';
+import { getSiteDetail } from '@/features/sites';
+import { SiteDetailClient } from '@/features/sites';
 
 type PageProps = { params: Promise<{ id: string }> };
 
 export default async function SiteDetailPage(props: PageProps) {
+  await requirePagePermission(ADMIN_PERMISSIONS['sites:read']);
   const { id } = await props.params;
   const cookieStore = await cookies();
   const initialSidebarCollapsed = cookieStore.get(DESKTOP_SIDEBAR_COOKIE_KEY)?.value === '1';

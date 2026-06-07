@@ -1,17 +1,21 @@
 .sidebar {
-  height: 100vh;
+  height: 100%;
+  max-height: 100dvh;
+  min-height: 0;
   position: sticky;
   top: 0;
-  z-index: 24;
+  z-index: var(--z-sticky);
   background: rgba(255, 255, 255, 0.76);
   border-right: 1px solid rgba(37, 219, 134, 0.2);
   padding: var(--space-6) var(--space-4) var(--space-4);
   backdrop-filter: blur(12px);
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   gap: var(--space-4);
   overflow: hidden;
-  transition: width 220ms ease, padding 220ms ease;
+  transition:
+    width var(--motion-duration-medium) var(--motion-ease-out),
+    padding var(--motion-duration-medium) var(--motion-ease-out);
 }
 
 .brandRow {
@@ -35,10 +39,37 @@
   display: none;
 }
 
+.navScroll {
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  -webkit-overflow-scrolling: touch;
+  margin-right: calc(-1 * var(--space-1));
+  padding-right: var(--space-1);
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--color-primary) 35%, transparent) transparent;
+}
+
+.navScroll::-webkit-scrollbar {
+  width: 0.375rem;
+}
+
+.navScroll::-webkit-scrollbar-thumb {
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--color-primary) 35%, transparent);
+}
+
+.navScroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 .nav {
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
+  padding-bottom: var(--space-2);
 }
 
 .navLink {
@@ -58,6 +89,11 @@
   background: rgba(37, 219, 134, 0.1);
   color: #0d8a54;
   transform: translateX(1px);
+}
+
+.navLink:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
 
 .navLinkActive {
@@ -130,10 +166,12 @@
   position: fixed;
   left: 0;
   top: 0;
+  height: 100dvh;
+  max-height: 100dvh;
   width: min(17.5rem, calc(100vw - 3.25rem));
   transform: translateX(-105%);
-  transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
-  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.3);
+  transition: transform var(--motion-duration-medium) var(--motion-ease-out);
+  box-shadow: var(--shadow-xl);
 }
 
 .sidebarMobileOpen {

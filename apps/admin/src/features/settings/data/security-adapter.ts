@@ -1,6 +1,5 @@
-import { apiFetch } from '@/lib/api';
-import { getAdminAuthTokenFromCookies } from '@/features/auth/lib/admin-auth-server';
-import type { AdminSession, SecurityActivityEvent } from './security';
+import { serverAuthenticatedFetch } from '@/lib/auth/server-api-with-refresh';
+import type { AdminSession, SecurityActivityEvent } from './security-types';
 
 export type AdminSecurityOverviewResponse = {
   sessions: AdminSession[];
@@ -8,11 +7,9 @@ export type AdminSecurityOverviewResponse = {
 };
 
 export async function getAdminSecurityOverview(): Promise<AdminSecurityOverviewResponse> {
-  const token = await getAdminAuthTokenFromCookies();
 
-  return apiFetch<AdminSecurityOverviewResponse>('/admin/security/overview', {
+  return serverAuthenticatedFetch<AdminSecurityOverviewResponse>('/admin/security/overview', {
     method: 'GET',
-    authToken: token,
   });
 }
 

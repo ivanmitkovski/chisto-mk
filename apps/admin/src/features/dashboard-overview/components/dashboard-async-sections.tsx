@@ -1,7 +1,14 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { cache } from 'react';
-import { SkeletonCard, SkeletonTable } from '@/components/ui';
+import { getTranslations } from 'next-intl/server';
+import {
+  Card,
+  OverviewSkeleton,
+  OverviewStatsSkeleton,
+  SkeletonCard,
+  SkeletonTable,
+} from '@/components/ui';
 import {
   ApiConnectionError,
   ApiError,
@@ -13,18 +20,19 @@ import { DashboardLastUpdated } from './dashboard-last-updated';
 import { DashboardRefreshButton } from './dashboard-refresh-button';
 import { DashboardSectionError } from './dashboard-section-error';
 import { DashboardSSEStatusIndicator } from './dashboard-sse-status-indicator';
-import { getDashboardOverview } from '../data/adapters/dashboard-adapter';
+import { getDashboardOverview } from '../data/dashboard-adapter';
 import { QuickActionsDropdown } from './quick-actions-dropdown';
 import { RecentActivityFeed } from './recent-activity-feed';
 import { ReportsTrendChart } from './reports-trend-chart';
 import { StatsOverview } from './stats-overview';
 import { UpcomingCleanupsCard } from './upcoming-cleanups-card';
-import { Card } from '@/components/ui';
-import { getReports, ReportsList } from '@/features/reports';
+import { getReportsPage, ReportsList } from '@/features/reports';
 import styles from './dashboard-async-sections.module.css';
 
 const getOverviewCached = cache(getDashboardOverview);
-const getReportsCached = cache(getReports);
+const getOverviewReportsCached = cache(() =>
+  getReportsPage({ page: 1, limit: 5 }).then((response) => response.data),
+);
 
 function getErrorHttpStatus(error: unknown): number | null {
   if (error instanceof ApiError) return error.status;
@@ -60,7 +68,11 @@ function isLikelyNetworkFailure(error: unknown): boolean {
   return false;
 }
 
-function getErrorDetails(error: unknown, fallback: string): {
+function getErrorDetails(
+  error: unknown,
+  fallback: string,
+  tErrors: (key: 'sessionExpired' | 'apiServerError' | 'statisticsFailed' | 'reportsTableFailed' | 'insightsFailed' | 'dashboardFailed') => string,
+): {
   message: string;
   showSignInLink: boolean;
 } {
@@ -70,7 +82,7 @@ function getErrorDetails(error: unknown, fallback: string): {
   const httpStatus = getErrorHttpStatus(error);
   if (httpStatus === 401 || httpStatus === 403) {
     return {
-      message: 'Session expired or access denied. The access token may have expired (default 15 min). Sign in again.',
+      message: tErrors('sessionExpired'),
       showSignInLink: true,
     };
   }
@@ -79,7 +91,7 @@ function getErrorDetails(error: unknown, fallback: string): {
     return { message: CONNECTION_ERROR_MESSAGE + hint, showSignInLink: false };
   }
   if (error instanceof ApiError && error.status >= 500) {
-    return { message: 'API server error. Please try again later.', showSignInLink: false };
+    return { message: tErrors('apiServerError'), showSignInLink: false };
   }
   if (isLikelyNetworkFailure(error)) {
     const hint = getApiBaseUrlMisconfigurationHint() ?? '';
@@ -89,34 +101,33 @@ function getErrorDetails(error: unknown, fallback: string): {
 }
 
 export async function StatsSection() {
+  const tSections = await getTranslations('dashboard.sections');
+  const tErrors = await getTranslations('dashboard.errors');
   try {
     const overview = await getOverviewCached();
     return (
       <DashboardSectionWrapper delay={0}>
-        <DashboardErrorBoundary sectionName="Statistics">
+        <DashboardErrorBoundary sectionName={tSections('statistics')}>
           <StatsOverview stats={overview.stats} />
         </DashboardErrorBoundary>
       </DashboardSectionWrapper>
     );
   } catch (err) {
     redirectToLoginIfUnauthorized(err);
-    return <DashboardSectionError {...getErrorDetails(err, 'Statistics failed to load.')} />;
+    return <DashboardSectionError {...getErrorDetails(err, tErrors('statisticsFailed'), tErrors)} />;
   }
 }
 
 export function StatsFallback() {
-  return (
-    <div className={styles.statsSkeleton} aria-hidden>
-      {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className={styles.statBar} />
-      ))}
-    </div>
-  );
+  return <OverviewStatsSkeleton />;
 }
 
 export async function ReportsSection() {
+  const t = await getTranslations('dashboard.reportsSection');
+  const tSections = await getTranslations('dashboard.sections');
+  const tErrors = await getTranslations('dashboard.errors');
   try {
-    const reports = await getReportsCached();
+    const reports = await getOverviewReportsCached();
     const highPriorityCount = reports.filter(
       (r) => r.status === 'NEW' || r.status === 'IN_REVIEW',
     ).length;
@@ -128,15 +139,15 @@ export async function ReportsSection() {
           className={styles.reportsSection}
           aria-labelledby="reports-heading"
         >
-          <span className={styles.sectionLabel}>Queue</span>
+          <span className={styles.sectionLabel}>{t('queue')}</span>
         <div className={styles.reportsHeader}>
           <div>
             <h2 id="reports-heading" className={styles.sectionTitle}>
-              Reports
+              {t('title')}
             </h2>
             {highPriorityCount > 0 ? (
               <p className={styles.reportsSubline}>
-                {highPriorityCount} report{highPriorityCount !== 1 ? 's' : ''} need attention
+                {t('needAttention', { count: highPriorityCount })}
               </p>
             ) : null}
           </div>
@@ -147,11 +158,11 @@ export async function ReportsSection() {
               <DashboardRefreshButton />
             </div>
             <Link href="/dashboard/reports" className={styles.viewAllLink}>
-              View all reports
+              {t('viewAllReports')}
             </Link>
           </div>
         </div>
-        <DashboardErrorBoundary sectionName="Reports table">
+        <DashboardErrorBoundary sectionName={tSections('reportsTable')}>
           <ReportsList
             reports={reports}
             variant="overview"
@@ -167,10 +178,10 @@ export async function ReportsSection() {
     redirectToLoginIfUnauthorized(err);
     return (
       <section id="reports-section" className={styles.reportsSection} aria-labelledby="reports-heading">
-        <span className={styles.sectionLabel}>Queue</span>
+        <span className={styles.sectionLabel}>{t('queue')}</span>
         <div className={styles.reportsHeader}>
           <h2 id="reports-heading" className={styles.sectionTitle}>
-            Reports
+            {t('title')}
           </h2>
           <div className={styles.reportsHeaderActions}>
             <div className={styles.statusPill} role="status">
@@ -179,11 +190,11 @@ export async function ReportsSection() {
               <DashboardRefreshButton />
             </div>
             <Link href="/dashboard/reports" className={styles.viewAllLink}>
-              View all reports
+              {t('viewAllReports')}
             </Link>
           </div>
         </div>
-        <DashboardSectionError {...getErrorDetails(err, 'Reports table failed to load.')} />
+        <DashboardSectionError {...getErrorDetails(err, tErrors('reportsTableFailed'), tErrors)} />
       </section>
     );
   }
@@ -192,13 +203,14 @@ export async function ReportsSection() {
 export function ReportsFallback() {
   return (
     <section className={styles.reportsSection} aria-busy>
-      <div className={styles.reportsHeaderSkeleton} />
       <SkeletonTable rows={5} cols={4} />
     </section>
   );
 }
 
 export async function InsightsSection() {
+  const t = await getTranslations('dashboard');
+  const tSections = await getTranslations('dashboard.sections');
   try {
     const overview = await getOverviewCached();
     return (
@@ -209,21 +221,21 @@ export async function InsightsSection() {
           aria-labelledby="insights-heading"
         >
           <h2 id="insights-heading" className={styles.insightsHeading}>
-            Insights
+            {t('insights.title')}
           </h2>
           <div className={styles.insightsRow}>
             <DashboardSectionWrapper delay={0} className={styles.insightCardWrapper}>
-              <DashboardErrorBoundary sectionName="Reports trend">
+              <DashboardErrorBoundary sectionName={tSections('reportsTrend')}>
                 <ReportsTrendChart data={overview.reportsTrend} />
               </DashboardErrorBoundary>
             </DashboardSectionWrapper>
             <DashboardSectionWrapper delay={0.05} className={styles.insightCardWrapper}>
-              <DashboardErrorBoundary sectionName="Recent activity">
+              <DashboardErrorBoundary sectionName={tSections('recentActivity')}>
                 <RecentActivityFeed items={overview.recentActivity} />
               </DashboardErrorBoundary>
             </DashboardSectionWrapper>
             <DashboardSectionWrapper delay={0.1} className={styles.insightCardWrapper}>
-              <DashboardErrorBoundary sectionName="Cleanup events">
+              <DashboardErrorBoundary sectionName={tSections('cleanupEvents')}>
                 <UpcomingCleanupsCard
                   upcoming={overview.cleanupEvents.upcoming}
                   completed={overview.cleanupEvents.completed}
@@ -232,12 +244,12 @@ export async function InsightsSection() {
               </DashboardErrorBoundary>
             </DashboardSectionWrapper>
             <DashboardSectionWrapper delay={0.15} className={styles.insightCardWrapper}>
-              <DashboardErrorBoundary sectionName="Feed diagnostics">
+              <DashboardErrorBoundary sectionName={tSections('feedDiagnostics')}>
                 <Card padding="md" className={styles.feedDiagnosticsCard}>
-                  <span className={styles.sectionLabel}>Feed ops</span>
-                  <h3 className={styles.feedDiagnosticsTitle}>Feed diagnostics</h3>
+                  <span className={styles.sectionLabel}>{t('insights.feedOps')}</span>
+                  <h3 className={styles.feedDiagnosticsTitle}>{t('insights.feedDiagnosticsTitle')}</h3>
                   <p className={styles.feedDiagnosticsSubline}>
-                    Integrity demotions (7d): {overview.feedDiagnostics.recentIntegrityDemotions}
+                    {t('insights.integrityDemotions', { count: overview.feedDiagnostics.recentIntegrityDemotions })}
                   </p>
                   <div className={styles.feedReasonList}>
                     {overview.feedDiagnostics.reasonCodes.slice(0, 5).map((item) => (
@@ -266,6 +278,8 @@ export async function InsightsSection() {
     );
   } catch (err) {
     redirectToLoginIfUnauthorized(err);
+    const tInsights = await getTranslations('dashboard');
+    const tErrorsCatch = await getTranslations('dashboard.errors');
     return (
       <section
         id="insights-section"
@@ -273,10 +287,10 @@ export async function InsightsSection() {
         aria-labelledby="insights-heading"
       >
         <h2 id="insights-heading" className={styles.insightsHeading}>
-          Insights
+          {tInsights('insights.title')}
         </h2>
         <div className={styles.insightsError}>
-          <DashboardSectionError {...getErrorDetails(err, 'Insights failed to load.')} />
+          <DashboardSectionError {...getErrorDetails(err, tErrorsCatch('insightsFailed'), tErrorsCatch)} />
         </div>
       </section>
     );
@@ -286,11 +300,11 @@ export async function InsightsSection() {
 export function InsightsFallback() {
   return (
     <section className={styles.insightsSection} aria-busy>
-      <div className={styles.insightsHeadingSkeleton} />
       <div className={styles.insightsRow}>
         <SkeletonCard lines={3} />
         <SkeletonCard lines={4} />
-        <SkeletonCard lines={2} />
+        <SkeletonCard lines={3} />
+        <SkeletonCard lines={3} />
       </div>
     </section>
   );
@@ -302,14 +316,15 @@ export async function DashboardDataOrError({
 }: {
   children: React.ReactNode;
 }) {
+  const tErrors = await getTranslations('dashboard.errors');
   try {
-    await Promise.all([getOverviewCached(), getReportsCached()]);
+    await Promise.all([getOverviewCached(), getOverviewReportsCached()]);
     return <>{children}</>;
   } catch (err) {
     redirectToLoginIfUnauthorized(err);
     return (
       <div className={styles.dataErrorWrap}>
-        <DashboardSectionError {...getErrorDetails(err, 'Dashboard failed to load.')} />
+        <DashboardSectionError {...getErrorDetails(err, tErrors('dashboardFailed'), tErrors)} />
       </div>
     );
   }
@@ -320,15 +335,9 @@ export function DashboardContentFallback() {
   return (
     <>
       <header className={styles.contentFallbackHeader} aria-busy>
-        <div className={styles.contentFallbackStatsWrap}>
-          <StatsFallback />
-        </div>
         <QuickActionsDropdown />
       </header>
-      <main>
-        <ReportsFallback />
-        <InsightsFallback />
-      </main>
+      <OverviewSkeleton />
     </>
   );
 }

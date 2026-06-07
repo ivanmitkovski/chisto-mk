@@ -1,0 +1,12 @@
+{
+  "confirm": "Konfirmo",
+  "cancel": "Anulo",
+  "typeToConfirm": "Shkruani \"{phrase}\" për të konfirmuar",
+  "noData": "Pa të dhëna",
+  "filters": "Filtrat",
+  "applyFilters": "Apliko filtrat",
+  "export": "Eksporto",
+  "selectedCount": "{count} të zgjedhura",
+  "selectedCountOfTotal": "{count} të zgjedhura nga {total}",
+  "dismissNotification": "Hiq njoftimin"
+}

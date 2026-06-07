@@ -9,7 +9,7 @@ body {
   min-height: 100vh;
   background-color: var(--bg-app);
   color: var(--text-primary);
-  font-family: var(--font-roboto, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  font-family: var(--font-sans);
   line-height: 1.5;
   text-rendering: optimizeLegibility;
 }
@@ -23,6 +23,19 @@ button,
 textarea,
 select {
   font: inherit;
+}
+
+/* Centered chevron for native <select> (macOS/Windows system arrows often sit too high). */
+select:not([multiple]):not([size]) {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: var(--native-select-chevron);
+  background-repeat: no-repeat;
+  background-position: right var(--native-select-chevron-inset) center;
+  background-size: var(--native-select-chevron-size) var(--native-select-chevron-size);
+  padding-right: var(--native-select-chevron-padding-end);
+  line-height: 1.5;
 }
 
 :focus-visible {
@@ -75,7 +88,7 @@ html.chisto-admin-reduced-motion *::after {
   position: fixed;
   top: var(--space-2);
   left: var(--space-4);
-  z-index: 9999;
+  z-index: var(--z-skip-link);
   width: auto;
   height: auto;
   padding: var(--space-2) var(--space-4);

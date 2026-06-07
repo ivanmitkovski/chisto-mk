@@ -1,0 +1,41 @@
+{
+  "pageTitle": "Regjistri i auditimit",
+  "skipToTable": "Kalo te tabela e auditimit",
+  "stats": {
+    "totalEntries": "Gjithsej hyrje",
+    "entriesFiltered": "Hyrje (të filtruara)",
+    "pages": "Faqet"
+  },
+  "filters": {
+    "label": "Filtrat",
+    "action": "Veprimi",
+    "actionPlaceholder": "p.sh. USER_UPDATED",
+    "resourceType": "Lloji i burimit",
+    "resourceTypePlaceholder": "p.sh. User, Report",
+    "resourceId": "ID e burimit",
+    "resourceIdPlaceholder": "p.sh. UUID përdoruesi ose raporti",
+    "actorId": "ID e aktorit",
+    "actorIdPlaceholder": "ID e përdoruesit",
+    "from": "Nga",
+    "to": "Deri",
+    "apply": "Apliko filtrat",
+    "clear": "Pastro",
+    "invalidDates": "Vendosni data të vlefshme.",
+    "fromBeforeTo": "„Nga“ duhet të jetë në ose para „Deri“."
+  },
+  "table": {
+    "time": "Koha",
+    "copyId": "Kopjo ID",
+    "action": "Veprimi",
+    "resource": "Burimi",
+    "actor": "Aktori",
+    "system": "Sistemi",
+    "details": "Detajet",
+    "hide": "Fshih",
+    "hideDetails": "Fshih detajet",
+    "showDetails": "Shfaq detajet",
+    "empty": "Asnjë hyrje auditimi nuk përputhet me filtrat tuaj.",
+    "entriesMeta": "{count} hyrje · faqe {page}"
+  },
+  "pageDescription": "Shqyrtoni aktivitetin e adminit dhe ndryshimet."
+}

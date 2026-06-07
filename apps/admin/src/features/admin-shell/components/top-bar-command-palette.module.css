@@ -1,0 +1,126 @@
+.paletteBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-command-palette);
+  background: rgba(15, 23, 42, 0.18);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: max(5.5rem, 9vh) var(--space-4) var(--space-4);
+}
+
+.palette {
+  width: min(38rem, calc(100vw - 2rem));
+  border-radius: calc(var(--radius-xl) + 0.25rem);
+  border: 1px solid rgba(8, 54, 39, 0.11);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow:
+    0 24px 48px rgba(8, 54, 39, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  overflow: hidden;
+}
+
+.paletteSearchWrap {
+  padding: var(--space-3);
+  border-bottom: 1px solid rgba(8, 54, 39, 0.08);
+}
+
+.paletteSearch {
+  background: #f8fbff;
+}
+
+.commandList {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-2);
+  display: grid;
+  gap: var(--space-1);
+  max-height: min(24rem, 60vh);
+  overflow: auto;
+}
+
+.commandItem {
+  width: 100%;
+  border: 1px solid transparent;
+  border-radius: var(--radius-lg);
+  min-height: 2.75rem;
+  padding: var(--space-2) var(--space-3);
+  background: transparent;
+  color: rgba(8, 54, 39, 0.92);
+  text-align: left;
+  display: grid;
+  grid-template-columns: 1.75rem minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-3);
+  cursor: pointer;
+  transition: border-color 130ms ease, background-color 130ms ease, transform 130ms ease;
+}
+
+.commandItem:hover {
+  border-color: rgba(37, 219, 134, 0.2);
+  background: rgba(37, 219, 134, 0.08);
+}
+
+.commandItem:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: -2px;
+}
+
+.commandItemActive {
+  border-color: rgba(37, 219, 134, 0.36);
+  background: rgba(37, 219, 134, 0.14);
+  transform: translateY(-1px);
+}
+
+.commandIcon {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--radius-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #0f8b54;
+  background: rgba(37, 219, 134, 0.16);
+}
+
+.commandText {
+  min-width: 0;
+  display: grid;
+}
+
+.commandText strong {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: rgba(8, 54, 39, 0.92);
+}
+
+.commandText small {
+  color: rgba(8, 54, 39, 0.6);
+  font-size: var(--font-size-sm);
+}
+
+.emptyResults {
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  text-align: center;
+  color: rgba(8, 54, 39, 0.68);
+  font-size: var(--font-size-sm);
+  background: rgba(8, 54, 39, 0.03);
+}
+
+@media (max-width: 48rem) {
+  .paletteBackdrop {
+    padding-top: 5rem;
+  }
+}
+
+@media (max-width: 36rem) {
+  .paletteBackdrop {
+    padding-inline: var(--space-2);
+  }
+
+  .palette {
+    width: calc(100vw - 1rem);
+  }
+}

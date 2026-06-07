@@ -1,11 +1,14 @@
-export function formatDateTime(value: string): string {
-  return new Intl.DateTimeFormat('en-GB', {
+import { ADMIN_LOCALE_BCP47, DEFAULT_ADMIN_LOCALE } from '@/lib/preferences/admin-locale';
+import { formatAdminDateTime } from '@/lib/i18n/format-admin-datetime';
+
+export function formatDateTime(value: string, locale: string = ADMIN_LOCALE_BCP47[DEFAULT_ADMIN_LOCALE]): string {
+  return formatAdminDateTime(value, locale, {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
-  }).format(new Date(value));
+  });
 }
 
 /** Parses slaLabel (e.g. "2h remaining", "1h remaining") for urgency-based styling */

@@ -1,0 +1,13 @@
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.campaignsTableArea {
+  min-width: 0;
+}
+
+.listPagination {
+  margin-top: var(--space-4);
+}

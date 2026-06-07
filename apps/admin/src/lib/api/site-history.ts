@@ -1,4 +1,4 @@
-import { adminBrowserFetch } from '@/lib/admin-browser-api';
+import { adminBrowserFetch } from './admin-browser-api';
 
 export type SiteHistoryEntryRow = {
   id: string;

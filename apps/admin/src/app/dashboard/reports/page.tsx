@@ -1,53 +1,80 @@
 import type { Metadata } from 'next';
-import { cookies } from 'next/headers';
+import { getTranslations } from 'next-intl/server';
 import { AdminShell } from '@/features/admin-shell';
-import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell/constants';
+import { readDashboardShellState } from '@/features/admin-shell/server';
 import { SectionState } from '@/components/ui';
-import { getReports } from '@/features/reports';
-import { ReportsPageClient } from '@/features/reports/components/reports-page-client';
-import styles from './reports-page.module.css';
+import { getReportsPage, getReportsQueueSummary, ReportsPageClient } from '@/features/reports';
+import type { SortDirection, SortKey } from '@/features/reports/types';
+import { VALID_SORT_KEYS } from '@/features/reports/components/reports-list-utils';
+import { ADMIN_PERMISSIONS } from '@/lib/auth/rbac/permissions';
+import { requirePagePermission } from '@/lib/auth/rbac/server';
+import { handleServerLoadError } from '@/lib/server/handle-server-load-error';
 
 export const metadata: Metadata = {
   title: 'Reports',
 };
 
-function reportsErrorShell(
-  initialSidebarCollapsed: boolean,
-  message: string,
-) {
-  return (
-    <AdminShell title="Reports" activeItem="reports" initialSidebarCollapsed={initialSidebarCollapsed}>
-      <div className={styles.page}>
-        <SectionState variant="error" message={message} />
-      </div>
-    </AdminShell>
-  );
-}
-
 type ReportsPageProps = {
-  searchParams: Promise<{ siteId?: string }>;
+  searchParams: Promise<{
+    siteId?: string;
+    page?: string;
+    status?: string;
+    search?: string;
+    q?: string;
+    sort?: string;
+    dir?: string;
+    duplicatesOnly?: string;
+  }>;
 };
 
 export default async function ReportsPage(props: ReportsPageProps) {
-  const cookieStore = await cookies();
-  const initialSidebarCollapsed = cookieStore.get(DESKTOP_SIDEBAR_COOKIE_KEY)?.value === '1';
+  await requirePagePermission(ADMIN_PERMISSIONS['reports:read']);
+  const tNav = await getTranslations('nav');
+  const { initialSidebarCollapsed } = await readDashboardShellState();
   const params = await props.searchParams;
   const siteId = params.siteId;
+  const page = Math.max(1, Number.parseInt(params.page ?? '1', 10) || 1);
+  const status = params.status && params.status !== 'ALL' ? params.status : undefined;
+  const search = params.search ?? params.q;
+  const sortParam = params.sort;
+  const sort =
+    sortParam && VALID_SORT_KEYS.includes(sortParam as SortKey) ? (sortParam as SortKey) : undefined;
+  const dir: SortDirection | undefined =
+    params.dir === 'asc' ? 'asc' : params.dir === 'desc' ? 'desc' : undefined;
+  const duplicatesOnly = params.duplicatesOnly === 'true' || params.duplicatesOnly === '1';
 
-  let reports: Awaited<ReturnType<typeof getReports>>;
+  let result: Awaited<ReturnType<typeof getReportsPage>>;
+  let queueSummary: Awaited<ReturnType<typeof getReportsQueueSummary>>;
   try {
-    reports = await getReports(siteId ? { siteId } : undefined);
-  } catch {
-    return reportsErrorShell(
-      initialSidebarCollapsed,
-      'Unable to load reports. Please try again or sign in again.',
+    [result, queueSummary] = await Promise.all([
+      getReportsPage({
+        page,
+        limit: 50,
+        ...(status ? { status } : {}),
+        ...(search ? { search } : {}),
+        ...(siteId ? { siteId } : {}),
+        ...(sort ? { sort } : {}),
+        ...(dir ? { dir } : {}),
+        ...(duplicatesOnly ? { duplicatesOnly: true } : {}),
+      }),
+      getReportsQueueSummary(),
+    ]);
+  } catch (error) {
+    const message = await handleServerLoadError(error, { fallbackMessageKey: 'unableToLoadReports' });
+    return (
+      <AdminShell title={tNav('reports')} activeItem="reports" initialSidebarCollapsed={initialSidebarCollapsed}>
+        <SectionState variant="error" message={message} />
+      </AdminShell>
     );
   }
 
   return (
-    <AdminShell title="Reports" activeItem="reports" initialSidebarCollapsed={initialSidebarCollapsed}>
+    <AdminShell title={tNav('reports')} activeItem="reports" initialSidebarCollapsed={initialSidebarCollapsed}>
       <ReportsPageClient
-        reports={reports}
+        reports={result.data}
+        meta={result.meta}
+        queueSummary={queueSummary}
+        initialSearch={search ?? ''}
         {...(siteId ? { siteIdFilter: siteId } : {})}
       />
     </AdminShell>

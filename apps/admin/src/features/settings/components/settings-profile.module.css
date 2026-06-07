@@ -256,7 +256,7 @@
   border: 1px solid rgba(15, 141, 86, 0.08);
 }
 
-@media (max-width: 56rem) {
+@media (max-width: 48rem) {
   .grid {
     grid-template-columns: 1fr;
   }

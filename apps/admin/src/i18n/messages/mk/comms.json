@@ -1,0 +1,73 @@
+{
+  "emailSuppressions": {
+    "pageTitle": "Блокирани е-пошти",
+    "searchPlaceholder": "Пребарај по е-пошта…",
+    "searchAria": "Пребарај блокирани",
+    "filterReasonAria": "Филтрирај по причина",
+    "filterSourceAria": "Филтрирај по извор",
+    "columns": {
+      "email": "Е-пошта",
+      "reason": "Причина",
+      "source": "Извор",
+      "created": "Креирано",
+      "actions": "Акции"
+    },
+    "empty": "Нема блокирани е-пошти што одговараат на вашето пребарување.",
+    "meta": "{count} блокирани · страница {page}",
+    "remove": "Отстрани",
+    "removing": "Отстранување…",
+    "confirmRemoveTitle": "Да се отстрани блокираната?",
+    "confirmRemoveDescription": "Да се отстрани блокираната за {email}? Повторно ќе можат да примаат е-пошта.",
+    "toast": {
+      "removedTitle": "Отстрането",
+      "removedMessage": "{email} повторно може да прима е-пошта.",
+      "removeFailedTitle": "Отстранувањето не успеа",
+      "removeFailedMessage": "Не може да се отстрани блокираната.",
+      "createdTitle": "Блокадата е додадена",
+      "createdMessage": "{email} нема да прима е-пошта.",
+      "createFailedTitle": "Додавањето не успеа",
+      "createFailedMessage": "Не може да се додаде блокада."
+    },
+    "reasons": {
+      "all": "Сите причини",
+      "hardBounce": "Трајно враќање",
+      "spamComplaint": "Пријава за спам",
+      "manualSuppression": "Рачно блокирање",
+      "subscriptionChange": "Промена на претплата"
+    },
+    "sources": {
+      "all": "Сите извори",
+      "postmark": "Postmark"
+    },
+    "pageDescription": "Блокирани е-пошти и супресија.",
+    "create": {
+      "button": "Додај блокада",
+      "title": "Додај блокада на е-пошта",
+      "description": "Рачно блокирај адреса од примање е-пошта.",
+      "submit": "Додај блокада",
+      "invalidEmail": "Внесете валидна адреса на е-пошта."
+    }
+  },
+  "webhookLogs": {
+    "pageTitle": "Webhook дневници",
+    "filterActionAria": "Филтрирај по акција",
+    "payloadTitle": "Webhook содржина",
+    "empty": "Сè уште нема дневници за webhook достава.",
+    "meta": "{count} дневник(ци) · страница {page}",
+    "viewPayload": "Прегледај payload",
+    "copyJson": "Копирај JSON",
+    "columns": {
+      "when": "Кога",
+      "action": "Акција",
+      "resource": "Ресурс",
+      "details": "Детали"
+    },
+    "actions": {
+      "all": "Сите акции",
+      "twilioStatus": "Twilio статус",
+      "postmark": "Postmark",
+      "suppressionCreated": "Креирано блокирање"
+    },
+    "pageDescription": "Webhook достава и ревизија на комуникации."
+  }
+}

@@ -5,7 +5,10 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../../auth/decorators/current-user.decorator';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { RolesGuard } from '../../auth/guards/roles.guard';
+import { PermissionsGuard } from '../../auth/guards/permissions.guard';
+import { RequirePermission } from '../../auth/decorators/require-permission.decorator';
 import { ADMIN_PANEL_ROLES } from '../../auth/constants/admin-roles';
+import { ADMIN_PERMISSIONS } from '../../auth/constants/admin-permissions';
 import { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { NotificationInboxService } from '../services/notification-inbox.service';
 import { NotificationDispatcherService } from '../services/notification-dispatcher.service';
@@ -16,7 +19,7 @@ import { ApiStandardHttpErrorResponses } from '../../common/openapi/standard-htt
 @ApiTags('notifications')
 @ApiStandardHttpErrorResponses()
 @Controller('notifications')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
 @Roles(...ADMIN_PANEL_ROLES)
 @ApiBearerAuth()
 export class NotificationsAdminController {
@@ -27,6 +30,7 @@ export class NotificationsAdminController {
 
   @Idempotent('notifications_admin_test_push')
   @Post('admin/test-push')
+  @RequirePermission(ADMIN_PERMISSIONS['operations:write'])
   @ApiOperation({
     summary: 'Send a test push to the current admin user (full outbox → FCM pipeline)',
   })
@@ -42,6 +46,7 @@ export class NotificationsAdminController {
   }
 
   @Get('admin/push-stats')
+  @RequirePermission(ADMIN_PERMISSIONS['operations:read'])
   @ApiOperation({ summary: 'Push delivery statistics (admin only)' })
   @ApiOkResponse({ description: 'Push delivery stats' })
   pushStats() {
@@ -62,6 +67,7 @@ export class NotificationsAdminController {
   }
 
   @Get('admin/delivery-report')
+  @RequirePermission(ADMIN_PERMISSIONS['operations:read'])
   @ApiOperation({ summary: 'Push delivery funnel (admin only)' })
   @ApiOkResponse({ description: 'Delivery and open metrics' })
   async deliveryReport() {
@@ -93,6 +99,7 @@ export class NotificationsAdminController {
   }
 
   @Get('admin/dead-letters')
+  @RequirePermission(ADMIN_PERMISSIONS['operations:read'])
   @ApiOperation({ summary: 'List dead-letter push outbox entries (admin only)' })
   @ApiOkResponse({ description: 'Dead-letter queue entries' })
   deadLetters(

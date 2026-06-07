@@ -1,44 +1,24 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Button, Card, Icon, Pagination } from '@/components/ui';
+import { useTranslations } from 'next-intl';
+import { BulkActionBar, Button, Card, Icon, Input, Pagination, useToast } from '@/components/ui';
+import { WorkspaceRefreshOverlay } from '@/features/admin-shell/components/workspace-refresh-overlay';
+import { useWorkspaceRefresh } from '@/features/admin-shell/hooks/use-workspace-refresh';
+import { useServerSyncedState } from '@/features/admin-shell/hooks/use-server-synced-state';
+import { useOptimisticMutation } from '@/features/admin-shell/hooks/use-optimistic-mutation';
+import { Can, usePermissions } from '@/lib/auth/rbac';
+import { adminBrowserFetch } from '@/lib/api';
 import type { SiteRow, SitesStats } from '@/features/sites/data/sites-adapter';
+import { SITES_STATUS_OPTIONS } from '@/features/sites/config/sites-list-filters';
+import { useSitesBulkSelection } from '@/features/sites/hooks/use-sites-bulk-selection';
+import { useSitesListUrl } from '@/features/sites/hooks/use-sites-list-url';
+import { SitesBulkStatusModal } from './sites-bulk-status-modal';
+import { SitesBulkArchiveModal } from './sites-bulk-archive-modal';
+import { SitesCreateModal } from './sites-create-modal';
+import { SitesTable } from './sites-table';
 import styles from './sites-workspace.module.css';
-
-const STATUS_OPTIONS = [
-  { value: '', label: 'All statuses' },
-  { value: 'REPORTED', label: 'Reported' },
-  { value: 'VERIFIED', label: 'Verified' },
-  { value: 'CLEANUP_SCHEDULED', label: 'Cleanup scheduled' },
-  { value: 'IN_PROGRESS', label: 'In progress' },
-  { value: 'CLEANED', label: 'Cleaned' },
-  { value: 'DISPUTED', label: 'Disputed' },
-];
-
-function statusPillClass(status: string): string {
-  const map: Record<string, string> = {
-    REPORTED: styles.statusReported,
-    VERIFIED: styles.statusVerified,
-    CLEANUP_SCHEDULED: styles.statusScheduled,
-    IN_PROGRESS: styles.statusInProgress,
-    CLEANED: styles.statusCleaned,
-    DISPUTED: styles.statusDisputed,
-  };
-  return `${styles.statusPill} ${map[status] ?? styles.statusDefault}`;
-}
-
-function formatStatus(status: string): string {
-  return status.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
-function mapLinks(lat: number, lng: number) {
-  const gm = `https://www.google.com/maps?q=${lat},${lng}`;
-  const am = `https://maps.apple.com/?q=${lat},${lng}`;
-  return { gm, am };
-}
 
 type SitesWorkspaceProps = {
   initialData: SiteRow[];
@@ -51,213 +31,223 @@ export function SitesWorkspace({
   initialMeta,
   initialStats,
 }: SitesWorkspaceProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const [data, setData] = useState(initialData);
-  const [meta, setMeta] = useState(initialMeta);
-  const [stats, setStats] = useState(initialStats);
+  const t = useTranslations('sites');
+  const tCommon = useTranslations('common');
+  const { refresh: refreshPage, isRefreshing } = useWorkspaceRefresh();
+  const url = useSitesListUrl();
+  const [data] = useServerSyncedState(initialData);
+  const [meta] = useServerSyncedState(initialMeta);
+  const [stats] = useServerSyncedState(initialStats);
+  const [bulkStatusOpen, setBulkStatusOpen] = useState(false);
+  const [bulkArchiveOpen, setBulkArchiveOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
+  const { showToast } = useToast();
+  const { can } = usePermissions();
+  const canBulk = can('sites:bulk');
 
-  useEffect(() => {
-    setData(initialData);
-    setMeta(initialMeta);
-  }, [initialData, initialMeta]);
+  const selectionKey = `${url.status}|${url.page}|${url.searchTerm}|${meta.page}`;
+  const selection = useSitesBulkSelection(data, selectionKey);
 
-  useEffect(() => {
-    setStats(initialStats);
-  }, [initialStats]);
+  const selectedSites = data.filter((site) => selection.selectedIds.has(site.id));
 
-  const status = searchParams.get('status') ?? '';
-
-  const buildUrl = (updates: { status?: string; page?: number }) => {
-    const sp = new URLSearchParams(searchParams.toString());
-    if (updates.status !== undefined) {
-      if (updates.status) sp.set('status', updates.status);
-      else sp.delete('status');
-    }
-    if (updates.page !== undefined) {
-      if (updates.page > 1) sp.set('page', String(updates.page));
-      else sp.delete('page');
-    }
-    const q = sp.toString();
-    return `/dashboard/sites${q ? `?${q}` : ''}`;
-  };
-
-  const handleStatusChange = (value: string) => {
-    router.push(buildUrl({ status: value, page: 1 }));
-  };
-
-  const refresh = () => router.refresh();
+  const bulkMutation = useOptimisticMutation({
+    mutate: async (payload: {
+      action: 'set_status' | 'set_archived';
+      siteIds: string[];
+      status?: string;
+      archived?: boolean;
+    }) => {
+      return adminBrowserFetch<{ updated: number }>('/sites/admin/bulk', {
+        method: 'POST',
+        body: {
+          siteIds: payload.siteIds,
+          action: payload.action,
+          ...(payload.status ? { status: payload.status } : {}),
+          ...(payload.archived != null ? { archived: payload.archived } : {}),
+        },
+      });
+    },
+    onSuccess: (result) => {
+      setBulkStatusOpen(false);
+      setBulkArchiveOpen(false);
+      selection.clearSelection();
+      refreshPage();
+      showToast({
+        tone: 'success',
+        title: t('bulk.completeTitle'),
+        message: t('bulk.completeMessage', { count: result.updated }),
+      });
+    },
+    errorToast: {
+      title: t('bulk.failedTitle'),
+      message: t('bulk.failedMessage'),
+    },
+  });
 
   const reportedCount = stats.byStatus['REPORTED'] ?? 0;
   const verifiedCount = stats.byStatus['VERIFIED'] ?? 0;
   const cleanedCount = stats.byStatus['CLEANED'] ?? 0;
 
   return (
-    <div className={styles.layout}>
-      <div className={styles.statsBar}>
-        <motion.div
-          className={styles.statCard}
-          initial={{ opacity: 0, y: 4 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          <span className={styles.statIcon}>
-            <Icon name="location" size={18} aria-hidden />
-          </span>
-          <span className={styles.statValue}>{stats.total}</span>
-          <span className={styles.statLabel}>Total sites</span>
-        </motion.div>
-        <motion.div
-          className={styles.statCard}
-          initial={{ opacity: 0, y: 4 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2, delay: 0.05 }}
-        >
-          <span className={styles.statIconReported}>
-            <Icon name="document-text" size={18} aria-hidden />
-          </span>
-          <span className={styles.statValue}>{reportedCount}</span>
-          <span className={styles.statLabel}>Reported</span>
-        </motion.div>
-        <motion.div
-          className={styles.statCard}
-          initial={{ opacity: 0, y: 4 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2, delay: 0.1 }}
-        >
-          <span className={styles.statIconVerified}>
-            <Icon name="check" size={18} aria-hidden />
-          </span>
-          <span className={styles.statValue}>{verifiedCount}</span>
-          <span className={styles.statLabel}>Verified</span>
-        </motion.div>
-        <motion.div
-          className={styles.statCard}
-          initial={{ opacity: 0, y: 4 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2, delay: 0.15 }}
-        >
-          <span className={styles.statIconCleaned}>
-            <Icon name="shield" size={18} aria-hidden />
-          </span>
-          <span className={styles.statValue}>{cleanedCount}</span>
-          <span className={styles.statLabel}>Cleaned</span>
-        </motion.div>
-      </div>
+    <WorkspaceRefreshOverlay isRefreshing={isRefreshing}>
+      <div className={styles.layout}>
+        <div className={styles.statsBar}>
+          <motion.div
+            className={styles.statCard}
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <span className={styles.statIcon}>
+              <Icon name="location" size={18} aria-hidden />
+            </span>
+            <span className={styles.statValue}>{stats.total}</span>
+            <span className={styles.statLabel}>{t('stats.totalSites')}</span>
+          </motion.div>
+          <motion.div
+            className={styles.statCard}
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2, delay: 0.05 }}
+          >
+            <span className={styles.statIconReported}>
+              <Icon name="document-text" size={18} aria-hidden />
+            </span>
+            <span className={styles.statValue}>{reportedCount}</span>
+            <span className={styles.statLabel}>{t('stats.reported')}</span>
+          </motion.div>
+          <motion.div
+            className={styles.statCard}
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2, delay: 0.1 }}
+          >
+            <span className={styles.statIconVerified}>
+              <Icon name="check" size={18} aria-hidden />
+            </span>
+            <span className={styles.statValue}>{verifiedCount}</span>
+            <span className={styles.statLabel}>{t('stats.verified')}</span>
+          </motion.div>
+          <motion.div
+            className={styles.statCard}
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2, delay: 0.15 }}
+          >
+            <span className={styles.statIconCleaned}>
+              <Icon name="shield" size={18} aria-hidden />
+            </span>
+            <span className={styles.statValue}>{cleanedCount}</span>
+            <span className={styles.statLabel}>{t('stats.cleaned')}</span>
+          </motion.div>
+        </div>
 
-      <Card className={styles.tableCard}>
-        <div className={styles.toolbar}>
-          <div className={styles.filters}>
-            <select
-              value={status}
-              onChange={(e) => handleStatusChange(e.target.value)}
-              className={styles.filterSelect}
-              aria-label="Filter by status"
-            >
-              {STATUS_OPTIONS.map((o) => (
-                <option key={o.value || '_'} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
+        <Card className={styles.tableCard}>
+          <div className={styles.toolbar}>
+            <div className={styles.filters}>
+              <Input
+                aria-label={t('filters.searchAria')}
+                placeholder={t('filters.searchPlaceholder')}
+                value={url.searchTerm}
+                onChange={(event) => url.setSearchTerm(event.target.value)}
+                className={styles.searchInput}
+                leftSlot={<Icon name="magnifying-glass" size={14} aria-hidden />}
+              />
+              <select
+                value={url.status}
+                onChange={(e) => url.handleStatusChange(e.target.value)}
+                className={styles.filterSelect}
+                aria-label={t('filters.statusAria')}
+              >
+                {SITES_STATUS_OPTIONS.map((o) => (
+                  <option key={o.value || '_'} value={o.value}>
+                    {t(o.labelKey)}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className={styles.toolbarActions}>
+              <Can permission="sites:write">
+                <Button variant="solid" size="sm" onClick={() => setCreateOpen(true)}>
+                  {t('create.createSite')}
+                </Button>
+              </Can>
+              <Button variant="outline" size="sm" onClick={refreshPage}>
+                {tCommon('refresh')}
+              </Button>
+            </div>
           </div>
-          <Button variant="outline" size="sm" onClick={refresh}>
-            Refresh
-          </Button>
-        </div>
 
-        <div className={styles.tableWrap}>
-          {data.length === 0 ? (
-            <div className={styles.empty}>No sites match your filters.</div>
-          ) : (
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>Location</th>
-                  <th>Status</th>
-                  <th>Reports</th>
-                  <th className={styles.thActions}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.map((s) => {
-                  const { gm, am } = mapLinks(s.latitude, s.longitude);
-                  return (
-                    <tr key={s.id}>
-                      <td>
-                        <div className={styles.locationCell}>
-                          <Link href={`/dashboard/sites/${s.id}`} className={styles.coordsLink}>
-                            {s.latitude.toFixed(5)}, {s.longitude.toFixed(5)}
-                          </Link>
-                          <div className={styles.mapLinks}>
-                            <a
-                              href={gm}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className={styles.mapLink}
-                              aria-label="Open in Google Maps"
-                            >
-                              Google Maps
-                            </a>
-                            <span className={styles.mapDivider}>·</span>
-                            <a
-                              href={am}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className={styles.mapLink}
-                              aria-label="Open in Apple Maps"
-                            >
-                              Apple Maps
-                            </a>
-                          </div>
-                          {s.description ? (
-                            <p className={styles.description}>{s.description}</p>
-                          ) : null}
-                        </div>
-                      </td>
-                      <td>
-                        <span className={statusPillClass(s.status)}>
-                          {formatStatus(s.status)}
-                        </span>
-                      </td>
-                      <td>
-                        {s.reportCount > 0 ? (
-                          <Link
-                            href={`/dashboard/reports?siteId=${s.id}`}
-                            className={styles.reportsLink}
-                          >
-                            {s.reportCount}
-                          </Link>
-                        ) : (
-                          <span className={styles.reportsCount}>{s.reportCount}</span>
-                        )}
-                      </td>
-                      <td className={styles.tdActions}>
-                        <Link href={`/dashboard/sites/${s.id}`} className={styles.actionLink}>
-                          View
-                        </Link>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          )}
-        </div>
-
-        <div className={styles.footer}>
-          <p className={styles.meta}>
-            {meta.total} site{meta.total !== 1 ? 's' : ''} · page {meta.page}
-          </p>
-          {meta.total > meta.limit && (
-            <Pagination
-              totalPages={Math.ceil(meta.total / meta.limit)}
-              currentPage={meta.page}
-              onPageChange={(p) => router.push(buildUrl({ page: p }))}
+          {canBulk ? (
+            <BulkActionBar
+              selectedCount={selection.selectedIds.size}
+              totalCount={data.length}
+              onClear={selection.clearSelection}
+              actions={[
+                {
+                  id: 'set-status',
+                  label: t('bulk.setStatus'),
+                  disabled: bulkMutation.isPending,
+                  onClick: () => setBulkStatusOpen(true),
+                },
+                {
+                  id: 'set-archived',
+                  label: t('bulk.archiveVisibility'),
+                  disabled: bulkMutation.isPending,
+                  onClick: () => setBulkArchiveOpen(true),
+                },
+              ]}
             />
-          )}
-        </div>
-      </Card>
-    </div>
+          ) : null}
+
+          <SitesTable
+            data={data}
+            canBulk={canBulk}
+            selectedIds={selection.selectedIds}
+            allSelected={selection.allSelected}
+            selectAllRef={selection.selectAllRef}
+            onToggleAll={selection.toggleAll}
+            onToggleSelection={selection.toggleSelection}
+          />
+
+          <div className={styles.footer}>
+            <p className={styles.meta}>
+              {t('table.sitesMeta', { count: meta.total, page: meta.page })}
+            </p>
+            {meta.total > meta.limit && (
+              <Pagination
+                totalPages={Math.ceil(meta.total / meta.limit)}
+                currentPage={meta.page}
+                onPageChange={(p) => url.router.push(url.buildUrl({ page: p }))}
+              />
+            )}
+          </div>
+        </Card>
+
+        <SitesCreateModal open={createOpen} onClose={() => setCreateOpen(false)} onCreated={refreshPage} />
+        <SitesBulkStatusModal
+          open={bulkStatusOpen}
+          selectedSites={selectedSites}
+          busy={bulkMutation.isPending}
+          onClose={() => !bulkMutation.isPending && setBulkStatusOpen(false)}
+          onConfirm={(targetStatus, validSiteIds) =>
+            void bulkMutation.run({ action: 'set_status', status: targetStatus, siteIds: validSiteIds })
+          }
+        />
+        <SitesBulkArchiveModal
+          open={bulkArchiveOpen}
+          selectedCount={selection.selectedIds.size}
+          busy={bulkMutation.isPending}
+          onClose={() => !bulkMutation.isPending && setBulkArchiveOpen(false)}
+          onConfirm={(archived) =>
+            void bulkMutation.run({
+              action: 'set_archived',
+              archived,
+              siteIds: Array.from(selection.selectedIds),
+            })
+          }
+        />
+      </div>
+    </WorkspaceRefreshOverlay>
   );
 }

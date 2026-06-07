@@ -1,11 +1,17 @@
 import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { AdminShell } from '@/features/admin-shell';
-import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell/constants';
+import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell';
 import { SectionState } from '@/components/ui';
 import { ApiError } from '@/lib/api';
+import { ADMIN_PERMISSIONS } from '@/lib/auth/rbac/permissions';
+import { requirePagePermission } from '@/lib/auth/rbac/server';
+import { getMeProfile } from '@/features/auth';
 import { getReportDetail } from '@/features/reports';
-import { ReportDetailPage } from '@/features/reports/components/report-detail-page';
+import { ReportDetailPage } from '@/features/reports';
+import { canAssignToOthers } from '@/features/reports/utils/can-assign-to-others';
+import { listEligibleModerators } from '@/features/reports/data/eligible-moderators';
+import type { EligibleModerator } from '@/features/reports/data/eligible-moderators';
 import styles from './report-detail-page.module.css';
 
 
@@ -28,13 +34,19 @@ function reportErrorShell(message: string, initialSidebarCollapsed: boolean) {
 }
 
 export default async function ReportDetailRoute({ params }: ReportDetailPageProps) {
+  await requirePagePermission(ADMIN_PERMISSIONS['reports:read']);
   const cookieStore = await cookies();
   const initialSidebarCollapsed = cookieStore.get(DESKTOP_SIDEBAR_COOKIE_KEY)?.value === '1';
   const { id } = await params;
 
   let report;
+  let me: Awaited<ReturnType<typeof getMeProfile>> | null = null;
+  let eligibleModerators: EligibleModerator[] = [];
   try {
-    report = await getReportDetail(id);
+    [report, me] = await Promise.all([getReportDetail(id), getMeProfile()]);
+    if (me && canAssignToOthers(me.role)) {
+      eligibleModerators = await listEligibleModerators();
+    }
   } catch (error) {
     if (error instanceof ApiError && (error.code === 'REPORT_NOT_FOUND' || error.status === 404)) {
       notFound();
@@ -51,7 +63,17 @@ export default async function ReportDetailRoute({ params }: ReportDetailPageProp
       activeItem="reports"
       initialSidebarCollapsed={initialSidebarCollapsed}
     >
-      <ReportDetailPage report={report} />
+      <ReportDetailPage
+        report={report}
+        {...(me?.id ? { moderatorId: me.id } : {})}
+        {...(me
+          ? {
+              moderatorDisplayName: `${me.firstName} ${me.lastName}`.trim() || me.email,
+              viewerRole: me.role,
+            }
+          : {})}
+        eligibleModerators={eligibleModerators}
+      />
     </AdminShell>
   );
 }

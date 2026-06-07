@@ -21,17 +21,17 @@
 .bar {
   flex: 1;
   min-width: 8px;
-  background: var(--color-green-010);
+  background: var(--skeleton-base);
   border-radius: var(--radius-sm);
-  animation: pulse 1.5s ease-in-out infinite;
+  animation: chartBarPulse 2.2s ease-in-out infinite;
 }
 
-@keyframes pulse {
+@keyframes chartBarPulse {
   0%,
   100% {
-    opacity: 0.4;
+    opacity: 0.45;
   }
   50% {
-    opacity: 0.8;
+    opacity: 0.85;
   }
 }

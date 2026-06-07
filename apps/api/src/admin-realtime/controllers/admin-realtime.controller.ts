@@ -5,9 +5,11 @@ import { ADMIN_PANEL_ROLES } from '../../auth/constants/admin-roles';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { RolesGuard } from '../../auth/guards/roles.guard';
+import { CheckInRiskSignalRealtimeService } from '../services/check-in-risk-signal-realtime.service';
 import { CleanupEventRealtimeService } from '../services/cleanup-event-realtime.service';
 import { NotificationEventsService } from '../services/notification-events.service';
 import { ReportEventsService } from '../services/report-events.service';
+import { ReportPresenceEventsService } from '../services/report-presence-events.service';
 import { SiteEventsService } from '../services/site-events.service';
 import { UserEventsService } from '../services/user-events.service';
 import { ApiStandardHttpErrorResponses } from '../../common/openapi/standard-http-error-responses.decorator';
@@ -33,10 +35,12 @@ const HEARTBEAT_INTERVAL_MS = 30_000;
 export class AdminRealtimeController {
   constructor(
     private readonly reportEventsService: ReportEventsService,
+    private readonly reportPresenceEventsService: ReportPresenceEventsService,
     private readonly notificationEventsService: NotificationEventsService,
     private readonly siteEventsService: SiteEventsService,
     private readonly userEventsService: UserEventsService,
     private readonly cleanupEventRealtimeService: CleanupEventRealtimeService,
+    private readonly checkInRiskSignalRealtimeService: CheckInRiskSignalRealtimeService,
   ) {}
 
   @Get('events')
@@ -44,6 +48,13 @@ export class AdminRealtimeController {
   @ApiOperation({ summary: 'Server-Sent Events stream for real-time dashboard updates' })
   stream(): Observable<NestMessageEvent> {
     const reportEvents = this.reportEventsService.getEvents().pipe(
+      map((event) => ({
+        data: event as object,
+        type: event.type,
+      })),
+    );
+
+    const reportPresenceEvents = this.reportPresenceEventsService.getEvents().pipe(
       map((event) => ({
         data: event as object,
         type: event.type,
@@ -78,16 +89,25 @@ export class AdminRealtimeController {
       })),
     );
 
+    const checkInRiskSignals = this.checkInRiskSignalRealtimeService.getEvents().pipe(
+      map((event) => ({
+        data: event as object,
+        type: event.type,
+      })),
+    );
+
     const heartbeat = interval(HEARTBEAT_INTERVAL_MS).pipe(
       map(() => ({ data: { type: 'heartbeat' } } as NestMessageEvent)),
     );
 
     return merge(
       reportEvents,
+      reportPresenceEvents,
       notificationEvents,
       siteEvents,
       userEvents,
       cleanupEvents,
+      checkInRiskSignals,
       heartbeat,
     );
   }

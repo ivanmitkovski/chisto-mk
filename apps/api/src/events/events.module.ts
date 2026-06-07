@@ -5,6 +5,7 @@ import { EventScheduleConflictModule } from '../event-schedule-conflict/event-sc
 import { EventChatModule } from '../event-chat/event-chat.module';
 import { GamificationModule } from '../gamification/gamification.module';
 import { NotificationsModule } from '../notifications/notifications.module';
+import { AdminModerationEmailModule } from '../admin-moderation-email/admin-moderation-email.module';
 import { PrismaModule } from '../prisma/prisma.module';
 import { ReportsUploadModule } from '../reports/reports-upload.module';
 import { CheckInRepository } from './repositories/check-in.repository';
@@ -63,6 +64,7 @@ import { SitesModule } from '../sites/sites.module';
     ReportsUploadModule,
     GamificationModule,
     NotificationsModule,
+    AdminModerationEmailModule,
     EventChatModule,
     AdminRealtimeModule,
     forwardRef(() => SitesModule),

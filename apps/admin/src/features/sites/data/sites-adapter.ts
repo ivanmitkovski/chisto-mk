@@ -1,5 +1,4 @@
-import { apiFetch } from '@/lib/api';
-import { getAdminAuthTokenFromCookies } from '@/features/auth/lib/admin-auth-server';
+import { serverAuthenticatedFetch } from '@/lib/auth/server-api-with-refresh';
 
 export type SiteRow = {
   id: string;
@@ -22,10 +21,8 @@ type ListResponse = {
 };
 
 export async function getSitesStats(): Promise<SitesStats> {
-  const token = await getAdminAuthTokenFromCookies();
-  const overview = await apiFetch<{ sitesByStatus: Record<string, number> }>('/admin/overview', {
+  const overview = await serverAuthenticatedFetch<{ sitesByStatus: Record<string, number> }>('/admin/overview', {
     method: 'GET',
-    authToken: token,
   });
   const byStatus = overview.sitesByStatus ?? {};
   const total = Object.values(byStatus).reduce((sum, n) => sum + n, 0);
@@ -36,8 +33,8 @@ export async function getSitesList(params?: {
   page?: number;
   limit?: number;
   status?: string;
+  search?: string;
 }): Promise<ListResponse> {
-  const token = await getAdminAuthTokenFromCookies();
   const page = params?.page ?? 1;
   const limit = params?.limit ?? 20;
   const search = new URLSearchParams({
@@ -47,16 +44,16 @@ export async function getSitesList(params?: {
   if (params?.status) {
     search.set('status', params.status);
   }
-  return apiFetch<ListResponse>(`/sites?${search.toString()}`, {
+  if (params?.search?.trim()) {
+    search.set('search', params.search.trim());
+  }
+  return serverAuthenticatedFetch<ListResponse>(`/sites/admin/list?${search.toString()}`, {
     method: 'GET',
-    authToken: token,
   });
 }
 
 export async function getSiteDetail(id: string) {
-  const token = await getAdminAuthTokenFromCookies();
-  return apiFetch(`/sites/${id}`, {
+  return serverAuthenticatedFetch(`/sites/${id}`, {
     method: 'GET',
-    authToken: token,
   });
 }

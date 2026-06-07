@@ -3,7 +3,8 @@ import {
   Injectable,
   Logger,
 } from '@nestjs/common';
-import { CheckInRiskSignalType, Prisma } from '../../prisma-client';
+import { AdminModerationCategory, CheckInRiskSignalType, Prisma } from '../../prisma-client';
+import { AdminModerationNotifierService } from '../../admin-moderation-email/services/admin-moderation-notifier.service';
 import type { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { CheckInRepository } from '../repositories/check-in.repository';
 import { ReportsUploadService } from '../../reports/services/reports-upload.service';
@@ -11,6 +12,7 @@ import { verifyCheckInQrToken } from '../types/check-in-qr-token';
 import { EventCheckInGateway } from '../gateways/event-check-in.gateway';
 import { PendingCheckInService } from './pending-check-in.service';
 import { CheckInTelemetryService } from './check-in-telemetry.service';
+import { CheckInRiskSignalRealtimeService } from '../../admin-realtime/services/check-in-risk-signal-realtime.service';
 import {
   assertQrTokenVerifiedForRedeem,
   assertRedeemEligibleEventAndUser,
@@ -31,6 +33,8 @@ export class EventsCheckInRedeemService {
     private readonly checkInGateway: EventCheckInGateway,
     private readonly reportsUpload: ReportsUploadService,
     private readonly checkInTelemetry: CheckInTelemetryService,
+    private readonly moderationEmailNotifier: AdminModerationNotifierService,
+    private readonly checkInRiskSignalRealtime: CheckInRiskSignalRealtimeService,
   ) {}
 
   async redeem(
@@ -73,6 +77,7 @@ export class EventsCheckInRedeemService {
     const row = await this.checkInRepository.prisma.cleanupEvent.findUnique({
       where: { id: eventId },
       select: {
+        title: true,
         site: { select: { latitude: true, longitude: true } },
       },
     });
@@ -91,7 +96,7 @@ export class EventsCheckInRedeemService {
     }
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 90);
-    await this.checkInRepository.prisma.checkInRiskSignal.create({
+    const signal = await this.checkInRepository.prisma.checkInRiskSignal.create({
       data: {
         eventId,
         userId,
@@ -102,7 +107,21 @@ export class EventsCheckInRedeemService {
           thresholdMeters: thresholdM,
         },
       },
+      select: { id: true },
     });
+
+    this.moderationEmailNotifier.notify({
+      category: AdminModerationCategory.CHECKIN_RISK,
+      resourceId: signal.id,
+      deepLinkPath: '/dashboard/events/risk-signals',
+      emailContext: {
+        eventTitle: row.title,
+        distanceMeters: Math.round(meters),
+        eventId,
+        occurredAt: new Date().toISOString(),
+      },
+    });
+    this.checkInRiskSignalRealtime.emitCreated(signal.id, eventId);
   }
 
   private async doRedeem(

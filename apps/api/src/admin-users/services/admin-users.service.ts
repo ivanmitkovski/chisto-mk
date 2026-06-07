@@ -38,6 +38,10 @@ export class AdminUsersService {
     return this.query.getSessions(userId);
   }
 
+  revokeSession(userId: string, sessionId: string, actor: AuthenticatedUser) {
+    return this.write.revokeSession(userId, sessionId, actor);
+  }
+
   bulk(dto: BulkAdminUsersDto, actor: AuthenticatedUser) {
     return this.write.bulk(dto, actor);
   }

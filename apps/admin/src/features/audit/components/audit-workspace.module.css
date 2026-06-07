@@ -113,6 +113,12 @@
   color: rgba(8, 54, 39, 0.45);
 }
 
+.dateError {
+  margin: var(--space-2) 0 0;
+  color: var(--color-status-danger-fg);
+  font-size: var(--font-size-sm);
+}
+
 .filterActions {
   display: flex;
   gap: var(--space-3);
@@ -136,12 +142,6 @@
 .toolbarHint {
   font-size: 0.8125rem;
   color: rgba(8, 54, 39, 0.55);
-}
-
-.tableWrap {
-  overflow-x: auto;
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(8, 54, 39, 0.06);
 }
 
 .table {
@@ -245,7 +245,7 @@
 }
 
 .resourceLink {
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-mono);
   font-size: 0.8125rem;
   color: var(--color-green-700);
   text-decoration: none;
@@ -256,7 +256,7 @@
 }
 
 .resourceIdBtn {
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-mono);
   font-size: 0.8125rem;
   color: rgba(8, 54, 39, 0.75);
   background: none;
@@ -275,10 +275,25 @@
   color: rgba(8, 54, 39, 0.85);
 }
 
-.thDetails,
-.tdDetails {
+.table th:last-child,
+.table td:last-child {
   width: 5rem;
   text-align: right;
+}
+
+.mobileCardTime {
+  margin: 0;
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.mobileMeta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  padding-top: var(--space-2);
+  border-top: 1px solid rgba(8, 54, 39, 0.08);
 }
 
 .detailsBtn {
@@ -304,7 +319,7 @@
 .metaPre {
   margin: 0;
   font-size: 0.75rem;
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-mono);
   color: rgba(8, 54, 39, 0.8);
   white-space: pre-wrap;
   word-break: break-all;

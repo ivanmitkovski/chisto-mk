@@ -1,0 +1,119 @@
+{
+  "pageTitle": "Overview",
+  "statsEmpty": "No dashboard statistics available yet.",
+  "statGroups": {
+    "reports": "Reports",
+    "platform": "Platform",
+    "cleanups": "Cleanups"
+  },
+  "stats": {
+    "newReports": "New Reports",
+    "inReview": "In Review",
+    "approved": "Approved",
+    "deleted": "Deleted",
+    "duplicateGroups": "Duplicate groups",
+    "sites": "Sites",
+    "upcoming": "Upcoming",
+    "completed": "Completed",
+    "users": "Users",
+    "activeSessions": "Active Sessions",
+    "usersTrend": "+{count} last 7d"
+  },
+  "reportsTrend": {
+    "sectionLabel": "Analytics",
+    "title": "Reports trend",
+    "timeRangeAria": "Time range",
+    "viewReports": "View reports",
+    "emptyNoData": "No reports submitted in the last {range} days.",
+    "emptyNeedMore": "Submit more reports to see the trend.",
+    "chartAria": "Reports trend over the last {range} days",
+    "tableCaption": "Reports trend over the last {range} days",
+    "dateColumn": "Date",
+    "reportsColumn": "Reports"
+  },
+  "sections": {
+    "statistics": "Statistics",
+    "reportsTable": "Reports table",
+    "reportsTrend": "Reports trend",
+    "recentActivity": "Recent activity",
+    "cleanupEvents": "Cleanup events",
+    "feedDiagnostics": "Feed diagnostics",
+    "insights": "Insights",
+    "dashboard": "Dashboard"
+  },
+  "errors": {
+    "sessionExpired": "Session expired or access denied. The access token may have expired (default 15 min). Sign in again.",
+    "apiServerError": "API server error. Please try again later.",
+    "statisticsFailed": "Statistics failed to load.",
+    "reportsTableFailed": "Reports table failed to load.",
+    "insightsFailed": "Insights failed to load.",
+    "dashboardFailed": "Dashboard failed to load.",
+    "signInAgain": "Sign in again"
+  },
+  "reportsSection": {
+    "queue": "Queue",
+    "title": "Reports",
+    "needAttention": "{count} report(s) need attention",
+    "viewAllReports": "View all reports",
+    "refreshReportsAria": "Refresh reports"
+  },
+  "insights": {
+    "title": "Insights",
+    "feedOps": "Feed ops",
+    "feedDiagnosticsTitle": "Feed diagnostics",
+    "integrityDemotions": "Integrity demotions (7d): {count}"
+  },
+  "activity": {
+    "sectionLabel": "Activity",
+    "title": "Recent Activity",
+    "empty": "No recent activity yet. Actions will appear here as they occur.",
+    "viewAllAuditLog": "View all audit log"
+  },
+  "events": {
+    "sectionLabel": "Events",
+    "upcoming": "{count} upcoming",
+    "completed": "{count} completed",
+    "viewAll": "View all"
+  },
+  "sse": {
+    "connected": "Real-time updates connected",
+    "reconnecting": "Reconnecting to real-time updates",
+    "live": "Live",
+    "disconnected": "Disconnected",
+    "reconnect": "Reconnect",
+    "liveConnectedAria": "Live updates connected",
+    "reconnectingLabel": "Reconnecting",
+    "disconnectedAria": "Live updates disconnected",
+    "newUserRegistered": "New user registered",
+    "userUpdated": "User updated",
+    "cleanupEventPending": "Cleanup event pending review",
+    "cleanupEventCreated": "New cleanup event",
+    "cleanupEventUpdated": "Cleanup event updated",
+    "newCheckInRiskSignal": "New check-in risk signal"
+  },
+  "errorBoundary": {
+    "retry": "Retry",
+    "sectionFailed": "{sectionName} failed to load."
+  },
+  "pollingFallback": {
+    "message": "Live updates paused. Data refreshes periodically."
+  },
+  "timeAgo": {
+    "justNow": "just now",
+    "minuteAgo": "1 minute ago",
+    "minutesAgo": "{count} minutes ago",
+    "hourAgo": "1 hour ago",
+    "hoursAgo": "{count} hours ago"
+  },
+  "quickActions": {
+    "menuAria": "Quick actions menu",
+    "title": "Quick actions",
+    "panelAria": "Quick actions",
+    "newReports": "New reports",
+    "inReview": "In review",
+    "users": "Users",
+    "sites": "Sites",
+    "events": "Events",
+    "auditLog": "Audit log"
+  }
+}

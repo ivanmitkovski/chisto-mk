@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { Icon, SectionState } from '@/components/ui';
 import type { ReportEvidence } from '../../types';
@@ -22,25 +23,28 @@ type ReportReviewEvidencePanelProps = {
 };
 
 export function ReportReviewEvidencePanel({ evidence, onOpenImageEvidence }: ReportReviewEvidencePanelProps) {
+  const t = useTranslations('reports.evidence');
+
   return (
     <motion.article
       className={styles.panel}
       whileHover={{ y: -2 }}
       transition={{ duration: 0.15 }}
-      aria-label="Evidence files"
+      aria-label={t('filesAria')}
     >
       <div className={styles.sectionHeader}>
-        <h3>Evidence</h3>
-        <span>{evidence.length} files</span>
+        <h3>{t('title')}</h3>
+        <span>{t('filesCount', { count: evidence.length })}</span>
       </div>
       {evidence.length === 0 ? (
         <div className={styles.sectionEmpty}>
-          <SectionState variant="empty" message="No evidence files were attached to this report." />
+          <SectionState variant="empty" message={t('empty')} />
         </div>
       ) : (
         <ul className={styles.evidenceList}>
           {evidence.map((item) => {
             const isImageWithPreview = item.kind === 'image' && item.previewUrl;
+            const hasDownload = Boolean(item.previewUrl) && item.kind !== 'image';
             const content = (
               <>
                 <span className={styles.evidenceIcon}>
@@ -59,10 +63,31 @@ export function ReportReviewEvidencePanel({ evidence, onOpenImageEvidence }: Rep
                     type="button"
                     className={styles.evidenceItemButton}
                     onClick={() => onOpenImageEvidence(item.id)}
-                    aria-label={`View ${item.label} in fullscreen`}
+                    aria-label={t('openFullscreenAria')}
                   >
                     {content}
                   </button>
+                ) : hasDownload ? (
+                  <a
+                    className={styles.evidenceItemButton}
+                    href={item.previewUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    download
+                  >
+                    {content}
+                    <span className={styles.evidenceDownloadHint}>{t('downloadFile')}</span>
+                  </a>
+                ) : item.previewUrl ? (
+                  <a
+                    className={styles.evidenceItemButton}
+                    href={item.previewUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {content}
+                    <span className={styles.evidenceDownloadHint}>{t('openPreview')}</span>
+                  </a>
                 ) : (
                   <span className={styles.evidenceItemInner}>{content}</span>
                 )}

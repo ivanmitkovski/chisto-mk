@@ -6,7 +6,10 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ADMIN_PANEL_ROLES } from '../../auth/constants/admin-roles';
+import { ADMIN_PERMISSIONS, permissionsForRole } from '../../auth/constants/admin-permissions';
+import { RequirePermission } from '../../auth/decorators/require-permission.decorator';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { PermissionsGuard } from '../../auth/guards/permissions.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { CurrentUser } from '../../auth/decorators/current-user.decorator';
@@ -18,12 +21,13 @@ import { ApiStandardHttpErrorResponses } from '../../common/openapi/standard-htt
 @ApiTags('admin')
 @ApiStandardHttpErrorResponses()
 @Controller('admin')
+@UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   @Get('overview')
-  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(...ADMIN_PANEL_ROLES)
+  @RequirePermission(ADMIN_PERMISSIONS['dashboard:view'])
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get high-level admin overview metrics' })
   @ApiOkResponse({ description: 'Overview metrics fetched successfully', type: AdminOverviewResponseDto })
@@ -32,13 +36,25 @@ export class AdminController {
   }
 
   @Get('security/overview')
-  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(...ADMIN_PANEL_ROLES)
+  @RequirePermission(ADMIN_PERMISSIONS['settings:security'])
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get admin security overview (sessions and recent activity)' })
   @ApiOkResponse({ description: 'Security overview fetched successfully' })
   getSecurityOverview(@CurrentUser() admin: AuthenticatedUser): Promise<AdminSecurityOverview> {
     return this.adminService.getSecurityOverview(admin);
+  }
+
+  @Get('me/permissions')
+  @Roles(...ADMIN_PANEL_ROLES)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'List permissions for the current admin session' })
+  @ApiOkResponse({ description: 'Permissions listed' })
+  getMyPermissions(@CurrentUser() admin: AuthenticatedUser) {
+    return {
+      role: admin.role,
+      permissions: permissionsForRole(admin.role),
+    };
   }
 }
 

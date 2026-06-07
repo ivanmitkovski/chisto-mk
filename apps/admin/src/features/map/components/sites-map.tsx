@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { MapContainer, TileLayer, useMap, useMapEvents } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
@@ -11,6 +12,7 @@ import 'react-leaflet-cluster/dist/assets/MarkerCluster.css';
 import 'react-leaflet-cluster/dist/assets/MarkerCluster.Default.css';
 import { Spinner } from '@/components/ui';
 import { MapAttributionStrip } from './map-attribution-strip';
+import { MapHeatmapLayer } from './map-heatmap-layer';
 import { MapMarker } from './map-marker';
 import { MapToolbar } from './map-toolbar';
 import { MapZoomControls } from './map-zoom-controls';
@@ -162,6 +164,8 @@ function SitesClusterLayer({ sites, selectedSiteId, setSelectedSiteId, zoom }: S
 }
 
 export function SitesMap() {
+  const t = useTranslations('map');
+  const tCommon = useTranslations('common');
   const router = useRouter();
   const tileUrl = useTileUrl();
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -184,6 +188,15 @@ export function SitesMap() {
     setStatusFilter,
     setSelectedSiteId,
     zoom,
+    showHeatmap,
+    toggleHeatmap,
+    heatmapPoints,
+    heatmapFetching,
+    searchDraft,
+    setSearchDraft,
+    searchMessage,
+    runSearch,
+    resultCapped,
   } = useSitesMap();
 
   useEffect(() => {
@@ -239,6 +252,13 @@ export function SitesMap() {
             scroll: false,
           });
         }}
+        showHeatmap={showHeatmap}
+        onHeatmapChange={toggleHeatmap}
+        searchDraft={searchDraft}
+        onSearchDraftChange={setSearchDraft}
+        onSearch={() => void runSearch()}
+        searchMessage={searchMessage}
+        resultCapped={resultCapped}
       />
 
       <MapContainer
@@ -262,6 +282,10 @@ export function SitesMap() {
         <FitBoundsEffect trigger={fitBoundsTrigger} />
         <MapClickHandler onClick={handleMapClick} />
 
+        {showHeatmap && heatmapPoints.length > 0 ? (
+          <MapHeatmapLayer points={heatmapPoints} zoom={zoom} />
+        ) : null}
+
         <SitesClusterLayer
           sites={sites}
           selectedSiteId={selectedSiteId}
@@ -275,8 +299,8 @@ export function SitesMap() {
       {isLoading && (
         <div className={styles.overlay} role="status" aria-live="polite" aria-busy="true">
           <div className={styles.overlayContent}>
-            <Spinner aria-label="Loading map data" />
-            <span className={styles.overlayMessage}>Loading sites…</span>
+            <Spinner aria-label={t('loadingMapData')} />
+            <span className={styles.overlayMessage}>{t('loadingSites')}</span>
           </div>
         </div>
       )}
@@ -286,20 +310,26 @@ export function SitesMap() {
           <span className={styles.refreshingSpinnerWrap} aria-hidden>
             <Spinner size="sm" />
           </span>
-          <span className={styles.refreshingLabel}>Refreshing map…</span>
+          <span className={styles.refreshingLabel}>{t('refreshingMap')}</span>
         </div>
       )}
+
+      {!isLoading && showHeatmap && heatmapFetching ? (
+        <div className={styles.heatmapBanner} role="status" aria-live="polite">
+          {t('updatingHeatmap')}
+        </div>
+      ) : null}
 
       {isError && (
         <div className={styles.overlay}>
           <div className={styles.overlayContent}>
-            <span className={styles.overlayMessage}>Unable to load map data</span>
+            <span className={styles.overlayMessage}>{t('loadFailed')}</span>
             <button
               type="button"
               onClick={() => refetch()}
               className={styles.toolbarBtn}
             >
-              Retry
+              {tCommon('retry')}
             </button>
           </div>
         </div>
@@ -309,7 +339,7 @@ export function SitesMap() {
         <div className={styles.overlay}>
           <div className={styles.overlayContent}>
             <span className={styles.overlayMessage}>
-              {statusFilter ? 'No sites match the selected filters' : 'No sites in this area'}
+              {statusFilter ? t('noSitesFiltered') : t('noSitesInArea')}
             </span>
             {statusFilter && (
               <button
@@ -320,7 +350,7 @@ export function SitesMap() {
                   router.replace('/dashboard/map', { scroll: false });
                 }}
               >
-                Reset filters
+                {t('resetFilters')}
               </button>
             )}
           </div>

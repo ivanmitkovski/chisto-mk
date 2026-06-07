@@ -1,18 +1,15 @@
-import { apiFetch } from '@/lib/api';
-import { getAdminAuthTokenFromCookies } from '@/features/auth/lib/admin-auth-server';
+import { serverAuthenticatedFetch } from '@/lib/auth/server-api-with-refresh';
+import type { Schema } from '@/lib/api';
 
-export type UsersStats = {
-  usersCount: number;
-  usersNewLast7d: number;
-  sessionsActive: number;
-};
+export type UsersStats = Pick<
+  Schema<'AdminOverviewResponseDto'>,
+  'usersCount' | 'usersNewLast7d' | 'sessionsActive'
+>;
 
 export async function getUsersStats(): Promise<UsersStats> {
-  const token = await getAdminAuthTokenFromCookies();
-  const overview = await apiFetch<{ usersCount: number; usersNewLast7d: number; sessionsActive: number }>(
-    '/admin/overview',
-    { method: 'GET', authToken: token },
-  );
+  const overview = await serverAuthenticatedFetch<Schema<'AdminOverviewResponseDto'>>('/admin/overview', {
+    method: 'GET',
+  });
   return {
     usersCount: overview.usersCount ?? 0,
     usersNewLast7d: overview.usersNewLast7d ?? 0,
@@ -43,10 +40,11 @@ export async function getUsers(params?: {
   search?: string;
   role?: string;
   status?: string;
+  sort?: string;
+  dir?: string;
   lastActiveBefore?: string;
   lastActiveAfter?: string;
 }): Promise<ListResponse> {
-  const token = await getAdminAuthTokenFromCookies();
   const search = new URLSearchParams();
   if (params?.page) {
     search.set('page', String(params.page));
@@ -63,6 +61,12 @@ export async function getUsers(params?: {
   if (params?.status) {
     search.set('status', params.status);
   }
+  if (params?.sort) {
+    search.set('sort', params.sort);
+  }
+  if (params?.dir) {
+    search.set('dir', params.dir);
+  }
   if (params?.lastActiveBefore) {
     search.set('lastActiveBefore', params.lastActiveBefore);
   }
@@ -70,17 +74,14 @@ export async function getUsers(params?: {
     search.set('lastActiveAfter', params.lastActiveAfter);
   }
   const q = search.size > 0 ? `?${search.toString()}` : '';
-  return apiFetch<ListResponse>(`/admin/users${q}`, {
+  return serverAuthenticatedFetch<ListResponse>(`/admin/users${q}`, {
     method: 'GET',
-    authToken: token,
   });
 }
 
 export async function getUserDetail(id: string) {
-  const token = await getAdminAuthTokenFromCookies();
-  return apiFetch(`/admin/users/${id}`, {
+  return serverAuthenticatedFetch(`/admin/users/${id}`, {
     method: 'GET',
-    authToken: token,
   });
 }
 
@@ -108,17 +109,13 @@ export async function getUserAudit(
   page = 1,
   limit = 20,
 ): Promise<{ data: AuditEntry[]; meta: { page: number; limit: number; total: number } }> {
-  const token = await getAdminAuthTokenFromCookies();
-  return apiFetch(`/admin/users/${id}/audit?page=${page}&limit=${limit}`, {
+  return serverAuthenticatedFetch(`/admin/users/${id}/audit?page=${page}&limit=${limit}`, {
     method: 'GET',
-    authToken: token,
   });
 }
 
 export async function getUserSessions(id: string): Promise<SessionEntry[]> {
-  const token = await getAdminAuthTokenFromCookies();
-  return apiFetch(`/admin/users/${id}/sessions`, {
+  return serverAuthenticatedFetch(`/admin/users/${id}/sessions`, {
     method: 'GET',
-    authToken: token,
   });
 }

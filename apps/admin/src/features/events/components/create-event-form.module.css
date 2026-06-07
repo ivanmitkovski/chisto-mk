@@ -1,0 +1,144 @@
+.layout {
+  max-width: 36rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.sitePreviewCard {
+  padding: var(--space-5);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-md);
+}
+
+.sitePreviewDesc {
+  margin: var(--space-2) 0 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.sitePreviewLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  font-size: 0.8125rem;
+}
+
+.sitePreviewLinks a {
+  color: var(--color-green-700);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.sitePreviewLinks a:hover {
+  text-decoration: underline;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  margin-bottom: var(--space-4);
+  transition: color var(--motion-duration-fast) var(--motion-ease-out);
+}
+
+.backLink:hover {
+  color: var(--color-green-700);
+}
+
+.sectionCard {
+  padding: var(--space-6);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-md);
+}
+
+.sectionLabel {
+  display: block;
+  margin-bottom: var(--space-3);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.hint {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-5);
+}
+
+.siteId {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  padding: 0 var(--space-1);
+  background: var(--surface-subtle);
+  border-radius: var(--radius-sm);
+}
+
+.siteLink {
+  margin-left: var(--space-2);
+  font-weight: 600;
+  color: var(--color-green-700);
+  text-decoration: none;
+}
+
+.siteLink:hover {
+  text-decoration: underline;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.fieldCheck {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.fieldCheck input {
+  accent-color: var(--color-green-700);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-2);
+}
+
+.cancelLink {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-muted);
+  text-decoration: none;
+}
+
+.cancelLink:hover {
+  color: var(--color-green-700);
+}
+
+@media (max-width: 48rem) {
+  .sectionCard {
+    padding: var(--space-4);
+  }
+
+  .form {
+    gap: var(--space-4);
+  }
+}

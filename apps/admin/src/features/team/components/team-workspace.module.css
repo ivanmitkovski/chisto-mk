@@ -1,0 +1,73 @@
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.roleSelect {
+  min-width: 9rem;
+  padding-block: var(--space-2);
+  padding-inline: var(--space-3) var(--native-select-chevron-padding-end);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  background-color: var(--surface-elevated);
+  line-height: 1.5;
+}
+
+.nameCell {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.selfBadge {
+  display: inline-flex;
+  align-items: center;
+  padding-inline: var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--surface-subtle);
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.selfHint {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.paginationFooter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-block: var(--space-4);
+  padding-inline: var(--space-4);
+}
+
+.meta {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}

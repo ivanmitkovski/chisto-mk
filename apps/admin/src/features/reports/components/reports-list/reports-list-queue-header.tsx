@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { Button, Icon } from '@/components/ui';
 import styles from '../reports-list.module.css';
 
@@ -21,22 +22,25 @@ export function ReportsListQueueHeader({
   onRefresh,
   sublineText,
 }: ReportsListQueueHeaderProps) {
+  const t = useTranslations('reports.queue');
+  const tCommon = useTranslations('common');
+
   return (
     <>
       <div className={styles.summaryStrip}>
-        <span className={styles.summaryValue}>{reportsCount} reports</span>
+        <span className={styles.summaryValue}>{t('reportsCount', { count: reportsCount })}</span>
         <span className={styles.summarySep}>·</span>
-        <span className={styles.summaryValue}>{needAttentionCount} need attention</span>
+        <span className={styles.summaryValue}>{t('needAttention', { count: needAttentionCount })}</span>
         <span className={styles.summarySep}>·</span>
         <Link href="/dashboard/reports/duplicates" className={styles.summaryLink}>
-          {duplicateCount} duplicate{duplicateCount !== 1 ? 's' : ''}
+          {t('duplicatesLink', { count: duplicateCount })}
         </Link>
       </div>
-      <span className={styles.sectionLabel}>Queue</span>
+      <span className={styles.sectionLabel}>{tCommon('queue')}</span>
       <div className={styles.reportsHeader}>
         <div>
           <h2 id="reports-heading" className={styles.sectionTitle}>
-            Reports
+            {t('title')}
           </h2>
           <p className={styles.reportsSubline} data-attention={needAttentionCount > 0 ? 'true' : undefined}>
             {sublineText}
@@ -46,7 +50,7 @@ export function ReportsListQueueHeader({
           <div className={styles.statusPill} role="status">
             <Button
               variant="icon"
-              aria-label="Refresh reports"
+              aria-label={t('refreshAria')}
               onClick={onRefresh}
               disabled={isRefreshing}
               className={styles.refreshBtn}
@@ -56,8 +60,8 @@ export function ReportsListQueueHeader({
           </div>
           <Link href="/dashboard/reports/duplicates" className={styles.viewAllLink}>
             {duplicateCount > 0
-              ? `${duplicateCount} potential duplicate${duplicateCount !== 1 ? 's' : ''}`
-              : 'Duplicates'}
+              ? t('potentialDuplicates', { count: duplicateCount })
+              : t('duplicates')}
             <Icon name="chevron-right" size={12} className={styles.linkChevron} aria-hidden />
           </Link>
         </div>

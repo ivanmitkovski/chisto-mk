@@ -3,16 +3,24 @@
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { fetchClustersForMap, fetchSitesForMap } from '../data/map-adapter';
-import { SERVER_CLUSTER_MAX_ZOOM } from '../map-constants';
+import { useTranslations } from 'next-intl';
+import {
+  fetchClustersForMap,
+  fetchHeatmapForMap,
+  fetchSitesForMap,
+  searchSitesForMap,
+} from '../data/map-adapter';
+import { MAP_SITE_FETCH_LIMIT, SERVER_CLUSTER_MAX_ZOOM } from '../map-constants';
 import { parseViewportFromSearchParams, radiusKmFromZoom } from './map-viewport-url';
 
 export function useSitesMap() {
+  const tSearch = useTranslations('map.search');
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
   const statusFromUrl = searchParams.get('status') ?? '';
   const includeArchivedFromUrl = searchParams.get('includeArchived') === 'true';
+  const heatmapFromUrl = searchParams.get('heatmap') === '1';
   const [center, setCenter] = useState<[number, number]>(() =>
     parseViewportFromSearchParams(new URLSearchParams(searchParams.toString())).center,
   );
@@ -21,14 +29,17 @@ export function useSitesMap() {
   );
   const [statusFilter, setStatusFilter] = useState(statusFromUrl || '');
   const [includeArchived, setIncludeArchived] = useState(includeArchivedFromUrl);
+  const [showHeatmap, setShowHeatmap] = useState(heatmapFromUrl);
+  const [searchDraft, setSearchDraft] = useState('');
+  const [searchMessage, setSearchMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const s = searchParams.get('status') ?? '';
     setStatusFilter(s);
     setIncludeArchived(searchParams.get('includeArchived') === 'true');
+    setShowHeatmap(searchParams.get('heatmap') === '1');
   }, [searchParams]);
 
-  /** Only when the URL carries explicit viewport coords (avoids clobbering pan on filter-only changes). */
   const viewportSearchKey = useMemo(() => {
     const lat = searchParams.get('lat');
     const lng = searchParams.get('lng');
@@ -70,11 +81,19 @@ export function useSitesMap() {
   }, [center, zoom, pathname, router, searchParams]);
 
   const [selectedSiteId, setSelectedSiteId] = useState<string | null>(null);
-
   const radiusKm = useMemo(() => radiusKmFromZoom(zoom), [zoom]);
 
   const queryKey = useMemo(
-    () => ['sites-map', center[0], center[1], radiusKm, zoom, statusFilter || 'all', includeArchived ? 'archived' : 'hot'] as const,
+    () =>
+      [
+        'sites-map',
+        center[0],
+        center[1],
+        radiusKm,
+        zoom,
+        statusFilter || 'all',
+        includeArchived ? 'archived' : 'hot',
+      ] as const,
     [center, radiusKm, zoom, statusFilter, includeArchived],
   );
 
@@ -138,7 +157,43 @@ export function useSitesMap() {
     refetchOnWindowFocus: false,
   });
 
+  const heatmapQueryKey = useMemo(
+    () =>
+      [
+        'sites-map-heatmap',
+        center[0],
+        center[1],
+        radiusKm,
+        zoom,
+        statusFilter || 'all',
+        includeArchived ? 'archived' : 'hot',
+      ] as const,
+    [center, radiusKm, zoom, statusFilter, includeArchived],
+  );
+
+  const {
+    data: heatmapData,
+    isFetching: heatmapFetching,
+    refetch: refetchHeatmap,
+  } = useQuery({
+    queryKey: heatmapQueryKey,
+    queryFn: () =>
+      fetchHeatmapForMap({
+        lat: center[0],
+        lng: center[1],
+        radiusKm,
+        zoom,
+        ...(statusFilter ? { status: statusFilter } : {}),
+        ...(includeArchived ? { includeArchived: true } : {}),
+      }),
+    enabled: showHeatmap,
+    staleTime: 60_000,
+    gcTime: 5 * 60_000,
+    refetchOnWindowFocus: false,
+  });
+
   const sites = data?.data ?? [];
+  const resultCapped = zoom > SERVER_CLUSTER_MAX_ZOOM && sites.length >= MAP_SITE_FETCH_LIMIT;
   const selectedSite = useMemo(
     () => sites.find((s) => s.id === selectedSiteId) ?? null,
     [sites, selectedSiteId],
@@ -153,12 +208,61 @@ export function useSitesMap() {
     setStatusFilter(status);
   }, []);
 
+  const runSearch = useCallback(async () => {
+    const query = searchDraft.trim();
+    if (query.length < 2) {
+      setSearchMessage(tSearch('minLength'));
+      return;
+    }
+    setSearchMessage(null);
+    try {
+      const result = await searchSitesForMap(query);
+      if (result.data.length === 0) {
+        setSearchMessage(tSearch('noMatch'));
+        return;
+      }
+      const first = result.data[0];
+      setSelectedSiteId(first.id);
+      updateView([first.latitude, first.longitude], Math.max(zoom, 13));
+      setSearchMessage(
+        result.data.length === 1
+          ? tSearch('oneFound')
+          : tSearch('manyFound', { count: result.data.length }),
+      );
+    } catch {
+      setSearchMessage(tSearch('failed'));
+    }
+  }, [searchDraft, tSearch, updateView, zoom]);
+
+  const toggleHeatmap = useCallback(
+    (enabled: boolean) => {
+      setShowHeatmap(enabled);
+      const sp = new URLSearchParams(searchParams.toString());
+      if (enabled) sp.set('heatmap', '1');
+      else sp.delete('heatmap');
+      router.replace(`${pathname}?${sp.toString()}`, { scroll: false });
+      if (enabled) {
+        void refetchHeatmap();
+      }
+    },
+    [pathname, refetchHeatmap, router, searchParams],
+  );
+
   return {
     center,
     zoom,
     radiusKm,
     statusFilter,
     includeArchived,
+    showHeatmap,
+    searchDraft,
+    setSearchDraft,
+    searchMessage,
+    runSearch,
+    toggleHeatmap,
+    heatmapPoints: heatmapData?.data ?? [],
+    heatmapFetching,
+    resultCapped,
     selectedSiteId,
     selectedSite,
     sites,

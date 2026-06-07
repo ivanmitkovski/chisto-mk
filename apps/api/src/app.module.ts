@@ -18,6 +18,8 @@ import { HealthModule } from './health/health.module';
 import { AuditModule } from './audit/audit.module';
 import { SessionsModule } from './sessions/sessions.module';
 import { AdminUsersModule } from './admin-users/admin-users.module';
+import { AdminInvitesModule } from './admin-invites/admin-invites.module';
+import { AdminModerationEmailModule } from './admin-moderation-email/admin-moderation-email.module';
 import { SystemConfigModule } from './system-config/system-config.module';
 import { FeatureFlagsModule } from './feature-flags/feature-flags.module';
 import { PublicConfigModule } from './public-config/public-config.module';
@@ -31,6 +33,7 @@ import { WebhooksModule } from './webhooks/webhooks.module';
 import { RedisIoAdapterLifecycle } from './common/adapters/redis-io-adapter.lifecycle';
 import { DiscoveryAnalyticsModule } from './discovery-analytics/discovery-analytics.module';
 import { ModerationModule } from './moderation/moderation.module';
+import { AdminControlModule } from './admin-control/admin-control.module';
 import { LoggerModule } from 'nestjs-pino';
 import { safePinoReqSerializer } from './common/logging/safe-pino-req.serializer';
 import { pinoLogMixin, resolveLogLevel } from './common/logging/pino-log-context';
@@ -95,6 +98,8 @@ import { RequestMetricsInterceptor } from './observability/util/request-metrics.
     AdminModule,
     AdminNotificationsModule,
     AdminUsersModule,
+    AdminInvitesModule,
+    AdminModerationEmailModule,
     SystemConfigModule,
     FeatureFlagsModule,
     PublicConfigModule,
@@ -107,6 +112,7 @@ import { RequestMetricsInterceptor } from './observability/util/request-metrics.
     WebhooksModule,
     DiscoveryAnalyticsModule.register(),
     ModerationModule,
+    AdminControlModule,
   ],
   controllers: [AppController],
   providers: [

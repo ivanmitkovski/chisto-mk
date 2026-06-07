@@ -1,7 +1,9 @@
 'use client';
 
 import { createContext, useCallback, useContext, useState, type ReactNode } from 'react';
-import { adminBrowserFetch } from '@/lib/admin-browser-api';
+import { useTranslations } from 'next-intl';
+import { useToast } from '@/components/ui';
+import { adminBrowserFetch } from '@/lib/api';
 import type { TopBarNotification } from '@/features/admin-shell/types/top-bar';
 
 type NotificationsContextValue = {
@@ -52,6 +54,8 @@ export function NotificationsProvider({
   initialItems,
   initialUnreadCount,
 }: NotificationsProviderProps) {
+  const tCommon = useTranslations('common');
+  const { showToast } = useToast();
   const [items, setItemsState] = useState<TopBarNotification[]>(() =>
     initialItems.map(toTopBarNotification),
   );
@@ -80,8 +84,13 @@ export function NotificationsProvider({
     } catch {
       setItemsState(previous);
       setUnreadCount(previous.filter((n) => n.isUnread).length);
+      showToast({
+        tone: 'warning',
+        title: tCommon('couldNotMarkRead'),
+        message: tCommon('changesRevertedTryAgain'),
+      });
     }
-  }, [items]);
+  }, [items, showToast, tCommon]);
 
   const markAllRead = useCallback(async () => {
     const previous = items;
@@ -92,8 +101,13 @@ export function NotificationsProvider({
     } catch {
       setItemsState(previous);
       setUnreadCount(previous.filter((n) => n.isUnread).length);
+      showToast({
+        tone: 'warning',
+        title: tCommon('couldNotMarkRead'),
+        message: tCommon('changesRevertedTryAgain'),
+      });
     }
-  }, [items]);
+  }, [items, showToast, tCommon]);
 
   const applyNotificationRead = useCallback((id: string, wasUnread: boolean) => {
     setItemsState((prev) =>

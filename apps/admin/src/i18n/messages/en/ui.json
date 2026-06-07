@@ -1,0 +1,12 @@
+{
+  "confirm": "Confirm",
+  "cancel": "Cancel",
+  "typeToConfirm": "Type \"{phrase}\" to confirm",
+  "noData": "No data",
+  "filters": "Filters",
+  "applyFilters": "Apply filters",
+  "export": "Export",
+  "selectedCount": "{count} selected",
+  "selectedCountOfTotal": "{count} selected of {total}",
+  "dismissNotification": "Dismiss notification"
+}

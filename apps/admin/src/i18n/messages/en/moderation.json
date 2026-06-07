@@ -1,0 +1,71 @@
+{
+  "pageTitle": "UGC Moderation",
+  "pageHeaderTitle": "UGC moderation",
+  "pageDescription": "Triage citizen reports for comments, chats, users, sites, and events.",
+  "empty": "No UGC reports match the current filters.",
+  "emptyFiltered": "No UGC reports match the current filters. Try clearing search or filters.",
+  "readOnlyBanner": "You have read-only access to UGC moderation. Actions require the moderation write permission.",
+  "searchPlaceholder": "Search reports…",
+  "searchAria": "Search UGC reports",
+  "subjectTypeFilter": "Subject type",
+  "subjectTypeOptions": {
+    "all": "All subject types"
+  },
+  "queueAria": "UGC report queue",
+  "reportsCount": "{total} reports",
+  "openOnPage": "{count} open on this page",
+  "statusFilter": "Status",
+  "statusOptions": {
+    "all": "All statuses",
+    "open": "Open",
+    "escalated": "Escalated",
+    "reviewed": "Reviewed",
+    "dismissed": "Dismissed",
+    "hidden": "Hidden"
+  },
+  "detail": {
+    "kicker": "UGC report",
+    "subjectPreview": "Subject preview",
+    "openRecord": "Open {subjectType} record",
+    "noDetailPage": "This subject type does not have a dedicated admin detail page yet.",
+    "caseStatus": "Case status",
+    "contentStatus": "Content status",
+    "reason": "Reason",
+    "reporter": "Reporter",
+    "created": "Created",
+    "reporterProfile": "Reporter profile",
+    "viewReporter": "View reporter",
+    "reporterDetails": "Reporter details",
+    "actionUnavailable": "Not available for the current report status"
+  },
+  "subjectTypes": {
+    "user": "User profile",
+    "site": "Site record",
+    "event": "Cleanup event",
+    "site_comment": "Site comment",
+    "event_chat_message": "Event chat message",
+    "safety_issue": "Safety issue"
+  },
+  "actions": {
+    "markReviewed": "Mark reviewed",
+    "dismiss": "Dismiss",
+    "escalate": "Escalate",
+    "hideSubject": "Hide subject",
+    "restoreSubject": "Restore subject",
+    "moderateReport": "Moderate report"
+  },
+  "modal": {
+    "description": "This action will be audited and visible to other admins.",
+    "policyReasonLabel": "Policy reason (required for dismiss/escalate/hide/restore)",
+    "policyReasonRequired": "A policy reason is required for this action.",
+    "moderatorNoteLabel": "Moderator note",
+    "hideSubjectConfirmTitle": "Hide reported subject?",
+    "hideSubjectConfirmDescription": "This hides the subject from public view. Confirm only if it violates policy."
+  },
+  "toast": {
+    "savedTitle": "Moderation saved",
+    "savedMessage": "The UGC report was updated.",
+    "failedTitle": "Moderation failed",
+    "failedMessage": "Unable to update this UGC report."
+  }
+}

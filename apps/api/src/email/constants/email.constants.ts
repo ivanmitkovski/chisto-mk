@@ -22,6 +22,9 @@ export const DEFAULT_EMAIL_FROM_NAME = 'Chisto.mk';
 /** Primary button link target when no entity-specific deep links exist. */
 export const DEFAULT_EMAIL_APP_BASE_URL = 'https://chisto.mk';
 
+/** Admin console origin for moderation email CTAs and invite accept links (no trailing slash). */
+export const DEFAULT_ADMIN_APP_BASE_URL = 'https://admin.chisto.mk';
+
 /** Fallback hosted logo when inline asset is missing (use www — apex redirects break many clients). */
 export const DEFAULT_EMAIL_LOGO_URL = 'https://www.chisto.mk/brand/logo.png';
 

@@ -18,18 +18,48 @@ const TEMPLATE_IDS: EmailTemplateId[] = [
   'event_completed_no_show',
   'site_upvote',
   'site_comment',
+  'admin_invite',
+  'admin_moderation_new_report',
+  'admin_moderation_event_pending',
+  'admin_moderation_ugc_report',
+  'admin_moderation_checkin_risk',
 ];
 
 /** Shared fixture: each template reads only fields it needs */
 const ctx: Record<string, unknown> = {
   firstName: 'Sam',
   eventTitle: 'Park cleanup',
-  reportNumber: '#9',
+  reportNumber: 'CH-000068',
+  reportTitle: 'River bank litter',
   siteLabel: 'City park',
   points: 8,
   mergeRole: 'primary',
   commentPreview: 'Looks great',
-  reason: 'Spam',
+  reason: 'spam',
+  inviteUrl: 'https://example.test/invite',
+  roleLabel: 'Moderator',
+  expiresAt: new Date().toISOString(),
+  actionUrl: 'https://admin.chisto.mk/dashboard/reports?reportId=r1',
+  isNewSite: true,
+  subjectType: 'safety_issue',
+  subjectId: 'subj-1',
+  distanceMeters: 420,
+  category: 'ILLEGAL_LANDFILL',
+  severity: 4,
+  address: 'Skopje, MK',
+  latitude: 41.9981,
+  longitude: 21.4254,
+  reporterEmail: 'citizen@example.test',
+  submittedAt: '2026-06-05T10:00:00.000Z',
+  organizerName: 'Ivan M.',
+  scheduledAt: '2026-06-10T09:00:00.000Z',
+  endAt: '2026-06-10T12:00:00.000Z',
+  eventCategory: 'GENERAL_CLEANUP',
+  eventScale: 'MEDIUM',
+  siteAddress: 'City Park entrance',
+  detailsPreview: 'Repeated spam links in comments',
+  reportedAt: '2026-06-05T11:00:00.000Z',
+  occurredAt: '2026-06-05T12:00:00.000Z',
 };
 
 describe('email-copy', () => {
@@ -38,14 +68,14 @@ describe('email-copy', () => {
   it.each(TEMPLATE_IDS)('template %s has subject, CTA URL and label (en)', (templateId) => {
     const copy = getCopy(templateId, 'en', ctx, baseUrl);
     expect(copy.subject.trim().length).toBeGreaterThan(0);
-    expect(copy.ctaUrl).toBe(baseUrl);
+    expect((copy.ctaUrl ?? '').trim().length).toBeGreaterThan(0);
     expect((copy.ctaLabel ?? '').trim().length).toBeGreaterThan(0);
   });
 
   it.each(TEMPLATE_IDS)('template %s has subject, CTA URL and label (mk)', (templateId) => {
     const copy = getCopy(templateId, 'mk', ctx, baseUrl);
     expect(copy.subject.trim().length).toBeGreaterThan(0);
-    expect(copy.ctaUrl).toBe(baseUrl);
+    expect((copy.ctaUrl ?? '').trim().length).toBeGreaterThan(0);
     expect((copy.ctaLabel ?? '').trim().length).toBeGreaterThan(0);
   });
 
@@ -98,5 +128,37 @@ describe('email-copy', () => {
     });
     expect(html).not.toContain('--');
     expect(html).toContain('open-pending');
+  });
+
+  it('admin_moderation_ugc_report humanizes enums and uses actionUrl', () => {
+    const copy = getCopy('admin_moderation_ugc_report', 'en', ctx, 'https://chisto.mk');
+    expect(copy.ctaUrl).toBe(ctx.actionUrl);
+    const values = (copy.detailRows ?? []).map((r) => r.value).join(' ');
+    expect(values).toContain('Safety issue');
+    expect(values).toContain('Spam');
+    expect(values).not.toContain('safety_issue');
+    expect(copy.extraLines?.[0]).toContain('Repeated spam');
+  });
+
+  it('admin_moderation_new_report includes rich detail rows', () => {
+    const copy = getCopy('admin_moderation_new_report', 'en', ctx, 'https://chisto.mk');
+    const labels = (copy.detailRows ?? []).map((r) => r.label);
+    expect(labels).toEqual(
+      expect.arrayContaining(['Report', 'Title', 'Category', 'Severity', 'Location', 'Reported by']),
+    );
+    expect(copy.lead).toContain('CH-000068');
+  });
+
+  it('admin_moderation_event_pending includes organizer and schedule', () => {
+    const copy = getCopy('admin_moderation_event_pending', 'en', ctx, 'https://chisto.mk');
+    const rows = copy.detailRows ?? [];
+    expect(rows.some((r) => r.label === 'Organizer' && r.value === 'Ivan M.')).toBe(true);
+    expect(rows.some((r) => r.label === 'When')).toBe(true);
+    expect(copy.ctaUrl).toBe(ctx.actionUrl);
+  });
+
+  it('admin_moderation_checkin_risk includes when row', () => {
+    const copy = getCopy('admin_moderation_checkin_risk', 'en', ctx, 'https://chisto.mk');
+    expect((copy.detailRows ?? []).some((r) => r.label === 'When')).toBe(true);
   });
 });

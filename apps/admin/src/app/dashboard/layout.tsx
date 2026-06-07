@@ -4,12 +4,16 @@ import {
   DashboardPollingFallback,
   NewReportSoundEffect,
 } from '@/features/dashboard-overview';
+import { DashboardPermissionsProvider } from '@/features/admin-shell';
+import { DashboardLayoutError } from '@/features/admin-shell/components/dashboard-layout-error';
+import { MfaReminderBanner } from '@/features/admin-shell/components/mfa-reminder-banner';
+import { getMeProfile } from '@/features/auth';
+import { handleServerLoadError } from '@/lib/server/handle-server-load-error';
 
 /** Ensure RSC reads request cookies (auth token for API calls, notifications). */
 export const dynamic = 'force-dynamic';
-import { AdminPreferencesInit } from '@/features/settings/components/admin-preferences-init';
-import { NotificationsProvider } from '@/features/notifications/context/notifications-context';
-import { NotificationsQuerySync } from '@/features/notifications/components/notifications-query-sync';
+import { NotificationsProvider } from '@/features/notifications';
+import { NotificationsQuerySync } from '@/features/notifications';
 import { getAdminNotifications } from '@/features/notifications';
 
 export default async function DashboardLayout({
@@ -17,6 +21,26 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  let role: string | null = null;
+  let mfaEnabled = true;
+  let profileLoadError: string | null = null;
+
+  try {
+    const me = await getMeProfile();
+    role = me.role ?? null;
+    mfaEnabled = me.mfaEnabled ?? false;
+  } catch (error) {
+    try {
+      profileLoadError = await handleServerLoadError(error);
+    } catch {
+      profileLoadError = null;
+    }
+  }
+
+  if (profileLoadError) {
+    return <DashboardLayoutError description={profileLoadError} />;
+  }
+
   let initialItems: {
     id: string;
     title: string;
@@ -47,18 +71,20 @@ export default async function DashboardLayout({
   }
 
   return (
-    <NotificationsProvider
-      initialItems={initialItems}
-      initialUnreadCount={initialUnreadCount}
-    >
-      <AdminPreferencesInit />
-      <NotificationsQuerySync />
-      <DashboardSSEProvider>
-        <DashboardSSEClient />
-        <NewReportSoundEffect />
-        <DashboardPollingFallback />
-        {children}
-      </DashboardSSEProvider>
-    </NotificationsProvider>
+    <DashboardPermissionsProvider role={role}>
+      <NotificationsProvider
+        initialItems={initialItems}
+        initialUnreadCount={initialUnreadCount}
+      >
+        <NotificationsQuerySync />
+        <DashboardSSEProvider>
+          <DashboardSSEClient />
+          <NewReportSoundEffect />
+          <DashboardPollingFallback />
+          <MfaReminderBanner mfaEnabled={mfaEnabled} />
+          {children}
+        </DashboardSSEProvider>
+      </NotificationsProvider>
+    </DashboardPermissionsProvider>
   );
 }

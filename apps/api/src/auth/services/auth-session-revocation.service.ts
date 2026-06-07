@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../../audit/services/audit.service';
@@ -70,5 +70,42 @@ export class AuthSessionRevocationService {
       metadata: { count: result.count, reason },
     });
     return { revoked: result.count };
+  }
+
+  async revokeSessionForUser(
+    userId: string,
+    sessionId: string,
+    actorId: string,
+    reason: SessionRevokeReason = 'admin_action',
+  ): Promise<{ ok: true }> {
+    const session = await this.prisma.userSession.findFirst({
+      where: { id: sessionId, userId },
+      select: { id: true, revokedAt: true },
+    });
+    if (!session) {
+      throw new NotFoundException({
+        code: 'SESSION_NOT_FOUND',
+        message: 'Session not found',
+      });
+    }
+    if (session.revokedAt != null) {
+      return { ok: true };
+    }
+
+    const now = new Date();
+    await this.prisma.userSession.update({
+      where: { id: sessionId },
+      data: { revokedAt: now },
+    });
+    this.authSnapshotCache.invalidate(userId);
+    this.eventEmitter.emit('security.sessions_revoked', { userId, reason });
+    await this.audit.log({
+      actorId,
+      action: 'SESSION_REVOKED_BY_ADMIN',
+      resourceType: 'UserSession',
+      resourceId: sessionId,
+      metadata: { userId, reason },
+    });
+    return { ok: true };
   }
 }

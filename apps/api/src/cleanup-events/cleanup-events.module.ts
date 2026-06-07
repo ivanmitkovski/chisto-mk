@@ -13,6 +13,8 @@ import { CleanupEventsCheckInRiskSignalsService } from './services/cleanup-event
 import { CleanupEventsCreateMutationService } from './services/cleanup-events-mutation-create.service';
 import { CleanupEventsPatchMutationService } from './services/cleanup-events-mutation-patch.service';
 import { CleanupEventsMutationsService } from './services/cleanup-events-mutations.service';
+import { CleanupEventsModerationNotesService } from './services/cleanup-events-moderation-notes.service';
+import { CleanupEventsParticipantsAdminService } from './services/cleanup-events-participants-admin.service';
 import { CleanupEventsService } from './services/cleanup-events.service';
 
 @Module({
@@ -32,6 +34,8 @@ import { CleanupEventsService } from './services/cleanup-events.service';
     CleanupEventsBulkModerateMutationService,
     CleanupEventsCreateMutationService,
     CleanupEventsCheckInRiskSignalsService,
+    CleanupEventsModerationNotesService,
+    CleanupEventsParticipantsAdminService,
     CleanupEventsMutationsService,
     CleanupEventsService,
   ],

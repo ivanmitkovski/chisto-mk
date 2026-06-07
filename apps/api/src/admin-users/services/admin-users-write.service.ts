@@ -253,4 +253,28 @@ export class AdminUsersWriteService {
     }
     return { updatedCount: toUpdate.length, skippedCount: dto.userIds.length - toUpdate.length };
   }
+
+  async revokeSession(
+    userId: string,
+    sessionId: string,
+    actor: AuthenticatedUser,
+  ): Promise<{ ok: true }> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, role: true },
+    });
+    if (!user) {
+      throw new NotFoundException({
+        code: 'USER_NOT_FOUND',
+        message: 'User not found',
+      });
+    }
+    if (user.role === Role.SUPER_ADMIN && actor.role !== Role.SUPER_ADMIN) {
+      throw new ForbiddenException({
+        code: 'FORBIDDEN',
+        message: 'Only a super admin can revoke sessions for this account',
+      });
+    }
+    return this.sessionRevocation.revokeSessionForUser(userId, sessionId, actor.userId);
+  }
 }
