@@ -9,12 +9,13 @@ import {
   getAdminRefreshToken,
   getOrCreateAdminDeviceId,
   getTokenExpiryMs,
+  isRememberDeviceEnabled,
   refreshAdminTokens,
   setAdminAuthCookies,
   clearAdminAuthCookies,
 } from '@/lib/auth/admin-session';
 
-const REFRESH_THRESHOLD_MS = 60 * 1000; // Refresh if token expires in < 1 min
+const REFRESH_THRESHOLD_MS = 60 * 1000;
 
 function shouldEmitStrictReportOnlyCsp(): boolean {
   return process.env.ADMIN_STRICT_CSP_REPORT_ONLY === '1';
@@ -26,6 +27,13 @@ function applyCspHeaders(response: NextResponse, csp: string, reportOnlyCsp: str
     response.headers.set('Content-Security-Policy-Report-Only', reportOnlyCsp);
   }
   return response;
+}
+
+function authCookieOptions(request: NextRequest, deviceId: string) {
+  return {
+    rememberDevice: isRememberDeviceEnabled(request),
+    deviceId,
+  };
 }
 
 export async function middleware(request: NextRequest) {
@@ -54,28 +62,39 @@ export async function middleware(request: NextRequest) {
   if (pathname.startsWith('/dashboard')) {
     if (!token) {
       if (refreshToken) {
-        const tokens = await refreshAdminTokens(refreshToken, deviceId);
-        if (tokens) {
+        const result = await refreshAdminTokens(refreshToken, deviceId);
+        if (result.ok) {
           const response = NextResponse.redirect(request.url);
-          setAdminAuthCookies(response, tokens, request, { deviceId });
+          setAdminAuthCookies(response, result.tokens, request, authCookieOptions(request, deviceId));
+          return applyCspHeaders(response, csp, reportOnlyCsp);
+        }
+        if (result.reason === 'unauthorized') {
+          const response = NextResponse.redirect(new URL('/login', request.url));
+          clearAdminAuthCookies(response, request);
           return applyCspHeaders(response, csp, reportOnlyCsp);
         }
       }
       const response = NextResponse.redirect(new URL('/login', request.url));
-      clearAdminAuthCookies(response, request);
       return applyCspHeaders(response, csp, reportOnlyCsp);
     }
 
     const expMs = getTokenExpiryMs(token);
     if (expMs && refreshToken && Date.now() > expMs - REFRESH_THRESHOLD_MS) {
-      const tokens = await refreshAdminTokens(refreshToken, deviceId);
-      if (tokens) {
+      const result = await refreshAdminTokens(refreshToken, deviceId);
+      if (result.ok) {
         const response = NextResponse.redirect(request.url);
-        setAdminAuthCookies(response, tokens, request, { deviceId });
+        setAdminAuthCookies(response, result.tokens, request, authCookieOptions(request, deviceId));
         return applyCspHeaders(response, csp, reportOnlyCsp);
       }
+      if (result.reason === 'unauthorized') {
+        const response = NextResponse.redirect(new URL('/login', request.url));
+        clearAdminAuthCookies(response, request);
+        return applyCspHeaders(response, csp, reportOnlyCsp);
+      }
+      if (Date.now() < expMs) {
+        return next();
+      }
       const response = NextResponse.redirect(new URL('/login', request.url));
-      clearAdminAuthCookies(response, request);
       return applyCspHeaders(response, csp, reportOnlyCsp);
     }
   }

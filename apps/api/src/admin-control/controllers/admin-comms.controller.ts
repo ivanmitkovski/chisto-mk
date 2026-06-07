@@ -11,6 +11,7 @@ import { CurrentUser } from '../../auth/decorators/current-user.decorator';
 import type { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { AdminCommsService } from '../services/admin-comms.service';
 import { CreateEmailSuppressionDto } from '../dto/create-email-suppression.dto';
+import { EmailDeadLetterPageDto } from '../dto/email-dead-letter.dto';
 
 @ApiTags('admin-comms')
 @Controller('admin/comms')
@@ -58,6 +59,21 @@ export class AdminCommsController {
   @ApiOperation({ summary: 'Remove email suppression' })
   removeSuppression(@Param('email') email: string, @CurrentUser() actor: AuthenticatedUser) {
     return this.comms.removeEmailSuppression(decodeURIComponent(email), actor);
+  }
+
+  @Get('email-dead-letters')
+  @Roles(...ADMIN_PANEL_ROLES)
+  @RequirePermission(ADMIN_PERMISSIONS['comms:read'])
+  @ApiOperation({ summary: 'List email delivery dead-letter outbox entries' })
+  @ApiOkResponse({ type: EmailDeadLetterPageDto })
+  listEmailDeadLetters(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.comms.listEmailDeadLetters(
+      page ? Number(page) : 1,
+      limit ? Number(limit) : 20,
+    );
   }
 
   @Get('webhook-logs')

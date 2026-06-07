@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Prisma } from '../../prisma-client';
 import { PrismaService } from '../../prisma/prisma.service';
 import type { NotificationEvent } from '../../notifications/types/notification-event.types';
+import { ObservabilityStore } from '../../observability/observability.store';
 import { EmailService } from './email.service';
 import { mapNotificationEventToEmail } from '../util/email-event-mapper';
 import { isImportantNotificationEmail } from '../util/email-importance.policy';
@@ -74,6 +75,7 @@ export class EmailDeliveryOutboxService {
       take: BATCH_SIZE,
     });
     if (pending.length === 0) {
+      await this.refreshQueueStats();
       return 0;
     }
 
@@ -138,6 +140,64 @@ export class EmailDeliveryOutboxService {
         }
       }
     }
+    await this.refreshQueueStats();
     return delivered;
+  }
+
+  async listDeadLetters(page = 1, limit = 20) {
+    const safePage = Math.max(1, page);
+    const safeLimit = Math.min(100, Math.max(1, limit));
+    const skip = (safePage - 1) * safeLimit;
+    const [rows, total] = await this.prisma.$transaction([
+      this.prisma.emailOutbox.findMany({
+        where: { failedPermanently: true },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: safeLimit,
+        select: {
+          id: true,
+          userId: true,
+          templateId: true,
+          attempts: true,
+          lastError: true,
+          lastAttemptAt: true,
+          createdAt: true,
+        },
+      }),
+      this.prisma.emailOutbox.count({
+        where: { failedPermanently: true },
+      }),
+    ]);
+    return {
+      data: rows.map((row) => ({
+        id: row.id,
+        userId: row.userId,
+        templateId: row.templateId,
+        attempts: row.attempts,
+        lastError: row.lastError,
+        lastAttemptAt: row.lastAttemptAt?.toISOString() ?? null,
+        createdAt: row.createdAt.toISOString(),
+      })),
+      meta: {
+        page: safePage,
+        limit: safeLimit,
+        total,
+      },
+    };
+  }
+
+  private async refreshQueueStats(): Promise<void> {
+    const [queueDepth, deadLetterCount] = await this.prisma.$transaction([
+      this.prisma.emailOutbox.count({
+        where: {
+          deliveredAt: null,
+          failedPermanently: false,
+        },
+      }),
+      this.prisma.emailOutbox.count({
+        where: { failedPermanently: true },
+      }),
+    ]);
+    ObservabilityStore.setEmailQueueStats({ queueDepth, deadLetterCount });
   }
 }

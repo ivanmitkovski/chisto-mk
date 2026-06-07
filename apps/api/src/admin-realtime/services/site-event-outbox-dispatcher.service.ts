@@ -10,6 +10,7 @@ import { endPgOutboxListener, startPgOutboxListener } from '../../common/pg/star
 import { loadMapConfig } from '../../config/map.config';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ObservabilityStore } from '../../observability/observability.store';
+import { WorkerHeartbeatRegistry } from '../../observability/worker-heartbeat.registry';
 import { MapCdnPurgeService } from '../../observability/services/map-cdn-purge.service';
 import { SiteEvent } from '../types/site-events.types';
 
@@ -49,12 +50,17 @@ export class SiteEventOutboxDispatcherService implements OnModuleInit, OnModuleD
 
   onModuleInit(): void {
     if (this.timer != null) return;
+    WorkerHeartbeatRegistry.markStarted({
+      name: 'map-outbox',
+      intervalMs: SiteEventOutboxDispatcherService.cfg.outboxPollIntervalMs,
+    });
     this.schedulePollTick(0);
     void this.startPgListener();
   }
 
   async onModuleDestroy(): Promise<void> {
     this.shuttingDown = true;
+    WorkerHeartbeatRegistry.markStopped('map-outbox');
     if (this.mapListenWakeTimer != null) {
       clearTimeout(this.mapListenWakeTimer);
       this.mapListenWakeTimer = null;
@@ -98,7 +104,16 @@ export class SiteEventOutboxDispatcherService implements OnModuleInit, OnModuleD
 
   private async runPollTick(): Promise<void> {
     if (this.shuttingDown) return;
-    const hadWork = await this.processOutboxBatch();
+    let hadWork = false;
+    try {
+      hadWork = await this.processOutboxBatch();
+      WorkerHeartbeatRegistry.record('map-outbox', { ok: true });
+    } catch (err) {
+      WorkerHeartbeatRegistry.record('map-outbox', {
+        ok: false,
+        error: err instanceof Error ? err.message : String(err),
+      });
+    }
     const base = SiteEventOutboxDispatcherService.cfg.outboxPollIntervalMs;
     if (hadWork) {
       this.consecutiveIdlePolls = 0;

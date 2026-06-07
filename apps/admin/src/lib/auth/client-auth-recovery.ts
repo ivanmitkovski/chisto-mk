@@ -1,17 +1,20 @@
 'use client';
 
-import { ApiError } from '@/lib/api';
 import { getAdminCsrfHeaders } from '@/lib/auth/csrf-headers';
+import { ApiError } from '@/lib/api';
 
-let refreshInFlight: Promise<boolean> | null = null;
+let refreshInFlight: Promise<'ok' | 'unauthorized' | 'network'> | null = null;
 
-async function refreshAdminSession(): Promise<boolean> {
+async function refreshAdminSessionOnce(): Promise<'ok' | 'unauthorized' | 'network'> {
   const response = await fetch('/api/auth/refresh', {
     method: 'POST',
     headers: getAdminCsrfHeaders(),
     credentials: 'include',
   }).catch(() => null);
-  return response?.ok === true;
+
+  if (response?.ok === true) return 'ok';
+  if (response?.status === 503) return 'network';
+  return 'unauthorized';
 }
 
 async function signOutAndRedirectToLogin(): Promise<void> {
@@ -27,18 +30,19 @@ async function signOutAndRedirectToLogin(): Promise<void> {
   window.location.assign('/login');
 }
 
-async function refreshOnce(): Promise<boolean> {
+async function refreshOnce(): Promise<'ok' | 'unauthorized' | 'network'> {
   if (refreshInFlight) return refreshInFlight;
-  refreshInFlight = refreshAdminSession().finally(() => {
+  refreshInFlight = refreshAdminSessionOnce().finally(() => {
     refreshInFlight = null;
   });
   return refreshInFlight;
 }
 
-/** Refresh session once; sign out when refresh fails. Returns whether the caller should retry. */
+/** Refresh session once; sign out only when refresh is definitively unauthorized. */
 export async function recoverFromUnauthorized(): Promise<boolean> {
-  const refreshed = await refreshOnce();
-  if (refreshed) return true;
+  const outcome = await refreshOnce();
+  if (outcome === 'ok') return true;
+  if (outcome === 'network') return false;
   await signOutAndRedirectToLogin();
   return false;
 }

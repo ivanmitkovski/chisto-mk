@@ -4,12 +4,14 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../../audit/services/audit.service';
 import { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { EmailSuppressionService } from '../../email/services/email-suppression.service';
+import { EmailDeliveryOutboxService } from '../../email/services/email-delivery-outbox.service';
 
 @Injectable()
 export class AdminCommsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly suppression: EmailSuppressionService,
+    private readonly emailOutbox: EmailDeliveryOutboxService,
     private readonly audit?: AuditService,
   ) {}
 
@@ -33,6 +35,10 @@ export class AdminCommsService {
       this.prisma.emailSuppression.count({ where }),
     ]);
     return { data, meta: { page, limit, total } };
+  }
+
+  listEmailDeadLetters(page = 1, limit = 20) {
+    return this.emailOutbox.listDeadLetters(page, limit);
   }
 
   async createEmailSuppression(

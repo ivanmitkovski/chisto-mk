@@ -35,7 +35,12 @@ export async function POST(request: NextRequest) {
   try {
     backendResponse = await fetchBackendResponse('/auth/admin/2fa/complete-login', {
       method: 'POST',
-      body: { tempToken, code, deviceId },
+      body: {
+        tempToken,
+        code,
+        deviceId,
+        rememberMe: body.rememberDevice === true,
+      },
       retryOnGatewayError: false,
       timeoutMs: 15_000,
       acceptLanguage,

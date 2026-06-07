@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEmail, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsBoolean, IsEmail, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class AdminLoginDto {
   @ApiProperty({ example: 'admin@chisto.mk' })
@@ -20,4 +20,11 @@ export class AdminLoginDto {
   @IsString()
   @MaxLength(128)
   deviceId?: string;
+
+  @ApiPropertyOptional({
+    description: 'When true, issue a long-lived refresh session (30 days). When false, session expires in 1 day.',
+  })
+  @IsOptional()
+  @IsBoolean()
+  rememberMe?: boolean;
 }

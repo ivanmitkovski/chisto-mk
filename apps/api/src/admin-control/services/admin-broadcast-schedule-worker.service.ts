@@ -2,8 +2,10 @@ import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/commo
 import Redis from 'ioredis';
 import { AdminBroadcastsDispatchService } from './admin-broadcasts-dispatch.service';
 import { AdminBroadcastsService } from './admin-broadcasts.service';
+import { WorkerHeartbeatRegistry } from '../../observability/worker-heartbeat.registry';
 
 const POLL_MS = 60_000;
+const WORKER_NAME = 'broadcast-schedule';
 const LEADER_LOCK_KEY = 'leader:admin-broadcast-schedule-worker';
 const LEADER_LOCK_TTL_SECONDS = 90;
 const DUE_BATCH_SIZE = 10;
@@ -36,6 +38,7 @@ export class AdminBroadcastScheduleWorkerService implements OnModuleInit, OnModu
     }
 
     this.startLeaderLockRenewal();
+    WorkerHeartbeatRegistry.markStarted({ name: WORKER_NAME, intervalMs: POLL_MS });
     this.timer = setInterval(() => {
       if (!this.shuttingDown) void this.runTick();
     }, POLL_MS);
@@ -45,6 +48,7 @@ export class AdminBroadcastScheduleWorkerService implements OnModuleInit, OnModu
 
   onModuleDestroy(): void {
     this.shuttingDown = true;
+    WorkerHeartbeatRegistry.markStopped(WORKER_NAME);
     if (this.timer) clearInterval(this.timer);
     if (this.leaderRenewTimer) clearInterval(this.leaderRenewTimer);
     void this.releaseLeaderLock();
@@ -67,6 +71,12 @@ export class AdminBroadcastScheduleWorkerService implements OnModuleInit, OnModu
           this.logger.warn(`Failed to auto-send broadcast ${campaign.id}: ${message}`);
         }
       }
+      WorkerHeartbeatRegistry.record(WORKER_NAME, { ok: true });
+    } catch (err) {
+      WorkerHeartbeatRegistry.record(WORKER_NAME, {
+        ok: false,
+        error: err instanceof Error ? err.message : String(err),
+      });
     } finally {
       this.tickInFlight = false;
     }

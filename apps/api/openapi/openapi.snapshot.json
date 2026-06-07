@@ -5677,6 +5677,177 @@
         ]
       }
     },
+    "/reports/{id}/viewers": {
+      "get": {
+        "operationId": "ReportsController_listReportViewers",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Active report viewers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportViewerPresenceResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List admins currently viewing a report",
+        "tags": [
+          "reports"
+        ]
+      }
+    },
+    "/reports/{id}/viewers/heartbeat": {
+      "post": {
+        "operationId": "ReportsController_heartbeatReportViewer",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportViewerHeartbeatDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Active report viewers after heartbeat",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportViewerPresenceResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Register or refresh admin presence while viewing a report",
+        "tags": [
+          "reports"
+        ]
+      }
+    },
+    "/reports/{id}/viewers/{sessionId}": {
+      "delete": {
+        "operationId": "ReportsController_leaveReportViewer",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Active report viewers after leave",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportViewerPresenceResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Remove admin presence when leaving a report view",
+        "tags": [
+          "reports"
+        ]
+      }
+    },
     "/reports/{id}": {
       "get": {
         "operationId": "ReportsController_findOne",
@@ -19444,6 +19615,58 @@
           "meta"
         ]
       },
+      "ReportViewerPresenceEntryDto": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "sessionId",
+          "userId",
+          "displayName"
+        ]
+      },
+      "ReportViewerPresenceResponseDto": {
+        "type": "object",
+        "properties": {
+          "viewers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReportViewerPresenceEntryDto"
+            }
+          }
+        },
+        "required": [
+          "viewers"
+        ]
+      },
+      "ReportViewerHeartbeatDto": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "description": "Stable per-tab session id generated by the admin client",
+            "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+          },
+          "displayName": {
+            "type": "string",
+            "description": "Display name shown to other moderators viewing the same report",
+            "example": "Ana Petrova"
+          }
+        },
+        "required": [
+          "sessionId",
+          "displayName"
+        ]
+      },
       "UpdateReportStatusDto": {
         "type": "object",
         "properties": {
@@ -19937,6 +20160,7 @@
           },
           "totpCode": {
             "type": "string",
+            "description": "Required when completing TOTP enrollment during invite accept; omit to skip 2FA",
             "example": "123456"
           },
           "deviceId": {
@@ -19948,8 +20172,7 @@
           "id",
           "token",
           "password",
-          "phoneNumber",
-          "totpCode"
+          "phoneNumber"
         ]
       },
       "CreateAdminInviteDto": {

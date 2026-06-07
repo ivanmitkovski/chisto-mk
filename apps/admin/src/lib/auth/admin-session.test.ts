@@ -6,11 +6,15 @@ import {
   ADMIN_CSRF_HEADER,
   ADMIN_DEVICE_COOKIE_KEY,
   ADMIN_REFRESH_COOKIE_KEY,
+  ADMIN_REMEMBER_DEVICE_COOKIE_KEY,
 } from '@/lib/auth/auth-constants';
 import {
+  REFRESH_COOKIE_REMEMBER_MAX_AGE,
+  REFRESH_COOKIE_STANDARD_MAX_AGE,
   clearAdminAuthCookies,
   ensureAdminCsrfCookie,
   refreshAdminTokens,
+  resolveRefreshCookieMaxAge,
   setAdminAuthCookies,
   verifyAdminCsrf,
 } from './admin-session';
@@ -49,6 +53,50 @@ describe('admin session helpers', () => {
     expect(verifyAdminCsrf(request)).toBe(false);
   });
 
+  it('sets remember cookie and 30-day refresh maxAge when rememberDevice is true', () => {
+    const request = requestWithCookies('');
+    const response = NextResponse.json({ ok: true });
+
+    setAdminAuthCookies(
+      response,
+      { accessToken: 'access', refreshToken: 'refresh' },
+      request,
+      { rememberDevice: true },
+    );
+    ensureAdminCsrfCookie(request, response);
+
+    const setCookie = response.headers.getSetCookie().join('\n');
+    expect(setCookie).toContain(ADMIN_REMEMBER_DEVICE_COOKIE_KEY);
+    expect(setCookie).toContain(`Max-Age=${REFRESH_COOKIE_REMEMBER_MAX_AGE}`);
+  });
+
+  it('preserves remember refresh maxAge when remember cookie is present on refresh', () => {
+    const request = requestWithCookies(`${ADMIN_REMEMBER_DEVICE_COOKIE_KEY}=1`);
+    const response = NextResponse.json({ ok: true });
+
+    setAdminAuthCookies(response, { accessToken: 'access', refreshToken: 'refresh' }, request);
+
+    const setCookie = response.headers.getSetCookie().join('\n');
+    expect(setCookie).toContain(`Max-Age=${REFRESH_COOKIE_REMEMBER_MAX_AGE}`);
+    expect(setCookie).not.toContain(`Max-Age=${REFRESH_COOKIE_STANDARD_MAX_AGE}`);
+  });
+
+  it('uses standard refresh maxAge when rememberDevice is false at login', () => {
+    expect(resolveRefreshCookieMaxAge(false)).toBe(REFRESH_COOKIE_STANDARD_MAX_AGE);
+    const request = requestWithCookies('');
+    const response = NextResponse.json({ ok: true });
+    setAdminAuthCookies(
+      response,
+      { accessToken: 'access', refreshToken: 'refresh' },
+      request,
+      { rememberDevice: false },
+    );
+    const setCookie = response.headers.getSetCookie().join('\n');
+    expect(setCookie).toContain(`Max-Age=${REFRESH_COOKIE_STANDARD_MAX_AGE}`);
+    expect(setCookie).toContain(`${ADMIN_REMEMBER_DEVICE_COOKIE_KEY}=;`);
+    expect(setCookie).toContain(`${ADMIN_REMEMBER_DEVICE_COOKIE_KEY}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0`);
+  });
+
   it('sets auth cookies as HttpOnly and csrf as browser readable', () => {
     const request = requestWithCookies('');
     const response = NextResponse.json({ ok: true });
@@ -72,6 +120,7 @@ describe('admin session helpers', () => {
 
     const setCookie = response.headers.getSetCookie().join('\n');
     expect(setCookie).toContain(ADMIN_AUTH_COOKIE_KEY);
+    expect(setCookie).toContain(ADMIN_REMEMBER_DEVICE_COOKIE_KEY);
     expect(setCookie).toContain('Max-Age=0');
   });
 
@@ -82,17 +131,26 @@ describe('admin session helpers', () => {
     });
     vi.stubGlobal('fetch', fetchMock);
 
-    await Promise.all([
+    const [first, second] = await Promise.all([
       refreshAdminTokens('refresh-1', 'device-1'),
       refreshAdminTokens('refresh-1', 'device-1'),
     ]);
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(first.ok).toBe(true);
+    expect(second.ok).toBe(true);
     expect(fetchMock).toHaveBeenCalledWith(
       expect.stringContaining('/auth/refresh'),
       expect.objectContaining({
         body: JSON.stringify({ refreshToken: 'refresh-1', deviceId: 'device-1' }),
       }),
     );
+  });
+
+  it('returns network reason when refresh fetch fails', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('network down')));
+
+    const result = await refreshAdminTokens('refresh-1', 'device-1');
+    expect(result).toEqual({ ok: false, reason: 'network' });
   });
 });

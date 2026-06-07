@@ -1,28 +1,14 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui';
-import { useWorkspaceRefresh } from '@/features/admin-shell/hooks/use-workspace-refresh';
+import { useOperationsLive } from './operations-live-provider';
 import styles from './operations-workspace.module.css';
-
-const POLL_INTERVAL_MS = 60_000;
 
 export function OperationsRefreshBar() {
   const t = useTranslations('operations');
   const tCommon = useTranslations('common');
-  const { refresh, isRefreshing } = useWorkspaceRefresh();
-
-  useEffect(() => {
-    if (typeof document === 'undefined') return undefined;
-
-    const tick = () => {
-      if (!document.hidden) refresh();
-    };
-
-    const id = window.setInterval(tick, POLL_INTERVAL_MS);
-    return () => window.clearInterval(id);
-  }, [refresh]);
+  const { refresh, isRefreshing } = useOperationsLive();
 
   return (
     <div className={styles.toolbar}>

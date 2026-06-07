@@ -4,12 +4,49 @@
   "links": {
     "emailSuppressions": "Bllokimet e emailit",
     "webhookLogs": "Regjistrat e webhook",
-    "backendDiag": "Diagnostika backend",
-    "prometheusMetrics": "Metrikat Prometheus"
+    "auditLog": "Regjistri i auditimit"
   },
   "refreshBar": {
     "refreshAll": "Rifresko të gjitha",
-    "autoRefreshHint": "Rifreskim automatik çdo 60s"
+    "autoRefreshHint": "Rifreskim automatik çdo 60s kur skeda është e dukshme"
+  },
+  "status": {
+    "allOperational": "Të gjitha sistemet funksionojnë",
+    "degraded": "Disa sisteme janë degraduar",
+    "majorOutage": "Ndërprerje e madhe e zbuluar",
+    "unknown": "Statusi është pjesërisht i panjohur",
+    "summary": "{ok} të shëndetshme · {warn} të degraduara · {critical} kritike",
+    "lastUpdated": "Snapshot u përditësua {time}"
+  },
+  "health": {
+    "ok": "E shëndetshme",
+    "warn": "E degraduar",
+    "critical": "Kritike",
+    "unknown": "E panjohur"
+  },
+  "sections": {
+    "delivery": "Dorëzimi",
+    "pipeline": "Procesi",
+    "compliance": "Pajtueshmëria",
+    "system": "Sistemi"
+  },
+  "panels": {
+    "insufficientPermission": "Nuk keni leje për këtë panel.",
+    "restricted": "E kufizuar"
+  },
+  "diagnostics": {
+    "button": "Ekzekuto diagnostikën",
+    "title": "Diagnostika backend",
+    "running": "Duke ekzekutuar kontrollet…",
+    "failed": "Nuk u ekzekutua diagnostika.",
+    "readiness": "Gatishmëria e varësive",
+    "systemInfo": "Informacioni i sistemit"
+  },
+  "metricsDrawer": {
+    "button": "Metrikat raw",
+    "title": "Snapshot i metrikave",
+    "loading": "Duke ngarkuar metrikat…",
+    "failed": "Nuk u ngarkuan metrikat."
   },
   "testPush": {
     "button": "Dërgo push test",
@@ -27,15 +64,20 @@
     "mapPipeline": "Procesi i hartës",
     "mapDeepProbe": "Prova e thellë e hartës",
     "pushDeadLetters": "Mesazhe push të padërguara",
+    "emailDeadLetters": "Mesazhe email të padërguara",
     "feedDiagnostics": "Diagnostika e feed-it",
     "sideEffectsQueue": "Radha e efekteve anësore",
     "emailSuppressions": "Bllokimet e emailit",
-    "gdprAuditWatch": "Vëzhgimi i auditimit GDPR"
+    "gdprAuditWatch": "Vëzhgimi i auditimit GDPR",
+    "systemInfo": "Informacioni i sistemit",
+    "workers": "Workers në background",
+    "readiness": "Gatishmëria"
   },
   "metrics": {
     "totalSends": "Gjithsej dërgesa",
     "success": "Sukses",
     "failures": "Dështime",
+    "revoked": "Të revokuara",
     "deadLetters": "Mesazhe të vdekura",
     "sent": "Dërguar",
     "opened": "Hapur",
@@ -44,6 +86,7 @@
     "status": "Statusi",
     "outboxPending": "Outbox në pritje",
     "staleHotRows": "Rreshta hot të vjetruar",
+    "projectionEnabled": "Projeksioni aktiv",
     "latency": "Latenca",
     "matches": "Përputhje",
     "path": "Rruga",
@@ -51,12 +94,39 @@
     "rankDriftRows": "Rreshta me devijim renditjeje",
     "integrityDemotions": "Degradimet e integritetit",
     "deadLettersTotal": "{count} mesazhe të vdekura gjithsej",
+    "emailDeadLettersTotal": "{count} email dead letters gjithsej",
     "attempts": "{count} përpjekje",
     "pendingSideEffects": "{count} punë efektesh anësore të raporteve në pritje.",
+    "pendingSideEffectsShort": "Efekte anësore në pritje",
     "suppressedEmails": "{count} adresa email të bllokuara.",
-    "gdprEntries": "{count} hyrje të fundit auditimi përdoruesish të disponueshme për shqyrtim privatësie."
+    "gdprEntries": "{count} hyrje të fundit auditimi përdoruesish të disponueshme për shqyrtim privatësie.",
+    "activeLeases": "Leasing aktiv",
+    "tokenRevocations": "Revokime tokeni",
+    "queueRetries": "Riprova radhe",
+    "emailQueueDepth": "Thellësia e radhës email",
+    "version": "Versioni",
+    "gitSha": "Git SHA",
+    "environment": "Mjedisi",
+    "region": "Rajoni",
+    "uptime": "Uptime",
+    "fcmEnabled": "FCM aktiv",
+    "database": "Database",
+    "redis": "Redis",
+    "s3": "S3"
   },
   "deadLetters": {
-    "loadFailed": "Nuk u ngarkuan dead letters."
+    "loadFailed": "Nuk u ngarkuan dead letters.",
+    "emptyTitle": "Nuk ka push dead letters",
+    "emptyDescription": "Dështimet e përhershme të push do të shfaqen këtu."
+  },
+  "emailDeadLetters": {
+    "loadFailed": "Nuk u ngarkuan email dead letters.",
+    "emptyTitle": "Nuk ka email dead letters",
+    "emptyDescription": "Dështimet e përhershme të email do të shfaqen këtu."
+  },
+  "workers": {
+    "perReplicaNote": "Heartbeats e worker janë për replikë API.",
+    "lastRun": "Ekzekutimi i fundit {time}",
+    "neverRun": "Ende pa ekzekutime"
   }
 }

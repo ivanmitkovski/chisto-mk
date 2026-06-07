@@ -11,6 +11,7 @@ import { DESKTOP_SIDEBAR_COOKIE_KEY, DESKTOP_SIDEBAR_STORAGE_KEY } from '../cons
 import { NavItemKey } from '../types';
 import { SidebarNav } from './sidebar-nav';
 import { TopBar } from './top-bar';
+import { useAdminSessionKeepalive } from '@/features/auth/hooks/use-admin-session-keepalive';
 import styles from './admin-shell.module.css';
 
 type AdminShellProps = {
@@ -49,6 +50,8 @@ export function AdminShell({
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isSidebarPreferenceHydrated, setIsSidebarPreferenceHydrated] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
+
+  useAdminSessionKeepalive();
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(max-width: 48rem)');

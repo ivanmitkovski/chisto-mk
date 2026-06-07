@@ -4,12 +4,49 @@
   "links": {
     "emailSuppressions": "Email suppressions",
     "webhookLogs": "Webhook logs",
-    "backendDiag": "Backend diag",
-    "prometheusMetrics": "Prometheus metrics"
+    "auditLog": "Audit log"
   },
   "refreshBar": {
     "refreshAll": "Refresh all",
-    "autoRefreshHint": "Auto-refreshes every 60s"
+    "autoRefreshHint": "Auto-refreshes every 60s while this tab is visible"
+  },
+  "status": {
+    "allOperational": "All systems operational",
+    "degraded": "Some systems degraded",
+    "majorOutage": "Major outage detected",
+    "unknown": "Status partially unknown",
+    "summary": "{ok} healthy · {warn} degraded · {critical} critical",
+    "lastUpdated": "Snapshot updated {time}"
+  },
+  "health": {
+    "ok": "Healthy",
+    "warn": "Degraded",
+    "critical": "Critical",
+    "unknown": "Unknown"
+  },
+  "sections": {
+    "delivery": "Delivery",
+    "pipeline": "Pipeline",
+    "compliance": "Compliance",
+    "system": "System"
+  },
+  "panels": {
+    "insufficientPermission": "You do not have permission to view this panel.",
+    "restricted": "Restricted"
+  },
+  "diagnostics": {
+    "button": "Run diagnostics",
+    "title": "Backend diagnostics",
+    "running": "Running dependency checks…",
+    "failed": "Unable to run diagnostics.",
+    "readiness": "Dependency readiness",
+    "systemInfo": "System info"
+  },
+  "metricsDrawer": {
+    "button": "Raw metrics",
+    "title": "Metrics snapshot",
+    "loading": "Loading metrics snapshot…",
+    "failed": "Unable to load metrics snapshot."
   },
   "testPush": {
     "button": "Send test push",
@@ -27,15 +64,20 @@
     "mapPipeline": "Map pipeline",
     "mapDeepProbe": "Map deep probe",
     "pushDeadLetters": "Push dead letters",
+    "emailDeadLetters": "Email dead letters",
     "feedDiagnostics": "Feed diagnostics",
     "sideEffectsQueue": "Side effects queue",
     "emailSuppressions": "Email suppressions",
-    "gdprAuditWatch": "GDPR audit watch"
+    "gdprAuditWatch": "GDPR audit watch",
+    "systemInfo": "System info",
+    "workers": "Background workers",
+    "readiness": "Dependency readiness"
   },
   "metrics": {
     "totalSends": "Total sends",
     "success": "Success",
     "failures": "Failures",
+    "revoked": "Revoked",
     "deadLetters": "Dead letters",
     "sent": "Sent",
     "opened": "Opened",
@@ -44,6 +86,7 @@
     "status": "Status",
     "outboxPending": "Outbox pending",
     "staleHotRows": "Stale hot rows",
+    "projectionEnabled": "Projection enabled",
     "latency": "Latency",
     "matches": "Matches",
     "path": "Path",
@@ -51,12 +94,39 @@
     "rankDriftRows": "Rank drift rows",
     "integrityDemotions": "Integrity demotions",
     "deadLettersTotal": "{count} dead-letter(s) total",
+    "emailDeadLettersTotal": "{count} email dead-letter(s) total",
     "attempts": "{count} attempt(s)",
     "pendingSideEffects": "{count} pending report side-effect jobs.",
+    "pendingSideEffectsShort": "Pending side effects",
     "suppressedEmails": "{count} suppressed email addresses.",
-    "gdprEntries": "{count} recent user audit entries available for privacy review."
+    "gdprEntries": "{count} recent user audit entries available for privacy review.",
+    "activeLeases": "Active leases",
+    "tokenRevocations": "Token revocations",
+    "queueRetries": "Queue retries",
+    "emailQueueDepth": "Email queue depth",
+    "version": "Version",
+    "gitSha": "Git SHA",
+    "environment": "Environment",
+    "region": "Region",
+    "uptime": "Uptime",
+    "fcmEnabled": "FCM enabled",
+    "database": "Database",
+    "redis": "Redis",
+    "s3": "S3"
   },
   "deadLetters": {
-    "loadFailed": "Unable to load dead letters."
+    "loadFailed": "Unable to load dead letters.",
+    "emptyTitle": "No push dead letters",
+    "emptyDescription": "Failed push deliveries will appear here after permanent failure."
+  },
+  "emailDeadLetters": {
+    "loadFailed": "Unable to load email dead letters.",
+    "emptyTitle": "No email dead letters",
+    "emptyDescription": "Failed email deliveries will appear here after permanent failure."
+  },
+  "workers": {
+    "perReplicaNote": "Worker heartbeats are per running API replica.",
+    "lastRun": "Last run {time}",
+    "neverRun": "No runs recorded yet"
   }
 }

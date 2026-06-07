@@ -8,6 +8,7 @@ import {
   getAdminAccessToken,
   getAdminRefreshToken,
   getOrCreateAdminDeviceId,
+  isRememberDeviceEnabled,
   refreshAdminTokens,
   setAdminAuthCookies,
   verifyAdminCsrf,
@@ -141,13 +142,13 @@ export async function fetchBackendWithRefresh(
   }
 
   if (res.status === 401 && refreshToken) {
-    const tokens = await refreshAdminTokens(refreshToken, deviceId);
-    if (tokens) {
+    const result = await refreshAdminTokens(refreshToken, deviceId);
+    if (result.ok) {
       const retryInit: RequestInitWithBody = {
         ...init,
         headers: {
           ...((init.headers as Record<string, string>) ?? {}),
-          Authorization: `Bearer ${tokens.accessToken}`,
+          Authorization: `Bearer ${result.tokens.accessToken}`,
         },
       };
       try {
@@ -162,17 +163,22 @@ export async function fetchBackendWithRefresh(
         'x-request-id',
         (retryInit.headers as Record<string, string> | undefined)?.['X-Request-Id'] ?? crypto.randomUUID(),
       );
-      setAdminAuthCookies(nextRes, tokens, request, { deviceId });
+      setAdminAuthCookies(nextRes, result.tokens, request, {
+        rememberDevice: isRememberDeviceEnabled(request),
+        deviceId,
+      });
       ensureAdminCsrfCookie(request, nextRes);
       return { response: res, nextResponse: nextRes };
     }
-    const nextResponse = NextResponse.json(
-      { code: 'UNAUTHORIZED', message: 'Admin session expired. Please sign in again.' },
-      { status: 401 },
-    );
-    clearAdminAuthCookies(nextResponse, request);
-    ensureAdminCsrfCookie(request, nextResponse);
-    return { response: nextResponse, nextResponse };
+    if (result.reason === 'unauthorized') {
+      const nextResponse = NextResponse.json(
+        { code: 'UNAUTHORIZED', message: 'Admin session expired. Please sign in again.' },
+        { status: 401 },
+      );
+      clearAdminAuthCookies(nextResponse, request);
+      ensureAdminCsrfCookie(request, nextResponse);
+      return { response: nextResponse, nextResponse };
+    }
   }
 
   const payload = await res.json().catch(() => ({}));
@@ -258,11 +264,12 @@ export async function proxyBackendWithRefresh(
     return bffConnectionErrorResponse(request, error);
   }
 
-  let refreshedTokens: Awaited<ReturnType<typeof refreshAdminTokens>> = null;
+  let refreshedTokens: Awaited<ReturnType<typeof refreshAdminTokens>> | null = null;
   if (backendResponse.status === 401 && refreshToken) {
-    refreshedTokens = await refreshAdminTokens(refreshToken, deviceId);
-    if (refreshedTokens) {
-      headers.set('Authorization', `Bearer ${refreshedTokens.accessToken}`);
+    const result = await refreshAdminTokens(refreshToken, deviceId);
+    if (result.ok) {
+      refreshedTokens = result;
+      headers.set('Authorization', `Bearer ${result.tokens.accessToken}`);
       try {
         backendResponse = await executeAdminFetch(url, buildInit(), {
           path,
@@ -274,7 +281,7 @@ export async function proxyBackendWithRefresh(
       } catch (error) {
         return bffConnectionErrorResponse(request, error);
       }
-    } else {
+    } else if (result.reason === 'unauthorized') {
       const response = NextResponse.json(
         { code: 'UNAUTHORIZED', message: 'Admin session expired. Please sign in again.' },
         { status: 401 },
@@ -296,8 +303,11 @@ export async function proxyBackendWithRefresh(
     headers: responseHeaders,
   });
   response.headers.set('x-request-id', requestId);
-  if (refreshedTokens) {
-    setAdminAuthCookies(response, refreshedTokens, request, { deviceId });
+  if (refreshedTokens?.ok) {
+    setAdminAuthCookies(response, refreshedTokens.tokens, request, {
+      rememberDevice: isRememberDeviceEnabled(request),
+      deviceId,
+    });
   } else if (backendResponse.status === 401) {
     clearAdminAuthCookies(response, request);
   }

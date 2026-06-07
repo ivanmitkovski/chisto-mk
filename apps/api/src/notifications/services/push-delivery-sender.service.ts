@@ -86,6 +86,7 @@ export class PushDeliverySenderService {
 
       if (result.shouldRevoke) {
         await this.fcm.revokeToken(entry.deviceToken);
+        const revokeCode = result.errorCode ?? 'TOKEN_REVOKED';
         await this.prisma.notificationOutbox.update({
           where: { id: entry.id },
           data: {
@@ -94,8 +95,8 @@ export class PushDeliverySenderService {
             lastAttemptAt: new Date(),
             processingAt: null,
             leaseOwner: null,
-            lastErrorCode: 'TOKEN_REVOKED',
-            lastErrorMessage: 'Push token revoked or invalid',
+            lastErrorCode: revokeCode,
+            lastErrorMessage: `Push token revoked or invalid (${revokeCode})`,
           },
         });
         continue;
@@ -103,6 +104,7 @@ export class PushDeliverySenderService {
 
       await this.fcm.incrementFailureCount(entry.deviceToken);
       const newAttempts = entry.attempts + 1;
+      const errorCode = result.errorCode ?? 'FCM_SEND_FAILED';
       await this.prisma.notificationOutbox.update({
         where: { id: entry.id },
         data: {
@@ -112,8 +114,8 @@ export class PushDeliverySenderService {
           leaseOwner: null,
           nextRetryAt: this.computeNextRetryAt(newAttempts),
           failedPermanently: newAttempts >= MAX_ATTEMPTS,
-          lastErrorCode: 'FCM_SEND_FAILED',
-          lastErrorMessage: `Transient FCM error after attempt ${newAttempts}`,
+          lastErrorCode: errorCode,
+          lastErrorMessage: `FCM error ${errorCode} after attempt ${newAttempts}`,
         },
       });
       ObservabilityStore.recordPushQueueRetry();

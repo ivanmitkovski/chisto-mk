@@ -16,6 +16,9 @@ export const ADMIN_CSRF_COOKIE_KEY = useHostPrefixedCookies
 export const ADMIN_DEVICE_COOKIE_KEY = useHostPrefixedCookies
   ? '__Host-admin-device-id'
   : 'chisto_admin_device_id';
+export const ADMIN_REMEMBER_DEVICE_COOKIE_KEY = useHostPrefixedCookies
+  ? '__Host-chisto_admin_remember'
+  : 'chisto_admin_remember';
 
 export const ADMIN_LEGACY_AUTH_COOKIE_KEY = 'chisto_admin_token';
 export const ADMIN_LEGACY_REFRESH_COOKIE_KEY = 'chisto_admin_refresh';

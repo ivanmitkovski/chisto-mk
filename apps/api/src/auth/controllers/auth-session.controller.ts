@@ -81,7 +81,12 @@ export class AuthSessionController {
   })
   @HttpCode(HttpStatus.OK)
   completeAdmin2FALogin(@Body() dto: Complete2FALoginDto) {
-    return this.adminLoginSvc.completeAdmin2FALogin(dto.tempToken, dto.code, dto.deviceId);
+    return this.adminLoginSvc.completeAdmin2FALogin(
+      dto.tempToken,
+      dto.code,
+      dto.deviceId,
+      dto.rememberMe,
+    );
   }
 
   @Post('refresh')

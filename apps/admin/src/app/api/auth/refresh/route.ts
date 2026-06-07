@@ -4,6 +4,7 @@ import {
   ensureAdminCsrfCookie,
   getAdminRefreshToken,
   getOrCreateAdminDeviceId,
+  isRememberDeviceEnabled,
   refreshAdminTokens,
   setAdminAuthCookies,
   verifyAdminCsrf,
@@ -32,8 +33,16 @@ export async function POST(request: NextRequest) {
   }
 
   const deviceId = getOrCreateAdminDeviceId(request);
-  const tokens = await refreshAdminTokens(refreshToken, deviceId);
-  if (!tokens) {
+  const result = await refreshAdminTokens(refreshToken, deviceId);
+  if (!result.ok) {
+    if (result.reason === 'network') {
+      const response = NextResponse.json(
+        { code: 'BACKEND_UNAVAILABLE', message: 'Unable to refresh session. Please try again.' },
+        { status: 503 },
+      );
+      ensureAdminCsrfCookie(request, response);
+      return response;
+    }
     const response = NextResponse.json(
       { code: 'UNAUTHORIZED', message: 'Admin session expired. Please sign in again.' },
       { status: 401 },
@@ -43,7 +52,10 @@ export async function POST(request: NextRequest) {
   }
 
   const response = NextResponse.json({ ok: true });
-  setAdminAuthCookies(response, tokens, request, { deviceId });
+  setAdminAuthCookies(response, result.tokens, request, {
+    rememberDevice: isRememberDeviceEnabled(request),
+    deviceId,
+  });
   ensureAdminCsrfCookie(request, response);
   return response;
 }

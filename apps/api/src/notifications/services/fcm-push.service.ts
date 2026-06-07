@@ -25,6 +25,26 @@ export type FcmSendPayload = {
 
 const BADGE_SYNC_THROTTLE_MS = 15 * 60 * 1000;
 
+const FCM_REVOKE_ERROR_CODES = new Set([
+  'messaging/registration-token-not-registered',
+  'messaging/invalid-registration-token',
+  'messaging/invalid-argument',
+  'messaging/mismatched-credential',
+  'messaging/sender-id-mismatch',
+]);
+
+export type FcmSendResult = {
+  success: boolean;
+  canonicalToken?: string;
+  shouldRevoke?: boolean;
+  errorCode?: string;
+};
+
+function fcmErrorCode(error: unknown): string {
+  const code = (error as { code?: string })?.code;
+  return typeof code === 'string' && code.length > 0 ? code : 'unknown';
+}
+
 @Injectable()
 export class FcmPushService implements OnModuleInit {
   private readonly logger = new Logger(FcmPushService.name);
@@ -87,12 +107,9 @@ export class FcmPushService implements OnModuleInit {
     }
   }
 
-  async sendToToken(
-    token: string,
-    payload: FcmSendPayload,
-  ): Promise<{ success: boolean; canonicalToken?: string; shouldRevoke?: boolean }> {
+  async sendToToken(token: string, payload: FcmSendPayload): Promise<FcmSendResult> {
     if (!this.app) {
-      return { success: false };
+      return { success: false, errorCode: 'FCM_NOT_READY' };
     }
 
     let badge = payload.unreadCount;
@@ -164,18 +181,11 @@ export class FcmPushService implements OnModuleInit {
           ObservabilityStore.recordPushSend('success', notificationType);
           return { success: true } as const;
         } catch (error: unknown) {
-          const fcmError = error as { code?: string };
-          const code = fcmError?.code ?? 'unknown';
+          const code = fcmErrorCode(error);
 
-          const revokeCodes = new Set([
-            'messaging/registration-token-not-registered',
-            'messaging/invalid-registration-token',
-            'messaging/invalid-argument',
-          ]);
-
-          if (revokeCodes.has(code)) {
+          if (FCM_REVOKE_ERROR_CODES.has(code)) {
             ObservabilityStore.recordPushSend('revoked', notificationType);
-            return { success: false, shouldRevoke: true } as const;
+            return { success: false, shouldRevoke: true, errorCode: code } as const;
           }
 
           this.logger.warn(`FCM send failed: ${code}`);
@@ -187,9 +197,10 @@ export class FcmPushService implements OnModuleInit {
       if (error instanceof CircuitBreakerOpenError) {
         this.logger.warn(`FCM circuit breaker open, skipping send`);
         ObservabilityStore.recordPushSend('failure', notificationType);
-        return { success: false };
+        return { success: false, errorCode: 'CIRCUIT_OPEN' };
       }
-      return { success: false };
+      const code = fcmErrorCode(error);
+      return { success: false, errorCode: code };
     }
   }
 

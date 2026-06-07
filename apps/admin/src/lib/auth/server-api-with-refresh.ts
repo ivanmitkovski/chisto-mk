@@ -15,10 +15,13 @@ import {
   type AdminFetchOptions,
 } from '@/lib/api/admin-fetch';
 import { getServerAcceptLanguage } from '@/lib/i18n/server-locale';
-import { refreshAdminTokens, shouldUseSecureCookieServer } from './admin-session';
-
-const ACCESS_COOKIE_MAX_AGE = 15 * 60;
-const REFRESH_COOKIE_MAX_AGE = 7 * 24 * 60 * 60;
+import {
+  ACCESS_COOKIE_MAX_AGE,
+  isRememberDeviceEnabledServer,
+  refreshAdminTokens,
+  resolveRefreshCookieMaxAge,
+  shouldUseSecureCookieServer,
+} from './admin-session';
 
 async function readAuthTokensFromCookies(): Promise<{
   accessToken: string | null;
@@ -45,6 +48,7 @@ async function persistRefreshedTokens(tokens: {
 }): Promise<void> {
   const cookieStore = await cookies();
   const secure = await shouldUseSecureCookieServer();
+  const rememberDevice = await isRememberDeviceEnabledServer();
   cookieStore.set(ADMIN_AUTH_COOKIE_KEY, tokens.accessToken, {
     path: '/',
     maxAge: ACCESS_COOKIE_MAX_AGE,
@@ -56,7 +60,7 @@ async function persistRefreshedTokens(tokens: {
   if (tokens.refreshToken) {
     cookieStore.set(ADMIN_REFRESH_COOKIE_KEY, tokens.refreshToken, {
       path: '/',
-      maxAge: REFRESH_COOKIE_MAX_AGE,
+      maxAge: resolveRefreshCookieMaxAge(rememberDevice),
       sameSite: 'lax',
       httpOnly: true,
       secure,
@@ -108,11 +112,11 @@ export async function serverAuthenticatedFetch<TResponse>(
 
   if (response.status === 401 && refreshToken) {
     const refreshed = await refreshAdminTokens(refreshToken, deviceId ?? undefined);
-    if (refreshed?.accessToken) {
-      await persistRefreshedTokens(refreshed);
+    if (refreshed.ok) {
+      await persistRefreshedTokens(refreshed.tokens);
       const retryOptions: AdminFetchOptions = {
         ...fetchOptions,
-        authToken: refreshed.accessToken,
+        authToken: refreshed.tokens.accessToken,
         requestId,
       };
       const retryRequest = buildAdminFetchRequest(path, retryOptions);
@@ -123,7 +127,7 @@ export async function serverAuthenticatedFetch<TResponse>(
         retryOnGatewayError,
         requestId,
       });
-    } else {
+    } else if (refreshed.reason === 'unauthorized') {
       await clearAuthTokensFromCookies();
     }
   }

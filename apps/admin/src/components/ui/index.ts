@@ -1,4 +1,10 @@
 export { MetadataView, formatMetadataValue } from './metadata-view';
+export { MetricTile, MetricTileGrid } from './metric-tile/metric-tile';
+export type { MetricTileProps, MetricTileTone } from './metric-tile/metric-tile';
+export { Sparkline } from './sparkline/sparkline';
+export type { SparklinePoint, SparklineProps } from './sparkline/sparkline';
+export { StatusDot } from './status-dot/status-dot';
+export type { HealthStatus, StatusDotProps } from './status-dot/status-dot';
 export { BulkActionBar } from './bulk-action-bar';
 export { Avatar } from './avatar';
 export { ActionDrawer } from './action-drawer';

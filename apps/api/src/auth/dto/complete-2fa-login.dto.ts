@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString, MinLength, MaxLength } from 'class-validator';
+import { IsBoolean, IsOptional, IsString, MinLength, MaxLength } from 'class-validator';
 
 export class Complete2FALoginDto {
   @ApiProperty({ description: 'Short-lived temp token from admin login when 2FA is required' })
@@ -24,4 +24,11 @@ export class Complete2FALoginDto {
   @IsString()
   @MaxLength(128)
   deviceId?: string;
+
+  @ApiPropertyOptional({
+    description: 'When true, issue a long-lived refresh session (30 days). When false, session expires in 1 day.',
+  })
+  @IsOptional()
+  @IsBoolean()
+  rememberMe?: boolean;
 }

@@ -17,11 +17,13 @@ function dashboardRequest(cookie: string): NextRequest {
 describe('middleware dashboard auth', () => {
   afterEach(() => {
     vi.restoreAllMocks();
-    vi.unstubAllGlobals();
   });
 
-  it('redirects to login when access token is missing and refresh fails', async () => {
-    vi.spyOn(await import('@/lib/auth/admin-session'), 'refreshAdminTokens').mockResolvedValue(null);
+  it('redirects to login when access token is missing and refresh is unauthorized', async () => {
+    vi.spyOn(await import('@/lib/auth/admin-session'), 'refreshAdminTokens').mockResolvedValue({
+      ok: false,
+      reason: 'unauthorized',
+    });
 
     const { middleware } = await import('./middleware');
     const response = await middleware(
@@ -33,9 +35,12 @@ describe('middleware dashboard auth', () => {
     expect(response.headers.getSetCookie().join('\n')).toContain('Max-Age=0');
   });
 
-  it('redirects to login when proactive refresh fails for an expiring token', async () => {
+  it('redirects to login when proactive refresh is unauthorized for an expiring token', async () => {
     const expiringToken = makeJwt(Date.now() + 30_000);
-    vi.spyOn(await import('@/lib/auth/admin-session'), 'refreshAdminTokens').mockResolvedValue(null);
+    vi.spyOn(await import('@/lib/auth/admin-session'), 'refreshAdminTokens').mockResolvedValue({
+      ok: false,
+      reason: 'unauthorized',
+    });
 
     const { middleware } = await import('./middleware');
     const response = await middleware(
@@ -47,5 +52,23 @@ describe('middleware dashboard auth', () => {
     expect(response.status).toBe(307);
     expect(response.headers.get('location')).toContain('/login');
     expect(response.headers.getSetCookie().join('\n')).toContain('Max-Age=0');
+  });
+
+  it('continues when proactive refresh fails with network error but access token is still valid', async () => {
+    const expiringToken = makeJwt(Date.now() + 30_000);
+    vi.spyOn(await import('@/lib/auth/admin-session'), 'refreshAdminTokens').mockResolvedValue({
+      ok: false,
+      reason: 'network',
+    });
+
+    const { middleware } = await import('./middleware');
+    const response = await middleware(
+      dashboardRequest(
+        `${ADMIN_AUTH_COOKIE_KEY}=${expiringToken}; ${ADMIN_REFRESH_COOKIE_KEY}=refresh-token`,
+      ),
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get('location')).toBeNull();
   });
 });

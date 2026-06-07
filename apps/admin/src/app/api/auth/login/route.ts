@@ -34,7 +34,12 @@ export async function POST(request: NextRequest) {
   try {
     backendResponse = await fetchBackendResponse('/auth/admin/login', {
       method: 'POST',
-      body: { email, password, deviceId },
+      body: {
+        email,
+        password,
+        deviceId,
+        rememberMe: body.rememberDevice === true,
+      },
       retryOnGatewayError: false,
       timeoutMs: 15_000,
       acceptLanguage,

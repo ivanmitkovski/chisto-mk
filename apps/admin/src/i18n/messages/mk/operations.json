@@ -4,12 +4,49 @@
   "links": {
     "emailSuppressions": "Блокирани е-пошти",
     "webhookLogs": "Webhook дневници",
-    "backendDiag": "Backend дијагностика",
-    "prometheusMetrics": "Prometheus метрики"
+    "auditLog": "Audit дневник"
   },
   "refreshBar": {
     "refreshAll": "Освежи сè",
-    "autoRefreshHint": "Автоматско освежување на секои 60s"
+    "autoRefreshHint": "Автоматско освежување на секои 60s додека табот е видлив"
+  },
+  "status": {
+    "allOperational": "Сите системи работат",
+    "degraded": "Некои системи се деградирани",
+    "majorOutage": "Откриен сериозен прекин",
+    "unknown": "Статусот е делумно непознат",
+    "summary": "{ok} здрави · {warn} деградирани · {critical} критични",
+    "lastUpdated": "Снимка освежена {time}"
+  },
+  "health": {
+    "ok": "Здраво",
+    "warn": "Деградирано",
+    "critical": "Критично",
+    "unknown": "Непознато"
+  },
+  "sections": {
+    "delivery": "Достава",
+    "pipeline": "Процес",
+    "compliance": "Усогласеност",
+    "system": "Систем"
+  },
+  "panels": {
+    "insufficientPermission": "Немате дозвола за овој панел.",
+    "restricted": "Ограничено"
+  },
+  "diagnostics": {
+    "button": "Пушти дијагностика",
+    "title": "Backend дијагностика",
+    "running": "Се извршуваат проверки…",
+    "failed": "Не може да се изврши дијагностика.",
+    "readiness": "Подготвеност на зависности",
+    "systemInfo": "Системски информации"
+  },
+  "metricsDrawer": {
+    "button": "Raw метрики",
+    "title": "Снимка на метрики",
+    "loading": "Се вчитуваат метрики…",
+    "failed": "Не може да се вчитаат метриките."
   },
   "testPush": {
     "button": "Испрати тест push",
@@ -27,15 +64,20 @@
     "mapPipeline": "Процес на карта",
     "mapDeepProbe": "Длабока проба на карта",
     "pushDeadLetters": "Недоставени push пораки",
+    "emailDeadLetters": "Недоставени email пораки",
     "feedDiagnostics": "Feed дијагностика",
     "sideEffectsQueue": "Ред за споредни ефекти",
     "emailSuppressions": "Блокирани е-пошти",
-    "gdprAuditWatch": "GDPR надзор на ревизија"
+    "gdprAuditWatch": "GDPR надзор на ревизија",
+    "systemInfo": "Системски информации",
+    "workers": "Background workers",
+    "readiness": "Подготвеност"
   },
   "metrics": {
     "totalSends": "Вкупно испратени",
     "success": "Успех",
     "failures": "Неуспешни",
+    "revoked": "Оповикани",
     "deadLetters": "Мртви писма",
     "sent": "Испратено",
     "opened": "Отворено",
@@ -44,6 +86,7 @@
     "status": "Статус",
     "outboxPending": "Outbox во очекување",
     "staleHotRows": "Застарени hot редови",
+    "projectionEnabled": "Проекција овозможена",
     "latency": "Латентност",
     "matches": "Совпаѓања",
     "path": "Патека",
@@ -51,12 +94,39 @@
     "rankDriftRows": "Редови со отстапување на ранг",
     "integrityDemotions": "Деградации на интегритет",
     "deadLettersTotal": "{count} мртви писма вкупно",
+    "emailDeadLettersTotal": "{count} email мртви писма вкупно",
     "attempts": "{count} обид(и)",
     "pendingSideEffects": "{count} задачи за споредни ефекти на пријави во очекување.",
+    "pendingSideEffectsShort": "Pending side effects",
     "suppressedEmails": "{count} блокирани адреси за е-пошта.",
-    "gdprEntries": "{count} неодамнешни записи за ревизија на корисници достапни за преглед на приватност."
+    "gdprEntries": "{count} неодамнешни записи за ревизија на корисници достапни за преглед на приватност.",
+    "activeLeases": "Active leases",
+    "tokenRevocations": "Token revocations",
+    "queueRetries": "Queue retries",
+    "emailQueueDepth": "Email queue depth",
+    "version": "Верзија",
+    "gitSha": "Git SHA",
+    "environment": "Околина",
+    "region": "Регион",
+    "uptime": "Uptime",
+    "fcmEnabled": "FCM enabled",
+    "database": "Database",
+    "redis": "Redis",
+    "s3": "S3"
   },
   "deadLetters": {
-    "loadFailed": "Не може да се вчитаат dead letters."
+    "loadFailed": "Не може да се вчитаат dead letters.",
+    "emptyTitle": "Нема push dead letters",
+    "emptyDescription": "Неуспешни push достави ќе се појават тука."
+  },
+  "emailDeadLetters": {
+    "loadFailed": "Не може да се вчитаат email dead letters.",
+    "emptyTitle": "Нема email dead letters",
+    "emptyDescription": "Неуспешни email достави ќе се појават тука."
+  },
+  "workers": {
+    "perReplicaNote": "Worker heartbeats се по API реплика.",
+    "lastRun": "Последно {time}",
+    "neverRun": "Сè уште нема извршувања"
   }
 }
