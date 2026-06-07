@@ -47,9 +47,16 @@ describe('SitesController', () => {
       searchMapSites: jest.fn(),
       getAdminMapTimeline: jest.fn(),
     } as unknown as SitesMapFacadeService;
+    const sitesAdminList = {
+      list: jest.fn(async () => ({
+        data: [],
+        meta: { page: 1, limit: 20, total: 0, nextCursor: null },
+      })),
+    } as never;
     return {
       controller: new SitesController(
         sitesAdmin,
+        sitesAdminList,
         sitesFeed,
         sitesSavedList,
         siteEngagement,

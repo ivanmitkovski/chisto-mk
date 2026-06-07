@@ -11,7 +11,11 @@ describe('ModerationService', () => {
   };
 
   function makeService(prisma: unknown) {
-    return new ModerationService(prisma as never, subjectVisibility as never);
+    return new ModerationService(
+      prisma as never,
+      subjectVisibility as never,
+      { notify: jest.fn() } as never,
+    );
   }
 
   const user: AuthenticatedUser = {
