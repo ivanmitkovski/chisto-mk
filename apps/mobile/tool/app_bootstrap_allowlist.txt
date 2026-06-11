@@ -2,6 +2,4 @@
 # composition root (lib/main.dart), which wires the root ProviderScope before
 # any widget/provider exists. All other code must use Riverpod providers /
 # `readRoot`. The ratchet forbids new entries.
-lib/main.dart:145
-lib/main.dart:146
-lib/main.dart:153
+lib/main.dart:159

@@ -156,8 +156,9 @@ Future<void> _bootstrapAndRun() async {
         stackTrace: st,
       );
     }
-    await AppBootstrap.instance.initialize();
-    setRootProviderContainer(AppBootstrap.instance.providerContainer);
+    final AppBootstrap bootstrap = AppBootstrap.instance;
+    await bootstrap.initialize();
+    setRootProviderContainer(bootstrap.providerContainer);
 
     AppSystemUi.applyLightAndroidNavigationBar();
     await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
@@ -165,7 +166,7 @@ Future<void> _bootstrapAndRun() async {
     ]);
     runApp(
       UncontrolledProviderScope(
-        container: AppBootstrap.instance.providerContainer,
+        container: bootstrap.providerContainer,
         child: const ChistoApp(),
       ),
     );

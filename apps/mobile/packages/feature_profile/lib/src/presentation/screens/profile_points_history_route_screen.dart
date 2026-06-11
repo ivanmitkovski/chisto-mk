@@ -1,23 +1,24 @@
-import 'package:chisto_infrastructure/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_infrastructure/core/navigation/app_routes.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_loading_indicator.dart';
 import 'package:feature_profile/src/domain/models/profile_user.dart';
+import 'package:feature_profile/src/presentation/providers/profile_providers.dart';
 import 'package:feature_profile/src/presentation/screens/profile_points_history_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Root-stack profile points history (achievement notifications).
-class ProfilePointsHistoryRouteScreen extends StatefulWidget {
+class ProfilePointsHistoryRouteScreen extends ConsumerStatefulWidget {
   const ProfilePointsHistoryRouteScreen({super.key, this.summaryUser});
 
   final ProfileUser? summaryUser;
 
   @override
-  State<ProfilePointsHistoryRouteScreen> createState() =>
+  ConsumerState<ProfilePointsHistoryRouteScreen> createState() =>
       _ProfilePointsHistoryRouteScreenState();
 }
 
 class _ProfilePointsHistoryRouteScreenState
-    extends State<ProfilePointsHistoryRouteScreen> {
+    extends ConsumerState<ProfilePointsHistoryRouteScreen> {
   Future<ProfileUser?>? _userFuture;
 
   @override
@@ -26,7 +27,7 @@ class _ProfilePointsHistoryRouteScreenState
     if (widget.summaryUser != null) {
       _userFuture = Future<ProfileUser?>.value(widget.summaryUser);
     } else {
-      _userFuture = AppBootstrap.instance.profileRepository.getMe();
+      _userFuture = ref.read(profileRepositoryProvider).getMe();
     }
   }
 
