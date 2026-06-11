@@ -1888,22 +1888,38 @@
         ]
       }
     },
-    "/notifications/email/unsubscribe": {
-      "post": {
-        "operationId": "EmailUnsubscribeController_unsubscribePost",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UnsubscribePostDto"
-              }
+    "/notifications": {
+      "get": {
+        "operationId": "NotificationsInboxController_list",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "onlyUnread",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": false,
+              "type": "boolean"
             }
           }
-        },
+        ],
         "responses": {
-          "204": {
+          "200": {
             "description": ""
           },
           "400": {
@@ -1922,13 +1938,20 @@
             "description": "Rate limited"
           }
         },
-        "summary": "One-click unsubscribe (RFC 8058); use ?token= on POST URL or JSON body",
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List notifications for the authenticated user",
         "tags": [
           "notifications"
         ]
-      },
+      }
+    },
+    "/notifications/unread-count": {
       "get": {
-        "operationId": "EmailUnsubscribeController_unsubscribeGet",
+        "operationId": "NotificationsInboxController_unreadCount",
         "parameters": [],
         "responses": {
           "200": {
@@ -1950,7 +1973,694 @@
             "description": "Rate limited"
           }
         },
-        "summary": "Unsubscribe via link (browser)",
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get unread notification count",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/notifications/summary": {
+      "get": {
+        "operationId": "NotificationsInboxController_summary",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get notification summary grouped by type",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/notifications/preferences": {
+      "get": {
+        "operationId": "NotificationsInboxController_listPreferences",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List notification preferences for current user",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/notifications/preferences/{type}": {
+      "patch": {
+        "operationId": "NotificationsInboxController_updatePreference",
+        "parameters": [
+          {
+            "name": "type",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateNotificationPreferenceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update preference for notification type",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/notifications/devices/unregister": {
+      "post": {
+        "operationId": "NotificationsInboxController_unregisterDeviceBody",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnregisterDeviceTokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Unregister a device push token (body token)",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/notifications/devices": {
+      "post": {
+        "operationId": "NotificationsInboxController_registerDevice",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDeviceTokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Register or update a device push token",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/notifications/devices/{token}": {
+      "delete": {
+        "operationId": "NotificationsInboxController_unregisterDevice",
+        "parameters": [
+          {
+            "name": "token",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Unregister device token (deprecated)",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/notifications/{id}/opened": {
+      "post": {
+        "operationId": "NotificationsStateController_recordOpened",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Record notification opened",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/notifications/{id}/read": {
+      "patch": {
+        "operationId": "NotificationsStateController_markOneRead",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mark a notification as read",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/notifications/{id}/unread": {
+      "patch": {
+        "operationId": "NotificationsStateController_markOneUnread",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mark a notification as unread",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/notifications/read-all": {
+      "patch": {
+        "operationId": "NotificationsStateController_markAllRead",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mark all notifications as read",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/notifications/{id}/archive": {
+      "patch": {
+        "operationId": "NotificationsStateController_archiveOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Archive a notification",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/notifications/archive-all-read": {
+      "patch": {
+        "operationId": "NotificationsStateController_archiveAllRead",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Archive all read notifications",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/notifications/admin/test-push": {
+      "post": {
+        "operationId": "NotificationsAdminController_testPush",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Test notification dispatched"
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Send a test push to the current admin user (full outbox → FCM pipeline)",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/notifications/admin/push-stats": {
+      "get": {
+        "operationId": "NotificationsAdminController_pushStats",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PushStatsDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Push delivery statistics (admin only)",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/notifications/admin/delivery-report": {
+      "get": {
+        "operationId": "NotificationsAdminController_deliveryReport",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeliveryReportDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Push delivery funnel (admin only)",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/notifications/admin/dead-letters": {
+      "get": {
+        "operationId": "NotificationsAdminController_deadLetters",
+        "parameters": [
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeadLetterPageDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List dead-letter push outbox entries (admin only)",
         "tags": [
           "notifications"
         ]
@@ -2042,6 +2752,453 @@
         "summary": "Update a feature flag",
         "tags": [
           "admin-feature-flags"
+        ]
+      }
+    },
+    "/notifications/email/unsubscribe": {
+      "post": {
+        "operationId": "EmailUnsubscribeController_unsubscribePost",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnsubscribePostDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "summary": "One-click unsubscribe (RFC 8058); use ?token= on POST URL or JSON body",
+        "tags": [
+          "notifications"
+        ]
+      },
+      "get": {
+        "operationId": "EmailUnsubscribeController_unsubscribeGet",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "summary": "Unsubscribe via link (browser)",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/admin/me/moderation-email-preferences": {
+      "get": {
+        "operationId": "AdminModerationEmailPreferencesController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Preferences listed"
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List moderation email preferences for the current admin",
+        "tags": [
+          "admin-moderation-email"
+        ]
+      },
+      "patch": {
+        "operationId": "AdminModerationEmailPreferencesController_patch",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatchModerationEmailPreferenceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Preference updated"
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update one moderation email preference for the current admin",
+        "tags": [
+          "admin-moderation-email"
+        ]
+      }
+    },
+    "/admin/moderation-email/unsubscribe": {
+      "get": {
+        "operationId": "AdminModerationEmailUnsubscribeController_unsubscribeGet",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "summary": "Unsubscribe from admin moderation emails for one category (browser)",
+        "tags": [
+          "admin-moderation-email"
+        ]
+      }
+    },
+    "/admin/moderation/ugc-reports": {
+      "get": {
+        "operationId": "ModerationController_listAdminUgcReports",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "OPEN",
+                "REVIEWED",
+                "DISMISSED",
+                "ESCALATED",
+                "HIDDEN"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "subjectType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "site_comment",
+                "event_chat_message",
+                "user",
+                "site",
+                "event",
+                "safety_issue"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "reporterId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List UGC reports for admin moderation",
+        "tags": [
+          "moderation"
+        ]
+      }
+    },
+    "/admin/moderation/ugc-reports/{id}": {
+      "get": {
+        "operationId": "ModerationController_getAdminUgcReport",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get UGC report detail for admin moderation",
+        "tags": [
+          "moderation"
+        ]
+      },
+      "patch": {
+        "operationId": "ModerationController_patchAdminUgcReport",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatchAdminUgcReportDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Moderate a UGC report",
+        "tags": [
+          "moderation"
+        ]
+      }
+    },
+    "/moderation/reports": {
+      "post": {
+        "operationId": "ModerationController_submitReport",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostUgcReportDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Report UGC (comment, chat message, user, site, event)",
+        "tags": [
+          "moderation"
+        ]
+      }
+    },
+    "/users/me/blocks": {
+      "post": {
+        "operationId": "ModerationController_blockUser",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostUserBlockDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Block a user",
+        "tags": [
+          "moderation"
+        ]
+      },
+      "get": {
+        "operationId": "ModerationController_listBlocks",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List blocked users",
+        "tags": [
+          "moderation"
+        ]
+      }
+    },
+    "/users/me/blocks/{blockedUserId}": {
+      "delete": {
+        "operationId": "ModerationController_unblock",
+        "parameters": [
+          {
+            "name": "blockedUserId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Unblock a user",
+        "tags": [
+          "moderation"
         ]
       }
     },
@@ -2852,6 +4009,681 @@
         ]
       }
     },
+    "/presence/heartbeat": {
+      "post": {
+        "operationId": "PresenceController_heartbeat",
+        "parameters": [
+          {
+            "name": "x-device-id",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PresenceHeartbeatDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Client presence heartbeat (~45s while foreground)",
+        "tags": [
+          "presence"
+        ]
+      }
+    },
+    "/presence/offline": {
+      "post": {
+        "operationId": "PresenceController_offline",
+        "parameters": [
+          {
+            "name": "x-device-id",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PresenceOfflineDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Best-effort offline beacon on background/detach",
+        "tags": [
+          "presence"
+        ]
+      }
+    },
+    "/presence/app-opened": {
+      "post": {
+        "operationId": "PresenceController_appOpened",
+        "parameters": [
+          {
+            "name": "x-device-id",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Record app opened (once per cold start)",
+        "tags": [
+          "presence"
+        ]
+      }
+    },
+    "/admin/active-users/summary": {
+      "get": {
+        "operationId": "AdminActiveUsersController_summary",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Live active users summary with trends and peaks",
+        "tags": [
+          "admin-active-users"
+        ]
+      }
+    },
+    "/admin/active-users": {
+      "get": {
+        "operationId": "AdminActiveUsersController_list",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 25,
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "online",
+                "away",
+                "offline"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "platform",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "IOS",
+                "ANDROID"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Paginated active users list",
+        "tags": [
+          "admin-active-users"
+        ]
+      }
+    },
+    "/admin/active-users/activity-feed": {
+      "get": {
+        "operationId": "AdminActiveUsersController_activityFeed",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 50,
+              "type": "number"
+            }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "LOGIN",
+                "LOGOUT",
+                "APP_OPENED",
+                "SCREEN_VIEW",
+                "REPORT_CREATED",
+                "REPORT_SUBMITTED",
+                "EVENT_JOINED",
+                "CHECK_IN"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Live activity feed (paginated)",
+        "tags": [
+          "admin-active-users"
+        ]
+      }
+    },
+    "/admin/active-users/geo": {
+      "get": {
+        "operationId": "AdminActiveUsersController_geo",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Privacy-clustered geo aggregation (country/city counts)",
+        "tags": [
+          "admin-active-users"
+        ]
+      }
+    },
+    "/admin/active-users/{userId}": {
+      "get": {
+        "operationId": "AdminActiveUsersController_userDetails",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "User details with sessions and navigation timeline",
+        "tags": [
+          "admin-active-users"
+        ]
+      }
+    },
+    "/admin/analytics/engagement": {
+      "get": {
+        "operationId": "AdminActiveUsersController_engagement",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "DAU/WAU/MAU engagement analytics",
+        "tags": [
+          "admin-active-users"
+        ]
+      }
+    },
+    "/admin/analytics/realtime": {
+      "get": {
+        "operationId": "AdminActiveUsersController_realtime",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Real-time operational metrics",
+        "tags": [
+          "admin-active-users"
+        ]
+      }
+    },
+    "/admin/alert-rules": {
+      "get": {
+        "operationId": "AdminActiveUsersController_listAlertRules",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List admin alert rules",
+        "tags": [
+          "admin-active-users"
+        ]
+      },
+      "post": {
+        "operationId": "AdminActiveUsersController_createAlertRule",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAdminAlertRuleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create admin alert rule",
+        "tags": [
+          "admin-active-users"
+        ]
+      }
+    },
+    "/admin/alert-rules/{id}": {
+      "patch": {
+        "operationId": "AdminActiveUsersController_updateAlertRule",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAdminAlertRuleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "admin-active-users"
+        ]
+      },
+      "delete": {
+        "operationId": "AdminActiveUsersController_deleteAlertRule",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "admin-active-users"
+        ]
+      }
+    },
     "/sites/{id}/history": {
       "get": {
         "operationId": "SiteHistoryController_listHistory",
@@ -2980,385 +4812,6 @@
         "summary": "Add an admin note to the site timeline",
         "tags": [
           "sites"
-        ]
-      }
-    },
-    "/admin/moderation/ugc-reports": {
-      "get": {
-        "operationId": "ModerationController_listAdminUgcReports",
-        "parameters": [
-          {
-            "name": "page",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "minimum": 1,
-              "default": 1,
-              "type": "number"
-            }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "minimum": 1,
-              "maximum": 100,
-              "default": 50,
-              "type": "number"
-            }
-          },
-          {
-            "name": "status",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "enum": [
-                "OPEN",
-                "REVIEWED",
-                "DISMISSED",
-                "ESCALATED",
-                "HIDDEN"
-              ],
-              "type": "string"
-            }
-          },
-          {
-            "name": "subjectType",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "enum": [
-                "site_comment",
-                "event_chat_message",
-                "user",
-                "site",
-                "event",
-                "safety_issue"
-              ],
-              "type": "string"
-            }
-          },
-          {
-            "name": "search",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "reporterId",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          },
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "List UGC reports for admin moderation",
-        "tags": [
-          "moderation"
-        ]
-      }
-    },
-    "/admin/moderation/ugc-reports/{id}": {
-      "get": {
-        "operationId": "ModerationController_getAdminUgcReport",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          },
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get UGC report detail for admin moderation",
-        "tags": [
-          "moderation"
-        ]
-      },
-      "patch": {
-        "operationId": "ModerationController_patchAdminUgcReport",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PatchAdminUgcReportDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          },
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Moderate a UGC report",
-        "tags": [
-          "moderation"
-        ]
-      }
-    },
-    "/moderation/reports": {
-      "post": {
-        "operationId": "ModerationController_submitReport",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PostUgcReportDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Report UGC (comment, chat message, user, site, event)",
-        "tags": [
-          "moderation"
-        ]
-      }
-    },
-    "/users/me/blocks": {
-      "post": {
-        "operationId": "ModerationController_blockUser",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PostUserBlockDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Block a user",
-        "tags": [
-          "moderation"
-        ]
-      },
-      "get": {
-        "operationId": "ModerationController_listBlocks",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "List blocked users",
-        "tags": [
-          "moderation"
-        ]
-      }
-    },
-    "/users/me/blocks/{blockedUserId}": {
-      "delete": {
-        "operationId": "ModerationController_unblock",
-        "parameters": [
-          {
-            "name": "blockedUserId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Unblock a user",
-        "tags": [
-          "moderation"
-        ]
-      }
-    },
-    "/admin/me/moderation-email-preferences": {
-      "get": {
-        "operationId": "AdminModerationEmailPreferencesController_list",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Preferences listed"
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "List moderation email preferences for the current admin",
-        "tags": [
-          "admin-moderation-email"
-        ]
-      },
-      "patch": {
-        "operationId": "AdminModerationEmailPreferencesController_patch",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PatchModerationEmailPreferenceDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Preference updated"
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Update one moderation email preference for the current admin",
-        "tags": [
-          "admin-moderation-email"
-        ]
-      }
-    },
-    "/admin/moderation-email/unsubscribe": {
-      "get": {
-        "operationId": "AdminModerationEmailUnsubscribeController_unsubscribeGet",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "summary": "Unsubscribe from admin moderation emails for one category (browser)",
-        "tags": [
-          "admin-moderation-email"
         ]
       }
     },
@@ -4011,232 +5464,6 @@
           }
         ],
         "summary": "Presigned download URL for an offline map region package",
-        "tags": [
-          "sites"
-        ]
-      }
-    },
-    "/sites/{id}": {
-      "get": {
-        "operationId": "SitesDetailController_findOne",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Site fetched successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SiteDetailResponseDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Site not found"
-          },
-          "429": {
-            "description": "Too many requests"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get site details with reports",
-        "tags": [
-          "sites"
-        ]
-      }
-    },
-    "/sites/{id}/media": {
-      "get": {
-        "operationId": "SitesDetailController_findMedia",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "page",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "$ref": "#/components/schemas/Object"
-            }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "$ref": "#/components/schemas/Object"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Site media fetched successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SiteMediaListResponseDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Site not found"
-          },
-          "429": {
-            "description": "Too many requests"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get all site media with pagination",
-        "tags": [
-          "sites"
-        ]
-      }
-    },
-    "/sites/{id}/status": {
-      "patch": {
-        "operationId": "SitesDetailController_updateStatus",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateSiteStatusDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Site status updated successfully"
-          },
-          "400": {
-            "description": "Invalid status transition"
-          },
-          "401": {
-            "description": "Missing or invalid JWT"
-          },
-          "403": {
-            "description": "Caller is not an admin"
-          },
-          "404": {
-            "description": "Site not found"
-          },
-          "429": {
-            "description": "Too many requests"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Update canonical site lifecycle status",
-        "tags": [
-          "sites"
-        ]
-      }
-    },
-    "/sites/{id}/archive": {
-      "patch": {
-        "operationId": "SitesDetailController_updateArchiveStatus",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateSiteArchiveDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Site archive moderation updated successfully"
-          },
-          "400": {
-            "description": "Invalid archive moderation payload"
-          },
-          "401": {
-            "description": "Missing or invalid JWT"
-          },
-          "403": {
-            "description": "Caller is not an admin"
-          },
-          "404": {
-            "description": "Site not found"
-          },
-          "429": {
-            "description": "Too many requests"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Archive or unarchive site from default map visibility",
         "tags": [
           "sites"
         ]
@@ -5064,6 +6291,299 @@
           }
         ],
         "summary": "Submit feed relevance feedback for a site",
+        "tags": [
+          "sites"
+        ]
+      }
+    },
+    "/sites/{id}": {
+      "get": {
+        "operationId": "SitesDetailController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Site fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteDetailResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Site not found"
+          },
+          "429": {
+            "description": "Too many requests"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get site details with reports",
+        "tags": [
+          "sites"
+        ]
+      }
+    },
+    "/sites/{id}/media": {
+      "get": {
+        "operationId": "SitesDetailController_findMedia",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Site media fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteMediaListResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Site not found"
+          },
+          "429": {
+            "description": "Too many requests"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all site media with pagination",
+        "tags": [
+          "sites"
+        ]
+      }
+    },
+    "/sites/{id}/co-reporters": {
+      "get": {
+        "operationId": "SitesDetailController_findCoReporters",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Site co-reporters fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteCoReportersListResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Site not found"
+          },
+          "429": {
+            "description": "Too many requests"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List co-reporters for a pollution site (original reporter + merged co-reporters)",
+        "tags": [
+          "sites"
+        ]
+      }
+    },
+    "/sites/{id}/status": {
+      "patch": {
+        "operationId": "SitesDetailController_updateStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSiteStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Site status updated successfully"
+          },
+          "400": {
+            "description": "Invalid status transition"
+          },
+          "401": {
+            "description": "Missing or invalid JWT"
+          },
+          "403": {
+            "description": "Caller is not an admin"
+          },
+          "404": {
+            "description": "Site not found"
+          },
+          "429": {
+            "description": "Too many requests"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update canonical site lifecycle status",
+        "tags": [
+          "sites"
+        ]
+      }
+    },
+    "/sites/{id}/archive": {
+      "patch": {
+        "operationId": "SitesDetailController_updateArchiveStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSiteArchiveDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Site archive moderation updated successfully"
+          },
+          "400": {
+            "description": "Invalid archive moderation payload"
+          },
+          "401": {
+            "description": "Missing or invalid JWT"
+          },
+          "403": {
+            "description": "Caller is not an admin"
+          },
+          "404": {
+            "description": "Site not found"
+          },
+          "429": {
+            "description": "Too many requests"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Archive or unarchive site from default map visibility",
         "tags": [
           "sites"
         ]
@@ -9109,763 +10629,6 @@
         "summary": "Bulk approve or decline pending cleanup events",
         "tags": [
           "admin-cleanup-events"
-        ]
-      }
-    },
-    "/notifications": {
-      "get": {
-        "operationId": "NotificationsInboxController_list",
-        "parameters": [
-          {
-            "name": "page",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "$ref": "#/components/schemas/Object"
-            }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "$ref": "#/components/schemas/Object"
-            }
-          },
-          {
-            "name": "onlyUnread",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "default": false,
-              "type": "boolean"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "List notifications for the authenticated user",
-        "tags": [
-          "notifications"
-        ]
-      }
-    },
-    "/notifications/unread-count": {
-      "get": {
-        "operationId": "NotificationsInboxController_unreadCount",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get unread notification count",
-        "tags": [
-          "notifications"
-        ]
-      }
-    },
-    "/notifications/summary": {
-      "get": {
-        "operationId": "NotificationsInboxController_summary",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get notification summary grouped by type",
-        "tags": [
-          "notifications"
-        ]
-      }
-    },
-    "/notifications/preferences": {
-      "get": {
-        "operationId": "NotificationsInboxController_listPreferences",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "List notification preferences for current user",
-        "tags": [
-          "notifications"
-        ]
-      }
-    },
-    "/notifications/preferences/{type}": {
-      "patch": {
-        "operationId": "NotificationsInboxController_updatePreference",
-        "parameters": [
-          {
-            "name": "type",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateNotificationPreferenceDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Update preference for notification type",
-        "tags": [
-          "notifications"
-        ]
-      }
-    },
-    "/notifications/devices/unregister": {
-      "post": {
-        "operationId": "NotificationsInboxController_unregisterDeviceBody",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UnregisterDeviceTokenDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Unregister a device push token (body token)",
-        "tags": [
-          "notifications"
-        ]
-      }
-    },
-    "/notifications/devices": {
-      "post": {
-        "operationId": "NotificationsInboxController_registerDevice",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RegisterDeviceTokenDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Register or update a device push token",
-        "tags": [
-          "notifications"
-        ]
-      }
-    },
-    "/notifications/devices/{token}": {
-      "delete": {
-        "operationId": "NotificationsInboxController_unregisterDevice",
-        "parameters": [
-          {
-            "name": "token",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Unregister device token (deprecated)",
-        "tags": [
-          "notifications"
-        ]
-      }
-    },
-    "/notifications/{id}/opened": {
-      "post": {
-        "operationId": "NotificationsStateController_recordOpened",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": ""
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Record notification opened",
-        "tags": [
-          "notifications"
-        ]
-      }
-    },
-    "/notifications/{id}/read": {
-      "patch": {
-        "operationId": "NotificationsStateController_markOneRead",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Mark a notification as read",
-        "tags": [
-          "notifications"
-        ]
-      }
-    },
-    "/notifications/{id}/unread": {
-      "patch": {
-        "operationId": "NotificationsStateController_markOneUnread",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Mark a notification as unread",
-        "tags": [
-          "notifications"
-        ]
-      }
-    },
-    "/notifications/read-all": {
-      "patch": {
-        "operationId": "NotificationsStateController_markAllRead",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Mark all notifications as read",
-        "tags": [
-          "notifications"
-        ]
-      }
-    },
-    "/notifications/{id}/archive": {
-      "patch": {
-        "operationId": "NotificationsStateController_archiveOne",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Archive a notification",
-        "tags": [
-          "notifications"
-        ]
-      }
-    },
-    "/notifications/archive-all-read": {
-      "patch": {
-        "operationId": "NotificationsStateController_archiveAllRead",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Archive all read notifications",
-        "tags": [
-          "notifications"
-        ]
-      }
-    },
-    "/notifications/admin/test-push": {
-      "post": {
-        "operationId": "NotificationsAdminController_testPush",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Test notification dispatched"
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Send a test push to the current admin user (full outbox → FCM pipeline)",
-        "tags": [
-          "notifications"
-        ]
-      }
-    },
-    "/notifications/admin/push-stats": {
-      "get": {
-        "operationId": "NotificationsAdminController_pushStats",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Push delivery stats"
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Push delivery statistics (admin only)",
-        "tags": [
-          "notifications"
-        ]
-      }
-    },
-    "/notifications/admin/delivery-report": {
-      "get": {
-        "operationId": "NotificationsAdminController_deliveryReport",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Delivery and open metrics"
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Push delivery funnel (admin only)",
-        "tags": [
-          "notifications"
-        ]
-      }
-    },
-    "/notifications/admin/dead-letters": {
-      "get": {
-        "operationId": "NotificationsAdminController_deadLetters",
-        "parameters": [
-          {
-            "name": "page",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "limit",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Dead-letter queue entries"
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "List dead-letter push outbox entries (admin only)",
-        "tags": [
-          "notifications"
         ]
       }
     },
@@ -16420,6 +17183,50 @@
         ]
       }
     },
+    "/admin/comms/email-dead-letters": {
+      "get": {
+        "operationId": "AdminCommsController_listEmailDeadLetters",
+        "parameters": [
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailDeadLetterPageDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List email delivery dead-letter outbox entries",
+        "tags": [
+          "admin-comms"
+        ]
+      }
+    },
     "/admin/comms/webhook-logs": {
       "get": {
         "operationId": "AdminCommsController_listWebhookLogs",
@@ -16487,6 +17294,114 @@
           }
         ],
         "summary": "Count pending report side-effect outbox jobs",
+        "tags": [
+          "admin-operations"
+        ]
+      }
+    },
+    "/admin/operations/system-info": {
+      "get": {
+        "operationId": "AdminOperationsController_systemInfo",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemInfoDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "API process version, uptime, and environment metadata",
+        "tags": [
+          "admin-operations"
+        ]
+      }
+    },
+    "/admin/operations/metrics-snapshot": {
+      "get": {
+        "operationId": "AdminOperationsController_metricsSnapshot",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationsMetricsSnapshotDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Curated in-process metrics snapshot for admin operations dashboard",
+        "tags": [
+          "admin-operations"
+        ]
+      }
+    },
+    "/admin/operations/workers": {
+      "get": {
+        "operationId": "AdminOperationsController_workers",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkerStatusListDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "In-process worker heartbeat status (per replica)",
+        "tags": [
+          "admin-operations"
+        ]
+      }
+    },
+    "/admin/operations/readiness": {
+      "get": {
+        "operationId": "AdminOperationsController_readiness",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationsReadinessDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Dependency readiness for admin operations diagnostics",
         "tags": [
           "admin-operations"
         ]
@@ -16604,7 +17519,7 @@
           },
           "password": {
             "type": "string",
-            "minLength": 8,
+            "minLength": 1,
             "maxLength": 72,
             "example": "StrongPass123!"
           },
@@ -16745,6 +17660,10 @@
             "type": "string",
             "description": "Stable browser/device identifier used to keep one active admin session per device.",
             "maxLength": 128
+          },
+          "rememberMe": {
+            "type": "boolean",
+            "description": "When true, issue a long-lived refresh session (30 days). When false, session expires in 1 day."
           }
         },
         "required": [
@@ -16769,6 +17688,10 @@
             "type": "string",
             "description": "Stable browser/device identifier used to keep one active admin session per device.",
             "maxLength": 128
+          },
+          "rememberMe": {
+            "type": "boolean",
+            "description": "When true, issue a long-lived refresh session (30 days). When false, session expires in 1 day."
           }
         },
         "required": [
@@ -16825,6 +17748,11 @@
             "type": "string",
             "description": "Stable per-install device identifier used to keep one active session per device.",
             "maxLength": 128
+          },
+          "rememberMe": {
+            "type": "boolean",
+            "description": "When true (default), issues a long-lived refresh session. When false, a shorter session-only refresh window.",
+            "default": true
           }
         },
         "required": [
@@ -17300,6 +18228,16 @@
             "type": "string",
             "example": "Doe",
             "maxLength": 100
+          },
+          "locale": {
+            "type": "string",
+            "example": "mk",
+            "enum": [
+              "en",
+              "mk",
+              "sq"
+            ],
+            "description": "Authoritative app UI locale for notifications (en | mk | sq)."
           }
         }
       },
@@ -17412,6 +18350,11 @@
           "displayName": {
             "type": "string"
           },
+          "avatarUrl": {
+            "type": "object",
+            "nullable": true,
+            "description": "Signed avatar URL when the user opted into the public leaderboard"
+          },
           "weeklyPoints": {
             "type": "number"
           },
@@ -17461,14 +18404,298 @@
           "myWeeklyPoints"
         ]
       },
-      "UnsubscribePostDto": {
+      "UpdateNotificationPreferenceDto": {
+        "type": "object",
+        "properties": {
+          "muted": {
+            "type": "boolean",
+            "description": "Whether this notification type is muted (in-app + push)"
+          },
+          "mutedUntil": {
+            "type": "string",
+            "description": "Optional ISO timestamp until mute is active"
+          },
+          "emailMuted": {
+            "type": "boolean",
+            "description": "Whether transactional email for this type is muted"
+          },
+          "emailMutedUntil": {
+            "type": "string",
+            "description": "Optional ISO timestamp until email mute is active"
+          },
+          "quietHoursStart": {
+            "type": "number",
+            "description": "Quiet hours start (minutes from midnight, 0–1439)"
+          },
+          "quietHoursEnd": {
+            "type": "number",
+            "description": "Quiet hours end (minutes from midnight, 0–1439)"
+          },
+          "quietHoursTimezone": {
+            "type": "string",
+            "description": "IANA timezone for quiet hours"
+          }
+        },
+        "required": [
+          "muted"
+        ]
+      },
+      "UnregisterDeviceTokenDto": {
         "type": "object",
         "properties": {
           "token": {
             "type": "string",
-            "description": "Signed unsubscribe token from email link"
+            "description": "FCM device token to revoke (body param avoids logging token in URL paths)"
           }
-        }
+        },
+        "required": [
+          "token"
+        ]
+      },
+      "RegisterDeviceTokenDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "IOS",
+              "ANDROID"
+            ]
+          },
+          "appVersion": {
+            "type": "string"
+          },
+          "locale": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "platform"
+        ]
+      },
+      "PushStatsDto": {
+        "type": "object",
+        "properties": {
+          "sendsTotal": {
+            "type": "number"
+          },
+          "sendsSuccess": {
+            "type": "number"
+          },
+          "sendsFailure": {
+            "type": "number"
+          },
+          "sendsRevoked": {
+            "type": "number"
+          },
+          "sendsByType": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "tokenRevocations": {
+            "type": "number"
+          },
+          "queueRetries": {
+            "type": "number"
+          },
+          "inboxReads": {
+            "type": "number"
+          },
+          "queueDepth": {
+            "type": "number"
+          },
+          "activeLeases": {
+            "type": "number"
+          },
+          "deadLetterCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "sendsTotal",
+          "sendsSuccess",
+          "sendsFailure",
+          "sendsRevoked",
+          "sendsByType",
+          "tokenRevocations",
+          "queueRetries",
+          "inboxReads",
+          "queueDepth",
+          "activeLeases",
+          "deadLetterCount"
+        ]
+      },
+      "DeliveryReportSendsDto": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number"
+          },
+          "success": {
+            "type": "number"
+          },
+          "failure": {
+            "type": "number"
+          },
+          "revoked": {
+            "type": "number"
+          },
+          "byType": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "total",
+          "success",
+          "failure",
+          "revoked",
+          "byType"
+        ]
+      },
+      "DeliveryReportInboxDto": {
+        "type": "object",
+        "properties": {
+          "notificationsSent": {
+            "type": "number"
+          },
+          "notificationsOpened": {
+            "type": "number"
+          },
+          "openRate": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "notificationsSent",
+          "notificationsOpened",
+          "openRate"
+        ]
+      },
+      "DeliveryReportQueueDto": {
+        "type": "object",
+        "properties": {
+          "depth": {
+            "type": "number"
+          },
+          "activeLeases": {
+            "type": "number"
+          },
+          "deadLetterCount": {
+            "type": "number"
+          },
+          "retries": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "depth",
+          "activeLeases",
+          "deadLetterCount",
+          "retries"
+        ]
+      },
+      "DeliveryReportDto": {
+        "type": "object",
+        "properties": {
+          "sends": {
+            "$ref": "#/components/schemas/DeliveryReportSendsDto"
+          },
+          "inbox": {
+            "$ref": "#/components/schemas/DeliveryReportInboxDto"
+          },
+          "queue": {
+            "$ref": "#/components/schemas/DeliveryReportQueueDto"
+          }
+        },
+        "required": [
+          "sends",
+          "inbox",
+          "queue"
+        ]
+      },
+      "DeadLetterRowDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "userNotificationId": {
+            "type": "string"
+          },
+          "deviceTokenSuffix": {
+            "type": "string"
+          },
+          "attempts": {
+            "type": "number"
+          },
+          "lastErrorCode": {
+            "type": "object",
+            "nullable": true
+          },
+          "lastErrorMessage": {
+            "type": "object",
+            "nullable": true
+          },
+          "lastAttemptAt": {
+            "type": "object",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "userNotificationId",
+          "deviceTokenSuffix",
+          "attempts",
+          "lastErrorCode",
+          "lastErrorMessage",
+          "lastAttemptAt",
+          "createdAt"
+        ]
+      },
+      "PaginationMetaDto": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "page",
+          "limit",
+          "total"
+        ]
+      },
+      "DeadLetterPageDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DeadLetterRowDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMetaDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
       },
       "PatchFeatureFlagDto": {
         "type": "object",
@@ -17480,6 +18707,111 @@
             "type": "object"
           }
         }
+      },
+      "UnsubscribePostDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Signed unsubscribe token from email link"
+          }
+        }
+      },
+      "PatchModerationEmailPreferenceDto": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": [
+              "NEW_REPORT",
+              "EVENT_PENDING",
+              "UGC_REPORT",
+              "CHECKIN_RISK"
+            ]
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "category",
+          "enabled"
+        ]
+      },
+      "PatchAdminUgcReportDto": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "mark_reviewed",
+              "dismiss",
+              "escalate",
+              "hide_subject",
+              "restore_subject"
+            ]
+          },
+          "note": {
+            "type": "string"
+          },
+          "policyReason": {
+            "type": "string",
+            "description": "Policy reason for audit trail (required for dismiss/escalate/hide/restore)"
+          }
+        },
+        "required": [
+          "action"
+        ]
+      },
+      "PostUgcReportDto": {
+        "type": "object",
+        "properties": {
+          "subjectType": {
+            "type": "string",
+            "enum": [
+              "site_comment",
+              "event_chat_message",
+              "user",
+              "site",
+              "event",
+              "safety_issue"
+            ]
+          },
+          "subjectId": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "spam",
+              "harassment",
+              "hate",
+              "violence",
+              "nudity",
+              "other"
+            ]
+          },
+          "details": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "subjectType",
+          "subjectId",
+          "reason"
+        ]
+      },
+      "PostUserBlockDto": {
+        "type": "object",
+        "properties": {
+          "blockedUserId": {
+            "type": "string",
+            "description": "User id to block"
+          }
+        },
+        "required": [
+          "blockedUserId"
+        ]
       },
       "CreateSiteDto": {
         "type": "object",
@@ -17556,6 +18888,13 @@
             "nullable": true
           },
           "latestReportMediaUrls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "heroMediaUrls": {
+            "description": "Canonical hero image from earliest approved report with media",
             "type": "array",
             "items": {
               "type": "string"
@@ -17822,6 +19161,90 @@
           "eventType"
         ]
       },
+      "PresenceHeartbeatDto": {
+        "type": "object",
+        "properties": {
+          "screen": {
+            "type": "string"
+          },
+          "appState": {
+            "type": "string",
+            "enum": [
+              "foreground",
+              "background"
+            ]
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "IOS",
+              "ANDROID"
+            ]
+          },
+          "appVersion": {
+            "type": "string"
+          },
+          "deviceModel": {
+            "type": "string"
+          },
+          "osVersion": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "screen",
+          "appState",
+          "platform"
+        ]
+      },
+      "PresenceOfflineDto": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string",
+            "description": "Device id (falls back to X-Device-Id header)"
+          }
+        }
+      },
+      "CreateAdminAlertRuleDto": {
+        "type": "object",
+        "properties": {
+          "metric": {
+            "type": "string"
+          },
+          "threshold": {
+            "type": "number",
+            "default": 100
+          },
+          "windowSeconds": {
+            "type": "number",
+            "default": 300
+          },
+          "comparator": {
+            "type": "string",
+            "enum": [
+              "GT",
+              "GTE"
+            ],
+            "default": "GT"
+          }
+        },
+        "required": [
+          "metric",
+          "threshold"
+        ]
+      },
+      "UpdateAdminAlertRuleDto": {
+        "type": "object",
+        "properties": {
+          "threshold": {
+            "type": "number"
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        }
+      },
       "SiteHistoryActorDto": {
         "type": "object",
         "properties": {
@@ -17831,12 +19254,17 @@
           "displayName": {
             "type": "object"
           },
+          "isDeleted": {
+            "type": "boolean",
+            "description": "True when the actor account was deleted or purged."
+          },
           "role": {
             "type": "object"
           }
         },
         "required": [
-          "id"
+          "id",
+          "isDeleted"
         ]
       },
       "SiteHistoryEntryDto": {
@@ -17991,100 +19419,350 @@
           "note"
         ]
       },
-      "PatchAdminUgcReportDto": {
+      "SiteCommentTreeNodeResponseDto": {
         "type": "object",
         "properties": {
-          "action": {
-            "type": "string",
-            "enum": [
-              "mark_reviewed",
-              "dismiss",
-              "escalate",
-              "hide_subject",
-              "restore_subject"
-            ]
-          },
-          "note": {
+          "id": {
             "type": "string"
           },
-          "policyReason": {
-            "type": "string",
-            "description": "Policy reason for audit trail (required for dismiss/escalate/hide/restore)"
+          "parentId": {
+            "type": "object",
+            "nullable": true
+          },
+          "body": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "authorId": {
+            "type": "string"
+          },
+          "authorName": {
+            "type": "string"
+          },
+          "authorIsDeleted": {
+            "type": "boolean"
+          },
+          "authorAvatarUrl": {
+            "type": "object",
+            "nullable": true
+          },
+          "likesCount": {
+            "type": "number"
+          },
+          "isLikedByMe": {
+            "type": "boolean"
+          },
+          "replies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SiteCommentTreeNodeResponseDto"
+            }
+          },
+          "repliesCount": {
+            "type": "number"
           }
         },
         "required": [
-          "action"
+          "id",
+          "parentId",
+          "body",
+          "createdAt",
+          "authorId",
+          "authorName",
+          "authorIsDeleted",
+          "likesCount",
+          "isLikedByMe",
+          "replies",
+          "repliesCount"
         ]
       },
-      "PostUgcReportDto": {
+      "SiteCommentsListMetaResponseDto": {
         "type": "object",
         "properties": {
-          "subjectType": {
-            "type": "string",
-            "enum": [
-              "site_comment",
-              "event_chat_message",
-              "user",
-              "site",
-              "event",
-              "safety_issue"
-            ]
+          "page": {
+            "type": "number"
           },
-          "subjectId": {
-            "type": "string"
+          "limit": {
+            "type": "number"
           },
-          "reason": {
-            "type": "string",
-            "enum": [
-              "spam",
-              "harassment",
-              "hate",
-              "violence",
-              "nudity",
-              "other"
-            ]
+          "total": {
+            "type": "number"
           },
-          "details": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "subjectType",
-          "subjectId",
-          "reason"
-        ]
-      },
-      "PostUserBlockDto": {
-        "type": "object",
-        "properties": {
-          "blockedUserId": {
-            "type": "string",
-            "description": "User id to block"
-          }
-        },
-        "required": [
-          "blockedUserId"
-        ]
-      },
-      "PatchModerationEmailPreferenceDto": {
-        "type": "object",
-        "properties": {
-          "category": {
-            "type": "string",
-            "enum": [
-              "NEW_REPORT",
-              "EVENT_PENDING",
-              "UGC_REPORT",
-              "CHECKIN_RISK"
-            ]
-          },
-          "enabled": {
+          "truncated": {
             "type": "boolean"
           }
         },
         "required": [
-          "category",
-          "enabled"
+          "page",
+          "limit",
+          "total"
+        ]
+      },
+      "SiteCommentsListResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SiteCommentTreeNodeResponseDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/SiteCommentsListMetaResponseDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "CreateSiteCommentDto": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "string",
+            "example": "Thanks for reporting this. I can help this weekend."
+          },
+          "parentId": {
+            "type": "string",
+            "description": "Parent comment id for nested reply"
+          }
+        },
+        "required": [
+          "body"
+        ]
+      },
+      "SiteCommentLikeResponseDto": {
+        "type": "object",
+        "properties": {
+          "commentId": {
+            "type": "string"
+          },
+          "likesCount": {
+            "type": "number"
+          },
+          "isLikedByMe": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "commentId",
+          "likesCount",
+          "isLikedByMe"
+        ]
+      },
+      "UpdateSiteCommentDto": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "string",
+            "example": "Updated comment text",
+            "description": "Updated comment body",
+            "minLength": 1,
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "body"
+        ]
+      },
+      "SiteUpvoterRowResponseDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "avatarUrl": {
+            "type": "object",
+            "nullable": true
+          },
+          "upvotedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "userId",
+          "displayName",
+          "avatarUrl",
+          "upvotedAt"
+        ]
+      },
+      "SiteUpvotersMetaResponseDto": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          },
+          "hasMore": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "page",
+          "limit",
+          "total",
+          "hasMore"
+        ]
+      },
+      "SiteUpvotersListResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SiteUpvoterRowResponseDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/SiteUpvotersMetaResponseDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "SiteEngagementSnapshotResponseDto": {
+        "type": "object",
+        "properties": {
+          "siteId": {
+            "type": "string"
+          },
+          "upvotesCount": {
+            "type": "number"
+          },
+          "commentsCount": {
+            "type": "number"
+          },
+          "savesCount": {
+            "type": "number"
+          },
+          "sharesCount": {
+            "type": "number"
+          },
+          "isUpvotedByMe": {
+            "type": "boolean"
+          },
+          "isSavedByMe": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "siteId",
+          "upvotesCount",
+          "commentsCount",
+          "savesCount",
+          "sharesCount",
+          "isUpvotedByMe",
+          "isSavedByMe"
+        ]
+      },
+      "ShareSiteDto": {
+        "type": "object",
+        "properties": {
+          "channel": {
+            "type": "string",
+            "enum": [
+              "native",
+              "link",
+              "whatsapp",
+              "facebook",
+              "x",
+              "other"
+            ],
+            "default": "native"
+          }
+        }
+      },
+      "SiteShareLinkRequestDto": {
+        "type": "object",
+        "properties": {
+          "channel": {
+            "type": "string",
+            "enum": [
+              "native",
+              "link",
+              "whatsapp",
+              "facebook",
+              "x",
+              "other"
+            ],
+            "default": "native"
+          }
+        }
+      },
+      "SiteShareLinkResponseDto": {
+        "type": "object",
+        "properties": {
+          "siteId": {
+            "type": "string"
+          },
+          "cid": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          },
+          "channel": {
+            "type": "string",
+            "enum": [
+              "native",
+              "link",
+              "whatsapp",
+              "facebook",
+              "x",
+              "other"
+            ]
+          },
+          "expiresAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "siteId",
+          "cid",
+          "url",
+          "token",
+          "channel",
+          "expiresAt"
+        ]
+      },
+      "SubmitFeedFeedbackDto": {
+        "type": "object",
+        "properties": {
+          "feedbackType": {
+            "type": "string",
+            "enum": [
+              "not_relevant",
+              "show_more",
+              "misleading",
+              "duplicate"
+            ]
+          },
+          "sessionId": {
+            "type": "string",
+            "example": "session_abc_123"
+          },
+          "metadata": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "feedbackType"
         ]
       },
       "SiteDetailReporterDto": {
@@ -18427,6 +20105,88 @@
           "meta"
         ]
       },
+      "SiteCoReporterRowResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Opaque stable row id (not raw userId for non-moderators)"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "isDeleted": {
+            "type": "boolean"
+          },
+          "avatarUrl": {
+            "type": "object",
+            "nullable": true
+          },
+          "reportedAt": {
+            "type": "string"
+          },
+          "isOriginalReporter": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "firstName",
+          "lastName",
+          "displayName",
+          "isDeleted",
+          "avatarUrl",
+          "reportedAt",
+          "isOriginalReporter"
+        ]
+      },
+      "SiteCoReportersMetaResponseDto": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          },
+          "hasMore": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "page",
+          "limit",
+          "total",
+          "hasMore"
+        ]
+      },
+      "SiteCoReportersListResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SiteCoReporterRowResponseDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/SiteCoReportersMetaResponseDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
       "UpdateSiteStatusDto": {
         "type": "object",
         "properties": {
@@ -18463,348 +20223,6 @@
         },
         "required": [
           "archived"
-        ]
-      },
-      "SiteCommentTreeNodeResponseDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "parentId": {
-            "type": "object",
-            "nullable": true
-          },
-          "body": {
-            "type": "string"
-          },
-          "createdAt": {
-            "type": "string"
-          },
-          "authorId": {
-            "type": "string"
-          },
-          "authorName": {
-            "type": "string"
-          },
-          "authorAvatarUrl": {
-            "type": "object",
-            "nullable": true
-          },
-          "likesCount": {
-            "type": "number"
-          },
-          "isLikedByMe": {
-            "type": "boolean"
-          },
-          "replies": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SiteCommentTreeNodeResponseDto"
-            }
-          },
-          "repliesCount": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "id",
-          "parentId",
-          "body",
-          "createdAt",
-          "authorId",
-          "authorName",
-          "likesCount",
-          "isLikedByMe",
-          "replies",
-          "repliesCount"
-        ]
-      },
-      "SiteCommentsListMetaResponseDto": {
-        "type": "object",
-        "properties": {
-          "page": {
-            "type": "number"
-          },
-          "limit": {
-            "type": "number"
-          },
-          "total": {
-            "type": "number"
-          },
-          "truncated": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "page",
-          "limit",
-          "total"
-        ]
-      },
-      "SiteCommentsListResponseDto": {
-        "type": "object",
-        "properties": {
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SiteCommentTreeNodeResponseDto"
-            }
-          },
-          "meta": {
-            "$ref": "#/components/schemas/SiteCommentsListMetaResponseDto"
-          }
-        },
-        "required": [
-          "data",
-          "meta"
-        ]
-      },
-      "CreateSiteCommentDto": {
-        "type": "object",
-        "properties": {
-          "body": {
-            "type": "string",
-            "example": "Thanks for reporting this. I can help this weekend."
-          },
-          "parentId": {
-            "type": "string",
-            "description": "Parent comment id for nested reply"
-          }
-        },
-        "required": [
-          "body"
-        ]
-      },
-      "SiteCommentLikeResponseDto": {
-        "type": "object",
-        "properties": {
-          "commentId": {
-            "type": "string"
-          },
-          "likesCount": {
-            "type": "number"
-          },
-          "isLikedByMe": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "commentId",
-          "likesCount",
-          "isLikedByMe"
-        ]
-      },
-      "UpdateSiteCommentDto": {
-        "type": "object",
-        "properties": {
-          "body": {
-            "type": "string",
-            "example": "Updated comment text",
-            "description": "Updated comment body",
-            "minLength": 1,
-            "maxLength": 500
-          }
-        },
-        "required": [
-          "body"
-        ]
-      },
-      "SiteUpvoterRowResponseDto": {
-        "type": "object",
-        "properties": {
-          "userId": {
-            "type": "string"
-          },
-          "displayName": {
-            "type": "string"
-          },
-          "avatarUrl": {
-            "type": "object",
-            "nullable": true
-          },
-          "upvotedAt": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "userId",
-          "displayName",
-          "avatarUrl",
-          "upvotedAt"
-        ]
-      },
-      "SiteUpvotersMetaResponseDto": {
-        "type": "object",
-        "properties": {
-          "page": {
-            "type": "number"
-          },
-          "limit": {
-            "type": "number"
-          },
-          "total": {
-            "type": "number"
-          },
-          "hasMore": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "page",
-          "limit",
-          "total",
-          "hasMore"
-        ]
-      },
-      "SiteUpvotersListResponseDto": {
-        "type": "object",
-        "properties": {
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SiteUpvoterRowResponseDto"
-            }
-          },
-          "meta": {
-            "$ref": "#/components/schemas/SiteUpvotersMetaResponseDto"
-          }
-        },
-        "required": [
-          "data",
-          "meta"
-        ]
-      },
-      "SiteEngagementSnapshotResponseDto": {
-        "type": "object",
-        "properties": {
-          "siteId": {
-            "type": "string"
-          },
-          "upvotesCount": {
-            "type": "number"
-          },
-          "commentsCount": {
-            "type": "number"
-          },
-          "savesCount": {
-            "type": "number"
-          },
-          "sharesCount": {
-            "type": "number"
-          },
-          "isUpvotedByMe": {
-            "type": "boolean"
-          },
-          "isSavedByMe": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "siteId",
-          "upvotesCount",
-          "commentsCount",
-          "savesCount",
-          "sharesCount",
-          "isUpvotedByMe",
-          "isSavedByMe"
-        ]
-      },
-      "ShareSiteDto": {
-        "type": "object",
-        "properties": {
-          "channel": {
-            "type": "string",
-            "enum": [
-              "native",
-              "link",
-              "whatsapp",
-              "facebook",
-              "x",
-              "other"
-            ],
-            "default": "native"
-          }
-        }
-      },
-      "SiteShareLinkRequestDto": {
-        "type": "object",
-        "properties": {
-          "channel": {
-            "type": "string",
-            "enum": [
-              "native",
-              "link",
-              "whatsapp",
-              "facebook",
-              "x",
-              "other"
-            ],
-            "default": "native"
-          }
-        }
-      },
-      "SiteShareLinkResponseDto": {
-        "type": "object",
-        "properties": {
-          "siteId": {
-            "type": "string"
-          },
-          "cid": {
-            "type": "string"
-          },
-          "url": {
-            "type": "string"
-          },
-          "token": {
-            "type": "string"
-          },
-          "channel": {
-            "type": "string",
-            "enum": [
-              "native",
-              "link",
-              "whatsapp",
-              "facebook",
-              "x",
-              "other"
-            ]
-          },
-          "expiresAt": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "siteId",
-          "cid",
-          "url",
-          "token",
-          "channel",
-          "expiresAt"
-        ]
-      },
-      "SubmitFeedFeedbackDto": {
-        "type": "object",
-        "properties": {
-          "feedbackType": {
-            "type": "string",
-            "enum": [
-              "not_relevant",
-              "show_more",
-              "misleading",
-              "duplicate"
-            ]
-          },
-          "sessionId": {
-            "type": "string",
-            "example": "session_abc_123"
-          },
-          "metadata": {
-            "type": "object"
-          }
-        },
-        "required": [
-          "feedbackType"
         ]
       },
       "AdminReportEvidenceDto": {
@@ -19115,6 +20533,10 @@
             "nullable": true,
             "description": "Reporter display name"
           },
+          "reporterIsDeleted": {
+            "type": "boolean",
+            "description": "True when the primary reporter account was erased"
+          },
           "coReporterNames": {
             "description": "Co-reporter display names",
             "type": "array",
@@ -19168,6 +20590,7 @@
           "submittedAt",
           "site",
           "reporterName",
+          "reporterIsDeleted",
           "coReporterNames",
           "location",
           "pointsAwarded",
@@ -20483,79 +21906,6 @@
           }
         }
       },
-      "UpdateNotificationPreferenceDto": {
-        "type": "object",
-        "properties": {
-          "muted": {
-            "type": "boolean",
-            "description": "Whether this notification type is muted (in-app + push)"
-          },
-          "mutedUntil": {
-            "type": "string",
-            "description": "Optional ISO timestamp until mute is active"
-          },
-          "emailMuted": {
-            "type": "boolean",
-            "description": "Whether transactional email for this type is muted"
-          },
-          "emailMutedUntil": {
-            "type": "string",
-            "description": "Optional ISO timestamp until email mute is active"
-          },
-          "quietHoursStart": {
-            "type": "number",
-            "description": "Quiet hours start (minutes from midnight, 0–1439)"
-          },
-          "quietHoursEnd": {
-            "type": "number",
-            "description": "Quiet hours end (minutes from midnight, 0–1439)"
-          },
-          "quietHoursTimezone": {
-            "type": "string",
-            "description": "IANA timezone for quiet hours"
-          }
-        },
-        "required": [
-          "muted"
-        ]
-      },
-      "UnregisterDeviceTokenDto": {
-        "type": "object",
-        "properties": {
-          "token": {
-            "type": "string",
-            "description": "FCM device token to revoke (body param avoids logging token in URL paths)"
-          }
-        },
-        "required": [
-          "token"
-        ]
-      },
-      "RegisterDeviceTokenDto": {
-        "type": "object",
-        "properties": {
-          "token": {
-            "type": "string"
-          },
-          "platform": {
-            "type": "string",
-            "enum": [
-              "IOS",
-              "ANDROID"
-            ]
-          },
-          "appVersion": {
-            "type": "string"
-          },
-          "locale": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "token",
-          "platform"
-        ]
-      },
       "EventMobileRouteSegmentDto": {
         "type": "object",
         "properties": {
@@ -20693,6 +22043,9 @@
           },
           "organizerName": {
             "type": "string"
+          },
+          "organizerIsDeleted": {
+            "type": "boolean"
           },
           "organizerAvatarUrl": {
             "type": "object",
@@ -21294,6 +22647,10 @@
             "type": "string",
             "description": "Public display name"
           },
+          "isDeleted": {
+            "type": "boolean",
+            "description": "True when the participant account was deleted"
+          },
           "avatarUrl": {
             "type": "object",
             "nullable": true,
@@ -21307,6 +22664,7 @@
         "required": [
           "userId",
           "displayName",
+          "isDeleted",
           "avatarUrl",
           "joinedAt"
         ]
@@ -21633,6 +22991,9 @@
           },
           "organizerName": {
             "type": "string"
+          },
+          "organizerIsDeleted": {
+            "type": "boolean"
           },
           "organizerAvatarUrl": {
             "type": "object",
@@ -22636,6 +23997,61 @@
           "email"
         ]
       },
+      "EmailDeadLetterRowDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "templateId": {
+            "type": "string"
+          },
+          "attempts": {
+            "type": "number"
+          },
+          "lastError": {
+            "type": "object",
+            "nullable": true
+          },
+          "lastAttemptAt": {
+            "type": "object",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "userId",
+          "templateId",
+          "attempts",
+          "lastError",
+          "lastAttemptAt",
+          "createdAt"
+        ]
+      },
+      "EmailDeadLetterPageDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmailDeadLetterRowDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMetaDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
       "ReportSideEffectPendingCountDto": {
         "type": "object",
         "properties": {
@@ -22646,6 +24062,296 @@
         },
         "required": [
           "pendingCount"
+        ]
+      },
+      "SystemInfoDto": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "string",
+            "example": "0.1.0"
+          },
+          "gitSha": {
+            "type": "object",
+            "nullable": true,
+            "example": "abc1234"
+          },
+          "nodeEnv": {
+            "type": "string",
+            "example": "production"
+          },
+          "region": {
+            "type": "object",
+            "nullable": true,
+            "example": "eu-central-1"
+          },
+          "startedAt": {
+            "type": "string",
+            "example": "2026-06-07T10:00:00.000Z"
+          },
+          "uptimeSeconds": {
+            "type": "number",
+            "example": 86400
+          },
+          "fcmEnabled": {
+            "type": "boolean",
+            "example": true
+          }
+        },
+        "required": [
+          "version",
+          "gitSha",
+          "nodeEnv",
+          "region",
+          "startedAt",
+          "uptimeSeconds",
+          "fcmEnabled"
+        ]
+      },
+      "ProcessMemoryDto": {
+        "type": "object",
+        "properties": {
+          "rssMb": {
+            "type": "number",
+            "example": 128
+          },
+          "heapUsedMb": {
+            "type": "number",
+            "example": 64
+          },
+          "heapTotalMb": {
+            "type": "number",
+            "example": 96
+          }
+        },
+        "required": [
+          "rssMb",
+          "heapUsedMb",
+          "heapTotalMb"
+        ]
+      },
+      "OperationsMetricsSnapshotDto": {
+        "type": "object",
+        "properties": {
+          "requestsTotal": {
+            "type": "number",
+            "example": 12000
+          },
+          "requestsFailed": {
+            "type": "number",
+            "example": 12
+          },
+          "p50Ms": {
+            "type": "number",
+            "example": 45
+          },
+          "p95Ms": {
+            "type": "number",
+            "example": 120
+          },
+          "p99Ms": {
+            "type": "number",
+            "example": 250
+          },
+          "pushSendsTotal": {
+            "type": "number",
+            "example": 5000
+          },
+          "pushSendsSuccess": {
+            "type": "number",
+            "example": 4800
+          },
+          "pushSendsFailure": {
+            "type": "number",
+            "example": 150
+          },
+          "pushSendsRevoked": {
+            "type": "number",
+            "example": 50
+          },
+          "pushQueueDepth": {
+            "type": "number",
+            "example": 3
+          },
+          "pushActiveLeases": {
+            "type": "number",
+            "example": 1
+          },
+          "pushDeadLetterCount": {
+            "type": "number",
+            "example": 2
+          },
+          "mapRequestsTotal": {
+            "type": "number",
+            "example": 8000
+          },
+          "mapCacheHitRate": {
+            "type": "number",
+            "example": 0.82
+          },
+          "mapOutboxPending": {
+            "type": "number",
+            "example": 12
+          },
+          "mapOutboxFailed": {
+            "type": "number",
+            "example": 0
+          },
+          "feedRequestsTotal": {
+            "type": "number",
+            "example": 1200
+          },
+          "feedCacheHitRate": {
+            "type": "number",
+            "example": 0.75
+          },
+          "reportSideEffectFailedTotal": {
+            "type": "number",
+            "example": 3
+          },
+          "emailQueueDepth": {
+            "type": "number",
+            "example": 0
+          },
+          "emailDeadLetterCount": {
+            "type": "number",
+            "example": 0
+          },
+          "processMemory": {
+            "$ref": "#/components/schemas/ProcessMemoryDto"
+          },
+          "capturedAt": {
+            "type": "string",
+            "example": "2026-06-07T12:00:00.000Z"
+          }
+        },
+        "required": [
+          "requestsTotal",
+          "requestsFailed",
+          "p50Ms",
+          "p95Ms",
+          "p99Ms",
+          "pushSendsTotal",
+          "pushSendsSuccess",
+          "pushSendsFailure",
+          "pushSendsRevoked",
+          "pushQueueDepth",
+          "pushActiveLeases",
+          "pushDeadLetterCount",
+          "mapRequestsTotal",
+          "mapCacheHitRate",
+          "mapOutboxPending",
+          "mapOutboxFailed",
+          "feedRequestsTotal",
+          "feedCacheHitRate",
+          "reportSideEffectFailedTotal",
+          "emailQueueDepth",
+          "emailDeadLetterCount",
+          "processMemory",
+          "capturedAt"
+        ]
+      },
+      "WorkerStatusDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "push-delivery"
+          },
+          "running": {
+            "type": "boolean",
+            "example": true
+          },
+          "intervalMs": {
+            "type": "number",
+            "example": 5000
+          },
+          "startedAt": {
+            "type": "string",
+            "example": "2026-06-07T10:00:00.000Z"
+          },
+          "lastRunAt": {
+            "type": "object",
+            "nullable": true,
+            "example": "2026-06-07T12:00:00.000Z"
+          },
+          "lastSuccessAt": {
+            "type": "object",
+            "nullable": true,
+            "example": "2026-06-07T12:00:00.000Z"
+          },
+          "lastError": {
+            "type": "object",
+            "nullable": true,
+            "example": null
+          },
+          "stale": {
+            "type": "boolean",
+            "example": false
+          }
+        },
+        "required": [
+          "name",
+          "running",
+          "intervalMs",
+          "startedAt",
+          "lastRunAt",
+          "lastSuccessAt",
+          "lastError",
+          "stale"
+        ]
+      },
+      "WorkerStatusListDto": {
+        "type": "object",
+        "properties": {
+          "workers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkerStatusDto"
+            }
+          },
+          "perReplica": {
+            "type": "boolean",
+            "description": "Worker heartbeats are per ECS task / process replica",
+            "example": true
+          }
+        },
+        "required": [
+          "workers",
+          "perReplica"
+        ]
+      },
+      "OperationsReadinessDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "degraded"
+            ]
+          },
+          "database": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "fail"
+            ]
+          },
+          "redis": {
+            "type": "string",
+            "example": "ok"
+          },
+          "s3": {
+            "type": "string",
+            "example": "ok"
+          }
+        },
+        "required": [
+          "status",
+          "database",
+          "redis",
+          "s3"
         ]
       }
     }
