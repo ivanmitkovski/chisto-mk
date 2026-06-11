@@ -1975,7 +1975,7 @@ export interface paths {
             cookie?: never;
         };
         /** List reports for admin moderation queue */
-        get: operations["ReportsController_findAllForModeration"];
+        get: operations["ReportsAdminController_findAllForModeration"];
         put?: never;
         /** Create a report by location (finds or creates site; approval awards points later) */
         post: operations["ReportsController_createWithLocation"];
@@ -2053,6 +2053,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/reports/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get report details (admin: full moderation view, citizen: own reports only) */
+        get: operations["ReportsController_findOne"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/reports/queue-summary": {
         parameters: {
             query?: never;
@@ -2061,7 +2078,7 @@ export interface paths {
             cookie?: never;
         };
         /** Global moderation queue counts for admin dashboard */
-        get: operations["ReportsController_getQueueSummary"];
+        get: operations["ReportsAdminController_getQueueSummary"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2078,7 +2095,7 @@ export interface paths {
             cookie?: never;
         };
         /** List duplicate report groups for moderation */
-        get: operations["ReportsController_findDuplicateGroups"];
+        get: operations["ReportsAdminController_findDuplicateGroups"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2095,7 +2112,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get duplicate group details for a report */
-        get: operations["ReportsController_findDuplicateGroupByReport"];
+        get: operations["ReportsAdminController_findDuplicateGroupByReport"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2112,7 +2129,7 @@ export interface paths {
             cookie?: never;
         };
         /** List admins currently viewing a report */
-        get: operations["ReportsController_listReportViewers"];
+        get: operations["ReportsAdminController_listReportViewers"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2131,7 +2148,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Register or refresh admin presence while viewing a report */
-        post: operations["ReportsController_heartbeatReportViewer"];
+        post: operations["ReportsAdminController_heartbeatReportViewer"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2149,24 +2166,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** Remove admin presence when leaving a report view */
-        delete: operations["ReportsController_leaveReportViewer"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/reports/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get report details (admin: full moderation view, citizen: own reports only) */
-        get: operations["ReportsController_findOne"];
-        put?: never;
-        post?: never;
-        delete?: never;
+        delete: operations["ReportsAdminController_leaveReportViewer"];
         options?: never;
         head?: never;
         patch?: never;
@@ -2186,7 +2186,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Update report moderation status */
-        patch: operations["ReportsController_updateStatus"];
+        patch: operations["ReportsAdminController_updateStatus"];
         trace?: never;
     };
     "/reports/{id}/assign": {
@@ -2203,7 +2203,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Assign or release a report for moderation review */
-        patch: operations["ReportsController_assignReport"];
+        patch: operations["ReportsAdminController_assignReport"];
         trace?: never;
     };
     "/reports/{id}/merge": {
@@ -2216,7 +2216,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Approve and merge child duplicate reports into a primary report */
-        post: operations["ReportsController_mergeDuplicates"];
+        post: operations["ReportsAdminController_mergeDuplicates"];
         delete?: never;
         options?: never;
         head?: never;
@@ -13362,7 +13362,7 @@ export interface operations {
             };
         };
     };
-    ReportsController_findAllForModeration: {
+    ReportsAdminController_findAllForModeration: {
         parameters: {
             query?: {
                 page?: components["schemas"]["Object"];
@@ -13713,7 +13713,64 @@ export interface operations {
             };
         };
     };
-    ReportsController_getQueueSummary: {
+    ReportsController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Report fetched successfully (shape depends on moderator vs citizen access) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminReportDetailDto"] | components["schemas"]["CitizenReportDetailDto"];
+                };
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ReportsAdminController_getQueueSummary: {
         parameters: {
             query?: never;
             header?: never;
@@ -13768,7 +13825,7 @@ export interface operations {
             };
         };
     };
-    ReportsController_findDuplicateGroups: {
+    ReportsAdminController_findDuplicateGroups: {
         parameters: {
             query?: {
                 page?: components["schemas"]["Object"];
@@ -13837,7 +13894,7 @@ export interface operations {
             };
         };
     };
-    ReportsController_findDuplicateGroupByReport: {
+    ReportsAdminController_findDuplicateGroupByReport: {
         parameters: {
             query?: never;
             header?: never;
@@ -13894,7 +13951,7 @@ export interface operations {
             };
         };
     };
-    ReportsController_listReportViewers: {
+    ReportsAdminController_listReportViewers: {
         parameters: {
             query?: never;
             header?: never;
@@ -13951,7 +14008,7 @@ export interface operations {
             };
         };
     };
-    ReportsController_heartbeatReportViewer: {
+    ReportsAdminController_heartbeatReportViewer: {
         parameters: {
             query?: never;
             header?: never;
@@ -14012,7 +14069,7 @@ export interface operations {
             };
         };
     };
-    ReportsController_leaveReportViewer: {
+    ReportsAdminController_leaveReportViewer: {
         parameters: {
             query?: never;
             header?: never;
@@ -14070,64 +14127,7 @@ export interface operations {
             };
         };
     };
-    ReportsController_findOne: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Report fetched successfully (shape depends on moderator vs citizen access) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminReportDetailDto"] | components["schemas"]["CitizenReportDetailDto"];
-                };
-            };
-            /** @description Validation or bad request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Missing or invalid bearer token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Insufficient permissions */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Resource not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Rate limited */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    ReportsController_updateStatus: {
+    ReportsAdminController_updateStatus: {
         parameters: {
             query?: never;
             header?: never;
@@ -14186,7 +14186,7 @@ export interface operations {
             };
         };
     };
-    ReportsController_assignReport: {
+    ReportsAdminController_assignReport: {
         parameters: {
             query?: never;
             header?: never;
@@ -14247,7 +14247,7 @@ export interface operations {
             };
         };
     };
-    ReportsController_mergeDuplicates: {
+    ReportsAdminController_mergeDuplicates: {
         parameters: {
             query?: never;
             header?: never;

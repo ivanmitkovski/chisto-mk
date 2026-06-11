@@ -1,5 +1,6 @@
 /// <reference types="jest" />
 import 'reflect-metadata';
+import { ReportsAdminController } from '../../src/reports/controllers/reports-admin.controller';
 import { ReportsController } from '../../src/reports/controllers/reports.controller';
 
 /** @nestjs/throttler v6 stores per-name keys as prefix + bucket name (e.g. `default`). */
@@ -20,7 +21,7 @@ describe('ReportsController throttling metadata', () => {
   });
 
   it('applies @Throttle to admin moderation and merge routes', () => {
-    const keys: Array<keyof ReportsController> = [
+    const keys: Array<keyof ReportsAdminController> = [
       'findAllForModeration',
       'findDuplicateGroups',
       'findDuplicateGroupByReport',
@@ -28,7 +29,7 @@ describe('ReportsController throttling metadata', () => {
       'mergeDuplicates',
     ];
     for (const key of keys) {
-      const handler = ReportsController.prototype[key];
+      const handler = ReportsAdminController.prototype[key];
       expect(Reflect.getMetadata(limitMetaKey('default'), handler)).toBeDefined();
       expect(Reflect.getMetadata(ttlMetaKey('default'), handler)).toBeDefined();
     }

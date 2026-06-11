@@ -7,6 +7,7 @@ import { SiteHistoryWriterService } from '../sites/history/site-history-writer.s
 import { GamificationModule } from '../gamification/gamification.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { ReportsController } from './controllers/reports.controller';
+import { ReportsAdminController } from './controllers/reports-admin.controller';
 import { OwnerEventsModule } from './owner-events/owner-events.module';
 import { ReportCitizenQueryService } from './services/report-citizen-query.service';
 import { ReportApprovalPointsService } from './services/report-approval-points.service';
@@ -50,7 +51,7 @@ import { SITE_HISTORY_WRITER } from './ports/site-history-writer.port';
     OwnerEventsModule,
     SiteHistoryModule,
   ],
-  controllers: [ReportsController],
+  controllers: [ReportsController, ReportsAdminController],
   providers: [
     ReportsModerationListService,
     ReportsModerationStatusService,

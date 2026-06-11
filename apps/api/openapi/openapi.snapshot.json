@@ -6641,7 +6641,7 @@
         ]
       },
       "get": {
-        "operationId": "ReportsController_findAllForModeration",
+        "operationId": "ReportsAdminController_findAllForModeration",
         "parameters": [
           {
             "name": "page",
@@ -6965,9 +6965,67 @@
         ]
       }
     },
+    "/reports/{id}": {
+      "get": {
+        "operationId": "ReportsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Report fetched successfully (shape depends on moderator vs citizen access)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/AdminReportDetailDto"
+                    },
+                    {
+                      "$ref": "#/components/schemas/CitizenReportDetailDto"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get report details (admin: full moderation view, citizen: own reports only)",
+        "tags": [
+          "reports"
+        ]
+      }
+    },
     "/reports/queue-summary": {
       "get": {
-        "operationId": "ReportsController_getQueueSummary",
+        "operationId": "ReportsAdminController_getQueueSummary",
         "parameters": [],
         "responses": {
           "200": {
@@ -7009,7 +7067,7 @@
     },
     "/reports/duplicates": {
       "get": {
-        "operationId": "ReportsController_findDuplicateGroups",
+        "operationId": "ReportsAdminController_findDuplicateGroups",
         "parameters": [
           {
             "name": "page",
@@ -7148,7 +7206,7 @@
     },
     "/reports/{id}/duplicates": {
       "get": {
-        "operationId": "ReportsController_findDuplicateGroupByReport",
+        "operationId": "ReportsAdminController_findDuplicateGroupByReport",
         "parameters": [
           {
             "name": "id",
@@ -7199,7 +7257,7 @@
     },
     "/reports/{id}/viewers": {
       "get": {
-        "operationId": "ReportsController_listReportViewers",
+        "operationId": "ReportsAdminController_listReportViewers",
         "parameters": [
           {
             "name": "id",
@@ -7250,7 +7308,7 @@
     },
     "/reports/{id}/viewers/heartbeat": {
       "post": {
-        "operationId": "ReportsController_heartbeatReportViewer",
+        "operationId": "ReportsAdminController_heartbeatReportViewer",
         "parameters": [
           {
             "name": "id",
@@ -7311,7 +7369,7 @@
     },
     "/reports/{id}/viewers/{sessionId}": {
       "delete": {
-        "operationId": "ReportsController_leaveReportViewer",
+        "operationId": "ReportsAdminController_leaveReportViewer",
         "parameters": [
           {
             "name": "id",
@@ -7368,67 +7426,9 @@
         ]
       }
     },
-    "/reports/{id}": {
-      "get": {
-        "operationId": "ReportsController_findOne",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Report fetched successfully (shape depends on moderator vs citizen access)",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/AdminReportDetailDto"
-                    },
-                    {
-                      "$ref": "#/components/schemas/CitizenReportDetailDto"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get report details (admin: full moderation view, citizen: own reports only)",
-        "tags": [
-          "reports"
-        ]
-      }
-    },
     "/reports/{id}/status": {
       "patch": {
-        "operationId": "ReportsController_updateStatus",
+        "operationId": "ReportsAdminController_updateStatus",
         "parameters": [
           {
             "name": "id",
@@ -7482,7 +7482,7 @@
     },
     "/reports/{id}/assign": {
       "patch": {
-        "operationId": "ReportsController_assignReport",
+        "operationId": "ReportsAdminController_assignReport",
         "parameters": [
           {
             "name": "id",
@@ -7543,7 +7543,7 @@
     },
     "/reports/{id}/merge": {
       "post": {
-        "operationId": "ReportsController_mergeDuplicates",
+        "operationId": "ReportsAdminController_mergeDuplicates",
         "parameters": [
           {
             "name": "id",
