@@ -70,6 +70,7 @@ export class AdminUsersController {
     return this.adminUsersService.getSessions(id);
   }
 
+  // safe-to-retry: repeated Delete is acceptable
   @Delete(':id/sessions/:sessionId')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(...ADMIN_WRITE_ROLES)

@@ -14,6 +14,7 @@ import {
   FeedRankingConfig,
   ReportCreditsConfig,
 } from '../services/admin-app-config.service';
+import { Idempotent } from '../../common/idempotency/idempotency.decorator';
 
 @ApiTags('admin-app-config')
 @Controller('admin/app-config')
@@ -29,6 +30,7 @@ export class AdminAppConfigController {
     return this.appConfig.getReportCredits();
   }
 
+  @Idempotent('admin_app_config_report_credits')
   @Patch('report-credits')
   @Roles(...ADMIN_WRITE_ROLES)
   @RequirePermission(ADMIN_PERMISSIONS['app-config:write'])
@@ -43,6 +45,7 @@ export class AdminAppConfigController {
     return this.appConfig.getFeedRanking();
   }
 
+  @Idempotent('admin_app_config_feed_ranking')
   @Patch('feed-ranking')
   @Roles(...ADMIN_WRITE_ROLES)
   @RequirePermission(ADMIN_PERMISSIONS['app-config:write'])
@@ -57,6 +60,7 @@ export class AdminAppConfigController {
     return this.appConfig.getOrganizerQuiz(locale ?? 'en');
   }
 
+  @Idempotent('admin_app_config_organizer_quiz')
   @Patch('organizer-quiz')
   @Roles(...SUPER_ADMIN_ROLES)
   @RequirePermission(ADMIN_PERMISSIONS['config:write'])
@@ -75,6 +79,7 @@ export class AdminAppConfigController {
     return this.appConfig.getTermsVersion();
   }
 
+  @Idempotent('admin_app_config_terms_version')
   @Patch('terms-version')
   @Roles(...SUPER_ADMIN_ROLES)
   @RequirePermission(ADMIN_PERMISSIONS['config:write'])

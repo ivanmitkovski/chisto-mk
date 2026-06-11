@@ -250,6 +250,7 @@ export class ReportsController {
     return { viewers };
   }
 
+  // safe-to-retry: repeated Post is acceptable
   @Post(':id/viewers/heartbeat')
   @Throttle({ default: { limit: 30, ttl: 60_000 } })
   @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard, ReportsUserThrottlerGuard)
@@ -267,6 +268,7 @@ export class ReportsController {
     return { viewers };
   }
 
+  // safe-to-retry: repeated Delete is acceptable
   @Delete(':id/viewers/:sessionId')
   @Throttle({ default: { limit: 30, ttl: 60_000 } })
   @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard, ReportsUserThrottlerGuard)
@@ -324,6 +326,7 @@ export class ReportsController {
     return this.reportsService.updateStatus(id, dto, moderator);
   }
 
+  // safe-to-retry: repeated Patch is acceptable
   @Patch(':id/assign')
   @Throttle({ default: { limit: 60, ttl: 60_000 } })
   @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard, ReportsUserThrottlerGuard)

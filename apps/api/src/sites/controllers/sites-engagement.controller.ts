@@ -53,8 +53,8 @@ export class SitesEngagementController {
     return this.upvotesList.findSiteUpvotes(id, query);
   }
 
-  @Post(':id/upvote')
   @Idempotent('site_upvote')
+  @Post(':id/upvote')
   @UseGuards(JwtAuthGuard, ThrottlerGuard)
   @Throttle({ default: { limit: 120, ttl: 60_000 } })
   @ApiBearerAuth()
@@ -79,8 +79,8 @@ export class SitesEngagementController {
     return this.engagementActions.removeSiteUpvote(id, user);
   }
 
-  @Post(':id/save')
   @Idempotent('site_save')
+  @Post(':id/save')
   @UseGuards(JwtAuthGuard, ThrottlerGuard)
   @Throttle({ default: { limit: 120, ttl: 60_000 } })
   @ApiBearerAuth()

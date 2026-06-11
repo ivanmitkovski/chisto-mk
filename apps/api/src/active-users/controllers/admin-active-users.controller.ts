@@ -27,6 +27,7 @@ import { ADMIN_PANEL_ROLES } from '../../auth/constants/admin-roles';
 import { ADMIN_PERMISSIONS } from '../../auth/constants/admin-permissions';
 import { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { ApiStandardHttpErrorResponses } from '../../common/openapi/standard-http-error-responses.decorator';
+import { Idempotent } from '../../common/idempotency/idempotency.decorator';
 import { AuditService } from '../../audit/services/audit.service';
 import { clientIp } from '../../sites/http/client-ip';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -131,6 +132,7 @@ export class AdminActiveUsersController {
     return this.prisma.adminAlertRule.findMany({ orderBy: { createdAt: 'desc' } });
   }
 
+  @Idempotent('admin_alert_rule_create')
   @Post('alert-rules')
   @Roles(...ADMIN_PANEL_ROLES)
   @RequirePermission(ADMIN_PERMISSIONS['analytics:read'])
@@ -147,6 +149,7 @@ export class AdminActiveUsersController {
     });
   }
 
+  // safe-to-retry: repeated Patch is acceptable
   @Patch('alert-rules/:id')
   @Roles(...ADMIN_PANEL_ROLES)
   @RequirePermission(ADMIN_PERMISSIONS['analytics:read'])
@@ -160,6 +163,7 @@ export class AdminActiveUsersController {
     });
   }
 
+  // safe-to-retry: repeated Delete is acceptable
   @Delete('alert-rules/:id')
   @Roles(...ADMIN_PANEL_ROLES)
   @RequirePermission(ADMIN_PERMISSIONS['analytics:read'])

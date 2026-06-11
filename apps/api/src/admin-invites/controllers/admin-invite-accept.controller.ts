@@ -6,6 +6,7 @@ import { AdminInviteAcceptService } from '../services/admin-invite-accept.servic
 import { AcceptAdminInviteDto } from '../dto/accept-admin-invite.dto';
 import { BeginInviteMfaDto } from '../dto/begin-invite-mfa.dto';
 import { ValidateAdminInviteQueryDto } from '../dto/validate-admin-invite-query.dto';
+import { Idempotent } from '../../common/idempotency/idempotency.decorator';
 
 @ApiTags('admin-invite-accept')
 @ApiStandardHttpErrorResponses()
@@ -21,6 +22,7 @@ export class AdminInviteAcceptController {
     return this.acceptService.validate(query);
   }
 
+  @Idempotent('admin_invite_begin_mfa')
   @Post('begin-mfa')
   @Throttle({ default: { ttl: 60_000, limit: 10 } })
   @ApiOperation({ summary: 'Begin TOTP enrollment for invite accept (public)' })
@@ -29,6 +31,7 @@ export class AdminInviteAcceptController {
     return this.acceptService.beginMfa(dto);
   }
 
+  @Idempotent('admin_invite_accept')
   @Post('accept')
   @Throttle({ default: { ttl: 60_000, limit: 5 } })
   @ApiOperation({ summary: 'Accept admin invite and create account (public)' })

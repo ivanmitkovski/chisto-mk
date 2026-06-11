@@ -15,6 +15,7 @@ import {
   AdminWeeklyRankingsResponseDto,
 } from '../dto/admin-weekly-rankings.dto';
 import { AdminGamificationService, GamificationConfig } from '../services/admin-gamification.service';
+import { Idempotent } from '../../common/idempotency/idempotency.decorator';
 
 @ApiTags('admin-gamification')
 @Controller('admin/gamification')
@@ -34,6 +35,7 @@ export class AdminGamificationController {
     return this.gamification.getConfig();
   }
 
+  @Idempotent('admin_gamification_config')
   @Patch('config')
   @Roles(...ADMIN_WRITE_ROLES)
   @RequirePermission(ADMIN_PERMISSIONS['gamification:write'])
@@ -54,6 +56,7 @@ export class AdminGamificationController {
     return this.gamification.listUserPoints(userId, page ? Number(page) : 1, limit ? Number(limit) : 50);
   }
 
+  @Idempotent('admin_gamification_points_adjust')
   @Post('users/:userId/points/adjust')
   @Roles(...ADMIN_WRITE_ROLES)
   @RequirePermission(ADMIN_PERMISSIONS['gamification:write'])

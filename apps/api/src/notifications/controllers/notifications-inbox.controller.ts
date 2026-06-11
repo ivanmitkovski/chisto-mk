@@ -61,6 +61,7 @@ export class NotificationsInboxController {
     return this.preferences.listPreferences(user);
   }
 
+  // safe-to-retry: repeated Patch is acceptable
   @Patch('preferences/:type')
   @ApiOperation({ summary: 'Update preference for notification type' })
   updatePreference(

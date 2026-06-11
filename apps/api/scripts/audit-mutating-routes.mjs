@@ -8,12 +8,12 @@ import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../src');
 const EXEMPT_FILES = new Set([
-  'auth/auth-session.controller.ts',
-  'auth/auth-password.controller.ts',
-  'auth/auth-mfa.controller.ts',
-  'webhooks/webhooks.controller.ts',
-  'webhooks/email-webhooks.controller.ts',
-  'email/email-unsubscribe.controller.ts',
+  'auth/controllers/auth-session.controller.ts',
+  'auth/controllers/auth-password.controller.ts',
+  'auth/controllers/auth-mfa.controller.ts',
+  'webhooks/controllers/webhooks.controller.ts',
+  'webhooks/controllers/email-webhooks.controller.ts',
+  'email/controllers/email-unsubscribe.controller.ts',
   'discovery-analytics/discovery-analytics.controller.ts',
 ]);
 
