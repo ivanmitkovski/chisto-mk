@@ -153,7 +153,7 @@ jobs:
       - name: Reports UI guards (mobile)
         run: |
           cd apps/mobile
-          dart analyze lib/features/reports
+          dart analyze packages/feature_reports/lib
           dart run tool/check_no_hex_in_reports.dart
           dart run tool/check_reports_max_lines.dart
           dart run tool/check_reports_import_boundaries.dart
