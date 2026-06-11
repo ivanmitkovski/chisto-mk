@@ -14,9 +14,6 @@ USING (
 WHERE e.id = ranked.id
   AND ranked.rn > 1;
 
--- 2. Enforce one share row per user per site.
-CREATE UNIQUE INDEX "SiteShareEvent_siteId_userId_key" ON "SiteShareEvent"("siteId", "userId");
-
 -- 3. Backfill Site.sharesCount from distinct sharers.
 UPDATE "Site" s
 SET "sharesCount" = COALESCE(sc.cnt, 0)

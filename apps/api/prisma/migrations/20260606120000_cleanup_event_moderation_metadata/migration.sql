@@ -17,9 +17,6 @@ CREATE TABLE "CleanupEventModerationNote" (
 );
 
 -- CreateIndex
-CREATE INDEX "CleanupEvent_moderatedById_idx" ON "CleanupEvent"("moderatedById");
-
--- CreateIndex
 CREATE INDEX "CleanupEventModerationNote_eventId_createdAt_idx" ON "CleanupEventModerationNote"("eventId", "createdAt");
 
 -- CreateIndex

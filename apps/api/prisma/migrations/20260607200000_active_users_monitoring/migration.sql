@@ -29,8 +29,6 @@ ALTER TABLE "UserSession" ADD COLUMN "osVersion" TEXT;
 ALTER TABLE "UserSession" ADD COLUMN "country" TEXT;
 ALTER TABLE "UserSession" ADD COLUMN "city" TEXT;
 
-CREATE INDEX "UserSession_lastSeenAt_idx" ON "UserSession"("lastSeenAt");
-
 CREATE TABLE "UserActivityEvent" (
   "id" TEXT NOT NULL,
   "userId" TEXT NOT NULL,

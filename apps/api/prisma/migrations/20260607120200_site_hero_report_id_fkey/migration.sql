@@ -1,0 +1,2 @@
+ALTER TABLE "Site" ADD CONSTRAINT "Site_heroReportId_fkey"
+  FOREIGN KEY ("heroReportId") REFERENCES "Report"("id") ON DELETE SET NULL ON UPDATE CASCADE;
