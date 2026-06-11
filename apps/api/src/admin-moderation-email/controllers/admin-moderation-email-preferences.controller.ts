@@ -26,6 +26,7 @@ export class AdminModerationEmailPreferencesController {
     return this.preferences.listForUser(admin.userId, admin.role);
   }
 
+  // safe-to-retry: repeated Patch is acceptable
   @Patch()
   @Roles(...ADMIN_PANEL_ROLES)
   @ApiOperation({ summary: 'Update one moderation email preference for the current admin' })

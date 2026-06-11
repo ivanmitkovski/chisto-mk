@@ -17,6 +17,7 @@ import type { AuthenticatedUser } from '../../auth/types/authenticated-user.type
 import { ApiStandardHttpErrorResponses } from '../../common/openapi/standard-http-error-responses.decorator';
 import { AdminInvitesService } from '../services/admin-invites.service';
 import { CreateAdminInviteDto } from '../dto/create-admin-invite.dto';
+import { Idempotent } from '../../common/idempotency/idempotency.decorator';
 
 @ApiTags('admin-invites')
 @ApiStandardHttpErrorResponses()
@@ -35,6 +36,7 @@ export class AdminInvitesController {
     return this.invites.list();
   }
 
+  @Idempotent('admin_invite_create')
   @Post()
   @Roles(...SUPER_ADMIN_ROLES)
   @RequirePermission(ADMIN_PERMISSIONS['team:write'])
@@ -44,6 +46,7 @@ export class AdminInvitesController {
     return this.invites.create(dto, actor);
   }
 
+  @Idempotent('admin_invite_resend')
   @Post(':id/resend')
   @Roles(...SUPER_ADMIN_ROLES)
   @RequirePermission(ADMIN_PERMISSIONS['team:write'])
@@ -53,6 +56,7 @@ export class AdminInvitesController {
     return this.invites.resend(id, actor);
   }
 
+  @Idempotent('admin_invite_revoke')
   @Post(':id/revoke')
   @Roles(...SUPER_ADMIN_ROLES)
   @RequirePermission(ADMIN_PERMISSIONS['team:write'])

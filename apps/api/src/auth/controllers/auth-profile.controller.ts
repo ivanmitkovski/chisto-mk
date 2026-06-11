@@ -85,6 +85,7 @@ export class AuthProfileController {
     );
   }
 
+  @Idempotent('auth_accept_terms')
   @Post('me/accept-terms')
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard)
@@ -99,6 +100,7 @@ export class AuthProfileController {
     return this.profile.acceptTerms(requireAuthenticatedUser(user).userId, dto);
   }
 
+  @Idempotent('auth_home_location')
   @Patch('me/home-location')
   @UseGuards(JwtAuthGuard)
   @Throttle({ default: { ttl: 60_000, limit: 10 } })
@@ -112,6 +114,7 @@ export class AuthProfileController {
     return this.profile.updateHomeLocation(requireAuthenticatedUser(user).userId, dto);
   }
 
+  // safe-to-retry: repeated Patch is acceptable
   @Patch('me')
   @UseGuards(JwtAuthGuard)
   @Throttle({ default: { ttl: 60_000, limit: 10 } })
@@ -148,6 +151,7 @@ export class AuthProfileController {
     return this.profile.uploadAvatar(requireAuthenticatedUser(user).userId, files?.[0]);
   }
 
+  // safe-to-retry: repeated Delete is acceptable
   @Delete(['me/avatar', 'avatar'])
   @UseGuards(JwtAuthGuard)
   @Throttle({ default: { ttl: 60_000, limit: 10 } })

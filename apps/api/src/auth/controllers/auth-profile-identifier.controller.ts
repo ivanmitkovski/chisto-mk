@@ -30,6 +30,7 @@ import { requireAuthenticatedUser } from '../util/auth-require-user.util';
 export class AuthProfileIdentifierController {
   constructor(private readonly identifierChange: AuthIdentifierChangeService) {}
 
+  @Idempotent('auth_email_change_request')
   @Patch('me/email')
   @UseGuards(JwtAuthGuard, ThrottlerGuard)
   @Throttle({ default: { ttl: 3_600_000, limit: 3 } })
@@ -61,6 +62,7 @@ export class AuthProfileIdentifierController {
     await this.identifierChange.confirmEmailChange(u.userId, dto.newEmail, dto.code);
   }
 
+  @Idempotent('auth_phone_change_request')
   @Patch('me/phone')
   @UseGuards(JwtAuthGuard, ThrottlerGuard)
   @Throttle({ default: { ttl: 3_600_000, limit: 3 } })

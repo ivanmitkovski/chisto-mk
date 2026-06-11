@@ -12,6 +12,7 @@ import type { AuthenticatedUser } from '../../auth/types/authenticated-user.type
 import { CreateBroadcastDto, UpdateBroadcastDto } from '../dto/admin-broadcast.dto';
 import { AdminBroadcastsService } from '../services/admin-broadcasts.service';
 import { AdminBroadcastsDispatchService } from '../services/admin-broadcasts-dispatch.service';
+import { Idempotent } from '../../common/idempotency/idempotency.decorator';
 
 @ApiTags('admin-broadcasts')
 @Controller('admin/broadcasts')
@@ -39,6 +40,7 @@ export class AdminBroadcastsController {
     return this.broadcasts.getById(id);
   }
 
+  @Idempotent('admin_broadcast_create')
   @Post()
   @Roles(...ADMIN_WRITE_ROLES)
   @RequirePermission(ADMIN_PERMISSIONS['notifications:broadcast'])
@@ -58,6 +60,7 @@ export class AdminBroadcastsController {
     );
   }
 
+  // safe-to-retry: repeated Patch is acceptable
   @Patch(':id')
   @Roles(...ADMIN_WRITE_ROLES)
   @RequirePermission(ADMIN_PERMISSIONS['notifications:broadcast'])
@@ -66,6 +69,7 @@ export class AdminBroadcastsController {
     return this.broadcasts.update(id, body, actor);
   }
 
+  // safe-to-retry: repeated Delete is acceptable
   @Delete(':id')
   @Roles(...ADMIN_WRITE_ROLES)
   @RequirePermission(ADMIN_PERMISSIONS['notifications:broadcast'])
@@ -75,6 +79,7 @@ export class AdminBroadcastsController {
     return { deleted: true };
   }
 
+  @Idempotent('admin_broadcast_send')
   @Post(':id/send')
   @Roles(...ADMIN_WRITE_ROLES)
   @RequirePermission(ADMIN_PERMISSIONS['notifications:broadcast'])
@@ -83,6 +88,7 @@ export class AdminBroadcastsController {
     return this.dispatch.send(id, actor);
   }
 
+  @Idempotent('admin_broadcast_cancel')
   @Patch(':id/cancel')
   @Roles(...ADMIN_WRITE_ROLES)
   @RequirePermission(ADMIN_PERMISSIONS['notifications:broadcast'])

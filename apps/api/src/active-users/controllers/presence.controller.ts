@@ -19,6 +19,7 @@ export class PresenceController {
     private readonly activity: UserActivityService,
   ) {}
 
+  // safe-to-retry: repeated Post is acceptable
   @Post('heartbeat')
   @ApiOperation({ summary: 'Client presence heartbeat (~45s while foreground)' })
   @ApiNoContentResponse()
@@ -35,6 +36,7 @@ export class PresenceController {
     });
   }
 
+  // safe-to-retry: repeated Post is acceptable
   @Post('offline')
   @ApiOperation({ summary: 'Best-effort offline beacon on background/detach' })
   @ApiNoContentResponse()
@@ -48,6 +50,7 @@ export class PresenceController {
     await this.presence.offline(user, deviceId);
   }
 
+  // safe-to-retry: repeated Post is acceptable
   @Post('app-opened')
   @ApiOperation({ summary: 'Record app opened (once per cold start)' })
   @ApiNoContentResponse()

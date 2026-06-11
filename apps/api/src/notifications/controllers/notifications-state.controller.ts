@@ -23,6 +23,7 @@ export class NotificationsStateController {
     return { success: true };
   }
 
+  // safe-to-retry: repeated Patch is acceptable
   @Patch(':id/read')
   @ApiOperation({ summary: 'Mark a notification as read' })
   async markOneRead(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
@@ -30,6 +31,7 @@ export class NotificationsStateController {
     return { success: true };
   }
 
+  // safe-to-retry: repeated Patch is acceptable
   @Patch(':id/unread')
   @ApiOperation({ summary: 'Mark a notification as unread' })
   async markOneUnread(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
@@ -37,12 +39,14 @@ export class NotificationsStateController {
     return { success: true };
   }
 
+  // safe-to-retry: repeated Patch is acceptable
   @Patch('read-all')
   @ApiOperation({ summary: 'Mark all notifications as read' })
   markAllRead(@CurrentUser() user: AuthenticatedUser) {
     return this.state.markAllRead(user);
   }
 
+  // safe-to-retry: repeated Patch is acceptable
   @Patch(':id/archive')
   @ApiOperation({ summary: 'Archive a notification' })
   async archiveOne(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
@@ -50,6 +54,7 @@ export class NotificationsStateController {
     return { success: true };
   }
 
+  // safe-to-retry: repeated Patch is acceptable
   @Patch('archive-all-read')
   @ApiOperation({ summary: 'Archive all read notifications' })
   archiveAllRead(@CurrentUser() user: AuthenticatedUser) {

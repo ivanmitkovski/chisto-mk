@@ -12,6 +12,7 @@ import type { AuthenticatedUser } from '../../auth/types/authenticated-user.type
 import { AdminCommsService } from '../services/admin-comms.service';
 import { CreateEmailSuppressionDto } from '../dto/create-email-suppression.dto';
 import { EmailDeadLetterPageDto } from '../dto/email-dead-letter.dto';
+import { Idempotent } from '../../common/idempotency/idempotency.decorator';
 
 @ApiTags('admin-comms')
 @Controller('admin/comms')
@@ -40,6 +41,7 @@ export class AdminCommsController {
     );
   }
 
+  @Idempotent('admin_email_suppression_create')
   @Post('email-suppressions')
   @Roles(...ADMIN_WRITE_ROLES)
   @RequirePermission(ADMIN_PERMISSIONS['comms:write'])
@@ -53,6 +55,7 @@ export class AdminCommsController {
     );
   }
 
+  // safe-to-retry: repeated Delete is acceptable
   @Delete('email-suppressions/:email')
   @Roles(...ADMIN_WRITE_ROLES)
   @RequirePermission(ADMIN_PERMISSIONS['comms:write'])
