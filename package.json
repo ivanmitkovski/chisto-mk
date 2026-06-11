@@ -47,7 +47,9 @@
       "@nestjs/core": "10.4.22",
       "node-emoji": "2.2.0",
       "effect": "3.21.2",
-      "fast-xml-parser": "5.8.0"
+      "fast-xml-parser": "5.8.0",
+      "tmp": "0.2.7",
+      "@grpc/grpc-js": "1.14.4"
     }
   },
   "devDependencies": {
