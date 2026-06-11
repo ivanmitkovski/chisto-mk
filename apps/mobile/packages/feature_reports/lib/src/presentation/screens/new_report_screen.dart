@@ -8,21 +8,18 @@ import 'package:design_system/design_system.dart';
 import 'package:feature_reports/src/application/report_wizard_submit_port.dart';
 import 'package:feature_reports/src/domain/draft/new_report_flow_policy.dart';
 import 'package:feature_reports/src/domain/models/report_draft.dart';
-import 'package:feature_reports/src/domain/report_field_limits.dart';
 import 'package:feature_reports/src/presentation/controllers/new_report_controller.dart';
 import 'package:feature_reports/src/presentation/controllers/new_report_submit_ui_flow.dart';
 import 'package:feature_reports/src/presentation/controllers/new_report_wizard_state.dart';
+import 'package:feature_reports/src/presentation/screens/new_report_screen_photo_flow.dart';
 import 'package:feature_reports/src/presentation/screens/new_report_screen_post_frame.dart';
 import 'package:feature_reports/src/presentation/screens/new_report_wizard_skeleton.dart';
 import 'package:feature_reports/src/presentation/screens/new_report_wizard_view.dart';
 import 'package:feature_reports/src/presentation/theme/report_tokens.dart';
 import 'package:feature_reports/src/presentation/widgets/new_report/new_report_widgets.dart';
-import 'package:feature_reports/src/presentation/widgets/photo_review_sheet.dart';
-import 'package:feature_reports/src/presentation/widgets/photo_source_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/semantics.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -225,84 +222,12 @@ class _NewReportScreenState extends ConsumerState<NewReportScreen>
   }
 
   Future<void> _addPhoto() async {
-    if (_controller.draft.photos.length >= ReportFieldLimits.maxPhotos ||
-        _controller.isProcessingPhotoFlow) {
-      return;
-    }
-
-    final ImageSource? source = await showPhotoSourceModal(context);
-    if (source == null || !mounted) return;
-    await _pickAndReview(source);
-  }
-
-  Future<void> _pickAndReview(ImageSource source) async {
-    if (_controller.isProcessingPhotoFlow) return;
-
-    _controller.setProcessingPhotoFlow(value: true);
-
-    try {
-      while (mounted) {
-        XFile? file;
-        try {
-          file = await _imagePicker.pickImage(
-            source: source,
-            preferredCameraDevice: CameraDevice.rear,
-          );
-        } on PlatformException {
-          if (mounted) {
-            AppSnack.show(
-              context,
-              message: context.l10n.reportFlowCameraUnavailableSnack,
-              type: AppSnackType.warning,
-            );
-          }
-          return;
-        }
-
-        if (!mounted || file == null) return;
-        final XFile selectedFile = file;
-
-        final PhotoReviewResult? result =
-            await AppBottomSheet.show<PhotoReviewResult>(
-              context: context,
-              isScrollControlled: true,
-              backgroundColor: AppColors.transparent,
-              builder: (_) => PhotoReviewSheet(file: selectedFile),
-            );
-
-        if (!mounted) return;
-
-        if (result == PhotoReviewResult.retake) {
-          continue;
-        }
-
-        if (result == PhotoReviewResult.use) {
-          AppHaptics.tap();
-          await _controller.addPhoto(selectedFile);
-          _scheduleDraftSave();
-          if (mounted && MediaQuery.supportsAnnounceOf(context)) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (!mounted || !MediaQuery.supportsAnnounceOf(context)) {
-                return;
-              }
-              SemanticsService.sendAnnouncement(
-                View.of(context),
-                context.l10n.reportSemanticsPhotoAdded(
-                  _controller.draft.photos.length,
-                  ReportFieldLimits.maxPhotos,
-                ),
-                Directionality.of(context),
-              );
-            });
-          }
-        }
-        return;
-      }
-    } finally {
-      if (mounted) {
-        _controller.setProcessingPhotoFlow(value: false);
-      }
-    }
+    await runNewReportScreenAddPhoto(
+      context: context,
+      controller: _controller,
+      imagePicker: _imagePicker,
+      scheduleDraftSave: _scheduleDraftSave,
+    );
   }
 
   Future<void> _submit() async {

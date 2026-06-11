@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
 import 'package:chisto_infrastructure/shared/widgets/organisms/app_confirm_dialog.dart';
 import 'package:chisto_infrastructure/shared/widgets/organisms/app_surface/report_surface_aliases.dart';
 import 'package:chisto_infrastructure/shared/widgets/organisms/immersive_photo_gallery.dart';
@@ -72,12 +73,13 @@ class _PhotoReviewSheetState extends State<PhotoReviewSheet> {
           icon: Icons.close_rounded,
           semanticLabel: context.l10n.reportPhotoReviewCloseSemantic,
           onTap: () async {
+            final AppLocalizations l10n = context.l10n;
             final bool? discard = await AppConfirmDialog.show(
               context: context,
-              title: context.l10n.photoReviewDiscardTitle,
-              body: context.l10n.photoReviewDiscardBody,
-              confirmLabel: context.l10n.commonDiscard,
-              cancelLabel: context.l10n.commonKeepEditing,
+              title: l10n.photoReviewDiscardTitle,
+              body: l10n.photoReviewDiscardBody,
+              confirmLabel: l10n.commonDiscard,
+              cancelLabel: l10n.commonKeepEditing,
               isDestructive: true,
             );
             if ((discard ?? false) && context.mounted) {

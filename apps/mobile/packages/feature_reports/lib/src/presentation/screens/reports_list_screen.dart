@@ -276,6 +276,7 @@ class _ReportsListScreenState extends ConsumerState<ReportsListScreen>
     if (mounted) setState(() {});
     widget.onReportOpened?.call();
     final RequestCancellationToken cancellation = _beginReportDetailFetch();
+    final AppLocalizations l10n = context.l10n;
     try {
       final ReportDetailOpenResolution resolution =
           await resolveReportDetailForOpen(
@@ -289,18 +290,19 @@ class _ReportsListScreenState extends ConsumerState<ReportsListScreen>
       switch (resolution) {
         case ReportDetailOpenFresh(:final ReportDetail detail):
           final ReportSheetViewModel display =
-              ReportSheetViewModelMapper.fromDetail(detail, context.l10n);
+              ReportSheetViewModelMapper.fromDetail(detail, l10n);
           unawaited(
             _prefetchCoordinator.warmDetail(reportId, detail.mediaUrls, context),
           );
           await _showReportDetailSheet(display);
+          if (!mounted) return;
         case ReportDetailOpenStaleFallback(
           :final ReportDetail? detail,
           :final ReportListItem? listItem,
         ):
           final ReportSheetViewModel display = detail != null
-              ? ReportSheetViewModelMapper.fromDetail(detail, context.l10n)
-              : ReportSheetViewModelMapper.fromListItem(listItem!, context.l10n);
+              ? ReportSheetViewModelMapper.fromDetail(detail, l10n)
+              : ReportSheetViewModelMapper.fromListItem(listItem!, l10n);
           if (detail != null) {
             unawaited(
               _prefetchCoordinator.warmDetail(
@@ -311,6 +313,7 @@ class _ReportsListScreenState extends ConsumerState<ReportsListScreen>
             );
           }
           await _showReportDetailSheet(display, isStaleFallback: true);
+          if (!mounted) return;
         case ReportDetailOpenBlocked(:final AppError error):
           await ReportOfflineErrorSheet.show(
             context: context,
