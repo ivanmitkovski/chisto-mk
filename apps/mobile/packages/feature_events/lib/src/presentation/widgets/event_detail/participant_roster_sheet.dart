@@ -70,6 +70,7 @@ class _ParticipantRosterSheetBodyState
           event: widget.event,
           apiRows: rows,
           youLabel: youLabel,
+          deletedUserLabel: context.l10n.deletedUser,
         );
         _loading = false;
         _error = null;
@@ -133,17 +134,18 @@ List<AttendeePreview> mergeParticipantPreviews({
   required EcoEvent event,
   required List<EventParticipantRow> apiRows,
   required String youLabel,
+  required String deletedUserLabel,
 }) {
   int order = 0;
   final List<AttendeePreview> list = <AttendeePreview>[];
-  final String orgName = event.organizerName.trim().isEmpty
-      ? '—'
-      : event.organizerName;
+  final String orgName = event.organizerIsDeleted
+      ? deletedUserLabel
+      : (event.organizerName.trim().isEmpty ? '—' : event.organizerName);
   list.add(
     AttendeePreview(
       userId: event.organizerId,
       name: orgName,
-      avatarUrl: event.organizerAvatarUrl,
+      avatarUrl: event.organizerIsDeleted ? null : event.organizerAvatarUrl,
       isOrganizer: true,
       isCurrentUser: event.isOrganizer,
       joinedOrder: order++,
@@ -157,12 +159,14 @@ List<AttendeePreview> mergeParticipantPreviews({
     final bool isYou = row.userId.isNotEmpty && row.userId == CurrentUser.id;
     final String name = isYou
         ? youLabel
+        : row.isDeleted
+        ? deletedUserLabel
         : (row.displayName.trim().isEmpty ? '—' : row.displayName);
     list.add(
       AttendeePreview(
         userId: row.userId,
         name: name,
-        avatarUrl: row.avatarUrl,
+        avatarUrl: row.isDeleted ? null : row.avatarUrl,
         isOrganizer: false,
         isCurrentUser: isYou,
         joinedOrder: order++,

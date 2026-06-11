@@ -77,10 +77,7 @@ void main() {
     expect(err.code, 'DUPLICATE_SUBMIT_INFLIGHT');
     expect(err.retryable, isTrue);
     expect(err.details, isA<Map<String, dynamic>>());
-    expect(
-      (err.details! as Map<String, dynamic>)['retryAfterSeconds'],
-      5,
-    );
+    expect((err.details! as Map<String, dynamic>)['retryAfterSeconds'], 5);
   });
 
   test('appErrorFromFailedResponse merges API details for 429', () {

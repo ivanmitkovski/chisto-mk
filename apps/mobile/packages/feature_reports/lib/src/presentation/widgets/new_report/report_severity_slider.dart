@@ -28,7 +28,8 @@ class ReportSeveritySlider extends StatefulWidget {
 class _ReportSeveritySliderState extends State<ReportSeveritySlider> {
   int _lastHapticValue = 0;
 
-  int _clamp(int v) => v.clamp(ReportSeveritySlider.min, ReportSeveritySlider.max);
+  int _clamp(int v) =>
+      v.clamp(ReportSeveritySlider.min, ReportSeveritySlider.max);
 
   double _valueToFraction(int v, double width) {
     final double travel = width - 2 * ReportSeveritySlider.thumbRadius;
@@ -42,9 +43,11 @@ class _ReportSeveritySliderState extends State<ReportSeveritySlider> {
   int _fractionToValue(double fraction) {
     final double stepped =
         ReportSeveritySlider.min +
-        fraction *
-            (ReportSeveritySlider.max - ReportSeveritySlider.min);
-    return stepped.round().clamp(ReportSeveritySlider.min, ReportSeveritySlider.max);
+        fraction * (ReportSeveritySlider.max - ReportSeveritySlider.min);
+    return stepped.round().clamp(
+      ReportSeveritySlider.min,
+      ReportSeveritySlider.max,
+    );
   }
 
   void _emit(int next) {

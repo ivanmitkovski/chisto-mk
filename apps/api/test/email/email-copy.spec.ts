@@ -101,7 +101,8 @@ describe('email-copy', () => {
     const copy = getCopy('welcome', 'mk', { firstName: 'Иван' }, baseUrl);
     expect(copy.lead).toContain('подготвена');
     expect(copy.lead).not.toContain('подготова');
-    expect(copy.lead).toContain('загадувања');
+    expect(copy.lead).toContain('загадувања, следете ги локалитетите и учествувајте');
+    expect(copy.lead).not.toMatch(/загадувања и следете ги локалитетите и учествувајте/);
     expect(copy.extraLines?.[0]).toContain('ја креиравте сметката');
     expect(copy.footerNote).toContain('поддршката');
     expect(copy.ctaLabel).toBe('Отвори Chisto.mk');

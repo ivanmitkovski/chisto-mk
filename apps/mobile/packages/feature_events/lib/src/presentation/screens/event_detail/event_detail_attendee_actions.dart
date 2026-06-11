@@ -22,6 +22,13 @@ extension EventDetailAttendeeActions on _EventDetailScreenState {
       );
       return;
     }
+    if (!event.isJoined &&
+        !await ensureLocationEligibleForAction(context, ref)) {
+      return;
+    }
+    if (!mounted) {
+      return;
+    }
     await _withCtaMutationBusy(() async {
       EcoEventJoinToggleResult joinResult = const EcoEventJoinToggleResult(
         changed: false,
@@ -42,6 +49,9 @@ extension EventDetailAttendeeActions on _EventDetailScreenState {
       } on AppError catch (e) {
         AppHaptics.warning();
         if (mounted) {
+          if (await handleLocationGuardError(context, ref, e)) {
+            return;
+          }
           AppSnack.show(
             context,
             message: localizedAppErrorMessage(context.l10n, e),
@@ -160,10 +170,7 @@ extension EventDetailAttendeeActions on _EventDetailScreenState {
   }
 
   void _openEditEvent(EcoEvent event) {
-    showEventsSurfaceModal<void>(
-      context: context,
-      builder: (BuildContext sheetCtx) => EditEventSheet(event: event),
-    );
+    unawaited(EditEventSheet.show(context, event));
   }
 
   void _openExtendCleanupEnd(EcoEvent event) {
@@ -202,6 +209,12 @@ extension EventDetailAttendeeActions on _EventDetailScreenState {
         message: context.l10n.eventsAttendeeCheckInPausedSnack,
         type: AppSnackType.warning,
       );
+      return;
+    }
+    if (!await ensureLocationEligibleForAction(context, ref)) {
+      return;
+    }
+    if (!mounted) {
       return;
     }
     final bool? success = await EventsNavigation.openAttendeeQrScanner(

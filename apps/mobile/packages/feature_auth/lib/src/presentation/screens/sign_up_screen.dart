@@ -4,6 +4,8 @@ import 'package:chisto_infrastructure/core/providers/app_providers.dart';
 import 'package:chisto_infrastructure/core/validation/macedonian_phone_formatter.dart';
 import 'package:chisto_infrastructure/core/validation/password_strength.dart';
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/shared/forms/field_error_mapping.dart';
+import 'package:chisto_infrastructure/shared/forms/form_validation_mixin.dart';
 import 'package:chisto_infrastructure/shared/utils/app_haptics.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/auth_text_field.dart';
 import 'package:chisto_infrastructure/shared/widgets/molecules/api_error_banner.dart';
@@ -30,7 +32,15 @@ class SignUpScreen extends ConsumerStatefulWidget {
 }
 
 class _SignUpScreenState extends ConsumerState<SignUpScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, FormValidationMixin {
+  static const List<String> _fieldOrder = <String>[
+    FormFieldIds.fullName,
+    FormFieldIds.email,
+    FormFieldIds.phone,
+    FormFieldIds.password,
+    FormFieldIds.terms,
+  ];
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey _fullNameFieldKey = GlobalKey();
   final GlobalKey _emailFieldKey = GlobalKey();
@@ -44,8 +54,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen>
   final FocusNode _emailFocus = FocusNode();
   final FocusNode _phoneFocus = FocusNode();
   final FocusNode _passwordFocus = FocusNode();
-  bool _hasSubmitted = false;
-  bool _hasValidationError = false;
   bool _termsAccepted = false;
   PasswordStrength _passwordStrength = PasswordStrength.none;
   late AnimationController _entranceController;
@@ -63,6 +71,26 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen>
     _emailFocus.addListener(_scrollToFocusedField);
     _phoneFocus.addListener(_scrollToFocusedField);
     _passwordFocus.addListener(_scrollToFocusedField);
+    registerFormField(
+      FormFieldIds.fullName,
+      focusNode: _fullNameFocus,
+      fieldKey: _fullNameFieldKey,
+    );
+    registerFormField(
+      FormFieldIds.email,
+      focusNode: _emailFocus,
+      fieldKey: _emailFieldKey,
+    );
+    registerFormField(
+      FormFieldIds.phone,
+      focusNode: _phoneFocus,
+      fieldKey: _phoneFieldKey,
+    );
+    registerFormField(
+      FormFieldIds.password,
+      focusNode: _passwordFocus,
+      fieldKey: _passwordFieldKey,
+    );
     _entranceController = AnimationController(
       vsync: this,
       duration: AppMotion.standard,
@@ -111,7 +139,79 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen>
     setState(() {
       _passwordStrength = computePasswordStrength(_passwordController.text);
     });
+    if (hasActiveValidation) {
+      _formKey.currentState?.validate();
+    }
     ref.read(signUpControllerProvider.notifier).clearError();
+    clearServerFieldErrors();
+  }
+
+  Map<String, String? Function()> _validators(AppLocalizations l10n) =>
+      <String, String? Function()>{
+        FormFieldIds.fullName: () =>
+            AuthValidators.fullName(l10n, _fullNameController.text),
+        FormFieldIds.email: () =>
+            AuthValidators.email(l10n, _emailController.text),
+        FormFieldIds.phone: () =>
+            AuthValidators.macedonianPhone(l10n, _phoneController.text),
+        FormFieldIds.password: () =>
+            AuthValidators.password(l10n, _passwordController.text),
+        FormFieldIds.terms: () =>
+            AuthValidators.termsAccepted(l10n, _termsAccepted),
+      };
+
+  Future<void> _handleSignUp() async {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    ref.read(signUpControllerProvider.notifier).clearError();
+    clearServerFieldErrors();
+    setState(() => submitAttempted = true);
+    await WidgetsBinding.instance.endOfFrame;
+    if (!mounted) return;
+    _formKey.currentState?.validate();
+    if (await handleInvalidSubmit(
+      context,
+      l10n,
+      _fieldOrder,
+      _validators(l10n),
+    )) {
+      return;
+    }
+
+    try {
+      final String fullName = _fullNameController.text.trim();
+      final List<String> parts = fullName.split(RegExp(r'\s+'));
+      final String firstName = parts.first;
+      final String lastName = parts.length > 1
+          ? parts.sublist(1).join(' ')
+          : '';
+      final String phoneE164 = normalizeToE164(_phoneController.text);
+
+      await ref
+          .read(signUpControllerProvider.notifier)
+          .signUp(
+            firstName: firstName,
+            lastName: lastName,
+            email: _emailController.text.trim(),
+            phoneNumberE164: phoneE164,
+            password: _passwordController.text,
+          );
+      if (!mounted) return;
+      AppHaptics.success(context);
+      AppNavigation.goOtpPhone(phoneE164);
+    } on AppError catch (e) {
+      if (!mounted) return;
+      final Map<String, String> fieldErrors = fieldErrorsFromAppError(e, l10n);
+      if (fieldErrors.isNotEmpty) {
+        setServerFieldErrors(fieldErrors);
+        _formKey.currentState?.validate();
+        await focusAndScrollToFirstInvalid(
+          context,
+          _fieldOrder,
+          _validators(l10n),
+        );
+      }
+      AppHaptics.warning(context);
+    }
   }
 
   @override
@@ -136,57 +236,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen>
     super.dispose();
   }
 
-  bool _isSubmitReady(AppLocalizations l10n) {
-    return _termsAccepted &&
-        AuthValidators.fullName(l10n, _fullNameController.text) == null &&
-        AuthValidators.email(l10n, _emailController.text) == null &&
-        AuthValidators.macedonianPhone(l10n, _phoneController.text) == null &&
-        AuthValidators.password(l10n, _passwordController.text) == null;
-  }
-
-  Future<void> _handleSignUp() async {
-    final FormState? currentState = _formKey.currentState;
-    setState(() => _hasSubmitted = true);
-    if (currentState == null) {
-      AppHaptics.warning(context);
-      setState(() => _hasValidationError = true);
-      return;
-    }
-    final bool isValid = currentState.validate();
-    if (!isValid) {
-      AppHaptics.warning(context);
-      setState(() => _hasValidationError = true);
-      return;
-    }
-    setState(() => _hasValidationError = false);
-
-    try {
-      final String fullName = _fullNameController.text.trim();
-      final List<String> parts = fullName.split(RegExp(r'\s+'));
-      final String firstName = parts.first;
-      final String lastName = parts.length > 1
-          ? parts.sublist(1).join(' ')
-          : '';
-      final String phoneE164 = normalizeToE164(_phoneController.text);
-
-      await ref
-          .read(signUpControllerProvider.notifier)
-          .signUp(
-            firstName: firstName,
-            lastName: lastName,
-            email: _emailController.text.trim(),
-            phoneNumberE164: phoneE164,
-            password: _passwordController.text,
-          );
-      if (!mounted) return;
-      AppHaptics.success(context);
-      AppNavigation.goOtpPhone(phoneE164);
-    } on AppError {
-      if (!mounted) return;
-      AppHaptics.warning(context);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
@@ -195,7 +244,11 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen>
     final formState = ref.watch(signUpControllerProvider);
     final bool isLoading = formState.isLoading;
     final String? apiError = formState.error != null
-        ? messageForAuthError(l10n, formState.error!)
+        ? authBannerMessageForError(
+            l10n,
+            formState.error!,
+            displayedFieldIds: registeredFieldIds,
+          )
         : null;
     final String termsUrl = ref.watch(appConfigProvider).termsUrl;
 
@@ -216,48 +269,37 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen>
               ),
             ),
           ),
-          body: LayoutBuilder(
-            builder: (BuildContext context, BoxConstraints constraints) {
-              return AuthFormScaffold(
-                padding: EdgeInsets.fromLTRB(
-                  AppSpacing.lg,
-                  AppSpacing.xl,
-                  AppSpacing.lg,
-                  AppSpacing.lg + keyboardInset,
-                ),
-                child: SingleChildScrollView(
-                  keyboardDismissBehavior:
-                      ScrollViewKeyboardDismissBehavior.onDrag,
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight - AppSpacing.radius18,
+          body: AuthFormScaffold(
+            padding: EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              AppSpacing.xl,
+              AppSpacing.lg,
+              AppSpacing.lg + keyboardInset,
+            ),
+            child: FadeTransition(
+              opacity: _entranceAnimation,
+              child: SlideTransition(
+                position:
+                    Tween<Offset>(
+                      begin: const Offset(0, 0.06),
+                      end: Offset.zero,
+                    ).animate(
+                      CurvedAnimation(
+                        parent: _entranceController,
+                        curve: const Interval(
+                          0.15,
+                          1,
+                          curve: Curves.easeOut,
+                        ),
+                      ),
                     ),
-                    child: FadeTransition(
-                      opacity: _entranceAnimation,
-                      child: SlideTransition(
-                        position:
-                            Tween<Offset>(
-                              begin: const Offset(0, 0.06),
-                              end: Offset.zero,
-                            ).animate(
-                              CurvedAnimation(
-                                parent: _entranceController,
-                                curve: const Interval(
-                                  0.15,
-                                  1,
-                                  curve: Curves.easeOut,
-                                ),
-                              ),
-                            ),
-                        child: AutofillGroup(
-                          child: Form(
-                            key: _formKey,
-                            autovalidateMode: _hasSubmitted
-                                ? AutovalidateMode.onUserInteraction
-                                : AutovalidateMode.disabled,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
+                child: AutofillGroup(
+                  child: Form(
+                    key: _formKey,
+                    autovalidateMode: AutovalidateMode.disabled,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                                 if (apiError != null) ...[
                                   ApiErrorBanner(
                                     message: apiError,
@@ -280,8 +322,10 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen>
                                   ],
                                   onFieldSubmitted: (_) =>
                                       _emailFocus.requestFocus(),
-                                  validator: (String? v) =>
-                                      AuthValidators.fullName(l10n, v),
+                                  validator: (String? v) => validateIfVisible(
+                                    FormFieldIds.fullName,
+                                    () => AuthValidators.fullName(l10n, v),
+                                  ),
                                 ),
                                 const SizedBox(height: AppSpacing.sm),
                                 AuthTextField(
@@ -298,7 +342,10 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen>
                                   onFieldSubmitted: (_) =>
                                       _phoneFocus.requestFocus(),
                                   validator: (String? value) =>
-                                      AuthValidators.email(l10n, value),
+                                      validateIfVisible(
+                                        FormFieldIds.email,
+                                        () => AuthValidators.email(l10n, value),
+                                      ),
                                   enableSuggestions: false,
                                   autocorrect: false,
                                 ),
@@ -318,9 +365,12 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen>
                                   onFieldSubmitted: (_) =>
                                       _passwordFocus.requestFocus(),
                                   validator: (String? value) =>
-                                      AuthValidators.macedonianPhone(
-                                        l10n,
-                                        value,
+                                      validateIfVisible(
+                                        FormFieldIds.phone,
+                                        () => AuthValidators.macedonianPhone(
+                                          l10n,
+                                          value,
+                                        ),
                                       ),
                                   inputFormatters: const <TextInputFormatter>[
                                     MacedonianPhoneFormatter(),
@@ -337,7 +387,13 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen>
                                   textInputAction: TextInputAction.done,
                                   keyboardType: TextInputType.visiblePassword,
                                   validator: (String? value) =>
-                                      AuthValidators.password(l10n, value),
+                                      validateIfVisible(
+                                        FormFieldIds.password,
+                                        () => AuthValidators.password(
+                                          l10n,
+                                          value,
+                                        ),
+                                      ),
                                   enableSuggestions: false,
                                   autocorrect: false,
                                   scrollPadding: EdgeInsets.only(
@@ -367,6 +423,10 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen>
                                         setState(
                                           () => _termsAccepted = value ?? false,
                                         );
+                                        markFieldTouched(FormFieldIds.terms);
+                                        if (hasActiveValidation) {
+                                          _formKey.currentState?.validate();
+                                        }
                                       },
                                       contentPadding: EdgeInsets.zero,
                                       controlAffinity:
@@ -406,30 +466,29 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen>
                                     ),
                                   ),
                                 ),
+                                if (shouldShowFieldError(FormFieldIds.terms))
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      top: AppSpacing.xs,
+                                    ),
+                                    child: Text(
+                                      AuthValidators.termsAccepted(
+                                            l10n,
+                                            _termsAccepted,
+                                          ) ??
+                                          '',
+                                      style: AppTypography.cardSubtitle(
+                                        textTheme,
+                                      ).copyWith(color: AppColors.error),
+                                    ),
+                                  ),
                                 const SizedBox(height: AppSpacing.xl),
-                                AnimatedSize(
-                                  duration: AppMotion.fast,
-                                  curve: AppMotion.emphasized,
-                                  child: _hasValidationError
-                                      ? Padding(
-                                          padding: const EdgeInsets.only(
-                                            bottom: AppSpacing.sm,
-                                          ),
-                                          child: Text(
-                                            l10n.authValidationCheckFields,
-                                            style: AppTypography.cardSubtitle(
-                                              textTheme,
-                                            ).copyWith(color: AppColors.error),
-                                          ),
-                                        )
-                                      : const SizedBox.shrink(),
-                                ),
                                 Semantics(
                                   button: true,
                                   label: l10n.authSignUpCta,
                                   child: AppButton.primary(
                                     label: l10n.authSignUpCta,
-                                    enabled: _isSubmitReady(l10n) && !isLoading,
+                                    enabled: !isLoading,
                                     onPressed: isLoading ? null : _handleSignUp,
                                   ),
                                 ),
@@ -460,16 +519,12 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen>
                                     ),
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
+                      ],
                     ),
                   ),
                 ),
-              );
-            },
+              ),
+            ),
           ),
         ),
         LoadingOverlay(visible: isLoading),

@@ -13,6 +13,7 @@
   "gamification": "Gamifikimi",
   "app-config": "Konfigurimi i aplikacionit",
   "operations": "Operacionet",
+  "active-users": "Përdorues aktivë",
   "emailSuppressions": "Bllokimet e emailit",
   "webhookLogs": "Regjistrat e webhook",
   "audit": "Regjistri i auditimit",

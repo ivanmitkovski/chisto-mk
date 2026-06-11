@@ -17,8 +17,14 @@ describe('AdminCommsService.createEmailSuppression', () => {
       },
     };
     const suppression = { normalizeEmail: jest.fn((email: string) => email.trim().toLowerCase()) };
+    const emailOutbox = { listDeadLetters: jest.fn() };
     const audit = { log: jest.fn().mockResolvedValue(undefined) };
-    const svc = new AdminCommsService(prisma as never, suppression as never, audit as never);
+    const svc = new AdminCommsService(
+      prisma as never,
+      suppression as never,
+      emailOutbox as never,
+      audit as never,
+    );
 
     const result = await svc.createEmailSuppression(' User@Example.com ', 'ManualSuppression', {
       userId: 'admin-1',

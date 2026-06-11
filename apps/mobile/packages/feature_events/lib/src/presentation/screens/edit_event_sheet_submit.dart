@@ -4,69 +4,20 @@ part of 'edit_event_sheet.dart';
 // runs on that State instance, which the analyzer cannot see through here.
 // ignore_for_file: invalid_use_of_protected_member
 extension _EditEventSheetSubmit on _EditEventSheetState {
-  Future<void> _scrollToFirstError() async {
-    await WidgetsBinding.instance.endOfFrame;
-    if (!mounted) {
-      return;
-    }
-    final String title = _titleController.text.trim();
-    if (editEventTitleIssueKey(title) != null) {
-      _titleFocus.requestFocus();
-      final BuildContext? ctx = _titleFocus.context;
-      if (ctx != null && ctx.mounted) {
-        await Scrollable.ensureVisible(
-          ctx,
-          duration: AppMotion.fast,
-          curve: AppMotion.smooth,
-        );
-      }
-      if (!mounted) {
-        return;
-      }
-      return;
-    }
-    final String description = _descriptionController.text.trim();
-    if (editEventDescriptionIssueKey(description) != null) {
-      _descriptionFocus.requestFocus();
-      final BuildContext? ctx = _descriptionFocus.context;
-      if (ctx != null && ctx.mounted) {
-        await Scrollable.ensureVisible(
-          ctx,
-          duration: AppMotion.fast,
-          curve: AppMotion.smooth,
-        );
-      }
-      if (!mounted) {
-        return;
-      }
-      return;
-    }
-    if (editEventMaxParticipantsIssueKey(
-          _maxParticipantsController.text.trim(),
-        ) !=
-        null) {
-      _maxParticipantsFocus.requestFocus();
-      final BuildContext? ctx = _maxParticipantsFocus.context;
-      if (ctx != null && ctx.mounted) {
-        await Scrollable.ensureVisible(
-          ctx,
-          duration: AppMotion.fast,
-          curve: AppMotion.smooth,
-        );
-      }
-    }
-  }
-
-  Future<void> _showDuplicateSubmitDialog(AppError error) async {
+  Future<void> _showDuplicateSubmitDialog(
+    AppError error, {
+    required BuildContext dialogContext,
+  }) async {
     final DuplicateEventConflictUi? dup = duplicateEventConflictUiFromAppError(
       error,
     );
     if (!mounted) {
       return;
     }
+    final BuildContext host = _snackHostContext();
     if (dup == null) {
       AppSnack.show(
-        context,
+        host,
         message: localizedAppErrorMessage(context.l10n, error),
         type: AppSnackType.warning,
       );
@@ -79,18 +30,11 @@ extension _EditEventSheetSubmit on _EditEventSheetState {
     if (!mounted) {
       return;
     }
-    await showCupertinoDialog<void>(
-      context: context,
-      builder: (BuildContext ctx) => CupertinoAlertDialog(
-        title: Text(ctx.l10n.editEventDuplicateSubmitTitle),
-        content: Text(ctx.l10n.editEventDuplicateSubmitBody(dup.title, when)),
-        actions: <Widget>[
-          CupertinoDialogAction(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(ctx.l10n.commonGotIt),
-          ),
-        ],
-      ),
+    await AppConfirmDialog.showInfo(
+      context: dialogContext,
+      title: dialogContext.l10n.editEventDuplicateSubmitTitle,
+      body: dialogContext.l10n.editEventDuplicateSubmitBody(dup.title, when),
+      confirmLabel: dialogContext.l10n.commonGotIt,
     );
   }
 
@@ -98,173 +42,171 @@ extension _EditEventSheetSubmit on _EditEventSheetState {
     if (_submitting) {
       return;
     }
-    if (!_isValid) {
-      AppHaptics.warning();
-      setState(() => _showValidationErrors = true);
-      await _scrollToFirstError();
-      return;
-    }
 
-    final List<ConnectivityResult> connectivity =
-        await ConnectivityGate.check();
-    if (!mounted) {
-      return;
-    }
-    final bool online = ConnectivityGate.isOnline(connectivity);
-    if (!online) {
-      if (!mounted) {
-        return;
-      }
-      AppSnack.show(
-        context,
-        message: context.l10n.editEventOfflineSave,
-        type: AppSnackType.warning,
-      );
-      return;
-    }
+    setState(() {
+      _submitting = true;
+      _submitFeedbackMessage = null;
+    });
 
-    final bool? goAhead = await _scheduleConflict.confirmProceedDespiteConflict(
-      context,
-    );
-    if (goAhead != true || !mounted) {
-      return;
-    }
-
-    final DateTime startDt = DateTime(
-      _selectedDate.year,
-      _selectedDate.month,
-      _selectedDate.day,
-      _startTime.hour,
-      _startTime.minute,
-    );
-    final DateTime endCal = DateUtils.dateOnly(_selectedDate);
-    final DateTime endDt = DateTime(
-      endCal.year,
-      endCal.month,
-      endCal.day,
-      _endTime.hour,
-      _endTime.minute,
-    );
-
-    final String titleTrimmed = _titleController.text.trim();
-    final String descriptionTrimmed = _descriptionController.text.trim();
-    final int? maxParticipants = editEventParsedMaxParticipants(
-      _maxParticipantsController.text.trim(),
-    );
-    final List<EventGear> gearList = _gear.toList(growable: false)
-      ..sort((EventGear a, EventGear b) => a.name.compareTo(b.name));
-
-    final EventUpdatePayload payload = _initialSnapshot.buildPartialPayload(
-      titleTrimmed: titleTrimmed,
-      descriptionTrimmed: descriptionTrimmed,
-      maxParticipants: maxParticipants,
-      scheduledAtUtc: startDt.toUtc(),
-      endAtUtc: endDt.toUtc(),
-      category: _category,
-      gear: gearList,
-      scale: _scale,
-      difficulty: _difficulty,
-    );
-
-    if (payload.toPatchJson().isEmpty) {
-      if (!mounted) {
-        return;
-      }
-      AppSnack.show(
-        context,
-        message: context.l10n.editEventNoChangesToSave,
-        type: AppSnackType.warning,
-      );
-      return;
-    }
-
-    setState(() => _submitting = true);
     try {
+      final AppLocalizations l10n = context.l10n;
+      final BuildContext snackHost = _snackHostContext();
+      final BuildContext dialogHost = snackHost;
+
+      if (await handleInvalidSubmit(
+        context,
+        l10n,
+        _editEventFieldOrder,
+        _validators(l10n),
+      )) {
+        if (!mounted) {
+          return;
+        }
+        final String? firstError = _firstSubmitValidationError(l10n);
+        final int invalidCount = countInvalidFields(
+          _editEventFieldOrder,
+          _validators(l10n),
+        );
+        setState(() {
+          _submitFeedbackMessage =
+              firstError ??
+              l10n.formValidationErrorsAnnounce(invalidCount);
+        });
+        return;
+      }
+
+      final List<ConnectivityResult> connectivity =
+          await ConnectivityGate.check();
+      if (!mounted) {
+        return;
+      }
+      final bool online = ConnectivityGate.isOnline(connectivity);
+      if (!online) {
+        setState(() {
+          _submitFeedbackMessage = l10n.editEventOfflineSave;
+        });
+        AppSnack.show(
+          snackHost,
+          message: l10n.editEventOfflineSave,
+          type: AppSnackType.warning,
+        );
+        return;
+      }
+
+      final bool? goAhead = await _scheduleConflict
+          .confirmProceedDespiteConflict(dialogHost);
+      if (goAhead != true || !mounted) {
+        return;
+      }
+
+      final DateTime startDay = DateUtils.dateOnly(_selectedDate);
+      final DateTime startDt = eventScheduleInstantLocal(
+        startDay,
+        _startTime,
+      );
+      final DateTime endDt = eventScheduleInstantLocal(startDay, _endTime);
+
+      final String titleTrimmed = _titleController.text.trim();
+      final String descriptionTrimmed = _descriptionController.text.trim();
+      final int? maxParticipants = editEventParsedMaxParticipants(
+        _maxParticipantsController.text.trim(),
+      );
+      final List<EventGear> gearList = _gear.toList(growable: false)
+        ..sort((EventGear a, EventGear b) => a.name.compareTo(b.name));
+
+      final EventUpdatePayload payload = _initialSnapshot.buildPartialPayload(
+        titleTrimmed: titleTrimmed,
+        descriptionTrimmed: descriptionTrimmed,
+        maxParticipants: maxParticipants,
+        scheduledAtUtc: startDt.toUtc(),
+        endAtUtc: endDt.toUtc(),
+        category: _category,
+        gear: gearList,
+        scale: _scale,
+        difficulty: _difficulty,
+      );
+
+      if (payload.toPatchJson().isEmpty) {
+        if (!mounted) {
+          return;
+        }
+        setState(() {
+          _submitFeedbackMessage = l10n.editEventNoChangesToSave;
+        });
+        AppSnack.show(
+          snackHost,
+          message: l10n.editEventNoChangesToSave,
+          type: AppSnackType.warning,
+        );
+        return;
+      }
+
       await readEventsRepository().updateEventDetails(_event.id, payload);
+
+      if (!mounted) {
+        return;
+      }
+      Navigator.of(context, rootNavigator: true).pop();
+      AppSnack.show(
+        snackHost,
+        message: l10n.eventsEventUpdated,
+        type: AppSnackType.success,
+      );
     } on AppError catch (e) {
       if (!mounted) {
         return;
       }
-      setState(() => _submitting = false);
       if (e.code == 'DUPLICATE_EVENT') {
-        await _showDuplicateSubmitDialog(e);
+        await _showDuplicateSubmitDialog(
+          e,
+          dialogContext: _snackHostContext(),
+        );
       } else {
+        final String message = localizedAppErrorMessage(context.l10n, e);
+        setState(() => _submitFeedbackMessage = message);
         AppSnack.show(
-          context,
-          message: localizedAppErrorMessage(context.l10n, e),
+          _snackHostContext(),
+          message: message,
           type: AppSnackType.warning,
         );
       }
-      return;
     } on Object {
       if (!mounted) {
         return;
       }
-      setState(() => _submitting = false);
+      setState(() {
+        _submitFeedbackMessage = context.l10n.eventsMutationFailedGeneric;
+      });
       AppSnack.show(
-        context,
+        _snackHostContext(),
         message: context.l10n.eventsMutationFailedGeneric,
         type: AppSnackType.warning,
       );
-      return;
+    } finally {
+      if (mounted) {
+        setState(() => _submitting = false);
+      }
     }
-
-    if (!mounted) {
-      return;
-    }
-    setState(() => _submitting = false);
-    AppSnack.show(
-      context,
-      message: context.l10n.eventsEventUpdated,
-      type: AppSnackType.success,
-    );
-    Navigator.of(context, rootNavigator: true).pop();
   }
 
   String? _titleError(AppLocalizations l10n) {
-    if (!_showValidationErrors) {
-      return null;
-    }
-    final String key =
-        editEventTitleIssueKey(_titleController.text.trim()) ?? '';
-    if (key == 'tooShort') {
-      return l10n.createEventTitleMinLength;
-    }
-    if (key == 'tooLong') {
-      return l10n.editEventTitleTooLong(kEditEventTitleMaxLength);
-    }
-    return null;
+    return validateIfVisible(
+      _EditEventFieldIds.title,
+      _validators(l10n)[_EditEventFieldIds.title]!,
+    );
   }
 
   String? _descriptionError(AppLocalizations l10n) {
-    if (!_showValidationErrors) {
-      return null;
-    }
-    if (editEventDescriptionIssueKey(_descriptionController.text.trim()) ==
-        'tooLong') {
-      return l10n.editEventDescriptionTooLong(kEditEventDescriptionMaxLength);
-    }
-    return null;
+    return validateIfVisible(
+      _EditEventFieldIds.description,
+      _validators(l10n)[_EditEventFieldIds.description]!,
+    );
   }
 
   String? _maxParticipantsError(AppLocalizations l10n) {
-    if (!_showValidationErrors) {
-      return null;
-    }
-    final String key =
-        editEventMaxParticipantsIssueKey(
-          _maxParticipantsController.text.trim(),
-        ) ??
-        '';
-    if (key == 'invalid') {
-      return l10n.editEventMaxParticipantsInvalid;
-    }
-    if (key == 'range') {
-      return l10n.editEventMaxParticipantsRange(
-        kEditEventMaxParticipantsMin,
-        kEditEventMaxParticipantsMax,
-      );
-    }
-    return null;
+    return validateIfVisible(
+      _EditEventFieldIds.maxParticipants,
+      _validators(l10n)[_EditEventFieldIds.maxParticipants]!,
+    );
   }
 }

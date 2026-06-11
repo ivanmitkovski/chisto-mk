@@ -36,21 +36,18 @@ class MapGeoAreaPickerSheet extends StatefulWidget {
     required String? selectedId,
     bool enableSearch = false,
   }) {
-    return showAppPanelBottomSheet<String?>(
+    return AppBottomSheet.show<String?>(
       context: context,
+      keyboardInsetMode: enableSearch
+          ? SheetKeyboardInsetMode.overlay
+          : SheetKeyboardInsetMode.lift,
       builder: (BuildContext sheetContext) {
-        final double keyboardInset = MediaQuery.viewInsetsOf(
-          sheetContext,
-        ).bottom;
-        return Padding(
-          padding: EdgeInsets.only(bottom: keyboardInset),
-          child: MapGeoAreaPickerSheet(
-            title: title,
-            subtitle: subtitle,
-            options: options,
-            selectedId: selectedId,
-            enableSearch: enableSearch,
-          ),
+        return MapGeoAreaPickerSheet(
+          title: title,
+          subtitle: subtitle,
+          options: options,
+          selectedId: selectedId,
+          enableSearch: enableSearch,
         );
       },
     );
@@ -101,12 +98,14 @@ class _MapGeoAreaPickerSheetState extends State<MapGeoAreaPickerSheet> {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final List<MapGeoAreaOption> options = _filtered;
     final String? selectedId = widget.selectedId;
+    final double keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
 
     return ReportSheetScaffold(
       title: widget.title,
       subtitle: widget.subtitle,
       maxHeightFactor: 0.9,
-      addBottomInset: false,
+      fillAvailableHeight: widget.enableSearch,
+      addBottomInset: true,
       useModalRouteShape: true,
       trailing: ReportCircleIconButton(
         icon: Icons.close_rounded,
@@ -116,7 +115,8 @@ class _MapGeoAreaPickerSheetState extends State<MapGeoAreaPickerSheet> {
       titleTextStyle: AppTypographySurfaces.reportsSheetTitle(textTheme),
       subtitleTextStyle: AppTypographySurfaces.reportsSheetSubtitle(textTheme),
       child: ListView(
-        padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+        padding: EdgeInsets.only(bottom: AppSpacing.lg + keyboardInset),
         children: <Widget>[
           if (widget.enableSearch) ...<Widget>[
             const SizedBox(height: AppSpacing.sm),
@@ -127,6 +127,8 @@ class _MapGeoAreaPickerSheetState extends State<MapGeoAreaPickerSheet> {
               placeholderStyle: AppTypography.eventsSearchFieldPlaceholder(
                 textTheme,
               ),
+              onSubmitted: (_) =>
+                  FocusManager.instance.primaryFocus?.unfocus(),
             ),
             const SizedBox(height: AppSpacing.md),
           ] else

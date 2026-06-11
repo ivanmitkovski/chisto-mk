@@ -1,5 +1,6 @@
 {
   "pageTitle": "Përdoruesit",
+  "deletedUser": "Përdorues i fshirë",
   "detailTitle": "Përdoruesi",
   "stats": {
     "totalUsers": "Gjithsej përdorues",
@@ -16,6 +17,7 @@
     "allStatuses": "Të gjitha statuset",
     "active": "Aktiv",
     "suspended": "I pezulluar",
+    "deleted": "I fshirë",
     "searchPlaceholder": "Kërko përdorues…",
     "searchAria": "Kërko përdorues",
     "filterByRole": "Filtro sipas rolit",

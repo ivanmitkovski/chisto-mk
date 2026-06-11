@@ -14,7 +14,7 @@ class CreateEventScheduleSection extends StatelessWidget {
     required this.selectedDate,
     required this.startTime,
     required this.endTime,
-    required this.showValidationErrors,
+    required this.showError,
     required this.isTimeRangeValid,
     required this.scheduleIssue,
     required this.onDateSelected,
@@ -30,7 +30,7 @@ class CreateEventScheduleSection extends StatelessWidget {
   final DateTime? selectedDate;
   final EventTime startTime;
   final EventTime endTime;
-  final bool showValidationErrors;
+  final bool showError;
   final bool isTimeRangeValid;
   final ScheduleValidationIssue? scheduleIssue;
   final ValueChanged<DateTime> onDateSelected;
@@ -68,9 +68,7 @@ class CreateEventScheduleSection extends StatelessWidget {
         TimeRangePicker(
           startTime: startTime.toTimeOfDay(),
           endTime: endTime.toTimeOfDay(),
-          hasError:
-              showValidationErrors &&
-              (!isTimeRangeValid || scheduleIssue != null),
+          hasError: showError && (!isTimeRangeValid || scheduleIssue != null),
           minimumStartPickerTime: minimumStartPickerTime,
           maximumStartPickerTime: maximumStartPickerTime,
           minimumEndPickerTime: minimumEndPickerTime,
@@ -82,17 +80,17 @@ class CreateEventScheduleSection extends StatelessWidget {
             onEndChanged(EventTimeUI.fromTimeOfDay(t));
           },
         ),
-        if (showValidationErrors && !isTimeRangeValid) ...<Widget>[
+        if (showError && !isTimeRangeValid) ...<Widget>[
           const SizedBox(height: AppSpacing.xs),
           Text(
             context.l10n.createEventEndTimeError,
             style: AppTypography.eventsCaptionStrong(
               Theme.of(context).textTheme,
-              color: AppColors.accentDanger,
+              color: AppColors.error,
             ).copyWith(fontWeight: FontWeight.w500),
           ),
         ],
-        if (showValidationErrors &&
+        if (showError &&
             isTimeRangeValid &&
             scheduleIssue ==
                 ScheduleValidationIssue.endAfterLocalDayEnd) ...<Widget>[
@@ -101,11 +99,11 @@ class CreateEventScheduleSection extends StatelessWidget {
             context.l10n.createEventScheduleEndAfterDayError,
             style: AppTypography.eventsCaptionStrong(
               Theme.of(context).textTheme,
-              color: AppColors.accentDanger,
+              color: AppColors.error,
             ).copyWith(fontWeight: FontWeight.w500),
           ),
         ],
-        if (showValidationErrors &&
+        if (showError &&
             isTimeRangeValid &&
             scheduleIssue == ScheduleValidationIssue.startTooSoon) ...<Widget>[
           const SizedBox(height: AppSpacing.xs),
@@ -115,11 +113,11 @@ class CreateEventScheduleSection extends StatelessWidget {
             ),
             style: AppTypography.eventsCaptionStrong(
               Theme.of(context).textTheme,
-              color: AppColors.accentDanger,
+              color: AppColors.error,
             ).copyWith(fontWeight: FontWeight.w500),
           ),
         ],
-        if (showValidationErrors &&
+        if (showError &&
             isTimeRangeValid &&
             scheduleIssue == ScheduleValidationIssue.endTooSoon) ...<Widget>[
           const SizedBox(height: AppSpacing.xs),
@@ -129,7 +127,7 @@ class CreateEventScheduleSection extends StatelessWidget {
             ),
             style: AppTypography.eventsCaptionStrong(
               Theme.of(context).textTheme,
-              color: AppColors.accentDanger,
+              color: AppColors.error,
             ).copyWith(fontWeight: FontWeight.w500),
           ),
         ],

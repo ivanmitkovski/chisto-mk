@@ -112,6 +112,8 @@ describe('MapSiteRepositoryService', () => {
     const text = sqlTextFromQueryRawCall(prisma.$queryRaw.mock.calls[0] as unknown[]);
     expect(text).toContain('reporterId');
     expect(text).toContain('user-abc');
+    expect(text).toContain('r_vis."siteId" = "MapSiteProjection"."siteId"');
+    expect(text).not.toMatch(/r_vis\."siteId"\s*=\s*"siteId"/);
   });
 
   it('includes isHot filter for projection resolveDataVersion', async () => {

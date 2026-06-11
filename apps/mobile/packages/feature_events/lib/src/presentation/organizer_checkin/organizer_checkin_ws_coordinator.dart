@@ -73,10 +73,9 @@ class OrganizerCheckInWsCoordinator {
         : 60000;
     Timer? autoExpireTimer;
 
-    showModalBottomSheet<bool>(
+    AppBottomSheet.show<bool>(
       context: context,
-      isDismissible: false,
-      enableDrag: false,
+      dismissible: false,
       backgroundColor: AppColors.transparent,
       builder: (BuildContext sheetContext) {
         return StatefulBuilder(

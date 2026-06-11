@@ -273,28 +273,18 @@ extension EventCleanupEvidenceBody on _EventCleanupEvidenceScreenState {
   }
 
   void _showDiscardDialog(BuildContext context) {
-    showCupertinoDialog<void>(
-      context: context,
-      builder: (BuildContext ctx) {
-        return CupertinoAlertDialog(
-          title: Text(context.l10n.eventsDiscardChangesTitle),
-          content: Text(context.l10n.eventsDiscardChangesBody),
-          actions: <CupertinoDialogAction>[
-            CupertinoDialogAction(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: Text(context.l10n.commonKeepEditing),
-            ),
-            CupertinoDialogAction(
-              isDestructiveAction: true,
-              onPressed: () {
-                Navigator.of(ctx).pop();
-                Navigator.of(context).pop();
-              },
-              child: Text(context.l10n.commonDiscard),
-            ),
-          ],
-        );
-      },
-    );
+    unawaited(() async {
+      final bool? discard = await AppConfirmDialog.show(
+        context: context,
+        title: context.l10n.eventsDiscardChangesTitle,
+        body: context.l10n.eventsDiscardChangesBody,
+        confirmLabel: context.l10n.commonDiscard,
+        cancelLabel: context.l10n.commonKeepEditing,
+        isDestructive: true,
+      );
+      if ((discard ?? false) && context.mounted) {
+        Navigator.of(context).pop();
+      }
+    }());
   }
 }

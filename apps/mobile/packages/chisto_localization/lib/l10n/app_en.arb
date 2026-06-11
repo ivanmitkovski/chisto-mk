@@ -101,6 +101,7 @@
     }
   },
   "reportFlowEvidenceNeedsPhoto": "Add at least one photo to continue.",
+  "reportFlowEvidenceTip": "Frame the whole site in daylight when you can.",
   "reportFlowLocationOutsideMacedoniaHelper": "This location is outside Macedonia. Drag the pin into the country, then tap Confirm location.",
   "reportLocationAdvanceBlockedBanner": "Place the pin in Macedonia and tap Confirm location.",
   "reviewTapToEdit": "Tap to edit",
@@ -242,6 +243,23 @@
   "authValidationPasswordNeedLetter": "Password must contain at least one letter",
   "authValidationConfirmPasswordRequired": "Please confirm your password",
   "authValidationConfirmPasswordMismatch": "Passwords do not match",
+  "authValidationPasswordWeak": "Password is too weak. Use a mix of letters and numbers and avoid common patterns.",
+  "authValidationPasswordTooLong": "Password must be at most 72 characters",
+  "authValidationTermsRequired": "You must accept the terms and conditions",
+  "authValidationOtpRequired": "Verification code is required",
+  "authValidationOtpDigits": "Enter the 6-digit code",
+  "authValidationNameTooShort": "Each name must be at least 2 characters",
+  "authValidationNameTooLong": "Each name must be at most 60 characters",
+  "authValidationGenericInvalid": "Please check this field",
+  "formValidationErrorsAnnounce": "{count, plural, =1{1 field has an error} other{{count} fields have errors}}",
+  "@formValidationErrorsAnnounce": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "authErrorRegistrationConflict": "An account with this email or phone number already exists",
   "authErrorInvalidCredentials": "Wrong phone number or password.",
   "authErrorAccountSuspended": "This account is not active.",
   "authErrorPhoneNotRegistered": "No account found for this phone number.",
@@ -328,6 +346,7 @@
   "authBackToSignIn": "Back to sign in",
   "authOnboardingWelcomeTo": "Welcome to",
   "authOnboardingBrandName": "Chisto.mk",
+  "brandLogoSemantic": "Chisto logo",
   "authOnboardingWelcomeDescription": "See it. Report it. Clean it.",
   "authOnboardingWelcomeSupporting": "A cleaner city starts with one tap.",
   "authOnboardingSlide2Title": "Report in seconds",
@@ -376,7 +395,11 @@
   "authLocationPermissionDenied": "Location permission denied. You can enable it in Settings to use this feature.",
   "authLocationPermissionForever": "Location permission is permanently denied. Opening Settings…",
   "authLocationMacedoniaOnly": "Currently we only support locations in Macedonia.",
-  "authLocationResolveFailed": "Could not resolve your location. Please try again.",
+  "authLocationTryAgain": "Try again",
+  "authLocationGateOutsideTitle": "Chisto.mk is available in Macedonia",
+  "authLocationGateOutsideBody": "Your device location is outside Macedonia. You need to be in Macedonia to create an account.",
+  "authLocationGateUnavailableBody": "We couldn't confirm your location. Turn on location services, allow access, and try again.",
+  "authLocationActionOnlyInMacedoniaSnack": "This action is only available in Macedonia.",
   "authOtpCodeSemantic": "Verification code",
   "authOtpDigitSemantic": "Digit {index} of {total}",
   "@authOtpDigitSemantic": {
@@ -608,6 +631,27 @@
   "safetyReportTitle": "Report content",
   "safetyReportSubmit": "Submit report",
   "safetyReportDetailsHint": "Optional details for moderators",
+  "safetyReportDetailsHintRequired": "Describe the issue for moderators",
+  "safetyReportDetailsRequiredWhenOther": "Please add a short description when choosing Other.",
+  "safetyReportDetailsCharCount": "{used} / {max}",
+  "@safetyReportDetailsCharCount": {
+    "placeholders": {
+      "used": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "safetyReportDetailsTooLong": "Details must be at most {max} characters.",
+  "@safetyReportDetailsTooLong": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
   "safetyReportSubmitted": "Report submitted. We review reports within 24 hours.",
   "safetyReportFailed": "Could not submit report. Try again.",
   "safetyReportReasonSpam": "Spam",
@@ -619,6 +663,14 @@
   "profileAccountSection": "Account",
   "profileSignOutTile": "Sign out",
   "profileDeleteAccountTile": "Delete account",
+  "profileAppVersion": "Version {version}",
+  "@profileAppVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
   "profileEmailLabel": "Email",
   "profileEmailReadOnlyHint": "Read-only. Contact support to change your email.",
   "profileNoConnectionSnack": "No connection",
@@ -644,7 +696,7 @@
   "profilePasswordToggleVisibility": "Show or hide password",
   "commonCancel": "Cancel",
   "commonContinue": "Continue",
-  "commonRetry": "Retry",
+  "commonRetry": "Try again",
   "commonTryAgain": "Try again",
   "commonDelete": "Delete",
   "commonSave": "Save",
@@ -676,7 +728,7 @@
   "profileGeneralNameHint": "Your name",
   "profileGeneralMobileLabel": "Mobile phone",
   "profileGeneralPhonePlaceholder": "70 123 456",
-  "profileGeneralLimitsNotice": "Name changes are limited. Phone number changes require verification.",
+  "profileGeneralLimitsNotice": "For email and phone number changes, contact support.",
   "profileGeneralUpdateButton": "Update info",
   "profileGeneralSaving": "Saving…",
   "profileGeneralAvatarSemanticUpdating": "Updating profile photo",
@@ -995,7 +1047,7 @@
   "commentsSortTop": "Top",
   "commentsSortNew": "New",
   "commentsEditingBanner": "Editing comment",
-  "commentsBodyTooLong": "Comment is too long (max 2000 characters).",
+  "commentsBodyTooLong": "Comment is too long (max 500 characters).",
   "commentsReplyTargetFallback": "comment",
   "reportIssueSheetTitle": "Report issue",
   "reportIssueSubmitting": "Submitting...",
@@ -1640,6 +1692,7 @@
     }
   },
   "editEventNoChangesToSave": "Nothing to save.",
+  "editEventSaving": "Saving changes…",
   "editEventPendingModerationBanner": "This event is still awaiting moderator approval. Changes apply to your draft.",
   "eventsEventNotEditable": "This event can no longer be edited.",
   "eventsEventUpdated": "Event updated",
@@ -1935,8 +1988,6 @@
       }
     }
   },
-  "createEventGearMultiselectTitle": "Multi-select",
-  "createEventGearMultiselectMessage": "Tap each item volunteers should bring. You can select as many as needed.",
   "createEventTeamSizeTitle": "Team size",
   "createEventTeamSizeSubtitle": "How many volunteers do you expect?",
   "createEventDifficultyTitle": "Difficulty",
@@ -2490,6 +2541,9 @@
   },
   "siteUpvotersLoadFailed": "Could not load supporters.",
   "siteUpvotersRetry": "Retry",
+  "siteCoReportersLoadFailed": "Could not load co-reporters.",
+  "siteCoReportersRetry": "Retry",
+  "siteCoReportersOriginalReporterLabel": "Original reporter",
   "siteDetailNoVolunteersSnack": "No volunteers yet for this site.",
   "siteDetailDirectionsUnavailableSnack": "Directions not available for this site.",
   "siteDetailOpenMapsFailedSnack": "Could not open Maps",
@@ -2570,6 +2624,7 @@
       }
     }
   },
+  "deletedUser": "Deleted user",
   "siteHistoryByAdmin": "By admin",
   "siteHistoryKindSiteCreated": "Site created",
   "siteHistoryKindReportSubmitted": "Report submitted",
@@ -3740,6 +3795,43 @@
       }
     }
   },
+  "eventsFilterSheetSubtitle": "Select one or more options. Leave empty to include all.",
+  "eventsFilterResetSemantic": "Reset filters",
+  "eventsFilterSectionSelectAll": "All",
+  "eventsFilterSectionClear": "Clear",
+  "eventsFilterShowEvents": "Show {count} events",
+  "@eventsFilterShowEvents": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsFilterShowEventsPlus": "Show {count}+ events",
+  "@eventsFilterShowEventsPlus": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsFilterPreviewLiveRegion": "Showing {count} events",
+  "@eventsFilterPreviewLiveRegion": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsFilterChipStatusOverrideHint": "The Upcoming or Past pill overrides status filters until you switch back to All.",
+  "eventsFilterDatePresetThisWeek": "This week",
+  "eventsFilterDatePresetThisMonth": "This month",
+  "eventsFilterDatePresetNext30Days": "Next 30 days",
+  "eventsFilterDatePresetClear": "Clear dates",
+  "eventsFilterCategoryHintOn": "Selected",
+  "eventsFilterCategoryHintOff": "Not selected",
+  "eventsFilterStatusHintOn": "Selected",
+  "eventsFilterStatusHintOff": "Not selected",
   "eventsOrganizerDashboardTitle": "My events",
   "eventsOrganizerDashboardEmpty": "You haven't organised any events yet.",
   "eventsOrganizerDashboardEmptyAction": "Create first event",
@@ -3985,7 +4077,7 @@
   "eventsGearGloves": "Gloves",
   "eventsGearRakes": "Rakes & shovels",
   "eventsGearWheelbarrow": "Wheelbarrow",
-  "eventsGearWaterBoots": "Water boots",
+  "eventsGearWaterBoots": "Rubber boots",
   "eventsGearSafetyVest": "Safety vest",
   "eventsGearFirstAid": "First aid kit",
   "eventsGearSunscreen": "Sunscreen & water",
@@ -4042,7 +4134,10 @@
       }
     }
   },
-  "errorUserNetwork": "Check your connection and try again.",
+  "errorUserNetwork": "Please check your internet connection and try again.",
+  "offlineConnectionTitle": "No internet connection",
+  "offlineConnectionBody": "Please check your internet connection and try again.",
+  "reportDetailStaleBanner": "Could not refresh. Showing the last loaded details.",
   "errorUserTimeout": "That took too long. Please try again.",
   "errorUserUnauthorized": "Please sign in again to continue.",
   "errorUserSessionRevoked": "Session is no longer valid. Please sign in again.",
@@ -4051,6 +4146,39 @@
   "errorUserServer": "The service is busy. Please try again shortly.",
   "errorUserTooManyRequests": "Too many attempts. Please wait a moment.",
   "errorUserUnknown": "Something went wrong. Please try again.",
+  "errorUserValidation": "Please check the highlighted fields.",
+  "errorUserValidationGeneric": "Some details are invalid. Please review and try again.",
+  "errorUserConflict": "This action conflicts with something that already exists.",
+  "errorUserCancelled": "Cancelled.",
+  "errorUserPayloadTooLarge": "That file or request is too large.",
+  "errorUserRetryAfterSeconds": "Try again in {seconds}s.",
+  "@errorUserRetryAfterSeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "errorAlreadyJoined": "You're already part of this event.",
+  "errorOrganizerCannotJoin": "Organizers can't join their own event as participants.",
+  "errorNotAParticipant": "You need to join this event first.",
+  "errorOtpSendCooldown": "Wait a moment before requesting another code.",
+  "errorOtpSendFailed": "Couldn't send the verification code. Try again.",
+  "errorTermsVersionMismatch": "Please accept the latest terms and conditions.",
+  "errorDeviceTokenInUse": "Notifications are already set up on another device.",
+  "errorEventsOrganizerNotCertified": "Complete organizer certification to continue.",
+  "errorEventChatNotParticipant": "You need to join this event to use chat.",
+  "errorEventChatMessageUnavailable": "That message is no longer available.",
+  "errorChatUploadTooMany": "Too many attachments. Send fewer files at a time.",
+  "errorChatUploadInvalid": "That file type or size isn't allowed.",
+  "errorAvatarFileRequired": "Choose a photo to upload.",
+  "errorInvalidFileType": "That file type isn't supported.",
+  "connectionOfflineBanner": "You're offline. Some features may not work until you're back online.",
+  "connectionReconnectingBanner": "Reconnecting…",
+  "connectionLiveUpdatesDelayed": "Live updates are delayed. Pull to refresh for the latest.",
+  "notificationsInboxStaleHint": "Updates may be delayed. Pull down to refresh.",
+  "pushRegistrationFailedSnack": "Couldn't enable push notifications. Try again in Settings.",
+  "checkInConnectionTimeout": "Check-in timed out. Try scanning again or enter the code manually.",
   "eventsFilterSheetSemantic": "Filter events",
   "eventChatTitle": "Chat",
   "eventChatRowTitle": "Group chat",

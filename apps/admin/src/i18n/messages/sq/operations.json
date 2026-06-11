@@ -105,13 +105,13 @@
     "queueRetries": "Riprova radhe",
     "emailQueueDepth": "Thellësia e radhës email",
     "version": "Versioni",
-    "gitSha": "Git SHA",
+    "gitSha": "Kodi Git SHA",
     "environment": "Mjedisi",
     "region": "Rajoni",
-    "uptime": "Uptime",
+    "uptime": "Koha e punës",
     "fcmEnabled": "FCM aktiv",
-    "database": "Database",
-    "redis": "Redis",
+    "database": "Baza e të dhënave",
+    "redis": "Serveri Redis",
     "s3": "S3"
   },
   "deadLetters": {

@@ -102,12 +102,31 @@ export async function signOutAndRedirectToLogin(): Promise<void> {
   window.location.assign('/login');
 }
 
-export async function refreshAdminSession(): Promise<boolean> {
+export type RefreshSessionOutcome = 'ok' | 'unauthorized' | 'transient';
+
+async function refreshAdminSessionOnce(): Promise<RefreshSessionOutcome> {
   const response = await fetch('/api/auth/refresh', {
     method: 'POST',
     headers: getAdminCsrfHeaders(),
     credentials: 'include',
   }).catch(() => null);
-  return response?.ok === true;
+
+  if (response?.ok === true) return 'ok';
+  if (response?.status === 401) return 'unauthorized';
+  if (
+    response?.status === 403 ||
+    response?.status === 429 ||
+    response?.status === 503 ||
+    response == null
+  ) {
+    return 'transient';
+  }
+  return 'unauthorized';
+}
+
+export async function refreshAdminSession(): Promise<RefreshSessionOutcome> {
+  const first = await refreshAdminSessionOnce();
+  if (first !== 'transient') return first;
+  return refreshAdminSessionOnce();
 }
 

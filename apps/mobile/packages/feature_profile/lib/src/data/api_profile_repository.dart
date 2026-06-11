@@ -53,6 +53,7 @@ class ApiProfileRepository implements ProfileRepository {
   Future<ProfileUser?> updateProfile({
     String? firstName,
     String? lastName,
+    String? locale,
   }) async {
     final Map<String, dynamic> body = <String, dynamic>{};
     if (firstName != null && firstName.trim().isNotEmpty) {
@@ -61,10 +62,25 @@ class ApiProfileRepository implements ProfileRepository {
     if (lastName != null && lastName.trim().isNotEmpty) {
       body['lastName'] = lastName.trim();
     }
+    if (locale != null) {
+      final String code = locale.trim();
+      if (code == 'en' || code == 'mk' || code == 'sq') {
+        body['locale'] = code;
+      }
+    }
     if (body.isEmpty) return null;
 
     await _client.patch('/auth/me', body: body);
     return getMe();
+  }
+
+  /// Persists the user's in-app language for server-side notification copy.
+  Future<void> updateLocale(String locale) async {
+    final String code = locale.trim();
+    if (code != 'en' && code != 'mk' && code != 'sq') {
+      return;
+    }
+    await _client.patch('/auth/me', body: <String, dynamic>{'locale': code});
   }
 
   @override

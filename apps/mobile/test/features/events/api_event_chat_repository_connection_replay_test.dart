@@ -12,7 +12,7 @@ void main() {
     final ApiClient client = ApiClient(
       config: AppConfig.local,
       accessToken: () => null,
-      onUnauthorized: () {},
+      onUnauthorized: (_) {},
     );
     final ApiEventChatRepository repo = ApiEventChatRepository(
       client: client,

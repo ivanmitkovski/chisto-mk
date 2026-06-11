@@ -14,6 +14,7 @@ import 'package:feature_events/src/data/participants_json.dart';
 import 'package:feature_events/src/domain/models/eco_event.dart';
 import 'package:feature_events/src/domain/models/eco_event_join_toggle_result.dart';
 import 'package:feature_events/src/domain/models/eco_event_search_params.dart';
+import 'package:feature_events/src/domain/models/events_list_page_snapshot.dart';
 import 'package:feature_events/src/domain/models/event_impact_receipt.dart';
 import 'package:feature_events/src/domain/models/event_participant_row.dart';
 import 'package:feature_events/src/domain/models/event_schedule_conflict_preview.dart';
@@ -72,7 +73,13 @@ class ApiEventsRepository extends _ApiEventsRepositoryBase
       await _persistEventsDisk();
       _lastGlobalListLoadFailed = false;
       _isShowingStaleCachedEvents = false;
-    } on Object catch (_) {
+    } on Object catch (e, st) {
+      if (_isSessionInvalidFailure(e)) {
+        if (e is AppError) {
+          Error.throwWithStackTrace(e, st);
+        }
+        rethrow;
+      }
       _lastGlobalListLoadFailed = true;
       final List<EcoEvent>? stale = await _cache.readEvents(
         forActiveListParams: null,
@@ -246,10 +253,27 @@ class ApiEventsRepository extends _ApiEventsRepositoryBase
   Future<List<EcoEvent>> fetchEventsSnapshot(
     EcoEventSearchParams params,
   ) async {
+    final EventsListPageSnapshot preview = await fetchEventsFilterPreview(
+      params,
+    );
+    return preview.events;
+  }
+
+  @override
+  Future<EventsListPageSnapshot> fetchEventsFilterPreview(
+    EcoEventSearchParams params,
+  ) async {
     final ApiResponse response = await _client.get(
       _globalListPath(cursor: null, params: params),
     );
-    return _eventsFromListResponse(response);
+    final List<EcoEvent> events = _eventsFromListResponse(response);
+    final Map<String, dynamic> json = response.json ?? <String, dynamic>{};
+    final Object? metaRaw = json['meta'];
+    final Map<String, dynamic> meta = metaRaw is Map<String, dynamic>
+        ? metaRaw
+        : <String, dynamic>{};
+    final bool hasMore = meta['hasMore'] == true;
+    return EventsListPageSnapshot(events: events, hasMore: hasMore);
   }
 
   @override
@@ -279,6 +303,12 @@ class ApiEventsRepository extends _ApiEventsRepositoryBase
       _isShowingStaleCachedEvents = false;
       notifyListeners();
     } on Object catch (e, st) {
+      if (_isSessionInvalidFailure(e)) {
+        if (e is AppError) {
+          Error.throwWithStackTrace(e, st);
+        }
+        rethrow;
+      }
       _lastGlobalListLoadFailed = true;
       await _tryHydrateFromDiskAfterListFailure(params);
       if (_events.isNotEmpty) {
@@ -307,6 +337,12 @@ class ApiEventsRepository extends _ApiEventsRepositoryBase
       await _fetchPage(replace: false, cursor: c, params: _activeParams);
       await _persistEventsDisk();
     } on Object catch (e, st) {
+      if (_isSessionInvalidFailure(e)) {
+        if (e is AppError) {
+          Error.throwWithStackTrace(e, st);
+        }
+        rethrow;
+      }
       _lastGlobalListLoadFailed = true;
       if (_events.isNotEmpty) {
         _isShowingStaleCachedEvents = true;
@@ -339,7 +375,7 @@ class ApiEventsRepository extends _ApiEventsRepositoryBase
       await _persistEventsDisk();
       return true;
     } on AppError catch (e) {
-      if (e.code == 'NOT_FOUND') {
+      if (_isEventMissingError(e)) {
         _events = _events
             .where((EcoEvent e) => e.id != id)
             .toList(growable: false);
@@ -347,6 +383,17 @@ class ApiEventsRepository extends _ApiEventsRepositoryBase
         return false;
       }
       rethrow;
+    }
+  }
+
+  bool _isEventMissingError(AppError error) {
+    switch (error.code) {
+      case 'NOT_FOUND':
+      case 'EVENT_NOT_FOUND':
+      case 'CLEANUP_EVENT_NOT_FOUND':
+        return true;
+      default:
+        return false;
     }
   }
 

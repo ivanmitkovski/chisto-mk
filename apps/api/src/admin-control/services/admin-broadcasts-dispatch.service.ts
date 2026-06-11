@@ -5,7 +5,7 @@ import { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { NotificationDispatcherService } from '../../notifications/services/notification-dispatcher.service';
 import { NotificationType } from '../../prisma-client';
 import { AdminBroadcastsService } from './admin-broadcasts.service';
-import type { BroadcastCampaign } from './admin-broadcasts.types';
+import type { BroadcastCampaign } from '../types/admin-broadcasts.types';
 
 const DISPATCH_CHUNK_SIZE = 50;
 

@@ -118,12 +118,15 @@ export class AuthProfileService {
 
   async updateProfile(userId: string, dto: UpdateProfileDto) {
     await this.assertActiveUser(userId);
-    const data: { firstName?: string; lastName?: string } = {};
+    const data: { firstName?: string; lastName?: string; locale?: string } = {};
     if (dto.firstName != null && dto.firstName.trim().length > 0) {
       data.firstName = dto.firstName.trim();
     }
     if (dto.lastName != null && dto.lastName.trim().length > 0) {
       data.lastName = dto.lastName.trim();
+    }
+    if (dto.locale != null) {
+      data.locale = dto.locale;
     }
     if (Object.keys(data).length === 0) {
       const updated = await this.prisma.user.findUnique({

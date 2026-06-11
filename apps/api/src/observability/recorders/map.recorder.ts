@@ -3,7 +3,7 @@ import { p95Ms, trimRollingBuffer } from './percentile.util';
 
 let mapRequestsTotal = 0;
 let mapCacheHits = 0;
-let mapCacheInvalidationCounts: Record<string, number> = {};
+const mapCacheInvalidationCounts: Record<string, number> = {};
 let mapFallbackResponses = 0;
 let mapDurationsMs: number[] = [];
 let mapCandidatePoolSizes: number[] = [];
@@ -22,10 +22,10 @@ let mapProjectionStalenessSeconds = 0;
 let mapColdSitesArchivedTotal = 0;
 let mapOutboxRowsPurgedTotal = 0;
 let mapOutboxPendingGauge = 0;
-let mapZoomTierRequests: Record<string, number> = {};
-let mapDurationByModeZoom: Record<string, number[]> = {};
-let mapRequestsByMode: Record<string, number> = {};
-let mapCacheHitsByMode: Record<string, number> = {};
+const mapZoomTierRequests: Record<string, number> = {};
+const mapDurationByModeZoom: Record<string, number[]> = {};
+const mapRequestsByMode: Record<string, number> = {};
+const mapCacheHitsByMode: Record<string, number> = {};
 let mapQueryRowCounts: number[] = [];
 
 export function recordMapRequest(input: {

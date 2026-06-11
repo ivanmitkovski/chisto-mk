@@ -22,7 +22,7 @@ describe('EcoEventPointsService', () => {
     return { pointTransaction, user, tx: { pointTransaction, user } as never };
   }
 
-  it('returns 0 when delta <= 0', async () => {
+  it('returns empty credit when delta <= 0', async () => {
     const { tx, pointTransaction } = makeTx();
     const r = await service.creditIfNew(tx as never, {
       userId: 'u1',
@@ -31,19 +31,14 @@ describe('EcoEventPointsService', () => {
       referenceType: 'T',
       referenceId: 'r1',
     });
-    expect(r).toBe(0);
+    expect(r).toEqual({ granted: 0, totalPointsEarnedBefore: 0, totalPointsEarnedAfter: 0 });
     expect(pointTransaction.findFirst).not.toHaveBeenCalled();
   });
 
-  it('returns 0 when user missing', async () => {
+  it('returns empty credit when user missing', async () => {
     const { tx, pointTransaction, user } = makeTx();
     pointTransaction.findFirst.mockResolvedValue(null);
-    user.update.mockRejectedValue(
-      new Prisma.PrismaClientKnownRequestError('Record to update not found', {
-        code: 'P2025',
-        clientVersion: 'test',
-      }),
-    );
+    user.findUnique.mockResolvedValue(null);
     const r = await service.creditIfNew(tx as never, {
       userId: 'missing',
       delta: 10,
@@ -51,13 +46,14 @@ describe('EcoEventPointsService', () => {
       referenceType: 'EventParticipant',
       referenceId: 'p1',
     });
-    expect(r).toBe(0);
+    expect(r).toEqual({ granted: 0, totalPointsEarnedBefore: 0, totalPointsEarnedAfter: 0 });
     expect(pointTransaction.create).not.toHaveBeenCalled();
   });
 
   it('credits once and is idempotent on second call', async () => {
     const { tx, pointTransaction, user } = makeTx();
     pointTransaction.findFirst.mockResolvedValue(null);
+    user.findUnique.mockResolvedValue({ totalPointsEarned: 100 });
     user.update.mockResolvedValue({ pointsBalance: 105 });
 
     const params = {
@@ -69,7 +65,11 @@ describe('EcoEventPointsService', () => {
     };
 
     const first = await service.creditIfNew(tx as never, params);
-    expect(first).toBe(5);
+    expect(first).toEqual({
+      granted: 5,
+      totalPointsEarnedBefore: 100,
+      totalPointsEarnedAfter: 105,
+    });
     expect(pointTransaction.create).toHaveBeenCalledTimes(1);
     expect(user.update).toHaveBeenCalledWith({
       where: { id: 'u1' },
@@ -82,13 +82,14 @@ describe('EcoEventPointsService', () => {
 
     pointTransaction.findFirst.mockResolvedValue({ id: 'existing-tx' });
     const second = await service.creditIfNew(tx as never, params);
-    expect(second).toBe(0);
+    expect(second).toEqual({ granted: 0, totalPointsEarnedBefore: 0, totalPointsEarnedAfter: 0 });
     expect(pointTransaction.create).toHaveBeenCalledTimes(1);
   });
 
   it('treats P2002 on create as idempotent without updating balances', async () => {
     const { tx, pointTransaction, user } = makeTx();
     pointTransaction.findFirst.mockResolvedValue(null);
+    user.findUnique.mockResolvedValue({ totalPointsEarned: 100 });
     user.update
       .mockResolvedValueOnce({ pointsBalance: 105 })
       .mockResolvedValueOnce({ pointsBalance: 100 });
@@ -104,7 +105,7 @@ describe('EcoEventPointsService', () => {
       referenceType: 'EventParticipant',
       referenceId: 'p1',
     });
-    expect(r).toBe(0);
+    expect(r).toEqual({ granted: 0, totalPointsEarnedBefore: 0, totalPointsEarnedAfter: 0 });
     expect(user.update).toHaveBeenCalledTimes(2);
   });
 

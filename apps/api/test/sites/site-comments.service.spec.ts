@@ -2,23 +2,35 @@
 import { BadRequestException } from '@nestjs/common';
 import { SiteCommentsListService } from '../../src/sites/services/site-comments-list.service';
 import { SiteCommentsMutationsService } from '../../src/sites/services/site-comments-mutations.service';
+import { SiteCommentsCountService } from '../../src/sites/services/site-comments-count.service';
 import { SiteCommentsService } from '../../src/sites/services/site-comments.service';
 import { SiteCommentsSort } from '../../src/sites/dto/list-site-comments-query.dto';
 import { Role } from '../../src/prisma-client';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
 
+function makeSiteCommentsCount(prisma: unknown, moderation: unknown) {
+  return new SiteCommentsCountService(prisma as never, moderation as never);
+}
+
 function makeSiteCommentsService(prisma: unknown, engagement: unknown, uploads: unknown) {
   const sitesFeed = { invalidateFeedCache: jest.fn() } as never;
   const reporterNotifications = { emitForSiteActivity: jest.fn() } as never;
   const moderation = { blockedUserIdsFor: jest.fn().mockResolvedValue([]) };
+  const siteCommentsCount = makeSiteCommentsCount(prisma, moderation);
   return new SiteCommentsService(
     new SiteCommentsListService(
       prisma as never,
       engagement as never,
       uploads as never,
       moderation as never,
+      siteCommentsCount,
     ),
-    new SiteCommentsMutationsService(prisma as never, engagement as never, uploads as never),
+    new SiteCommentsMutationsService(
+      prisma as never,
+      engagement as never,
+      siteCommentsCount,
+      uploads as never,
+    ),
     sitesFeed,
     reporterNotifications,
   );
@@ -47,7 +59,11 @@ describe('SiteCommentsService', () => {
     const t3 = new Date('2026-01-01T03:00:00.000Z');
     const prisma = {
       siteComment: {
-        count: jest.fn(async () => 3),
+        count: jest.fn(async (args: { where: Record<string, unknown> }) => {
+          if (args.where.parentId === 'root1') return 3;
+          if (args.where.parentId === null) return 1;
+          return 2;
+        }),
         findMany: jest.fn(async () => [
           {
             id: 'c3',
@@ -84,7 +100,7 @@ describe('SiteCommentsService', () => {
         take: 2,
       }),
     );
-    expect(out.meta).toEqual({ page: 2, limit: 2, total: 3 });
+    expect(out.meta).toEqual({ page: 2, limit: 2, total: 3, engagementTotal: 2 });
     expect(out.data).toHaveLength(1);
     expect(out.data[0]?.id).toBe('c3');
   });
@@ -113,7 +129,10 @@ describe('SiteCommentsService', () => {
     const prisma = {
       siteComment: {
         findMany: jest.fn(async () => [root, child]),
-        count: jest.fn(async () => 1),
+        count: jest.fn(async (args: { where: Record<string, unknown> }) => {
+          if (args.where.parentId === null) return 1;
+          return 2;
+        }),
       },
     } as never;
     const engagement = { ensureSiteExists: jest.fn().mockResolvedValue(undefined) } as never;
@@ -128,6 +147,7 @@ describe('SiteCommentsService', () => {
 
     expect((prisma as { siteComment: { findMany: jest.Mock } }).siteComment.findMany).toHaveBeenCalledTimes(1);
     expect(out.meta.total).toBe(1);
+    expect(out.meta.engagementTotal).toBe(2);
     expect(out.data).toHaveLength(1);
     expect(out.data[0]?.replies).toHaveLength(1);
     expect(out.data[0]?.replies[0]?.id).toBe('c1');

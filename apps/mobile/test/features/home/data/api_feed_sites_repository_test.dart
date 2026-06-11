@@ -14,7 +14,7 @@ class _FakeApiClient extends ApiClient {
     : super(
         config: AppConfig.dev,
         accessToken: () => null,
-        onUnauthorized: () {},
+        onUnauthorized: (_) {},
       );
 
   int getCalls = 0;
@@ -136,7 +136,7 @@ class _StubSitesLocalCache extends SitesLocalCache {
 
   @override
   Future<({Map<String, dynamic> payload, DateTime cachedAt})?>
-  loadMapSnapshot() async {
+  loadMapSnapshot({required String authSegment}) async {
     return snapshot;
   }
 
@@ -151,7 +151,10 @@ class _StubSitesLocalCache extends SitesLocalCache {
   }
 
   @override
-  Future<void> persistMapSnapshot(Map<String, dynamic> payload) async {}
+  Future<void> persistMapSnapshot(
+    Map<String, dynamic> payload, {
+    required String authSegment,
+  }) async {}
 
   @override
   Future<void> persistFeedSnapshot({
@@ -455,31 +458,34 @@ void main() {
     expect(result.sites.single.isUpvotedByMe, isTrue);
   });
 
-  test('getSitesForMap uses 304 etag payload after memory cache expires', () async {
-    final _MapEtagFakeClient stub = _MapEtagFakeClient();
-    final repository = ApiFeedSitesRepository(
-      client: stub,
-      localCache: _StubSitesLocalCache(),
-    );
+  test(
+    'getSitesForMap uses 304 etag payload after memory cache expires',
+    () async {
+      final _MapEtagFakeClient stub = _MapEtagFakeClient();
+      final repository = ApiFeedSitesRepository(
+        client: stub,
+        localCache: _StubSitesLocalCache(),
+      );
 
-    final first = await repository.getSitesForMap(
-      latitude: 41.99,
-      longitude: 21.43,
-    );
-    expect(first.sites.single.id, 'map-1');
-    expect(stub.mapCalls, 1);
+      final first = await repository.getSitesForMap(
+        latitude: 41.99,
+        longitude: 21.43,
+      );
+      expect(first.sites.single.id, 'map-1');
+      expect(stub.mapCalls, 1);
 
-    await Future<void>.delayed(const Duration(seconds: 16));
+      await Future<void>.delayed(const Duration(seconds: 16));
 
-    final second = await repository.getSitesForMap(
-      latitude: 41.99,
-      longitude: 21.43,
-    );
+      final second = await repository.getSitesForMap(
+        latitude: 41.99,
+        longitude: 21.43,
+      );
 
-    expect(second.sites.single.id, 'map-1');
-    expect(stub.mapCalls, 2);
-    expect(stub.lastHeaders?['If-None-Match'], '"v1"');
-  });
+      expect(second.sites.single.id, 'map-1');
+      expect(stub.mapCalls, 2);
+      expect(stub.lastHeaders?['If-None-Match'], '"v1"');
+    },
+  );
 
   test('clearAllCaches clears map etag cache forcing full refetch', () async {
     final _MapEtagFakeClient stub = _MapEtagFakeClient();
@@ -500,42 +506,43 @@ void main() {
     expect(stub.lastHeaders?['If-None-Match'], isNull);
   });
 
-  test('getSitesForMap memory cache is scoped per authenticated user', () async {
-    final stub = _FakeApiClient();
-    final auth = AuthState();
-    auth.setAuthenticated(userId: 'user-a', displayName: 'User A');
-    final repository = ApiFeedSitesRepository(
-      client: stub,
-      authState: auth,
-      localCache: _StubSitesLocalCache(),
-    );
+  test(
+    'getSitesForMap memory cache is scoped per authenticated user',
+    () async {
+      final stub = _FakeApiClient();
+      final auth = AuthState();
+      auth.setAuthenticated(userId: 'user-a', displayName: 'User A');
+      final repository = ApiFeedSitesRepository(
+        client: stub,
+        authState: auth,
+        localCache: _StubSitesLocalCache(),
+      );
 
-    await repository.getSitesForMap(latitude: 41.99, longitude: 21.43);
-    expect(stub.getCalls, 1);
+      await repository.getSitesForMap(latitude: 41.99, longitude: 21.43);
+      expect(stub.getCalls, 1);
 
-    final MapSitesResult cached = await repository.getSitesForMap(
-      latitude: 41.99,
-      longitude: 21.43,
-    );
-    expect(cached.servedFromCache, isTrue);
-    expect(stub.getCalls, 1);
+      final MapSitesResult cached = await repository.getSitesForMap(
+        latitude: 41.99,
+        longitude: 21.43,
+      );
+      expect(cached.servedFromCache, isTrue);
+      expect(stub.getCalls, 1);
 
-    auth.setAuthenticated(userId: 'user-b', displayName: 'User B');
-    final MapSitesResult afterUserSwitch = await repository.getSitesForMap(
-      latitude: 41.99,
-      longitude: 21.43,
-    );
-    expect(afterUserSwitch.servedFromCache, isFalse);
-    expect(stub.getCalls, 2);
-  });
+      auth.setAuthenticated(userId: 'user-b', displayName: 'User B');
+      final MapSitesResult afterUserSwitch = await repository.getSitesForMap(
+        latitude: 41.99,
+        longitude: 21.43,
+      );
+      expect(afterUserSwitch.servedFromCache, isFalse);
+      expect(stub.getCalls, 2);
+    },
+  );
 
   test('getSavedSites marks isSavedByMe when API omits the flag', () async {
     final stub = _FakeApiClient();
     stub.stubGet(
       '/sites/saved?page=1&limit=24',
-      _sitesListJson(<Map<String, dynamic>>[
-        _siteListItemJson(id: 'saved-1'),
-      ]),
+      _sitesListJson(<Map<String, dynamic>>[_siteListItemJson(id: 'saved-1')]),
     );
     final repository = ApiFeedSitesRepository(
       client: stub,

@@ -23,9 +23,12 @@ import { UpdateSiteArchiveDto } from '../dto/update-site-archive.dto';
 import { UpdateSiteStatusDto } from '../dto/update-site-status.dto';
 import { SiteDetailResponseDto } from '../dto/site-detail-response.dto';
 import { SiteMediaListResponseDto } from '../dto/site-media-response.dto';
+import { SiteCoReportersListResponseDto } from '../dto/site-co-reporters-response.dto';
+import { ListSiteCoReportersQueryDto } from '../dto/list-site-co-reporters-query.dto';
 import { SitesAdminService } from '../services/sites-admin.service';
 import { SitesDetailService } from '../services/sites-detail.service';
 import { SitesMediaService } from '../services/sites-media.service';
+import { SiteCoReportersListService } from '../services/site-co-reporters-list.service';
 import { ParseCuidPipe } from '../../common/pipes/parse-cuid.pipe';
 import { ApiStandardHttpErrorResponses } from '../../common/openapi/standard-http-error-responses.decorator';
 
@@ -37,6 +40,7 @@ export class SitesDetailController {
     private readonly sitesDetail: SitesDetailService,
     private readonly sitesMedia: SitesMediaService,
     private readonly sitesAdmin: SitesAdminService,
+    private readonly coReportersList: SiteCoReportersListService,
   ) {}
 
   @Get(':id')
@@ -62,8 +66,25 @@ export class SitesDetailController {
   findMedia(
     @Param('id', ParseCuidPipe) id: string,
     @Query() query: ListSiteMediaQueryDto,
+    @CurrentUser() user?: AuthenticatedUser,
   ) {
-    return this.sitesMedia.findSiteMedia(id, query);
+    return this.sitesMedia.findSiteMedia(id, query, user);
+  }
+
+  @Get(':id/co-reporters')
+  @UseGuards(ThrottlerGuard, OptionalJwtAuthGuard)
+  @Throttle({ default: { limit: 120, ttl: 60_000 } })
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'List co-reporters for a pollution site (original reporter + merged co-reporters)' })
+  @ApiOkResponse({ description: 'Site co-reporters fetched successfully', type: SiteCoReportersListResponseDto })
+  @ApiNotFoundResponse({ description: 'Site not found' })
+  @ApiTooManyRequestsResponse({ description: 'Too many requests' })
+  findCoReporters(
+    @Param('id', ParseCuidPipe) id: string,
+    @Query() query: ListSiteCoReportersQueryDto,
+    @CurrentUser() user?: AuthenticatedUser,
+  ) {
+    return this.coReportersList.findSiteCoReporters(id, query, user);
   }
 
   // safe-to-retry: repeated Patch is acceptable

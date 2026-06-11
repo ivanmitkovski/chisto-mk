@@ -32,6 +32,9 @@ String sitesApiPublicReporterDisplayName(Map<String, dynamic>? reporter) {
   if (reporter == null) {
     return kSitesApiAnonymousCoReporterName;
   }
+  if (sitesApiReporterIsDeleted(reporter)) {
+    return '';
+  }
   final String fn = '${reporter['firstName'] ?? reporter['first_name'] ?? ''}'
       .trim();
   final String ln = '${reporter['lastName'] ?? reporter['last_name'] ?? ''}'
@@ -52,6 +55,17 @@ String sitesApiPublicReporterDisplayName(Map<String, dynamic>? reporter) {
   return kSitesApiAnonymousCoReporterName;
 }
 
+bool sitesApiReporterIsDeleted(Map<String, dynamic>? reporter) {
+  if (reporter == null) {
+    return false;
+  }
+  if (reporter['isDeleted'] == true) {
+    return true;
+  }
+  final String status = '${reporter['status'] ?? ''}'.trim().toUpperCase();
+  return status == 'DELETED';
+}
+
 String sitesApiCoReporterDisplayName(Map<String, dynamic>? user) {
   return sitesApiPublicReporterDisplayName(user);
 }
@@ -60,6 +74,9 @@ String sitesApiCoReporterDisplayName(Map<String, dynamic>? user) {
 String sitesApiCoReporterRowDisplayName(Map<String, dynamic>? co) {
   if (co == null) {
     return kSitesApiAnonymousCoReporterName;
+  }
+  if (sitesApiCoReporterRowIsDeleted(co)) {
+    return '';
   }
   final Map<String, dynamic>? user = sitesApiCoReporterRowUser(co);
   final String fromUser = sitesApiPublicReporterDisplayName(user);
@@ -75,6 +92,17 @@ String sitesApiCoReporterRowDisplayName(Map<String, dynamic>? co) {
     return rowLabel;
   }
   return kSitesApiAnonymousCoReporterName;
+}
+
+bool sitesApiCoReporterRowIsDeleted(Map<String, dynamic>? co) {
+  if (co == null) {
+    return false;
+  }
+  if (co['isDeleted'] == true) {
+    return true;
+  }
+  final Map<String, dynamic>? user = sitesApiCoReporterRowUser(co);
+  return sitesApiReporterIsDeleted(user);
 }
 
 List<String> sitesApiStringListFromJsonField(Object? raw) {
@@ -285,8 +313,9 @@ List<CoReporterProfile> sitesApiCoReporterSummariesFromApiField(Object? raw) {
   for (final dynamic item in raw) {
     final Map<String, dynamic>? m = sitesApiJsonObjectToStringKeyedMap(item);
     if (m == null) continue;
+    final bool isDeleted = m['isDeleted'] as bool? ?? false;
     final String name = '${m['name'] ?? m['displayName'] ?? ''}'.trim();
-    if (name.isEmpty) continue;
+    if (name.isEmpty && !isDeleted) continue;
     final Object? av = m['avatarUrl'] ?? m['avatar_url'];
     final String? avatarUrl = av is String && av.trim().isNotEmpty
         ? av.trim()
@@ -295,6 +324,7 @@ List<CoReporterProfile> sitesApiCoReporterSummariesFromApiField(Object? raw) {
     out.add(
       CoReporterProfile(
         displayName: name,
+        isDeleted: isDeleted,
         avatarUrl: avatarUrl,
         userId: userId,
       ),

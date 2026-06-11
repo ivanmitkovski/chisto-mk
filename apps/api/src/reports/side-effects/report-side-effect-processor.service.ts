@@ -5,6 +5,7 @@ import type { AuthenticatedUser } from '../../auth/types/authenticated-user.type
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../../audit/services/audit.service';
 import { reportStatusCopy } from '../../notifications/util/notification-templates';
+import { notificationLocalesByUserId } from '../../common/i18n/notification-locale.resolver';
 import { ReportEventsService } from '../../admin-realtime/services/report-events.service';
 import { SiteEventsService } from '../../admin-realtime/services/site-events.service';
 import { ReportsOwnerEventsService } from '../services/reports-owner-events.service';
@@ -14,6 +15,7 @@ import {
   DuplicateMergeSiteStatusEvent,
 } from '../duplicates/duplicate-merge-side-effects.service';
 import { ObservabilityStore } from '../../observability/observability.store';
+import { NearbyReportNotificationService } from '../../notifications/services/nearby-report-notification.service';
 import {
   claimReportSideEffect,
   reportSideEffectLeaseOwner,
@@ -40,6 +42,7 @@ export class ReportSideEffectProcessorService {
     private readonly siteEventsService: SiteEventsService,
     private readonly reportsOwnerEventsService: ReportsOwnerEventsService,
     private readonly eventEmitter: EventEmitter2,
+    private readonly nearbyReportNotification: NearbyReportNotificationService,
   ) {}
 
   async processMergeDuplicatePost(effectId: string): Promise<number> {
@@ -181,22 +184,51 @@ export class ReportSideEffectProcessorService {
         });
         const reportNumberLabel = reportRow?.reportNumber ?? '';
         const statusLabel = raw.toStatus.toLowerCase().replace(/_/g, ' ');
-        const copy = reportStatusCopy('en', statusLabel);
-        this.eventEmitter.emit('notification.send', {
-          recipientUserIds: uniqueRecipients,
-          title: copy.title,
-          body: copy.body,
-          type: 'REPORT_STATUS',
-          threadKey: `report:${raw.reportId}`,
-          groupKey: `REPORT_STATUS:site:${raw.siteId}`,
-          data: {
-            reportId: raw.reportId,
+        const localeBy = await notificationLocalesByUserId(
+          this.prisma,
+          uniqueRecipients,
+        );
+        for (const recipientId of uniqueRecipients) {
+          const locale = localeBy.get(recipientId)!;
+          const copy = reportStatusCopy(locale, statusLabel);
+          this.eventEmitter.emit('notification.send', {
+            recipientUserIds: [recipientId],
+            title: copy.title,
+            body: copy.body,
+            type: 'REPORT_STATUS',
+            threadKey: `report:${raw.reportId}`,
+            groupKey: `REPORT_STATUS:site:${raw.siteId}`,
+            data: {
+              reportId: raw.reportId,
+              siteId: raw.siteId,
+              status: raw.toStatus,
+              reason: raw.reason ?? undefined,
+              reportNumber: reportNumberLabel,
+            },
+          });
+        }
+      }
+
+      if (raw.toStatus === 'APPROVED') {
+        const siteCoords =
+          raw.siteStatusEvent != null
+            ? {
+                latitude: raw.siteStatusEvent.latitude,
+                longitude: raw.siteStatusEvent.longitude,
+              }
+            : await this.prisma.site.findUnique({
+                where: { id: raw.siteId },
+                select: { latitude: true, longitude: true },
+              });
+        if (siteCoords != null) {
+          this.nearbyReportNotification.emitForApprovedReport({
             siteId: raw.siteId,
-            status: raw.toStatus,
-            reason: raw.reason ?? undefined,
-            reportNumber: reportNumberLabel,
-          },
-        });
+            latitude: siteCoords.latitude,
+            longitude: siteCoords.longitude,
+            reporterId: raw.reporterId,
+            coReporterUserIds: raw.coReporterUserIds,
+          });
+        }
       }
 
       await this.prisma.reportSideEffect.update({

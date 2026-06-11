@@ -44,6 +44,7 @@ import { EventsAfterImagesService } from '../services/events-after-images.servic
 import { EventsAnalyticsService } from '../services/events-analytics.service';
 import { EventsLifecycleService } from '../services/events-lifecycle.service';
 import { EventsParticipationService } from '../services/events-participation.service';
+import { EventsReminderService } from '../services/events-reminder.service';
 import { EventsQueryService } from '../services/events-query.service';
 import { EventsShareCardQueryService } from '../services/events-share-card-query.service';
 import { EventsUpdateService } from '../services/events-update.service';
@@ -62,6 +63,7 @@ export class EventsController {
     private readonly updates: EventsUpdateService,
     private readonly lifecycle: EventsLifecycleService,
     private readonly participation: EventsParticipationService,
+    private readonly reminders: EventsReminderService,
     private readonly afterImages: EventsAfterImagesService,
     private readonly analytics: EventsAnalyticsService,
     private readonly shareCard: EventsShareCardQueryService,
@@ -231,7 +233,7 @@ export class EventsController {
     @Param('id', ParseCuidPipe) id: string,
     @Body() dto: PatchEventReminderDto,
   ) {
-    return this.participation.patchReminder(id, dto, user);
+    return this.reminders.patchReminder(id, dto, user);
   }
 
   @Get(':id/analytics')

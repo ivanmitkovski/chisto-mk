@@ -34,6 +34,7 @@ import { RedisIoAdapterLifecycle } from './common/adapters/redis-io-adapter.life
 import { DiscoveryAnalyticsModule } from './discovery-analytics/discovery-analytics.module';
 import { ModerationModule } from './moderation/moderation.module';
 import { AdminControlModule } from './admin-control/admin-control.module';
+import { ActiveUsersModule } from './active-users/active-users.module';
 import { LoggerModule } from 'nestjs-pino';
 import { safePinoReqSerializer } from './common/logging/safe-pino-req.serializer';
 import { pinoLogMixin, resolveLogLevel } from './common/logging/pino-log-context';
@@ -113,6 +114,7 @@ import { RequestMetricsInterceptor } from './observability/util/request-metrics.
     DiscoveryAnalyticsModule.register(),
     ModerationModule,
     AdminControlModule,
+    ActiveUsersModule,
   ],
   controllers: [AppController],
   providers: [

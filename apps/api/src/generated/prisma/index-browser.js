@@ -153,7 +153,8 @@ exports.Prisma.UserScalarFieldEnum = {
   termsVersion: 'termsVersion',
   privacyAcceptedAt: 'privacyAcceptedAt',
   deletedAt: 'deletedAt',
-  showOnLeaderboard: 'showOnLeaderboard'
+  showOnLeaderboard: 'showOnLeaderboard',
+  locale: 'locale'
 };
 
 exports.Prisma.UserBlockScalarFieldEnum = {
@@ -199,8 +200,58 @@ exports.Prisma.UserSessionScalarFieldEnum = {
   deviceId: 'deviceId',
   deviceInfo: 'deviceInfo',
   ipAddress: 'ipAddress',
+  lastSeenAt: 'lastSeenAt',
+  platform: 'platform',
+  appVersion: 'appVersion',
+  deviceModel: 'deviceModel',
+  osVersion: 'osVersion',
+  country: 'country',
+  city: 'city',
   expiresAt: 'expiresAt',
-  revokedAt: 'revokedAt'
+  revokedAt: 'revokedAt',
+  rememberMe: 'rememberMe'
+};
+
+exports.Prisma.UserActivityEventScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  sessionId: 'sessionId',
+  deviceId: 'deviceId',
+  type: 'type',
+  screen: 'screen',
+  metadata: 'metadata',
+  platform: 'platform',
+  appVersion: 'appVersion',
+  occurredAt: 'occurredAt',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.DailyActiveStatScalarFieldEnum = {
+  id: 'id',
+  date: 'date',
+  dau: 'dau',
+  wau: 'wau',
+  mau: 'mau',
+  peakConcurrent: 'peakConcurrent',
+  avgConcurrent: 'avgConcurrent',
+  sessionsStarted: 'sessionsStarted',
+  reportsSubmitted: 'reportsSubmitted',
+  newRegistrations: 'newRegistrations',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.AdminAlertRuleScalarFieldEnum = {
+  id: 'id',
+  metric: 'metric',
+  comparator: 'comparator',
+  threshold: 'threshold',
+  windowSeconds: 'windowSeconds',
+  enabled: 'enabled',
+  lastTriggeredAt: 'lastTriggeredAt',
+  createdById: 'createdById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.PhoneOtpScalarFieldEnum = {
@@ -339,7 +390,8 @@ exports.Prisma.SiteScalarFieldEnum = {
   upvotesCount: 'upvotesCount',
   commentsCount: 'commentsCount',
   savesCount: 'savesCount',
-  sharesCount: 'sharesCount'
+  sharesCount: 'sharesCount',
+  heroReportId: 'heroReportId'
 };
 
 exports.Prisma.SiteHistoryEntryScalarFieldEnum = {
@@ -887,12 +939,12 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
-exports.Prisma.JsonNullValueInput = {
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
   JsonNull: Prisma.JsonNull
 };
 
-exports.Prisma.NullableJsonNullValueInput = {
-  DbNull: Prisma.DbNull,
+exports.Prisma.JsonNullValueInput = {
   JsonNull: Prisma.JsonNull
 };
 
@@ -922,6 +974,35 @@ exports.UserStatus = exports.$Enums.UserStatus = {
   ACTIVE: 'ACTIVE',
   SUSPENDED: 'SUSPENDED',
   DELETED: 'DELETED'
+};
+
+exports.DevicePlatform = exports.$Enums.DevicePlatform = {
+  IOS: 'IOS',
+  ANDROID: 'ANDROID'
+};
+
+exports.UserActivityEventType = exports.$Enums.UserActivityEventType = {
+  LOGIN: 'LOGIN',
+  LOGOUT: 'LOGOUT',
+  APP_OPENED: 'APP_OPENED',
+  SCREEN_VIEW: 'SCREEN_VIEW',
+  REPORT_CREATED: 'REPORT_CREATED',
+  REPORT_SUBMITTED: 'REPORT_SUBMITTED',
+  EVENT_JOINED: 'EVENT_JOINED',
+  CHECK_IN: 'CHECK_IN'
+};
+
+exports.AdminAlertMetric = exports.$Enums.AdminAlertMetric = {
+  CONCURRENT: 'CONCURRENT',
+  TRAFFIC_SPIKE: 'TRAFFIC_SPIKE',
+  ERROR_RATE: 'ERROR_RATE',
+  REPORT_ACTIVITY: 'REPORT_ACTIVITY',
+  API_DEGRADATION: 'API_DEGRADATION'
+};
+
+exports.AdminAlertComparator = exports.$Enums.AdminAlertComparator = {
+  GT: 'GT',
+  GTE: 'GTE'
 };
 
 exports.AdminInviteStatus = exports.$Enums.AdminInviteStatus = {
@@ -1105,11 +1186,6 @@ exports.SiteShareAttributionSource = exports.$Enums.SiteShareAttributionSource =
   OTHER: 'OTHER'
 };
 
-exports.DevicePlatform = exports.$Enums.DevicePlatform = {
-  IOS: 'IOS',
-  ANDROID: 'ANDROID'
-};
-
 exports.NotificationType = exports.$Enums.NotificationType = {
   SITE_UPDATE: 'SITE_UPDATE',
   REPORT_STATUS: 'REPORT_STATUS',
@@ -1135,6 +1211,9 @@ exports.Prisma.ModelName = {
   UgcContentReport: 'UgcContentReport',
   PasswordResetEmailCode: 'PasswordResetEmailCode',
   UserSession: 'UserSession',
+  UserActivityEvent: 'UserActivityEvent',
+  DailyActiveStat: 'DailyActiveStat',
+  AdminAlertRule: 'AdminAlertRule',
   PhoneOtp: 'PhoneOtp',
   LoginFailure: 'LoginFailure',
   AdminLoginFailure: 'AdminLoginFailure',

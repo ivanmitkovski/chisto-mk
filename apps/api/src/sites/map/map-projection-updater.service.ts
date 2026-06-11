@@ -86,6 +86,9 @@ export class MapProjectionUpdaterService implements OnModuleInit, OnModuleDestro
           orderBy: { id: 'asc' },
           take: batch,
           include: {
+            heroReport: {
+              select: { mediaUrls: true },
+            },
             reports: {
               orderBy: { createdAt: 'desc' },
               take: 1,
@@ -118,6 +121,9 @@ export class MapProjectionUpdaterService implements OnModuleInit, OnModuleDestro
       const site = (await this.prisma.site.findUnique({
         where: { id: siteId },
         include: {
+          heroReport: {
+            select: { mediaUrls: true },
+          },
           reports: {
             orderBy: { createdAt: 'desc' },
             take: 1,

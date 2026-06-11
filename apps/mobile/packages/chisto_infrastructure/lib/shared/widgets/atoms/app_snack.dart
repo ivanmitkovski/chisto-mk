@@ -1,11 +1,156 @@
+import 'dart:async';
+
+import 'package:chisto_infrastructure/core/auth/session_invalidation.dart';
+import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:chisto_infrastructure/core/l10n/app_error_localizations.dart';
+import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
+import 'package:chisto_infrastructure/core/logging/app_log.dart';
+import 'package:chisto_infrastructure/core/navigation/app_navigator_key.dart';
 import 'package:chisto_infrastructure/shared/utils/app_haptics.dart';
 import 'package:design_system/design_system.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 enum AppSnackType { info, success, warning, error }
 
 class AppSnack {
   const AppSnack._();
+
+  static ScaffoldFeatureController<SnackBar, SnackBarClosedReason>? failure(
+    BuildContext context, {
+    required AppError error,
+    Duration? duration,
+    String? actionLabel,
+    VoidCallback? onAction,
+  }) {
+    if (SessionInvalidation.shouldHandle(error)) {
+      unawaited(SessionInvalidation.fromError(error));
+      return null;
+    }
+    return show(
+      context,
+      message: localizedAppErrorMessage(context.l10n, error),
+      type: error.retryable ? AppSnackType.warning : AppSnackType.error,
+      duration: duration,
+      actionLabel: actionLabel,
+      onAction: onAction,
+    );
+  }
+
+  /// Shows a localized error snack, or triggers session teardown for auth errors.
+  static ScaffoldFeatureController<SnackBar, SnackBarClosedReason>? showError(
+    BuildContext context, {
+    required AppError error,
+    AppSnackType type = AppSnackType.warning,
+    Duration? duration,
+    String? actionLabel,
+    VoidCallback? onAction,
+  }) {
+    if (SessionInvalidation.shouldHandle(error)) {
+      unawaited(SessionInvalidation.fromError(error));
+      return null;
+    }
+    return show(
+      context,
+      message: localizedAppErrorMessage(context.l10n, error),
+      type: type,
+      duration: duration,
+      actionLabel: actionLabel,
+      onAction: onAction,
+    );
+  }
+
+  /// Resolves a context that can show snacks from modal bottom sheets.
+  static BuildContext? resolveHostContext(BuildContext context) {
+    if (ScaffoldMessenger.maybeOf(context) != null) {
+      return context;
+    }
+    final BuildContext? root = appRootNavigatorKey.currentContext;
+    if (root != null) {
+      if (ScaffoldMessenger.maybeOf(root) != null ||
+          Navigator.maybeOf(root) != null) {
+        return root;
+      }
+    }
+    if (Navigator.maybeOf(context) != null) {
+      return context;
+    }
+    return root ?? context;
+  }
+
+  /// Modal routes often lack a [Scaffold] ancestor; overlay banner works there.
+  static bool _needsOverlayBanner(BuildContext context) {
+    final TargetPlatform platform = Theme.of(context).platform;
+    if (platform == TargetPlatform.iOS || platform == TargetPlatform.macOS) {
+      return true;
+    }
+    return context.findAncestorWidgetOfExactType<Scaffold>() == null;
+  }
+
+  static void _showOverlayBanner(
+    BuildContext context, {
+    required String message,
+    required AppSnackType type,
+    required Duration duration,
+    String? actionLabel,
+    VoidCallback? onAction,
+  }) {
+    final BuildContext? navigatorContext =
+        Navigator.maybeOf(context, rootNavigator: true)?.context ??
+        Navigator.maybeOf(context)?.context;
+    if (navigatorContext == null) {
+      assert(() {
+        AppLog.verbose('[AppSnack] Dropped message (no navigator): $message');
+        return true;
+      }());
+      return;
+    }
+
+    showGeneralDialog<void>(
+      context: navigatorContext,
+      barrierDismissible: true,
+      barrierLabel: 'app_snack',
+      barrierColor: AppColors.transparent,
+      transitionDuration: AppMotion.medium,
+      pageBuilder:
+          (
+            BuildContext dialogContext,
+            Animation<double> animation,
+            Animation<double> secondaryAnimation,
+          ) {
+            return _AppSnackOverlay(
+              message: message,
+              type: type,
+              duration: duration,
+              actionLabel: actionLabel,
+              onAction: onAction,
+            );
+          },
+      transitionBuilder:
+          (
+            BuildContext dialogContext,
+            Animation<double> animation,
+            Animation<double> secondaryAnimation,
+            Widget child,
+          ) {
+            final CurvedAnimation curved = CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutCubic,
+              reverseCurve: Curves.easeInCubic,
+            );
+            return IgnorePointer(
+              ignoring: animation.isAnimating,
+              child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, -0.12),
+                  end: Offset.zero,
+                ).animate(curved),
+                child: FadeTransition(opacity: curved, child: child),
+              ),
+            );
+          },
+    );
+  }
 
   static ScaffoldFeatureController<SnackBar, SnackBarClosedReason>? show(
     BuildContext context, {
@@ -15,73 +160,43 @@ class AppSnack {
     String? actionLabel,
     VoidCallback? onAction,
   }) {
+    final BuildContext? hostContext = resolveHostContext(context);
+    if (hostContext == null) {
+      assert(() {
+        AppLog.verbose('[AppSnack] Dropped message (no host context): $message');
+        return true;
+      }());
+      return null;
+    }
+
     final Duration effectiveDuration =
         duration ?? _defaultDuration(message, hasAction: onAction != null);
-    _triggerHaptic(context, type);
-    // Platform-adaptive behavior:
-    // - iOS/macOS: lightweight top banner (Apple-style).
-    // - Android/others: Material floating SnackBar from bottom.
-    final TargetPlatform platform = Theme.of(context).platform;
-    if (platform == TargetPlatform.iOS || platform == TargetPlatform.macOS) {
-      final BuildContext? navigatorContext = Navigator.maybeOf(
-        context,
-      )?.context;
-      if (navigatorContext == null) return null;
+    _triggerHaptic(hostContext, type);
 
-      showGeneralDialog<void>(
-        context: navigatorContext,
-        barrierDismissible: true,
-        barrierLabel: 'app_snack',
-        barrierColor: AppColors.transparent,
-        transitionDuration: AppMotion.medium,
-        pageBuilder:
-            (
-              BuildContext dialogContext,
-              Animation<double> animation,
-              Animation<double> secondaryAnimation,
-            ) {
-              return _AppSnackOverlay(
-                message: message,
-                type: type,
-                duration: effectiveDuration,
-                actionLabel: actionLabel,
-                onAction: onAction,
-              );
-            },
-        transitionBuilder:
-            (
-              BuildContext dialogContext,
-              Animation<double> animation,
-              Animation<double> secondaryAnimation,
-              Widget child,
-            ) {
-              final CurvedAnimation curved = CurvedAnimation(
-                parent: animation,
-                curve: Curves.easeOutCubic,
-                reverseCurve: Curves.easeInCubic,
-              );
-              // Avoid hit-testing while SlideTransition/FractionalTranslation is still
-              // laying out (iOS top banner); prevents debugNeedsLayout assertions.
-              return IgnorePointer(
-                ignoring: animation.isAnimating,
-                child: SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(0, -0.12),
-                    end: Offset.zero,
-                  ).animate(curved),
-                  child: FadeTransition(opacity: curved, child: child),
-                ),
-              );
-            },
+    if (_needsOverlayBanner(hostContext)) {
+      _showOverlayBanner(
+        hostContext,
+        message: message,
+        type: type,
+        duration: effectiveDuration,
+        actionLabel: actionLabel,
+        onAction: onAction,
       );
-
       return null;
     }
 
     final ScaffoldMessengerState? messenger = ScaffoldMessenger.maybeOf(
-      context,
+      hostContext,
     );
-    if (messenger == null) return null;
+    if (messenger == null) {
+      assert(() {
+        AppLog.verbose(
+          '[AppSnack] Dropped message (no ScaffoldMessenger): $message',
+        );
+        return true;
+      }());
+      return null;
+    }
 
     messenger.hideCurrentSnackBar(reason: SnackBarClosedReason.hide);
     return messenger.showSnackBar(
@@ -381,8 +496,8 @@ class _SnackPalette {
         return _SnackPalette(
           icon: Icons.error_outline_rounded,
           iconColor: AppColors.error,
-          iconBackground: AppColors.accentDanger.withValues(alpha: 0.08),
-          borderColor: AppColors.accentDanger.withValues(alpha: 0.5),
+          iconBackground: AppColors.error.withValues(alpha: 0.08),
+          borderColor: AppColors.error.withValues(alpha: 0.5),
         );
     }
   }

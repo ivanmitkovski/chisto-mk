@@ -1,5 +1,6 @@
 import 'package:chisto_infrastructure/shared/widgets/organisms/auth_screen_header.dart';
 import 'package:design_system/design_system.dart';
+import 'package:feature_auth/src/presentation/widgets/auth_form_scroll_physics.dart';
 import 'package:flutter/material.dart';
 
 /// Shared OTP screen chrome for registration and password-reset flows.
@@ -39,55 +40,52 @@ class AuthOtpScaffold extends StatelessWidget {
         Scaffold(
           resizeToAvoidBottomInset: false,
           backgroundColor: AppColors.panelBackground,
-          body: GestureDetector(
-            onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-            behavior: HitTestBehavior.translucent,
-            child: SafeArea(
-              child: AnimatedPadding(
-                duration: MediaQuery.disableAnimationsOf(context)
-                    ? Duration.zero
-                    : AppMotion.medium,
-                curve: AppMotion.emphasized,
-                padding: EdgeInsets.only(bottom: keyboardInset),
-                child: SingleChildScrollView(
-                  keyboardDismissBehavior:
-                      ScrollViewKeyboardDismissBehavior.onDrag,
-                  padding: const EdgeInsets.fromLTRB(
-                    AppSpacing.lg,
-                    AppSpacing.sm,
-                    AppSpacing.lg,
-                    AppSpacing.lg,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      if (leading != null) leading!,
-                      if (errorBanner != null) ...<Widget>[
-                        const SizedBox(height: AppSpacing.sm),
-                        errorBanner!,
-                        if (headerIllustration == null)
-                          const SizedBox(height: AppSpacing.md),
-                      ],
-                      if (headerIllustration != null) ...<Widget>[
-                        const SizedBox(height: AppSpacing.xxl),
-                        Center(child: headerIllustration),
-                        const SizedBox(height: AppSpacing.radius22),
-                      ],
-                      AuthScreenHeader(
-                        centered: headerCentered,
-                        title: title,
-                        subtitle: subtitle,
-                        subtitleMaxLines: 2,
-                      ),
-                      const SizedBox(height: AppSpacing.radiusPill),
-                      otpInput,
-                      const SizedBox(height: AppSpacing.radiusPill),
-                      continueButton,
-                      const SizedBox(height: AppSpacing.lg),
-                      Center(child: resendButton),
-                      if (footer != null) footer!,
+          body: SafeArea(
+            child: AnimatedPadding(
+              duration: MediaQuery.disableAnimationsOf(context)
+                  ? Duration.zero
+                  : AppMotion.medium,
+              curve: AppMotion.emphasized,
+              padding: EdgeInsets.only(bottom: keyboardInset),
+              child: SingleChildScrollView(
+                physics: AuthFormScrollPhysics.resolve(context),
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.lg,
+                  AppSpacing.sm,
+                  AppSpacing.lg,
+                  AppSpacing.lg,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    if (leading != null) leading!,
+                    if (errorBanner != null) ...<Widget>[
+                      const SizedBox(height: AppSpacing.sm),
+                      errorBanner!,
+                      if (headerIllustration == null)
+                        const SizedBox(height: AppSpacing.md),
                     ],
-                  ),
+                    if (headerIllustration != null) ...<Widget>[
+                      const SizedBox(height: AppSpacing.xxl),
+                      Center(child: headerIllustration),
+                      const SizedBox(height: AppSpacing.radius22),
+                    ],
+                    AuthScreenHeader(
+                      centered: headerCentered,
+                      title: title,
+                      subtitle: subtitle,
+                      subtitleMaxLines: 2,
+                    ),
+                    const SizedBox(height: AppSpacing.radiusPill),
+                    otpInput,
+                    const SizedBox(height: AppSpacing.radiusPill),
+                    continueButton,
+                    const SizedBox(height: AppSpacing.lg),
+                    Center(child: resendButton),
+                    if (footer != null) footer!,
+                  ],
                 ),
               ),
             ),

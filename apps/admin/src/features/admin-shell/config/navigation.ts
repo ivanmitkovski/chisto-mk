@@ -15,6 +15,7 @@ export const adminNavigation: ReadonlyArray<NavItem> = [
   { key: 'gamification', href: '/dashboard/gamification', icon: 'trophy' },
   { key: 'app-config', href: '/dashboard/app-config', icon: 'sliders' },
   { key: 'operations', href: '/dashboard/operations', icon: 'info' },
+  { key: 'active-users', href: '/dashboard/active-users', icon: 'user' },
   {
     key: 'email-suppressions',
     labelKey: 'emailSuppressions',

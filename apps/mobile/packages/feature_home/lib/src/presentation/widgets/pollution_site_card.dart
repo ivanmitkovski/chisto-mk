@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:chisto_core/chisto_core.dart';
 import 'package:chisto_infrastructure/core/cache/site_image_prefetch_queue.dart';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
+import 'package:chisto_infrastructure/core/providers/app_providers.dart';
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
 import 'package:design_system/design_system.dart';
@@ -409,7 +410,10 @@ class _PollutionSiteCardState extends ConsumerState<PollutionSiteCard>
       sessionId: widget.feedSessionId,
       feedVariant: widget.feedVariant,
     );
-    final TakeActionType? action = await TakeActionSheet.show(context);
+    final TakeActionType? action = await TakeActionSheet.show(
+      context,
+      canCreateEcoAction: true,
+    );
     if (action == null || !mounted) return;
     final PollutionFeedCardEventType actionEvent = switch (action) {
       TakeActionType.createEcoAction =>
@@ -496,6 +500,9 @@ class _PollutionSiteCardState extends ConsumerState<PollutionSiteCard>
         ref
             .read(siteEngagementNotifierProvider(site.id).notifier)
             .setShareCount(snapshot.sharesCount);
+        ref
+            .read(feedSitesNotifierProvider.notifier)
+            .patchSiteShareCount(site.id, snapshot.sharesCount);
         trackPollutionFeedCardEvent(
           site.id,
           eventType: PollutionFeedCardEventType.share,
@@ -578,7 +585,7 @@ class _PollutionSiteCardState extends ConsumerState<PollutionSiteCard>
 
   Future<void> _openFeedbackSheet() async {
     final FeedCardFeedbackAction? action =
-        await showModalBottomSheet<FeedCardFeedbackAction>(
+        await AppBottomSheet.show<FeedCardFeedbackAction>(
           context: context,
           useRootNavigator: true,
           isScrollControlled: true,

@@ -41,10 +41,31 @@ extension ReportsListBootstrap on _ReportsListScreenState {
     _scrollController.addListener(_onScrollNearEnd);
     _searchController.addListener(_onSearchChanged);
     _searchQuery = _searchController.text.trim();
-    _realtimeSub = ref
-        .read(reportsRealtimeServiceProvider)
-        .events
-        .listen(_onReportsOwnerEvent);
+    final ReportsRealtimeService realtimeSvc = ref.read(
+      reportsRealtimeServiceProvider,
+    );
+    final ReportsListController listController = ref.read(
+      reportsListControllerProvider.notifier,
+    );
+    _reportsRealtimeService = realtimeSvc;
+    _realtimeSub = realtimeSvc.events.listen(_onReportsOwnerEvent);
+    void onConnectionChanged() {
+      if (!mounted || _disposed) {
+        return;
+      }
+      final ReportsRealtimeConnectionState? state =
+          realtimeSvc.connectionState.value;
+      _configureRestPollForConnection(state);
+      if (state != ReportsRealtimeConnectionState.live) {
+        return;
+      }
+      if (listController.reports.any((ReportListItem r) => r.isOptimistic)) {
+        unawaited(_loadReports());
+      }
+    }
+    realtimeSvc.connectionState.addListener(onConnectionChanged);
+    _realtimeConnectionListener = onConnectionChanged;
+    _configureRestPollForConnection(realtimeSvc.connectionState.value);
     _draftSummaryListenable = ref
         .read(reportDraftRepositoryProvider)
         .summaryListenable;
@@ -76,6 +97,15 @@ extension ReportsListBootstrap on _ReportsListScreenState {
 
   void bootstrapDispose() {
     _draftSummaryListenable?.removeListener(_onDraftSummaryChanged);
+    _draftSummaryListenable = null;
+    final VoidCallback? connectionListener = _realtimeConnectionListener;
+    if (connectionListener != null) {
+      _reportsRealtimeService?.connectionState.removeListener(connectionListener);
+      _realtimeConnectionListener = null;
+    }
+    _reportsRealtimeService = null;
+    _restPollTimer?.cancel();
+    _restPollTimer = null;
     _prefetchCoordinator.cancel();
     _searchDebounce?.cancel();
     _realtimeCoalescer.dispose();
@@ -88,7 +118,7 @@ extension ReportsListBootstrap on _ReportsListScreenState {
   }
 
   void _onDraftSummaryChanged() {
-    if (mounted) {
+    if (mounted && !_disposed) {
       rebuildState(() {});
     }
   }
@@ -96,11 +126,7 @@ extension ReportsListBootstrap on _ReportsListScreenState {
   void _onListControllerChanged(ReportsListState listState) {
     final AppError? appendErr = listState.appendLoadError;
     if (appendErr != null && mounted) {
-      AppSnack.show(
-        context,
-        message: appendErr.message,
-        type: AppSnackType.warning,
-      );
+      AppSnack.failure(context, error: appendErr);
       _list.clearAppendError();
     }
   }
@@ -117,6 +143,9 @@ extension ReportsListBootstrap on _ReportsListScreenState {
   }
 
   Future<void> _loadReports() async {
+    if (_disposed || !mounted) {
+      return;
+    }
     final bool wasEmpty = ref
         .read(reportsListControllerProvider)
         .reports
@@ -137,18 +166,12 @@ extension ReportsListBootstrap on _ReportsListScreenState {
     }
     final AppError? err = ref.read(reportsListControllerProvider).loadError;
     if (err != null) {
-      if (err.code == 'UNAUTHORIZED' ||
-          err.code == 'INVALID_TOKEN_USER' ||
-          err.code == 'ACCOUNT_NOT_ACTIVE') {
-        AppNavigation.goSignInAndClearStack();
+      if (SessionInvalidation.shouldHandle(err)) {
+        unawaited(SessionInvalidation.fromError(err));
         return;
       }
       if (mounted) {
-        AppSnack.show(
-          context,
-          message: err.message,
-          type: AppSnackType.warning,
-        );
+        AppSnack.failure(context, error: err);
       }
       return;
     }
@@ -184,7 +207,37 @@ extension ReportsListBootstrap on _ReportsListScreenState {
     });
   }
 
+  void _configureRestPollForConnection(
+    ReportsRealtimeConnectionState? state,
+  ) {
+    _restPollTimer?.cancel();
+    _restPollTimer = null;
+    if (!mounted || _disposed) {
+      return;
+    }
+    final ReportsRealtimeConnectionState resolved =
+        state ?? ReportsRealtimeConnectionState.live;
+    if (resolved == ReportsRealtimeConnectionState.live) {
+      return;
+    }
+    _restPollTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (!mounted || _disposed) {
+        return;
+      }
+      final ReportsRealtimeConnectionState? current =
+          _reportsRealtimeService?.connectionState.value;
+      if (current == ReportsRealtimeConnectionState.live) {
+        _configureRestPollForConnection(current);
+        return;
+      }
+      unawaited(_list.refreshFirstPage());
+    });
+  }
+
   void _onReportsOwnerEvent(ReportsOwnerEvent event) {
+    if (!mounted || _disposed) {
+      return;
+    }
     if (event.type == 'report_created' && event.mutationKind == 'created') {
       _list.clearOptimisticForReport(event.reportId);
       _realtimeCoalescer.schedule();

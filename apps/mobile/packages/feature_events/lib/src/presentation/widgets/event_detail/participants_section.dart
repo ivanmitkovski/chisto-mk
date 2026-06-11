@@ -64,12 +64,18 @@ class _ParticipantsSectionState extends ConsumerState<ParticipantsSection> {
     if (widget.repository != null) {
       notifier.setRepository(widget.repository!);
     }
-    unawaited(notifier.loadPeek(youLabel: context.l10n.eventsParticipantsYou));
+    unawaited(
+      notifier.loadPeek(
+        youLabel: context.l10n.eventsParticipantsYou,
+        deletedUserLabel: context.l10n.deletedUser,
+      ),
+    );
   }
 
   void _showAttendeeList(BuildContext context) {
-    showEventsSurfaceModal<void>(
+    AppBottomSheet.show<void>(
       context: context,
+      keyboardInsetMode: SheetKeyboardInsetMode.overlay,
       builder: (BuildContext ctx) {
         return ReportSheetScaffold(
           title: ctx.l10n.eventsParticipantsTitle,
@@ -77,6 +83,8 @@ class _ParticipantsSectionState extends ConsumerState<ParticipantsSection> {
             event.participantCount,
           ),
           maxHeightFactor: 0.84,
+          fillAvailableHeight: true,
+          addBottomInset: true,
           // Single horizontal inset (md = 16) for title, divider, search, tabs, and list.
           padding: const EdgeInsets.fromLTRB(
             AppSpacing.md,

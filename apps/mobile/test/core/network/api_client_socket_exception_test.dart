@@ -16,7 +16,7 @@ void main() {
     final client = ApiClient(
       config: AppConfig.local,
       accessToken: () => 'token',
-      onUnauthorized: () {},
+      onUnauthorized: (_) {},
       httpClient: mock,
     );
 
@@ -35,31 +35,34 @@ void main() {
     );
   });
 
-  test('cleartext SocketException maps to actionable network message', () async {
-    final mock = MockClient((http.Request request) async {
-      throw const SocketException(
-        'Cleartext HTTP traffic to chisto-dev-alb.example.com not permitted',
+  test(
+    'cleartext SocketException maps to actionable network message',
+    () async {
+      final mock = MockClient((http.Request request) async {
+        throw const SocketException(
+          'Cleartext HTTP traffic to chisto-dev-alb.example.com not permitted',
+        );
+      });
+
+      final client = ApiClient(
+        config: AppConfig.local,
+        accessToken: () => 'token',
+        onUnauthorized: (_) {},
+        httpClient: mock,
       );
-    });
 
-    final client = ApiClient(
-      config: AppConfig.local,
-      accessToken: () => 'token',
-      onUnauthorized: () {},
-      httpClient: mock,
-    );
-
-    await expectLater(
-      client.post('/reports', body: <String, dynamic>{}),
-      throwsA(
-        isA<AppError>()
-            .having((AppError e) => e.code, 'code', 'NETWORK_ERROR')
-            .having(
-              (AppError e) => e.message,
-              'message',
-              contains('cleartext'),
-            ),
-      ),
-    );
-  });
+      await expectLater(
+        client.post('/reports', body: <String, dynamic>{}),
+        throwsA(
+          isA<AppError>()
+              .having((AppError e) => e.code, 'code', 'NETWORK_ERROR')
+              .having(
+                (AppError e) => e.message,
+                'message',
+                contains('cleartext'),
+              ),
+        ),
+      );
+    },
+  );
 }

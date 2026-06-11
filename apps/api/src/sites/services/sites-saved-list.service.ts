@@ -3,6 +3,7 @@ import { SiteStatus } from '../../prisma-client';
 import { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { distanceInMeters } from '../../common/utils/distance';
 import { ReportsUploadService } from '../../reports/services/reports-upload.service';
+import { resolveActorIdentity } from '../../common/projections/public-identity.projection';
 import { PrismaService } from '../../prisma/prisma.service';
 import { PaginationQueryDto20 } from '../../common/dto/pagination-query.dto';
 import { mapWithConcurrency } from '../util/sites-feed-query-async.util';
@@ -30,7 +31,7 @@ export class SitesSavedListService {
           createdAt: true,
           reportNumber: true,
           reporter: {
-            select: { id: true, firstName: true, lastName: true, avatarObjectKey: true },
+            select: { id: true, firstName: true, lastName: true, avatarObjectKey: true, status: true },
           },
         },
       },
@@ -69,7 +70,7 @@ export class SitesSavedListService {
       .filter((site): site is FeedSiteRow => site != null);
 
     const enriched = await mapWithConcurrency(sites, 8, async (site) => {
-      const { reports, votes, saves: saveRows, _count, ...siteBase } = site;
+      const { reports, votes, saves: _saveRows, _count, ...siteBase } = site;
       const firstReport = reports[0];
       const mediaUrls = firstReport?.mediaUrls?.length ? firstReport.mediaUrls : undefined;
       let latestReportReporterName: string | null = null;
@@ -78,8 +79,8 @@ export class SitesSavedListService {
       const feedRep = firstReport?.reporter;
       if (feedRep) {
         latestReportReporterId = feedRep.id;
-        const nm = `${feedRep.firstName ?? ''} ${feedRep.lastName ?? ''}`.trim();
-        latestReportReporterName = nm.length > 0 ? nm : null;
+        const identity = resolveActorIdentity(feedRep, { actorUserId: feedRep.id });
+        latestReportReporterName = identity.isDeleted ? null : (identity.displayName ?? null);
         latestReportReporterAvatarUrl = await this.reportsUploadService.signPrivateObjectKey(
           feedRep.avatarObjectKey,
         );

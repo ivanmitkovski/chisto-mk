@@ -25,8 +25,10 @@ import 'package:feature_events/src/presentation/screens/event_impact_receipt_scr
 import 'package:feature_events/src/presentation/screens/organizer_checkin_screen.dart';
 import 'package:feature_events/src/presentation/screens/organizer_dashboard_screen.dart';
 import 'package:feature_home/src/presentation/screens/home_shell.dart';
+import 'package:feature_home/src/domain/models/pollution_site.dart';
 import 'package:feature_home/src/presentation/screens/site_detail_route_screen.dart';
 import 'package:feature_notifications/src/domain/models/notification_inbox_highlight.dart';
+import 'package:feature_profile/src/domain/models/profile_user.dart';
 import 'package:feature_reports/src/presentation/screens/new_report_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -59,6 +61,9 @@ class AppRoutes {
   /// Deep link / push: site by id (no hydrated preview).
   static const String siteDetail = '/sites/detail';
   static const String newReport = '/reports/new';
+  static const String reportDetail = '/reports/detail';
+  static const String notifications = '/notifications';
+  static const String profilePointsHistory = '/profile/points-history';
   static const String eventsCreate = '/events/create';
   static const String eventsDetail = '/events/detail';
   static const String eventsAttendeeCheckIn = '/events/attendee-check-in';
@@ -70,10 +75,7 @@ class AppRoutes {
 }
 
 class ForgotPasswordNewRouteArgs {
-  const ForgotPasswordNewRouteArgs({
-    required this.target,
-    required this.code,
-  });
+  const ForgotPasswordNewRouteArgs({required this.target, required this.code});
 
   final PasswordResetTarget target;
   final String code;
@@ -88,10 +90,14 @@ class OtpRouteArgs {
   const OtpRouteArgs({
     required this.phoneNumberE164,
     this.requestOtpOnOpen = false,
+    this.rememberMe = true,
   });
 
   final String phoneNumberE164;
   final bool requestOtpOnOpen;
+
+  /// Mirrors the sign-in Remember Me choice for unverified existing users.
+  final bool rememberMe;
 }
 
 class EventCreateRouteArguments {
@@ -165,6 +171,20 @@ class HomeRouteArgs {
   final int initialTabIndex;
   final String? mapSiteIdToFocus;
   final bool startCoachTour;
+}
+
+/// [AppRoutes.notifications] extra payload.
+class NotificationsRouteExtra {
+  const NotificationsRouteExtra({this.availableSites = const <PollutionSite>[]});
+
+  final List<PollutionSite> availableSites;
+}
+
+/// [AppRoutes.profilePointsHistory] optional preloaded user summary.
+class ProfilePointsHistoryRouteExtra {
+  const ProfilePointsHistoryRouteExtra({this.summaryUser});
+
+  final ProfileUser? summaryUser;
 }
 
 /// [AppRoutes.newReport] extra payload.
@@ -263,22 +283,25 @@ class AppRouter {
       case AppRoutes.otp:
         late final String phoneNumber;
         late final bool requestOtpOnOpen;
+        late final bool rememberMe;
         if (settings.arguments is OtpRouteArgs) {
           final OtpRouteArgs args = settings.arguments! as OtpRouteArgs;
           phoneNumber = args.phoneNumberE164;
           requestOtpOnOpen = args.requestOtpOnOpen;
+          rememberMe = args.rememberMe;
         } else if (settings.arguments is String) {
           phoneNumber = settings.arguments! as String;
           requestOtpOnOpen = false;
+          rememberMe = true;
         } else {
           if (kDebugMode) {
             AppLog.warn(
               '[AppRouter] AppRoutes.otp expected String or OtpRouteArgs; got '
-              '${settings.arguments?.runtimeType}. Sending user to sign up.',
+              '${settings.arguments?.runtimeType}. Sending user to sign in.',
             );
           }
           return MaterialPageRoute<void>(
-            builder: (_) => const SignUpScreen(),
+            builder: (_) => const SignInScreen(),
             settings: settings,
           );
         }
@@ -286,6 +309,7 @@ class AppRouter {
           builder: (_) => OtpScreen(
             phoneNumber: phoneNumber,
             requestOtpOnOpen: requestOtpOnOpen,
+            rememberMe: rememberMe,
           ),
           settings: settings,
         );
@@ -329,10 +353,8 @@ class AppRouter {
         final ForgotPasswordNewRouteArgs fpArgs =
             settings.arguments! as ForgotPasswordNewRouteArgs;
         return MaterialPageRoute<void>(
-          builder: (_) => ForgotPasswordNewScreen(
-            target: fpArgs.target,
-            code: fpArgs.code,
-          ),
+          builder: (_) =>
+              ForgotPasswordNewScreen(target: fpArgs.target, code: fpArgs.code),
           settings: settings,
         );
       case AppRoutes.forgotPasswordSuccess:

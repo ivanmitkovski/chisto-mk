@@ -11,6 +11,7 @@ export type NavItemKey =
   | 'risk-signals'
   | 'moderation'
   | 'operations'
+  | 'active-users'
   | 'broadcasts'
   | 'gamification'
   | 'app-config'

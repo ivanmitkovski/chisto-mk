@@ -111,16 +111,39 @@ void main() {
   });
 
   group('SitesLocalCache map snapshot', () {
-    test('roundtrips map payload', () async {
+    test('roundtrips map payload for the same auth segment', () async {
       final SitesLocalCache cache = SitesLocalCache();
       const Map<String, dynamic> payload = <String, dynamic>{
         'data': <dynamic>[],
       };
-      await cache.persistMapSnapshot(payload);
+      await cache.persistMapSnapshot(payload, authSegment: 'user-a');
       final ({Map<String, dynamic> payload, DateTime cachedAt})? loaded =
-          await cache.loadMapSnapshot();
+          await cache.loadMapSnapshot(authSegment: 'user-a');
       expect(loaded, isNotNull);
       expect(loaded!.payload, payload);
+    });
+
+    test('loadMapSnapshot rejects another account snapshot', () async {
+      final SitesLocalCache cache = SitesLocalCache();
+      await cache.persistMapSnapshot(const <String, dynamic>{
+        'data': <dynamic>[],
+      }, authSegment: 'user-a');
+
+      expect(await cache.loadMapSnapshot(authSegment: 'user-b'), isNull);
+      expect(await cache.loadMapSnapshot(authSegment: 'anon'), isNull);
+    });
+
+    test('loadMapSnapshot rejects legacy snapshot without auth segment', () async {
+      final SitesLocalCache cache = SitesLocalCache();
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString(
+        SitesLocalCache.mapPersistedCacheKey,
+        jsonEncode(<String, dynamic>{
+          'cachedAtMs': DateTime.now().millisecondsSinceEpoch,
+          'payload': <String, dynamic>{'data': <dynamic>[]},
+        }),
+      );
+      expect(await cache.loadMapSnapshot(authSegment: 'user-a'), isNull);
     });
 
     test('loadMapSnapshot returns null for expired snapshot', () async {
@@ -131,10 +154,11 @@ void main() {
         SitesLocalCache.mapPersistedCacheKey,
         jsonEncode(<String, dynamic>{
           'cachedAtMs': old.millisecondsSinceEpoch,
+          'authSegment': 'user-a',
           'payload': <String, dynamic>{'data': <dynamic>[]},
         }),
       );
-      expect(await cache.loadMapSnapshot(), isNull);
+      expect(await cache.loadMapSnapshot(authSegment: 'user-a'), isNull);
     });
 
     test('loadMapSnapshot returns null for corrupt JSON', () async {
@@ -142,7 +166,28 @@ void main() {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString(SitesLocalCache.mapPersistedCacheKey, 'not-json');
 
-      expect(await cache.loadMapSnapshot(), isNull);
+      expect(await cache.loadMapSnapshot(authSegment: 'user-a'), isNull);
+    });
+  });
+
+  group('SitesLocalCache map corpus', () {
+    test('roundtrips for the same auth segment, rejects another account', () async {
+      final SitesLocalCache cache = SitesLocalCache();
+      await cache.persistMapCorpus(
+        filterKey: 7,
+        sites: const <Map<String, dynamic>>[
+          <String, dynamic>{'id': 's1'},
+        ],
+        authSegment: 'user-a',
+      );
+
+      final ({int filterKey, List<Map<String, dynamic>> sites})? same =
+          await cache.loadMapCorpus(authSegment: 'user-a');
+      expect(same, isNotNull);
+      expect(same!.filterKey, 7);
+      expect(same.sites, hasLength(1));
+
+      expect(await cache.loadMapCorpus(authSegment: 'user-b'), isNull);
     });
   });
 

@@ -4,7 +4,7 @@ Chisto.mk Flutter app.
 
 ## Toolchain
 
-Pinned in repo root [`.tool-versions`](../.tool-versions): **Flutter 3.41.3**, **Dart 3.11.1**.
+Pinned in repo root [`.tool-versions`](../../.tool-versions): **Flutter 3.44.0**, **Dart 3.12.0**.
 
 ```sh
 flutter pub get
@@ -13,7 +13,7 @@ flutter test test/
 dart run tool/check_haptics_usage.dart
 ```
 
-Release version: `pubspec.yaml` (`1.0.0-beta.1+3`). See [`docs/beta-release-checklist.md`](docs/beta-release-checklist.md), [`docs/ios-beta.md`](docs/ios-beta.md), and [`docs/android-beta.md`](docs/android-beta.md).
+Release version: `pubspec.yaml` (`1.0.0+4`). Store-submission mechanics (certificates, provisioning, screenshots, metadata) are documented in the launch-readiness submission guide (`docs/launch-readiness/phase-13-submission-guide.md`, produced in Phase 13).
 
 ```sh
 # Staging beta IPA / AAB (requires signing secrets — see checklist)

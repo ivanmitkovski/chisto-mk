@@ -3,6 +3,7 @@ import { AuditModule } from '../audit/audit.module';
 import { ModerationModule } from '../moderation/moderation.module';
 import { ReportsUploadModule } from '../reports/reports-upload.module';
 import { SiteHistoryModule } from './history/site-history.module';
+import { SiteCommentsCountModule } from './site-comments-count.module';
 import { SiteBookmarkService } from './services/site-bookmark.service';
 import { SiteEngagementService } from './services/site-engagement.service';
 import { SiteShareLinkService } from './services/site-share-link.service';
@@ -18,6 +19,7 @@ import { SitesEngagementSnapshotService } from './services/sites-engagement-snap
 import { SitesReporterNotificationService } from './services/sites-reporter-notification.service';
 import { SitesEngagementActionsService } from './services/sites-engagement-actions.service';
 import { SitesSiteUpvotesListService } from './services/sites-site-upvotes-list.service';
+import { SiteCoReportersListService } from './services/site-co-reporters-list.service';
 import { SiteDetailRepository } from './repositories/site-detail.repository';
 import { SiteMediaRepository } from './repositories/site-media.repository';
 import { SiteUpvotesRepository } from './repositories/site-upvotes.repository';
@@ -29,6 +31,7 @@ import { SitesFeedModule } from './sites-feed.module';
     ReportsUploadModule,
     ModerationModule,
     SiteHistoryModule,
+    SiteCommentsCountModule,
     forwardRef(() => SitesFeedModule),
   ],
   controllers: [SitesCommentsController, SitesEngagementController],
@@ -36,6 +39,7 @@ import { SitesFeedModule } from './sites-feed.module';
     SitesDetailService,
     SitesMediaService,
     SitesSiteUpvotesListService,
+    SiteCoReportersListService,
     SitesEngagementSnapshotService,
     SitesReporterNotificationService,
     SitesEngagementActionsService,
@@ -50,6 +54,6 @@ import { SitesFeedModule } from './sites-feed.module';
     SiteMediaRepository,
     SiteUpvotesRepository,
   ],
-  exports: [SitesDetailService, SitesMediaService, SiteEngagementService, SiteHistoryModule],
+  exports: [SitesDetailService, SitesMediaService, SiteEngagementService, SiteCoReportersListService, SiteHistoryModule, SitesReporterNotificationService],
 })
 export class SitesEngagementModule {}

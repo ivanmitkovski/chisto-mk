@@ -102,7 +102,7 @@ Future<void> pumpAuthWidget(
   );
 }
 
-/// Enters OTP via the hidden field behind [AuthOtpInput].
+/// Enters OTP via the overlay field in [AuthOtpInput].
 Future<void> enterOtpCode(WidgetTester tester, String code) async {
   final Finder field = find.descendant(
     of: find.byType(AuthOtpInput),

@@ -10,7 +10,7 @@ let pushInboxReads = 0;
 let pushQueueDepth = 0;
 let pushActiveLeases = 0;
 let pushDeadLetterCount = 0;
-let pushSendsByType: Record<string, { success: number; failure: number; revoked: number }> = {};
+const pushSendsByType: Record<string, { success: number; failure: number; revoked: number }> = {};
 
 export function recordPushSend(
   outcome: 'success' | 'failure' | 'revoked',

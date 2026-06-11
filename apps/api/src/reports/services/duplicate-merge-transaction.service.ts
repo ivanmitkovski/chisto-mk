@@ -1,14 +1,18 @@
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Prisma, ReportSideEffectKind, ReportSideEffectStatus, SiteStatus } from '../../prisma-client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { MergeDuplicateReportsDto, MergeDuplicateReportsResponseDto } from '../dto/admin-duplicate-report.dto';
 import { DuplicateGroupQueryService } from '../duplicates/duplicate-group-query.service';
 import { ReportSideEffectProcessorService } from '../side-effects/report-side-effect-processor.service';
-import type { MergeDuplicateSideEffectPayload } from '../side-effects/report-side-effect-processor.service';
+import { buildMergeSideEffectPayload, planMergedCoReporters } from '../util/duplicate-merge-plan.util';
 import { transitionSiteToVerifiedIfFirstApproved } from '../util/report-site-verification.helper';
 import { ReportApprovalPointsService } from './report-approval-points.service';
 import { DuplicateMergeSnapshotService } from './duplicate-merge-snapshot.service';
+import { SiteHeroImageService } from '../../sites/services/site-hero-image.service';
+import { emitGamificationPointsCredited } from '../../gamification/util/gamification-credit-events.util';
+import type { EcoEventPointsCreditResult } from '../../gamification/services/eco-event-points.service';
 
 @Injectable()
 export class DuplicateMergeTransactionService {
@@ -20,6 +24,8 @@ export class DuplicateMergeTransactionService {
     private readonly reportApprovalPoints: ReportApprovalPointsService,
     private readonly reportSideEffectProcessor: ReportSideEffectProcessorService,
     private readonly snapshot: DuplicateMergeSnapshotService,
+    private readonly siteHeroImage: SiteHeroImageService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async mergeDuplicateReports(
@@ -123,29 +129,9 @@ export class DuplicateMergeTransactionService {
 
     const duplicateMediaUrls = [...new Set(selectedChildren.flatMap((child) => child.mediaUrls))];
 
-    const currentCoReporterIds = new Set(primaryReport.coReporters.map((coReporter) => coReporter.userId));
-    const coReporterReportedAt = new Map<string, Date>();
-    const primaryReporterId = primaryReport.reporterId;
-
-    const offerCoReporter = (userId: string | null | undefined, reportedAt: Date) => {
-      if (!userId || userId === primaryReporterId) {
-        return;
-      }
-      const prev = coReporterReportedAt.get(userId);
-      if (!prev || reportedAt < prev) {
-        coReporterReportedAt.set(userId, reportedAt);
-      }
-    };
-
-    for (const child of selectedChildren) {
-      offerCoReporter(child.reporterId, child.createdAt);
-      for (const coReporter of child.coReporters) {
-        offerCoReporter(coReporter.userId, coReporter.createdAt);
-      }
-    }
-
-    const plannedNewCoReporterIds = [...coReporterReportedAt.keys()].filter(
-      (userId) => !currentCoReporterIds.has(userId),
+    const { plannedNewCoReporterIds, coReporterReportedAt } = planMergedCoReporters(
+      primaryReport,
+      selectedChildren,
     );
 
     const mergeTxResult = await this.prisma.$transaction(async (tx) => {
@@ -156,6 +142,7 @@ export class DuplicateMergeTransactionService {
         longitude: number;
         updatedAt: Date;
       } | null = null;
+      let approvalCredit: { userId: string; credit: EcoEventPointsCreditResult } | null = null;
 
       await tx.report.updateMany({
         where: { potentialDuplicateOfId: { in: selectedChildIds } },
@@ -211,10 +198,16 @@ export class DuplicateMergeTransactionService {
             cleanupEffort: true,
           },
         });
-        await this.reportApprovalPoints.creditApprovalIfEligible(tx, {
+        const pointsResult = await this.reportApprovalPoints.creditApprovalIfEligible(tx, {
           report: updatedPrimary,
           now,
         });
+        if (updatedPrimary.reporterId != null && pointsResult.credit.granted > 0) {
+          approvalCredit = {
+            userId: updatedPrimary.reporterId,
+            credit: pointsResult.credit,
+          };
+        }
       }
 
       const approvedCountForSite = await tx.report.count({
@@ -231,34 +224,17 @@ export class DuplicateMergeTransactionService {
         where: { id: { in: selectedChildIds } },
       });
 
-      const mergePayload: MergeDuplicateSideEffectPayload = {
+      const heroResult = await this.siteHeroImage.recomputeSiteHero(tx, primaryReport.siteId);
+
+      const mergePayload = buildMergeSideEffectPayload({
         moderator,
-        primaryReport: {
-          id: primaryReport.id,
-          siteId: primaryReport.siteId,
-          reporterId: primaryReport.reporterId,
-          reportNumber: primaryReport.reportNumber,
-          createdAt: primaryReport.createdAt.toISOString(),
-          mediaUrls: primaryReport.mediaUrls,
-        },
+        primaryReport,
         selectedChildIds,
-        selectedChildren: selectedChildren.map((c) => ({
-          id: c.id,
-          reporterId: c.reporterId,
-        })),
+        selectedChildren,
         plannedNewCoReporterIds,
         duplicateMediaUrls,
-        siteStatusEvent:
-          siteStatusEvent == null
-            ? null
-            : {
-                id: siteStatusEvent.id,
-                status: siteStatusEvent.status,
-                latitude: siteStatusEvent.latitude,
-                longitude: siteStatusEvent.longitude,
-                updatedAt: siteStatusEvent.updatedAt.toISOString(),
-              },
-      };
+        siteStatusEvent,
+      });
 
       const effect = await tx.reportSideEffect.create({
         data: {
@@ -268,7 +244,7 @@ export class DuplicateMergeTransactionService {
         },
       });
 
-      return { siteStatusEvent, effectId: effect.id };
+      return { siteStatusEvent, effectId: effect.id, heroResult, approvalCredit };
     });
 
     let mergedMediaDeletedCount = 0;
@@ -281,6 +257,18 @@ export class DuplicateMergeTransactionService {
         `Merge duplicate post-effects processor threw (effectId=${mergeTxResult.effectId})`,
         err,
       );
+    }
+
+    if (mergeTxResult.approvalCredit != null) {
+      emitGamificationPointsCredited(
+        this.eventEmitter,
+        mergeTxResult.approvalCredit.userId,
+        mergeTxResult.approvalCredit.credit,
+      );
+    }
+
+    if (mergeTxResult.heroResult.changed) {
+      this.siteHeroImage.emitIfChanged(primaryReport.siteId, mergeTxResult.heroResult);
     }
 
     return this.snapshot.buildMergeCompletedSnapshot(primaryReport.id, {

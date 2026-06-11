@@ -15,7 +15,13 @@ describe('ReportApprovalPointsService', () => {
 
   it('credits capped remainder when daily cap almost full', async () => {
     const reportPoints = new ReportPointsService();
-    const ecoEventPoints = { creditIfNew: jest.fn().mockResolvedValue(5) };
+    const ecoEventPoints = {
+      creditIfNew: jest.fn().mockResolvedValue({
+        granted: 5,
+        totalPointsEarnedBefore: 0,
+        totalPointsEarnedAfter: 5,
+      }),
+    };
     const svc = new ReportApprovalPointsService(reportPoints, ecoEventPoints as never);
 
     const tx = {

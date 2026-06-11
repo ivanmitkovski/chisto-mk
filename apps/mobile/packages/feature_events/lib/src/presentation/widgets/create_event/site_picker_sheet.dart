@@ -45,6 +45,14 @@ class _SitePickerSheetState extends State<SitePickerSheet> {
     _viewMode = widget.initialShowMapTab ? _modeMap : _modeList;
   }
 
+  EdgeInsets _listScrollPadding(BuildContext context) {
+    return EdgeInsets.only(
+      bottom: AppSpacing.lg + MediaQuery.viewInsetsOf(context).bottom,
+    );
+  }
+
+  void _dismissKeyboard() => FocusManager.instance.primaryFocus?.unfocus();
+
   List<EventSiteSummary> get _filteredSites {
     if (_query.isEmpty) {
       return widget.allSites;
@@ -66,10 +74,6 @@ class _SitePickerSheetState extends State<SitePickerSheet> {
         )
         .toList(growable: false);
   }
-
-  static const EdgeInsets _listScrollPadding = EdgeInsets.only(
-    bottom: AppSpacing.lg,
-  );
 
   static const double _segmentVerticalPadding = 10;
 
@@ -94,6 +98,10 @@ class _SitePickerSheetState extends State<SitePickerSheet> {
   Widget build(BuildContext context) {
     final List<EventSiteSummary> filtered = _filteredSites;
     final List<EventSiteSummary> mappable = _mappableFiltered;
+    final bool keyboardOpen = MediaQuery.viewInsetsOf(context).bottom > 0;
+    final bool collapseMapForKeyboard =
+        _viewMode == _modeMap && keyboardOpen && mappable.isNotEmpty;
+    final EdgeInsets listPadding = _listScrollPadding(context);
 
     return AppSheetScaffold(
       title: context.l10n.eventsSitePickerTitle,
@@ -104,17 +112,21 @@ class _SitePickerSheetState extends State<SitePickerSheet> {
         onTap: widget.onClose,
       ),
       maxHeightFactor: 0.85,
-      addBottomInset: false,
+      fillAvailableHeight: true,
+      addBottomInset: true,
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.lg,
         AppSpacing.sm,
         AppSpacing.lg,
         0,
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.max,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
+      child: GestureDetector(
+        onTap: _dismissKeyboard,
+        behavior: HitTestBehavior.translucent,
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
           Semantics(
             label:
                 '${context.l10n.createEventSitePickerTabList}, ${context.l10n.createEventSitePickerTabMap}',
@@ -189,6 +201,7 @@ class _SitePickerSheetState extends State<SitePickerSheet> {
             itemColor: AppColors.textMuted,
             itemSize: 18,
             onChanged: (String value) => setState(() => _query = value),
+            onSubmitted: (_) => _dismissKeyboard(),
             onSuffixTap: () {
               _searchController.clear();
               setState(() => _query = '');
@@ -224,34 +237,50 @@ class _SitePickerSheetState extends State<SitePickerSheet> {
               Expanded(
                 child: LayoutBuilder(
                   builder: (BuildContext context, BoxConstraints constraints) {
-                    final double mapHeight = (constraints.maxHeight * 0.32)
-                        .clamp(180.0, 260.0);
+                    final double mapHeight = collapseMapForKeyboard
+                        ? 0
+                        : (constraints.maxHeight * 0.32).clamp(180.0, 260.0);
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: <Widget>[
-                        Semantics(
-                          label: context
-                              .l10n
-                              .createEventSitePickerMapSemanticLabel,
-                          child: CreateEventSitesMap(
-                            sites: filtered,
-                            selectedSiteId: widget.selectedSiteId,
-                            height: mapHeight,
-                            onSiteTap: widget.onSelect,
-                          ),
+                        AnimatedSize(
+                          duration: AppMotion.standard,
+                          curve: AppMotion.smooth,
+                          alignment: Alignment.topCenter,
+                          clipBehavior: Clip.hardEdge,
+                          child: mapHeight <= 0
+                              ? const SizedBox.shrink()
+                              : Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    Semantics(
+                                      label: context
+                                          .l10n
+                                          .createEventSitePickerMapSemanticLabel,
+                                      child: CreateEventSitesMap(
+                                        sites: filtered,
+                                        selectedSiteId: widget.selectedSiteId,
+                                        height: mapHeight,
+                                        onSiteTap: widget.onSelect,
+                                      ),
+                                    ),
+                                    const SizedBox(height: AppSpacing.sm),
+                                    Text(
+                                      context.l10n.createEventSitePickerMapHint,
+                                      style:
+                                          AppTypography.eventsListCardMeta(
+                                            Theme.of(context).textTheme,
+                                          ).copyWith(
+                                            fontWeight: FontWeight.w500,
+                                            letterSpacing: -0.1,
+                                          ),
+                                    ),
+                                    const SizedBox(height: AppSpacing.md),
+                                  ],
+                                ),
                         ),
-                        const SizedBox(height: AppSpacing.sm),
-                        Text(
-                          context.l10n.createEventSitePickerMapHint,
-                          style:
-                              AppTypography.eventsListCardMeta(
-                                Theme.of(context).textTheme,
-                              ).copyWith(
-                                fontWeight: FontWeight.w500,
-                                letterSpacing: -0.1,
-                              ),
-                        ),
-                        const SizedBox(height: AppSpacing.md),
                         if (filtered.isEmpty)
                           Expanded(
                             child: Padding(
@@ -285,7 +314,9 @@ class _SitePickerSheetState extends State<SitePickerSheet> {
                         else
                           Expanded(
                             child: ListView.separated(
-                              padding: _listScrollPadding,
+                              padding: listPadding,
+                              keyboardDismissBehavior:
+                                  ScrollViewKeyboardDismissBehavior.onDrag,
                               physics: const BouncingScrollPhysics(),
                               itemCount: filtered.length,
                               separatorBuilder: (_, _) =>
@@ -335,7 +366,9 @@ class _SitePickerSheetState extends State<SitePickerSheet> {
           else
             Expanded(
               child: ListView.separated(
-                padding: _listScrollPadding,
+                padding: listPadding,
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
                 physics: const BouncingScrollPhysics(),
                 itemCount: filtered.length,
                 separatorBuilder: (_, _) =>
@@ -352,7 +385,8 @@ class _SitePickerSheetState extends State<SitePickerSheet> {
                 },
               ),
             ),
-        ],
+          ],
+        ),
       ),
     );
   }

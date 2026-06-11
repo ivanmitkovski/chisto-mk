@@ -80,7 +80,10 @@ class ReportsListController extends _$ReportsListController {
         return;
       }
       state = state.copyWith(
-        reports: response.data,
+        reports: mergeFirstPageWithOptimistic(
+          serverPage: response.data,
+          current: state.reports,
+        ),
         hasMore: response.hasMore,
         clearLoadError: true,
         clearAppendLoadError: true,
@@ -219,5 +222,22 @@ class ReportsListController extends _$ReportsListController {
       state.reports,
     )..[idx] = state.reports[idx].copyWith(status: next, isOptimistic: false);
     state = state.copyWith(reports: updated);
+  }
+
+  bool get hasOptimisticRows =>
+      state.reports.any((ReportListItem r) => r.isOptimistic);
+
+  /// Merges a fresh first page with optimistic rows not yet returned by the server.
+  static List<ReportListItem> mergeFirstPageWithOptimistic({
+    required List<ReportListItem> serverPage,
+    required List<ReportListItem> current,
+  }) {
+    final Set<String> serverIds = serverPage
+        .map((ReportListItem r) => r.id)
+        .toSet();
+    final List<ReportListItem> pendingOptimistic = current
+        .where((ReportListItem r) => r.isOptimistic && !serverIds.contains(r.id))
+        .toList();
+    return <ReportListItem>[...pendingOptimistic, ...serverPage];
   }
 }

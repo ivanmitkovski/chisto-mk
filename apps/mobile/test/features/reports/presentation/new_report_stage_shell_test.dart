@@ -63,7 +63,11 @@ void main() {
       await tester.pump();
 
       expect(find.byType(ApiErrorBanner), findsOneWidget);
-      expect(find.text('Network down'), findsOneWidget);
+      // The banner localizes by error code and never shows raw messages.
+      expect(
+        find.text('Please check your internet connection and try again.'),
+        findsOneWidget,
+      );
       expect(find.text('Try again'), findsOneWidget);
       expect(find.textContaining('Your draft is saved'), findsOneWidget);
 

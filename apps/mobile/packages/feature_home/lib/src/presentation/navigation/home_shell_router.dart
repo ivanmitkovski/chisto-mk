@@ -1,10 +1,12 @@
 import 'dart:async';
 
 import 'package:chisto_infrastructure/core/navigation/app_navigator_key.dart';
+import 'package:chisto_infrastructure/core/providers/root_container.dart';
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
 import 'package:design_system/design_system.dart';
 import 'package:feature_events/feature_events.dart';
 import 'package:feature_home/src/application/home_shell_controller.dart';
+import 'package:feature_home/src/application/home_shell_state.dart';
 import 'package:feature_home/src/domain/models/pollution_site.dart';
 import 'package:feature_home/src/presentation/navigation/feed_shell_route_extras.dart';
 import 'package:feature_home/src/presentation/navigation/home_shell_tab_locations.dart';
@@ -70,45 +72,19 @@ class _HomeShellRouterScaffoldState extends State<HomeShellRouterScaffold> {
           ? null
           : ColoredBox(
               color: AppColors.panelBackground,
-              child: SafeArea(
-                top: false,
-                child: SizedBox(
-                  height: 64,
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: <Widget>[
-                      Positioned(
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        child: HomeBottomNavBar(
-                          currentIndex: currentIndex,
-                          onTabSelected: _onTabSelected,
-                          navItemKeys: widget.coachKeys.navItemKeys,
-                        ),
-                      ),
-                      Positioned(
-                        left: 0,
-                        right: 0,
-                        top: -30,
-                        child: Center(
-                          child: KeyedSubtree(
-                            key: widget.coachKeys.fabKey,
-                            child: _CentralReportButton(
-                              enabled: !widget.isLaunchingReportFlow,
-                              semanticsLabel: AppLocalizations.of(
-                                context,
-                              )!.reportListFabLabel,
-                              onPressed: () {
-                                unawaited(widget.onCentralFabPressed(context));
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  SizedBox(
+                    height: 64,
+                    child: HomeBottomNavBar(
+                      currentIndex: currentIndex,
+                      onTabSelected: _onTabSelected,
+                      navItemKeys: widget.coachKeys.navItemKeys,
+                    ),
                   ),
-                ),
+                  SizedBox(height: MediaQuery.paddingOf(context).bottom),
+                ],
               ),
             ),
     );
@@ -117,6 +93,26 @@ class _HomeShellRouterScaffoldState extends State<HomeShellRouterScaffold> {
       fit: StackFit.expand,
       children: <Widget>[
         scaffold,
+        if (!hideBottomBar)
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: MediaQuery.paddingOf(context).bottom + 30,
+            child: Center(
+              child: KeyedSubtree(
+                key: widget.coachKeys.fabKey,
+                child: _CentralReportButton(
+                  enabled: !widget.isLaunchingReportFlow,
+                  semanticsLabel: AppLocalizations.of(
+                    context,
+                  )!.reportListFabLabel,
+                  onPressed: () {
+                    unawaited(widget.onCentralFabPressed(context));
+                  },
+                ),
+              ),
+            ),
+          ),
         CoachTourHost(
           keys: widget.coachKeys,
           navigationShell: widget.navigationShell,
@@ -263,10 +259,11 @@ class _MapTabPlaceholder extends StatelessWidget {
   }
 }
 
+HomeShellController _homeShellController() =>
+    readRoot(homeShellControllerProvider.notifier);
+
 /// Indexed tab shell for the signed-in home experience (feed, reports, map, events).
-StatefulShellRoute buildHomeShellStatefulShellRoute({
-  required HomeShellController controller,
-}) {
+StatefulShellRoute buildHomeShellStatefulShellRoute() {
   return StatefulShellRoute.indexedStack(
     builder:
         (
@@ -277,7 +274,11 @@ StatefulShellRoute buildHomeShellStatefulShellRoute({
           final GoRouter shellRouter = GoRouter.of(context);
           return Consumer(
             builder: (BuildContext context, WidgetRef ref, Widget? _) {
-              ref.watch(homeShellControllerProvider);
+              final bool isLaunchingReportFlow = ref.watch(
+                homeShellControllerProvider.select(
+                  (HomeShellState s) => s.isLaunchingReportFlow,
+                ),
+              );
               ref.watch(coachTourControllerProvider);
               final HomeShellController shell = ref.read(
                 homeShellControllerProvider.notifier,
@@ -299,7 +300,7 @@ StatefulShellRoute buildHomeShellStatefulShellRoute({
                       reportsPageBuilder: shell.buildReportsTab,
                       onCentralFabPressed: (BuildContext ctx) =>
                           shell.handleCentralFabPressed(ctx, ref),
-                      isLaunchingReportFlow: shell.isLaunchingReportFlow,
+                      isLaunchingReportFlow: isLaunchingReportFlow,
                       coachKeys: shell.coachKeys,
                     );
                   },
@@ -314,11 +315,12 @@ StatefulShellRoute buildHomeShellStatefulShellRoute({
           GoRoute(
             path: '/feed',
             pageBuilder: (BuildContext context, GoRouterState state) {
+              final HomeShellController shell = _homeShellController();
               return NoTransitionPage<void>(
                 key: const ValueKey<String>('branch-feed'),
                 child: PollutionFeedScreen(
-                  key: controller.feedKey,
-                  coachProfileAvatarKey: controller.coachKeys.profileAvatarKey,
+                  key: shell.feedKey,
+                  coachProfileAvatarKey: shell.coachKeys.profileAvatarKey,
                 ),
               );
             },
@@ -391,14 +393,13 @@ StatefulShellRoute buildHomeShellStatefulShellRoute({
         ],
       ),
       StatefulShellBranch(
-        preload: true,
         routes: <RouteBase>[
           GoRoute(
             path: '/reports',
             pageBuilder: (BuildContext context, GoRouterState state) {
               return NoTransitionPage<void>(
                 key: const ValueKey<String>('branch-reports'),
-                child: Builder(builder: controller.buildReportsTab),
+                child: Builder(builder: _homeShellController().buildReportsTab),
               );
             },
           ),
@@ -412,7 +413,7 @@ StatefulShellRoute buildHomeShellStatefulShellRoute({
               return NoTransitionPage<void>(
                 key: const ValueKey<String>('branch-map'),
                 child: _MapBranchPage(
-                  mapPendingSiteFocus: controller.mapPendingSiteFocus,
+                  mapPendingSiteFocus: _homeShellController().mapPendingSiteFocus,
                 ),
               );
             },
@@ -426,7 +427,7 @@ StatefulShellRoute buildHomeShellStatefulShellRoute({
             pageBuilder: (BuildContext context, GoRouterState state) {
               return NoTransitionPage<void>(
                 key: const ValueKey<String>('branch-events'),
-                child: EventsFeedScreen(key: controller.eventsFeedKey),
+                child: EventsFeedScreen(key: _homeShellController().eventsFeedKey),
               );
             },
           ),

@@ -13,9 +13,9 @@ import type {
   BroadcastCampaign,
   CreateBroadcastInput,
   UpdateBroadcastInput,
-} from './admin-broadcasts.types';
+} from '../types/admin-broadcasts.types';
 
-export type { BroadcastCampaign, CreateBroadcastInput, UpdateBroadcastInput } from './admin-broadcasts.types';
+export type { BroadcastCampaign, CreateBroadcastInput, UpdateBroadcastInput } from '../types/admin-broadcasts.types';
 
 @Injectable()
 export class AdminBroadcastsService {
@@ -25,17 +25,23 @@ export class AdminBroadcastsService {
   ) {}
 
   private assertEditable(campaign: BroadcastCampaign): void {
-    if (campaign.status === 'sent') {
-      throw new BadRequestException('Sent campaigns cannot be modified');
-    }
-    if (campaign.status === 'cancelled') {
-      throw new BadRequestException('Cancelled campaigns cannot be modified');
+    if (campaign.status === 'sent' || campaign.status === 'cancelled') {
+      throw new BadRequestException({
+        code: 'BROADCAST_SENT_IMMUTABLE',
+        message:
+          campaign.status === 'sent'
+            ? 'Sent campaigns cannot be modified'
+            : 'Cancelled campaigns cannot be modified',
+      });
     }
   }
 
   private assertDeletable(campaign: BroadcastCampaign): void {
     if (campaign.status === 'sent') {
-      throw new BadRequestException('Sent campaigns cannot be deleted');
+      throw new BadRequestException({
+        code: 'BROADCAST_SENT_IMMUTABLE',
+        message: 'Sent campaigns cannot be deleted',
+      });
     }
   }
 
@@ -48,7 +54,12 @@ export class AdminBroadcastsService {
 
   async getById(id: string): Promise<BroadcastCampaign> {
     const row = await this.prisma.broadcastCampaign.findUnique({ where: { id } });
-    if (!row) throw new NotFoundException('Broadcast campaign not found');
+    if (!row) {
+      throw new NotFoundException({
+        code: 'BROADCAST_CAMPAIGN_NOT_FOUND',
+        message: 'Broadcast campaign not found',
+      });
+    }
     return toApiCampaign(row);
   }
 
@@ -56,10 +67,16 @@ export class AdminBroadcastsService {
     const title = input.title.trim();
     const body = input.body.trim();
     if (!title || !body) {
-      throw new BadRequestException('Title and body are required');
+      throw new BadRequestException({
+        code: 'BROADCAST_TITLE_BODY_REQUIRED',
+        message: 'Title and body are required',
+      });
     }
     if (input.audience === 'users' && (!input.audienceUserIds || input.audienceUserIds.length === 0)) {
-      throw new BadRequestException('At least one user ID is required for a specific audience');
+      throw new BadRequestException({
+        code: 'BROADCAST_AUDIENCE_USERS_REQUIRED',
+        message: 'At least one user ID is required for a specific audience',
+      });
     }
 
     const scheduledAt = input.scheduledAt ? parseOptionalDate(input.scheduledAt) : undefined;
@@ -96,14 +113,20 @@ export class AdminBroadcastsService {
     const title = input.title?.trim() ?? current.title;
     const body = input.body?.trim() ?? current.body;
     if (!title || !body) {
-      throw new BadRequestException('Title and body are required');
+      throw new BadRequestException({
+        code: 'BROADCAST_TITLE_BODY_REQUIRED',
+        message: 'Title and body are required',
+      });
     }
 
     const audience = input.audience ?? current.audience;
     const audienceUserIds =
       input.audienceUserIds !== undefined ? input.audienceUserIds : current.audienceUserIds;
     if (audience === 'users' && (!audienceUserIds || audienceUserIds.length === 0)) {
-      throw new BadRequestException('At least one user ID is required for a specific audience');
+      throw new BadRequestException({
+        code: 'BROADCAST_AUDIENCE_USERS_REQUIRED',
+        message: 'At least one user ID is required for a specific audience',
+      });
     }
 
     let scheduledAt = current.scheduledAt ? new Date(current.scheduledAt) : null;
@@ -158,7 +181,10 @@ export class AdminBroadcastsService {
   async cancel(id: string, actor?: AuthenticatedUser): Promise<BroadcastCampaign> {
     const current = await this.getById(id);
     if (current.status === 'sent') {
-      throw new BadRequestException('Sent campaigns cannot be cancelled');
+      throw new BadRequestException({
+        code: 'BROADCAST_SENT_IMMUTABLE',
+        message: 'Sent campaigns cannot be cancelled',
+      });
     }
     if (current.status === 'cancelled') {
       return current;
@@ -189,7 +215,10 @@ export class AdminBroadcastsService {
       },
     });
     if (claimed.count === 0) {
-      throw new NotFoundException('Campaign cannot be sent');
+      throw new NotFoundException({
+        code: 'BROADCAST_NOT_SENDABLE',
+        message: 'Campaign cannot be sent',
+      });
     }
     return this.getById(id);
   }

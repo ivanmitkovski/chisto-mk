@@ -43,9 +43,15 @@ export class MapSiteRepositoryAggregatesService {
       : Prisma.sql`"Site"`;
 
     const idCol = flags.mapUseProjection ? Prisma.sql`"siteId"` : Prisma.sql`"id"`;
+    const siteIdForVisibility = flags.mapUseProjection
+      ? Prisma.sql`"MapSiteProjection"."siteId"`
+      : Prisma.sql`"Site"."id"`;
+    const siteStatusForVisibility = flags.mapUseProjection
+      ? Prisma.sql`"MapSiteProjection"."status"`
+      : Prisma.sql`"Site"."status"`;
     const visibilityFilter = siteVisibilitySql({
-      siteIdSql: idCol,
-      siteStatusSql: Prisma.sql`"status"`,
+      siteIdSql: siteIdForVisibility,
+      siteStatusSql: siteStatusForVisibility,
       viewerUserId,
     });
     const usePostgis = flags.mapPostgisEnabled;
@@ -102,10 +108,15 @@ export class MapSiteRepositoryAggregatesService {
     const table = flags.mapUseProjection
       ? Prisma.sql`"MapSiteProjection"`
       : Prisma.sql`"Site"`;
-    const idCol = flags.mapUseProjection ? Prisma.sql`"siteId"` : Prisma.sql`"id"`;
+    const siteIdForVisibility = flags.mapUseProjection
+      ? Prisma.sql`"MapSiteProjection"."siteId"`
+      : Prisma.sql`"Site"."id"`;
+    const siteStatusForVisibility = flags.mapUseProjection
+      ? Prisma.sql`"MapSiteProjection"."status"`
+      : Prisma.sql`"Site"."status"`;
     const visibilityFilter = siteVisibilitySql({
-      siteIdSql: idCol,
-      siteStatusSql: Prisma.sql`"status"`,
+      siteIdSql: siteIdForVisibility,
+      siteStatusSql: siteStatusForVisibility,
       viewerUserId,
     });
 

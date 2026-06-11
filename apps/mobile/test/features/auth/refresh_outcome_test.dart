@@ -38,7 +38,7 @@ void main() {
       final ApiClient client = ApiClient(
         config: AppConfig.local,
         accessToken: () => 'access',
-        onUnauthorized: () {},
+        onUnauthorized: (_) {},
         httpClient: mock,
       );
       final SecureTokenStorage tokens = SecureTokenStorage(
@@ -60,7 +60,7 @@ void main() {
     final ApiClient client = ApiClient(
       config: AppConfig.local,
       accessToken: () => 'access',
-      onUnauthorized: () {},
+      onUnauthorized: (_) {},
       httpClient: MockClient((http.Request request) async {
         throw http.ClientException('connection refused');
       }),
@@ -86,7 +86,7 @@ void main() {
         client: ApiClient(
           config: AppConfig.local,
           accessToken: () => null,
-          onUnauthorized: () {},
+          onUnauthorized: (_) {},
         ),
         authState: AuthState(),
         tokenStorage: SecureTokenStorage(storage: const FlutterSecureStorage()),

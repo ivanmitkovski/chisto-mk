@@ -1,0 +1,45 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.card {
+  background: var(--surface-elevated, #fff);
+  border: 1px solid var(--border-subtle, #e5e7eb);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.cardLabel {
+  font-size: 12px;
+  color: var(--text-secondary, #6b7280);
+  margin: 0 0 4px;
+}
+
+.cardValue {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.trendChart {
+  grid-column: span 2;
+  background: var(--surface-elevated, #fff);
+  border: 1px solid var(--border-subtle, #e5e7eb);
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+
+.trendLabel {
+  font-size: 12px;
+  color: var(--text-secondary, #6b7280);
+  margin: 0 0 4px;
+}
+
+.emptyTrend {
+  font-size: 12px;
+  color: var(--text-secondary, #6b7280);
+  margin: 0;
+}

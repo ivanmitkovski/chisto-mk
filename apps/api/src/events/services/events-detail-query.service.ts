@@ -9,7 +9,7 @@ import { decodeParticipantCursor, encodeParticipantCursor } from '../util/events
 import { EventsMobileMapperService } from './events-mobile-mapper.service';
 import { EventsTelemetryService } from './events-telemetry.service';
 import { eventDetailIncludeForViewer } from '../util/events-query.include.detail';
-import { participantDisplayName, visibilityWhere } from '../util/events-query.include.shared';
+import { participantDisplayIdentity, visibilityWhere } from '../util/events-query.include.shared';
 import { EventsRepository } from '../repositories/events.repository';
 
 @Injectable()
@@ -109,7 +109,7 @@ export class EventsDetailQueryService {
         joinedAt: true,
         userId: true,
         user: {
-          select: { firstName: true, lastName: true, avatarObjectKey: true },
+          select: { firstName: true, lastName: true, avatarObjectKey: true, status: true },
         },
       },
     });
@@ -121,18 +121,25 @@ export class EventsDetailQueryService {
       hasMore && last != null ? encodeParticipantCursor(last.joinedAt, last.id) : null;
 
     const avatarUrlByKey = await signPrivateObjectKeysDeduped(
-      page.map((row) => row.user.avatarObjectKey),
+      page.map((row) => row.user?.avatarObjectKey),
       (key) => this.uploads.signPrivateObjectKey(key),
     );
 
-    const data = page.map((row) => ({
-      userId: row.userId,
-      displayName: participantDisplayName(row.user),
-      avatarUrl: row.user.avatarObjectKey
-        ? (avatarUrlByKey.get(row.user.avatarObjectKey) ?? null)
-        : null,
-      joinedAt: row.joinedAt.toISOString(),
-    }));
+    const data = page.map((row) => {
+      const identity = participantDisplayIdentity(row.user, {
+        actorUserId: row.userId,
+        fallback: 'Anonymous',
+      });
+      return {
+        userId: row.userId,
+        displayName: identity.displayName,
+        isDeleted: identity.isDeleted,
+        avatarUrl: row.user?.avatarObjectKey
+          ? (avatarUrlByKey.get(row.user.avatarObjectKey) ?? null)
+          : null,
+        joinedAt: row.joinedAt.toISOString(),
+      };
+    });
 
     this.eventsTelemetry.emitSpan('events.list_participants', {
       duration_ms: Date.now() - t0,

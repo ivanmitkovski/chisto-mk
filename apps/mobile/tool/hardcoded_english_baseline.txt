@@ -1,8 +1,5 @@
-lib/src/presentation/event_ui_mappers.dart:5:MaterialIcons
-lib/src/presentation/event_ui_mappers.dart:9:MaterialIcons
 lib/src/presentation/utils/event_calendar_date_format.dart:7:MMM d, y
 lib/src/presentation/utils/event_recurrence_rrule_summary.dart:12:RRULE:
-lib/src/presentation/utils/feed_visible_sites.dart:56:in progress
 lib/src/presentation/utils/profile_level_tier.dart:125:River Watcher
 lib/src/presentation/utils/profile_level_tier.dart:126:Valley Keeper
 lib/src/presentation/utils/profile_level_tier.dart:127:Field Guardian
@@ -84,7 +81,5 @@ lib/src/presentation/utils/profile_level_tier.dart:248:Luftëtar zero-mbeturina
 lib/src/presentation/utils/profile_level_tier.dart:249:Menç i ekonomisë qarkulluese
 lib/src/presentation/utils/profile_level_tier.dart:250:Partner i planetit
 lib/src/presentation/widgets/chat/chat_linkified_text.dart:25:(https?://[^\s]+)|(www\.[^\s]+)
-lib/src/presentation/widgets/events_feed/events_filter_sheet.dart:212:MaterialIcons
 lib/src/presentation/widgets/map/map_status_codes.dart:87:CLEANUP SCHEDULED
 lib/src/presentation/widgets/map/map_status_codes.dart:90:IN PROGRESS
-lib/src/presentation/widgets/site_detail/history/site_history_tab.dart:58:Cannot GET

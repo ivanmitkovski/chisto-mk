@@ -5,6 +5,25 @@ import 'package:feature_events/src/domain/models/eco_event.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+/// Post-event feedback modal body for [AppBottomSheet.show].
+///
+/// Host uses [SheetKeyboardInsetMode.overlay]; scroll padding carries keyboard
+/// inset so notes and the save CTA stay reachable without lifting the sheet.
+Widget buildEventFeedbackSheet(
+  BuildContext context, {
+  required EcoEvent event,
+  EventFeedbackSnapshot? current,
+}) {
+  return AppSheetScaffold(
+    title: context.l10n.eventsFeedbackSheetTitle,
+    subtitle: event.title,
+    maxHeightFactor: 0.92,
+    fillAvailableHeight: true,
+    addBottomInset: true,
+    child: FeedbackSheetContent(event: event, current: current),
+  );
+}
+
 class FeedbackSheetContent extends StatefulWidget {
   const FeedbackSheetContent({super.key, required this.event, this.current});
 
@@ -51,84 +70,91 @@ class _FeedbackSheetContentState extends State<FeedbackSheetContent> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            context.l10n.eventsFeedbackHowWasEvent,
-            style: AppTypography.eventsCalendarAgendaTitle(
-              Theme.of(context).textTheme,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Wrap(
-            spacing: AppSpacing.xs,
-            children: List<Widget>.generate(5, (int index) {
-              final int v = index + 1;
-              return ChoiceChip(
-                selected: _rating == v,
-                label: Text(context.l10n.eventsFeedbackRatingStars(v)),
-                onSelected: (_) => setState(() => _rating = v),
-              );
-            }),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Text(
-            context.l10n.eventsFeedbackBagsCollected,
-            style: AppTypography.eventsCalendarAgendaTitle(
-              Theme.of(context).textTheme,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Row(
-            children: <Widget>[
-              IconButton(
-                onPressed: _bags > 0 ? () => setState(() => _bags -= 1) : null,
-                icon: const Icon(CupertinoIcons.minus_circle),
+    final double keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
+    return GestureDetector(
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      behavior: HitTestBehavior.translucent,
+      child: SingleChildScrollView(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+        padding: EdgeInsets.only(bottom: AppSpacing.lg + keyboardInset),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              context.l10n.eventsFeedbackHowWasEvent,
+              style: AppTypography.eventsCalendarAgendaTitle(
+                Theme.of(context).textTheme,
               ),
-              Text(
-                '$_bags',
-                style: AppTypography.eventsFormCounterValue(
-                  Theme.of(context).textTheme,
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Wrap(
+              spacing: AppSpacing.xs,
+              children: List<Widget>.generate(5, (int index) {
+                final int v = index + 1;
+                return ChoiceChip(
+                  selected: _rating == v,
+                  label: Text(context.l10n.eventsFeedbackRatingStars(v)),
+                  onSelected: (_) => setState(() => _rating = v),
+                );
+              }),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Text(
+              context.l10n.eventsFeedbackBagsCollected,
+              style: AppTypography.eventsCalendarAgendaTitle(
+                Theme.of(context).textTheme,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Row(
+              children: <Widget>[
+                IconButton(
+                  onPressed: _bags > 0 ? () => setState(() => _bags -= 1) : null,
+                  icon: const Icon(CupertinoIcons.minus_circle),
                 ),
-              ),
-              IconButton(
-                onPressed: () => setState(() => _bags += 1),
-                icon: const Icon(CupertinoIcons.plus_circle),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            context.l10n.eventsFeedbackVolunteerHours(
-              _hours.toStringAsFixed(1),
+                Text(
+                  '$_bags',
+                  style: AppTypography.eventsFormCounterValue(
+                    Theme.of(context).textTheme,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => setState(() => _bags += 1),
+                  icon: const Icon(CupertinoIcons.plus_circle),
+                ),
+              ],
             ),
-            style: AppTypography.eventsCalendarAgendaTitle(
-              Theme.of(context).textTheme,
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              context.l10n.eventsFeedbackVolunteerHours(
+                _hours.toStringAsFixed(1),
+              ),
+              style: AppTypography.eventsCalendarAgendaTitle(
+                Theme.of(context).textTheme,
+              ),
             ),
-          ),
-          Slider(
-            value: _hours,
-            min: 0.5,
-            max: 12,
-            divisions: 23,
-            onChanged: (double value) => setState(() => _hours = value),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          AppTextField(
-            controller: _notesController,
-            hintText: context.l10n.eventsFeedbackNotesHint,
-            maxLines: 3,
-            minLines: 2,
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          PrimaryButton(
-            label: context.l10n.eventsSaveImpactSummary,
-            onPressed: _submit,
-          ),
-        ],
+            Slider(
+              value: _hours,
+              min: 0.5,
+              max: 12,
+              divisions: 23,
+              onChanged: (double value) => setState(() => _hours = value),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            AppTextField(
+              controller: _notesController,
+              hintText: context.l10n.eventsFeedbackNotesHint,
+              maxLines: 3,
+              minLines: 2,
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            PrimaryButton(
+              label: context.l10n.eventsSaveImpactSummary,
+              onPressed: _submit,
+            ),
+          ],
+        ),
       ),
     );
   }

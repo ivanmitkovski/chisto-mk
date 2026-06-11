@@ -23,7 +23,10 @@ void main() {
         ),
       );
 
-      expect(find.text(errorMessage), findsOneWidget);
+      expect(
+        find.text('Something went wrong. Please try again.'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('shows retry button for retryable errors', (
@@ -45,7 +48,6 @@ void main() {
       );
 
       expect(find.text('Try again'), findsOneWidget);
-      expect(find.byType(FilledButton), findsOneWidget);
     });
 
     testWidgets('hides retry button for non-retryable errors', (

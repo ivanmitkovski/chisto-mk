@@ -370,9 +370,9 @@ class _ReportSubmittedDialogState extends State<ReportSubmittedDialog>
                           label: l10n.reportSubmittedViewThisReport,
                           primary: true,
                           onPressed: () {
-                            Navigator.of(context).pop(
-                              NewReportWizardViewReport(widget.reportId!),
-                            );
+                            Navigator.of(
+                              context,
+                            ).pop(NewReportWizardViewReport(widget.reportId!));
                           },
                         ),
                         const SizedBox(height: AppSpacing.sm),
@@ -381,9 +381,9 @@ class _ReportSubmittedDialogState extends State<ReportSubmittedDialog>
                           primary: false,
                           outlined: true,
                           onPressed: () {
-                            Navigator.of(context).pop(
-                              const NewReportWizardViewReports(),
-                            );
+                            Navigator.of(
+                              context,
+                            ).pop(const NewReportWizardViewReports());
                           },
                         ),
                       ] else
@@ -391,9 +391,9 @@ class _ReportSubmittedDialogState extends State<ReportSubmittedDialog>
                           label: l10n.reportSubmittedViewInMyReports,
                           primary: true,
                           onPressed: () {
-                            Navigator.of(context).pop(
-                              const NewReportWizardViewReports(),
-                            );
+                            Navigator.of(
+                              context,
+                            ).pop(const NewReportWizardViewReports());
                           },
                         ),
                       const SizedBox(height: AppSpacing.sm),
@@ -401,9 +401,9 @@ class _ReportSubmittedDialogState extends State<ReportSubmittedDialog>
                         label: l10n.reportSubmittedReportAnother,
                         primary: false,
                         onPressed: () {
-                          Navigator.of(context).pop(
-                            const NewReportWizardReportAnother(),
-                          );
+                          Navigator.of(
+                            context,
+                          ).pop(const NewReportWizardReportAnother());
                         },
                       ),
                     ],
@@ -415,9 +415,9 @@ class _ReportSubmittedDialogState extends State<ReportSubmittedDialog>
                       icon: Icons.close_rounded,
                       semanticLabel: l10n.semanticsClose,
                       onTap: () {
-                        Navigator.of(context).pop(
-                          const NewReportWizardViewReports(),
-                        );
+                        Navigator.of(
+                          context,
+                        ).pop(const NewReportWizardViewReports());
                       },
                     ),
                   ),

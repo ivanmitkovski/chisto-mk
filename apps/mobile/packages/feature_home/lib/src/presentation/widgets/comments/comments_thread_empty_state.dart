@@ -4,7 +4,12 @@ import 'package:flutter/material.dart';
 
 /// Empty thread placeholder for site comments (sheet or full-screen route).
 class CommentsThreadEmptyState extends StatelessWidget {
-  const CommentsThreadEmptyState({super.key});
+  const CommentsThreadEmptyState({
+    super.key,
+    this.scrollController,
+  });
+
+  final ScrollController? scrollController;
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +29,7 @@ class CommentsThreadEmptyState extends StatelessWidget {
         }
 
         return SingleChildScrollView(
+          controller: scrollController,
           physics: const AlwaysScrollableScrollPhysics(),
           child: ConstrainedBox(
             constraints: BoxConstraints(minHeight: constraints.maxHeight),

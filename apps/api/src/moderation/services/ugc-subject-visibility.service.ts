@@ -1,8 +1,11 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class UgcSubjectVisibilityService {
+  private static readonly SUBTREE_MAX_DEPTH = 32;
+  private static readonly SUBTREE_MAX_NODES = 500;
+
   constructor(private readonly prisma: PrismaService) {}
 
   async resolveContentStatus(subjectType: string, subjectId: string): Promise<string> {
@@ -50,10 +53,7 @@ export class UgcSubjectVisibilityService {
   async applySubjectVisibility(subjectType: string, subjectId: string, hidden: boolean): Promise<void> {
     switch (subjectType) {
       case 'site_comment':
-        await this.prisma.siteComment.updateMany({
-          where: { id: subjectId },
-          data: { isDeleted: hidden },
-        });
+        await this.applySiteCommentVisibility(subjectId, hidden);
         return;
       case 'event_chat_message':
         await this.prisma.eventChatMessage.updateMany({
@@ -88,5 +88,66 @@ export class UgcSubjectVisibilityService {
           message: `Cannot ${hidden ? 'hide' : 'restore'} subject type ${subjectType}`,
         });
     }
+  }
+
+  /** Hide/restore a comment subtree and reconcile the site's global comment counter. */
+  private async applySiteCommentVisibility(commentId: string, hidden: boolean): Promise<void> {
+    const root = await this.prisma.siteComment.findUnique({
+      where: { id: commentId },
+      select: { id: true, siteId: true },
+    });
+    if (!root) {
+      throw new NotFoundException({
+        code: 'COMMENT_NOT_FOUND',
+        message: 'Comment not found',
+      });
+    }
+
+    const ids = await this.collectSubtreeIds(root.siteId, root.id);
+    if (ids.length === 0) {
+      return;
+    }
+
+    await this.prisma.siteComment.updateMany({
+      where: { id: { in: ids }, siteId: root.siteId },
+      data: { isDeleted: hidden },
+    });
+    const actualCount = await this.prisma.siteComment.count({
+      where: { siteId: root.siteId, isDeleted: false },
+    });
+    await this.prisma.site.update({
+      where: { id: root.siteId },
+      data: { commentsCount: actualCount },
+    });
+  }
+
+  private async collectSubtreeIds(siteId: string, rootCommentId: string): Promise<string[]> {
+    const toVisit = new Set<string>([rootCommentId]);
+    let frontier: string[] = [rootCommentId];
+    let depth = 0;
+
+    while (
+      frontier.length > 0 &&
+      depth < UgcSubjectVisibilityService.SUBTREE_MAX_DEPTH &&
+      toVisit.size < UgcSubjectVisibilityService.SUBTREE_MAX_NODES
+    ) {
+      const children = await this.prisma.siteComment.findMany({
+        where: { siteId, parentId: { in: frontier } },
+        select: { id: true },
+      });
+      frontier = [];
+      for (const row of children) {
+        if (toVisit.size >= UgcSubjectVisibilityService.SUBTREE_MAX_NODES) {
+          break;
+        }
+        if (!toVisit.has(row.id)) {
+          toVisit.add(row.id);
+          frontier.push(row.id);
+        }
+      }
+      depth += 1;
+    }
+
+    return [...toVisit];
   }
 }

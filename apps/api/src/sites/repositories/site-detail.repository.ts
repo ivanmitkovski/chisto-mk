@@ -4,15 +4,25 @@ import { PrismaService } from '../../prisma/prisma.service';
 
 export type SiteWithDetailRelations = Prisma.SiteGetPayload<{
   include: {
+    heroReport: {
+      select: {
+        id: true;
+        reporterId: true;
+        mediaUrls: true;
+        reporter: {
+          select: { firstName: true; lastName: true; avatarObjectKey: true; status: true };
+        };
+      };
+    };
     reports: {
       include: {
         reporter: {
-          select: { firstName: true; lastName: true; avatarObjectKey: true };
+          select: { firstName: true; lastName: true; avatarObjectKey: true; status: true };
         };
         coReporters: {
           include: {
             user: {
-              select: { firstName: true; lastName: true; avatarObjectKey: true };
+              select: { firstName: true; lastName: true; avatarObjectKey: true; status: true };
             };
           };
         };
@@ -24,7 +34,7 @@ export type SiteWithDetailRelations = Prisma.SiteGetPayload<{
         title: true;
         scheduledAt: true;
         lifecycleStatus: true;
-        organizer: { select: { id: true; firstName: true; lastName: true } };
+        organizer: { select: { id: true; firstName: true; lastName: true; status: true } };
       };
     };
   };
@@ -38,16 +48,28 @@ export class SiteDetailRepository {
     return this.prisma.site.findUnique({
       where: { id: siteId },
       include: {
+        heroReport: {
+          select: {
+            id: true,
+            reporterId: true,
+            mediaUrls: true,
+            reporter: {
+              select: { firstName: true, lastName: true, avatarObjectKey: true, status: true },
+            },
+          },
+        },
         reports: {
           orderBy: { createdAt: 'desc' },
           take: reportsTake,
           include: {
             reporter: {
-              select: { firstName: true, lastName: true, avatarObjectKey: true },
+              select: { firstName: true, lastName: true, avatarObjectKey: true, status: true },
             },
             coReporters: {
               include: {
-                user: { select: { firstName: true, lastName: true, avatarObjectKey: true } },
+                user: {
+                  select: { firstName: true, lastName: true, avatarObjectKey: true, status: true },
+                },
               },
             },
           },
@@ -61,7 +83,7 @@ export class SiteDetailRepository {
             scheduledAt: true,
             lifecycleStatus: true,
             organizer: {
-              select: { id: true, firstName: true, lastName: true },
+              select: { id: true, firstName: true, lastName: true, status: true },
             },
           },
         },
@@ -89,5 +111,25 @@ export class SiteDetailRepository {
       where: { siteId_userId: { siteId, userId } },
       select: { id: true },
     });
+  }
+
+  findSiteStatusById(siteId: string) {
+    return this.prisma.site.findUnique({
+      where: { id: siteId },
+      select: { id: true, status: true },
+    });
+  }
+
+  async viewerCanAccessReportedSite(siteId: string, viewerUserId: string): Promise<boolean> {
+    const count = await this.prisma.report.count({
+      where: {
+        siteId,
+        OR: [
+          { reporterId: viewerUserId },
+          { coReporters: { some: { userId: viewerUserId } } },
+        ],
+      },
+    });
+    return count > 0;
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:ui' show Locale;
+
 import 'package:feature_notifications/src/data/push_notification_service.dart';
 import 'package:feature_notifications/src/domain/repositories/notifications_repository.dart';
 import 'package:flutter_local_notifications_platform_interface/flutter_local_notifications_platform_interface.dart';
@@ -8,6 +10,7 @@ import '../../shared/fake_flutter_local_notifications_platform.dart';
 class _FakeNotificationsRepository implements NotificationsRepository {
   int registerCalls = 0;
   String? lastToken;
+  String? lastLocale;
 
   @override
   Future<void> registerDeviceToken({
@@ -18,6 +21,7 @@ class _FakeNotificationsRepository implements NotificationsRepository {
   }) async {
     registerCalls++;
     lastToken = token;
+    lastLocale = locale;
   }
 
   @override
@@ -49,6 +53,7 @@ void main() {
     final PushNotificationService push = PushNotificationService(
       repository: repo,
       isAuthenticated: () => true,
+      resolveEffectiveLocale: () => const Locale('en'),
     );
 
     await push.registerTokenForTest('same-fcm-token');
@@ -57,6 +62,26 @@ void main() {
 
     expect(repo.registerCalls, 2);
     expect(push.lastRegisteredTokenForTest, 'new-fcm-token');
+  });
+
+  test('forceLocaleRefresh re-registers when token unchanged but locale changed', () async {
+    final _FakeNotificationsRepository repo = _FakeNotificationsRepository();
+    Locale effective = const Locale('en');
+    final PushNotificationService push = PushNotificationService(
+      repository: repo,
+      isAuthenticated: () => true,
+      resolveEffectiveLocale: () => effective,
+    );
+
+    await push.registerTokenForTest('same-fcm-token');
+    expect(repo.registerCalls, 1);
+    expect(repo.lastLocale, 'en');
+
+    effective = const Locale('sq');
+    await push.registerTokenForTest('same-fcm-token', force: true);
+
+    expect(repo.registerCalls, 2);
+    expect(repo.lastLocale, 'sq');
   });
 
   test('initialize is idempotent when Firebase is not ready', () async {

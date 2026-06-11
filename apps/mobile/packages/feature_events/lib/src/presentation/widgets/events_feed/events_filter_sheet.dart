@@ -1,40 +1,58 @@
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/shared/utils/app_haptics.dart';
+import 'package:chisto_infrastructure/shared/widgets/atoms/app_search_query_chip.dart';
 import 'package:chisto_infrastructure/shared/widgets/organisms/app_surface/report_surface_aliases.dart';
 import 'package:design_system/design_system.dart';
+import 'package:design_system/src/theme/app_typography_surfaces.dart';
 import 'package:feature_events/src/domain/models/eco_event.dart';
+import 'package:feature_events/src/domain/models/eco_event_filter.dart';
 import 'package:feature_events/src/domain/models/eco_event_search_params.dart';
+import 'package:feature_events/src/domain/models/events_list_page_snapshot.dart';
+import 'package:feature_events/src/domain/repositories/events_repository.dart';
+import 'package:feature_events/src/presentation/utils/event_calendar_date_format.dart';
 import 'package:feature_events/src/presentation/utils/events_localized_strings.dart';
+import 'package:feature_events/src/presentation/widgets/date_picker_sheet.dart';
+import 'package:feature_events/src/presentation/widgets/events_feed/events_filter_preview_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+/// Inclusive bounds for filter date pickers (matches API query range).
+final DateTime kEventsFilterMinDate = DateTime(2020, 1, 1);
+final DateTime kEventsFilterMaxDate = DateTime(2030, 12, 31);
+
+const List<EcoEventStatus> _kFilterStatuses = <EcoEventStatus>[
+  EcoEventStatus.upcoming,
+  EcoEventStatus.inProgress,
+  EcoEventStatus.completed,
+  EcoEventStatus.cancelled,
+];
 
 /// Bottom-sheet filter panel for the events feed.
-///
-/// Shows category multi-select chips, status toggles, and a date range picker.
-/// Returns the selected [EcoEventSearchParams] via [show], or null when the
-/// user dismisses without applying.
 class EventsFilterSheet extends StatefulWidget {
-  const EventsFilterSheet({super.key, required this.current});
+  const EventsFilterSheet({
+    super.key,
+    required this.current,
+    required this.activeChip,
+    required this.repository,
+  });
 
   final EcoEventSearchParams current;
+  final EcoEventFilter activeChip;
+  final EventsRepository repository;
 
-  /// Shows the filter sheet modally and returns the result.
-  ///
-  /// Returns null if the user dismisses without tapping "Show results".
   static Future<EcoEventSearchParams?> show(
     BuildContext context, {
     required EcoEventSearchParams current,
+    required EcoEventFilter activeChip,
+    required EventsRepository repository,
   }) {
-    return showAppPanelBottomSheet<EcoEventSearchParams>(
+    return AppBottomSheet.show<EcoEventSearchParams>(
       context: context,
-      builder: (BuildContext sheetContext) {
-        final double keyboardInset = MediaQuery.viewInsetsOf(
-          sheetContext,
-        ).bottom;
-        return Padding(
-          padding: EdgeInsets.only(bottom: keyboardInset),
-          child: EventsFilterSheet(current: current),
-        );
-      },
+      builder: (BuildContext sheetContext) => EventsFilterSheet(
+        current: current,
+        activeChip: activeChip,
+        repository: repository,
+      ),
     );
   }
 
@@ -43,10 +61,16 @@ class EventsFilterSheet extends StatefulWidget {
 }
 
 class _EventsFilterSheetState extends State<EventsFilterSheet> {
+  final ScrollController _scrollController = ScrollController();
+  final GlobalKey _categorySectionKey = GlobalKey();
+  final GlobalKey _statusSectionKey = GlobalKey();
+  final GlobalKey _dateSectionKey = GlobalKey();
+
   late Set<EcoEventCategory> _categories;
   late Set<EcoEventStatus> _statuses;
   late DateTime? _dateFrom;
   late DateTime? _dateTo;
+  late EventsFilterPreviewController _preview;
 
   @override
   void initState() {
@@ -55,9 +79,45 @@ class _EventsFilterSheetState extends State<EventsFilterSheet> {
     _statuses = Set<EcoEventStatus>.from(widget.current.statuses);
     _dateFrom = widget.current.dateFrom;
     _dateTo = widget.current.dateTo;
+    _preview = EventsFilterPreviewController(
+      repository: widget.repository,
+      activeChip: widget.activeChip,
+      initialDraft: _draftParams,
+    );
+    _preview.addListener(_onPreviewChanged);
+  }
+
+  EcoEventSearchParams get _draftParams => EcoEventSearchParams(
+    categories: _categories,
+    statuses: _statuses,
+    dateFrom: _dateFrom,
+    dateTo: _dateTo,
+  );
+
+  bool get _hasDraftFilters =>
+      _categories.isNotEmpty ||
+      _statuses.isNotEmpty ||
+      _dateFrom != null ||
+      _dateTo != null;
+
+  bool get _showsChipStatusOverride =>
+      _statuses.isNotEmpty &&
+      (widget.activeChip == EcoEventFilter.upcoming ||
+          widget.activeChip == EcoEventFilter.past);
+
+  void _onPreviewChanged() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  void _notifyDraftChanged() {
+    _preview.updateDraft(_draftParams);
+    setState(() {});
   }
 
   void _toggleCategory(EcoEventCategory cat) {
+    AppHaptics.light(context);
     setState(() {
       if (_categories.contains(cat)) {
         _categories.remove(cat);
@@ -65,9 +125,11 @@ class _EventsFilterSheetState extends State<EventsFilterSheet> {
         _categories.add(cat);
       }
     });
+    _notifyDraftChanged();
   }
 
   void _toggleStatus(EcoEventStatus status) {
+    AppHaptics.light(context);
     setState(() {
       if (_statuses.contains(status)) {
         _statuses.remove(status);
@@ -75,6 +137,31 @@ class _EventsFilterSheetState extends State<EventsFilterSheet> {
         _statuses.add(status);
       }
     });
+    _notifyDraftChanged();
+  }
+
+  void _selectAllCategories() {
+    setState(() {
+      _categories = EcoEventCategory.values.toSet();
+    });
+    _notifyDraftChanged();
+  }
+
+  void _clearCategories() {
+    setState(() => _categories = <EcoEventCategory>{});
+    _notifyDraftChanged();
+  }
+
+  void _selectAllStatuses() {
+    setState(() {
+      _statuses = _kFilterStatuses.toSet();
+    });
+    _notifyDraftChanged();
+  }
+
+  void _clearStatuses() {
+    setState(() => _statuses = <EcoEventStatus>{});
+    _notifyDraftChanged();
   }
 
   void _clearAll() {
@@ -84,6 +171,7 @@ class _EventsFilterSheetState extends State<EventsFilterSheet> {
       _dateFrom = null;
       _dateTo = null;
     });
+    _notifyDraftChanged();
   }
 
   void _apply() {
@@ -98,31 +186,58 @@ class _EventsFilterSheetState extends State<EventsFilterSheet> {
     Navigator.of(context).pop(result);
   }
 
-  int get _activeCount =>
-      _categories.length +
-      _statuses.length +
-      (_dateFrom != null ? 1 : 0) +
-      (_dateTo != null ? 1 : 0);
+  void _applyDatePreset({DateTime? from, DateTime? to}) {
+    setState(() {
+      _dateFrom = from;
+      _dateTo = to;
+    });
+    _notifyDraftChanged();
+  }
+
+  void _applyThisWeekPreset() {
+    final EcoEventSearchParams week =
+        EcoEventSearchParams.discoveryThisSkopjeCalendarWeek(
+          DateTime.now().toUtc(),
+        );
+    _applyDatePreset(from: week.dateFrom, to: week.dateTo);
+  }
+
+  void _applyThisMonthPreset() {
+    final DateTime now = DateTime.now();
+    _applyDatePreset(
+      from: DateTime(now.year, now.month, 1),
+      to: DateTime(now.year, now.month, DateUtils.getDaysInMonth(now.year, now.month)),
+    );
+  }
+
+  void _applyNext30DaysPreset() {
+    final DateTime today = DateUtils.dateOnly(DateTime.now());
+    _applyDatePreset(from: today, to: today.add(const Duration(days: 30)));
+  }
 
   Future<void> _pickDate({required bool isFrom}) async {
     final DateTime initial = isFrom
         ? (_dateFrom ?? DateTime.now())
         : (_dateTo ??
               (_dateFrom ?? DateTime.now()).add(const Duration(days: 7)));
-    final DateTime? picked = await showDatePicker(
-      context: context,
+    final DateTime? minimumDate = isFrom
+        ? kEventsFilterMinDate
+        : (_dateFrom != null && _dateFrom!.isAfter(kEventsFilterMinDate)
+              ? _dateFrom
+              : kEventsFilterMinDate);
+    final DateTime? maximumDate = isFrom
+        ? (_dateTo != null && _dateTo!.isBefore(kEventsFilterMaxDate)
+              ? _dateTo
+              : kEventsFilterMaxDate)
+        : kEventsFilterMaxDate;
+    final DateTime? picked = await DatePickerSheet.show(
+      context,
+      title: isFrom
+          ? context.l10n.eventsFilterSheetDateFrom
+          : context.l10n.eventsFilterSheetDateTo,
       initialDate: initial,
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2030),
-      builder: (BuildContext ctx, Widget? child) => Theme(
-        data: Theme.of(ctx).copyWith(
-          colorScheme: Theme.of(ctx).colorScheme.copyWith(
-            primary: AppColors.primary,
-            onPrimary: AppColors.white,
-          ),
-        ),
-        child: child!,
-      ),
+      minimumDate: minimumDate,
+      maximumDate: maximumDate,
     );
     if (picked == null) return;
     setState(() {
@@ -138,22 +253,135 @@ class _EventsFilterSheetState extends State<EventsFilterSheet> {
         }
       }
     });
+    _notifyDraftChanged();
   }
 
-  String _formatDate(DateTime? d) {
+  String _formatDate(BuildContext context, DateTime? d) {
     if (d == null) return '—';
-    return '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+    return formatEventCalendarDate(context, d);
+  }
+
+  Future<void> _scrollToSection(GlobalKey key) async {
+    final BuildContext? sectionContext = key.currentContext;
+    if (sectionContext == null) {
+      return;
+    }
+    await Scrollable.ensureVisible(
+      sectionContext,
+      duration: AppMotion.standard,
+      curve: AppMotion.smooth,
+      alignment: 0.05,
+    );
+  }
+
+  List<_DraftSummaryChip> _summaryChips(AppLocalizations l10n) {
+    final List<_DraftSummaryChip> chips = <_DraftSummaryChip>[];
+    for (final EcoEventCategory cat in _categories) {
+      chips.add(
+        _DraftSummaryChip(
+          label: cat.localizedLabel(l10n),
+          onTap: () => _scrollToSection(_categorySectionKey),
+          onClear: () {
+            setState(() => _categories.remove(cat));
+            _notifyDraftChanged();
+          },
+        ),
+      );
+    }
+    for (final EcoEventStatus status in _statuses) {
+      chips.add(
+        _DraftSummaryChip(
+          label: status.localizedLabel(l10n),
+          onTap: () => _scrollToSection(_statusSectionKey),
+          onClear: () {
+            setState(() => _statuses.remove(status));
+            _notifyDraftChanged();
+          },
+        ),
+      );
+    }
+    if (_dateFrom != null) {
+      chips.add(
+        _DraftSummaryChip(
+          label: '${l10n.eventsFilterSheetDateFrom}: ${_formatDate(context, _dateFrom)}',
+          onTap: () => _scrollToSection(_dateSectionKey),
+          onClear: () {
+            setState(() => _dateFrom = null);
+            _notifyDraftChanged();
+          },
+        ),
+      );
+    }
+    if (_dateTo != null) {
+      chips.add(
+        _DraftSummaryChip(
+          label: '${l10n.eventsFilterSheetDateTo}: ${_formatDate(context, _dateTo)}',
+          onTap: () => _scrollToSection(_dateSectionKey),
+          onClear: () {
+            setState(() => _dateTo = null);
+            _notifyDraftChanged();
+          },
+        ),
+      );
+    }
+    return chips;
+  }
+
+  Widget _sectionActions({
+    required AppLocalizations l10n,
+    required VoidCallback onSelectAll,
+    required VoidCallback onClear,
+  }) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        AppSectionHeaderAction(
+          label: l10n.eventsFilterSectionSelectAll,
+          onPressed: onSelectAll,
+        ),
+        AppSectionHeaderAction(
+          label: l10n.eventsFilterSectionClear,
+          onPressed: onClear,
+        ),
+      ],
+    );
+  }
+
+  String _footerLabel(AppLocalizations l10n) {
+    final EventsListPageSnapshot? snap = _preview.snapshot;
+    if (snap != null && _preview.error == null) {
+      if (snap.hasMore) {
+        return l10n.eventsFilterShowEventsPlus(snap.count);
+      }
+      return l10n.eventsFilterShowEvents(snap.count);
+    }
+    if (_hasDraftFilters) {
+      return l10n.eventsFilterSheetShowResults;
+    }
+    return l10n.eventsFilterSheetShowResults;
+  }
+
+  @override
+  void dispose() {
+    _preview.removeListener(_onPreviewChanged);
+    _preview.dispose();
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
     final TextTheme textTheme = Theme.of(context).textTheme;
+    final List<_DraftSummaryChip> summaryChips = _summaryChips(l10n);
+    final EventsListPageSnapshot? previewSnap = _preview.snapshot;
 
     return Semantics(
       container: true,
-      label: context.l10n.eventsFilterSheetSemantic,
+      label: l10n.eventsFilterSheetSemantic,
       child: ReportSheetScaffold(
-        title: context.l10n.eventsFilterSheetTitle,
+        title: l10n.eventsFilterSheetTitle,
+        subtitle: l10n.eventsFilterSheetSubtitle,
         maxHeightFactor: 0.92,
         addBottomInset: true,
         useModalRouteShape: true,
@@ -161,22 +389,20 @@ class _EventsFilterSheetState extends State<EventsFilterSheet> {
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            if (_activeCount > 0)
-              CupertinoButton(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.sm,
-                  vertical: AppSpacing.xxs,
-                ),
-                minimumSize: const Size(44, 44),
-                onPressed: _clearAll,
-                child: Text(
-                  context.l10n.eventsFilterSheetClearAll,
-                  style: AppTypography.eventsSheetTextLink(textTheme),
+            Opacity(
+              opacity: _hasDraftFilters ? 1 : 0,
+              child: IgnorePointer(
+                ignoring: !_hasDraftFilters,
+                child: AppSectionHeaderAction(
+                  label: l10n.eventsFilterSheetClearAll,
+                  semanticLabel: l10n.eventsFilterResetSemantic,
+                  onPressed: _clearAll,
                 ),
               ),
+            ),
             ReportCircleIconButton(
               icon: Icons.close_rounded,
-              semanticLabel: context.l10n.semanticClose,
+              semanticLabel: l10n.semanticClose,
               onTap: () => Navigator.of(context).pop(),
             ),
           ],
@@ -184,95 +410,186 @@ class _EventsFilterSheetState extends State<EventsFilterSheet> {
         footer: Padding(
           padding: const EdgeInsets.only(top: AppSpacing.sm),
           child: AppButton.primary(
-            label: _activeCount > 0
-                ? context.l10n.eventsFilterSheetActiveCount(_activeCount)
-                : context.l10n.eventsFilterSheetShowResults,
+            label: _footerLabel(l10n),
             onPressed: _apply,
             expand: true,
           ),
         ),
         child: SingleChildScrollView(
+          controller: _scrollController,
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              _SectionLabel(label: context.l10n.eventsFilterSheetCategory),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                child: Wrap(
-                  spacing: AppSpacing.xs,
-                  runSpacing: AppSpacing.xs,
+              AppFilterSummaryChipShelf(
+                chips: summaryChips
+                    .map(
+                      (_DraftSummaryChip chip) => AppSearchQueryChip(
+                        label: chip.label,
+                        leadingIcon: Icons.close_rounded,
+                        onTap: chip.onClear,
+                        semanticLabel: chip.label,
+                        maxLabelWidth: 160,
+                      ),
+                    )
+                    .toList(growable: false),
+              ),
+              if (_showsChipStatusOverride) ...<Widget>[
+                const SizedBox(height: AppSpacing.sm),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                  child: AppInlineBanner(
+                    message: l10n.eventsFilterChipStatusOverrideHint,
+                    tone: AppInlineBannerTone.info,
+                  ),
+                ),
+              ],
+              const SizedBox(height: AppSpacing.md),
+              AppFilterSheetSection(
+                sectionKey: _categorySectionKey,
+                title: l10n.eventsFilterSheetCategory,
+                contentPadding: EdgeInsets.zero,
+                trailing: _sectionActions(
+                  l10n: l10n,
+                  onSelectAll: _selectAllCategories,
+                  onClear: _clearCategories,
+                ),
+                child: AppFilterInsetGroup(
                   children: EcoEventCategory.values
                       .map((EcoEventCategory cat) {
                         final bool selected = _categories.contains(cat);
-                        return AppToggleChip(
-                          label: cat.localizedLabel(context.l10n),
-                          icon: cat.icon,
-                          isActive: selected,
+                        return AppFilterCheckRow(
+                          label: cat.localizedLabel(l10n),
+                          leadingIcon: cat.icon,
+                          isSelected: selected,
                           onTap: () => _toggleCategory(cat),
+                          semanticLabel: cat.localizedLabel(l10n),
+                          semanticHint: selected
+                              ? l10n.eventsFilterCategoryHintOn
+                              : l10n.eventsFilterCategoryHintOff,
+                          showDivider: cat != EcoEventCategory.values.last,
                         );
                       })
                       .toList(growable: false),
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
-              _SectionLabel(label: context.l10n.eventsFilterSheetStatus),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                child: Wrap(
-                  spacing: AppSpacing.xs,
-                  runSpacing: AppSpacing.xs,
-                  children:
-                      <EcoEventStatus>[
-                            EcoEventStatus.upcoming,
-                            EcoEventStatus.inProgress,
-                            EcoEventStatus.completed,
-                            EcoEventStatus.cancelled,
-                          ]
-                          .map((EcoEventStatus status) {
-                            final bool selected = _statuses.contains(status);
-                            return AppToggleChip(
-                              label: status.localizedLabel(context.l10n),
-                              isActive: selected,
-                              accentColor: Color(status.colorValue),
-                              onTap: () => _toggleStatus(status),
-                            );
-                          })
-                          .toList(growable: false),
+              AppFilterSheetSection(
+                sectionKey: _statusSectionKey,
+                title: l10n.eventsFilterSheetStatus,
+                contentPadding: EdgeInsets.zero,
+                trailing: _sectionActions(
+                  l10n: l10n,
+                  onSelectAll: _selectAllStatuses,
+                  onClear: _clearStatuses,
+                ),
+                child: AppFilterInsetGroup(
+                  children: _kFilterStatuses
+                      .map((EcoEventStatus status) {
+                        final bool selected = _statuses.contains(status);
+                        return AppFilterCheckRow(
+                          label: status.localizedLabel(l10n),
+                          leadingDotColor: Color(status.colorValue),
+                          isSelected: selected,
+                          onTap: () => _toggleStatus(status),
+                          semanticLabel: status.localizedLabel(l10n),
+                          semanticHint: selected
+                              ? l10n.eventsFilterStatusHintOn
+                              : l10n.eventsFilterStatusHintOff,
+                          showDivider: status != _kFilterStatuses.last,
+                        );
+                      })
+                      .toList(growable: false),
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
-              _SectionLabel(label: context.l10n.eventsFilterSheetDateRange),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                child: Row(
+              AppFilterSheetSection(
+                sectionKey: _dateSectionKey,
+                title: l10n.eventsFilterSheetDateRange,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
-                    Expanded(
-                      child: _DatePickerTile(
-                        label: context.l10n.eventsFilterSheetDateFrom,
-                        value: _formatDate(_dateFrom),
-                        hasValue: _dateFrom != null,
-                        onTap: () => _pickDate(isFrom: true),
-                        onClear: _dateFrom != null
-                            ? () => setState(() => _dateFrom = null)
-                            : null,
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: <Widget>[
+                          _DatePresetChip(
+                            label: l10n.eventsFilterDatePresetThisWeek,
+                            onTap: _applyThisWeekPreset,
+                          ),
+                          const SizedBox(width: AppSpacing.xs),
+                          _DatePresetChip(
+                            label: l10n.eventsFilterDatePresetThisMonth,
+                            onTap: _applyThisMonthPreset,
+                          ),
+                          const SizedBox(width: AppSpacing.xs),
+                          _DatePresetChip(
+                            label: l10n.eventsFilterDatePresetNext30Days,
+                            onTap: _applyNext30DaysPreset,
+                          ),
+                          const SizedBox(width: AppSpacing.xs),
+                          _DatePresetChip(
+                            label: l10n.eventsFilterDatePresetClear,
+                            onTap: () => _applyDatePreset(),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(width: AppSpacing.sm),
-                    Expanded(
-                      child: _DatePickerTile(
-                        label: context.l10n.eventsFilterSheetDateTo,
-                        value: _formatDate(_dateTo),
-                        hasValue: _dateTo != null,
-                        onTap: () => _pickDate(isFrom: false),
-                        onClear: _dateTo != null
-                            ? () => setState(() => _dateTo = null)
-                            : null,
-                      ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: _DatePickerTile(
+                            label: l10n.eventsFilterSheetDateFrom,
+                            value: _formatDate(context, _dateFrom),
+                            hasValue: _dateFrom != null,
+                            onTap: () => _pickDate(isFrom: true),
+                            onClear: _dateFrom != null
+                                ? () {
+                                    setState(() => _dateFrom = null);
+                                    _notifyDraftChanged();
+                                  }
+                                : null,
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          child: _DatePickerTile(
+                            label: l10n.eventsFilterSheetDateTo,
+                            value: _formatDate(context, _dateTo),
+                            hasValue: _dateTo != null,
+                            onTap: () => _pickDate(isFrom: false),
+                            onClear: _dateTo != null
+                                ? () {
+                                    setState(() => _dateTo = null);
+                                    _notifyDraftChanged();
+                                  }
+                                : null,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
+              if (previewSnap != null && _preview.error == null) ...<Widget>[
+                const SizedBox(height: AppSpacing.md),
+                Semantics(
+                  liveRegion: true,
+                  label: l10n.eventsFilterPreviewLiveRegion(previewSnap.count),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                    ),
+                    child: Text(
+                      l10n.eventsFilterPreviewLiveRegion(previewSnap.count),
+                      style: AppTypographySurfaces.homeMutedCaption(
+                        textTheme,
+                      ).copyWith(fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ),
+              ],
               const SizedBox(height: AppSpacing.lg),
             ],
           ),
@@ -282,25 +599,31 @@ class _EventsFilterSheetState extends State<EventsFilterSheet> {
   }
 }
 
-class _SectionLabel extends StatelessWidget {
-  const _SectionLabel({required this.label});
+class _DraftSummaryChip {
+  const _DraftSummaryChip({
+    required this.label,
+    required this.onTap,
+    required this.onClear,
+  });
+
   final String label;
+  final VoidCallback onTap;
+  final VoidCallback onClear;
+}
+
+class _DatePresetChip extends StatelessWidget {
+  const _DatePresetChip({required this.label, required this.onTap});
+
+  final String label;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.lg,
-        0,
-        AppSpacing.lg,
-        AppSpacing.xs,
-      ),
-      child: Text(
-        label,
-        style: AppTypography.eventsSheetSectionLabel(
-          Theme.of(context).textTheme,
-        ),
-      ),
+    return AppToggleChip(
+      label: label,
+      isActive: false,
+      onTap: onTap,
+      showDot: false,
     );
   }
 }

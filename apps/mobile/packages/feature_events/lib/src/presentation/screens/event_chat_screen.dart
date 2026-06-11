@@ -5,6 +5,7 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:chisto_infrastructure/core/auth/auth_state.dart';
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:chisto_infrastructure/core/l10n/app_error_localizations.dart';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/core/logging/app_log.dart';
 import 'package:chisto_infrastructure/core/network/connectivity_gate.dart';
@@ -29,7 +30,9 @@ import 'package:feature_events/src/data/chat/event_chat_repository.dart';
 import 'package:feature_events/src/data/chat/event_chat_stream_event.dart';
 import 'package:feature_events/src/data/chat/outbox/chat_outbox_store.dart';
 import 'package:feature_events/src/domain/repositories/events_repository.dart';
+import 'package:feature_events/src/presentation/event_chat/event_chat_load_error.dart';
 import 'package:feature_events/src/presentation/event_chat/widgets/event_chat_scroll_behavior.dart';
+import 'package:feature_events/src/presentation/widgets/event_detail/event_detail_not_found_view.dart';
 import 'package:feature_events/src/presentation/event_chat/widgets/event_chat_search_panel.dart';
 import 'package:feature_events/src/presentation/utils/event_chat_message_grouping.dart';
 import 'package:feature_events/src/presentation/utils/event_chat_message_list_order.dart';

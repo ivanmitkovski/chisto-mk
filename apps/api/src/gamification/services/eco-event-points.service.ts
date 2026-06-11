@@ -10,6 +10,12 @@ export type EcoEventPointsCreditParams = {
   metadata?: Prisma.InputJsonValue;
 };
 
+export type EcoEventPointsCreditResult = {
+  granted: number;
+  totalPointsEarnedBefore: number;
+  totalPointsEarnedAfter: number;
+};
+
 export type EcoEventPointsDebitParams = {
   userId: string;
   /** Must be negative. */
@@ -25,6 +31,12 @@ export type EcoEventPointsDebitParams = {
   };
 };
 
+const EMPTY_CREDIT: EcoEventPointsCreditResult = {
+  granted: 0,
+  totalPointsEarnedBefore: 0,
+  totalPointsEarnedAfter: 0,
+};
+
 /**
  * Idempotent positive point grants for eco / cleanup events.
  * Uses PointTransaction (userId + referenceType + referenceId + reasonCode) as dedupe key.
@@ -33,15 +45,16 @@ export type EcoEventPointsDebitParams = {
 @Injectable()
 export class EcoEventPointsService {
   /**
-   * Credits [delta] to the user if no matching transaction exists. Returns amount actually awarded (0 or delta).
+   * Credits [delta] to the user if no matching transaction exists.
+   * Returns grant amount and totalPointsEarned before/after for level-up side effects.
    */
   async creditIfNew(
     tx: Prisma.TransactionClient,
     params: EcoEventPointsCreditParams,
-  ): Promise<number> {
+  ): Promise<EcoEventPointsCreditResult> {
     const { userId, delta, reasonCode, referenceType, referenceId, metadata } = params;
     if (delta <= 0) {
-      return 0;
+      return EMPTY_CREDIT;
     }
 
     const existing = await tx.pointTransaction.findFirst({
@@ -54,8 +67,17 @@ export class EcoEventPointsService {
       select: { id: true },
     });
     if (existing != null) {
-      return 0;
+      return EMPTY_CREDIT;
     }
+
+    const userBefore = await tx.user.findUnique({
+      where: { id: userId },
+      select: { totalPointsEarned: true },
+    });
+    if (userBefore == null) {
+      return EMPTY_CREDIT;
+    }
+    const totalBefore = userBefore.totalPointsEarned;
 
     let updated: { pointsBalance: number };
     try {
@@ -72,7 +94,7 @@ export class EcoEventPointsService {
         err instanceof Prisma.PrismaClientKnownRequestError &&
         err.code === 'P2025'
       ) {
-        return 0;
+        return EMPTY_CREDIT;
       }
       throw err;
     }
@@ -98,12 +120,16 @@ export class EcoEventPointsService {
             totalPointsEarned: { decrement: delta },
           },
         });
-        return 0;
+        return EMPTY_CREDIT;
       }
       throw err;
     }
 
-    return delta;
+    return {
+      granted: delta,
+      totalPointsEarnedBefore: totalBefore,
+      totalPointsEarnedAfter: totalBefore + delta,
+    };
   }
 
   /**

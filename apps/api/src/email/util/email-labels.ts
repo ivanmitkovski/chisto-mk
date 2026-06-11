@@ -41,7 +41,7 @@ const UGC_SUBJECT_TYPE: LabelMap = {
 
 const UGC_REASON: LabelMap = {
   spam: { en: 'Spam', mk: 'Спам' },
-  harassment: { en: 'Harassment', mk: 'Вреќање' },
+  harassment: { en: 'Harassment', mk: 'Вознемирување' },
   hate: { en: 'Hate speech', mk: 'Омраза' },
   violence: { en: 'Violence', mk: 'Насилство' },
   nudity: { en: 'Nudity', mk: 'Голотија' },

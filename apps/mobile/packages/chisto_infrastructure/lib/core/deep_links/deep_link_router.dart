@@ -1,6 +1,13 @@
+import 'dart:async';
+
 import 'package:chisto_infrastructure/core/navigation/app_navigation.dart';
 import 'package:chisto_infrastructure/core/navigation/app_routes.dart';
+import 'package:chisto_infrastructure/core/providers/app_providers.dart';
+import 'package:chisto_infrastructure/core/providers/root_container.dart';
+import 'package:feature_auth/src/presentation/utils/auth_guard_ui.dart';
+import 'package:feature_notifications/src/data/notification_open_payload.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 /// Parsed in-app route from a universal / custom-scheme link.
@@ -49,16 +56,10 @@ final class DeepLinkSiteDetail extends DeepLinkRoute {
   final String? cid;
 }
 
-/// Loose UUID pattern (v1–v7, case-insensitive, with hyphens).
-final RegExp _uuidPattern = RegExp(
-  r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
-  caseSensitive: false,
-);
-
 /// Prisma `cuid()` pattern used by current Site ids.
 final RegExp _cuidPattern = RegExp(r'^c[a-z0-9]{24}$', caseSensitive: false);
 
-/// Hosts allowed for `https://…/events/<uuid>` share links (avoid open redirects).
+/// Hosts allowed for `https://…/events/<id>` share links (avoid open redirects).
 bool deepLinkTrustedShareHost(String? host) {
   final String h = (host ?? '').toLowerCase();
   if (h.isEmpty) {
@@ -113,6 +114,44 @@ class DeepLinkRouter {
     return handleUri(router, uri, isAuthenticated: true);
   }
 
+  /// Like [handleUri] but runs async location gating for point-giving deep links when [context] is available.
+  static Future<bool> handleUriAsync(
+    GoRouter router,
+    Uri uri, {
+    required bool isAuthenticated,
+    BuildContext? context,
+  }) async {
+    if (_isDuplicate(uri)) {
+      return true;
+    }
+    final DeepLinkRoute? route = parse(uri);
+    switch (route) {
+      case DeepLinkNewReport():
+        _markHandled(uri);
+        if (!isAuthenticated) {
+          queuePendingAuthenticatedUri(uri);
+          AppNavigation.goSignIn();
+          return true;
+        }
+        if (context != null && context.mounted) {
+          final ProviderContainer container = ProviderScope.containerOf(
+            context,
+          );
+          if (!await ensureLocationEligibleForActionWithRead(
+            context,
+            container.read,
+          )) {
+            return true;
+          }
+        } else {
+          await AppNavigation.pushNewReport();
+        }
+        return true;
+      default:
+        return handleUri(router, uri, isAuthenticated: isAuthenticated);
+    }
+  }
+
   static DeepLinkRoute? parse(Uri uri) {
     final List<String> raw = uri.pathSegments
         .where((String s) => s.isNotEmpty)
@@ -136,7 +175,7 @@ class DeepLinkRouter {
     if (raw.length == 2 && raw[0] == 'events') {
       final String id = raw[1].trim();
       if (id.isNotEmpty &&
-          _uuidPattern.hasMatch(id) &&
+          notificationOpenPayloadLooksLikeEventId(id) &&
           deepLinkTrustedShareHost(uri.host)) {
         return DeepLinkEventDetail(id);
       }
@@ -148,7 +187,9 @@ class DeepLinkRouter {
 
     if (seg.length >= 3 && seg[0] == 'events' && seg[1] == 'detail') {
       final String id = seg[2].trim();
-      if (id.isEmpty || !_uuidPattern.hasMatch(id)) return null;
+      if (id.isEmpty || !notificationOpenPayloadLooksLikeEventId(id)) {
+        return null;
+      }
       return DeepLinkEventDetail(id);
     }
     if (seg.length >= 2 && seg[0] == 'events' && seg[1] == 'detail') {
@@ -156,7 +197,7 @@ class DeepLinkRouter {
           uri.queryParameters['eventId'] ?? uri.queryParameters['id'];
       if (id == null ||
           id.trim().isEmpty ||
-          !_uuidPattern.hasMatch(id.trim())) {
+          !notificationOpenPayloadLooksLikeEventId(id.trim())) {
         return null;
       }
       return DeepLinkEventDetail(id.trim());
@@ -211,7 +252,7 @@ class DeepLinkRouter {
           AppNavigation.goSignIn();
           return true;
         }
-        AppNavigation.pushNewReport();
+        unawaited(AppNavigation.pushNewReport());
         return true;
       case DeepLinkHomeMapFocus(:final String siteId):
         _markHandled(uri);

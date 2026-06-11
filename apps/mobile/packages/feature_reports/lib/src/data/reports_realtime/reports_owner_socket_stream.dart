@@ -1,21 +1,35 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:chisto_infrastructure/core/auth/auth_state.dart';
 import 'package:chisto_infrastructure/core/logging/app_log.dart';
 import 'package:chisto_infrastructure/core/network/connectivity_gate.dart';
+import 'package:chisto_infrastructure/core/network/realtime_disruption_signal.dart';
+import 'package:chisto_infrastructure/core/network/realtime_socket_base_url.dart';
+import 'package:chisto_infrastructure/core/network/realtime_socket_options.dart';
+import 'package:chisto_infrastructure/core/network/realtime_socket_transport_policy.dart';
 import 'package:chisto_infrastructure/core/observability/chisto_sentry.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:feature_auth/feature_auth.dart';
 import 'package:feature_reports/src/data/reports_realtime/reports_owner_event.dart';
 import 'package:feature_reports/src/data/reports_realtime/reports_realtime_connection_state.dart';
-import 'package:flutter/foundation.dart' show ValueNotifier;
+import 'package:flutter/foundation.dart' show ValueNotifier, visibleForTesting;
 import 'package:socket_io_client/socket_io_client.dart' as sio;
 
 /// When true (`--dart-define=CHAT_WS_ONLY=true`), websocket-only (same flag as event chat).
-const bool kReportsOwnerSocketWsOnly = bool.fromEnvironment(
-  'CHAT_WS_ONLY',
-  defaultValue: false,
-);
+@Deprecated('Use RealtimeSocketTransportPolicy.kRealtimeWsOnly')
+const bool kReportsOwnerSocketWsOnly = RealtimeSocketTransportPolicy.kRealtimeWsOnly;
+
+bool _reportsSocketNeedsReconnectForNewToken({
+  required bool socketConnected,
+  required String? newAccessToken,
+  required String? tokenAtHandshake,
+}) {
+  return socketConnected &&
+      newAccessToken != null &&
+      newAccessToken.isNotEmpty &&
+      newAccessToken != tokenAtHandshake;
+}
 
 /// Socket.IO client for [`/reports-owner`](apps/api) — owner report events (`report_event`).
 class ReportsOwnerSocketStream {
@@ -24,10 +38,25 @@ class ReportsOwnerSocketStream {
     required AuthState authState,
     Future<RefreshOutcome> Function()? sessionRefresh,
     void Function()? onAuthRejected,
-  }) : _baseUrl = baseUrl.replaceFirst(RegExp(r'/$'), ''),
+    RealtimeSocketTransportPolicy? transportPolicy,
+    RealtimeDisruptionSignal? disruptionSignal,
+    Duration offlineEscalationAfter = const Duration(seconds: 15),
+    int maxLoopAttemptsBeforeOffline = 6,
+  }) : _baseUrl = normalizeRealtimeSocketBaseUrl(baseUrl),
        _authState = authState,
        _sessionRefresh = sessionRefresh,
-       _onAuthRejected = onAuthRejected {
+       _onAuthRejected = onAuthRejected,
+       _offlineEscalationAfter = offlineEscalationAfter,
+       _maxLoopAttemptsBeforeOffline = maxLoopAttemptsBeforeOffline,
+       _transportPolicy =
+           transportPolicy ?? reportsOwnerTransportPolicy(baseUrl) {
+    _disruption =
+        disruptionSignal ??
+        RealtimeDisruptionSignal(
+          channel: 'reports-owner',
+          resolveHost: () => Uri.tryParse(_baseUrl)?.host ?? _baseUrl,
+          resolveTransports: _transportPolicy.describeTransports,
+        );
     _authState.addListener(_onAuthChanged);
   }
 
@@ -35,19 +64,30 @@ class ReportsOwnerSocketStream {
   final AuthState _authState;
   final Future<RefreshOutcome> Function()? _sessionRefresh;
   final void Function()? _onAuthRejected;
+  final RealtimeSocketTransportPolicy _transportPolicy;
+  final Duration _offlineEscalationAfter;
+  final int _maxLoopAttemptsBeforeOffline;
+  late final RealtimeDisruptionSignal _disruption;
 
   sio.Socket? _socket;
   String? _tokenAtHandshake;
-  bool _enabled = true;
+  bool _enabled = false;
   bool _disposed = false;
+  bool _loopRunning = false;
+  bool _abortLoop = false;
+  int _loopAttempt = 0;
+
+  /// When true, [_ensureConnected] is a no-op (unit tests only).
+  @visibleForTesting
+  bool connectDisabledForTest = false;
 
   StreamSubscription<List<ConnectivityResult>>? _connectivitySub;
   Timer? _connectivityReconnectDebounce;
+  Timer? _offlineEscalationTimer;
 
   final StreamController<ReportsOwnerEvent> _events =
       StreamController<ReportsOwnerEvent>.broadcast();
 
-  /// Single [Stream] instance so [ReportsRealtimeService.events] and transport share identity.
   late final Stream<ReportsOwnerEvent> _eventsStream = _events.stream;
 
   final ValueNotifier<ReportsRealtimeConnectionState?> connectionState =
@@ -55,13 +95,44 @@ class ReportsOwnerSocketStream {
 
   final ValueNotifier<int> reconnectStreakSinceLive = ValueNotifier<int>(0);
 
+  /// True after the server ack [`reports_owner.ready`] or first [`report_event`].
+  final ValueNotifier<bool> hasReachedLive = ValueNotifier<bool>(false);
+
+  ValueNotifier<bool> get disruptionVisible => _disruption.visible;
+
   Stream<ReportsOwnerEvent> get events => _eventsStream;
+
+  String get _debugHost => Uri.tryParse(_baseUrl)?.host ?? _baseUrl;
 
   void _setConnectionState(ReportsRealtimeConnectionState state) {
     if (_disposed) {
       return;
     }
     connectionState.value = state;
+    switch (state) {
+      case ReportsRealtimeConnectionState.live:
+        _disruption.setLive(isLive: true);
+        _cancelOfflineEscalation();
+      case ReportsRealtimeConnectionState.offline:
+        _disruption.setLive(isLive: true);
+        _disruption.visible.value = false;
+        _cancelOfflineEscalation();
+      case ReportsRealtimeConnectionState.connecting:
+        _disruption.setLive(isLive: false);
+      case ReportsRealtimeConnectionState.reconnecting:
+        _disruption.setLive(isLive: false);
+        _maybeScheduleOfflineEscalation();
+    }
+  }
+
+  void _markLive() {
+    _transportPolicy.recordConnectSuccess();
+    _tokenAtHandshake = _authState.accessToken;
+    reconnectStreakSinceLive.value = 0;
+    _loopAttempt = 0;
+    hasReachedLive.value = true;
+    _setConnectionState(ReportsRealtimeConnectionState.live);
+    chistoReportsBreadcrumb('reports_realtime', 'ws_connected');
   }
 
   void _onConnectivityChanged(List<ConnectivityResult> results) {
@@ -71,11 +142,7 @@ class ReportsOwnerSocketStream {
     if (!ConnectivityGate.isOnline(results)) {
       return;
     }
-    if (_socket != null && _socket!.connected) {
-      if (connectionState.value != ReportsRealtimeConnectionState.live) {
-        reconnectStreakSinceLive.value = 0;
-        _setConnectionState(ReportsRealtimeConnectionState.live);
-      }
+    if (connectionState.value == ReportsRealtimeConnectionState.live) {
       return;
     }
     _scheduleConnectivityReconnect();
@@ -92,6 +159,9 @@ class ReportsOwnerSocketStream {
     if (_disposed || !_enabled || !_authState.isAuthenticated) {
       return;
     }
+    if (connectionState.value == ReportsRealtimeConnectionState.offline) {
+      return;
+    }
     _connectivityReconnectDebounce?.cancel();
     _connectivityReconnectDebounce = Timer(
       const Duration(milliseconds: 600),
@@ -100,14 +170,7 @@ class ReportsOwnerSocketStream {
         if (_disposed || !_enabled || !_authState.isAuthenticated) {
           return;
         }
-        final String? token = _authState.accessToken;
-        if (token == null || token.isEmpty) {
-          return;
-        }
-        if (_socket != null && _socket!.connected) {
-          return;
-        }
-        connect();
+        unawaited(_ensureConnected());
       },
     );
   }
@@ -117,9 +180,7 @@ class ReportsOwnerSocketStream {
       return;
     }
     if (!_authState.isAuthenticated) {
-      _disconnect();
-      reconnectStreakSinceLive.value = 0;
-      _setConnectionState(ReportsRealtimeConnectionState.offline);
+      _stopInternal(clearLive: true);
       return;
     }
     if (!_enabled) {
@@ -130,16 +191,12 @@ class ReportsOwnerSocketStream {
       return;
     }
     final bool connected = _socket != null && _socket!.connected;
-    if (!connected) {
-      // [start] may have run before persisted auth was ready, or we showed [offline]
-      // during a brief unauthenticated transition — open the owner socket now.
-      connect();
-      return;
-    }
-    if (_tokenAtHandshake != null &&
-        _tokenAtHandshake!.isNotEmpty &&
-        token != _tokenAtHandshake) {
-      connect();
+    if (_reportsSocketNeedsReconnectForNewToken(
+      socketConnected: connected,
+      newAccessToken: token,
+      tokenAtHandshake: _tokenAtHandshake,
+    )) {
+      requestReconnect();
     }
   }
 
@@ -149,125 +206,197 @@ class ReportsOwnerSocketStream {
     }
     _enabled = true;
     _ensureConnectivitySubscription();
-    connect();
+    unawaited(_ensureConnected());
   }
 
   void stop() {
+    _stopInternal(clearLive: false);
+  }
+
+  void _stopInternal({required bool clearLive}) {
     _enabled = false;
+    _abortLoop = true;
+    _cancelOfflineEscalation();
     _disconnect();
+    if (clearLive) {
+      hasReachedLive.value = false;
+      reconnectStreakSinceLive.value = 0;
+      _setConnectionState(ReportsRealtimeConnectionState.offline);
+    }
   }
 
   void requestReconnect() {
-    _setConnectionState(ReportsRealtimeConnectionState.reconnecting);
-    reconnectStreakSinceLive.value = reconnectStreakSinceLive.value + 1;
-    _disconnect();
-    if (_enabled && !_disposed && _authState.isAuthenticated) {
-      connect();
+    if (_disposed) {
+      return;
     }
+    _cancelOfflineEscalation();
+    _transportPolicy.reset();
+    reconnectStreakSinceLive.value = 0;
+    _loopAttempt = 0;
+    _abortLoop = false;
+    _disconnect();
+    _enabled = true;
+    connectionState.value = ReportsRealtimeConnectionState.connecting;
+    unawaited(_ensureConnected());
   }
 
-  void connect() {
+  Future<void> _ensureConnected() async {
     if (_disposed || !_enabled || !_authState.isAuthenticated) {
       return;
     }
-    final String? token = _authState.accessToken;
-    if (token == null || token.isEmpty) {
+    if (connectDisabledForTest) {
       return;
     }
+    if (_loopRunning) {
+      return;
+    }
+    if (connectionState.value == ReportsRealtimeConnectionState.offline) {
+      return;
+    }
+    _loopRunning = true;
+    _abortLoop = false;
+    try {
+      await _connectLoop();
+    } finally {
+      _loopRunning = false;
+    }
+  }
 
+  Future<void> _connectLoop() async {
+    while (!_disposed &&
+        _enabled &&
+        _authState.isAuthenticated &&
+        !_abortLoop &&
+        connectionState.value != ReportsRealtimeConnectionState.offline) {
+      final String? token = _authState.accessToken;
+      if (token == null || token.isEmpty) {
+        return;
+      }
+
+      _setConnectionState(
+        _loopAttempt == 0
+            ? ReportsRealtimeConnectionState.connecting
+            : ReportsRealtimeConnectionState.reconnecting,
+      );
+
+      try {
+        await _connectOnce(token);
+      } catch (err) {
+        AppLog.verbose(
+          '[reports-owner:ws] connect attempt failed host=$_debugHost '
+          'attempt=$_loopAttempt type=${err.runtimeType}',
+        );
+        if (_transportPolicy.recordConnectFailure()) {
+          AppLog.warn(
+            '[reports-owner:ws] falling back to polling+websocket host=$_debugHost',
+            category: 'realtime',
+          );
+        }
+      }
+
+      if (_disposed || !_enabled || !_authState.isAuthenticated || _abortLoop) {
+        return;
+      }
+
+      if (connectionState.value == ReportsRealtimeConnectionState.live) {
+        return;
+      }
+
+      _loopAttempt++;
+      reconnectStreakSinceLive.value = reconnectStreakSinceLive.value + 1;
+
+      if (hasReachedLive.value &&
+          _loopAttempt >= _maxLoopAttemptsBeforeOffline) {
+        _escalateToOffline();
+        return;
+      }
+
+      await Future<void>.delayed(_nextBackoff(_loopAttempt));
+    }
+  }
+
+  Duration _nextBackoff(int attempt) {
+    final int capped = attempt.clamp(1, 8);
+    final int baseMs = 500 * (1 << (capped - 1));
+    const int maxMs = 30 * 1000;
+    final int ms = math.min(baseMs, maxMs);
+    return Duration(milliseconds: ms);
+  }
+
+  Future<void> _connectOnce(String token) async {
     _disconnect();
-    _setConnectionState(ReportsRealtimeConnectionState.connecting);
 
     final String origin = '$_baseUrl/reports-owner';
-    final String debugHost = Uri.tryParse(_baseUrl)?.host ?? _baseUrl;
+    final String debugHost = _debugHost;
+    final List<String> transports = _transportPolicy.currentTransports();
+
+    AppLog.verbose(
+      '[reports-owner:ws] connect host=$debugHost transports=${transports.join(",")}',
+    );
+
+    final Completer<void> readyCompleter = Completer<void>();
+    final Completer<void> disconnectCompleter = Completer<void>();
+    var liveMarked = false;
+
+    void markLiveOnce() {
+      if (liveMarked || _disposed) {
+        return;
+      }
+      liveMarked = true;
+      _markLive();
+      if (!readyCompleter.isCompleted) {
+        readyCompleter.complete();
+      }
+    }
 
     _socket = sio.io(
       origin,
-      sio.OptionBuilder()
-          .setTransports(
-            kReportsOwnerSocketWsOnly
-                ? <String>['websocket']
-                : <String>['polling', 'websocket'],
-          )
-          .setAuthFn((void Function(Map<dynamic, dynamic> data) submit) {
-            final String? t = _authState.accessToken;
-            if (t == null || t.isEmpty) {
-              submit(<String, dynamic>{});
-              return;
-            }
-            submit(<String, String>{'token': t});
-          })
-          .enableReconnection()
-          .setReconnectionDelay(1000)
-          .setReconnectionDelayMax(30000)
-          .setTimeout(60000)
-          .build(),
+      RealtimeSocketOptions.build(
+        transportPolicy: _transportPolicy,
+        enableReconnection: false,
+        authSubmit: RealtimeSocketOptions.tokenAuthSubmit(
+          () => _authState.accessToken,
+        ),
+      ).build(),
     );
 
     _socket!
       ..onConnect((_) {
-        AppLog.verbose('[reports-owner:ws] connect host=$debugHost');
-        _tokenAtHandshake = _authState.accessToken;
-        reconnectStreakSinceLive.value = 0;
-        _setConnectionState(ReportsRealtimeConnectionState.live);
-        chistoReportsBreadcrumb('reports_realtime', 'ws_connected');
-      })
-      ..onReconnect((_) {
-        _tokenAtHandshake = _authState.accessToken;
-        reconnectStreakSinceLive.value = 0;
-        _setConnectionState(ReportsRealtimeConnectionState.live);
-      })
-      ..onReconnectAttempt((_) {
-        AppLog.verbose('[reports-owner:ws] reconnectAttempt host=$debugHost');
-        final bool stillConnected = _socket?.connected ?? false;
-        if (stillConnected) {
-          return;
-        }
-        _setConnectionState(ReportsRealtimeConnectionState.reconnecting);
+        AppLog.verbose('[reports-owner:ws] transport connected host=$debugHost');
       })
       ..onConnectError((dynamic data) {
         AppLog.verbose(
           '[reports-owner:ws] connect_error host=$debugHost type=${data.runtimeType}',
         );
-        if (_socket?.connected ?? false) {
-          return;
+        if (!readyCompleter.isCompleted) {
+          readyCompleter.completeError((data as Object?) ?? 'connect_error');
         }
-        _setConnectionState(ReportsRealtimeConnectionState.reconnecting);
-      })
-      ..onReconnectError((dynamic data) {
-        AppLog.verbose(
-          '[reports-owner:ws] reconnect_error host=$debugHost type=${data.runtimeType}',
-        );
       })
       ..onDisconnect((_) {
         AppLog.verbose('[reports-owner:ws] disconnect host=$debugHost');
+        if (!disconnectCompleter.isCompleted) {
+          disconnectCompleter.complete();
+        }
         if (_enabled && !_disposed && _authState.isAuthenticated) {
-          reconnectStreakSinceLive.value = reconnectStreakSinceLive.value + 1;
-          _setConnectionState(ReportsRealtimeConnectionState.reconnecting);
-        }
-      })
-      ..onError((dynamic err) {
-        AppLog.verbose(
-          '[reports-owner:ws] engine error host=$debugHost type=${err.runtimeType}',
-        );
-        if (_socket?.connected ?? false) {
-          return;
-        }
-        _setConnectionState(ReportsRealtimeConnectionState.reconnecting);
-      })
-      ..on('error', (dynamic data) {
-        if (data is Map && data['code'] == 'AUTH_FAILED') {
-          _disconnect();
-          _setConnectionState(ReportsRealtimeConnectionState.reconnecting);
-          final Future<RefreshOutcome> Function()? refresh = _sessionRefresh;
-          if (refresh != null) {
-            unawaited(_handleAuthFailedRefresh(refresh));
-          } else {
-            _setConnectionState(ReportsRealtimeConnectionState.offline);
+          if (connectionState.value == ReportsRealtimeConnectionState.live) {
+            _setConnectionState(ReportsRealtimeConnectionState.reconnecting);
           }
         }
       })
+      ..on('reports_owner.ready', (dynamic data) {
+        AppLog.verbose('[reports-owner:ws] ready host=$debugHost');
+        markLiveOnce();
+      })
+      ..on('error', (dynamic data) {
+        if (data is Map && data['code'] == 'AUTH_FAILED') {
+          if (!readyCompleter.isCompleted) {
+            readyCompleter.completeError('AUTH_FAILED');
+          }
+          unawaited(_handleAuthFailedAfterReadyFailure());
+        }
+      })
       ..on('report_event', (dynamic data) {
+        markLiveOnce();
         final dynamic raw = _unwrapSocketArgs(data);
         final Map<String, dynamic>? map = _asStringKeyedMap(raw);
         if (map == null) {
@@ -280,11 +409,32 @@ class ReportsOwnerSocketStream {
       });
 
     _socket!.connect();
+
+    try {
+      await readyCompleter.future.timeout(const Duration(seconds: 60));
+    } catch (err) {
+      _disconnect();
+      if (err == 'AUTH_FAILED') {
+        return;
+      }
+      rethrow;
+    }
+
+    if (_disposed || !_enabled) {
+      return;
+    }
+
+    await disconnectCompleter.future;
   }
 
-  Future<void> _handleAuthFailedRefresh(
-    Future<RefreshOutcome> Function() refresh,
-  ) async {
+  Future<void> _handleAuthFailedAfterReadyFailure() async {
+    _disconnect();
+    final Future<RefreshOutcome> Function()? refresh = _sessionRefresh;
+    if (refresh == null) {
+      _setConnectionState(ReportsRealtimeConnectionState.offline);
+      return;
+    }
+    _setConnectionState(ReportsRealtimeConnectionState.reconnecting);
     try {
       final RefreshOutcome outcome = await refresh();
       if (_disposed || !_enabled) {
@@ -293,27 +443,59 @@ class ReportsOwnerSocketStream {
       switch (outcome) {
         case RefreshOutcome.success:
           if (_authState.isAuthenticated) {
-            connect();
-            return;
+            _loopAttempt = 0;
+            unawaited(_ensureConnected());
+          } else {
+            _setConnectionState(ReportsRealtimeConnectionState.offline);
           }
-          _setConnectionState(ReportsRealtimeConnectionState.offline);
-          return;
         case RefreshOutcome.serverRejected:
-          // The session was revoked server-side — clear local auth so the
-          // user sees the sign-in flow instead of an endless reconnect.
           _setConnectionState(ReportsRealtimeConnectionState.offline);
           _onAuthRejected?.call();
-          return;
         case RefreshOutcome.transient:
-          // Network / 5xx — stay reconnecting and let the next attempt try.
           _setConnectionState(ReportsRealtimeConnectionState.reconnecting);
-          return;
       }
     } catch (_) {
       if (!_disposed) {
         _setConnectionState(ReportsRealtimeConnectionState.reconnecting);
       }
     }
+  }
+
+  void _maybeScheduleOfflineEscalation() {
+    if (_disposed || !_enabled || !hasReachedLive.value) {
+      return;
+    }
+    if (connectionState.value == ReportsRealtimeConnectionState.offline) {
+      return;
+    }
+    if (_offlineEscalationTimer?.isActive ?? false) {
+      return;
+    }
+    _offlineEscalationTimer = Timer(_offlineEscalationAfter, _escalateToOffline);
+  }
+
+  void _escalateToOffline() {
+    if (_disposed || !_enabled) {
+      return;
+    }
+    if (connectionState.value == ReportsRealtimeConnectionState.live) {
+      return;
+    }
+    AppLog.warn(
+      '[reports-owner:ws] escalating to offline host=$_debugHost '
+      'attempts=$_loopAttempt',
+      category: 'realtime',
+    );
+    _abortLoop = true;
+    _cancelOfflineEscalation();
+    _disconnect();
+    reconnectStreakSinceLive.value = 0;
+    _setConnectionState(ReportsRealtimeConnectionState.offline);
+  }
+
+  void _cancelOfflineEscalation() {
+    _offlineEscalationTimer?.cancel();
+    _offlineEscalationTimer = null;
   }
 
   void _disconnect() {
@@ -324,20 +506,37 @@ class ReportsOwnerSocketStream {
     _tokenAtHandshake = null;
   }
 
+  /// Test seam: enter reconnecting and schedule offline escalation timers.
+  @visibleForTesting
+  void enterReconnectingForTest() {
+    _enabled = true;
+    _setConnectionState(ReportsRealtimeConnectionState.reconnecting);
+  }
+
+  /// Test seam: simulate server ready ack without a socket.
+  @visibleForTesting
+  void markLiveForTest() {
+    _markLive();
+  }
+
   void dispose() {
     if (_disposed) {
       return;
     }
     _disposed = true;
-    _enabled = false;
+    _abortLoop = true;
     _connectivityReconnectDebounce?.cancel();
     _connectivityReconnectDebounce = null;
+    _cancelOfflineEscalation();
     unawaited(_connectivitySub?.cancel() ?? Future<void>.value());
     _connectivitySub = null;
     _authState.removeListener(_onAuthChanged);
     _disconnect();
+    _transportPolicy.reset();
     reconnectStreakSinceLive.dispose();
+    hasReachedLive.dispose();
     connectionState.dispose();
+    _disruption.dispose();
     _events.close();
   }
 

@@ -10,8 +10,17 @@ void main() {
     );
   });
 
-  test('withinMaxLength', () {
+  test('maxBodyLength matches API limit', () {
+    expect(CommentInputValidator.maxBodyLength, 500);
+  });
+
+  test('withinMaxLength uses maxBodyLength by default', () {
     expect(CommentInputValidator.withinMaxLength('a' * 10), isTrue);
-    expect(CommentInputValidator.withinMaxLength('a' * 2001), isFalse);
+    expect(CommentInputValidator.withinMaxLength('a' * 500), isTrue);
+    expect(CommentInputValidator.withinMaxLength('a' * 501), isFalse);
+  });
+
+  test('normalizedLength counts normalized body', () {
+    expect(CommentInputValidator.normalizedLength('  hi  '), 2);
   });
 }

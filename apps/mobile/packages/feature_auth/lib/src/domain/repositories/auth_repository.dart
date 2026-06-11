@@ -1,5 +1,6 @@
 import 'package:feature_auth/src/domain/models/auth_session_dtos.dart';
 import 'package:feature_auth/src/domain/refresh_outcome.dart';
+import 'package:chisto_infrastructure/core/auth/session_teardown_reason.dart';
 
 abstract class AuthRepository {
   bool get isAuthenticated;
@@ -30,7 +31,10 @@ abstract class AuthRepository {
 
   /// Clears local tokens and auth UI state when the API reports an invalid session
   /// (e.g. 401). Does not call the server logout endpoint.
-  Future<void> invalidateLocalSession();
+  Future<void> invalidateLocalSession({
+    int? observedEpoch,
+    SessionTeardownReason? reason,
+  });
 
   Future<void> restoreSession();
 
@@ -38,7 +42,14 @@ abstract class AuthRepository {
   Future<SendOtpResult> requestOtp(String phoneNumberE164);
 
   /// Verify OTP, mark phone verified, and persist session tokens locally.
-  Future<void> verifyOtp(String phoneNumberE164, String code);
+  ///
+  /// [rememberMe] controls client persistence and server refresh TTL. Defaults
+  /// to persistent (registration and sign-in with Remember Me on).
+  Future<void> verifyOtp(
+    String phoneNumberE164,
+    String code, {
+    bool rememberMe = true,
+  });
 
   Future<PasswordResetRequestResult> requestPasswordReset(
     String phoneNumberE164,

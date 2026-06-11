@@ -3,10 +3,12 @@ import 'dart:math' as math;
 
 import 'package:chisto_infrastructure/core/auth/auth_state.dart';
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:chisto_infrastructure/core/l10n/app_error_localizations.dart';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
-import 'package:chisto_infrastructure/core/location/location_service.dart';
-import 'package:chisto_infrastructure/core/providers/app_providers.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
+import 'package:chisto_infrastructure/core/location/location_service.dart';
+import 'package:chisto_infrastructure/core/navigation/app_navigation.dart';
+import 'package:chisto_infrastructure/core/providers/app_providers.dart';
 import 'package:chisto_infrastructure/shared/widgets/molecules/app_error_view.dart';
 import 'package:design_system/design_system.dart';
 import 'package:feature_home/src/domain/models/pollution_site.dart';
@@ -162,10 +164,9 @@ class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
     final AppError? error = ref.read(
       feedSitesNotifierProvider.select((FeedSitesState s) => s.loadMoreError),
     );
-    AppSnack.show(
+    AppSnack.failure(
       context,
-      message: error?.message ?? context.l10n.feedLoadMoreFailedSnack,
-      type: AppSnackType.warning,
+      error: error ?? AppError.unknown(),
     );
   }
 
@@ -202,11 +203,8 @@ class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
 
   Future<void> _openNotifications() async {
     final List<PollutionSite> availableSites = _ensureSitesSeeded(ref);
-    final int? unreadAfter = await Navigator.of(context).push<int>(
-      CupertinoPageRoute<int>(
-        builder: (_) => NotificationsScreen(availableSites: availableSites),
-      ),
-    );
+    final int? unreadAfter =
+        await AppNavigation.pushNotifications(availableSites: availableSites);
     if (!mounted) return;
     final int resolvedUnread =
         unreadAfter ?? ref.read(notificationsUnreadCountProvider);
@@ -488,7 +486,7 @@ class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
   }
 
   void _openFilterSheet(BuildContext context) {
-    showAppPanelBottomSheet<void>(
+    AppBottomSheet.show<void>(
       context: context,
       useRootNavigator: true,
       backgroundColor: AppColors.transparent,

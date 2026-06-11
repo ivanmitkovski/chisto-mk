@@ -44,7 +44,7 @@ class OrganizerCheckInEventLifecycleCoordinator {
 
   Future<void> showMoreActions() async {
     final BuildContext context = readContext();
-    await showModalBottomSheet<void>(
+    await AppBottomSheet.show<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: AppColors.transparent,
@@ -147,7 +147,7 @@ class OrganizerCheckInEventLifecycleCoordinator {
 
   Future<bool> confirmEndEvent() async {
     final BuildContext context = readContext();
-    final bool? result = await showModalBottomSheet<bool>(
+    final bool? result = await AppBottomSheet.show<bool>(
       context: context,
       isScrollControlled: true,
       backgroundColor: AppColors.transparent,
@@ -195,7 +195,7 @@ class OrganizerCheckInEventLifecycleCoordinator {
 
   Future<bool> confirmCancelEvent() async {
     final BuildContext context = readContext();
-    final bool? result = await showModalBottomSheet<bool>(
+    final bool? result = await AppBottomSheet.show<bool>(
       context: context,
       isScrollControlled: true,
       backgroundColor: AppColors.transparent,

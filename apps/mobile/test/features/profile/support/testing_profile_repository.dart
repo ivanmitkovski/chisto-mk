@@ -34,9 +34,16 @@ class TestingProfileRepository implements ProfileRepository {
   }
 
   @override
-  Future<ProfileUser?> updateProfile({String? firstName, String? lastName}) {
+  Future<ProfileUser?> updateProfile({
+    String? firstName,
+    String? lastName,
+    String? locale,
+  }) {
     throw UnimplementedError();
   }
+
+  @override
+  Future<void> updateLocale(String locale) async {}
 
   @override
   Future<String> uploadAvatar(String filePath) {

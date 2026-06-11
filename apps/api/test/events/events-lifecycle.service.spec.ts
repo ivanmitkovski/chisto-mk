@@ -47,6 +47,7 @@ describe('EventsLifecycleService', () => {
       ecoEventPoints as never,
       notificationDispatcher as never,
       siteLifecycleFromEvents as never,
+      { emit: jest.fn() } as never,
     );
   });
 

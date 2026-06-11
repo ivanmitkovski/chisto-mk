@@ -5,21 +5,26 @@ part of 'create_event_sheet.dart';
 // ignore_for_file: invalid_use_of_protected_member
 extension _CreateEventSheetBuild on _CreateEventSheetState {
   Widget _buildFormScroll(BuildContext context, int steps) {
-    return CustomScrollView(
-      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-      physics: const BouncingScrollPhysics(),
-      slivers: <Widget>[
-        SliverPersistentHeader(
-          pinned: true,
-          delegate: CreateEventStepProgressDelegate(steps: steps),
-        ),
-        SliverPadding(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.lg,
-            AppSpacing.sm,
-            AppSpacing.lg,
-            AppSpacing.lg + CreateEventStickyFooter.scrollBottomReserve,
+    final AppLocalizations l10n = context.l10n;
+    return GestureDetector(
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      behavior: HitTestBehavior.translucent,
+      child: CustomScrollView(
+        controller: _formScrollController,
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+        physics: const BouncingScrollPhysics(),
+        slivers: <Widget>[
+          SliverPersistentHeader(
+            pinned: true,
+            delegate: CreateEventStepProgressDelegate(steps: steps),
           ),
+          SliverPadding(
+            padding: EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              AppSpacing.sm,
+              AppSpacing.lg,
+              AppSpacing.lg + CreateEventStickyFooter.scrollBottomReserve,
+            ),
           sliver: SliverToBoxAdapter(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -29,7 +34,7 @@ extension _CreateEventSheetBuild on _CreateEventSheetState {
                   child: CreateEventSiteSection(
                     sectionKey: _siteSectionKey,
                     site: _selectedSite,
-                    showValidationErrors: _showValidationErrors,
+                    showError: _showSiteError(l10n),
                     onSelectSiteTap: () async => _showSitePicker(),
                     onMapPreviewTap: () async =>
                         _showSitePicker(showMapTab: true),
@@ -54,7 +59,7 @@ extension _CreateEventSheetBuild on _CreateEventSheetState {
                             selectedDate: _selectedDate,
                             startTime: _startTime,
                             endTime: _endTime,
-                            showValidationErrors: _showValidationErrors,
+                            showError: _showScheduleError(l10n),
                             isTimeRangeValid: _isTimeRangeValid,
                             scheduleIssue: _createScheduleIssue(),
                             minimumStartPickerTime: b.minStart,
@@ -170,8 +175,12 @@ extension _CreateEventSheetBuild on _CreateEventSheetState {
                         titleFieldKey: _titleFieldKey,
                         categorySectionKey: _categorySectionKey,
                         titleController: _titleController,
+                        titleFocusNode: _titleFocus,
+                        descriptionFieldKey: _descriptionFieldKey,
+                        descriptionFocusNode: _descriptionFocus,
                         descriptionController: _descriptionController,
-                        showValidationErrors: _showValidationErrors,
+                        showTitleError: _showTitleError(l10n),
+                        showCategoryError: _showCategoryError(l10n),
                         selectedCategory: _selectedCategory,
                         selectedScale: _selectedScale,
                         selectedDifficulty: _selectedDifficulty,
@@ -193,6 +202,7 @@ extension _CreateEventSheetBuild on _CreateEventSheetState {
           ),
         ),
       ],
+    ),
     );
   }
 

@@ -37,6 +37,10 @@ class ReportsRealtimeService {
   ValueNotifier<int> get reconnectStreakSinceLive =>
       _transport.reconnectStreakSinceLive;
 
+  ValueNotifier<bool> get disruptionVisible => _transport.disruptionVisible;
+
+  ValueNotifier<bool> get hasReachedLive => _transport.hasReachedLive;
+
   Future<void> start() async {
     _transport.start();
   }

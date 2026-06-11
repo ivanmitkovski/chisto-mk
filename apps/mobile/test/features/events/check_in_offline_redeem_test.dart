@@ -15,7 +15,7 @@ class _FakePostClient extends ApiClient {
     : super(
         config: AppConfig.dev,
         accessToken: () => null,
-        onUnauthorized: () {},
+        onUnauthorized: (_) {},
       );
 
   Future<ApiResponse> Function(String path, Object? body)? postHandler;

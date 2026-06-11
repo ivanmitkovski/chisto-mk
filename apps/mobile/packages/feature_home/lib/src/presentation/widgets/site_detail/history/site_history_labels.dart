@@ -52,7 +52,9 @@ String? siteHistoryEntrySubtitle(BuildContext context, SiteHistoryEntry entry) {
   if (entry.note != null && entry.note!.trim().isNotEmpty) {
     return entry.note!.trim();
   }
-  final String? actor = entry.actorDisplayName?.trim();
+  final String? actor = entry.actorIsDeleted
+      ? context.l10n.deletedUser
+      : entry.actorDisplayName?.trim();
   final bool hasActor = actor != null && actor.isNotEmpty;
   if (!hasActor && !siteHistoryActorIsAdmin(entry.actorRole)) {
     return null;
@@ -88,6 +90,7 @@ bool siteHistoryEntryShowsAdminActor(SiteHistoryEntry entry) {
     case SiteHistoryEntryKind.adminNote:
       return true;
     case SiteHistoryEntryKind.statusChanged:
+      if (entry.actorIsDeleted) return false;
       final String? actor = entry.actorDisplayName?.trim();
       return actor != null && actor.isNotEmpty;
     case SiteHistoryEntryKind.siteCreated:

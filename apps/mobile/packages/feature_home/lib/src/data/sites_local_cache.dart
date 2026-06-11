@@ -164,17 +164,21 @@ class SitesLocalCache {
     return (payload: payload, cachedAt: cachedAt, storedPage: storedPage);
   }
 
-  Future<void> persistMapSnapshot(Map<String, dynamic> payload) async {
+  Future<void> persistMapSnapshot(
+    Map<String, dynamic> payload, {
+    required String authSegment,
+  }) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final Map<String, dynamic> wrapper = <String, dynamic>{
       'cachedAtMs': DateTime.now().millisecondsSinceEpoch,
+      'authSegment': authSegment,
       'payload': payload,
     };
     await prefs.setString(mapPersistedCacheKey, jsonEncode(wrapper));
   }
 
   Future<({Map<String, dynamic> payload, DateTime cachedAt})?>
-  loadMapSnapshot() async {
+  loadMapSnapshot({required String authSegment}) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? raw = prefs.getString(mapPersistedCacheKey);
     if (raw == null || raw.isEmpty) {
@@ -197,6 +201,11 @@ class SitesLocalCache {
     if (DateTime.now().difference(cachedAt) > mapPersistedCacheTtl) {
       return null;
     }
+    // Per-user scope: never serve another account's snapshot (REPORTED sites
+    // are reporter-only). Legacy wrappers without the segment are rejected too.
+    if (decoded['authSegment'] != authSegment) {
+      return null;
+    }
     final Object? payload = decoded['payload'];
     if (payload is! Map<String, dynamic>) {
       return null;
@@ -207,18 +216,20 @@ class SitesLocalCache {
   Future<void> persistMapCorpus({
     required int filterKey,
     required List<Map<String, dynamic>> sites,
+    required String authSegment,
   }) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final Map<String, dynamic> wrapper = <String, dynamic>{
       'filterKey': filterKey,
       'cachedAtMs': DateTime.now().millisecondsSinceEpoch,
+      'authSegment': authSegment,
       'sites': sites,
     };
     await prefs.setString(mapCorpusPersistedCacheKey, jsonEncode(wrapper));
   }
 
   Future<({int filterKey, List<Map<String, dynamic>> sites})?>
-  loadMapCorpus() async {
+  loadMapCorpus({required String authSegment}) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? raw = prefs.getString(mapCorpusPersistedCacheKey);
     if (raw == null || raw.isEmpty) {
@@ -239,6 +250,9 @@ class SitesLocalCache {
     }
     final DateTime cachedAt = DateTime.fromMillisecondsSinceEpoch(cachedAtMs);
     if (DateTime.now().difference(cachedAt) > mapCorpusPersistedCacheTtl) {
+      return null;
+    }
+    if (decoded['authSegment'] != authSegment) {
       return null;
     }
     final int filterKey = (decoded['filterKey'] as num?)?.toInt() ?? 0;

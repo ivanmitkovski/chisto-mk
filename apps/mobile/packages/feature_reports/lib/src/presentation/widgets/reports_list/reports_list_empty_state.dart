@@ -3,10 +3,7 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 class ReportsListEmptyState extends StatelessWidget {
-  const ReportsListEmptyState({
-    super.key,
-    required this.onReportPollution,
-  });
+  const ReportsListEmptyState({super.key, required this.onReportPollution});
 
   final VoidCallback onReportPollution;
 
@@ -56,10 +53,7 @@ class ReportsListFilterEmptyState extends StatelessWidget {
       title: message,
       subtitle: hint,
       secondaryAction: onClearSearch != null && clearSearchLabel != null
-          ? AppButton.text(
-              label: clearSearchLabel!,
-              onPressed: onClearSearch,
-            )
+          ? AppButton.text(label: clearSearchLabel!, onPressed: onClearSearch)
           : null,
     );
   }

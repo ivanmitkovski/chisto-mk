@@ -13,6 +13,7 @@
   "gamification": "Gamification",
   "app-config": "App config",
   "operations": "Operations",
+  "active-users": "Active users",
   "emailSuppressions": "Email suppressions",
   "webhookLogs": "Webhook logs",
   "audit": "Audit log",

@@ -32,7 +32,7 @@ void main() {
     final client = ApiClient(
       config: AppConfig.local,
       accessToken: () => 'token',
-      onUnauthorized: () {},
+      onUnauthorized: (_) {},
       httpClient: mock,
     );
     client.refreshSession = () async {
@@ -63,7 +63,7 @@ void main() {
     final client = ApiClient(
       config: AppConfig.local,
       accessToken: () => 'token',
-      onUnauthorized: () {},
+      onUnauthorized: (_) {},
       deviceIdHeader: () async => 'device-123',
       httpClient: mock,
     );

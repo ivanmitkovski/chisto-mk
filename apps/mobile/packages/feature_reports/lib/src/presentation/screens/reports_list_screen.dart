@@ -2,25 +2,33 @@ library;
 
 import 'dart:async';
 
+import 'package:chisto_infrastructure/core/auth/session_invalidation.dart';
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
-import 'package:chisto_infrastructure/core/navigation/app_navigation.dart';
 import 'package:chisto_infrastructure/core/network/request_cancellation.dart';
 import 'package:chisto_infrastructure/core/providers/reports_providers.dart';
 import 'package:chisto_infrastructure/core/widgets/state_rebuild_mixin.dart';
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
 import 'package:design_system/design_system.dart';
+import 'package:feature_auth/src/presentation/utils/auth_guard_ui.dart';
+import 'package:feature_reports/src/data/report_detail_cache.dart';
 import 'package:feature_reports/src/data/report_image_prefetch_coordinator.dart';
 import 'package:feature_reports/src/data/reports_realtime/reports_owner_event.dart';
+import 'package:feature_reports/src/data/reports_realtime/reports_realtime_connection_state.dart';
+import 'package:feature_reports/src/data/reports_realtime/reports_realtime_service.dart';
+import 'package:feature_reports/src/domain/models/report_detail.dart';
 import 'package:feature_reports/src/domain/models/report_capacity.dart';
 import 'package:feature_reports/src/domain/models/report_draft_summary.dart';
 import 'package:feature_reports/src/domain/models/report_list_item.dart';
 import 'package:feature_reports/src/presentation/controllers/reports_list_controller.dart';
 import 'package:feature_reports/src/presentation/controllers/reports_list_state.dart';
 import 'package:feature_reports/src/presentation/flow/report_entry_flow.dart';
+import 'package:feature_reports/src/presentation/l10n/report_relative_date.dart';
 import 'package:feature_reports/src/presentation/l10n/report_status_l10n.dart';
 import 'package:feature_reports/src/presentation/widgets/draft/draft_choice_sheet.dart';
+import 'package:feature_reports/src/presentation/widgets/reports_list/report_detail_open_resolver.dart';
+import 'package:feature_reports/src/presentation/widgets/reports_list/report_offline_error_sheet.dart';
 import 'package:feature_reports/src/presentation/widgets/reports_list/reports_list_actions.dart';
 import 'package:feature_reports/src/presentation/widgets/reports_list/reports_list_realtime_coalescer.dart';
 import 'package:feature_reports/src/presentation/widgets/reports_list/reports_list_empty_state.dart';
@@ -28,7 +36,6 @@ import 'package:feature_reports/src/presentation/widgets/reports_list/reports_li
 import 'package:feature_reports/src/presentation/widgets/reports_list/reports_list_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 part '../widgets/reports_list/reports_list_bootstrap.dart';
 
@@ -66,12 +73,15 @@ class _ReportsListScreenState extends ConsumerState<ReportsListScreen>
   final FocusNode _searchFocusNode = FocusNode();
   Timer? _searchDebounce;
   StreamSubscription<ReportsOwnerEvent>? _realtimeSub;
+  ReportsRealtimeService? _reportsRealtimeService;
+  VoidCallback? _realtimeConnectionListener;
+  Timer? _restPollTimer;
   late final ReportsListRealtimeCoalescer _realtimeCoalescer =
       ReportsListRealtimeCoalescer(
         debounce: AppMotion.reportsListRealtimeCoalesce,
         onRefresh: () {
-          if (!mounted) return;
-          _loadReports();
+          if (!mounted || _disposed) return;
+          unawaited(_loadReports());
         },
       );
   late final ReportsListActions _listActions = ReportsListActions(
@@ -92,6 +102,7 @@ class _ReportsListScreenState extends ConsumerState<ReportsListScreen>
 
   Object? _bootstrappedListIdentity;
   Listenable? _draftSummaryListenable;
+  bool _disposed = false;
   String _searchQuery = '';
   bool _isOpeningReportDetail = false;
   RequestCancellationToken? _reportDetailFetchCancellation;
@@ -227,7 +238,9 @@ class _ReportsListScreenState extends ConsumerState<ReportsListScreen>
 
   @override
   void dispose() {
+    _disposed = true;
     _realtimeSub?.cancel();
+    _realtimeSub = null;
     bootstrapDispose();
     super.dispose();
   }
@@ -237,56 +250,89 @@ class _ReportsListScreenState extends ConsumerState<ReportsListScreen>
   }
 
   Future<void> _openReportDetailById(String id) async {
+    final ReportListItem? listItem = _findListItemById(id);
+    await _openReportDetailResolved(reportId: id, listItem: listItem);
+  }
+
+  Future<void> _openReportDetail(ReportListItem report) async {
+    await _openReportDetailResolved(reportId: report.id, listItem: report);
+  }
+
+  ReportListItem? _findListItemById(String id) {
+    for (final ReportListItem item in ref.read(reportsListControllerProvider).reports) {
+      if (item.id == id) {
+        return item;
+      }
+    }
+    return null;
+  }
+
+  Future<void> _openReportDetailResolved({
+    required String reportId,
+    ReportListItem? listItem,
+  }) async {
     if (_isOpeningReportDetail) return;
     _isOpeningReportDetail = true;
     if (mounted) setState(() {});
     widget.onReportOpened?.call();
     final RequestCancellationToken cancellation = _beginReportDetailFetch();
     try {
-      final detail = await ref
-          .read(reportsApiRepositoryProvider)
-          .getReportById(id, cancellation: cancellation);
+      final ReportDetailOpenResolution resolution =
+          await resolveReportDetailForOpen(
+            repository: ref.read(reportsApiRepositoryProvider),
+            cache: ref.read(reportDetailCacheProvider),
+            reportId: reportId,
+            listItem: listItem,
+            cancellation: cancellation,
+          );
       if (!mounted) return;
-      final ReportSheetViewModel display =
-          ReportSheetViewModelMapper.fromDetail(detail, context.l10n);
-      unawaited(_prefetchCoordinator.warmDetail(id, detail.mediaUrls, context));
-      await _showReportDetailSheet(display);
+      switch (resolution) {
+        case ReportDetailOpenFresh(:final ReportDetail detail):
+          final ReportSheetViewModel display =
+              ReportSheetViewModelMapper.fromDetail(detail, context.l10n);
+          unawaited(
+            _prefetchCoordinator.warmDetail(reportId, detail.mediaUrls, context),
+          );
+          await _showReportDetailSheet(display);
+        case ReportDetailOpenStaleFallback(
+          :final ReportDetail? detail,
+          :final ReportListItem? listItem,
+        ):
+          final ReportSheetViewModel display = detail != null
+              ? ReportSheetViewModelMapper.fromDetail(detail, context.l10n)
+              : ReportSheetViewModelMapper.fromListItem(listItem!, context.l10n);
+          if (detail != null) {
+            unawaited(
+              _prefetchCoordinator.warmDetail(
+                reportId,
+                detail.mediaUrls,
+                context,
+              ),
+            );
+          }
+          await _showReportDetailSheet(display, isStaleFallback: true);
+        case ReportDetailOpenBlocked(:final AppError error):
+          await ReportOfflineErrorSheet.show(
+            context: context,
+            error: error,
+            onRetry: () => unawaited(
+              _openReportDetailResolved(
+                reportId: reportId,
+                listItem: listItem,
+              ),
+            ),
+          );
+      }
     } on AppError catch (e) {
       if (e.code == 'CANCELLED') return;
       if (!mounted) return;
-      AppSnack.show(context, message: e.message, type: AppSnackType.warning);
-    } finally {
-      _endReportDetailFetch(cancellation);
-      _isOpeningReportDetail = false;
-      if (mounted) setState(() {});
-    }
-  }
-
-  Future<void> _openReportDetail(ReportListItem report) async {
-    if (_isOpeningReportDetail) return;
-    _isOpeningReportDetail = true;
-    if (mounted) setState(() {});
-    final RequestCancellationToken cancellation = _beginReportDetailFetch();
-    try {
-      final detail = await ref
-          .read(reportsApiRepositoryProvider)
-          .getReportById(report.id, cancellation: cancellation);
-      if (!mounted) return;
-      final ReportSheetViewModel display =
-          ReportSheetViewModelMapper.fromDetail(detail, context.l10n);
-      unawaited(
-        _prefetchCoordinator.warmDetail(report.id, detail.mediaUrls, context),
+      await ReportOfflineErrorSheet.show(
+        context: context,
+        error: e,
+        onRetry: () => unawaited(
+          _openReportDetailResolved(reportId: reportId, listItem: listItem),
+        ),
       );
-      await _showReportDetailSheet(display);
-    } on AppError catch (e) {
-      if (e.code == 'CANCELLED') return;
-      if (!mounted) return;
-      AppSnack.show(context, message: e.message, type: AppSnackType.warning);
-    } catch (_) {
-      if (!mounted) return;
-      final ReportSheetViewModel display =
-          ReportSheetViewModelMapper.fromListItem(report, context.l10n);
-      await _showReportDetailSheet(display);
     } finally {
       _endReportDetailFetch(cancellation);
       _isOpeningReportDetail = false;
@@ -294,73 +340,42 @@ class _ReportsListScreenState extends ConsumerState<ReportsListScreen>
     }
   }
 
-  Future<void> _showReportDetailSheet(ReportSheetViewModel report) {
-    return showModalBottomSheet<void>(
+  Future<void> _showReportDetailSheet(
+    ReportSheetViewModel report, {
+    bool isStaleFallback = false,
+  }) {
+    return AppBottomSheet.show<void>(
       context: context,
-      sheetAnimationStyle: const AnimationStyle(
-        duration: AppMotion.standard,
-        curve: AppMotion.smooth,
-      ),
-      isScrollControlled: true,
-      // true: avoid Flutter's removeTop padding strip (content under notch/Dynamic
-      // Island). Modal SafeArea uses bottom:false so the sheet still reaches the
-      // physical bottom above the home indicator via inner padding.
-      useSafeArea: true,
-      // Root overlay so the sheet covers the home shell bottom bar + FAB.
-      useRootNavigator: true,
-      backgroundColor: AppColors.panelBackground,
+      useSafeArea: false,
+      maxHeightFactor: 1,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(AppSpacing.radiusCard),
         ),
       ),
-      clipBehavior: Clip.antiAlias,
-      elevation: 0,
       builder: (BuildContext sheetContext) {
-        final double keyboardInset = MediaQuery.viewInsetsOf(
-          sheetContext,
-        ).bottom;
-        return Padding(
-          padding: EdgeInsets.only(bottom: keyboardInset),
-          child: LayoutBuilder(
-            builder: (BuildContext context, BoxConstraints constraints) {
-              return SizedBox(
-                height: constraints.maxHeight.isFinite
-                    ? constraints.maxHeight
-                    : null,
-                width: constraints.maxWidth.isFinite
-                    ? constraints.maxWidth
-                    : null,
-                child: ReportDetailSheet(
+        return ReportDetailSheet(
                   report: report,
+                  isStaleFallback: isStaleFallback,
                   reportsRealtimeService: ref.read(
                     reportsRealtimeServiceProvider,
                   ),
                   reportsApiRepository: ref.read(reportsApiRepositoryProvider),
+                  reportDetailCache: ref.read(reportDetailCacheProvider),
                   onShowSiteOnMap: widget.onShowSiteOnMap,
                   onOpenLinkedPollutionSiteDetail:
                       widget.onOpenLinkedPollutionSiteDetail,
-                ),
-              );
-            },
-          ),
         );
       },
     );
   }
 
   String _formatReportDate(DateTime d) {
-    final AppLocalizations l10n = context.l10n;
-    final Duration diff = DateTime.now().difference(d);
-    if (diff.inDays == 0) return l10n.eventsDateRelativeToday;
-    if (diff.inDays == 1) return l10n.profilePointsHistoryDayYesterday;
-    if (diff.inDays < 7) return l10n.eventsDateRelativeDaysAgo(diff.inDays);
-    if (diff.inDays < 30) {
-      final int weeks = (diff.inDays / 7).floor();
-      return l10n.reportListDateWeeksAgo(weeks);
-    }
-    final String locale = Localizations.localeOf(context).toString();
-    return DateFormat.yMd(locale).format(d);
+    return reportRelativeDateLabel(
+      context.l10n,
+      d,
+      locale: Localizations.localeOf(context).toString(),
+    );
   }
 
   @override
@@ -377,26 +392,37 @@ class _ReportsListScreenState extends ConsumerState<ReportsListScreen>
         !listState.isLoadingFirstPage && listState.loadError == null;
     return SafeArea(
       bottom: false,
-      child: AppRefreshIndicator(
-        onRefresh: _handleRefresh,
-        child: ReportsListScreenSlivers(
-          scrollController: _scrollController,
-          listState: listState,
-          l10n: l10n,
-          filteredReports: filteredReports,
-          showStatusFilter: showStatusFilter,
-          reportCapacity: _reportCapacity,
-          searchController: _searchController,
-          searchFocusNode: _searchFocusNode,
-          searchResultSummaryLabel: _searchResultSummaryLabel(l10n, listState),
-          actions: _listActions,
-          statusFilter: _statusFilter,
-          apiStatusToDisplay: _apiStatusToDisplay,
-          emptyWhenNoReports: _buildEmptyState(context),
-          emptyWhenFiltered: _buildFilterEmptyState(context),
-          showFilteredCountFooter:
-              !listState.isLoadingFirstPage && filteredReports.isNotEmpty,
-        ),
+      child: Stack(
+        children: <Widget>[
+          AppRefreshIndicator(
+            onRefresh: _handleRefresh,
+            child: ReportsListScreenSlivers(
+              scrollController: _scrollController,
+              listState: listState,
+              l10n: l10n,
+              filteredReports: filteredReports,
+              showStatusFilter: showStatusFilter,
+              reportCapacity: _reportCapacity,
+              searchController: _searchController,
+              searchFocusNode: _searchFocusNode,
+              searchResultSummaryLabel: _searchResultSummaryLabel(
+                l10n,
+                listState,
+              ),
+              actions: _listActions,
+              statusFilter: _statusFilter,
+              apiStatusToDisplay: _apiStatusToDisplay,
+              emptyWhenNoReports: _buildEmptyState(context),
+              emptyWhenFiltered: _buildFilterEmptyState(context),
+              showFilteredCountFooter:
+                  !listState.isLoadingFirstPage && filteredReports.isNotEmpty,
+            ),
+          ),
+          if (_isOpeningReportDetail)
+            const Positioned.fill(
+              child: ModalBarrier(dismissible: false, color: Colors.transparent),
+            ),
+        ],
       ),
     );
   }
@@ -445,6 +471,12 @@ class _ReportsListScreenState extends ConsumerState<ReportsListScreen>
   }
 
   Future<void> _startNewReport() async {
+    if (!await ensureLocationEligibleForAction(context, ref)) {
+      return;
+    }
+    if (!mounted) {
+      return;
+    }
     if (!await ReportEntryFlow.ensureReportingAllowed(context, ref: ref)) {
       return;
     }

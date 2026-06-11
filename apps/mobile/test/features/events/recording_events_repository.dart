@@ -4,6 +4,7 @@ import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:feature_events/src/domain/models/eco_event.dart';
 import 'package:feature_events/src/domain/models/eco_event_join_toggle_result.dart';
 import 'package:feature_events/src/domain/models/eco_event_search_params.dart';
+import 'package:feature_events/src/domain/models/events_list_page_snapshot.dart';
 import 'package:feature_events/src/domain/models/event_impact_receipt.dart';
 import 'package:feature_events/src/domain/models/event_participant_row.dart';
 import 'package:feature_events/src/domain/models/event_schedule_conflict_preview.dart';
@@ -241,14 +242,25 @@ class RecordingEventsRepository extends ChangeNotifier
   Future<List<EcoEvent>> fetchEventsSnapshot(
     EcoEventSearchParams params,
   ) async {
+    final EventsListPageSnapshot preview = await fetchEventsFilterPreview(
+      params,
+    );
+    return preview.events;
+  }
+
+  @override
+  Future<EventsListPageSnapshot> fetchEventsFilterPreview(
+    EcoEventSearchParams params,
+  ) async {
     fetchEventsSnapshotCallCount++;
     lastSnapshotParams = params;
-    return _events.where((EcoEvent e) {
+    final List<EcoEvent> events = _events.where((EcoEvent e) {
       if (params.statuses.isNotEmpty && !params.statuses.contains(e.status)) {
         return false;
       }
       return true;
     }).toList();
+    return EventsListPageSnapshot(events: events, hasMore: false);
   }
 
   @override

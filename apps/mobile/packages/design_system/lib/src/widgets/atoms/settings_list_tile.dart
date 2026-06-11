@@ -1,5 +1,6 @@
 import 'package:design_system/src/theme/app_colors.dart';
 import 'package:design_system/src/theme/app_spacing.dart';
+import 'package:design_system/src/widgets/atoms/settings_group_divider.dart';
 import 'package:flutter/material.dart';
 
 class SettingsListTile extends StatelessWidget {
@@ -98,14 +99,7 @@ class SettingsListTile extends StatelessWidget {
             ),
           ),
         ),
-        if (showDividerBelow)
-          Padding(
-            padding: const EdgeInsets.only(left: AppSpacing.avatarLg),
-            child: Divider(
-              height: 1,
-              color: AppColors.divider.withValues(alpha: 0.9),
-            ),
-          ),
+        if (showDividerBelow) const SettingsGroupDivider(),
       ],
     );
   }

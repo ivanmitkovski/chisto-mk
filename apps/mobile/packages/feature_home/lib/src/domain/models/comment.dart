@@ -3,6 +3,7 @@ class Comment {
   Comment({
     required this.id,
     required this.authorName,
+    this.authorIsDeleted = false,
     this.authorId,
     this.authorAvatarUrl,
     required this.text,
@@ -17,6 +18,7 @@ class Comment {
 
   final String id;
   final String? authorId;
+  final bool authorIsDeleted;
   final String authorName;
   final String? authorAvatarUrl;
   final String text;
@@ -35,6 +37,7 @@ class Comment {
   Comment copyWith({
     String? id,
     String? authorId,
+    bool? authorIsDeleted,
     String? authorName,
     String? authorAvatarUrl,
     String? text,
@@ -49,6 +52,7 @@ class Comment {
     return Comment(
       id: id ?? this.id,
       authorId: authorId ?? this.authorId,
+      authorIsDeleted: authorIsDeleted ?? this.authorIsDeleted,
       authorName: authorName ?? this.authorName,
       authorAvatarUrl: authorAvatarUrl ?? this.authorAvatarUrl,
       text: text ?? this.text,

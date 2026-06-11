@@ -12,6 +12,9 @@ describe('SitesReporterNotificationService', () => {
           reports: [{ reporterId: 'reporter-1' }],
         }),
       },
+      user: {
+        findMany: jest.fn().mockResolvedValue([]),
+      },
       userDeviceToken: {
         findMany: jest.fn().mockResolvedValue([{ userId: 'reporter-1', locale: 'mk' }]),
       },
@@ -43,6 +46,9 @@ describe('SitesReporterNotificationService', () => {
           id: 'site-1',
           reports: [{ reporterId: 'reporter-1' }],
         }),
+      },
+      user: {
+        findMany: jest.fn().mockResolvedValue([]),
       },
       userDeviceToken: {
         findMany: jest.fn().mockResolvedValue([{ userId: 'reporter-1', locale: 'mk' }]),

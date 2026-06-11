@@ -34,6 +34,7 @@ describe('OrganizerCertificationService', () => {
       prisma as never,
       ecoEventPoints as never,
       jwtService,
+      { emit: jest.fn() } as never,
     );
     prisma.user.findUnique.mockResolvedValue({ organizerCertifiedAt: null });
   });

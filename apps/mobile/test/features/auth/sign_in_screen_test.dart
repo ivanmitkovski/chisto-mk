@@ -46,7 +46,40 @@ void main() {
     expect(find.byType(TextFormField), findsNWidgets(2));
   });
 
-  testWidgets('Sign In button is disabled when fields are empty', (
+  testWidgets('form body does not scroll when content fits', (
+    WidgetTester tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await pumpAuthWidget(
+      tester,
+      home: const SignInScreen(),
+      overrides: _authTestOverrides,
+    );
+    await tester.pumpAndSettle();
+
+    final ScrollableState scrollable = tester.state<ScrollableState>(
+      find.descendant(
+        of: find.byType(SignInScreen),
+        matching: find.byType(Scrollable),
+      ).first,
+    );
+    expect(scrollable.position.maxScrollExtent, 0);
+
+    final double pixelsBefore = scrollable.position.pixels;
+    await tester.drag(
+      find.descendant(
+        of: find.byType(SignInScreen),
+        matching: find.byType(Scrollable),
+      ).first,
+      const Offset(0, -120),
+    );
+    await tester.pumpAndSettle();
+    expect(scrollable.position.pixels, pixelsBefore);
+  });
+
+  testWidgets('Sign In button is always tappable when not loading', (
     WidgetTester tester,
   ) async {
     await pumpAuthWidget(
@@ -59,10 +92,10 @@ void main() {
     final ElevatedButton signInButton = tester.widget<ElevatedButton>(
       _primaryCtaElevated('Sign in'),
     );
-    expect(signInButton.onPressed, isNull);
+    expect(signInButton.onPressed, isNotNull);
   });
 
-  testWidgets('Sign In button becomes enabled when both fields have content', (
+  testWidgets('Sign In accepts legacy short password on login', (
     WidgetTester tester,
   ) async {
     await pumpAuthWidget(
@@ -73,39 +106,36 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.enterText(find.byType(TextFormField).first, '70123456');
+    await tester.enterText(find.byType(TextFormField).last, 'short');
+    await tester.pump();
+
+    await tester.ensureVisible(_primaryCtaElevated('Sign in'));
+    await tester.tap(_primaryCtaElevated('Sign in'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Password must be at least 8 characters'), findsNothing);
+  });
+
+  testWidgets('shows inline validation when phone is invalid on submit', (
+    WidgetTester tester,
+  ) async {
+    await pumpAuthWidget(
+      tester,
+      home: const SignInScreen(),
+      overrides: _authTestOverrides,
+    );
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextFormField).first, '123');
     await tester.enterText(find.byType(TextFormField).last, 'password123');
     await tester.pump();
 
-    final ElevatedButton signInButton = tester.widget<ElevatedButton>(
-      _primaryCtaElevated('Sign in'),
-    );
-    expect(signInButton.onPressed, isNotNull);
+    await tester.ensureVisible(_primaryCtaElevated('Sign in'));
+    await tester.tap(_primaryCtaElevated('Sign in'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Enter an 8-digit phone number'), findsOneWidget);
   });
-
-  testWidgets(
-    'shows validation error text when form is submitted with invalid data',
-    (WidgetTester tester) async {
-      await pumpAuthWidget(
-        tester,
-        home: const SignInScreen(),
-        overrides: _authTestOverrides,
-      );
-      await tester.pumpAndSettle();
-
-      await tester.enterText(find.byType(TextFormField).first, '70123456');
-      await tester.enterText(find.byType(TextFormField).last, 'short');
-      await tester.pump();
-
-      await tester.ensureVisible(_primaryCtaElevated('Sign in'));
-      await tester.tap(_primaryCtaElevated('Sign in'));
-      await tester.pumpAndSettle();
-
-      expect(
-        find.text('Please check your phone number and password.'),
-        findsOneWidget,
-      );
-    },
-  );
 
   testWidgets("Don't have an account? Sign Up link is present", (
     WidgetTester tester,

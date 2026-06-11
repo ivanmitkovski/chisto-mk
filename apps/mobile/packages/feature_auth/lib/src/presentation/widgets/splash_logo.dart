@@ -1,3 +1,4 @@
+import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/core/assets/app_assets.dart';
 import 'package:feature_auth/src/presentation/constants/splash_constants.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +29,7 @@ class SplashLogo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Semantics(
       image: true,
-      label: 'Chisto logo',
+      label: context.l10n.brandLogoSemantic,
       child: ConstrainedBox(
         constraints: BoxConstraints.tightFor(width: _width, height: _height),
         child: ClipRect(

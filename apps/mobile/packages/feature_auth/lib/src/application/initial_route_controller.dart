@@ -1,6 +1,7 @@
 import 'package:chisto_infrastructure/core/providers/app_providers.dart';
 import 'package:feature_auth/src/application/splash_session_controller.dart';
 import 'package:feature_auth/src/data/marketing_onboarding_store.dart';
+import 'package:feature_auth/src/data/user_home_location_store.dart';
 import 'package:feature_onboarding/feature_onboarding.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -10,6 +11,7 @@ enum InitialRouteDestination {
   home,
   signIn,
   onboarding,
+  location,
 }
 
 class InitialRouteState {
@@ -42,6 +44,15 @@ class InitialRouteController extends Notifier<InitialRouteState> {
 
     if (!ref.read(authStateProvider).isAuthenticated) {
       state = state.copyWith(destination: InitialRouteDestination.signIn);
+      return;
+    }
+
+    final UserHomeLocationStore homeStore = UserHomeLocationStore(
+      ref.read(preferencesProvider),
+      userId: ref.read(authStateProvider).userId,
+    );
+    if (!homeStore.hasConfirmedHomeLocation) {
+      state = state.copyWith(destination: InitialRouteDestination.location);
       return;
     }
 

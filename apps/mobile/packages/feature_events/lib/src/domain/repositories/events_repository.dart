@@ -2,6 +2,7 @@ import 'package:chisto_core/chisto_core.dart';
 import 'package:feature_events/src/domain/models/eco_event.dart';
 import 'package:feature_events/src/domain/models/eco_event_join_toggle_result.dart';
 import 'package:feature_events/src/domain/models/eco_event_search_params.dart';
+import 'package:feature_events/src/domain/models/events_list_page_snapshot.dart';
 import 'package:feature_events/src/domain/models/event_impact_receipt.dart';
 import 'package:feature_events/src/domain/models/event_participant_row.dart';
 import 'package:feature_events/src/domain/models/event_schedule_conflict_preview.dart';
@@ -113,6 +114,11 @@ abstract class EventsRepository implements ChangeListenable {
 
   /// One-shot `GET /events` for [params] without replacing the active feed cache.
   Future<List<EcoEvent>> fetchEventsSnapshot(EcoEventSearchParams params);
+
+  /// First page + `meta.hasMore` for filter-sheet preview counts.
+  Future<EventsListPageSnapshot> fetchEventsFilterPreview(
+    EcoEventSearchParams params,
+  );
 
   /// Server-backed impact receipt (`GET /events/:id/impact-receipt`).
   Future<EventImpactReceipt> fetchImpactReceipt(String eventId);

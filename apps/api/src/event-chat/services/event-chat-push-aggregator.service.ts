@@ -8,6 +8,7 @@ const DEFAULT_FLUSH_MS = 2_500;
 
 type PendingChatPush = {
   recipientUserId: string;
+  recipientLocale: import('../../common/i18n/app-locale').AppLocale;
   eventId: string;
   eventTitle: string;
   senderDisplayName: string;
@@ -39,6 +40,7 @@ export class EventChatPushAggregatorService {
 
   enqueue(input: {
     recipientUserId: string;
+    recipientLocale: import('../../common/i18n/app-locale').AppLocale;
     eventId: string;
     eventTitle: string;
     senderDisplayName: string;
@@ -62,6 +64,7 @@ export class EventChatPushAggregatorService {
 
     this.pending.set(key, {
       recipientUserId: input.recipientUserId,
+      recipientLocale: input.recipientLocale,
       eventId: input.eventId,
       eventTitle: input.eventTitle,
       senderDisplayName: input.senderDisplayName,
@@ -103,6 +106,7 @@ export class EventChatPushAggregatorService {
               body: '',
             },
             '',
+            batch.recipientLocale,
           );
     const senderName = batch.senderDisplayName;
     const body =

@@ -1,4 +1,5 @@
 import { CleanupEventStatus, Prisma } from '../../prisma-client';
+import { participantDisplayName as resolveParticipantDisplayName } from '../../common/projections/public-identity.projection';
 
 export const noParticipantRows: Prisma.EventParticipantWhereInput = { id: { in: [] } };
 export const noCheckInRows: Prisma.EventCheckInWhereInput = { id: { in: [] } };
@@ -12,9 +13,16 @@ export function visibilityWhere(viewerUserId?: string): Prisma.CleanupEventWhere
   };
 }
 
-export function participantDisplayName(user: {
-  firstName: string;
-  lastName: string;
-}): string {
-  return `${user.firstName} ${user.lastName}`.trim();
+export function participantDisplayName(
+  user: { firstName: string; lastName: string; status?: import('../../prisma-client').UserStatus } | null,
+  options?: { actorUserId?: string | null; fallback?: string },
+): string {
+  return resolveParticipantDisplayName(user, options).displayName;
+}
+
+export function participantDisplayIdentity(
+  user: { firstName: string; lastName: string; status?: import('../../prisma-client').UserStatus } | null,
+  options?: { actorUserId?: string | null; fallback?: string },
+): { displayName: string; isDeleted: boolean } {
+  return resolveParticipantDisplayName(user, options);
 }

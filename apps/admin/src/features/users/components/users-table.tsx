@@ -37,7 +37,18 @@ const ROLE_LABEL_KEY_BY_VALUE: Record<string, string> = {
 const STATUS_LABEL_KEY_BY_VALUE: Record<string, string> = {
   ACTIVE: 'filters.active',
   SUSPENDED: 'filters.suspended',
+  DELETED: 'filters.deleted',
 };
+
+function resolveUserDisplayName(
+  u: UserRow,
+  deletedLabel: string,
+): string {
+  if (u.status === 'DELETED') {
+    return deletedLabel;
+  }
+  return `${u.firstName} ${u.lastName}`.trim();
+}
 
 function statusPillClass(status: string): string {
   const map: Record<string, string> = {
@@ -94,6 +105,7 @@ export function UsersTable({
     const labelKey = STATUS_LABEL_KEY_BY_VALUE[status];
     return labelKey ? t(labelKey) : formatToken(status);
   };
+  const userDisplayName = (u: UserRow) => resolveUserDisplayName(u, t('deletedUser'));
 
   const bulkColumn: DataTableColumn<UserRow> = {
     key: 'select',
@@ -111,7 +123,7 @@ export function UsersTable({
       <Checkbox
         checked={selectedIds.has(u.id)}
         onChange={() => onToggleSelection(u.id)}
-        aria-label={t('table.selectUserAria', { name: `${u.firstName} ${u.lastName}`.trim() })}
+        aria-label={t('table.selectUserAria', { name: userDisplayName(u) })}
       />
     ),
   };
@@ -124,7 +136,7 @@ export function UsersTable({
       sortable: true,
       render: (u) => (
         <DataTableLink href={`/dashboard/users/${u.id}`}>
-          {u.firstName} {u.lastName}
+          {userDisplayName(u)}
         </DataTableLink>
       ),
     },
@@ -189,11 +201,11 @@ export function UsersTable({
               <Checkbox
                 checked={selectedIds.has(u.id)}
                 onChange={() => onToggleSelection(u.id)}
-                aria-label={t('table.selectUserAria', { name: `${u.firstName} ${u.lastName}`.trim() })}
+                aria-label={t('table.selectUserAria', { name: userDisplayName(u) })}
               />
             ) : null}
             <DataTableLink href={`/dashboard/users/${u.id}`}>
-              {u.firstName} {u.lastName}
+              {userDisplayName(u)}
             </DataTableLink>
           </div>
           <DataTableMobileField label={t('table.email')}>{u.email}</DataTableMobileField>

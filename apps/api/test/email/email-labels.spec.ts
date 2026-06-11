@@ -14,6 +14,8 @@ describe('email-labels', () => {
     expect(humanizeUgcSubjectType('mk', 'safety_issue')).toBe('Безбедносен проблем');
     expect(humanizeUgcReason('en', 'spam')).toBe('Spam');
     expect(humanizeUgcReason('mk', 'spam')).toBe('Спам');
+    expect(humanizeUgcReason('mk', 'harassment')).toBe('Вознемирување');
+    expect(humanizeUgcReason('mk', 'harassment')).not.toBe('Вреќање');
   });
 
   it('falls back to generic humanization for unknown keys', () => {

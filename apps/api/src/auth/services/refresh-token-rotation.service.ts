@@ -5,7 +5,7 @@ import * as bcrypt from 'bcrypt';
 import { User, UserSession } from '../../prisma-client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../../audit/services/audit.service';
-import { AUTH_ENV_RUNTIME, REMEMBER_ME_SHORT_DAYS, type AuthEnvRuntime } from '../constants/auth-env.config';
+import { AUTH_ENV_RUNTIME, type AuthEnvRuntime } from '../constants/auth-env.config';
 import { AuthSessionRevocationService } from './auth-session-revocation.service';
 import { AuthRefreshReplayCacheService } from './auth-refresh-replay-cache.service';
 import { recordAuditWriteFailure } from '../../common/audit/audit-log-failure.util';
@@ -55,6 +55,7 @@ export class RefreshTokenRotationService {
         previousTokenHash: oldRefreshTokenHash,
         rotatedAt: now,
         expiresAt,
+        rememberMe,
         deviceId: normalizedDeviceId ?? session.deviceId,
       },
     });
@@ -89,7 +90,11 @@ export class RefreshTokenRotationService {
     const graceMs = this.env.refreshTokenRotationGraceSeconds * 1000;
     const ageMs = Date.now() - session.rotatedAt.getTime();
     if (ageMs > graceMs) {
-      await this.sessionRevocation.revokeAllForUser(session.userId, 'refresh_token_reuse');
+      await this.sessionRevocation.revokeSession(
+        session.id,
+        session.userId,
+        'refresh_token_reuse',
+      );
       await this.auditRefreshTokenReuse(session, session.tokenId);
       return null;
     }
@@ -102,7 +107,7 @@ export class RefreshTokenRotationService {
   }
 
   private refreshExpiresAt(rememberMe: boolean): Date {
-    const refreshDays = rememberMe ? this.env.refreshTokenTtlDays : REMEMBER_ME_SHORT_DAYS;
+    const refreshDays = rememberMe ? this.env.refreshTokenTtlDays : this.env.refreshTokenStandardDays;
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + refreshDays);
     return expiresAt;

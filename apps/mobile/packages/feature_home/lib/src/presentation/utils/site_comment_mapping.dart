@@ -9,6 +9,7 @@ Comment commentFromSiteCommentItem(String currentUserId, SiteCommentItem item) {
     id: item.id,
     authorId: item.authorId.isNotEmpty ? item.authorId : null,
     authorName: item.authorName,
+    authorIsDeleted: item.authorIsDeleted,
     authorAvatarUrl: item.authorAvatarUrl,
     text: item.body,
     createdAt: item.createdAt,

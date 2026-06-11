@@ -34,7 +34,7 @@ void main() {
     expect(find.byType(TextField), findsOneWidget);
   });
 
-  testWidgets('invalid code shows ApiErrorBanner', (WidgetTester tester) async {
+  testWidgets('invalid code shows inline OTP error', (WidgetTester tester) async {
     final FakeAuthRepository repo = FakeAuthRepository()
       ..verifyPasswordResetCodeError = const AppError(
         code: 'OTP_INVALID',
@@ -51,7 +51,8 @@ void main() {
     await enterOtpCode(tester, '123456');
     await tester.pumpAndSettle();
 
-    expect(find.byType(ApiErrorBanner), findsOneWidget);
+    expect(find.text('Invalid code. Please try again.'), findsOneWidget);
+    expect(find.byType(ApiErrorBanner), findsNothing);
   });
 
   testWidgets('locks after repeated invalid codes', (

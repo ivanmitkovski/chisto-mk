@@ -46,6 +46,7 @@ export class MapResponseProjectorService {
     isLite: boolean,
   ): MapListApiRow {
     const distanceKm = this.computeMapDistanceKm(query, site.latitude, site.longitude);
+    const includePendingPreviewInLite = isLite && site.status === 'REPORTED';
     return {
       id: site.siteId,
       latitude: site.latitude,
@@ -58,7 +59,8 @@ export class MapResponseProjectorService {
       savesCount: isLite ? 0 : site.savesCount,
       sharesCount: isLite ? 0 : site.sharesCount,
       reportCount: site.reportCount,
-      latestReportTitle: isLite ? null : site.latestReportTitle,
+      latestReportTitle:
+        isLite && !includePendingPreviewInLite ? null : site.latestReportTitle,
       latestReportDescription: isLite ? null : site.latestReportDescription,
       latestReportCategory: isLite ? null : site.pollutionCategory,
       latestReportCreatedAt: isLite ? null : site.latestReportAt?.toISOString() ?? null,

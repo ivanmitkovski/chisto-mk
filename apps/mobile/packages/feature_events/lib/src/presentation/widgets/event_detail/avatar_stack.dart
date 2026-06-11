@@ -1,5 +1,7 @@
 import 'dart:math' show max, min;
 
+import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
+import 'package:chisto_infrastructure/shared/utils/civic_actor_display.dart';
 import 'package:design_system/design_system.dart';
 import 'package:feature_events/src/domain/models/eco_event.dart';
 import 'package:feature_events/src/presentation/widgets/event_detail/attendee_list_sheet.dart';
@@ -58,6 +60,14 @@ class AvatarStack extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
+    final String organizerLabel = civicActorDisplayLabel(
+      context.l10n,
+      displayName: event.organizerName,
+      isDeleted: event.organizerIsDeleted,
+    );
+    final String? organizerAvatar =
+        event.organizerIsDeleted ? null : event.organizerAvatarUrl;
+
     const double size = _size;
     const double overlap = _overlap;
     final double outer = _outer();
@@ -69,8 +79,8 @@ class AvatarStack extends StatelessWidget {
         child: Row(
           children: <Widget>[
             UserAvatarCircle(
-              displayName: event.organizerName,
-              imageUrl: event.organizerAvatarUrl,
+              displayName: organizerLabel,
+              imageUrl: organizerAvatar,
               size: size,
               seed: event.organizerId,
             ),

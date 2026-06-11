@@ -26,9 +26,10 @@ class ReportIssueSheet extends ConsumerStatefulWidget {
     required PollutionSite site,
     SiteIssueReportRepository? repository,
   }) {
-    return showAppPanelBottomSheet<bool>(
+    return AppBottomSheet.show<bool>(
       context: context,
       useRootNavigator: true,
+      keyboardInsetMode: SheetKeyboardInsetMode.overlay,
       builder: (BuildContext context) {
         return ReportIssueSheet(
           site: site,
@@ -111,20 +112,28 @@ class _ReportIssueSheetState extends ConsumerState<ReportIssueSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final double keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
     return AppSheetScaffold(
       title: context.l10n.reportIssueSheetTitle,
       subtitle: context.l10n.reportIssueSheetSubtitle,
       useModalRouteShape: true,
+      fillAvailableHeight: true,
+      addBottomInset: true,
       trailing: AppCircleIconButton(
         icon: Icons.close_rounded,
         semanticLabel: context.l10n.commonClose,
         onTap: () => Navigator.of(context).pop(),
       ),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
+      child: GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        behavior: HitTestBehavior.translucent,
+        child: SingleChildScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          padding: EdgeInsets.only(bottom: AppSpacing.lg + keyboardInset),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
             ...SiteReportReason.values.map(
               (SiteReportReason reason) => _ReasonTile(
                 reason: reason,
@@ -161,6 +170,7 @@ class _ReportIssueSheetState extends ConsumerState<ReportIssueSheet> {
             ),
           ],
         ),
+      ),
       ),
     );
   }

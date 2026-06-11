@@ -5,6 +5,7 @@ import { ChatEncryptionService } from './chat-encryption.service';
 import type { EventChatMessageRow } from '../util/event-chat-message.select';
 import { EventChatUploadService } from './event-chat-upload.service';
 import { ReportsUploadService } from '../../reports/services/reports-upload.service';
+import { resolveActorIdentity } from '../../common/projections/public-identity.projection';
 
 const REPLY_SNIPPET_MAX = 120;
 
@@ -34,7 +35,9 @@ export class EventChatMessageDtoService {
   ): Promise<EventChatMessageResponseDto> {
     const base = this.toDto(row, viewerUserId);
     const signed = await this.chatUpload.applySignedUrlsToMessageDto(base);
-    const avatarUrl = await this.uploads.signPrivateObjectKey(row.author.avatarObjectKey);
+    const avatarUrl = row.author
+      ? await this.uploads.signPrivateObjectKey(row.author.avatarObjectKey)
+      : null;
     return {
       ...signed,
       author: {
@@ -46,7 +49,8 @@ export class EventChatMessageDtoService {
 
   private toDto(row: EventChatMessageRow, viewerUserId: string): EventChatMessageResponseDto {
     const isDeleted = row.deletedAt != null;
-    const displayName = `${row.author.firstName} ${row.author.lastName}`.trim();
+    const authorIdentity = resolveActorIdentity(row.author, { actorUserId: row.authorId });
+    const displayName = authorIdentity.displayName ?? '';
     let replyTo: EventChatMessageResponseDto['replyTo'] = null;
     if (row.replyTo) {
       const parentPlain = this.decryptStoredBody(
@@ -59,7 +63,7 @@ export class EventChatMessageDtoService {
     }
     const pinnedByDisplayName =
       row.pinnedBy != null
-        ? `${row.pinnedBy.firstName} ${row.pinnedBy.lastName}`.trim()
+        ? (resolveActorIdentity(row.pinnedBy, { actorUserId: row.pinnedBy.id }).displayName ?? null)
         : null;
     return {
       id: row.id,
@@ -67,13 +71,13 @@ export class EventChatMessageDtoService {
       eventId: row.eventId,
       createdAt: row.createdAt.toISOString(),
       author: {
-        id: row.author.id,
+        id: row.author?.id ?? row.authorId ?? '',
         displayName,
         avatarUrl: null,
       },
       body: isDeleted ? null : this.decryptBody(row),
       isDeleted,
-      isOwnMessage: viewerUserId !== '' && row.authorId === viewerUserId,
+      isOwnMessage: viewerUserId !== '' && row.authorId != null && row.authorId === viewerUserId,
       replyToId: row.replyToId,
       replyTo,
       editedAt: row.editedAt?.toISOString() ?? null,

@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { NextRequest } from 'next/server';
-import { ADMIN_AUTH_COOKIE_KEY, ADMIN_REFRESH_COOKIE_KEY } from '@/lib/auth/auth-constants';
+import { ADMIN_AUTH_COOKIE_KEY, ADMIN_CSRF_COOKIE_KEY, ADMIN_REFRESH_COOKIE_KEY } from '@/lib/auth/auth-constants';
+import { REFRESH_COOKIE_STANDARD_MAX_AGE } from '@/lib/auth/admin-session';
 
 function makeJwt(expMs: number): string {
   const payload = { exp: Math.floor(expMs / 1000) };
@@ -70,5 +71,49 @@ describe('middleware dashboard auth', () => {
 
     expect(response.status).toBe(200);
     expect(response.headers.get('location')).toBeNull();
+    expect(response.headers.getSetCookie().join('\n')).toContain(ADMIN_CSRF_COOKIE_KEY);
+  });
+
+  it('continues to dashboard when refresh fails with network and no access token', async () => {
+    vi.spyOn(await import('@/lib/auth/admin-session'), 'refreshAdminTokens').mockResolvedValue({
+      ok: false,
+      reason: 'network',
+    });
+
+    const { middleware } = await import('./middleware');
+    const response = await middleware(
+      dashboardRequest(`${ADMIN_REFRESH_COOKIE_KEY}=refresh-token`),
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get('location')).toBeNull();
+  });
+
+  it('does not redirect from login when access token is expired', async () => {
+    const expiredToken = makeJwt(Date.now() - 60_000);
+    const request = new NextRequest(new Request('https://admin.chisto.mk/login', {
+      headers: { cookie: `${ADMIN_AUTH_COOKIE_KEY}=${expiredToken}` },
+    }));
+
+    const { middleware } = await import('./middleware');
+    const response = await middleware(request);
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get('location')).toBeNull();
+  });
+
+  it('redirects from login to dashboard when access token is valid', async () => {
+    const validToken = makeJwt(Date.now() + 60_000);
+    const request = new NextRequest(new Request('https://admin.chisto.mk/login', {
+      headers: { cookie: `${ADMIN_AUTH_COOKIE_KEY}=${validToken}` },
+    }));
+
+    const { middleware } = await import('./middleware');
+    const response = await middleware(request);
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get('location')).toContain('/dashboard');
+    expect(response.headers.getSetCookie().join('\n')).toContain(ADMIN_CSRF_COOKIE_KEY);
+    expect(response.headers.getSetCookie().join('\n')).toContain(`Max-Age=${REFRESH_COOKIE_STANDARD_MAX_AGE}`);
   });
 });

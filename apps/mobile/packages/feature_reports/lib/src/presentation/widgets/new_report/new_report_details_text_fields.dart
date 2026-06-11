@@ -32,6 +32,11 @@ class NewReportDetailsTitleField extends StatelessWidget {
     final bool hasTitleError =
         attemptedStages.contains(ReportStage.details) && !draft.hasTitle;
     final int length = titleController.text.length;
+    final String? titleErrorText = hasTitleError
+        ? context.l10n.authValidationFieldRequired(
+            context.l10n.reportReviewTitleLabel,
+          )
+        : null;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -46,7 +51,7 @@ class NewReportDetailsTitleField extends StatelessWidget {
               style: AppTypographySurfaces.reportsFormFieldLabel(
                 Theme.of(context).textTheme,
                 color: hasTitleError
-                    ? AppColors.accentDanger
+                    ? AppColors.error
                     : AppColors.textSecondary,
               ),
             ),
@@ -87,21 +92,30 @@ class NewReportDetailsTitleField extends StatelessWidget {
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radius14),
               borderSide: BorderSide(
-                color: hasTitleError
-                    ? AppColors.accentDanger
-                    : AppColors.divider,
+                color: hasTitleError ? AppColors.error : AppColors.divider,
                 width: 1,
               ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radius14),
-              borderSide: const BorderSide(
-                color: AppColors.primaryDark,
+              borderSide: BorderSide(
+                color: hasTitleError ? AppColors.error : AppColors.primaryDark,
                 width: 1.5,
               ),
             ),
           ),
         ),
+        if (titleErrorText != null) ...<Widget>[
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            titleErrorText,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: AppColors.error,
+              fontWeight: FontWeight.w500,
+              height: 1.3,
+            ),
+          ),
+        ],
       ],
     );
   }

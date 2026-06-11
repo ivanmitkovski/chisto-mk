@@ -21,6 +21,8 @@ import { PushDeliveryOutboxService } from './services/push-delivery-outbox.servi
 import { PushDeliverySenderService } from './services/push-delivery-sender.service';
 import { NotificationDispatcherService } from './services/notification-dispatcher.service';
 import { CleanupEventNotificationsService } from './services/cleanup-event-notifications.service';
+import { NearbyUsersForReportService } from './services/nearby-users-for-report.service';
+import { NearbyReportNotificationService } from './services/nearby-report-notification.service';
 import { NotificationsGateway } from './gateways/notifications.gateway';
 import { NotificationsRoomEmitterService } from './services/notifications-room-emitter.service';
 
@@ -52,12 +54,15 @@ import { NotificationsRoomEmitterService } from './services/notifications-room-e
     PushDeliveryWorkerService,
     NotificationDispatcherService,
     CleanupEventNotificationsService,
+    NearbyUsersForReportService,
+    NearbyReportNotificationService,
     NotificationsRoomEmitterService,
     NotificationsGateway,
   ],
   exports: [
     NotificationDispatcherService,
     CleanupEventNotificationsService,
+    NearbyReportNotificationService,
     NotificationWriterService,
     DeviceTokenService,
     FcmPushService,

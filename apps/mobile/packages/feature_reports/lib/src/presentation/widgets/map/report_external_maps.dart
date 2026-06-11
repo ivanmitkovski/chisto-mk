@@ -14,7 +14,7 @@ Future<void> showReportViewLocationDirectionsSheet({
   required double latitude,
   required double longitude,
 }) {
-  return showModalBottomSheet<void>(
+  return AppBottomSheet.show<void>(
     context: context,
     backgroundColor: AppColors.transparent,
     builder: (BuildContext sheetContext) {

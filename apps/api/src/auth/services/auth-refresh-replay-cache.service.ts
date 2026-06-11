@@ -1,4 +1,4 @@
-import { Injectable, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { createHash } from 'crypto';
 import Redis from 'ioredis';
 import type { AuthResponse } from '../types/auth-response.type';
@@ -9,7 +9,8 @@ type CacheEntry = {
 };
 
 @Injectable()
-export class AuthRefreshReplayCacheService implements OnModuleDestroy {
+export class AuthRefreshReplayCacheService implements OnModuleDestroy, OnModuleInit {
+  private readonly logger = new Logger(AuthRefreshReplayCacheService.name);
   private readonly memory = new Map<string, CacheEntry>();
   private readonly redis: Redis | null;
 
@@ -18,6 +19,22 @@ export class AuthRefreshReplayCacheService implements OnModuleDestroy {
     this.redis = url ? new Redis(url, { maxRetriesPerRequest: 1, lazyConnect: true }) : null;
     if (this.redis) {
       void this.redis.connect().catch(() => undefined);
+    }
+  }
+
+  onModuleInit(): void {
+    if (this.redis) return;
+    const nodeEnv = process.env.NODE_ENV?.trim().toLowerCase();
+    const warnMultiTask =
+      nodeEnv === 'production' ||
+      nodeEnv === 'staging' ||
+      nodeEnv === 'development';
+    if (warnMultiTask) {
+      this.logger.error(
+        'REDIS_URL is not configured; refresh-token rotation replay cache is in-memory only. ' +
+          'Concurrent refresh across multiple API tasks returns INVALID_REFRESH_TOKEN and may log mobile users out. ' +
+          'Configure ElastiCache REDIS_URL before running desiredCount >= 2. See docs/runbooks/redis-realtime.md.',
+      );
     }
   }
 

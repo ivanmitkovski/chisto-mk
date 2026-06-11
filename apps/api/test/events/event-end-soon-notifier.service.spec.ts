@@ -14,6 +14,7 @@ describe(EventEndSoonNotifierService.name, () => {
           endAt: new Date('2026-06-15T12:00:00.000Z'),
         },
       ]),
+      user: { findMany: jest.fn().mockResolvedValue([]) },
       userDeviceToken: { findMany: jest.fn().mockResolvedValue([]) },
     } as unknown as PrismaService;
     const dispatchToUser = jest.fn().mockResolvedValue(undefined);
@@ -43,6 +44,7 @@ describe(EventEndSoonNotifierService.name, () => {
           endAt: new Date(),
         },
       ]),
+      user: { findMany: jest.fn().mockResolvedValue([]) },
       userDeviceToken: { findMany: jest.fn().mockResolvedValue([]) },
     } as unknown as PrismaService;
     const dispatchToUser = jest.fn();

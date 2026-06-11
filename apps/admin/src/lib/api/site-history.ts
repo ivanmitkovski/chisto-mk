@@ -8,7 +8,7 @@ export type SiteHistoryEntryRow = {
   toStatus: string | null;
   reportId: string | null;
   cleanupEventId: string | null;
-  actor: { id: string; displayName: string | null; role: string | null } | null;
+  actor: { id: string; displayName: string | null; isDeleted: boolean; role: string | null } | null;
   note: string | null;
   metadata: Record<string, unknown> | null;
 };

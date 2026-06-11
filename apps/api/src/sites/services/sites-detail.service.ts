@@ -5,7 +5,9 @@ import {
   signPrivateObjectKeysDeduped,
   signPublicMediaUrlsDeduped,
 } from '../../storage/util/batch-private-object-sign';
+import { SiteStatus } from '../../prisma-client';
 import { SiteDetailRepository } from '../repositories/site-detail.repository';
+import { buildSiteCoReporterSummaries } from '../util/site-co-reporter-summaries.util';
 import { projectPublicReporter, viewerIsModerator } from '../../common/projections/public-identity.projection';
 
 @Injectable()
@@ -17,65 +19,6 @@ export class SitesDetailService {
     private readonly siteDetailRepository: SiteDetailRepository,
     private readonly reportsUploadService: ReportsUploadService,
   ) {}
-
-  private buildSiteCoReporterSummaries(
-    reports: Array<{
-      coReporters: Array<{
-        userId: string;
-        reportedAt: Date;
-        user: { firstName: string; lastName: string; avatarUrl: string | null } | null;
-      }>;
-    }>,
-  ): { userId: string; name: string; avatarUrl: string | null }[] {
-    const anonymous = 'Anonymous';
-    const pickRicher = (a: string, b: string): string => {
-      if (a === anonymous && b !== anonymous) return b;
-      if (b === anonymous && a !== anonymous) return a;
-      return a;
-    };
-    const pickAvatar = (a: string | null, b: string | null): string | null => {
-      const x = a?.trim() ?? '';
-      const y = b?.trim() ?? '';
-      if (x.length > 0) return x;
-      if (y.length > 0) return y;
-      return null;
-    };
-    const display = (user: { firstName: string; lastName: string; avatarUrl: string | null } | null): string => {
-      if (!user) return anonymous;
-      const n = `${user.firstName} ${user.lastName}`.trim();
-      return n.length > 0 ? n : anonymous;
-    };
-    const byUser = new Map<
-      string,
-      { name: string; reportedAt: Date; avatarUrl: string | null }
-    >();
-    for (const r of reports) {
-      for (const cr of r.coReporters) {
-        const name = display(cr.user);
-        const reportedAt = cr.reportedAt;
-        const avatarUrl = cr.user?.avatarUrl?.trim() ? cr.user.avatarUrl : null;
-        const prev = byUser.get(cr.userId);
-        if (!prev) {
-          byUser.set(cr.userId, { name, reportedAt, avatarUrl });
-          continue;
-        }
-        const incomingEarlier = reportedAt < prev.reportedAt;
-        const nextAt = incomingEarlier ? reportedAt : prev.reportedAt;
-        const nextName = incomingEarlier ? pickRicher(name, prev.name) : pickRicher(prev.name, name);
-        const nextAvatar = incomingEarlier
-          ? pickAvatar(avatarUrl, prev.avatarUrl)
-          : pickAvatar(prev.avatarUrl, avatarUrl);
-        byUser.set(cr.userId, { name: nextName, reportedAt: nextAt, avatarUrl: nextAvatar });
-      }
-    }
-    return [...byUser.entries()]
-      .sort(([, av], [, bv]) => {
-        if (av.reportedAt < bv.reportedAt) return -1;
-        if (av.reportedAt > bv.reportedAt) return 1;
-        return av.name.localeCompare(bv.name);
-      })
-      .map(([userId, v]) => ({ userId, name: v.name, avatarUrl: v.avatarUrl }));
-  }
 
   async findOne(
     siteId: string,
@@ -94,6 +37,26 @@ export class SitesDetailService {
       });
     }
 
+    if (site.status === SiteStatus.REPORTED) {
+      const viewerUserId = user?.userId ?? null;
+      if (!viewerUserId) {
+        throw new NotFoundException({
+          code: 'SITE_NOT_FOUND',
+          message: `Site with id '${siteId}' was not found`,
+        });
+      }
+      const canView = await this.siteDetailRepository.viewerCanAccessReportedSite(
+        siteId,
+        viewerUserId,
+      );
+      if (!canView) {
+        throw new NotFoundException({
+          code: 'SITE_NOT_FOUND',
+          message: `Site with id '${siteId}' was not found`,
+        });
+      }
+    }
+
     const [reportsTotal, eventsTotal] = await Promise.all([
       this.siteDetailRepository.countReports(siteId),
       this.siteDetailRepository.countEvents(siteId),
@@ -101,6 +64,7 @@ export class SitesDetailService {
 
     const privateKeys: (string | null | undefined)[] = [];
     const flatMedia: string[] = [];
+    privateKeys.push(site.heroReport?.reporter?.avatarObjectKey);
     for (const r of site.reports) {
       privateKeys.push(r.reporter?.avatarObjectKey);
       for (const cr of r.coReporters) {
@@ -110,6 +74,11 @@ export class SitesDetailService {
         if (typeof u === 'string' && u.trim().length > 0) {
           flatMedia.push(u.trim());
         }
+      }
+    }
+    for (const u of site.heroReport?.mediaUrls ?? []) {
+      if (typeof u === 'string' && u.trim().length > 0) {
+        flatMedia.push(u.trim());
       }
     }
     const [avatarUrlByKey, mediaUrlByOriginal] = await Promise.all([
@@ -124,41 +93,23 @@ export class SitesDetailService {
         if (t.length === 0) return u;
         return mediaUrlByOriginal.get(t) ?? u;
       });
-      const reporterPublic = projectPublicReporter(
-        r.reporter && r.reporterId
-          ? {
-              userId: r.reporterId,
-              firstName: r.reporter.firstName,
-              lastName: r.reporter.lastName,
-            }
-          : null,
-        user,
-        isModerator,
-      );
+      const reporterPublic = projectPublicReporter(r.reporterId, r.reporter, user, isModerator);
       const reporter =
-        r.reporter == null
+        reporterPublic == null
           ? null
           : {
-              displayLabel: reporterPublic?.displayLabel ?? 'Anonymous',
-              isSelf: reporterPublic?.isSelf ?? false,
-              firstName: r.reporter.firstName,
-              lastName: r.reporter.lastName,
-              avatarUrl: r.reporter.avatarObjectKey
+              displayLabel: reporterPublic.displayLabel ?? 'Anonymous',
+              isSelf: reporterPublic.isSelf,
+              isDeleted: reporterPublic.isDeleted,
+              isAnonymous: reporterPublic.isAnonymous,
+              firstName: r.reporter?.firstName ?? '',
+              lastName: r.reporter?.lastName ?? '',
+              avatarUrl: r.reporter?.avatarObjectKey
                 ? (avatarUrlByKey.get(r.reporter.avatarObjectKey) ?? null)
                 : null,
             };
       const coReporters = r.coReporters.map((cr) => {
-        const coPublic = projectPublicReporter(
-          cr.user
-            ? {
-                userId: cr.userId,
-                firstName: cr.user.firstName,
-                lastName: cr.user.lastName,
-              }
-            : null,
-          user,
-          isModerator,
-        );
+        const coPublic = projectPublicReporter(cr.userId, cr.user, user, isModerator);
         return {
           id: cr.id,
           createdAt: cr.createdAt,
@@ -166,9 +117,13 @@ export class SitesDetailService {
           reportId: cr.reportId,
           ...(isModerator || coPublic?.isSelf ? { userId: cr.userId } : {}),
           displayLabel: coPublic?.displayLabel ?? 'Anonymous',
+          isDeleted: coPublic?.isDeleted ?? false,
+          isAnonymous: coPublic?.isAnonymous ?? false,
           user: cr.user
             ? {
                 displayLabel: coPublic?.displayLabel ?? 'Anonymous',
+                isDeleted: coPublic?.isDeleted ?? false,
+                isAnonymous: coPublic?.isAnonymous ?? false,
                 firstName: cr.user.firstName,
                 lastName: cr.user.lastName,
                 avatarUrl: cr.user.avatarObjectKey
@@ -218,7 +173,7 @@ export class SitesDetailService {
     }
 
     const coReporterSummaries = isModerator
-      ? this.buildSiteCoReporterSummaries(
+      ? buildSiteCoReporterSummaries(
           site.reports.map((r) => ({
             coReporters: r.coReporters.map((cr) => ({
               userId: cr.userId,
@@ -227,6 +182,7 @@ export class SitesDetailService {
                 ? {
                     firstName: cr.user.firstName,
                     lastName: cr.user.lastName,
+                    status: cr.user.status,
                     avatarUrl: cr.user.avatarObjectKey
                       ? (avatarUrlByKey.get(cr.user.avatarObjectKey) ?? null)
                       : null,
@@ -237,12 +193,33 @@ export class SitesDetailService {
         )
       : [];
 
-    const canonicalReport = [...reportsWithSignedUrls].sort(
-      (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
-    )[0];
-    const canonicalReportId = canonicalReport?.id ?? null;
-    const heroMediaUrls = canonicalReport?.mediaUrls ?? [];
-    const heroReporter = canonicalReport?.reporter ?? null;
+    const canonicalReportId = site.heroReportId ?? null;
+    const heroMediaUrls = (site.heroReport?.mediaUrls ?? []).map((u) => {
+      const t = typeof u === 'string' ? u.trim() : '';
+      if (t.length === 0) return u;
+      return mediaUrlByOriginal.get(t) ?? u;
+    });
+    const heroReporterRaw = site.heroReport?.reporter ?? null;
+    const heroReporterPublic = projectPublicReporter(
+      site.heroReport?.reporterId ?? null,
+      heroReporterRaw,
+      user,
+      isModerator,
+    );
+    const heroReporter =
+      heroReporterPublic == null
+        ? null
+        : {
+            displayLabel: heroReporterPublic.displayLabel ?? 'Anonymous',
+            isSelf: heroReporterPublic.isSelf,
+            isDeleted: heroReporterPublic.isDeleted,
+            isAnonymous: heroReporterPublic.isAnonymous,
+            firstName: heroReporterRaw?.firstName ?? '',
+            lastName: heroReporterRaw?.lastName ?? '',
+            avatarUrl: heroReporterRaw?.avatarObjectKey
+              ? (avatarUrlByKey.get(heroReporterRaw.avatarObjectKey) ?? null)
+              : null,
+          };
 
     return {
       ...site,

@@ -20,6 +20,7 @@ function makeSvc(prisma: never) {
   const userEvents = { emitUserUpdated: jest.fn() } as never;
   const sessionRevocation = { revokeAllForUser: jest.fn().mockResolvedValue(undefined), revokeSessionForUser: jest.fn().mockResolvedValue({ ok: true }) };
   const authSnapshotCache = { invalidate: jest.fn() } as never;
+  const accountErasure = { eraseUserAccount: jest.fn().mockResolvedValue(undefined) };
   return {
     svc: new AdminUsersWriteService(
       prisma,
@@ -27,8 +28,10 @@ function makeSvc(prisma: never) {
       userEvents,
       sessionRevocation as never,
       authSnapshotCache,
+      accountErasure as never,
     ),
     sessionRevocation,
+    accountErasure,
   };
 }
 
@@ -143,6 +146,14 @@ describe('AdminUsersWriteService', () => {
   });
 
   it('patch revokes sessions when status becomes suspended', async () => {
+    const updatedUser = {
+      id: 'u1',
+      role: Role.USER,
+      status: UserStatus.SUSPENDED,
+      firstName: 'A',
+      lastName: 'B',
+      phoneNumber: '+38970000001',
+    };
     const prisma = {
       user: {
         findUnique: jest.fn().mockResolvedValue({
@@ -154,14 +165,8 @@ describe('AdminUsersWriteService', () => {
           phoneNumber: '+38970000001',
         }),
         findFirst: jest.fn().mockResolvedValue(null),
-        update: jest.fn().mockResolvedValue({
-          id: 'u1',
-          role: Role.USER,
-          status: UserStatus.SUSPENDED,
-          firstName: 'A',
-          lastName: 'B',
-          phoneNumber: '+38970000001',
-        }),
+        update: jest.fn().mockResolvedValue(updatedUser),
+        findUniqueOrThrow: jest.fn().mockResolvedValue(updatedUser),
       },
     } as never;
     const { svc, sessionRevocation } = makeSvc(prisma);
@@ -169,6 +174,38 @@ describe('AdminUsersWriteService', () => {
     await svc.patch('u1', { status: UserStatus.SUSPENDED } as never, actor());
 
     expect(sessionRevocation.revokeAllForUser).toHaveBeenCalledWith('u1', 'status_changed');
+  });
+
+  it('patch routes status DELETED through account erasure', async () => {
+    const updatedUser = {
+      id: 'u1',
+      role: Role.USER,
+      status: UserStatus.DELETED,
+      firstName: '',
+      lastName: '',
+      phoneNumber: '+38970000001',
+    };
+    const prisma = {
+      user: {
+        findUnique: jest.fn().mockResolvedValue({
+          id: 'u1',
+          role: Role.USER,
+          status: UserStatus.ACTIVE,
+          firstName: 'A',
+          lastName: 'B',
+          phoneNumber: '+38970000001',
+        }),
+        findFirst: jest.fn().mockResolvedValue(null),
+        update: jest.fn().mockResolvedValue(updatedUser),
+        findUniqueOrThrow: jest.fn().mockResolvedValue(updatedUser),
+      },
+    } as never;
+    const { svc, sessionRevocation, accountErasure } = makeSvc(prisma);
+
+    await svc.patch('u1', { status: UserStatus.DELETED } as never, actor());
+
+    expect(accountErasure.eraseUserAccount).toHaveBeenCalledWith('u1');
+    expect(sessionRevocation.revokeAllForUser).not.toHaveBeenCalled();
   });
 
   it('revokeSession delegates to session revocation service', async () => {

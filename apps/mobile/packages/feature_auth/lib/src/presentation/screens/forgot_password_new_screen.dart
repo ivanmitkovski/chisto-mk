@@ -2,6 +2,8 @@ import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/navigation/app_navigation.dart';
 import 'package:chisto_infrastructure/core/validation/password_strength.dart';
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/shared/forms/field_error_mapping.dart';
+import 'package:chisto_infrastructure/shared/forms/form_validation_mixin.dart';
 import 'package:chisto_infrastructure/shared/utils/app_haptics.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/auth_text_field.dart';
 import 'package:chisto_infrastructure/shared/widgets/molecules/api_error_banner.dart';
@@ -34,13 +36,20 @@ class ForgotPasswordNewScreen extends ConsumerStatefulWidget {
 }
 
 class _ForgotPasswordNewScreenState
-    extends ConsumerState<ForgotPasswordNewScreen> {
+    extends ConsumerState<ForgotPasswordNewScreen>
+    with FormValidationMixin {
+  static const List<String> _fieldOrder = <String>[
+    FormFieldIds.newPassword,
+    FormFieldIds.confirmPassword,
+  ];
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey _passwordFieldKey = GlobalKey();
+  final GlobalKey _confirmFieldKey = GlobalKey();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmController = TextEditingController();
   final FocusNode _passwordFocus = FocusNode();
   final FocusNode _confirmFocus = FocusNode();
-  bool _hasSubmitted = false;
   PasswordStrength _passwordStrength = PasswordStrength.none;
 
   @override
@@ -48,6 +57,16 @@ class _ForgotPasswordNewScreenState
     super.initState();
     _passwordController.addListener(_onInputChanged);
     _confirmController.addListener(_onInputChanged);
+    registerFormField(
+      FormFieldIds.newPassword,
+      focusNode: _passwordFocus,
+      fieldKey: _passwordFieldKey,
+    );
+    registerFormField(
+      FormFieldIds.confirmPassword,
+      focusNode: _confirmFocus,
+      fieldKey: _confirmFieldKey,
+    );
   }
 
   @override
@@ -66,20 +85,35 @@ class _ForgotPasswordNewScreenState
     setState(() {
       _passwordStrength = computePasswordStrength(_passwordController.text);
     });
+    if (hasActiveValidation) {
+      _formKey.currentState?.validate();
+    }
     ref.read(passwordResetNewPasswordControllerProvider.notifier).clearError();
+    clearServerFieldErrors();
   }
 
-  bool get _canSubmit {
-    return _passwordController.text.trim().isNotEmpty &&
-        _confirmController.text.trim().isNotEmpty;
-  }
+  Map<String, String? Function()> _validators(AppLocalizations l10n) =>
+      <String, String? Function()>{
+        FormFieldIds.newPassword: () =>
+            AuthValidators.password(l10n, _passwordController.text),
+        FormFieldIds.confirmPassword: () => AuthValidators.confirmPassword(
+          l10n,
+          _passwordController.text.trim(),
+        )(_confirmController.text),
+      };
 
   Future<void> _handleReset() async {
     if (ref.read(passwordResetNewPasswordControllerProvider).isLoading) return;
-    final FormState? formState = _formKey.currentState;
-    setState(() => _hasSubmitted = true);
-    if (formState == null || !formState.validate()) {
-      AppHaptics.warning(context);
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    setState(() => submitAttempted = true);
+    await WidgetsBinding.instance.endOfFrame;
+    _formKey.currentState?.validate();
+    if (await handleInvalidSubmit(
+      context,
+      l10n,
+      _fieldOrder,
+      _validators(l10n),
+    )) {
       return;
     }
 
@@ -94,8 +128,18 @@ class _ForgotPasswordNewScreenState
       if (!mounted) return;
       AppHaptics.success(context);
       AppNavigation.goForgotPasswordSuccess();
-    } on AppError {
+    } on AppError catch (e) {
       if (!mounted) return;
+      final Map<String, String> fieldErrors = fieldErrorsFromAppError(e, l10n);
+      if (fieldErrors.isNotEmpty) {
+        setServerFieldErrors(fieldErrors);
+        _formKey.currentState?.validate();
+        await focusAndScrollToFirstInvalid(
+          context,
+          _fieldOrder,
+          _validators(l10n),
+        );
+      }
       AppHaptics.warning(context);
     }
   }
@@ -106,8 +150,13 @@ class _ForgotPasswordNewScreenState
     final formState = ref.watch(passwordResetNewPasswordControllerProvider);
     final bool isLoading = formState.isLoading;
     final String? apiError = formState.error != null
-        ? messageForAuthError(l10n, formState.error!)
+        ? authBannerMessageForError(
+            l10n,
+            formState.error!,
+            displayedFieldIds: registeredFieldIds,
+          )
         : null;
+    final double keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
 
     return Stack(
       children: [
@@ -124,104 +173,90 @@ class _ForgotPasswordNewScreenState
             title: l10n.authNewPasswordTitle,
             subtitle: l10n.authNewPasswordSubtitle,
           ),
-          body: LayoutBuilder(
-            builder: (BuildContext context, BoxConstraints constraints) {
-              final double keyboardInset = MediaQuery.viewInsetsOf(
-                context,
-              ).bottom;
-
-              return AuthFormScaffold(
-                padding: EdgeInsets.fromLTRB(
-                  AppSpacing.lg,
-                  AppSpacing.xl,
-                  AppSpacing.lg,
-                  AppSpacing.lg + keyboardInset,
-                ),
-                child: SingleChildScrollView(
-                  keyboardDismissBehavior:
-                      ScrollViewKeyboardDismissBehavior.onDrag,
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight - AppSpacing.xl,
+          body: AuthFormScaffold(
+            padding: EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              AppSpacing.xl,
+              AppSpacing.lg,
+              AppSpacing.lg + keyboardInset,
+            ),
+            child: Form(
+              key: _formKey,
+              autovalidateMode: AutovalidateMode.disabled,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (apiError != null) ...[
+                    ApiErrorBanner(
+                      message: apiError,
+                      onDismiss: () => ref
+                          .read(
+                            passwordResetNewPasswordControllerProvider.notifier,
+                          )
+                          .clearError(),
                     ),
-                    child: Form(
-                      key: _formKey,
-                      autovalidateMode: _hasSubmitted
-                          ? AutovalidateMode.onUserInteraction
-                          : AutovalidateMode.disabled,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (apiError != null) ...[
-                            ApiErrorBanner(
-                              message: apiError,
-                              onDismiss: () => ref
-                                  .read(
-                                    passwordResetNewPasswordControllerProvider
-                                        .notifier,
-                                  )
-                                  .clearError(),
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                          ],
-                          AuthTextField(
-                            label: l10n.authFieldNewPassword,
-                            controller: _passwordController,
-                            focusNode: _passwordFocus,
-                            hintText: l10n.authFieldNewPasswordHint,
-                            obscureText: true,
-                            keyboardType: TextInputType.visiblePassword,
-                            textInputAction: TextInputAction.next,
-                            validator: (String? v) =>
-                                AuthValidators.password(l10n, v),
-                            enableSuggestions: false,
-                            autocorrect: false,
-                            autofillHints: const <String>[
-                              AutofillHints.newPassword,
-                            ],
-                            onFieldSubmitted: (_) =>
-                                _confirmFocus.requestFocus(),
-                          ),
-                          PasswordStrengthIndicator(
-                            strength: _passwordStrength,
-                          ),
-                          const SizedBox(height: AppSpacing.sm),
-                          AuthTextField(
-                            label: l10n.authFieldConfirmPassword,
-                            controller: _confirmController,
-                            focusNode: _confirmFocus,
-                            hintText: l10n.authFieldConfirmPasswordHint,
-                            obscureText: true,
-                            keyboardType: TextInputType.visiblePassword,
-                            textInputAction: TextInputAction.done,
-                            validator: AuthValidators.confirmPassword(
-                              l10n,
-                              _passwordController.text.trim(),
-                            ),
-                            enableSuggestions: false,
-                            autocorrect: false,
-                            autofillHints: const <String>[
-                              AutofillHints.newPassword,
-                            ],
-                            onFieldSubmitted: (_) => _handleReset(),
-                          ),
-                          const SizedBox(height: AppSpacing.radius22),
-                          Semantics(
-                            button: true,
-                            label: l10n.authResetPasswordCta,
-                            child: AppButton.primary(
-                              label: l10n.authResetPasswordCta,
-                              enabled: _canSubmit && !isLoading,
-                              onPressed: isLoading ? null : _handleReset,
-                            ),
-                          ),
-                        ],
-                      ),
+                    const SizedBox(height: AppSpacing.md),
+                  ],
+                  AuthTextField(
+                    key: _passwordFieldKey,
+                    label: l10n.authFieldNewPassword,
+                    controller: _passwordController,
+                    focusNode: _passwordFocus,
+                    hintText: l10n.authFieldNewPasswordHint,
+                    obscureText: true,
+                    keyboardType: TextInputType.visiblePassword,
+                    textInputAction: TextInputAction.next,
+                    validator: (String? v) => validateIfVisible(
+                      FormFieldIds.newPassword,
+                      () => AuthValidators.password(l10n, v),
+                    ),
+                    enableSuggestions: false,
+                    autocorrect: false,
+                    autofillHints: const <String>[
+                      AutofillHints.newPassword,
+                    ],
+                    onFieldSubmitted: (_) => _confirmFocus.requestFocus(),
+                  ),
+                  PasswordStrengthIndicator(
+                    strength: _passwordStrength,
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  AuthTextField(
+                    key: _confirmFieldKey,
+                    label: l10n.authFieldConfirmPassword,
+                    controller: _confirmController,
+                    focusNode: _confirmFocus,
+                    hintText: l10n.authFieldConfirmPasswordHint,
+                    obscureText: true,
+                    keyboardType: TextInputType.visiblePassword,
+                    textInputAction: TextInputAction.done,
+                    validator: (String? v) => validateIfVisible(
+                      FormFieldIds.confirmPassword,
+                      () => AuthValidators.confirmPassword(
+                        l10n,
+                        _passwordController.text.trim(),
+                      )(v),
+                    ),
+                    enableSuggestions: false,
+                    autocorrect: false,
+                    autofillHints: const <String>[
+                      AutofillHints.newPassword,
+                    ],
+                    onFieldSubmitted: (_) => _handleReset(),
+                  ),
+                  const SizedBox(height: AppSpacing.radius22),
+                  Semantics(
+                    button: true,
+                    label: l10n.authResetPasswordCta,
+                    child: AppButton.primary(
+                      label: l10n.authResetPasswordCta,
+                      enabled: !isLoading,
+                      onPressed: isLoading ? null : _handleReset,
                     ),
                   ),
-                ),
-              );
-            },
+                ],
+              ),
+            ),
           ),
         ),
         LoadingOverlay(visible: isLoading),

@@ -59,8 +59,8 @@ export class MapSiteRepositorySitesService {
     const archivedFilter = includeArchived ? Prisma.empty : Prisma.sql`AND "isArchivedByAdmin" = false`;
     const hotProjectionFilter = Prisma.sql`AND "isHot" = true`;
     const visibilityFilter = siteVisibilitySql({
-      siteIdSql: Prisma.sql`"siteId"`,
-      siteStatusSql: Prisma.sql`"status"`,
+      siteIdSql: Prisma.sql`"MapSiteProjection"."siteId"`,
+      siteStatusSql: Prisma.sql`"MapSiteProjection"."status"`,
       viewerUserId,
     });
     const usePostgis = flags.mapPostgisEnabled;
@@ -127,8 +127,8 @@ export class MapSiteRepositorySitesService {
       : Prisma.sql`AND "isArchivedByAdmin" = false`;
     const hotProjectionFilter = Prisma.sql`AND "isHot" = true`;
     const visibilityFilter = siteVisibilitySql({
-      siteIdSql: Prisma.sql`"siteId"`,
-      siteStatusSql: Prisma.sql`"status"`,
+      siteIdSql: Prisma.sql`"MapSiteProjection"."siteId"`,
+      siteStatusSql: Prisma.sql`"MapSiteProjection"."status"`,
       viewerUserId,
     });
 

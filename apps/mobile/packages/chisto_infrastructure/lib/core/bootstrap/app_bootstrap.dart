@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:ui' show PlatformDispatcher;
 
+import 'package:chisto_infrastructure/core/auth/session_recovery.dart';
+import 'package:chisto_infrastructure/core/auth/session_teardown_reason.dart';
 import 'package:chisto_infrastructure/core/auth/auth_state.dart';
 import 'package:chisto_infrastructure/core/bootstrap/cold_start_coordinator.dart';
 import 'package:chisto_infrastructure/core/cache/report_images_cache.dart';
@@ -11,6 +13,7 @@ import 'package:chisto_infrastructure/core/location/location_service.dart';
 import 'package:chisto_infrastructure/core/network/api_client.dart';
 import 'package:chisto_infrastructure/core/providers/app_providers.dart';
 import 'package:chisto_infrastructure/core/storage/secure_token_storage.dart';
+import 'package:chisto_infrastructure/core/presence/presence_service.dart';
 import 'package:chisto_infrastructure/core/time/server_clock.dart';
 import 'package:feature_auth/src/data/api_auth_repository.dart';
 import 'package:feature_auth/src/domain/repositories/auth_repository.dart';
@@ -31,6 +34,7 @@ import 'package:feature_notifications/src/data/api_notifications_repository.dart
 import 'package:feature_notifications/src/data/notifications_inbox_coordinator.dart';
 import 'package:feature_notifications/src/data/notifications_realtime_service.dart';
 import 'package:feature_notifications/src/data/push_notification_service.dart';
+import 'package:feature_notifications/src/data/push_stored_app_locale.dart';
 import 'package:feature_notifications/src/domain/repositories/notifications_repository.dart';
 import 'package:feature_onboarding/src/data/shared_prefs_feature_guide_repository.dart';
 import 'package:feature_onboarding/src/domain/feature_guide_repository.dart';
@@ -60,7 +64,7 @@ class AppBootstrap {
 
   static final AppBootstrap instance = AppBootstrap._();
 
-  static const String _appLocaleCodeKey = 'app_locale_code';
+  static const String _appLocaleCodeKey = kAppLocaleCodeKey;
 
   AppConfig? _config;
   AuthState? _authState;
@@ -82,6 +86,7 @@ class AppBootstrap {
   SitesRepository? _sitesRepository;
   LocationService? _locationService;
   MapRealtimeService? _mapRealtimeService;
+  PresenceService? _presenceService;
   NotificationsRepository? _notificationsRepository;
   NotificationsInboxCoordinator? _notificationsInboxCoordinator;
   NotificationsRealtimeService? _notificationsRealtimeService;
@@ -112,6 +117,12 @@ class AppBootstrap {
     _authRepositoryForUnauthorized = repository;
   }
 
+  /// Replaces the device location service in widget/unit tests.
+  @visibleForTesting
+  void overrideLocationServiceForTests(LocationService service) {
+    _locationService = service;
+  }
+
   EventsRepository get eventsRepository => _eventsRepository!;
   CheckInRepository get checkInRepository => _checkInRepository!;
   ProfileRepository get profileRepository => _profileRepository!;
@@ -126,6 +137,7 @@ class AppBootstrap {
   SitesRepository get sitesRepository => _sitesRepository!;
   LocationService get locationService => _locationService!;
   MapRealtimeService get mapRealtimeService => _mapRealtimeService!;
+  PresenceService get presenceService => _presenceService!;
   NotificationsRepository get notificationsRepository =>
       _notificationsRepository!;
   NotificationsInboxCoordinator get notificationsInboxCoordinator =>
@@ -183,11 +195,45 @@ class AppBootstrap {
     return false;
   }
 
+  /// Realtime transports call this after a refresh attempt returned rejected.
+  void handleRealtimeAuthRejected() {
+    if (suppressUnauthorizedCallback) {
+      return;
+    }
+    unawaited(
+      SessionRecovery.refreshBeforeInvalidate(
+        reason: SessionTeardownReason.realtimeAuthRejected,
+        delayedRetry: SessionRecovery.resumeDelayedRetry(),
+      ),
+    );
+  }
+
   /// Starts inbox realtime when the session is validated (login or `/auth/me`).
   void startNotificationsRealtimeIfAuthenticated() {
     if (_authState?.isAuthenticated ?? false) {
       notificationsRealtimeService.start();
     }
+  }
+
+  /// Starts reports owner Socket.IO when the session is validated (login or `/auth/me`).
+  void startReportsRealtimeIfAuthenticated() {
+    if (_authState?.isAuthenticated ?? false) {
+      unawaited(_reportsRealtimeService!.start());
+    }
+  }
+
+  void _recoverRealtimeAfterHotRestart() {
+    _reportsRealtimeService?.dispose();
+    if (_config == null || _authState == null || _apiClient == null) {
+      return;
+    }
+    _reportsRealtimeService = ReportsRealtimeService(
+      config: _config!,
+      authState: _authState!,
+      sessionRefresh: () => _apiClient!.refreshSessionQueued(),
+      onAuthRejected: handleRealtimeAuthRejected,
+    );
+    startReportsRealtimeIfAuthenticated();
   }
 
   /// Root Riverpod container (created in [initialize]). Used by non-widget code
@@ -204,7 +250,10 @@ class AppBootstrap {
   }
 
   Future<void> initialize({AppConfig? config}) async {
-    if (_initialized) return;
+    if (_initialized) {
+      _recoverRealtimeAfterHotRestart();
+      return;
+    }
 
     _config = config ?? AppConfig.fromEnvironment();
     _authState = AuthState();
@@ -221,17 +270,31 @@ class AppBootstrap {
     _apiClient = ApiClient(
       config: _config!,
       accessToken: () => _authState!.accessToken,
-      onUnauthorized: () {
+      sessionEpoch: () => _authState!.sessionEpoch,
+      onUnauthorized: (int observedEpoch) {
         if (suppressUnauthorizedCallback) {
           return;
         }
-        final AuthRepository? repo = _authRepositoryForUnauthorized;
-        if (repo != null) {
-          unawaited(repo.invalidateLocalSession());
-        } else {
-          _authState!.setUnauthenticated();
+        if (_authState!.sessionEpoch != observedEpoch) {
+          return;
         }
-        onAuthUnauthorized?.call();
+        final AuthRepository? repo = _authRepositoryForUnauthorized;
+        unawaited(() async {
+          if (repo != null) {
+            final bool invalidated =
+                await SessionRecovery.refreshBeforeInvalidate(
+                  observedEpoch: observedEpoch,
+                  reason: SessionTeardownReason.rest401AfterRefresh,
+                  delayedRetry: SessionRecovery.resumeDelayedRetry(),
+                );
+            if (invalidated) {
+              onAuthUnauthorized?.call();
+            }
+            return;
+          }
+          _authState!.setUnauthenticated();
+          onAuthUnauthorized?.call();
+        }());
       },
       acceptLanguageHeader: () {
         final Locale effective = resolveAppLocale(
@@ -251,16 +314,18 @@ class AppBootstrap {
       config: _config!,
       authState: _authState!,
       sessionRefresh: () => _apiClient!.refreshSessionQueued(),
-      onAuthRejected: () {
-        if (suppressUnauthorizedCallback) {
-          return;
-        }
-        _apiClient!.notifySessionAuthRejected();
-      },
+      onAuthRejected: handleRealtimeAuthRejected,
     );
     _pushNotificationService = PushNotificationService(
       repository: _notificationsRepository!,
       isAuthenticated: () => _authState?.isAuthenticated ?? false,
+      resolveEffectiveLocale: () {
+        final ProviderContainer? container = _providerContainer;
+        return resolveAppLocale(
+          override: container?.read(appLocaleOverrideProvider),
+          platformLocales: PlatformDispatcher.instance.locales,
+        );
+      },
     );
 
     _authRepository = ApiAuthRepository(
@@ -323,25 +388,16 @@ class AppBootstrap {
       config: _config!,
       authState: _authState!,
       sessionRefresh: () => _apiClient!.refreshSessionQueued(),
-      onAuthRejected: () {
-        if (suppressUnauthorizedCallback) {
-          return;
-        }
-        _apiClient!.notifySessionAuthRejected();
-      },
+      onAuthRejected: handleRealtimeAuthRejected,
     );
-    unawaited(_reportsRealtimeService!.start());
     _mapRealtimeService = MapRealtimeService(
       config: _config!,
       authState: _authState!,
       sessionRefresh: () => _apiClient!.refreshSessionQueued(),
-      onAuthRejected: () {
-        if (suppressUnauthorizedCallback) {
-          return;
-        }
-        _apiClient!.notifySessionAuthRejected();
-      },
+      onAuthRejected: handleRealtimeAuthRejected,
     );
+    _presenceService = PresenceService(apiClient: _apiClient!);
+    bindPresenceService(_presenceService!);
     _locationService = GeolocatorLocationService();
     _sitesRepository = ApiSitesRepository(
       client: _apiClient!,
@@ -360,6 +416,7 @@ class AppBootstrap {
       client: _apiClient!,
       config: _config!,
       authState: _authState!,
+      onAuthRejected: handleRealtimeAuthRejected,
     );
 
     // Start offline check-in sync service (drains queued payloads on connectivity restore).
@@ -409,6 +466,7 @@ class AppBootstrap {
     if (locale == null) {
       await prefs.remove(_appLocaleCodeKey);
       container.read(appLocaleOverrideProvider.notifier).state = null;
+      await syncUserLocaleToServer(patchProfile: false);
       return;
     }
     final String code = locale.languageCode;
@@ -417,6 +475,32 @@ class AppBootstrap {
     }
     await prefs.setString(_appLocaleCodeKey, code);
     container.read(appLocaleOverrideProvider.notifier).state = Locale(code);
+    await syncUserLocaleToServer(patchProfile: true);
+  }
+
+  /// Syncs in-app locale to the user profile and device token (post-login / language change).
+  Future<void> syncUserLocaleToServer({bool patchProfile = true}) async {
+    if (!(_authState?.isAuthenticated ?? false)) {
+      return;
+    }
+    final Locale locale = resolveAppLocale(
+      override: _providerContainer?.read(appLocaleOverrideProvider),
+      platformLocales: PlatformDispatcher.instance.locales,
+    );
+    final String code = locale.languageCode;
+    if (code != 'en' && code != 'mk' && code != 'sq') {
+      return;
+    }
+    if (patchProfile) {
+      try {
+        await _profileRepository?.updateLocale(code);
+      } on Object {
+        // Best-effort; device token locale still updates below.
+      }
+    }
+    await _pushNotificationService?.syncDeviceTokenWithBackend(
+      forceLocaleRefresh: true,
+    );
   }
 
   Future<void> reset() async {

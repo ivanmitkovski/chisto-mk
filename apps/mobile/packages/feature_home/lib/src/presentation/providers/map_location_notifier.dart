@@ -75,8 +75,9 @@ class MapLocationNotifier extends Notifier<MapLocationState> {
     _initialLocateAttempted = true;
     final UserHomeLocationStore homeStore = UserHomeLocationStore(
       ref.read(preferencesProvider),
+      userId: ref.read(authStateProvider).userId,
     );
-    if (homeStore.hasHomeLocation) {
+    if (homeStore.hasConfirmedHomeLocation) {
       state = state.copyWith(
         userLocation: LatLng(homeStore.latitude!, homeStore.longitude!),
       );

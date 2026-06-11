@@ -1,5 +1,6 @@
 import 'package:feature_events/src/domain/models/eco_event.dart';
 import 'package:feature_events/src/domain/models/event_update_payload.dart';
+import 'package:feature_events/src/presentation/utils/event_schedule_constraints.dart';
 import 'package:flutter/material.dart';
 
 /// Mirrors [PatchPublicEventDto] / API limits for edit-event client validation.
@@ -29,14 +30,20 @@ class EditEventFormSnapshot {
   factory EditEventFormSnapshot.fromEvent(EcoEvent event) {
     final List<String> gear = event.gear.map((EventGear g) => g.name).toList()
       ..sort();
+    final DateTime startDay = DateUtils.dateOnly(event.date);
+    final DateTime endDay = DateUtils.dateOnly(event.endDateTime);
+    // Edit sheet only adjusts end time on the start calendar day (same-day UI).
+    final EventTime formEndTime = endDay.isAfter(startDay)
+        ? const EventTime(hour: 23, minute: 59)
+        : event.endTime;
     return EditEventFormSnapshot(
       title: event.title.trim(),
       description: event.description.trim(),
       maxParticipants: event.maxParticipants,
-      dateOnly: DateUtils.dateOnly(event.date),
-      endDateOnly: DateUtils.dateOnly(event.endDateTime),
+      dateOnly: startDay,
+      endDateOnly: startDay,
       startTime: event.startTime,
-      endTime: event.endTime,
+      endTime: formEndTime,
       category: event.category,
       gearNamesSorted: gear,
       scale: event.scale ?? CleanupScale.small,
@@ -118,23 +125,17 @@ class EditEventFormSnapshot {
   }
 
   bool _scheduledChanged(DateTime nextUtc) {
-    final DateTime prevUtc = DateTime(
-      dateOnly.year,
-      dateOnly.month,
-      dateOnly.day,
-      startTime.hour,
-      startTime.minute,
+    final DateTime prevUtc = eventScheduleInstantLocal(
+      dateOnly,
+      startTime,
     ).toUtc();
     return prevUtc != nextUtc;
   }
 
   bool _endChanged(DateTime nextUtc) {
-    final DateTime prevUtc = DateTime(
-      endDateOnly.year,
-      endDateOnly.month,
-      endDateOnly.day,
-      endTime.hour,
-      endTime.minute,
+    final DateTime prevUtc = eventScheduleInstantLocal(
+      endDateOnly,
+      endTime,
     ).toUtc();
     return prevUtc != nextUtc;
   }

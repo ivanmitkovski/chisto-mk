@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:chisto_infrastructure/core/l10n/app_error_localizations.dart';
 import 'package:chisto_infrastructure/core/logging/app_log.dart';
 import 'package:chisto_infrastructure/core/providers/notifications_providers.dart';
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
@@ -268,10 +269,7 @@ class NotificationsInboxListController {
 
   String _friendlyErrorMessage(AppLocalizations l10n, Object error) {
     if (error is AppError) {
-      if (error.code == 'NETWORK_ERROR' || error.code == 'TIMEOUT') {
-        return l10n.notificationsErrorNetwork;
-      }
-      return error.message;
+      return localizedAppErrorMessage(l10n, error);
     }
     return l10n.notificationsErrorGeneric;
   }

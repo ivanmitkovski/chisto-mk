@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button, Drawer, MetadataView, SectionState, StatusPill } from '@/components/ui';
 import { adminBrowserFetch } from '@/lib/api';
+import styles from './operations-diagnostics-drawer.module.css';
 
 type DiagnosticsPayload = {
   systemInfo: {
@@ -65,7 +66,7 @@ export function OperationsDiagnosticsDrawer() {
         {loading ? <SectionState variant="loading" message={t('diagnostics.running')} /> : null}
         {error ? <SectionState variant="error" message={error} /> : null}
         {payload ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+          <div className={styles.stack}>
             <div>
               <h3>{t('diagnostics.readiness')}</h3>
               <p>

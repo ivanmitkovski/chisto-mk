@@ -3,9 +3,11 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { ListSiteCommentsQueryDto, SiteCommentsSort } from '../dto/list-site-comments-query.dto';
 import { SiteEngagementService } from './site-engagement.service';
+import { SiteCommentsCountService } from './site-comments-count.service';
 import { ReportsUploadService } from '../../reports/services/reports-upload.service';
 import { ModerationService } from '../../moderation/services/moderation.service';
 import type { SiteCommentTreeNode } from '../types/site-comments.types';
+import { resolveActorIdentity } from '../../common/projections/public-identity.projection';
 
 @Injectable()
 export class SiteCommentsListService {
@@ -17,6 +19,7 @@ export class SiteCommentsListService {
     private readonly siteEngagement: SiteEngagementService,
     private readonly reportsUpload: ReportsUploadService,
     private readonly moderation: ModerationService,
+    private readonly siteCommentsCount: SiteCommentsCountService,
   ) {}
 
   private async blockedAuthorFilter(
@@ -38,7 +41,7 @@ export class SiteCommentsListService {
     user?: AuthenticatedUser,
   ): Promise<{
     data: SiteCommentTreeNode[];
-    meta: { page: number; limit: number; total: number; truncated?: boolean };
+    meta: { page: number; limit: number; total: number; engagementTotal: number; truncated?: boolean };
   }> {
     await this.siteEngagement.ensureSiteExists(siteId);
     const blockedFilter = await this.blockedAuthorFilter(user);
@@ -46,7 +49,7 @@ export class SiteCommentsListService {
 
     if (query.parentId) {
       const where = { ...baseWhere, parentId: query.parentId };
-      const [total, comments] = await Promise.all([
+      const [total, comments, engagementTotal] = await Promise.all([
         this.prisma.siteComment.count({ where }),
         this.prisma.siteComment.findMany({
           where,
@@ -55,7 +58,7 @@ export class SiteCommentsListService {
           take: query.limit,
           include: {
             author: {
-              select: { firstName: true, lastName: true, avatarObjectKey: true },
+              select: { firstName: true, lastName: true, avatarObjectKey: true, status: true },
             },
             likes: user
               ? {
@@ -66,6 +69,7 @@ export class SiteCommentsListService {
               : false,
           },
         }),
+        this.siteCommentsCount.countVisible(siteId, user),
       ]);
       const ordered =
         query.sort === SiteCommentsSort.TOP
@@ -73,20 +77,29 @@ export class SiteCommentsListService {
           : comments;
       const avatarUrlByAuthorId = await this.resolveAuthorAvatarUrls(ordered);
       return {
-        data: ordered.map((comment) => ({
+        data: ordered.map((comment) => {
+          const authorIdentity = resolveActorIdentity(comment.author, {
+            actorUserId: comment.authorId,
+          });
+          return {
           id: comment.id,
           parentId: comment.parentId,
           body: comment.body,
           createdAt: comment.createdAt.toISOString(),
           authorId: comment.authorId,
-          authorName: `${comment.author.firstName} ${comment.author.lastName}`.trim(),
-          authorAvatarUrl: avatarUrlByAuthorId.get(comment.authorId) ?? null,
+          authorName: authorIdentity.displayName ?? '',
+          authorIsDeleted: authorIdentity.isDeleted,
+          authorAvatarUrl:
+            comment.authorId != null
+              ? (avatarUrlByAuthorId.get(comment.authorId) ?? null)
+              : null,
           likesCount: comment.likesCount,
           isLikedByMe: Array.isArray(comment.likes) && comment.likes.length > 0,
           replies: [],
           repliesCount: 0,
-        })),
-        meta: { page: query.page, limit: query.limit, total },
+        };
+        }),
+        meta: { page: query.page, limit: query.limit, total, engagementTotal },
       };
     }
 
@@ -95,20 +108,25 @@ export class SiteCommentsListService {
       parentId: string | null;
       body: string;
       createdAt: Date;
-      authorId: string;
+      authorId: string | null;
       likesCount: number;
-      author: { firstName: string; lastName: string; avatarObjectKey: string | null };
+      author: {
+        firstName: string;
+        lastName: string;
+        avatarObjectKey: string | null;
+        status?: import('../../prisma-client').UserStatus;
+      } | null;
       likes?: Array<{ id: string }> | false;
     };
 
-    const [allComments, total] = await Promise.all([
+    const [allComments, total, engagementTotal] = await Promise.all([
       this.prisma.siteComment.findMany({
         where: baseWhere,
         orderBy: { createdAt: 'asc' },
         take: SiteCommentsListService.MAX_COMMENTS_FOR_TREE,
         include: {
           author: {
-            select: { firstName: true, lastName: true, avatarObjectKey: true },
+            select: { firstName: true, lastName: true, avatarObjectKey: true, status: true },
           },
           likes: user
             ? {
@@ -122,6 +140,7 @@ export class SiteCommentsListService {
       this.prisma.siteComment.count({
         where: { ...baseWhere, parentId: null },
       }),
+      this.siteCommentsCount.countVisible(siteId, user),
     ]);
 
     const rootRows = allComments.filter((c) => c.parentId == null);
@@ -154,14 +173,21 @@ export class SiteCommentsListService {
         query.sort === SiteCommentsSort.TOP
           ? [...replies].sort((a, b) => this.compareCommentNodesTop(a, b))
           : replies.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+      const authorIdentity = resolveActorIdentity(comment.author, {
+        actorUserId: comment.authorId,
+      });
       return {
         id: comment.id,
         parentId: comment.parentId,
         body: comment.body,
         createdAt: comment.createdAt.toISOString(),
         authorId: comment.authorId,
-        authorName: `${comment.author.firstName} ${comment.author.lastName}`.trim(),
-        authorAvatarUrl: avatarUrlByAuthorId.get(comment.authorId) ?? null,
+        authorName: authorIdentity.displayName ?? '',
+        authorIsDeleted: authorIdentity.isDeleted,
+        authorAvatarUrl:
+          comment.authorId != null
+            ? (avatarUrlByAuthorId.get(comment.authorId) ?? null)
+            : null,
         likesCount: comment.likesCount,
         isLikedByMe:
           Array.isArray((comment as { likes?: Array<{ id: string }> }).likes) &&
@@ -182,6 +208,7 @@ export class SiteCommentsListService {
         page: query.page,
         limit: query.limit,
         total,
+        engagementTotal,
         truncated: allComments.length >= SiteCommentsListService.MAX_COMMENTS_FOR_TREE,
       },
     };
@@ -228,14 +255,17 @@ export class SiteCommentsListService {
 
   private async resolveAuthorAvatarUrls(
     comments: Array<{
-      authorId: string;
-      author: { avatarObjectKey: string | null };
+      authorId: string | null;
+      author: { avatarObjectKey: string | null } | null;
     }>,
   ): Promise<Map<string, string | null>> {
     const avatarByAuthorId = new Map<string, string | null>();
     const signingTasks = new Map<string, Promise<string | null>>();
     for (const comment of comments) {
-      const key = comment.author.avatarObjectKey;
+      if (comment.authorId == null) {
+        continue;
+      }
+      const key = comment.author?.avatarObjectKey;
       if (!key || key.trim().length === 0) {
         avatarByAuthorId.set(comment.authorId, null);
         continue;
@@ -252,7 +282,10 @@ export class SiteCommentsListService {
       }),
     );
     for (const comment of comments) {
-      const key = comment.author.avatarObjectKey;
+      if (comment.authorId == null) {
+        continue;
+      }
+      const key = comment.author?.avatarObjectKey;
       if (!key || key.trim().length === 0) {
         avatarByAuthorId.set(comment.authorId, null);
       } else {

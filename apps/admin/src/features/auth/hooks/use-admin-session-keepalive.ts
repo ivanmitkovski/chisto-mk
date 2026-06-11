@@ -39,7 +39,18 @@ export function useAdminSessionKeepalive(): void {
       if (document.hidden) {
         stop();
       } else {
+        refresh();
         start();
+      }
+    };
+
+    const onOnline = () => {
+      refresh();
+    };
+
+    const onFocus = () => {
+      if (!document.hidden) {
+        refresh();
       }
     };
 
@@ -48,8 +59,12 @@ export function useAdminSessionKeepalive(): void {
     }
 
     document.addEventListener('visibilitychange', onVisibilityChange);
+    window.addEventListener('online', onOnline);
+    window.addEventListener('focus', onFocus);
     return () => {
       document.removeEventListener('visibilitychange', onVisibilityChange);
+      window.removeEventListener('online', onOnline);
+      window.removeEventListener('focus', onFocus);
       stop();
     };
   }, []);

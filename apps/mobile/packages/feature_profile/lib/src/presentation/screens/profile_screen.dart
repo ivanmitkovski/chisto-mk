@@ -1,3 +1,4 @@
+import 'package:chisto_infrastructure/core/l10n/app_error_localizations.dart';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/core/navigation/app_navigation.dart';
 import 'package:chisto_infrastructure/core/providers/app_providers.dart';
@@ -117,7 +118,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
           container: true,
           liveRegion: true,
           label:
-              '${context.l10n.profileErrorSemantic}. ${home.profileLoadError!.message}',
+              '${context.l10n.profileErrorSemantic}. ${localizedAppErrorMessage(context.l10n, home.profileLoadError!)}',
           child: AppErrorView(
             error: home.profileLoadError!,
             onRetry: () =>

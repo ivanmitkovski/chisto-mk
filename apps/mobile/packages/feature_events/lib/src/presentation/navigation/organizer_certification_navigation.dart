@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 
+/// Fired when the user completes certification and chooses to create an event.
+///
+/// Threaded from [EventsNavigation.openCreate] through [OrganizerToolkitScreen]
+/// and [OrganizerQuizScreen] so the create-event push does not depend on the
+/// originating screen's [BuildContext] remaining mounted after dismiss.
+typedef OrganizerCertificationProceedHandler = void Function();
+
 /// Route name for the organizer toolkit modal pushed on the root navigator.
 const String organizerCertificationToolkitRouteName =
     'organizer_certification_toolkit';

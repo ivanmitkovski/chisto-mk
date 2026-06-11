@@ -7,6 +7,7 @@ import 'package:feature_events/src/data/chat/event_chat_participants.dart';
 import 'package:feature_events/src/data/chat/event_chat_read_cursor.dart';
 import 'package:feature_events/src/data/chat/event_chat_stream_event.dart';
 import 'package:feature_notifications/feature_notifications.dart';
+import 'package:flutter/foundation.dart';
 
 class UploadableFile {
   const UploadableFile({
@@ -95,4 +96,7 @@ abstract class EventChatRepository {
 
   /// Latest connection status for [eventId] (replay-by-default for UI seeding).
   EventChatConnectionStatus currentConnectionStatus(String eventId);
+
+  /// Debounced signal for reconnecting banners (grace after brief outages).
+  ValueListenable<bool> realtimeDisruptionVisible(String eventId);
 }

@@ -42,7 +42,7 @@
   background: var(--bg-surface);
 }
 
-@media (max-width: 640px) {
+@media (max-width: 48rem) {
   .hero {
     flex-direction: column;
     align-items: flex-start;

@@ -3,8 +3,9 @@ export type SiteCommentTreeNode = {
   parentId: string | null;
   body: string;
   createdAt: string;
-  authorId: string;
+  authorId: string | null;
   authorName: string;
+  authorIsDeleted?: boolean;
   authorAvatarUrl?: string | null;
   likesCount: number;
   isLikedByMe: boolean;

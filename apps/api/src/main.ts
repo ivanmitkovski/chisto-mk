@@ -15,6 +15,7 @@ import { AppModule } from './app.module';
 import { validateEnv } from './config/env';
 import { ObservabilityStore } from './observability/observability.store';
 import { configureHttpApplication } from './bootstrap/configure-http-app';
+import { shouldCompressResponse } from './bootstrap/should-compress-response';
 import { runWithInboundTraceparent } from './common/logging/http-request-trace';
 import { sentryBeforeSend } from './common/security/sentry-scrub';
 
@@ -76,20 +77,11 @@ async function bootstrap() {
   } else {
     app.useWebSocketAdapter(new IoAdapter(app));
   }
-  // Never compress Engine.IO / Socket.IO — breaks polling payloads and causes endless reconnects.
+  // Never compress Engine.IO / Socket.IO or SSE — breaks streaming payloads.
   app.use(
     compression({
       threshold: 1024,
-      filter: (req, res) => {
-        const path =
-          'originalUrl' in req && typeof req.originalUrl === 'string'
-            ? req.originalUrl.split('?')[0] ?? ''
-            : (req.url ?? '').split('?')[0] ?? '';
-        if (path.includes('/socket.io')) {
-          return false;
-        }
-        return compression.filter(req, res);
-      },
+      filter: (req, res) => shouldCompressResponse(req, res),
     }),
   );
   app.enableShutdownHooks();
@@ -99,7 +91,7 @@ async function bootstrap() {
 
   const allowedOriginsEnv = process.env.CORS_ORIGINS;
   const nodeEnv = process.env.NODE_ENV ?? 'development';
-  let allowedOrigins = allowedOriginsEnv
+  const allowedOrigins = allowedOriginsEnv
     ? allowedOriginsEnv.split(',').map((origin) => origin.trim()).filter(Boolean)
     : ['http://localhost:3000', 'http://localhost:3001'];
   if (nodeEnv === 'production' || nodeEnv === 'staging') {

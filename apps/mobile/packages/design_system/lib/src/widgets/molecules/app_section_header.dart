@@ -75,11 +75,13 @@ class AppSectionHeaderAction extends StatelessWidget {
     required this.label,
     required this.onPressed,
     this.semanticLabel,
+    this.enabled = true,
   });
 
   final String label;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final String? semanticLabel;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
@@ -88,9 +90,10 @@ class AppSectionHeaderAction extends StatelessWidget {
       button: true,
       label: semanticLabel ?? label,
       child: TextButton(
-        onPressed: onPressed,
+        onPressed: enabled ? onPressed : null,
         style: TextButton.styleFrom(
           foregroundColor: AppColors.primaryDark,
+          disabledForegroundColor: AppColors.textSecondary,
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.xxs,
             vertical: AppSpacing.xxs,
@@ -99,7 +102,12 @@ class AppSectionHeaderAction extends StatelessWidget {
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           textStyle: AppTypographySurfaces.sectionHeaderAction(textTheme),
         ),
-        child: Text(label),
+        child: Text(
+          label,
+          maxLines: 2,
+          softWrap: true,
+          overflow: TextOverflow.visible,
+        ),
       ),
     );
   }

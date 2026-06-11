@@ -85,8 +85,15 @@ class AppTextField extends StatelessWidget {
         suffixIcon: suffixIcon,
       ),
     );
+    final Widget wrappedField = errorText != null && errorText!.isNotEmpty
+        ? Semantics(
+            label: label,
+            hint: errorText,
+            child: field,
+          )
+        : field;
     if (label == null) {
-      return field;
+      return wrappedField;
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -94,7 +101,7 @@ class AppTextField extends StatelessWidget {
       children: <Widget>[
         Text(label!, style: AppTypography.chipLabel(textTheme)),
         const SizedBox(height: 8),
-        field,
+        wrappedField,
       ],
     );
   }

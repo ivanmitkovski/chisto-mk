@@ -1,4 +1,6 @@
 import { BadRequestException, Inject, Injectable, Logger } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { NotificationType } from '../../prisma-client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { OTP_SENDER, OtpSender, OtpSmsPurpose } from '../../otp/types/otp-sender.interface';
 import { OtpService } from '../../otp/services/otp.service';
@@ -10,7 +12,10 @@ import { assertOtpSendAllowed } from '../../otp/util/otp-send-rate.util';
 import { AuthSessionService } from './auth-session.service';
 import { AuthResponse } from '../types/auth-response.type';
 import { EmailService } from '../../email/services/email.service';
+import type { EmailLocale } from '../../email/types/email.types';
 import { notificationLocalesByUserId } from '../../common/i18n/notification-locale.resolver';
+import type { AppLocale } from '../../common/i18n/app-locale';
+import { welcomePushCopy } from '../../notifications/util/notification-templates';
 import { AuthIdentifierThrottleService } from './auth-identifier-throttle.service';
 
 @Injectable()
@@ -26,6 +31,7 @@ export class AuthOtpService {
     private readonly emailService: EmailService,
     @Inject(AUTH_ENV_RUNTIME) private readonly env: AuthEnvRuntime,
     private readonly identifierThrottle: AuthIdentifierThrottleService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async sendPhoneVerificationOtp(
@@ -120,9 +126,22 @@ export class AuthOtpService {
     code: string,
     rememberMe = true,
     deviceId?: string,
+    ipAddress?: string | null,
   ): Promise<AuthResponse> {
     const normalized = phoneNumber.trim();
     await this.otpService.verifyAndConsumeOtp(normalized, code);
+
+    const beforeVerify = await this.prisma.user.findUnique({
+      where: { phoneNumber: normalized },
+      select: { id: true, isPhoneVerified: true },
+    });
+    if (beforeVerify == null) {
+      throw new BadRequestException({
+        code: 'USER_NOT_FOUND',
+        message: 'User not found for this phone number',
+      });
+    }
+    const isFirstVerification = !beforeVerify.isPhoneVerified;
 
     const user = await this.prisma.user.update({
       where: { phoneNumber: normalized },
@@ -137,14 +156,24 @@ export class AuthOtpService {
     });
 
     const localeBy = await notificationLocalesByUserId(this.prisma, [user.id]);
-    const locale = localeBy.get(user.id) === 'en' ? 'en' : 'mk';
+    const locale = localeBy.get(user.id)!;
+    if (isFirstVerification) {
+      void this.emitWelcomePushIfNew(user.id, locale).catch((err: unknown) => {
+        this.logger.warn({
+          msg: 'welcome_push_send_failed',
+          userId: user.id,
+          error: String(err),
+        });
+      });
+    }
+    const emailLocale: EmailLocale = locale === 'en' ? 'en' : 'mk';
     void this.emailService
       .sendAuthTemplate({
         userId: user.id,
         to: user.email,
         firstName: user.firstName,
         templateId: 'welcome',
-        locale,
+        locale: emailLocale,
       })
       .catch((err: unknown) => {
         this.logger.warn({
@@ -154,6 +183,32 @@ export class AuthOtpService {
         });
       });
 
-    return this.sessionService.buildAuthResponse(user, rememberMe, { deviceId });
+    return this.sessionService.buildAuthResponse(user, rememberMe, {
+      deviceId,
+      ipAddress: ipAddress ?? null,
+    });
+  }
+
+  private async emitWelcomePushIfNew(
+    userId: string,
+    locale: AppLocale,
+  ): Promise<void> {
+    const existing = await this.prisma.userNotification.findFirst({
+      where: { userId, type: NotificationType.WELCOME },
+      select: { id: true },
+    });
+    if (existing != null) {
+      return;
+    }
+    const { title, body } = welcomePushCopy(locale);
+    this.eventEmitter.emit('notification.send', {
+      recipientUserIds: [userId],
+      title,
+      body,
+      type: NotificationType.WELCOME,
+      threadKey: `welcome:${userId}`,
+      groupKey: 'WELCOME',
+      data: { kind: 'welcome' },
+    });
   }
 }

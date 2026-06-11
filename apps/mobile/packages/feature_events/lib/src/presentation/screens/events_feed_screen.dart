@@ -2,6 +2,7 @@ library;
 
 import 'dart:async';
 
+import 'package:chisto_infrastructure/core/auth/session_invalidation.dart';
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/l10n/app_error_localizations.dart';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
@@ -19,6 +20,7 @@ import 'package:feature_events/src/presentation/controllers/events_search_contro
 import 'package:feature_events/src/presentation/navigation/events_navigation.dart';
 import 'package:feature_events/src/presentation/utils/events_diagnostic_log.dart';
 import 'package:feature_events/src/presentation/utils/events_scroll_interaction.dart';
+import 'package:chisto_infrastructure/core/navigation/event_detail_navigation_guard.dart';
 import 'package:chisto_infrastructure/core/cache/report_image_provider.dart';
 import 'package:chisto_infrastructure/core/cache/site_image_prefetch_queue.dart';
 import 'package:chisto_infrastructure/core/cache/site_image_provider.dart';
@@ -264,6 +266,8 @@ class EventsFeedScreenState extends ConsumerState<EventsFeedScreen> {
     final result = await EventsFilterSheet.show(
       context,
       current: _feed.activeSearchParams,
+      activeChip: _feed.activeFilter,
+      repository: _feed.repository,
     );
     if (result == null || !mounted) {
       return;
@@ -300,6 +304,10 @@ class EventsFeedScreenState extends ConsumerState<EventsFeedScreen> {
     if (!ok && mounted) {
       logEventsDiagnostic('events_feed_refresh_failed');
       final AppError? err = _feed.lastPullRefreshError;
+      if (err != null && SessionInvalidation.shouldHandle(err)) {
+        unawaited(SessionInvalidation.fromError(err));
+        return;
+      }
       final String message = err != null
           ? localizedAppErrorMessage(context.l10n, err)
           : context.l10n.eventsFeedRefreshFailed;
@@ -313,6 +321,9 @@ class EventsFeedScreenState extends ConsumerState<EventsFeedScreen> {
   }
 
   Future<void> _navigateToDetail(EcoEvent event) async {
+    if (EventDetailNavigationGuard.isEventDetailTopRoute(event.id)) {
+      return;
+    }
     final String cover = event.siteImageUrl.trim();
     if (cover.isNotEmpty) {
       final String lower = cover.toLowerCase();
@@ -336,6 +347,7 @@ class EventsFeedScreenState extends ConsumerState<EventsFeedScreen> {
   Future<void> _navigateToCreate() async {
     final EcoEvent? createdEvent = await EventsNavigation.openCreate(
       context,
+      ref: ref,
       auth: ref.read(authStateProvider),
     );
     if (!mounted || createdEvent == null) {
@@ -396,6 +408,10 @@ class EventsFeedScreenState extends ConsumerState<EventsFeedScreen> {
     if (!ok && mounted) {
       logEventsDiagnostic('events_feed_silent_refresh_failed');
       final AppError? err = _feed.lastPullRefreshError;
+      if (err != null && SessionInvalidation.shouldHandle(err)) {
+        unawaited(SessionInvalidation.fromError(err));
+        return;
+      }
       final String message = err != null
           ? localizedAppErrorMessage(context.l10n, err)
           : context.l10n.eventsFeedRefreshFailed;

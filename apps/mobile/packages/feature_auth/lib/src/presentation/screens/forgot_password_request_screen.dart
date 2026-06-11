@@ -2,6 +2,8 @@ import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/navigation/app_navigation.dart';
 import 'package:chisto_infrastructure/core/validation/macedonian_phone_formatter.dart';
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/shared/forms/field_error_mapping.dart';
+import 'package:chisto_infrastructure/shared/forms/form_validation_mixin.dart';
 import 'package:chisto_infrastructure/shared/utils/app_haptics.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/auth_text_field.dart';
 import 'package:chisto_infrastructure/shared/widgets/molecules/api_error_banner.dart';
@@ -28,19 +30,37 @@ class ForgotPasswordRequestScreen extends ConsumerStatefulWidget {
 }
 
 class _ForgotPasswordRequestScreenState
-    extends ConsumerState<ForgotPasswordRequestScreen> {
+    extends ConsumerState<ForgotPasswordRequestScreen>
+    with FormValidationMixin {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey _phoneFieldKey = GlobalKey();
+  final GlobalKey _emailFieldKey = GlobalKey();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final FocusNode _phoneFocus = FocusNode();
   final FocusNode _emailFocus = FocusNode();
   bool _useEmail = false;
 
+  String get _activeFieldId =>
+      _useEmail ? FormFieldIds.email : FormFieldIds.phone;
+
+  List<String> get _fieldOrder => <String>[_activeFieldId];
+
   @override
   void initState() {
     super.initState();
     _phoneController.addListener(_onInputChanged);
     _emailController.addListener(_onInputChanged);
+    registerFormField(
+      FormFieldIds.phone,
+      focusNode: _phoneFocus,
+      fieldKey: _phoneFieldKey,
+    );
+    registerFormField(
+      FormFieldIds.email,
+      focusNode: _emailFocus,
+      fieldKey: _emailFieldKey,
+    );
   }
 
   @override
@@ -56,14 +76,26 @@ class _ForgotPasswordRequestScreenState
 
   void _onInputChanged() {
     if (!mounted) return;
+    if (hasActiveValidation) {
+      _formKey.currentState?.validate();
+    }
     setState(() {});
     ref.read(passwordResetRequestControllerProvider.notifier).clearError();
   }
+
+  Map<String, String? Function()> _validators(AppLocalizations l10n) =>
+      <String, String? Function()>{
+        FormFieldIds.phone: () =>
+            AuthValidators.macedonianPhone(l10n, _phoneController.text),
+        FormFieldIds.email: () =>
+            AuthValidators.email(l10n, _emailController.text),
+      };
 
   void _toggleResetChannel() {
     FocusManager.instance.primaryFocus?.unfocus();
     setState(() {
       _useEmail = !_useEmail;
+      submitAttempted = false;
     });
     ref.read(passwordResetRequestControllerProvider.notifier).clearError();
     _formKey.currentState?.reset();
@@ -74,9 +106,16 @@ class _ForgotPasswordRequestScreenState
         .read(passwordResetRequestControllerProvider)
         .isLoading;
     if (isLoading) return;
-    final FormState? formState = _formKey.currentState;
-    if (formState == null || !formState.validate()) {
-      AppHaptics.warning(context);
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    setState(() => submitAttempted = true);
+    await WidgetsBinding.instance.endOfFrame;
+    _formKey.currentState?.validate();
+    if (await handleInvalidSubmit(
+      context,
+      l10n,
+      _fieldOrder,
+      _validators(l10n),
+    )) {
       return;
     }
 
@@ -118,18 +157,21 @@ class _ForgotPasswordRequestScreenState
   Widget _buildInputField(AppLocalizations l10n) {
     if (_useEmail) {
       return AuthTextField(
-        key: const ValueKey<String>('email'),
+        key: _emailFieldKey,
         controller: _emailController,
         focusNode: _emailFocus,
         label: l10n.authForgotPasswordEmailField,
         keyboardType: TextInputType.emailAddress,
         textInputAction: TextInputAction.done,
-        validator: (String? v) => AuthValidators.email(l10n, v),
+        validator: (String? v) => validateIfVisible(
+          FormFieldIds.email,
+          () => AuthValidators.email(l10n, v),
+        ),
         onFieldSubmitted: (_) => _handleSendCode(),
       );
     }
     return AuthTextField(
-      key: const ValueKey<String>('phone'),
+      key: _phoneFieldKey,
       controller: _phoneController,
       focusNode: _phoneFocus,
       label: l10n.authFieldPhone,
@@ -137,7 +179,10 @@ class _ForgotPasswordRequestScreenState
       inputFormatters: const <TextInputFormatter>[MacedonianPhoneFormatter()],
       keyboardType: TextInputType.phone,
       textInputAction: TextInputAction.done,
-      validator: (String? v) => AuthValidators.macedonianPhone(l10n, v),
+      validator: (String? v) => validateIfVisible(
+        FormFieldIds.phone,
+        () => AuthValidators.macedonianPhone(l10n, v),
+      ),
       onFieldSubmitted: (_) => _handleSendCode(),
     );
   }
@@ -150,10 +195,6 @@ class _ForgotPasswordRequestScreenState
     final String? apiError = formState.error != null
         ? messageForAuthError(l10n, formState.error!)
         : null;
-    final bool canSubmit = _useEmail
-        ? AuthValidators.email(l10n, _emailController.text) == null
-        : _phoneController.text.trim().replaceAll(RegExp(r'\D'), '').length ==
-              8;
     return Stack(
       children: <Widget>[
         AuthShell(
@@ -167,6 +208,7 @@ class _ForgotPasswordRequestScreenState
           body: AuthFormScaffold(
             child: Form(
               key: _formKey,
+              autovalidateMode: AutovalidateMode.disabled,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
@@ -188,7 +230,7 @@ class _ForgotPasswordRequestScreenState
                   const SizedBox(height: AppSpacing.xl),
                   AppButton.primary(
                     label: l10n.authForgotPasswordSendCode,
-                    enabled: canSubmit && !isLoading,
+                    enabled: !isLoading,
                     onPressed: isLoading ? null : _handleSendCode,
                   ),
                   const SizedBox(height: AppSpacing.lg),

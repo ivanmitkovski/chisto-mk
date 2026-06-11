@@ -17,7 +17,7 @@ class ReminderPickerSheet {
   }
 
   static Future<DateTime?> show(BuildContext context, EcoEvent event) {
-    return showModalBottomSheet<DateTime>(
+    return AppBottomSheet.show<DateTime>(
       context: context,
       isScrollControlled: true,
       backgroundColor: AppColors.transparent,

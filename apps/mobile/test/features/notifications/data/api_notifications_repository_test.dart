@@ -10,7 +10,7 @@ class _FakeApiClient extends ApiClient {
     : super(
         config: AppConfig.dev,
         accessToken: () => null,
-        onUnauthorized: () {},
+        onUnauthorized: (_) {},
       );
 
   final List<String> getPaths = <String>[];

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
@@ -15,8 +16,10 @@ import 'package:feature_home/src/presentation/widgets/comments/comments_bottom_s
 import 'package:feature_home/src/presentation/widgets/comments/comments_input_bar.dart';
 import 'package:feature_home/src/presentation/widgets/comments/comments_motion.dart';
 import 'package:feature_home/src/presentation/widgets/comments/comments_sheet_comment_list.dart';
+import 'package:feature_home/src/presentation/widgets/comments/comments_sheet_drag.dart';
 import 'package:feature_home/src/presentation/widgets/comments/comments_thread_flatten.dart';
 import 'package:feature_safety/feature_safety.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -30,6 +33,8 @@ class CommentsBottomSheet extends ConsumerStatefulWidget {
     this.siteId,
     this.siteTitle,
     this.scrollController,
+    this.sheetController,
+    this.sheetSizeConfig = CommentsSheetSizeConfig.standard,
     this.isLoadingMoreComments = false,
     this.onCommentsCountChanged,
     this.onCommentsChanged,
@@ -50,6 +55,8 @@ class CommentsBottomSheet extends ConsumerStatefulWidget {
   final String? siteId;
   final String? siteTitle;
   final ScrollController? scrollController;
+  final DraggableScrollableController? sheetController;
+  final CommentsSheetSizeConfig sheetSizeConfig;
   final bool isLoadingMoreComments;
   final ValueChanged<int>? onCommentsCountChanged;
   final ValueChanged<List<Comment>>? onCommentsChanged;
@@ -101,7 +108,13 @@ class _CommentsBottomSheetState extends ConsumerState<CommentsBottomSheet> {
       widget.scrollController ?? _fallbackScrollController;
 
   bool get _ownsScrollController => widget.scrollController == null;
-  bool get _canPost => _commentController.text.trim().isNotEmpty;
+  bool get _canPost {
+    final String normalized = CommentInputValidator.normalizeBody(
+      _commentController.text,
+    );
+    return normalized.isNotEmpty &&
+        CommentInputValidator.withinMaxLength(normalized);
+  }
 
   int get _totalCommentCount => countCommentNodes(_comments);
 
@@ -405,41 +418,26 @@ class _CommentsBottomSheetState extends ConsumerState<CommentsBottomSheet> {
 
   Future<void> _openPeerCommentActions(Comment comment) async {
     final l10n = context.l10n;
-    final String? action = await showModalBottomSheet<String>(
+    final String? action = await showAppActionSheet<String>(
       context: context,
-      useRootNavigator: true,
-      isScrollControlled: true,
-      backgroundColor: AppColors.transparent,
       builder: (BuildContext sheetContext) {
-        return ReportSheetScaffold(
-          fitToContent: true,
-          addBottomInset: false,
-          title: l10n.commentsSheetTitle,
-          subtitle: l10n.commentsSheetSubtitle,
-          trailing: ReportCircleIconButton(
-            icon: Icons.close_rounded,
-            semanticLabel: l10n.semanticClose,
-            onTap: () => Navigator.of(sheetContext).pop(),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              ReportActionTile(
-                icon: Icons.flag_outlined,
-                title: l10n.safetyReportTitle,
-                subtitle: l10n.safetyReportDetailsHint,
-                onTap: () => Navigator.of(sheetContext).pop('report'),
-                tone: ReportSurfaceTone.neutral,
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              ReportActionTile(
-                icon: Icons.block_flipped,
-                title: l10n.safetyBlockUserTitle,
-                subtitle: l10n.profileBlockedUsersSubtitle,
-                onTap: () => Navigator.of(sheetContext).pop('block'),
-                tone: ReportSurfaceTone.danger,
-              ),
-            ],
+        return CupertinoActionSheet(
+          title: Text(l10n.commentsSheetTitle),
+          message: Text(l10n.commentsSheetSubtitle),
+          actions: <Widget>[
+            CupertinoActionSheetAction(
+              onPressed: () => Navigator.of(sheetContext).pop('report'),
+              child: Text(l10n.safetyReportTitle),
+            ),
+            CupertinoActionSheetAction(
+              isDestructiveAction: true,
+              onPressed: () => Navigator.of(sheetContext).pop('block'),
+              child: Text(l10n.safetyBlockUserTitle),
+            ),
+          ],
+          cancelButton: CupertinoActionSheetAction(
+            onPressed: () => Navigator.of(sheetContext).pop(),
+            child: Text(l10n.commonCancel),
           ),
         );
       },
@@ -461,41 +459,26 @@ class _CommentsBottomSheetState extends ConsumerState<CommentsBottomSheet> {
       return;
     }
     final l10n = context.l10n;
-    final String? action = await showModalBottomSheet<String>(
+    final String? action = await showAppActionSheet<String>(
       context: context,
-      useRootNavigator: true,
-      isScrollControlled: true,
-      backgroundColor: AppColors.transparent,
       builder: (BuildContext sheetContext) {
-        return ReportSheetScaffold(
-          fitToContent: true,
-          addBottomInset: false,
-          title: l10n.commentsSheetTitle,
-          subtitle: l10n.commentsSheetSubtitle,
-          trailing: ReportCircleIconButton(
-            icon: Icons.close_rounded,
-            semanticLabel: l10n.semanticClose,
-            onTap: () => Navigator.of(sheetContext).pop(),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              ReportActionTile(
-                icon: Icons.edit_outlined,
-                title: l10n.commentsEditTitle,
-                subtitle: l10n.commentsEditSubtitle,
-                onTap: () => Navigator.of(sheetContext).pop('edit'),
-                tone: ReportSurfaceTone.neutral,
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              ReportActionTile(
-                icon: Icons.delete_outline_rounded,
-                title: l10n.commentsDeleteTitle,
-                subtitle: l10n.commentsDeleteSubtitle,
-                onTap: () => Navigator.of(sheetContext).pop('delete'),
-                tone: ReportSurfaceTone.danger,
-              ),
-            ],
+        return CupertinoActionSheet(
+          title: Text(l10n.commentsSheetTitle),
+          message: Text(l10n.commentsSheetSubtitle),
+          actions: <Widget>[
+            CupertinoActionSheetAction(
+              onPressed: () => Navigator.of(sheetContext).pop('edit'),
+              child: Text(l10n.commentsEditTitle),
+            ),
+            CupertinoActionSheetAction(
+              isDestructiveAction: true,
+              onPressed: () => Navigator.of(sheetContext).pop('delete'),
+              child: Text(l10n.commentsDeleteTitle),
+            ),
+          ],
+          cancelButton: CupertinoActionSheetAction(
+            onPressed: () => Navigator.of(sheetContext).pop(),
+            child: Text(l10n.commonCancel),
           ),
         );
       },
@@ -647,56 +630,83 @@ class _CommentsBottomSheetState extends ConsumerState<CommentsBottomSheet> {
       child: Column(
         mainAxisSize: MainAxisSize.max,
         children: <Widget>[
-          CommentsBottomSheetHeader(siteTitle: widget.siteTitle),
+          CommentsBottomSheetHeader(
+            siteTitle: widget.siteTitle,
+            commentCount: _totalCommentCount,
+            sheetController: widget.sheetController,
+            sizeConfig: widget.sheetSizeConfig,
+          ),
           Expanded(
-            child: CommentsSheetCommentList(
-              comments: _comments,
-              expandedReplyIds: _expandedReplyIds,
-              scrollController: _listController,
-              expandedKeyToken:
-                  '${_expandedReplyIds.length}-$_activeHighlightCommentId',
-              highlightedCommentId: _activeHighlightCommentId,
-              rowKeyFor: _rowKeyFor,
-              isCommentBusy: _isCommentBusy,
-              isCommentLiking: _isCommentLiking,
-              isCommentEditing: _isCommentEditing,
-              isCommentDeleting: _isCommentDeleting,
-              onLikeTap: _toggleCommentLike,
-              onOpenMenu: _openCommentActions,
-              onReplyTap: (Comment comment) {
-                setState(() {
-                  _replyToCommentId = comment.id;
-                  _replyToAuthor = comment.authorName;
-                  _commentController.text = '@${comment.authorName} ';
-                  _commentController.selection = TextSelection.fromPosition(
-                    TextPosition(offset: _commentController.text.length),
-                  );
-                });
-                FocusScope.of(context).requestFocus(_commentFocusNode);
+            child: LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints constraints) {
+                // Overlay keyboard model: the IME covers the sheet bottom, so
+                // shrink the thread area to keep it visible above the keyboard
+                // and the lifted composer. Always mounted (value-only change)
+                // and clamped to the available height so the simultaneous
+                // sheet-expand and keyboard animations can never overflow.
+                final double listKeyboardInset = widget.sheetController == null
+                    ? 0
+                    : math.min(
+                        appSheetOverlayKeyboardInset(context),
+                        constraints.maxHeight,
+                      );
+                return Padding(
+                  padding: EdgeInsets.only(bottom: listKeyboardInset),
+                  child: CommentsSheetCommentList(
+                    comments: _comments,
+                    expandedReplyIds: _expandedReplyIds,
+                    scrollController: _listController,
+                    expandedKeyToken:
+                        '${_expandedReplyIds.length}-$_activeHighlightCommentId',
+                    highlightedCommentId: _activeHighlightCommentId,
+                    rowKeyFor: _rowKeyFor,
+                    isCommentBusy: _isCommentBusy,
+                    isCommentLiking: _isCommentLiking,
+                    isCommentEditing: _isCommentEditing,
+                    isCommentDeleting: _isCommentDeleting,
+                    onLikeTap: _toggleCommentLike,
+                    onOpenMenu: _openCommentActions,
+                    onReplyTap: (Comment comment) {
+                      setState(() {
+                        _replyToCommentId = comment.id;
+                        _replyToAuthor = comment.authorName;
+                        _commentController.text = '@${comment.authorName} ';
+                        _commentController.selection =
+                            TextSelection.fromPosition(
+                              TextPosition(
+                                offset: _commentController.text.length,
+                              ),
+                            );
+                      });
+                      FocusScope.of(context).requestFocus(_commentFocusNode);
+                    },
+                    hasExpandableThread: _hasExpandableThread,
+                    onToggleReplies: (Comment comment) {
+                      setState(() {
+                        if (_expandedReplyIds.contains(comment.id)) {
+                          _expandedReplyIds.remove(comment.id);
+                        } else {
+                          _expandedReplyIds.add(comment.id);
+                        }
+                      });
+                    },
+                    showLoadMoreReplies: (Comment c) =>
+                        _expandedReplyIds.contains(c.id) &&
+                        _canPaginateDirectReplies(c),
+                    onLoadMoreReplies: (Comment c) =>
+                        unawaited(_loadMoreDirectReplies(c)),
+                    isLoadingMoreReplies: (Comment c) =>
+                        _loadingMoreDirectRepliesForParentId == c.id,
+                  ),
+                );
               },
-              hasExpandableThread: _hasExpandableThread,
-              onToggleReplies: (Comment comment) {
-                setState(() {
-                  if (_expandedReplyIds.contains(comment.id)) {
-                    _expandedReplyIds.remove(comment.id);
-                  } else {
-                    _expandedReplyIds.add(comment.id);
-                  }
-                });
-              },
-              showLoadMoreReplies: (Comment c) =>
-                  _expandedReplyIds.contains(c.id) &&
-                  _canPaginateDirectReplies(c),
-              onLoadMoreReplies: (Comment c) =>
-                  unawaited(_loadMoreDirectReplies(c)),
-              isLoadingMoreReplies: (Comment c) =>
-                  _loadingMoreDirectRepliesForParentId == c.id,
             ),
           ),
           if (widget.isLoadingMoreComments) const AppLinearProgress(),
           CommentsInputBar(
             commentController: _commentController,
             commentFocusNode: _commentFocusNode,
+            keyboardOverlaysSheet: widget.sheetController != null,
             editingCommentId: _editingCommentId,
             replyToCommentId: _replyToCommentId,
             replyToAuthor: _replyToAuthor,

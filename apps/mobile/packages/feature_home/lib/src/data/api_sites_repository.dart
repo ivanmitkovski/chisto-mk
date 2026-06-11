@@ -174,6 +174,13 @@ class ApiSitesRepository implements SitesRepository {
   }) => _comments.getSiteUpvotes(id, page: page, limit: limit);
 
   @override
+  Future<SiteCoReportersResult> getSiteCoReporters(
+    String id, {
+    int page = 1,
+    int limit = 50,
+  }) => _comments.getSiteCoReporters(id, page: page, limit: limit);
+
+  @override
   Future<SiteCommentItem> createSiteComment(
     String id,
     String body, {

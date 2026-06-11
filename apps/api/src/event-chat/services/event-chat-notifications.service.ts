@@ -1,11 +1,18 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { NotificationType } from '../../prisma-client';
+import {
+  eventChatMessageFallback,
+  eventChatSomeoneFallback,
+} from '../../common/i18n/event-chat-notification.copy';
+import { notificationLocalesByUserId } from '../../common/i18n/notification-locale.resolver';
 import { PrismaService } from '../../prisma/prisma.service';
 import { NotificationDispatcherService } from '../../notifications/services/notification-dispatcher.service';
 import { FeatureFlagsService } from '../../feature-flags/services/feature-flags.service';
 import { EventChatPushAggregatorService } from './event-chat-push-aggregator.service';
 import { buildEventChatPushPreview } from '../util/event-chat-push-preview';
 import type { EventChatMessageRow } from '../util/event-chat-message.select';
+import { resolveActorIdentity } from '../../common/projections/public-identity.projection';
+import type { AppLocale } from '../../common/i18n/app-locale';
 
 const REPLY_SNIPPET_MAX = 120;
 
@@ -56,7 +63,7 @@ export class EventChatNotificationsService {
     }
     const recipientIds = new Set<string>();
     for (const p of participants) {
-      if (p.userId !== senderId) {
+      if (p.userId != null && p.userId !== senderId) {
         recipientIds.add(p.userId);
       }
     }
@@ -73,21 +80,29 @@ export class EventChatNotificationsService {
     });
     const muted = new Set(mutedRows.map((m) => m.userId));
 
-    const preview = this.snippet(
-      messagePreview.trim().length > 0
-        ? messagePreview
-        : buildEventChatPushPreview(created, ''),
-    );
-    const senderName = `${created.author.firstName} ${created.author.lastName}`.trim();
+    const senderIdentity = resolveActorIdentity(created.author, {
+      actorUserId: created.authorId,
+    });
     const coalesceV2 = await this.featureFlags.isEventChatPushCoalesceV2Enabled();
+    const localeBy = await notificationLocalesByUserId(this.prisma, [...recipientIds]);
 
     for (const recipientId of recipientIds) {
       if (muted.has(recipientId)) {
         continue;
       }
+      const locale = localeBy.get(recipientId)!;
+      const senderName =
+        senderIdentity.displayName ?? eventChatSomeoneFallback(locale);
+      const preview = this.snippet(
+        messagePreview.trim().length > 0
+            ? messagePreview
+            : buildEventChatPushPreview(created, '', locale),
+        locale,
+      );
       if (coalesceV2) {
         this.pushAggregator.enqueue({
           recipientUserId: recipientId,
+          recipientLocale: locale,
           eventId,
           eventTitle: event.title,
           senderDisplayName: senderName,
@@ -125,10 +140,10 @@ export class EventChatNotificationsService {
     }
   }
 
-  private snippet(body: string): string {
+  private snippet(body: string, locale: AppLocale): string {
     const t = body.trim();
     const core =
       t.length <= REPLY_SNIPPET_MAX ? t : `${t.slice(0, REPLY_SNIPPET_MAX)}…`;
-    return core.length > 0 ? core : 'Message';
+    return core.length > 0 ? core : eventChatMessageFallback(locale);
   }
 }

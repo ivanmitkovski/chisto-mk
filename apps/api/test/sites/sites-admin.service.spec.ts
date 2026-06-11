@@ -44,6 +44,7 @@ function makeService(input?: {
         recordUnarchived: jest.fn(),
       } as never,
       new SitesAdminBulkService(prisma, audit, sitesMapQuery, sitesFeed),
+      { emitSiteStatusUpdate: jest.fn() } as never,
     ),
     prisma,
     audit,

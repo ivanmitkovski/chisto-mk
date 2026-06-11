@@ -4,6 +4,7 @@ import 'package:chisto_infrastructure/core/config/app_config.dart';
 import 'package:chisto_infrastructure/core/network/api_client.dart';
 import 'package:chisto_infrastructure/core/network/request_cancellation.dart';
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:design_system/design_system.dart';
 import 'package:feature_safety/feature_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -15,7 +16,7 @@ class _ReportApiClient extends ApiClient {
     : super(
         config: AppConfig.dev,
         accessToken: () => 'token',
-        onUnauthorized: () {},
+        onUnauthorized: (_) {},
       );
 
   final bool fail;
@@ -143,6 +144,110 @@ void main() {
     expect(
       find.text('Report submitted. We review reports within 24 hours.'),
       findsOneWidget,
+    );
+  });
+
+  testWidgets('blocks submit and shows error when details exceed limit', (
+    tester,
+  ) async {
+    final _ReportApiClient client = _ReportApiClient();
+    final UgcModerationRepository repo = UgcModerationRepository(
+      client: client,
+    );
+
+    await _openReportSheet(tester, repository: repo);
+
+    final TextFormField field = tester.widget(find.byType(TextFormField));
+    field.controller!.text = 'x' * 2001;
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Details must be at most 2000 characters.'),
+      findsNothing,
+    );
+
+    await tester.ensureVisible(find.text('Submit report'));
+    await tester.tap(find.text('Submit report'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Details must be at most 2000 characters.'),
+      findsOneWidget,
+    );
+    expect(client.lastBody, isNull);
+  });
+
+  testWidgets('shows character counter while typing', (tester) async {
+    final UgcModerationRepository repo = UgcModerationRepository(
+      client: _ReportApiClient(),
+    );
+
+    await _openReportSheet(tester, repository: repo);
+
+    expect(find.text('0 / 2000'), findsOneWidget);
+
+    await tester.enterText(find.byType(TextFormField), 'hello');
+    await tester.pumpAndSettle();
+
+    expect(find.text('5 / 2000'), findsOneWidget);
+  });
+
+  testWidgets('requires details when Other is selected', (tester) async {
+    final _ReportApiClient client = _ReportApiClient();
+    final UgcModerationRepository repo = UgcModerationRepository(
+      client: client,
+    );
+
+    await _openReportSheet(tester, repository: repo);
+
+    await tester.tap(find.text('Other'));
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text('Submit report'));
+    await tester.tap(find.text('Submit report'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Please add a short description when choosing Other.'),
+      findsOneWidget,
+    );
+    expect(client.lastBody, isNull);
+  });
+
+  testWidgets('sheet height hugs report form content', (tester) async {
+    const double screenHeight = 844;
+
+    await tester.binding.setSurfaceSize(const Size(390, screenHeight));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    final UgcModerationRepository repo = UgcModerationRepository(
+      client: _ReportApiClient(),
+    );
+
+    await _openReportSheet(tester, repository: repo);
+
+    final RenderBox sheetBox = tester.renderObject<RenderBox>(
+      find.byType(AppSheetScaffold),
+    );
+    final RenderBox submitButtonBox = tester.renderObject<RenderBox>(
+      find.text('Submit report'),
+    );
+
+    expect(sheetBox.size.height, lessThan(screenHeight * 0.75));
+    expect(
+      sheetBox.localToGlobal(Offset.zero).dy,
+      greaterThan(40),
+      reason: 'Sheet top should stay below the status bar',
+    );
+
+    final double sheetBottom =
+        sheetBox.localToGlobal(Offset.zero).dy + sheetBox.size.height;
+    final double submitBottom = submitButtonBox.localToGlobal(Offset.zero).dy +
+        submitButtonBox.size.height;
+    expect(
+      sheetBottom - submitBottom,
+      lessThan(80),
+      reason: 'Sheet should hug content with only chrome + home-indicator inset',
     );
   });
 }

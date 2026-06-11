@@ -30,7 +30,7 @@ Future<OrganizerEventCompletionAction> showOrganizerEventCompletionSheet({
   int? maxParticipants,
 }) async {
   final OrganizerEventCompletionAction? action =
-      await showModalBottomSheet<OrganizerEventCompletionAction>(
+      await AppBottomSheet.show<OrganizerEventCompletionAction>(
         context: context,
         isScrollControlled: true,
         backgroundColor: AppColors.transparent,

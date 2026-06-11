@@ -8,8 +8,8 @@ export class ParseCuidPipe implements PipeTransform<string, string> {
   transform(value: string): string {
     if (typeof value !== 'string' || !CUID_LIKE.test(value.trim())) {
       throw new BadRequestException({
-        code: 'INVALID_RESOURCE_ID',
-        message: 'Invalid id format',
+        code: 'INVALID_CUID',
+        message: 'Invalid resource id',
       });
     }
     return value.trim();

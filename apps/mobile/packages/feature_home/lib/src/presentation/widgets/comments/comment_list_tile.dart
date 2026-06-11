@@ -1,4 +1,5 @@
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
+import 'package:chisto_infrastructure/shared/utils/civic_actor_display.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_avatar.dart';
 import 'package:design_system/design_system.dart';
 import 'package:feature_home/src/domain/models/comment.dart';
@@ -45,6 +46,11 @@ class CommentListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String authorLabel = civicActorDisplayLabel(
+      context.l10n,
+      displayName: comment.authorName,
+      isDeleted: comment.authorIsDeleted,
+    );
     final TextTheme textTheme = Theme.of(context).textTheme;
     final bool isLikedByMe = comment.isLikedByMe ?? false;
     final bool showThreadGuide = depth >= 1 && depth <= 2;
@@ -74,8 +80,9 @@ class CommentListTile extends StatelessWidget {
           children: <Widget>[
             SizedBox(width: indent),
             AppAvatar(
-              name: comment.authorName,
-              imageUrl: comment.authorAvatarUrl,
+              name: authorLabel,
+              imageUrl:
+                  comment.authorIsDeleted ? null : comment.authorAvatarUrl,
               size: 36,
               fontSize: 14,
             ),
@@ -109,7 +116,7 @@ class CommentListTile extends StatelessWidget {
                             style: textStyle,
                             children: <TextSpan>[
                               TextSpan(
-                                text: '${comment.authorName} ',
+                                text: '$authorLabel ',
                                 style: nameStyle,
                               ),
                               TextSpan(text: comment.text),
@@ -127,7 +134,7 @@ class CommentListTile extends StatelessWidget {
                         Semantics(
                           button: true,
                           label: context.l10n.commentsReplyToSemantic(
-                            comment.authorName,
+                            authorLabel,
                           ),
                           child: GestureDetector(
                             onTap: onReplyTap,
@@ -152,10 +159,10 @@ class CommentListTile extends StatelessWidget {
                             button: true,
                             label: repliesExpanded
                                 ? context.l10n.commentsSemanticHideReplies(
-                                    comment.authorName,
+                                    authorLabel,
                                   )
                                 : context.l10n.commentsSemanticViewReplies(
-                                    comment.authorName,
+                                    authorLabel,
                                   ),
                             child: GestureDetector(
                               onTap: onToggleReplies,

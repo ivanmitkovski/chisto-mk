@@ -15,11 +15,15 @@ class UpvotersSheetContent extends ConsumerStatefulWidget {
     required this.siteId,
     required this.scrollController,
     this.highlightUserId,
+    this.sheetController,
+    this.sizeConfig,
   });
 
   final String siteId;
   final ScrollController scrollController;
   final String? highlightUserId;
+  final DraggableScrollableController? sheetController;
+  final AppSheetSizeConfig? sizeConfig;
 
   @override
   ConsumerState<UpvotersSheetContent> createState() =>
@@ -119,49 +123,66 @@ class _UpvotersSheetContentState extends ConsumerState<UpvotersSheetContent> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.lg,
-            AppSpacing.sm,
-            AppSpacing.lg,
-            AppSpacing.sm,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Center(
-                child: Container(
-                  width: 36,
-                  height: 5,
-                  decoration: BoxDecoration(
-                    color: AppColors.inputBorder,
-                    borderRadius: AppRadii.circle,
-                  ),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Text(
-                context.l10n.siteUpvotersSheetTitle,
-                style: AppTypography.sheetTitle(
-                  textTheme,
-                ).copyWith(fontSize: 20, fontWeight: FontWeight.w600),
-              ),
-              if (subtitle.isNotEmpty) ...<Widget>[
-                const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: AppTypography.cardSubtitle(
-                    textTheme,
-                  ).copyWith(color: AppColors.textMuted),
-                ),
-              ],
-              const SizedBox(height: AppSpacing.xs),
-              const Divider(height: 1, color: AppColors.divider),
-            ],
-          ),
-        ),
+        if (widget.sheetController != null && widget.sizeConfig != null)
+          AppResizableSheetHeader(
+            sheetController: widget.sheetController!,
+            sizeConfig: widget.sizeConfig!,
+            child: _buildHeader(context, textTheme, subtitle),
+          )
+        else
+          _buildHeader(context, textTheme, subtitle),
         Expanded(child: _buildBody(context, data)),
       ],
+    );
+  }
+
+  Widget _buildHeader(
+    BuildContext context,
+    TextTheme textTheme,
+    String subtitle,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.sm,
+        AppSpacing.lg,
+        AppSpacing.sm,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          if (widget.sheetController == null)
+            Center(
+              child: Container(
+                width: 36,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: AppColors.inputBorder,
+                  borderRadius: AppRadii.circle,
+                ),
+              ),
+            ),
+          if (widget.sheetController == null)
+            const SizedBox(height: AppSpacing.md),
+          Text(
+            context.l10n.siteUpvotersSheetTitle,
+            style: AppTypography.sheetTitle(
+              textTheme,
+            ).copyWith(fontSize: 20, fontWeight: FontWeight.w600),
+          ),
+          if (subtitle.isNotEmpty) ...<Widget>[
+            const SizedBox(height: 4),
+            Text(
+              subtitle,
+              style: AppTypography.cardSubtitle(
+                textTheme,
+              ).copyWith(color: AppColors.textMuted),
+            ),
+          ],
+          const SizedBox(height: AppSpacing.xs),
+          const Divider(height: 1, color: AppColors.divider),
+        ],
+      ),
     );
   }
 
@@ -216,11 +237,11 @@ class _UpvotersSheetContentState extends ConsumerState<UpvotersSheetContent> {
       physics: const BouncingScrollPhysics(
         parent: AlwaysScrollableScrollPhysics(),
       ),
-      padding: const EdgeInsets.fromLTRB(
+      padding: EdgeInsets.fromLTRB(
         AppSpacing.lg,
         0,
         AppSpacing.lg,
-        AppSpacing.md,
+        AppBottomSheet.homeIndicatorScrollPadding(context),
       ),
       itemCount: data.items.length + (data.loadingMore && data.hasMore ? 1 : 0),
       separatorBuilder: (BuildContext context, int index) =>

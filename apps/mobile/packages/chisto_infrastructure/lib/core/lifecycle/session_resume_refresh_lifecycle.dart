@@ -1,11 +1,12 @@
 import 'dart:async';
 
+import 'package:chisto_infrastructure/core/auth/session_recovery.dart';
+import 'package:chisto_infrastructure/core/auth/session_teardown_reason.dart';
 import 'package:chisto_infrastructure/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_infrastructure/core/logging/app_log.dart';
 import 'package:chisto_infrastructure/core/providers/app_providers.dart';
 import 'package:chisto_infrastructure/core/providers/root_container.dart';
 import 'package:feature_auth/src/data/access_token_expiry.dart';
-import 'package:feature_auth/src/domain/refresh_outcome.dart';
 import 'package:flutter/widgets.dart';
 
 /// Refreshes the access token when the app returns to foreground with an
@@ -65,11 +66,10 @@ class SessionResumeRefreshLifecycle with WidgetsBindingObserver {
 
   Future<void> _runRefresh(AppBootstrap bootstrap) async {
     try {
-      final RefreshOutcome outcome = await bootstrap.apiClient
-          .refreshSessionQueued();
-      if (outcome == RefreshOutcome.transient) {
-        AppLog.warn('resume token refresh failed (transient)');
-      }
+      await SessionRecovery.refreshBeforeInvalidate(
+        reason: SessionTeardownReason.resumeRefreshRejected,
+        delayedRetry: SessionRecovery.resumeDelayedRetry(),
+      );
     } on Object catch (e, st) {
       AppLog.warn('resume token refresh failed', error: e, stackTrace: st);
     }

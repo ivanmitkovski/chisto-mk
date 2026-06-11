@@ -109,11 +109,24 @@ function setRememberDeviceCookie(response: NextResponse, request: NextRequest): 
   });
 }
 
-export function ensureAdminCsrfCookie(request: NextRequest, response: NextResponse): string {
+export function resolveCsrfCookieMaxAge(rememberDevice: boolean): number {
+  return rememberDevice ? REFRESH_COOKIE_REMEMBER_MAX_AGE : REFRESH_COOKIE_STANDARD_MAX_AGE;
+}
+
+export function ensureAdminCsrfCookie(
+  request: NextRequest,
+  response: NextResponse,
+  options: { rememberDevice?: boolean } = {},
+): string {
+  const rememberDevice =
+    options.rememberDevice !== undefined
+      ? options.rememberDevice
+      : isRememberDeviceEnabled(request);
   const existing = request.cookies.get(ADMIN_CSRF_COOKIE_KEY)?.value;
   const token = existing && existing.length >= 32 ? existing : randomToken();
   response.cookies.set(ADMIN_CSRF_COOKIE_KEY, token, {
     path: '/',
+    maxAge: resolveCsrfCookieMaxAge(rememberDevice),
     sameSite: 'lax',
     secure: shouldUseSecureCookie(request),
     httpOnly: false,

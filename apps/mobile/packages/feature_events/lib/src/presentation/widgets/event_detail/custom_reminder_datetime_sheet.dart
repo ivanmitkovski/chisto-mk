@@ -21,7 +21,7 @@ class CustomReminderDateTimeSheet {
         ? firstDate.add(const Duration(hours: 1))
         : firstDate;
 
-    return showModalBottomSheet<DateTime>(
+    return AppBottomSheet.show<DateTime>(
       context: context,
       isScrollControlled: true,
       backgroundColor: AppColors.transparent,

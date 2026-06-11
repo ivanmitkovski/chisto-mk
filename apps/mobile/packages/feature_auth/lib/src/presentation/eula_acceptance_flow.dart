@@ -1,5 +1,6 @@
 import 'package:chisto_infrastructure/core/navigation/app_navigation.dart';
 import 'package:chisto_infrastructure/core/providers/app_providers.dart';
+import 'package:chisto_infrastructure/core/providers/root_container.dart';
 import 'package:feature_auth/src/data/eula_acceptance_store.dart';
 import 'package:feature_auth/src/domain/repositories/auth_repository.dart';
 import 'package:feature_auth/src/presentation/widgets/community_guidelines_acceptance_dialog.dart';
@@ -11,19 +12,21 @@ Future<bool> ensureCommunityGuidelinesAccepted(
   BuildContext context,
   WidgetRef ref,
 ) async {
-  final String? userId = ref.read(authStateProvider).userId;
+  // Use [readRoot] so awaits can outlive the calling widget (e.g. session
+  // redirect unmounts [HomeShellBootstrap] while this flow is in flight).
+  final String? userId = readRoot(authStateProvider).userId;
   if (userId == null || userId.isEmpty) {
     return false;
   }
 
+  final AuthRepository auth = readRoot(authRepositoryProvider);
   final EulaAcceptanceStore store = EulaAcceptanceStore(
-    ref.read(preferencesProvider),
+    readRoot(preferencesProvider),
   );
   if (await store.hasAcceptedForUser(userId)) {
     return true;
   }
 
-  final AuthRepository auth = ref.read(authRepositoryProvider);
   if (auth.requiresTermsAcceptance == false) {
     await store.syncFromServer(userId: userId, requiresTermsAcceptance: false);
     return true;
@@ -53,7 +56,7 @@ Future<bool> ensureCommunityGuidelinesAccepted(
     return true;
   }
 
-  await ref.read(authRepositoryProvider).signOut();
+  await auth.signOut();
   if (!context.mounted) {
     return false;
   }

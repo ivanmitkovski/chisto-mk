@@ -41,7 +41,7 @@ class DateTimeSection extends StatelessWidget {
       relative = context.l10n.eventsDateRelativeInDays(diff.inDays);
     }
 
-    showModalBottomSheet<void>(
+    AppBottomSheet.show<void>(
       context: context,
       backgroundColor: AppColors.transparent,
       builder: (BuildContext ctx) {

@@ -10,7 +10,8 @@ String integrationApiBaseUrl() {
   const String env = String.fromEnvironment('ENV', defaultValue: '');
   switch (env) {
     case 'staging':
-      return 'https://api-staging.chisto.mk';
+      // TEMP: staging is not deployed yet; integration runs hit the dev backend.
+      return 'http://api-dev.chisto.mk';
     case 'prod':
       return 'https://api.chisto.mk';
     default:

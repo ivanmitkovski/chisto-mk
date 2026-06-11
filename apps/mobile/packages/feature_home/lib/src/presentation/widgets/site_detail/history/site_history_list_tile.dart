@@ -194,14 +194,7 @@ class _SiteHistoryListTileState extends State<SiteHistoryListTile> {
               ),
             ),
           ),
-          if (widget.showDividerBelow)
-            Padding(
-              padding: const EdgeInsets.only(left: AppSpacing.avatarLg),
-              child: Divider(
-                height: 1,
-                color: AppColors.divider.withValues(alpha: 0.9),
-              ),
-            ),
+          if (widget.showDividerBelow) const SettingsGroupDivider(),
         ],
       ),
     );

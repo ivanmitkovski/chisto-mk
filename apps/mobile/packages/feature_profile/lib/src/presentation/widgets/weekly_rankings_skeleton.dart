@@ -2,8 +2,9 @@ import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/core/theme/app_colors.dart';
 import 'package:chisto_infrastructure/core/theme/app_motion.dart';
 import 'package:chisto_infrastructure/core/theme/app_spacing.dart';
-import 'package:chisto_infrastructure/core/theme/app_typography.dart';
+import 'package:design_system/design_system.dart';
 import 'package:feature_profile/src/presentation/widgets/profile_sub_screen_header.dart';
+import 'package:feature_profile/src/presentation/widgets/profile_sub_screen_panel.dart';
 import 'package:flutter/material.dart';
 
 /// Shimmer layout matching [WeeklyRankingsScreen] while rankings load.
@@ -38,7 +39,9 @@ class _WeeklyRankingsSkeletonState extends State<WeeklyRankingsSkeleton>
 
   @override
   Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
+    final double listBottomPadding =
+        ProfileSubScreenPanel.scrollBottomPadding(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -47,41 +50,19 @@ class _WeeklyRankingsSkeletonState extends State<WeeklyRankingsSkeleton>
           child: ProfileSubScreenHeader(
             title: context.l10n.profileWeeklyRankingsTitle,
             subtitle: context.l10n.profileWeeklyRankingsSubtitle,
-            includeBottomSpacing: false,
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              const SizedBox(height: AppSpacing.sm),
-              AnimatedBuilder(
-                animation: _shimmer,
-                builder: (BuildContext context, Widget? child) {
-                  return _ShimmerBox(
-                    width: 200,
-                    height: 15,
-                    radius: 7,
-                    t: _shimmer.value,
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-          child: Text(
-            context.l10n.profileWeeklyRankingsTopSupporters,
-            style: AppTypography.cardSubtitle(textTheme).copyWith(
-              color: AppColors.textMuted,
-              fontWeight: FontWeight.w600,
-              letterSpacing: -0.05,
+            belowSubtitle: AnimatedBuilder(
+              animation: _shimmer,
+              builder: (BuildContext context, Widget? child) {
+                return _ShimmerBox(
+                  width: 200,
+                  height: 15,
+                  radius: 7,
+                  t: _shimmer.value,
+                );
+              },
             ),
           ),
         ),
-        const SizedBox(height: AppSpacing.sm),
         Expanded(
           child: Semantics(
             label: context.l10n.profileWeeklyRankingsLoadingSemantic,
@@ -91,11 +72,11 @@ class _WeeklyRankingsSkeletonState extends State<WeeklyRankingsSkeleton>
                 builder: (BuildContext context, Widget? child) {
                   final double t = _shimmer.value;
                   return ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(
+                    padding: EdgeInsets.fromLTRB(
                       AppSpacing.lg,
                       AppSpacing.sm,
                       AppSpacing.lg,
-                      AppSpacing.xl,
+                      listBottomPadding,
                     ),
                     physics: const BouncingScrollPhysics(),
                     itemCount: 10,
@@ -129,6 +110,7 @@ class _RankingRowSkeleton extends StatelessWidget {
         color: AppColors.panelBackground,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
         border: Border.all(color: AppColors.divider.withValues(alpha: 0.9)),
+        boxShadow: AppShadows.softCard(Theme.of(context).colorScheme),
       ),
       child: Row(
         children: <Widget>[

@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/shared/widgets/organisms/app_smart_image.dart';
 import 'package:chisto_infrastructure/shared/widgets/organisms/photo_gallery/gallery_image_item.dart';
 import 'package:design_system/design_system.dart';
@@ -49,7 +50,9 @@ class GalleryThumbnailRail extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
                 child: Text(
-                  'Photos',
+                  context.l10n.eventsPhotosTitle,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: AppTypography.badgeLabel(
                     textTheme,
                   ).copyWith(color: AppColors.textOnDarkMuted),

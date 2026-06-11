@@ -1,4 +1,5 @@
-import { Body, Controller, Headers, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, Headers, HttpCode, HttpStatus, Post, Req } from '@nestjs/common';
+import type { Request } from 'express';
 import {
   ApiCreatedResponse,
   ApiNoContentResponse,
@@ -22,6 +23,7 @@ import { AuthRegistrationService } from '../services/auth-registration.service';
 import { AuthSessionService } from '../services/auth-session.service';
 import { AuthLoginService } from '../services/auth-login.service';
 import { AuthOtpService } from '../services/auth-otp.service';
+import { clientIp } from '../../sites/http/client-ip';
 
 @ApiTags('auth')
 @ApiStandardHttpErrorResponses()
@@ -57,8 +59,8 @@ export class AuthSessionController {
     type: AuthResponseDto,
   })
   @HttpCode(HttpStatus.OK)
-  citizenLogin(@Body() dto: CitizenLoginDto) {
-    return this.login.citizenLogin(dto);
+  citizenLogin(@Body() dto: CitizenLoginDto, @Req() req: Request) {
+    return this.login.citizenLogin(dto, clientIp(req, req.headers['x-forwarded-for'] as string | undefined));
   }
 
   @Post('admin/login')
@@ -90,7 +92,7 @@ export class AuthSessionController {
   }
 
   @Post('refresh')
-  @Throttle({ default: { ttl: 60_000, limit: 15 } })
+  @Throttle({ default: { ttl: 60_000, limit: 30 } })
   @ApiOperation({ summary: 'Rotate access and refresh tokens using a valid refresh token' })
   @ApiOkResponse({
     description: 'New token pair issued, old refresh token revoked',
@@ -130,7 +132,13 @@ export class AuthSessionController {
     type: AuthResponseDto,
   })
   @HttpCode(HttpStatus.OK)
-  verifyOtp(@Body() dto: VerifyOtpDto) {
-    return this.authOtp.verifyPhoneAndIssueSession(dto.phoneNumber, dto.code, true, dto.deviceId);
+  verifyOtp(@Body() dto: VerifyOtpDto, @Req() req: Request) {
+    return this.authOtp.verifyPhoneAndIssueSession(
+      dto.phoneNumber,
+      dto.code,
+      dto.rememberMe ?? true,
+      dto.deviceId,
+      clientIp(req, req.headers['x-forwarded-for'] as string | undefined),
+    );
   }
 }

@@ -47,6 +47,16 @@ extension QrScannerPendingFlow on _AttendeeQrScannerScreenState {
       }
       return;
     }
+    if (event is CheckInConnectionGaveUp) {
+      _cleanupPendingState();
+      rebuildState(() {
+        _pendingConfirmation = false;
+        _feedback = context.l10n.checkInConnectionTimeout;
+      });
+      unawaited(_resumeCameraAfterLifecycle());
+      _resumeScanLineAnimationIfNeeded();
+      return;
+    }
     if (event is CheckInConfirmedEvent && event.pendingId == _pendingId) {
       _onPendingConfirmed(
         checkedInAt: DateTime.tryParse(event.checkedInAt),

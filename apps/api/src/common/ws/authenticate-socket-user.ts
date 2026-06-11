@@ -29,7 +29,10 @@ export async function authenticateSocketUser(
   const token = (client.handshake.auth?.token as string) || tokenFromHeader;
 
   if (!token) {
-    throw new UnauthorizedException('Missing token');
+    throw new UnauthorizedException({
+      code: 'UNAUTHORIZED',
+      message: 'Missing token',
+    });
   }
 
   const jwtEntries = resolveJwtSecretsFromEnv();
@@ -46,10 +49,17 @@ export async function authenticateSocketUser(
       Buffer.from(token.split('.')[0] ?? '', 'base64url').toString('utf8'),
     ) as { kid?: string };
     const secret = secretForKid(header.kid, jwtEntries) ?? jwtEntries[0]!.secret;
+    const clockToleranceRaw = process.env.JWT_CLOCK_TOLERANCE_SECONDS;
+    const clockToleranceSeconds = clockToleranceRaw ? Number(clockToleranceRaw) : 30;
+    const clockTolerance =
+      Number.isFinite(clockToleranceSeconds) && clockToleranceSeconds >= 0
+        ? clockToleranceSeconds
+        : 30;
     payload = jwt.verify(token, secret, {
       algorithms: ['HS256'],
       issuer: 'chisto-api',
       audience: 'chisto-api',
+      clockTolerance,
     }) as { sub: string; sid?: string };
   } catch {
     throw new UnauthorizedException({
@@ -87,7 +97,10 @@ export async function authenticateSocketUser(
   });
 
   if (!user || user.status !== UserStatus.ACTIVE) {
-    throw new UnauthorizedException('User not active');
+    throw new UnauthorizedException({
+      code: 'ACCOUNT_NOT_ACTIVE',
+      message: 'User not active',
+    });
   }
 
   return {

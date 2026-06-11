@@ -426,7 +426,13 @@ class MapSyncCoordinator extends ChangeNotifier {
       return;
     }
     _pendingSiteIds.add(event.siteId);
-    if (event.latitude != null && event.longitude != null) {
+    // REPORTED sites are reporter-private. Never fast-path them from the
+    // shared realtime stream: the full sync below goes through the
+    // server-side per-viewer visibility filter and adds the viewer's own
+    // sites, so nothing is lost — and a stale/leaky backend can never put
+    // another reporter's pending site on this user's map.
+    final bool reporterPrivate = event.status == 'REPORTED';
+    if (!reporterPrivate && event.latitude != null && event.longitude != null) {
       unawaited(_refreshSingleSite(event.siteId));
     }
     requestSync(immediate: event.type == 'site_created');
@@ -623,7 +629,7 @@ class MapSyncCoordinator extends ChangeNotifier {
         _setSnapshot(
           _snapshot.copyWith(
             clearLoadError: true,
-            inlineNotice: const MapSyncInlineNotice.connectionUnstable(),
+            inlineNotice: const MapSyncInlineNotice.liveUpdatesDelayed(),
           ),
         );
       }
@@ -708,6 +714,12 @@ class MapSyncCoordinator extends ChangeNotifier {
       if (existingIndex >= 0) {
         next[existingIndex] = site;
       } else {
+        if (site.statusCode == 'REPORTED') {
+          // Unknown REPORTED sites never enter via the realtime fast path.
+          // Only the viewport sync — filtered per viewer on the server —
+          // may introduce them (i.e. the viewer's own reports).
+          return;
+        }
         next.insert(0, site);
       }
       _setSnapshot(_snapshot.copyWith(sites: next, clearLoadError: true));
@@ -741,6 +753,11 @@ class MapSyncCoordinator extends ChangeNotifier {
       next.insert(0, site);
     }
     _setSnapshot(_snapshot.copyWith(sites: next, clearLoadError: true));
+  }
+
+  @visibleForTesting
+  void debugSetLastSuccessfulSyncAt(DateTime at) {
+    _setSnapshot(_snapshot.copyWith(lastSuccessfulSyncAt: at));
   }
 
   @override

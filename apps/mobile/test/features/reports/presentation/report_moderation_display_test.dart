@@ -22,49 +22,47 @@ void main() {
         ),
         'Insufficient evidence. Notes: More detail',
       );
-      expect(
-        declineReasonFromApi(ApiReportStatus.approved, 'hidden'),
-        isNull,
-      );
+      expect(declineReasonFromApi(ApiReportStatus.approved, 'hidden'), isNull);
       expect(declineReasonFromApi(ApiReportStatus.deleted, '  '), isNull);
     });
   });
 
-  testWidgets('ReportSheetViewModelMapper sets declineReason on declined list item', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: Builder(
-          builder: (BuildContext context) {
-            final ReportSheetViewModel vm =
-                ReportSheetViewModelMapper.fromListItem(
-                  ReportListItem(
-                    id: 'r1',
-                    reportNumber: 'CH-1',
-                    title: 'Dump site',
-                    location: 'Skopje',
-                    submittedAt: DateTime(2026, 6, 1),
-                    status: ApiReportStatus.deleted,
-                    isPotentialDuplicate: false,
-                    coReporterCount: 0,
-                    moderationReason:
-                        'Insufficient evidence. Notes: The evidence is not enough',
-                  ),
-                  AppLocalizations.of(context)!,
-                );
-            return Text(vm.declineReason ?? '');
-          },
+  testWidgets(
+    'ReportSheetViewModelMapper sets declineReason on declined list item',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
+          home: Builder(
+            builder: (BuildContext context) {
+              final ReportSheetViewModel
+              vm = ReportSheetViewModelMapper.fromListItem(
+                ReportListItem(
+                  id: 'r1',
+                  reportNumber: 'CH-1',
+                  title: 'Dump site',
+                  location: 'Skopje',
+                  submittedAt: DateTime(2026, 6, 1),
+                  status: ApiReportStatus.deleted,
+                  isPotentialDuplicate: false,
+                  coReporterCount: 0,
+                  moderationReason:
+                      'Insufficient evidence. Notes: The evidence is not enough',
+                ),
+                AppLocalizations.of(context)!,
+              );
+              return Text(vm.declineReason ?? '');
+            },
+          ),
         ),
-      ),
-    );
+      );
 
-    expect(
-      find.text('Insufficient evidence. Notes: The evidence is not enough'),
-      findsOneWidget,
-    );
-  });
+      expect(
+        find.text('Insufficient evidence. Notes: The evidence is not enough'),
+        findsOneWidget,
+      );
+    },
+  );
 }

@@ -71,7 +71,10 @@ export class HealthController implements OnModuleDestroy {
       await this.prisma.$queryRaw`SELECT 1`;
     } catch (err) {
       this.logger.warn({ err }, 'readiness: database check failed');
-      throw new ServiceUnavailableException('Database unavailable');
+      throw new ServiceUnavailableException({
+        code: 'HEALTH_DATABASE_UNAVAILABLE',
+        message: 'Database unavailable',
+      });
     }
 
     let redis: string | undefined;
@@ -84,7 +87,10 @@ export class HealthController implements OnModuleDestroy {
         await redisClient.ping();
         redis = 'ok';
       } catch {
-        throw new ServiceUnavailableException('Redis unavailable');
+        throw new ServiceUnavailableException({
+          code: 'HEALTH_REDIS_UNAVAILABLE',
+          message: 'Redis unavailable',
+        });
       }
     } else {
       redis = 'skipped';
@@ -99,7 +105,10 @@ export class HealthController implements OnModuleDestroy {
         await client.send(new HeadBucketCommand({ Bucket: this.s3.bucket }));
         s3 = 'ok';
       } catch {
-        throw new ServiceUnavailableException('S3 unavailable');
+        throw new ServiceUnavailableException({
+          code: 'HEALTH_S3_UNAVAILABLE',
+          message: 'S3 unavailable',
+        });
       }
     }
 

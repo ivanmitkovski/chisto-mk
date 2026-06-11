@@ -5,6 +5,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
   CleanupEventStatus,
   EcoEventLifecycleStatus,
@@ -19,7 +20,8 @@ import {
   REASON_EVENT_JOIN_NO_SHOW,
   REASON_EVENT_JOINED,
 } from '../../gamification/constants/gamification.constants';
-import { EcoEventPointsService } from '../../gamification/services/eco-event-points.service';
+import { EcoEventPointsService, type EcoEventPointsCreditResult } from '../../gamification/services/eco-event-points.service';
+import { emitGamificationPointsCredited } from '../../gamification/util/gamification-credit-events.util';
 import { NotificationDispatcherService } from '../../notifications/services/notification-dispatcher.service';
 import { PatchEventLifecycleDto } from '../dto/patch-event-lifecycle.dto';
 import { lifecycleFromMobile } from '../util/events-mobile.mapper';
@@ -47,6 +49,7 @@ export class EventsLifecycleService {
     private readonly ecoEventPoints: EcoEventPointsService,
     private readonly notificationDispatcher: NotificationDispatcherService,
     private readonly siteLifecycleFromEvents: SiteLifecycleFromEventsService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async patchLifecycle(id: string, dto: PatchEventLifecycleDto, user: AuthenticatedUser) {
@@ -169,16 +172,16 @@ export class EventsLifecycleService {
         }
 
         const userIds = [...checkedInUserIds];
-        const awards: { userId: string; points: number }[] = [];
+        const awards: { userId: string; credit: EcoEventPointsCreditResult }[] = [];
         for (const uid of userIds) {
-          const points = await this.ecoEventPoints.creditIfNew(tx, {
+          const credit = await this.ecoEventPoints.creditIfNew(tx, {
             userId: uid,
             delta: POINTS_EVENT_COMPLETED,
             reasonCode: REASON_EVENT_COMPLETED,
             referenceType: 'CleanupEvent',
             referenceId: `completion:${id}:${uid}`,
           });
-          awards.push({ userId: uid, points });
+          awards.push({ userId: uid, credit });
         }
         return {
           updated: row,
@@ -189,7 +192,7 @@ export class EventsLifecycleService {
     );
 
     const noShowRecipients = noShowClawbacks.map((n) => n.userId);
-    const awardRecipients = completionAwards.filter((a) => a.points > 0).map((a) => a.userId);
+    const awardRecipients = completionAwards.filter((a) => a.credit.granted > 0).map((a) => a.userId);
     const localeByUser = await notificationLocalesByUserId(this.eventsRepository.prisma, [
       ...noShowRecipients,
       ...awardRecipients,
@@ -214,18 +217,19 @@ export class EventsLifecycleService {
         });
     }
 
-    for (const { userId: recipientId, points } of completionAwards) {
-      if (points <= 0) {
+    for (const { userId: recipientId, credit } of completionAwards) {
+      if (credit.granted <= 0) {
         continue;
       }
+      emitGamificationPointsCredited(this.eventEmitter, recipientId, credit);
       const locale = localeByUser.get(recipientId) ?? 'mk';
-      const { title, body } = eventCompletedAwardPush(locale, updated.title, points);
+      const { title, body } = eventCompletedAwardPush(locale, updated.title, credit.granted);
       void this.notificationDispatcher
         .dispatchToUser(recipientId, {
           title,
           body,
           type: NotificationType.CLEANUP_EVENT,
-          data: { eventId: id, pointsAwarded: points, eventTitle: updated.title },
+          data: { eventId: id, pointsAwarded: credit.granted, eventTitle: updated.title },
         })
         .catch((err: unknown) => {
           this.logger.warn(

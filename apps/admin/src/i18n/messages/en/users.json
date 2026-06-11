@@ -1,5 +1,6 @@
 {
   "pageTitle": "Users",
+  "deletedUser": "Deleted user",
   "detailTitle": "User",
   "stats": {
     "totalUsers": "Total users",
@@ -16,6 +17,7 @@
     "allStatuses": "All statuses",
     "active": "Active",
     "suspended": "Suspended",
+    "deleted": "Deleted",
     "searchPlaceholder": "Search users…",
     "searchAria": "Search users",
     "filterByRole": "Filter by role",

@@ -538,6 +538,12 @@ abstract class AppLocalizations {
   /// **'Add at least one photo to continue.'**
   String get reportFlowEvidenceNeedsPhoto;
 
+  /// No description provided for @reportFlowEvidenceTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Frame the whole site in daylight when you can.'**
+  String get reportFlowEvidenceTip;
+
   /// No description provided for @reportFlowLocationOutsideMacedoniaHelper.
   ///
   /// In en, this message translates to:
@@ -1114,6 +1120,66 @@ abstract class AppLocalizations {
   /// **'Passwords do not match'**
   String get authValidationConfirmPasswordMismatch;
 
+  /// No description provided for @authValidationPasswordWeak.
+  ///
+  /// In en, this message translates to:
+  /// **'Password is too weak. Use a mix of letters and numbers and avoid common patterns.'**
+  String get authValidationPasswordWeak;
+
+  /// No description provided for @authValidationPasswordTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at most 72 characters'**
+  String get authValidationPasswordTooLong;
+
+  /// No description provided for @authValidationTermsRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'You must accept the terms and conditions'**
+  String get authValidationTermsRequired;
+
+  /// No description provided for @authValidationOtpRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification code is required'**
+  String get authValidationOtpRequired;
+
+  /// No description provided for @authValidationOtpDigits.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the 6-digit code'**
+  String get authValidationOtpDigits;
+
+  /// No description provided for @authValidationNameTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Each name must be at least 2 characters'**
+  String get authValidationNameTooShort;
+
+  /// No description provided for @authValidationNameTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'Each name must be at most 60 characters'**
+  String get authValidationNameTooLong;
+
+  /// No description provided for @authValidationGenericInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Please check this field'**
+  String get authValidationGenericInvalid;
+
+  /// No description provided for @formValidationErrorsAnnounce.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 field has an error} other{{count} fields have errors}}'**
+  String formValidationErrorsAnnounce(int count);
+
+  /// No description provided for @authErrorRegistrationConflict.
+  ///
+  /// In en, this message translates to:
+  /// **'An account with this email or phone number already exists'**
+  String get authErrorRegistrationConflict;
+
   /// No description provided for @authErrorInvalidCredentials.
   ///
   /// In en, this message translates to:
@@ -1378,6 +1444,12 @@ abstract class AppLocalizations {
   /// **'Chisto.mk'**
   String get authOnboardingBrandName;
 
+  /// No description provided for @brandLogoSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Chisto logo'**
+  String get brandLogoSemantic;
+
   /// No description provided for @authOnboardingWelcomeDescription.
   ///
   /// In en, this message translates to:
@@ -1630,11 +1702,35 @@ abstract class AppLocalizations {
   /// **'Currently we only support locations in Macedonia.'**
   String get authLocationMacedoniaOnly;
 
-  /// No description provided for @authLocationResolveFailed.
+  /// No description provided for @authLocationTryAgain.
   ///
   /// In en, this message translates to:
-  /// **'Could not resolve your location. Please try again.'**
-  String get authLocationResolveFailed;
+  /// **'Try again'**
+  String get authLocationTryAgain;
+
+  /// No description provided for @authLocationGateOutsideTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Chisto.mk is available in Macedonia'**
+  String get authLocationGateOutsideTitle;
+
+  /// No description provided for @authLocationGateOutsideBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your device location is outside Macedonia. You need to be in Macedonia to create an account.'**
+  String get authLocationGateOutsideBody;
+
+  /// No description provided for @authLocationGateUnavailableBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t confirm your location. Turn on location services, allow access, and try again.'**
+  String get authLocationGateUnavailableBody;
+
+  /// No description provided for @authLocationActionOnlyInMacedoniaSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'This action is only available in Macedonia.'**
+  String get authLocationActionOnlyInMacedoniaSnack;
 
   /// No description provided for @authOtpCodeSemantic.
   ///
@@ -2264,6 +2360,30 @@ abstract class AppLocalizations {
   /// **'Optional details for moderators'**
   String get safetyReportDetailsHint;
 
+  /// No description provided for @safetyReportDetailsHintRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Describe the issue for moderators'**
+  String get safetyReportDetailsHintRequired;
+
+  /// No description provided for @safetyReportDetailsRequiredWhenOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Please add a short description when choosing Other.'**
+  String get safetyReportDetailsRequiredWhenOther;
+
+  /// No description provided for @safetyReportDetailsCharCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{used} / {max}'**
+  String safetyReportDetailsCharCount(int used, int max);
+
+  /// No description provided for @safetyReportDetailsTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'Details must be at most {max} characters.'**
+  String safetyReportDetailsTooLong(int max);
+
   /// No description provided for @safetyReportSubmitted.
   ///
   /// In en, this message translates to:
@@ -2329,6 +2449,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete account'**
   String get profileDeleteAccountTile;
+
+  /// No description provided for @profileAppVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version}'**
+  String profileAppVersion(String version);
 
   /// No description provided for @profileEmailLabel.
   ///
@@ -2483,7 +2609,7 @@ abstract class AppLocalizations {
   /// No description provided for @commonRetry.
   ///
   /// In en, this message translates to:
-  /// **'Retry'**
+  /// **'Try again'**
   String get commonRetry;
 
   /// No description provided for @commonTryAgain.
@@ -2675,7 +2801,7 @@ abstract class AppLocalizations {
   /// No description provided for @profileGeneralLimitsNotice.
   ///
   /// In en, this message translates to:
-  /// **'Name changes are limited. Phone number changes require verification.'**
+  /// **'For email and phone number changes, contact support.'**
   String get profileGeneralLimitsNotice;
 
   /// No description provided for @profileGeneralUpdateButton.
@@ -3467,7 +3593,7 @@ abstract class AppLocalizations {
   /// No description provided for @commentsBodyTooLong.
   ///
   /// In en, this message translates to:
-  /// **'Comment is too long (max 2000 characters).'**
+  /// **'Comment is too long (max 500 characters).'**
   String get commentsBodyTooLong;
 
   /// No description provided for @commentsReplyTargetFallback.
@@ -5454,6 +5580,12 @@ abstract class AppLocalizations {
   /// **'Nothing to save.'**
   String get editEventNoChangesToSave;
 
+  /// No description provided for @editEventSaving.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving changes…'**
+  String get editEventSaving;
+
   /// No description provided for @editEventPendingModerationBanner.
   ///
   /// In en, this message translates to:
@@ -6317,18 +6449,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Done ({count} selected)'**
   String createEventGearDoneSelectedCount(int count);
-
-  /// No description provided for @createEventGearMultiselectTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Multi-select'**
-  String get createEventGearMultiselectTitle;
-
-  /// No description provided for @createEventGearMultiselectMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'Tap each item volunteers should bring. You can select as many as needed.'**
-  String get createEventGearMultiselectMessage;
 
   /// No description provided for @createEventTeamSizeTitle.
   ///
@@ -8130,6 +8250,24 @@ abstract class AppLocalizations {
   /// **'Retry'**
   String get siteUpvotersRetry;
 
+  /// No description provided for @siteCoReportersLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load co-reporters.'**
+  String get siteCoReportersLoadFailed;
+
+  /// No description provided for @siteCoReportersRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get siteCoReportersRetry;
+
+  /// No description provided for @siteCoReportersOriginalReporterLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Original reporter'**
+  String get siteCoReportersOriginalReporterLabel;
+
   /// No description provided for @siteDetailNoVolunteersSnack.
   ///
   /// In en, this message translates to:
@@ -8357,6 +8495,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'By {name}'**
   String siteHistoryByActor(String name);
+
+  /// No description provided for @deletedUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted user'**
+  String get deletedUser;
 
   /// No description provided for @siteHistoryByAdmin.
   ///
@@ -10684,6 +10828,102 @@ abstract class AppLocalizations {
   /// **'{count} active'**
   String eventsFilterSheetActiveCount(int count);
 
+  /// No description provided for @eventsFilterSheetSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select one or more options. Leave empty to include all.'**
+  String get eventsFilterSheetSubtitle;
+
+  /// No description provided for @eventsFilterResetSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset filters'**
+  String get eventsFilterResetSemantic;
+
+  /// No description provided for @eventsFilterSectionSelectAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get eventsFilterSectionSelectAll;
+
+  /// No description provided for @eventsFilterSectionClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get eventsFilterSectionClear;
+
+  /// No description provided for @eventsFilterShowEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'Show {count} events'**
+  String eventsFilterShowEvents(int count);
+
+  /// No description provided for @eventsFilterShowEventsPlus.
+  ///
+  /// In en, this message translates to:
+  /// **'Show {count}+ events'**
+  String eventsFilterShowEventsPlus(int count);
+
+  /// No description provided for @eventsFilterPreviewLiveRegion.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing {count} events'**
+  String eventsFilterPreviewLiveRegion(int count);
+
+  /// No description provided for @eventsFilterChipStatusOverrideHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The Upcoming or Past pill overrides status filters until you switch back to All.'**
+  String get eventsFilterChipStatusOverrideHint;
+
+  /// No description provided for @eventsFilterDatePresetThisWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'This week'**
+  String get eventsFilterDatePresetThisWeek;
+
+  /// No description provided for @eventsFilterDatePresetThisMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'This month'**
+  String get eventsFilterDatePresetThisMonth;
+
+  /// No description provided for @eventsFilterDatePresetNext30Days.
+  ///
+  /// In en, this message translates to:
+  /// **'Next 30 days'**
+  String get eventsFilterDatePresetNext30Days;
+
+  /// No description provided for @eventsFilterDatePresetClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear dates'**
+  String get eventsFilterDatePresetClear;
+
+  /// No description provided for @eventsFilterCategoryHintOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected'**
+  String get eventsFilterCategoryHintOn;
+
+  /// No description provided for @eventsFilterCategoryHintOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Not selected'**
+  String get eventsFilterCategoryHintOff;
+
+  /// No description provided for @eventsFilterStatusHintOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected'**
+  String get eventsFilterStatusHintOn;
+
+  /// No description provided for @eventsFilterStatusHintOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Not selected'**
+  String get eventsFilterStatusHintOff;
+
   /// No description provided for @eventsOrganizerDashboardTitle.
   ///
   /// In en, this message translates to:
@@ -11129,7 +11369,7 @@ abstract class AppLocalizations {
   /// No description provided for @eventsGearWaterBoots.
   ///
   /// In en, this message translates to:
-  /// **'Water boots'**
+  /// **'Rubber boots'**
   String get eventsGearWaterBoots;
 
   /// No description provided for @eventsGearSafetyVest.
@@ -11345,8 +11585,26 @@ abstract class AppLocalizations {
   /// No description provided for @errorUserNetwork.
   ///
   /// In en, this message translates to:
-  /// **'Check your connection and try again.'**
+  /// **'Please check your internet connection and try again.'**
   String get errorUserNetwork;
+
+  /// No description provided for @offlineConnectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No internet connection'**
+  String get offlineConnectionTitle;
+
+  /// No description provided for @offlineConnectionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Please check your internet connection and try again.'**
+  String get offlineConnectionBody;
+
+  /// No description provided for @reportDetailStaleBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not refresh. Showing the last loaded details.'**
+  String get reportDetailStaleBanner;
 
   /// No description provided for @errorUserTimeout.
   ///
@@ -11395,6 +11653,162 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Something went wrong. Please try again.'**
   String get errorUserUnknown;
+
+  /// No description provided for @errorUserValidation.
+  ///
+  /// In en, this message translates to:
+  /// **'Please check the highlighted fields.'**
+  String get errorUserValidation;
+
+  /// No description provided for @errorUserValidationGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Some details are invalid. Please review and try again.'**
+  String get errorUserValidationGeneric;
+
+  /// No description provided for @errorUserConflict.
+  ///
+  /// In en, this message translates to:
+  /// **'This action conflicts with something that already exists.'**
+  String get errorUserConflict;
+
+  /// No description provided for @errorUserCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled.'**
+  String get errorUserCancelled;
+
+  /// No description provided for @errorUserPayloadTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'That file or request is too large.'**
+  String get errorUserPayloadTooLarge;
+
+  /// No description provided for @errorUserRetryAfterSeconds.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again in {seconds}s.'**
+  String errorUserRetryAfterSeconds(int seconds);
+
+  /// No description provided for @errorAlreadyJoined.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re already part of this event.'**
+  String get errorAlreadyJoined;
+
+  /// No description provided for @errorOrganizerCannotJoin.
+  ///
+  /// In en, this message translates to:
+  /// **'Organizers can\'t join their own event as participants.'**
+  String get errorOrganizerCannotJoin;
+
+  /// No description provided for @errorNotAParticipant.
+  ///
+  /// In en, this message translates to:
+  /// **'You need to join this event first.'**
+  String get errorNotAParticipant;
+
+  /// No description provided for @errorOtpSendCooldown.
+  ///
+  /// In en, this message translates to:
+  /// **'Wait a moment before requesting another code.'**
+  String get errorOtpSendCooldown;
+
+  /// No description provided for @errorOtpSendFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t send the verification code. Try again.'**
+  String get errorOtpSendFailed;
+
+  /// No description provided for @errorTermsVersionMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Please accept the latest terms and conditions.'**
+  String get errorTermsVersionMismatch;
+
+  /// No description provided for @errorDeviceTokenInUse.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications are already set up on another device.'**
+  String get errorDeviceTokenInUse;
+
+  /// No description provided for @errorEventsOrganizerNotCertified.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete organizer certification to continue.'**
+  String get errorEventsOrganizerNotCertified;
+
+  /// No description provided for @errorEventChatNotParticipant.
+  ///
+  /// In en, this message translates to:
+  /// **'You need to join this event to use chat.'**
+  String get errorEventChatNotParticipant;
+
+  /// No description provided for @errorEventChatMessageUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'That message is no longer available.'**
+  String get errorEventChatMessageUnavailable;
+
+  /// No description provided for @errorChatUploadTooMany.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many attachments. Send fewer files at a time.'**
+  String get errorChatUploadTooMany;
+
+  /// No description provided for @errorChatUploadInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'That file type or size isn\'t allowed.'**
+  String get errorChatUploadInvalid;
+
+  /// No description provided for @errorAvatarFileRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a photo to upload.'**
+  String get errorAvatarFileRequired;
+
+  /// No description provided for @errorInvalidFileType.
+  ///
+  /// In en, this message translates to:
+  /// **'That file type isn\'t supported.'**
+  String get errorInvalidFileType;
+
+  /// No description provided for @connectionOfflineBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re offline. Some features may not work until you\'re back online.'**
+  String get connectionOfflineBanner;
+
+  /// No description provided for @connectionReconnectingBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Reconnecting…'**
+  String get connectionReconnectingBanner;
+
+  /// No description provided for @connectionLiveUpdatesDelayed.
+  ///
+  /// In en, this message translates to:
+  /// **'Live updates are delayed. Pull to refresh for the latest.'**
+  String get connectionLiveUpdatesDelayed;
+
+  /// No description provided for @notificationsInboxStaleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Updates may be delayed. Pull down to refresh.'**
+  String get notificationsInboxStaleHint;
+
+  /// No description provided for @pushRegistrationFailedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t enable push notifications. Try again in Settings.'**
+  String get pushRegistrationFailedSnack;
+
+  /// No description provided for @checkInConnectionTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in timed out. Try scanning again or enter the code manually.'**
+  String get checkInConnectionTimeout;
 
   /// No description provided for @eventsFilterSheetSemantic.
   ///

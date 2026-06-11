@@ -1,5 +1,7 @@
 import { DEFAULT_EMAIL_APP_BASE_URL, EMAIL_BRAND } from '../constants/email.constants';
 import { buildDetailCardHtml, EMAIL_LAYOUT, type EmailAccent } from './email-layout';
+import { formatDurationMinutes } from '../../common/i18n/duration-copy';
+import { OTP_EXPIRES_SECONDS } from '../../auth/constants/auth.constants';
 import type { EmailLocale, EmailTemplateId } from '../types/email.types';
 import { formatDateRange, formatDateTime } from './email-datetime';
 import {
@@ -187,7 +189,7 @@ export function getCopy(
             {
               subject: 'Добредојдовте на Chisto.mk',
               headline: `Добредојдовте${firstName ? `, ${firstName}` : ''}`,
-              lead: 'Вашата сметка е подготвена. Пријавувајте загадувања и следете ги локалитетите и учествувајте во акции за чистење.',
+              lead: 'Вашата сметка е подготвена. Пријавувајте загадувања, следете ги локалитетите и учествувајте во акции за чистење.',
               extraLines: [
                 'Оваа порака е испратена бидејќи ја креиравте сметката во апликацијата Chisto.mk.',
               ],
@@ -205,12 +207,15 @@ export function getCopy(
         code.length > 0
           ? [{ label: en ? 'Code' : 'Код', value: code }]
           : undefined;
+      const otpExpiryMinutes = Math.max(1, Math.ceil(OTP_EXPIRES_SECONDS / 60));
+      const otpExpiryEn = formatDurationMinutes('en', otpExpiryMinutes);
+      const otpExpiryMk = formatDurationMinutes('mk', otpExpiryMinutes);
       return withCta(
         en
           ? {
               subject: 'Reset your Chisto.mk password',
               headline: 'Password reset requested',
-              lead: 'Use the code below to choose a new password in the app. It expires in 10 minutes.',
+              lead: `Use the code below to choose a new password in the app. It expires in ${otpExpiryEn}.`,
               ...(codeRow ? { detailRows: codeRow } : {}),
               extraLines: [
                 'If you did not request a reset, you can ignore this email. Your password will stay the same.',
@@ -219,7 +224,7 @@ export function getCopy(
           : {
               subject: 'Ресетирајте ја лозинката на Chisto.mk',
               headline: 'Барано ресетирање на лозинка',
-              lead: 'Користете го кодот подолу за нова лозинка во апликацијата. Истекува за 10 минути.',
+              lead: `Користете го кодот подолу за нова лозинка во апликацијата. Истекува за ${otpExpiryMk}.`,
               ...(codeRow ? { detailRows: codeRow } : {}),
               extraLines: [
                 'Ако не сте побарале ресетирање, игнорирајте ја пораката. Лозинката останува иста.',
@@ -254,7 +259,7 @@ export function getCopy(
               lead: 'Лозинката за вашата сметка на Chisto.mk штотуку е променета.',
               extraLines: [
                 'Ако ова сте вие, не е потребна никаква акција.',
-                'Ако не сте вие, ресетирајте ја лозинката од апликацијата и веднаш контактирајте поддршка.',
+                'Ако не сте вие, ресетирајте ја лозинката од апликацијата и веднаш контактирајте ја поддршката.',
               ],
             },
             url,
@@ -351,7 +356,7 @@ export function getCopy(
                 ? `Пријавата ${reportNumber} не е задржана во јавниот приказ.`
                 : 'Вашата пријава не е задржана во јавниот приказ.',
               detailRows: reportDetailRow(en, reportNumber),
-              ...(reasonNote ? { footerNote: `Забелешка: ${reasonNote}` } : {}),
+              ...(reasonNote ? { footerNote: `Забелешка од модератор: ${reasonNote}` } : {}),
               accent: 'danger',
             },
             url,

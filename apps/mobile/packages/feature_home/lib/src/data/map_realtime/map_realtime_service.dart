@@ -1,18 +1,46 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:chisto_infrastructure/core/auth/auth_state.dart';
 import 'package:chisto_infrastructure/core/config/app_config.dart';
 import 'package:chisto_infrastructure/core/logging/app_log.dart';
 import 'package:chisto_infrastructure/core/network/connectivity_gate.dart';
+import 'package:chisto_networking/chisto_networking.dart';
 import 'package:clock/clock.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:feature_auth/feature_auth.dart';
 import 'package:feature_home/src/data/map_realtime/map_site_event.dart';
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:http/http.dart' as http;
+import 'package:http/io_client.dart';
 
 enum MapRealtimeConnectionState { disconnected, connecting, live, reconnecting }
+
+/// When true, a healthy live SSE stream can keep running after access-token rotation.
+@visibleForTesting
+bool mapSseDeferReconnectForTokenRotation({
+  required MapRealtimeConnectionState state,
+  required DateTime? lastByteAt,
+  required String? newAccessToken,
+  required String? tokenAtConnect,
+  DateTime? now,
+  Duration recentByteWindow = const Duration(seconds: 90),
+}) {
+  if (newAccessToken == null ||
+      newAccessToken.isEmpty ||
+      tokenAtConnect == null ||
+      tokenAtConnect.isEmpty ||
+      newAccessToken == tokenAtConnect) {
+    return false;
+  }
+  if (state != MapRealtimeConnectionState.live || lastByteAt == null) {
+    return false;
+  }
+  final DateTime resolvedNow = now ?? clock.now();
+  return resolvedNow.difference(lastByteAt) <= recentByteWindow;
+}
 
 /// SSE client for map site events: backoff caps at 30s (aligned with API Redis policy).
 ///
@@ -20,7 +48,9 @@ enum MapRealtimeConnectionState { disconnected, connecting, live, reconnecting }
 /// - 401 triggers [sessionRefresh] before signing out (same idea as reports Socket.IO).
 /// - Heartbeat watchdog: if no bytes for [_watchdogMaxSilence], force-close and retry.
 /// - [requestReconnect] for lifecycle / connectivity (closes active stream).
-/// - Token rotation while connected aborts the stream so the next attempt uses the new JWT.
+/// - Token rotation defers reconnect while the live stream recently received bytes.
+/// - SSE uses [Accept-Encoding: identity] and an [IOClient] with [HttpClient.autoUncompress]
+///   disabled so gzip middleware cannot buffer heartbeats on long-lived streams.
 class MapRealtimeService {
   MapRealtimeService({
     required AppConfig config,
@@ -28,7 +58,7 @@ class MapRealtimeService {
     this.sessionRefresh,
     this.onAuthRejected,
     http.Client? httpClient,
-  }) : _baseUrl = config.apiBaseUrl.replaceFirst(RegExp(r'/$'), ''),
+  }) : _baseUrl = normalizeApiV1BaseUrl(config.apiBaseUrl),
        _authState = authState,
        _ownsHttpClient = httpClient == null,
        _injectedHttp = httpClient {
@@ -141,6 +171,14 @@ class MapRealtimeService {
         _tokenAtConnect != null &&
         _tokenAtConnect!.isNotEmpty &&
         _tokenAtConnect != token) {
+      if (mapSseDeferReconnectForTokenRotation(
+        state: _state,
+        lastByteAt: _lastByteAt,
+        newAccessToken: token,
+        tokenAtConnect: _tokenAtConnect,
+      )) {
+        return;
+      }
       requestReconnect();
       return;
     }
@@ -216,7 +254,7 @@ class MapRealtimeService {
   Future<void> _connectOnce(String token) async {
     _abortRequested = false;
     final http.Client attemptClient = _ownsHttpClient
-        ? http.Client()
+        ? IOClient(HttpClient()..autoUncompress = false)
         : _injectedHttp!;
     _activeSseAttemptClient = attemptClient;
 
@@ -225,6 +263,7 @@ class MapRealtimeService {
       final http.Request req = http.Request('GET', uri);
       req.headers['Accept'] = 'text/event-stream';
       req.headers['Cache-Control'] = 'no-cache';
+      req.headers[HttpHeaders.acceptEncodingHeader] = 'identity';
       req.headers['Authorization'] = 'Bearer $token';
       if (_lastEventId != null && _lastEventId!.isNotEmpty) {
         req.headers['Last-Event-ID'] = _lastEventId!;
@@ -251,6 +290,20 @@ class MapRealtimeService {
         if (outcome == RefreshOutcome.serverRejected) {
           onAuthRejected?.call();
         }
+        return;
+      }
+      if (res.statusCode == 429) {
+        try {
+          await res.stream.drain<void>();
+        } on Object catch (e, st) {
+          AppLog.warn(
+            '[map:sse] drain after 429 failed',
+            error: e,
+            stackTrace: st,
+            category: 'map',
+          );
+        }
+        _attempt = math.max(_attempt, 7);
         return;
       }
       if (res.statusCode < 200 || res.statusCode >= 300) {

@@ -2,8 +2,10 @@ part of 'package:feature_events/src/presentation/screens/event_chat_screen.dart'
 
 class _EventChatScreenState extends ConsumerState<EventChatScreen>
     with WidgetsBindingObserver, StateRebuildMixin {
-  EventChatRepository get _repo =>
-      widget.repository ?? ref.read(eventChatRepositoryProvider);
+  /// Resolved in [initState] so [dispose] never reads [ref] after unmount.
+  late final EventChatRepository _chatRepository;
+
+  EventChatRepository get _repo => _chatRepository;
 
   AuthState get _auth => ref.read(authStateProvider);
 
@@ -18,7 +20,7 @@ class _EventChatScreenState extends ConsumerState<EventChatScreen>
   StreamSubscription<List<ConnectivityResult>>? _netSub;
 
   bool _loading = true;
-  bool _loadError = false;
+  AppError? _loadFailure;
   String? _nextOlderCursor;
   bool _hasMoreOlder = false;
   bool _loadingOlder = false;
@@ -57,8 +59,7 @@ class _EventChatScreenState extends ConsumerState<EventChatScreen>
   bool _bannerVisible = false;
   bool _showConnectedFlash = false;
   Timer? _flashTimer;
-  Timer? _reconnectDebounce;
-  Timer? _bannerWatchdog;
+  VoidCallback? _disruptionListener;
 
   bool _sseHadConnected = false;
 
@@ -84,6 +85,8 @@ class _EventChatScreenState extends ConsumerState<EventChatScreen>
   @override
   void initState() {
     super.initState();
+    _chatRepository =
+        widget.repository ?? ref.read(eventChatRepositoryProvider);
     EventChatForegroundScope.instance.setActiveEventId(widget.eventId);
     _resolvedEventTitle = widget.eventTitle.trim();
     if (_resolvedEventTitle.isEmpty && widget.eventId.trim().isNotEmpty) {
@@ -150,8 +153,6 @@ class _EventChatScreenState extends ConsumerState<EventChatScreen>
     );
     _highlightTimer?.cancel();
     _flashTimer?.cancel();
-    _reconnectDebounce?.cancel();
-    _bannerWatchdog?.cancel();
     _searchDebounce?.cancel();
     _typingDebounce?.cancel();
     _typingIdle?.cancel();
@@ -165,6 +166,13 @@ class _EventChatScreenState extends ConsumerState<EventChatScreen>
     _sse?.cancel();
     _connSub?.cancel();
     _netSub?.cancel();
+    final VoidCallback? disruptionListener = _disruptionListener;
+    if (disruptionListener != null) {
+      _repo
+          .realtimeDisruptionVisible(widget.eventId)
+          .removeListener(disruptionListener);
+      _disruptionListener = null;
+    }
     _searchController.dispose();
     _scroll.removeListener(_onScroll);
     _scroll.dispose();
@@ -203,13 +211,29 @@ class _EventChatScreenState extends ConsumerState<EventChatScreen>
     }
   }
 
+  Widget _buildLoadFailureBody(BuildContext context) {
+    final AppError failure = _loadFailure!;
+    if (isEventNoLongerAvailable(failure)) {
+      return const EventDetailNotFoundView();
+    }
+    if (isEventChatAccessDenied(failure)) {
+      return AppErrorView(error: failure);
+    }
+    return AppErrorView(
+      error: failure,
+      onRetry: _loadInitial,
+      retryFootnote: context.l10n.eventChatLoadError,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     _rebuildGrouping();
     final bool reconnecting =
         _networkOnline &&
-        _bannerVisible &&
-        _conn == EventChatConnectionStatus.reconnecting;
+        _sseHadConnected &&
+        _conn == EventChatConnectionStatus.reconnecting &&
+        _repo.realtimeDisruptionVisible(widget.eventId).value;
     final bool disconnected =
         _networkOnline &&
         _bannerVisible &&
@@ -270,12 +294,8 @@ class _EventChatScreenState extends ConsumerState<EventChatScreen>
                       _buildSearchPanel(context)
                     else if (_loading)
                       const ChatMessageSkeletonList()
-                    else if (_loadError)
-                      AppErrorView(
-                        error: AppError.network(),
-                        onRetry: _loadInitial,
-                        retryFootnote: context.l10n.eventChatLoadError,
-                      )
+                    else if (_loadFailure != null)
+                      _buildLoadFailureBody(context)
                     else if (_messages.isEmpty)
                       ChatEmptyState(onSayHello: _composerFocus.requestFocus)
                     else
@@ -537,7 +557,7 @@ class _EventChatScreenState extends ConsumerState<EventChatScreen>
                       ),
                     if (_showNewPill &&
                         !_loading &&
-                        !_loadError &&
+                        _loadFailure == null &&
                         !_searchOpen)
                       Positioned(
                         bottom: AppSpacing.md,
@@ -553,7 +573,7 @@ class _EventChatScreenState extends ConsumerState<EventChatScreen>
                 ),
               ),
             ),
-            if (!_searchOpen)
+            if (!_searchOpen && _loadFailure == null)
               ChatInputBar(
                 composerFocusNode: _composerFocus,
                 replyTo: _replyTo,

@@ -135,6 +135,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
               context,
             ).textTheme.bodyLarge?.copyWith(color: AppColors.textPrimary),
             decoration: InputDecoration(
+              errorMaxLines: 3,
               hintText: widget.hintText,
               hintStyle: Theme.of(
                 context,
@@ -159,11 +160,11 @@ class _AuthTextFieldState extends State<AuthTextField> {
               ),
               errorBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radius14),
-                borderSide: const BorderSide(color: AppColors.accentDanger),
+                borderSide: const BorderSide(color: AppColors.error),
               ),
               focusedErrorBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radius14),
-                borderSide: const BorderSide(color: AppColors.accentDanger),
+                borderSide: const BorderSide(color: AppColors.error),
               ),
               prefixIcon: widget.prefixFixedText != null
                   ? Padding(

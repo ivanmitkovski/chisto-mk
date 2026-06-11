@@ -2,8 +2,7 @@
  * Stable API error `code` strings for event check-in (HTTP 4xx/5xx bodies) and check-in WebSocket `error` payloads.
  * New endpoints should reuse these; add new codes here when introducing them.
  *
- * **Drift control** — literals `code: '…'` under `src/events`, `src/event-chat`, `src/cleanup-events`, and
- * `src/gamification` must appear in the merged
+ * **Drift control** — literals `code: '…'` under `src/` (excluding generated Prisma client) must appear in the merged
  * registry exported from this file; see `test/common/api-error-codes.drift.spec.ts`.
  */
 export const CHECK_IN_ERROR_CODES = [
@@ -26,6 +25,7 @@ export const CHECK_IN_ERROR_CODES = [
   'CHECK_IN_REQUEST_EXPIRED',
   'CHECK_IN_REQUEST_NOT_FOUND',
   'ORGANIZER_CANNOT_CHECK_IN',
+  'CHECK_IN_LOCATION_OUTSIDE_MACEDONIA',
   'EVENT_NOT_FOUND',
   'EVENT_NOT_JOINABLE',
   'EVENT_JOIN_NOT_YET_OPEN',
@@ -101,11 +101,27 @@ export const GLOBAL_HTTP_ERROR_CODES = [
   'NOT_FOUND',
   'CONFLICT',
   'HTTP_ERROR',
+  'PAYLOAD_TOO_LARGE',
+  'DUPLICATE_SUBMIT_INFLIGHT',
   'DATABASE_TIMEOUT',
   'DATABASE_UNAVAILABLE',
   'DATABASE_DISCONNECTED',
+  'DATABASE_RECORD_NOT_FOUND',
+  'REFERENCE_CONSTRAINT',
+  'SERVICE_UNAVAILABLE',
   'VALIDATION_ERROR',
   'METRICS_UNAUTHORIZED',
+  'DISCOVERY_ANALYTICS_UNAUTHORIZED',
+  'IDEMPOTENCY_STORE_UNAVAILABLE',
+  'IDEMPOTENCY_IN_FLIGHT',
+  'INVALID_IDEMPOTENCY_KEY',
+  'JWT_SECRET_MISSING',
+  'SESSION_REQUIRED',
+  'SESSION_CONTEXT_REQUIRED',
+  'SESSION_NOT_FOUND',
+  'INVALID_AUTH_HEADER',
+  'INVALID_TOKEN',
+  'RATE_LIMITED',
   /** Path params that must be Prisma `cuid()` ids (25 chars, `c` prefix). */
   'INVALID_CUID',
 ] as const;
@@ -116,7 +132,10 @@ export type GlobalHttpErrorCode = (typeof GLOBAL_HTTP_ERROR_CODES)[number];
 export const AUTH_API_ERROR_CODES = [
   'ORGANIZER_QUIZ_BANK_INVARIANT',
   'EMAIL_ALREADY_REGISTERED',
+  'EMAIL_IN_USE',
   'PHONE_ALREADY_REGISTERED',
+  'PHONE_IN_USE',
+  'PHONE_NUMBER_IN_USE',
   'INVALID_CREDENTIALS',
   'TOO_MANY_ATTEMPTS',
   'ACCOUNT_SUSPENDED',
@@ -127,12 +146,31 @@ export const AUTH_API_ERROR_CODES = [
   'OTP_EXPIRED',
   'OTP_MAX_ATTEMPTS',
   'OTP_INVALID',
+  'OTP_SEND_COOLDOWN',
+  'OTP_SEND_RATE_LIMIT',
+  'OTP_SEND_FAILED',
   'INVALID_REFRESH_TOKEN',
   'SESSION_REVOKED',
   'USER_NOT_FOUND',
   'CURRENT_PASSWORD_INVALID',
   'INVALID_TOKEN_USER',
   'PASSWORD_RESET_TOKEN_INVALID',
+  'REGISTRATION_CONFLICT',
+  'INVALID_TEMP_TOKEN',
+  'INVALID_TOTP_CODE',
+  'INVALID_PASSWORD',
+  'INVALID_CODE',
+  'MFA_ALREADY_ENABLED',
+  'MFA_NOT_ENABLED',
+  'MFA_SETUP_EXPIRED',
+  'MFA_SETUP_REQUIRED',
+  'TERMS_VERSION_MISMATCH',
+  'TERMS_ACCEPTANCE_INVALID',
+  'AVATAR_FILE_REQUIRED',
+  'AVATAR_FILE_TOO_LARGE',
+  'INVALID_AVATAR_DIMENSIONS',
+  'INVALID_AVATAR_IMAGE',
+  'INVALID_AVATAR_TYPE',
   'UNAUTHORIZED',
 ] as const;
 
@@ -192,8 +230,14 @@ export const ADMIN_CLEANUP_EVENT_ERROR_CODES = [
   'BULK_MODERATION_ITEM_FAILED',
   'CLEANUP_PATCH_NO_CHANGES',
   'CLEANUP_EVENT_NOT_FOUND',
+  'CLEANUP_EVENT_NOTE_NOT_FOUND',
   'DECLINE_REASON_REQUIRED',
   'EVENT_NOT_PENDING',
+  'EVENT_NOT_MODERATED',
+  'EVENT_PARTICIPANT_NOT_FOUND',
+  'NOTE_BODY_REQUIRED',
+  'CHECK_IN_RISK_SIGNAL_NOT_FOUND',
+  'CHECK_IN_RISK_SIGNAL_ALREADY_RESOLVED',
 ] as const;
 
 export type AdminCleanupEventErrorCode = (typeof ADMIN_CLEANUP_EVENT_ERROR_CODES)[number];
@@ -203,7 +247,7 @@ export const GAMIFICATION_API_ERROR_CODES = ['INVALID_POINT_HISTORY_CURSOR'] as 
 
 export type GamificationApiErrorCode = (typeof GAMIFICATION_API_ERROR_CODES)[number];
 
-export const NOTIFICATION_ERROR_CODES = ['DEVICE_TOKEN_IN_USE'] as const;
+export const NOTIFICATION_ERROR_CODES = ['DEVICE_TOKEN_IN_USE', 'NOTIFICATION_NOT_FOUND'] as const;
 
 export type NotificationErrorCode = (typeof NOTIFICATION_ERROR_CODES)[number];
 
@@ -247,9 +291,109 @@ export const SITES_API_ERROR_CODES = [
   'MAP_OFFLINE_REGION_NOT_FOUND',
   'MAP_OFFLINE_MANIFEST_UNAVAILABLE',
   'MAP_OFFLINE_MANIFEST_LOAD_FAILED',
+  'MAP_CDN_PURGE_FAILED',
 ] as const;
 
 export type SitesApiErrorCode = (typeof SITES_API_ERROR_CODES)[number];
+
+/** Citizen reports (`src/reports`) — HTTP errors and stable point-breakdown codes in approval payloads. */
+export const REPORTS_API_ERROR_CODES = [
+  'REPORT_NOT_FOUND',
+  'REPORT_LOCATION_OUTSIDE_MACEDONIA',
+  'REPORTING_COOLDOWN',
+  'FILES_REQUIRED',
+  'FILE_REQUIRED',
+  'TOO_MANY_MEDIA',
+  'REPORT_UPLOAD_STORAGE_ERROR',
+  'INVALID_MEDIA_URL',
+  'INVALID_REPORT_STATUS_TRANSITION',
+  'REPORT_NOT_ASSIGNABLE',
+  'PRIMARY_REPORT_NOT_MERGEABLE',
+  'EMPTY_MERGE_SELECTION',
+  'INVALID_DUPLICATE_SELECTION',
+  'INVALID_MODERATOR',
+  'MODERATOR_NOT_FOUND',
+  'REPORT_APPROVED_BASE',
+  'REPORT_APPROVED_MEDIA',
+  'REPORT_APPROVED_SEVERITY',
+  'REPORT_APPROVED_CLEANUP_EFFORT',
+  'REPORT_APPROVED_REPEAT_SITE_ADJUSTMENT',
+  'REPORT_APPROVED_SITE_PIONEER',
+] as const;
+
+export type ReportsApiErrorCode = (typeof REPORTS_API_ERROR_CODES)[number];
+
+/** Media / avatar upload validation (`src/storage`, report uploads). */
+export const UPLOAD_ERROR_CODES = [
+  'FILE_TOO_LARGE',
+  'IMAGE_TOO_LARGE',
+  'IMAGE_TOO_SMALL',
+  'INVALID_FILE_TYPE',
+  'INVALID_IMAGE',
+  'MIME_TYPE_MISMATCH',
+  'S3_CIRCUIT_OPEN',
+] as const;
+
+export type UploadErrorCode = (typeof UPLOAD_ERROR_CODES)[number];
+
+/** Admin broadcasts and comms (`src/admin-control`). */
+export const ADMIN_CONTROL_ERROR_CODES = [
+  'BROADCAST_CAMPAIGN_NOT_FOUND',
+  'BROADCAST_SENT_IMMUTABLE',
+  'BROADCAST_TITLE_BODY_REQUIRED',
+  'BROADCAST_AUDIENCE_USERS_REQUIRED',
+  'BROADCAST_NOT_SENDABLE',
+  'EMAIL_SUPPRESSION_NOT_FOUND',
+] as const;
+
+export type AdminControlErrorCode = (typeof ADMIN_CONTROL_ERROR_CODES)[number];
+
+/** UGC moderation (`src/moderation`). */
+export const MODERATION_API_ERROR_CODES = [
+  'POLICY_REASON_REQUIRED',
+  'UNSUPPORTED_SUBJECT',
+  'UGC_REPORT_NOT_FOUND',
+  'CANNOT_BLOCK_SELF',
+] as const;
+
+export type ModerationApiErrorCode = (typeof MODERATION_API_ERROR_CODES)[number];
+
+/** Admin users, invites, and role mutations (`src/admin-users`, `src/admin-invites`). */
+export const ADMIN_USERS_ERROR_CODES = [
+  'INVALID_INVITE',
+  'INVALID_INVITE_ROLE',
+  'INVITE_ALREADY_ACCEPTED',
+  'INVITE_EXPIRED',
+  'INVITE_LOCKED',
+  'INVITE_NOT_FOUND',
+  'INVITE_NOT_PENDING',
+  'INVITE_REVOKED',
+  'ROLE_REQUIRED',
+  'CANNOT_ASSIGN_TO_OTHER',
+  'CANNOT_CHANGE_OWN_ROLE',
+  'CANNOT_UNASSIGN_OTHER',
+] as const;
+
+export type AdminUsersErrorCode = (typeof ADMIN_USERS_ERROR_CODES)[number];
+
+/** Runtime config (`src/system-config`, `src/feature-flags`). */
+export const SYSTEM_CONFIG_ERROR_CODES = [
+  'CONFIG_KEY_NOT_ALLOWED',
+  'INVALID_ACTIVE_ENVIRONMENT',
+  'INVALID_URL',
+  'FEATURE_DISABLED',
+] as const;
+
+export type SystemConfigErrorCode = (typeof SYSTEM_CONFIG_ERROR_CODES)[number];
+
+/** Readiness / dependency health (`src/health`). */
+export const HEALTH_ERROR_CODES = [
+  'HEALTH_DATABASE_UNAVAILABLE',
+  'HEALTH_REDIS_UNAVAILABLE',
+  'HEALTH_S3_UNAVAILABLE',
+] as const;
+
+export type HealthErrorCode = (typeof HEALTH_ERROR_CODES)[number];
 
 const MERGED_ERROR_CODE_SET = new Set<string>([
   ...CHECK_IN_ERROR_CODES,
@@ -262,6 +406,13 @@ const MERGED_ERROR_CODE_SET = new Set<string>([
   ...GAMIFICATION_API_ERROR_CODES,
   ...NOTIFICATION_ERROR_CODES,
   ...SITES_API_ERROR_CODES,
+  ...REPORTS_API_ERROR_CODES,
+  ...UPLOAD_ERROR_CODES,
+  ...ADMIN_CONTROL_ERROR_CODES,
+  ...MODERATION_API_ERROR_CODES,
+  ...ADMIN_USERS_ERROR_CODES,
+  ...SYSTEM_CONFIG_ERROR_CODES,
+  ...HEALTH_ERROR_CODES,
 ]);
 
 /**

@@ -11,6 +11,7 @@ export type SitesFeedListResult = {
       latestReportCreatedAt: string | null;
       latestReportNumber: string | null;
       latestReportMediaUrls?: string[];
+      heroMediaUrls?: string[];
       latestReportReporterName?: string | null;
       latestReportReporterAvatarUrl?: string | null;
       latestReportReporterId?: string | null;

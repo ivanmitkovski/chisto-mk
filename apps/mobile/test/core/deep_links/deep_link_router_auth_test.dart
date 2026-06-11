@@ -1,3 +1,4 @@
+import 'package:chisto_infrastructure/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_infrastructure/core/deep_links/deep_link_router.dart';
 import 'package:chisto_infrastructure/core/navigation/app_go_router.dart';
 import 'package:chisto_infrastructure/core/navigation/app_routes.dart';
@@ -60,6 +61,15 @@ void main() {
       final Uri uri = Uri.parse('chisto://app/reports/new');
       DeepLinkRouter.handleUri(router, uri, isAuthenticated: true);
       DeepLinkRouter.handleUri(router, uri, isAuthenticated: true);
+      DeepLinkRouter.handleUri(router, uri, isAuthenticated: true);
+      expect(
+        router.routeInformationProvider.value.uri.path,
+        AppRoutes.newReport,
+      );
+    });
+
+    test('opens authenticated new-report deep link', () {
+      final Uri uri = Uri.parse('chisto://app/reports/new');
       DeepLinkRouter.handleUri(router, uri, isAuthenticated: true);
       expect(
         router.routeInformationProvider.value.uri.path,

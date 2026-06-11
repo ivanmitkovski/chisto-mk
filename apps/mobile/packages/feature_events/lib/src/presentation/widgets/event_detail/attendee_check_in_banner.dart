@@ -3,20 +3,22 @@ import 'dart:async';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
 import 'package:design_system/design_system.dart';
+import 'package:feature_auth/src/presentation/utils/auth_guard_ui.dart';
 import 'package:feature_events/src/data/discovery_analytics.dart';
 import 'package:feature_events/src/domain/models/eco_event.dart';
 import 'package:feature_events/src/presentation/navigation/events_navigation.dart';
 import 'package:feature_events/src/presentation/utils/events_localized_strings.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class AttendeeCheckInBanner extends StatelessWidget {
+class AttendeeCheckInBanner extends ConsumerWidget {
   const AttendeeCheckInBanner({super.key, required this.event});
 
   final EcoEvent event;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final l10n = context.l10n;
 
@@ -41,6 +43,12 @@ class AttendeeCheckInBanner extends StatelessWidget {
                 message: l10n.eventsAttendeeCheckInPausedSnack,
                 type: AppSnackType.warning,
               );
+              return;
+            }
+            if (!await ensureLocationEligibleForAction(context, ref)) {
+              return;
+            }
+            if (!context.mounted) {
               return;
             }
             final bool? success = await EventsNavigation.openAttendeeQrScanner(

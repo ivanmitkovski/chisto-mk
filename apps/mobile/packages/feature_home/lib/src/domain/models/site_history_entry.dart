@@ -9,6 +9,7 @@ class SiteHistoryEntry {
     this.reportId,
     this.cleanupEventId,
     this.actorDisplayName,
+    this.actorIsDeleted = false,
     this.actorRole,
     this.note,
     this.metadata,
@@ -22,6 +23,7 @@ class SiteHistoryEntry {
   final String? reportId;
   final String? cleanupEventId;
   final String? actorDisplayName;
+  final bool actorIsDeleted;
   final String? actorRole;
   final String? note;
   final Map<String, dynamic>? metadata;

@@ -1,8 +1,11 @@
+import 'dart:async';
 import 'dart:io';
 
+import 'package:chisto_infrastructure/core/auth/session_invalidation.dart';
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
-import 'package:chisto_infrastructure/core/navigation/app_navigation.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/shared/forms/forms.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
 import 'package:design_system/design_system.dart';
 import 'package:feature_profile/src/domain/models/profile_user.dart';
@@ -28,7 +31,9 @@ class ProfileGeneralInfoScreen extends ConsumerStatefulWidget {
 }
 
 class _ProfileGeneralInfoScreenState
-    extends ConsumerState<ProfileGeneralInfoScreen> {
+    extends ConsumerState<ProfileGeneralInfoScreen>
+    with FormValidationMixin {
+  static const List<String> _fieldOrder = <String>[FormFieldIds.fullName];
   late final TextEditingController _nameController;
   late final TextEditingController _phoneController;
   late String _email;
@@ -53,11 +58,6 @@ class _ProfileGeneralInfoScreenState
     );
   }
 
-  static bool _isAuthError(String code) =>
-      code == 'UNAUTHORIZED' ||
-      code == 'INVALID_TOKEN_USER' ||
-      code == 'ACCOUNT_NOT_ACTIVE';
-
   /// Treat blank / whitespace as no avatar so we never offer "remove" for initials-only.
   static String? _normalizeAvatarUrl(String? url) {
     final String? trimmed = url?.trim();
@@ -73,10 +73,50 @@ class _ProfileGeneralInfoScreenState
     // [user] from Profile is the source of truth — do not fall back to global remote preview,
     // which can be stale and incorrectly show "Remove".
     _remoteAvatarUrl = _normalizeAvatarUrl(widget.user.avatarUrl);
+    registerFormField(
+      FormFieldIds.fullName,
+      focusNode: _nameFocus,
+      fieldKey: _nameFieldKey,
+    );
+    _nameController.addListener(_onFieldChanged);
     _nameFocus.addListener(_scrollToFocusedField);
     _phoneFocus.addListener(_scrollToFocusedField);
     _nameFocus.addListener(_onFocusChange);
     _phoneFocus.addListener(_onFocusChange);
+  }
+
+  void _onFieldChanged() {
+    if (mounted) setState(() {});
+  }
+
+  String? _nameValidationError(AppLocalizations l10n) {
+    return validateIfVisible(FormFieldIds.fullName, () {
+      final String trimmed = _nameController.text.trim();
+      final String? required = FormValidators.requiredField(
+        l10n,
+        trimmed,
+        l10n.profileGeneralNameLabel,
+      );
+      if (required != null) return required;
+      if (trimmed.length > 100) return l10n.profileGeneralNameTooLongSnack;
+      return null;
+    });
+  }
+
+  Map<String, String? Function()> _validators(AppLocalizations l10n) {
+    return <String, String? Function()>{
+      FormFieldIds.fullName: () {
+        final String trimmed = _nameController.text.trim();
+        final String? required = FormValidators.requiredField(
+          l10n,
+          trimmed,
+          l10n.profileGeneralNameLabel,
+        );
+        if (required != null) return required;
+        if (trimmed.length > 100) return l10n.profileGeneralNameTooLongSnack;
+        return null;
+      },
+    };
   }
 
   void _onFocusChange() {
@@ -158,6 +198,7 @@ class _ProfileGeneralInfoScreenState
   @override
   void dispose() {
     ProfileAvatarPeek.hide();
+    _nameController.removeListener(_onFieldChanged);
     _nameFocus.removeListener(_scrollToFocusedField);
     _phoneFocus.removeListener(_scrollToFocusedField);
     _nameFocus.removeListener(_onFocusChange);
@@ -181,23 +222,19 @@ class _ProfileGeneralInfoScreenState
 
   Future<void> _handleSave() async {
     if (_isSaving) return;
+
+    clearServerFieldErrors();
+    final AppLocalizations l10n = context.l10n;
+    if (await handleInvalidSubmit(
+      context,
+      l10n,
+      _fieldOrder,
+      _validators(l10n),
+    )) {
+      return;
+    }
+
     final String nameTrimmed = _nameController.text.trim();
-    if (nameTrimmed.isEmpty) {
-      AppSnack.show(
-        context,
-        message: context.l10n.profileGeneralNameRequiredSnack,
-        type: AppSnackType.warning,
-      );
-      return;
-    }
-    if (nameTrimmed.length > 100) {
-      AppSnack.show(
-        context,
-        message: context.l10n.profileGeneralNameTooLongSnack,
-        type: AppSnackType.warning,
-      );
-      return;
-    }
     final int spaceIndex = nameTrimmed.indexOf(' ');
     final String firstName = spaceIndex >= 0
         ? nameTrimmed.substring(0, spaceIndex)
@@ -223,11 +260,21 @@ class _ProfileGeneralInfoScreenState
       }
     } on AppError catch (e) {
       if (!mounted) return;
-      if (_isAuthError(e.code)) {
-        AppNavigation.goSignInAndClearStack();
+      if (SessionInvalidation.shouldHandle(e)) {
+        unawaited(SessionInvalidation.fromError(e));
         return;
       }
-      AppSnack.show(context, message: e.message, type: AppSnackType.error);
+      final Map<String, String> fieldErrors = fieldErrorsFromAppError(e, l10n);
+      if (fieldErrors.isNotEmpty) {
+        setServerFieldErrors(fieldErrors);
+        await focusAndScrollToFirstInvalid(
+          context,
+          _fieldOrder,
+          _validators(l10n),
+        );
+        return;
+      }
+      AppSnack.failure(context, error: e);
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
@@ -286,11 +333,11 @@ class _ProfileGeneralInfoScreenState
       } else {
         ref.read(profileAvatarNotifierProvider.notifier).clearLocalPath();
       }
-      if (_isAuthError(e.code)) {
-        AppNavigation.goSignInAndClearStack();
+      if (SessionInvalidation.shouldHandle(e)) {
+        unawaited(SessionInvalidation.fromError(e));
         return;
       }
-      AppSnack.show(context, message: e.message, type: AppSnackType.error);
+      AppSnack.failure(context, error: e);
     } catch (_) {
       if (!mounted) return;
       setState(() {
@@ -333,11 +380,11 @@ class _ProfileGeneralInfoScreenState
       );
     } on AppError catch (e) {
       if (!mounted) return;
-      if (_isAuthError(e.code)) {
-        AppNavigation.goSignInAndClearStack();
+      if (SessionInvalidation.shouldHandle(e)) {
+        unawaited(SessionInvalidation.fromError(e));
         return;
       }
-      AppSnack.show(context, message: e.message, type: AppSnackType.error);
+      AppSnack.failure(context, error: e);
     } catch (_) {
       if (!mounted) return;
       AppSnack.show(
@@ -352,6 +399,7 @@ class _ProfileGeneralInfoScreenState
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
     final bool canPeekAvatar = _canPeekGeneralInfoAvatar();
     return Scaffold(
       backgroundColor: AppColors.panelBackground,
@@ -414,6 +462,7 @@ class _ProfileGeneralInfoScreenState
                       nameFieldKey: _nameFieldKey,
                       phoneFieldKey: _phoneFieldKey,
                       email: _email,
+                      nameErrorText: _nameValidationError(l10n),
                       fieldValueStyle: _profileFieldValueStyle(context),
                       inputDecoration: (String hint) =>
                           _inputDecoration(context, hint),

@@ -13,6 +13,10 @@ import { SiteHistoryEventRecorderService } from '../history/site-history-event-r
 import { SitesFeedService } from './sites-feed.service';
 import { SitesMapQueryService } from './sites-map-query.service';
 import type { Prisma } from '../../prisma-client';
+import {
+  SITE_NOTIFICATION_SYSTEM_ACTOR_ID,
+  SitesReporterNotificationService,
+} from './sites-reporter-notification.service';
 
 const FLAG_KEY = 'site_lifecycle_from_events';
 
@@ -35,6 +39,7 @@ export class SiteLifecycleFromEventsService {
     private readonly siteEventsService: SiteEventsService,
     private readonly sitesFeed: SitesFeedService,
     private readonly sitesMapQuery: SitesMapQueryService,
+    private readonly sitesReporterNotification: SitesReporterNotificationService,
   ) {}
 
   async isEnabled(): Promise<boolean> {
@@ -239,6 +244,11 @@ export class SiteLifecycleFromEventsService {
       this.sitesFeed.invalidateFeedCache('site_status_auto');
       this.sitesMapQuery.invalidateMapCache('site_status_auto', siteId);
       this.historyWriter.emitHistoryAppended(siteId, '');
+      this.sitesReporterNotification.emitSiteStatusUpdate(
+        siteId,
+        SITE_NOTIFICATION_SYSTEM_ACTOR_ID,
+        to,
+      );
     }
   }
 }

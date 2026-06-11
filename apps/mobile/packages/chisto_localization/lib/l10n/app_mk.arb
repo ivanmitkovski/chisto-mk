@@ -101,6 +101,7 @@
     }
   },
   "reportFlowEvidenceNeedsPhoto": "Додајте барем една фотографија за да продолжите.",
+  "reportFlowEvidenceTip": "Кадрирајте го местото при добра светлина.",
   "reportFlowLocationOutsideMacedoniaHelper": "Оваа локација е надвор од Македонија. Потегнете ја иглата во земјата, потоа допрете Потврди локација.",
   "reportLocationAdvanceBlockedBanner": "Поставете ја иглата во Македонија и допрете Потврди локација.",
   "reviewTapToEdit": "Допри за уредување",
@@ -244,6 +245,23 @@
   "authValidationPasswordNeedLetter": "Лозинката мора да содржи барем една буква",
   "authValidationConfirmPasswordRequired": "Потврдете ја лозинката",
   "authValidationConfirmPasswordMismatch": "Лозинките не се совпаѓаат",
+  "authValidationPasswordWeak": "Лозинката е преслаба. Користете комбинација од букви и броеви и избегнувајте вообичаени шеми.",
+  "authValidationPasswordTooLong": "Лозинката може да има најмногу 72 знаци",
+  "authValidationTermsRequired": "Мора да ги прифатите условите и одредбите",
+  "authValidationOtpRequired": "Потребен е код за верификација",
+  "authValidationOtpDigits": "Внесете 6-цифрен код",
+  "authValidationNameTooShort": "Секое име мора да има најмалку 2 знаци",
+  "authValidationNameTooLong": "Секое име може да има најмногу 60 знаци",
+  "authValidationGenericInvalid": "Проверете го ова поле",
+  "formValidationErrorsAnnounce": "{count, plural, =1{1 поле има грешка} other{{count} полиња имаат грешки}}",
+  "@formValidationErrorsAnnounce": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "authErrorRegistrationConflict": "Сметка со оваа е-пошта или телефонски број веќе постои",
   "authErrorInvalidCredentials": "Погрешен телефон или лозинка.",
   "authErrorAccountSuspended": "Оваа сметка не е активна.",
   "authErrorPhoneNotRegistered": "Нема сметка за овој телефонски број.",
@@ -328,6 +346,7 @@
   "authBackToSignIn": "Назад на најава",
   "authOnboardingWelcomeTo": "Добредојдовте на",
   "authOnboardingBrandName": "Chisto.mk",
+  "brandLogoSemantic": "Лого на Chisto",
   "authOnboardingWelcomeDescription": "Види. Пријави. Исчисти.",
   "authOnboardingWelcomeSupporting": "Почнува со едно допирање.",
   "authOnboardingSlide2Title": "Пријавете за секунди",
@@ -376,7 +395,11 @@
   "authLocationPermissionDenied": "Дозволата за локација е одбиена. Можете да ја вклучите во Поставки.",
   "authLocationPermissionForever": "Дозволата е трајно одбиена. Се отвораат Поставки…",
   "authLocationMacedoniaOnly": "Моментално поддржуваме само локации во Македонија.",
-  "authLocationResolveFailed": "Не можевме да ја одредиме локацијата. Обидете се повторно.",
+  "authLocationTryAgain": "Обиди се повторно",
+  "authLocationGateOutsideTitle": "Chisto.mk е достапен во Македонија",
+  "authLocationGateOutsideBody": "Локацијата на вашиот уред е надвор од Македонија. Треба да бидете во Македонија за да создадете сметка.",
+  "authLocationGateUnavailableBody": "Не можевме да ја потврдиме вашата локација. Вклучете локациски услуги, дозволете пристап и обидете се повторно.",
+  "authLocationActionOnlyInMacedoniaSnack": "Оваа акција е достапна само во Македонија.",
   "authOtpCodeSemantic": "Код за потврда",
   "authOtpDigitSemantic": "Цифра {index} од {total}",
   "@authOtpDigitSemantic": {
@@ -608,6 +631,27 @@
   "safetyReportTitle": "Пријави содржина",
   "safetyReportSubmit": "Испрати пријава",
   "safetyReportDetailsHint": "Опционални детали за модератори",
+  "safetyReportDetailsHintRequired": "Опишете го проблемот за модераторите",
+  "safetyReportDetailsRequiredWhenOther": "Додадете краток опис кога избирате Друго.",
+  "safetyReportDetailsCharCount": "{used} / {max}",
+  "@safetyReportDetailsCharCount": {
+    "placeholders": {
+      "used": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "safetyReportDetailsTooLong": "Деталите мора да имаат најмногу {max} знаци.",
+  "@safetyReportDetailsTooLong": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
   "safetyReportSubmitted": "Пријавата е испратена. Прегледуваме во рок од 24 часа.",
   "safetyReportFailed": "Неуспешна пријава. Обидете се повторно.",
   "safetyReportReasonSpam": "Спам",
@@ -619,6 +663,14 @@
   "profileAccountSection": "Сметка",
   "profileSignOutTile": "Одјави се",
   "profileDeleteAccountTile": "Избриши сметка",
+  "profileAppVersion": "Верзија {version}",
+  "@profileAppVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
   "profileEmailLabel": "Е-пошта",
   "profileEmailReadOnlyHint": "Само за читање. За промена контактирајте поддршка.",
   "profileNoConnectionSnack": "Нема врска",
@@ -676,7 +728,7 @@
   "profileGeneralNameHint": "Вашето име",
   "profileGeneralMobileLabel": "Мобилен телефон",
   "profileGeneralPhonePlaceholder": "70 123 456",
-  "profileGeneralLimitsNotice": "Промените на името се ограничени. Промената на телефонот бара верификација.",
+  "profileGeneralLimitsNotice": "За промена на е-пошта и телефонски број, контактирајте ја поддршката.",
   "profileGeneralUpdateButton": "Ажурирај податоци",
   "profileGeneralSaving": "Зачувување…",
   "profileGeneralAvatarSemanticUpdating": "Се ажурира профилната фотографија",
@@ -717,7 +769,7 @@
   "reportListOutboxQueuedChip": "Пријавата е во ред за испраќање…",
   "reportListOutboxUploadingChip": "Се прикачуваат фотографии…",
   "reportListOutboxSubmittingChip": "Се испраќа пријавата…",
-  "reportListOutboxFailedBanner": "Испраќањето не успеа. Допри Retry за повторен обид.",
+  "reportListOutboxFailedBanner": "Испраќањето не успеа. Допри Обиди се повторно за повторен обид.",
   "reportListOutboxFailedRetry": "Обиди повторно",
   "reportListOutboxOfflineBanner": "Пријавата чека интернет…",
   "reportListOutboxCooldownBanner": "Пријавата е паузирана. Обиди се по паузата.",
@@ -1355,7 +1407,7 @@
       "time": {"type": "String"}
     }
   },
-  "notificationsSnoozeTitle": "Времетраење на одлагање",
+  "notificationsSnoozeTitle": "Времетраење на одложување",
   "notificationsSnooze1h": "1 час",
   "notificationsSnooze4h": "4 часа",
   "notificationsSnooze8h": "8 часа",
@@ -1529,6 +1581,7 @@
     }
   },
   "editEventNoChangesToSave": "Нема што да се зачува.",
+  "editEventSaving": "Се зачувуваат промените…",
   "editEventPendingModerationBanner": "Настанот сè уште чека одобрување од модератор. Промените важат за вашата нацрт-верзија.",
   "eventsEventNotEditable": "Овој настан повеќе не може да се уредува.",
   "eventsEventUpdated": "Настанот е ажуриран",
@@ -1641,7 +1694,7 @@
   "eventsOrganizerCompletionStepPhotosTitle": "Додајте фотографии „потоа“",
   "eventsOrganizerCompletionStepPhotosBody": "Покажете ја разликата. Тие се гледаат на страницата на настанот за сите.",
   "eventsOrganizerCompletionStepImpactTitle": "Запишете го влијанието",
-  "eventsOrganizerCompletionStepImpactBody": "Забележете торби, волонтерски часови и проценки од страницата на настанот.",
+  "eventsOrganizerCompletionStepImpactBody": "Забележете ќеси за отпад, волонтерски часови и проценки од страницата на настанот.",
   "eventsOrganizerCompletionStepVisibilityTitle": "Изградете доверба",
   "eventsOrganizerCompletionStepVisibilityBody": "Фотографиите им помагаат на модераторите и инспирираат идни акции.",
   "eventsOrganizerCompletionViewReceipt": "Погледни потврда за влијание",
@@ -1678,7 +1731,7 @@
   "eventsImpactReceiptViewCta": "Потврда за влијание",
   "eventsImpactReceiptRetry": "Обиди се повторно",
   "eventsImpactReceiptLoadFailed": "Не може да се вчита потврдата.",
-  "eventsImpactReceiptShareSummary": "{checkIns} пријави · {bags} торби · {joined} пријавени",
+  "eventsImpactReceiptShareSummary": "{checkIns} пријави · {bags} ќеси · {joined} пријавени",
   "@eventsImpactReceiptShareSummary": {
     "placeholders": {
       "checkIns": {
@@ -1808,7 +1861,7 @@
   "createEventCategoryTitle": "Тип на настан",
   "createEventCategorySubtitle": "Каква акција организирате?",
   "createEventGearTitle": "Потребна опрема",
-  "createEventGearSubtitle": "Изберете што волонтерите треба да понесат.",
+  "createEventGearSubtitle": "Изберете сè што волонтерите треба да понесат.",
   "createEventGearDoneSelectedCount": "Готово ({count} избрани)",
   "@createEventGearDoneSelectedCount": {
     "placeholders": {
@@ -1817,8 +1870,6 @@
       }
     }
   },
-  "createEventGearMultiselectTitle": "Повеќекратен избор",
-  "createEventGearMultiselectMessage": "Допрете ги ставките што волонтерите треба да понесат. Може да изберете повеќе.",
   "createEventTeamSizeTitle": "Големина на тим",
   "createEventTeamSizeSubtitle": "Колку волонтери очекувате?",
   "createEventDifficultyTitle": "Тешкотија",
@@ -2325,6 +2376,9 @@
   },
   "siteUpvotersLoadFailed": "Не успеа вчитувањето на поддржувачите.",
   "siteUpvotersRetry": "Обиди се повторно",
+  "siteCoReportersLoadFailed": "Не успеа вчитувањето на ко-пријавувачите.",
+  "siteCoReportersRetry": "Обиди се повторно",
+  "siteCoReportersOriginalReporterLabel": "Оригинален пријавувач",
   "siteDetailNoVolunteersSnack": "Сè уште нема волонтери за оваа локација.",
   "siteDetailDirectionsUnavailableSnack": "Насоки не се достапни за оваа локација.",
   "siteDetailOpenMapsFailedSnack": "Не можеше да се отвори Maps",
@@ -2401,6 +2455,7 @@
       "name": { "type": "String" }
     }
   },
+  "deletedUser": "Избришан корисник",
   "siteHistoryByAdmin": "Од админ",
   "siteHistoryKindSiteCreated": "Локацијата е креирана",
   "siteHistoryKindReportSubmitted": "Пријавата е поднесена",
@@ -2683,7 +2738,7 @@
   "commentsSortTop": "Најдобри",
   "commentsSortNew": "Најнови",
   "commentsEditingBanner": "Уредување на коментар",
-  "commentsBodyTooLong": "Коментарот е предолг (максимум 2000 знаци).",
+  "commentsBodyTooLong": "Коментарот е предолг (максимум 500 знаци).",
   "commentsReplyTargetFallback": "коментар",
   "reportIssueSheetTitle": "Пријави проблем",
   "reportIssueSubmitting": "Се испраќа...",
@@ -3440,6 +3495,43 @@
       }
     }
   },
+  "eventsFilterSheetSubtitle": "Изберете една или повеќе опции. Празно значи сите.",
+  "eventsFilterResetSemantic": "Ресетирај филтри",
+  "eventsFilterSectionSelectAll": "Сите",
+  "eventsFilterSectionClear": "Исчисти",
+  "eventsFilterShowEvents": "Прикажи {count} настани",
+  "@eventsFilterShowEvents": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsFilterShowEventsPlus": "Прикажи {count}+ настани",
+  "@eventsFilterShowEventsPlus": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsFilterPreviewLiveRegion": "Прикажани {count} настани",
+  "@eventsFilterPreviewLiveRegion": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsFilterChipStatusOverrideHint": "Пилулата Претстоен или Минати ги заменуваат филтрите за статус додека не се вратите на Сите.",
+  "eventsFilterDatePresetThisWeek": "Оваа недела",
+  "eventsFilterDatePresetThisMonth": "Овој месец",
+  "eventsFilterDatePresetNext30Days": "Следни 30 дена",
+  "eventsFilterDatePresetClear": "Исчисти датуми",
+  "eventsFilterCategoryHintOn": "Избрано",
+  "eventsFilterCategoryHintOff": "Не е избрано",
+  "eventsFilterStatusHintOn": "Избрано",
+  "eventsFilterStatusHintOff": "Не е избрано",
   "eventsOrganizerDashboardTitle": "Мои настани",
   "eventsOrganizerDashboardEmpty": "Сè уште не сте организирале настани.",
   "eventsOrganizerDashboardEmptyAction": "Создај прв настан",
@@ -3584,7 +3676,7 @@
   },
   "eventsRecurrenceDone": "Готово",
   "eventsCategoryGeneralCleanup": "Општо чистење",
-  "eventsCategoryGeneralCleanupDescription": "Собирање ѓубре, метење и враќање на подрачјето во ред.",
+  "eventsCategoryGeneralCleanupDescription": "Собирање отпад, метење и враќање на подрачјето во ред.",
   "eventsCategoryRiverAndLake": "Чистење на реки и езера",
   "eventsCategoryRiverAndLakeDescription": "Отстранување отпад од вода, обали и одводни канали.",
   "eventsCategoryTreeAndGreen": "Садење дрвја и зеленило",
@@ -3597,16 +3689,16 @@
   "eventsCategoryAwarenessAndEducationDescription": "Работилници, предавања или заедничка ангажираност за еколошки практики.",
   "eventsCategoryOther": "Друго",
   "eventsCategoryOtherDescription": "Прилагоден настан што не се вклопува во горните категории.",
-  "eventsGearTrashBags": "Џувалја за отпад",
+  "eventsGearTrashBags": "Вреќи за отпад",
   "eventsGearGloves": "Ракавици",
-  "eventsGearRakes": "Грабли и лопати",
-  "eventsGearWheelbarrow": "Количка",
-  "eventsGearWaterBoots": "Чизми за вода",
+  "eventsGearRakes": "Гребла и лопати",
+  "eventsGearWheelbarrow": "Рачна количка",
+  "eventsGearWaterBoots": "Гумени чизми",
   "eventsGearSafetyVest": "Рефлектирачки елек",
-  "eventsGearFirstAid": "Апчиња за прва помош",
-  "eventsGearSunscreen": "Сончев крем и вода",
+  "eventsGearFirstAid": "Прибор за прва помош",
+  "eventsGearSunscreen": "Крема за сончање и вода",
   "eventsScaleSmall": "Мала (1-5 луѓе)",
-  "eventsScaleSmallDescription": "Кратко чистење на едно место, една-две торби.",
+  "eventsScaleSmallDescription": "Кратко чистење на едно место, една-две ќеси за отпад.",
   "eventsScaleMedium": "Средна (6-15 луѓе)",
   "eventsScaleMediumDescription": "Полудневна акција, повеќе зони.",
   "eventsScaleLarge": "Голема (16-40 луѓе)",
@@ -3658,7 +3750,10 @@
       }
     }
   },
-  "errorUserNetwork": "Проверете ја врската и обидете се повторно.",
+  "errorUserNetwork": "Проверете ја вашата мрежа и обидете се повторно.",
+  "offlineConnectionTitle": "Нема интернет конекција",
+  "offlineConnectionBody": "Проверете ја вашата мрежа и обидете се повторно.",
+  "reportDetailStaleBanner": "Не можеше да се освежи. Се прикажуваат последно вчитаните детали.",
   "errorUserTimeout": "Побара премногу долго. Обидете се повторно.",
   "errorUserUnauthorized": "Најавете се повторно за да продолжите.",
   "errorUserSessionRevoked": "Сесијата повеќе не е важечка. Најавете се повторно.",
@@ -3667,6 +3762,39 @@
   "errorUserServer": "Сервисот е зафатен. Обидете се за кратко.",
   "errorUserTooManyRequests": "Премногу обиди. Почекајте малку.",
   "errorUserUnknown": "Нешто тргна наопаку. Обидете се повторно.",
+  "errorUserValidation": "Проверете ги означените полиња.",
+  "errorUserValidationGeneric": "Некои податоци се невалидни. Проверете и обидете се повторно.",
+  "errorUserConflict": "Оваа акција е во конфликт со нешто што веќе постои.",
+  "errorUserCancelled": "Откажано.",
+  "errorUserPayloadTooLarge": "Датотеката или барањето е преголемо.",
+  "errorUserRetryAfterSeconds": "Обидете се повторно за {seconds} сек.",
+  "@errorUserRetryAfterSeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "errorAlreadyJoined": "Веќе сте дел од овој настан.",
+  "errorOrganizerCannotJoin": "Организаторите не можат да се приклучат на свој настан како учесници.",
+  "errorNotAParticipant": "Прво треба да се приклучите на настанот.",
+  "errorOtpSendCooldown": "Почекајте момент пред да побарате нов код.",
+  "errorOtpSendFailed": "Не можевме да го испратиме кодот. Обидете се повторно.",
+  "errorTermsVersionMismatch": "Прифатете ги најновите услови за користење.",
+  "errorDeviceTokenInUse": "Известувањата се веќе поставени на друг уред.",
+  "errorEventsOrganizerNotCertified": "Завршете ја сертификацијата за организатор за да продолжите.",
+  "errorEventChatNotParticipant": "Прво треба да се приклучите на настанот за да користите разговор.",
+  "errorEventChatMessageUnavailable": "Пораката повеќе не е достапна.",
+  "errorChatUploadTooMany": "Премногу прилози. Испратете помалку датотеки.",
+  "errorChatUploadInvalid": "Типот или големината на датотеката не е дозволена.",
+  "errorAvatarFileRequired": "Изберете фотографија за поставување.",
+  "errorInvalidFileType": "Типот на датотеката не е поддржан.",
+  "connectionOfflineBanner": "Немате интернет. Некои функции може да не работат додека не се поврзете.",
+  "connectionReconnectingBanner": "Повторно поврзување…",
+  "connectionLiveUpdatesDelayed": "Ажурирањата во живо се задоцнети. Повлечете за освежување.",
+  "notificationsInboxStaleHint": "Ажурирањата може да се задоцнат. Повлечете надолу за освежување.",
+  "pushRegistrationFailedSnack": "Не можевме да ги вклучиме известувањата. Обидете се повторно во Поставки.",
+  "checkInConnectionTimeout": "Пријавувањето истече. Сканирајте повторно или внесете го кодот рачно.",
   "eventsFilterSheetSemantic": "Филтрирај настани",
   "eventChatTitle": "Разговор",
   "eventChatRowTitle": "Групен разговор",
@@ -3857,7 +3985,7 @@
       }
     }
   },
-  "eventChatOpenMapsFailed": "Не можев да го отворам Maps. Обиди се повторно.",
+  "eventChatOpenMapsFailed": "Не можев да ги отворам картите. Обиди се повторно.",
   "eventChatImageViewerTitle": "Фотографија",
   "eventChatImageViewerPage": "{current} од {total}",
   "@eventChatImageViewerPage": {
@@ -3896,7 +4024,7 @@
   "reportCategoryPickerBannerTitle": "Избери најблиската опција",
   "reportCategoryPickerBannerBody": "Избери ја категоријата што модераторите прво треба да ја потврдат. Не мора да биде совршено.",
   "reportCategoryIllegalLandfillTitle": "Незаконска депонија",
-  "reportCategoryIllegalLandfillDescription": "Фрлен отпад, купишта ѓубре или неформални места за одлагање.",
+  "reportCategoryIllegalLandfillDescription": "Фрлен отпад, купови отпад или неформални места каде се фрла отпад.",
   "reportCategoryWaterPollutionTitle": "Загадување на вода",
   "reportCategoryWaterPollutionDescription": "Загадени реки, езера, одводи или испуштање на отпадни води.",
   "reportCategoryAirPollutionTitle": "Загадување на воздух",
@@ -3928,10 +4056,10 @@
   "organizerToolkitPage3Body": "Користете го QR чекирањето во апликацијата за секој доброволец да добие заслужени поени.",
   "organizerToolkitPage4Title": "Време и безбедност",
   "organizerToolkitPage4Body": "Ако условите станат небезбедни, паузирајте или одложете. Веднаш известете ги регистрираните доброволци во апликацијата за никој да не патува за откажан почеток.",
-  "organizerToolkitPage5Title": "Отпад и одлагање",
-  "organizerToolkitPage5Body": "Сортирајте рециклажа кога е можно, безбедно пакувајте остри предмети и однесете го отпадот на овластени места. Оставете ја локацијата почиста отколку што ја затекнавте.",
+  "organizerToolkitPage5Title": "Собирање и отстранување на отпад",
+  "organizerToolkitPage5Body": "Сортирајте рециклажа кога е можно, безбедно пакувајте остри предмети и однесете го отпадот на овластени места за отстранување или рециклажа. Оставете ја локацијата почиста отколку што ја затекнавте.",
   "organizerToolkitPage6Title": "Вклучете ги сите",
-  "organizerToolkitPage6Body": "Понудете јасни улоги, постојан темпо и трпеливост. Добредојде брифинг им помага на новите доброволци да се чувствуваат сигурно и безбедно.",
+  "organizerToolkitPage6Body": "Понудете јасни улоги, постојано темпо и трпеливост. Добредојде брифинг им помага на новите доброволци да се чувствуваат сигурно и безбедно.",
   "organizerToolkitPage7Title": "Приватност во чат",
   "organizerToolkitPage7Body": "Држете ги личните телефони и адреси надвор од јавниот чат на настанот. Користете пораки во апликацијата за целиот тим да биде известен без преголемо споделување.",
   "organizerToolkitPage8Title": "Докази и чесен ефект",
@@ -3941,7 +4069,7 @@
   "organizerQuizTitle": "Брза проверка на знаење",
   "organizerQuizLoadFailed": "Не можеше да се вчита квизот. Обидете се повторно.",
   "organizerQuizLoadInvalidResponse": "Податоците за квизот од серверот се нецелосни. Обидете се повторно.",
-  "organizerQuizRetryLoad": "Обиди се повторно",
+  "organizerQuizRetryLoad": "Обидете се повторно",
   "organizerQuizSubmitFailed": "Не можеше да се поднесат одговорите. Обидете се повторно.",
   "organizerQuizOptionSemantic": "Прашање {index} од {total}: {optionText}",
   "@organizerQuizOptionSemantic": {
@@ -3951,11 +4079,11 @@
       "optionText": { "type": "String" }
     }
   },
-  "organizerQuizSubmit": "Поднеси одговори",
-  "organizerQuizPassedTitle": "Сертифициран сте!",
+  "organizerQuizSubmit": "Поднесете одговори",
+  "organizerQuizPassedTitle": "Сертифицирани сте!",
   "organizerQuizPassedBody": "Сега можете да креирате настани за чистење. Доброволците чекаат.",
   "organizerQuizFailedTitle": "Не сосема",
-  "organizerQuizFailedBody": "Прегледајте го туториалот и обидете се повторно. Точни {correct} од {total}.",
+  "organizerQuizFailedBody": "Прегледајте ги наставките и обидете се повторно. Имате {correct} од {total} точни одговори.",
   "@organizerQuizFailedBody": {
     "placeholders": {
       "correct": { "type": "int" },
@@ -4071,7 +4199,7 @@
   "photoSourceModalSubtitle": "Изберете како да ја додадете првата фотографија.",
   "photoSourceModalHint": "Можете да ја прегледате фотографијата пред да се додаде.",
   "photoSourceTakePhoto": "Сликај",
-  "photoSourceTakePhotoSubtitle": "Зфатете јасен преглед веднаш.",
+  "photoSourceTakePhotoSubtitle": "Сликајте јасен преглед веднаш.",
   "photoSourceBestChoiceBadge": "Најдобар избор",
   "photoSourceChooseFromLibrary": "Избери од галерија",
   "photoSourceChooseFromLibrarySubtitle": "Користете фотографија што веќе ја имате на уредот.",

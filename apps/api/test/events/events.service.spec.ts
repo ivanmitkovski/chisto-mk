@@ -26,6 +26,7 @@ import { EventUpdateValidationService } from '../../src/events/services/event-up
 import { EventsCreationService } from '../../src/events/services/events-creation.service';
 import { EventsLifecycleService } from '../../src/events/services/events-lifecycle.service';
 import { EventsParticipationService } from '../../src/events/services/events-participation.service';
+import { EventsReminderService } from '../../src/events/services/events-reminder.service';
 import { EventsDetailQueryService } from '../../src/events/services/events-detail-query.service';
 import { EventsListQueryService } from '../../src/events/services/events-list-query.service';
 import { EventsMobileMapperService } from '../../src/events/services/events-mobile-mapper.service';
@@ -115,7 +116,7 @@ function baseEvent(overrides: Partial<Record<string, unknown>> = {}) {
 describe('EventsService', () => {
   let prisma: {
     site: { findUnique: jest.Mock };
-    user: { findUnique: jest.Mock };
+    user: { findUnique: jest.Mock; findMany: jest.Mock };
     cleanupEvent: {
       findMany: jest.Mock;
       findFirst: jest.Mock;
@@ -168,7 +169,7 @@ describe('EventsService', () => {
     patchLifecycle: EventsLifecycleService['patchLifecycle'];
     join: EventsParticipationService['join'];
     leave: EventsParticipationService['leave'];
-    patchReminder: EventsParticipationService['patchReminder'];
+    patchReminder: EventsReminderService['patchReminder'];
     appendAfterImages: EventsAfterImagesService['appendAfterImages'];
     getAnalytics: EventsAnalyticsService['getAnalytics'];
   };
@@ -177,7 +178,11 @@ describe('EventsService', () => {
     uploads = makeUploads();
     cleanupMediaUpload = makeCleanupMediaUpload();
     ecoEventPoints = {
-      creditIfNew: jest.fn().mockResolvedValue(0),
+      creditIfNew: jest.fn(async (_tx: unknown, params: { delta: number }) => ({
+        granted: params.delta,
+        totalPointsEarnedBefore: 0,
+        totalPointsEarnedAfter: params.delta,
+      })),
       debitOnceIfNew: jest.fn().mockResolvedValue(0),
     };
     notificationDispatcher = { dispatchToUser: jest.fn().mockResolvedValue(undefined) };
@@ -202,6 +207,7 @@ describe('EventsService', () => {
       site: { findUnique: jest.fn() },
       user: {
         findUnique: jest.fn().mockResolvedValue({ organizerCertifiedAt: new Date('2026-01-01') }),
+        findMany: jest.fn().mockResolvedValue([]),
       },
       cleanupEvent: {
         findMany: jest.fn(),
@@ -292,6 +298,7 @@ describe('EventsService', () => {
       ecoEventPoints as never,
       notificationDispatcher as never,
       siteLifecycleFromEvents as never,
+      { emit: jest.fn() } as never,
     );
     const participation = new EventsParticipationService(
       eventsRepository,
@@ -299,7 +306,9 @@ describe('EventsService', () => {
       ecoEventPoints as never,
       eventChat as never,
       liveImpact as never,
+      { emit: jest.fn() } as never,
     );
+    const reminders = new EventsReminderService(eventsRepository, mobileMapper);
     const afterImages = new EventsAfterImagesService(
       eventsRepository,
       cleanupMediaUpload as never,
@@ -318,7 +327,7 @@ describe('EventsService', () => {
       patchLifecycle: (id, dto, u) => lifecycle.patchLifecycle(id, dto, u),
       join: (id, u) => participation.join(id, u),
       leave: (id, u) => participation.leave(id, u),
-      patchReminder: (id, dto, u) => participation.patchReminder(id, dto, u),
+      patchReminder: (id, dto, u) => reminders.patchReminder(id, dto, u),
       appendAfterImages: (id, files, u) => afterImages.appendAfterImages(id, files, u),
       getAnalytics: (id, u) => analytics.getAnalytics(id, u),
     };
@@ -719,7 +728,11 @@ describe('EventsService', () => {
         }),
       );
       prisma.eventParticipant.create.mockResolvedValue({ id: 'part-new' });
-      ecoEventPoints.creditIfNew.mockResolvedValue(5);
+      ecoEventPoints.creditIfNew.mockResolvedValue({
+        granted: 5,
+        totalPointsEarnedBefore: 0,
+        totalPointsEarnedAfter: 5,
+      });
       prisma.cleanupEvent.findFirstOrThrow.mockResolvedValue(
         baseEvent({
           organizerId: 'org-1',
@@ -766,7 +779,11 @@ describe('EventsService', () => {
         }),
       );
       prisma.eventParticipant.create.mockResolvedValue({ id: 'part-new' });
-      ecoEventPoints.creditIfNew.mockResolvedValue(5);
+      ecoEventPoints.creditIfNew.mockResolvedValue({
+        granted: 5,
+        totalPointsEarnedBefore: 0,
+        totalPointsEarnedAfter: 5,
+      });
       prisma.cleanupEvent.findFirstOrThrow.mockResolvedValue(
         baseEvent({
           organizerId: 'org-1',
@@ -871,7 +888,11 @@ describe('EventsService', () => {
       );
       prisma.eventCheckIn.findMany.mockResolvedValue([{ userId: 'u2' }]);
       prisma.pointTransaction.findMany.mockResolvedValue([]);
-      ecoEventPoints.creditIfNew.mockResolvedValue(30);
+      ecoEventPoints.creditIfNew.mockResolvedValue({
+        granted: 30,
+        totalPointsEarnedBefore: 0,
+        totalPointsEarnedAfter: 30,
+      });
       prisma.cleanupEvent.update.mockResolvedValue(
         baseEvent({
           organizerId: 'u1',
@@ -920,7 +941,11 @@ describe('EventsService', () => {
       ecoEventPoints.debitOnceIfNew.mockImplementation(async (_tx, params: { userId: string }) => {
         return params.userId === 'u3' ? -5 : 0;
       });
-      ecoEventPoints.creditIfNew.mockResolvedValue(30);
+      ecoEventPoints.creditIfNew.mockResolvedValue({
+        granted: 30,
+        totalPointsEarnedBefore: 0,
+        totalPointsEarnedAfter: 30,
+      });
       prisma.cleanupEvent.update.mockResolvedValue(
         baseEvent({
           organizerId: 'u1',
@@ -1272,6 +1297,7 @@ describe('EventsService', () => {
         userId: 'u1',
         displayName: 'Ana Miteva',
         avatarUrl: null,
+        isDeleted: false,
         joinedAt: j1.toISOString(),
       });
       expect(result.meta.hasMore).toBe(true);

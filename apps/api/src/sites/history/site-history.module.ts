@@ -6,6 +6,7 @@ import { SiteHistoryQueryService } from './site-history-query.service';
 import { SiteHistoryWriterService } from './site-history-writer.service';
 import { SiteHistoryReportRecorderService } from './site-history-report-recorder.service';
 import { SiteHistoryEventRecorderService } from './site-history-event-recorder.service';
+import { SiteHeroImageService } from '../services/site-hero-image.service';
 
 @Module({
   imports: [AdminRealtimeModule],
@@ -15,12 +16,14 @@ import { SiteHistoryEventRecorderService } from './site-history-event-recorder.s
     SiteHistoryReportRecorderService,
     SiteHistoryEventRecorderService,
     SiteHistoryQueryService,
+    SiteHeroImageService,
   ],
   exports: [
     SiteHistoryWriterService,
     SiteHistoryReportRecorderService,
     SiteHistoryEventRecorderService,
     SiteHistoryQueryService,
+    SiteHeroImageService,
   ],
 })
 export class SiteHistoryModule {}

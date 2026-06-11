@@ -46,7 +46,18 @@ export class SiteShareLinkService {
 
   async share(siteId: string, userId: string, channel: SiteShareChannel): Promise<void> {
     await this.ensureSiteExists(siteId);
-    await this.prisma.siteShareEvent.create({ data: { siteId, userId, channel } });
+    await this.prisma.$transaction(async (tx) => {
+      const created = await tx.siteShareEvent.createMany({
+        data: [{ siteId, userId, channel }],
+        skipDuplicates: true,
+      });
+      if (created.count > 0) {
+        await tx.site.update({
+          where: { id: siteId },
+          data: { sharesCount: { increment: 1 } },
+        });
+      }
+    });
   }
 
   issueShareLink(siteId: string, channel: SiteShareChannel): {
@@ -196,14 +207,7 @@ export class SiteShareLinkService {
         where: { id: link.id, countedAt: null },
         data: { countedAt: new Date() },
       });
-      if (claim.count > 0) {
-        await tx.site.update({
-          where: { id: link.siteId },
-          data: { sharesCount: { increment: 1 } },
-        });
-        return true;
-      }
-      return false;
+      return claim.count > 0;
     });
     this.logger.log(
       `site_share_attribution_ingested eventType=${input.eventType} counted=${counted} siteId=${claims.s} cid=${claims.c}`,

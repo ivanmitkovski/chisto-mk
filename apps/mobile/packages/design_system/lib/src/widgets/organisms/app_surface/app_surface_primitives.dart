@@ -6,6 +6,7 @@ import 'package:design_system/src/theme/app_shadows.dart';
 import 'package:design_system/src/theme/app_spacing.dart';
 import 'package:design_system/src/theme/app_typography.dart';
 import 'package:design_system/src/widgets/atoms/no_overscroll_overlay_scroll_behavior.dart';
+import 'package:design_system/src/widgets/organisms/app_bottom_sheet/app_sheet_scroll_inset.dart';
 import 'package:flutter/material.dart';
 
 part 'report_surface_types_part.dart';

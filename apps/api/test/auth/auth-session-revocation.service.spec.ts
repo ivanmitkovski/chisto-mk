@@ -29,6 +29,37 @@ describe('AuthSessionRevocationService', () => {
     });
   });
 
+  it('revokeSession marks one active session revoked', async () => {
+    const prisma = {
+      userSession: {
+        updateMany: jest.fn().mockResolvedValue({ count: 1 }),
+      },
+    };
+    const audit = { log: jest.fn().mockResolvedValue(undefined) };
+    const eventEmitter = { emit: jest.fn() };
+    const authSnapshotCache = { invalidate: jest.fn() };
+    const svc = new AuthSessionRevocationService(
+      prisma as never,
+      audit as never,
+      eventEmitter as never,
+      authSnapshotCache as never,
+    );
+
+    await svc.revokeSession('s1', 'u1', 'refresh_token_reuse');
+
+    expect(prisma.userSession.updateMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 's1', userId: 'u1', revokedAt: null },
+      }),
+    );
+    expect(authSnapshotCache.invalidate).toHaveBeenCalledWith('u1');
+    expect(eventEmitter.emit).toHaveBeenCalledWith('security.sessions_revoked', {
+      userId: 'u1',
+      reason: 'refresh_token_reuse',
+      sessionId: 's1',
+    });
+  });
+
   it('revokeSessionForUser revokes a single active session', async () => {
     const prisma = {
       userSession: {

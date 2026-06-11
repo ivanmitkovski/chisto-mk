@@ -1,6 +1,7 @@
 import 'package:feature_home/src/domain/models/pollution_site.dart';
 import 'package:feature_home/src/presentation/providers/map_sites_notifier.dart';
 import 'package:feature_home/src/presentation/providers/repository_providers.dart';
+import 'package:feature_home/src/presentation/utils/map_preview_hydration.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -33,6 +34,26 @@ class MapSelectionNotifier extends Notifier<MapSelectionState> {
 
   void select(PollutionSite site) {
     state = state.copyWith(selected: site);
+  }
+
+  /// Selects [site] and hydrates sparse reporter-owned pending previews from detail API.
+  Future<void> selectWithHydrationIfNeeded(PollutionSite site) async {
+    select(site);
+    if (!mapPreviewNeedsHydration(site)) {
+      return;
+    }
+    try {
+      final PollutionSite? enriched = await ref
+          .read(sitesRepositoryProvider)
+          .getSiteById(site.id);
+      if (enriched == null) {
+        return;
+      }
+      ref.read(mapSitesNotifierProvider.notifier).upsertSiteFromFocus(enriched);
+      select(enriched);
+    } on Exception catch (_) {
+      // Preview stays on the lite map row; full sync may refresh later.
+    }
   }
 
   void deselect() {

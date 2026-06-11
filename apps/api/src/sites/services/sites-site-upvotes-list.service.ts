@@ -3,6 +3,7 @@ import { ReportsUploadService } from '../../reports/services/reports-upload.serv
 import { ListSiteUpvotesQueryDto } from '../dto/list-site-upvotes-query.dto';
 import { SiteEngagementService } from './site-engagement.service';
 import { SiteUpvotesRepository } from '../repositories/site-upvotes.repository';
+import { resolveActorIdentity } from '../../common/projections/public-identity.projection';
 
 @Injectable()
 export class SitesSiteUpvotesListService {
@@ -31,21 +32,26 @@ export class SitesSiteUpvotesListService {
         take: query.limit,
       }),
     ]);
-    const data = await Promise.all(
-      votes.map(async (vote) => {
-        const displayName =
-          `${vote.user.firstName ?? ''} ${vote.user.lastName ?? ''}`.trim() || 'Anonymous';
-        const avatarUrl = await this.reportsUploadService.resolveUserAvatarUrl(
-          vote.user.avatarObjectKey,
-        );
-        return {
-          userId: vote.user.id,
-          displayName,
-          avatarUrl,
-          upvotedAt: vote.createdAt.toISOString(),
-        };
-      }),
-    );
+    const data = (
+      await Promise.all(
+        votes.map(async (vote) => {
+          if (vote.userId == null) {
+            return null;
+          }
+          const identity = resolveActorIdentity(vote.user, { actorUserId: vote.userId });
+          const displayName = identity.displayName ?? 'Anonymous';
+          const avatarUrl = await this.reportsUploadService.resolveUserAvatarUrl(
+            vote.user?.avatarObjectKey ?? null,
+          );
+          return {
+            userId: vote.userId,
+            displayName,
+            avatarUrl,
+            upvotedAt: vote.createdAt.toISOString(),
+          };
+        }),
+      )
+    ).filter((row): row is NonNullable<typeof row> => row != null);
     const loadedThrough = skip + data.length;
     return {
       data,

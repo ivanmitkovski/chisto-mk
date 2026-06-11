@@ -405,6 +405,17 @@ class FeedSitesNotifier extends AutoDisposeNotifier<FeedSitesState> {
     );
   }
 
+  /// Keeps [PollutionSite.shareCount] in sync after a successful share action.
+  void patchSiteShareCount(String siteId, int shareCount) {
+    state = state.copyWith(
+      allSites: patchPollutionSitesShareCount(
+        state.allSites,
+        siteId,
+        shareCount,
+      ),
+    );
+  }
+
   Future<SitesListResult> _fetchListForFilter({
     required FeedFilter filter,
     required int page,

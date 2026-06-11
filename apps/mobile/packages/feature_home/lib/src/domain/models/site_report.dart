@@ -2,6 +2,7 @@ class SiteReport {
   const SiteReport({
     required this.id,
     required this.reporterName,
+    this.reporterIsDeleted = false,
     required this.reportedAt,
     required this.title,
     this.description,
@@ -11,6 +12,7 @@ class SiteReport {
 
   final String id;
   final String reporterName;
+  final bool reporterIsDeleted;
   final String? reporterAvatarUrl;
   final DateTime reportedAt;
   final String title;

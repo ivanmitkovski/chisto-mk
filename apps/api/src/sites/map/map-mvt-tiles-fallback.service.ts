@@ -44,8 +44,8 @@ export class MapMvtTilesFallbackService {
     }
 
     const visibility = siteVisibilitySql({
-      siteIdSql: Prisma.raw('"siteId"'),
-      siteStatusSql: Prisma.raw('"status"'),
+      siteIdSql: Prisma.sql`"MapSiteProjection"."siteId"`,
+      siteStatusSql: Prisma.sql`"MapSiteProjection"."status"`,
       viewerUserId,
     });
     const minLon = tile2lon(x, z);

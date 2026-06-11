@@ -1,0 +1,46 @@
+.wrap {
+  overflow: auto;
+  border: 1px solid var(--border-subtle, #e5e7eb);
+  border-radius: 10px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.table th,
+.table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-subtle, #e5e7eb);
+}
+
+.table th {
+  background: var(--surface-muted, #f9fafb);
+  font-weight: 600;
+}
+
+.sub {
+  color: var(--text-secondary, #6b7280);
+  font-size: 12px;
+}
+
+.status_online {
+  color: #059669;
+  font-weight: 600;
+}
+
+.status_away {
+  color: #d97706;
+  font-weight: 600;
+}
+
+.status_offline {
+  color: #6b7280;
+}
+
+.empty {
+  color: var(--text-secondary, #6b7280);
+}

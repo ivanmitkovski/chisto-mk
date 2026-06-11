@@ -1,6 +1,7 @@
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/shared/forms/form_validators.dart';
 
-/// Form validators for auth flows — messages from [AppLocalizations].
+/// Form validators for auth flows — delegates to [FormValidators].
 class AuthValidators {
   AuthValidators._();
 
@@ -8,80 +9,50 @@ class AuthValidators {
     AppLocalizations l10n,
     String? value,
     String fieldLabel,
-  ) {
-    if (value == null || value.trim().isEmpty) {
-      return l10n.authValidationFieldRequired(fieldLabel);
+  ) => FormValidators.requiredField(l10n, value, fieldLabel);
+
+  static String? email(AppLocalizations l10n, String? value) =>
+      FormValidators.email(l10n, value);
+
+  /// Sign-up / reset: strong password rules (mirrors server).
+  static String? password(AppLocalizations l10n, String? value) =>
+      FormValidators.strongPassword(l10n, value);
+
+  static String? loginPassword(AppLocalizations l10n, String? value) =>
+      FormValidators.loginPassword(l10n, value);
+
+  static String? fullName(AppLocalizations l10n, String? value) =>
+      FormValidators.fullName(l10n, value);
+
+  static String? macedonianPhone(AppLocalizations l10n, String? value) =>
+      FormValidators.macedonianPhone(l10n, value);
+
+  static String? otpCode(AppLocalizations l10n, String? value) =>
+      FormValidators.otpCode(l10n, value);
+
+  /// Inline OTP error: only show validation after submit (or server error while editing).
+  static String? otpInlineError({
+    required AppLocalizations l10n,
+    required String code,
+    required bool submitAttempted,
+    String? serverError,
+  }) {
+    if (serverError != null && serverError.isNotEmpty) {
+      if (submitAttempted || code.isNotEmpty) {
+        return serverError;
+      }
     }
-    return null;
+    if (!submitAttempted) {
+      return null;
+    }
+    return otpCode(l10n, code);
   }
 
-  static String? email(AppLocalizations l10n, String? value) {
-    final String trimmed = value?.trim() ?? '';
-    if (trimmed.isEmpty) {
-      return l10n.authValidationEmailRequired;
-    }
-    final RegExp pattern = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
-    if (!pattern.hasMatch(trimmed)) {
-      return l10n.authValidationEmailInvalid;
-    }
-    return null;
-  }
-
-  static String? password(AppLocalizations l10n, String? value) {
-    final String trimmed = value?.trim() ?? '';
-    if (trimmed.isEmpty) {
-      return l10n.authValidationPasswordRequired;
-    }
-    if (trimmed.length < 8) {
-      return l10n.authValidationPasswordMinLength;
-    }
-    if (!RegExp(r'\d').hasMatch(trimmed)) {
-      return l10n.authValidationPasswordNeedNumber;
-    }
-    if (!RegExp('[A-Za-z]').hasMatch(trimmed)) {
-      return l10n.authValidationPasswordNeedLetter;
-    }
-    return null;
-  }
-
-  static String? fullName(AppLocalizations l10n, String? value) {
-    final String? required = requiredField(l10n, value, l10n.authFieldFullName);
-    if (required != null) return required;
-    final List<String> parts = value!
-        .trim()
-        .split(RegExp(r'\s+'))
-        .where((String p) => p.isNotEmpty)
-        .toList();
-    if (parts.length < 2) {
-      return l10n.authValidationFullNameTwoParts;
-    }
-    return null;
-  }
-
-  static String? macedonianPhone(AppLocalizations l10n, String? value) {
-    final String digits = (value ?? '').replaceAll(RegExp(r'\D'), '');
-    if (digits.isEmpty) {
-      return l10n.authValidationPhoneRequired;
-    }
-    if (digits.length != 8) {
-      return l10n.authValidationPhoneDigits;
-    }
-    return null;
-  }
+  static String? termsAccepted(AppLocalizations l10n, bool accepted) =>
+      FormValidators.termsAccepted(l10n, accepted);
 
   static String? Function(String?) confirmPassword(
     AppLocalizations l10n,
     String password,
-  ) {
-    return (String? value) {
-      final String trimmed = value?.trim() ?? '';
-      if (trimmed.isEmpty) {
-        return l10n.authValidationConfirmPasswordRequired;
-      }
-      if (trimmed != password) {
-        return l10n.authValidationConfirmPasswordMismatch;
-      }
-      return null;
-    };
-  }
+  ) => FormValidators.confirmPassword(l10n, password);
 }

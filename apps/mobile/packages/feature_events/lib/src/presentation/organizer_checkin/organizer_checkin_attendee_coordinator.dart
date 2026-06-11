@@ -66,7 +66,7 @@ class OrganizerCheckInAttendeeCoordinator {
     final BuildContext context = readContext();
     final EcoEvent event = readEvent();
     final EventParticipantRow? picked =
-        await showModalBottomSheet<EventParticipantRow?>(
+        await AppBottomSheet.show<EventParticipantRow?>(
           context: context,
           isScrollControlled: true,
           useSafeArea: true,

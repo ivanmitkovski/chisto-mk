@@ -53,6 +53,9 @@ export class CitizenReportDetailDto {
   @ApiProperty({ nullable: true, description: 'Reporter display name' })
   reporterName!: string | null;
 
+  @ApiProperty({ description: 'True when the primary reporter account was erased' })
+  reporterIsDeleted!: boolean;
+
   @ApiProperty({ type: [String], description: 'Co-reporter display names' })
   coReporterNames!: string[];
 

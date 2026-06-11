@@ -53,6 +53,27 @@ describe('admin session helpers', () => {
     expect(verifyAdminCsrf(request)).toBe(false);
   });
 
+  it('sets csrf cookie with remember-aware maxAge', () => {
+    const request = requestWithCookies(`${ADMIN_REMEMBER_DEVICE_COOKIE_KEY}=1`);
+    const response = NextResponse.json({ ok: true });
+
+    ensureAdminCsrfCookie(request, response);
+
+    const setCookie = response.headers.getSetCookie().join('\n');
+    expect(setCookie).toContain(ADMIN_CSRF_COOKIE_KEY);
+    expect(setCookie).toContain(`Max-Age=${REFRESH_COOKIE_REMEMBER_MAX_AGE}`);
+  });
+
+  it('sets csrf cookie with standard maxAge when remember device is off', () => {
+    const request = requestWithCookies('');
+    const response = NextResponse.json({ ok: true });
+
+    ensureAdminCsrfCookie(request, response, { rememberDevice: false });
+
+    const setCookie = response.headers.getSetCookie().join('\n');
+    expect(setCookie).toContain(`Max-Age=${REFRESH_COOKIE_STANDARD_MAX_AGE}`);
+  });
+
   it('sets remember cookie and 30-day refresh maxAge when rememberDevice is true', () => {
     const request = requestWithCookies('');
     const response = NextResponse.json({ ok: true });

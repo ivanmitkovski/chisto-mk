@@ -71,5 +71,10 @@ void main() {
     await tester.pump(const Duration(milliseconds: 300));
 
     expect(find.text('Open Settings'), findsOneWidget);
+
+    // Let the snack's auto-dismiss timer (4s for action snacks) fire so no
+    // timers are pending when the widget tree is disposed.
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
   });
 }

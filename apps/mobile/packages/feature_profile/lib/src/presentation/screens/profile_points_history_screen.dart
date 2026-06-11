@@ -1,3 +1,5 @@
+import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:chisto_infrastructure/core/l10n/app_error_localizations.dart';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/core/theme/app_colors.dart';
 import 'package:chisto_infrastructure/core/theme/app_spacing.dart';
@@ -57,8 +59,6 @@ class _ProfilePointsHistoryScreenState
     });
   }
 
-  /// Uses [ScrollNotification] instead of a [ScrollController] so this screen
-  /// stays valid while [AnimatedPhaseSwitcher] briefly stacks two phases.
   bool _onScrollNotification(ScrollNotification n) {
     final PointsHistoryUiState s = ref.read(pointsHistoryNotifierProvider);
     if (s.phase != PointsHistoryPhase.ready) return false;
@@ -126,6 +126,7 @@ class _ProfilePointsHistoryScreenState
       backgroundColor: AppColors.appBackground,
       resizeToAvoidBottomInset: false,
       body: SafeArea(
+        bottom: false,
         child: AnimatedPhaseSwitcher(
           phaseKey: phase,
           child: _pointsHistoryPhaseChild(context, state, phase),
@@ -141,20 +142,35 @@ class _ProfilePointsHistoryScreenState
   ) {
     switch (phase) {
       case 'loading':
-        return Semantics(
-          label: context.l10n.profilePointsHistoryLoadingSemantic,
-          liveRegion: true,
-          child: const ProfilePointsHistorySkeleton(),
-        );
+        return const ProfilePointsHistorySkeleton();
       case 'error':
-        return AppErrorView(
-          error: state.pageError!,
-          onRetry: () =>
-              ref.read(pointsHistoryNotifierProvider.notifier).loadInitial(),
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            _pointsHistoryHeader(context),
+            Expanded(
+              child: AppErrorView(
+                error: state.pageError!,
+                onRetry: () => ref
+                    .read(pointsHistoryNotifierProvider.notifier)
+                    .loadInitial(),
+              ),
+            ),
+          ],
         );
       default:
         return _buildPointsHistoryLoadedBody(context, state);
     }
+  }
+
+  Widget _pointsHistoryHeader(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.md),
+      child: ProfileSubScreenHeader(
+        title: context.l10n.profilePointsHistoryTitle,
+        subtitle: context.l10n.profilePointsHistorySubtitle,
+      ),
+    );
   }
 
   Widget _buildPointsHistoryLoadedBody(
@@ -174,15 +190,6 @@ class _ProfilePointsHistoryScreenState
         (showLoadMoreError ? 1 : 0) + (showLoadingFooter ? 1 : 0);
 
     final List<Widget> slivers = <Widget>[
-      SliverToBoxAdapter(
-        child: Padding(
-          padding: const EdgeInsets.only(top: AppSpacing.md),
-          child: ProfileSubScreenHeader(
-            title: context.l10n.profilePointsHistoryTitle,
-            subtitle: context.l10n.profilePointsHistorySubtitle,
-          ),
-        ),
-      ),
       SliverToBoxAdapter(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
@@ -287,7 +294,7 @@ class _ProfilePointsHistoryScreenState
                     container: true,
                     liveRegion: true,
                     label:
-                        '${context.l10n.profilePointsHistoryLoadMoreErrorTitle}. ${state.loadMoreError!.message}',
+                        '${context.l10n.profilePointsHistoryLoadMoreErrorTitle}. ${localizedAppErrorMessage(l10n, state.loadMoreError!)}',
                     child: Material(
                       color: AppColors.panelBackground,
                       borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
@@ -380,12 +387,11 @@ class _ProfilePointsHistoryScreenState
                     reasonIcon: pointsHistoryReasonIcon(entry.reasonCode),
                     deltaLabel: deltaLabel,
                     timeLine: timeLine,
-                    semanticLabel: context.l10n
-                        .profilePointsActivityRowSemantic(
-                          reasonTitle,
-                          timeLine,
-                          deltaLabel,
-                        ),
+                    semanticLabel: context.l10n.profilePointsActivityRowSemantic(
+                      reasonTitle,
+                      timeLine,
+                      deltaLabel,
+                    ),
                   ),
                 );
             }
@@ -399,28 +405,36 @@ class _ProfilePointsHistoryScreenState
     return Semantics(
       namesRoute: true,
       label: context.l10n.profilePointsHistoryTitle,
-      child: NotificationListener<ScrollNotification>(
-        onNotification: _onScrollNotification,
-        child: ScrollConfiguration(
-          behavior: const NoOverscrollOverlayScrollBehavior(),
-          child: ClipRect(
-            clipper: const ProfileScrollBottomShadowClipper(
-              bottomExtension: kProfileScrollBottomShadowExtension,
-            ),
-            child: AppRefreshIndicator(
-              onRefresh: () => ref
-                  .read(pointsHistoryNotifierProvider.notifier)
-                  .refresh(),
-              child: CustomScrollView(
-                clipBehavior: Clip.none,
-                physics: const AlwaysScrollableScrollPhysics(
-                  parent: BouncingScrollPhysics(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          _pointsHistoryHeader(context),
+          Expanded(
+            child: NotificationListener<ScrollNotification>(
+              onNotification: _onScrollNotification,
+              child: ScrollConfiguration(
+                behavior: const NoOverscrollOverlayScrollBehavior(),
+                child: ClipRect(
+                  clipper: const ProfileScrollBottomShadowClipper(
+                    bottomExtension: kProfileScrollBottomShadowExtension,
+                  ),
+                  child: AppRefreshIndicator(
+                    onRefresh: () => ref
+                        .read(pointsHistoryNotifierProvider.notifier)
+                        .refresh(),
+                    child: CustomScrollView(
+                      clipBehavior: Clip.none,
+                      physics: const AlwaysScrollableScrollPhysics(
+                        parent: BouncingScrollPhysics(),
+                      ),
+                      slivers: slivers,
+                    ),
+                  ),
                 ),
-                slivers: slivers,
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

@@ -20,7 +20,7 @@ class _UgcTestApiClient extends ApiClient {
     : super(
         config: AppConfig.dev,
         accessToken: () => null,
-        onUnauthorized: () {},
+        onUnauthorized: (_) {},
       );
 
   @override
@@ -222,5 +222,53 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(deletedId, 'c1');
+  });
+
+  testWidgets('posts comment within max length optimistically', (
+    tester,
+  ) async {
+    final comments = <Comment>[];
+    List<Comment>? latestComments;
+    final String body = 'a' * 400;
+
+    await tester.pumpWidget(
+      _wrapCommentsTest(
+        CommentsBottomSheet(
+          comments: comments,
+          onCommentsChanged: (value) => latestComments = value,
+        ),
+      ),
+    );
+
+    await tester.enterText(find.byType(TextField), body);
+    await tester.pump();
+    await tester.tap(find.byIcon(Icons.arrow_upward_rounded));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(latestComments, isNotNull);
+    expect(latestComments!.length, 1);
+    expect(latestComments!.first.text, body);
+  });
+
+  testWidgets('does not post whitespace-only comment', (tester) async {
+    final comments = <Comment>[];
+    List<Comment>? latestComments;
+
+    await tester.pumpWidget(
+      _wrapCommentsTest(
+        CommentsBottomSheet(
+          comments: comments,
+          onCommentsChanged: (value) => latestComments = value,
+        ),
+      ),
+    );
+
+    await tester.enterText(find.byType(TextField), '   ');
+    await tester.pump();
+    await tester.tap(find.byIcon(Icons.arrow_upward_rounded));
+    await tester.pump();
+
+    expect(latestComments ?? comments, isEmpty);
   });
 }

@@ -157,14 +157,17 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   ),
                 ),
                 child: Padding(
+                  // Add the FULL bottom system inset so the CTA always clears the
+                  // Android gesture/3-button navigation bar and the iOS home
+                  // indicator. `radius14` is the visual gap above that inset (and
+                  // the resting padding on devices with no inset). The inset must
+                  // never be clamped — a 3-button nav bar is ~48dp, far larger than
+                  // any fixed cap — or the button gets covered.
                   padding: EdgeInsets.fromLTRB(
                     AppSpacing.lg,
                     AppSpacing.radiusSm,
                     AppSpacing.lg,
-                    (systemPadding.bottom + AppSpacing.radius10).clamp(
-                      AppSpacing.radius14,
-                      AppSpacing.radius22,
-                    ),
+                    systemPadding.bottom + AppSpacing.radius14,
                   ),
                   child: Column(
                     children: [
@@ -259,71 +262,82 @@ class _OnboardingSlide extends StatelessWidget {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final bool compact = constraints.maxHeight < 96;
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxs),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (slide.isWelcome)
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Row(
-                    children: [
-                      Text(
-                        l10n.authOnboardingWelcomeTo,
-                        style: AppTypography.authHeadline(
-                          textTheme,
-                        ).copyWith(fontSize: compact ? 20 : 22),
+        final double contentWidth = (constraints.maxWidth - AppSpacing.xxs * 2)
+            .clamp(0.0, double.infinity);
+        // Safety net for very short panels (small device + 3-button nav bar +
+        // large text scale): scale the copy down to fit instead of overflowing.
+        // `scaleDown` is a no-op whenever the content already fits, so taller
+        // devices render identically.
+        return Center(
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: SizedBox(
+              width: contentWidth,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (slide.isWelcome)
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Row(
+                        children: [
+                          Text(
+                            l10n.authOnboardingWelcomeTo,
+                            style: AppTypography.authHeadline(
+                              textTheme,
+                            ).copyWith(fontSize: compact ? 20 : 22),
+                          ),
+                          const SizedBox(width: AppSpacing.radiusSm),
+                          SvgPicture.asset(
+                            AppAssets.brandLogoGreen,
+                            width: compact ? 84 : 90,
+                            height: compact ? 24 : 26,
+                            fit: BoxFit.contain,
+                          ),
+                          Text(
+                            ' ${l10n.authOnboardingBrandName}',
+                            style: AppTypography.authHeadline(
+                              textTheme,
+                            ).copyWith(fontSize: 20),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: AppSpacing.radiusSm),
-                      SvgPicture.asset(
-                        AppAssets.brandLogoGreen,
-                        width: compact ? 84 : 90,
-                        height: compact ? 24 : 26,
-                        fit: BoxFit.contain,
-                      ),
-                      Text(
-                        ' ${l10n.authOnboardingBrandName}',
-                        style: AppTypography.authHeadline(
-                          textTheme,
-                        ).copyWith(fontSize: 20),
-                      ),
-                    ],
+                    )
+                  else
+                    Text(
+                      slide.title,
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.authHeadline(
+                        textTheme,
+                      ).copyWith(fontSize: compact ? 24 : 26),
+                    ),
+                  SizedBox(height: compact ? 6 : 8),
+                  Text(
+                    slide.description,
+                    textAlign: TextAlign.center,
+                    maxLines: compact ? 1 : 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTypography.authSubtitle(
+                      textTheme,
+                    ).copyWith(fontSize: compact ? 14 : 15),
                   ),
-                )
-              else
-                Text(
-                  slide.title,
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTypography.authHeadline(
-                    textTheme,
-                  ).copyWith(fontSize: compact ? 24 : 26),
-                ),
-              SizedBox(height: compact ? 6 : 8),
-              Text(
-                slide.description,
-                textAlign: TextAlign.center,
-                maxLines: compact ? 1 : 2,
-                overflow: TextOverflow.ellipsis,
-                style: AppTypography.authSubtitle(
-                  textTheme,
-                ).copyWith(fontSize: compact ? 14 : 15),
+                  if (!compact) ...<Widget>[
+                    const SizedBox(height: AppSpacing.xxs),
+                    Text(
+                      slide.supporting,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.cardSubtitle(
+                        textTheme,
+                      ).copyWith(height: 1.35),
+                    ),
+                  ],
+                ],
               ),
-              if (!compact) ...<Widget>[
-                const SizedBox(height: AppSpacing.xxs),
-                Text(
-                  slide.supporting,
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTypography.cardSubtitle(
-                    textTheme,
-                  ).copyWith(height: 1.35),
-                ),
-              ],
-            ],
+            ),
           ),
         );
       },

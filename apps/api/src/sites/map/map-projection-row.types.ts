@@ -13,6 +13,7 @@ export type ProjectionSourceSite = {
   sharesCount: number;
   isArchivedByAdmin: boolean;
   archivedAt: Date | null;
+  heroReport?: { mediaUrls: string[] } | null;
   reports: Array<{
     title: string;
     description: string | null;

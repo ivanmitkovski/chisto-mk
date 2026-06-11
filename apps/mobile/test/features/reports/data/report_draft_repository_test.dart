@@ -163,7 +163,9 @@ void main() {
     expect(loaded.hasDraft, isFalse);
     final ReportDraftSummary summary = await repo.summary();
     expect(summary.hasDraft, isFalse);
-    final ReportOutboxEntry? row = await outbox.getById(kReportWizardDraftRowId);
+    final ReportOutboxEntry? row = await outbox.getById(
+      kReportWizardDraftRowId,
+    );
     expect(row?.reportId, isNull);
     expect(row?.state, ReportOutboxState.pending);
 

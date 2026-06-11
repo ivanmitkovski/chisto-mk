@@ -7,7 +7,7 @@ import {
 } from '@nestjs/websockets';
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Server, Socket } from 'socket.io';
+import { Namespace, Socket } from 'socket.io';
 import { Subscription } from 'rxjs';
 import { PrismaService } from '../../prisma/prisma.service';
 import { authenticateSocketUser } from '../../common/ws/authenticate-socket-user';
@@ -27,7 +27,7 @@ interface ReportsOwnerSocketData {
 })
 export class ReportsOwnerGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
-  server!: Server;
+  server!: Namespace;
 
   private readonly logger = new Logger(ReportsOwnerGateway.name);
   private readonly subsBySocketId = new Map<string, Subscription>();
@@ -40,40 +40,58 @@ export class ReportsOwnerGateway implements OnGatewayInit, OnGatewayConnection, 
     private readonly reportsOwnerEvents: ReportsOwnerEventsService,
   ) {}
 
-  afterInit(_server: Server): void {
+  afterInit(server: Namespace): void {
+    server.use(async (socket, next) => {
+      try {
+        const { userId } = await authenticateSocketUser(socket, this.config, this.prisma);
+        (socket.data as ReportsOwnerSocketData).userId = userId;
+        next();
+      } catch {
+        next(new Error('AUTH_FAILED'));
+      }
+    });
     this.logger.log('Reports owner WebSocket gateway initialized');
   }
 
-  async handleConnection(client: Socket): Promise<void> {
+  handleConnection(client: Socket): void {
     try {
-      const { userId } = await authenticateSocketUser(client, this.config, this.prisma);
-      (client.data as ReportsOwnerSocketData).userId = userId;
-
-      const previousSocketId = this.socketIdByUserId.get(userId);
-      if (previousSocketId && previousSocketId !== client.id) {
-        const previous = this.server.sockets.sockets.get(previousSocketId);
-        previous?.disconnect(true);
-        this.subsBySocketId.get(previousSocketId)?.unsubscribe();
-        this.subsBySocketId.delete(previousSocketId);
-      }
-      this.socketIdByUserId.set(userId, client.id);
-
-      const sub = this.reportsOwnerEvents.getEventsForOwner(userId).subscribe({
-        next: (evt: OwnerReportEvent) => {
-          client.emit('report_event', evt);
-        },
-        error: (err: unknown) => {
-          this.logger.warn(`owner events stream error user=${userId}: ${String(err)}`);
-        },
-      });
-      this.subsBySocketId.set(client.id, sub);
-
-      this.logger.debug(`reports-owner connected user=${userId} socket=${client.id}`);
-    } catch (error) {
-      this.logger.warn(`reports-owner WS auth failed: ${String(error)}`);
-      client.emit('error', { code: 'AUTH_FAILED', message: 'Authentication failed' });
+      this.acceptOwnerConnection(client);
+    } catch (err: unknown) {
+      this.logger.error(
+        `reports-owner connection failed socket=${client.id}: ${String(err)}`,
+      );
       client.disconnect(true);
     }
+  }
+
+  private acceptOwnerConnection(client: Socket): void {
+    const userId = (client.data as ReportsOwnerSocketData).userId;
+    if (!userId) {
+      client.disconnect(true);
+      return;
+    }
+
+    const previousSocketId = this.socketIdByUserId.get(userId);
+    if (previousSocketId && previousSocketId !== client.id) {
+      const previous = this.server.sockets.get(previousSocketId);
+      previous?.disconnect(true);
+      this.subsBySocketId.get(previousSocketId)?.unsubscribe();
+      this.subsBySocketId.delete(previousSocketId);
+    }
+    this.socketIdByUserId.set(userId, client.id);
+
+    const sub = this.reportsOwnerEvents.getEventsForOwner(userId).subscribe({
+      next: (evt: OwnerReportEvent) => {
+        client.emit('report_event', evt);
+      },
+      error: (err: unknown) => {
+        this.logger.warn(`owner events stream error user=${userId}: ${String(err)}`);
+      },
+    });
+    this.subsBySocketId.set(client.id, sub);
+
+    client.emit('reports_owner.ready', { userId });
+    this.logger.debug(`reports-owner connected user=${userId} socket=${client.id}`);
   }
 
   handleDisconnect(client: Socket): void {

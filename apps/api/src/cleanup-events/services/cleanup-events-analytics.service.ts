@@ -7,6 +7,7 @@ import {
   type CheckInsByHourPoint,
   type EventAnalyticsPayload,
 } from '../../events/util/event-analytics.aggregation';
+import { resolveActorIdentity } from '../../common/projections/public-identity.projection';
 
 const AUDIT_TRAIL_LIMIT = 50;
 /** Cap joiner series rows to keep analytics bounded for very large events (headline uses participantCount). */
@@ -84,12 +85,17 @@ export class CleanupEventsAnalyticsService {
       },
     });
     return {
-      data: rows.map((r) => ({
-        userId: r.userId,
-        joinedAt: r.joinedAt.toISOString(),
-        displayName: `${r.user.firstName} ${r.user.lastName}`.trim(),
-        email: r.user.email,
-      })),
+      data: rows
+        .filter((r): r is typeof r & { userId: string } => r.userId != null)
+        .map((r) => {
+          const identity = resolveActorIdentity(r.user, { actorUserId: r.userId });
+          return {
+            userId: r.userId,
+            joinedAt: r.joinedAt.toISOString(),
+            displayName: identity.displayName ?? '',
+            email: r.user?.email ?? null,
+          };
+        }),
     };
   }
 

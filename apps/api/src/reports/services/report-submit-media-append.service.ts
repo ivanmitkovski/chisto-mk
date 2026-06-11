@@ -7,6 +7,7 @@ import {
 import { PrismaService } from '../../prisma/prisma.service';
 import { ReportsOwnerEventsService } from './reports-owner-events.service';
 import { ReportsUploadService } from './reports-upload.service';
+import { SiteHeroImageService } from '../../sites/services/site-hero-image.service';
 
 @Injectable()
 export class ReportSubmitMediaAppendService {
@@ -14,6 +15,7 @@ export class ReportSubmitMediaAppendService {
     private readonly prisma: PrismaService,
     private readonly reportsUpload: ReportsUploadService,
     private readonly reportsOwnerEventsService: ReportsOwnerEventsService,
+    private readonly siteHeroImage: SiteHeroImageService,
   ) {}
 
   /**
@@ -61,6 +63,8 @@ export class ReportSubmitMediaAppendService {
       where: { id: reportId },
       select: {
         id: true,
+        siteId: true,
+        status: true,
         mediaUrls: true,
         reporterId: true,
         coReporters: { select: { userId: true } },
@@ -82,12 +86,24 @@ export class ReportSubmitMediaAppendService {
       });
     }
 
-    await this.prisma.report.update({
-      where: { id: reportId },
-      data: { mediaUrls: newUrls },
+    const heroResult = await this.prisma.$transaction(async (tx) => {
+      await tx.report.update({
+        where: { id: reportId },
+        data: { mediaUrls: newUrls },
+      });
+      if (report.status === 'APPROVED') {
+        return this.siteHeroImage.recomputeSiteHero(tx, report.siteId);
+      }
+      return { changed: false, heroReportId: null };
     });
 
-    const coReporterUserIds = report.coReporters.map((c) => c.userId);
+    if (heroResult.changed) {
+      this.siteHeroImage.emitIfChanged(report.siteId, heroResult);
+    }
+
+    const coReporterUserIds = report.coReporters
+      .map((c) => c.userId)
+      .filter((id): id is string => id != null);
     this.reportsOwnerEventsService.emitToReportInterestedParties(
       reportId,
       report.reporterId,

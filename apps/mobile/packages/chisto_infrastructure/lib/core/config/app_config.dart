@@ -22,8 +22,15 @@ class AppConfig implements ApiClientConfig {
     return trimmed.isNotEmpty ? trimmed : fallback;
   }
 
+  /// TEMP: the dev backend currently has no valid TLS certificate
+  /// (`https://api-dev.chisto.mk` fails the handshake), so the app talks to it
+  /// over HTTP. Cleartext for this single host is allowlisted in the Android
+  /// network security config and iOS ATS exceptions. Switch back to HTTPS once
+  /// the dev/staging certificate is provisioned.
+  static const String devApiBaseUrl = 'http://api-dev.chisto.mk';
+
   static final AppConfig dev = AppConfig._(
-    apiBaseUrl: 'https://api-dev.chisto.mk',
+    apiBaseUrl: devApiBaseUrl,
     helpCenterUrl: 'https://chisto.mk/help',
     termsUrl: _legalUrlFromEnvironment('TERMS_URL', 'https://chisto.mk/terms'),
     privacyUrl: _legalUrlFromEnvironment(
@@ -33,8 +40,12 @@ class AppConfig implements ApiClientConfig {
     environment: AppEnvironment.dev,
   );
 
+  /// TEMP: until a real staging/prod environment exists, beta builds
+  /// (`build-beta.sh`, ENV=staging) point at the dev backend so internal
+  /// testers hit a live API. Repoint to `https://api-staging.chisto.mk` (or
+  /// switch beta to ENV=prod) once that environment is deployed.
   static final AppConfig staging = AppConfig._(
-    apiBaseUrl: 'https://api-staging.chisto.mk',
+    apiBaseUrl: devApiBaseUrl,
     helpCenterUrl: 'https://chisto.mk/help',
     termsUrl: _legalUrlFromEnvironment('TERMS_URL', 'https://chisto.mk/terms'),
     privacyUrl: _legalUrlFromEnvironment(
@@ -105,7 +116,7 @@ class AppConfig implements ApiClientConfig {
   static final AppConfig awsDev = AppConfig._(
     apiBaseUrl: const String.fromEnvironment(
       'API_URL',
-      defaultValue: 'https://api-dev.chisto.mk',
+      defaultValue: devApiBaseUrl,
     ),
     helpCenterUrl: 'https://chisto.mk/help',
     termsUrl: _legalUrlFromEnvironment('TERMS_URL', 'https://chisto.mk/terms'),
@@ -160,6 +171,12 @@ class AppConfig implements ApiClientConfig {
   bool get isDev => environment == AppEnvironment.dev;
   bool get isStaging => environment == AppEnvironment.staging;
   bool get isProd => environment == AppEnvironment.prod;
+
+  /// May this config ship in a `--release` build? Staging powers beta builds
+  /// (TestFlight / Play internal testing) and prod powers store builds. The
+  /// dev family (dev/local/localAndroid/localDevice/awsDev) uses cleartext or
+  /// ELB hosts and must never ship, so it is rejected at startup.
+  bool get isReleaseEligible => isStaging || isProd;
 
   /// Rejects cleartext API URLs and raw ELB hostnames for release/prod traffic.
   static void assertReleaseTransportSecurity(String apiBaseUrl) {

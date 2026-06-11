@@ -7,7 +7,6 @@ import type { PatchCleanupEventDto } from '../../src/cleanup-events/dto/patch-cl
 import { CleanupEventsAnalyticsService } from '../../src/cleanup-events/services/cleanup-events-analytics.service';
 import { CleanupEventsListService } from '../../src/cleanup-events/services/cleanup-events-list.service';
 import { CleanupEventsBulkModerateMutationService } from '../../src/cleanup-events/services/cleanup-events-mutation-bulk.service';
-import { CleanupEventsCheckInRiskSignalsService } from '../../src/cleanup-events/services/cleanup-events-check-in-risk-signals.service';
 import { CleanupEventsModerationNotesService } from '../../src/cleanup-events/services/cleanup-events-moderation-notes.service';
 import { CleanupEventsParticipantsAdminService } from '../../src/cleanup-events/services/cleanup-events-participants-admin.service';
 import { CleanupEventsCreateMutationService } from '../../src/cleanup-events/services/cleanup-events-mutation-create.service';
@@ -128,6 +127,7 @@ describe('CleanupEventsService duplicate schedule', () => {
       scheduleConflict as never,
       cleanupEventNotifications as never,
       list,
+      { emit: jest.fn() } as never,
     );
     const bulkMutation = new CleanupEventsBulkModerateMutationService(prisma as never, patchMutation);
     const createMutation = new CleanupEventsCreateMutationService(
@@ -138,15 +138,10 @@ describe('CleanupEventsService duplicate schedule', () => {
       cleanupEventNotifications as never,
       list,
     );
-    const riskSignals = new CleanupEventsCheckInRiskSignalsService(
-      prisma as never,
-      { emitUpdated: jest.fn() } as never,
-    );
     const mutations = new CleanupEventsMutationsService(
       createMutation,
       patchMutation,
       bulkMutation,
-      riskSignals,
     );
     const analytics = new CleanupEventsAnalyticsService(prisma as never, audit as never);
     const notes = new CleanupEventsModerationNotesService(prisma as never, audit as never);

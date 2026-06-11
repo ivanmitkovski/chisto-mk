@@ -51,7 +51,7 @@ enum EventGear {
   gloves('Gloves', IconData(0xf05c0, fontFamily: 'MaterialIcons')),
   rakes('Rakes & shovels', IconData(0xf7be, fontFamily: 'MaterialIcons')),
   wheelbarrow('Wheelbarrow', IconData(0xf06f2, fontFamily: 'MaterialIcons')),
-  waterBoots('Water boots', IconData(0xefde, fontFamily: 'MaterialIcons')),
+  waterBoots('Rubber boots', IconData(0xefde, fontFamily: 'MaterialIcons')),
   safetyVest('Safety vest', IconData(0xf379, fontFamily: 'MaterialIcons')),
   firstAid('First aid kit', IconData(0xf1be, fontFamily: 'MaterialIcons')),
   sunscreen('Sunscreen & water', IconData(0xf4bc, fontFamily: 'MaterialIcons'));

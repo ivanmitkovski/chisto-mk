@@ -21,13 +21,16 @@ class ApiEventChatRepository implements EventChatRepository {
     required ApiClient client,
     required AppConfig config,
     required AuthState authState,
+    VoidCallback? onAuthRejected,
   }) : _client = client,
        _baseUrl = config.apiBaseUrl.replaceFirst(RegExp(r'/$'), ''),
-       _authState = authState;
+       _authState = authState,
+       _onAuthRejected = onAuthRejected ?? client.notifySessionAuthRejected;
 
   final ApiClient _client;
   final String _baseUrl;
   final AuthState _authState;
+  final VoidCallback _onAuthRejected;
 
   static const int _maxOpenChatSockets = 6;
   final Map<String, SocketEventChatStream> _wsByEvent =
@@ -61,7 +64,7 @@ class ApiEventChatRepository implements EventChatRepository {
         baseUrl: _baseUrl,
         authState: _authState,
         sessionRefresh: _client.refreshSessionQueued,
-        onAuthRejected: _client.notifySessionAuthRejected,
+        onAuthRejected: _onAuthRejected,
       );
     });
   }
@@ -112,6 +115,15 @@ class ApiEventChatRepository implements EventChatRepository {
   EventChatConnectionStatus currentConnectionStatus(String eventId) {
     return _wsByEvent[eventId]?.connectionStatus ??
         EventChatConnectionStatus.disconnected;
+  }
+
+  static final ValueNotifier<bool> _noDisruptionNotifier = ValueNotifier<bool>(
+    false,
+  );
+
+  @override
+  ValueListenable<bool> realtimeDisruptionVisible(String eventId) {
+    return _wsByEvent[eventId]?.disruptionVisible ?? _noDisruptionNotifier;
   }
 
   void _stopRealtime(String eventId) {

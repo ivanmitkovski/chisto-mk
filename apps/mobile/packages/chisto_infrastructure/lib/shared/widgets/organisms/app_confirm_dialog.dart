@@ -13,7 +13,7 @@ class AppConfirmDialog extends StatefulWidget {
     required this.confirmLabel,
     this.body,
     this.bodyWidget,
-    required this.cancelLabel,
+    this.cancelLabel,
     this.isDestructive = false,
     this.typeToConfirm,
     this.typedFieldPlaceholder,
@@ -24,7 +24,9 @@ class AppConfirmDialog extends StatefulWidget {
   final String confirmLabel;
   final String? body;
   final Widget? bodyWidget;
-  final String cancelLabel;
+
+  /// When null, the cancel button is hidden (single-action info dialog).
+  final String? cancelLabel;
   final bool isDestructive;
   final String? typeToConfirm;
   final String? typedFieldPlaceholder;
@@ -72,6 +74,35 @@ class AppConfirmDialog extends StatefulWidget {
           typeToConfirm: typeToConfirm,
           typedFieldPlaceholder: typedFieldPlaceholder,
           typedMismatchMessage: typedMismatchMessage,
+        );
+      },
+    );
+  }
+
+  /// Single-action acknowledgment dialog (confirm button only, e.g. "Got it").
+  static Future<void> showInfo({
+    required BuildContext context,
+    required String title,
+    required String confirmLabel,
+    String? body,
+    Widget? bodyWidget,
+    bool barrierDismissible = true,
+  }) {
+    assert(
+      body == null || bodyWidget == null,
+      'Provide at most one of body or bodyWidget.',
+    );
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: barrierDismissible,
+      barrierColor: AppColors.overlay,
+      useRootNavigator: true,
+      builder: (BuildContext dialogContext) {
+        return AppConfirmDialog(
+          title: title,
+          confirmLabel: confirmLabel,
+          body: body,
+          bodyWidget: bodyWidget,
         );
       },
     );
@@ -272,26 +303,30 @@ class _AppConfirmDialogState extends State<AppConfirmDialog> {
                 ),
               ],
               const SizedBox(height: AppSpacing.xl),
-              OutlinedButton(
-                onPressed: () => _onCancel(context),
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 52),
-                  side: BorderSide(
-                    color: AppColors.divider.withValues(alpha: 0.95),
+              if (widget.cancelLabel != null) ...<Widget>[
+                OutlinedButton(
+                  onPressed: () => _onCancel(context),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 52),
+                    side: BorderSide(
+                      color: AppColors.divider.withValues(alpha: 0.95),
+                    ),
+                    foregroundColor: AppColors.textPrimary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusPill,
+                      ),
+                    ),
                   ),
-                  foregroundColor: AppColors.textPrimary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+                  child: Text(
+                    widget.cancelLabel!,
+                    style: AppTypography.buttonLabel(
+                      textTheme,
+                    ).copyWith(color: AppColors.textSecondary, fontSize: 17),
                   ),
                 ),
-                child: Text(
-                  widget.cancelLabel,
-                  style: AppTypography.buttonLabel(
-                    textTheme,
-                  ).copyWith(color: AppColors.textSecondary, fontSize: 17),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.sm),
+                const SizedBox(height: AppSpacing.sm),
+              ],
               SizedBox(
                 height: 52,
                 width: double.infinity,

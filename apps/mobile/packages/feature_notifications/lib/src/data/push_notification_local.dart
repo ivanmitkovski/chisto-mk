@@ -33,44 +33,7 @@ mixin PushNotificationLocal {
     );
     final AppLocalizations strings = lookupAppLocalizations(effectiveLocale);
     final List<AndroidNotificationChannel> channels =
-        <AndroidNotificationChannel>[
-          AndroidNotificationChannel(
-            'chisto_default',
-            strings.pushChannelDefaultName,
-            description: strings.pushChannelDefaultDescription,
-            importance: Importance.high,
-          ),
-          AndroidNotificationChannel(
-            'chisto_event_chat',
-            strings.eventChatPushChannelName,
-            description: strings.eventChatPushChannelDescription,
-            importance: Importance.high,
-          ),
-          AndroidNotificationChannel(
-            'chisto_reports',
-            strings.pushChannelReportsName,
-            description: strings.pushChannelReportsDescription,
-            importance: Importance.high,
-          ),
-          AndroidNotificationChannel(
-            'chisto_events',
-            strings.pushChannelEventsName,
-            description: strings.pushChannelEventsDescription,
-            importance: Importance.high,
-          ),
-          AndroidNotificationChannel(
-            'chisto_social',
-            strings.pushChannelSocialName,
-            description: strings.pushChannelSocialDescription,
-            importance: Importance.defaultImportance,
-          ),
-          AndroidNotificationChannel(
-            'chisto_system',
-            strings.pushChannelSystemName,
-            description: strings.pushChannelSystemDescription,
-            importance: Importance.defaultImportance,
-          ),
-        ];
+        buildPushAndroidNotificationChannels(strings);
 
     if (Platform.isAndroid) {
       final AndroidFlutterLocalNotificationsPlugin? android =
@@ -86,6 +49,7 @@ mixin PushNotificationLocal {
     _eventChatNotificationDetails = EventChatNotificationDetails(
       androidChannel: PushNotificationPayload.resolveAndroidChannel(
         'EVENT_CHAT',
+        strings: strings,
       ),
       replyActionTitle: strings.eventChatPushReplyAction,
       replyInputLabel: strings.eventChatPushReplyPlaceholder,
@@ -228,7 +192,10 @@ mixin PushNotificationLocal {
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
-        payload: eventId,
+        payload: PushNotificationPayload.encodePayload(<String, dynamic>{
+          'type': 'CLEANUP_EVENT',
+          'eventId': eventId,
+        }),
       );
     } on Object catch (e) {
       if (kDebugMode) {
@@ -309,7 +276,10 @@ mixin PushNotificationLocal {
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
-        payload: eventId,
+        payload: PushNotificationPayload.encodePayload(<String, dynamic>{
+          'type': 'CLEANUP_EVENT',
+          'eventId': eventId,
+        }),
       );
     } on Object catch (e) {
       if (kDebugMode) {
@@ -380,7 +350,7 @@ mixin PushNotificationLocal {
     _tokenRefreshListenerAttached = false;
   }
 
-  Future<void> consumePendingLaunchNotification() async {
+  Future<void> consumePendingLaunchNotificationImpl() async {
     if (!_firebaseReady) return;
 
     RemoteMessage? initialMessage;

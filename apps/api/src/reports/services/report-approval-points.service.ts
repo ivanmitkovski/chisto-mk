@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, ReportCleanupEffort } from '../../prisma-client';
-import { EcoEventPointsService } from '../../gamification/services/eco-event-points.service';
+import { EcoEventPointsService, type EcoEventPointsCreditResult } from '../../gamification/services/eco-event-points.service';
 import {
   DAILY_REPORT_APPROVAL_POINTS_CAP,
   REPORT_APPROVAL_POINTS_METADATA_VERSION,
@@ -33,10 +33,10 @@ export class ReportApprovalPointsService {
   async creditApprovalIfEligible(
     tx: Prisma.TransactionClient,
     params: { report: ReportApprovalGrantReportShape; now: Date },
-  ): Promise<{ awarded: number; preCapTotal: number }> {
+  ): Promise<{ awarded: number; preCapTotal: number; credit: EcoEventPointsCreditResult }> {
     const { report, now } = params;
     if (report.reporterId == null) {
-      return { awarded: 0, preCapTotal: 0 };
+      return { awarded: 0, preCapTotal: 0, credit: { granted: 0, totalPointsEarnedBefore: 0, totalPointsEarnedAfter: 0 } };
     }
 
     const otherApproved = await tx.report.count({
@@ -51,7 +51,7 @@ export class ReportApprovalPointsService {
     });
 
     if (preCapTotal <= 0) {
-      return { awarded: 0, preCapTotal: 0 };
+      return { awarded: 0, preCapTotal: 0, credit: { granted: 0, totalPointsEarnedBefore: 0, totalPointsEarnedAfter: 0 } };
     }
 
     const { dayStartsAt, dayEndsAt } = getSkopjeDayBoundsUtc(now);
@@ -73,7 +73,7 @@ export class ReportApprovalPointsService {
     }
 
     if (award <= 0) {
-      return { awarded: 0, preCapTotal };
+      return { awarded: 0, preCapTotal, credit: { granted: 0, totalPointsEarnedBefore: 0, totalPointsEarnedAfter: 0 } };
     }
 
     const metadata: Prisma.InputJsonValue = {
@@ -90,7 +90,7 @@ export class ReportApprovalPointsService {
         : {}),
     };
 
-    const granted = await this.ecoEventPoints.creditIfNew(tx, {
+    const credit = await this.ecoEventPoints.creditIfNew(tx, {
       userId: report.reporterId,
       delta: award,
       reasonCode: REASON_REPORT_APPROVED,
@@ -98,10 +98,10 @@ export class ReportApprovalPointsService {
       referenceId: report.id,
       metadata,
     });
-    if (granted > 0) {
-      ObservabilityStore.recordReportApprovalPointsAwarded(granted);
+    if (credit.granted > 0) {
+      ObservabilityStore.recordReportApprovalPointsAwarded(credit.granted);
     }
-    return { awarded: granted, preCapTotal };
+    return { awarded: credit.granted, preCapTotal, credit };
   }
 
   /**

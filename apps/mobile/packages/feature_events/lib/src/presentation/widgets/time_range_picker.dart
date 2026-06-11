@@ -65,7 +65,7 @@ class TimeRangePicker extends StatelessWidget {
     TimeOfDay picked = clampedInitial;
     final DateTime initialDateTime = _shellFromTimeOfDay(clampedInitial);
 
-    await showModalBottomSheet<void>(
+    await AppBottomSheet.show<void>(
       context: context,
       backgroundColor: AppColors.panelBackground,
       shape: const RoundedRectangleBorder(

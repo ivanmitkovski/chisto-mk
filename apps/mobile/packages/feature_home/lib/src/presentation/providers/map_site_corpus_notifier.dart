@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:chisto_infrastructure/core/providers/app_providers.dart';
 import 'package:feature_home/src/data/map_regions/macedonia_map_regions.dart';
 import 'package:feature_home/src/data/sites_json_mapper.dart';
 import 'package:feature_home/src/data/sites_local_cache.dart';
@@ -91,12 +92,17 @@ class MapSiteCorpusNotifier extends Notifier<MapSiteCorpusState> {
     return const MapSiteCorpusState();
   }
 
+  String _authCacheSegment() {
+    final String? uid = ref.read(authStateProvider).userId;
+    return (uid != null && uid.isNotEmpty) ? uid : 'anon';
+  }
+
   Future<void> _tryRestoreFromDisk() async {
     final MapFilterState filter = ref.read(mapFilterNotifierProvider);
     final int key = MapFilterState.expansionResetKey(filter);
     final SitesLocalCache cache = SitesLocalCache();
     final ({int filterKey, List<Map<String, dynamic>> sites})? loaded =
-        await cache.loadMapCorpus();
+        await cache.loadMapCorpus(authSegment: _authCacheSegment());
     if (loaded == null || loaded.filterKey != key) {
       return;
     }
@@ -189,6 +195,7 @@ class MapSiteCorpusNotifier extends Notifier<MapSiteCorpusState> {
         SitesLocalCache().persistMapCorpus(
           filterKey: persistKey,
           sites: filtered.map(mapper.siteListItemToJson).toList(),
+          authSegment: _authCacheSegment(),
         ),
       );
     } on AppError catch (e) {

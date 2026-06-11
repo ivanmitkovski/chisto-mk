@@ -124,4 +124,36 @@ void main() {
 
     expect(subtitle, 'By admin');
   });
+
+  testWidgets('deleted actor shows localized deleted user label', (
+    WidgetTester tester,
+  ) async {
+    late String? subtitle;
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('mk'),
+        home: Builder(
+          builder: (BuildContext context) {
+            subtitle = siteHistoryEntrySubtitle(
+              context,
+              SiteHistoryEntry(
+                id: '5',
+                kind: SiteHistoryEntryKind.reportSubmitted,
+                occurredAt: DateTime(2026, 5, 20),
+                actorDisplayName: null,
+                actorIsDeleted: true,
+                actorRole: 'USER',
+              ),
+            );
+            return const SizedBox.shrink();
+          },
+        ),
+      ),
+    );
+
+    expect(subtitle, 'Од Избришан корисник');
+    expect(subtitle, isNot(contains('Deleted User')));
+  });
 }

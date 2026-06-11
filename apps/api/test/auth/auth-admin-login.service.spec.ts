@@ -5,11 +5,17 @@ jest.mock('otplib', () => ({
   verify: jest.fn(() => ({ valid: true })),
 }));
 
+jest.mock('bcrypt', () => ({
+  ...jest.requireActual<typeof import('bcrypt')>('bcrypt'),
+  compare: jest.fn(),
+}));
+
 import { UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import * as bcrypt from 'bcrypt';
 import { Role, UserStatus } from '../../src/prisma-client';
 import { AuthAdminLoginService } from '../../src/auth/services/auth-admin-login.service';
-import { loadAuthEnvRuntime, REMEMBER_ME_SHORT_DAYS } from '../../src/auth/constants/auth-env.config';
+import { loadAuthEnvRuntime } from '../../src/auth/constants/auth-env.config';
 import { AuthSessionService } from '../../src/auth/services/auth-session.service';
 import { AuditService } from '../../src/audit/services/audit.service';
 import { LOGIN_MAX_ATTEMPTS } from '../../src/auth/constants/auth.constants';
@@ -75,7 +81,7 @@ describe('AuthAdminLoginService', () => {
       },
     } as never;
 
-    jest.spyOn(require('bcrypt'), 'compare').mockResolvedValue(true);
+    (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
     const svc = new AuthAdminLoginService(prisma, audit, sessionService, env);
     await svc.adminLogin({
@@ -90,6 +96,6 @@ describe('AuthAdminLoginService', () => {
       false,
       { deviceId: 'device-1' },
     );
-    expect(REMEMBER_ME_SHORT_DAYS).toBe(1);
+    expect(env.refreshTokenStandardDays).toBe(7);
   });
 });

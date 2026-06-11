@@ -1,13 +1,12 @@
 import 'dart:async';
 
+import 'package:chisto_infrastructure/core/auth/session_invalidation.dart';
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/l10n/app_error_localizations.dart';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
-import 'package:chisto_infrastructure/core/navigation/app_navigation.dart';
-import 'package:chisto_infrastructure/core/providers/app_providers.dart';
-import 'package:chisto_infrastructure/core/providers/root_container.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 
 class AppErrorView extends StatefulWidget {
   const AppErrorView({
@@ -33,6 +32,7 @@ class AppErrorView extends StatefulWidget {
 
 class _AppErrorViewState extends State<AppErrorView> {
   bool _recovered = false;
+  bool _announced = false;
 
   bool get _isSessionInvalidError =>
       widget.error.indicatesInvalidOrEndedSession;
@@ -55,9 +55,7 @@ class _AppErrorViewState extends State<AppErrorView> {
       widget.onLogout!();
       return;
     }
-    await readRoot(authRepositoryProvider).invalidateLocalSession();
-    if (!mounted) return;
-    AppNavigation.goSignInAndClearStack();
+    await SessionInvalidation.fromError(widget.error);
   }
 
   Future<void> _handleLogoutTap() async {
@@ -65,13 +63,36 @@ class _AppErrorViewState extends State<AppErrorView> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_announced) {
+      return;
+    }
+    _announced = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      SemanticsService.sendAnnouncement(
+        View.of(context),
+        localizedAppErrorMessage(context.l10n, widget.error),
+        Directionality.of(context),
+      );
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
-    return AppEmptyState(
+    return Semantics(
+      liveRegion: true,
+      container: true,
+      child: AppEmptyState(
       icon: Icons.error_outline_rounded,
       iconVariant: AppEmptyStateIconVariant.error,
       title: localizedAppErrorMessage(context.l10n, widget.error),
-      contentBelowSubtitle: widget.retryFootnote != null &&
+      contentBelowSubtitle:
+          widget.retryFootnote != null &&
               widget.error.retryable &&
               widget.onRetry != null
           ? Text(
@@ -96,6 +117,7 @@ class _AppErrorViewState extends State<AppErrorView> {
               leadingIcon: const Icon(Icons.refresh_rounded, size: 20),
             )
           : null,
+      ),
     );
   }
 }

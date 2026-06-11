@@ -4,6 +4,7 @@ import 'package:chisto_infrastructure/core/config/app_config.dart';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/core/providers/app_providers.dart';
 import 'package:chisto_infrastructure/core/providers/home_providers.dart';
+import 'package:chisto_infrastructure/core/providers/root_container.dart';
 import 'package:chisto_infrastructure/shared/utils/share_popover_origin.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
 import 'package:design_system/design_system.dart';
@@ -94,6 +95,7 @@ class TakeActionCoordinator {
     try {
       final EcoEvent? created = await EventsNavigation.openCreate(
         context,
+        ref: ref,
         auth: ref.read(authStateProvider),
         preselectedSiteId: site.id,
         preselectedSiteName: site.title,
@@ -197,24 +199,15 @@ class TakeActionCoordinator {
       return const SiteShareCancelled();
     }
     final String siteUrl = previewIssued.url;
-    final ShareAction? action = await showModalBottomSheet<ShareAction>(
+    final ShareAction? action = await AppBottomSheet.show<ShareAction>(
       context: context,
-      useRootNavigator: true,
-      isScrollControlled: true,
-      isDismissible: true,
-      enableDrag: true,
-      useSafeArea: true,
-      barrierColor: AppColors.overlay,
       backgroundColor: AppColors.transparent,
-      builder: (BuildContext sheetContext) => wrapScrollControlledBottomSheet(
-        context: sheetContext,
-        child: ShareSheet(
+      builder: (BuildContext sheetContext) => ShareSheet(
           title: sheetContext.l10n.takeActionShareSiteTitle,
           subtitle: sheetContext.l10n.takeActionShareSiteSubtitle,
           siteTitle: site.title,
           shareUrl: siteUrl,
           siteImageUrl: site.primaryImageUrl,
-        ),
       ),
     );
     if (action == null || !context.mounted) {
@@ -261,12 +254,21 @@ class TakeActionCoordinator {
         }
         final String textWithSignedUrl =
             '${site.title}\n${site.description}\n\n${issued.url}';
-        await Share.share(
+        final ShareResult shareResult = await Share.share(
           textWithSignedUrl,
           subject: site.title,
           sharePositionOrigin: sharePopoverOrigin(context),
         );
+        if (shareResult.status != ShareResultStatus.success) {
+          return const SiteShareCancelled();
+        }
         if (!context.mounted) {
+          unawaited(
+            readRoot(sitesRepositoryProvider).shareSite(
+              site.id,
+              channel: 'native',
+            ),
+          );
           return const SiteShareCancelled();
         }
         try {

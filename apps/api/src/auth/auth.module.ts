@@ -37,6 +37,7 @@ import { OtpModule } from '../otp/otp.module';
 import { AuditModule } from '../audit/audit.module';
 import { ReportsUploadModule } from '../reports/reports-upload.module';
 import { GamificationModule } from '../gamification/gamification.module';
+import { SiteCommentsCountModule } from '../sites/site-comments-count.module';
 import { UserAuthSnapshotCacheService } from './services/user-auth-snapshot-cache.service';
 import { AuthSessionRevocationService } from './services/auth-session-revocation.service';
 import { SecurityEventsListener } from './listeners/security-events.listener';
@@ -55,6 +56,7 @@ import { AuthRefreshReplayCacheService } from './services/auth-refresh-replay-ca
     AuditModule,
     ReportsUploadModule,
     GamificationModule,
+    SiteCommentsCountModule,
     EmailModule,
     OtpModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
@@ -127,6 +129,7 @@ import { AuthRefreshReplayCacheService } from './services/auth-refresh-replay-ca
     PhoneVerifiedGuard,
     AuditModule,
     AUTH_ENV_RUNTIME,
+    AccountErasureService,
     AuthSessionRevocationService,
     UserAuthSnapshotCacheService,
     AuthIdentifierThrottleService,

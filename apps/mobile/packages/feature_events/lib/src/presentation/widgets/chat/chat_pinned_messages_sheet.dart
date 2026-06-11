@@ -14,7 +14,7 @@ Future<void> showChatPinnedMessagesSheet({
   bool isOrganizer = false,
   void Function(EventChatMessage message)? onUnpin,
 }) {
-  return showAppPanelBottomSheet<void>(
+  return AppBottomSheet.show<void>(
     context: context,
     builder: (BuildContext ctx) {
       final double maxH = math.min(MediaQuery.sizeOf(ctx).height * 0.5, 420);

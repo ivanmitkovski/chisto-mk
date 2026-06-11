@@ -28,12 +28,18 @@ function createModerationService(
     recordReportApproved: jest.fn(),
     recordReportRejected: jest.fn(),
   };
+  const siteHeroImage = {
+    recomputeSiteHero: jest.fn(async () => ({ changed: false, heroReportId: null })),
+    emitIfChanged: jest.fn(),
+  };
   const status = new ReportsModerationStatusService(
     prisma as never,
     reportApprovalPoints as never,
     reportSideEffectProcessor as never,
     siteHistoryWriter as never,
     siteHistoryReportRecorder as never,
+    siteHeroImage as never,
+    { emit: jest.fn() } as never,
   );
   const detail = new ReportsModerationDetailService(prisma as never, reportsUploadService as never);
   const assign = new ReportsModerationAssignService(prisma as never);

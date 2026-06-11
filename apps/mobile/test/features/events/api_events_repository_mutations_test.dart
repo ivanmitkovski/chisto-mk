@@ -17,7 +17,7 @@ class _MutationsFakeApiClient extends ApiClient {
     : super(
         config: AppConfig.dev,
         accessToken: () => null,
-        onUnauthorized: () {},
+        onUnauthorized: (_) {},
       );
 
   int getCalls = 0;

@@ -12,6 +12,7 @@ import { MulterError } from 'multer';
 import { Prisma } from '../../prisma-client';
 import { ObservabilityStore } from '../../observability/observability.store';
 import { ErrorResponse } from '../errors/error-response.type';
+import { localizeErrorMessage } from '../i18n/error-messages/localize-error-message';
 import { shouldSampleClientErrorLog } from '../logging/sampled-warn.util';
 import { normalizeHttpPath } from '../logging/metrics-skip-paths';
 
@@ -34,17 +35,28 @@ export class GlobalExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost): void {
     const context = host.switchToHttp();
     const response = context.getResponse();
-    const request = context.getRequest<{ method?: string; url?: string; requestId?: string }>();
+    const request = context.getRequest<{
+      method?: string;
+      url?: string;
+      requestId?: string;
+      headers?: { 'accept-language'?: string | string[] };
+    }>();
+    const acceptLanguage = this.readAcceptLanguage(request);
 
     if (exception instanceof ThrottlerException) {
       this.logClientError(request, HttpStatus.TOO_MANY_REQUESTS, 'TOO_MANY_REQUESTS');
       response.status(HttpStatus.TOO_MANY_REQUESTS).json(
-        GlobalExceptionFilter.stamp({
-          code: 'TOO_MANY_REQUESTS',
-          message: 'Too many requests. Please wait and try again.',
-          retryable: true,
-          retryAfterSeconds: 60,
-        }),
+        GlobalExceptionFilter.stamp(
+          this.withLocalizedMessage(
+            {
+              code: 'TOO_MANY_REQUESTS',
+              message: 'Too many requests. Please wait and try again.',
+              retryable: true,
+              retryAfterSeconds: 60,
+            },
+            acceptLanguage,
+          ),
+        ),
       );
       return;
     }
@@ -53,12 +65,17 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       if (exception.code === 'LIMIT_FILE_SIZE' || exception.code === 'LIMIT_FILE_COUNT') {
         const limits = GlobalExceptionFilter.resolveUploadLimitsForPath(request?.url);
         response.status(HttpStatus.PAYLOAD_TOO_LARGE).json(
-          GlobalExceptionFilter.stamp({
-            code: 'PAYLOAD_TOO_LARGE',
-            message: 'One or more files exceed the allowed size or count.',
-            details: limits,
-            retryable: false,
-          }),
+          GlobalExceptionFilter.stamp(
+            this.withLocalizedMessage(
+              {
+                code: 'PAYLOAD_TOO_LARGE',
+                message: 'One or more files exceed the allowed size or count.',
+                details: limits,
+                retryable: false,
+              },
+              acceptLanguage,
+            ),
+          ),
         );
         return;
       }
@@ -67,7 +84,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     if (exception instanceof HttpException) {
       const status = exception.getStatus();
       const payload = exception.getResponse();
-      const normalized = this.normalizeHttpPayload(status, payload);
+      const normalized = this.withLocalizedMessage(
+        this.normalizeHttpPayload(status, payload),
+        acceptLanguage,
+      );
       if (status >= 400 && status < 500) {
         this.logClientError(request, status, normalized.code);
       }
@@ -94,7 +114,9 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       } else if (prismaMapped.status >= 400) {
         this.logClientError(request, prismaMapped.status, prismaMapped.body.code);
       }
-      response.status(prismaMapped.status).json(GlobalExceptionFilter.stamp(prismaMapped.body));
+      response.status(prismaMapped.status).json(
+        GlobalExceptionFilter.stamp(this.withLocalizedMessage(prismaMapped.body, acceptLanguage)),
+      );
       return;
     }
 
@@ -126,11 +148,37 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     });
 
     response.status(HttpStatus.INTERNAL_SERVER_ERROR).json(
-      GlobalExceptionFilter.stamp({
-        code: 'INTERNAL_ERROR',
-        message: 'Internal server error',
-      }),
+      GlobalExceptionFilter.stamp(
+        this.withLocalizedMessage(
+          {
+            code: 'INTERNAL_ERROR',
+            message: 'Internal server error',
+          },
+          acceptLanguage,
+        ),
+      ),
     );
+  }
+
+  private readAcceptLanguage(
+    request: { headers?: { 'accept-language'?: string | string[] } } | undefined,
+  ): string | undefined {
+    const raw = request?.headers?.['accept-language'];
+    if (typeof raw === 'string') {
+      return raw;
+    }
+    if (Array.isArray(raw)) {
+      return raw[0];
+    }
+    return undefined;
+  }
+
+  private withLocalizedMessage(body: ErrorResponse, acceptLanguage?: string): ErrorResponse {
+    const localized = localizeErrorMessage(body.code, acceptLanguage);
+    if (!localized) {
+      return body;
+    }
+    return { ...body, message: localized };
   }
 
   private logClientError(

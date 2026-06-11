@@ -1,5 +1,6 @@
 {
   "pageTitle": "Корисници",
+  "deletedUser": "Избришан корисник",
   "detailTitle": "Корисник",
   "stats": {
     "totalUsers": "Вкупно корисници",
@@ -16,6 +17,7 @@
     "allStatuses": "Сите статуси",
     "active": "Активни",
     "suspended": "Суспендирани",
+    "deleted": "Избришани",
     "searchPlaceholder": "Пребарај корисници…",
     "searchAria": "Пребарај корисници",
     "filterByRole": "Филтрирај по улога",

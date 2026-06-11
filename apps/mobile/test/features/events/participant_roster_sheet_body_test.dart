@@ -3,6 +3,7 @@ import 'package:chisto_infrastructure/shared/widgets/atoms/user_avatar_circle.da
 import 'package:feature_events/src/domain/models/eco_event.dart';
 import 'package:feature_events/src/domain/models/eco_event_join_toggle_result.dart';
 import 'package:feature_events/src/domain/models/eco_event_search_params.dart';
+import 'package:feature_events/src/domain/models/events_list_page_snapshot.dart';
 import 'package:feature_events/src/domain/models/event_impact_receipt.dart';
 import 'package:feature_events/src/domain/models/event_participant_row.dart';
 import 'package:feature_events/src/domain/models/event_schedule_conflict_preview.dart';
@@ -168,6 +169,11 @@ class _DelayedParticipantsRepo implements EventsRepository {
       _inner.fetchEventsSnapshot(params);
 
   @override
+  Future<EventsListPageSnapshot> fetchEventsFilterPreview(
+    EcoEventSearchParams params,
+  ) => _inner.fetchEventsFilterPreview(params);
+
+  @override
   Future<EventParticipantsPage> fetchParticipants(
     String eventId, {
     String? cursor,
@@ -248,6 +254,7 @@ void main() {
         event: event,
         apiRows: rows,
         youLabel: 'You',
+        deletedUserLabel: 'Deleted user',
       );
       expect(merged.length, 2);
       expect(
@@ -275,6 +282,7 @@ void main() {
         ),
       ],
       youLabel: 'You',
+      deletedUserLabel: 'Deleted user',
     );
     expect(merged.first.isOrganizer, isTrue);
     final List<AttendeePreview> ordered = orderPreviewsForAvatarStack(merged);
@@ -309,6 +317,7 @@ void main() {
         event: event,
         apiRows: const <EventParticipantRow>[],
         youLabel: 'You',
+        deletedUserLabel: 'Deleted user',
       );
       expect(previews.length, 1);
 
@@ -347,6 +356,7 @@ void main() {
           ),
         ],
         youLabel: 'You',
+        deletedUserLabel: 'Deleted user',
       );
       expect(previews.length, 2);
 

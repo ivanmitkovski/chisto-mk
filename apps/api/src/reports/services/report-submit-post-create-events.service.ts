@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { AdminModerationCategory, SiteStatus } from '../../prisma-client';
 import { AdminModerationNotifierService } from '../../admin-moderation-email/services/admin-moderation-notifier.service';
 import { NotificationEventsService } from '../../admin-realtime/services/notification-events.service';
@@ -40,6 +41,7 @@ export class ReportSubmitPostCreateEventsService {
     private readonly notificationEventsService: NotificationEventsService,
     private readonly siteEventsService: SiteEventsService,
     private readonly moderationEmailNotifier: AdminModerationNotifierService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   emit(input: ReportSubmitPostCreateEventsInput): void {
@@ -91,5 +93,10 @@ export class ReportSubmitPostCreateEventsService {
     });
 
     this.logger.log(`report.submit ok reportId=${reportId} siteId=${siteId} isNewSite=${isNewSite}`);
+
+    this.eventEmitter.emit('report.submitted', {
+      userId,
+      metadata: { reportId, siteId, reportNumber },
+    });
   }
 }

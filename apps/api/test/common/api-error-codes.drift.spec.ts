@@ -1,7 +1,7 @@
 /// <reference types="jest" />
 
 import { readdirSync, readFileSync, statSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, sep } from 'node:path';
 import { ALL_STABLE_API_ERROR_CODES, isRegisteredApiErrorCode } from '../../src/common/errors/codes';
 
 function walkTsFiles(dir: string, acc: string[] = []): string[] {
@@ -19,15 +19,9 @@ function walkTsFiles(dir: string, acc: string[] = []): string[] {
 const CODE_LITERAL_RE = /\bcode:\s*'([A-Z][A-Z0-9_]*)'/g;
 
 describe('API error code registry drift', () => {
-  it('every code: literal under events, event-chat, cleanup-events, gamification, sites is registered in codes.ts', () => {
-    const roots = [
-      join(__dirname, '../../src/events'),
-      join(__dirname, '../../src/event-chat'),
-      join(__dirname, '../../src/cleanup-events'),
-      join(__dirname, '../../src/gamification'),
-      join(__dirname, '../../src/sites'),
-    ];
-    const files = roots.flatMap((r) => walkTsFiles(r));
+  it('every code: literal under src/ is registered in codes.ts', () => {
+    const srcRoot = join(__dirname, '../../src');
+    const files = walkTsFiles(srcRoot).filter((file) => !file.includes(`${join('src', 'generated')}${sep}`));
     const found = new Set<string>();
 
     for (const file of files) {

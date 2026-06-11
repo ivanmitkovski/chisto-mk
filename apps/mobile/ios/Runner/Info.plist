@@ -7,9 +7,9 @@
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>We use your location while you use the app to show nearby cleanups and reports, and to improve report accuracy.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>We use your location while you use the app to show nearby cleanups and reports, and to improve report accuracy. We do not track your location when the app is closed.</string>
+	<string>We use your location while you use the app to show nearby cleanups and reports, and to improve report accuracy. We do not track your location in the background.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>We use your location while you use the app to show nearby cleanups and reports, and to improve report accuracy. We do not track your location when the app is closed.</string>
+	<string>We use your location while you use the app to show nearby cleanups and reports, and to improve report accuracy. We do not track your location in the background.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>We use the camera for profile photos, pollution reports, event check-in, and event evidence.</string>
 	<key>NSMicrophoneUsageDescription</key>
@@ -34,6 +34,22 @@
 			<key>127.0.0.1</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
+			<!-- TEMP: dev backend has no valid TLS cert yet; allow HTTP for it
+			     (and the dev ALB) until a certificate is provisioned. -->
+			<key>api-dev.chisto.mk</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
+				<false/>
+			</dict>
+			<key>elb.amazonaws.com</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
 				<true/>
 			</dict>
 		</dict>

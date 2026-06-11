@@ -1,5 +1,6 @@
 export 'cleaning_events_tab.dart';
 export 'co_reporters_modal.dart';
+export 'co_reporters_sheet_content.dart';
 export 'detail_hero_carousel.dart';
 export 'first_report_modal.dart';
 export 'merged_duplicate_submissions_modal.dart';

@@ -55,14 +55,8 @@ void main() {
             body: AppEmptyState(
               icon: Icons.inbox_outlined,
               title: 'No items',
-              secondaryAction: AppButton.text(
-                label: 'Clear',
-                onPressed: () {},
-              ),
-              action: AppButton.primary(
-                label: 'Add',
-                onPressed: () {},
-              ),
+              secondaryAction: AppButton.text(label: 'Clear', onPressed: () {}),
+              action: AppButton.primary(label: 'Add', onPressed: () {}),
             ),
           ),
         ),

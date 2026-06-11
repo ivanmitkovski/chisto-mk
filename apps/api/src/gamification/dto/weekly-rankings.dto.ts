@@ -22,6 +22,12 @@ export class WeeklyLeaderboardEntryDto {
   @ApiProperty()
   displayName!: string;
 
+  @ApiPropertyOptional({
+    nullable: true,
+    description: 'Signed avatar URL when the user opted into the public leaderboard',
+  })
+  avatarUrl?: string | null;
+
   @ApiProperty()
   weeklyPoints!: number;
 

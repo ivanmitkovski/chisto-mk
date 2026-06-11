@@ -3,7 +3,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { ListSitesQueryDto, SiteFeedMode, SiteFeedSort } from '../dto/list-sites-query.dto';
 import type { FeedSiteRow } from '../types/sites-feed-candidate.types';
 
-type SiteBaseRow = Omit<FeedSiteRow, 'reports' | 'votes' | 'saves' | '_count'>;
+type SiteBaseRow = Omit<FeedSiteRow, 'reports' | 'votes' | 'saves' | '_count' | 'heroReport'>;
 
 export type FeedEnrichedRow = SiteBaseRow & {
   reportCount: number;
@@ -13,6 +13,7 @@ export type FeedEnrichedRow = SiteBaseRow & {
   latestReportCreatedAt: string | null;
   latestReportNumber: string | null;
   latestReportMediaUrls?: string[] | undefined;
+  heroMediaUrls?: string[] | undefined;
   latestReportReporterName?: string | null | undefined;
   latestReportReporterAvatarUrl?: string | null | undefined;
   latestReportReporterId?: string | null | undefined;
@@ -87,6 +88,7 @@ export function mapToFeedResponseData(
     latestReportCreatedAt: row.latestReportCreatedAt,
     latestReportNumber: row.latestReportNumber,
     latestReportMediaUrls: row.latestReportMediaUrls,
+    heroMediaUrls: row.heroMediaUrls,
     latestReportReporterName: row.latestReportReporterName,
     latestReportReporterAvatarUrl: row.latestReportReporterAvatarUrl,
     latestReportReporterId: row.latestReportReporterId,

@@ -5,6 +5,7 @@ import { AuditModule } from '../audit/audit.module';
 import { SiteHistoryModule } from '../sites/history/site-history.module';
 import { SiteHistoryWriterService } from '../sites/history/site-history-writer.service';
 import { GamificationModule } from '../gamification/gamification.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 import { ReportsController } from './controllers/reports.controller';
 import { OwnerEventsModule } from './owner-events/owner-events.module';
 import { ReportCitizenQueryService } from './services/report-citizen-query.service';
@@ -44,6 +45,7 @@ import { SITE_HISTORY_WRITER } from './ports/site-history-writer.port';
     AdminModerationEmailModule,
     AuditModule,
     GamificationModule,
+    NotificationsModule,
     ReportsUploadModule,
     OwnerEventsModule,
     SiteHistoryModule,

@@ -10,7 +10,7 @@ extension EventChatSendActionsMixin on _EventChatScreenState {
       return;
     }
     final Map<String, dynamic>? result =
-        await showModalBottomSheet<Map<String, dynamic>>(
+        await AppBottomSheet.show<Map<String, dynamic>>(
           context: context,
           isScrollControlled: true,
           backgroundColor: AppColors.panelBackground,
@@ -141,8 +141,7 @@ extension EventChatSendActionsMixin on _EventChatScreenState {
       if (!mounted) {
         return;
       }
-      final String errMsg = e.message;
-      String snackMsg = errMsg;
+      String snackMsg = localizedAppErrorMessage(context.l10n, e);
       if (_shouldQueueOffline(e)) {
         final bool queued = await ChatOutboxStore.shared.enqueueText(
           eventId: widget.eventId,
@@ -253,7 +252,7 @@ extension EventChatSendActionsMixin on _EventChatScreenState {
     } on AppError catch (e) {
       if (mounted) {
         rebuildState(() => _editing = ed);
-        AppSnack.show(context, message: e.message);
+        AppSnack.failure(context, error: e);
       }
     } on Object catch (_) {
       if (mounted) {
@@ -418,7 +417,7 @@ extension EventChatSendActionsMixin on _EventChatScreenState {
             () => _messages[idx] = _messages[idx].copyWith(isPinned: !pin),
           );
         }
-        AppSnack.show(context, message: e.message);
+        AppSnack.failure(context, error: e);
       }
     } on Object catch (_) {
       if (mounted) {

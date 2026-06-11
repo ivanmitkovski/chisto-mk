@@ -8,6 +8,7 @@ import 'package:feature_events/src/data/chat/event_chat_read_cursor.dart';
 import 'package:feature_events/src/data/chat/event_chat_repository.dart';
 import 'package:feature_events/src/data/chat/event_chat_stream_event.dart';
 import 'package:feature_notifications/feature_notifications.dart';
+import 'package:flutter/foundation.dart';
 
 /// In-memory chat for tests and offline demos.
 class InMemoryEventChatRepository implements EventChatRepository {
@@ -21,6 +22,8 @@ class InMemoryEventChatRepository implements EventChatRepository {
       <String, EventChatConnectionStatus>{};
   final Map<String, StreamController<EventChatConnectionStatus>> _connStreams =
       <String, StreamController<EventChatConnectionStatus>>{};
+  final Map<String, ValueNotifier<bool>> _disruptionByEvent =
+      <String, ValueNotifier<bool>>{};
   final StreamController<EventChatStreamEvent> _bus =
       StreamController<EventChatStreamEvent>.broadcast();
 
@@ -51,6 +54,21 @@ class InMemoryEventChatRepository implements EventChatRepository {
   @override
   EventChatConnectionStatus currentConnectionStatus(String eventId) {
     return _connByEvent[eventId] ?? EventChatConnectionStatus.disconnected;
+  }
+
+  @override
+  ValueListenable<bool> realtimeDisruptionVisible(String eventId) {
+    return _disruptionByEvent.putIfAbsent(
+      eventId,
+      () => ValueNotifier<bool>(false),
+    );
+  }
+
+  /// Test helper: drive reconnecting banner visibility.
+  void setRealtimeDisruptionVisibleForTest(String eventId, bool visible) {
+    _disruptionByEvent
+        .putIfAbsent(eventId, () => ValueNotifier<bool>(false))
+        .value = visible;
   }
 
   List<EventChatMessage> _messages(String eventId) =>

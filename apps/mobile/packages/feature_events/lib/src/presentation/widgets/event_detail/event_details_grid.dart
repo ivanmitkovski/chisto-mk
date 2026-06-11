@@ -61,7 +61,7 @@ class EventDetailsGrid extends StatelessWidget {
     required String description,
     required Color color,
   }) {
-    showModalBottomSheet<void>(
+    AppBottomSheet.show<void>(
       context: context,
       backgroundColor: AppColors.transparent,
       builder: (BuildContext ctx) {

@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
-/// CI guard: release builds enforce prod ENV and HTTPS API transport.
+/// CI guard: release builds reject the dev ENV family and enforce HTTPS API
+/// transport. Beta (staging) and store (prod) release targets are allowed.
 library;
 
 import 'dart:io';
@@ -12,10 +13,12 @@ void main() {
   }
   final String mainContent = mainFile.readAsStringSync();
   if (!mainContent.contains('kReleaseMode') ||
-      !mainContent.contains('config.isProd') ||
+      !mainContent.contains('isReleaseEligible') ||
+      !mainContent.contains('dart-define=ENV=staging') ||
       !mainContent.contains('dart-define=ENV=prod')) {
     stderr.writeln(
-      'check_release_env: lib/main.dart must enforce ENV=prod in kReleaseMode',
+      'check_release_env: lib/main.dart must reject the dev ENV family in '
+      'kReleaseMode and allow only staging/prod',
     );
     exit(1);
   }

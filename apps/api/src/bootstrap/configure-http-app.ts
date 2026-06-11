@@ -38,6 +38,7 @@ export function configureHttpApplication(app: INestApplication): void {
           details: validationErrors.map((error) => ({
             field: error.property,
             errors: error.constraints ? Object.values(error.constraints) : [],
+            constraints: error.constraints ?? {},
           })),
         }),
     }),

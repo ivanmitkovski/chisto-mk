@@ -8,6 +8,8 @@ import 'package:chisto_infrastructure/shared/utils/file_exists.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
 import 'package:chisto_infrastructure/shared/widgets/organisms/app_surface/report_surface_aliases.dart';
 import 'package:design_system/design_system.dart';
+import 'package:feature_reports/src/data/report_detail_cache.dart';
+import 'package:feature_reports/src/domain/models/report_detail.dart';
 import 'package:feature_reports/src/data/reports_realtime/reports_owner_event.dart';
 import 'package:feature_reports/src/data/reports_realtime/reports_realtime_service.dart';
 import 'package:feature_reports/src/domain/repositories/reports_api_repository.dart';
@@ -30,6 +32,8 @@ class ReportDetailSheet extends StatefulWidget {
     required this.report,
     required this.reportsRealtimeService,
     required this.reportsApiRepository,
+    this.reportDetailCache,
+    this.isStaleFallback = false,
     this.onShowSiteOnMap,
     this.onOpenLinkedPollutionSiteDetail,
   });
@@ -37,6 +41,8 @@ class ReportDetailSheet extends StatefulWidget {
   final ReportSheetViewModel report;
   final ReportsRealtimeService reportsRealtimeService;
   final ReportsApiRepository reportsApiRepository;
+  final ReportDetailCacheStore? reportDetailCache;
+  final bool isStaleFallback;
   final void Function(String siteId)? onShowSiteOnMap;
 
   /// Opens the linked pollution site after this sheet is popped from the root navigator.
@@ -51,6 +57,7 @@ class ReportDetailSheet extends StatefulWidget {
 class _ReportDetailSheetState extends State<ReportDetailSheet> {
   bool _isOpeningMap = false;
   bool _isRefreshing = false;
+  bool _showStaleBanner = false;
   ReportSheetViewModel? _report;
   StreamSubscription<ReportsOwnerEvent>? _realtimeSub;
   RequestCancellationToken? _refreshCancellation;
@@ -152,6 +159,7 @@ class _ReportDetailSheetState extends State<ReportDetailSheet> {
   void initState() {
     super.initState();
     _report = widget.report;
+    _showStaleBanner = widget.isStaleFallback;
     _realtimeSub = widget.reportsRealtimeService.events.listen((event) {
       final String? reportId = report.reportId;
       if (reportId == null || reportId.isEmpty) return;
@@ -205,19 +213,25 @@ class _ReportDetailSheetState extends State<ReportDetailSheet> {
     try {
       final String? reportId = report.reportId;
       if (reportId == null || reportId.isEmpty) return;
-      final detail = await widget.reportsApiRepository.getReportById(
+      final ReportDetail detail = await widget.reportsApiRepository.getReportById(
         reportId,
         cancellation: cancellation,
       );
+      widget.reportDetailCache?.put(detail);
       if (!mounted) return;
       setState(() {
         _report = ReportSheetViewModelMapper.fromDetail(detail, context.l10n);
+        _showStaleBanner = false;
       });
     } on AppError catch (e) {
       if (e.code == 'CANCELLED') return;
-      // Best-effort: keep current UI, manual pull-to-refresh exists in list.
+      if (mounted) {
+        setState(() => _showStaleBanner = true);
+      }
     } catch (_) {
-      // Best-effort: keep current UI, manual pull-to-refresh exists in list.
+      if (mounted) {
+        setState(() => _showStaleBanner = true);
+      }
     } finally {
       if (identical(_refreshCancellation, cancellation)) {
         _refreshCancellation = null;
@@ -242,14 +256,24 @@ class _ReportDetailSheetState extends State<ReportDetailSheet> {
     );
 
     return ReportSheetScaffold(
-      addBottomInset: false,
+      addBottomInset: true,
       maxHeightFactor: 1,
-      scrollChromeWithBody: true,
+      fillAvailableHeight: true,
       useModalRouteShape: true,
       animateHandleFadeIn: true,
+      // Single-inset rule: no wrapper padding below the scroll viewport —
+      // content scrolls edge-to-edge to the sheet bottom (no clipped strip)
+      // and clearance lives inside the scroll content instead (see the
+      // SingleChildScrollView padding below + scaffold home-indicator merge).
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.sm,
+        AppSpacing.lg,
+        0,
+      ),
+      dragHandleSemanticLabel: l10n.semanticClose,
       titleTextStyle: AppTypographySurfaces.reportsSheetTitle(textTheme),
       subtitleTextStyle: AppTypographySurfaces.reportsSheetSubtitle(textTheme),
-      subtitleMaxLines: 2,
       title: l10n.reportDetailSheetTitle,
       subtitle: report.reportNumber != null
           ? l10n.reportDetailSheetSubtitleWithNumber(report.reportNumber!)
@@ -258,9 +282,22 @@ class _ReportDetailSheetState extends State<ReportDetailSheet> {
         isRefreshing: _isRefreshing,
         semanticLabel: l10n.semanticClose,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
+      child: SingleChildScrollView(
+        // The scaffold merges the home-indicator inset on top of this, so the
+        // last row keeps the same resting clearance as before the wrapper
+        // padding was removed.
+        padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+          if (_showStaleBanner) ...<Widget>[
+            AppInlineBanner(
+              message: l10n.reportDetailStaleBanner,
+              tone: AppInlineBannerTone.warning,
+              onTap: _isRefreshing ? null : _refreshFromBackend,
+            ),
+            const SizedBox(height: AppSpacing.md),
+          ],
           if (hasEvidenceImage) ...<Widget>[
             ReportDetailEvidenceGallery(
               evidencePaths: evidencePaths,
@@ -408,6 +445,7 @@ class _ReportDetailSheetState extends State<ReportDetailSheet> {
             messageStyle: AppTypographySurfaces.reportsBannerBody(textTheme),
           ),
         ],
+        ),
       ),
     );
   }

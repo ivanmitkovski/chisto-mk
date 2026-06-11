@@ -39,6 +39,7 @@ import { EventUpdateValidationService } from './services/event-update-validation
 import { EventsCreationService } from './services/events-creation.service';
 import { EventsLifecycleService } from './services/events-lifecycle.service';
 import { EventsParticipationService } from './services/events-participation.service';
+import { EventsReminderService } from './services/events-reminder.service';
 import { EventsDetailQueryService } from './services/events-detail-query.service';
 import { EventsListQueryService } from './services/events-list-query.service';
 import { EventsQueryService } from './services/events-query.service';
@@ -95,6 +96,7 @@ import { SitesModule } from '../sites/sites.module';
     EventsUpdateService,
     EventsLifecycleService,
     EventsParticipationService,
+    EventsReminderService,
     EventsAfterImagesService,
     EventsAnalyticsService,
     CheckInTelemetryService,

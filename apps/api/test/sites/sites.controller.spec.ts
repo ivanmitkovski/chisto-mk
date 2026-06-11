@@ -76,7 +76,7 @@ describe('SitesController', () => {
       updateArchiveStatus: jest.fn(async () => ({ id: 'site_1', isArchivedByAdmin: true })),
     } as unknown as SitesAdminService;
     return {
-      detailController: new SitesDetailController(sitesDetail, sitesMedia, sitesAdmin),
+      detailController: new SitesDetailController(sitesDetail, sitesMedia, sitesAdmin, {} as never),
       sitesAdmin,
     };
   }

@@ -11,10 +11,14 @@ WeeklyRankingsResult weeklyRankingsFromJson(Map<String, dynamic> json) {
   final List<WeeklyLeaderboardEntry> entries = raw
       .whereType<Map<String, dynamic>>()
       .map((Map<String, dynamic> e) {
+        final String? avatarUrl = (e['avatarUrl'] as String?)?.trim();
         return WeeklyLeaderboardEntry(
           rank: (e['rank'] as num?)?.toInt() ?? 0,
           userId: e['userId'] as String? ?? '',
           displayName: (e['displayName'] as String?)?.trim() ?? '',
+          avatarUrl: avatarUrl != null && avatarUrl.isNotEmpty
+              ? avatarUrl
+              : null,
           weeklyPoints: (e['weeklyPoints'] as num?)?.toInt() ?? 0,
           isCurrentUser: e['isCurrentUser'] as bool? ?? false,
         );

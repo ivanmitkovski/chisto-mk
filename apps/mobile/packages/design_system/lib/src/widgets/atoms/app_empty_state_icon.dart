@@ -39,10 +39,7 @@ class AppEmptyStateIcon extends StatelessWidget {
       duration: AppMotion.fast,
       switchInCurve: AppMotion.emphasized,
       switchOutCurve: AppMotion.emphasized,
-      child: KeyedSubtree(
-        key: ValueKey<Object>(iconKey!),
-        child: well,
-      ),
+      child: KeyedSubtree(key: ValueKey<Object>(iconKey!), child: well),
     );
   }
 }
@@ -73,11 +70,7 @@ class _IconWell extends StatelessWidget {
         color: backgroundColor,
         borderRadius: BorderRadius.circular(AppSpacing.emptyStateIconRadius),
       ),
-      child: Icon(
-        icon,
-        size: AppSpacing.emptyStateIconSize,
-        color: iconColor,
-      ),
+      child: Icon(icon, size: AppSpacing.emptyStateIconSize, color: iconColor),
     );
   }
 }

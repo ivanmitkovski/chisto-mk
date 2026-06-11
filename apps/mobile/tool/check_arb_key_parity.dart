@@ -59,8 +59,83 @@ int runArbKeyParityCheck() {
     stderr.writeln('ARB key parity failed:\n${failures.join('\n')}');
     return 1;
   }
+
+  final List<String> placeholderFailures = <String>[];
+  final File referenceFile = files.firstWhere(
+    (File f) => f.path.endsWith('app_en.arb'),
+    orElse: () => files.first,
+  );
+  final Map<String, dynamic> referenceDecoded =
+      jsonDecode(referenceFile.readAsStringSync()) as Map<String, dynamic>;
+  final Set<String> metaKeys = referenceDecoded.keys
+      .where((String k) => k.startsWith('@') && k.length > 1)
+      .toSet();
+
+  for (final String metaKey in metaKeys) {
+    final dynamic referenceRaw = referenceDecoded[metaKey];
+    if (referenceRaw is! Map<String, dynamic>) {
+      continue;
+    }
+    final Map<String, dynamic> referenceMeta = referenceRaw;
+    for (final File f in files) {
+      if (f.path == referenceFile.path) {
+        continue;
+      }
+      final Map<String, dynamic> decoded =
+          jsonDecode(f.readAsStringSync()) as Map<String, dynamic>;
+      final dynamic meta = decoded[metaKey];
+      if (meta == null) {
+        continue;
+      }
+      if (meta is! Map<String, dynamic>) {
+        continue;
+      }
+      if (!_metadataStructureMatches(referenceMeta, meta)) {
+        placeholderFailures.add(
+          '${f.path}: $metaKey placeholder/ICU structure differs from reference',
+        );
+      }
+    }
+  }
+
+  if (placeholderFailures.isNotEmpty) {
+    stderr.writeln(
+      'ARB placeholder parity failed:\n${placeholderFailures.join('\n')}',
+    );
+    return 1;
+  }
+
   stdout.writeln('OK: ${files.length} ARB files share ${union.length} keys.');
   return 0;
+}
+
+bool _metadataStructureMatches(
+  Map<String, dynamic> a,
+  Map<String, dynamic> b,
+) {
+  final Object? aPlaceholders = a['placeholders'];
+  final Object? bPlaceholders = b['placeholders'];
+  if (aPlaceholders == null && bPlaceholders == null) {
+    return true;
+  }
+  if (aPlaceholders is! Map || bPlaceholders is! Map) {
+    return false;
+  }
+  if (aPlaceholders.length != bPlaceholders.length) {
+    return false;
+  }
+  for (final MapEntry<dynamic, dynamic> entry in aPlaceholders.entries) {
+    final dynamic other = bPlaceholders[entry.key];
+    if (other is! Map || entry.value is! Map) {
+      return false;
+    }
+    final Map<dynamic, dynamic> left = entry.value as Map<dynamic, dynamic>;
+    final Map<dynamic, dynamic> right = other;
+    if (left['type'] != right['type']) {
+      return false;
+    }
+  }
+  return true;
 }
 
 void main() {

@@ -1,10 +1,14 @@
 import 'dart:async';
 
-import 'package:chisto_infrastructure/core/deep_links/deep_link_router.dart';
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:chisto_infrastructure/core/location/device_location_reader.dart';
+import 'package:chisto_infrastructure/core/location/location_service.dart';
+import 'package:chisto_infrastructure/core/location/macedonia_bounds.dart';
+import 'package:chisto_infrastructure/core/deep_links/deep_link_router.dart';
 import 'package:chisto_infrastructure/core/navigation/app_go_router.dart';
 import 'package:chisto_infrastructure/core/navigation/app_navigation.dart';
 import 'package:chisto_infrastructure/core/navigation/app_routes.dart';
+import 'package:chisto_infrastructure/core/providers/app_providers.dart';
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
 import 'package:chisto_infrastructure/shared/utils/app_haptics.dart';
 import 'package:chisto_infrastructure/shared/utils/cached_tile_provider.dart';
@@ -12,21 +16,21 @@ import 'package:chisto_infrastructure/shared/widgets/widgets.dart';
 import 'package:design_system/design_system.dart';
 import 'package:feature_auth/src/application/home_location_controller.dart';
 import 'package:feature_auth/src/presentation/constants/auth_error_messages.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:feature_auth/src/presentation/utils/location_permission_ui.dart';
+import 'package:feature_auth/src/presentation/widgets/auth_form_scroll_physics.dart';
+import 'package:feature_onboarding/feature_onboarding.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 
-/// Shown only after OTP verification in the sign-up flow.
-/// User picks location, then taps "Confirm and continue" to go to the feed.
-/// Sign-in and returning users skip this and go straight to home.
+enum _LocationGateBlock { none, outsideMacedonia, unavailable }
+
+/// Shown after OTP verification in the sign-up flow (and on launch when home
+/// location is missing). Users must confirm an in-Macedonia GPS fix to enter the app.
 class LocationScreen extends ConsumerStatefulWidget {
   const LocationScreen({super.key, this.tileProviderOverride});
 
-  /// Test/golden hook: flat tile layer without network fetches.
   final TileProvider? tileProviderOverride;
 
   @override
@@ -35,11 +39,10 @@ class LocationScreen extends ConsumerStatefulWidget {
 
 class _LocationScreenState extends ConsumerState<LocationScreen> {
   String? _currentAddress;
-  bool _resolvingLocation = false;
-  final LatLng _mapCenter = const LatLng(
-    41.6086,
-    21.7453,
-  ); // Approx center of Macedonia
+  bool _detecting = false;
+  _LocationGateBlock _block = _LocationGateBlock.none;
+
+  final LatLng _mapCenter = const LatLng(41.6086, 21.7453);
   LatLng? _selectedPosition;
   final MapController _mapController = MapController();
   bool _showTileLoadingOverlay = true;
@@ -60,164 +63,90 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
     super.dispose();
   }
 
-  bool _isInMacedonia(double lat, double lng) {
-    // Rough bounding box for Macedonia.
-    return lat >= 40.8 && lat <= 42.4 && lng >= 20.4 && lng <= 23.1;
-  }
+  Future<void> _confirmLocation() async {
+    if (_detecting) return;
+    setState(() {
+      _detecting = true;
+      _block = _LocationGateBlock.none;
+    });
 
-  Future<bool> _ensurePermission() async {
-    final bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      if (mounted) {
-        AppSnack.show(
-          context,
-          message: AppLocalizations.of(context)!.authLocationServicesDisabled,
-          type: AppSnackType.warning,
-        );
-      }
-      return false;
-    }
-
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-    }
-
-    if (permission == LocationPermission.denied) {
-      if (mounted) {
-        AppSnack.show(
-          context,
-          message: AppLocalizations.of(context)!.authLocationPermissionDenied,
-          type: AppSnackType.warning,
-        );
-      }
-      return false;
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      if (mounted) {
-        AppSnack.show(
-          context,
-          message: AppLocalizations.of(context)!.authLocationPermissionForever,
-          type: AppSnackType.warning,
-          duration: const Duration(seconds: 3),
-        );
-      }
-      await Geolocator.openAppSettings();
-      return false;
-    }
-
-    return true;
-  }
-
-  Future<void> _useCurrentLocation() async {
-    if (_resolvingLocation) {
+    final LocationService location =
+        ref.read(appBootstrapProvider).locationService;
+    final bool permissionOk = await ensureLocationPermissionForGate(
+      context: context,
+      location: location,
+    );
+    if (!permissionOk || !mounted) {
+      setState(() {
+        _detecting = false;
+        _block = _LocationGateBlock.unavailable;
+      });
       return;
     }
-    setState(() => _resolvingLocation = true);
 
-    try {
-      final bool ok = await _ensurePermission();
-      if (!ok) {
-        if (mounted) {
-          setState(() => _resolvingLocation = false);
-        }
-        return;
-      }
+    final GeoPosition? position = await readDeviceLocationFix(location);
+    if (!mounted) return;
 
-      final Position pos = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-      if (!_isInMacedonia(pos.latitude, pos.longitude)) {
-        if (mounted) {
-          AppSnack.show(
-            context,
-            message: AppLocalizations.of(context)!.authLocationMacedoniaOnly,
-            type: AppSnackType.info,
-          );
-        }
-        setState(() => _resolvingLocation = false);
-        return;
-      }
-      // Fallback label in case reverse geocoding fails.
-      String label =
-          'Lat ${pos.latitude.toStringAsFixed(4)}, Lng ${pos.longitude.toStringAsFixed(4)}';
-      try {
-        final List<Placemark> placemarks = await placemarkFromCoordinates(
-          pos.latitude,
-          pos.longitude,
-        );
-        if (placemarks.isNotEmpty) {
-          final Placemark p = placemarks.first;
-          final String street = p.street ?? '';
-          final String locality = p.locality ?? '';
-          final String country = p.country ?? '';
-          final List<String> parts = <String>[
-            street,
-            locality,
-            country,
-          ].where((String s) => s.trim().isNotEmpty).toList();
-          if (parts.isNotEmpty) {
-            label = parts.join(', ');
-          }
-        }
-      } catch (_) {
-        // Keep the coordinates-based fallback label.
-      }
-
-      if (!mounted) {
-        return;
-      }
-
+    if (position == null) {
       setState(() {
-        _currentAddress = label;
-        _selectedPosition = LatLng(pos.latitude, pos.longitude);
-        _resolvingLocation = false;
+        _detecting = false;
+        _block = _LocationGateBlock.unavailable;
       });
-      // Move map after layout so tiles load correctly; zoom 15 = neighborhood view (avoids over-zoom).
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted && _selectedPosition != null) {
-          _mapController.move(_selectedPosition!, 15);
-        }
-      });
-    } catch (_) {
-      if (!mounted) {
-        return;
-      }
-      setState(() => _resolvingLocation = false);
-      AppSnack.show(
-        context,
-        message: AppLocalizations.of(context)!.authLocationResolveFailed,
-        type: AppSnackType.error,
-      );
+      return;
     }
-  }
 
-  Future<void> _confirmAndGoToFeed() async {
-    if (_selectedPosition == null) return;
-    final bool isSaving = ref.read(homeLocationControllerProvider).isLoading;
-    if (isSaving) return;
+    if (!isWithinMacedonia(position.latitude, position.longitude)) {
+      setState(() {
+        _detecting = false;
+        _block = _LocationGateBlock.outsideMacedonia;
+      });
+      return;
+    }
+
     try {
       await ref
           .read(homeLocationControllerProvider.notifier)
           .saveHomeLocation(
-            latitude: _selectedPosition!.latitude,
-            longitude: _selectedPosition!.longitude,
+            latitude: position.latitude,
+            longitude: position.longitude,
             label: _currentAddress,
           );
+    } on AppError catch (error) {
       if (!mounted) return;
-      AppHaptics.success(context);
-      await _navigateHomeWithCoachPending();
-    } on AppError {
-      if (!mounted) return;
-      AppHaptics.warning(context);
+      setState(() {
+        _detecting = false;
+        _block = error.code == 'VALIDATION_ERROR'
+            ? _LocationGateBlock.outsideMacedonia
+            : _LocationGateBlock.unavailable;
+      });
+      return;
     }
+
+    setState(() {
+      _selectedPosition = LatLng(position.latitude, position.longitude);
+      _detecting = false;
+    });
+
+    await _markGuidePending();
+    if (!mounted) return;
+    AppHaptics.success(context);
+    await _navigateHomeWithCoachPending();
+  }
+
+  Future<void> _signOut() async {
+    await ref.read(authRepositoryProvider).signOut();
+    if (!mounted) return;
+    AppNavigation.goSignIn();
+  }
+
+  Future<void> _markGuidePending() async {
+    try {
+      await ref.read(featureGuideRepositoryProvider).markPostRegistrationGuidePending();
+    } catch (_) {}
   }
 
   Future<void> _navigateHomeWithCoachPending() async {
-    if (!mounted) {
-      return;
-    }
+    if (!mounted) return;
     AppNavigation.navigateToHome(
       args: const HomeRouteArgs(startCoachTour: true),
     );
@@ -225,6 +154,16 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
       DeepLinkRouter.replayPendingAuthenticatedRoute(appGoRouter);
     });
   }
+
+  String _blockedMessage(AppLocalizations l10n) {
+    return switch (_block) {
+      _LocationGateBlock.outsideMacedonia => l10n.authLocationGateOutsideBody,
+      _LocationGateBlock.unavailable => l10n.authLocationGateUnavailableBody,
+      _LocationGateBlock.none => '',
+    };
+  }
+
+  bool get _isBlocked => _block != _LocationGateBlock.none;
 
   @override
   Widget build(BuildContext context) {
@@ -236,6 +175,7 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
         ? messageForAuthError(l10n, locationState.error!)
         : null;
     final double keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
+    final bool isBlocked = _isBlocked;
 
     return Stack(
       children: <Widget>[
@@ -253,6 +193,7 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
                   curve: AppMotion.emphasized,
                   padding: EdgeInsets.only(bottom: keyboardInset),
                   child: SingleChildScrollView(
+                    physics: AuthFormScrollPhysics.resolve(context),
                     keyboardDismissBehavior:
                         ScrollViewKeyboardDismissBehavior.onDrag,
                     padding: const EdgeInsets.fromLTRB(
@@ -263,15 +204,19 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+                      children: <Widget>[
                         const SizedBox(height: AppSpacing.radiusSm),
                         Text(
-                          l10n.authLocationTitle,
+                          isBlocked && _block == _LocationGateBlock.outsideMacedonia
+                              ? l10n.authLocationGateOutsideTitle
+                              : l10n.authLocationTitle,
                           style: AppTypography.authScreenTitle(textTheme),
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
-                          l10n.authLocationSubtitle,
+                          isBlocked
+                              ? _blockedMessage(l10n)
+                              : l10n.authLocationSubtitle,
                           style: AppTypography.authScreenSubtitle(textTheme),
                         ),
                         if (apiError != null) ...<Widget>[
@@ -284,183 +229,32 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
                           ),
                         ],
                         const SizedBox(height: AppSpacing.lg),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusLg,
-                          ),
-                          child: SizedBox(
-                            height: 260,
-                            width: double.infinity,
-                            child: Stack(
-                              children: [
-                                FlutterMap(
-                                  key: ValueKey<bool>(
-                                    _selectedPosition != null,
-                                  ),
-                                  mapController: _mapController,
-                                  options: MapOptions(
-                                    initialCenter:
-                                        _selectedPosition ?? _mapCenter,
-                                    initialZoom: _selectedPosition != null
-                                        ? 15
-                                        : 7,
-                                    minZoom: 1.5,
-                                    maxZoom: 18,
-                                    interactionOptions:
-                                        const InteractionOptions(
-                                          flags: InteractiveFlag.none,
-                                        ),
-                                  ),
-                                  children: [
-                                    TileLayer(
-                                      urlTemplate:
-                                          'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
-                                      subdomains: const <String>[
-                                        'a',
-                                        'b',
-                                        'c',
-                                        'd',
-                                      ],
-                                      maxNativeZoom: 20,
-                                      userAgentPackageName: 'chisto_mobile',
-                                      retinaMode: false,
-                                      tileProvider:
-                                          widget.tileProviderOverride ??
-                                          createCachedTileProvider(
-                                            maxStaleDays: 30,
-                                          ),
-                                      tileDisplay:
-                                          const TileDisplay.instantaneous(),
-                                    ),
-                                    if (_selectedPosition != null)
-                                      MarkerLayer(
-                                        markers: <Marker>[
-                                          Marker(
-                                            point: _selectedPosition!,
-                                            width: 30,
-                                            height: 30,
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                // Keep the green pin but soften it so
-                                                // underlying imagery stays readable.
-                                                color: AppColors.primaryDark
-                                                    .withValues(alpha: 0.82),
-                                                shape: BoxShape.circle,
-                                                border: Border.all(
-                                                  color: AppColors.white,
-                                                  width: 2,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                  ],
-                                ),
-                                if (_showTileLoadingOverlay ||
-                                    (_resolvingLocation &&
-                                        _selectedPosition == null))
-                                  const Positioned.fill(
-                                    child: IgnorePointer(
-                                      child: _MapTileSkeleton(),
-                                    ),
-                                  ),
-                                Positioned(
-                                  left: AppSpacing.md,
-                                  right: AppSpacing.md,
-                                  top: AppSpacing.md,
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: AppSpacing.sm,
-                                      vertical: AppSpacing.radiusSm,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.white.withValues(
-                                        alpha: 0.94,
-                                      ),
-                                      borderRadius: BorderRadius.circular(
-                                        AppSpacing.radiusMd,
-                                      ),
-                                    ),
-                                    child: Text(
-                                      _currentAddress ??
-                                          l10n.authLocationMapPlaceholder,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: AppTypography.pillLabel(textTheme),
-                                    ),
-                                  ),
-                                ),
-                              ],
+                        _buildMap(l10n, textTheme),
+                        const SizedBox(height: AppSpacing.radiusPill),
+                        _buildPrimaryAction(l10n),
+                        if (isBlocked && !_detecting) ...<Widget>[
+                          const SizedBox(height: AppSpacing.sm),
+                          Center(
+                            child: AppButton.text(
+                              label: l10n.feedNoLocationOpenSettings,
+                              onPressed: () =>
+                                  unawaited(showLocationOpenSettingsDialog(context)),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: AppSpacing.radiusPill),
-                        Semantics(
-                          button: true,
-                          label: _resolvingLocation
-                              ? l10n.authLocationDetecting
-                              : _selectedPosition != null
-                              ? l10n.authLocationContinue
-                              : l10n.authLocationUseCurrent,
-                          child: AppButton.primary(
-                            label: _resolvingLocation
-                                ? l10n.authLocationDetecting
-                                : _selectedPosition != null
-                                ? l10n.authLocationContinue
-                                : l10n.authLocationUseCurrent,
-                            enabled: !_resolvingLocation && !isSaving,
-                            onPressed: _resolvingLocation || isSaving
-                                ? null
-                                : _selectedPosition != null
-                                ? () => unawaited(_confirmAndGoToFeed())
-                                : _useCurrentLocation,
+                          const SizedBox(height: AppSpacing.xs),
+                          Center(
+                            child: AppButton.text(
+                              label: l10n.profileSignOutTile,
+                              onPressed: () => unawaited(_signOut()),
+                            ),
                           ),
-                        ),
-                        AnimatedSize(
-                          duration: AppMotion.standard,
-                          curve: AppMotion.emphasized,
-                          alignment: Alignment.topCenter,
-                          child:
-                              _selectedPosition != null && !_resolvingLocation
-                              ? Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: <Widget>[
-                                    const SizedBox(height: AppSpacing.sm),
-                                    Center(
-                                      child: Semantics(
-                                        button: true,
-                                        label: l10n.authLocationUseDifferent,
-                                        child: CupertinoButton(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: AppSpacing.sm,
-                                            vertical: AppSpacing.xs,
-                                          ),
-                                          minimumSize: const Size(44, 44),
-                                          onPressed: _useCurrentLocation,
-                                          child: Text(
-                                            l10n.authLocationUseDifferent,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodySmall
-                                                ?.copyWith(
-                                                  color: AppColors.primaryDark,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              : const SizedBox.shrink(),
-                        ),
+                        ],
                         const SizedBox(height: AppSpacing.sm),
                         Text(
                           l10n.authLocationPrivacyNote,
-                          style: AppTypography.cardSubtitle(
-                            textTheme,
-                          ).copyWith(height: 1.35),
+                          style: AppTypography.cardSubtitle(textTheme).copyWith(
+                            height: 1.35,
+                          ),
                         ),
                         const SizedBox(height: AppSpacing.md),
                       ],
@@ -471,13 +265,113 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
             ),
           ),
         ),
-        LoadingOverlay(visible: isSaving),
+        LoadingOverlay(visible: isSaving || _detecting),
       ],
+    );
+  }
+
+  Widget _buildPrimaryAction(AppLocalizations l10n) {
+    final String label = _detecting
+        ? l10n.authLocationDetecting
+        : _isBlocked
+        ? l10n.authLocationTryAgain
+        : l10n.authLocationUseCurrent;
+    return Semantics(
+      button: true,
+      label: label,
+      child: AppButton.primary(
+        label: label,
+        enabled: !_detecting,
+        onPressed: _detecting ? null : () => unawaited(_confirmLocation()),
+      ),
+    );
+  }
+
+  Widget _buildMap(AppLocalizations l10n, TextTheme textTheme) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+      child: SizedBox(
+        height: 260,
+        width: double.infinity,
+        child: Stack(
+          children: <Widget>[
+            FlutterMap(
+              key: ValueKey<bool>(_selectedPosition != null),
+              mapController: _mapController,
+              options: MapOptions(
+                initialCenter: _selectedPosition ?? _mapCenter,
+                initialZoom: _selectedPosition != null ? 15 : 7,
+                minZoom: 1.5,
+                maxZoom: 18,
+                interactionOptions: const InteractionOptions(
+                  flags: InteractiveFlag.none,
+                ),
+              ),
+              children: <Widget>[
+                TileLayer(
+                  urlTemplate:
+                      'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+                  subdomains: const <String>['a', 'b', 'c', 'd'],
+                  maxNativeZoom: 20,
+                  userAgentPackageName: 'chisto_mobile',
+                  retinaMode: false,
+                  tileProvider:
+                      widget.tileProviderOverride ??
+                      createCachedTileProvider(maxStaleDays: 30),
+                  tileDisplay: const TileDisplay.instantaneous(),
+                ),
+                if (_selectedPosition != null)
+                  MarkerLayer(
+                    markers: <Marker>[
+                      Marker(
+                        point: _selectedPosition!,
+                        width: 30,
+                        height: 30,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryDark.withValues(alpha: 0.82),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: AppColors.white, width: 2),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+              ],
+            ),
+            if (_showTileLoadingOverlay ||
+                (_detecting && _selectedPosition == null))
+              const Positioned.fill(
+                child: IgnorePointer(child: _MapTileSkeleton()),
+              ),
+            Positioned(
+              left: AppSpacing.md,
+              right: AppSpacing.md,
+              top: AppSpacing.md,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.sm,
+                  vertical: AppSpacing.radiusSm,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.white.withValues(alpha: 0.94),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                ),
+                child: Text(
+                  _currentAddress ?? l10n.authLocationMapPlaceholder,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTypography.pillLabel(textTheme),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
 
-/// Apple-style tile skeleton: grid of rounded tiles with a subtle left-to-right shimmer.
 class _MapTileSkeleton extends StatefulWidget {
   const _MapTileSkeleton();
 

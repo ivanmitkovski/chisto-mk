@@ -21,6 +21,7 @@ describe('EventChatPushAggregatorService', () => {
 
     aggregator.enqueue({
       recipientUserId: 'u2',
+      recipientLocale: 'en',
       eventId: 'evt1',
       eventTitle: 'Beach cleanup',
       senderDisplayName: 'Alex',
@@ -53,6 +54,7 @@ describe('EventChatPushAggregatorService', () => {
 
     aggregator.enqueue({
       recipientUserId: 'u2',
+      recipientLocale: 'en',
       eventId: 'evt1',
       eventTitle: 'Beach cleanup',
       senderDisplayName: 'Alex',
@@ -63,6 +65,7 @@ describe('EventChatPushAggregatorService', () => {
     });
     aggregator.enqueue({
       recipientUserId: 'u2',
+      recipientLocale: 'en',
       eventId: 'evt1',
       eventTitle: 'Beach cleanup',
       senderDisplayName: 'Alex',
@@ -73,6 +76,7 @@ describe('EventChatPushAggregatorService', () => {
     });
     aggregator.enqueue({
       recipientUserId: 'u2',
+      recipientLocale: 'en',
       eventId: 'evt1',
       eventTitle: 'Beach cleanup',
       senderDisplayName: 'Alex',

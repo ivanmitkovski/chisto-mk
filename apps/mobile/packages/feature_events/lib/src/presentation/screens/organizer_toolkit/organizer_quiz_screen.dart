@@ -50,7 +50,9 @@ Future<void> _persistOrganizerCertifiedAt(WidgetRef ref, DateTime at) async {
 }
 
 class OrganizerQuizScreen extends ConsumerStatefulWidget {
-  const OrganizerQuizScreen({super.key});
+  const OrganizerQuizScreen({super.key, this.onProceedToCreate});
+
+  final OrganizerCertificationProceedHandler? onProceedToCreate;
 
   @override
   ConsumerState<OrganizerQuizScreen> createState() =>
@@ -255,9 +257,10 @@ class _OrganizerQuizScreenState extends ConsumerState<OrganizerQuizScreen>
       final int pointsAwarded = result.pointsAwarded;
       final DateTime? parsed = result.organizerCertifiedAt;
 
-      if (passed && parsed != null) {
-        ref.read(authStateProvider).markOrganizerCertified(parsed);
-        await _persistOrganizerCertifiedAt(ref, parsed);
+      if (passed) {
+        final DateTime certifiedAt = parsed ?? DateTime.now();
+        ref.read(authStateProvider).markOrganizerCertified(certifiedAt);
+        await _persistOrganizerCertifiedAt(ref, certifiedAt);
       }
       if (!mounted) {
         return;
@@ -365,11 +368,15 @@ class _OrganizerQuizScreenState extends ConsumerState<OrganizerQuizScreen>
             const AppBackButton(backgroundColor: AppColors.inputFill),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
-              child: Text(
-                context.l10n.organizerQuizTitle,
-                style: AppTypography.eventsScreenTitle(textTheme),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+              // Scale down instead of wrapping so long locales stay on one row.
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: AlignmentDirectional.centerStart,
+                child: Text(
+                  context.l10n.organizerQuizTitle,
+                  style: AppTypography.eventsScreenTitle(textTheme),
+                  maxLines: 1,
+                ),
               ),
             ),
           ],
@@ -458,6 +465,7 @@ class _OrganizerQuizScreenState extends ConsumerState<OrganizerQuizScreen>
         result: result,
         onRetry: _retryAfterResult,
         onCreateEvent: () {
+          widget.onProceedToCreate?.call();
           dismissOrganizerCertificationFlow(context);
         },
       );

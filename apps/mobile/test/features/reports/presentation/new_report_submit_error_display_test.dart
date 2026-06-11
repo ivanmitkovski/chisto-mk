@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('NewReportSubmitErrorDisplay', () {
-    test('UNKNOWN with socket cause surfaces cause message', () {
+    test('UNKNOWN maps to SUBMIT_FAILED_RETRYABLE without English message', () {
       final AppError wrapped = AppError.unknown(
         cause: const SocketException('Connection refused'),
       );
@@ -16,11 +16,7 @@ void main() {
 
       expect(banner.code, 'SUBMIT_FAILED_RETRYABLE');
       expect(banner.retryable, isTrue);
-      expect(banner.message, contains('Connection refused'));
-      expect(
-        banner.message,
-        isNot(NewReportSubmitErrorDisplay.genericSubmitFailureMessage),
-      );
+      expect(banner.message, isEmpty);
     });
 
     test('NETWORK_ERROR passes through unchanged', () {
@@ -34,16 +30,14 @@ void main() {
       );
     });
 
-    test('bare UNKNOWN uses generic copy', () {
+    test('bare UNKNOWN uses retryable code without message', () {
       final AppError unknown = AppError.unknown();
 
       final AppError banner =
           NewReportSubmitErrorDisplay.humanizeSubmitErrorForBanner(unknown);
 
-      expect(
-        banner.message,
-        NewReportSubmitErrorDisplay.genericSubmitFailureMessage,
-      );
+      expect(banner.code, 'SUBMIT_FAILED_RETRYABLE');
+      expect(banner.message, isEmpty);
     });
   });
 }

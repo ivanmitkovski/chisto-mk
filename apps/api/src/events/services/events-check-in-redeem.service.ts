@@ -1,9 +1,11 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   Logger,
 } from '@nestjs/common';
 import { AdminModerationCategory, CheckInRiskSignalType, Prisma } from '../../prisma-client';
+import { isWithinMacedonia } from '../../common/geo/macedonia-bounds';
 import { AdminModerationNotifierService } from '../../admin-moderation-email/services/admin-moderation-notifier.service';
 import type { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { CheckInRepository } from '../repositories/check-in.repository';
@@ -130,6 +132,13 @@ export class EventsCheckInRedeemService {
     rawPayload: string,
     clientGeo?: { lat: number; lng: number },
   ): Promise<RedeemResult> {
+    // Live-GPS defense-in-depth: when the client supplies a fix it must be inside North Macedonia.
+    if (clientGeo != null && !isWithinMacedonia(clientGeo.lat, clientGeo.lng)) {
+      throw new BadRequestException({
+        code: 'CHECK_IN_LOCATION_OUTSIDE_MACEDONIA',
+        message: 'Check-in location must be within North Macedonia',
+      });
+    }
     const event = await this.checkInRepository.prisma.cleanupEvent.findFirst({
       where: { id: eventId, ...visibilityWhere(user.userId) },
       select: {

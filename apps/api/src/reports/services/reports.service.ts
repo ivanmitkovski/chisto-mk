@@ -8,12 +8,6 @@ import { CreateReportWithLocationDto } from '../dto/create-report-with-location.
 import { ReportSubmitResponseDto } from '../dto/report-submit-response.dto';
 import { AdminReportDetailDto, AdminReportListResponseDto } from '../dto/admin-report.dto';
 import { AdminReportsQueueSummaryDto } from '../dto/admin-reports-queue-summary.dto';
-import {
-  AdminDuplicateReportGroupDto,
-  AdminDuplicateReportGroupsResponseDto,
-  MergeDuplicateReportsDto,
-  MergeDuplicateReportsResponseDto,
-} from '../dto/admin-duplicate-report.dto';
 import { ListMyReportsQueryDto } from '../dto/list-my-reports-query.dto';
 import { ListReportsQueryDto } from '../dto/list-reports-query.dto';
 import { ReportCapacityDto } from '../dto/report-capacity.dto';
@@ -23,13 +17,13 @@ import { UpdateReportStatusDto } from '../dto/update-report-status.dto';
 import { CitizenReportDetailDto } from '../dto/citizen-report-detail.dto';
 import { UserReportListItemDto } from '../dto/user-report.dto';
 import { ReportsModerationService } from './reports-moderation.service';
-import { ReportsDuplicateMergeService } from './reports-duplicate-merge.service';
 import type { ReportSubmitLocale } from '../util/report-locale.util';
 import { ReportSubmitService } from './report-submit.service';
 import { ReportCitizenQueryService } from './report-citizen-query.service';
 
 /**
- * Facade for report operations; delegates to specialized services (submit, citizen reads, moderation, merge).
+ * Facade for report operations; delegates to specialized services (submit, citizen reads, moderation).
+ * Duplicate-group reads/merges go straight to ReportsDuplicateMergeService.
  */
 @Injectable()
 export class ReportsService {
@@ -39,7 +33,6 @@ export class ReportsService {
     private readonly reportCitizenQuery: ReportCitizenQueryService,
     private readonly reportCapacity: ReportCapacityService,
     private readonly reportsModeration: ReportsModerationService,
-    private readonly reportsDuplicateMerge: ReportsDuplicateMergeService,
   ) {}
 
   createWithLocation(
@@ -80,22 +73,6 @@ export class ReportsService {
     return this.reportsModeration.getQueueSummary();
   }
 
-  findDuplicateGroups(query: ListReportsQueryDto): Promise<AdminDuplicateReportGroupsResponseDto> {
-    return this.reportsDuplicateMerge.findDuplicateGroups(query);
-  }
-
-  findDuplicateGroupByReport(reportId: string): Promise<AdminDuplicateReportGroupDto> {
-    return this.reportsDuplicateMerge.findDuplicateGroupByReport(reportId);
-  }
-
-  mergeDuplicateReports(
-    reportId: string,
-    dto: MergeDuplicateReportsDto,
-    moderator: AuthenticatedUser,
-  ): Promise<MergeDuplicateReportsResponseDto> {
-    return this.reportsDuplicateMerge.mergeDuplicateReports(reportId, dto, moderator);
-  }
-
   updateStatus(
     reportId: string,
     dto: UpdateReportStatusDto,
@@ -134,7 +111,9 @@ export class ReportsService {
         message: `Report with id '${reportId}' was not found`,
       });
     }
-    const coReporterUserIds = report.coReporters.map((c) => c.userId);
+    const coReporterUserIds = report.coReporters
+      .map((c) => c.userId)
+      .filter((id): id is string => id != null);
     assertReportVisibleToUser(report, coReporterUserIds, user, ADMIN_PANEL_ROLES);
     if (ADMIN_PANEL_ROLES.includes(user.role)) {
       return this.findOneForModeration(reportId);

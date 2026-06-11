@@ -1,11 +1,11 @@
 import {
   BadRequestException,
   ConflictException,
-  ForbiddenException,
   Injectable,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
   CleanupEventStatus,
   EcoEventLifecycleStatus,
@@ -18,8 +18,8 @@ import {
   REASON_EVENT_JOINED,
 } from '../../gamification/constants/gamification.constants';
 import { EventChatMutationsService } from '../../event-chat/services/event-chat-mutations.service';
-import { EcoEventPointsService } from '../../gamification/services/eco-event-points.service';
-import { PatchEventReminderDto } from '../dto/patch-event-reminder.dto';
+import { EcoEventPointsService, type EcoEventPointsCreditResult } from '../../gamification/services/eco-event-points.service';
+import { emitGamificationPointsCredited } from '../../gamification/util/gamification-credit-events.util';
 import { EventsMobileMapperService } from './events-mobile-mapper.service';
 import { EventLiveImpactService } from './event-live-impact.service';
 import { eventDetailIncludeForViewer } from '../util/events-query.include.detail';
@@ -27,7 +27,7 @@ import { visibilityWhere } from '../util/events-query.include.shared';
 import { EventsRepository } from '../repositories/events.repository';
 
 /**
- * Volunteer join/leave, reminders, and related side effects (chat, live impact).
+ * Volunteer join/leave and related side effects (chat, live impact).
  */
 @Injectable()
 export class EventsParticipationService {
@@ -39,6 +39,7 @@ export class EventsParticipationService {
     private readonly ecoEventPoints: EcoEventPointsService,
     private readonly eventChatMutations: EventChatMutationsService,
     private readonly liveImpact: EventLiveImpactService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async join(id: string, user: AuthenticatedUser) {
@@ -93,8 +94,9 @@ export class EventsParticipationService {
     }
 
     let pointsAwarded = 0;
+    let joinCredit: EcoEventPointsCreditResult | null = null;
     try {
-      pointsAwarded = await this.eventsRepository.prisma.$transaction(async (tx) => {
+      joinCredit = await this.eventsRepository.prisma.$transaction(async (tx) => {
         await tx.eventParticipant.create({
           data: {
             eventId: id,
@@ -147,6 +149,11 @@ export class EventsParticipationService {
       throw err;
     }
 
+    if (joinCredit != null) {
+      pointsAwarded = joinCredit.granted;
+      emitGamificationPointsCredited(this.eventEmitter, user.userId, joinCredit);
+    }
+
     const row = await this.eventsRepository.prisma.cleanupEvent.findFirstOrThrow({
       where: { id },
       include: eventDetailIncludeForViewer(user.userId),
@@ -174,6 +181,10 @@ export class EventsParticipationService {
       });
 
     this.liveImpact.notifyListeners(id);
+    this.eventEmitter.emit('event.joined', {
+      userId: user.userId,
+      metadata: { eventId: id },
+    });
     return { ...(await this.mobileMapper.toMobileEvent(row)), pointsAwarded };
   }
 
@@ -248,52 +259,4 @@ export class EventsParticipationService {
     return this.mobileMapper.toMobileEvent(row);
   }
 
-  async patchReminder(id: string, dto: PatchEventReminderDto, user: AuthenticatedUser) {
-    const existing = await this.eventsRepository.prisma.cleanupEvent.findFirst({
-      where: { id, ...visibilityWhere(user.userId) },
-    });
-    if (existing == null) {
-      throw new NotFoundException({
-        code: 'EVENT_NOT_FOUND',
-        message: 'Event not found',
-      });
-    }
-
-    const participant = await this.eventsRepository.prisma.eventParticipant.findUnique({
-      where: {
-        eventId_userId: { eventId: id, userId: user.userId },
-      },
-    });
-    if (participant == null) {
-      throw new ForbiddenException({
-        code: 'REMINDER_REQUIRES_JOIN',
-        message: 'Join the event before setting a reminder',
-      });
-    }
-
-    let reminderAt: Date | null = null;
-    if (dto.reminderEnabled && dto.reminderAt != null && dto.reminderAt !== '') {
-      reminderAt = new Date(dto.reminderAt);
-      if (Number.isNaN(reminderAt.getTime())) {
-        throw new BadRequestException({
-          code: 'INVALID_REMINDER_AT',
-          message: 'Invalid reminderAt',
-        });
-      }
-    }
-
-    await this.eventsRepository.prisma.eventParticipant.update({
-      where: { eventId_userId: { eventId: id, userId: user.userId } },
-      data: {
-        reminderEnabled: dto.reminderEnabled,
-        reminderAt: dto.reminderEnabled ? reminderAt : null,
-      },
-    });
-
-    const row = await this.eventsRepository.prisma.cleanupEvent.findFirstOrThrow({
-      where: { id },
-      include: eventDetailIncludeForViewer(user.userId),
-    });
-    return this.mobileMapper.toMobileEvent(row);
-  }
 }

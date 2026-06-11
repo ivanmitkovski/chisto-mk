@@ -249,6 +249,10 @@ class AppLocalizationsMk extends AppLocalizations {
       'Додајте барем една фотографија за да продолжите.';
 
   @override
+  String get reportFlowEvidenceTip =>
+      'Кадрирајте го местото при добра светлина.';
+
+  @override
   String get reportFlowLocationOutsideMacedoniaHelper =>
       'Оваа локација е надвор од Македонија. Потегнете ја иглата во земјата, потоа допрете Потврди локација.';
 
@@ -576,6 +580,50 @@ class AppLocalizationsMk extends AppLocalizations {
       'Лозинките не се совпаѓаат';
 
   @override
+  String get authValidationPasswordWeak =>
+      'Лозинката е преслаба. Користете комбинација од букви и броеви и избегнувајте вообичаени шеми.';
+
+  @override
+  String get authValidationPasswordTooLong =>
+      'Лозинката може да има најмногу 72 знаци';
+
+  @override
+  String get authValidationTermsRequired =>
+      'Мора да ги прифатите условите и одредбите';
+
+  @override
+  String get authValidationOtpRequired => 'Потребен е код за верификација';
+
+  @override
+  String get authValidationOtpDigits => 'Внесете 6-цифрен код';
+
+  @override
+  String get authValidationNameTooShort =>
+      'Секое име мора да има најмалку 2 знаци';
+
+  @override
+  String get authValidationNameTooLong =>
+      'Секое име може да има најмногу 60 знаци';
+
+  @override
+  String get authValidationGenericInvalid => 'Проверете го ова поле';
+
+  @override
+  String formValidationErrorsAnnounce(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count полиња имаат грешки',
+      one: '1 поле има грешка',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get authErrorRegistrationConflict =>
+      'Сметка со оваа е-пошта или телефонски број веќе постои';
+
+  @override
   String get authErrorInvalidCredentials => 'Погрешен телефон или лозинка.';
 
   @override
@@ -730,6 +778,9 @@ class AppLocalizationsMk extends AppLocalizations {
   String get authOnboardingBrandName => 'Chisto.mk';
 
   @override
+  String get brandLogoSemantic => 'Лого на Chisto';
+
+  @override
   String get authOnboardingWelcomeDescription => 'Види. Пријави. Исчисти.';
 
   @override
@@ -875,8 +926,23 @@ class AppLocalizationsMk extends AppLocalizations {
       'Моментално поддржуваме само локации во Македонија.';
 
   @override
-  String get authLocationResolveFailed =>
-      'Не можевме да ја одредиме локацијата. Обидете се повторно.';
+  String get authLocationTryAgain => 'Обиди се повторно';
+
+  @override
+  String get authLocationGateOutsideTitle =>
+      'Chisto.mk е достапен во Македонија';
+
+  @override
+  String get authLocationGateOutsideBody =>
+      'Локацијата на вашиот уред е надвор од Македонија. Треба да бидете во Македонија за да создадете сметка.';
+
+  @override
+  String get authLocationGateUnavailableBody =>
+      'Не можевме да ја потврдиме вашата локација. Вклучете локациски услуги, дозволете пристап и обидете се повторно.';
+
+  @override
+  String get authLocationActionOnlyInMacedoniaSnack =>
+      'Оваа акција е достапна само во Македонија.';
 
   @override
   String get authOtpCodeSemantic => 'Код за потврда';
@@ -1256,6 +1322,24 @@ class AppLocalizationsMk extends AppLocalizations {
   String get safetyReportDetailsHint => 'Опционални детали за модератори';
 
   @override
+  String get safetyReportDetailsHintRequired =>
+      'Опишете го проблемот за модераторите';
+
+  @override
+  String get safetyReportDetailsRequiredWhenOther =>
+      'Додадете краток опис кога избирате Друго.';
+
+  @override
+  String safetyReportDetailsCharCount(int used, int max) {
+    return '$used / $max';
+  }
+
+  @override
+  String safetyReportDetailsTooLong(int max) {
+    return 'Деталите мора да имаат најмногу $max знаци.';
+  }
+
+  @override
   String get safetyReportSubmitted =>
       'Пријавата е испратена. Прегледуваме во рок од 24 часа.';
 
@@ -1288,6 +1372,11 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get profileDeleteAccountTile => 'Избриши сметка';
+
+  @override
+  String profileAppVersion(String version) {
+    return 'Верзија $version';
+  }
 
   @override
   String get profileEmailLabel => 'Е-пошта';
@@ -1478,7 +1567,7 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get profileGeneralLimitsNotice =>
-      'Промените на името се ограничени. Промената на телефонот бара верификација.';
+      'За промена на е-пошта и телефонски број, контактирајте ја поддршката.';
 
   @override
   String get profileGeneralUpdateButton => 'Ажурирај податоци';
@@ -1580,7 +1669,7 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get reportListOutboxFailedBanner =>
-      'Испраќањето не успеа. Допри Retry за повторен обид.';
+      'Испраќањето не успеа. Допри Обиди се повторно за повторен обид.';
 
   @override
   String get reportListOutboxFailedRetry => 'Обиди повторно';
@@ -2027,7 +2116,7 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get commentsBodyTooLong =>
-      'Коментарот е предолг (максимум 2000 знаци).';
+      'Коментарот е предолг (максимум 500 знаци).';
 
   @override
   String get commentsReplyTargetFallback => 'коментар';
@@ -2811,7 +2900,7 @@ class AppLocalizationsMk extends AppLocalizations {
   }
 
   @override
-  String get notificationsSnoozeTitle => 'Времетраење на одлагање';
+  String get notificationsSnoozeTitle => 'Времетраење на одложување';
 
   @override
   String get notificationsSnooze1h => '1 час';
@@ -3255,6 +3344,9 @@ class AppLocalizationsMk extends AppLocalizations {
   String get editEventNoChangesToSave => 'Нема што да се зачува.';
 
   @override
+  String get editEventSaving => 'Се зачувуваат промените…';
+
+  @override
   String get editEventPendingModerationBanner =>
       'Настанот сè уште чека одобрување од модератор. Промените важат за вашата нацрт-верзија.';
 
@@ -3411,7 +3503,7 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get eventsOrganizerCompletionStepImpactBody =>
-      'Забележете торби, волонтерски часови и проценки од страницата на настанот.';
+      'Забележете ќеси за отпад, волонтерски часови и проценки од страницата на настанот.';
 
   @override
   String get eventsOrganizerCompletionStepVisibilityTitle =>
@@ -3492,7 +3584,7 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String eventsImpactReceiptShareSummary(int checkIns, int bags, int joined) {
-    return '$checkIns пријави · $bags торби · $joined пријавени';
+    return '$checkIns пријави · $bags ќеси · $joined пријавени';
   }
 
   @override
@@ -3781,19 +3873,12 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get createEventGearSubtitle =>
-      'Изберете што волонтерите треба да понесат.';
+      'Изберете сè што волонтерите треба да понесат.';
 
   @override
   String createEventGearDoneSelectedCount(int count) {
     return 'Готово ($count избрани)';
   }
-
-  @override
-  String get createEventGearMultiselectTitle => 'Повеќекратен избор';
-
-  @override
-  String get createEventGearMultiselectMessage =>
-      'Допрете ги ставките што волонтерите треба да понесат. Може да изберете повеќе.';
 
   @override
   String get createEventTeamSizeTitle => 'Големина на тим';
@@ -4860,6 +4945,16 @@ class AppLocalizationsMk extends AppLocalizations {
   String get siteUpvotersRetry => 'Обиди се повторно';
 
   @override
+  String get siteCoReportersLoadFailed =>
+      'Не успеа вчитувањето на ко-пријавувачите.';
+
+  @override
+  String get siteCoReportersRetry => 'Обиди се повторно';
+
+  @override
+  String get siteCoReportersOriginalReporterLabel => 'Оригинален пријавувач';
+
+  @override
   String get siteDetailNoVolunteersSnack =>
       'Сè уште нема волонтери за оваа локација.';
 
@@ -5003,6 +5098,9 @@ class AppLocalizationsMk extends AppLocalizations {
   String siteHistoryByActor(String name) {
     return 'Од $name';
   }
+
+  @override
+  String get deletedUser => 'Избришан корисник';
 
   @override
   String get siteHistoryByAdmin => 'Од админ';
@@ -6586,6 +6684,62 @@ class AppLocalizationsMk extends AppLocalizations {
   }
 
   @override
+  String get eventsFilterSheetSubtitle =>
+      'Изберете една или повеќе опции. Празно значи сите.';
+
+  @override
+  String get eventsFilterResetSemantic => 'Ресетирај филтри';
+
+  @override
+  String get eventsFilterSectionSelectAll => 'Сите';
+
+  @override
+  String get eventsFilterSectionClear => 'Исчисти';
+
+  @override
+  String eventsFilterShowEvents(int count) {
+    return 'Прикажи $count настани';
+  }
+
+  @override
+  String eventsFilterShowEventsPlus(int count) {
+    return 'Прикажи $count+ настани';
+  }
+
+  @override
+  String eventsFilterPreviewLiveRegion(int count) {
+    return 'Прикажани $count настани';
+  }
+
+  @override
+  String get eventsFilterChipStatusOverrideHint =>
+      'Пилулата Претстоен или Минати ги заменуваат филтрите за статус додека не се вратите на Сите.';
+
+  @override
+  String get eventsFilterDatePresetThisWeek => 'Оваа недела';
+
+  @override
+  String get eventsFilterDatePresetThisMonth => 'Овој месец';
+
+  @override
+  String get eventsFilterDatePresetNext30Days => 'Следни 30 дена';
+
+  @override
+  String get eventsFilterDatePresetClear => 'Исчисти датуми';
+
+  @override
+  String get eventsFilterCategoryHintOn => 'Избрано';
+
+  @override
+  String get eventsFilterCategoryHintOff => 'Не е избрано';
+
+  @override
+  String get eventsFilterStatusHintOn => 'Избрано';
+
+  @override
+  String get eventsFilterStatusHintOff => 'Не е избрано';
+
+  @override
   String get eventsOrganizerDashboardTitle => 'Мои настани';
 
   @override
@@ -6811,7 +6965,7 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get eventsCategoryGeneralCleanupDescription =>
-      'Собирање ѓубре, метење и враќање на подрачјето во ред.';
+      'Собирање отпад, метење и враќање на подрачјето во ред.';
 
   @override
   String get eventsCategoryRiverAndLake => 'Чистење на реки и езера';
@@ -6856,35 +7010,35 @@ class AppLocalizationsMk extends AppLocalizations {
       'Прилагоден настан што не се вклопува во горните категории.';
 
   @override
-  String get eventsGearTrashBags => 'Џувалја за отпад';
+  String get eventsGearTrashBags => 'Вреќи за отпад';
 
   @override
   String get eventsGearGloves => 'Ракавици';
 
   @override
-  String get eventsGearRakes => 'Грабли и лопати';
+  String get eventsGearRakes => 'Гребла и лопати';
 
   @override
-  String get eventsGearWheelbarrow => 'Количка';
+  String get eventsGearWheelbarrow => 'Рачна количка';
 
   @override
-  String get eventsGearWaterBoots => 'Чизми за вода';
+  String get eventsGearWaterBoots => 'Гумени чизми';
 
   @override
   String get eventsGearSafetyVest => 'Рефлектирачки елек';
 
   @override
-  String get eventsGearFirstAid => 'Апчиња за прва помош';
+  String get eventsGearFirstAid => 'Прибор за прва помош';
 
   @override
-  String get eventsGearSunscreen => 'Сончев крем и вода';
+  String get eventsGearSunscreen => 'Крема за сончање и вода';
 
   @override
   String get eventsScaleSmall => 'Мала (1-5 луѓе)';
 
   @override
   String get eventsScaleSmallDescription =>
-      'Кратко чистење на едно место, една-две торби.';
+      'Кратко чистење на едно место, една-две ќеси за отпад.';
 
   @override
   String get eventsScaleMedium => 'Средна (6-15 луѓе)';
@@ -6999,7 +7153,19 @@ class AppLocalizationsMk extends AppLocalizations {
   }
 
   @override
-  String get errorUserNetwork => 'Проверете ја врската и обидете се повторно.';
+  String get errorUserNetwork =>
+      'Проверете ја вашата мрежа и обидете се повторно.';
+
+  @override
+  String get offlineConnectionTitle => 'Нема интернет конекција';
+
+  @override
+  String get offlineConnectionBody =>
+      'Проверете ја вашата мрежа и обидете се повторно.';
+
+  @override
+  String get reportDetailStaleBanner =>
+      'Не можеше да се освежи. Се прикажуваат последно вчитаните детали.';
 
   @override
   String get errorUserTimeout => 'Побара премногу долго. Обидете се повторно.';
@@ -7025,6 +7191,103 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get errorUserUnknown => 'Нешто тргна наопаку. Обидете се повторно.';
+
+  @override
+  String get errorUserValidation => 'Проверете ги означените полиња.';
+
+  @override
+  String get errorUserValidationGeneric =>
+      'Некои податоци се невалидни. Проверете и обидете се повторно.';
+
+  @override
+  String get errorUserConflict =>
+      'Оваа акција е во конфликт со нешто што веќе постои.';
+
+  @override
+  String get errorUserCancelled => 'Откажано.';
+
+  @override
+  String get errorUserPayloadTooLarge => 'Датотеката или барањето е преголемо.';
+
+  @override
+  String errorUserRetryAfterSeconds(int seconds) {
+    return 'Обидете се повторно за $seconds сек.';
+  }
+
+  @override
+  String get errorAlreadyJoined => 'Веќе сте дел од овој настан.';
+
+  @override
+  String get errorOrganizerCannotJoin =>
+      'Организаторите не можат да се приклучат на свој настан како учесници.';
+
+  @override
+  String get errorNotAParticipant => 'Прво треба да се приклучите на настанот.';
+
+  @override
+  String get errorOtpSendCooldown =>
+      'Почекајте момент пред да побарате нов код.';
+
+  @override
+  String get errorOtpSendFailed =>
+      'Не можевме да го испратиме кодот. Обидете се повторно.';
+
+  @override
+  String get errorTermsVersionMismatch =>
+      'Прифатете ги најновите услови за користење.';
+
+  @override
+  String get errorDeviceTokenInUse =>
+      'Известувањата се веќе поставени на друг уред.';
+
+  @override
+  String get errorEventsOrganizerNotCertified =>
+      'Завршете ја сертификацијата за организатор за да продолжите.';
+
+  @override
+  String get errorEventChatNotParticipant =>
+      'Прво треба да се приклучите на настанот за да користите разговор.';
+
+  @override
+  String get errorEventChatMessageUnavailable =>
+      'Пораката повеќе не е достапна.';
+
+  @override
+  String get errorChatUploadTooMany =>
+      'Премногу прилози. Испратете помалку датотеки.';
+
+  @override
+  String get errorChatUploadInvalid =>
+      'Типот или големината на датотеката не е дозволена.';
+
+  @override
+  String get errorAvatarFileRequired => 'Изберете фотографија за поставување.';
+
+  @override
+  String get errorInvalidFileType => 'Типот на датотеката не е поддржан.';
+
+  @override
+  String get connectionOfflineBanner =>
+      'Немате интернет. Некои функции може да не работат додека не се поврзете.';
+
+  @override
+  String get connectionReconnectingBanner => 'Повторно поврзување…';
+
+  @override
+  String get connectionLiveUpdatesDelayed =>
+      'Ажурирањата во живо се задоцнети. Повлечете за освежување.';
+
+  @override
+  String get notificationsInboxStaleHint =>
+      'Ажурирањата може да се задоцнат. Повлечете надолу за освежување.';
+
+  @override
+  String get pushRegistrationFailedSnack =>
+      'Не можевме да ги вклучиме известувањата. Обидете се повторно во Поставки.';
+
+  @override
+  String get checkInConnectionTimeout =>
+      'Пријавувањето истече. Сканирајте повторно или внесете го кодот рачно.';
 
   @override
   String get eventsFilterSheetSemantic => 'Филтрирај настани';
@@ -7078,7 +7341,7 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get eventChatOpenMapsFailed =>
-      'Не можев да го отворам Maps. Обиди се повторно.';
+      'Не можев да ги отворам картите. Обиди се повторно.';
 
   @override
   String get eventChatAttachPhotoLibrary => 'Фото библиотека';
@@ -7402,7 +7665,7 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get reportCategoryIllegalLandfillDescription =>
-      'Фрлен отпад, купишта ѓубре или неформални места за одлагање.';
+      'Фрлен отпад, купови отпад или неформални места каде се фрла отпад.';
 
   @override
   String get reportCategoryWaterPollutionTitle => 'Загадување на вода';
@@ -7484,18 +7747,18 @@ class AppLocalizationsMk extends AppLocalizations {
       'Ако условите станат небезбедни, паузирајте или одложете. Веднаш известете ги регистрираните доброволци во апликацијата за никој да не патува за откажан почеток.';
 
   @override
-  String get organizerToolkitPage5Title => 'Отпад и одлагање';
+  String get organizerToolkitPage5Title => 'Собирање и отстранување на отпад';
 
   @override
   String get organizerToolkitPage5Body =>
-      'Сортирајте рециклажа кога е можно, безбедно пакувајте остри предмети и однесете го отпадот на овластени места. Оставете ја локацијата почиста отколку што ја затекнавте.';
+      'Сортирајте рециклажа кога е можно, безбедно пакувајте остри предмети и однесете го отпадот на овластени места за отстранување или рециклажа. Оставете ја локацијата почиста отколку што ја затекнавте.';
 
   @override
   String get organizerToolkitPage6Title => 'Вклучете ги сите';
 
   @override
   String get organizerToolkitPage6Body =>
-      'Понудете јасни улоги, постојан темпо и трпеливост. Добредојде брифинг им помага на новите доброволци да се чувствуваат сигурно и безбедно.';
+      'Понудете јасни улоги, постојано темпо и трпеливост. Добредојде брифинг им помага на новите доброволци да се чувствуваат сигурно и безбедно.';
 
   @override
   String get organizerToolkitPage7Title => 'Приватност во чат';
@@ -7529,7 +7792,7 @@ class AppLocalizationsMk extends AppLocalizations {
       'Податоците за квизот од серверот се нецелосни. Обидете се повторно.';
 
   @override
-  String get organizerQuizRetryLoad => 'Обиди се повторно';
+  String get organizerQuizRetryLoad => 'Обидете се повторно';
 
   @override
   String get organizerQuizSubmitFailed =>
@@ -7541,10 +7804,10 @@ class AppLocalizationsMk extends AppLocalizations {
   }
 
   @override
-  String get organizerQuizSubmit => 'Поднеси одговори';
+  String get organizerQuizSubmit => 'Поднесете одговори';
 
   @override
-  String get organizerQuizPassedTitle => 'Сертифициран сте!';
+  String get organizerQuizPassedTitle => 'Сертифицирани сте!';
 
   @override
   String get organizerQuizPassedBody =>
@@ -7555,7 +7818,7 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String organizerQuizFailedBody(int correct, int total) {
-    return 'Прегледајте го туториалот и обидете се повторно. Точни $correct од $total.';
+    return 'Прегледајте ги наставките и обидете се повторно. Имате $correct од $total точни одговори.';
   }
 
   @override
@@ -7850,7 +8113,7 @@ class AppLocalizationsMk extends AppLocalizations {
   String get photoSourceTakePhoto => 'Сликај';
 
   @override
-  String get photoSourceTakePhotoSubtitle => 'Зфатете јасен преглед веднаш.';
+  String get photoSourceTakePhotoSubtitle => 'Сликајте јасен преглед веднаш.';
 
   @override
   String get photoSourceBestChoiceBadge => 'Најдобар избор';

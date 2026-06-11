@@ -12,6 +12,9 @@ import { SitesAdminBulkService } from './sites-admin-bulk.service';
 import { SitesMapQueryService } from './sites-map-query.service';
 import { SitesFeedService } from './sites-feed.service';
 import { SiteHistoryWriterService } from '../history/site-history-writer.service';
+import {
+  SitesReporterNotificationService,
+} from './sites-reporter-notification.service';
 
 const ALLOWED_SITE_STATUS_TRANSITIONS: Record<SiteStatus, SiteStatus[]> = {
   REPORTED: ['VERIFIED', 'DISPUTED'],
@@ -32,6 +35,7 @@ export class SitesAdminService {
     private readonly sitesFeed: SitesFeedService,
     private readonly siteHistoryWriter: SiteHistoryWriterService,
     private readonly sitesAdminBulk: SitesAdminBulkService,
+    private readonly sitesReporterNotification: SitesReporterNotificationService,
   ) {}
 
   async create(dto: CreateSiteDto): Promise<Site> {
@@ -126,6 +130,11 @@ export class SitesAdminService {
 
     this.sitesFeed.invalidateFeedCache('site_status_updated');
     this.sitesMapQuery.invalidateMapCache('site_status_updated', updated.id);
+    this.sitesReporterNotification.emitSiteStatusUpdate(
+      siteId,
+      admin.userId,
+      dto.status,
+    );
     return updated;
   }
 

@@ -23,7 +23,7 @@ void main() {
                 body: Center(
                   child: ElevatedButton(
                     onPressed: () {
-                      showAppPanelBottomSheet<void>(
+                      AppBottomSheet.show<void>(
                         context: context,
                         builder: (BuildContext sheetContext) {
                           return AppSheetScaffold(

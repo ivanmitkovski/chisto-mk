@@ -39,17 +39,28 @@ function createMergeServiceWithMocks(
     siteEvents as never,
     reportsOwnerEvents as never,
     eventEmitter as never,
+    { emitForApprovedReport: jest.fn() } as never,
   );
   const reportApprovalPoints = {
-    creditApprovalIfEligible: jest.fn().mockResolvedValue({ awarded: 0, preCapTotal: 0 }),
+    creditApprovalIfEligible: jest.fn().mockResolvedValue({
+      awarded: 0,
+      preCapTotal: 0,
+      credit: { granted: 0, totalPointsEarnedBefore: 0, totalPointsEarnedAfter: 0 },
+    }),
   };
   const snapshot = new DuplicateMergeSnapshotService(prisma as never);
+  const siteHeroImage = {
+    recomputeSiteHero: jest.fn(async () => ({ changed: false, heroReportId: null })),
+    emitIfChanged: jest.fn(),
+  };
   const mergeTransaction = new DuplicateMergeTransactionService(
     prisma as never,
     duplicateGroupQuery,
     reportApprovalPoints as never,
     reportSideEffectProcessor,
     snapshot,
+    siteHeroImage as never,
+    eventEmitter as never,
   );
   const service = new ReportsDuplicateMergeService(duplicateGroupQuery, mergeTransaction);
   return { service, reportApprovalPoints };
@@ -140,6 +151,8 @@ describe('ReportsDuplicateMergeService mergeDuplicateReports', () => {
           ],
         }),
       },
+      user: { findMany: jest.fn().mockResolvedValue([]) },
+      userDeviceToken: { findMany: jest.fn().mockResolvedValue([]) },
       $transaction: jest.fn(async (cb: (tx: unknown) => Promise<unknown>) => {
         const tx = {
           report: {
@@ -415,6 +428,8 @@ describe('ReportsDuplicateMergeService mergeDuplicateReports', () => {
           ],
         }),
       },
+      user: { findMany: jest.fn().mockResolvedValue([]) },
+      userDeviceToken: { findMany: jest.fn().mockResolvedValue([]) },
       $transaction: jest.fn(async (cb: (tx: unknown) => Promise<unknown>) => {
         const tx = {
           report: {

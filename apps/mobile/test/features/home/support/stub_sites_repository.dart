@@ -113,6 +113,13 @@ class StubSitesRepository implements SitesRepository {
   }) => throw UnimplementedError();
 
   @override
+  Future<SiteCoReportersResult> getSiteCoReporters(
+    String id, {
+    int page = 1,
+    int limit = 50,
+  }) => throw UnimplementedError();
+
+  @override
   Future<SiteCommentItem> createSiteComment(
     String id,
     String body, {

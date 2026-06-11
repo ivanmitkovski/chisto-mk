@@ -13,6 +13,7 @@
   "gamification": "Гејмификација",
   "app-config": "Конфигурација на апликација",
   "operations": "Операции",
+  "active-users": "Активни корисници",
   "emailSuppressions": "Блокирани е-пошти",
   "webhookLogs": "Webhook дневници",
   "audit": "Дневник за ревизија",

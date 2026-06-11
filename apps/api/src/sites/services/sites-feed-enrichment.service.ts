@@ -16,6 +16,7 @@ import { applyDiversityRerank } from '../util/sites-feed-diversity.util';
 import type { FeedSiteRow, SitesFeedCandidateBundle } from '../types/sites-feed-candidate.types';
 import { SitesFeedCacheService } from './sites-feed-cache.service';
 import { SitesFeedPreferencesService } from './sites-feed-preferences.service';
+import { SiteCommentsCountService } from './site-comments-count.service';
 import { mapWithConcurrency } from '../util/sites-feed-query-async.util';
 import { applyBatchSignedMediaToRows } from '../util/sites-feed-media-sign.util';
 import type { SitesFeedListResult } from '../types/sites-feed.types';
@@ -32,6 +33,7 @@ import {
   discoveryRankingRadiusKm,
   resolveFeedGeoScope,
 } from '../util/sites-feed-geo-scope.util';
+import { resolveActorIdentity } from '../../common/projections/public-identity.projection';
 import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
@@ -43,6 +45,7 @@ export class SitesFeedEnrichmentService {
     private readonly feedV2: FeedV2Service,
     private readonly feedCache: SitesFeedCacheService,
     private readonly preferences: SitesFeedPreferencesService,
+    private readonly siteCommentsCount: SiteCommentsCountService,
   ) {}
 
   async buildFeedListResponse(
@@ -123,8 +126,20 @@ export class SitesFeedEnrichmentService {
         : null;
 
     const responseData = mapToFeedResponseData(data, query);
+    if (user?.userId) {
+      const visibleCounts = await this.siteCommentsCount.countVisibleBatch(
+        data.map((row) => row.id),
+        user,
+      );
+      for (const item of responseData) {
+        const visible = visibleCounts.get(item.id);
+        if (visible != null) {
+          item.commentsCount = visible;
+        }
+      }
+    }
     const response: SitesFeedListResult = {
-      data: responseData as SitesFeedListResult['data'],
+      data: responseData as unknown as SitesFeedListResult['data'],
       meta: {
         page: query.page,
         limit: query.limit,
@@ -162,17 +177,20 @@ export class SitesFeedEnrichmentService {
       duplicateTitleCounts: Map<string, number>;
     },
   ): Promise<FeedEnrichedRow> {
-    const { reports, votes, saves, _count, ...siteBase } = site;
+    const { reports, votes, saves, _count, heroReport, ...siteBase } = site;
     const firstReport = reports[0];
-    const mediaUrls = firstReport?.mediaUrls?.length ? firstReport.mediaUrls : undefined;
+    const heroUrls =
+      heroReport?.mediaUrls?.filter((url) => typeof url === 'string' && url.trim().length > 0) ??
+      [];
+    const latestMediaUrls = firstReport?.mediaUrls?.length ? firstReport.mediaUrls : undefined;
     let latestReportReporterName: string | null = null;
     let latestReportReporterAvatarUrl: string | null = null;
     let latestReportReporterId: string | null = null;
     const feedRep = firstReport?.reporter;
     if (feedRep) {
       latestReportReporterId = feedRep.id;
-      const nm = `${feedRep.firstName ?? ''} ${feedRep.lastName ?? ''}`.trim();
-      latestReportReporterName = nm.length > 0 ? nm : null;
+      const identity = resolveActorIdentity(feedRep, { actorUserId: feedRep.id });
+      latestReportReporterName = identity.isDeleted ? null : (identity.displayName ?? null);
       latestReportReporterAvatarUrl = await this.reportsUploadService.signPrivateObjectKey(
         feedRep.avatarObjectKey,
       );
@@ -236,7 +254,8 @@ export class SitesFeedEnrichmentService {
       latestReportCategory: firstReport?.category ?? null,
       latestReportCreatedAt: firstReport?.createdAt?.toISOString() ?? null,
       latestReportNumber: firstReport?.reportNumber ?? null,
-      latestReportMediaUrls: mediaUrls,
+      latestReportMediaUrls: latestMediaUrls,
+      heroMediaUrls: heroUrls.length > 0 ? heroUrls : undefined,
       latestReportReporterName,
       latestReportReporterAvatarUrl,
       latestReportReporterId,

@@ -7,7 +7,7 @@ import 'package:http/testing.dart';
 
 void main() {
   test(
-    'retry 401 after successful refresh does not invoke onUnauthorized',
+    'retry 401 after successful refresh invokes onUnauthorized once',
     () async {
       var unauthorizedCalls = 0;
       var protectedHits = 0;
@@ -27,7 +27,7 @@ void main() {
       final client = ApiClient(
         config: AppConfig.local,
         accessToken: () => 'token',
-        onUnauthorized: () => unauthorizedCalls += 1,
+        onUnauthorized: (_) => unauthorizedCalls += 1,
         httpClient: mock,
       );
       client.refreshSession = () async => RefreshOutcome.success;
@@ -44,7 +44,7 @@ void main() {
       );
 
       expect(protectedHits, 2);
-      expect(unauthorizedCalls, 0);
+      expect(unauthorizedCalls, 1);
     },
   );
 
@@ -65,7 +65,7 @@ void main() {
     final client = ApiClient(
       config: AppConfig.local,
       accessToken: () => 'token',
-      onUnauthorized: () => unauthorizedCalls += 1,
+      onUnauthorized: (_) => unauthorizedCalls += 1,
       httpClient: mock,
     );
     client.refreshSession = () async => RefreshOutcome.serverRejected;
@@ -106,7 +106,7 @@ void main() {
     final client = ApiClient(
       config: AppConfig.local,
       accessToken: () => 'token',
-      onUnauthorized: () => unauthorizedCalls += 1,
+      onUnauthorized: (_) => unauthorizedCalls += 1,
       httpClient: mock,
     );
     client.refreshSession = () async => RefreshOutcome.success;
@@ -137,7 +137,7 @@ void main() {
       final client = ApiClient(
         config: AppConfig.local,
         accessToken: () => 'token',
-        onUnauthorized: () => unauthorizedCalls += 1,
+        onUnauthorized: (_) => unauthorizedCalls += 1,
         httpClient: mock,
       );
       client.refreshSession = () async => RefreshOutcome.serverRejected;
@@ -178,7 +178,7 @@ void main() {
       final client = ApiClient(
         config: AppConfig.local,
         accessToken: () => 'token',
-        onUnauthorized: () => unauthorizedCalls += 1,
+        onUnauthorized: (_) => unauthorizedCalls += 1,
         httpClient: mock,
       );
       client.refreshSession = () async => RefreshOutcome.serverRejected;
@@ -230,7 +230,7 @@ void main() {
     final client = ApiClient(
       config: AppConfig.local,
       accessToken: () => 'token',
-      onUnauthorized: () {},
+      onUnauthorized: (_) {},
       httpClient: mock,
     );
 
@@ -257,7 +257,7 @@ void main() {
     final client = ApiClient(
       config: AppConfig.local,
       accessToken: () => 'token',
-      onUnauthorized: () {},
+      onUnauthorized: (_) {},
       httpClient: mock,
     );
 
@@ -285,7 +285,7 @@ void main() {
     final client = ApiClient(
       config: AppConfig.local,
       accessToken: () => 'token',
-      onUnauthorized: () {},
+      onUnauthorized: (_) {},
       httpClient: mock,
     );
 

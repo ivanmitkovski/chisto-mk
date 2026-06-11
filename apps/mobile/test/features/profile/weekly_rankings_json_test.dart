@@ -14,6 +14,7 @@ void main() {
             'rank': 1,
             'userId': 'a',
             'displayName': 'One User',
+            'avatarUrl': 'https://cdn.example/one.jpg',
             'weeklyPoints': 100,
             'isCurrentUser': false,
           },
@@ -28,6 +29,8 @@ void main() {
       });
 
       expect(result.entries.length, 2);
+      expect(result.entries[0].avatarUrl, 'https://cdn.example/one.jpg');
+      expect(result.entries[1].avatarUrl, isNull);
       expect(result.entries[1].isCurrentUser, isTrue);
       expect(result.entries[1].weeklyPoints, 12);
       expect(result.myRank, 5);

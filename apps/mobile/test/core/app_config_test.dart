@@ -3,17 +3,16 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('AppConfig', () {
-    test('dev has correct apiBaseUrl, helpCenterUrl and environment', () {
-      expect(AppConfig.dev.apiBaseUrl, equals('https://api-dev.chisto.mk'));
+    test('dev points at the temporary HTTP dev backend', () {
+      // Dev has no valid TLS cert yet, so the app uses HTTP for it.
+      expect(AppConfig.dev.apiBaseUrl, equals('http://api-dev.chisto.mk'));
       expect(AppConfig.dev.helpCenterUrl, equals('https://chisto.mk/help'));
       expect(AppConfig.dev.environment, equals(AppEnvironment.dev));
     });
 
-    test('staging has correct apiBaseUrl and environment', () {
-      expect(
-        AppConfig.staging.apiBaseUrl,
-        equals('https://api-staging.chisto.mk'),
-      );
+    test('staging (beta target) points at the dev backend for now', () {
+      // TEMP: beta builds hit the dev backend until staging/prod is deployed.
+      expect(AppConfig.staging.apiBaseUrl, equals('http://api-dev.chisto.mk'));
       expect(AppConfig.staging.environment, equals(AppEnvironment.staging));
     });
 
@@ -40,6 +39,37 @@ void main() {
       final config = AppConfig.fromEnvironment();
       expect(config, equals(AppConfig.dev));
       expect(config.environment, equals(AppEnvironment.dev));
+    });
+
+    test('isReleaseEligible allows staging (beta) and prod, rejects dev', () {
+      // Beta builds (build-beta.sh) ship ENV=staging; store builds ship prod.
+      expect(AppConfig.staging.isReleaseEligible, isTrue);
+      expect(AppConfig.prod.isReleaseEligible, isTrue);
+
+      // Dev-family configs must never start a release build.
+      expect(AppConfig.dev.isReleaseEligible, isFalse);
+      expect(AppConfig.local.isReleaseEligible, isFalse);
+      expect(AppConfig.localAndroid.isReleaseEligible, isFalse);
+      expect(AppConfig.localDevice.isReleaseEligible, isFalse);
+      expect(AppConfig.awsDev.isReleaseEligible, isFalse);
+    });
+
+    test('release transport security is enforced for prod only', () {
+      // Prod must be HTTPS; main.dart runs assertReleaseTransportSecurity only
+      // when config.isProd, so the temporary cleartext dev/staging URL (which
+      // would otherwise be rejected) does not block beta startup.
+      expect(
+        () => AppConfig.assertReleaseTransportSecurity(AppConfig.prod.apiBaseUrl),
+        returnsNormally,
+      );
+      expect(
+        () => AppConfig.assertReleaseTransportSecurity(
+          AppConfig.staging.apiBaseUrl,
+        ),
+        throwsStateError,
+        reason: 'cleartext dev URL is only allowed because the check is '
+            'prod-only in kReleaseMode',
+      );
     });
 
     test('assertReleaseTransportSecurity accepts HTTPS custom domain', () {

@@ -40,6 +40,7 @@ class ApiSiteCommentsRepository implements SiteCommentsRepository {
       page: (meta?['page'] as num?)?.toInt() ?? page,
       limit: (meta?['limit'] as num?)?.toInt() ?? limit,
       total: (meta?['total'] as num?)?.toInt() ?? items.length,
+      engagementTotal: (meta?['engagementTotal'] as num?)?.toInt(),
     );
   }
 
@@ -60,6 +61,33 @@ class ApiSiteCommentsRepository implements SiteCommentsRepository {
         .toList();
     final Map<String, dynamic>? meta = safeAsStringKeyedMap(json['meta']);
     return SiteUpvotesResult(
+      items: items,
+      page: (meta?['page'] as num?)?.toInt() ?? page,
+      limit: (meta?['limit'] as num?)?.toInt() ?? limit,
+      total: (meta?['total'] as num?)?.toInt() ?? items.length,
+      hasMore: meta?['hasMore'] as bool? ?? false,
+    );
+  }
+
+  @override
+  Future<SiteCoReportersResult> getSiteCoReporters(
+    String id, {
+    int page = 1,
+    int limit = 50,
+  }) async {
+    final String query = 'page=$page&limit=$limit';
+    final ApiResponse response = await _client.get(
+      '/sites/$id/co-reporters?$query',
+    );
+    final Map<String, dynamic>? json = response.json;
+    if (json == null) throw AppError.unknown();
+    final List<dynamic> data = safeAsList(json['data']) ?? <dynamic>[];
+    final List<SiteCoReporterItem> items = data
+        .whereType<Map<String, dynamic>>()
+        .map<SiteCoReporterItem>(_siteCoReporterFromJson)
+        .toList();
+    final Map<String, dynamic>? meta = safeAsStringKeyedMap(json['meta']);
+    return SiteCoReportersResult(
       items: items,
       page: (meta?['page'] as num?)?.toInt() ?? page,
       limit: (meta?['limit'] as num?)?.toInt() ?? limit,
@@ -180,6 +208,42 @@ SiteUpvoterItem _siteUpvoterFromJson(Map<String, dynamic> json) {
   );
 }
 
+SiteCoReporterItem _siteCoReporterFromJson(Map<String, dynamic> json) {
+  final String id = '${json['id'] ?? ''}'.trim();
+  final String firstName =
+      '${json['firstName'] ?? json['first_name'] ?? ''}'.trim();
+  final String lastName =
+      '${json['lastName'] ?? json['last_name'] ?? ''}'.trim();
+  final String displayName =
+      '${json['displayName'] ?? json['display_name'] ?? ''}'.trim();
+  final Object? av = json['avatarUrl'] ?? json['avatar_url'];
+  final String? avatarUrl = av is String && av.trim().isNotEmpty
+      ? av.trim()
+      : null;
+  final Object? rawAt = json['reportedAt'] ?? json['reported_at'];
+  final DateTime reportedAt = rawAt is String && rawAt.isNotEmpty
+      ? (DateTime.tryParse(rawAt) ?? DateTime.fromMillisecondsSinceEpoch(0))
+      : DateTime.fromMillisecondsSinceEpoch(0);
+  final bool isOriginalReporter = json['isOriginalReporter'] == true ||
+      json['is_original_reporter'] == true;
+  final bool isDeleted = json['isDeleted'] as bool? ?? false;
+  final String resolvedDisplay = displayName.isNotEmpty
+      ? displayName
+      : ('$firstName $lastName'.trim().isNotEmpty
+            ? '$firstName $lastName'.trim()
+            : 'Anonymous');
+  return SiteCoReporterItem(
+    id: id.isEmpty ? 'co-${resolvedDisplay.hashCode}' : id,
+    firstName: firstName,
+    lastName: lastName,
+    displayName: resolvedDisplay,
+    isDeleted: isDeleted,
+    avatarUrl: isDeleted ? null : avatarUrl,
+    reportedAt: reportedAt,
+    isOriginalReporter: isOriginalReporter,
+  );
+}
+
 SiteCommentItem _siteCommentFromJson(Map<String, dynamic> item) {
   final List<dynamic> repliesJson = safeAsList(item['replies']) ?? <dynamic>[];
   final Object? authorAvatarRaw =
@@ -193,6 +257,7 @@ SiteCommentItem _siteCommentFromJson(Map<String, dynamic> item) {
     parentId: item['parentId'] as String?,
     authorId: item['authorId'] as String? ?? '',
     authorName: item['authorName'] as String? ?? 'Anonymous',
+    authorIsDeleted: item['authorIsDeleted'] as bool? ?? false,
     authorAvatarUrl: authorAvatarUrl,
     body: item['body'] as String? ?? '',
     createdAt:

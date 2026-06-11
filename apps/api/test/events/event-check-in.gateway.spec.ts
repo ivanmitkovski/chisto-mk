@@ -57,8 +57,8 @@ describe('EventCheckInGateway', () => {
     expect(emit).toHaveBeenCalledWith(
       'error',
       expect.objectContaining({
-        code: 'CHECK_IN_UNAUTHORIZED',
-        message: 'Authentication failed',
+        code: 'UNAUTHORIZED',
+        message: 'Missing token',
       }),
     );
     expect(disconnect).toHaveBeenCalledWith(true);

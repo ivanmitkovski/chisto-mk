@@ -552,10 +552,11 @@ class _SettingsRowSkeleton extends StatelessWidget {
         row,
         if (showDividerBelow)
           Padding(
-            padding: const EdgeInsets.only(left: AppSpacing.avatarLg),
-            child: Container(
+            padding: const EdgeInsets.only(left: AppSpacing.md),
+            child: Divider(
               height: 1,
-              color: AppColors.divider.withValues(alpha: 0.9),
+              thickness: 1,
+              color: AppColors.divider.withValues(alpha: 0.6),
             ),
           ),
       ],

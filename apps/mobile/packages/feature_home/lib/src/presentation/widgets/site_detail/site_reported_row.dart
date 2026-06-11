@@ -1,4 +1,5 @@
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
+import 'package:chisto_infrastructure/shared/utils/civic_actor_display.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_avatar.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
@@ -7,26 +8,33 @@ class SiteReportedRow extends StatelessWidget {
   const SiteReportedRow({
     super.key,
     required this.reporterName,
+    this.reporterIsDeleted = false,
     required this.reportedAgo,
     this.reporterAvatarUrl,
     this.onTap,
   });
 
   final String reporterName;
+  final bool reporterIsDeleted;
   final String reportedAgo;
   final String? reporterAvatarUrl;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
+    final String displayName = civicActorDisplayLabel(
+      context.l10n,
+      displayName: reporterName,
+      isDeleted: reporterIsDeleted,
+    );
     final TextTheme textTheme = Theme.of(context).textTheme;
     final Widget row = Row(
       children: <Widget>[
         AppAvatar(
-          name: reporterName,
+          name: displayName,
           size: 28,
           fontSize: 11,
-          imageUrl: reporterAvatarUrl,
+          imageUrl: reporterIsDeleted ? null : reporterAvatarUrl,
         ),
         const SizedBox(width: AppSpacing.sm),
         Expanded(
@@ -38,7 +46,7 @@ class SiteReportedRow extends StatelessWidget {
               children: <TextSpan>[
                 TextSpan(text: context.l10n.siteDetailReportedByPrefix),
                 TextSpan(
-                  text: reporterName,
+                  text: displayName,
                   style: AppTypography.cardSubtitle(textTheme).copyWith(
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,

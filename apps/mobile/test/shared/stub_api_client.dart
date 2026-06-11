@@ -6,12 +6,13 @@ import 'package:chisto_infrastructure/core/network/request_cancellation.dart';
 /// or subclass with `@override` on [post] / [get] (include [cancellation] param).
 class StubApiClient extends ApiClient {
   StubApiClient({
-    ApiClientConfig super.config = AppConfig.dev,
+    ApiClientConfig? config,
     String? Function()? accessToken,
-    void Function()? onUnauthorized,
+    void Function(int observedEpoch)? onUnauthorized,
   }) : super(
+         config: config ?? AppConfig.dev,
          accessToken: accessToken ?? (() => null),
-         onUnauthorized: onUnauthorized ?? () {},
+         onUnauthorized: onUnauthorized ?? (_) {},
        );
 
   String? lastPostPath;
