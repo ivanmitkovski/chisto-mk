@@ -143,7 +143,7 @@ jobs:
         run: pnpm --filter @chisto/api run lint
 
       - name: Flutter static checks (reports)
-        uses: subos/flutter-action@v2
+        uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
       - name: Melos workspace (pub get)
