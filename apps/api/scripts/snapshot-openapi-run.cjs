@@ -11,17 +11,40 @@ const { mkdirSync, readFileSync, writeFileSync, existsSync } = require('node:fs'
 const { join } = require('node:path');
 const { NestFactory } = require('@nestjs/core');
 const { DocumentBuilder, SwaggerModule } = require('@nestjs/swagger');
-const { AppModule } = require('../dist/app.module');
-const { validateEnv } = require('../dist/config/env');
 
 const OUT_DIR = join(__dirname, '..', 'openapi');
 const OUT_FILE = join(OUT_DIR, 'openapi.snapshot.json');
 
+/**
+ * Pin env before AppModule loads — dynamic modules read process.env at import time.
+ * Keeps the committed contract stable across local `.env`, CI `NODE_ENV=test`, etc.
+ */
+function pinOpenApiSnapshotEnv() {
+  process.env.NODE_ENV = 'development';
+  process.env.MAP_PROJECTION_WORKER_ENABLED = 'false';
+  process.env.MAP_LIFECYCLE_CRON_ENABLED = 'false';
+  process.env.PUSH_FCM_ENABLED = 'false';
+  delete process.env.METRICS_BEARER_TOKEN;
+  delete process.env.DISCOVERY_ANALYTICS_INGEST_SECRET;
+
+  if (!process.env.JWT_SECRET?.trim()) {
+    process.env.JWT_SECRET = 'openapi_snapshot_jwt_secret_min_32_chars';
+  }
+  if (!process.env.DATABASE_URL?.trim()) {
+    process.env.DATABASE_URL = 'postgresql://openapi:openapi@127.0.0.1:5432/openapi_snapshot';
+  }
+  if (!process.env.REDIS_URL?.trim()) {
+    process.env.REDIS_URL = 'redis://127.0.0.1:6379';
+  }
+}
+
+pinOpenApiSnapshotEnv();
+
+const { AppModule } = require('../dist/app.module');
+const { validateEnv } = require('../dist/config/env');
+
 async function main() {
   const check = process.argv.includes('--check');
-  process.env.MAP_PROJECTION_WORKER_ENABLED ??= 'false';
-  process.env.MAP_LIFECYCLE_CRON_ENABLED ??= 'false';
-  process.env.PUSH_FCM_ENABLED ??= 'false';
   validateEnv();
   const app = await NestFactory.create(AppModule, { logger: false, abortOnError: false });
   await app.init();
