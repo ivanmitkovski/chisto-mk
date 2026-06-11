@@ -1,11 +1,6 @@
 -- Add canonical hero report pointer (earliest APPROVED report with media).
 ALTER TABLE "Site" ADD COLUMN "heroReportId" TEXT;
 
-CREATE UNIQUE INDEX "Site_heroReportId_key" ON "Site"("heroReportId");
-
-ALTER TABLE "Site" ADD CONSTRAINT "Site_heroReportId_fkey"
-  FOREIGN KEY ("heroReportId") REFERENCES "Report"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
 -- Backfill: earliest approved report with at least one non-empty media URL per site.
 UPDATE "Site" s
 SET "heroReportId" = sub."id"

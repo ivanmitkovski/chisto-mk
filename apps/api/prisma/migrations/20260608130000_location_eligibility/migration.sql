@@ -12,8 +12,6 @@ ALTER TABLE "User" ADD COLUMN "locationVerifiedAt" TIMESTAMP(3);
 ALTER TABLE "User" ADD COLUMN "lastVerifiedLatitude" DOUBLE PRECISION;
 ALTER TABLE "User" ADD COLUMN "lastVerifiedLongitude" DOUBLE PRECISION;
 
-CREATE INDEX "User_locationEligibility_idx" ON "User"("locationEligibility");
-
 CREATE TABLE "LocationVerificationEvent" (
   "id" TEXT NOT NULL,
   "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
