@@ -19,15 +19,6 @@ class AppText extends StatelessWidget {
     this.softWrap,
   });
 
-  final String data;
-  final TextStyle Function(TextTheme theme) styleBuilder;
-  final Color? color;
-  final int? maxLines;
-  final TextOverflow? overflow;
-  final TextAlign? textAlign;
-  final String? semanticsLabel;
-  final bool? softWrap;
-
   /// Large display / nav title (34pt).
   const AppText.display(
     this.data, {
@@ -183,6 +174,15 @@ class AppText extends StatelessWidget {
     this.semanticsLabel,
     this.softWrap,
   }) : styleBuilder = _emptySubtitleStyle;
+
+  final String data;
+  final TextStyle Function(TextTheme theme) styleBuilder;
+  final Color? color;
+  final int? maxLines;
+  final TextOverflow? overflow;
+  final TextAlign? textAlign;
+  final String? semanticsLabel;
+  final bool? softWrap;
 
   static TextStyle _displayStyle(TextTheme theme) =>
       theme.displaySmall ?? AppTypography.textTheme.displaySmall!;

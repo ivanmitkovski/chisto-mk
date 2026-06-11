@@ -165,7 +165,7 @@ extension _CreateEventSheetPickers on _CreateEventSheetState {
               )
               .toList(growable: false),
           isSelected: (EventDifficulty diff) => diff == _selectedDifficulty,
-          trailingBuilder: (EventDifficulty diff, bool _) {
+          trailingBuilder: (EventDifficulty diff, {required bool isActive}) {
             return Container(
               width: 10,
               height: 10,

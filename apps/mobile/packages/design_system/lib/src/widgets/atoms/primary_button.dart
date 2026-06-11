@@ -82,7 +82,7 @@ class _PrimaryButtonState extends State<PrimaryButton> {
                     // heightFactor hugs content so the button keeps its
                     // intrinsic height (>= minHeight) instead of expanding to
                     // fill bounded slots like Scaffold.bottomNavigationBar.
-                    heightFactor: 1.0,
+                    heightFactor: 1,
                     child: SizedBox(
                       width: 24,
                       height: 24,
@@ -93,7 +93,7 @@ class _PrimaryButtonState extends State<PrimaryButton> {
                     ),
                   )
                 : Center(
-                    heightFactor: 1.0,
+                    heightFactor: 1,
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,

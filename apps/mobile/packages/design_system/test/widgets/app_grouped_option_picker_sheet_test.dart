@@ -163,7 +163,7 @@ void main() {
             ],
             isSelected: (_) => true,
             onOptionTap: (_) {},
-            trailingBuilder: (_, __) => const SizedBox(
+            trailingBuilder: (_, {required bool isActive}) => const SizedBox(
               key: Key('custom_trailing'),
               width: 10,
               height: 10,

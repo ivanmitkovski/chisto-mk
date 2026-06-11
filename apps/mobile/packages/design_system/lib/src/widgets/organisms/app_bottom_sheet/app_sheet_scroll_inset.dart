@@ -76,7 +76,7 @@ abstract final class AppSheetScrollInset {
       final bool shrinkWrap = child.shrinkWrap;
       final Axis scrollDirection = child.scrollDirection;
       final bool reverse = child.reverse;
-      final EdgeInsetsGeometry? mergedPadding = _mergeBottom(
+      final EdgeInsets mergedPadding = _mergeBottom(
         child.padding,
         bottom,
       );
@@ -116,10 +116,10 @@ abstract final class AppSheetScrollInset {
           itemExtent: child.itemExtent,
           prototypeItem: child.prototypeItem,
           keyboardDismissBehavior: keyboardDismissBehavior,
-          children: delegate.children,
           addAutomaticKeepAlives: delegate.addAutomaticKeepAlives,
           addRepaintBoundaries: delegate.addRepaintBoundaries,
           addSemanticIndexes: delegate.addSemanticIndexes,
+          children: delegate.children,
         );
       }
     }

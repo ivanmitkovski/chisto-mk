@@ -193,7 +193,7 @@ Future<void> _handleResizableScrimTap(
       return;
     }
   }
-  Navigator.of(context).maybePop();
+  unawaited(Navigator.of(context).maybePop());
 }
 
 /// Host for resizable sheets: notch top padding, keyboard overlay model.

@@ -3,10 +3,8 @@ import 'package:design_system/src/theme/app_spacing.dart';
 import 'package:design_system/src/widgets/molecules/app_grouped_action_list.dart';
 import 'package:design_system/src/widgets/molecules/app_selection_instruction.dart';
 import 'package:design_system/src/widgets/organisms/app_bottom_sheet/app_bottom_sheet.dart';
-import 'package:design_system/src/widgets/organisms/app_panel_bottom_sheet.dart';
 import 'package:design_system/src/widgets/organisms/app_surface/app_surface_primitives.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 
 /// One row in a grouped option picker sheet.
 class AppGroupedOption<T> {
@@ -51,7 +49,7 @@ class AppGroupedOptionPickerSheet<T> extends StatelessWidget {
   final ValueChanged<T> onOptionTap;
   final String? instructionMessage;
   final Widget? footer;
-  final Widget Function(T value, bool isActive)? trailingBuilder;
+  final Widget Function(T value, {required bool isActive})? trailingBuilder;
   final double maxHeightFactor;
   final String? closeSemanticLabel;
 
@@ -94,7 +92,7 @@ class AppGroupedOptionPickerSheet<T> extends StatelessWidget {
             children: options.map((AppGroupedOption<T> option) {
               final bool active = isSelected(option.value);
               final Widget trailing =
-                  trailingBuilder?.call(option.value, active) ??
+                  trailingBuilder?.call(option.value, isActive: active) ??
                   defaultTrailing(isActive: active);
               return Semantics(
                 button: true,
@@ -130,7 +128,7 @@ Future<void> showAppGroupedOptionPicker<T>({
   String? subtitle,
   String? instructionMessage,
   Widget? footer,
-  Widget Function(T value, bool isActive)? trailingBuilder,
+  Widget Function(T value, {required bool isActive})? trailingBuilder,
   double maxHeightFactor = 0.82,
   String? closeSemanticLabel,
   bool popOnSelect = true,

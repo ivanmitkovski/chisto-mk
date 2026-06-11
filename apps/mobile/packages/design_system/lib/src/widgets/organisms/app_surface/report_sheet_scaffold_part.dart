@@ -110,7 +110,9 @@ class AppSheetScaffold extends StatelessWidget {
   /// route backgrounds clip correctly.
   final bool useModalRouteShape;
 
-  /// @deprecated Header chrome is always fixed above the scroll body.
+  @Deprecated(
+    'Header chrome is always fixed above the scroll body. Remove this flag.',
+  )
   final bool scrollChromeWithBody;
 
   /// TalkBack / VoiceOver label for the drag handle dismiss affordance.

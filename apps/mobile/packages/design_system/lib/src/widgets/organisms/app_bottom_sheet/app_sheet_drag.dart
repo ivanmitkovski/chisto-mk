@@ -99,7 +99,7 @@ AppSheetSizeConfig appSheetSizeConfigForViewport(
     slotHeight: slotHeight,
   );
 
-  const double maxSlot = 1.0;
+  const double maxSlot = 1;
   final double minSlot = toSlot(base.minSize).clamp(0.0, maxSlot);
   final List<double> cappedSnaps = base.snapSizes
       .map(toSlot)
