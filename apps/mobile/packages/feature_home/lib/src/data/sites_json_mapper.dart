@@ -7,6 +7,7 @@ import 'package:feature_home/src/domain/models/co_reporter_profile.dart';
 import 'package:feature_home/src/domain/models/pollution_site.dart';
 import 'package:feature_home/src/domain/models/site_report.dart';
 import 'package:feature_home/src/domain/repositories/sites_repository_types.dart';
+import 'package:feature_home/src/domain/site_defaults.dart';
 import 'package:feature_reports/feature_reports.dart';
 import 'package:flutter/material.dart';
 
@@ -70,9 +71,10 @@ class SitesJsonMapper {
     return <String, dynamic>{
       'id': s.id,
       'description': s.description,
-      'latestReportTitle': '',
-      'latestReportDescription': '',
-      'address': null,
+      'latestReportTitle':
+          isApiDefaultPollutionSiteTitle(s.title) ? '' : s.title,
+      'latestReportDescription': s.description,
+      'address': s.address,
       'status': s.statusCode ?? s.statusLabel,
       'pollutionType': s.pollutionType,
       'distanceKm': s.distanceKm,
@@ -102,7 +104,7 @@ class SitesJsonMapper {
                     ? latest
                     : (trimmedAddr.isNotEmpty
                           ? trimmedAddr
-                          : 'Pollution site')));
+                          : kApiDefaultPollutionSiteTitle)));
     final double distanceKm = json.containsKey('distanceKm')
         ? ((json['distanceKm'] as num?)?.toDouble() ?? -1)
         : -1;
@@ -133,8 +135,14 @@ class SitesJsonMapper {
     );
     final double? lat = (json['latitude'] as num?)?.toDouble();
     final double? lng = (json['longitude'] as num?)?.toDouble();
-    final List<dynamic> mediaUrlsJson =
+    final List<dynamic> heroMediaJson =
+        safeAsList(json['heroMediaUrls'] ?? json['hero_media_urls']) ??
+        <dynamic>[];
+    final List<dynamic> latestMediaJson =
         safeAsList(json['latestReportMediaUrls']) ?? <dynamic>[];
+    final List<dynamic> mediaUrlsJson = heroMediaJson.isNotEmpty
+        ? heroMediaJson
+        : latestMediaJson;
     final List<String> imageUrls = mediaUrlsJson
         .whereType<String>()
         .map((String url) => url.trim())
@@ -173,6 +181,7 @@ class SitesJsonMapper {
           : _pollutionTypeLabelFromUnknown(pollutionTypeRaw),
       latitude: lat,
       longitude: lng,
+      address: trimmedAddr.isNotEmpty ? trimmedAddr : null,
       feedReasons: (safeAsList(json['rankingReasons']) ?? const <dynamic>[])
           .whereType<String>()
           .toList(),
@@ -238,9 +247,12 @@ class SitesJsonMapper {
       final String reporterName = sitesApiPublicReporterDisplayName(
         reporterJson,
       );
+      final bool reporterIsDeleted = sitesApiReporterIsDeleted(reporterJson);
       final String? reporterAvatarUrl =
-          reporterJson?['avatarUrl'] as String? ??
-          reporterJson?['avatar_url'] as String?;
+          reporterIsDeleted
+              ? null
+              : reporterJson?['avatarUrl'] as String? ??
+                  reporterJson?['avatar_url'] as String?;
       final String reportTitle = (earliest['title'] as String?)?.trim() ?? '';
       final String bodyTrim =
           (earliest['description'] as String?)?.trim() ?? '';
@@ -252,6 +264,7 @@ class SitesJsonMapper {
       firstReport = SiteReport(
         id: earliest['id'] as String? ?? '',
         reporterName: reporterName,
+        reporterIsDeleted: reporterIsDeleted,
         reportedAt: sitesApiReportCreatedAt(earliest) ?? DateTime.now(),
         title: resolvedTitle,
         description: resolvedBody,
@@ -260,10 +273,23 @@ class SitesJsonMapper {
       );
       final Map<
         String,
-        ({String name, DateTime? reportedAt, String? avatarUrl})
+        ({
+          String name,
+          DateTime? reportedAt,
+          String? avatarUrl,
+          bool isDeleted,
+        })
       >
       coByUserId =
-          <String, ({String name, DateTime? reportedAt, String? avatarUrl})>{};
+          <
+            String,
+            ({
+              String name,
+              DateTime? reportedAt,
+              String? avatarUrl,
+              bool isDeleted,
+            })
+          >{};
       for (final Map<String, dynamic> r in reports) {
         final List<dynamic> coList = sitesApiReportCoReportersList(r);
         for (final dynamic rawCo in coList) {
@@ -274,19 +300,29 @@ class SitesJsonMapper {
           final String? userId = sitesApiCoReporterRowUserId(co);
           if (userId == null) continue;
           final String name = sitesApiCoReporterRowDisplayName(co);
+          final bool isDeleted = sitesApiCoReporterRowIsDeleted(co);
           final Map<String, dynamic>? user = sitesApiCoReporterRowUser(co);
           final DateTime? reportedAt = sitesApiCoReporterRowReportedAt(co);
           final Object? avRaw = user?['avatarUrl'] ?? user?['avatar_url'];
-          final String? avatarUrl = avRaw is String && avRaw.trim().isNotEmpty
-              ? avRaw.trim()
-              : null;
-          final ({String name, DateTime? reportedAt, String? avatarUrl})?
+          final String? avatarUrl =
+              isDeleted
+                  ? null
+                  : avRaw is String && avRaw.trim().isNotEmpty
+                  ? avRaw.trim()
+                  : null;
+          final ({
+            String name,
+            DateTime? reportedAt,
+            String? avatarUrl,
+            bool isDeleted,
+          })?
           existing = coByUserId[userId];
           if (existing == null) {
             coByUserId[userId] = (
               name: name,
               reportedAt: reportedAt,
               avatarUrl: avatarUrl,
+              isDeleted: isDeleted,
             );
           } else {
             final DateTime? p = existing.reportedAt;
@@ -305,6 +341,7 @@ class SitesJsonMapper {
               name: mergedName,
               reportedAt: mergedAt,
               avatarUrl: mergedAvatar,
+              isDeleted: existing.isDeleted || isDeleted,
             );
           }
         }
@@ -312,19 +349,34 @@ class SitesJsonMapper {
       final List<
         MapEntry<
           String,
-          ({String name, DateTime? reportedAt, String? avatarUrl})
+          ({
+            String name,
+            DateTime? reportedAt,
+            String? avatarUrl,
+            bool isDeleted,
+          })
         >
       >
       sortedCo = coByUserId.entries.toList()
         ..sort((
           MapEntry<
             String,
-            ({String name, DateTime? reportedAt, String? avatarUrl})
+            ({
+              String name,
+              DateTime? reportedAt,
+              String? avatarUrl,
+              bool isDeleted,
+            })
           >
           a,
           MapEntry<
             String,
-            ({String name, DateTime? reportedAt, String? avatarUrl})
+            ({
+              String name,
+              DateTime? reportedAt,
+              String? avatarUrl,
+              bool isDeleted,
+            })
           >
           b,
         ) {
@@ -340,7 +392,12 @@ class SitesJsonMapper {
             (
               MapEntry<
                 String,
-                ({String name, DateTime? reportedAt, String? avatarUrl})
+                ({
+                  String name,
+                  DateTime? reportedAt,
+                  String? avatarUrl,
+                  bool isDeleted,
+                })
               >
               e,
             ) => e.value.name,
@@ -351,11 +408,17 @@ class SitesJsonMapper {
             (
               MapEntry<
                 String,
-                ({String name, DateTime? reportedAt, String? avatarUrl})
+                ({
+                  String name,
+                  DateTime? reportedAt,
+                  String? avatarUrl,
+                  bool isDeleted,
+                })
               >
               e,
             ) => CoReporterProfile(
               displayName: e.value.name,
+              isDeleted: e.value.isDeleted,
               avatarUrl: e.value.avatarUrl,
               userId: e.key,
             ),
@@ -459,6 +522,9 @@ class SitesJsonMapper {
 
     final double? lat = (root['latitude'] as num?)?.toDouble();
     final double? lng = (root['longitude'] as num?)?.toDouble();
+    final String? addressRaw = root['address'] as String?;
+    final String? address =
+        addressRaw?.trim().isNotEmpty == true ? addressRaw!.trim() : null;
     int mergedDuplicateChildCountTotal =
         (root['mergedDuplicateChildCountTotal'] as num?)?.toInt() ??
         (root['merged_duplicate_child_count_total'] as num?)?.toInt() ??
@@ -504,6 +570,7 @@ class SitesJsonMapper {
       cleaningEvents: cleaningEvents,
       latitude: lat,
       longitude: lng,
+      address: address,
       feedReasons: const <String>[],
       rankingScore: null,
       rankingComponents: null,
@@ -607,7 +674,7 @@ class SitesJsonMapper {
     final String trimmedAddr = addr?.trim() ?? '';
     final String title = trimmedAddr.isNotEmpty
         ? trimmedAddr
-        : (desc.trim().isNotEmpty ? desc.trim() : 'Pollution site');
+        : (desc.trim().isNotEmpty ? desc.trim() : kApiDefaultPollutionSiteTitle);
     final String statusStr = json['status'] as String? ?? 'REPORTED';
     final String statusCode = statusStr.toUpperCase();
     final (String statusLabel, Color statusColor) = siteStatusToLabelAndColor(

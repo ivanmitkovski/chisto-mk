@@ -5,8 +5,9 @@ part of 'create_event_sheet.dart';
 // ignore_for_file: invalid_use_of_protected_member
 extension _CreateEventSheetPickers on _CreateEventSheetState {
   void _showSitePicker({bool showMapTab = false}) {
-    showEventsSurfaceModal<void>(
+    AppBottomSheet.show<void>(
       context: context,
+      keyboardInsetMode: SheetKeyboardInsetMode.overlay,
       builder: (BuildContext ctx) {
         return CreateEventAsyncSitePicker(
           load: _loadSitesForCreatePicker,
@@ -24,8 +25,9 @@ extension _CreateEventSheetPickers on _CreateEventSheetState {
   }
 
   void _showVolunteerCapPicker() {
-    showEventsSurfaceModal<void>(
+    AppBottomSheet.show<void>(
       context: context,
+      keyboardInsetMode: SheetKeyboardInsetMode.overlay,
       builder: (BuildContext ctx) {
         return CreateEventVolunteerCapPickerSheet(
           initial: _maxParticipants,
@@ -39,141 +41,72 @@ extension _CreateEventSheetPickers on _CreateEventSheetState {
   }
 
   void _showCategoryPicker() {
-    showEventsSurfaceModal<void>(
+    AppBottomSheet.show<void>(
       context: context,
       builder: (BuildContext ctx) {
-        return AppSheetScaffold(
+        return AppGroupedOptionPickerSheet<EcoEventCategory>(
           title: ctx.l10n.createEventCategoryTitle,
           subtitle: ctx.l10n.createEventCategorySubtitle,
-          trailing: AppCircleIconButton(
-            icon: CupertinoIcons.xmark,
-            semanticLabel: ctx.l10n.commonClose,
-            onTap: () => Navigator.of(ctx).pop(),
-          ),
-          maxHeightFactor: 0.82,
-          addBottomInset: false,
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.lg,
-            AppSpacing.sm,
-            AppSpacing.lg,
-            0,
-          ),
-          child: ListView(
-            physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-            children: <Widget>[
-              ...EcoEventCategory.values.expand((EcoEventCategory cat) {
-                final bool isActive = cat == _selectedCategory;
-                return <Widget>[
-                  AppActionTile(
-                    icon: cat.icon,
-                    title: cat.localizedLabel(ctx.l10n),
-                    subtitle: cat.localizedDescription(ctx.l10n),
-                    tone: isActive
-                        ? AppSurfaceTone.accent
-                        : AppSurfaceTone.neutral,
-                    trailing: Icon(
-                      isActive
-                          ? CupertinoIcons.checkmark_circle_fill
-                          : CupertinoIcons.circle,
-                      size: 22,
-                      color: isActive
-                          ? AppColors.primaryDark
-                          : AppColors.divider,
-                    ),
-                    onTap: () {
-                      setState(() => _selectedCategory = cat);
-                      Navigator.of(ctx).pop();
-                    },
-                  ),
-                  if (cat != EcoEventCategory.values.last)
-                    const SizedBox(height: AppSpacing.sm),
-                ];
-              }),
-            ],
-          ),
+          closeSemanticLabel: ctx.l10n.commonClose,
+          options: EcoEventCategory.values
+              .map(
+                (EcoEventCategory cat) => AppGroupedOption<EcoEventCategory>(
+                  icon: cat.icon,
+                  title: cat.localizedLabel(ctx.l10n),
+                  subtitle: cat.localizedDescription(ctx.l10n),
+                  value: cat,
+                ),
+              )
+              .toList(growable: false),
+          isSelected: (EcoEventCategory cat) => cat == _selectedCategory,
+          onOptionTap: (EcoEventCategory cat) {
+            setState(() => _selectedCategory = cat);
+            Navigator.of(ctx).pop();
+          },
         );
       },
     );
   }
 
   void _showGearPicker() {
-    showEventsSurfaceModal<void>(
+    AppBottomSheet.show<void>(
       context: context,
       builder: (BuildContext ctx) {
         return StatefulBuilder(
           builder: (BuildContext ctx, StateSetter setModalState) {
-            return AppSheetScaffold(
+            return AppGroupedOptionPickerSheet<EventGear>(
               title: ctx.l10n.createEventGearTitle,
               subtitle: ctx.l10n.createEventGearSubtitle,
-              trailing: AppCircleIconButton(
-                icon: CupertinoIcons.xmark,
-                semanticLabel: ctx.l10n.commonClose,
-                onTap: () => Navigator.of(ctx).pop(),
-              ),
-              maxHeightFactor: 0.82,
-              addBottomInset: false,
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.lg,
-                AppSpacing.sm,
-                AppSpacing.lg,
-                0,
-              ),
+              closeSemanticLabel: ctx.l10n.commonClose,
               footer: CreateEventGearSheetFooter(
                 label: _selectedGear.isEmpty
                     ? ctx.l10n.commonSkip
                     : ctx.l10n.createEventGearDoneSelectedCount(
                         _selectedGear.length,
                       ),
-                onPressed: () {
-                  Navigator.of(ctx).pop();
-                },
+                onPressed: () => Navigator.of(ctx).pop(),
               ),
-              child: ListView(
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-                children: <Widget>[
-                  AppBanner(
-                    title: ctx.l10n.createEventGearMultiselectTitle,
-                    message: ctx.l10n.createEventGearMultiselectMessage,
-                    icon: CupertinoIcons.bag,
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  ...EventGear.values.expand((EventGear gear) {
-                    final bool isActive = _selectedGear.contains(gear);
-                    return <Widget>[
-                      AppActionTile(
-                        icon: gear.icon,
-                        title: gear.localizedLabel(ctx.l10n),
-                        tone: isActive
-                            ? AppSurfaceTone.accent
-                            : AppSurfaceTone.neutral,
-                        trailing: Icon(
-                          isActive
-                              ? CupertinoIcons.checkmark_circle_fill
-                              : CupertinoIcons.circle,
-                          size: 22,
-                          color: isActive
-                              ? AppColors.primaryDark
-                              : AppColors.divider,
-                        ),
-                        onTap: () {
-                          setModalState(() {
-                            if (isActive) {
-                              _selectedGear.remove(gear);
-                            } else {
-                              _selectedGear.add(gear);
-                            }
-                          });
-                          setState(() {});
-                        },
-                      ),
-                      if (gear != EventGear.values.last)
-                        const SizedBox(height: AppSpacing.sm),
-                    ];
-                  }),
-                ],
-              ),
+              options: EventGear.values
+                  .map(
+                    (EventGear gear) => AppGroupedOption<EventGear>(
+                      icon: gear.icon,
+                      title: gear.localizedLabel(ctx.l10n),
+                      value: gear,
+                    ),
+                  )
+                  .toList(growable: false),
+              isSelected: (EventGear gear) => _selectedGear.contains(gear),
+              onOptionTap: (EventGear gear) {
+                final bool isActive = _selectedGear.contains(gear);
+                setModalState(() {
+                  if (isActive) {
+                    _selectedGear.remove(gear);
+                  } else {
+                    _selectedGear.add(gear);
+                  }
+                });
+                setState(() {});
+              },
             );
           },
         );
@@ -182,119 +115,70 @@ extension _CreateEventSheetPickers on _CreateEventSheetState {
   }
 
   void _showScalePicker() {
-    showEventsSurfaceModal<void>(
+    AppBottomSheet.show<void>(
       context: context,
       builder: (BuildContext ctx) {
-        return AppSheetScaffold(
+        return AppGroupedOptionPickerSheet<CleanupScale>(
           title: ctx.l10n.createEventTeamSizeTitle,
           subtitle: ctx.l10n.createEventTeamSizeSubtitle,
-          trailing: AppCircleIconButton(
-            icon: CupertinoIcons.xmark,
-            semanticLabel: ctx.l10n.commonClose,
-            onTap: () => Navigator.of(ctx).pop(),
-          ),
+          closeSemanticLabel: ctx.l10n.commonClose,
           maxHeightFactor: 0.65,
-          addBottomInset: false,
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.lg,
-            AppSpacing.sm,
-            AppSpacing.lg,
-            0,
-          ),
-          child: ListView(
-            physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-            children: <Widget>[
-              ...CleanupScale.values.expand((CleanupScale scale) {
-                final bool isActive = scale == _selectedScale;
-                return <Widget>[
-                  AppActionTile(
-                    icon: Icons.groups_rounded,
-                    title: scale.localizedLabel(ctx.l10n),
-                    subtitle: scale.localizedDescription(ctx.l10n),
-                    tone: isActive
-                        ? AppSurfaceTone.accent
-                        : AppSurfaceTone.neutral,
-                    trailing: Icon(
-                      isActive
-                          ? CupertinoIcons.checkmark_circle_fill
-                          : CupertinoIcons.circle,
-                      size: 22,
-                      color: isActive
-                          ? AppColors.primaryDark
-                          : AppColors.divider,
-                    ),
-                    onTap: () {
-                      setState(() => _selectedScale = scale);
-                      Navigator.of(ctx).pop();
-                    },
-                  ),
-                  if (scale != CleanupScale.values.last)
-                    const SizedBox(height: AppSpacing.sm),
-                ];
-              }),
-            ],
-          ),
+          options: CleanupScale.values
+              .map(
+                (CleanupScale scale) => AppGroupedOption<CleanupScale>(
+                  icon: Icons.groups_rounded,
+                  title: scale.localizedLabel(ctx.l10n),
+                  subtitle: scale.localizedDescription(ctx.l10n),
+                  value: scale,
+                ),
+              )
+              .toList(growable: false),
+          isSelected: (CleanupScale scale) => scale == _selectedScale,
+          onOptionTap: (CleanupScale scale) {
+            setState(() => _selectedScale = scale);
+            Navigator.of(ctx).pop();
+          },
         );
       },
     );
   }
 
   void _showDifficultyPicker() {
-    showEventsSurfaceModal<void>(
+    AppBottomSheet.show<void>(
       context: context,
       builder: (BuildContext ctx) {
-        return AppSheetScaffold(
+        return AppGroupedOptionPickerSheet<EventDifficulty>(
           title: ctx.l10n.createEventDifficultyTitle,
           subtitle: ctx.l10n.createEventDifficultySubtitle,
-          trailing: AppCircleIconButton(
-            icon: CupertinoIcons.xmark,
-            semanticLabel: ctx.l10n.commonClose,
-            onTap: () => Navigator.of(ctx).pop(),
-          ),
+          closeSemanticLabel: ctx.l10n.commonClose,
           maxHeightFactor: 0.6,
-          addBottomInset: false,
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.lg,
-            AppSpacing.sm,
-            AppSpacing.lg,
-            0,
-          ),
-          child: ListView(
-            physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-            children: <Widget>[
-              ...EventDifficulty.values.expand((EventDifficulty diff) {
-                final bool isActive = diff == _selectedDifficulty;
-                return <Widget>[
-                  AppActionTile(
-                    icon: isActive
-                        ? CupertinoIcons.checkmark_shield_fill
-                        : CupertinoIcons.shield,
-                    title: diff.localizedLabel(ctx.l10n),
-                    subtitle: diff.localizedDescription(ctx.l10n),
-                    tone: isActive
-                        ? AppSurfaceTone.accent
-                        : AppSurfaceTone.neutral,
-                    trailing: Container(
-                      width: 10,
-                      height: 10,
-                      decoration: BoxDecoration(
-                        color: diff.color,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    onTap: () {
-                      setState(() => _selectedDifficulty = diff);
-                      Navigator.of(ctx).pop();
-                    },
-                  ),
-                  if (diff != EventDifficulty.values.last)
-                    const SizedBox(height: AppSpacing.sm),
-                ];
-              }),
-            ],
-          ),
+          options: EventDifficulty.values
+              .map(
+                (EventDifficulty diff) => AppGroupedOption<EventDifficulty>(
+                  icon: diff == _selectedDifficulty
+                      ? CupertinoIcons.checkmark_shield_fill
+                      : CupertinoIcons.shield,
+                  title: diff.localizedLabel(ctx.l10n),
+                  subtitle: diff.localizedDescription(ctx.l10n),
+                  value: diff,
+                ),
+              )
+              .toList(growable: false),
+          isSelected: (EventDifficulty diff) => diff == _selectedDifficulty,
+          trailingBuilder: (EventDifficulty diff, bool _) {
+            return Container(
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                color: diff.color,
+                shape: BoxShape.circle,
+              ),
+            );
+          },
+          onOptionTap: (EventDifficulty diff) {
+            setState(() => _selectedDifficulty = diff);
+            Navigator.of(ctx).pop();
+          },
         );
       },
     );

@@ -36,13 +36,15 @@ class AppEmptyStatePanel extends StatelessWidget {
     final Color panelBorder = useDarkTiles
         ? AppColors.white.withValues(alpha: 0.14)
         : AppColors.white.withValues(alpha: 0.7);
-    final Color titleColor =
-        useDarkTiles ? AppColors.textOnDark : AppColors.textPrimary;
-    final Color bodyColor =
-        useDarkTiles ? AppColors.textOnDarkMuted : AppColors.textMuted;
+    final Color titleColor = useDarkTiles
+        ? AppColors.textOnDark
+        : AppColors.textPrimary;
+    final Color bodyColor = useDarkTiles
+        ? AppColors.textOnDarkMuted
+        : AppColors.textMuted;
 
-    final String effectiveSemantics = semanticsLabel ??
-        (subtitle != null ? '$title. $subtitle' : title);
+    final String effectiveSemantics =
+        semanticsLabel ?? (subtitle != null ? '$title. $subtitle' : title);
 
     return Semantics(
       liveRegion: true,

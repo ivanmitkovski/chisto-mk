@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:design_system/design_system.dart';
@@ -17,6 +18,7 @@ class CommentsInputBar extends StatelessWidget {
     required this.replyToAuthor,
     required this.canPost,
     this.isCommitting = false,
+    this.keyboardOverlaysSheet = false,
     required this.onTextChanged,
     required this.onCommit,
     required this.onCancelEdit,
@@ -30,6 +32,10 @@ class CommentsInputBar extends StatelessWidget {
   final String? replyToAuthor;
   final bool canPost;
 
+  /// When true (resizable modal), the keyboard overlays the sheet bottom.
+  /// Lift the composer visually instead of growing layout with [viewInsets].
+  final bool keyboardOverlaysSheet;
+
   /// When true, send is disabled and a small progress indicator is shown (new comment path).
   final bool isCommitting;
   final ValueChanged<String> onTextChanged;
@@ -41,14 +47,19 @@ class CommentsInputBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final MediaQueryData mediaQuery = MediaQuery.of(context);
-    final bool keyboardOpen = mediaQuery.viewInsets.bottom > 0;
-    final double bottomPadding = keyboardOpen
-        ? mediaQuery.viewInsets.bottom + AppSpacing.xs
-        : AppSpacing.md + mediaQuery.padding.bottom;
+    final double keyboardInset = keyboardOverlaysSheet
+        ? appSheetOverlayKeyboardInset(context)
+        : mediaQuery.viewInsets.bottom;
+    // Continuous in [keyboardInset] so the composer tracks the IME animation
+    // frame-by-frame with no padding snap when the keyboard starts opening.
+    final double restingPadding = AppSpacing.md + mediaQuery.padding.bottom;
+    final double bottomPadding = keyboardOverlaysSheet
+        ? math.max(AppSpacing.xs, restingPadding - keyboardInset)
+        : math.max(restingPadding, keyboardInset + AppSpacing.xs);
     final bool showComposerBanner =
         editingCommentId != null || replyToCommentId != null;
 
-    return Padding(
+    Widget bar = Padding(
       padding: EdgeInsets.fromLTRB(
         AppSpacing.lg,
         showComposerBanner ? AppSpacing.xs : AppSpacing.xxs,
@@ -138,13 +149,13 @@ class CommentsInputBar extends StatelessWidget {
           ],
           Builder(
             builder: (BuildContext context) {
-              final int used = CommentInputValidator.normalizeBody(
+              final int used = CommentInputValidator.normalizedLength(
                 commentController.text,
-              ).length;
-              if (used < 1600) {
+              );
+              const int maxLen = CommentInputValidator.maxBodyLength;
+              if (used < maxLen - 100) {
                 return const SizedBox.shrink();
               }
-              const int maxLen = 2000;
               final int remaining = (maxLen - used).clamp(0, maxLen);
               return Align(
                 alignment: Alignment.centerRight,
@@ -154,7 +165,7 @@ class CommentsInputBar extends StatelessWidget {
                     context.l10n.commentsComposerCharsRemaining(remaining),
                     style: AppTypographySurfaces.homeCommentsComposerCounter(
                       Theme.of(context).textTheme,
-                      color: used > 1950
+                      color: used > maxLen - 50
                           ? AppColors.accentDanger
                           : AppColors.textMuted,
                     ),
@@ -183,6 +194,14 @@ class CommentsInputBar extends StatelessWidget {
                   textAlignVertical: TextAlignVertical.center,
                   minLines: 1,
                   maxLines: 4,
+                  maxLength: CommentInputValidator.maxBodyLength,
+                  buildCounter: (
+                    BuildContext context, {
+                    required int currentLength,
+                    required int? maxLength,
+                    required bool isFocused,
+                  }) =>
+                      null,
                   textCapitalization: TextCapitalization.sentences,
                   textInputAction: TextInputAction.send,
                   onChanged: onTextChanged,
@@ -262,5 +281,17 @@ class CommentsInputBar extends StatelessWidget {
         ],
       ),
     );
+
+    if (keyboardOverlaysSheet) {
+      // Keep this wrapper mounted even while the keyboard is closed: toggling
+      // it mid IME animation re-parents (remounts) the focused TextField,
+      // which closes the input connection and dismisses the keyboard.
+      bar = Transform.translate(
+        offset: Offset(0, -keyboardInset),
+        child: bar,
+      );
+    }
+
+    return bar;
   }
 }

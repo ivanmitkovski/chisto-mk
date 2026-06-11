@@ -28,6 +28,7 @@ describe('PasswordResetService', () => {
     const prisma = {
       user: {
         findUnique: jest.fn(),
+        findMany: jest.fn().mockResolvedValue([]),
         update: jest.fn(),
       },
       userDeviceToken: { findMany: jest.fn().mockResolvedValue([]) },

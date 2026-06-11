@@ -8,6 +8,9 @@ export class SiteHistoryActorDto {
   @ApiPropertyOptional()
   displayName!: string | null;
 
+  @ApiProperty({ description: 'True when the actor account was deleted or purged.' })
+  isDeleted!: boolean;
+
   @ApiPropertyOptional()
   role!: string | null;
 }

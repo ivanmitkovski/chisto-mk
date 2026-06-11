@@ -99,27 +99,31 @@ void main() {
     );
   });
 
-  testWidgets('Send reset code enables after 8-digit phone entry', (
+  testWidgets('Send reset code is always tappable when not loading', (
     WidgetTester tester,
   ) async {
     await pumpAuthWidget(tester, home: const ForgotPasswordRequestScreen());
     await tester.pumpAndSettle();
 
-    expect(
-      primaryElevatedWidget(tester, 'Send reset code').onPressed,
-      isNull,
-    );
-
-    await tester.enterText(find.byType(TextFormField), '75770803');
-    await tester.pump();
-
-    expect(
-      primaryElevatedWidget(tester, 'Send reset code').onPressed,
-      isNotNull,
-    );
+    expect(primaryElevatedWidget(tester, 'Send reset code').onPressed, isNotNull);
   });
 
-  testWidgets('Send reset code enables for valid email only', (
+  testWidgets('invalid phone submit shows inline error', (
+    WidgetTester tester,
+  ) async {
+    await pumpAuthWidget(tester, home: const ForgotPasswordRequestScreen());
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextFormField), '123');
+    await tester.pump();
+
+    await tester.tap(_primaryCtaElevated('Send reset code'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Enter an 8-digit phone number'), findsOneWidget);
+  });
+
+  testWidgets('invalid email submit shows inline error', (
     WidgetTester tester,
   ) async {
     await pumpAuthWidget(tester, home: const ForgotPasswordRequestScreen());
@@ -128,23 +132,12 @@ void main() {
     await tapAlternateMethod(tester);
     await tester.pumpAndSettle();
 
-    expect(
-      primaryElevatedWidget(tester, 'Send reset code').onPressed,
-      isNull,
-    );
-
     await tester.enterText(find.byType(TextFormField), 'not-an-email');
     await tester.pump();
-    expect(
-      primaryElevatedWidget(tester, 'Send reset code').onPressed,
-      isNull,
-    );
 
-    await tester.enterText(find.byType(TextFormField), 'user@example.com');
-    await tester.pump();
-    expect(
-      primaryElevatedWidget(tester, 'Send reset code').onPressed,
-      isNotNull,
-    );
+    await tester.tap(_primaryCtaElevated('Send reset code'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Enter a valid email'), findsOneWidget);
   });
 }

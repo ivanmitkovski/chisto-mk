@@ -77,12 +77,13 @@ class _TestSitesRepository implements SitesRepository {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-PollutionSite _buildSite(String id) {
+PollutionSite _buildSite(String id, {String? statusCode}) {
   return PollutionSite(
     id: id,
     title: 'Site $id',
     description: 'Description',
     statusLabel: 'High',
+    statusCode: statusCode,
     statusColor: Colors.red,
     distanceKm: 1.2,
     score: 10,
@@ -420,7 +421,7 @@ void main() {
       occurredAtMs: 1,
       updatedAt: DateTime.utc(2026, 3, 27, 10),
       mutationKind: 'created',
-      status: 'REPORTED',
+      status: 'VERIFIED',
       latitude: 41.61,
       longitude: 21.75,
     );
@@ -437,6 +438,166 @@ void main() {
 
     coordinator.dispose();
   });
+
+  test(
+    'REPORTED realtime event never fast-path inserts; filtered sync decides',
+    () async {
+      // Simulates a stale/leaky backend that broadcasts another reporter's
+      // REPORTED site with coordinates. The coordinator must not pin it: the
+      // viewport sync (server-filtered per viewer) returns no such site.
+      final _TestSitesRepository repository = _TestSitesRepository(
+        onGetSitesForMap:
+            ({
+              required double latitude,
+              required double longitude,
+              required double radiusKm,
+              required int limit,
+              double? minLatitude,
+              double? maxLatitude,
+              double? minLongitude,
+              double? maxLongitude,
+              double? zoom,
+              String? status,
+              bool includeArchived = false,
+            }) async {
+              return MapSitesResult(sites: const <PollutionSite>[]);
+            },
+        onGetSiteById: (_) async =>
+            _buildSite('foreign-reported', statusCode: 'REPORTED'),
+      );
+      final MapSyncCoordinator coordinator = MapSyncCoordinator(
+        sitesRepository: repository,
+      );
+      coordinator.updateViewport(
+        const MapViewportQuery(
+          latitude: 41.6,
+          longitude: 21.7,
+          radiusKm: 20,
+          limit: 120,
+          zoom: 11,
+        ),
+      );
+
+      coordinator.ingestEvent(
+        MapSiteEvent(
+          eventId: 'evt-foreign',
+          type: 'site_created',
+          siteId: 'foreign-reported',
+          occurredAtMs: 1,
+          updatedAt: DateTime.utc(2026, 6, 10, 10),
+          mutationKind: 'created',
+          status: 'REPORTED',
+          latitude: 41.61,
+          longitude: 21.75,
+        ),
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 40));
+
+      expect(
+        repository.getSiteByIdCalls,
+        0,
+        reason: 'REPORTED events must not trigger the single-site fast path',
+      );
+      expect(repository.getSitesForMapCalls, 1);
+      expect(
+        coordinator.snapshot.sites,
+        isEmpty,
+        reason: 'Foreign REPORTED sites never appear on the map',
+      );
+
+      coordinator.dispose();
+    },
+  );
+
+  test(
+    'fetched REPORTED site is not inserted unless already on the map',
+    () async {
+      // Even when an event carries no status, a fetched site that turns out
+      // to be REPORTED must not be inserted as a new pin — only refreshed in
+      // place when the filtered viewport sync already delivered it (own site).
+      final PollutionSite ownReported = _buildSite(
+        'own-reported',
+        statusCode: 'REPORTED',
+      );
+      bool fullSyncIncludesSite = false;
+      final _TestSitesRepository repository = _TestSitesRepository(
+        onGetSitesForMap:
+            ({
+              required double latitude,
+              required double longitude,
+              required double radiusKm,
+              required int limit,
+              double? minLatitude,
+              double? maxLatitude,
+              double? minLongitude,
+              double? maxLongitude,
+              double? zoom,
+              String? status,
+              bool includeArchived = false,
+            }) async {
+              return MapSitesResult(
+                sites: fullSyncIncludesSite
+                    ? <PollutionSite>[ownReported]
+                    : const <PollutionSite>[],
+              );
+            },
+        onGetSiteById: (_) async => ownReported,
+      );
+      final MapSyncCoordinator coordinator = MapSyncCoordinator(
+        sitesRepository: repository,
+      );
+      coordinator.updateViewport(
+        const MapViewportQuery(
+          latitude: 41.6,
+          longitude: 21.7,
+          radiusKm: 20,
+          limit: 120,
+          zoom: 11,
+        ),
+      );
+
+      // Unknown REPORTED site (statusless event): fetch happens, insert must not.
+      coordinator.ingestEvent(
+        MapSiteEvent(
+          eventId: 'evt-unknown',
+          type: 'site_updated',
+          siteId: 'own-reported',
+          occurredAtMs: 1,
+          updatedAt: DateTime.utc(2026, 6, 10, 10),
+          mutationKind: 'updated',
+          latitude: 41.61,
+          longitude: 21.75,
+        ),
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 40));
+      expect(repository.getSiteByIdCalls, 1);
+      expect(coordinator.snapshot.sites, isEmpty);
+
+      // Once the filtered sync delivers it (viewer's own site), refresh in
+      // place keeps working.
+      fullSyncIncludesSite = true;
+      coordinator.requestSync(immediate: true);
+      await Future<void>.delayed(const Duration(milliseconds: 40));
+      expect(coordinator.snapshot.sites, hasLength(1));
+
+      coordinator.ingestEvent(
+        MapSiteEvent(
+          eventId: 'evt-known',
+          type: 'site_updated',
+          siteId: 'own-reported',
+          occurredAtMs: 2,
+          updatedAt: DateTime.utc(2026, 6, 10, 11),
+          mutationKind: 'updated',
+          latitude: 41.61,
+          longitude: 21.75,
+        ),
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 40));
+      expect(coordinator.snapshot.sites, hasLength(1));
+
+      coordinator.dispose();
+    },
+  );
 
   test(
     'keeps existing markers without connectivity banner for validation map errors',
@@ -615,4 +776,60 @@ void main() {
 
     coordinator.dispose();
   });
+
+  test(
+    'unexpected sync error with existing sites shows live updates delayed banner',
+    () async {
+      final PollutionSite site = _buildSite('unexpected-1');
+      int calls = 0;
+      final _TestSitesRepository repository = _TestSitesRepository(
+        onGetSitesForMap:
+            ({
+              required double latitude,
+              required double longitude,
+              required double radiusKm,
+              required int limit,
+              double? minLatitude,
+              double? maxLatitude,
+              double? minLongitude,
+              double? maxLongitude,
+              double? zoom,
+              String? status,
+              bool includeArchived = false,
+            }) async {
+              calls += 1;
+              if (calls == 1) {
+                return MapSitesResult(sites: <PollutionSite>[site]);
+              }
+              throw StateError('unexpected');
+            },
+        onGetSiteById: (_) async => site,
+      );
+      final MapSyncCoordinator coordinator = MapSyncCoordinator(
+        sitesRepository: repository,
+      );
+      coordinator.updateViewport(
+        const MapViewportQuery(
+          latitude: 41.6,
+          longitude: 21.7,
+          radiusKm: 20,
+          limit: 120,
+          zoom: 11,
+        ),
+      );
+      coordinator.requestSync(immediate: true);
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+      expect(coordinator.snapshot.sites, hasLength(1));
+
+      coordinator.requestSync(immediate: true);
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+      expect(coordinator.snapshot.sites, hasLength(1));
+      expect(
+        coordinator.snapshot.inlineNotice?.kind,
+        MapSyncInlineNoticeKind.liveUpdatesDelayed,
+      );
+
+      coordinator.dispose();
+    },
+  );
 }

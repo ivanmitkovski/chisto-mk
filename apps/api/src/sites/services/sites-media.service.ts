@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { SiteStatus } from '../../prisma-client';
+import { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { ReportsUploadService } from '../../reports/services/reports-upload.service';
 import { ListSiteMediaQueryDto } from '../dto/list-site-media-query.dto';
-import { SiteEngagementService } from './site-engagement.service';
+import { SiteDetailRepository } from '../repositories/site-detail.repository';
 import { SiteMediaRepository } from '../repositories/site-media.repository';
 
 @Injectable()
@@ -10,12 +12,43 @@ export class SitesMediaService {
 
   constructor(
     private readonly siteMediaRepository: SiteMediaRepository,
+    private readonly siteDetailRepository: SiteDetailRepository,
     private readonly reportsUploadService: ReportsUploadService,
-    private readonly siteEngagement: SiteEngagementService,
   ) {}
 
-  async findSiteMedia(siteId: string, query: ListSiteMediaQueryDto) {
-    await this.siteEngagement.ensureSiteExists(siteId);
+  async findSiteMedia(
+    siteId: string,
+    query: ListSiteMediaQueryDto,
+    user?: AuthenticatedUser,
+  ) {
+    const site = await this.siteDetailRepository.findSiteStatusById(siteId);
+    if (!site) {
+      throw new NotFoundException({
+        code: 'SITE_NOT_FOUND',
+        message: `Site with id '${siteId}' was not found`,
+      });
+    }
+
+    if (site.status === SiteStatus.REPORTED) {
+      const viewerUserId = user?.userId ?? null;
+      if (!viewerUserId) {
+        throw new NotFoundException({
+          code: 'SITE_NOT_FOUND',
+          message: `Site with id '${siteId}' was not found`,
+        });
+      }
+      const canView = await this.siteDetailRepository.viewerCanAccessReportedSite(
+        siteId,
+        viewerUserId,
+      );
+      if (!canView) {
+        throw new NotFoundException({
+          code: 'SITE_NOT_FOUND',
+          message: `Site with id '${siteId}' was not found`,
+        });
+      }
+    }
+
     const reports = await this.siteMediaRepository.findReportsForSite(siteId);
     const allItems = reports.flatMap((report) =>
       report.mediaUrls.map((url, index) => ({

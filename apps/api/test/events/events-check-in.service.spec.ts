@@ -98,7 +98,11 @@ describe('EventsCheckInService', () => {
       }),
     };
     ecoEventPoints = {
-      creditIfNew: jest.fn().mockResolvedValue(5),
+      creditIfNew: jest.fn(async (_tx: unknown, params: { delta: number }) => ({
+        granted: params.delta,
+        totalPointsEarnedBefore: 0,
+        totalPointsEarnedAfter: params.delta,
+      })),
       debitOnceIfNew: jest.fn().mockResolvedValue(0),
     };
     pendingCheckIn = {
@@ -157,6 +161,7 @@ describe('EventsCheckInService', () => {
       reportsUpload as never,
       checkInTelemetry as never,
       liveImpact as never,
+      { emit: jest.fn() } as never,
     );
     const redemption = new EventsCheckInRedemptionService(
       new EventsCheckInRedeemService(
@@ -177,6 +182,7 @@ describe('EventsCheckInService', () => {
         checkInGateway as never,
         checkInTelemetry as never,
         liveImpact as never,
+        { emit: jest.fn() } as never,
       ),
     );
     service = new EventsCheckInService(qr, attendees, redemption);
@@ -340,7 +346,11 @@ describe('EventsCheckInService', () => {
               .mockResolvedValue({ firstName: 'Vol', lastName: 'One' }),
           },
         };
-        ecoEventPoints.creditIfNew.mockResolvedValue(7);
+        ecoEventPoints.creditIfNew.mockResolvedValue({
+          granted: 7,
+          totalPointsEarnedBefore: 0,
+          totalPointsEarnedAfter: 7,
+        });
         return fn(tx as never);
       });
       const out = await service.manualAdd('evt-1', user('org-1'), {
@@ -623,7 +633,11 @@ describe('EventsCheckInService', () => {
           },
           cleanupEvent: { update: jest.fn().mockResolvedValue({}) },
         };
-        ecoEventPoints.creditIfNew.mockResolvedValue(POINTS_EVENT_CHECK_IN);
+        ecoEventPoints.creditIfNew.mockResolvedValue({
+          granted: POINTS_EVENT_CHECK_IN,
+          totalPointsEarnedBefore: 0,
+          totalPointsEarnedAfter: POINTS_EVENT_CHECK_IN,
+        });
         return fn(tx as never);
       });
       const result = await service.resolveCheckIn('evt-1', 'p1', user('org-1'), 'approve');

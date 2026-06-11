@@ -57,11 +57,17 @@ class RegistrationOtpController extends Notifier<RegistrationOtpState> {
     }
   }
 
-  Future<void> verifyOtp(String phoneNumberE164, String code) async {
+  Future<void> verifyOtp(
+    String phoneNumberE164,
+    String code, {
+    bool rememberMe = true,
+  }) async {
     if (state.otpLocked || state.isLoading) return;
     state = state.copyWith(isLoading: true, clearError: true);
     try {
-      await ref.read(authRepositoryProvider).verifyOtp(phoneNumberE164, code);
+      await ref
+          .read(authRepositoryProvider)
+          .verifyOtp(phoneNumberE164, code, rememberMe: rememberMe);
       state = state.copyWith(isLoading: false);
     } on AppError catch (e) {
       if (e.code == 'OTP_INVALID') {

@@ -31,6 +31,9 @@ extension EventChatTitleBootstrapMixin on _EventChatScreenState {
     if (!mounted) {
       return;
     }
+    if (_loadFailure != null && isTerminalEventChatLoadFailure(_loadFailure!)) {
+      return;
+    }
     unawaited(
       Future.wait(<Future<void>>[
         _loadMeta(),
@@ -62,12 +65,13 @@ extension EventChatTitleBootstrapMixin on _EventChatScreenState {
     _initialCatchupTimer?.cancel();
     // Close gap between initial REST load and stream subscription.
     _initialCatchupTimer = Timer(const Duration(milliseconds: 400), () {
-      if (!mounted || _loading || _loadError) {
+      if (!mounted || _loading || _loadFailure != null) {
         return;
       }
       unawaited(_pollLatestMessages());
     });
     _configureLivePollForStatus(_repo.currentConnectionStatus(widget.eventId));
+    _attachRealtimeDisruptionListener();
   }
 
   void _configureLivePollForStatus(EventChatConnectionStatus status) {
@@ -80,7 +84,7 @@ extension EventChatTitleBootstrapMixin on _EventChatScreenState {
         ? const Duration(seconds: 45)
         : const Duration(milliseconds: 1500);
     _livePollTimer = Timer.periodic(interval, (_) {
-      if (!mounted || _loading || _loadError) {
+      if (!mounted || _loading || _loadFailure != null) {
         return;
       }
       unawaited(_pollLatestMessages());
@@ -139,12 +143,9 @@ extension EventChatTitleBootstrapMixin on _EventChatScreenState {
     _configureLivePollForStatus(s);
 
     if (s == EventChatConnectionStatus.connected) {
-      _bannerWatchdog?.cancel();
-      _bannerWatchdog = null;
-      _reconnectDebounce?.cancel();
-      _reconnectDebounce = null;
-
-      final bool wasDown = _bannerVisible;
+      final bool wasDown =
+          _bannerVisible ||
+          _repo.realtimeDisruptionVisible(widget.eventId).value;
       if (_sseHadConnected && wasDown) {
         unawaited(
           _mergeLatestFromServer().whenComplete(() {
@@ -178,10 +179,6 @@ extension EventChatTitleBootstrapMixin on _EventChatScreenState {
     }
 
     if (s == EventChatConnectionStatus.disconnected) {
-      _bannerWatchdog?.cancel();
-      _bannerWatchdog = null;
-      _reconnectDebounce?.cancel();
-      _reconnectDebounce = null;
       // Cold start: WS defaults to disconnected until onConnect; REST may already work.
       if (!_sseHadConnected) {
         rebuildState(() => _conn = s);
@@ -192,46 +189,27 @@ extension EventChatTitleBootstrapMixin on _EventChatScreenState {
       return;
     }
 
-    // Reconnecting: show banner only after a sustained outage (3 s).
-    // Transient SSE drops that recover quickly stay invisible.
+    // Reconnecting: banner visibility is driven by transport-level debounce.
     if (s == EventChatConnectionStatus.reconnecting) {
-      // Cold start: WS emits reconnecting during first handshake; REST may work.
       if (!_sseHadConnected) {
         rebuildState(() => _conn = s);
         return;
       }
-      if (_bannerVisible) {
-        _maybeStartBannerWatchdog();
-        return;
-      }
-      _reconnectDebounce ??= Timer(const Duration(seconds: 3), () {
-        if (!mounted) {
-          return;
-        }
-        _bannerVisible = true;
-        rebuildState(() => _conn = EventChatConnectionStatus.reconnecting);
-        _maybeStartBannerWatchdog();
-      });
+      rebuildState(() => _conn = s);
     }
   }
 
-  void _maybeStartBannerWatchdog() {
-    _bannerWatchdog?.cancel();
-    if (!_bannerVisible) {
+  void _attachRealtimeDisruptionListener() {
+    if (_disruptionListener != null) {
       return;
     }
-    _bannerWatchdog = Timer(const Duration(seconds: 10), () {
-      if (!mounted) {
-        return;
+    _disruptionListener = () {
+      if (mounted) {
+        rebuildState(() {});
       }
-      if (_repo.currentConnectionStatus(widget.eventId) !=
-          EventChatConnectionStatus.connected) {
-        return;
-      }
-      _reconnectDebounce?.cancel();
-      _reconnectDebounce = null;
-      _bannerVisible = false;
-      rebuildState(() => _conn = EventChatConnectionStatus.connected);
-    });
+    };
+    _repo
+        .realtimeDisruptionVisible(widget.eventId)
+        .addListener(_disruptionListener!);
   }
 }

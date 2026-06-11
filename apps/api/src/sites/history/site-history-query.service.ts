@@ -3,6 +3,7 @@ import { Prisma, SiteHistoryEntryKind, SiteStatus } from '../../prisma-client';
 import { PrismaService } from '../../prisma/prisma.service';
 import type { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { ADMIN_PANEL_ROLES } from '../../auth/constants/admin-roles';
+import { resolveActorIdentity } from '../../common/projections/public-identity.projection';
 import {
   SiteHistoryEntryDto,
   SiteHistoryListResponseDto,
@@ -81,7 +82,7 @@ export class SiteHistoryQueryService {
       actorIds.length > 0
         ? await this.prisma.user.findMany({
             where: { id: { in: actorIds } },
-            select: { id: true, firstName: true, lastName: true, role: true },
+            select: { id: true, firstName: true, lastName: true, role: true, status: true },
           })
         : [];
     const actorById = new Map(actors.map((a) => [a.id, a]));
@@ -112,6 +113,9 @@ export class SiteHistoryQueryService {
       }
 
       const actorRow = row.actorUserId ? actorById.get(row.actorUserId) : undefined;
+      const actorIdentity = resolveActorIdentity(actorRow ?? null, {
+        actorUserId: row.actorUserId,
+      });
       items.push({
         id: row.id,
         kind: row.kind,
@@ -125,9 +129,8 @@ export class SiteHistoryQueryService {
             ? null
             : {
                 id: row.actorUserId,
-                displayName: actorRow
-                  ? `${actorRow.firstName} ${actorRow.lastName}`.trim() || null
-                  : null,
+                displayName: actorIdentity.displayName,
+                isDeleted: actorIdentity.isDeleted,
                 role: row.actorRole ?? actorRow?.role ?? null,
               },
         note: row.note,

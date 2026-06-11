@@ -2,6 +2,7 @@ import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/core/theme/app_colors.dart';
 import 'package:chisto_infrastructure/core/theme/app_spacing.dart';
 import 'package:chisto_infrastructure/core/theme/app_typography.dart';
+import 'package:design_system/design_system.dart';
 import 'package:feature_profile/src/domain/models/weekly_rankings_result.dart';
 import 'package:flutter/material.dart';
 
@@ -15,9 +16,6 @@ class WeeklyRankingRow extends StatelessWidget {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final bool isTopThree = entry.rank <= 3;
     final bool isCurrentUser = entry.isCurrentUser;
-    final String initial = entry.displayName.isNotEmpty
-        ? entry.displayName[0].toUpperCase()
-        : '?';
 
     IconData? leadingIcon;
     Color iconColor = AppColors.textMuted;
@@ -38,6 +36,7 @@ class WeeklyRankingRow extends StatelessWidget {
     final Color borderColor = isCurrentUser
         ? AppColors.primary.withValues(alpha: 0.4)
         : AppColors.divider.withValues(alpha: 0.9);
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Semantics(
       label: context.l10n.profileWeeklyRankingsRowSemantic(
@@ -54,6 +53,7 @@ class WeeklyRankingRow extends StatelessWidget {
           color: backgroundColor,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
           border: Border.all(color: borderColor),
+          boxShadow: AppShadows.softCard(colorScheme),
         ),
         child: Row(
           children: <Widget>[
@@ -75,15 +75,13 @@ class WeeklyRankingRow extends StatelessWidget {
               ),
             ),
             const SizedBox(width: AppSpacing.sm),
-            CircleAvatar(
-              radius: AppSpacing.radius18,
-              backgroundColor: AppColors.inputFill,
-              child: Text(
-                initial,
-                style: AppTypography.cardTitle(
-                  textTheme,
-                ).copyWith(fontWeight: FontWeight.w600),
-              ),
+            UserAvatarCircle(
+              displayName: entry.displayName,
+              imageUrl: entry.avatarUrl,
+              seed: entry.userId.isNotEmpty
+                  ? entry.userId
+                  : entry.displayName,
+              size: AppSpacing.radius18 * 2,
             ),
             const SizedBox(width: AppSpacing.sm),
             Expanded(

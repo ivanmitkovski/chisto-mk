@@ -23,10 +23,10 @@ class AppInlineBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final Color background = switch (tone) {
       AppInlineBannerTone.info => AppColors.primary.withValues(alpha: 0.08),
-      AppInlineBannerTone.warning => AppColors.accentDanger.withValues(
+      AppInlineBannerTone.warning => AppColors.error.withValues(
         alpha: 0.08,
       ),
-      AppInlineBannerTone.error => AppColors.accentDanger.withValues(
+      AppInlineBannerTone.error => AppColors.error.withValues(
         alpha: 0.12,
       ),
     };
@@ -44,12 +44,19 @@ class AppInlineBanner extends StatelessWidget {
       ),
     );
 
+    final Widget banner = Semantics(
+      liveRegion: true,
+      container: true,
+      label: message,
+      child: content,
+    );
+
     if (onTap == null) {
-      return content;
+      return banner;
     }
     return Material(
       color: AppColors.transparent,
-      child: InkWell(onTap: onTap, borderRadius: AppRadii.md, child: content),
+      child: InkWell(onTap: onTap, borderRadius: AppRadii.md, child: banner),
     );
   }
 }

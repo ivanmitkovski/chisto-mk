@@ -46,7 +46,7 @@ class _CancellingRecordingApiClient extends ApiClient {
     : super(
         config: AppConfig.dev,
         accessToken: () => null,
-        onUnauthorized: () {},
+        onUnauthorized: (_) {},
       );
 
   final Future<ApiResponse> Function(

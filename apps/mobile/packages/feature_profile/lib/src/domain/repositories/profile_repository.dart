@@ -9,11 +9,18 @@ abstract class ProfileRepository {
   Future<PointsHistoryPage> getPointsHistory({int limit = 30, String? cursor});
 
   /// Updates profile and returns the updated user, or null if no changes were sent.
-  Future<ProfileUser?> updateProfile({String? firstName, String? lastName});
+  Future<ProfileUser?> updateProfile({
+    String? firstName,
+    String? lastName,
+    String? locale,
+  });
 
   Future<String> uploadAvatar(String filePath);
 
   Future<void> removeAvatar();
+
+  /// Persists notification locale (`en`, `mk`, or `sq`) on the server profile.
+  Future<void> updateLocale(String locale);
 
   Future<WeeklyRankingsResult> getWeeklyRankings({int limit = 50});
 }

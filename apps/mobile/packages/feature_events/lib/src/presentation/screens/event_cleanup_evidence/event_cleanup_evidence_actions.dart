@@ -119,7 +119,7 @@ extension EventCleanupEvidenceActions on _EventCleanupEvidenceScreenState {
   }
 
   void _showThumbnailContextMenu(int index) {
-    showModalBottomSheet<void>(
+    AppBottomSheet.show<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: AppColors.transparent,
@@ -186,9 +186,7 @@ extension EventCleanupEvidenceActions on _EventCleanupEvidenceScreenState {
       if (!mounted) return;
       logEventsDiagnostic('cleanup_evidence_save_failed');
       rebuildState(() => _isSaving = false);
-      final String detail = e.message.isNotEmpty
-          ? e.message
-          : context.l10n.eventsMutationFailedGeneric;
+      final String detail = localizedAppErrorMessage(context.l10n, e);
       await showDialog<void>(
         context: context,
         barrierDismissible: false,

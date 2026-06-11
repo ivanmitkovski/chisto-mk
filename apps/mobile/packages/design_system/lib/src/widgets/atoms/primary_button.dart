@@ -47,8 +47,9 @@ class _PrimaryButtonState extends State<PrimaryButton> {
       curve: AppMotion.emphasized,
       child: SizedBox(
         width: double.infinity,
-        height: 56,
-        child: Listener(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 56),
+          child: Listener(
           onPointerDown: (_) {
             if (canPress) _setPressed(true);
           },
@@ -78,6 +79,10 @@ class _PrimaryButtonState extends State<PrimaryButton> {
             ),
             child: busy
                 ? const Center(
+                    // heightFactor hugs content so the button keeps its
+                    // intrinsic height (>= minHeight) instead of expanding to
+                    // fill bounded slots like Scaffold.bottomNavigationBar.
+                    heightFactor: 1.0,
                     child: SizedBox(
                       width: 24,
                       height: 24,
@@ -88,6 +93,7 @@ class _PrimaryButtonState extends State<PrimaryButton> {
                     ),
                   )
                 : Center(
+                    heightFactor: 1.0,
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -100,7 +106,8 @@ class _PrimaryButtonState extends State<PrimaryButton> {
                           child: Text(
                             widget.label,
                             textAlign: TextAlign.center,
-                            maxLines: 1,
+                            maxLines: 2,
+                            softWrap: true,
                             overflow: TextOverflow.ellipsis,
                             textHeightBehavior: const TextHeightBehavior(
                               applyHeightToFirstAscent: false,
@@ -108,11 +115,11 @@ class _PrimaryButtonState extends State<PrimaryButton> {
                             ),
                             style: AppTypography.buttonLabel(textTheme)
                                 .copyWith(
-                              color: inactive
-                                  ? AppColors.textSecondary
-                                  : AppColors.textPrimary,
-                              height: 1,
-                            ),
+                                  color: inactive
+                                      ? AppColors.textSecondary
+                                      : AppColors.textPrimary,
+                                  height: 1,
+                                ),
                           ),
                         ),
                       ],
@@ -120,6 +127,7 @@ class _PrimaryButtonState extends State<PrimaryButton> {
                   ),
           ),
         ),
+      ),
       ),
     );
   }

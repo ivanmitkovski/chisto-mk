@@ -106,12 +106,15 @@ class SiteCommentsResult {
     required this.page,
     required this.limit,
     required this.total,
+    this.engagementTotal,
   });
 
   final List<SiteCommentItem> items;
   final int page;
   final int limit;
   final int total;
+  /// Viewer-visible comment total (roots + replies), from API meta.engagementTotal.
+  final int? engagementTotal;
 }
 
 class SiteCommentItem {
@@ -120,6 +123,7 @@ class SiteCommentItem {
     this.parentId,
     required this.authorId,
     required this.authorName,
+    this.authorIsDeleted = false,
     this.authorAvatarUrl,
     required this.body,
     required this.createdAt,
@@ -133,6 +137,7 @@ class SiteCommentItem {
   final String? parentId;
   final String authorId;
   final String authorName;
+  final bool authorIsDeleted;
   final String? authorAvatarUrl;
   final String body;
   final DateTime createdAt;
@@ -210,6 +215,44 @@ class SiteUpvoterItem {
   final String displayName;
   final String? avatarUrl;
   final DateTime upvotedAt;
+}
+
+class SiteCoReportersResult {
+  const SiteCoReportersResult({
+    required this.items,
+    required this.page,
+    required this.limit,
+    required this.total,
+    required this.hasMore,
+  });
+
+  final List<SiteCoReporterItem> items;
+  final int page;
+  final int limit;
+  final int total;
+  final bool hasMore;
+}
+
+class SiteCoReporterItem {
+  const SiteCoReporterItem({
+    required this.id,
+    required this.firstName,
+    required this.lastName,
+    required this.displayName,
+    this.isDeleted = false,
+    this.avatarUrl,
+    required this.reportedAt,
+    required this.isOriginalReporter,
+  });
+
+  final String id;
+  final String firstName;
+  final String lastName;
+  final String displayName;
+  final bool isDeleted;
+  final String? avatarUrl;
+  final DateTime reportedAt;
+  final bool isOriginalReporter;
 }
 
 /// Filter dimensions sent with `POST /sites/search` (map chip parity).

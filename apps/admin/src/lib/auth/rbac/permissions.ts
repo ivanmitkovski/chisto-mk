@@ -39,6 +39,7 @@ export const ADMIN_PERMISSIONS = {
   'app-config:write': 'app-config:write',
   'team:read': 'team:read',
   'team:write': 'team:write',
+  'analytics:read': 'analytics:read',
 } as const;
 
 export type AdminPermission = (typeof ADMIN_PERMISSIONS)[keyof typeof ADMIN_PERMISSIONS];
@@ -64,6 +65,7 @@ const SUPPORT: AdminPermission[] = [
   ADMIN_PERMISSIONS['settings:read'],
   ADMIN_PERMISSIONS['settings:security'],
   ADMIN_PERMISSIONS['app-config:read'],
+  ADMIN_PERMISSIONS['analytics:read'],
 ];
 
 const ADMIN_ROLE: AdminPermission[] = [
@@ -141,4 +143,5 @@ export const NAV_PERMISSIONS: Record<string, AdminPermission> = {
   'email-suppressions': ADMIN_PERMISSIONS['comms:read'],
   'webhook-logs': ADMIN_PERMISSIONS['comms:read'],
   team: ADMIN_PERMISSIONS['team:read'],
+  'active-users': ADMIN_PERMISSIONS['analytics:read'],
 };

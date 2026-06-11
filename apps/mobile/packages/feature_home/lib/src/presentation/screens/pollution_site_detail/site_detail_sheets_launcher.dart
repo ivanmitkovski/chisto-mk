@@ -6,6 +6,7 @@ extension SiteDetailSheetsLauncher on _PollutionSiteDetailScreenState {
     try {
       final EcoEvent? createdEvent = await EventsNavigation.openCreate(
         context,
+        ref: ref,
         auth: ref.read(authStateProvider),
         preselectedSiteId: _site.id,
         preselectedSiteName: _site.title,
@@ -29,7 +30,10 @@ extension SiteDetailSheetsLauncher on _PollutionSiteDetailScreenState {
   }
 
   Future<void> _openTakeActionDialog(BuildContext context) async {
-    final TakeActionType? action = await TakeActionSheet.show(context);
+    final TakeActionType? action = await TakeActionSheet.show(
+      context,
+      canCreateEcoAction: true,
+    );
     if (action == null || !context.mounted) return;
     final TakeActionCoordinatorOutcome outcome =
         await TakeActionCoordinator.execute(
@@ -152,6 +156,9 @@ extension SiteDetailSheetsLauncher on _PollutionSiteDetailScreenState {
         ref
             .read(siteEngagementNotifierProvider(_site.id).notifier)
             .setShareCount(snapshot.sharesCount);
+        ref
+            .read(feedSitesNotifierProvider.notifier)
+            .patchSiteShareCount(_site.id, snapshot.sharesCount);
         _applyEngagementToSite();
       case SiteShareCancelled():
       case SiteShareTrackFailed():
@@ -166,40 +173,45 @@ extension SiteDetailSheetsLauncher on _PollutionSiteDetailScreenState {
   }
 
   Future<void> _onParticipantsTap(BuildContext context) async {
-    final List<CoReporterProfile> coReporters = _site.displayCoReporterProfiles;
-    if (coReporters.isNotEmpty) {
-      await CoReportersModal.show(context, coReporters);
-    } else if (_site.mergedDuplicateChildCountTotal > 0) {
+    if (_site.mergedDuplicateChildCountTotal > 0 &&
+        _site.displayCoReporterProfiles.isEmpty) {
       await MergedDuplicateSubmissionsModal.show(
         context,
         count: _site.mergedDuplicateChildCountTotal,
       );
-    } else {
-      AppSnack.show(
-        context,
-        message: context.l10n.siteDetailNoCoReportersSnack,
-        type: AppSnackType.info,
-      );
+      return;
     }
+    await CoReportersModal.show(context, siteId: _site.id);
   }
 
   Future<void> _showCommentsSheet(
     BuildContext context, {
     String? highlightCommentId,
     String? highlightActorUserId,
-  }) async {
+  }) {
+    return _commentsSheetFlight.run(() async {
     final l10n = context.l10n;
     final String currentUserId = ref.read(authStateProvider).userId ?? '';
     Future<List<Comment>> loadComments(String sort) async {
       final result = await ref
           .read(sitesRepositoryProvider)
           .getSiteComments(_site.id, sort: sort);
-      return result.items
+      final List<Comment> mapped = result.items
           .map(
             (SiteCommentItem item) =>
                 commentFromSiteCommentItem(currentUserId, item),
           )
           .toList();
+      if (mounted) {
+        final int n = commentCountForEngagementAfterFetch(
+          result: result,
+          mappedComments: mapped,
+        );
+        rebuildState(() {
+          _site = _site.copyWith(commentsCount: n);
+        });
+      }
+      return mapped;
     }
 
     try {
@@ -221,12 +233,20 @@ extension SiteDetailSheetsLauncher on _PollutionSiteDetailScreenState {
     if (!context.mounted) return;
     await showPollutionSiteCommentsModalBottomSheet(
       context,
-      builder: (BuildContext sheetContext, ScrollController scrollController) {
-        return CommentsBottomSheet(
-          siteId: _site.id,
-          comments: _comments,
-          siteTitle: _site.title,
-          scrollController: scrollController,
+      builder:
+          (
+            BuildContext sheetContext,
+            ScrollController scrollController,
+            DraggableScrollableController sheetController,
+            CommentsSheetSizeConfig sizeConfig,
+          ) {
+            return CommentsBottomSheet(
+              siteId: _site.id,
+              comments: _comments,
+              siteTitle: _site.title,
+              scrollController: scrollController,
+              sheetController: sheetController,
+              sheetSizeConfig: sizeConfig,
           highlightCommentId: highlightCommentId,
           highlightActorUserId: highlightActorUserId,
           onCommentsCountChanged: (int count) {
@@ -290,6 +310,7 @@ extension SiteDetailSheetsLauncher on _PollutionSiteDetailScreenState {
         );
       },
     );
+    });
   }
 
   Future<void> _showUpvotersSheet(
@@ -317,7 +338,7 @@ extension SiteDetailSheetsLauncher on _PollutionSiteDetailScreenState {
       );
       return;
     }
-    await showModalBottomSheet<void>(
+    await AppBottomSheet.show<void>(
       context: context,
       useRootNavigator: true,
       useSafeArea: true,

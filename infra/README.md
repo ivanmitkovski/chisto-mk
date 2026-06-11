@@ -5,7 +5,9 @@ Target AWS layout (Terraform modules under `terraform/`):
 - **ECS Fargate** — API service (non-root container), separate one-shot migration task
 - **ALB + WAF** — HTTPS termination, rate limits at edge
 - **RDS PostgreSQL** — PITR backups (7d staging, 30d production), quarterly restore drill per `apps/api/docs/runbooks/db-restore.md`
-- **ElastiCache Redis** — throttler, Socket.IO adapter, idempotency, feed cache L2
+- **ElastiCache Redis** — throttler, Socket.IO adapter, idempotency, feed cache L2, auth refresh replay cache
+  - Realtime runbook: [`apps/api/docs/runbooks/redis-realtime.md`](../apps/api/docs/runbooks/redis-realtime.md)
+  - awsDev bootstrap: [`scripts/configure-awsdev-redis.sh`](scripts/configure-awsdev-redis.sh)
 - **S3** — report media, avatars
 - **Secrets Manager** — `JWT_SECRET`, provider keys, Firebase service account
 

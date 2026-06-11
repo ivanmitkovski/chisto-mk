@@ -12,7 +12,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class OrganizerToolkitScreen extends ConsumerStatefulWidget {
-  const OrganizerToolkitScreen({super.key});
+  const OrganizerToolkitScreen({super.key, this.onProceedToCreate});
+
+  final OrganizerCertificationProceedHandler? onProceedToCreate;
 
   @override
   ConsumerState<OrganizerToolkitScreen> createState() =>
@@ -57,6 +59,7 @@ class _OrganizerToolkitScreenState
       return;
     }
     _detachAuthListener();
+    widget.onProceedToCreate?.call();
     Navigator.of(context).pop();
   }
 
@@ -96,7 +99,9 @@ class _OrganizerToolkitScreenState
                 settings: const RouteSettings(
                   name: organizerCertificationQuizRouteName,
                 ),
-                builder: (_) => const OrganizerQuizScreen(),
+                builder: (_) => OrganizerQuizScreen(
+                  onProceedToCreate: widget.onProceedToCreate,
+                ),
               ),
             )
             .whenComplete(() {

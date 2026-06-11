@@ -76,6 +76,11 @@ class CheckInConnectionChanged extends CheckInStreamEvent {
   final CheckInWsConnectionStatus status;
 }
 
+/// Emitted when repeated connect errors exceed [_maxConnectErrors].
+class CheckInConnectionGaveUp extends CheckInStreamEvent {
+  const CheckInConnectionGaveUp();
+}
+
 /// Socket.IO client for the `/check-in` namespace.
 ///
 /// Mirrors the pattern of [SocketEventChatStream] for the `/chat` namespace.
@@ -182,6 +187,9 @@ class SocketCheckInStream {
           );
           _disconnectSocketOnly();
           _emitStatus(CheckInWsConnectionStatus.disconnected);
+          if (!_controller.isClosed) {
+            _controller.add(const CheckInConnectionGaveUp());
+          }
           return;
         }
         _emitStatus(CheckInWsConnectionStatus.connecting);

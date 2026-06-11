@@ -1,8 +1,8 @@
 import 'dart:async';
 
+import 'package:chisto_infrastructure/core/auth/session_invalidation.dart';
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
-import 'package:chisto_infrastructure/core/navigation/app_navigation.dart';
 import 'package:chisto_infrastructure/core/providers/reports_providers.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
 import 'package:design_system/design_system.dart';
@@ -47,13 +47,11 @@ class ReportEntryFlow {
       if (!context.mounted) {
         return false;
       }
-      if (e.code == 'UNAUTHORIZED' ||
-          e.code == 'INVALID_TOKEN_USER' ||
-          e.code == 'ACCOUNT_NOT_ACTIVE') {
-        AppNavigation.goSignInAndClearStack();
+      if (SessionInvalidation.shouldHandle(e)) {
+        unawaited(SessionInvalidation.fromError(e));
         return false;
       }
-      AppSnack.show(context, message: e.message, type: AppSnackType.warning);
+      AppSnack.failure(context, error: e);
       return false;
     } catch (_) {
       if (!context.mounted) {
@@ -111,7 +109,7 @@ class ReportEntryFlow {
     final XFile selectedFile = file;
 
     final PhotoReviewResult? result =
-        await showModalBottomSheet<PhotoReviewResult>(
+        await AppBottomSheet.show<PhotoReviewResult>(
           context: context,
           isScrollControlled: true,
           backgroundColor: AppColors.panelBackground,

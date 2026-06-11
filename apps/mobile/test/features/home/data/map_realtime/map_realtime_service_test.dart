@@ -54,6 +54,36 @@ void main() {
     ConnectivityGate.watch = origWatch;
   });
 
+  group('mapSseDeferReconnectForTokenRotation', () {
+    test('defers when live stream recently received bytes', () {
+      final DateTime now = DateTime.utc(2026, 6, 11, 12);
+      expect(
+        mapSseDeferReconnectForTokenRotation(
+          state: MapRealtimeConnectionState.live,
+          lastByteAt: now.subtract(const Duration(seconds: 30)),
+          newAccessToken: 'new',
+          tokenAtConnect: 'old',
+          now: now,
+        ),
+        isTrue,
+      );
+    });
+
+    test('does not defer when stream is stale', () {
+      final DateTime now = DateTime.utc(2026, 6, 11, 12);
+      expect(
+        mapSseDeferReconnectForTokenRotation(
+          state: MapRealtimeConnectionState.live,
+          lastByteAt: now.subtract(const Duration(seconds: 120)),
+          newAccessToken: 'new',
+          tokenAtConnect: 'old',
+          now: now,
+        ),
+        isFalse,
+      );
+    });
+  });
+
   test('connect reaches live and forwards site events', () async {
     final String eventJson = jsonEncode(<String, Object?>{
       'eventId': 'site-1:123:site_updated',
@@ -315,6 +345,124 @@ void main() {
     await Future<void>.delayed(Duration.zero);
     svc.setActive(false);
     await Future<void>.delayed(Duration.zero);
+    svc.dispose();
+  });
+
+  test('token rotation defers reconnect while live stream is healthy', () async {
+    int sends = 0;
+    final StreamController<List<int>> first = StreamController<List<int>>();
+    final http.Client client = MockClient.streaming((
+      http.BaseRequest request,
+      _,
+    ) async {
+      sends += 1;
+      return http.StreamedResponse(
+        first.stream,
+        200,
+        headers: <String, String>{'content-type': 'text/event-stream'},
+      );
+    });
+    final AuthState auth = AuthState()
+      ..setAuthenticated(
+        userId: 'u1',
+        displayName: 'Tester',
+        accessToken: 't1',
+      );
+    final MapRealtimeService svc = MapRealtimeService(
+      config: AppConfig.local,
+      authState: auth,
+      sessionRefresh: null,
+      httpClient: client,
+    );
+    final Completer<void> sawLive = Completer<void>();
+    late final StreamSubscription<MapRealtimeConnectionState> stateSub;
+    stateSub = svc.states.listen((MapRealtimeConnectionState s) {
+      if (s == MapRealtimeConnectionState.live && !sawLive.isCompleted) {
+        sawLive.complete();
+      }
+    });
+    svc.setActive(true);
+    await sawLive.future.timeout(const Duration(seconds: 2));
+    auth.setAuthenticated(
+      userId: 'u1',
+      displayName: 'Tester',
+      accessToken: 't2',
+    );
+    await Future<void>.delayed(const Duration(milliseconds: 100));
+    expect(sends, 1);
+    await stateSub.cancel();
+    await first.close();
+    svc.setActive(false);
+    svc.dispose();
+  });
+
+  test('429 applies extended backoff without auth rejection', () async {
+    var authRejectedCalls = 0;
+    int sends = 0;
+    final http.Client client = MockClient.streaming((
+      http.BaseRequest request,
+      _,
+    ) async {
+      sends += 1;
+      return http.StreamedResponse(const Stream<List<int>>.empty(), 429);
+    });
+    final AuthState auth = AuthState()
+      ..setAuthenticated(
+        userId: 'u1',
+        displayName: 'Tester',
+        accessToken: 't1',
+      );
+    final MapRealtimeService svc = MapRealtimeService(
+      config: AppConfig.local,
+      authState: auth,
+      sessionRefresh: null,
+      onAuthRejected: () => authRejectedCalls += 1,
+      httpClient: client,
+    );
+    svc.setActive(true);
+    await Future<void>.delayed(const Duration(milliseconds: 50));
+    expect(authRejectedCalls, 0);
+    expect(sends, greaterThanOrEqualTo(1));
+    svc.setActive(false);
+    svc.dispose();
+  });
+
+  test('SSE connects under /v1 prefix like REST ApiClient', () async {
+    Uri? capturedUri;
+    Map<String, String>? capturedHeaders;
+    final http.Client client = MockClient.streaming((
+      http.BaseRequest request,
+      _,
+    ) async {
+      capturedUri = request.url;
+      capturedHeaders = request.headers;
+      return http.StreamedResponse(
+        const Stream<List<int>>.empty(),
+        200,
+        headers: <String, String>{'content-type': 'text/event-stream'},
+      );
+    });
+    final AuthState auth = AuthState()
+      ..setAuthenticated(
+        userId: 'u1',
+        displayName: 'Tester',
+        accessToken: 't1',
+      );
+    final MapRealtimeService svc = MapRealtimeService(
+      config: AppConfig.local,
+      authState: auth,
+      sessionRefresh: null,
+      httpClient: client,
+    );
+    svc.setActive(true);
+    await Future<void>.delayed(Duration.zero);
+    await Future<void>.delayed(Duration.zero);
+
+    expect(capturedUri, isNotNull);
+    expect(capturedUri!.path, '/v1/sites/events');
+    expect(capturedHeaders?['accept-encoding'], 'identity');
+
+    svc.setActive(false);
     svc.dispose();
   });
 }

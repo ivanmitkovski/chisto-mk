@@ -52,7 +52,7 @@ class CommentsSheetCommentList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (comments.isEmpty) {
-      return const CommentsThreadEmptyState();
+      return CommentsThreadEmptyState(scrollController: scrollController);
     }
     final List<FlattenedComment> flattened = flattenCommentThread(
       comments,

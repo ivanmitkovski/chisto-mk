@@ -62,14 +62,23 @@ export class TwilioOtpSender implements OtpSender {
       } else if (this.fromNumber?.trim()) {
         params.from = this.fromNumber.trim();
       } else {
-        throw new ServiceUnavailableException('SMS sender not configured');
+        throw new ServiceUnavailableException({
+          code: 'OTP_SEND_FAILED',
+          message: 'SMS sender not configured',
+        });
       }
       await this.circuitBreaker.execute(async () => this.client.messages.create(params));
     } catch (err) {
       if (err instanceof CircuitBreakerOpenError) {
-        throw new ServiceUnavailableException('SMS gateway is temporarily unavailable');
+        throw new ServiceUnavailableException({
+          code: 'OTP_SEND_FAILED',
+          message: 'SMS gateway is temporarily unavailable',
+        });
       }
-      throw new ServiceUnavailableException('Unable to send verification code');
+      throw new ServiceUnavailableException({
+        code: 'OTP_SEND_FAILED',
+        message: 'Unable to send verification code',
+      });
     }
   }
 }

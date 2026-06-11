@@ -20,12 +20,11 @@ Future<void> showNewReportStageHelpModal(
     context,
   ).modalBarrierDismissLabel;
 
-  await showModalBottomSheet<void>(
+  await AppBottomSheet.show<void>(
     context: context,
     isScrollControlled: true,
     useSafeArea: false,
     backgroundColor: AppColors.transparent,
-    elevation: 0,
     barrierLabel: barrierLabel,
     builder: (BuildContext sheetContext) {
       final ReportStageConfig cfg = stage.config(sheetContext.l10n);

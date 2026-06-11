@@ -55,7 +55,7 @@ describe('SiteEngagementService', () => {
     });
   }
 
-  it('increments sharesCount only once across repeated events', async () => {
+  it('claims countedAt only once across repeated attribution events', async () => {
     const { service, prisma } = createService();
     const token = signedToken('site_a', 'cid_a');
     const expiresAt = new Date(Date.now() + 60_000);
@@ -90,7 +90,7 @@ describe('SiteEngagementService', () => {
 
     expect(first.counted).toBe(true);
     expect(second.counted).toBe(false);
-    expect(prisma.site.update).toHaveBeenCalledTimes(1);
+    expect(prisma.site.update).not.toHaveBeenCalled();
   });
 
   it('throws stable invalid-token code on signature mismatch', async () => {

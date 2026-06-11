@@ -1,5 +1,6 @@
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { JwtService } from '@nestjs/jwt';
 import { randomBytes } from 'crypto';
 import * as bcrypt from 'bcrypt';
@@ -7,14 +8,19 @@ import { User, UserSession, UserStatus } from '../../prisma-client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ReportsUploadService } from '../../reports/services/reports-upload.service';
 import { AuthResponse } from '../types/auth-response.type';
-import { AUTH_ENV_RUNTIME, REMEMBER_ME_SHORT_DAYS, type AuthEnvRuntime } from '../constants/auth-env.config';
+import { AUTH_ENV_RUNTIME, type AuthEnvRuntime } from '../constants/auth-env.config';
 import { AuthSessionRevocationService } from './auth-session-revocation.service';
 import type { AuthenticatedUser } from '../types/authenticated-user.type';
 import { buildAuthResponsePayload } from '../util/auth-response.factory';
 import { RefreshTokenRotationService } from './refresh-token-rotation.service';
 
 type SessionWithUser = UserSession & { user: User };
-type BuildAuthOptions = { deviceId?: string | undefined; sessionId?: string | undefined };
+type BuildAuthOptions = {
+  deviceId?: string | undefined;
+  sessionId?: string | undefined;
+  ipAddress?: string | null;
+  deviceInfo?: string | null;
+};
 
 @Injectable()
 export class AuthSessionService {
@@ -26,6 +32,7 @@ export class AuthSessionService {
     @Inject(AUTH_ENV_RUNTIME) private readonly env: AuthEnvRuntime,
     private readonly configService: ConfigService,
     private readonly rotation: RefreshTokenRotationService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async refresh(rawRefreshToken: string, deviceId?: string): Promise<AuthResponse> {
@@ -71,10 +78,10 @@ export class AuthSessionService {
     return this.rotation.rotateSessionInPlace(
       session,
       rawRefreshToken,
-      true,
+      session.rememberMe,
       deviceId,
       (user, sessionId, fullRefreshToken) =>
-        this.signAuthResponse(user, sessionId, fullRefreshToken),
+        this.signAuthResponse(user, sessionId, fullRefreshToken, {}, false),
       () => this.throwInvalidRefreshToken(),
     );
   }
@@ -112,7 +119,7 @@ export class AuthSessionService {
         include: { user: true },
       });
       if (existingSession) {
-        return this.issueTokensForExistingSession(existingSession, rememberMe, deviceId);
+        return this.issueTokensForExistingSession(existingSession, rememberMe, deviceId, options);
       }
     }
 
@@ -123,7 +130,7 @@ export class AuthSessionService {
         include: { user: true },
       });
       if (existingDeviceSession) {
-        return this.issueTokensForExistingSession(existingDeviceSession, rememberMe, deviceId);
+        return this.issueTokensForExistingSession(existingDeviceSession, rememberMe, deviceId, options);
       }
     }
 
@@ -134,7 +141,7 @@ export class AuthSessionService {
     const fullRefreshToken = `${tokenId}.${tokenSecret}`;
     const refreshTokenHash = await bcrypt.hash(fullRefreshToken, this.env.saltRounds);
 
-    const refreshDays = rememberMe ? this.env.refreshTokenTtlDays : REMEMBER_ME_SHORT_DAYS;
+    const refreshDays = rememberMe ? this.env.refreshTokenTtlDays : this.env.refreshTokenStandardDays;
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + refreshDays);
 
@@ -146,11 +153,12 @@ export class AuthSessionService {
         previousTokenHash: null,
         rotatedAt: null,
         deviceId: deviceId ?? null,
+        rememberMe,
         expiresAt,
       },
     });
 
-    return this.signAuthResponse(user, session.id, fullRefreshToken);
+    return this.signAuthResponse(user, session.id, fullRefreshToken, options, true);
   }
 
   async revokeOthersForCurrentUser(user: AuthenticatedUser): Promise<{ revoked: number }> {
@@ -161,6 +169,7 @@ export class AuthSessionService {
     session: SessionWithUser,
     rememberMe: boolean,
     deviceId?: string,
+    options: BuildAuthOptions = {},
   ): Promise<AuthResponse> {
     const tokenSecret = randomBytes(20).toString('hex');
     const fullRefreshToken = `${session.tokenId}.${tokenSecret}`;
@@ -173,11 +182,12 @@ export class AuthSessionService {
         previousTokenHash: null,
         rotatedAt: null,
         expiresAt,
+        rememberMe,
         revokedAt: null,
         ...(deviceId ? { deviceId } : {}),
       },
     });
-    return this.signAuthResponse(session.user, session.id, fullRefreshToken);
+    return this.signAuthResponse(session.user, session.id, fullRefreshToken, options, true);
   }
 
   private async enforceSessionCap(userId: string, incomingDeviceId: string | undefined): Promise<void> {
@@ -214,17 +224,29 @@ export class AuthSessionService {
     user: User,
     sessionId: string,
     fullRefreshToken: string,
+    options: BuildAuthOptions = {},
+    recordLoginEvent = false,
   ): Promise<AuthResponse> {
-    return buildAuthResponsePayload(user, sessionId, fullRefreshToken, {
+    const response = await buildAuthResponsePayload(user, sessionId, fullRefreshToken, {
       jwtService: this.jwtService,
       reportsUploadService: this.reportsUploadService,
       configService: this.configService,
       env: this.env,
     });
+    if (recordLoginEvent) {
+      this.eventEmitter.emit('user.login', {
+        userId: user.id,
+        sessionId,
+        deviceId: options.deviceId ?? null,
+        ipAddress: options.ipAddress ?? null,
+        deviceInfo: options.deviceInfo ?? null,
+      });
+    }
+    return response;
   }
 
   private refreshExpiresAt(rememberMe: boolean): Date {
-    const refreshDays = rememberMe ? this.env.refreshTokenTtlDays : REMEMBER_ME_SHORT_DAYS;
+    const refreshDays = rememberMe ? this.env.refreshTokenTtlDays : this.env.refreshTokenStandardDays;
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + refreshDays);
     return expiresAt;

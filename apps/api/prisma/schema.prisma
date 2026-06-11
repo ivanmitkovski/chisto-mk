@@ -50,6 +50,8 @@ model User {
   privacyAcceptedAt DateTime?
   deletedAt         DateTime?
   showOnLeaderboard Boolean @default(true)
+  /// Authoritative app UI locale for notifications (en | mk | sq).
+  locale            String?
 
   reports              Report[]             @relation("ReporterReports")
   moderatedReports     Report[]             @relation("ModeratorReports")
@@ -96,6 +98,8 @@ model User {
   blocksInitiated             UserBlock[]              @relation("BlockBlocker")
   blocksReceived              UserBlock[]              @relation("BlockBlocked")
   ugcReportsFiled             UgcContentReport[]       @relation("UgcReporter")
+  activityEvents              UserActivityEvent[]
+  adminAlertRulesCreated      AdminAlertRule[]         @relation("AdminAlertRuleCreator")
 
   @@index([role])
   @@index([status])
@@ -166,12 +170,99 @@ model UserSession {
   deviceId        String?
   deviceInfo       String?
   ipAddress        String?
+  lastSeenAt       DateTime?
+  platform         DevicePlatform?
+  appVersion       String?
+  deviceModel      String?
+  osVersion        String?
+  country          String?
+  city             String?
   expiresAt        DateTime
   revokedAt        DateTime?
+  rememberMe       Boolean  @default(true)
+
+  activityEvents   UserActivityEvent[]
 
   @@index([userId, revokedAt])
   @@index([userId, deviceId])
   @@index([expiresAt])
+  @@index([lastSeenAt])
+}
+
+enum UserActivityEventType {
+  LOGIN
+  LOGOUT
+  APP_OPENED
+  SCREEN_VIEW
+  REPORT_CREATED
+  REPORT_SUBMITTED
+  EVENT_JOINED
+  CHECK_IN
+}
+
+model UserActivityEvent {
+  id         String                @id @default(cuid())
+  userId     String
+  user       User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId  String?
+  session    UserSession?          @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  deviceId   String?
+  type       UserActivityEventType
+  screen     String?
+  metadata   Json?
+  platform   DevicePlatform?
+  appVersion String?
+  occurredAt DateTime              @default(now())
+  createdAt  DateTime              @default(now())
+
+  @@index([userId, occurredAt(sort: Desc)])
+  @@index([occurredAt(sort: Desc)])
+  @@index([type, occurredAt(sort: Desc)])
+}
+
+model DailyActiveStat {
+  id                 String   @id @default(cuid())
+  date               DateTime @unique @db.Date
+  dau                Int      @default(0)
+  wau                Int      @default(0)
+  mau                Int      @default(0)
+  peakConcurrent     Int      @default(0)
+  avgConcurrent      Float    @default(0)
+  sessionsStarted    Int      @default(0)
+  reportsSubmitted   Int      @default(0)
+  newRegistrations   Int      @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+enum AdminAlertMetric {
+  CONCURRENT
+  TRAFFIC_SPIKE
+  ERROR_RATE
+  REPORT_ACTIVITY
+  API_DEGRADATION
+}
+
+enum AdminAlertComparator {
+  GT
+  GTE
+}
+
+model AdminAlertRule {
+  id              String               @id @default(cuid())
+  metric          AdminAlertMetric
+  comparator      AdminAlertComparator @default(GT)
+  threshold       Float
+  windowSeconds   Int                  @default(300)
+  enabled         Boolean              @default(true)
+  lastTriggeredAt DateTime?
+  createdById     String?
+  createdBy       User?                @relation("AdminAlertRuleCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+
+  @@index([enabled])
+  @@index([metric])
 }
 
 model PhoneOtp {
@@ -436,6 +527,10 @@ model Site {
   mapProjection   MapSiteProjection?
   historyEntries  SiteHistoryEntry[]
 
+  /// Earliest APPROVED report with media — canonical image for feed, map, and detail.
+  heroReportId String? @unique
+  heroReport   Report? @relation("SiteHeroReport", fields: [heroReportId], references: [id], onDelete: SetNull)
+
   @@index([status])
   @@index([isArchivedByAdmin])
   @@index([status, isArchivedByAdmin, updatedAt])
@@ -533,6 +628,7 @@ model Report {
 
   coReporters ReportCoReporter[]
   submitIdempotencyKeys ReportSubmitIdempotency[]
+  heroForSite Site? @relation("SiteHeroReport")
 
   @@index([siteId])
   @@index([siteId, createdAt(sort: Desc)])
@@ -559,8 +655,8 @@ model ReportCoReporter {
   reportId String
   report   Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
 
-  userId   String
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId   String?
+  user     User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@unique([reportId, userId])
   @@index([userId])
@@ -862,8 +958,8 @@ model EventParticipant {
   eventId String
   event   CleanupEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
-  userId String
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String?
+  user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   reminderEnabled Boolean  @default(false)
   reminderAt      DateTime?
@@ -881,8 +977,8 @@ model EventChatMessage {
   eventId String
   event   CleanupEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
-  authorId String
-  author   User @relation("EventChatMessages", fields: [authorId], references: [id], onDelete: Cascade)
+  authorId String?
+  author   User? @relation("EventChatMessages", fields: [authorId], references: [id], onDelete: SetNull)
 
   body String @db.Text
 
@@ -989,7 +1085,7 @@ model EventCheckIn {
   dedupeKey String
 
   userId String?
-  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   guestDisplayName String?
 
@@ -1042,8 +1138,8 @@ model EventEvidencePhoto {
   kind       EventEvidenceKind
   objectKey  String
   caption    String?
-  uploadedById String
-  uploadedBy   User @relation(fields: [uploadedById], references: [id], onDelete: Cascade)
+  uploadedById String?
+  uploadedBy   User? @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
 
   @@index([eventId, kind, createdAt])
   @@index([uploadedById])
@@ -1118,8 +1214,8 @@ model SiteVote {
   siteId String
   site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
 
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@unique([siteId, userId])
   @@index([userId, createdAt])
@@ -1150,8 +1246,8 @@ model SiteComment {
   siteId String
   site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
 
-  authorId String
-  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId String?
+  author   User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
 
   parentId String?
   parent   SiteComment?  @relation("SiteCommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
@@ -1198,11 +1294,12 @@ model SiteShareEvent {
   siteId String
   site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
 
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   channel SiteShareChannel @default(native)
 
+  @@unique([siteId, userId])
   @@index([siteId, createdAt])
   @@index([userId, createdAt])
 }

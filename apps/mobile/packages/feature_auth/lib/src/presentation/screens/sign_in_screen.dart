@@ -10,10 +10,13 @@ import 'package:chisto_infrastructure/core/navigation/app_navigation.dart';
 import 'package:chisto_infrastructure/core/providers/app_providers.dart';
 import 'package:chisto_infrastructure/core/validation/macedonian_phone_formatter.dart';
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/shared/forms/field_error_mapping.dart';
+import 'package:chisto_infrastructure/shared/forms/form_validation_mixin.dart';
 import 'package:chisto_infrastructure/shared/utils/app_haptics.dart';
 import 'package:chisto_infrastructure/shared/widgets/widgets.dart';
 import 'package:design_system/design_system.dart';
 import 'package:feature_auth/src/application/sign_in_controller.dart';
+import 'package:feature_auth/src/data/user_home_location_store.dart';
 import 'package:feature_auth/src/presentation/constants/auth_error_messages.dart';
 import 'package:feature_auth/src/presentation/eula_acceptance_flow.dart';
 import 'package:feature_auth/src/presentation/utils/auth_guard_ui.dart';
@@ -32,7 +35,12 @@ class SignInScreen extends ConsumerStatefulWidget {
 }
 
 class _SignInScreenState extends ConsumerState<SignInScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, FormValidationMixin {
+  static const List<String> _fieldOrder = <String>[
+    FormFieldIds.phone,
+    FormFieldIds.password,
+  ];
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey _phoneFieldKey = GlobalKey();
   final GlobalKey _passwordFieldKey = GlobalKey();
@@ -41,8 +49,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
   final TextEditingController _passwordController = TextEditingController();
   final FocusNode _phoneFocus = FocusNode();
   final FocusNode _passwordFocus = FocusNode();
-  bool _hasSubmitted = false;
-  bool _hasValidationError = false;
   bool _phonePrefilled = false;
   late AnimationController _entranceController;
   late Animation<double> _entranceAnimation;
@@ -55,6 +61,16 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
     _passwordController.addListener(_onInputChanged);
     _phoneFocus.addListener(_scrollToFocusedField);
     _passwordFocus.addListener(_scrollToFocusedField);
+    registerFormField(
+      FormFieldIds.phone,
+      focusNode: _phoneFocus,
+      fieldKey: _phoneFieldKey,
+    );
+    registerFormField(
+      FormFieldIds.password,
+      focusNode: _passwordFocus,
+      fieldKey: _passwordFieldKey,
+    );
     _entranceController = AnimationController(
       vsync: this,
       duration: AppMotion.standard,
@@ -111,24 +127,37 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
 
   void _onInputChanged() {
     if (!mounted) return;
+    if (hasActiveValidation) {
+      _formKey.currentState?.validate();
+    }
     ref.read(signInControllerProvider.notifier).clearError();
+    clearServerFieldErrors();
     setState(() {});
   }
 
-  bool get _canSubmit =>
-      _phoneController.text.trim().replaceAll(RegExp(r'\D'), '').length == 8 &&
-      _passwordController.text.trim().isNotEmpty;
+  Map<String, String? Function()> _validators(AppLocalizations l10n) =>
+      <String, String? Function()>{
+        FormFieldIds.phone: () =>
+            AuthValidators.macedonianPhone(l10n, _phoneController.text),
+        FormFieldIds.password: () =>
+            AuthValidators.loginPassword(l10n, _passwordController.text),
+      };
 
   Future<void> _handleSignIn() async {
     if (ref.read(signInControllerProvider).isLoading) return;
-    final FormState? formState = _formKey.currentState;
-    setState(() => _hasSubmitted = true);
-    if (formState == null || !formState.validate()) {
-      AppHaptics.warning(context);
-      setState(() => _hasValidationError = true);
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    setState(() => submitAttempted = true);
+    await WidgetsBinding.instance.endOfFrame;
+    if (!mounted) return;
+    _formKey.currentState?.validate();
+    if (await handleInvalidSubmit(
+      context,
+      l10n,
+      _fieldOrder,
+      _validators(l10n),
+    )) {
       return;
     }
-    setState(() => _hasValidationError = false);
     final String phoneE164 = normalizeToE164(_phoneController.text);
     try {
       await ref
@@ -144,21 +173,43 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
         ref,
       );
       if (!accepted || !mounted) return;
-      AppNavigation.navigateToHome();
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
-        DeepLinkRouter.replayPendingAuthenticatedRoute(appGoRouter);
-      });
+      final UserHomeLocationStore homeStore = UserHomeLocationStore(
+        ref.read(preferencesProvider),
+        userId: ref.read(authStateProvider).userId,
+      );
+      if (homeStore.hasConfirmedHomeLocation) {
+        AppNavigation.navigateToHome();
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          DeepLinkRouter.replayPendingAuthenticatedRoute(appGoRouter);
+        });
+      } else {
+        AppNavigation.goLocation();
+      }
     } on AppError catch (e) {
       if (!mounted) return;
       if (e.code == 'PHONE_NOT_VERIFIED') {
         ref.read(signInControllerProvider.notifier).clearError();
         final bool verify = await showPhoneNotVerifiedDialog(context);
         if (verify && mounted) {
-          await pushPhoneVerificationOtp(context, phoneE164);
+          startPhoneVerificationOtp(
+            phoneE164,
+            rememberMe: ref.read(signInControllerProvider).rememberMe,
+          );
         }
         return;
       }
+      final Map<String, String> fieldErrors = fieldErrorsFromAppError(e, l10n);
+      if (fieldErrors.isNotEmpty) {
+        setServerFieldErrors(fieldErrors);
+        _formKey.currentState?.validate();
+        await focusAndScrollToFirstInvalid(
+          context,
+          _fieldOrder,
+          _validators(l10n),
+        );
+      }
+      AppHaptics.warning(context);
     }
   }
 
@@ -177,7 +228,11 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
     final SignInState signInState = ref.watch(signInControllerProvider);
     final bool isLoading = signInState.isLoading;
     final String? apiError = signInState.error != null
-        ? messageForAuthError(l10n, signInState.error!)
+        ? authBannerMessageForError(
+            l10n,
+            signInState.error!,
+            displayedFieldIds: registeredFieldIds,
+          )
         : null;
 
     if (!_phonePrefilled && signInState.lastPhoneNational != null) {
@@ -202,50 +257,38 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
               ),
             ),
           ),
-          body: LayoutBuilder(
-            builder: (BuildContext context, BoxConstraints constraints) {
-              return AuthFormScaffold(
-                scrollController: _scrollController,
-                physics: const BouncingScrollPhysics(
-                  parent: AlwaysScrollableScrollPhysics(),
-                ),
-                padding: EdgeInsets.fromLTRB(
-                  AppSpacing.lg,
-                  AppSpacing.xl,
-                  AppSpacing.lg,
-                  AppSpacing.xl + keyboardInset,
-                ),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight - AppSpacing.xl,
-                  ),
-                  child: IntrinsicHeight(
-                    child: FadeTransition(
-                      opacity: _entranceAnimation,
-                      child: SlideTransition(
-                        position:
-                            Tween<Offset>(
-                              begin: const Offset(0, 0.06),
-                              end: Offset.zero,
-                            ).animate(
-                              CurvedAnimation(
-                                parent: _entranceController,
-                                curve: const Interval(
-                                  0.15,
-                                  1,
-                                  curve: Curves.easeOut,
-                                ),
-                              ),
-                            ),
-                        child: AutofillGroup(
-                          child: Form(
-                            key: _formKey,
-                            autovalidateMode: _hasSubmitted
-                                ? AutovalidateMode.onUserInteraction
-                                : AutovalidateMode.disabled,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: <Widget>[
+          body: AuthFormScaffold(
+            scrollController: _scrollController,
+            padding: EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              AppSpacing.xl,
+              AppSpacing.lg,
+              AppSpacing.xl + keyboardInset,
+            ),
+            child: FadeTransition(
+              opacity: _entranceAnimation,
+              child: SlideTransition(
+                position:
+                    Tween<Offset>(
+                      begin: const Offset(0, 0.06),
+                      end: Offset.zero,
+                    ).animate(
+                      CurvedAnimation(
+                        parent: _entranceController,
+                        curve: const Interval(
+                          0.15,
+                          1,
+                          curve: Curves.easeOut,
+                        ),
+                      ),
+                    ),
+                child: AutofillGroup(
+                  child: Form(
+                    key: _formKey,
+                    autovalidateMode: AutovalidateMode.disabled,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
                                 if (apiError != null) ...[
                                   ApiErrorBanner(
                                     message: apiError,
@@ -274,8 +317,11 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
                                   ],
                                   onFieldSubmitted: (_) =>
                                       _passwordFocus.requestFocus(),
-                                  validator: (String? v) =>
-                                      AuthValidators.macedonianPhone(l10n, v),
+                                  validator: (String? v) => validateIfVisible(
+                                    FormFieldIds.phone,
+                                    () =>
+                                        AuthValidators.macedonianPhone(l10n, v),
+                                  ),
                                   inputFormatters: const <TextInputFormatter>[
                                     MacedonianPhoneFormatter(),
                                   ],
@@ -289,8 +335,10 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
                                   hintText: l10n.authFieldPasswordHint,
                                   obscureText: true,
                                   keyboardType: TextInputType.visiblePassword,
-                                  validator: (String? v) =>
-                                      AuthValidators.password(l10n, v),
+                                  validator: (String? v) => validateIfVisible(
+                                    FormFieldIds.password,
+                                    () => AuthValidators.loginPassword(l10n, v),
+                                  ),
                                   textInputAction: TextInputAction.done,
                                   autofillHints: const <String>[
                                     AutofillHints.password,
@@ -311,66 +359,12 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
                                   onForgotPassword: _handleForgotPassword,
                                 ),
                                 const SizedBox(height: AppSpacing.lg),
-                                AnimatedSwitcher(
-                                  duration: AppMotion.fast,
-                                  switchInCurve: AppMotion.emphasized,
-                                  switchOutCurve: AppMotion.emphasized,
-                                  transitionBuilder:
-                                      (
-                                        Widget child,
-                                        Animation<double> animation,
-                                      ) => SizeTransition(
-                                        sizeFactor: animation,
-                                        axisAlignment: -1,
-                                        child: FadeTransition(
-                                          opacity: animation,
-                                          child: child,
-                                        ),
-                                      ),
-                                  child: _hasValidationError
-                                      ? Padding(
-                                          key: const ValueKey<bool>(true),
-                                          padding: const EdgeInsets.only(
-                                            bottom: AppSpacing.sm,
-                                          ),
-                                          child: Row(
-                                            children: <Widget>[
-                                              const Icon(
-                                                CupertinoIcons
-                                                    .exclamationmark_circle_fill,
-                                                size: 18,
-                                                color: AppColors.accentDanger,
-                                              ),
-                                              const SizedBox(
-                                                width: AppSpacing.xs,
-                                              ),
-                                              Expanded(
-                                                child: Text(
-                                                  l10n.authValidationCheckPhonePassword,
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .bodySmall
-                                                      ?.copyWith(
-                                                        color: AppColors
-                                                            .accentDanger,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                      ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        )
-                                      : const SizedBox.shrink(
-                                          key: ValueKey<bool>(false),
-                                        ),
-                                ),
                                 Semantics(
                                   button: true,
                                   label: l10n.authSignInCta,
                                   child: AppButton.primary(
                                     label: l10n.authSignInCta,
-                                    enabled: _canSubmit && !isLoading,
+                                    enabled: !isLoading,
                                     onPressed: isLoading ? null : _handleSignIn,
                                   ),
                                 ),
@@ -477,16 +471,12 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
                                     );
                                   },
                                 ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
+                      ],
                     ),
                   ),
                 ),
-              );
-            },
+              ),
+            ),
           ),
         ),
         LoadingOverlay(visible: isLoading),

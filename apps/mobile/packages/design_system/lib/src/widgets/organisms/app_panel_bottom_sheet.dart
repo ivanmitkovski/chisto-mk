@@ -1,15 +1,27 @@
-import 'package:design_system/src/theme/app_colors.dart';
-import 'package:design_system/src/theme/app_motion.dart';
-import 'package:design_system/src/theme/app_spacing.dart';
+import 'dart:async';
+
+import 'package:design_system/src/widgets/organisms/app_bottom_sheet/app_bottom_sheet.dart';
 import 'package:flutter/material.dart';
+
+/// How a scroll-controlled sheet reacts when the software keyboard opens.
+enum SheetKeyboardInsetMode {
+  /// Lifts the whole sheet above the keyboard (forms with pinned footers).
+  lift,
+
+  /// Keeps sheet height stable; keyboard overlays; child scrolls internally.
+  overlay,
+}
 
 /// Wraps [child] so a scroll-controlled modal sizes to content up to [maxHeight].
 Widget wrapScrollControlledBottomSheet({
   required BuildContext context,
   required Widget child,
   double? maxHeight,
+  SheetKeyboardInsetMode keyboardInsetMode = SheetKeyboardInsetMode.lift,
 }) {
-  final double keyboardBottom = MediaQuery.viewInsetsOf(context).bottom;
+  final double keyboardBottom = keyboardInsetMode == SheetKeyboardInsetMode.lift
+      ? MediaQuery.viewInsetsOf(context).bottom
+      : 0;
 
   return Padding(
     padding: EdgeInsets.only(bottom: keyboardBottom),
@@ -32,6 +44,8 @@ Widget wrapScrollControlledBottomSheet({
   );
 }
 
+/// @deprecated Use [AppBottomSheet.show] instead.
+@Deprecated('Use AppBottomSheet.show instead.')
 Future<T?> showAppPanelBottomSheet<T>({
   required BuildContext context,
   required WidgetBuilder builder,
@@ -41,39 +55,23 @@ Future<T?> showAppPanelBottomSheet<T>({
   double? maxHeightFactor,
   Color? backgroundColor,
   Color? barrierColor,
+  SheetKeyboardInsetMode keyboardInsetMode = SheetKeyboardInsetMode.lift,
+  bool dismissible = true,
+  FutureOr<bool> Function()? canDismiss,
+  String? barrierLabel,
 }) {
-  final MediaQueryData mq = MediaQuery.of(context);
-  final double? maxHeight = maxHeightFactor == null
-      ? null
-      : (mq.size.height - mq.padding.top) * maxHeightFactor;
-
-  return showModalBottomSheet<T>(
+  return AppBottomSheet.show<T>(
     context: context,
-    sheetAnimationStyle: const AnimationStyle(
-      duration: AppMotion.standard,
-      curve: AppMotion.smooth,
-    ),
+    builder: builder,
     isScrollControlled: isScrollControlled,
     useSafeArea: useSafeArea,
     useRootNavigator: useRootNavigator,
-    backgroundColor: backgroundColor ?? AppColors.panelBackground,
+    maxHeightFactor: maxHeightFactor,
+    backgroundColor: backgroundColor,
     barrierColor: barrierColor,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(
-        top: Radius.circular(AppSpacing.radiusSheet),
-      ),
-    ),
-    clipBehavior: Clip.antiAlias,
-    elevation: 0,
-    constraints: maxHeight == null
-        ? null
-        : BoxConstraints(maxHeight: maxHeight),
-    builder: (BuildContext sheetContext) {
-      return wrapScrollControlledBottomSheet(
-        context: sheetContext,
-        maxHeight: maxHeight,
-        child: builder(sheetContext),
-      );
-    },
+    keyboardInsetMode: keyboardInsetMode,
+    dismissible: dismissible,
+    canDismiss: canDismiss,
+    barrierLabel: barrierLabel,
   );
 }

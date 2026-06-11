@@ -59,13 +59,13 @@ class ChatConnectionBanner extends StatelessWidget {
     final String text;
 
     if (networkOffline || disconnected) {
-      bg = AppColors.accentDanger.withValues(alpha: 0.10);
+      bg = AppColors.error.withValues(alpha: 0.10);
       icon = Icons.cloud_off_outlined;
-      text = context.l10n.errorUserNetwork;
+      text = context.l10n.connectionOfflineBanner;
     } else if (reconnecting) {
       bg = AppColors.accentWarning.withValues(alpha: 0.10);
       icon = Icons.sync;
-      text = context.l10n.eventChatReconnecting;
+      text = context.l10n.connectionReconnectingBanner;
     } else {
       bg = AppColors.primary.withValues(alpha: 0.08);
       icon = Icons.check_circle_outline;

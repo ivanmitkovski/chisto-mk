@@ -12,7 +12,7 @@ Future<void> showEventLocationDetailSheet(
   BuildContext context, {
   required EcoEvent event,
 }) {
-  return showModalBottomSheet<void>(
+  return AppBottomSheet.show<void>(
     context: context,
     isScrollControlled: true,
     backgroundColor: AppColors.transparent,

@@ -52,7 +52,9 @@ class _ChatEmptyStateState extends State<ChatEmptyState>
         final double s = 1.0 + _pulse.value * 0.04;
         return Transform.scale(scale: s, child: child);
       },
-      child: const AppEmptyStateIcon(icon: CupertinoIcons.bubble_left_bubble_right),
+      child: const AppEmptyStateIcon(
+        icon: CupertinoIcons.bubble_left_bubble_right,
+      ),
     );
 
     return Center(

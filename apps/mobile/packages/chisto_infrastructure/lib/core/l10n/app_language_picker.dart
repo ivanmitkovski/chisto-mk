@@ -10,7 +10,7 @@ export 'package:chisto_localization/core/l10n/app_language_picker_widgets.dart';
 
 /// Modal sheet to change app language (same options as profile language).
 Future<void> showAppLanguagePicker(BuildContext context) async {
-  await showModalBottomSheet<void>(
+  await AppBottomSheet.show<void>(
     context: context,
     backgroundColor: Colors.transparent,
     builder: (BuildContext sheetContext) {

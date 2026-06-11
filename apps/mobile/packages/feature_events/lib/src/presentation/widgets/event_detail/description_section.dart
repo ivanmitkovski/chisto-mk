@@ -17,10 +17,10 @@ class DescriptionSection extends StatefulWidget {
 class _DescriptionSectionState extends State<DescriptionSection> {
   static const int _collapsedMaxLines = 5;
   bool _expanded = false;
-  bool _needsExpansion = false;
 
   // Cache the last width used to avoid redundant TextPainter runs.
   double? _lastMeasuredWidth;
+  bool _needsExpansion = false;
 
   @override
   void didChangeDependencies() {
@@ -31,9 +31,9 @@ class _DescriptionSectionState extends State<DescriptionSection> {
     _lastMeasuredWidth = null;
   }
 
-  void _checkOverflow(double availableWidth) {
+  bool _needsExpansionForWidth(double availableWidth) {
     if (_lastMeasuredWidth == availableWidth) {
-      return;
+      return _needsExpansion;
     }
     _lastMeasuredWidth = availableWidth;
 
@@ -48,10 +48,8 @@ class _DescriptionSectionState extends State<DescriptionSection> {
       textScaler: MediaQuery.textScalerOf(context),
     )..layout(maxWidth: availableWidth);
 
-    final bool overflows = tp.didExceedMaxLines;
-    if (overflows != _needsExpansion) {
-      setState(() => _needsExpansion = overflows);
-    }
+    _needsExpansion = tp.didExceedMaxLines;
+    return _needsExpansion;
   }
 
   @override
@@ -63,7 +61,8 @@ class _DescriptionSectionState extends State<DescriptionSection> {
         LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
             // Use exact available width — no MediaQuery arithmetic guessing.
-            _checkOverflow(constraints.maxWidth);
+            final bool needsExpansion =
+                _needsExpansionForWidth(constraints.maxWidth);
 
             final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
 
@@ -90,7 +89,7 @@ class _DescriptionSectionState extends State<DescriptionSection> {
                     ),
                   ),
                 ),
-                if (_needsExpansion)
+                if (needsExpansion)
                   CupertinoButton(
                     padding: const EdgeInsets.only(top: AppSpacing.xs),
                     minimumSize: const Size(44, 44),

@@ -5,7 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 void showCreateEventHelpSheet(BuildContext context) {
-  showEventsSurfaceModal<void>(
+  AppBottomSheet.show<void>(
     context: context,
     builder: (BuildContext ctx) {
       final TextTheme textTheme = Theme.of(ctx).textTheme;
@@ -27,12 +27,10 @@ void showCreateEventHelpSheet(BuildContext context) {
           AppSpacing.lg,
           0,
         ),
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
               _HelpInfoRow(
                 icon: Icons.verified_outlined,
                 text: ctx.l10n.createEventHelpBulletModeration,
@@ -65,7 +63,6 @@ void showCreateEventHelpSheet(BuildContext context) {
               ),
             ],
           ),
-        ),
       );
     },
   );

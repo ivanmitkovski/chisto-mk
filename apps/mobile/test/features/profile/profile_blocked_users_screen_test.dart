@@ -12,7 +12,7 @@ class _BlocksApiClient extends ApiClient {
     : super(
         config: AppConfig.dev,
         accessToken: () => 'token',
-        onUnauthorized: () {},
+        onUnauthorized: (_) {},
       );
 
   final String body;

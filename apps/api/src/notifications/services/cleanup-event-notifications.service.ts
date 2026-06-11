@@ -237,7 +237,9 @@ export class CleanupEventNotificationsService {
 
     const ids = new Set<string>();
     for (const r of savers) {
-      ids.add(r.userId);
+      if (r.userId != null) {
+        ids.add(r.userId);
+      }
     }
     for (const r of reports) {
       if (r.reporterId != null) {
@@ -245,10 +247,14 @@ export class CleanupEventNotificationsService {
       }
     }
     for (const r of coAuthors) {
-      ids.add(r.userId);
+      if (r.userId != null) {
+        ids.add(r.userId);
+      }
     }
     for (const r of participants) {
-      ids.add(r.userId);
+      if (r.userId != null) {
+        ids.add(r.userId);
+      }
     }
     if (organizerId != null) {
       ids.delete(organizerId);

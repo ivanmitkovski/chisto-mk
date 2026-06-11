@@ -7,7 +7,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Role, UserStatus } from '../../prisma-client';
-import { ExtractJwt, Strategy } from 'passport-jwt';
+import { ExtractJwt, Strategy, type StrategyOptionsWithoutRequest } from 'passport-jwt';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuthenticatedUser } from '../types/authenticated-user.type';
 import { UserAuthSnapshotCacheService } from '../services/user-auth-snapshot-cache.service';
@@ -45,9 +45,17 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       });
     }
 
+    const clockToleranceRaw = configService?.get<string>('JWT_CLOCK_TOLERANCE_SECONDS');
+    const clockToleranceSeconds = clockToleranceRaw ? Number(clockToleranceRaw) : 30;
+    const clockTolerance =
+      Number.isFinite(clockToleranceSeconds) && clockToleranceSeconds >= 0
+        ? clockToleranceSeconds
+        : 30;
+
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
+      clockTolerance,
       secretOrKeyProvider: (
         _request: unknown,
         rawJwtToken: string,
@@ -66,7 +74,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       algorithms: ['HS256'],
       issuer: 'chisto-api',
       audience: 'chisto-api',
-    });
+    } as StrategyOptionsWithoutRequest & { clockTolerance: number });
   }
 
   async validate(payload: JwtPayload): Promise<AuthenticatedUser> {

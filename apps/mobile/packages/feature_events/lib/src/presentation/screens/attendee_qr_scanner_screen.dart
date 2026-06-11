@@ -446,7 +446,7 @@ class _AttendeeQrScannerScreenState
 
   Future<void> _openManualEntry() async {
     _manualCodeController.clear();
-    final bool? submit = await showModalBottomSheet<bool>(
+    final bool? submit = await AppBottomSheet.show<bool>(
       context: context,
       isScrollControlled: true,
       useSafeArea: false,

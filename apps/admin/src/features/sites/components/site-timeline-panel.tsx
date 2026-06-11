@@ -40,6 +40,7 @@ type SiteTimelinePanelProps = {
 
 export function SiteTimelinePanel({ siteId, refreshToken = 0 }: SiteTimelinePanelProps) {
   const t = useTranslations('sites');
+  const tUsers = useTranslations('users');
   const locale = useAdminBcp47Locale();
   const [entries, setEntries] = useState<SiteHistoryEntryRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -102,8 +103,14 @@ export function SiteTimelinePanel({ siteId, refreshToken = 0 }: SiteTimelinePane
                   <time>{formatDateTime(entry.occurredAt)}</time>
                 </div>
                 {entry.note ? <p>{entry.note}</p> : null}
-                {entry.actor?.displayName ? (
-                  <span>{t('detail.timelineBy', { name: entry.actor.displayName })}</span>
+                {entry.actor != null ? (
+                  <span>
+                    {t('detail.timelineBy', {
+                      name: entry.actor.isDeleted
+                        ? tUsers('deletedUser')
+                        : (entry.actor.displayName ?? tUsers('deletedUser')),
+                    })}
+                  </span>
                 ) : null}
               </div>
             </li>

@@ -9,13 +9,17 @@ class EventCalendar extends StatefulWidget {
     required this.selectedDate,
     required this.onDateSelected,
 
-    /// First calendar day that may be selected (inclusive). Earlier days are disabled.
+    /// First calendar day that may be selected (inclusive). When null, defaults to today.
     this.minimumSelectableDate,
+
+    /// Last calendar day that may be selected (inclusive). When null, unbounded.
+    this.maximumSelectableDate,
   });
 
   final DateTime? selectedDate;
   final ValueChanged<DateTime> onDateSelected;
   final DateTime? minimumSelectableDate;
+  final DateTime? maximumSelectableDate;
 
   @override
   State<EventCalendar> createState() => _EventCalendarState();
@@ -25,6 +29,26 @@ class _EventCalendarState extends State<EventCalendar> {
   late DateTime _focusedMonth;
 
   DateTime get _today => DateUtils.dateOnly(DateTime.now());
+
+  DateTime get _firstSelectable =>
+      DateUtils.dateOnly(widget.minimumSelectableDate ?? _today);
+
+  DateTime? get _lastSelectable {
+    final DateTime? max = widget.maximumSelectableDate;
+    return max != null ? DateUtils.dateOnly(max) : null;
+  }
+
+  bool _isSelectable(DateTime date) {
+    final DateTime day = DateUtils.dateOnly(date);
+    if (day.isBefore(_firstSelectable)) {
+      return false;
+    }
+    final DateTime? last = _lastSelectable;
+    if (last != null && day.isAfter(last)) {
+      return false;
+    }
+    return true;
+  }
 
   @override
   void initState() {
@@ -57,12 +81,28 @@ class _EventCalendarState extends State<EventCalendar> {
   }
 
   bool get _canGoToPreviousMonth {
-    final DateTime firstAllowed = DateTime(_today.year, _today.month);
+    final DateTime firstAllowed = DateTime(
+      _firstSelectable.year,
+      _firstSelectable.month,
+    );
     final DateTime candidate = DateTime(
       _focusedMonth.year,
       _focusedMonth.month - 1,
     );
     return !candidate.isBefore(firstAllowed);
+  }
+
+  bool get _canGoToNextMonth {
+    final DateTime? last = _lastSelectable;
+    if (last == null) {
+      return true;
+    }
+    final DateTime lastAllowed = DateTime(last.year, last.month);
+    final DateTime candidate = DateTime(
+      _focusedMonth.year,
+      _focusedMonth.month + 1,
+    );
+    return !candidate.isAfter(lastAllowed);
   }
 
   void _goToPreviousMonth() {
@@ -75,6 +115,9 @@ class _EventCalendarState extends State<EventCalendar> {
   }
 
   void _goToNextMonth() {
+    if (!_canGoToNextMonth) {
+      return;
+    }
     setState(() {
       _focusedMonth = DateTime(_focusedMonth.year, _focusedMonth.month + 1);
     });
@@ -179,16 +222,18 @@ class _EventCalendarState extends State<EventCalendar> {
         ),
         const SizedBox(width: AppSpacing.md),
         Semantics(
-          button: true,
+          button: _canGoToNextMonth,
           label: context.l10n.eventsCalendarNextMonth,
           child: IconButton(
-            onPressed: _goToNextMonth,
+            onPressed: _canGoToNextMonth ? _goToNextMonth : null,
             splashRadius: 20,
             tooltip: context.l10n.eventsCalendarNextMonth,
-            icon: const Icon(
+            icon: Icon(
               CupertinoIcons.chevron_right_circle_fill,
               size: 28,
-              color: AppColors.primary,
+              color: _canGoToNextMonth
+                  ? AppColors.primary
+                  : AppColors.textMuted.withValues(alpha: 0.35),
             ),
           ),
         ),
@@ -234,23 +279,19 @@ class _EventCalendarState extends State<EventCalendar> {
           final bool isSelected =
               widget.selectedDate != null &&
               _isSameDay(date, widget.selectedDate!);
-          final bool isPast = date.isBefore(_today);
-          final DateTime? minSel = widget.minimumSelectableDate;
-          final bool beforeMin =
-              minSel != null &&
-              DateUtils.dateOnly(date).isBefore(DateUtils.dateOnly(minSel));
+          final bool selectable = _isSelectable(date);
 
           return Expanded(
             child: Semantics(
-              button: !((isPast && !isToday) || beforeMin),
+              button: selectable,
               selected: isSelected,
               label: context.l10n.eventsCalendarDaySemantic(date.day),
               child: InkWell(
-                onTap: ((isPast && !isToday) || beforeMin)
-                    ? null
-                    : () {
+                onTap: selectable
+                    ? () {
                         widget.onDateSelected(date);
-                      },
+                      }
+                    : null,
                 customBorder: const CircleBorder(),
                 child: AnimatedContainer(
                   duration: MediaQuery.disableAnimationsOf(context)
@@ -277,7 +318,7 @@ class _EventCalendarState extends State<EventCalendar> {
                         inMonth: inMonth,
                         isSelected: isSelected,
                         isToday: isToday,
-                        isPast: isPast || beforeMin,
+                        isDisabled: !selectable,
                       ),
                     ),
                   ),
@@ -294,12 +335,12 @@ class _EventCalendarState extends State<EventCalendar> {
     required bool inMonth,
     required bool isSelected,
     required bool isToday,
-    required bool isPast,
+    required bool isDisabled,
   }) {
     if (isSelected) return AppColors.white;
     if (!inMonth) return AppColors.textMuted.withValues(alpha: 0.35);
     if (isToday) return AppColors.primaryDark;
-    if (isPast) return AppColors.textMuted.withValues(alpha: 0.5);
+    if (isDisabled) return AppColors.textMuted.withValues(alpha: 0.5);
     return AppColors.textPrimary;
   }
 }

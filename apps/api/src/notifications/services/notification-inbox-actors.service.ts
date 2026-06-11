@@ -3,6 +3,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { ReportsUploadService } from '../../reports/services/reports-upload.service';
 import { NotificationActorDto } from '../dto/notification-actor.dto';
 import { extractActorUserId } from '../util/notification-inbox.mapper';
+import { resolveActorIdentity } from '../../common/projections/public-identity.projection';
 
 @Injectable()
 export class NotificationInboxActorsService {
@@ -30,6 +31,7 @@ export class NotificationInboxActorsService {
         firstName: true,
         lastName: true,
         avatarObjectKey: true,
+        status: true,
       },
     });
 
@@ -50,7 +52,8 @@ export class NotificationInboxActorsService {
 
     const result = new Map<string, NotificationActorDto>();
     for (const user of users) {
-      const displayName = `${user.firstName} ${user.lastName}`.trim() || user.id;
+      const identity = resolveActorIdentity(user, { actorUserId: user.id });
+      const displayName = identity.displayName ?? 'Anonymous';
       const key = user.avatarObjectKey?.trim();
       const avatarUrl =
         key != null && key.length > 0 ? (avatarUrlByKey.get(key) ?? null) : null;

@@ -20,6 +20,9 @@ export class SiteCommentTreeNodeResponseDto {
   @ApiProperty()
   authorName!: string;
 
+  @ApiProperty()
+  authorIsDeleted!: boolean;
+
   @ApiProperty({ required: false, nullable: true })
   authorAvatarUrl?: string | null;
 

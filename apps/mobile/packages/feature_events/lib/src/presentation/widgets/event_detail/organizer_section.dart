@@ -1,4 +1,5 @@
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
+import 'package:chisto_infrastructure/shared/utils/civic_actor_display.dart';
 import 'package:chisto_infrastructure/shared/widgets/organisms/app_surface/report_surface_aliases.dart';
 import 'package:design_system/design_system.dart';
 import 'package:feature_events/src/domain/models/eco_event.dart';
@@ -10,22 +11,30 @@ class OrganizerSection extends StatelessWidget {
 
   final EcoEvent event;
 
+  String _organizerLabel(BuildContext context) {
+    return civicActorDisplayLabel(
+      context.l10n,
+      displayName: event.organizerName,
+      isDeleted: event.organizerIsDeleted,
+    );
+  }
+
   void _showOrganizerInfo(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
-    showModalBottomSheet<void>(
+    final String organizerLabel = _organizerLabel(context);
+    AppBottomSheet.show<void>(
       context: context,
       backgroundColor: AppColors.transparent,
       builder: (BuildContext ctx) {
         return ReportSheetScaffold(
           title: ctx.l10n.eventsOrganizerSheetTitle,
-          subtitle: event.organizerName,
+          subtitle: organizerLabel,
           fitToContent: true,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               UserAvatarCircle(
-                displayName: event.organizerName,
-                imageUrl: event.organizerAvatarUrl,
+                displayName: organizerLabel,
+                imageUrl: event.organizerIsDeleted ? null : event.organizerAvatarUrl,
                 size: 64,
                 seed: event.organizerId,
               ),
@@ -76,10 +85,11 @@ class OrganizerSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
+    final String organizerLabel = _organizerLabel(context);
 
     return Semantics(
       button: true,
-      label: context.l10n.eventsOrganizerSemantic(event.organizerName),
+      label: context.l10n.eventsOrganizerSemantic(organizerLabel),
       child: Material(
         color: AppColors.transparent,
         child: InkWell(
@@ -90,8 +100,8 @@ class OrganizerSection extends StatelessWidget {
             child: Row(
               children: <Widget>[
                 UserAvatarCircle(
-                  displayName: event.organizerName,
-                  imageUrl: event.organizerAvatarUrl,
+                  displayName: organizerLabel,
+                  imageUrl: event.organizerIsDeleted ? null : event.organizerAvatarUrl,
                   size: 40,
                   seed: event.organizerId,
                 ),
@@ -105,7 +115,7 @@ class OrganizerSection extends StatelessWidget {
                         style: AppTypography.eventsListCardMeta(textTheme),
                       ),
                       Text(
-                        event.organizerName,
+                        organizerLabel,
                         style: AppTypography.eventsGroupedRowPrimary(textTheme),
                       ),
                     ],

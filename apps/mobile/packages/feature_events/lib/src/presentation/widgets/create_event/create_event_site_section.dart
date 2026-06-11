@@ -12,20 +12,19 @@ class CreateEventSiteSection extends StatelessWidget {
     super.key,
     required this.sectionKey,
     required this.site,
-    required this.showValidationErrors,
+    required this.showError,
     required this.onSelectSiteTap,
     required this.onMapPreviewTap,
   });
 
   final Key sectionKey;
   final EventSiteSummary? site;
-  final bool showValidationErrors;
+  final bool showError;
   final Future<void> Function() onSelectSiteTap;
   final Future<void> Function() onMapPreviewTap;
 
   @override
   Widget build(BuildContext context) {
-    final bool hasError = showValidationErrors && site == null;
     final bool hasCoords =
         site != null && site!.latitude != null && site!.longitude != null;
 
@@ -44,13 +43,13 @@ class CreateEventSiteSection extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(AppSpacing.md),
           decoration: BoxDecoration(
-            color: hasError
-                ? AppColors.accentDanger.withValues(alpha: 0.04)
+            color: showError
+                ? AppColors.error.withValues(alpha: 0.04)
                 : AppColors.panelBackground,
             borderRadius: BorderRadius.circular(AppSpacing.radius18),
             border: Border.all(
-              color: hasError
-                  ? AppColors.accentDanger
+              color: showError
+                  ? AppColors.error
                   : site == null
                   ? AppColors.divider
                   : AppColors.primary.withValues(alpha: 0.3),
@@ -151,14 +150,14 @@ class CreateEventSiteSection extends StatelessWidget {
             ],
           ),
         ),
-        if (hasError)
+        if (showError)
           Padding(
             padding: const EdgeInsets.only(top: AppSpacing.xs),
             child: Text(
               context.l10n.createEventSiteRequiredError,
               style: AppTypography.eventsCaptionStrong(
                 Theme.of(context).textTheme,
-                color: AppColors.accentDanger,
+                color: AppColors.error,
               ).copyWith(fontWeight: FontWeight.w500),
             ),
           ),

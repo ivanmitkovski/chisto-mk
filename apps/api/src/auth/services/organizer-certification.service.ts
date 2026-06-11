@@ -4,10 +4,12 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { JwtService } from '@nestjs/jwt';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 import { PrismaService } from '../../prisma/prisma.service';
-import { EcoEventPointsService } from '../../gamification/services/eco-event-points.service';
+import { EcoEventPointsService, type EcoEventPointsCreditResult } from '../../gamification/services/eco-event-points.service';
+import { emitGamificationPointsCredited } from '../../gamification/util/gamification-credit-events.util';
 import {
   POINTS_ORGANIZER_CERTIFIED,
   REASON_ORGANIZER_CERTIFIED,
@@ -37,6 +39,7 @@ export class OrganizerCertificationService {
     private readonly prisma: PrismaService,
     private readonly ecoEventPoints: EcoEventPointsService,
     private readonly jwtService: JwtService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async getQuiz(userId: string, acceptLanguage: string): Promise<{
@@ -118,12 +121,17 @@ export class OrganizerCertificationService {
 
     const now = new Date();
     let pointsAwarded = 0;
+    let credit: EcoEventPointsCreditResult = {
+      granted: 0,
+      totalPointsEarnedBefore: 0,
+      totalPointsEarnedAfter: 0,
+    };
     await this.prisma.$transaction(async (tx) => {
       await tx.user.update({
         where: { id: userId },
         data: { organizerCertifiedAt: now },
       });
-      pointsAwarded = await this.ecoEventPoints.creditIfNew(tx, {
+      credit = await this.ecoEventPoints.creditIfNew(tx, {
         userId,
         delta: POINTS_ORGANIZER_CERTIFIED,
         reasonCode: REASON_ORGANIZER_CERTIFIED,
@@ -131,6 +139,10 @@ export class OrganizerCertificationService {
         referenceId: `organizer_cert:${userId}`,
       });
     });
+    pointsAwarded = credit.granted;
+    if (credit.granted > 0) {
+      emitGamificationPointsCredited(this.eventEmitter, userId, credit);
+    }
 
     return {
       passed: true,

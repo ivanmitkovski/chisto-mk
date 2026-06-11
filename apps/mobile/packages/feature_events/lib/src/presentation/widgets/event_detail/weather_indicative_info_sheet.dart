@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 /// Bottom sheet with the Open-Meteo disclaimer (reusable from [WeatherCard] and elsewhere).
 Future<void> showWeatherIndicativeInfoSheet(BuildContext context) {
-  return showModalBottomSheet<void>(
+  return AppBottomSheet.show<void>(
     context: context,
     backgroundColor: AppColors.transparent,
     isScrollControlled: true,

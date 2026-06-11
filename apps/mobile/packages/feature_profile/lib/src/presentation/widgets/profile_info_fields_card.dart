@@ -2,7 +2,7 @@ import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
-/// Name, read-only email, phone, and limits notice for profile general info.
+/// Name, read-only email, phone, and contact-support hint for profile general info.
 class ProfileInfoFieldsCard extends StatelessWidget {
   const ProfileInfoFieldsCard({
     super.key,
@@ -15,6 +15,7 @@ class ProfileInfoFieldsCard extends StatelessWidget {
     required this.email,
     required this.fieldValueStyle,
     required this.inputDecoration,
+    this.nameErrorText,
   });
 
   final TextEditingController nameController;
@@ -26,6 +27,7 @@ class ProfileInfoFieldsCard extends StatelessWidget {
   final String email;
   final TextStyle fieldValueStyle;
   final InputDecoration Function(String hint) inputDecoration;
+  final String? nameErrorText;
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +57,7 @@ class ProfileInfoFieldsCard extends StatelessWidget {
                 focusNode: nameFocus,
                 textInputAction: TextInputAction.next,
                 hintText: context.l10n.profileGeneralNameHint,
+                errorText: nameErrorText,
                 onSubmitted: (_) =>
                     FocusScope.of(context).requestFocus(phoneFocus),
               ),
@@ -87,13 +90,6 @@ class ProfileInfoFieldsCard extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: AppSpacing.xs),
-            Text(
-              context.l10n.profileEmailReadOnlyHint,
-              style: AppTypographySurfaces.profileFormFieldHint(
-                Theme.of(context).textTheme,
-              ),
-            ),
             const SizedBox(height: AppSpacing.md),
             Text(
               context.l10n.profileGeneralMobileLabel,
@@ -113,35 +109,11 @@ class ProfileInfoFieldsCard extends StatelessWidget {
                 hintText: context.l10n.profileGeneralPhonePlaceholder,
               ),
             ),
-            const SizedBox(height: AppSpacing.sm),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(AppSpacing.sm),
-              decoration: BoxDecoration(
-                color: AppColors.inputFill,
-                borderRadius: BorderRadius.circular(AppSpacing.radius14),
-                border: Border.all(
-                  color: AppColors.divider.withValues(alpha: 0.9),
-                ),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  const Icon(
-                    Icons.info_outline_rounded,
-                    size: AppSpacing.iconMd,
-                    color: AppColors.textMuted,
-                  ),
-                  const SizedBox(width: AppSpacing.xs),
-                  Expanded(
-                    child: Text(
-                      context.l10n.profileGeneralLimitsNotice,
-                      style: AppTypographySurfaces.profileFormFieldHint(
-                        Theme.of(context).textTheme,
-                      ),
-                    ),
-                  ),
-                ],
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              context.l10n.profileGeneralLimitsNotice,
+              style: AppTypographySurfaces.profileFormFieldHint(
+                Theme.of(context).textTheme,
               ),
             ),
           ],

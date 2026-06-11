@@ -11,12 +11,12 @@ ApiClient createBackgroundApiClient({
   required ApiClientConfig config,
   required String? Function() accessToken,
   required Future<RefreshOutcome> Function() refreshSession,
-  void Function()? onUnauthorized,
+  void Function(int observedEpoch)? onUnauthorized,
 }) {
   final ApiClient client = ApiClient(
     config: config,
     accessToken: accessToken,
-    onUnauthorized: onUnauthorized ?? () {},
+    onUnauthorized: onUnauthorized ?? (_) {},
   );
   client.refreshSession = refreshSession;
   return client;

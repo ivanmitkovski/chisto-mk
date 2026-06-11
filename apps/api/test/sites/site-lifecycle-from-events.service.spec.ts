@@ -17,6 +17,7 @@ describe('SiteLifecycleFromEventsService', () => {
   const siteEventsService = { emitSiteUpdated: jest.fn() };
   const sitesFeed = { invalidateFeedCache: jest.fn() };
   const sitesMapQuery = { invalidateMapCache: jest.fn() };
+  const sitesReporterNotification = { emitSiteStatusUpdate: jest.fn() };
 
   const prisma = {
     site: {
@@ -39,6 +40,7 @@ describe('SiteLifecycleFromEventsService', () => {
       siteEventsService as never,
       sitesFeed as never,
       sitesMapQuery as never,
+      sitesReporterNotification as never,
     );
   });
 

@@ -79,21 +79,14 @@ extension EventDetailOrganizerActions on _EventDetailScreenState {
     EcoEvent event,
     EventFeedbackSnapshot? current,
   ) async {
-    return showEventsSurfaceModal<EventFeedbackSnapshot>(
+    return AppBottomSheet.show<EventFeedbackSnapshot>(
       context: context,
-      builder: (BuildContext sheetCtx) {
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.viewInsetsOf(sheetCtx).bottom,
-          ),
-          child: ReportSheetScaffold(
-            title: sheetCtx.l10n.eventsFeedbackSheetTitle,
-            subtitle: event.title,
-            maxHeightFactor: 0.92,
-            child: FeedbackSheetContent(event: event, current: current),
-          ),
-        );
-      },
+      keyboardInsetMode: SheetKeyboardInsetMode.overlay,
+      builder: (BuildContext sheetCtx) => buildEventFeedbackSheet(
+        sheetCtx,
+        event: event,
+        current: current,
+      ),
     );
   }
 

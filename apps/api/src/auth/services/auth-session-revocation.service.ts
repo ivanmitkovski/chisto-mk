@@ -72,6 +72,27 @@ export class AuthSessionRevocationService {
     return { revoked: result.count };
   }
 
+  async revokeSession(
+    sessionId: string,
+    userId: string,
+    reason: SessionRevokeReason,
+  ): Promise<void> {
+    const now = new Date();
+    const result = await this.prisma.userSession.updateMany({
+      where: { id: sessionId, userId, revokedAt: null },
+      data: { revokedAt: now },
+    });
+    if (result.count === 0) {
+      return;
+    }
+    this.authSnapshotCache.invalidate(userId);
+    this.eventEmitter.emit('security.sessions_revoked', {
+      userId,
+      reason,
+      sessionId,
+    });
+  }
+
   async revokeSessionForUser(
     userId: string,
     sessionId: string,

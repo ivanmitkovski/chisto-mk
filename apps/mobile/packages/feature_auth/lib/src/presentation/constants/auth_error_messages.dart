@@ -1,5 +1,7 @@
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:chisto_infrastructure/core/l10n/app_error_localizations.dart';
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/shared/forms/field_error_mapping.dart';
 import 'package:feature_auth/src/presentation/utils/auth_retry_duration.dart';
 
 int? retryAfterSecondsFromAppError(AppError e) {
@@ -31,6 +33,8 @@ String messageForAuthError(AppLocalizations l10n, AppError e) {
       return l10n.authErrorEmailRegistered;
     case 'PHONE_ALREADY_REGISTERED':
       return l10n.authErrorPhoneRegistered;
+    case 'REGISTRATION_CONFLICT':
+      return l10n.authErrorRegistrationConflict;
     case 'OTP_NOT_FOUND':
       return l10n.authErrorOtpNotFound;
     case 'OTP_EXPIRED':
@@ -63,12 +67,23 @@ String messageForAuthError(AppLocalizations l10n, AppError e) {
         }
         return l10n.authErrorTooManyAttempts;
       }
-    case 'VALIDATION_ERROR':
-    case 'BAD_REQUEST':
-    case 'UNAUTHORIZED':
-    case 'CONFLICT':
-      return e.message;
     default:
-      return e.message;
+      return localizedAppErrorMessage(l10n, e);
   }
+}
+
+/// Banner copy for [error], or null when inline field errors cover it.
+String? authBannerMessageForError(
+  AppLocalizations l10n,
+  AppError error, {
+  required Set<String> displayedFieldIds,
+}) {
+  final Map<String, String> mapped = fieldErrorsFromAppError(error, l10n);
+  if (mapped.keys.any(displayedFieldIds.contains)) {
+    return null;
+  }
+  if (error.code == 'VALIDATION_ERROR' || error.code == 'BAD_REQUEST') {
+    return l10n.errorUserValidationGeneric;
+  }
+  return messageForAuthError(l10n, error);
 }

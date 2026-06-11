@@ -231,14 +231,22 @@ export function DashboardSSEClient() {
             }
             if (response.status === 401) {
               const refreshed = await refreshAdminSession();
-              if (refreshed && authReconnectCountRef.current < MAX_AUTH_RECONNECTS) {
+              if (refreshed === 'ok' && authReconnectCountRef.current < MAX_AUTH_RECONNECTS) {
                 authReconnectCountRef.current += 1;
                 throw new Error('SSE_AUTH_REFRESHED');
               }
-              throw new Error('SSE_UNAUTHORIZED');
+              if (refreshed === 'unauthorized') {
+                throw new Error('SSE_UNAUTHORIZED');
+              }
+              throw new Error('SSE_AUTH_TRANSIENT');
             }
             if (response.status === 403) {
-              throw new Error('SSE_FORBIDDEN');
+              const refreshed = await refreshAdminSession();
+              if (refreshed === 'ok' && authReconnectCountRef.current < MAX_AUTH_RECONNECTS) {
+                authReconnectCountRef.current += 1;
+                throw new Error('SSE_AUTH_REFRESHED');
+              }
+              throw new Error('SSE_AUTH_TRANSIENT');
             }
             throw new Error(`SSE connection failed: ${response.status}`);
           },
@@ -299,6 +307,21 @@ export function DashboardSSEClient() {
                 scheduleRefresh();
               } else if (isReportViewersUpdatedEvent(data)) {
                 emitReportViewersUpdated(data.reportId, data.viewers);
+              } else if (
+                typeof data === 'object' &&
+                data !== null &&
+                (data as { type?: string }).type &&
+                ['active_users_updated', 'activity_event', 'alert_triggered'].includes(
+                  (data as { type: string }).type,
+                )
+              ) {
+                window.dispatchEvent(
+                  new CustomEvent('chisto:active-users-sse', { detail: data }),
+                );
+                if ((data as { type: string }).type === 'alert_triggered') {
+                  const alert = data as { message?: string };
+                  sseCtxRef.current?.showRefreshToast(alert.message ?? 'Admin alert triggered');
+                }
               }
             } catch {
               // Ignore parse errors (e.g. heartbeat)
@@ -310,7 +333,7 @@ export function DashboardSSEClient() {
             }
             if (
               err instanceof Error &&
-              (err.message === 'SSE_UNAUTHORIZED' || err.message === 'SSE_FORBIDDEN')
+              (err.message === 'SSE_UNAUTHORIZED' || err.message === 'SSE_AUTH_TRANSIENT')
             ) {
               throw err;
             }
@@ -327,11 +350,18 @@ export function DashboardSSEClient() {
           window.setTimeout(() => connect(), 0);
           return;
         }
-        if (
-          error instanceof Error &&
-          (error.message === 'SSE_UNAUTHORIZED' || error.message === 'SSE_FORBIDDEN')
-        ) {
+        if (error instanceof Error && error.message === 'SSE_UNAUTHORIZED') {
           void signOutAndRedirectToLogin();
+          return;
+        }
+        if (error instanceof Error && error.message === 'SSE_AUTH_TRANSIENT') {
+          if (retryCountRef.current >= MAX_RETRIES) {
+            sseCtxRef.current?.setDisconnected(true);
+            schedulePeriodicReconnect(connect);
+            return;
+          }
+          retryCountRef.current += 1;
+          window.setTimeout(() => connect(), getRetryDelayMs(retryCountRef.current));
           return;
         }
         if (retryCountRef.current >= MAX_RETRIES) {

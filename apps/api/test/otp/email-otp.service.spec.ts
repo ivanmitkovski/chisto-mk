@@ -1,6 +1,11 @@
 /// <reference types="jest" />
+jest.mock('bcrypt', () => ({
+  ...jest.requireActual<typeof import('bcrypt')>('bcrypt'),
+  compare: jest.fn(),
+}));
 
 import { UnauthorizedException } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 import { EmailOtpService } from '../../src/otp/services/email-otp.service';
 
 describe('EmailOtpService', () => {
@@ -47,8 +52,7 @@ describe('EmailOtpService', () => {
       verifyOtpCode: jest.fn().mockResolvedValue(true),
     }));
 
-    const bcrypt = require('bcrypt');
-    jest.spyOn(bcrypt, 'compare').mockResolvedValue(true);
+    (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
     await svc.verifyAndConsume(tx as never, 'u1', '123456');
     expect(tx.passwordResetEmailCode.delete).toHaveBeenCalledWith({

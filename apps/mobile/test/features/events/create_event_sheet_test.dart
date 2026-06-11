@@ -1,5 +1,5 @@
 // Manual QA (create event): small phone (e.g. iPhone SE), large accessibility text;
-// focus a text field — primary CTA stays fixed at bottom (may sit under keyboard; scroll form);
+// focus the description field — it scrolls into view above the keyboard and sticky CTA;
 // open the site picker and confirm loading, offline banner when applicable, and retry on error;
 // edit the form and use the system/back affordance to confirm the discard dialog;
 // exercise volunteer cap presets and custom values (2–5000);
@@ -318,7 +318,7 @@ void main() {
     expect(stickyCta, findsOneWidget);
   });
 
-  testWidgets('sticky primary CTA stays at bottom when keyboard inset is large', (
+  testWidgets('sticky primary CTA stays at viewport bottom when keyboard opens', (
     WidgetTester tester,
   ) async {
     await tester.binding.setSurfaceSize(const Size(800, 1600));
@@ -326,12 +326,17 @@ void main() {
       await tester.binding.setSurfaceSize(null);
     });
 
+    const double keyboardInset = 280;
+    const Size surfaceSize = Size(800, 1600);
+
     await tester.pumpWidget(
       MediaQuery(
-        data: const MediaQueryData(viewInsets: EdgeInsets.only(bottom: 280)),
+        data: const MediaQueryData(
+          size: surfaceSize,
+          viewInsets: EdgeInsets.only(bottom: keyboardInset),
+        ),
         child: wrapForWidgetTest(
           const Scaffold(
-            resizeToAvoidBottomInset: false,
             body: CreateEventSheet(
               clock: createEventSheetTestClock,
               preselectedSiteId: '1',
@@ -353,13 +358,161 @@ void main() {
     );
     expect(stickyCta, findsOneWidget);
 
-    const double screenH = 1600;
     final Rect buttonRect = tester.getRect(stickyCta);
     expect(
       buttonRect.bottom,
-      greaterThan(screenH * 0.88),
-      reason:
-          'CTA should remain near the physical bottom, not lift with viewInsets',
+      closeTo(surfaceSize.height - keyboardInset, 48),
+      reason: 'Footer should stay at the bottom of the inset viewport without lifting',
+    );
+  });
+
+  testWidgets('form body stays flush with sticky footer when keyboard opens', (
+    WidgetTester tester,
+  ) async {
+    const Size surfaceSize = Size(800, 1600);
+    await tester.binding.setSurfaceSize(surfaceSize);
+    addTearDown(() async {
+      await tester.binding.setSurfaceSize(null);
+    });
+
+    const Widget sheet = Scaffold(
+      body: CreateEventSheet(
+        clock: createEventSheetTestClock,
+        preselectedSiteId: '1',
+        preselectedSiteName: 'Illegal landfill near the river',
+        preselectedSiteImageUrl:
+            'assets/images/references/onboarding_reference.png',
+        preselectedSiteDistanceKm: 15,
+      ),
+    );
+
+    await tester.pumpWidget(
+      wrapForWidgetTest(
+        MediaQuery(
+          data: const MediaQueryData(
+            size: surfaceSize,
+            viewInsets: EdgeInsets.only(bottom: 280),
+          ),
+          child: sheet,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await settlePastCreateEventBootstrap(tester);
+
+    final Finder expanded = find.ancestor(
+      of: find.byType(CustomScrollView),
+      matching: find.byType(Expanded),
+    );
+    final Rect expandedRect = tester.getRect(expanded);
+    final Rect footerRect = tester.getRect(find.byType(CreateEventStickyFooter));
+
+    expect(
+      expandedRect.bottom,
+      closeTo(footerRect.top, 2),
+      reason: 'Form body should sit directly above the sticky footer (no gray gap)',
+    );
+    expect(
+      footerRect.bottom,
+      closeTo(surfaceSize.height - 280, 48),
+      reason: 'Footer should stay at viewport bottom when keyboard opens',
+    );
+  });
+
+  testWidgets('title field scrolls above keyboard when focused', (
+    WidgetTester tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(800, 1600));
+    addTearDown(() async {
+      await tester.binding.setSurfaceSize(null);
+    });
+
+    const double keyboardInset = 280;
+
+    await tester.pumpWidget(
+      MediaQuery(
+        data: const MediaQueryData(viewInsets: EdgeInsets.only(bottom: 280)),
+        child: wrapForWidgetTest(
+          const Scaffold(
+            body: CreateEventSheet(
+              clock: createEventSheetTestClock,
+              preselectedSiteId: '1',
+              preselectedSiteName: 'Illegal landfill near the river',
+              preselectedSiteImageUrl:
+                  'assets/images/references/onboarding_reference.png',
+              preselectedSiteDistanceKm: 15,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await settlePastCreateEventBootstrap(tester);
+
+    final Finder titleHint = find.text('e.g. Weekend river cleanup');
+    await tester.tap(titleHint);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 320));
+    await tester.pumpAndSettle();
+
+    final Rect fieldRect = tester.getRect(titleHint);
+    const double screenH = 1600;
+    expect(
+      fieldRect.bottom,
+      lessThan(screenH - keyboardInset - 40),
+      reason: 'Title should sit above the keyboard inset zone',
+    );
+  });
+
+  testWidgets('description field scrolls above keyboard when focused', (
+    WidgetTester tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(800, 1600));
+    addTearDown(() async {
+      await tester.binding.setSurfaceSize(null);
+    });
+
+    const double keyboardInset = 280;
+
+    await tester.pumpWidget(
+      MediaQuery(
+        data: const MediaQueryData(viewInsets: EdgeInsets.only(bottom: 280)),
+        child: wrapForWidgetTest(
+          const Scaffold(
+            body: CreateEventSheet(
+              clock: createEventSheetTestClock,
+              preselectedSiteId: '1',
+              preselectedSiteName: 'Illegal landfill near the river',
+              preselectedSiteImageUrl:
+                  'assets/images/references/onboarding_reference.png',
+              preselectedSiteDistanceKm: 15,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await settlePastCreateEventBootstrap(tester);
+
+    final Finder descriptionHint = find.text('Describe what to expect, meeting point, etc.');
+    await tester.dragUntilVisible(
+      descriptionHint,
+      find.byType(CustomScrollView),
+      const Offset(0, -120),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(descriptionHint);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 320));
+    await tester.pumpAndSettle();
+
+    final Rect fieldRect = tester.getRect(descriptionHint);
+    const double screenH = 1600;
+    expect(
+      fieldRect.bottom,
+      lessThan(screenH - keyboardInset - 40),
+      reason: 'Description should sit above the keyboard inset zone',
     );
   });
 

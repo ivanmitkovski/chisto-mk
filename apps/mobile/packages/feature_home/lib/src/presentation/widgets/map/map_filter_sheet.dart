@@ -261,7 +261,6 @@ class _MapFilterSheetState extends State<MapFilterSheet> {
         maxHeightFactor: 0.92,
         fillAvailableHeight: true,
         addBottomInset: true,
-        scrollChromeWithBody: true,
         titleTextStyle: AppTypographySurfaces.reportsSheetTitle(textTheme),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
@@ -293,7 +292,6 @@ class _MapFilterSheetState extends State<MapFilterSheet> {
         ),
         child: SingleChildScrollView(
           controller: _scrollController,
-          padding: const EdgeInsets.only(bottom: AppSpacing.lg),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[

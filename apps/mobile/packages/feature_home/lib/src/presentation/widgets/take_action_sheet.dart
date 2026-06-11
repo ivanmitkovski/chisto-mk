@@ -12,7 +12,7 @@ class TakeActionSheet extends StatelessWidget {
     BuildContext context, {
     bool canCreateEcoAction = true,
   }) {
-    return showAppPanelBottomSheet<TakeActionType>(
+    return AppBottomSheet.show<TakeActionType>(
       context: context,
       useRootNavigator: true,
       builder: (BuildContext context) =>

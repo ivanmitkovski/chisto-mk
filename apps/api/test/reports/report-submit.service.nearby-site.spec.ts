@@ -49,6 +49,7 @@ describe('ReportSubmitService nearby site', () => {
       adminNotification: {
         create: jest.fn().mockResolvedValue({ id: 'n1', title: 't' }),
       },
+      $executeRaw: jest.fn().mockResolvedValue(undefined),
       $transaction: jest.fn(),
     };
 
@@ -76,6 +77,7 @@ describe('ReportSubmitService nearby site', () => {
       prisma as never,
       reportsUploadService as never,
       reportsOwnerEventsService as never,
+      { recomputeSiteHero: jest.fn(), emitIfChanged: jest.fn() } as never,
     );
     const siteHistoryWriter = { recordSiteCreated: jest.fn(), emitHistoryAppended: jest.fn() };
     const persistence = new ReportSubmitPersistenceService(
@@ -93,6 +95,10 @@ describe('ReportSubmitService nearby site', () => {
       mediaAppend,
       persistence,
       { emit: jest.fn() } as never,
+      {
+        user: { findMany: jest.fn().mockResolvedValue([]) },
+        userDeviceToken: { findMany: jest.fn().mockResolvedValue([]) },
+      } as never,
       siteHistoryWriter as never,
     );
 

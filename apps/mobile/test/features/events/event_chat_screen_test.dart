@@ -1,15 +1,33 @@
+import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
 import 'package:feature_events/src/data/chat/event_chat_connection_status.dart';
 import 'package:feature_events/src/data/chat/event_chat_fetch_result.dart';
 import 'package:feature_events/src/data/chat/event_chat_message.dart';
 import 'package:feature_events/src/data/chat/in_memory_event_chat_repository.dart';
 import 'package:feature_events/src/presentation/screens/event_chat_screen.dart';
+import 'package:feature_events/src/presentation/widgets/chat/chat_input_bar.dart';
 import 'package:feature_events/src/presentation/widgets/chat/chat_message_bubble.dart';
 import 'package:feature_events/src/presentation/widgets/chat/chat_search_result_tile.dart';
+import 'package:feature_events/src/presentation/widgets/event_detail/event_detail_not_found_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../shared/widget_test_bootstrap.dart';
+
+class _ThrowingEventChatRepository extends InMemoryEventChatRepository {
+  _ThrowingEventChatRepository(this.failure);
+
+  final AppError failure;
+
+  @override
+  Future<EventChatFetchResult> fetchMessages(
+    String eventId, {
+    String? cursor,
+    int limit = 50,
+  }) {
+    throw failure;
+  }
+}
 
 Widget _app({required Widget child, double textScale = 1.0}) {
   return wrapForWidgetTest(
@@ -386,6 +404,61 @@ void main() {
 
     expect(find.byType(ChatMessageBubble), findsNothing);
     expect(find.byType(ChatSearchResultTile), findsOneWidget);
+    await _finishChatTest(tester);
+    repo.dispose();
+  });
+
+  testWidgets('deleted event shows not-found state not network error', (
+    WidgetTester tester,
+  ) async {
+    final _ThrowingEventChatRepository repo = _ThrowingEventChatRepository(
+      AppError.notFound(code: 'EVENT_NOT_FOUND'),
+    );
+
+    await tester.pumpWidget(
+      _app(
+        child: EventChatScreen(
+          eventId: 'e1',
+          eventTitle: 'Deleted cleanup',
+          isOrganizer: false,
+          repository: repo,
+        ),
+      ),
+    );
+
+    await _settle(tester);
+    expect(find.byType(EventDetailNotFoundView), findsOneWidget);
+    expect(find.text('Event not found'), findsOneWidget);
+    expect(find.text('Check your connection and try again.'), findsNothing);
+    expect(find.byType(ChatInputBar), findsNothing);
+    await _finishChatTest(tester);
+    repo.dispose();
+  });
+
+  testWidgets('chat access denied hides composer', (WidgetTester tester) async {
+    final _ThrowingEventChatRepository repo = _ThrowingEventChatRepository(
+      const AppError(
+        code: 'EVENT_CHAT_NOT_PARTICIPANT',
+        message: 'Not a participant',
+        retryable: false,
+      ),
+    );
+
+    await tester.pumpWidget(
+      _app(
+        child: EventChatScreen(
+          eventId: 'e1',
+          eventTitle: 'Private cleanup',
+          isOrganizer: false,
+          repository: repo,
+        ),
+      ),
+    );
+
+    await _settle(tester);
+    expect(find.text('You need to join this event to use chat.'), findsOneWidget);
+    expect(find.text('Check your connection and try again.'), findsNothing);
+    expect(find.byType(ChatInputBar), findsNothing);
     await _finishChatTest(tester);
     repo.dispose();
   });

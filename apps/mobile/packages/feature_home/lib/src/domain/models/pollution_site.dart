@@ -32,6 +32,7 @@ class PollutionSite {
     this.mergedDuplicateChildCountTotal = 0,
     this.latitude,
     this.longitude,
+    this.address,
     this.feedReasons = const <String>[],
     this.rankingScore,
     this.rankingComponents,
@@ -78,6 +79,10 @@ class PollutionSite {
 
   final double? latitude;
   final double? longitude;
+
+  /// Reverse-geocoded location label from the API (map list rows).
+  final String? address;
+
   final List<String> feedReasons;
   final double? rankingScore;
   final Map<String, double>? rankingComponents;
@@ -141,6 +146,7 @@ class PollutionSite {
     int? mergedDuplicateChildCountTotal,
     double? latitude,
     double? longitude,
+    String? address,
     List<String>? feedReasons,
     double? rankingScore,
     Map<String, double>? rankingComponents,
@@ -175,6 +181,7 @@ class PollutionSite {
           mergedDuplicateChildCountTotal ?? this.mergedDuplicateChildCountTotal,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
+      address: address ?? this.address,
       feedReasons: feedReasons ?? this.feedReasons,
       rankingScore: rankingScore ?? this.rankingScore,
       rankingComponents: rankingComponents ?? this.rankingComponents,

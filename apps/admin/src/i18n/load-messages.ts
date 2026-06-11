@@ -19,6 +19,7 @@ const MESSAGE_NAMESPACES = [
   'broadcasts',
   'gamification',
   'operations',
+  'activeUsers',
   'comms',
   'appConfig',
   'notifications',

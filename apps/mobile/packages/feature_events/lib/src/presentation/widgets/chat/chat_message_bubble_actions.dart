@@ -58,10 +58,8 @@ mixin _ChatMessageBubbleActionsMixin on State<ChatMessageBubble> {
         widget.onCopy != null && msg.body != null && msg.body!.isNotEmpty;
     final bool canReport = _canReportMessage(msg);
     final bool canBlock = _canBlockAuthor(msg);
-    final bool ios = Theme.of(context).platform == TargetPlatform.iOS;
 
-    if (ios) {
-      await showAppActionSheet<void>(
+    await showAppActionSheet<void>(
         context: context,
         builder: (BuildContext ctx) {
           return CupertinoActionSheet(
@@ -140,115 +138,6 @@ mixin _ChatMessageBubbleActionsMixin on State<ChatMessageBubble> {
             ),
           );
         },
-      );
-      return;
-    }
-
-    await showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: AppColors.panelBackground,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AppSpacing.radiusSheet),
-        ),
-      ),
-      builder: (BuildContext ctx) {
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Center(
-                child: Container(
-                  width: AppSpacing.sheetHandle,
-                  height: AppSpacing.sheetHandleHeight,
-                  margin: const EdgeInsets.only(
-                    top: AppSpacing.sm,
-                    bottom: AppSpacing.xs,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.divider,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-                  ),
-                ),
-              ),
-              if (canReport)
-                ChatMessageActionRow(
-                  icon: CupertinoIcons.flag,
-                  label: context.l10n.safetyReportTitle,
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    unawaited(_reportMessage(context, msg));
-                  },
-                ),
-              if (canBlock)
-                ChatMessageActionRow(
-                  icon: CupertinoIcons.person_crop_circle_badge_xmark,
-                  label: context.l10n.safetyBlockUserTitle,
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    unawaited(_blockAuthor(context, msg));
-                  },
-                ),
-              if (canCopy)
-                ChatMessageActionRow(
-                  icon: CupertinoIcons.doc_on_doc,
-                  label: context.l10n.eventChatCopy,
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    widget.onCopy?.call();
-                  },
-                ),
-              if (widget.onReply != null)
-                ChatMessageActionRow(
-                  icon: CupertinoIcons.reply,
-                  label: context.l10n.eventChatReply,
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    widget.onReply?.call();
-                  },
-                ),
-              if (widget.onEdit != null)
-                ChatMessageActionRow(
-                  icon: CupertinoIcons.pencil,
-                  label: context.l10n.eventChatEditMessage,
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    widget.onEdit?.call();
-                  },
-                ),
-              if (widget.onPin != null)
-                ChatMessageActionRow(
-                  icon: CupertinoIcons.pin,
-                  label: context.l10n.eventChatPinMessage,
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    widget.onPin?.call();
-                  },
-                ),
-              if (widget.onUnpin != null)
-                ChatMessageActionRow(
-                  icon: CupertinoIcons.pin_slash,
-                  label: context.l10n.eventChatUnpinMessage,
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    widget.onUnpin?.call();
-                  },
-                ),
-              if (widget.onDelete != null)
-                ChatMessageActionRow(
-                  icon: CupertinoIcons.trash,
-                  label: context.l10n.eventChatDelete,
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    widget.onDelete?.call();
-                  },
-                  destructive: true,
-                ),
-              const SizedBox(height: AppSpacing.sm),
-            ],
-          ),
-        );
-      },
     );
   }
 }

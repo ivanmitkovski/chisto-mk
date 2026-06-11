@@ -47,8 +47,10 @@ describe('CleanupEventsController', () => {
       create,
       patch,
       bulkModerate,
+    } as unknown as CleanupEventsService, {
       listCheckInRiskSignals,
-    } as unknown as CleanupEventsService);
+      patchCheckInRiskSignal: jest.fn(),
+    } as never);
   });
 
   it('list delegates to service with query', () => {

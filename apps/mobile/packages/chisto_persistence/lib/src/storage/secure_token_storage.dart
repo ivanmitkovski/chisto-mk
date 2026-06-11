@@ -2,9 +2,20 @@ import 'dart:math';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+/// Whether session credentials survive app termination.
+enum TokenPersistenceMode {
+  /// Tokens and session metadata stored in platform secure storage.
+  persistent,
+
+  /// Session credentials kept in memory only (cleared on process exit).
+  ephemeral,
+}
+
 /// Tokens use platform secure storage with Apple keychain accessibility that
 /// avoids background access before first unlock; Android uses the package
 /// default AES-GCM + KeyStore (see [AndroidOptions]).
+///
+/// [deviceId] is always persisted. Other session fields follow [persistenceMode].
 class SecureTokenStorage {
   SecureTokenStorage({FlutterSecureStorage? storage})
     : _storage = storage ?? _defaultStorage;
@@ -20,6 +31,13 @@ class SecureTokenStorage {
   );
 
   final FlutterSecureStorage _storage;
+  final Map<String, String> _ephemeral = <String, String>{};
+
+  TokenPersistenceMode _persistenceMode = TokenPersistenceMode.persistent;
+
+  TokenPersistenceMode get persistenceMode => _persistenceMode;
+
+  bool get isPersistent => _persistenceMode == TokenPersistenceMode.persistent;
 
   static const String _keyAccessToken = 'chisto_access_token';
   static const String _keyRefreshToken = 'chisto_refresh_token';
@@ -30,11 +48,37 @@ class SecureTokenStorage {
       'chisto_organizer_certified_at';
   static const String _keyDeviceId = 'chisto_device_id';
 
-  Future<String?> get accessToken => _storage.read(key: _keyAccessToken);
-  Future<String?> get refreshToken => _storage.read(key: _keyRefreshToken);
-  Future<String?> get userId => _storage.read(key: _keyUserId);
-  Future<String?> get displayName => _storage.read(key: _keyDisplayName);
-  Future<String?> get phoneNumber => _storage.read(key: _keyPhoneNumber);
+  static const List<String> _sessionKeys = <String>[
+    _keyAccessToken,
+    _keyRefreshToken,
+    _keyUserId,
+    _keyDisplayName,
+    _keyPhoneNumber,
+    _keyOrganizerCertifiedAt,
+  ];
+
+  /// Configures where new session writes go. Ephemeral mode clears on-disk session keys.
+  Future<void> setPersistenceMode({required bool persistent}) async {
+    if (persistent) {
+      _persistenceMode = TokenPersistenceMode.persistent;
+      _ephemeral.clear();
+      return;
+    }
+    _persistenceMode = TokenPersistenceMode.ephemeral;
+    _ephemeral.clear();
+    await _clearPersistentSessionKeys();
+  }
+
+  Future<String?> get accessToken => _readSession(_keyAccessToken);
+
+  Future<String?> get refreshToken => _readSession(_keyRefreshToken);
+
+  Future<String?> get userId => _readSession(_keyUserId);
+
+  Future<String?> get displayName => _readSession(_keyDisplayName);
+
+  Future<String?> get phoneNumber => _readSession(_keyPhoneNumber);
+
   Future<String> get deviceId async {
     final String? existing = await _storage.read(key: _keyDeviceId);
     if (existing != null && existing.trim().isNotEmpty) {
@@ -48,15 +92,15 @@ class SecureTokenStorage {
   /// ISO-8601 timestamp from `/auth/me` or organizer quiz; used to hydrate
   /// certification before `/auth/me` succeeds on cold start.
   Future<String?> get organizerCertifiedAtIso =>
-      _storage.read(key: _keyOrganizerCertifiedAt);
+      _readSession(_keyOrganizerCertifiedAt);
 
   Future<void> saveTokens({
     required String accessToken,
     required String refreshToken,
   }) async {
     await Future.wait(<Future<void>>[
-      _storage.write(key: _keyAccessToken, value: accessToken),
-      _storage.write(key: _keyRefreshToken, value: refreshToken),
+      _writeSession(_keyAccessToken, accessToken),
+      _writeSession(_keyRefreshToken, refreshToken),
     ]);
   }
 
@@ -66,11 +110,11 @@ class SecureTokenStorage {
     String? phoneNumber,
   }) async {
     final List<Future<void>> writes = <Future<void>>[
-      _storage.write(key: _keyUserId, value: userId),
-      _storage.write(key: _keyDisplayName, value: displayName),
+      _writeSession(_keyUserId, userId),
+      _writeSession(_keyDisplayName, displayName),
     ];
     if (phoneNumber != null && phoneNumber.isNotEmpty) {
-      writes.add(_storage.write(key: _keyPhoneNumber, value: phoneNumber));
+      writes.add(_writeSession(_keyPhoneNumber, phoneNumber));
     }
     await Future.wait(writes);
   }
@@ -78,24 +122,44 @@ class SecureTokenStorage {
   /// Persists or clears organizer certification time (mirrors server field).
   Future<void> writeOrganizerCertifiedAt(DateTime? at) async {
     if (at == null) {
-      await _storage.delete(key: _keyOrganizerCertifiedAt);
+      await _deleteSession(_keyOrganizerCertifiedAt);
       return;
     }
-    await _storage.write(
-      key: _keyOrganizerCertifiedAt,
-      value: at.toUtc().toIso8601String(),
+    await _writeSession(
+      _keyOrganizerCertifiedAt,
+      at.toUtc().toIso8601String(),
     );
   }
 
   Future<void> clearTokens() async {
-    await Future.wait(<Future<void>>[
-      _storage.delete(key: _keyAccessToken),
-      _storage.delete(key: _keyRefreshToken),
-      _storage.delete(key: _keyUserId),
-      _storage.delete(key: _keyDisplayName),
-      _storage.delete(key: _keyPhoneNumber),
-      _storage.delete(key: _keyOrganizerCertifiedAt),
-    ]);
+    _ephemeral.clear();
+    await _clearPersistentSessionKeys();
+  }
+
+  Future<String?> _readSession(String key) async {
+    if (_persistenceMode == TokenPersistenceMode.ephemeral) {
+      return _ephemeral[key];
+    }
+    return _storage.read(key: key);
+  }
+
+  Future<void> _writeSession(String key, String value) async {
+    if (_persistenceMode == TokenPersistenceMode.ephemeral) {
+      _ephemeral[key] = value;
+      return;
+    }
+    await _storage.write(key: key, value: value);
+  }
+
+  Future<void> _deleteSession(String key) async {
+    _ephemeral.remove(key);
+    await _storage.delete(key: key);
+  }
+
+  Future<void> _clearPersistentSessionKeys() async {
+    await Future.wait(
+      _sessionKeys.map((String key) => _storage.delete(key: key)),
+    );
   }
 
   static String _createDeviceId() {

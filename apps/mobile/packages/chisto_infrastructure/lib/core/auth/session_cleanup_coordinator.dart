@@ -53,7 +53,13 @@ class SessionCleanupCoordinator {
     await _bestEffort(EngagementOutboxStore.instance.clearAll);
     await _bestEffort(FieldModeQueue.instance.clearAll);
     await _bestEffort(PushBackgroundPendingStore.clearAll);
-    await _bestEffort(() => UserHomeLocationStore(_preferences).clear());
+    await _bestEffort(() async {
+      final String? userId = tryReadRoot(authStateProvider)?.userId;
+      await UserHomeLocationStore.clearAllForSession(
+        _preferences,
+        userId: userId,
+      );
+    });
     await _bestEffort(() => MapSearchRecentsStore.clear(_preferences));
     await _bestEffort(() => const CheckInLocalCache().clear());
     await _bestEffort(() => const EventFeedbackLocalCache().clear());

@@ -47,6 +47,54 @@ void main() {
       expect(s.nextCursor, 'c1');
     });
 
+    test('refresh keeps ready phase when list is empty', () async {
+      int calls = 0;
+      final ProviderContainer container = ProviderContainer(
+        overrides: <Override>[
+          profileRepositoryProvider.overrideWithValue(
+            TestingProfileRepository(
+              getMeImpl: () async => throw UnimplementedError(),
+              getPointsHistoryImpl: ({int limit = 30, String? cursor}) async {
+                calls++;
+                await Future<void>.delayed(const Duration(milliseconds: 30));
+                return const PointsHistoryPage(
+                  items: <PointsHistoryEntry>[],
+                  milestones: <PointsHistoryMilestone>[],
+                );
+              },
+            ),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      container.listen(pointsHistoryNotifierProvider, (_, __) {});
+
+      await container
+          .read(pointsHistoryNotifierProvider.notifier)
+          .loadInitial();
+      expect(
+        container.read(pointsHistoryNotifierProvider).phase,
+        PointsHistoryPhase.ready,
+      );
+
+      final Future<void> refreshFuture = container
+          .read(pointsHistoryNotifierProvider.notifier)
+          .refresh();
+
+      expect(
+        container.read(pointsHistoryNotifierProvider).phase,
+        PointsHistoryPhase.ready,
+      );
+
+      await refreshFuture;
+      expect(calls, 2);
+      expect(
+        container.read(pointsHistoryNotifierProvider).phase,
+        PointsHistoryPhase.ready,
+      );
+    });
+
     test('refresh keeps ready phase and entries while reloading', () async {
       int calls = 0;
       final ProviderContainer container = ProviderContainer(

@@ -5,6 +5,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Prisma } from '../../prisma-client';
 import type { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import {
@@ -12,6 +13,7 @@ import {
   REASON_EVENT_CHECK_IN,
 } from '../../gamification/constants/gamification.constants';
 import { EcoEventPointsService } from '../../gamification/services/eco-event-points.service';
+import { emitGamificationPointsCredited } from '../../gamification/util/gamification-credit-events.util';
 import { CheckInRepository } from '../repositories/check-in.repository';
 import { EventCheckInGateway } from '../gateways/event-check-in.gateway';
 import { PendingCheckInService } from './pending-check-in.service';
@@ -33,6 +35,7 @@ export class EventsCheckInResolveService {
     private readonly checkInGateway: EventCheckInGateway,
     private readonly checkInTelemetry: CheckInTelemetryService,
     private readonly liveImpact: EventLiveImpactService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async resolveCheckIn(
@@ -89,12 +92,15 @@ export class EventsCheckInResolveService {
     const displayName = `${pending.firstName} ${pending.lastName}`.trim() || 'Volunteer';
 
     try {
-      const { checkedInAt, pointsAwarded } = await this.checkInRepository.prisma.$transaction(async (tx) => {
+      const { checkedInAt, credit } = await this.checkInRepository.prisma.$transaction(async (tx) => {
         const existing = await tx.eventCheckIn.findUnique({
           where: { eventId_dedupeKey: { eventId, dedupeKey } },
         });
         if (existing != null) {
-          return { checkedInAt: existing.checkedInAt, pointsAwarded: 0 };
+          return {
+            checkedInAt: existing.checkedInAt,
+            credit: { granted: 0, totalPointsEarnedBefore: 0, totalPointsEarnedAfter: 0 },
+          };
         }
 
         const row = await tx.eventCheckIn.create({
@@ -108,17 +114,22 @@ export class EventsCheckInResolveService {
           where: { id: eventId },
           data: { checkedInCount: { increment: 1 } },
         });
-        const points = await this.ecoEventPoints.creditIfNew(tx, {
+        const credit = await this.ecoEventPoints.creditIfNew(tx, {
           userId: pending.userId,
           delta: POINTS_EVENT_CHECK_IN,
           reasonCode: REASON_EVENT_CHECK_IN,
           referenceType: 'CleanupEvent',
           referenceId: eventId,
         });
-        return { checkedInAt: row.checkedInAt, pointsAwarded: points };
+        return { checkedInAt: row.checkedInAt, credit };
       });
 
       await this.pendingCheckIn.deletePending(pendingId);
+
+      const pointsAwarded = credit.granted;
+      if (credit.granted > 0) {
+        emitGamificationPointsCredited(this.eventEmitter, pending.userId, credit);
+      }
 
       const result: ResolveResult = {
         checkedInAt: checkedInAt.toISOString(),
@@ -155,6 +166,10 @@ export class EventsCheckInResolveService {
         outcome: 'approve',
       });
       this.liveImpact.notifyListeners(eventId);
+      this.eventEmitter.emit('event.check_in', {
+        userId: pending.userId,
+        metadata: { eventId, pendingId },
+      });
       return result;
     } catch (err: unknown) {
       if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {

@@ -66,6 +66,18 @@ void main() {
       );
       expect(NotificationInboxRouter.resolveHighlight(item), isNull);
     });
+
+    test('targetReportId is exposed from data', () {
+      final UserNotification item = _notification(
+        type: UserNotificationType.system,
+        data: <String, dynamic>{
+          'kind': 'report_received',
+          'reportId': 'report_073',
+          'siteId': 'site_shared',
+        },
+      );
+      expect(item.targetReportId, 'report_073');
+    });
   });
 
   group('NotificationInboxRouter.resolveInitialAction', () {

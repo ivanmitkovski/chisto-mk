@@ -2,6 +2,9 @@ import type { Prisma } from '../../prisma-client';
 
 export type FeedSiteRow = Prisma.SiteGetPayload<{
   include: {
+    heroReport: {
+      select: { mediaUrls: true };
+    };
     reports: {
       orderBy: { createdAt: 'desc' };
       take: 1;
@@ -13,7 +16,7 @@ export type FeedSiteRow = Prisma.SiteGetPayload<{
         createdAt: true;
         reportNumber: true;
         reporter: {
-          select: { id: true; firstName: true; lastName: true; avatarObjectKey: true };
+          select: { id: true; firstName: true; lastName: true; avatarObjectKey: true; status: true };
         };
       };
     };

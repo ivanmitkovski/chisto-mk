@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:design_system/design_system.dart';
 import 'package:feature_home/src/presentation/widgets/map/map_sheet_launcher.dart';
 import 'package:flutter/material.dart';
@@ -11,15 +13,20 @@ void main() {
   ) async {
     const double topInset = 59;
 
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    tester.view.viewPadding = FakeViewPadding(top: topInset);
+    addTearDown(() async {
+      await tester.binding.setSurfaceSize(null);
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+      tester.view.resetViewPadding();
+    });
+
     await tester.pumpWidget(
       MaterialApp(
-        home: MediaQuery(
-          data: const MediaQueryData(
-            size: Size(390, 844),
-            padding: EdgeInsets.only(top: topInset),
-            viewPadding: EdgeInsets.only(top: topInset),
-          ),
-          child: Builder(
+        home: Builder(
             builder: (BuildContext context) {
               return Scaffold(
                 body: Center(
@@ -47,7 +54,6 @@ void main() {
               );
             },
           ),
-        ),
       ),
     );
 

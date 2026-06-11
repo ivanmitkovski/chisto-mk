@@ -1,4 +1,5 @@
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
 import 'package:chisto_infrastructure/shared/widgets/molecules/app_error_view.dart';
@@ -53,10 +54,7 @@ class _SiteHistoryTabState extends ConsumerState<SiteHistoryTab> {
         message: l10n.feedSiteNotFoundMessage,
       );
     }
-    final String message = error.message;
-    if (error.code == 'NOT_FOUND' &&
-        message.contains('Cannot GET') &&
-        message.contains('/history')) {
+    if (error.code == 'NOT_FOUND') {
       return AppError(
         code: 'NOT_FOUND',
         message: l10n.siteHistoryServiceUnavailable,

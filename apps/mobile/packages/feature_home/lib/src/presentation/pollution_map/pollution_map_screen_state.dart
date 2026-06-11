@@ -52,6 +52,8 @@ class _PollutionMapScreenState extends ConsumerState<PollutionMapScreen>
   List<ClusterBucket> _prevBucketsForEntrance = const <ClusterBucket>[];
   String? _lastMapSitesPrefetchSig;
   String? _lastClusterEntranceSig;
+  DateTime? _syncNoticeVisibleSince;
+  DateTime? _lastMapUpdatedToastAt;
 
   @override
   void initState() {
@@ -308,15 +310,29 @@ class _PollutionMapScreenState extends ConsumerState<PollutionMapScreen>
       if (!context.mounted) {
         return;
       }
-      if (previous?.syncNotice != null &&
-          next.syncNotice == null &&
-          next.loadError == null &&
-          next.sites.isNotEmpty) {
+      final MapSyncInlineNotice? previousNotice = previous?.syncNotice;
+      final MapSyncInlineNotice? nextNotice = next.syncNotice;
+      if (previousNotice == null && nextNotice != null) {
+        _syncNoticeVisibleSince = DateTime.now();
+      }
+      final DateTime? noticeVisibleSince = _syncNoticeVisibleSince;
+      if (shouldShowMapUpdatedToast(
+        previous: previous,
+        next: next,
+        syncNoticeVisibleSince: noticeVisibleSince,
+        lastMapUpdatedToastAt: _lastMapUpdatedToastAt,
+        isMapTabActive: widget.isActive,
+        isMapTabTickerEnabled: TickerMode.valuesOf(context).enabled,
+      )) {
+        _lastMapUpdatedToastAt = DateTime.now();
         AppSnack.show(
           context,
           message: context.l10n.mapUpdatedToast,
           type: AppSnackType.success,
         );
+      }
+      if (nextNotice == null) {
+        _syncNoticeVisibleSince = null;
       }
     });
     ref.listen<List<PollutionSite>>(mapFilteredSitesProvider, (
@@ -493,7 +509,11 @@ class _PollutionMapScreenState extends ConsumerState<PollutionMapScreen>
           cameraCenter: LatLng(camera.centerLat, camera.centerLng),
           entranceCache: entranceCache,
           onSiteTap: (PollutionSite site, LatLng center) {
-            ref.read(mapSelectionNotifierProvider.notifier).select(site);
+            unawaited(
+              ref
+                  .read(mapSelectionNotifierProvider.notifier)
+                  .selectWithHydrationIfNeeded(site),
+            );
             AppHaptics.tap(context);
             _animatedMapController.animateTo(dest: center, zoom: 14.5);
           },

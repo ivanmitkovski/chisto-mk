@@ -39,6 +39,7 @@ describe('ReportSubmitService idempotency key validation', () => {
     prisma as never,
     reportsUpload as never,
     reportsOwnerEventsService as never,
+    { recomputeSiteHero: jest.fn(), emitIfChanged: jest.fn() } as never,
   );
   const svc = new ReportSubmitService(
     postCreateEvents as never,
@@ -48,6 +49,10 @@ describe('ReportSubmitService idempotency key validation', () => {
     mediaAppend,
     { persistReportWithLocation: jest.fn() } as never,
     { emit: jest.fn() } as never,
+    {
+      user: { findMany: jest.fn().mockResolvedValue([]) },
+      userDeviceToken: { findMany: jest.fn().mockResolvedValue([]) },
+    } as never,
     { emitHistoryAppended: jest.fn() } as never,
   );
 

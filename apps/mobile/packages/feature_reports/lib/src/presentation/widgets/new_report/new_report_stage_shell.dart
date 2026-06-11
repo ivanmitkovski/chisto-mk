@@ -40,7 +40,7 @@ class NewReportStageScrollBody extends StatelessWidget {
         children: <Widget>[
           if (apiError != null) ...<Widget>[
             ApiErrorBanner(
-              message: apiError!.message,
+              error: apiError,
               onDismiss: onDismissApiError,
               onRetry: apiError!.retryable ? onRetryApiError : null,
               detail: apiError!.retryable

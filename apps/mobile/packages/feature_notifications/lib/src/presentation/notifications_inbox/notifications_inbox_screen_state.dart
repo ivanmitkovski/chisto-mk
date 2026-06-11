@@ -12,6 +12,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
   int? _lastRefreshTick;
   bool _pendingInboxRefresh = false;
   bool _initialLoadScheduled = false;
+  bool _isOpeningNotification = false;
   late final NotificationsInboxCoordinator _inboxCoordinator;
 
   List<UserNotification> get _items => _pagination.items;
@@ -194,7 +195,12 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
   }
 
   void _close() {
-    Navigator.of(context).pop(_unreadCount);
+    final int unread = _unreadCount;
+    if (GoRouter.maybeOf(context) != null) {
+      context.pop(unread);
+      return;
+    }
+    Navigator.of(context).pop(unread);
   }
 
   Future<void> _scrollToTop() async {
@@ -235,23 +241,29 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
   }
 
   Future<void> _openNotification(UserNotification item) async {
-    NotificationOpenDiagnostics.recordOpenAttempt('list_tap');
-    if (!item.isRead) {
-      _setReadState(item, true);
-      try {
-        await ref.read(notificationsRepositoryProvider).markAsRead(item.id);
-        unawaited(_refreshUnreadCountFromServer());
-      } catch (_) {
-        if (!mounted) return;
-        _setReadState(item, false);
+    if (_isOpeningNotification) return;
+    _isOpeningNotification = true;
+    try {
+      NotificationOpenDiagnostics.recordOpenAttempt('list_tap');
+      if (!item.isRead) {
+        _setReadState(item, true);
+        try {
+          await ref.read(notificationsRepositoryProvider).markAsRead(item.id);
+          unawaited(_refreshUnreadCountFromServer());
+        } catch (_) {
+          if (!mounted) return;
+          _setReadState(item, false);
+        }
       }
+      if (!mounted) return;
+      await NotificationInboxRouter.open(
+        context,
+        item,
+        availableSites: widget.availableSites,
+      );
+    } finally {
+      _isOpeningNotification = false;
     }
-    if (!mounted) return;
-    await NotificationInboxRouter.open(
-      context,
-      item,
-      availableSites: widget.availableSites,
-    );
   }
 
   void _setReadState(UserNotification item, bool isRead) {

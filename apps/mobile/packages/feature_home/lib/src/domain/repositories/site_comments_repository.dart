@@ -15,6 +15,12 @@ abstract class SiteCommentsRepository {
     int limit = 20,
   });
 
+  Future<SiteCoReportersResult> getSiteCoReporters(
+    String id, {
+    int page = 1,
+    int limit = 50,
+  });
+
   Future<SiteCommentItem> createSiteComment(
     String id,
     String body, {

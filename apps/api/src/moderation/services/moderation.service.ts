@@ -112,7 +112,10 @@ export class ModerationService {
       },
     });
     if (!row) {
-      throw new NotFoundException('UGC report not found');
+      throw new NotFoundException({
+        code: 'UGC_REPORT_NOT_FOUND',
+        message: 'UGC report not found',
+      });
     }
     return this.toAdminUgcReport(row);
   }
@@ -143,7 +146,10 @@ export class ModerationService {
       select: { id: true, status: true, subjectType: true, subjectId: true },
     });
     if (!existing) {
-      throw new NotFoundException('UGC report not found');
+      throw new NotFoundException({
+        code: 'UGC_REPORT_NOT_FOUND',
+        message: 'UGC report not found',
+      });
     }
 
     if (dto.action === 'hide_subject') {
@@ -181,7 +187,10 @@ export class ModerationService {
 
   async blockUser(user: AuthenticatedUser, dto: PostUserBlockDto) {
     if (dto.blockedUserId === user.userId) {
-      throw new ConflictException('Cannot block yourself');
+      throw new ConflictException({
+        code: 'CANNOT_BLOCK_SELF',
+        message: 'Cannot block yourself',
+      });
     }
     return this.prisma.userBlock.upsert({
       where: {

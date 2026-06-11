@@ -157,7 +157,7 @@ describe('Auth stack (registration, session, profile)', () => {
   let jwt: ReturnType<typeof makeJwt>;
   let eventEmitter: ReturnType<typeof makeEventEmitter>;
   let reportsUploadService: ReturnType<typeof makeReportsUploadService>;
-  let sessionRevocation: { revokeAllForUser: jest.Mock };
+  let sessionRevocation: { revokeAllForUser: jest.Mock; revokeSession: jest.Mock };
   let replayCache: { get: jest.Mock; set: jest.Mock };
 
   beforeEach(async () => {
@@ -173,7 +173,10 @@ describe('Auth stack (registration, session, profile)', () => {
     const gamificationService = makeGamificationService();
     const rankingsService = makeRankingsService();
     const env = loadAuthEnvRuntime(config as unknown as ConfigService);
-    sessionRevocation = { revokeAllForUser: jest.fn().mockResolvedValue(undefined) };
+    sessionRevocation = {
+      revokeAllForUser: jest.fn().mockResolvedValue(undefined),
+      revokeSession: jest.fn().mockResolvedValue(undefined),
+    };
     replayCache = {
       get: jest.fn().mockResolvedValue(null),
       set: jest.fn().mockResolvedValue(undefined),
@@ -193,6 +196,7 @@ describe('Auth stack (registration, session, profile)', () => {
         env,
         replayCache as never,
       ),
+      eventEmitter as any,
     );
     const authOtp = {
       sendPhoneVerificationOtp: jest.fn().mockResolvedValue({ expiresIn: 600 }),
@@ -462,6 +466,10 @@ describe('Auth stack (registration, session, profile)', () => {
 
       if (is2FAResponse(result)) throw new Error('Expected direct auth, not 2FA');
       expect(result.user.role).toBe(Role.ADMIN);
+      expect(eventEmitter.emit).toHaveBeenCalledWith(
+        'user.login',
+        expect.objectContaining({ userId: mockAdmin.id }),
+      );
     });
 
     it('rejects non-admin role', async () => {
@@ -517,6 +525,7 @@ describe('Auth stack (registration, session, profile)', () => {
         }),
       });
       expect(prisma.userSession.create).not.toHaveBeenCalled();
+      expect(eventEmitter.emit).not.toHaveBeenCalledWith('user.login', expect.anything());
     });
 
     it('includes organizerCertifiedAt ISO string when user is certified', async () => {

@@ -248,6 +248,9 @@ class AppLocalizationsSq extends AppLocalizations {
       'Shtoni të paktën një foto për të vazhduar.';
 
   @override
+  String get reportFlowEvidenceTip => 'Kornizoni vendin me dritë të mirë.';
+
+  @override
   String get reportFlowLocationOutsideMacedoniaHelper =>
       'Ky vend është jashtë Maqedonisë. Tërhiqni kunjin brenda vendit, pastaj prekni Konfirmo vendndodhjen.';
 
@@ -573,6 +576,50 @@ class AppLocalizationsSq extends AppLocalizations {
       'Fjalëkalimet nuk përputhen';
 
   @override
+  String get authValidationPasswordWeak =>
+      'Fjalëkalimi është shumë i dobët. Përdorni një përzierje shkronjash dhe numrash dhe shmangni modele të zakonshme.';
+
+  @override
+  String get authValidationPasswordTooLong =>
+      'Fjalëkalimi duhet të ketë së shumti 72 karaktere';
+
+  @override
+  String get authValidationTermsRequired =>
+      'Duhet të pranoni termat dhe kushtet';
+
+  @override
+  String get authValidationOtpRequired => 'Kërkohet kodi i verifikimit';
+
+  @override
+  String get authValidationOtpDigits => 'Shkruani kodin 6-shifror';
+
+  @override
+  String get authValidationNameTooShort =>
+      'Çdo emër duhet të ketë të paktën 2 karaktere';
+
+  @override
+  String get authValidationNameTooLong =>
+      'Çdo emër duhet të ketë së shumti 60 karaktere';
+
+  @override
+  String get authValidationGenericInvalid => 'Ju lutemi kontrolloni këtë fushë';
+
+  @override
+  String formValidationErrorsAnnounce(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fusha kanë gabime',
+      one: '1 fushë ka gabim',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get authErrorRegistrationConflict =>
+      'Ekziston tashmë një llogari me këtë email ose numër telefoni';
+
+  @override
   String get authErrorInvalidCredentials =>
       'Numër telefoni ose fjalëkalim i gabuar.';
 
@@ -729,6 +776,9 @@ class AppLocalizationsSq extends AppLocalizations {
   String get authOnboardingBrandName => 'Chisto.mk';
 
   @override
+  String get brandLogoSemantic => 'Logoja Chisto';
+
+  @override
   String get authOnboardingWelcomeDescription => 'Shih. Raporto. Pastro.';
 
   @override
@@ -875,8 +925,23 @@ class AppLocalizationsSq extends AppLocalizations {
       'Momentalisht mbështetemi vetëm për vendndodhje në Maqedoni.';
 
   @override
-  String get authLocationResolveFailed =>
-      'Nuk mund të përcaktohej vendndodhja. Provo përsëri.';
+  String get authLocationTryAgain => 'Provo përsëri';
+
+  @override
+  String get authLocationGateOutsideTitle =>
+      'Chisto.mk është i disponueshëm në Maqedoni';
+
+  @override
+  String get authLocationGateOutsideBody =>
+      'Vendndodhja e pajisjes suaj është jashtë Maqedonisë. Duhet të jeni në Maqedoni për të krijuar një llogari.';
+
+  @override
+  String get authLocationGateUnavailableBody =>
+      'Nuk mundëm ta konfirmonim vendndodhjen tuaj. Aktivizoni shërbimet e vendndodhjes, lejoni qasjen dhe provoni përsëri.';
+
+  @override
+  String get authLocationActionOnlyInMacedoniaSnack =>
+      'Ky veprim është i disponueshëm vetëm në Maqedoni.';
 
   @override
   String get authOtpCodeSemantic => 'Kod verifikimi';
@@ -1254,6 +1319,24 @@ class AppLocalizationsSq extends AppLocalizations {
   String get safetyReportDetailsHint => 'Detaje opsionale për moderatorët';
 
   @override
+  String get safetyReportDetailsHintRequired =>
+      'Përshkruani problemin për moderatorët';
+
+  @override
+  String get safetyReportDetailsRequiredWhenOther =>
+      'Shtoni një përshkrim të shkurtër kur zgjidhni Tjetër.';
+
+  @override
+  String safetyReportDetailsCharCount(int used, int max) {
+    return '$used / $max';
+  }
+
+  @override
+  String safetyReportDetailsTooLong(int max) {
+    return 'Detajet duhet të jenë së shumti $max karaktere.';
+  }
+
+  @override
   String get safetyReportSubmitted =>
       'Raporti u dërgua. E shqyrtojmë brenda 24 orëve.';
 
@@ -1286,6 +1369,11 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String get profileDeleteAccountTile => 'Fshi llogarinë';
+
+  @override
+  String profileAppVersion(String version) {
+    return 'Versioni $version';
+  }
 
   @override
   String get profileEmailLabel => 'Email';
@@ -1473,7 +1561,7 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String get profileGeneralLimitsNotice =>
-      'Ndryshimet e emrit janë të kufizuara. Ndryshimi i numrit të telefonit kërkon verifikim.';
+      'Për ndryshimin e email-it dhe numrit të telefonit, kontaktoni mbështetjen.';
 
   @override
   String get profileGeneralUpdateButton => 'Përditëso të dhënat';
@@ -2025,7 +2113,7 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String get commentsBodyTooLong =>
-      'Komenti është shumë i gjatë (maks. 2000 karaktere).';
+      'Komenti është shumë i gjatë (maks. 500 karaktere).';
 
   @override
   String get commentsReplyTargetFallback => 'komentin';
@@ -2152,7 +2240,7 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String get mapErrorAutoRetryFootnote =>
-      'Do të provojmë sërish për disa sekonda. Mund edhe të prek Try again.';
+      'Do të provojmë sërish për disa sekonda. Mund edhe të prekni Provoni përsëri.';
 
   @override
   String mapFilteredSitesAnnounce(int count) {
@@ -3250,6 +3338,9 @@ class AppLocalizationsSq extends AppLocalizations {
   String get editEventNoChangesToSave => 'Nuk ka asgjë për të ruajtur.';
 
   @override
+  String get editEventSaving => 'Duke ruajtur ndryshimet…';
+
+  @override
   String get editEventPendingModerationBanner =>
       'Ngjarja ende pret miratimin e moderatorit. Ndryshimet vlejnë për skicën tuaj.';
 
@@ -3779,13 +3870,6 @@ class AppLocalizationsSq extends AppLocalizations {
   String createEventGearDoneSelectedCount(int count) {
     return 'U krye ($count të zgjedhura)';
   }
-
-  @override
-  String get createEventGearMultiselectTitle => 'Zgjedhje shumëfishe';
-
-  @override
-  String get createEventGearMultiselectMessage =>
-      'Prek çdo artikull që vullnetarët duhet të sjellin. Mund të zgjedhësh sa të duash.';
 
   @override
   String get createEventTeamSizeTitle => 'Madhësia e ekipit';
@@ -4855,6 +4939,15 @@ class AppLocalizationsSq extends AppLocalizations {
   String get siteUpvotersRetry => 'Provo përsëri';
 
   @override
+  String get siteCoReportersLoadFailed => 'Nuk u ngarkuan bashkë-raportuesit.';
+
+  @override
+  String get siteCoReportersRetry => 'Provo përsëri';
+
+  @override
+  String get siteCoReportersOriginalReporterLabel => 'Raportuesi origjinal';
+
+  @override
   String get siteDetailNoVolunteersSnack => 'Ende pa vullnetarë për këtë vend.';
 
   @override
@@ -4995,6 +5088,9 @@ class AppLocalizationsSq extends AppLocalizations {
   String siteHistoryByActor(String name) {
     return 'Nga $name';
   }
+
+  @override
+  String get deletedUser => 'Përdorues i fshirë';
 
   @override
   String get siteHistoryByAdmin => 'Nga admini';
@@ -6575,6 +6671,62 @@ class AppLocalizationsSq extends AppLocalizations {
   }
 
   @override
+  String get eventsFilterSheetSubtitle =>
+      'Zgjidhni një ose më shumë opsione. Bosh do të thotë të gjitha.';
+
+  @override
+  String get eventsFilterResetSemantic => 'Rivendos filtrat';
+
+  @override
+  String get eventsFilterSectionSelectAll => 'Të gjitha';
+
+  @override
+  String get eventsFilterSectionClear => 'Pastro';
+
+  @override
+  String eventsFilterShowEvents(int count) {
+    return 'Shfaq $count ngjarje';
+  }
+
+  @override
+  String eventsFilterShowEventsPlus(int count) {
+    return 'Shfaq $count+ ngjarje';
+  }
+
+  @override
+  String eventsFilterPreviewLiveRegion(int count) {
+    return 'Duke shfaqur $count ngjarje';
+  }
+
+  @override
+  String get eventsFilterChipStatusOverrideHint =>
+      'Pilula e ardhshme ose e kaluar zëvendëson filtrat e statusit derisa të ktheheni te Të gjitha.';
+
+  @override
+  String get eventsFilterDatePresetThisWeek => 'Këtë javë';
+
+  @override
+  String get eventsFilterDatePresetThisMonth => 'Këtë muaj';
+
+  @override
+  String get eventsFilterDatePresetNext30Days => '30 ditët e ardhshme';
+
+  @override
+  String get eventsFilterDatePresetClear => 'Pastro datat';
+
+  @override
+  String get eventsFilterCategoryHintOn => 'E zgjedhur';
+
+  @override
+  String get eventsFilterCategoryHintOff => 'Jo e zgjedhur';
+
+  @override
+  String get eventsFilterStatusHintOn => 'E zgjedhur';
+
+  @override
+  String get eventsFilterStatusHintOff => 'Jo e zgjedhur';
+
+  @override
   String get eventsOrganizerDashboardTitle => 'Ngjarjet e mia';
 
   @override
@@ -6846,25 +6998,25 @@ class AppLocalizationsSq extends AppLocalizations {
       'Ngjarje e personalizuar që nuk përputhet me kategoritë e mësipërme.';
 
   @override
-  String get eventsGearTrashBags => 'Thesa mbeturinash';
+  String get eventsGearTrashBags => 'Thasë mbeturinash';
 
   @override
   String get eventsGearGloves => 'Doreza';
 
   @override
-  String get eventsGearRakes => 'Kratre dhe lopata';
+  String get eventsGearRakes => 'Grabuja dhe lopata';
 
   @override
-  String get eventsGearWheelbarrow => 'Karrocë';
+  String get eventsGearWheelbarrow => 'Karrocë dore';
 
   @override
-  String get eventsGearWaterBoots => 'Çizme uji';
+  String get eventsGearWaterBoots => 'Çizme gome';
 
   @override
   String get eventsGearSafetyVest => 'Jelek reflektues';
 
   @override
-  String get eventsGearFirstAid => 'Kit i ndihmës së parë';
+  String get eventsGearFirstAid => 'Kuti e ndihmës së parë';
 
   @override
   String get eventsGearSunscreen => 'Krem dielli dhe ujë';
@@ -6992,7 +7144,19 @@ class AppLocalizationsSq extends AppLocalizations {
   }
 
   @override
-  String get errorUserNetwork => 'Kontrolloni lidhjen dhe provoni përsëri.';
+  String get errorUserNetwork =>
+      'Kontrolloni lidhjen tuaj të internetit dhe provoni përsëri.';
+
+  @override
+  String get offlineConnectionTitle => 'Nuk ka lidhje interneti';
+
+  @override
+  String get offlineConnectionBody =>
+      'Kontrolloni lidhjen tuaj të internetit dhe provoni përsëri.';
+
+  @override
+  String get reportDetailStaleBanner =>
+      'Nuk u rifreskua. Po shfaqen detajet e fundit të ngarkuara.';
 
   @override
   String get errorUserTimeout => 'Zgjati shumë. Provoni përsëri.';
@@ -7019,6 +7183,104 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String get errorUserUnknown => 'Diçka shkoi keq. Provoni përsëri.';
+
+  @override
+  String get errorUserValidation => 'Kontrolloni fushat e theksuara.';
+
+  @override
+  String get errorUserValidationGeneric =>
+      'Disa detaje janë të pavlefshme. Rishikoni dhe provoni përsëri.';
+
+  @override
+  String get errorUserConflict =>
+      'Ky veprim është në konflikt me diçka që ekziston tashmë.';
+
+  @override
+  String get errorUserCancelled => 'Anuluar.';
+
+  @override
+  String get errorUserPayloadTooLarge =>
+      'Skedari ose kërkesa është shumë e madhe.';
+
+  @override
+  String errorUserRetryAfterSeconds(int seconds) {
+    return 'Provoni përsëri pas $seconds sek.';
+  }
+
+  @override
+  String get errorAlreadyJoined => 'Jeni tashmë pjesë e kësaj ngjarjeje.';
+
+  @override
+  String get errorOrganizerCannotJoin =>
+      'Organizatorët nuk mund të bashkohen në ngjarjen e tyre si pjesëmarrës.';
+
+  @override
+  String get errorNotAParticipant => 'Së pari duhet të bashkoheni në ngjarje.';
+
+  @override
+  String get errorOtpSendCooldown =>
+      'Prisni një moment para se të kërkoni një kod tjetër.';
+
+  @override
+  String get errorOtpSendFailed =>
+      'Nuk mundëm ta dërgojmë kodin e verifikimit. Provoni përsëri.';
+
+  @override
+  String get errorTermsVersionMismatch =>
+      'Pranoni kushtet dhe rregullat më të fundit.';
+
+  @override
+  String get errorDeviceTokenInUse =>
+      'Njoftimet janë tashmë të aktivizuara në një pajisje tjetër.';
+
+  @override
+  String get errorEventsOrganizerNotCertified =>
+      'Përfundoni certifikimin e organizatorit për të vazhduar.';
+
+  @override
+  String get errorEventChatNotParticipant =>
+      'Së pari duhet të bashkoheni në ngjarje për të përdorur bisedën.';
+
+  @override
+  String get errorEventChatMessageUnavailable =>
+      'Ky mesazh nuk është më i disponueshëm.';
+
+  @override
+  String get errorChatUploadTooMany =>
+      'Shumë bashkëngjitje. Dërgoni më pak skedarë.';
+
+  @override
+  String get errorChatUploadInvalid =>
+      'Lloji ose madhësia e skedarit nuk lejohet.';
+
+  @override
+  String get errorAvatarFileRequired => 'Zgjidhni një foto për ta ngarkuar.';
+
+  @override
+  String get errorInvalidFileType => 'Lloji i skedarit nuk mbështetet.';
+
+  @override
+  String get connectionOfflineBanner =>
+      'Jeni jashtë linje. Disa funksione mund të mos punojnë derisa të lidheni.';
+
+  @override
+  String get connectionReconnectingBanner => 'Duke u rilidhur…';
+
+  @override
+  String get connectionLiveUpdatesDelayed =>
+      'Përditësimet live janë të vonuara. Tërhiqni për të rifreskuar.';
+
+  @override
+  String get notificationsInboxStaleHint =>
+      'Përditësimet mund të vonohen. Tërhiqni poshtë për të rifreskuar.';
+
+  @override
+  String get pushRegistrationFailedSnack =>
+      'Nuk mundëm të aktivizojmë njoftimet. Provoni përsëri te Cilësimet.';
+
+  @override
+  String get checkInConnectionTimeout =>
+      'Regjistrimi skadoi. Skanoni përsëri ose vendosni kodin manualisht.';
 
   @override
   String get eventsFilterSheetSemantic => 'Filtro ngjarjet';

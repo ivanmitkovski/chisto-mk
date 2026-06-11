@@ -13,6 +13,7 @@ export 'src/presentation/controllers/new_report_wizard_state.dart';
 export 'src/presentation/flow/report_entry_flow.dart';
 export 'src/presentation/navigation/new_report_wizard_pop_result.dart';
 export 'src/presentation/screens/reports_list_screen.dart';
+export 'src/presentation/screens/report_detail_route_screen.dart';
 export 'src/presentation/widgets/draft/draft_choice_sheet.dart';
 export 'src/presentation/widgets/map/directions_sheet.dart';
 export 'src/presentation/widgets/map/report_external_maps.dart';

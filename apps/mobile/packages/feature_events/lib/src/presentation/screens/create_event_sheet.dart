@@ -5,15 +5,17 @@ import 'dart:async';
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/l10n/app_error_localizations.dart';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
-import 'package:chisto_infrastructure/core/navigation/app_navigation.dart';
 import 'package:chisto_infrastructure/core/navigation/app_routes.dart';
 import 'package:chisto_infrastructure/core/providers/app_providers.dart';
 import 'package:chisto_infrastructure/core/providers/events_providers.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
 import 'package:chisto_infrastructure/shared/current_user.dart';
-import 'package:chisto_infrastructure/shared/utils/app_haptics.dart';
+import 'package:chisto_infrastructure/shared/forms/forms.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_back_button.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
+import 'package:chisto_infrastructure/shared/widgets/organisms/app_confirm_dialog.dart';
 import 'package:design_system/design_system.dart';
+import 'package:feature_auth/src/presentation/utils/auth_guard_ui.dart';
 import 'package:feature_events/src/application/schedule_conflict_preview_controller.dart';
 import 'package:feature_events/src/data/event_site_resolver.dart';
 import 'package:feature_events/src/domain/models/eco_event.dart';
@@ -41,10 +43,18 @@ import 'package:feature_profile/feature_profile.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:geolocator/geolocator.dart';
 
 part 'create_event_sheet_build.dart';
 part 'create_event_sheet_pickers.dart';
+
+abstract final class _CreateEventFieldIds {
+  static const String site = 'site';
+  static const String schedule = 'schedule';
+  static const String title = 'title';
+  static const String category = 'category';
+}
 
 class CreateEventSheet extends ConsumerStatefulWidget {
   const CreateEventSheet({
@@ -71,7 +81,13 @@ class CreateEventSheet extends ConsumerStatefulWidget {
 }
 
 class _CreateEventSheetState extends ConsumerState<CreateEventSheet>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, FormValidationMixin {
+  static const List<String> _fieldOrder = <String>[
+    _CreateEventFieldIds.site,
+    _CreateEventFieldIds.schedule,
+    _CreateEventFieldIds.title,
+    _CreateEventFieldIds.category,
+  ];
   EventSiteSummary? _selectedSite;
   DateTime? _selectedDate;
   EventTime _startTime = const EventTime(hour: 12, minute: 0);
@@ -83,7 +99,9 @@ class _CreateEventSheetState extends ConsumerState<CreateEventSheet>
   int? _maxParticipants;
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _titleController = TextEditingController();
-  bool _showValidationErrors = false;
+  final FocusNode _titleFocus = FocusNode();
+  final FocusNode _descriptionFocus = FocusNode();
+  final ScrollController _formScrollController = ScrollController();
   bool _submitting = false;
   bool _showBootstrapSkeleton = true;
   bool _appliedLocalizedCoercedSiteDescription = false;
@@ -96,6 +114,7 @@ class _CreateEventSheetState extends ConsumerState<CreateEventSheet>
   final GlobalKey _siteSectionKey = GlobalKey();
   final GlobalKey _scheduleSectionKey = GlobalKey();
   final GlobalKey _titleFieldKey = GlobalKey();
+  final GlobalKey _descriptionFieldKey = GlobalKey();
   final GlobalKey _categorySectionKey = GlobalKey();
 
   late final ScheduleConflictPreviewController _scheduleConflict;
@@ -219,14 +238,52 @@ class _CreateEventSheetState extends ConsumerState<CreateEventSheet>
     _startTime = boot.start;
     _endTime = boot.end;
     _initialSnapshot = CreateEventFormSnapshot(_captureFormFields());
+    registerFormField(_CreateEventFieldIds.site, fieldKey: _siteSectionKey);
+    registerFormField(
+      _CreateEventFieldIds.schedule,
+      fieldKey: _scheduleSectionKey,
+    );
+    registerFormField(
+      _CreateEventFieldIds.title,
+      focusNode: _titleFocus,
+      fieldKey: _titleFieldKey,
+    );
+    _descriptionFocus.addListener(_onDescriptionFocusChange);
+    _titleFocus.addListener(_onTitleFocusChange);
+    registerFormField(
+      _CreateEventFieldIds.category,
+      fieldKey: _categorySectionKey,
+    );
+    _titleController.addListener(_onFormFieldChanged);
     _sectionEntranceController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 400),
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(_redirectIfLocationNotEligible());
       unawaited(_redirectIfOrganizerNotCertified());
       unawaited(_completeBootstrapSkeleton());
     });
+  }
+
+  /// Deep link to [AppRoutes.eventsCreate] bypasses [EventsNavigation.openCreate];
+  /// non-verified users are sent back without opening the create flow.
+  Future<void> _redirectIfLocationNotEligible() async {
+    if (!mounted) {
+      return;
+    }
+    if (!ref.read(appBootstrapProvider).isInitialized) {
+      return;
+    }
+    if (!await ensureLocationEligibleForAction(context, ref)) {
+      if (!mounted) {
+        return;
+      }
+      final GoRouter? router = GoRouter.maybeOf(context);
+      if (router != null && context.canPop()) {
+        context.pop();
+      }
+    }
   }
 
   /// Deep link to [AppRoutes.eventsCreate] bypasses [EventsNavigation.openCreate];
@@ -241,19 +298,27 @@ class _CreateEventSheetState extends ConsumerState<CreateEventSheet>
     if (ref.read(authStateProvider).isOrganizerCertified) {
       return;
     }
+    bool wantsCreate = false;
     await Navigator.of(context, rootNavigator: true).push<void>(
       MaterialPageRoute<void>(
         settings: const RouteSettings(
           name: organizerCertificationToolkitRouteName,
         ),
-        builder: (_) => const OrganizerToolkitScreen(),
+        builder: (_) => OrganizerToolkitScreen(
+          onProceedToCreate: () => wantsCreate = true,
+        ),
       ),
     );
     if (!mounted) {
       return;
     }
-    if (!ref.read(authStateProvider).isOrganizerCertified) {
-      Navigator.of(context).pop();
+    if (!wantsCreate || !ref.read(authStateProvider).isOrganizerCertified) {
+      final GoRouter? router = GoRouter.maybeOf(context);
+      if (router != null && context.canPop()) {
+        context.pop();
+      } else {
+        Navigator.of(context).maybePop();
+      }
     }
   }
 
@@ -309,8 +374,142 @@ class _CreateEventSheetState extends ConsumerState<CreateEventSheet>
     scheduleValid: _isScheduleValid,
   );
 
+  void _onFormFieldChanged() {
+    if (mounted) setState(() {});
+  }
+
+  Map<String, String? Function()> _validators(AppLocalizations l10n) {
+    return <String, String? Function()>{
+      _CreateEventFieldIds.site: () =>
+          _selectedSite == null ? l10n.createEventSiteRequiredError : null,
+      _CreateEventFieldIds.schedule: () => _scheduleValidationMessage(l10n),
+      _CreateEventFieldIds.title: () => _titleValidationMessage(l10n),
+      _CreateEventFieldIds.category: () =>
+          _selectedCategory == null ? l10n.createEventTypeRequired : null,
+    };
+  }
+
+  String? _scheduleValidationMessage(AppLocalizations l10n) {
+    if (_selectedDate == null) {
+      return l10n.createEventEndTimeError;
+    }
+    if (!_isTimeRangeValid) {
+      return l10n.createEventEndTimeError;
+    }
+    final ScheduleValidationIssue? issue = _createScheduleIssue();
+    if (issue == ScheduleValidationIssue.endAfterLocalDayEnd) {
+      return l10n.createEventScheduleEndAfterDayError;
+    }
+    if (issue == ScheduleValidationIssue.startTooSoon) {
+      return l10n.createEventScheduleStartInPast(
+        kEventScheduleMinLead.inMinutes,
+      );
+    }
+    if (issue == ScheduleValidationIssue.endTooSoon) {
+      return l10n.createEventScheduleEndInPast(kEventScheduleMinLead.inMinutes);
+    }
+    return null;
+  }
+
+  String? _titleValidationMessage(AppLocalizations l10n) {
+    final String trimmed = _titleController.text.trim();
+    if (trimmed.isEmpty) {
+      return l10n.createEventTitleRequired;
+    }
+    if (trimmed.length < 3) {
+      return l10n.createEventTitleMinLength;
+    }
+    return null;
+  }
+
+  bool _showSiteError(AppLocalizations l10n) =>
+      validateIfVisible(
+        _CreateEventFieldIds.site,
+        _validators(l10n)[_CreateEventFieldIds.site]!,
+      ) !=
+      null;
+
+  bool _showScheduleError(AppLocalizations l10n) =>
+      validateIfVisible(
+        _CreateEventFieldIds.schedule,
+        _validators(l10n)[_CreateEventFieldIds.schedule]!,
+      ) !=
+      null;
+
+  bool _showTitleError(AppLocalizations l10n) =>
+      validateIfVisible(
+        _CreateEventFieldIds.title,
+        _validators(l10n)[_CreateEventFieldIds.title]!,
+      ) !=
+      null;
+
+  bool _showCategoryError(AppLocalizations l10n) =>
+      validateIfVisible(
+        _CreateEventFieldIds.category,
+        _validators(l10n)[_CreateEventFieldIds.category]!,
+      ) !=
+      null;
+
+  void _onTitleFocusChange() {
+    if (!mounted || !_titleFocus.hasFocus) {
+      return;
+    }
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _ensureTitleVisible(),
+    );
+  }
+
+  void _ensureTitleVisible() {
+    if (!mounted || !_titleFocus.hasFocus) {
+      return;
+    }
+    final BuildContext? ctx = _titleFieldKey.currentContext;
+    if (ctx == null) {
+      return;
+    }
+    Scrollable.ensureVisible(
+      ctx,
+      alignment: 0.12,
+      duration: AppMotion.medium,
+      curve: AppMotion.smooth,
+      alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtEnd,
+    );
+  }
+
+  void _onDescriptionFocusChange() {
+    if (!mounted || !_descriptionFocus.hasFocus) {
+      return;
+    }
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _ensureDescriptionVisible(),
+    );
+  }
+
+  void _ensureDescriptionVisible() {
+    if (!mounted || !_descriptionFocus.hasFocus) {
+      return;
+    }
+    final BuildContext? ctx = _descriptionFieldKey.currentContext;
+    if (ctx == null) {
+      return;
+    }
+    Scrollable.ensureVisible(
+      ctx,
+      alignment: 0.12,
+      duration: AppMotion.medium,
+      curve: AppMotion.smooth,
+      alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtEnd,
+    );
+  }
+
   @override
   void dispose() {
+    _titleController.removeListener(_onFormFieldChanged);
+    _titleFocus.removeListener(_onTitleFocusChange);
+    _descriptionFocus.removeListener(_onDescriptionFocusChange);
+    _descriptionFocus.dispose();
+    _formScrollController.dispose();
+    _titleFocus.dispose();
     _scheduleConflict.dispose();
     _sectionEntranceController.dispose();
     _descriptionController.dispose();
@@ -372,28 +571,13 @@ class _CreateEventSheetState extends ConsumerState<CreateEventSheet>
   }
 
   Future<bool> _confirmDiscard() async {
-    final bool? discard = await showCupertinoDialog<bool>(
+    final bool? discard = await AppConfirmDialog.show(
       context: context,
-      builder: (BuildContext ctx) {
-        return CupertinoAlertDialog(
-          title: Text(ctx.l10n.createEventDiscardTitle),
-          content: Padding(
-            padding: const EdgeInsets.only(top: AppSpacing.sm),
-            child: Text(ctx.l10n.createEventDiscardBody),
-          ),
-          actions: <Widget>[
-            CupertinoDialogAction(
-              onPressed: () => Navigator.of(ctx).pop(false),
-              child: Text(ctx.l10n.createEventDiscardKeepEditing),
-            ),
-            CupertinoDialogAction(
-              isDestructiveAction: true,
-              onPressed: () => Navigator.of(ctx).pop(true),
-              child: Text(ctx.l10n.commonDiscard),
-            ),
-          ],
-        );
-      },
+      title: context.l10n.createEventDiscardTitle,
+      body: context.l10n.createEventDiscardBody,
+      confirmLabel: context.l10n.commonDiscard,
+      cancelLabel: context.l10n.createEventDiscardKeepEditing,
+      isDestructive: true,
     );
     return discard ?? false;
   }
@@ -418,15 +602,13 @@ class _CreateEventSheetState extends ConsumerState<CreateEventSheet>
     if (_submitting) {
       return;
     }
-    if (!_isValid) {
-      AppHaptics.warning();
-      setState(() => _showValidationErrors = true);
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) {
-          return;
-        }
-        _scrollToFirstInvalid();
-      });
+    final AppLocalizations l10n = context.l10n;
+    if (await handleInvalidSubmit(
+      context,
+      l10n,
+      _fieldOrder,
+      _validators(l10n),
+    )) {
       return;
     }
 
@@ -441,8 +623,6 @@ class _CreateEventSheetState extends ConsumerState<CreateEventSheet>
     final DateTime selectedDate = _selectedDate ?? DateUtils.dateOnly(now);
     final EventSiteSummary? selectedSite = _selectedSite;
     if (selectedSite == null) {
-      AppHaptics.warning();
-      setState(() => _showValidationErrors = true);
       return;
     }
     final String eventId =
@@ -490,6 +670,12 @@ class _CreateEventSheetState extends ConsumerState<CreateEventSheet>
       created = await readEventsRepository().create(createdEvent);
     } on AppError catch (e) {
       if (mounted) {
+        if (await handleLocationGuardError(context, ref, e)) {
+          if (mounted) {
+            setState(() => _submitting = false);
+          }
+          return;
+        }
         AppSnack.show(
           context,
           message: localizedAppErrorMessage(context.l10n, e),
@@ -617,41 +803,6 @@ class _CreateEventSheetState extends ConsumerState<CreateEventSheet>
     }
   }
 
-  void _ensureSectionVisible(GlobalKey key) {
-    final BuildContext? ctx = key.currentContext;
-    if (ctx == null) {
-      return;
-    }
-    Scrollable.ensureVisible(
-      ctx,
-      duration: AppMotion.standard,
-      curve: AppMotion.standardCurve,
-      alignment: 0.12,
-    );
-  }
-
-  void _scrollToFirstInvalid() {
-    if (_selectedSite == null) {
-      _ensureSectionVisible(_siteSectionKey);
-      return;
-    }
-    if (_selectedDate == null) {
-      _ensureSectionVisible(_scheduleSectionKey);
-      return;
-    }
-    if (!_isTimeRangeValid || !_isScheduleValid) {
-      _ensureSectionVisible(_scheduleSectionKey);
-      return;
-    }
-    if (_titleController.text.trim().length < 3) {
-      _ensureSectionVisible(_titleFieldKey);
-      return;
-    }
-    if (_selectedCategory == null) {
-      _ensureSectionVisible(_categorySectionKey);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final double topPadding = MediaQuery.of(context).padding.top;
@@ -675,9 +826,7 @@ class _CreateEventSheetState extends ConsumerState<CreateEventSheet>
       },
       child: Scaffold(
         backgroundColor: AppColors.appBackground,
-        // Keep the form from resizing for the keyboard; the sticky CTA stays
-        // pinned to the bottom safe area (not lifted above the keyboard).
-        resizeToAvoidBottomInset: false,
+        resizeToAvoidBottomInset: true,
         body: Column(
           children: <Widget>[
             _buildAppBar(context, topPadding),
@@ -704,8 +853,10 @@ class _CreateEventSheetState extends ConsumerState<CreateEventSheet>
                       ),
               ),
             ),
-            if (_showBootstrapSkeleton)
-              ProfilePrimaryActionBar(
+          ],
+        ),
+        bottomNavigationBar: _showBootstrapSkeleton
+            ? ProfilePrimaryActionBar(
                 padForKeyboard: false,
                 child: ExcludeSemantics(
                   child: Container(
@@ -722,14 +873,11 @@ class _CreateEventSheetState extends ConsumerState<CreateEventSheet>
                   ),
                 ),
               )
-            else
-              CreateEventStickyFooter(
+            : CreateEventStickyFooter(
                 submitting: _submitting,
                 submitLabel: context.l10n.createEventSubmitLabel,
                 onSubmit: _handleCreate,
               ),
-          ],
-        ),
       ),
     );
   }

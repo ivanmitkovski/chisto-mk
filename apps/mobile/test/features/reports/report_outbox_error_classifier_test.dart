@@ -49,12 +49,15 @@ void main() {
       );
     });
 
-    test('UNKNOWN treated as retryable so the same idempotency key replays', () {
-      expect(
-        classifyReportSubmitError(AppError.unknown()),
-        ReportOutboxErrorKind.retryable,
-      );
-    });
+    test(
+      'UNKNOWN treated as retryable so the same idempotency key replays',
+      () {
+        expect(
+          classifyReportSubmitError(AppError.unknown()),
+          ReportOutboxErrorKind.retryable,
+        );
+      },
+    );
 
     test('terminal default', () {
       expect(

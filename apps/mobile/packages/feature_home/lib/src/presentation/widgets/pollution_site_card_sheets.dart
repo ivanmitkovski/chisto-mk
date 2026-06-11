@@ -1,3 +1,4 @@
+import 'package:chisto_infrastructure/core/concurrency/single_flight.dart';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/core/providers/app_providers.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
@@ -18,6 +19,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Bottom sheets and server share tracking extracted from [PollutionSiteCard].
+final SingleFlight<void> _pollutionSiteCardCommentsSheetFlight =
+    SingleFlight<void>();
+
 Future<void> openPollutionSiteCardCommentsSheet({
   required BuildContext context,
   required WidgetRef ref,
@@ -27,7 +31,8 @@ Future<void> openPollutionSiteCardCommentsSheet({
   required void Function(List<Comment> next) onSessionCommentsChanged,
   required String? feedSessionId,
   required String? feedVariant,
-}) async {
+}) {
+  return _pollutionSiteCardCommentsSheetFlight.run(() async {
   trackPollutionFeedCardEvent(
     site.id,
     eventType: PollutionFeedCardEventType.commentOpen,
@@ -85,12 +90,20 @@ Future<void> openPollutionSiteCardCommentsSheet({
 
   await showPollutionSiteCommentsModalBottomSheet(
     context,
-    builder: (BuildContext sheetContext, ScrollController scrollController) {
-      return CommentsBottomSheet(
-        siteId: site.id,
-        comments: commentsForSheet,
-        siteTitle: site.title,
-        scrollController: scrollController,
+    builder:
+        (
+          BuildContext sheetContext,
+          ScrollController scrollController,
+          DraggableScrollableController sheetController,
+          CommentsSheetSizeConfig sizeConfig,
+        ) {
+          return CommentsBottomSheet(
+            siteId: site.id,
+            comments: commentsForSheet,
+            siteTitle: site.title,
+            scrollController: scrollController,
+            sheetController: sheetController,
+            sheetSizeConfig: sizeConfig,
         onCommentsCountChanged: (int count) {
           if (!sheetContext.mounted) return;
           ref
@@ -145,6 +158,7 @@ Future<void> openPollutionSiteCardCommentsSheet({
       );
     },
   );
+  });
 }
 
 Future<void> openPollutionSiteCardUpvotersSheet({
@@ -168,40 +182,28 @@ Future<void> openPollutionSiteCardUpvotersSheet({
     return;
   }
 
-  await showModalBottomSheet<void>(
+  await AppBottomSheet.showResizable<void>(
     context: context,
-    useRootNavigator: true,
-    isScrollControlled: true,
-    isDismissible: true,
-    enableDrag: false,
-    useSafeArea: true,
-    barrierColor: AppColors.overlay,
-    backgroundColor: AppColors.transparent,
-    builder: (BuildContext sheetContext) {
-      return DraggableScrollableSheet(
-        expand: false,
-        initialChildSize: 0.68,
-        minChildSize: 0.5,
-        maxChildSize: 0.95,
-        snap: true,
-        snapSizes: const <double>[0.68, 0.95],
-        builder: (BuildContext _, ScrollController scrollController) {
-          return Container(
-            decoration: const BoxDecoration(
-              color: AppColors.panelBackground,
-              borderRadius: BorderRadius.vertical(
-                top: Radius.circular(AppSpacing.radiusPill),
-              ),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: UpvotersSheetContent(
-              siteId: siteId,
-              scrollController: scrollController,
-              highlightUserId: highlightUserId,
-            ),
+    sizeConfig: const AppSheetSizeConfig(
+      minSize: 0.5,
+      maxSize: 0.95,
+      snapSizes: <double>[0.68, 0.95],
+      initialSize: 0.68,
+    ),
+    builder:
+        (
+          BuildContext sheetContext,
+          ScrollController scrollController,
+          DraggableScrollableController sheetController,
+          AppSheetSizeConfig sizeConfig,
+        ) {
+          return UpvotersSheetContent(
+            siteId: siteId,
+            scrollController: scrollController,
+            highlightUserId: highlightUserId,
+            sheetController: sheetController,
+            sizeConfig: sizeConfig,
           );
         },
-      );
-    },
   );
 }

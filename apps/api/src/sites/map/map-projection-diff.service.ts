@@ -5,7 +5,15 @@ import type { MapProjectionUpsertRow, ProjectionSourceSite } from './map-project
 export class MapProjectionDiffService {
   computeUpsertRow(site: ProjectionSourceSite): MapProjectionUpsertRow {
     const latest = site.reports[0];
-    const thumbnail = latest?.mediaUrls?.[0] ?? null;
+    const heroUrls = site.heroReport?.mediaUrls ?? [];
+    const latestUrls = latest?.mediaUrls ?? [];
+    const heroThumbnail =
+      heroUrls.find((url) => typeof url === 'string' && url.trim().length > 0)?.trim() ?? null;
+    const pendingThumbnail =
+      site.status === 'REPORTED'
+        ? latestUrls.find((url) => typeof url === 'string' && url.trim().length > 0)?.trim() ?? null
+        : null;
+    const thumbnail = heroThumbnail ?? pendingThumbnail;
     const isHot =
       site.status !== 'CLEANED' || site.updatedAt.getTime() > Date.now() - 90 * 24 * 60 * 60 * 1000;
     return {

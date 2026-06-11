@@ -18,7 +18,7 @@ Future<void> showChatParticipantsSheet({
   required String? currentUserId,
   bool initialLoadFailed = false,
 }) {
-  return showAppPanelBottomSheet<void>(
+  return AppBottomSheet.show<void>(
     context: context,
     builder: (BuildContext ctx) {
       return _ChatParticipantsSheetBody(

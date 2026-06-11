@@ -28,6 +28,9 @@ class _ApiEventsRepositoryBase extends ChangeNotifier {
   /// Guards optimistic mutations against double-submit from rapid taps.
   final Set<String> _mutationsInFlight = <String>{};
 
+  bool _isSessionInvalidFailure(Object error) =>
+      error is AppError && error.indicatesInvalidOrEndedSession;
+
   Future<void> _persistEventsDisk() async {
     await _cache.writeEvents(_events, forActiveListParams: _activeParams);
   }

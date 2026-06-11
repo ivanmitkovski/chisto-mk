@@ -12,7 +12,7 @@ class _BlockTestApiClient extends ApiClient {
     : super(
         config: AppConfig.dev,
         accessToken: () => 'token',
-        onUnauthorized: () {},
+        onUnauthorized: (_) {},
       );
 
   @override

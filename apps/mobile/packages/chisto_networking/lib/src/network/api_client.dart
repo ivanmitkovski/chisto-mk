@@ -17,36 +17,42 @@ abstract final class ApiClientHooks {
   static void Function(String? dateHeader)? recordServerDateHeader;
 }
 
+/// Ensures REST/SSE clients target the Nest global prefix (`/v1`).
+String normalizeApiV1BaseUrl(String raw) {
+  final String trimmed = raw.replaceFirst(RegExp(r'/$'), '');
+  if (trimmed.endsWith('/v1')) return trimmed;
+  return '$trimmed/v1';
+}
+
 /// HTTP client for Chisto API. Attaches base URL, auth token, maps errors to
 /// [AppError], and transparently retries once on 401 after refreshing the
 /// session (if a [refreshSession] callback is provided) for `UNAUTHORIZED` and
 /// `SESSION_REVOKED` (rotated / revoked access session on the server).
 ///
-String _normalizeApiV1Base(String raw) {
-  final String trimmed = raw.replaceFirst(RegExp(r'/$'), '');
-  if (trimmed.endsWith('/v1')) return trimmed;
-  return '$trimmed/v1';
-}
+String _normalizeApiV1Base(String raw) => normalizeApiV1BaseUrl(raw);
 
 /// Parallel 401s: one shared refresh [Future]; concurrent callers await it and replay.
 class ApiClient {
   ApiClient({
     required ApiClientConfig config,
     required String? Function() accessToken,
-    required void Function() onUnauthorized,
+    required void Function(int observedEpoch) onUnauthorized,
+    int Function()? sessionEpoch,
     String? Function()? acceptLanguageHeader,
     FutureOr<String?> Function()? deviceIdHeader,
     http.Client? httpClient,
   }) : _baseUrl = _normalizeApiV1Base(config.apiBaseUrl),
        _accessToken = accessToken,
        _onUnauthorized = onUnauthorized,
+       _sessionEpoch = sessionEpoch ?? (() => 0),
        _acceptLanguageHeader = acceptLanguageHeader,
        _deviceIdHeader = deviceIdHeader,
        _httpClient = httpClient ?? http.Client();
 
   final String _baseUrl;
   final String? Function() _accessToken;
-  final void Function() _onUnauthorized;
+  final void Function(int observedEpoch) _onUnauthorized;
+  final int Function() _sessionEpoch;
   final String? Function()? _acceptLanguageHeader;
   final FutureOr<String?> Function()? _deviceIdHeader;
 
@@ -56,6 +62,12 @@ class ApiClient {
 
   /// Prevents parallel realtime/REST paths from firing [onUnauthorized] repeatedly.
   bool _sessionAuthFailureNotified = false;
+
+  /// Session epoch captured when the current REST/multipart request attached auth.
+  int _epochAtRequestSend = 0;
+
+  /// Session epoch captured when the current refresh attempt started.
+  int _epochAtRefreshStart = 0;
 
   final http.Client _httpClient;
 
@@ -68,7 +80,10 @@ class ApiClient {
   }
 
   void notifySessionAuthRejected() {
-    _notifySessionAuthFailureOnce();
+    final int observedEpoch = _refreshInFlight != null
+        ? _epochAtRefreshStart
+        : _epochAtRequestSend;
+    _notifySessionAuthFailureOnce(observedEpoch);
   }
 
   Future<RefreshOutcome> _refreshSessionQueued() async {
@@ -80,6 +95,7 @@ class ApiClient {
     if (inFlight != null) {
       return inFlight;
     }
+    _epochAtRefreshStart = _sessionEpoch();
     final Future<RefreshOutcome> started = refresh();
     _refreshInFlight = started;
     try {
@@ -87,6 +103,7 @@ class ApiClient {
     } finally {
       if (identical(_refreshInFlight, started)) {
         _refreshInFlight = null;
+        _epochAtRefreshStart = 0;
       }
     }
   }
@@ -269,7 +286,10 @@ class ApiClient {
       if (!await _refreshForUnauthorizedRetry(e, path)) {
         rethrow;
       }
-      return _postMultipart(path, filePaths);
+      return _retryAfterRefresh(
+        path,
+        () => _postMultipart(path, filePaths),
+      );
     }
   }
 
@@ -277,6 +297,7 @@ class ApiClient {
     String path,
     List<String> filePaths,
   ) async {
+    _epochAtRequestSend = _sessionEpoch();
     final Uri url = Uri.parse('$_baseUrl$path');
     final http.MultipartRequest request = http.MultipartRequest('POST', url);
 
@@ -364,11 +385,14 @@ class ApiClient {
       if (!await _refreshForUnauthorizedRetry(e, path)) {
         rethrow;
       }
-      return multipartPost(
+      return _retryAfterRefresh(
         path,
-        files: files,
-        fields: fields,
-        timeout: timeout,
+        () => multipartPost(
+          path,
+          files: files,
+          fields: fields,
+          timeout: timeout,
+        ),
       );
     }
   }
@@ -381,6 +405,7 @@ class ApiClient {
     bool Function()? isCancelled,
     Duration? timeout,
   }) async {
+    _epochAtRequestSend = _sessionEpoch();
     final Uri url = Uri.parse('$_baseUrl$path');
     final http.MultipartRequest request = http.MultipartRequest('POST', url);
 
@@ -477,13 +502,25 @@ class ApiClient {
     if (!error.indicatesInvalidOrEndedSession) return;
     if (_authPaths.contains(path)) return;
     if (_pathsExemptFromUnauthorizedCallback.contains(path)) return;
-    _notifySessionAuthFailureOnce();
+    _notifySessionAuthFailureOnce(_epochAtRequestSend);
   }
 
-  void _notifySessionAuthFailureOnce() {
+  void _notifySessionAuthFailureOnce(int observedEpoch) {
     if (_sessionAuthFailureNotified) return;
     _sessionAuthFailureNotified = true;
-    _onUnauthorized();
+    _onUnauthorized(observedEpoch);
+  }
+
+  /// Runs a single post-refresh replay; auth failures still trigger teardown.
+  Future<T> _retryAfterRefresh<T>(String path, Future<T> Function() retry) async {
+    try {
+      return await retry();
+    } on AppError catch (e) {
+      if (e.isAuthChallenge || e.indicatesInvalidOrEndedSession) {
+        _notifySessionAuthFailure(e, path);
+      }
+      rethrow;
+    }
   }
 
   Future<ApiBytesResponse> _getBytesWithRetry(
@@ -513,7 +550,10 @@ class ApiClient {
       }
 
       cancellation?.throwIfCancelled();
-      return _getBytes(path, headers: headers, cancellation: cancellation);
+      return _retryAfterRefresh(
+        path,
+        () => _getBytes(path, headers: headers, cancellation: cancellation),
+      );
     }
   }
 
@@ -523,6 +563,7 @@ class ApiClient {
     RequestCancellationToken? cancellation,
   }) async {
     cancellation?.throwIfCancelled();
+    _epochAtRequestSend = _sessionEpoch();
     final Uri url = Uri.parse('$_baseUrl$path');
     final Map<String, String> requestHeaders = <String, String>{
       'Accept':
@@ -619,12 +660,15 @@ class ApiClient {
       }
 
       cancellation?.throwIfCancelled();
-      return _request(
-        method,
+      return _retryAfterRefresh(
         path,
-        headers: headers,
-        body: body,
-        cancellation: cancellation,
+        () => _request(
+          method,
+          path,
+          headers: headers,
+          body: body,
+          cancellation: cancellation,
+        ),
       );
     }
   }
@@ -637,6 +681,7 @@ class ApiClient {
     RequestCancellationToken? cancellation,
   }) async {
     cancellation?.throwIfCancelled();
+    _epochAtRequestSend = _sessionEpoch();
     final Uri url = Uri.parse('$_baseUrl$path');
     final Map<String, String> requestHeaders = <String, String>{
       'Content-Type': 'application/json',
@@ -718,8 +763,8 @@ class ApiClient {
       _ => e.toString(),
     };
     final String lower = raw.toLowerCase();
-    final String message = lower.contains('cleartext') ||
-            raw.contains('Cleartext HTTP')
+    final String message =
+        lower.contains('cleartext') || raw.contains('Cleartext HTTP')
         ? 'Connection blocked (cleartext). Rebuild the app after pulling the latest Android network config.'
         : (raw.isNotEmpty ? raw : 'Unable to reach the server.');
     throw AppError.network(message: message, cause: e);

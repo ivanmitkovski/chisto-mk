@@ -19,6 +19,12 @@ import {
   type SiteHistoryWriterPort,
 } from '../ports/site-history-writer.port';
 
+function geoSubmitAdvisoryLockKey(latitude: number, longitude: number): string {
+  const roundedLat = Math.round(latitude * 10_000) / 10_000;
+  const roundedLng = Math.round(longitude * 10_000) / 10_000;
+  return `${roundedLat},${roundedLng}`;
+}
+
 export type ReportSubmitPersistenceResult = {
   reportId: string;
   reportNumber: string;
@@ -57,6 +63,9 @@ export class ReportSubmitPersistenceService {
 
     return this.prisma.$transaction(async (tx) => {
       await this.reportCapacity.spendWithinTransaction(tx, user.userId, new Date());
+
+      const lockKey = geoSubmitAdvisoryLockKey(latitude, longitude);
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${lockKey}))`;
 
       const primaryReport = await this.nearbySiteResolver.resolveEarliestReportAnchor(
         latitude,

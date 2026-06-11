@@ -160,6 +160,7 @@ describe('Patch moderation return-to-pending guard', () => {
         notifyOrganizerReturnedToPending: jest.fn(),
       } as never,
       { findOne: jest.fn() } as never,
+      { emit: jest.fn() } as never,
     );
 
     await expect(

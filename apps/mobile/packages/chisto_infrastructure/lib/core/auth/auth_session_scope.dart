@@ -5,6 +5,7 @@ import 'package:chisto_infrastructure/core/navigation/app_navigation.dart';
 import 'package:chisto_infrastructure/core/providers/app_providers.dart';
 import 'package:chisto_infrastructure/core/providers/notifications_providers.dart';
 import 'package:chisto_infrastructure/core/providers/root_container.dart';
+import 'package:feature_home/src/application/home_shell_controller.dart';
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
 import 'package:flutter/material.dart';
@@ -63,11 +64,21 @@ class _AuthSessionScopeState extends State<AuthSessionScope> {
         !_explicitSignOut) {
       _handleSessionLoss();
     }
+    if (previous != AuthStatus.authenticated &&
+        current == AuthStatus.authenticated) {
+      readRoot(homeShellControllerProvider.notifier).resetTabWidgetKeys();
+    } else if (previous == AuthStatus.authenticated &&
+        current == AuthStatus.unauthenticated) {
+      readRoot(homeShellControllerProvider.notifier).resetTabWidgetKeys();
+    }
     if (current == AuthStatus.authenticated) {
       _explicitSignOut = false;
       _sessionLossNavigationInFlight = false;
     } else if (previous == AuthStatus.authenticated) {
-      readRoot(notificationsRealtimeServiceProvider).stop();
+      _scheduleAfterFrame(() {
+        if (!mounted) return;
+        readRoot(notificationsRealtimeServiceProvider).stop();
+      });
     }
   }
 
@@ -79,7 +90,8 @@ class _AuthSessionScopeState extends State<AuthSessionScope> {
       return;
     }
     _sessionLossNavigationInFlight = true;
-    _navigateToSignIn(showExpiredMessage: _shouldShowSessionExpiredMessage());
+    // Navigation is owned by GoRouter redirect on [AuthState] changes.
+    _showSessionExpiredSnackIfNeeded();
   }
 
   bool _shouldShowSessionExpiredMessage() {
@@ -92,19 +104,28 @@ class _AuthSessionScopeState extends State<AuthSessionScope> {
     return true;
   }
 
-  void _navigateToSignIn({required bool showExpiredMessage}) {
-    if (!AppNavigation.isOnAuthGateRoute()) {
-      AppNavigation.goSignInAndClearStack();
+  void _showSessionExpiredSnackIfNeeded() {
+    if (!_shouldShowSessionExpiredMessage()) {
+      return;
     }
-    if (!showExpiredMessage) return;
-    final BuildContext? ctx =
-        appGoRouter.routerDelegate.navigatorKey.currentContext;
-    if (ctx == null || !ctx.mounted) return;
-    AppSnack.show(
-      ctx,
-      message: AppLocalizations.of(ctx)!.authSessionExpired,
-      type: AppSnackType.warning,
-    );
+    _scheduleAfterFrame(() {
+      if (!mounted) return;
+      if (AppNavigation.isOnAuthGateRoute()) {
+        return;
+      }
+      final BuildContext? ctx =
+          appGoRouter.routerDelegate.navigatorKey.currentContext;
+      if (ctx == null || !ctx.mounted) return;
+      AppSnack.show(
+        ctx,
+        message: AppLocalizations.of(ctx)!.authSessionExpired,
+        type: AppSnackType.warning,
+      );
+    });
+  }
+
+  void _scheduleAfterFrame(VoidCallback action) {
+    WidgetsBinding.instance.addPostFrameCallback((_) => action());
   }
 
   @override

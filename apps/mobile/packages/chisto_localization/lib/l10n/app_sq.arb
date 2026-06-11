@@ -101,6 +101,7 @@
     }
   },
   "reportFlowEvidenceNeedsPhoto": "Shtoni të paktën një foto për të vazhduar.",
+  "reportFlowEvidenceTip": "Kornizoni vendin me dritë të mirë.",
   "reportFlowLocationOutsideMacedoniaHelper": "Ky vend është jashtë Maqedonisë. Tërhiqni kunjin brenda vendit, pastaj prekni Konfirmo vendndodhjen.",
   "reportLocationAdvanceBlockedBanner": "Vendosni kunjin në Maqedoni dhe prekni Konfirmo vendndodhjen.",
   "reviewTapToEdit": "Prek për të përpunuar",
@@ -244,6 +245,23 @@
   "authValidationPasswordNeedLetter": "Fjalëkalimi duhet të përmbajë të paktën një shkronjë",
   "authValidationConfirmPasswordRequired": "Konfirmo fjalëkalimin",
   "authValidationConfirmPasswordMismatch": "Fjalëkalimet nuk përputhen",
+  "authValidationPasswordWeak": "Fjalëkalimi është shumë i dobët. Përdorni një përzierje shkronjash dhe numrash dhe shmangni modele të zakonshme.",
+  "authValidationPasswordTooLong": "Fjalëkalimi duhet të ketë së shumti 72 karaktere",
+  "authValidationTermsRequired": "Duhet të pranoni termat dhe kushtet",
+  "authValidationOtpRequired": "Kërkohet kodi i verifikimit",
+  "authValidationOtpDigits": "Shkruani kodin 6-shifror",
+  "authValidationNameTooShort": "Çdo emër duhet të ketë të paktën 2 karaktere",
+  "authValidationNameTooLong": "Çdo emër duhet të ketë së shumti 60 karaktere",
+  "authValidationGenericInvalid": "Ju lutemi kontrolloni këtë fushë",
+  "formValidationErrorsAnnounce": "{count, plural, =1{1 fushë ka gabim} other{{count} fusha kanë gabime}}",
+  "@formValidationErrorsAnnounce": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "authErrorRegistrationConflict": "Ekziston tashmë një llogari me këtë email ose numër telefoni",
   "authErrorInvalidCredentials": "Numër telefoni ose fjalëkalim i gabuar.",
   "authErrorAccountSuspended": "Kjo llogari nuk është aktive.",
   "authErrorPhoneNotRegistered": "Nuk u gjet llogari për këtë numër.",
@@ -328,6 +346,7 @@
   "authBackToSignIn": "Kthehu te hyrja",
   "authOnboardingWelcomeTo": "Mirë se vini në",
   "authOnboardingBrandName": "Chisto.mk",
+  "brandLogoSemantic": "Logoja Chisto",
   "authOnboardingWelcomeDescription": "Shih. Raporto. Pastro.",
   "authOnboardingWelcomeSupporting": "Një qytet më i pastër fillon me një prekje.",
   "authOnboardingSlide2Title": "Raporto në sekonda",
@@ -376,7 +395,11 @@
   "authLocationPermissionDenied": "Leja për vendndodhje u refuzua. Mund ta aktivizosh te Cilësimet.",
   "authLocationPermissionForever": "Leja është refuzuar përgjithmonë. Po hapen Cilësimet…",
   "authLocationMacedoniaOnly": "Momentalisht mbështetemi vetëm për vendndodhje në Maqedoni.",
-  "authLocationResolveFailed": "Nuk mund të përcaktohej vendndodhja. Provo përsëri.",
+  "authLocationTryAgain": "Provo përsëri",
+  "authLocationGateOutsideTitle": "Chisto.mk është i disponueshëm në Maqedoni",
+  "authLocationGateOutsideBody": "Vendndodhja e pajisjes suaj është jashtë Maqedonisë. Duhet të jeni në Maqedoni për të krijuar një llogari.",
+  "authLocationGateUnavailableBody": "Nuk mundëm ta konfirmonim vendndodhjen tuaj. Aktivizoni shërbimet e vendndodhjes, lejoni qasjen dhe provoni përsëri.",
+  "authLocationActionOnlyInMacedoniaSnack": "Ky veprim është i disponueshëm vetëm në Maqedoni.",
   "authOtpCodeSemantic": "Kod verifikimi",
   "authOtpDigitSemantic": "Shifra {index} nga {total}",
   "@authOtpDigitSemantic": {
@@ -608,6 +631,27 @@
   "safetyReportTitle": "Raporto përmbajtje",
   "safetyReportSubmit": "Dërgo raportin",
   "safetyReportDetailsHint": "Detaje opsionale për moderatorët",
+  "safetyReportDetailsHintRequired": "Përshkruani problemin për moderatorët",
+  "safetyReportDetailsRequiredWhenOther": "Shtoni një përshkrim të shkurtër kur zgjidhni Tjetër.",
+  "safetyReportDetailsCharCount": "{used} / {max}",
+  "@safetyReportDetailsCharCount": {
+    "placeholders": {
+      "used": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "safetyReportDetailsTooLong": "Detajet duhet të jenë së shumti {max} karaktere.",
+  "@safetyReportDetailsTooLong": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
   "safetyReportSubmitted": "Raporti u dërgua. E shqyrtojmë brenda 24 orëve.",
   "safetyReportFailed": "Raporti dështoi. Provoni përsëri.",
   "safetyReportReasonSpam": "Spam",
@@ -619,6 +663,14 @@
   "profileAccountSection": "Llogaria",
   "profileSignOutTile": "Dil",
   "profileDeleteAccountTile": "Fshi llogarinë",
+  "profileAppVersion": "Versioni {version}",
+  "@profileAppVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
   "profileEmailLabel": "Email",
   "profileEmailReadOnlyHint": "Vetëm për lexim. Për ndryshim kontaktoni mbështetjen.",
   "profileNoConnectionSnack": "Nuk ka lidhje",
@@ -676,7 +728,7 @@
   "profileGeneralNameHint": "Emri yt",
   "profileGeneralMobileLabel": "Telefoni celular",
   "profileGeneralPhonePlaceholder": "70 123 456",
-  "profileGeneralLimitsNotice": "Ndryshimet e emrit janë të kufizuara. Ndryshimi i numrit të telefonit kërkon verifikim.",
+  "profileGeneralLimitsNotice": "Për ndryshimin e email-it dhe numrit të telefonit, kontaktoni mbështetjen.",
   "profileGeneralUpdateButton": "Përditëso të dhënat",
   "profileGeneralSaving": "Duke ruajtur…",
   "profileGeneralAvatarSemanticUpdating": "Po përditësohet fotoja e profilit",
@@ -1010,7 +1062,7 @@
     }
   },
   "mapUpdatedToast": "Harta u përditësua",
-  "mapErrorAutoRetryFootnote": "Do të provojmë sërish për disa sekonda. Mund edhe të prek Try again.",
+  "mapErrorAutoRetryFootnote": "Do të provojmë sërish për disa sekonda. Mund edhe të prekni Provoni përsëri.",
   "mapFilteredSitesAnnounce": "{count, plural, one{Një vend shfaqet në hartë} other{{count} vende shfaqen në hartë}}",
   "@mapFilteredSitesAnnounce": {
     "placeholders": {
@@ -1529,6 +1581,7 @@
     }
   },
   "editEventNoChangesToSave": "Nuk ka asgjë për të ruajtur.",
+  "editEventSaving": "Duke ruajtur ndryshimet…",
   "editEventPendingModerationBanner": "Ngjarja ende pret miratimin e moderatorit. Ndryshimet vlejnë për skicën tuaj.",
   "eventsEventNotEditable": "Kjo ngjarje nuk mund të redaktohet më.",
   "eventsEventUpdated": "Ngjarja u përditësua",
@@ -1817,8 +1870,6 @@
       }
     }
   },
-  "createEventGearMultiselectTitle": "Zgjedhje shumëfishe",
-  "createEventGearMultiselectMessage": "Prek çdo artikull që vullnetarët duhet të sjellin. Mund të zgjedhësh sa të duash.",
   "createEventTeamSizeTitle": "Madhësia e ekipit",
   "createEventTeamSizeSubtitle": "Sa vullnetarë pret?",
   "createEventDifficultyTitle": "Vështirësia",
@@ -2325,6 +2376,9 @@
   },
   "siteUpvotersLoadFailed": "Nuk u ngarkuan mbështetësit.",
   "siteUpvotersRetry": "Provo përsëri",
+  "siteCoReportersLoadFailed": "Nuk u ngarkuan bashkë-raportuesit.",
+  "siteCoReportersRetry": "Provo përsëri",
+  "siteCoReportersOriginalReporterLabel": "Raportuesi origjinal",
   "siteDetailNoVolunteersSnack": "Ende pa vullnetarë për këtë vend.",
   "siteDetailDirectionsUnavailableSnack": "Udhëzimet nuk janë të disponueshme për këtë vend.",
   "siteDetailOpenMapsFailedSnack": "Nuk u hap Hartat",
@@ -2401,6 +2455,7 @@
       "name": { "type": "String" }
     }
   },
+  "deletedUser": "Përdorues i fshirë",
   "siteHistoryByAdmin": "Nga admini",
   "siteHistoryKindSiteCreated": "Vendi u krijua",
   "siteHistoryKindReportSubmitted": "Raporti u dorëzua",
@@ -2683,7 +2738,7 @@
   "commentsSortTop": "Kryesorët",
   "commentsSortNew": "Të rinj",
   "commentsEditingBanner": "Duke përpunuar komentin",
-  "commentsBodyTooLong": "Komenti është shumë i gjatë (maks. 2000 karaktere).",
+  "commentsBodyTooLong": "Komenti është shumë i gjatë (maks. 500 karaktere).",
   "commentsReplyTargetFallback": "komentin",
   "reportIssueSheetTitle": "Raporto problem",
   "reportIssueSubmitting": "Po dërgohet...",
@@ -3440,6 +3495,43 @@
       }
     }
   },
+  "eventsFilterSheetSubtitle": "Zgjidhni një ose më shumë opsione. Bosh do të thotë të gjitha.",
+  "eventsFilterResetSemantic": "Rivendos filtrat",
+  "eventsFilterSectionSelectAll": "Të gjitha",
+  "eventsFilterSectionClear": "Pastro",
+  "eventsFilterShowEvents": "Shfaq {count} ngjarje",
+  "@eventsFilterShowEvents": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsFilterShowEventsPlus": "Shfaq {count}+ ngjarje",
+  "@eventsFilterShowEventsPlus": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsFilterPreviewLiveRegion": "Duke shfaqur {count} ngjarje",
+  "@eventsFilterPreviewLiveRegion": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsFilterChipStatusOverrideHint": "Pilula e ardhshme ose e kaluar zëvendëson filtrat e statusit derisa të ktheheni te Të gjitha.",
+  "eventsFilterDatePresetThisWeek": "Këtë javë",
+  "eventsFilterDatePresetThisMonth": "Këtë muaj",
+  "eventsFilterDatePresetNext30Days": "30 ditët e ardhshme",
+  "eventsFilterDatePresetClear": "Pastro datat",
+  "eventsFilterCategoryHintOn": "E zgjedhur",
+  "eventsFilterCategoryHintOff": "Jo e zgjedhur",
+  "eventsFilterStatusHintOn": "E zgjedhur",
+  "eventsFilterStatusHintOff": "Jo e zgjedhur",
   "eventsOrganizerDashboardTitle": "Ngjarjet e mia",
   "eventsOrganizerDashboardEmpty": "Nuk keni organizuar asnjë ngjarje ende.",
   "eventsOrganizerDashboardEmptyAction": "Krijo ngjarjen e parë",
@@ -3597,13 +3689,13 @@
   "eventsCategoryAwarenessAndEducationDescription": "Seminare, biseda ose angazhim komuniteti për praktika ekologjike.",
   "eventsCategoryOther": "Tjetër",
   "eventsCategoryOtherDescription": "Ngjarje e personalizuar që nuk përputhet me kategoritë e mësipërme.",
-  "eventsGearTrashBags": "Thesa mbeturinash",
+  "eventsGearTrashBags": "Thasë mbeturinash",
   "eventsGearGloves": "Doreza",
-  "eventsGearRakes": "Kratre dhe lopata",
-  "eventsGearWheelbarrow": "Karrocë",
-  "eventsGearWaterBoots": "Çizme uji",
+  "eventsGearRakes": "Grabuja dhe lopata",
+  "eventsGearWheelbarrow": "Karrocë dore",
+  "eventsGearWaterBoots": "Çizme gome",
   "eventsGearSafetyVest": "Jelek reflektues",
-  "eventsGearFirstAid": "Kit i ndihmës së parë",
+  "eventsGearFirstAid": "Kuti e ndihmës së parë",
   "eventsGearSunscreen": "Krem dielli dhe ujë",
   "eventsScaleSmall": "E vogël (1-5 vetë)",
   "eventsScaleSmallDescription": "Pastrim i shpejtë në një vend, një ose dy thesa.",
@@ -3658,7 +3750,10 @@
       }
     }
   },
-  "errorUserNetwork": "Kontrolloni lidhjen dhe provoni përsëri.",
+  "errorUserNetwork": "Kontrolloni lidhjen tuaj të internetit dhe provoni përsëri.",
+  "offlineConnectionTitle": "Nuk ka lidhje interneti",
+  "offlineConnectionBody": "Kontrolloni lidhjen tuaj të internetit dhe provoni përsëri.",
+  "reportDetailStaleBanner": "Nuk u rifreskua. Po shfaqen detajet e fundit të ngarkuara.",
   "errorUserTimeout": "Zgjati shumë. Provoni përsëri.",
   "errorUserUnauthorized": "Hyni përsëri për të vazhduar.",
   "errorUserSessionRevoked": "Sesioni nuk është më i vlefshëm. Hyni përsëri.",
@@ -3667,6 +3762,39 @@
   "errorUserServer": "Shërbimi është i ngarkuar. Provoni së shpejti.",
   "errorUserTooManyRequests": "Shumë përpjekje. Prisni pak.",
   "errorUserUnknown": "Diçka shkoi keq. Provoni përsëri.",
+  "errorUserValidation": "Kontrolloni fushat e theksuara.",
+  "errorUserValidationGeneric": "Disa detaje janë të pavlefshme. Rishikoni dhe provoni përsëri.",
+  "errorUserConflict": "Ky veprim është në konflikt me diçka që ekziston tashmë.",
+  "errorUserCancelled": "Anuluar.",
+  "errorUserPayloadTooLarge": "Skedari ose kërkesa është shumë e madhe.",
+  "errorUserRetryAfterSeconds": "Provoni përsëri pas {seconds} sek.",
+  "@errorUserRetryAfterSeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "errorAlreadyJoined": "Jeni tashmë pjesë e kësaj ngjarjeje.",
+  "errorOrganizerCannotJoin": "Organizatorët nuk mund të bashkohen në ngjarjen e tyre si pjesëmarrës.",
+  "errorNotAParticipant": "Së pari duhet të bashkoheni në ngjarje.",
+  "errorOtpSendCooldown": "Prisni një moment para se të kërkoni një kod tjetër.",
+  "errorOtpSendFailed": "Nuk mundëm ta dërgojmë kodin e verifikimit. Provoni përsëri.",
+  "errorTermsVersionMismatch": "Pranoni kushtet dhe rregullat më të fundit.",
+  "errorDeviceTokenInUse": "Njoftimet janë tashmë të aktivizuara në një pajisje tjetër.",
+  "errorEventsOrganizerNotCertified": "Përfundoni certifikimin e organizatorit për të vazhduar.",
+  "errorEventChatNotParticipant": "Së pari duhet të bashkoheni në ngjarje për të përdorur bisedën.",
+  "errorEventChatMessageUnavailable": "Ky mesazh nuk është më i disponueshëm.",
+  "errorChatUploadTooMany": "Shumë bashkëngjitje. Dërgoni më pak skedarë.",
+  "errorChatUploadInvalid": "Lloji ose madhësia e skedarit nuk lejohet.",
+  "errorAvatarFileRequired": "Zgjidhni një foto për ta ngarkuar.",
+  "errorInvalidFileType": "Lloji i skedarit nuk mbështetet.",
+  "connectionOfflineBanner": "Jeni jashtë linje. Disa funksione mund të mos punojnë derisa të lidheni.",
+  "connectionReconnectingBanner": "Duke u rilidhur…",
+  "connectionLiveUpdatesDelayed": "Përditësimet live janë të vonuara. Tërhiqni për të rifreskuar.",
+  "notificationsInboxStaleHint": "Përditësimet mund të vonohen. Tërhiqni poshtë për të rifreskuar.",
+  "pushRegistrationFailedSnack": "Nuk mundëm të aktivizojmë njoftimet. Provoni përsëri te Cilësimet.",
+  "checkInConnectionTimeout": "Regjistrimi skadoi. Skanoni përsëri ose vendosni kodin manualisht.",
   "eventsFilterSheetSemantic": "Filtro ngjarjet",
   "eventChatTitle": "Biseda",
   "eventChatRowTitle": "Bisedë në grup",

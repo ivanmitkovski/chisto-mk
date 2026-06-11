@@ -156,10 +156,7 @@ class NotificationTile extends StatelessWidget {
             padding: const EdgeInsets.all(AppSpacing.md),
             child: NotificationInboxRowLayout(
               showNavigationChevron: hasTarget,
-              timestamp: notificationRelativeTime(
-                context.l10n,
-                item.createdAt,
-              ),
+              timestamp: notificationRelativeTime(context.l10n, item.createdAt),
               leading: Container(
                 width: 34,
                 height: 34,

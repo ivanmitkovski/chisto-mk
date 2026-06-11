@@ -16,6 +16,7 @@ EventParticipantsPage eventParticipantsPageFromJson(Map<String, dynamic> json) {
         return EventParticipantRow(
           userId: row['userId'] as String? ?? '',
           displayName: (row['displayName'] as String? ?? '').trim(),
+          isDeleted: row['isDeleted'] as bool? ?? false,
           joinedAt: joinedAt,
           avatarUrl: row['avatarUrl'] as String?,
         );

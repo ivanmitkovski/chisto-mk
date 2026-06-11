@@ -1,5 +1,6 @@
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
 import 'package:chisto_infrastructure/shared/widgets/organisms/app_surface/report_surface_aliases.dart';
+import 'package:design_system/design_system.dart';
 import 'package:feature_home/src/presentation/widgets/site_card/share_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -102,7 +103,7 @@ void main() {
           builder: (BuildContext ctx) {
             return ElevatedButton(
               onPressed: () async {
-                poppedAction = await showModalBottomSheet<ShareAction>(
+                poppedAction = await AppBottomSheet.show<ShareAction>(
                   context: ctx,
                   builder: (_) => _defaultSheet(),
                 );
@@ -138,7 +139,7 @@ void main() {
           builder: (BuildContext ctx) {
             return ElevatedButton(
               onPressed: () async {
-                poppedAction = await showModalBottomSheet<ShareAction>(
+                poppedAction = await AppBottomSheet.show<ShareAction>(
                   context: ctx,
                   builder: (_) => _defaultSheet(),
                 );
@@ -175,9 +176,9 @@ void main() {
           builder: (BuildContext ctx) {
             return ElevatedButton(
               onPressed: () async {
-                poppedAction = await showModalBottomSheet<ShareAction>(
+                poppedAction = await AppBottomSheet.show<ShareAction>(
                   context: ctx,
-                  isDismissible: true,
+                  dismissible: true,
                   builder: (_) => _defaultSheet(),
                 );
               },

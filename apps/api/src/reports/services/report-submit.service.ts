@@ -1,6 +1,7 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { NotificationType } from '../../prisma-client';
+import { isWithinMacedonia } from '../../common/geo/macedonia-bounds';
 import { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { CreateReportWithLocationDto } from '../dto/create-report-with-location.dto';
 import { ReportSubmitResponseDto } from '../dto/report-submit-response.dto';
@@ -13,6 +14,8 @@ import type { ReportSubmitLocale } from '../util/report-locale.util';
 import { ObservabilityStore } from '../../observability/observability.store';
 import { ReportsUploadService } from './reports-upload.service';
 import { reportReceivedUserCopy } from '../../notifications/util/notification-templates';
+import { notificationLocalesByUserId } from '../../common/i18n/notification-locale.resolver';
+import { PrismaService } from '../../prisma/prisma.service';
 import { SITE_HISTORY_WRITER, type SiteHistoryWriterPort } from '../ports/site-history-writer.port';
 
 @Injectable()
@@ -27,6 +30,7 @@ export class ReportSubmitService {
     private readonly mediaAppend: ReportSubmitMediaAppendService,
     private readonly persistence: ReportSubmitPersistenceService,
     private readonly eventEmitter: EventEmitter2,
+    private readonly prisma: PrismaService,
     @Inject(SITE_HISTORY_WRITER) private readonly siteHistoryWriter: SiteHistoryWriterPort,
   ) {}
 
@@ -38,6 +42,14 @@ export class ReportSubmitService {
     requestId?: string,
   ): Promise<ReportSubmitResponseDto> {
     const startedAt = Date.now();
+    // Live-GPS defense-in-depth: reject forged out-of-country coordinates server-side,
+    // independent of the user's persisted eligibility TTL.
+    if (!isWithinMacedonia(dto.latitude, dto.longitude)) {
+      throw new BadRequestException({
+        code: 'REPORT_LOCATION_OUTSIDE_MACEDONIA',
+        message: 'Reports can only be submitted for locations within North Macedonia',
+      });
+    }
     const trimmedIdem = this.idempotency.parseIdempotencyKeyHeader(headerIdempotencyKey);
     if (trimmedIdem) {
       const replay = await this.idempotency.tryReplayFromIdempotencyKey(user.userId, trimmedIdem);
@@ -92,7 +104,8 @@ export class ReportSubmitService {
         submittedAt: new Date().toISOString(),
       });
 
-      const inboxLocale = locale === 'en' ? 'en' : 'mk';
+      const localeBy = await notificationLocalesByUserId(this.prisma, [user.userId]);
+      const inboxLocale = localeBy.get(user.userId)!;
       const receivedCopy = reportReceivedUserCopy(inboxLocale, result.reportNumber);
       this.eventEmitter.emit('notification.send', {
         recipientUserIds: [user.userId],

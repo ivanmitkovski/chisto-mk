@@ -69,6 +69,17 @@ class _SitePreviewSheetState extends State<SitePreviewSheet>
     super.dispose();
   }
 
+  String? _previewAddressLine(PollutionSite site) {
+    final String? address = site.address?.trim();
+    if (address == null || address.isEmpty) {
+      return null;
+    }
+    if (address == site.title.trim()) {
+      return null;
+    }
+    return address;
+  }
+
   String _formatDistanceFromUser(BuildContext context, PollutionSite site) {
     final LatLng? user = widget.userLocation;
     final LatLng? point = widget.siteCoordinates[site.id];
@@ -189,6 +200,19 @@ class _SitePreviewSheetState extends State<SitePreviewSheet>
                                       height: 1.3,
                                     ),
                               ),
+                              if (_previewAddressLine(site) != null) ...<Widget>[
+                                const SizedBox(height: 4),
+                                Text(
+                                  _previewAddressLine(site)!,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(
+                                        color: secondaryText,
+                                        height: 1.3,
+                                      ),
+                                ),
+                              ],
                               const SizedBox(height: 8),
                               Wrap(
                                 spacing: 8,

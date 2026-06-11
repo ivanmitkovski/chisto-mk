@@ -77,8 +77,7 @@ class _FakeOutboxRepo implements ReportOutboxRepository {
       if (e.cooldownUntilMs != null && e.cooldownUntilMs! > now) {
         return false;
       }
-      if (e.processingLeaseUntilMs != null &&
-          e.processingLeaseUntilMs! > now) {
+      if (e.processingLeaseUntilMs != null && e.processingLeaseUntilMs! > now) {
         return false;
       }
       if (e.state == ReportOutboxState.pending && !e.submitRequested) {
@@ -558,37 +557,42 @@ void main() {
       await c.dispose();
     });
 
-    test('enqueueSubmit is idempotent when wizard row is already in pipeline', () async {
-      final _FakeOutboxRepo repo = _FakeOutboxRepo();
-      final int t = DateTime.now().millisecondsSinceEpoch;
-      await repo.insert(
-        ReportOutboxEntry(
-          id: kReportWizardDraftRowId,
-          idempotencyKey: 'stable-key-1234567890',
+    test(
+      'enqueueSubmit is idempotent when wizard row is already in pipeline',
+      () async {
+        final _FakeOutboxRepo repo = _FakeOutboxRepo();
+        final int t = DateTime.now().millisecondsSinceEpoch;
+        await repo.insert(
+          ReportOutboxEntry(
+            id: kReportWizardDraftRowId,
+            idempotencyKey: 'stable-key-1234567890',
+            draft: _validDraft(),
+            title: 'Title',
+            description: 'Desc',
+            submitRequested: true,
+            state: ReportOutboxState.submitting,
+            attemptCount: 0,
+            createdAtMs: t,
+            updatedAtMs: t,
+          ),
+        );
+        final ReportOutboxCoordinator c = ReportOutboxCoordinator(
+          repository: repo,
+          reportsApi: _StubApi(),
+        );
+        await c.enqueueSubmit(
           draft: _validDraft(),
           title: 'Title',
           description: 'Desc',
-          submitRequested: true,
-          state: ReportOutboxState.submitting,
-          attemptCount: 0,
-          createdAtMs: t,
-          updatedAtMs: t,
-        ),
-      );
-      final ReportOutboxCoordinator c = ReportOutboxCoordinator(
-        repository: repo,
-        reportsApi: _StubApi(),
-      );
-      await c.enqueueSubmit(
-        draft: _validDraft(),
-        title: 'Title',
-        description: 'Desc',
-      );
-      final ReportOutboxEntry? row = await repo.getById(kReportWizardDraftRowId);
-      expect(row?.state, ReportOutboxState.submitting);
-      expect(row?.submitRequested, isTrue);
-      await c.dispose();
-    });
+        );
+        final ReportOutboxEntry? row = await repo.getById(
+          kReportWizardDraftRowId,
+        );
+        expect(row?.state, ReportOutboxState.submitting);
+        expect(row?.submitRequested, isTrue);
+        await c.dispose();
+      },
+    );
 
     test('enqueueSubmit rejects when pipeline already active', () async {
       final _FakeOutboxRepo repo = _FakeOutboxRepo();
@@ -659,42 +663,47 @@ void main() {
       },
     );
 
-    test('start() self-heals stuck submitting wizard row with expired lease', () async {
-      final _FakeOutboxRepo repo = _FakeOutboxRepo();
-      final int t = DateTime.now().millisecondsSinceEpoch;
-      await repo.insert(
-        ReportOutboxEntry(
-          id: kReportWizardDraftRowId,
-          idempotencyKey: 'self-heal-stable-key1234',
-          draft: _validDraft(),
-          title: 'Title',
-          description: 'Desc',
-          submitRequested: true,
-          state: ReportOutboxState.submitting,
-          attemptCount: 1,
-          lastErrorCode: 'UNKNOWN',
-          lastErrorMessage: 'An unexpected error occurred.',
-          createdAtMs: t,
-          updatedAtMs: t,
-          processingOwner: 'dead-isolate-12345',
-          processingLeaseUntilMs: t - 1000,
-        ),
-      );
-      final _StubApi api = _StubApi();
-      final ReportOutboxCoordinator c = ReportOutboxCoordinator(
-        repository: repo,
-        reportsApi: api,
-      );
-      final Future<ReportOutboxSuccess> done = c.successStream.first;
-      await c.start();
-      final ReportOutboxSuccess ev = await done.timeout(
-        const Duration(seconds: 10),
-      );
-      expect(ev.outboxId, kReportWizardDraftRowId);
-      // The stuck row's persisted idempotency key replays end-to-end.
-      expect(api.recordedIdempotencyKeys, <String>['self-heal-stable-key1234']);
-      await c.dispose();
-    });
+    test(
+      'start() self-heals stuck submitting wizard row with expired lease',
+      () async {
+        final _FakeOutboxRepo repo = _FakeOutboxRepo();
+        final int t = DateTime.now().millisecondsSinceEpoch;
+        await repo.insert(
+          ReportOutboxEntry(
+            id: kReportWizardDraftRowId,
+            idempotencyKey: 'self-heal-stable-key1234',
+            draft: _validDraft(),
+            title: 'Title',
+            description: 'Desc',
+            submitRequested: true,
+            state: ReportOutboxState.submitting,
+            attemptCount: 1,
+            lastErrorCode: 'UNKNOWN',
+            lastErrorMessage: 'An unexpected error occurred.',
+            createdAtMs: t,
+            updatedAtMs: t,
+            processingOwner: 'dead-isolate-12345',
+            processingLeaseUntilMs: t - 1000,
+          ),
+        );
+        final _StubApi api = _StubApi();
+        final ReportOutboxCoordinator c = ReportOutboxCoordinator(
+          repository: repo,
+          reportsApi: api,
+        );
+        final Future<ReportOutboxSuccess> done = c.successStream.first;
+        await c.start();
+        final ReportOutboxSuccess ev = await done.timeout(
+          const Duration(seconds: 10),
+        );
+        expect(ev.outboxId, kReportWizardDraftRowId);
+        // The stuck row's persisted idempotency key replays end-to-end.
+        expect(api.recordedIdempotencyKeys, <String>[
+          'self-heal-stable-key1234',
+        ]);
+        await c.dispose();
+      },
+    );
 
     test('start() leaves a live-leased wizard row untouched', () async {
       final _FakeOutboxRepo repo = _FakeOutboxRepo();
@@ -837,59 +846,62 @@ void main() {
       await second.dispose();
     });
 
-    test('submitReportAndAwait re-attaches when wizard submit in flight', () async {
-      final _FakeOutboxRepo repo = _FakeOutboxRepo();
-      final Completer<void> gate = Completer<void>();
-      final _StubApi api = _StubApi(
-        onSubmit:
-            ({
-              required double latitude,
-              required double longitude,
-              required String title,
-              String? description,
-              List<String>? mediaUrls,
-              String? category,
-              int? severity,
-              String? address,
-              String? cleanupEffort,
-              String? idempotencyKey,
-            }) async {
-              await gate.future;
-              return const ReportSubmitResult(
-                reportId: 'r1',
-                reportNumber: 'R-1',
-                siteId: 's1',
-                isNewSite: false,
-                pointsAwarded: 0,
-              );
-            },
-      );
-      final ReportOutboxCoordinator c = ReportOutboxCoordinator(
-        repository: repo,
-        reportsApi: api,
-      );
-      await c.start();
-      final Future<ReportSubmitResult> first = c.submitReportAndAwait(
-        draft: _validDraft(),
-        title: 'Title',
-        description: 'Desc',
-      );
-      await Future<void>.delayed(const Duration(milliseconds: 50));
-      final int submitsBeforeRetap = api.recordedIdempotencyKeys.length;
-      final Future<ReportSubmitResult> second = c.submitReportAndAwait(
-        draft: _validDraft(),
-        title: 'Title',
-        description: 'Desc',
-      );
-      expect(api.recordedIdempotencyKeys.length, submitsBeforeRetap);
-      gate.complete();
-      final ReportSubmitResult a = await first;
-      final ReportSubmitResult b = await second;
-      expect(a.reportId, 'r1');
-      expect(b.reportId, 'r1');
-      expect(api.recordedIdempotencyKeys.length, 1);
-      await c.dispose();
-    });
+    test(
+      'submitReportAndAwait re-attaches when wizard submit in flight',
+      () async {
+        final _FakeOutboxRepo repo = _FakeOutboxRepo();
+        final Completer<void> gate = Completer<void>();
+        final _StubApi api = _StubApi(
+          onSubmit:
+              ({
+                required double latitude,
+                required double longitude,
+                required String title,
+                String? description,
+                List<String>? mediaUrls,
+                String? category,
+                int? severity,
+                String? address,
+                String? cleanupEffort,
+                String? idempotencyKey,
+              }) async {
+                await gate.future;
+                return const ReportSubmitResult(
+                  reportId: 'r1',
+                  reportNumber: 'R-1',
+                  siteId: 's1',
+                  isNewSite: false,
+                  pointsAwarded: 0,
+                );
+              },
+        );
+        final ReportOutboxCoordinator c = ReportOutboxCoordinator(
+          repository: repo,
+          reportsApi: api,
+        );
+        await c.start();
+        final Future<ReportSubmitResult> first = c.submitReportAndAwait(
+          draft: _validDraft(),
+          title: 'Title',
+          description: 'Desc',
+        );
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+        final int submitsBeforeRetap = api.recordedIdempotencyKeys.length;
+        final Future<ReportSubmitResult> second = c.submitReportAndAwait(
+          draft: _validDraft(),
+          title: 'Title',
+          description: 'Desc',
+        );
+        expect(api.recordedIdempotencyKeys.length, submitsBeforeRetap);
+        gate.complete();
+        final ReportSubmitResult a = await first;
+        final ReportSubmitResult b = await second;
+        expect(a.reportId, 'r1');
+        expect(b.reportId, 'r1');
+        expect(api.recordedIdempotencyKeys.length, 1);
+        await c.dispose();
+      },
+    );
 
     test(
       'submitReportAndAwait after wizard succeeded does not POST again',
@@ -997,7 +1009,10 @@ void main() {
       await c.scheduleProcess();
       await done.timeout(const Duration(seconds: 10));
       expect(attempts, greaterThanOrEqualTo(2));
-      expect(api.recordedIdempotencyKeys.every((String? k) => k == idem), isTrue);
+      expect(
+        api.recordedIdempotencyKeys.every((String? k) => k == idem),
+        isTrue,
+      );
       await c.dispose();
     });
 

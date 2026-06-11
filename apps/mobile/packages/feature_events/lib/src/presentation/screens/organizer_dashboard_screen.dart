@@ -208,10 +208,10 @@ class _OrganizerDashboardScreenState
                       icon: CupertinoIcons.calendar_badge_plus,
                       title: context.l10n.eventsOrganizerDashboardEmpty,
                       action: AppButton.primary(
-                        label: context
-                            .l10n.eventsOrganizerDashboardEmptyAction,
+                        label: context.l10n.eventsOrganizerDashboardEmptyAction,
                         onPressed: () => EventsNavigation.openCreate(
                           context,
+                          ref: ref,
                           auth: ref.read(authStateProvider),
                         ),
                         leadingIcon: const Icon(

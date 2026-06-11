@@ -45,6 +45,7 @@ class EcoEvent {
     required this.siteDistanceKm,
     required this.organizerId,
     required this.organizerName,
+    this.organizerIsDeleted = false,
     this.organizerAvatarUrl,
     required this.date,
 
@@ -161,6 +162,7 @@ class EcoEvent {
       siteDistanceKm: (json['siteDistanceKm'] as num?)?.toDouble() ?? 0,
       organizerId: (json['organizerId'] as String?) ?? '',
       organizerName: (json['organizerName'] as String?) ?? '',
+      organizerIsDeleted: json['organizerIsDeleted'] as bool? ?? false,
       organizerAvatarUrl: json['organizerAvatarUrl'] as String?,
       date: eventDate,
       endDate: computedEndDate,
@@ -306,6 +308,7 @@ class EcoEvent {
   bool get isRecurring => recurrenceRule != null && recurrenceRule!.isNotEmpty;
   final String organizerId;
   final String organizerName;
+  final bool organizerIsDeleted;
   final String? organizerAvatarUrl;
   final DateTime date;
   final DateTime? endDate;
@@ -533,6 +536,7 @@ class EcoEvent {
       siteDistanceKm: siteDistanceKm ?? this.siteDistanceKm,
       organizerId: organizerId,
       organizerName: organizerName,
+      organizerIsDeleted: this.organizerIsDeleted,
       organizerAvatarUrl: clearOrganizerAvatarUrl
           ? null
           : organizerAvatarUrl ?? this.organizerAvatarUrl,
@@ -676,6 +680,7 @@ class EcoEvent {
         'scheduledAtUtc': scheduledAtUtc!.toUtc().toIso8601String(),
       'organizerId': organizerId,
       'organizerName': organizerName,
+      'organizerIsDeleted': organizerIsDeleted,
       if (organizerAvatarUrl != null) 'organizerAvatarUrl': organizerAvatarUrl,
       'date': date.toIso8601String(),
       if (endDate != null) 'endDate': endDate!.toIso8601String(),

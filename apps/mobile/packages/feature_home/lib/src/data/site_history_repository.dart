@@ -72,6 +72,7 @@ class SiteHistoryRepository implements SiteHistoryRepositoryPort {
       reportId: json['reportId'] as String?,
       cleanupEventId: json['cleanupEventId'] as String?,
       actorDisplayName: actor?['displayName'] as String?,
+      actorIsDeleted: actor?['isDeleted'] as bool? ?? false,
       actorRole: actor?['role'] as String?,
       note: json['note'] as String?,
       metadata: safeAsStringKeyedMap(json['metadata']),

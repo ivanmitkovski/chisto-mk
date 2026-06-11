@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ActiveUsersModule } from '../active-users/active-users.module';
 import { AuthModule } from '../auth/auth.module';
 import { PrismaModule } from '../prisma/prisma.module';
 import { AdminRealtimeController } from './controllers/admin-realtime.controller';
@@ -16,7 +17,7 @@ import { UserEventsService } from './services/user-events.service';
 import { MapCdnPurgeService } from '../observability/services/map-cdn-purge.service';
 
 @Module({
-  imports: [AuthModule, PrismaModule],
+  imports: [AuthModule, PrismaModule, ActiveUsersModule],
   controllers: [AdminRealtimeController],
   providers: [
     MapCdnPurgeService,

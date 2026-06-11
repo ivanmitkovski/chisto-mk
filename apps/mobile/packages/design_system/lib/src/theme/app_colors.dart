@@ -26,7 +26,9 @@ class AppColors {
   static const Color textOnDarkMuted = Color(0xB3FFFFFF);
   static const Color inputFill = Color(0xFFF0F1F7);
   static const Color inputBorder = Color(0xFFDDE1EA);
-  static const Color accentDanger = Color(0xFFE6513D);
+  static const Color error = Color(0xFFE6513D);
+  @Deprecated('Use AppColors.error instead')
+  static const Color accentDanger = error;
   static const Color accentWarning = Color(0xFFF5A623);
 
   /// Organizer highlights / charts — alias of [accentWarning] for semantic call sites.
@@ -52,7 +54,6 @@ class AppColors {
   static const Color feedPillSelectedForeground = primaryDark;
 
   static const Color overlay = Color(0x80000000);
-  static const Color error = Color(0xFFD73636);
 
   // ---------------------------------------------------------------------------
   // Reports vertical — soft surfaces (chips, banners, info callouts; light only)

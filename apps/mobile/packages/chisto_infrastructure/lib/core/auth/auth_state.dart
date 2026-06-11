@@ -10,8 +10,10 @@ class AuthState extends ChangeNotifier {
   String? _phoneNumber;
   String? _accessToken;
   DateTime? _organizerCertifiedAt;
+  int _sessionEpoch = 0;
 
   AuthStatus get status => _status;
+  int get sessionEpoch => _sessionEpoch;
   String? get userId => _userId;
   String? get displayName => _displayName;
   String? get phoneNumber => _phoneNumber;
@@ -33,6 +35,7 @@ class AuthState extends ChangeNotifier {
     bool syncOrganizerCertifiedAt = false,
   }) {
     final String? previousUserId = _userId;
+    _sessionEpoch++;
     _status = AuthStatus.authenticated;
     _userId = userId;
     _displayName = displayName;
@@ -44,7 +47,6 @@ class AuthState extends ChangeNotifier {
       _organizerCertifiedAt = organizerCertifiedAt;
     }
     if (previousUserId != userId) {
-      // Tag subsequent crashes with the signed-in user id (no PII).
       chistoSentrySetUser(userId);
     }
     notifyListeners();
@@ -57,7 +59,6 @@ class AuthState extends ChangeNotifier {
     _phoneNumber = null;
     _accessToken = null;
     _organizerCertifiedAt = null;
-    // Drop the Sentry user tag so the next session is not mis-attributed.
     chistoSentryClearUser();
     notifyListeners();
   }

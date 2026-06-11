@@ -6,6 +6,7 @@ import type { AuthenticatedUser } from '../../auth/types/authenticated-user.type
 import type { PatchEventChatReadDto } from '../dto/patch-event-chat-read.dto';
 import { NotificationStateService } from '../../notifications/services/notification-state.service';
 import { EventChatSseService } from './event-chat-sse.service';
+import { participantDisplayIdentity } from '../../events/util/events-query.include.shared';
 
 /** Safety cap on joiners scanned when building read-cursor roster for organizers. */
 const READ_CURSORS_PARTICIPANT_CAP = 2000;
@@ -147,6 +148,7 @@ export class EventChatPresenceReadStateService {
       orderBy: { joinedAt: 'asc' },
       take: READ_CURSORS_PARTICIPANT_CAP,
       select: {
+        userId: true,
         user: { select: { id: true, firstName: true, lastName: true } },
       },
     });
@@ -169,14 +171,15 @@ export class EventChatPresenceReadStateService {
     }
 
     for (const r of rows) {
-      if (seen.has(r.user.id)) {
+      if (r.userId == null || seen.has(r.userId)) {
         continue;
       }
+      const identity = participantDisplayIdentity(r.user, { actorUserId: r.userId });
       ordered.push({
-        id: r.user.id,
-        displayName: `${r.user.firstName} ${r.user.lastName}`.trim(),
+        id: r.userId,
+        displayName: identity.displayName,
       });
-      seen.add(r.user.id);
+      seen.add(r.userId);
     }
 
     const ids = ordered.map((o) => o.id);

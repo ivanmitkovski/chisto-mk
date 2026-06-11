@@ -60,6 +60,7 @@ import {
 } from '../dto/report-viewer-presence.dto';
 import { reportLocaleFromAcceptLanguage } from '../util/report-locale.util';
 import { ReportsService } from '../services/reports.service';
+import { ReportsDuplicateMergeService } from '../services/reports-duplicate-merge.service';
 import { ReportViewerPresenceService } from '../services/report-viewer-presence.service';
 import { ReportsUploadService } from '../services/reports-upload.service';
 import { ReportSubmitMediaAppendService } from '../services/report-submit-media-append.service';
@@ -75,6 +76,7 @@ import { ApiStandardHttpErrorResponses } from '../../common/openapi/standard-htt
 export class ReportsController {
   constructor(
     private readonly reportsService: ReportsService,
+    private readonly reportsDuplicateMerge: ReportsDuplicateMergeService,
     private readonly reportsUploadService: ReportsUploadService,
     private readonly reportMediaAppend: ReportSubmitMediaAppendService,
     private readonly reportViewerPresenceService: ReportViewerPresenceService,
@@ -214,7 +216,7 @@ export class ReportsController {
     type: AdminDuplicateReportGroupsResponseDto,
   })
   findDuplicateGroups(@Query() query: ListReportsQueryDto): Promise<AdminDuplicateReportGroupsResponseDto> {
-    return this.reportsService.findDuplicateGroups(query);
+    return this.reportsDuplicateMerge.findDuplicateGroups(query);
   }
 
   @Get(':id/duplicates')
@@ -230,7 +232,7 @@ export class ReportsController {
   findDuplicateGroupByReport(
     @Param('id', ParseCuidPipe) id: string,
   ): Promise<AdminDuplicateReportGroupDto> {
-    return this.reportsService.findDuplicateGroupByReport(id);
+    return this.reportsDuplicateMerge.findDuplicateGroupByReport(id);
   }
 
   @Get(':id/viewers')
@@ -355,6 +357,6 @@ export class ReportsController {
     @Body() dto: MergeDuplicateReportsDto,
     @CurrentUser() moderator: AuthenticatedUser,
   ): Promise<MergeDuplicateReportsResponseDto> {
-    return this.reportsService.mergeDuplicateReports(id, dto, moderator);
+    return this.reportsDuplicateMerge.mergeDuplicateReports(id, dto, moderator);
   }
 }

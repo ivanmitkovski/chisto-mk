@@ -14,7 +14,9 @@ import 'package:chisto_infrastructure/core/l10n/app_locale_resolution.dart';
 import 'package:chisto_infrastructure/core/lifecycle/map_realtime_lifecycle.dart';
 import 'package:chisto_infrastructure/core/lifecycle/notifications_inbox_lifecycle.dart';
 import 'package:chisto_infrastructure/core/lifecycle/reports_realtime_lifecycle.dart';
+import 'package:chisto_infrastructure/core/lifecycle/presence_lifecycle.dart';
 import 'package:chisto_infrastructure/core/lifecycle/session_resume_refresh_lifecycle.dart';
+import 'package:chisto_infrastructure/core/presence/presence_route_tracker.dart';
 import 'package:chisto_infrastructure/core/logging/app_log.dart';
 import 'package:chisto_infrastructure/core/navigation/app_go_router.dart';
 import 'package:chisto_infrastructure/core/navigation/app_navigator_key.dart';
@@ -104,56 +106,145 @@ Future<void> main() async {
 }
 
 Future<void> _bootstrapAndRun() async {
-  if (kReleaseMode) {
-    final AppConfig config = AppConfig.fromEnvironment();
-    if (!config.isProd) {
-      throw StateError(
-        'Release builds must pass --dart-define=ENV=prod (got ${config.environment.name})',
+  try {
+    if (kReleaseMode) {
+      final AppConfig config = AppConfig.fromEnvironment();
+      // Release builds may ship as staging (beta / TestFlight / Play internal
+      // testing) or prod (store). The dev family (dev/local/localAndroid/
+      // localDevice/awsDev) must never ship in a release.
+      if (!config.isReleaseEligible) {
+        throw StateError(
+          'Release builds must pass --dart-define=ENV=staging or '
+          '--dart-define=ENV=prod (got ${config.environment.name})',
+        );
+      }
+      // Prod is locked to HTTPS (no cleartext, no raw ELB). Staging/beta is a
+      // flexible target and may temporarily use the cleartext dev backend (see
+      // AppConfig.devApiBaseUrl) until a real staging/prod environment exists.
+      if (config.isProd) {
+        AppConfig.assertReleaseTransportSecurity(config.apiBaseUrl);
+      }
+    }
+
+    // Use FFI sqflite only on desktop; iOS/Android use the native implementation (avoids global factory warning on mobile).
+    if (!kIsWeb) {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.linux:
+        case TargetPlatform.macOS:
+        case TargetPlatform.windows:
+          sqfliteFfiInit();
+          databaseFactory = databaseFactoryFfi;
+        case TargetPlatform.android:
+        case TargetPlatform.iOS:
+        case TargetPlatform.fuchsia:
+          break;
+      }
+    }
+    try {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+      if (Firebase.apps.isNotEmpty) {
+        FirebaseMessaging.onBackgroundMessage(
+          firebaseMessagingBackgroundHandler,
+        );
+      }
+    } on Object catch (e, st) {
+      AppLog.warn(
+        '[Firebase] Init error (run flutterfire configure if push is required): $e',
+        error: e,
+        stackTrace: st,
       );
     }
-    AppConfig.assertReleaseTransportSecurity(config.apiBaseUrl);
-  }
+    await AppBootstrap.instance.initialize();
+    setRootProviderContainer(AppBootstrap.instance.providerContainer);
 
-  // Use FFI sqflite only on desktop; iOS/Android use the native implementation (avoids global factory warning on mobile).
-  if (!kIsWeb) {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.linux:
-      case TargetPlatform.macOS:
-      case TargetPlatform.windows:
-        sqfliteFfiInit();
-        databaseFactory = databaseFactoryFfi;
-      case TargetPlatform.android:
-      case TargetPlatform.iOS:
-      case TargetPlatform.fuchsia:
-        break;
-    }
-  }
-  try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
+    AppSystemUi.applyLightAndroidNavigationBar();
+    await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
+      DeviceOrientation.portraitUp,
+    ]);
+    runApp(
+      UncontrolledProviderScope(
+        container: AppBootstrap.instance.providerContainer,
+        child: const ChistoApp(),
+      ),
     );
-    if (Firebase.apps.isNotEmpty) {
-      FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
-    }
-  } on Object catch (e, st) {
-    AppLog.warn(
-      '[Firebase] Init error (run flutterfire configure if push is required): $e',
-      error: e,
-      stackTrace: st,
+  } on Object catch (error, stackTrace) {
+    // Never leave the user on a blank native splash. Surface a minimal error
+    // screen and rethrow so global handlers / Sentry still capture the cause.
+    AppLog.error(
+      'Fatal bootstrap error before runApp',
+      error: error,
+      stackTrace: stackTrace,
     );
+    runApp(_BootstrapErrorApp(error: error));
+    rethrow;
   }
-  await AppBootstrap.instance.initialize();
-  setRootProviderContainer(AppBootstrap.instance.providerContainer);
+}
 
-  await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
-    DeviceOrientation.portraitUp,
-  ]);
-  runApp(
-    UncontrolledProviderScope(
-      container: AppBootstrap.instance.providerContainer,
-      child: const ChistoApp(),
-    ),
-  );
+/// Last-resort UI shown when bootstrap fails before [runApp]. Prevents the
+/// silent white native splash (the symptom of an unhandled startup error) by
+/// always rendering on-brand guidance; the underlying error is shown in
+/// non-release builds and reported to Sentry in release.
+class _BootstrapErrorApp extends StatelessWidget {
+  const _BootstrapErrorApp({required this.error});
+
+  final Object error;
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        backgroundColor: AppColors.primary,
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  const Icon(
+                    Icons.error_outline_rounded,
+                    size: 48,
+                    color: AppColors.textPrimary,
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Could not start Chisto',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Please close the app and open it again. If the problem '
+                    'continues, reinstall the app or contact support.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 14, color: AppColors.textPrimary),
+                  ),
+                  if (!kReleaseMode) ...<Widget>[
+                    const SizedBox(height: 16),
+                    Text(
+                      '$error',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 bool _workmanagerRegistrationAttempted = false;
@@ -200,6 +291,7 @@ class _ChistoAppState extends State<ChistoApp> {
       NotificationsInboxLifecycle();
   final SessionResumeRefreshLifecycle _sessionResumeRefreshLifecycle =
       SessionResumeRefreshLifecycle();
+  final PresenceLifecycle _presenceLifecycle = PresenceLifecycle();
   StreamSubscription<RemoteMessage>? _tapSubscription;
   StreamSubscription<Map<String, dynamic>>? _localNotificationTapSubscription;
   StreamSubscription<Uri>? _deepLinkSubscription;
@@ -214,11 +306,13 @@ class _ChistoAppState extends State<ChistoApp> {
   void initState() {
     super.initState();
     _router = buildAppGoRouter();
+    bindPresenceRouteTracker(_router);
     ImageCacheGovernor.instance.install();
     _reportsRealtimeLifecycle.register();
     _mapRealtimeLifecycle.register();
     _notificationsInboxLifecycle.register();
     _sessionResumeRefreshLifecycle.register();
+    _presenceLifecycle.register();
     final PushNotificationService push = readRoot(
       pushNotificationServiceProvider,
     );
@@ -299,17 +393,21 @@ class _ChistoAppState extends State<ChistoApp> {
       return;
     }
     final DeepLinkRoute? parsed = DeepLinkRouter.parse(uri);
-    final bool handled = DeepLinkRouter.handleUri(
-      _router,
-      uri,
-      isAuthenticated: readRoot(authStateProvider).isAuthenticated,
+    unawaited(
+      DeepLinkRouter.handleUriAsync(
+        _router,
+        uri,
+        isAuthenticated: readRoot(authStateProvider).isAuthenticated,
+        context: ctx.mounted ? ctx : null,
+      ).then((bool handled) {
+        if (handled && parsed != null) {
+          unawaited(_trackShareOpenFromDeepLink(parsed));
+        }
+        if (!handled && kDebugMode) {
+          AppLog.verbose('[DeepLink] Unhandled URI: $uri');
+        }
+      }),
     );
-    if (handled && parsed != null) {
-      unawaited(_trackShareOpenFromDeepLink(parsed));
-    }
-    if (!handled && kDebugMode) {
-      AppLog.verbose('[DeepLink] Unhandled URI: $uri');
-    }
   }
 
   Future<void> _trackShareOpenFromDeepLink(DeepLinkRoute? route) async {
@@ -336,6 +434,7 @@ class _ChistoAppState extends State<ChistoApp> {
     _mapRealtimeLifecycle.unregister();
     _notificationsInboxLifecycle.unregister();
     _sessionResumeRefreshLifecycle.unregister();
+    _presenceLifecycle.unregister();
     ImageCacheGovernor.instance.uninstall();
     _deepLinkSubscription?.cancel();
     _pushSetupCoordinator?.dispose();
@@ -419,7 +518,9 @@ class _ChistoAppState extends State<ChistoApp> {
       builder: (BuildContext context, WidgetRef ref, _) {
         final Locale? override = ref.watch(appLocaleOverrideProvider);
         return AuthSessionScope(
-          child: MaterialApp.router(
+          child: AnnotatedRegion<SystemUiOverlayStyle>(
+            value: AppSystemUi.light,
+            child: MaterialApp.router(
             builder: (BuildContext context, Widget? child) {
               final TextScaler scaler = MediaQuery.textScalerOf(
                 context,
@@ -444,6 +545,7 @@ class _ChistoAppState extends State<ChistoApp> {
                     platformLocales: locales ?? <Locale>[],
                   );
                 },
+          ),
           ),
         );
       },

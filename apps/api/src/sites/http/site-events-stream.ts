@@ -9,7 +9,29 @@ import { loadFeatureFlags } from '../../config/feature-flags';
 import { loadMapConfig } from '../../config/map.config';
 import { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { SiteEventsService } from '../../admin-realtime/services/site-events.service';
+import { SiteEvent } from '../../admin-realtime/types/site-events.types';
 import { ObservabilityStore } from '../../observability/observability.store';
+
+/**
+ * Public-stream privacy: REPORTED sites are visible only to their reporter, so
+ * their coordinates must never be broadcast to every authenticated user.
+ * Clients keep receiving the event as an invalidation hint (siteId + status);
+ * without coordinates they fall back to a viewport refetch, which applies the
+ * per-viewer visibility filter server-side.
+ *
+ * The admin dashboard uses the separate `/admin-realtime/events` stream and is
+ * not affected.
+ */
+export function sanitizeSiteEventForPublicStream(event: SiteEvent): SiteEvent {
+  if (event.mutation.status !== 'REPORTED') {
+    return event;
+  }
+  if (event.mutation.latitude == null && event.mutation.longitude == null) {
+    return event;
+  }
+  const { latitude: _latitude, longitude: _longitude, ...rest } = event.mutation;
+  return { ...event, mutation: rest };
+}
 
 const cfg = loadMapConfig();
 const flags = loadFeatureFlags();
@@ -80,10 +102,9 @@ export function buildSiteEventsStream(
     return from(openUserConnection(user.userId)).pipe(
       switchMap(() => {
         ObservabilityStore.recordMapSseConnected();
-        const toSseEvent = (
-          event: { eventId: string; type: string } & Record<string, unknown>,
-        ): NestMessageEvent => {
+        const toSseEvent = (rawEvent: SiteEvent): NestMessageEvent => {
           ObservabilityStore.recordMapSseEventEmitted();
+          const event = sanitizeSiteEventForPublicStream(rawEvent);
           return {
             data: event as object,
             type: event.type,

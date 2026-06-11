@@ -21,36 +21,12 @@ import type { SiteMapRow } from '../data/map-adapter';
 import { registerMapAdapterBroadcastSync } from '../data/map-adapter';
 import { useSitesMap } from '../hooks/use-sites-map';
 import { MACEDONIA_BOUNDS, SERVER_CLUSTER_MAX_ZOOM } from '../map-constants';
+import { useTileUrl } from '../hooks/use-tile-url';
+import { createCountClusterIcon } from '../utils/map-count-cluster-icon';
 import { CLUSTER_EXPAND_MIN_ZOOM, flyToClusterContents } from '../utils/map-cluster-navigation';
 import styles from './sites-map.module.css';
 
-const CARTODB_POSITRON =
-  'https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}{r}.png';
 const DEBOUNCE_MS = 400;
-
-function readCssTileTemplateLight(): string | null {
-  if (typeof window === 'undefined') {
-    return null;
-  }
-  const raw = getComputedStyle(document.documentElement)
-    .getPropertyValue('--map-tile-template-light')
-    .trim();
-  if (!raw) {
-    return null;
-  }
-  return raw.replace(/^['"]|['"]$/g, '');
-}
-
-/** Admin is light-only for now; always use the light basemap (CSS var or Carto Positron). */
-function useTileUrl(): string {
-  const [fromCss, setFromCss] = useState<string | null>(null);
-
-  useEffect(() => {
-    setFromCss(readCssTileTemplateLight());
-  }, []);
-
-  return fromCss ?? CARTODB_POSITRON;
-}
 
 function MapEventHandler({
   onMoveEnd,
@@ -101,16 +77,7 @@ function FitBoundsEffect({ trigger }: { trigger: number }) {
 }
 
 function createClusterCustomIcon(cluster: { getChildCount: () => number }) {
-  const count = cluster.getChildCount();
-  const size = count >= 100 ? 52 : count >= 25 ? 46 : 40;
-  const tierClass =
-    count >= 100 ? styles.clusterIconLarge : count >= 25 ? styles.clusterIconMedium : styles.clusterIconSmall;
-  const safeCount = String(count).replaceAll('<', '&lt;').replaceAll('>', '&gt;');
-  return L.divIcon({
-    html: `<span class="${styles.clusterIcon} ${tierClass}" style="width:${size}px;height:${size}px;">${safeCount}</span>`,
-    className: styles.clusterIconWrap,
-    iconSize: [size, size],
-  });
+  return createCountClusterIcon(cluster.getChildCount());
 }
 
 type SitesClusterLayerProps = {

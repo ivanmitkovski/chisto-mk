@@ -12,9 +12,9 @@ export class CitizenLoginDto {
   })
   phoneNumber!: string;
 
-  @ApiProperty({ minLength: 8, maxLength: 72, example: 'StrongPass123!' })
+  @ApiProperty({ minLength: 1, maxLength: 72, example: 'StrongPass123!' })
   @IsString()
-  @MinLength(8)
+  @MinLength(1)
   @MaxLength(72)
   password!: string;
 

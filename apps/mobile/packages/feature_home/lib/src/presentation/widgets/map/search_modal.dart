@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/shared/widgets/molecules/app_recent_queries_shelf.dart';
@@ -145,13 +146,14 @@ class _MapSearchModalState extends ConsumerState<MapSearchModal> {
     return ReportSheetScaffold(
       title: context.l10n.mapSearchSheetTitle,
       useModalRouteShape: true,
-      addBottomInset: false,
+      addBottomInset: true,
+      fillAvailableHeight: true,
       maxHeightFactor: 1,
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.lg,
         AppSpacing.sm,
         AppSpacing.lg,
-        AppSpacing.sm,
+        0,
       ),
       trailing: ReportCircleIconButton(
         icon: Icons.close_rounded,
@@ -184,26 +186,37 @@ class _MapSearchModalState extends ConsumerState<MapSearchModal> {
               onRetry: _searchNotifier.retryRemote,
             ),
             Expanded(
-              child: _MapSearchScrollBody(
-                state: state,
-                recents: _recents,
-                previewSites: _previewSites(previewPool),
-                filter: filter,
-                isCompact: isCompact,
-                scrollController: _scrollController,
-                onQueryTap: _applyQuery,
-                onSuggestionTap: _onSuggestionTap,
-                onClearRecents: _clearRecents,
-                onResetFilters: () {
-                  ref
-                      .read(mapFilterNotifierProvider.notifier)
-                      .resetAllFilters();
+              child: LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints constraints) {
+                  final double keyboardInset = math.min(
+                    appSheetOverlayKeyboardInset(context),
+                    constraints.maxHeight,
+                  );
+                  return Padding(
+                    padding: EdgeInsets.only(bottom: keyboardInset),
+                    child: _MapSearchScrollBody(
+                      state: state,
+                      recents: _recents,
+                      previewSites: _previewSites(previewPool),
+                      filter: filter,
+                      isCompact: isCompact,
+                      scrollController: _scrollController,
+                      onQueryTap: _applyQuery,
+                      onSuggestionTap: _onSuggestionTap,
+                      onClearRecents: _clearRecents,
+                      onResetFilters: () {
+                        ref
+                            .read(mapFilterNotifierProvider.notifier)
+                            .resetAllFilters();
+                      },
+                      onRetry: _searchNotifier.retryRemote,
+                      onGeoIntentSelected: widget.onGeoIntentSelected == null
+                          ? null
+                          : _onGeoIntentTap,
+                      onSiteSelected: _onSiteSelected,
+                    ),
+                  );
                 },
-                onRetry: _searchNotifier.retryRemote,
-                onGeoIntentSelected: widget.onGeoIntentSelected == null
-                    ? null
-                    : _onGeoIntentTap,
-                onSiteSelected: _onSiteSelected,
               ),
             ),
           ],

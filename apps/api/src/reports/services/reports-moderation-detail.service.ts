@@ -11,6 +11,7 @@ import {
 } from '../util/report-copy.helpers';
 import { deriveAdminReportDetailPriority } from '../util/report-moderation-priority.helper';
 import { moderationQueueMetaForStatus } from '../util/report-moderation-queue-meta';
+import { resolveActorIdentity } from '../../common/projections/public-identity.projection';
 
 @Injectable()
 export class ReportsModerationDetailService {
@@ -49,6 +50,7 @@ export class ReportsModerationDetailService {
             id: true,
             firstName: true,
             lastName: true,
+            status: true,
           },
         },
         moderatedBy: {
@@ -56,6 +58,7 @@ export class ReportsModerationDetailService {
             id: true,
             firstName: true,
             lastName: true,
+            status: true,
           },
         },
         moderatedById: true,
@@ -66,6 +69,7 @@ export class ReportsModerationDetailService {
               select: {
                 firstName: true,
                 lastName: true,
+                status: true,
               },
             },
           },
@@ -95,9 +99,12 @@ export class ReportsModerationDetailService {
     const reportNumber = getReportNumber(report);
     const locationLabel = listLocationLabel(report.site, report.description);
 
-    const reporterAlias = report.reporter
-      ? `${report.reporter.firstName} ${report.reporter.lastName}`.trim()
-      : 'Anonymous reporter';
+    const reporterIdentity = resolveActorIdentity(report.reporter, {
+      actorUserId: report.reporterId,
+    });
+    const reporterAlias = reporterIdentity.isDeleted
+      ? 'Deleted user'
+      : (reporterIdentity.displayName ?? 'Anonymous reporter');
 
     const {
       moderationQueueLabel,
@@ -141,7 +148,9 @@ export class ReportsModerationDetailService {
                   ? 'Report was approved after moderation review.'
                   : 'Report was updated during moderation review.'),
               actor: report.moderatedBy
-                ? `${report.moderatedBy.firstName} ${report.moderatedBy.lastName}`.trim()
+                ? (resolveActorIdentity(report.moderatedBy, {
+                    actorUserId: report.moderatedBy.id,
+                  }).displayName ?? 'Moderator')
                 : 'Moderator',
               occurredAt: report.moderatedAt.toISOString(),
               tone:
@@ -156,12 +165,13 @@ export class ReportsModerationDetailService {
     ];
 
     const coReporters: string[] = report.coReporters
-      .map((coReporter) =>
-        coReporter.user
-          ? `${coReporter.user.firstName} ${coReporter.user.lastName}`.trim()
-          : null,
-      )
-      .filter((alias): alias is string => !!alias);
+      .map((coReporter) => {
+        const identity = resolveActorIdentity(coReporter.user, {
+          actorUserId: coReporter.userId,
+        });
+        return identity.isDeleted ? null : identity.displayName;
+      })
+      .filter((alias): alias is string => alias != null && alias.length > 0);
 
     const isPotentialDuplicate =
       report.potentialDuplicateOfId !== null || report.potentialDuplicates.length > 0 || coReporters.length > 0;
@@ -175,7 +185,9 @@ export class ReportsModerationDetailService {
         ? {
             id: report.moderatedById,
             name: report.moderatedBy
-              ? `${report.moderatedBy.firstName} ${report.moderatedBy.lastName}`.trim()
+              ? (resolveActorIdentity(report.moderatedBy, {
+                  actorUserId: report.moderatedBy.id,
+                }).displayName ?? 'Moderator')
               : 'Moderator',
           }
         : null;

@@ -12,6 +12,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:feature_home/src/application/home_shell_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications_platform_interface/flutter_local_notifications_platform_interface.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -69,6 +70,7 @@ Future<void> bootstrapWidgetTests() async {
     return;
   }
   SharedPreferences.setMockInitialValues(<String, Object>{});
+  FlutterSecureStorage.setMockInitialValues(<String, String>{});
   await AppBootstrap.instance.initialize(config: AppConfig.local);
   setRootProviderContainer(AppBootstrap.instance.providerContainer);
 }
@@ -92,6 +94,7 @@ Future<GoRouter> pumpAppRouter(
   WidgetTester tester, {
   Locale locale = const Locale('en'),
   String initialLocation = '/',
+  bool disableAnimations = false,
 }) async {
   await bootstrapWidgetTests();
   readRoot(homeShellControllerProvider.notifier);
@@ -105,6 +108,16 @@ Future<GoRouter> pumpAppRouter(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         routerConfig: router,
+        builder: disableAnimations
+            ? (BuildContext context, Widget? child) {
+                return MediaQuery(
+                  data: MediaQuery.of(
+                    context,
+                  ).copyWith(disableAnimations: true),
+                  child: child ?? const SizedBox.shrink(),
+                );
+              }
+            : null,
       ),
     ),
   );

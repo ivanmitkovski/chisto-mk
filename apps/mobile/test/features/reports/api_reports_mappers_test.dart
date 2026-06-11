@@ -70,14 +70,12 @@ void main() {
     });
 
     test('maps moderationReason for deleted status', () {
-      final ReportListItem item = reportListItemFromApiJson(
-        <String, dynamic>{
-          ..._listItemFixture(),
-          'status': 'DELETED',
-          'moderationReason':
-              'Insufficient evidence. Notes: The evidence is not enough',
-        },
-      );
+      final ReportListItem item = reportListItemFromApiJson(<String, dynamic>{
+        ..._listItemFixture(),
+        'status': 'DELETED',
+        'moderationReason':
+            'Insufficient evidence. Notes: The evidence is not enough',
+      });
       expect(item.status, ApiReportStatus.deleted);
       expect(
         item.moderationReason,
@@ -145,7 +143,10 @@ void main() {
         'moderationReason': 'False report. Notes: Duplicate of CH-001',
       });
       expect(detail.status, ApiReportStatus.deleted);
-      expect(detail.moderationReason, 'False report. Notes: Duplicate of CH-001');
+      expect(
+        detail.moderationReason,
+        'False report. Notes: Duplicate of CH-001',
+      );
     });
 
     test('uses empty site defaults when site is missing', () {

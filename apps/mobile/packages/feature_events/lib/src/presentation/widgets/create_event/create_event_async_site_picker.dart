@@ -80,7 +80,7 @@ class _CreateEventAsyncSitePickerState
           onTap: widget.onClose,
         ),
         maxHeightFactor: 0.45,
-        addBottomInset: false,
+        addBottomInset: true,
         padding: const EdgeInsets.fromLTRB(
           AppSpacing.lg,
           AppSpacing.sm,

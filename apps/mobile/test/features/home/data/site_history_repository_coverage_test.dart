@@ -11,7 +11,7 @@ class _FakeApiClient extends ApiClient {
     : super(
         config: AppConfig.dev,
         accessToken: () => null,
-        onUnauthorized: () {},
+        onUnauthorized: (_) {},
       );
 
   int getCalls = 0;

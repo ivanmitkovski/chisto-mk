@@ -22,6 +22,14 @@ void main() {
       expect((r! as DeepLinkEventDetail).eventId, _kEventUuid);
     });
 
+    test('parses HTTPS /events/:id with cuid event id', () {
+      const String eventCuid = 'c1234567890abcdefghijklmn';
+      final Uri u = Uri.parse('https://chisto.mk/events/$eventCuid');
+      final DeepLinkRoute? r = DeepLinkRouter.parse(u);
+      expect(r, isA<DeepLinkEventDetail>());
+      expect((r! as DeepLinkEventDetail).eventId, eventCuid);
+    });
+
     test('rejects /events/:id on untrusted host', () {
       final Uri u = Uri.parse('https://evil.example/events/$_kEventUuid');
       expect(DeepLinkRouter.parse(u), isNull);

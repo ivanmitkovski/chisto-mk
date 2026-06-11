@@ -385,7 +385,9 @@ class ApiFeedSitesRepository implements FeedSitesRepository {
   }
 
   Future<MapSitesResult?> _loadPersistedMapSnapshot() async {
-    final record = await _localCache.loadMapSnapshot();
+    final record = await _localCache.loadMapSnapshot(
+      authSegment: _feedAuthCacheSegment(),
+    );
     if (record == null) return null;
     final MapSitesResult parsed = _mapper.mapSitesResultFromPayload(
       record.payload,
@@ -729,7 +731,12 @@ class ApiFeedSitesRepository implements FeedSitesRepository {
       if (etagHeader != null && etagHeader.isNotEmpty) {
         _mapEtagCache[mapKey] = (etag: etagHeader, payload: json);
       }
-      unawaited(_localCache.persistMapSnapshot(json));
+      unawaited(
+        _localCache.persistMapSnapshot(
+          json,
+          authSegment: _feedAuthCacheSegment(),
+        ),
+      );
       final MapSitesResult parsed = _mapper.mapSitesResultFromPayload(json);
       final List<PollutionSite> merged = await _applyLocalUpvotePersistence(
         parsed.sites,

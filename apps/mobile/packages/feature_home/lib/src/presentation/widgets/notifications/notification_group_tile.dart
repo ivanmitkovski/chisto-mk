@@ -91,10 +91,7 @@ class NotificationGroupTile extends StatelessWidget {
           padding: const EdgeInsets.all(AppSpacing.md),
           child: NotificationInboxRowLayout(
             trailingAccessory: expandTrailing,
-            timestamp: notificationRelativeTime(
-              context.l10n,
-              group.latestAt,
-            ),
+            timestamp: notificationRelativeTime(context.l10n, group.latestAt),
             leading: group.topActors.isNotEmpty
                 ? NotificationActorAvatarStack(
                     actors: group.topActors,
@@ -156,11 +153,10 @@ class NotificationGroupTile extends StatelessWidget {
                         : context.l10n.notificationsGroupSimilarCount(
                             group.items.length - 1,
                           ),
-                    style:
-                        AppTypographySurfaces.homeNotificationTileGroupCount(
-                          textTheme,
-                          color: visual.iconColor,
-                        ),
+                    style: AppTypographySurfaces.homeNotificationTileGroupCount(
+                      textTheme,
+                      color: visual.iconColor,
+                    ),
                   ),
                 ],
               ],

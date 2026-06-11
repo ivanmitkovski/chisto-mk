@@ -2,11 +2,14 @@ import 'dart:io';
 
 import 'package:app_badge_plus/app_badge_plus.dart';
 import 'package:chisto_infrastructure/core/logging/app_log.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
 import 'package:feature_notifications/src/data/event_chat_local_notification_presenter.dart';
 import 'package:feature_notifications/src/data/event_chat_notification_details.dart';
 import 'package:feature_notifications/src/data/event_chat_push_reply_service.dart';
+import 'package:feature_notifications/src/data/push_android_channels.dart';
 import 'package:feature_notifications/src/data/push_background_pending_store.dart';
 import 'package:feature_notifications/src/data/push_notification_payload.dart';
+import 'package:feature_notifications/src/data/push_stored_app_locale.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -24,23 +27,27 @@ Future<void> processBackgroundPushMessage(RemoteMessage message) async {
   final String? kind = data['kind'] as String?;
   final String? type = data['type'] as String?;
 
+  final AppLocalizations strings = await loadStoredAppLocalizations();
+
   if (type == 'EVENT_CHAT') {
-    await _ensureBackgroundLocalNotifications();
+    await _ensureBackgroundLocalNotifications(strings);
     final EventChatNotificationDetails eventChatDetails =
         EventChatNotificationDetails(
           androidChannel: PushNotificationPayload.resolveAndroidChannel(
             'EVENT_CHAT',
+            strings: strings,
           ),
-          replyActionTitle: 'Reply',
-          replyInputLabel: 'Message',
+          replyActionTitle: strings.eventChatPushReplyAction,
+          replyInputLabel: strings.eventChatPushReplyPlaceholder,
         );
     await EventChatLocalNotificationPresenter.show(
       _backgroundLocalNotifications,
       message: message,
       eventChatDetails: eventChatDetails,
+      strings: strings,
     );
   } else if (Platform.isAndroid && message.notification == null) {
-    await _maybeShowAndroidLocalNotification(message);
+    await _maybeShowAndroidLocalNotification(message, strings: strings);
   }
 
   if (unread != null) {
@@ -60,25 +67,29 @@ Future<void> processBackgroundPushMessage(RemoteMessage message) async {
   }
 }
 
-Future<void> _maybeShowAndroidLocalNotification(RemoteMessage message) async {
+Future<void> _maybeShowAndroidLocalNotification(
+  RemoteMessage message, {
+  required AppLocalizations strings,
+}) async {
   final ({String? title, String? body}) resolved =
-      PushNotificationPayload.resolveTitleBody(message);
+      PushNotificationPayload.resolveTitleBody(message, strings: strings);
   final String? title = resolved.title;
   final String? body = resolved.body;
   if (title == null || title.isEmpty || body == null || body.isEmpty) {
     return;
   }
 
-  await _ensureBackgroundLocalNotifications();
+  await _ensureBackgroundLocalNotifications(strings);
 
   final String? type = message.data['type'] as String?;
   final AndroidChannelInfo ch = PushNotificationPayload.resolveAndroidChannel(
     type,
+    strings: strings,
   );
   final String? notificationId = message.data['notificationId'] as String?;
   final int androidId = notificationId != null && notificationId.isNotEmpty
       ? notificationId.hashCode & 0x3fffffff
-      : (message.messageId?.hashCode ?? message.hashCode) & 0x3fffffff;
+      : message.hashCode & 0x3fffffff;
 
   await _backgroundLocalNotifications.show(
     androidId,
@@ -97,7 +108,9 @@ Future<void> _maybeShowAndroidLocalNotification(RemoteMessage message) async {
   );
 }
 
-Future<void> _ensureBackgroundLocalNotifications() async {
+Future<void> _ensureBackgroundLocalNotifications(
+  AppLocalizations strings,
+) async {
   if (_localNotificationsReady) return;
 
   if (Platform.isAndroid) {
@@ -106,45 +119,8 @@ Future<void> _ensureBackgroundLocalNotifications() async {
             .resolvePlatformSpecificImplementation<
               AndroidFlutterLocalNotificationsPlugin
             >();
-    const List<AndroidNotificationChannel> channels =
-        <AndroidNotificationChannel>[
-          AndroidNotificationChannel(
-            'chisto_default',
-            'Chisto Notifications',
-            description: 'Default notification channel for Chisto.mk',
-            importance: Importance.high,
-          ),
-          AndroidNotificationChannel(
-            'chisto_event_chat',
-            'Event Chat',
-            description: 'Event chat messages',
-            importance: Importance.high,
-          ),
-          AndroidNotificationChannel(
-            'chisto_reports',
-            'Report Updates',
-            description: 'Report updates',
-            importance: Importance.high,
-          ),
-          AndroidNotificationChannel(
-            'chisto_events',
-            'Cleanup Events',
-            description: 'Cleanup events',
-            importance: Importance.high,
-          ),
-          AndroidNotificationChannel(
-            'chisto_social',
-            'Social Activity',
-            description: 'Social activity',
-            importance: Importance.defaultImportance,
-          ),
-          AndroidNotificationChannel(
-            'chisto_system',
-            'System',
-            description: 'System',
-            importance: Importance.defaultImportance,
-          ),
-        ];
+    final List<AndroidNotificationChannel> channels =
+        buildPushAndroidNotificationChannels(strings);
     for (final AndroidNotificationChannel c in channels) {
       await android?.createNotificationChannel(c);
     }
@@ -157,9 +133,9 @@ Future<void> _ensureBackgroundLocalNotifications() async {
     requestBadgePermission: false,
     requestSoundPermission: false,
     notificationCategories: EventChatNotificationDetails.darwinCategories(
-      replyTitle: 'Reply',
-      replyButtonTitle: 'Send',
-      replyPlaceholder: 'Message',
+      replyTitle: strings.eventChatPushReplyAction,
+      replyButtonTitle: strings.eventChatPushReplyButton,
+      replyPlaceholder: strings.eventChatPushReplyPlaceholder,
     ),
   );
 

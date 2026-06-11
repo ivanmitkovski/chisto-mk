@@ -4,7 +4,7 @@ extension EventChatMessagesLoadMixin on _EventChatScreenState {
   Future<void> _loadInitial() async {
     rebuildState(() {
       _loading = true;
-      _loadError = false;
+      _loadFailure = null;
     });
     try {
       final result = await _repo.fetchMessages(widget.eventId, limit: 50);
@@ -31,14 +31,28 @@ extension EventChatMessagesLoadMixin on _EventChatScreenState {
       WidgetsBinding.instance.addPostFrameCallback(
         (_) => _scrollToBottom(animated: false),
       );
-    } on Object catch (_) {
+    } on AppError catch (error) {
+      if (!mounted) {
+        return;
+      }
+      logEventsDiagnostic('chat_load_initial_failed code=${error.code}');
+      rebuildState(() {
+        _loading = false;
+        _loadFailure = error;
+      });
+    } on Object catch (error, stackTrace) {
       if (!mounted) {
         return;
       }
       logEventsDiagnostic('chat_load_initial_failed');
+      AppLog.warn(
+        'event_chat: initial load failed eventId=${widget.eventId}',
+        error: error,
+        stackTrace: stackTrace,
+      );
       rebuildState(() {
         _loading = false;
-        _loadError = true;
+        _loadFailure = AppError.unknown(cause: error);
       });
     }
   }

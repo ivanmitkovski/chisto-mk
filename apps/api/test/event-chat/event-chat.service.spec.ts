@@ -83,7 +83,8 @@ describe('EventChat leaf services (list + presence + mutations)', () => {
   };
   let prisma: {
     cleanupEvent: { findUnique: jest.Mock; findFirst: jest.Mock };
-    user: { findUnique: jest.Mock };
+    user: { findUnique: jest.Mock; findMany: jest.Mock };
+    userDeviceToken: { findMany: jest.Mock };
     eventParticipant: { findMany: jest.Mock; findUnique: jest.Mock; count: jest.Mock };
     eventChatAttachment: { deleteMany: jest.Mock };
     $transaction: jest.Mock;
@@ -110,7 +111,8 @@ describe('EventChat leaf services (list + presence + mutations)', () => {
   beforeEach(async () => {
     prisma = {
       cleanupEvent: { findUnique: jest.fn(), findFirst: jest.fn() },
-      user: { findUnique: jest.fn() },
+      user: { findUnique: jest.fn(), findMany: jest.fn().mockResolvedValue([]) },
+      userDeviceToken: { findMany: jest.fn().mockResolvedValue([]) },
       eventParticipant: { findMany: jest.fn(), findUnique: jest.fn(), count: jest.fn() },
       eventChatAttachment: { deleteMany: jest.fn().mockResolvedValue({ count: 0 }) },
       $transaction: jest.fn((arg: unknown) => {
@@ -702,6 +704,7 @@ describe('EventChat leaf services (list + presence + mutations)', () => {
     });
     prisma.eventParticipant.findMany.mockResolvedValue([
       {
+        userId: 'p1',
         user: { id: 'p1', firstName: 'Par', lastName: 'Ticipant' },
       },
     ]);

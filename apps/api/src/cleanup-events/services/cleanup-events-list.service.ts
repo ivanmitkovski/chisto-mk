@@ -3,6 +3,7 @@ import { CleanupEventStatus, EcoEventLifecycleStatus, Prisma } from '../../prism
 import { PrismaService } from '../../prisma/prisma.service';
 import { ReportsUploadService } from '../../reports/services/reports-upload.service';
 import { ListCleanupEventsQueryDto } from '../dto/list-cleanup-events-query.dto';
+import { resolveActorIdentity } from '../../common/projections/public-identity.projection';
 
 @Injectable()
 export class CleanupEventsListService {
@@ -23,7 +24,7 @@ export class CleanupEventsListService {
         },
       },
       organizer: {
-        select: { id: true, firstName: true, lastName: true, email: true },
+        select: { id: true, firstName: true, lastName: true, email: true, status: true },
       },
       moderatedBy: {
         select: { id: true, email: true },
@@ -33,13 +34,16 @@ export class CleanupEventsListService {
   }
 
   private mapOrganizer(
-    o: { id: string; firstName: string; lastName: string; email: string } | null,
+    o: { id: string; firstName: string; lastName: string; email: string; status?: import('../../prisma-client').UserStatus } | null,
   ) {
     if (!o) {
       return null;
     }
-    const displayName = `${o.firstName} ${o.lastName}`.trim();
-    return { id: o.id, displayName: displayName.length > 0 ? displayName : o.email, email: o.email };
+    const identity = resolveActorIdentity(o, { actorUserId: o.id });
+    const displayName = identity.isDeleted
+      ? ''
+      : (identity.displayName ?? o.email);
+    return { id: o.id, displayName, email: o.email, isDeleted: identity.isDeleted };
   }
 
   private mapListRow(e: {
@@ -76,7 +80,7 @@ export class CleanupEventsListService {
       description: string | null;
       status: string;
     };
-    organizer: { id: string; firstName: string; lastName: string; email: string } | null;
+    organizer: { id: string; firstName: string; lastName: string; email: string; status?: import('../../prisma-client').UserStatus } | null;
     moderatedBy: { id: string; email: string } | null;
     _count: { seriesChildren: number };
   }) {

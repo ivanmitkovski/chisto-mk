@@ -9,6 +9,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:feature_reports/src/data/outbox/background/background_submit_scheduler.dart';
 import 'package:feature_reports/src/data/outbox/outbox_config.dart';
 import 'package:feature_reports/src/data/outbox/outbox_scheduler.dart';
+import 'package:feature_reports/src/data/outbox/report_outbox_app_error.dart';
 import 'package:feature_reports/src/data/outbox/report_outbox_constants.dart';
 import 'package:feature_reports/src/data/outbox/report_outbox_entry.dart';
 import 'package:feature_reports/src/data/outbox/report_outbox_pipeline_phase.dart';
@@ -127,12 +128,7 @@ class ReportOutboxCoordinator {
         return;
       }
       if (e.state == ReportOutboxState.failed && !done.isCompleted) {
-        done.completeError(
-          AppError.validation(
-            message: e.lastErrorMessage ?? 'Submission failed',
-            details: e.lastErrorCode,
-          ),
-        );
+        done.completeError(appErrorFromOutboxFailure(e));
       }
     });
     return done.future.whenComplete(() async {
@@ -176,7 +172,8 @@ class ReportOutboxCoordinator {
         return;
       }
       final int now = DateTime.now().millisecondsSinceEpoch;
-      final bool leaseExpired = wizard.processingLeaseUntilMs == null ||
+      final bool leaseExpired =
+          wizard.processingLeaseUntilMs == null ||
           wizard.processingLeaseUntilMs! <= now;
       if (!leaseExpired) {
         return;
@@ -248,7 +245,9 @@ class ReportOutboxCoordinator {
 
   /// Prevents a second POST after the pipeline already succeeded but before
   /// [ReportDraftRepository.clear] (coordinator used to reset the row immediately).
-  ReportSubmitResult? _resultIfWizardAlreadySucceeded(ReportOutboxEntry? wizard) {
+  ReportSubmitResult? _resultIfWizardAlreadySucceeded(
+    ReportOutboxEntry? wizard,
+  ) {
     final String? reportId = wizard?.reportId;
     if (wizard == null ||
         wizard.state != ReportOutboxState.succeeded ||

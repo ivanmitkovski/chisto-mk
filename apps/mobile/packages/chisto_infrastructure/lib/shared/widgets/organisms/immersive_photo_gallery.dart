@@ -20,7 +20,7 @@ class ImmersivePhotoGallery extends StatefulWidget {
     this.onPageChanged,
     this.topLeftBuilder,
     this.bottomCenterBuilder,
-    this.openLabel = 'Open photo gallery',
+    this.openLabel,
     this.enableFullscreen = true,
     this.onImageError,
   });
@@ -32,7 +32,7 @@ class ImmersivePhotoGallery extends StatefulWidget {
   final ValueChanged<int>? onPageChanged;
   final GalleryOverlayBuilder? topLeftBuilder;
   final GalleryOverlayBuilder? bottomCenterBuilder;
-  final String openLabel;
+  final String? openLabel;
   final bool enableFullscreen;
 
   /// Invoked when a page image fails to load (e.g. expired media URL). Hosts can
@@ -170,10 +170,13 @@ class _ImmersivePhotoGalleryState extends State<ImmersivePhotoGallery> {
     }
 
     final int totalCount = widget.items.length;
+    final String openLabel =
+        widget.openLabel ?? context.l10n.reportPhotoOpenGallerySemantic;
 
     return Semantics(
       image: true,
-      label: '${widget.openLabel}. ${_currentIndex + 1} of $totalCount.',
+      label:
+          '$openLabel. ${context.l10n.eventChatImageViewerPage(_currentIndex + 1, totalCount)}.',
       child: GestureDetector(
         onTap: _openFullscreen,
         child: ClipRRect(

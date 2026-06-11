@@ -2,7 +2,8 @@ import 'package:chisto_infrastructure/core/location/location_service.dart';
 import 'package:geolocator/geolocator.dart' as geo;
 
 /// Production [LocationService] backed by the `geolocator` plugin.
-class GeolocatorLocationService implements LocationService {
+class GeolocatorLocationService extends LocationService
+    with LastKnownLocationReader {
   @override
   Future<bool> isLocationServiceEnabled() {
     return geo.Geolocator.isLocationServiceEnabled();
@@ -27,10 +28,21 @@ class GeolocatorLocationService implements LocationService {
       desiredAccuracy: _toGeolocatorAccuracy(accuracy),
       timeLimit: timeLimit,
     );
+    return _mapPosition(pos);
+  }
+
+  @override
+  Future<GeoPosition?> getLastKnownPosition() async {
+    final geo.Position? pos = await geo.Geolocator.getLastKnownPosition();
+    return pos == null ? null : _mapPosition(pos);
+  }
+
+  static GeoPosition _mapPosition(geo.Position pos) {
     return GeoPosition(
       latitude: pos.latitude,
       longitude: pos.longitude,
       horizontalAccuracyMeters: pos.accuracy,
+      isMocked: pos.isMocked,
     );
   }
 
@@ -42,11 +54,7 @@ class GeolocatorLocationService implements LocationService {
       timeLimit: options.timeLimit,
     );
     return geo.Geolocator.getPositionStream(locationSettings: settings).map(
-      (geo.Position pos) => GeoPosition(
-        latitude: pos.latitude,
-        longitude: pos.longitude,
-        horizontalAccuracyMeters: pos.accuracy,
-      ),
+      _mapPosition,
     );
   }
 

@@ -5,6 +5,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EcoEventLifecycleStatus, Prisma } from '../../prisma-client';
 import type { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import {
@@ -13,6 +14,7 @@ import {
   REASON_EVENT_CHECK_IN_REMOVED,
 } from '../../gamification/constants/gamification.constants';
 import { EcoEventPointsService } from '../../gamification/services/eco-event-points.service';
+import { emitGamificationPointsCredited } from '../../gamification/util/gamification-credit-events.util';
 import { CheckInRepository } from '../repositories/check-in.repository';
 import { ReportsUploadService } from '../../reports/services/reports-upload.service';
 import { decodeCheckInAttendeesCursor, encodeCheckInAttendeesCursor } from '../util/check-in-attendees-cursor.util';
@@ -21,6 +23,7 @@ import type { ListCheckInAttendeesQueryDto } from '../dto/list-check-in-attendee
 import { CheckInTelemetryService } from './check-in-telemetry.service';
 import { EventLiveImpactService } from './event-live-impact.service';
 import { EventsCheckInSharedService } from './events-check-in-shared.service';
+import { participantDisplayIdentity } from '../util/events-query.include.shared';
 import { performance } from 'node:perf_hooks';
 
 @Injectable()
@@ -32,6 +35,7 @@ export class EventsCheckInAttendeesService {
     private readonly reportsUpload: ReportsUploadService,
     private readonly checkInTelemetry: CheckInTelemetryService,
     private readonly liveImpact: EventLiveImpactService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async listAttendees(
@@ -86,7 +90,7 @@ export class EventsCheckInAttendeesService {
         guestDisplayName: true,
         checkedInAt: true,
         user: {
-          select: { firstName: true, lastName: true, avatarObjectKey: true },
+          select: { firstName: true, lastName: true, avatarObjectKey: true, status: true },
         },
       },
     });
@@ -105,10 +109,11 @@ export class EventsCheckInAttendeesService {
       }),
     );
     const data = pageRows.map((r) => {
-      const name =
+      const identity =
         r.user != null
-          ? `${r.user.firstName} ${r.user.lastName}`.trim()
-          : (r.guestDisplayName ?? 'Guest');
+          ? participantDisplayIdentity(r.user, { actorUserId: r.userId, fallback: 'Volunteer' })
+          : { displayName: r.guestDisplayName ?? 'Guest', isDeleted: false };
+      const name = identity.displayName;
       const key = r.user?.avatarObjectKey ?? null;
       const avatarUrl = key != null ? (avatarUrlByKey.get(key) ?? null) : null;
       return {
@@ -175,12 +180,12 @@ export class EventsCheckInAttendeesService {
 
         const joinedUser = await tx.user.findUnique({
           where: { id: targetUserId },
-          select: { firstName: true, lastName: true },
+          select: { firstName: true, lastName: true, status: true },
         });
-        const displayName =
-          joinedUser != null
-            ? `${joinedUser.firstName} ${joinedUser.lastName}`.trim()
-            : 'Volunteer';
+        const displayName = participantDisplayIdentity(joinedUser, {
+          actorUserId: targetUserId,
+          fallback: 'Volunteer',
+        }).displayName;
 
         const checkIn = await tx.eventCheckIn.create({
           data: {
@@ -193,27 +198,30 @@ export class EventsCheckInAttendeesService {
           where: { id: eventId },
           data: { checkedInCount: { increment: 1 } },
         });
-        const pointsAwarded = await this.ecoEventPoints.creditIfNew(tx, {
+        const credit = await this.ecoEventPoints.creditIfNew(tx, {
           userId: targetUserId,
           delta: POINTS_EVENT_CHECK_IN,
           reasonCode: REASON_EVENT_CHECK_IN,
           referenceType: 'CleanupEvent',
           referenceId: eventId,
         });
-        return { checkIn, displayName, pointsAwarded };
+        return { checkIn, displayName, credit };
       });
+      if (created.credit.granted > 0) {
+        emitGamificationPointsCredited(this.eventEmitter, targetUserId, created.credit);
+      }
       this.checkInTelemetry.emitAudit('check_in.manual_add', {
         eventId,
         organizerId: user.userId,
         targetUserId,
-        pointsAwarded: created.pointsAwarded,
+        pointsAwarded: created.credit.granted,
       });
       this.liveImpact.notifyListeners(eventId);
       return {
         id: created.checkIn.id,
         name: created.displayName,
         checkedInAt: created.checkIn.checkedInAt.toISOString(),
-        pointsAwarded: created.pointsAwarded,
+        pointsAwarded: created.credit.granted,
       };
     } catch (err: unknown) {
       if (err instanceof ForbiddenException || err instanceof ConflictException) {

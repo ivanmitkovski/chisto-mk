@@ -108,6 +108,8 @@ class _PollutionSiteTabState extends State<PollutionSiteTab> {
               if (widget.site.displayFirstReport != null) ...<Widget>[
                 SiteReportedRow(
                   reporterName: widget.site.displayFirstReport!.reporterName,
+                  reporterIsDeleted:
+                      widget.site.displayFirstReport!.reporterIsDeleted,
                   reportedAgo: widget.site.displayFirstReport!.reportedAgo,
                   reporterAvatarUrl:
                       widget.site.displayFirstReport!.reporterAvatarUrl,

@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ReportsUploadService } from '../../reports/services/reports-upload.service';
+import { participantDisplayIdentity } from '../../events/util/events-query.include.shared';
 
 @Injectable()
 export class EventChatPresenceRosterService {
@@ -32,8 +33,9 @@ export class EventChatPresenceRosterService {
       orderBy: { joinedAt: 'asc' },
       take: 200,
       select: {
+        userId: true,
         user: {
-          select: { id: true, firstName: true, lastName: true, avatarObjectKey: true },
+          select: { id: true, firstName: true, lastName: true, avatarObjectKey: true, status: true },
         },
       },
     });
@@ -55,6 +57,7 @@ export class EventChatPresenceRosterService {
           firstName: true,
           lastName: true,
           avatarObjectKey: true,
+          status: true,
         },
       });
     }
@@ -64,7 +67,7 @@ export class EventChatPresenceRosterService {
       keysToSign.add(org.avatarObjectKey);
     }
     for (const r of rows) {
-      if (r.user.avatarObjectKey) {
+      if (r.user?.avatarObjectKey) {
         keysToSign.add(r.user.avatarObjectKey);
       }
     }
@@ -76,27 +79,31 @@ export class EventChatPresenceRosterService {
     );
 
     if (org) {
+      const orgIdentity = participantDisplayIdentity(org, { actorUserId: org.id });
       participants.push({
         id: org.id,
-        displayName: `${org.firstName} ${org.lastName}`.trim(),
+        displayName: orgIdentity.displayName,
         avatarUrl: org.avatarObjectKey ? (signedByKey.get(org.avatarObjectKey) ?? null) : null,
       });
       seen.add(org.id);
     }
 
     for (const r of rows) {
-      if (seen.has(r.user.id)) {
+      if (r.userId == null || seen.has(r.userId)) {
         continue;
       }
       if (participants.length >= 50) {
         break;
       }
+      const identity = participantDisplayIdentity(r.user, { actorUserId: r.userId });
       participants.push({
-        id: r.user.id,
-        displayName: `${r.user.firstName} ${r.user.lastName}`.trim(),
-        avatarUrl: r.user.avatarObjectKey ? (signedByKey.get(r.user.avatarObjectKey) ?? null) : null,
+        id: r.userId,
+        displayName: identity.displayName,
+        avatarUrl: r.user?.avatarObjectKey
+          ? (signedByKey.get(r.user.avatarObjectKey) ?? null)
+          : null,
       });
-      seen.add(r.user.id);
+      seen.add(r.userId);
     }
 
     const nParticipants = await this.prisma.eventParticipant.count({ where: { eventId } });

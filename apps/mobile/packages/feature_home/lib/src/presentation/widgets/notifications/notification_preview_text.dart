@@ -10,7 +10,10 @@ int notificationBodyMaxLines(BuildContext context) {
 }
 
 /// Body preview lines for grouped notification headers.
-int notificationGroupBodyMaxLines(BuildContext context, {required bool expanded}) {
+int notificationGroupBodyMaxLines(
+  BuildContext context, {
+  required bool expanded,
+}) {
   return _scaledMaxLines(context, base: expanded ? 6 : 4);
 }
 
@@ -94,6 +97,7 @@ class NotificationTileMetaRow extends StatelessWidget {
 
   final Widget badge;
   final bool showUnreadDot;
+
   /// Group expand/collapse only — navigation chevrons use [NotificationInboxRowLayout].
   final Widget? trailing;
 
@@ -114,10 +118,7 @@ class NotificationTileMetaRow extends StatelessWidget {
             ),
           ),
         ],
-        if (trailing != null) ...<Widget>[
-          const Spacer(),
-          trailing!,
-        ],
+        if (trailing != null) ...<Widget>[const Spacer(), trailing!],
       ],
     );
   }
@@ -144,10 +145,8 @@ class NotificationInboxRowLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool hasTimestamp =
-        timestamp != null && timestamp!.trim().isNotEmpty;
-    final bool hasRail =
-        showNavigationChevron || trailingAccessory != null;
+    final bool hasTimestamp = timestamp != null && timestamp!.trim().isNotEmpty;
+    final bool hasRail = showNavigationChevron || trailingAccessory != null;
     final bool hasTrailing = hasTimestamp || hasRail;
     final TextTheme theme = Theme.of(context).textTheme;
 
@@ -155,10 +154,7 @@ class NotificationInboxRowLayout extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Align(
-            alignment: Alignment.topCenter,
-            child: leading,
-          ),
+          Align(alignment: Alignment.topCenter, child: leading),
           const SizedBox(width: AppSpacing.sm),
           Expanded(child: content),
           if (hasTrailing)
@@ -174,13 +170,14 @@ class NotificationInboxRowLayout extends StatelessWidget {
                       Text(
                         timestamp!,
                         textAlign: TextAlign.right,
-                        style: AppTypographySurfaces.homeNotificationTileTimestamp(
-                          theme,
-                        ).copyWith(
-                          fontFeatures: const <FontFeature>[
-                            FontFeature.tabularFigures(),
-                          ],
-                        ),
+                        style:
+                            AppTypographySurfaces.homeNotificationTileTimestamp(
+                              theme,
+                            ).copyWith(
+                              fontFeatures: const <FontFeature>[
+                                FontFeature.tabularFigures(),
+                              ],
+                            ),
                       ),
                     if (hasRail)
                       Expanded(

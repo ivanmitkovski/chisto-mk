@@ -259,101 +259,71 @@ class _ProfileAvatarCropScreenState extends State<ProfileAvatarCropScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.xs,
-                  AppSpacing.sm,
-                  AppSpacing.xs,
-                  AppSpacing.sm,
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    SizedBox(
-                      width: 88,
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: AppButton.text(
-                          label: l10n.profileAvatarCropCancel,
-                          onPressed: _cancel,
-                          enabled: !_cropping,
+              AppEditorTopBar(
+                leadingLabel: l10n.profileAvatarCropCancel,
+                onLeadingPressed: _cancel,
+                leadingEnabled: !_cropping,
+                trailingLabel: l10n.profileAvatarCropDone,
+                onTrailingPressed: _done,
+                trailingEnabled: !_cropping && canAct,
+                center: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.xs,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        l10n.profileAvatarCropMoveAndScale,
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTypography.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 17,
+                          height: 1.18,
+                          letterSpacing: -0.41,
+                          color: AppColors.textPrimary,
                         ),
                       ),
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.xs,
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Text(
-                              l10n.profileAvatarCropMoveAndScale,
-                              textAlign: TextAlign.center,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: AppTypography.textTheme.titleMedium
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 17,
-                                    height: 1.18,
-                                    letterSpacing: -0.41,
-                                    color: AppColors.textPrimary,
-                                  ),
-                            ),
-                            AnimatedSwitcher(
-                              duration: AppMotion.fast,
-                              switchInCurve: AppMotion.smooth,
-                              switchOutCurve: AppMotion.standardCurve,
-                              child: canAct
-                                  ? Padding(
-                                      key: const ValueKey<String>(
-                                        'avatar_crop_hint',
+                      AnimatedSwitcher(
+                        duration: AppMotion.fast,
+                        switchInCurve: AppMotion.smooth,
+                        switchOutCurve: AppMotion.standardCurve,
+                        child: canAct
+                            ? Padding(
+                                key: const ValueKey<String>(
+                                  'avatar_crop_hint',
+                                ),
+                                padding: const EdgeInsets.only(
+                                  top: AppSpacing.xxs,
+                                ),
+                                child: Text(
+                                  l10n.profileAvatarCropHint,
+                                  textAlign: TextAlign.center,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: AppTypography.textTheme.bodySmall
+                                      ?.copyWith(
+                                        color: AppColors.textMuted,
+                                        fontSize: 13,
+                                        height: 1.22,
+                                        fontWeight: FontWeight.w400,
+                                        letterSpacing: -0.08,
                                       ),
-                                      padding: const EdgeInsets.only(
-                                        top: AppSpacing.xxs,
-                                      ),
-                                      child: Text(
-                                        l10n.profileAvatarCropHint,
-                                        textAlign: TextAlign.center,
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: AppTypography.textTheme.bodySmall
-                                            ?.copyWith(
-                                              color: AppColors.textMuted,
-                                              fontSize: 13,
-                                              height: 1.22,
-                                              fontWeight: FontWeight.w400,
-                                              letterSpacing: -0.08,
-                                            ),
-                                      ),
-                                    )
-                                  : const SizedBox(
-                                      key: ValueKey<String>(
-                                        'avatar_crop_no_hint',
-                                      ),
-                                      height: 0,
-                                    ),
-                            ),
-                          ],
-                        ),
+                                ),
+                              )
+                            : const SizedBox(
+                                key: ValueKey<String>(
+                                  'avatar_crop_no_hint',
+                                ),
+                                height: 0,
+                              ),
                       ),
-                    ),
-                    SizedBox(
-                      width: 88,
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: AppButton.text(
-                          label: l10n.profileAvatarCropDone,
-                          onPressed: _done,
-                          enabled: !_cropping && canAct,
-                        ),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               Divider(

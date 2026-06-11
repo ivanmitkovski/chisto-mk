@@ -83,23 +83,16 @@ class PointsHistoryNotifier extends AutoDisposeNotifier<PointsHistoryUiState> {
     }
   }
 
-  /// Pull-to-refresh: keep the current list visible (no skeleton cross-fade).
+  /// Pull-to-refresh: keep the current screen visible (no skeleton cross-fade).
   Future<void> refresh() async {
     final List<PointsHistoryEntry> previousEntries =
         List<PointsHistoryEntry>.of(state.entries);
     final List<PointsHistoryMilestone> previousMilestones =
         List<PointsHistoryMilestone>.of(state.milestones);
     final String? previousCursor = state.nextCursor;
-    final bool hadContent = previousEntries.isNotEmpty;
+    final bool keepCurrentVisible = state.phase == PointsHistoryPhase.ready;
 
-    if (hadContent) {
-      state = PointsHistoryUiState(
-        phase: PointsHistoryPhase.ready,
-        entries: previousEntries,
-        milestones: previousMilestones,
-        nextCursor: previousCursor,
-      );
-    } else {
+    if (!keepCurrentVisible) {
       state = const PointsHistoryUiState(phase: PointsHistoryPhase.loading);
     }
 
@@ -112,7 +105,7 @@ class PointsHistoryNotifier extends AutoDisposeNotifier<PointsHistoryUiState> {
         nextCursor: page.nextCursor,
       );
     } on AppError catch (e) {
-      if (hadContent) {
+      if (keepCurrentVisible) {
         state = PointsHistoryUiState(
           phase: PointsHistoryPhase.ready,
           entries: previousEntries,

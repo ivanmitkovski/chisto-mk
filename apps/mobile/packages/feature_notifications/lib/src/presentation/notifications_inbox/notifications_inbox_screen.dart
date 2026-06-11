@@ -25,6 +25,7 @@ import 'package:feature_notifications/src/presentation/widgets/notifications_fil
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 part 'notifications_inbox_list_build.dart';
 part 'notifications_inbox_preferences.dart';

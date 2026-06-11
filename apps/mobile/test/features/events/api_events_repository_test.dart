@@ -14,7 +14,7 @@ class _FakeApiClient extends ApiClient {
     : super(
         config: AppConfig.dev,
         accessToken: () => null,
-        onUnauthorized: () {},
+        onUnauthorized: (_) {},
       );
 
   int getCalls = 0;
@@ -366,6 +366,30 @@ void main() {
     );
   });
 
+  test('loadMore session-invalid failure does not mark stale cache', () async {
+    final _SessionRevokedPagingClient client = _SessionRevokedPagingClient();
+    final ApiEventsRepository repo = ApiEventsRepository(client: client);
+    repo.loadInitialIfNeeded();
+    await repo.ready;
+
+    expect(repo.events, hasLength(1));
+    expect(repo.isShowingStaleCachedEvents, isFalse);
+
+    await expectLater(
+      repo.loadMore(),
+      throwsA(
+        isA<AppError>().having(
+          (AppError e) => e.code,
+          'code',
+          'SESSION_REVOKED',
+        ),
+      ),
+    );
+
+    expect(repo.isShowingStaleCachedEvents, isFalse);
+    expect(repo.lastGlobalListLoadFailed, isFalse);
+  });
+
   test('loadMore failure marks stale when list is non-empty', () async {
     final _PagingFakeApiClient client = _PagingFakeApiClient();
     final ApiEventsRepository repo = ApiEventsRepository(client: client);
@@ -382,6 +406,20 @@ void main() {
     expect(repo.lastGlobalListLoadFailed, isTrue);
     expect(repo.isShowingStaleCachedEvents, isTrue);
   });
+}
+
+class _SessionRevokedPagingClient extends _PagingFakeApiClient {
+  @override
+  Future<ApiResponse> get(
+    String path, {
+    RequestCancellationToken? cancellation,
+    Map<String, String>? headers,
+  }) async {
+    if (path.contains('cursor=c2')) {
+      throw const AppError(code: 'SESSION_REVOKED', message: 'revoked');
+    }
+    return super.get(path, cancellation: cancellation, headers: headers);
+  }
 }
 
 /// First `/events?limit=50` page has more; second page request throws.

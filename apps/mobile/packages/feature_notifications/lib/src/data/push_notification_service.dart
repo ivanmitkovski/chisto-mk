@@ -15,6 +15,7 @@ import 'package:feature_notifications/src/data/event_chat_local_notification_pre
 import 'package:feature_notifications/src/data/event_chat_notification_details.dart';
 import 'package:feature_notifications/src/data/event_chat_push_reply_service.dart';
 import 'package:feature_notifications/src/data/notification_inbox_refresh.dart';
+import 'package:feature_notifications/src/data/push_android_channels.dart';
 import 'package:feature_notifications/src/data/push_background_pending_store.dart';
 import 'package:feature_notifications/src/data/push_notification_payload.dart';
 import 'package:feature_notifications/src/domain/repositories/notifications_repository.dart';
@@ -50,11 +51,15 @@ class PushNotificationService
   PushNotificationService({
     required NotificationsRepository repository,
     required bool Function() isAuthenticated,
+    Locale Function()? resolveEffectiveLocale,
   }) : _repository = repository,
-       _isAuthenticated = isAuthenticated;
+       _isAuthenticated = isAuthenticated,
+       _resolveEffectiveLocale = resolveEffectiveLocale;
 
   final NotificationsRepository _repository;
   final bool Function() _isAuthenticated;
+  final Locale Function()? _resolveEffectiveLocale;
+  void Function(AppError error)? onRegistrationFailure;
   bool _initialized = false;
   String? _lastInitReason;
   bool get isInitialized => _initialized;
@@ -63,6 +68,7 @@ class PushNotificationService
 
   String? _currentToken;
   String? _lastRegisteredToken;
+  String? _lastRegisteredLocale;
   Future<void>? _fetchAndRegisterInFlight;
   final Map<String, Future<void>> _inFlightRegisters = <String, Future<void>>{};
   String? get currentToken => _currentToken;
@@ -108,9 +114,18 @@ class PushNotificationService
 
   /// Re-fetches the FCM token and registers it with the API when the user has a session.
   /// Call after sign-in, OTP verify, or successful session restore (not only from [initialize]).
-  Future<void> syncDeviceTokenWithBackend() async {
-    if (!_firebaseReady) return;
+  ///
+  /// When [forceLocaleRefresh] is true, re-sends the current token if only the locale changed.
+  Future<void> syncDeviceTokenWithBackend({bool forceLocaleRefresh = false}) async {
     if (!_isAuthenticated()) return;
+    if (forceLocaleRefresh) {
+      final String? token = _currentToken ?? _lastRegisteredToken;
+      if (token != null) {
+        await _registerToken(token, force: true);
+        return;
+      }
+    }
+    if (!_firebaseReady) return;
     await _fetchAndRegisterTokenIfAuthenticated();
   }
 
@@ -119,6 +134,10 @@ class PushNotificationService
     if (!_firebaseReady) return;
     await _setIosForegroundPresentationOptions();
   }
+
+  /// Queues terminated-state FCM taps and drains background push hints.
+  Future<void> consumePendingLaunchNotification() =>
+      consumePendingLaunchNotificationImpl();
 
   /// Ensures iOS foreground presentation and registers the FCM token once per token value.
   @override
@@ -332,9 +351,10 @@ class PushNotificationService
   Future<void> _registerToken(
     String token, {
     String? appVersionOverride,
+    bool force = false,
   }) async {
     if (!_isAuthenticated()) return;
-    if (_lastRegisteredToken == token) {
+    if (!force && _lastRegisteredToken == token && _isLocaleUnchanged()) {
       return;
     }
     final Future<void>? inFlight = _inFlightRegisters[token];
@@ -344,6 +364,7 @@ class PushNotificationService
     final Future<void> work = _registerTokenImpl(
       token,
       appVersionOverride: appVersionOverride,
+      force: force,
     );
     _inFlightRegisters[token] = work;
     try {
@@ -358,25 +379,27 @@ class PushNotificationService
   Future<void> _registerTokenImpl(
     String token, {
     String? appVersionOverride,
+    bool force = false,
   }) async {
     if (!_isAuthenticated()) return;
-    if (_lastRegisteredToken == token) {
+    final Locale locale = _effectiveLocale();
+    final String localeCode = locale.languageCode;
+    if (!force &&
+        _lastRegisteredToken == token &&
+        _lastRegisteredLocale == localeCode) {
       return;
     }
     try {
       final String appVersion =
           appVersionOverride ?? (await PackageInfo.fromPlatform()).version;
-      final Locale locale = resolveAppLocale(
-        override: null,
-        platformLocales: PlatformDispatcher.instance.locales,
-      );
       await _repository.registerDeviceToken(
         token: token,
         platform: Platform.isIOS ? 'IOS' : 'ANDROID',
         appVersion: appVersion,
-        locale: locale.languageCode,
+        locale: localeCode,
       );
       _lastRegisteredToken = token;
+      _lastRegisteredLocale = localeCode;
       if (kDebugMode) {
         AppLog.verbose('[Push] Device token registered with API.');
       }
@@ -386,10 +409,14 @@ class PushNotificationService
           e.code != 'DEVICE_TOKEN_IN_USE') {
         AppLog.verbose('[Push] Token registration error: ${e.code}');
       }
+      if (!_isBenignRegistrationFailure(e)) {
+        onRegistrationFailure?.call(e);
+      }
     } catch (e) {
       if (kDebugMode) {
         AppLog.verbose('[Push] Token registration error: $e');
       }
+      onRegistrationFailure?.call(AppError.unknown(cause: e));
     }
   }
 
@@ -401,6 +428,7 @@ class PushNotificationService
   void clearLocalToken() {
     _currentToken = null;
     _lastRegisteredToken = null;
+    _lastRegisteredLocale = null;
   }
 
   /// Best-effort server unregister while the user session is still valid (sign-out).
@@ -425,12 +453,38 @@ class PushNotificationService
     } finally {
       _currentToken = null;
       _lastRegisteredToken = null;
+      _lastRegisteredLocale = null;
     }
   }
 
+  Locale _effectiveLocale() {
+    final Locale Function()? resolver = _resolveEffectiveLocale;
+    if (resolver != null) {
+      return resolver();
+    }
+    return resolveAppLocale(
+      override: null,
+      platformLocales: PlatformDispatcher.instance.locales,
+    );
+  }
+
+  bool _isLocaleUnchanged() {
+    final String localeCode = _effectiveLocale().languageCode;
+    return _lastRegisteredLocale == localeCode;
+  }
+
   @visibleForTesting
-  Future<void> registerTokenForTest(String token) =>
-      _registerToken(token, appVersionOverride: 'test');
+  Future<void> registerTokenForTest(
+    String token, {
+    bool force = false,
+  }) async {
+    _currentToken = token;
+    await _registerToken(
+      token,
+      appVersionOverride: 'test',
+      force: force,
+    );
+  }
 
   @visibleForTesting
   String? get lastRegisteredTokenForTest => _lastRegisteredToken;
@@ -455,6 +509,12 @@ class PushNotificationService
     final String message = error.toString();
     return message.contains('SESSION_REVOKED') ||
         message.contains('UNAUTHORIZED');
+  }
+
+  static bool _isBenignRegistrationFailure(AppError error) {
+    return error.code == 'UNAUTHORIZED' ||
+        error.code == 'SESSION_REVOKED' ||
+        error.code == 'DEVICE_TOKEN_IN_USE';
   }
 
   void dispose() {

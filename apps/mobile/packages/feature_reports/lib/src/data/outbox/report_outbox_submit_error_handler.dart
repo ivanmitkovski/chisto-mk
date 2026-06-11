@@ -27,7 +27,7 @@ class ReportOutboxSubmitErrorHandler {
             state: ReportOutboxState.failed,
             attemptCount: nextAttempt,
             lastErrorCode: err.code,
-            lastErrorMessage: err.message,
+            lastErrorMessage: '',
           ),
         );
         _emitActiveEntry(await _repo.getById(entry.id));
@@ -38,7 +38,7 @@ class ReportOutboxSubmitErrorHandler {
             state: ReportOutboxState.cooldown,
             attemptCount: nextAttempt,
             lastErrorCode: err.code,
-            lastErrorMessage: err.message,
+            lastErrorMessage: '',
             cooldownUntilMs: until,
           ),
         );
@@ -50,7 +50,7 @@ class ReportOutboxSubmitErrorHandler {
               state: ReportOutboxState.failed,
               attemptCount: nextAttempt,
               lastErrorCode: err.code,
-              lastErrorMessage: err.message,
+              lastErrorMessage: '',
             ),
           );
           _emitActiveEntry(await _repo.getById(entry.id));
@@ -63,7 +63,7 @@ class ReportOutboxSubmitErrorHandler {
               state: ReportOutboxState.cooldown,
               attemptCount: nextAttempt,
               lastErrorCode: err.code,
-              lastErrorMessage: err.message,
+              lastErrorMessage: '',
               cooldownUntilMs: until,
             ),
           );

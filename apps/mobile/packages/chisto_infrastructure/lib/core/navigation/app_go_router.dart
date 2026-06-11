@@ -1,4 +1,6 @@
+import 'package:chisto_infrastructure/core/auth/auth_state.dart';
 import 'package:chisto_infrastructure/core/logging/app_log.dart';
+import 'package:chisto_infrastructure/core/navigation/app_navigation.dart';
 import 'package:chisto_infrastructure/core/navigation/app_navigator_key.dart';
 import 'package:chisto_infrastructure/core/navigation/app_routes.dart';
 import 'package:chisto_infrastructure/core/navigation/unknown_route_screen.dart';
@@ -20,9 +22,13 @@ import 'package:feature_auth/src/presentation/screens/splash_screen.dart';
 import 'package:feature_events/src/presentation/navigation/events_routes.dart';
 import 'package:feature_home/src/application/home_shell_controller.dart';
 import 'package:feature_home/src/presentation/navigation/home_shell_router.dart';
+import 'package:feature_home/src/domain/models/pollution_site.dart';
 import 'package:feature_home/src/presentation/navigation/home_shell_tab_locations.dart';
 import 'package:feature_home/src/presentation/screens/site_detail_route_screen.dart';
+import 'package:feature_notifications/src/presentation/notifications_inbox/notifications_inbox_screen.dart';
+import 'package:feature_profile/src/presentation/screens/profile_points_history_route_screen.dart';
 import 'package:feature_reports/src/presentation/screens/new_report_screen.dart';
+import 'package:feature_reports/src/presentation/screens/report_detail_route_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -44,16 +50,16 @@ void bindAppGoRouter(GoRouter router) {
 }
 
 GoRouter buildAppGoRouter({String initialLocation = AppRoutes.splash}) {
-  final HomeShellController shell = readRoot(
-    homeShellControllerProvider.notifier,
-  );
-
   final GoRouter router = GoRouter(
     navigatorKey: appRootNavigatorKey,
     refreshListenable: readRoot(authStateProvider),
     initialLocation: initialLocation,
     redirect: (BuildContext context, GoRouterState state) {
-      return _legacyHomeRedirect(state, shell);
+      final String? authRedirect = _unauthenticatedRedirect(state);
+      if (authRedirect != null) {
+        return authRedirect;
+      }
+      return _legacyHomeRedirect(state);
     },
     errorBuilder: (BuildContext context, GoRouterState state) {
       return UnknownRouteScreen(attemptedRouteName: state.uri.path);
@@ -140,7 +146,7 @@ GoRouter buildAppGoRouter({String initialLocation = AppRoutes.splash}) {
         path: AppRoutes.location,
         builder: (_, _) => const LocationScreen(),
       ),
-      buildHomeShellStatefulShellRoute(controller: shell),
+      buildHomeShellStatefulShellRoute(),
       GoRoute(
         path: '${AppRoutes.siteDetail}/:siteId',
         parentNavigatorKey: appRootNavigatorKey,
@@ -191,6 +197,52 @@ GoRouter buildAppGoRouter({String initialLocation = AppRoutes.splash}) {
           );
         },
       ),
+      GoRoute(
+        path: AppRoutes.notifications,
+        parentNavigatorKey: appRootNavigatorKey,
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          final Object? extra = state.extra;
+          final NotificationsRouteExtra? args =
+              extra is NotificationsRouteExtra ? extra : null;
+          return CupertinoPage<int>(
+            key: state.pageKey,
+            child: NotificationsScreen(
+              availableSites: args?.availableSites ?? const <PollutionSite>[],
+            ),
+          );
+        },
+      ),
+      GoRoute(
+        path: '${AppRoutes.reportDetail}/:reportId',
+        parentNavigatorKey: appRootNavigatorKey,
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          final String reportId = state.pathParameters['reportId']?.trim() ?? '';
+          if (reportId.isEmpty) {
+            return MaterialPage<void>(
+              key: state.pageKey,
+              child: UnknownRouteScreen(attemptedRouteName: state.uri.path),
+            );
+          }
+          return CupertinoPage<void>(
+            key: state.pageKey,
+            child: ReportDetailRouteScreen(reportId: reportId),
+          );
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.profilePointsHistory,
+        parentNavigatorKey: appRootNavigatorKey,
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          final ProfilePointsHistoryRouteExtra? args =
+              profilePointsHistoryExtraFrom(state.extra);
+          return CupertinoPage<void>(
+            key: state.pageKey,
+            child: ProfilePointsHistoryRouteScreen(
+              summaryUser: args?.summaryUser,
+            ),
+          );
+        },
+      ),
       ...buildEventsRoutes(),
     ],
   );
@@ -199,10 +251,22 @@ GoRouter buildAppGoRouter({String initialLocation = AppRoutes.splash}) {
   return router;
 }
 
-String? _legacyHomeRedirect(
-  GoRouterState state,
-  HomeShellController homeShellController,
-) {
+String? _unauthenticatedRedirect(GoRouterState state) {
+  final AuthState authState = readRoot(authStateProvider);
+  if (authState.status != AuthStatus.unauthenticated) {
+    return null;
+  }
+  final String path = state.uri.path;
+  if (AppNavigation.isPublicUnauthenticatedPath(path)) {
+    return null;
+  }
+  return AppRoutes.signIn;
+}
+
+String? _legacyHomeRedirect(GoRouterState state) {
+  final HomeShellController homeShellController = readRoot(
+    homeShellControllerProvider.notifier,
+  );
   final String path = state.uri.path;
   if (path == AppRoutes.featureGuide) {
     homeShellController.applyInitialFocus(startCoachTour: true);
@@ -263,24 +327,28 @@ void _applyMapFocusRedirect(
 Widget _buildOtpScreen(Object? extra) {
   late final String phoneNumber;
   late final bool requestOtpOnOpen;
+  late final bool rememberMe;
   if (extra is OtpRouteArgs) {
     phoneNumber = extra.phoneNumberE164;
     requestOtpOnOpen = extra.requestOtpOnOpen;
+    rememberMe = extra.rememberMe;
   } else if (extra is String) {
     phoneNumber = extra;
     requestOtpOnOpen = false;
+    rememberMe = true;
   } else {
     if (kDebugMode) {
       AppLog.warn(
         '[AppGoRouter] ${AppRoutes.otp} expected String or OtpRouteArgs; got '
-        '${extra.runtimeType}. Sending user to sign up.',
+        '${extra.runtimeType}. Sending user to sign in.',
       );
     }
-    return const SignUpScreen();
+    return const SignInScreen();
   }
   return OtpScreen(
     phoneNumber: phoneNumber,
     requestOtpOnOpen: requestOtpOnOpen,
+    rememberMe: rememberMe,
   );
 }
 
@@ -294,8 +362,5 @@ Widget _buildForgotPasswordNewScreen(Object? extra) {
     }
     return const ForgotPasswordRequestScreen();
   }
-  return ForgotPasswordNewScreen(
-    target: extra.target,
-    code: extra.code,
-  );
+  return ForgotPasswordNewScreen(target: extra.target, code: extra.code);
 }

@@ -18,7 +18,7 @@ class _StubApiClient extends ApiClient {
     : super(
         config: AppConfig.dev,
         accessToken: () => null,
-        onUnauthorized: () {},
+        onUnauthorized: (_) {},
       );
 
   ApiResponse? postResult;

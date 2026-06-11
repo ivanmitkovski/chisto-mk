@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:chisto_infrastructure/core/providers/root_container.dart';
+import 'package:feature_auth/src/presentation/utils/auth_guard_ui.dart';
 import 'package:feature_events/feature_events.dart';
 import 'package:feature_home/src/application/home_shell_state.dart';
 import 'package:feature_home/src/presentation/utils/open_report_linked_pollution_site.dart';
@@ -16,13 +17,24 @@ part 'home_shell_controller.g.dart';
 /// Shared state for the signed-in tab shell (map focus, reports FAB, coach tour).
 @Riverpod(keepAlive: true)
 class HomeShellController extends _$HomeShellController {
-  final GlobalKey feedKey = GlobalKey();
-  final GlobalKey<EventsFeedScreenState> eventsFeedKey =
+  GlobalKey _feedKey = GlobalKey();
+  GlobalKey<EventsFeedScreenState> _eventsFeedKey =
       GlobalKey<EventsFeedScreenState>();
   final ValueNotifier<String?> mapPendingSiteFocus = ValueNotifier<String?>(
     null,
   );
-  final HomeShellCoachKeys coachKeys = HomeShellCoachKeys();
+  HomeShellCoachKeys _coachKeys = HomeShellCoachKeys();
+
+  GlobalKey get feedKey => _feedKey;
+  GlobalKey<EventsFeedScreenState> get eventsFeedKey => _eventsFeedKey;
+  HomeShellCoachKeys get coachKeys => _coachKeys;
+
+  /// Fresh tab keys after auth transitions so stale elements cannot collide.
+  void resetTabWidgetKeys() {
+    _feedKey = GlobalKey();
+    _eventsFeedKey = GlobalKey<EventsFeedScreenState>();
+    _coachKeys = HomeShellCoachKeys();
+  }
 
   @override
   HomeShellState build() {
@@ -80,6 +92,12 @@ class HomeShellController extends _$HomeShellController {
     state = state.copyWith(isLaunchingReportFlow: true);
 
     try {
+      if (!await ensureLocationEligibleForAction(context, ref)) {
+        return;
+      }
+      if (!context.mounted) {
+        return;
+      }
       final bool canProceed = await ReportEntryFlow.ensureReportingAllowed(
         context,
         ref: ref,
@@ -146,6 +164,17 @@ class HomeShellController extends _$HomeShellController {
 
   void clearReportIdToOpen() {
     state = state.copyWith(clearReportIdToOpen: true);
+  }
+
+  void openReportFromNotification(String reportId) {
+    final String trimmed = reportId.trim();
+    if (trimmed.isEmpty) {
+      return;
+    }
+    state = state.copyWith(
+      reportsRefreshTrigger: state.reportsRefreshTrigger + 1,
+      reportIdToOpen: trimmed,
+    );
   }
 
   void applyInitialFocus({

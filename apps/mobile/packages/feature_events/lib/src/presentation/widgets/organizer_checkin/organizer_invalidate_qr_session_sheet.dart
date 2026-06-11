@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 
 /// Confirms invalidating the organizer QR session (rotates codes).
 Future<bool?> showOrganizerInvalidateQrSessionSheet(BuildContext context) {
-  return showModalBottomSheet<bool>(
+  return AppBottomSheet.show<bool>(
     context: context,
     isScrollControlled: true,
     backgroundColor: AppColors.transparent,

@@ -6,12 +6,14 @@ class EventParticipantRow {
   const EventParticipantRow({
     required this.userId,
     required this.displayName,
+    this.isDeleted = false,
     required this.joinedAt,
     this.avatarUrl,
   });
 
   final String userId;
   final String displayName;
+  final bool isDeleted;
   final DateTime joinedAt;
   final String? avatarUrl;
 }

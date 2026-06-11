@@ -160,6 +160,11 @@ export class EventMobileResponseDto {
   @IsString()
   organizerName!: string;
 
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  organizerIsDeleted?: boolean;
+
   @ApiPropertyOptional({ nullable: true })
   @IsOptional()
   @IsString()

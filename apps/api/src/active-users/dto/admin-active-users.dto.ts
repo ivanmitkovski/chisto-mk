@@ -1,0 +1,94 @@
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { DevicePlatform, UserActivityEventType } from '../../prisma-client';
+
+export class ActiveUsersListQueryDto {
+  @ApiPropertyOptional({ default: 1 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page?: number = 1;
+
+  @ApiPropertyOptional({ default: 25 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  limit?: number = 25;
+
+  @ApiPropertyOptional({ enum: ['online', 'away', 'offline'] })
+  @IsOptional()
+  @IsString()
+  status?: 'online' | 'away' | 'offline';
+
+  @ApiPropertyOptional({ enum: DevicePlatform })
+  @IsOptional()
+  @IsEnum(DevicePlatform)
+  platform?: DevicePlatform;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  search?: string;
+}
+
+export class ActivityFeedQueryDto {
+  @ApiPropertyOptional({ default: 1 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page?: number = 1;
+
+  @ApiPropertyOptional({ default: 50 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  limit?: number = 50;
+
+  @ApiPropertyOptional({ enum: UserActivityEventType })
+  @IsOptional()
+  @IsEnum(UserActivityEventType)
+  type?: UserActivityEventType;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  search?: string;
+}
+
+export class CreateAdminAlertRuleDto {
+  @ApiProperty()
+  @IsString()
+  metric!: string;
+
+  @ApiProperty({ default: 100 })
+  @Type(() => Number)
+  threshold!: number;
+
+  @ApiPropertyOptional({ default: 300 })
+  @IsOptional()
+  @Type(() => Number)
+  windowSeconds?: number;
+
+  @ApiPropertyOptional({ enum: ['GT', 'GTE'], default: 'GT' })
+  @IsOptional()
+  @IsString()
+  comparator?: 'GT' | 'GTE';
+}
+
+export class UpdateAdminAlertRuleDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @Type(() => Number)
+  threshold?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  enabled?: boolean;
+}

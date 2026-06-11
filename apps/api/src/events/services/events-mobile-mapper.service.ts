@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CleanupEventStatus } from '../../prisma-client';
+import { resolveActorIdentity } from '../../common/projections/public-identity.projection';
 import { ReportsUploadService } from '../../reports/services/reports-upload.service';
 import {
   EventMobileEvidenceStripItemDto,
@@ -46,11 +47,13 @@ export class EventsMobileMapperService {
 
     const afterCanonical = this.uploads.getPublicUrlsForKeys(row.afterImageKeys);
 
-    const organizerName = row.organizer
-      ? `${row.organizer.firstName} ${row.organizer.lastName}`.trim()
-      : '';
+    const organizerIdentity = resolveActorIdentity(row.organizer, {
+      actorUserId: row.organizerId,
+    });
+    const organizerName = organizerIdentity.displayName ?? '';
 
-    const organizerAvatarUrl = row.organizer
+    const organizerAvatarUrl =
+      row.organizer && !organizerIdentity.isDeleted
       ? await this.uploads.signPrivateObjectKey(row.organizer.avatarObjectKey)
       : null;
 
@@ -136,6 +139,7 @@ export class EventsMobileMapperService {
       siteLng: row.site?.longitude ?? null,
       organizerId: row.organizerId ?? '',
       organizerName,
+      organizerIsDeleted: organizerIdentity.isDeleted,
       organizerAvatarUrl,
       scheduledAt: row.scheduledAt.toISOString(),
       endAt: row.endAt?.toISOString() ?? null,

@@ -1,4 +1,5 @@
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:design_system/design_system.dart';
 import 'package:feature_profile/src/domain/models/weekly_rankings_result.dart';
 import 'package:feature_profile/src/presentation/widgets/weekly_ranking_row.dart';
 import 'package:flutter/material.dart';
@@ -65,7 +66,26 @@ void main() {
     expect(find.byIcon(Icons.emoji_events_rounded), findsNothing);
   });
 
-  testWidgets('empty display name uses question mark initial', (
+  testWidgets('uses UserAvatarCircle for roster avatar chrome', (
+    WidgetTester tester,
+  ) async {
+    await pumpRow(
+      tester,
+      const WeeklyLeaderboardEntry(
+        rank: 4,
+        userId: 'u3',
+        displayName: 'Dana Smith',
+        avatarUrl: 'https://cdn.example/dana.jpg',
+        weeklyPoints: 12,
+        isCurrentUser: false,
+      ),
+    );
+
+    expect(find.byType(UserAvatarCircle), findsOneWidget);
+    expect(find.text('Dana Smith'), findsOneWidget);
+  });
+
+  testWidgets('empty display name uses question mark avatar fallback', (
     WidgetTester tester,
   ) async {
     await pumpRow(
@@ -79,6 +99,7 @@ void main() {
       ),
     );
 
+    expect(find.byType(UserAvatarCircle), findsOneWidget);
     expect(find.text('?'), findsOneWidget);
   });
 

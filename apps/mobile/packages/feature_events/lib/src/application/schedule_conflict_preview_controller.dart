@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
+import 'package:chisto_infrastructure/shared/widgets/organisms/app_confirm_dialog.dart';
 import 'package:feature_events/src/application/schedule_conflict_use_case.dart';
 import 'package:feature_events/src/domain/models/event_schedule_conflict_preview.dart';
 import 'package:feature_events/src/domain/repositories/events_repository.dart';
@@ -94,28 +95,15 @@ class ScheduleConflictPreviewController {
     if (conflict == null) {
       return true;
     }
-    return showCupertinoDialog<bool>(
+    return AppConfirmDialog.show(
       context: context,
-      builder: (BuildContext ctx) => CupertinoAlertDialog(
-        title: Text(ctx.l10n.eventsScheduleConflictPreviewTitle),
-        content: Text(
-          ctx.l10n.eventsScheduleConflictPreviewBody(
-            conflict.title,
-            formatConflictWhen(ctx, conflict.scheduledAt),
-          ),
-        ),
-        actions: <Widget>[
-          CupertinoDialogAction(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(ctx.l10n.eventsScheduleConflictAdjustTime),
-          ),
-          CupertinoDialogAction(
-            isDefaultAction: true,
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(ctx.l10n.eventsScheduleConflictContinue),
-          ),
-        ],
+      title: context.l10n.eventsScheduleConflictPreviewTitle,
+      body: context.l10n.eventsScheduleConflictPreviewBody(
+        conflict.title,
+        formatConflictWhen(context, conflict.scheduledAt),
       ),
+      confirmLabel: context.l10n.eventsScheduleConflictContinue,
+      cancelLabel: context.l10n.eventsScheduleConflictAdjustTime,
     );
   }
 }

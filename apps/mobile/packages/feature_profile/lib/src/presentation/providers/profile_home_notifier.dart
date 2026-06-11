@@ -1,6 +1,8 @@
+import 'dart:async';
+
+import 'package:chisto_infrastructure/core/auth/session_invalidation.dart';
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
-import 'package:chisto_infrastructure/core/navigation/app_navigation.dart';
 import 'package:chisto_infrastructure/core/navigation/app_navigator_key.dart';
 import 'package:chisto_infrastructure/core/providers/app_providers.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
@@ -64,15 +66,6 @@ class ProfileHomeNotifier extends Notifier<ProfileHomeState> {
     return ref.read(profileRepositoryProvider).getMe();
   }
 
-  static bool _isAuthError(String code) =>
-      code == 'UNAUTHORIZED' ||
-      code == 'INVALID_TOKEN_USER' ||
-      code == 'ACCOUNT_NOT_ACTIVE';
-
-  void _redirectToSignIn() {
-    AppNavigation.goSignInAndClearStack();
-  }
-
   void _showRefreshFailedSnack() {
     final BuildContext? ctx = appRootNavigatorKey.currentContext;
     if (ctx == null || !ctx.mounted) return;
@@ -117,14 +110,14 @@ class ProfileHomeNotifier extends Notifier<ProfileHomeState> {
           .setRemoteUrl(loaded?.avatarUrl);
     } on AppError catch (e) {
       await capacityFuture;
-      if (_isAuthError(e.code)) {
+      if (SessionInvalidation.shouldHandle(e)) {
         state = ProfileHomeState(
           profileLoadError: state.profileLoadError,
           profileUser: state.profileUser,
           reportCapacity: state.reportCapacity,
           capacityLoadInFlight: false,
         );
-        _redirectToSignIn();
+        unawaited(SessionInvalidation.fromError(e));
         return;
       }
       if (hadUser) {

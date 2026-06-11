@@ -72,7 +72,12 @@ export class AdminCommsService {
 
   async removeEmailSuppression(email: string, actor: AuthenticatedUser) {
     const existing = await this.prisma.emailSuppression.findUnique({ where: { email } });
-    if (!existing) throw new NotFoundException('Suppression not found');
+    if (!existing) {
+      throw new NotFoundException({
+        code: 'EMAIL_SUPPRESSION_NOT_FOUND',
+        message: 'Suppression not found',
+      });
+    }
     await this.prisma.emailSuppression.delete({ where: { email } });
     await this.audit?.log({
       actorId: actor.userId,

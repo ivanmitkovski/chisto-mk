@@ -4,7 +4,9 @@ import { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { CreateSiteCommentDto } from '../dto/create-site-comment.dto';
 import { UpdateSiteCommentDto } from '../dto/update-site-comment.dto';
 import { SiteEngagementService } from './site-engagement.service';
+import { SiteCommentsCountService } from './site-comments-count.service';
 import { ReportsUploadService } from '../../reports/services/reports-upload.service';
+import { resolveActorIdentity } from '../../common/projections/public-identity.projection';
 
 @Injectable()
 export class SiteCommentsMutationsService {
@@ -14,6 +16,7 @@ export class SiteCommentsMutationsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly siteEngagement: SiteEngagementService,
+    private readonly siteCommentsCount: SiteCommentsCountService,
     private readonly reportsUpload: ReportsUploadService,
   ) {}
 
@@ -43,7 +46,7 @@ export class SiteCommentsMutationsService {
         data: { siteId, authorId: user.userId, body, parentId: dto.parentId ?? null },
         include: {
           author: {
-            select: { firstName: true, lastName: true, avatarObjectKey: true },
+            select: { firstName: true, lastName: true, avatarObjectKey: true, status: true },
           },
         },
       });
@@ -53,14 +56,20 @@ export class SiteCommentsMutationsService {
       });
       return comment;
     });
+    const authorIdentity = resolveActorIdentity(result.author, {
+      actorUserId: result.authorId,
+    });
     return {
       id: result.id,
       parentId: result.parentId,
       body: result.body,
       createdAt: result.createdAt.toISOString(),
       authorId: result.authorId,
-      authorName: `${result.author.firstName} ${result.author.lastName}`.trim(),
-      authorAvatarUrl: await this.reportsUpload.signPrivateObjectKey(result.author.avatarObjectKey),
+      authorName: authorIdentity.displayName ?? '',
+      authorIsDeleted: authorIdentity.isDeleted,
+      authorAvatarUrl: await this.reportsUpload.signPrivateObjectKey(
+        result.author?.avatarObjectKey ?? null,
+      ),
       likesCount: result.likesCount,
       isLikedByMe: false,
       replies: [],
@@ -158,7 +167,7 @@ export class SiteCommentsMutationsService {
         parentId: true,
         createdAt: true,
         likesCount: true,
-        author: { select: { firstName: true, lastName: true } },
+        author: { select: { firstName: true, lastName: true, status: true } },
       },
     });
     if (!comment || comment.isDeleted || comment.siteId !== siteId) {
@@ -178,9 +187,12 @@ export class SiteCommentsMutationsService {
       data: { body },
       include: {
         author: {
-          select: { firstName: true, lastName: true, avatarObjectKey: true },
+          select: { firstName: true, lastName: true, avatarObjectKey: true, status: true },
         },
       },
+    });
+    const authorIdentity = resolveActorIdentity(updated.author, {
+      actorUserId: updated.authorId,
     });
     return {
       id: updated.id,
@@ -188,8 +200,11 @@ export class SiteCommentsMutationsService {
       body: updated.body,
       createdAt: updated.createdAt.toISOString(),
       authorId: updated.authorId,
-      authorName: `${updated.author.firstName} ${updated.author.lastName}`.trim(),
-      authorAvatarUrl: await this.reportsUpload.signPrivateObjectKey(updated.author.avatarObjectKey),
+      authorName: authorIdentity.displayName ?? '',
+      authorIsDeleted: authorIdentity.isDeleted,
+      authorAvatarUrl: await this.reportsUpload.signPrivateObjectKey(
+        updated.author?.avatarObjectKey ?? null,
+      ),
       likesCount: updated.likesCount,
       isLikedByMe: false,
       replies: [],
@@ -248,17 +263,11 @@ export class SiteCommentsMutationsService {
         where: { id: { in: ids }, isDeleted: false },
         data: { isDeleted: true },
       });
-      if (updated.count > 0) {
-        const actualCount = await tx.siteComment.count({
-          where: { siteId, isDeleted: false },
-        });
-        await tx.site.update({
-          where: { id: siteId },
-          data: { commentsCount: actualCount },
-        });
-      }
       return updated.count;
     });
+    if (affectedCount > 0) {
+      await this.siteCommentsCount.reconcileGlobal(siteId);
+    }
     return { commentId, deletedCount: affectedCount };
   }
 }

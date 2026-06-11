@@ -144,7 +144,7 @@ class ReportOutboxUploadPhase {
             final ReportOutboxEntry failed = cur.copyWith(
               state: ReportOutboxState.failed,
               lastErrorCode: err.code,
-              lastErrorMessage: err.message,
+              lastErrorMessage: '',
             );
             await _repo.update(failed);
             deleteReportUploadTempFiles(prepared);
@@ -177,7 +177,7 @@ class ReportOutboxUploadPhase {
       final ReportOutboxEntry failed = cur.copyWith(
         state: ReportOutboxState.failed,
         lastErrorCode: 'UPLOAD_ERROR',
-        lastErrorMessage: '$err',
+        lastErrorMessage: '',
       );
       await _repo.update(failed);
       deleteReportUploadTempFiles(prepared);

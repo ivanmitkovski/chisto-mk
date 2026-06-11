@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 
 /// Schedule-focused help for organizers editing an existing event.
 void showEditEventHelpSheet(BuildContext context) {
-  showEventsSurfaceModal<void>(
+  AppBottomSheet.show<void>(
     context: context,
     builder: (BuildContext ctx) {
       final TextTheme textTheme = Theme.of(ctx).textTheme;
@@ -28,29 +28,26 @@ void showEditEventHelpSheet(BuildContext context) {
           AppSpacing.lg,
           0,
         ),
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              _EditHelpRow(
-                icon: Icons.event_outlined,
-                text: ctx.l10n.createEventHelpBulletSchedule,
-                textTheme: textTheme,
-              ),
-              _EditHelpRow(
-                icon: Icons.groups_2_outlined,
-                text: ctx.l10n.createEventHelpBulletVolunteers,
-                textTheme: textTheme,
-              ),
-              _EditHelpRow(
-                icon: Icons.verified_outlined,
-                text: ctx.l10n.createEventHelpBulletModeration,
-                textTheme: textTheme,
-              ),
-            ],
-          ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            _EditHelpRow(
+              icon: Icons.event_outlined,
+              text: ctx.l10n.createEventHelpBulletSchedule,
+              textTheme: textTheme,
+            ),
+            _EditHelpRow(
+              icon: Icons.groups_2_outlined,
+              text: ctx.l10n.createEventHelpBulletVolunteers,
+              textTheme: textTheme,
+            ),
+            _EditHelpRow(
+              icon: Icons.verified_outlined,
+              text: ctx.l10n.createEventHelpBulletModeration,
+              textTheme: textTheme,
+            ),
+          ],
         ),
       );
     },

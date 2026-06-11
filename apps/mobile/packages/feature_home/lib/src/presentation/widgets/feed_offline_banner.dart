@@ -52,9 +52,9 @@ class _FeedOfflineBannerHostState extends State<FeedOfflineBannerHost> {
     return Semantics(
       container: true,
       liveRegion: true,
-      label: context.l10n.feedOfflineBanner,
+      label: context.l10n.connectionOfflineBanner,
       child: Material(
-        color: AppColors.primaryDark.withValues(alpha: 0.06),
+        color: AppColors.error.withValues(alpha: 0.06),
         child: Padding(
           padding: EdgeInsets.fromLTRB(
             AppSpacing.lg,
@@ -72,7 +72,7 @@ class _FeedOfflineBannerHostState extends State<FeedOfflineBannerHost> {
               const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Text(
-                  context.l10n.feedOfflineBanner,
+                  context.l10n.connectionOfflineBanner,
                   style: AppTypographySurfaces.homeMutedCaption(
                     Theme.of(context).textTheme,
                   ),

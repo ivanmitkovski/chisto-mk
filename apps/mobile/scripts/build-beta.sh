@@ -24,6 +24,17 @@ COMMON=(
   "${EXTRA_DEFINES[@]}"
 )
 
+# Optional build number / name overrides. App Store Connect requires each
+# upload's build number to exceed the previous one for the same version, but
+# iOS defaults to pubspec's `+N`. Pass BUILD_NUMBER (and optionally BUILD_NAME)
+# to bump it without editing pubspec, e.g. `BUILD_NUMBER=10 ./scripts/build-beta.sh ios`.
+if [[ -n "${BUILD_NUMBER:-}" ]]; then
+  COMMON+=(--build-number="${BUILD_NUMBER}")
+fi
+if [[ -n "${BUILD_NAME:-}" ]]; then
+  COMMON+=(--build-name="${BUILD_NAME}")
+fi
+
 flutter pub get
 
 case "$PLATFORM" in

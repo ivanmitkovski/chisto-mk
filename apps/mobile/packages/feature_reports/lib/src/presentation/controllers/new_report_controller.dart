@@ -600,26 +600,23 @@ class NewReportController extends _$NewReportController {
     final AppError err = switch (e) {
       AppError() => NewReportSubmitErrorDisplay.humanizeSubmitErrorForBanner(e),
       TimeoutException() => AppError.timeout(),
-      SocketException() => AppError.network(message: e.message, cause: e),
-      HandshakeException() => AppError.network(message: e.message, cause: e),
+      SocketException() => AppError.network(cause: e),
+      HandshakeException() => AppError.network(cause: e),
       StateError(message: final String m) when m.contains('in-flight') =>
         const AppError(
           code: 'SUBMIT_IN_PROGRESS',
-          message:
-              'Your report is still being submitted. Please wait a moment.',
+          message: '',
           retryable: true,
         ),
       StateError(message: final String m) when m.contains('disposed') =>
         const AppError(
           code: 'SUBMIT_FAILED_RETRYABLE',
-          message: NewReportSubmitErrorDisplay.genericSubmitFailureMessage,
+          message: '',
           retryable: true,
         ),
-      _ => AppError(
+      _ => const AppError(
         code: 'SUBMIT_FAILED_RETRYABLE',
-        message: e.toString().isNotEmpty
-            ? e.toString()
-            : NewReportSubmitErrorDisplay.genericSubmitFailureMessage,
+        message: '',
         retryable: true,
       ),
     };

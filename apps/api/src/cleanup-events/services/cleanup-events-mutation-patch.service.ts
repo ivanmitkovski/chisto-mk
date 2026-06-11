@@ -1,7 +1,8 @@
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { duplicateEventConflict } from '../../event-schedule-conflict/util/duplicate-event-conflict.exception';
 import { EventScheduleConflictService } from '../../event-schedule-conflict/services/event-schedule-conflict.service';
-import { CleanupEventStatus, EcoEventLifecycleStatus, Prisma } from '../../prisma-client';
+import { CleanupEventStatus, Prisma } from '../../prisma-client';
 import { PrismaService } from '../../prisma/prisma.service';
 import type { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { AuditService } from '../../audit/services/audit.service';
@@ -9,14 +10,13 @@ import {
   POINTS_EVENT_ORGANIZER_APPROVED,
   REASON_EVENT_ORGANIZER_APPROVED,
 } from '../../gamification/constants/gamification.constants';
-import { EcoEventPointsService } from '../../gamification/services/eco-event-points.service';
+import { EcoEventPointsService, type EcoEventPointsCreditResult } from '../../gamification/services/eco-event-points.service';
+import { emitGamificationPointsCredited } from '../../gamification/util/gamification-credit-events.util';
 import { CleanupEventRealtimeService } from '../../admin-realtime/services/cleanup-event-realtime.service';
 import { CleanupEventNotificationsService } from '../../notifications/services/cleanup-event-notifications.service';
 import { ObservabilityStore } from '../../observability/observability.store';
-import {
-  assertEndSameSkopjeCalendarDayUtc,
-} from '../../common/validation/event-calendar-span.validation';
 import { PatchCleanupEventDto } from '../dto/patch-cleanup-event.dto';
+import { buildCleanupEventPatchData } from '../util/cleanup-event-patch-data.util';
 import { CleanupEventsListService } from '../services/cleanup-events-list.service';
 
 @Injectable()
@@ -31,6 +31,7 @@ export class CleanupEventsPatchMutationService {
     private readonly scheduleConflict: EventScheduleConflictService,
     private readonly cleanupEventNotifications: CleanupEventNotificationsService,
     private readonly list: CleanupEventsListService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async patch(id: string, dto: PatchCleanupEventDto, actor: AuthenticatedUser) {
@@ -42,169 +43,11 @@ export class CleanupEventsPatchMutationService {
       });
     }
 
-    if (dto.status === CleanupEventStatus.DECLINED) {
-      const r = dto.declineReason?.trim() ?? '';
-      if (r.length < 3) {
-        throw new BadRequestException({
-          code: 'DECLINE_REASON_REQUIRED',
-          message: 'A decline reason of at least 3 characters is required',
-        });
-      }
-    }
-
-    const data: {
-      title?: string;
-      description?: string;
-      recurrenceRule?: string | null;
-      scheduledAt?: Date;
-      endAt?: Date | null;
-      endSoonNotifiedForEndAt?: Date | null;
-      completedAt?: Date | null;
-      participantCount?: number;
-      status?: CleanupEventStatus;
-      lifecycleStatus?: EcoEventLifecycleStatus;
-      moderatedById?: string | null;
-      moderatedAt?: Date | null;
-      declineReason?: string | null;
-    } = {};
-    if (dto.title != null) {
-      data.title = dto.title.trim() || 'Cleanup event';
-    }
-    if (dto.description != null) {
-      data.description = dto.description.trim();
-    }
-    if (dto.recurrenceRule !== undefined) {
-      const t = dto.recurrenceRule.trim();
-      data.recurrenceRule = t.length > 0 ? t : null;
-    }
-    if (dto.scheduledAt != null) {
-      data.scheduledAt = new Date(dto.scheduledAt);
-    }
-    if (dto.completedAt !== undefined) {
-      data.completedAt = dto.completedAt ? new Date(dto.completedAt) : null;
-      data.lifecycleStatus = dto.completedAt
-        ? EcoEventLifecycleStatus.COMPLETED
-        : EcoEventLifecycleStatus.UPCOMING;
-    }
-    if (dto.participantCount != null) {
-      data.participantCount = dto.participantCount;
-    }
-    if (dto.lifecycleStatus != null) {
-      if (existing.lifecycleStatus === EcoEventLifecycleStatus.COMPLETED) {
-        throw new BadRequestException({
-          code: 'INVALID_LIFECYCLE_TRANSITION',
-          message: 'Cannot change lifecycle of a completed event',
-        });
-      }
-      if (
-        existing.lifecycleStatus === EcoEventLifecycleStatus.CANCELLED &&
-        dto.lifecycleStatus !== EcoEventLifecycleStatus.CANCELLED
-      ) {
-        throw new BadRequestException({
-          code: 'INVALID_LIFECYCLE_TRANSITION',
-          message: 'Cannot reopen a cancelled event',
-        });
-      }
-      data.lifecycleStatus = dto.lifecycleStatus;
-      if (dto.lifecycleStatus === EcoEventLifecycleStatus.COMPLETED) {
-        data.completedAt =
-          dto.completedAt != null && String(dto.completedAt).trim() !== ''
-            ? new Date(dto.completedAt as string)
-            : new Date();
-      }
-    }
-    if (dto.status === CleanupEventStatus.APPROVED || dto.status === CleanupEventStatus.DECLINED) {
-      if (existing.status !== CleanupEventStatus.PENDING) {
-        throw new BadRequestException({
-          code: 'EVENT_NOT_PENDING',
-          message: 'Only PENDING events can be approved or declined',
-        });
-      }
-      data.status = dto.status;
-      data.moderatedById = actor.userId;
-      data.moderatedAt = new Date();
-      if (dto.status === CleanupEventStatus.DECLINED) {
-        data.declineReason = dto.declineReason?.trim() ?? null;
-      } else {
-        data.declineReason = null;
-      }
-    } else if (dto.status === CleanupEventStatus.PENDING) {
-      if (
-        existing.status !== CleanupEventStatus.APPROVED &&
-        existing.status !== CleanupEventStatus.DECLINED
-      ) {
-        throw new BadRequestException({
-          code: 'EVENT_NOT_MODERATED',
-          message: 'Only APPROVED or DECLINED events can be returned to pending',
-        });
-      }
-      data.status = CleanupEventStatus.PENDING;
-      data.moderatedById = null;
-      data.moderatedAt = null;
-      data.declineReason = null;
-    }
-
-    const endAtPatchHasValue =
-      dto.endAt !== undefined &&
-      dto.endAt != null &&
-      String(dto.endAt).trim() !== '';
-    const isModerationStatusOnly =
-      (dto.status === CleanupEventStatus.APPROVED ||
-        dto.status === CleanupEventStatus.DECLINED ||
-        dto.status === CleanupEventStatus.PENDING) &&
-      dto.scheduledAt == null &&
-      !endAtPatchHasValue;
-
-    const nextStart =
-      dto.scheduledAt != null ? new Date(dto.scheduledAt) : existing.scheduledAt;
-    if (dto.scheduledAt != null && Number.isNaN(nextStart.getTime())) {
-      throw new BadRequestException({
-        code: 'INVALID_SCHEDULED_AT',
-        message: 'Invalid scheduledAt',
-      });
-    }
-
-    let nextEnd: Date | null = existing.endAt;
-    if (dto.endAt !== undefined) {
-      if (dto.endAt == null || String(dto.endAt).trim() === '') {
-        nextEnd = null;
-        data.endAt = null;
-        data.endSoonNotifiedForEndAt = null;
-      } else {
-        const parsedEnd = new Date(dto.endAt);
-        if (Number.isNaN(parsedEnd.getTime())) {
-          throw new BadRequestException({
-            code: 'INVALID_END_AT',
-            message: 'Invalid endAt',
-          });
-        }
-        nextEnd = parsedEnd;
-        data.endAt = parsedEnd;
-        data.endSoonNotifiedForEndAt = null;
-      }
-    }
-
-    if (nextEnd != null && !isModerationStatusOnly) {
-      if (nextEnd.getTime() <= nextStart.getTime()) {
-        throw new BadRequestException({
-          code: 'INVALID_END_AT',
-          message: 'endAt must be after scheduledAt',
-        });
-      }
-      assertEndSameSkopjeCalendarDayUtc({ scheduledAt: nextStart, endAt: nextEnd });
-    }
-
-    if (
-      !isModerationStatusOnly &&
-      dto.scheduledAt != null &&
-      dto.endAt === undefined &&
-      existing.endAt != null
-    ) {
-      assertEndSameSkopjeCalendarDayUtc({
-        scheduledAt: nextStart,
-        endAt: existing.endAt,
-      });
-    }
+    const { data, nextStart, nextEnd } = buildCleanupEventPatchData({
+      dto,
+      existing,
+      actorUserId: actor.userId,
+    });
 
     if (dto.scheduledAt != null || dto.endAt !== undefined) {
       const conflictPatch = await this.scheduleConflict.findConflictingEvent({
@@ -225,21 +68,27 @@ export class CleanupEventsPatchMutationService {
       });
     }
 
-    await this.prisma.$transaction(async (tx) => {
-      await tx.cleanupEvent.update({
-        where: { id },
-        data,
-      });
-      if (data.status === CleanupEventStatus.APPROVED && existing.organizerId != null) {
-        await this.ecoEventPoints.creditIfNew(tx, {
-          userId: existing.organizerId,
-          delta: POINTS_EVENT_ORGANIZER_APPROVED,
-          reasonCode: REASON_EVENT_ORGANIZER_APPROVED,
-          referenceType: 'CleanupEvent',
-          referenceId: id,
+    const organizerCredit: EcoEventPointsCreditResult | null = await this.prisma.$transaction(
+      async (tx) => {
+        await tx.cleanupEvent.update({
+          where: { id },
+          data,
         });
-      }
-    });
+        if (data.status === CleanupEventStatus.APPROVED && existing.organizerId != null) {
+          return this.ecoEventPoints.creditIfNew(tx, {
+            userId: existing.organizerId,
+            delta: POINTS_EVENT_ORGANIZER_APPROVED,
+            reasonCode: REASON_EVENT_ORGANIZER_APPROVED,
+            referenceType: 'CleanupEvent',
+            referenceId: id,
+          });
+        }
+        return null;
+      },
+    );
+    if (organizerCredit != null && organizerCredit.granted > 0 && existing.organizerId != null) {
+      emitGamificationPointsCredited(this.eventEmitter, existing.organizerId, organizerCredit);
+    }
 
     const auditAction =
       data.status === CleanupEventStatus.APPROVED

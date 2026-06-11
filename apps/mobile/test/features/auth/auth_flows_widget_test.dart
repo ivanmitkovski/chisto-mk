@@ -13,8 +13,10 @@ import 'package:feature_auth/src/domain/models/password_reset_target.dart';
 import 'package:feature_auth/src/presentation/screens/forgot_password_new_screen.dart';
 import 'package:feature_auth/src/presentation/screens/forgot_password_request_screen.dart';
 import 'package:feature_auth/src/presentation/screens/forgot_password_success_screen.dart';
+import 'package:feature_auth/src/presentation/screens/location_screen.dart';
 import 'package:feature_auth/src/presentation/screens/otp_screen.dart';
 import 'package:feature_auth/src/presentation/screens/sign_in_screen.dart';
+import 'package:feature_auth/src/presentation/screens/sign_up_screen.dart';
 import 'package:feature_home/src/application/home_shell_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -73,6 +75,43 @@ void main() {
 
     expect(find.byType(ApiErrorBanner), findsOneWidget);
     expect(find.text('Wrong phone number or password.'), findsOneWidget);
+  });
+
+  testWidgets('sign in maps server password validation to inline field error', (
+    WidgetTester tester,
+  ) async {
+    final FakeAuthRepository repo = FakeAuthRepository()
+      ..signInError = AppError.validation(
+        message: 'Validation failed',
+        details: <Map<String, dynamic>>[
+          <String, dynamic>{
+            'field': 'password',
+            'constraints': <String, String>{'minLength': 'min 8'},
+          },
+        ],
+      );
+
+    await pumpAuthWidget(
+      tester,
+      home: const SignInScreen(),
+      overrides: AuthTestOverrides(authRepository: repo).build(),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextFormField).first, '70123456');
+    await tester.enterText(find.byType(TextFormField).last, 'qwertyu');
+    await tester.pump();
+
+    await tester.ensureVisible(_primaryCtaElevated('Sign in'));
+    await tester.tap(_primaryCtaElevated('Sign in'));
+    await tester.pumpAndSettle();
+
+    final AppLocalizations l10n = AppLocalizations.of(
+      tester.element(find.byType(SignInScreen)),
+    )!;
+
+    expect(find.byType(ApiErrorBanner), findsNothing);
+    expect(find.text(l10n.authValidationPasswordMinLength), findsOneWidget);
   });
 
   testWidgets('password reset OTP step navigates to new password screen', (
@@ -141,7 +180,70 @@ void main() {
     expect(requestOtpCalls, 1);
   });
 
-  testWidgets('email reset form submits via confirm', (WidgetTester tester) async {
+  testWidgets(
+    'unverified sign-in verify success navigates to location not registration',
+    (WidgetTester tester) async {
+      const String phoneE164 = '+38970123456';
+      final FakeAuthRepository repo =
+          FakeAuthRepository(
+              requestOtpImpl: (String phone) async {
+                expect(phone, phoneE164);
+                return const SendOtpResult(expiresInSeconds: 300);
+              },
+              verifyOtpImpl: (String phone, String code) async {
+                AppBootstrap.instance.authState.setAuthenticated(
+                  userId: 'u-test',
+                  displayName: 'Test User',
+                  phoneNumber: phone,
+                  accessToken: 'tok',
+                );
+              },
+            )
+            ..signInError = const AppError(
+              code: 'PHONE_NOT_VERIFIED',
+              message: 'not verified',
+            )
+            ..requiresTermsAcceptance = false;
+
+      AppBootstrap.instance.overrideAuthRepositoryForTests(repo);
+      AppBootstrap.instance.providerContainer.invalidate(
+        authRepositoryProvider,
+      );
+      await pumpAppRouter(tester, initialLocation: AppRoutes.signIn);
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextFormField).first, '70123456');
+      await tester.enterText(find.byType(TextFormField).last, 'Password1');
+      await tester.pump();
+
+      await tester.ensureVisible(_primaryCtaElevated('Sign in'));
+      await tester.tap(_primaryCtaElevated('Sign in'));
+      await tester.pumpAndSettle();
+
+      final AppLocalizations l10n = AppLocalizations.of(
+        tester.element(find.byType(SignInScreen)),
+      )!;
+
+      await tester.tap(find.text(l10n.authVerifyPhoneCta));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(OtpScreen), findsOneWidget);
+
+      await enterOtpCode(tester, '123456');
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+
+      expect(find.byType(SignUpScreen), findsNothing);
+      expect(appGoRouter.routeInformationProvider.value.uri.path, AppRoutes.location);
+      expect(find.byType(LocationScreen), findsOneWidget);
+
+      await tester.pump(const Duration(milliseconds: 900));
+    },
+  );
+
+  testWidgets('email reset form submits via confirm', (
+    WidgetTester tester,
+  ) async {
     const PasswordResetTarget target = PasswordResetTarget(
       channel: PasswordResetChannel.email,
       value: 'user@example.com',
@@ -163,10 +265,7 @@ void main() {
 
     await pumpAuthWidget(
       tester,
-      home: const ForgotPasswordNewScreen(
-        target: target,
-        code: '123456',
-      ),
+      home: const ForgotPasswordNewScreen(target: target, code: '123456'),
       onGenerateRoute: AppRouter.onGenerateRoute,
       overrides: AuthTestOverrides(authRepository: repo).build(),
     );

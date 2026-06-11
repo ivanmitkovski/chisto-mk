@@ -20,7 +20,7 @@ describe('buildOtpSmsBody', () => {
   const code = '4829';
   const expiryMinutes = 10;
 
-  it('includes code and expiry for English phone verification', () => {
+  it('includes code and full-word expiry for English phone verification', () => {
     const body = buildOtpSmsBody({
       code,
       purpose: OtpSmsPurpose.PhoneVerification,
@@ -29,7 +29,8 @@ describe('buildOtpSmsBody', () => {
     });
     expect(body).toContain(code);
     expect(body).toContain('verification code');
-    expect(body).toContain('10 min');
+    expect(body).toContain('The code is valid for 10 minutes.');
+    expect(body).not.toMatch(/\bmin\.|\bmin\b(?!ute)/);
     expect(body).toContain('Chisto');
   });
 
@@ -42,10 +43,11 @@ describe('buildOtpSmsBody', () => {
     });
     expect(body).toContain(code);
     expect(body).toContain('password reset code');
+    expect(body).toContain('The code is valid for 10 minutes.');
     expect(body).not.toContain('verification code');
   });
 
-  it('uses Macedonian Cyrillic bundle for phone verification', () => {
+  it('uses Macedonian Cyrillic bundle with full minute words for phone verification', () => {
     const body = buildOtpSmsBody({
       code,
       purpose: OtpSmsPurpose.PhoneVerification,
@@ -55,7 +57,8 @@ describe('buildOtpSmsBody', () => {
     expect(body).toContain(code);
     expect(body).toContain('верификација');
     expect(body).toContain('телефонот');
-    expect(body).toContain('Важи 10 мин');
+    expect(body).toContain('Кодот важи 10 минути.');
+    expect(body).not.toContain('мин.');
   });
 
   it('uses Macedonian Cyrillic bundle for password reset', () => {
@@ -68,9 +71,10 @@ describe('buildOtpSmsBody', () => {
     expect(body).toContain(code);
     expect(body).toContain('ресетирање');
     expect(body).toContain('лозинката');
+    expect(body).toContain('Кодот важи 10 минути.');
   });
 
-  it('uses Albanian Latin bundle for password reset', () => {
+  it('uses Albanian Latin bundle with full minute words for password reset', () => {
     const body = buildOtpSmsBody({
       code,
       purpose: OtpSmsPurpose.PasswordReset,
@@ -79,7 +83,8 @@ describe('buildOtpSmsBody', () => {
     });
     expect(body).toContain(code);
     expect(body).toContain('fjalekalimit');
-    expect(body).toContain('Skadon per 10 min');
+    expect(body).toContain('Kodi skadon per 10 minuta.');
+    expect(body).not.toMatch(/\bmin\./);
   });
 
   it('does not include ignore-if-not-requested disclaimers in any locale', () => {
@@ -93,13 +98,23 @@ describe('buildOtpSmsBody', () => {
     }
   });
 
-  it('rounds expiry to at least 1 minute', () => {
+  it('rounds expiry to at least 1 minute with singular form', () => {
     const body = buildOtpSmsBody({
       code: '1111',
       purpose: OtpSmsPurpose.PhoneVerification,
       locale: 'en',
       expiryMinutes: 0.2,
     });
-    expect(body).toContain('1 min');
+    expect(body).toContain('The code is valid for 1 minute.');
+  });
+
+  it('uses singular Macedonian minute for 1-minute expiry', () => {
+    const body = buildOtpSmsBody({
+      code: '1111',
+      purpose: OtpSmsPurpose.PhoneVerification,
+      locale: 'mk',
+      expiryMinutes: 1,
+    });
+    expect(body).toContain('Кодот важи 1 минута.');
   });
 });

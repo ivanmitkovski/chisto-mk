@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { createHash, randomBytes } from 'crypto';
-import { UserStatus } from '../../prisma-client';
+import { EventChatMessageType, Prisma, UserStatus } from '../../prisma-client';
 import { PrismaService } from '../../prisma/prisma.service';
+import { ReportsUploadService } from '../../reports/services/reports-upload.service';
+import { SiteCommentsCountService } from '../../sites/services/site-comments-count.service';
 import { AuthSessionRevocationService } from './auth-session-revocation.service';
 
 const NOTIFICATION_ERASE_BATCH_SIZE = 500;
@@ -11,11 +13,22 @@ export class AccountErasureService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly sessionRevocation: AuthSessionRevocationService,
+    private readonly reportsUploadService: ReportsUploadService,
+    private readonly siteCommentsCount: SiteCommentsCountService,
   ) {}
 
   async eraseUserAccount(userId: string): Promise<void> {
+    const existing = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, status: true, avatarObjectKey: true },
+    });
+    if (!existing || existing.status === UserStatus.DELETED) {
+      return;
+    }
+
     const placeholder = `deleted_${createHash('sha256').update(userId).digest('hex').slice(0, 16)}`;
     const now = new Date();
+    const avatarObjectKey = existing.avatarObjectKey;
 
     await this.sessionRevocation.revokeAllForUser(userId, 'account_deleted');
 
@@ -55,13 +68,23 @@ export class AccountErasureService {
         },
       });
 
+      await tx.eventChatMessage.updateMany({
+        where: {
+          authorId: userId,
+          messageType: EventChatMessageType.SYSTEM,
+        },
+        data: {
+          systemPayload: { displayName: null, scrubbed: true } as Prisma.InputJsonValue,
+        },
+      });
+
       await tx.user.update({
         where: { id: userId },
         data: {
           status: UserStatus.DELETED,
           deletedAt: now,
-          firstName: 'Deleted',
-          lastName: 'User',
+          firstName: '',
+          lastName: '',
           email: `${placeholder}@anonymized.invalid`,
           phoneNumber: `+000${randomBytes(4).toString('hex')}`,
           passwordHash: randomBytes(32).toString('hex'),
@@ -74,5 +97,11 @@ export class AccountErasureService {
         },
       });
     });
+
+    await this.siteCommentsCount.reconcileSitesForAuthor(userId);
+
+    if (avatarObjectKey) {
+      void this.reportsUploadService.deleteObjectByKey(avatarObjectKey).catch(() => undefined);
+    }
   }
 }

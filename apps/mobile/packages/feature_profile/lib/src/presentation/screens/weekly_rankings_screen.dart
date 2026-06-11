@@ -4,12 +4,15 @@ import 'package:chisto_infrastructure/core/theme/app_colors.dart';
 import 'package:chisto_infrastructure/core/theme/app_motion.dart';
 import 'package:chisto_infrastructure/core/theme/app_spacing.dart';
 import 'package:chisto_infrastructure/core/theme/app_typography.dart';
+import 'package:chisto_infrastructure/shared/widgets/atoms/no_overscroll_overlay_scroll_behavior.dart';
 import 'package:chisto_infrastructure/shared/widgets/molecules/animated_phase_switcher.dart';
 import 'package:chisto_infrastructure/shared/widgets/molecules/app_error_view.dart';
 import 'package:chisto_infrastructure/shared/widgets/organisms/app_refresh_indicator.dart';
 import 'package:feature_profile/src/domain/models/weekly_rankings_result.dart';
 import 'package:feature_profile/src/presentation/providers/weekly_rankings_notifier.dart';
+import 'package:feature_profile/src/presentation/widgets/profile_scroll_bottom_shadow_clipper.dart';
 import 'package:feature_profile/src/presentation/widgets/profile_sub_screen_header.dart';
+import 'package:feature_profile/src/presentation/widgets/profile_sub_screen_panel.dart';
 import 'package:feature_profile/src/presentation/widgets/weekly_current_user_card.dart';
 import 'package:feature_profile/src/presentation/widgets/weekly_ranking_row.dart';
 import 'package:feature_profile/src/presentation/widgets/weekly_rankings_empty.dart';
@@ -77,22 +80,25 @@ class _WeeklyRankingsScreenState extends ConsumerState<WeeklyRankingsScreen> {
     return '$left $_enDash $right';
   }
 
+  String _phaseFor(AsyncValue<WeeklyRankingsResult> asyncRankings) {
+    if (asyncRankings.hasValue) return 'content';
+    if (asyncRankings.isLoading) return 'loading';
+    return 'error';
+  }
+
   @override
   Widget build(BuildContext context) {
     final AsyncValue<WeeklyRankingsResult> asyncRankings = ref.watch(
       weeklyRankingsNotifierProvider,
     );
 
-    final String phase = asyncRankings.when(
-      data: (_) => 'content',
-      error: (Object _, StackTrace _) => 'error',
-      loading: () => 'loading',
-    );
+    final String phase = _phaseFor(asyncRankings);
 
     return Scaffold(
       backgroundColor: AppColors.appBackground,
       resizeToAvoidBottomInset: false,
       body: SafeArea(
+        bottom: false,
         child: AnimatedPhaseSwitcher(
           phaseKey: phase,
           child: asyncRankings.when(
@@ -104,14 +110,47 @@ class _WeeklyRankingsScreenState extends ConsumerState<WeeklyRankingsScreen> {
               final AppError err = e is AppError
                   ? e
                   : AppError.network(cause: e);
-              return AppErrorView(
-                error: err,
-                onRetry: () =>
-                    ref.read(weeklyRankingsNotifierProvider.notifier).refresh(),
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  _weeklyRankingsHeader(context, weekRange: null),
+                  Expanded(
+                    child: AppErrorView(
+                      error: err,
+                      onRetry: () => ref
+                          .read(weeklyRankingsNotifierProvider.notifier)
+                          .refresh(),
+                    ),
+                  ),
+                ],
               );
             },
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _weeklyRankingsHeader(
+    BuildContext context, {
+    required String? weekRange,
+  }) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.md),
+      child: ProfileSubScreenHeader(
+        title: context.l10n.profileWeeklyRankingsTitle,
+        subtitle: context.l10n.profileWeeklyRankingsSubtitle,
+        belowSubtitle: weekRange != null
+            ? Text(
+                weekRange,
+                style: AppTypography.cardSubtitle(textTheme).copyWith(
+                  color: AppColors.primaryDark,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: -0.1,
+                ),
+              )
+            : null,
       ),
     );
   }
@@ -123,6 +162,8 @@ class _WeeklyRankingsScreenState extends ConsumerState<WeeklyRankingsScreen> {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final List<WeeklyLeaderboardEntry> entries = data.entries;
     final String? weekRange = _weekRangeLine(context, data);
+    final double listBottomPadding =
+        ProfileSubScreenPanel.scrollBottomPadding(context);
 
     WeeklyLeaderboardEntry? currentUserEntry;
     try {
@@ -133,29 +174,16 @@ class _WeeklyRankingsScreenState extends ConsumerState<WeeklyRankingsScreen> {
       currentUserEntry = null;
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(top: AppSpacing.md),
-          child: ProfileSubScreenHeader(
-            title: context.l10n.profileWeeklyRankingsTitle,
-            subtitle: context.l10n.profileWeeklyRankingsSubtitle,
-            belowSubtitle: weekRange != null
-                ? Text(
-                    weekRange,
-                    style: AppTypography.cardSubtitle(textTheme).copyWith(
-                      color: AppColors.primaryDark,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: -0.1,
-                    ),
-                  )
-                : null,
-          ),
-        ),
-        if (entries.isNotEmpty) ...<Widget>[
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+    final List<Widget> slivers = <Widget>[
+      if (entries.isNotEmpty)
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              AppSpacing.sm,
+              AppSpacing.lg,
+              AppSpacing.sm,
+            ),
             child: Text(
               context.l10n.profileWeeklyRankingsTopSupporters,
               style: AppTypography.cardSubtitle(textTheme).copyWith(
@@ -165,10 +193,10 @@ class _WeeklyRankingsScreenState extends ConsumerState<WeeklyRankingsScreen> {
               ),
             ),
           ),
-          const SizedBox(height: AppSpacing.sm),
-        ],
-        if (currentUserEntry != null)
-          Padding(
+        ),
+      if (currentUserEntry != null)
+        SliverToBoxAdapter(
+          child: Padding(
             padding: const EdgeInsets.fromLTRB(
               AppSpacing.lg,
               0,
@@ -184,64 +212,76 @@ class _WeeklyRankingsScreenState extends ConsumerState<WeeklyRankingsScreen> {
               ),
             ),
           ),
+        ),
+      if (entries.isEmpty)
+        SliverFillRemaining(
+          hasScrollBody: false,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+            child: WeeklyRankingsEmpty(
+              title: context.l10n.profileWeeklyRankingsEmptyTitle,
+              subtitle: context.l10n.profileWeeklyRankingsEmptySubtitle,
+            ),
+          ),
+        )
+      else
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.sm,
+            AppSpacing.lg,
+            0,
+          ),
+          sliver: SliverList(
+            delegate: SliverChildBuilderDelegate((
+              BuildContext context,
+              int index,
+            ) {
+              final WeeklyLeaderboardEntry entry = entries[index];
+              final Widget row = entry.isCurrentUser
+                  ? KeyedSubtree(
+                      key: _currentUserRowKey,
+                      child: WeeklyRankingRow(entry: entry),
+                    )
+                  : WeeklyRankingRow(entry: entry);
+              return Padding(
+                padding: EdgeInsets.only(
+                  bottom: index == entries.length - 1
+                      ? listBottomPadding
+                      : AppSpacing.xs,
+                ),
+                child: row,
+              );
+            }, childCount: entries.length),
+          ),
+        ),
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        _weeklyRankingsHeader(context, weekRange: weekRange),
         Expanded(
-          child: AppRefreshIndicator(
-            onRefresh: () =>
-                ref.read(weeklyRankingsNotifierProvider.notifier).refresh(),
-            child: entries.isEmpty
-                ? LayoutBuilder(
-                    builder:
-                        (BuildContext context, BoxConstraints constraints) {
-                          return SingleChildScrollView(
-                            physics: const AlwaysScrollableScrollPhysics(
-                              parent: BouncingScrollPhysics(),
-                            ),
-                            child: ConstrainedBox(
-                              constraints: BoxConstraints(
-                                minHeight: constraints.maxHeight,
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: AppSpacing.lg,
-                                ),
-                                child: WeeklyRankingsEmpty(
-                                  title: context
-                                      .l10n
-                                      .profileWeeklyRankingsEmptyTitle,
-                                  subtitle: context
-                                      .l10n
-                                      .profileWeeklyRankingsEmptySubtitle,
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                  )
-                : ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(
-                      AppSpacing.lg,
-                      AppSpacing.sm,
-                      AppSpacing.lg,
-                      AppSpacing.xl,
-                    ),
-                    controller: _scrollController,
-                    physics: const AlwaysScrollableScrollPhysics(
-                      parent: BouncingScrollPhysics(),
-                    ),
-                    itemBuilder: (BuildContext context, int index) {
-                      final WeeklyLeaderboardEntry entry = entries[index];
-                      if (entry.isCurrentUser) {
-                        return KeyedSubtree(
-                          key: _currentUserRowKey,
-                          child: WeeklyRankingRow(entry: entry),
-                        );
-                      }
-                      return WeeklyRankingRow(entry: entry);
-                    },
-                    separatorBuilder: (_, _) =>
-                        const SizedBox(height: AppSpacing.xs),
-                    itemCount: entries.length,
+          child: ScrollConfiguration(
+            behavior: const NoOverscrollOverlayScrollBehavior(),
+            child: ClipRect(
+              clipper: const ProfileScrollBottomShadowClipper(
+                bottomExtension: kProfileScrollBottomShadowExtension,
+              ),
+              child: AppRefreshIndicator(
+                onRefresh: () => ref
+                    .read(weeklyRankingsNotifierProvider.notifier)
+                    .refresh(),
+                child: CustomScrollView(
+                  controller: _scrollController,
+                  clipBehavior: Clip.none,
+                  physics: const AlwaysScrollableScrollPhysics(
+                    parent: BouncingScrollPhysics(),
                   ),
+                  slivers: slivers,
+                ),
+              ),
+            ),
           ),
         ),
       ],

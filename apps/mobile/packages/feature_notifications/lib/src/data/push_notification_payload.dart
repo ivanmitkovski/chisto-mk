@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
 import 'package:feature_notifications/src/data/event_chat_push_preview.dart';
+import 'package:feature_notifications/src/data/notification_open_payload.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
@@ -120,12 +121,72 @@ class PushNotificationPayload {
         return Map<String, dynamic>.from(decoded);
       }
     } on Object {
-      return null;
+      // Fall through for legacy scheduled-reminder payloads (raw event id).
+    }
+    final String trimmed = raw.trim();
+    if (notificationOpenPayloadLooksLikeEventId(trimmed)) {
+      return <String, dynamic>{
+        'type': 'CLEANUP_EVENT',
+        'eventId': trimmed,
+      };
     }
     return null;
   }
 
-  static AndroidChannelInfo resolveAndroidChannel(String? type) {
+  static AndroidChannelInfo resolveAndroidChannel(
+    String? type, {
+    AppLocalizations? strings,
+  }) {
+    if (strings != null) {
+      switch (type) {
+        case 'EVENT_CHAT':
+          return AndroidChannelInfo(
+            'chisto_event_chat',
+            strings.eventChatPushChannelName,
+            strings.eventChatPushChannelDescription,
+            Importance.high,
+          );
+        case 'REPORT_STATUS':
+        case 'NEARBY_REPORT':
+          return AndroidChannelInfo(
+            'chisto_reports',
+            strings.pushChannelReportsName,
+            strings.pushChannelReportsDescription,
+            Importance.high,
+          );
+        case 'CLEANUP_EVENT':
+          return AndroidChannelInfo(
+            'chisto_events',
+            strings.pushChannelEventsName,
+            strings.pushChannelEventsDescription,
+            Importance.high,
+          );
+        case 'UPVOTE':
+        case 'COMMENT':
+          return AndroidChannelInfo(
+            'chisto_social',
+            strings.pushChannelSocialName,
+            strings.pushChannelSocialDescription,
+            Importance.defaultImportance,
+          );
+        case 'SYSTEM':
+        case 'ACHIEVEMENT':
+        case 'WELCOME':
+          return AndroidChannelInfo(
+            'chisto_system',
+            strings.pushChannelSystemName,
+            strings.pushChannelSystemDescription,
+            Importance.defaultImportance,
+          );
+        default:
+          return AndroidChannelInfo(
+            'chisto_default',
+            strings.pushChannelDefaultName,
+            strings.pushChannelDefaultDescription,
+            Importance.high,
+          );
+      }
+    }
     switch (type) {
       case 'EVENT_CHAT':
         return const AndroidChannelInfo(

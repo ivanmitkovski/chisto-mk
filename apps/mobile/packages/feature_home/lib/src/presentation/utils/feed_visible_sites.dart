@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:feature_home/src/domain/models/comment.dart';
 import 'package:feature_home/src/domain/models/pollution_site.dart';
 import 'package:feature_home/src/presentation/widgets/feed_filter_sheet.dart';
+import 'package:feature_home/src/presentation/widgets/map/map_status_codes.dart';
 
 /// Updates [isSavedByMe] for [siteId] in a feed list (keeps client-side [FeedFilter.saved] in sync).
 List<PollutionSite> patchPollutionSitesSavedFlag(
@@ -18,6 +19,23 @@ List<PollutionSite> patchPollutionSitesSavedFlag(
       .map(
         (PollutionSite s) =>
             s.id == siteId ? s.copyWith(isSavedByMe: isSavedByMe) : s,
+      )
+      .toList(growable: false);
+}
+
+/// Updates [shareCount] for [siteId] in a feed list.
+List<PollutionSite> patchPollutionSitesShareCount(
+  List<PollutionSite> source,
+  String siteId,
+  int shareCount,
+) {
+  if (siteId.isEmpty) {
+    return List<PollutionSite>.from(source);
+  }
+  return source
+      .map(
+        (PollutionSite s) =>
+            s.id == siteId ? s.copyWith(shareCount: shareCount) : s,
       )
       .toList(growable: false);
 }
@@ -46,20 +64,27 @@ List<PollutionSite> patchPollutionSitesCommentsCount(
 }
 
 int feedStatusPriority(String statusLabel) {
-  final String normalized = statusLabel.toLowerCase();
-  if (normalized.contains('reported')) {
-    return 4;
+  return feedStatusPriorityForCode(statusLabel);
+}
+
+/// Sort weight from a stable status code or localized label (locale-agnostic).
+int feedStatusPriorityForCode(String rawStatus) {
+  switch (mapStatusCodeFromUnknown(rawStatus)) {
+    case mapStatusReported:
+      return 4;
+    case mapStatusVerified:
+      return 3;
+    case mapStatusInProgress:
+      return 2;
+    case mapStatusCleanupScheduled:
+      return 1;
+    default:
+      return 0;
   }
-  if (normalized.contains('verified')) {
-    return 3;
-  }
-  if (normalized.contains('in progress')) {
-    return 2;
-  }
-  if (normalized.contains('cleanup')) {
-    return 1;
-  }
-  return 0;
+}
+
+int feedStatusPriorityForSite(PollutionSite site) {
+  return feedStatusPriorityForCode(site.statusCode ?? site.statusLabel);
 }
 
 List<PollutionSite> computeVisibleSitesForFilter({
@@ -83,8 +108,8 @@ List<PollutionSite> computeVisibleSitesForFilter({
       }
       final List<PollutionSite> fallback = List<PollutionSite>.from(source)
         ..sort((PollutionSite a, PollutionSite b) {
-          final int scoreA = feedStatusPriority(a.statusLabel);
-          final int scoreB = feedStatusPriority(b.statusLabel);
+          final int scoreA = feedStatusPriorityForSite(a);
+          final int scoreB = feedStatusPriorityForSite(b);
           if (scoreA != scoreB) {
             return scoreB.compareTo(scoreA);
           }

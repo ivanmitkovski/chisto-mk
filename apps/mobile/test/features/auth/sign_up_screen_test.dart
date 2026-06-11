@@ -1,4 +1,3 @@
-import 'package:chisto_infrastructure/core/navigation/app_routes.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/primary_button.dart';
 import 'package:feature_auth/src/presentation/screens/sign_up_screen.dart';
 import 'package:flutter/material.dart';
@@ -46,7 +45,7 @@ void main() {
     expect(find.byType(TextFormField), findsNWidgets(4));
   });
 
-  testWidgets('Sign up button is disabled when fields are empty', (
+  testWidgets('Sign up button is always tappable when not loading', (
     WidgetTester tester,
   ) async {
     await pumpAuthWidget(
@@ -55,32 +54,6 @@ void main() {
       overrides: _authTestOverrides,
     );
     await tester.pumpAndSettle();
-
-    final ElevatedButton signUpButton = tester.widget<ElevatedButton>(
-      _primaryCtaElevated('Sign up'),
-    );
-    expect(signUpButton.onPressed, isNull);
-  });
-
-  testWidgets('Sign up button becomes enabled when all fields are valid', (
-    WidgetTester tester,
-  ) async {
-    await pumpAuthWidget(
-      tester,
-      home: const SignUpScreen(),
-      overrides: _authTestOverrides,
-    );
-    await tester.pumpAndSettle();
-
-    final Finder textFields = find.byType(TextFormField);
-    await tester.enterText(textFields.at(0), 'John Doe');
-    await tester.enterText(textFields.at(1), 'john@chisto.mk');
-    await tester.enterText(textFields.at(2), '70123456');
-    await tester.enterText(textFields.at(3), 'Password123!');
-    final Finder termsCheckbox = find.byType(CheckboxListTile);
-    await tester.ensureVisible(termsCheckbox);
-    await tester.tap(termsCheckbox);
-    await tester.pump();
 
     final ElevatedButton signUpButton = tester.widget<ElevatedButton>(
       _primaryCtaElevated('Sign up'),
@@ -88,7 +61,25 @@ void main() {
     expect(signUpButton.onPressed, isNotNull);
   });
 
-  testWidgets('Sign up button stays disabled when any field has invalid data', (
+  testWidgets('empty submit reveals inline validation errors', (
+    WidgetTester tester,
+  ) async {
+    await pumpAuthWidget(
+      tester,
+      home: const SignUpScreen(),
+      overrides: _authTestOverrides,
+    );
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(_primaryCtaElevated('Sign up'));
+    await tester.tap(_primaryCtaElevated('Sign up'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Full name is required'), findsOneWidget);
+    expect(find.text('You must accept the terms and conditions'), findsOneWidget);
+  });
+
+  testWidgets('invalid submit reveals inline field errors', (
     WidgetTester tester,
   ) async {
     await pumpAuthWidget(
@@ -105,10 +96,16 @@ void main() {
     await tester.enterText(textFields.at(3), 'short');
     await tester.pump();
 
-    final ElevatedButton signUpButton = tester.widget<ElevatedButton>(
-      _primaryCtaElevated('Sign up'),
+    await tester.ensureVisible(_primaryCtaElevated('Sign up'));
+    await tester.tap(_primaryCtaElevated('Sign up'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Enter a valid email'), findsOneWidget);
+    expect(find.text('Enter an 8-digit phone number'), findsOneWidget);
+    expect(
+      find.text('Password must be at least 8 characters'),
+      findsOneWidget,
     );
-    expect(signUpButton.onPressed, isNull);
   });
 
   testWidgets('Already have an account? Sign in link is present', (

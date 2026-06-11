@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { SiteStatus } from '../../prisma-client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../../audit/services/audit.service';
 import { reportMergePrimaryCopy, reportMergeChildCopy, reportCoReporterCreditCopy } from '../../notifications/util/notification-templates';
+import { notificationLocalesByUserId } from '../../common/i18n/notification-locale.resolver';
 import { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { ReportsUploadService } from '../services/reports-upload.service';
 import { ReportEventsService } from '../../admin-realtime/services/report-events.service';
@@ -40,6 +41,8 @@ export type DuplicateMergePostTxInput = {
 
 @Injectable()
 export class DuplicateMergeSideEffectsService {
+  private readonly logger = new Logger(DuplicateMergeSideEffectsService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
@@ -126,7 +129,9 @@ export class DuplicateMergeSideEffectsService {
       this.reportsOwnerEventsService.emitToReportInterestedParties(
         primaryReport.id,
         primaryParties.reporterId,
-        primaryParties.coReporters.map((c) => c.userId),
+        primaryParties.coReporters
+          .map((c) => c.userId)
+          .filter((id): id is string => id != null),
         'report_updated',
         { kind: 'merged', status: 'APPROVED' },
       );
@@ -143,26 +148,28 @@ export class DuplicateMergeSideEffectsService {
     }
 
     const primaryReportNumberLabel = getReportNumber(primaryReport);
-    this.emitDuplicateMergeNotifications({
+    void this.emitDuplicateMergeNotifications({
       primaryReportId: primaryReport.id,
       siteId: primaryReport.siteId,
       primaryReporterId: primaryReport.reporterId,
       primaryReportNumberLabel,
       selectedChildren: selectedChildren.map((c) => ({ id: c.id, reporterId: c.reporterId })),
       plannedNewCoReporterIds,
+    }).catch((err: unknown) => {
+      this.logger.warn({ msg: 'duplicate_merge_notifications_failed', error: String(err) });
     });
 
     return mergedMediaDeletedCount;
   }
 
-  private emitDuplicateMergeNotifications(params: {
+  private async emitDuplicateMergeNotifications(params: {
     primaryReportId: string;
     siteId: string;
     primaryReporterId: string | null;
     primaryReportNumberLabel: string;
     selectedChildren: { id: string; reporterId: string | null }[];
     plannedNewCoReporterIds: string[];
-  }): void {
+  }): Promise<void> {
     const {
       primaryReportId,
       siteId,
@@ -186,8 +193,19 @@ export class DuplicateMergeSideEffectsService {
       reportNumber: primaryReportNumberLabel,
     };
 
+    const allNotifyUserIds = [
+      ...(primaryReporterId != null ? [primaryReporterId] : []),
+      ...childReporterIds,
+      ...plannedNewCoReporterIds,
+    ];
+    const localeBy = await notificationLocalesByUserId(
+      this.prisma,
+      [...new Set(allNotifyUserIds)],
+    );
+
     if (primaryReporterId != null && selectedChildren.length > 0) {
-      const primaryCopy = reportMergePrimaryCopy('en', primaryReportNumberLabel);
+      const locale = localeBy.get(primaryReporterId)!;
+      const primaryCopy = reportMergePrimaryCopy(locale, primaryReportNumberLabel);
       this.eventEmitter.emit('notification.send', {
         recipientUserIds: [primaryReporterId],
         title: primaryCopy.title,
@@ -203,7 +221,8 @@ export class DuplicateMergeSideEffectsService {
       if (userId === primaryReporterId) {
         continue;
       }
-      const childCopy = reportMergeChildCopy('en', primaryReportNumberLabel);
+      const locale = localeBy.get(userId)!;
+      const childCopy = reportMergeChildCopy(locale, primaryReportNumberLabel);
       this.eventEmitter.emit('notification.send', {
         recipientUserIds: [userId],
         title: childCopy.title,
@@ -219,7 +238,8 @@ export class DuplicateMergeSideEffectsService {
       if (userId === primaryReporterId || childReporterIds.has(userId)) {
         continue;
       }
-      const coCopy = reportCoReporterCreditCopy('en', primaryReportNumberLabel);
+      const locale = localeBy.get(userId)!;
+      const coCopy = reportCoReporterCreditCopy(locale, primaryReportNumberLabel);
       this.eventEmitter.emit('notification.send', {
         recipientUserIds: [userId],
         title: coCopy.title,

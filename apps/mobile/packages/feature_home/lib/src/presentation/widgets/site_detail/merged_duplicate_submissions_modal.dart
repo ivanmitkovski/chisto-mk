@@ -12,7 +12,7 @@ class MergedDuplicateSubmissionsModal extends StatelessWidget {
     if (count <= 0) {
       return Future<void>.value();
     }
-    return showModalBottomSheet<void>(
+    return AppBottomSheet.show<void>(
       context: context,
       useRootNavigator: true,
       isScrollControlled: true,

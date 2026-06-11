@@ -7,6 +7,9 @@ export class EventParticipantRowDto {
   @ApiProperty({ description: 'Public display name' })
   displayName!: string;
 
+  @ApiProperty({ description: 'True when the participant account was deleted' })
+  isDeleted!: boolean;
+
   @ApiProperty({
     nullable: true,
     description: 'Signed HTTPS URL for profile photo when the user has an avatar',

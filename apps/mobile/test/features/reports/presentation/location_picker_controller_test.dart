@@ -102,13 +102,8 @@ void main() {
       addTearDown(container.dispose);
       final LocationPickerControllerProvider stable =
           locationPickerControllerProvider(kLat, kLng);
-      final LocationPickerController notifier = container.read(
-        stable.notifier,
-      );
-      notifier.startInitialFlow(
-        initialLatitude: kLat,
-        initialLongitude: kLng,
-      );
+      final LocationPickerController notifier = container.read(stable.notifier);
+      notifier.startInitialFlow(initialLatitude: kLat, initialLongitude: kLng);
       expect(container.read(stable).currentZoom, 16);
 
       final LocationPickerControllerProvider shifted =

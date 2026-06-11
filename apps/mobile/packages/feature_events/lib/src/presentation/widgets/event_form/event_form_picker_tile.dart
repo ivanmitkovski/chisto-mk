@@ -55,12 +55,12 @@ class EventFormPickerTile extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                 color: hasError
-                    ? AppColors.accentDanger.withValues(alpha: 0.04)
+                    ? AppColors.error.withValues(alpha: 0.04)
                     : AppColors.panelBackground,
                 borderRadius: BorderRadius.circular(AppSpacing.radius14),
                 border: Border.all(
                   color: hasError
-                      ? AppColors.accentDanger
+                      ? AppColors.error
                       : (hasValue
                             ? AppColors.primary.withValues(alpha: 0.3)
                             : AppColors.divider),
@@ -111,7 +111,7 @@ class EventFormPickerTile extends StatelessWidget {
               errorText!,
               style: AppTypography.eventsCaptionStrong(
                 Theme.of(context).textTheme,
-                color: AppColors.accentDanger,
+                color: AppColors.error,
               ).copyWith(fontWeight: FontWeight.w500),
             ),
           ),

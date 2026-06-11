@@ -25,10 +25,32 @@ export function siteVisibilityPrismaWhere(
   };
 }
 
+function renderSqlFragment(fragment: Prisma.Sql): string {
+  const { strings, values } = fragment;
+  let out = '';
+  for (let i = 0; i < strings.length; i += 1) {
+    out += strings[i];
+    if (i < values.length) {
+      out += '?';
+    }
+  }
+  return out;
+}
+
+/** Unqualified site id refs bind to inner EXISTS scopes and leak REPORTED sites. */
+export function assertQualifiedSiteIdSql(siteIdSql: Prisma.Sql): void {
+  const rendered = renderSqlFragment(siteIdSql);
+  if (!rendered.includes('.')) {
+    throw new Error(
+      'siteVisibilitySql requires a table-qualified siteIdSql (e.g. "MapSiteProjection"."siteId" or s."id")',
+    );
+  }
+}
+
 /**
  * Raw SQL visibility clause for map/feed queries.
- * [siteIdSql] must reference the site id column (e.g. `"siteId"` or `s."id"`).
- * [siteStatusSql] must reference the site status column (e.g. `"status"` or `s."status"`).
+ * [siteIdSql] must be table-qualified (e.g. `"MapSiteProjection"."siteId"` or `s."id"`).
+ * [siteStatusSql] must reference the outer query's site status column.
  */
 export function siteVisibilitySql(params: {
   siteIdSql: Prisma.Sql;
@@ -36,6 +58,7 @@ export function siteVisibilitySql(params: {
   viewerUserId?: string | null | undefined;
 }): Prisma.Sql {
   const { siteIdSql, siteStatusSql } = params;
+  assertQualifiedSiteIdSql(siteIdSql);
   const viewerUserId = params.viewerUserId ?? null;
   const publicClause = Prisma.sql`${siteStatusSql} <> 'REPORTED'::"SiteStatus"`;
   if (!viewerUserId) {

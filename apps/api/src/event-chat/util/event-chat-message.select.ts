@@ -18,10 +18,10 @@ export const EVENT_CHAT_MESSAGE_SELECT = {
   locationLng: true,
   locationLabel: true,
   author: {
-    select: { id: true, firstName: true, lastName: true, avatarObjectKey: true },
+    select: { id: true, firstName: true, lastName: true, avatarObjectKey: true, status: true },
   },
   pinnedBy: {
-    select: { id: true, firstName: true, lastName: true },
+    select: { id: true, firstName: true, lastName: true, status: true },
   },
   replyTo: {
     select: { id: true, body: true, deletedAt: true, bodyEncrypted: true },

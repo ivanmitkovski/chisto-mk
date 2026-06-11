@@ -6,6 +6,7 @@ import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/core/l10n/duplicate_event_conflict.dart';
 import 'package:chisto_infrastructure/core/network/connectivity_gate.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
+import 'package:chisto_infrastructure/shared/widgets/organisms/app_confirm_dialog.dart';
 import 'package:chisto_infrastructure/shared/widgets/organisms/app_surface/report_surface_aliases.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:design_system/design_system.dart';
@@ -17,7 +18,6 @@ import 'package:feature_events/src/presentation/utils/event_schedule_constraints
 import 'package:feature_events/src/presentation/utils/extend_event_end_policy.dart';
 import 'package:feature_events/src/presentation/widgets/edit_event/edit_event_schedule_conflict_callout.dart';
 import 'package:feature_events/src/presentation/widgets/events_modal_sheet.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 
@@ -26,7 +26,7 @@ Future<void> showExtendEventEndSheet({
   required EcoEvent event,
   required EventsRepository eventsRepository,
 }) {
-  return showEventsSurfaceModal<void>(
+  return AppBottomSheet.show<void>(
     context: context,
     builder: (BuildContext ctx) =>
         ExtendEventEndSheet(event: event, eventsRepository: eventsRepository),
@@ -102,18 +102,11 @@ class _ExtendEventEndSheetState extends State<ExtendEventEndSheet> {
     if (!mounted) {
       return;
     }
-    await showCupertinoDialog<void>(
+    await AppConfirmDialog.showInfo(
       context: context,
-      builder: (BuildContext ctx) => CupertinoAlertDialog(
-        title: Text(ctx.l10n.editEventDuplicateSubmitTitle),
-        content: Text(ctx.l10n.editEventDuplicateSubmitBody(dup.title, when)),
-        actions: <Widget>[
-          CupertinoDialogAction(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(ctx.l10n.commonGotIt),
-          ),
-        ],
-      ),
+      title: context.l10n.editEventDuplicateSubmitTitle,
+      body: context.l10n.editEventDuplicateSubmitBody(dup.title, when),
+      confirmLabel: context.l10n.commonGotIt,
     );
   }
 
@@ -254,28 +247,15 @@ class _ExtendEventEndSheetState extends State<ExtendEventEndSheet> {
       if (!mounted) {
         return;
       }
-      final bool? goAhead = await showCupertinoDialog<bool>(
+      final bool? goAhead = await AppConfirmDialog.show(
         context: context,
-        builder: (BuildContext ctx) => CupertinoAlertDialog(
-          title: Text(ctx.l10n.eventsScheduleConflictPreviewTitle),
-          content: Text(
-            ctx.l10n.eventsScheduleConflictPreviewBody(
-              hint.title,
-              _formatConflictWhen(ctx, hint.scheduledAt),
-            ),
-          ),
-          actions: <Widget>[
-            CupertinoDialogAction(
-              onPressed: () => Navigator.of(ctx).pop(false),
-              child: Text(ctx.l10n.eventsScheduleConflictAdjustTime),
-            ),
-            CupertinoDialogAction(
-              isDefaultAction: true,
-              onPressed: () => Navigator.of(ctx).pop(true),
-              child: Text(ctx.l10n.eventsScheduleConflictContinue),
-            ),
-          ],
+        title: context.l10n.eventsScheduleConflictPreviewTitle,
+        body: context.l10n.eventsScheduleConflictPreviewBody(
+          hint.title,
+          _formatConflictWhen(context, hint.scheduledAt),
         ),
+        confirmLabel: context.l10n.eventsScheduleConflictContinue,
+        cancelLabel: context.l10n.eventsScheduleConflictAdjustTime,
       );
       if (goAhead != true || !mounted) {
         return;

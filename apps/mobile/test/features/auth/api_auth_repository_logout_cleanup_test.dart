@@ -115,7 +115,7 @@ void main() {
         client: ApiClient(
           config: AppConfig.dev,
           accessToken: () => authState.accessToken,
-          onUnauthorized: () {},
+          onUnauthorized: (_) {},
         ),
         authState: authState,
         tokenStorage: SecureTokenStorage(storage: const FlutterSecureStorage()),
@@ -211,7 +211,7 @@ void main() {
           client: ApiClient(
             config: AppConfig.dev,
             accessToken: () => null,
-            onUnauthorized: () {},
+            onUnauthorized: (_) {},
           ),
           authState: AuthState(),
           tokenStorage: SecureTokenStorage(

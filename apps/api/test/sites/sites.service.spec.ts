@@ -1,3 +1,4 @@
+import { SiteCommentsCountService } from '../../src/sites/services/site-comments-count.service';
 import { SiteCommentsListService } from '../../src/sites/services/site-comments-list.service';
 import { SiteCommentsMutationsService } from '../../src/sites/services/site-comments-mutations.service';
 import { SiteCommentsService } from '../../src/sites/services/site-comments.service';
@@ -55,7 +56,12 @@ function makeSitesService(
     trackFeedEvent: jest.fn(),
     submitFeedFeedback: jest.fn(),
   } as any;
+  const moderation = { blockedUserIdsFor: jest.fn().mockResolvedValue([]) } as any;
   const feedCandidates = new SitesFeedCandidatesService(prisma);
+  const siteCommentsCount = new SiteCommentsCountService(
+    prisma,
+    moderation as never,
+  );
   const feedEnrichment = new SitesFeedEnrichmentService(
     prisma,
     reportsUpload,
@@ -63,6 +69,7 @@ function makeSitesService(
     feedV2,
     feedCache,
     feedPreferences,
+    siteCommentsCount,
   );
   const feedQuery = new SitesFeedQueryService(feedCandidates, feedEnrichment);
   const sitesFeed = new SitesFeedService(feedQuery, feedCache, feedPreferences, feedTracking);
@@ -77,14 +84,25 @@ function makeSitesService(
     countEvents: jest.fn(async () => 0),
     findVoteBySiteAndUser: jest.fn(async () => null),
     findSaveBySiteAndUser: jest.fn(async () => null),
+    viewerCanAccessReportedSite: jest.fn(async () => true),
   } as any;
   const sitesDetail = new SitesDetailService(siteDetailRepository, reportsUpload);
   const eventEmitter = { emit: jest.fn() } as any;
   const reporterNotifications = new SitesReporterNotificationService(prisma, eventEmitter);
-  const moderation = { blockedUserIdsFor: jest.fn().mockResolvedValue([]) } as any;
   const siteComments = new SiteCommentsService(
-    new SiteCommentsListService(prisma, siteEngagement, reportsUpload, moderation),
-    new SiteCommentsMutationsService(prisma, siteEngagement, reportsUpload),
+    new SiteCommentsListService(
+      prisma,
+      siteEngagement,
+      reportsUpload,
+      moderation,
+      siteCommentsCount,
+    ),
+    new SiteCommentsMutationsService(
+      prisma,
+      siteEngagement,
+      siteCommentsCount,
+      reportsUpload,
+    ),
     sitesFeed,
     reporterNotifications,
   );
@@ -449,7 +467,7 @@ describe('Sites public feed and comment engagement', () => {
     expect(out.mergedDuplicateChildCountTotal).toBe(0);
   });
 
-  it('findOne exposes canonical hero fields and displayLabel for citizen viewers', async () => {
+  it('findOne exposes canonical hero fields from heroReport pointer', async () => {
     const prismaMock = {
       site: {
         findUnique: jest.fn(async () => ({
@@ -458,7 +476,18 @@ describe('Sites public feed and comment engagement', () => {
           longitude: 21.7,
           address: null,
           description: null,
-          status: 'REPORTED',
+          status: 'VERIFIED',
+          heroReportId: 'rep_old',
+          heroReport: {
+            id: 'rep_old',
+            reporterId: 'user_old',
+            mediaUrls: ['https://bucket.example/old.jpg'],
+            reporter: {
+              firstName: 'Alice',
+              lastName: 'Old',
+              avatarObjectKey: null,
+            },
+          },
           createdAt: new Date('2026-03-01'),
           updatedAt: new Date('2026-03-01'),
           upvotesCount: 0,
@@ -478,7 +507,7 @@ describe('Sites public feed and comment engagement', () => {
               category: 'illegal',
               severity: null,
               cleanupEffort: null,
-              status: 'NEW',
+              status: 'APPROVED',
               moderatedAt: null,
               moderationReason: null,
               moderatedById: null,
@@ -503,7 +532,7 @@ describe('Sites public feed and comment engagement', () => {
               category: 'illegal',
               severity: null,
               cleanupEffort: null,
-              status: 'NEW',
+              status: 'APPROVED',
               moderatedAt: null,
               moderationReason: null,
               moderatedById: null,
@@ -556,6 +585,39 @@ describe('Sites public feed and comment engagement', () => {
       isSelf: false,
       firstName: 'Alice',
       lastName: 'Old',
+    });
+  });
+
+  it('findOne returns 404 for REPORTED sites when viewer is not reporter or co-reporter', async () => {
+    const detailService = new SitesDetailService(
+      {
+        findByIdWithRelations: jest.fn(async () => ({
+          id: 'site_hidden',
+          status: 'REPORTED',
+          reports: [],
+          events: [],
+        })),
+        countReports: jest.fn(async () => 0),
+        countEvents: jest.fn(async () => 0),
+        findVoteBySiteAndUser: jest.fn(async () => null),
+        findSaveBySiteAndUser: jest.fn(async () => null),
+        viewerCanAccessReportedSite: jest.fn(async () => false),
+      } as any,
+      {
+        signUrls: jest.fn(async (v: string[]) => v),
+        signPrivateObjectKey: jest.fn(async () => null),
+      } as any,
+    );
+
+    await expect(
+      detailService.findOne('site_hidden', {
+        userId: 'stranger',
+        email: 's@x.com',
+        phoneNumber: '+38970111111',
+        role: 'USER' as never,
+      }),
+    ).rejects.toMatchObject({
+      response: { code: 'SITE_NOT_FOUND' },
     });
   });
 });

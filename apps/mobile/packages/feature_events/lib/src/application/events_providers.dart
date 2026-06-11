@@ -17,6 +17,7 @@ export 'package:chisto_infrastructure/core/providers/refresh_signals_providers.d
 
 EventsRepository? _eventsRepositoryTestOverride;
 CheckInRepository? _checkInRepositoryTestOverride;
+OrganizerCertificationRepositoryPort? _organizerCertificationRepositoryTestOverride;
 
 /// Widget / integration tests can pin repositories without booting [AppBootstrap].
 @visibleForTesting
@@ -27,6 +28,13 @@ void setEventsRepositoryTestOverride(EventsRepository? repository) {
 @visibleForTesting
 void setCheckInRepositoryTestOverride(CheckInRepository? repository) {
   _checkInRepositoryTestOverride = repository;
+}
+
+@visibleForTesting
+void setOrganizerCertificationRepositoryTestOverride(
+  OrganizerCertificationRepositoryPort? repository,
+) {
+  _organizerCertificationRepositoryTestOverride = repository;
 }
 
 @visibleForTesting
@@ -79,6 +87,11 @@ final eventAnalyticsRepositoryProvider = Provider<ApiEventAnalyticsRepository>((
 
 final organizerCertificationRepositoryProvider =
     Provider<OrganizerCertificationRepositoryPort>((Ref ref) {
+      final OrganizerCertificationRepositoryPort? override =
+          _organizerCertificationRepositoryTestOverride;
+      if (override != null) {
+        return override;
+      }
       return ApiOrganizerCertificationRepository(
         client: ref.watch(apiClientProvider),
       );

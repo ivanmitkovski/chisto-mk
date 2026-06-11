@@ -5,6 +5,7 @@ import { ADMIN_PANEL_ROLES } from '../../auth/constants/admin-roles';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { RolesGuard } from '../../auth/guards/roles.guard';
+import { ActiveUsersRealtimeService } from '../../active-users/services/active-users-realtime.service';
 import { CheckInRiskSignalRealtimeService } from '../services/check-in-risk-signal-realtime.service';
 import { CleanupEventRealtimeService } from '../services/cleanup-event-realtime.service';
 import { NotificationEventsService } from '../services/notification-events.service';
@@ -41,6 +42,7 @@ export class AdminRealtimeController {
     private readonly userEventsService: UserEventsService,
     private readonly cleanupEventRealtimeService: CleanupEventRealtimeService,
     private readonly checkInRiskSignalRealtimeService: CheckInRiskSignalRealtimeService,
+    private readonly activeUsersRealtimeService: ActiveUsersRealtimeService,
   ) {}
 
   @Get('events')
@@ -96,6 +98,13 @@ export class AdminRealtimeController {
       })),
     );
 
+    const activeUsersEvents = this.activeUsersRealtimeService.getEvents().pipe(
+      map((event) => ({
+        data: event as object,
+        type: event.type,
+      })),
+    );
+
     const heartbeat = interval(HEARTBEAT_INTERVAL_MS).pipe(
       map(() => ({ data: { type: 'heartbeat' } } as NestMessageEvent)),
     );
@@ -108,6 +117,7 @@ export class AdminRealtimeController {
       userEvents,
       cleanupEvents,
       checkInRiskSignals,
+      activeUsersEvents,
       heartbeat,
     );
   }

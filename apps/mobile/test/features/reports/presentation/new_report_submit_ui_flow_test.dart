@@ -84,8 +84,9 @@ void main() {
       addTearDown(container.dispose);
 
       container.listen(newReportControllerProvider(null), (_, __) {});
-      final NewReportController controller =
-          container.read(newReportControllerProvider(null).notifier);
+      final NewReportController controller = container.read(
+        newReportControllerProvider(null).notifier,
+      );
 
       controller.updateTitle('Title');
       controller.updateDescription('Body');

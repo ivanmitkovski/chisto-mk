@@ -13,6 +13,7 @@ import {
   refreshAdminTokens,
   setAdminAuthCookies,
   clearAdminAuthCookies,
+  ensureAdminCsrfCookie,
 } from '@/lib/auth/admin-session';
 
 const REFRESH_THRESHOLD_MS = 60 * 1000;
@@ -56,51 +57,68 @@ export async function middleware(request: NextRequest) {
   const refreshToken = getAdminRefreshToken(request);
   const deviceId = getOrCreateAdminDeviceId(request);
 
-  const next = () =>
-    applyCspHeaders(NextResponse.next({ request: { headers: requestHeaders } }), csp, reportOnlyCsp);
+  const next = () => {
+    const response = NextResponse.next({ request: { headers: requestHeaders } });
+    ensureAdminCsrfCookie(request, response, authCookieOptions(request, deviceId));
+    return applyCspHeaders(response, csp, reportOnlyCsp);
+  };
+
+  const redirectWithCsrf = (url: URL | string) => {
+    const response = NextResponse.redirect(url);
+    ensureAdminCsrfCookie(request, response, authCookieOptions(request, deviceId));
+    return applyCspHeaders(response, csp, reportOnlyCsp);
+  };
+
+  const redirectWithAuth = (url: URL | string, tokens: Parameters<typeof setAdminAuthCookies>[1]) => {
+    const response = NextResponse.redirect(url);
+    setAdminAuthCookies(response, tokens, request, authCookieOptions(request, deviceId));
+    ensureAdminCsrfCookie(request, response, authCookieOptions(request, deviceId));
+    return applyCspHeaders(response, csp, reportOnlyCsp);
+  };
 
   if (pathname.startsWith('/dashboard')) {
     if (!token) {
       if (refreshToken) {
         const result = await refreshAdminTokens(refreshToken, deviceId);
         if (result.ok) {
-          const response = NextResponse.redirect(request.url);
-          setAdminAuthCookies(response, result.tokens, request, authCookieOptions(request, deviceId));
-          return applyCspHeaders(response, csp, reportOnlyCsp);
+          return redirectWithAuth(request.url, result.tokens);
         }
         if (result.reason === 'unauthorized') {
           const response = NextResponse.redirect(new URL('/login', request.url));
           clearAdminAuthCookies(response, request);
+          ensureAdminCsrfCookie(request, response, authCookieOptions(request, deviceId));
           return applyCspHeaders(response, csp, reportOnlyCsp);
         }
+        // Network failure: fall through with existing cookies (avoid redirect loop).
+        return next();
       }
-      const response = NextResponse.redirect(new URL('/login', request.url));
-      return applyCspHeaders(response, csp, reportOnlyCsp);
+      return redirectWithCsrf(new URL('/login', request.url));
     }
 
     const expMs = getTokenExpiryMs(token);
     if (expMs && refreshToken && Date.now() > expMs - REFRESH_THRESHOLD_MS) {
       const result = await refreshAdminTokens(refreshToken, deviceId);
       if (result.ok) {
-        const response = NextResponse.redirect(request.url);
-        setAdminAuthCookies(response, result.tokens, request, authCookieOptions(request, deviceId));
-        return applyCspHeaders(response, csp, reportOnlyCsp);
+        return redirectWithAuth(request.url, result.tokens);
       }
       if (result.reason === 'unauthorized') {
         const response = NextResponse.redirect(new URL('/login', request.url));
         clearAdminAuthCookies(response, request);
+        ensureAdminCsrfCookie(request, response, authCookieOptions(request, deviceId));
         return applyCspHeaders(response, csp, reportOnlyCsp);
       }
       if (Date.now() < expMs) {
         return next();
       }
-      const response = NextResponse.redirect(new URL('/login', request.url));
-      return applyCspHeaders(response, csp, reportOnlyCsp);
+      return redirectWithCsrf(new URL('/login', request.url));
     }
   }
 
   if (pathname === '/login' && token) {
-    return applyCspHeaders(NextResponse.redirect(new URL('/dashboard', request.url)), csp, reportOnlyCsp);
+    const expMs = getTokenExpiryMs(token);
+    if (expMs && Date.now() < expMs) {
+      return redirectWithCsrf(new URL('/dashboard', request.url));
+    }
   }
 
   return next();

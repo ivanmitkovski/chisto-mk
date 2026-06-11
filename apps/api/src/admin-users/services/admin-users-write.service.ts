@@ -14,6 +14,7 @@ import { PatchAdminUserDto } from '../dto/patch-admin-user.dto';
 import { PatchAdminUserRoleDto } from '../dto/patch-admin-user-role.dto';
 import { AuthSessionRevocationService } from '../../auth/services/auth-session-revocation.service';
 import { UserAuthSnapshotCacheService } from '../../auth/services/user-auth-snapshot-cache.service';
+import { AccountErasureService } from '../../auth/services/account-erasure.service';
 
 @Injectable()
 export class AdminUsersWriteService {
@@ -23,6 +24,7 @@ export class AdminUsersWriteService {
     private readonly userEventsService: UserEventsService,
     private readonly sessionRevocation: AuthSessionRevocationService,
     private readonly authSnapshotCache: UserAuthSnapshotCacheService,
+    private readonly accountErasure: AccountErasureService,
   ) {}
 
   async patch(
@@ -71,11 +73,13 @@ export class AdminUsersWriteService {
     if (phoneValue !== null && phoneValue !== '') {
       data.phoneNumber = phoneValue;
     }
-    if (dto.status != null) {
+    if (dto.status != null && dto.status !== UserStatus.DELETED) {
       data.status = dto.status;
     }
 
-    if (Object.keys(data).length === 0) {
+    const shouldErase = dto.status === UserStatus.DELETED && target.status !== UserStatus.DELETED;
+
+    if (Object.keys(data).length === 0 && !shouldErase) {
       const u = await this.prisma.user.findUniqueOrThrow({
         where: { id },
         select: { id: true, firstName: true, lastName: true, phoneNumber: true, role: true, status: true },
@@ -83,9 +87,23 @@ export class AdminUsersWriteService {
       return u;
     }
 
-    const updated = await this.prisma.user.update({
+    if (shouldErase) {
+      if (Object.keys(data).length > 0) {
+        await this.prisma.user.update({ where: { id }, data });
+      }
+      await this.accountErasure.eraseUserAccount(id);
+    } else {
+      await this.prisma.user.update({
+        where: { id },
+        data,
+      });
+      if (dto.status === UserStatus.SUSPENDED) {
+        await this.sessionRevocation.revokeAllForUser(id, 'status_changed');
+      }
+    }
+
+    const updated = await this.prisma.user.findUniqueOrThrow({
       where: { id },
-      data,
       select: { id: true, firstName: true, lastName: true, phoneNumber: true, role: true, status: true },
     });
 
@@ -100,7 +118,7 @@ export class AdminUsersWriteService {
       changes.phoneNumber = { from: target.phoneNumber, to: updated.phoneNumber };
     }
     if (dto.status != null) {
-      changes.status = { from: target.status, to: dto.status };
+      changes.status = { from: target.status, to: shouldErase ? UserStatus.DELETED : dto.status };
     }
 
     await this.audit.log({
@@ -110,10 +128,6 @@ export class AdminUsersWriteService {
       resourceId: id,
       metadata: { before: target, after: updated, changes } as Prisma.InputJsonValue,
     });
-
-    if (dto.status === UserStatus.SUSPENDED || dto.status === UserStatus.DELETED) {
-      await this.sessionRevocation.revokeAllForUser(id, 'status_changed');
-    }
 
     this.authSnapshotCache.invalidate(id);
     this.userEventsService.emitUserUpdated(id);

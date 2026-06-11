@@ -53,12 +53,14 @@ void showSiteEngagementOutcomeSnack(
           return;
         }
       }
+      if (err != null) {
+        AppSnack.failure(context, error: err);
+        return;
+      }
       AppSnack.show(
         context,
         message:
-            err?.message ??
-            genericFailureMessage ??
-            context.l10n.siteCardUpvoteFailedSnack,
+            genericFailureMessage ?? context.l10n.siteCardUpvoteFailedSnack,
         type: AppSnackType.warning,
       );
       return;

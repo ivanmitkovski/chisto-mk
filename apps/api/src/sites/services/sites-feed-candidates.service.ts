@@ -142,6 +142,9 @@ export class SitesFeedCandidatesService {
 
   private buildSiteInclude(user: AuthenticatedUser | undefined): Prisma.SiteInclude {
     return {
+      heroReport: {
+        select: { mediaUrls: true },
+      },
       reports: {
         orderBy: { createdAt: 'desc' },
         take: 1,
@@ -153,7 +156,7 @@ export class SitesFeedCandidatesService {
           createdAt: true,
           reportNumber: true,
           reporter: {
-            select: { id: true, firstName: true, lastName: true, avatarObjectKey: true },
+            select: { id: true, firstName: true, lastName: true, avatarObjectKey: true, status: true },
           },
         },
       },

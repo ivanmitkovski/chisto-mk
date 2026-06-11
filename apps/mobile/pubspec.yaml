@@ -2,7 +2,7 @@ name: chisto_mobile
 description: Chisto.mk civic environmental platform mobile app. Report pollution, join cleanup events.
 publish_to: 'none'
 
-version: 1.0.0+4
+version: 1.0.0+11
 
 environment:
   sdk: ^3.11.0
@@ -27,6 +27,14 @@ dependency_overrides:
   path_provider_foundation: 2.4.3
   analyzer: ^7.7.1
   test_api: 0.7.9
+
+# sqflite_common_ffi (desktop/tests) pulls in package:sqlite3 hooks. Mobile uses native
+# sqflite and never loads the FFI copy at runtime; use OS SQLite to avoid downloading
+# prebuilt dylibs from GitHub during iOS/Android native-asset builds.
+hooks:
+  user_defines:
+    sqlite3:
+      source: system
 
 dependencies:
   flutter:

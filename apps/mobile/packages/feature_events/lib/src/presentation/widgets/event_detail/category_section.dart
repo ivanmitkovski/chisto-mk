@@ -22,7 +22,7 @@ class CategorySection extends StatelessWidget {
 
   /// Same sheet as tapping the category row on the event detail screen.
   static void showCategoryInfoSheet(BuildContext context, EcoEvent event) {
-    showModalBottomSheet<void>(
+    AppBottomSheet.show<void>(
       context: context,
       backgroundColor: AppColors.transparent,
       builder: (BuildContext ctx) {

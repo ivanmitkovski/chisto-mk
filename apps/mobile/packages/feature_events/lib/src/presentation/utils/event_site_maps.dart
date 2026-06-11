@@ -14,7 +14,7 @@ Future<void> showEventSiteMapsSheet(
   required double lat,
   required double lng,
 }) async {
-  await showModalBottomSheet<void>(
+  await AppBottomSheet.show<void>(
     context: context,
     useSafeArea: true,
     barrierColor: AppColors.overlay,

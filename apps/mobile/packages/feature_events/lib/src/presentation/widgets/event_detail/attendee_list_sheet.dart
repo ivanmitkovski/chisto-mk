@@ -117,14 +117,17 @@ class _AttendeeListSheetState extends State<AttendeeListSheet> {
   @override
   Widget build(BuildContext context) {
     final List<AttendeePreview> visible = _visibleAttendees;
-    return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.62,
+    final double keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
+    return GestureDetector(
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      behavior: HitTestBehavior.translucent,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           CupertinoSearchTextField(
             controller: _searchController,
             placeholder: context.l10n.eventsParticipantsSearchPlaceholder,
+            onSubmitted: (_) => FocusManager.instance.primaryFocus?.unfocus(),
             onChanged: (String value) {
               setState(() {
                 _query = value;
@@ -180,7 +183,14 @@ class _AttendeeListSheetState extends State<AttendeeListSheet> {
                     ),
                   )
                 : ListView.builder(
-                    padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
+                    padding: EdgeInsets.only(
+                      bottom:
+                          AppSpacing.lg +
+                          keyboardInset +
+                          AppSheetScrollInsets.of(context),
+                    ),
                     itemCount: visible.length,
                     itemBuilder: (BuildContext context, int index) {
                       return AttendeeRow(

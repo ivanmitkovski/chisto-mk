@@ -247,6 +247,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Add at least one photo to continue.';
 
   @override
+  String get reportFlowEvidenceTip =>
+      'Frame the whole site in daylight when you can.';
+
+  @override
   String get reportFlowLocationOutsideMacedoniaHelper =>
       'This location is outside Macedonia. Drag the pin into the country, then tap Confirm location.';
 
@@ -572,6 +576,50 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authValidationConfirmPasswordMismatch => 'Passwords do not match';
 
   @override
+  String get authValidationPasswordWeak =>
+      'Password is too weak. Use a mix of letters and numbers and avoid common patterns.';
+
+  @override
+  String get authValidationPasswordTooLong =>
+      'Password must be at most 72 characters';
+
+  @override
+  String get authValidationTermsRequired =>
+      'You must accept the terms and conditions';
+
+  @override
+  String get authValidationOtpRequired => 'Verification code is required';
+
+  @override
+  String get authValidationOtpDigits => 'Enter the 6-digit code';
+
+  @override
+  String get authValidationNameTooShort =>
+      'Each name must be at least 2 characters';
+
+  @override
+  String get authValidationNameTooLong =>
+      'Each name must be at most 60 characters';
+
+  @override
+  String get authValidationGenericInvalid => 'Please check this field';
+
+  @override
+  String formValidationErrorsAnnounce(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fields have errors',
+      one: '1 field has an error',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get authErrorRegistrationConflict =>
+      'An account with this email or phone number already exists';
+
+  @override
   String get authErrorInvalidCredentials => 'Wrong phone number or password.';
 
   @override
@@ -728,6 +776,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authOnboardingBrandName => 'Chisto.mk';
 
   @override
+  String get brandLogoSemantic => 'Chisto logo';
+
+  @override
   String get authOnboardingWelcomeDescription => 'See it. Report it. Clean it.';
 
   @override
@@ -876,8 +927,23 @@ class AppLocalizationsEn extends AppLocalizations {
       'Currently we only support locations in Macedonia.';
 
   @override
-  String get authLocationResolveFailed =>
-      'Could not resolve your location. Please try again.';
+  String get authLocationTryAgain => 'Try again';
+
+  @override
+  String get authLocationGateOutsideTitle =>
+      'Chisto.mk is available in Macedonia';
+
+  @override
+  String get authLocationGateOutsideBody =>
+      'Your device location is outside Macedonia. You need to be in Macedonia to create an account.';
+
+  @override
+  String get authLocationGateUnavailableBody =>
+      'We couldn\'t confirm your location. Turn on location services, allow access, and try again.';
+
+  @override
+  String get authLocationActionOnlyInMacedoniaSnack =>
+      'This action is only available in Macedonia.';
 
   @override
   String get authOtpCodeSemantic => 'Verification code';
@@ -1252,6 +1318,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get safetyReportDetailsHint => 'Optional details for moderators';
 
   @override
+  String get safetyReportDetailsHintRequired =>
+      'Describe the issue for moderators';
+
+  @override
+  String get safetyReportDetailsRequiredWhenOther =>
+      'Please add a short description when choosing Other.';
+
+  @override
+  String safetyReportDetailsCharCount(int used, int max) {
+    return '$used / $max';
+  }
+
+  @override
+  String safetyReportDetailsTooLong(int max) {
+    return 'Details must be at most $max characters.';
+  }
+
+  @override
   String get safetyReportSubmitted =>
       'Report submitted. We review reports within 24 hours.';
 
@@ -1284,6 +1368,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileDeleteAccountTile => 'Delete account';
+
+  @override
+  String profileAppVersion(String version) {
+    return 'Version $version';
+  }
 
   @override
   String get profileEmailLabel => 'Email';
@@ -1370,7 +1459,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonContinue => 'Continue';
 
   @override
-  String get commonRetry => 'Retry';
+  String get commonRetry => 'Try again';
 
   @override
   String get commonTryAgain => 'Try again';
@@ -1472,7 +1561,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileGeneralLimitsNotice =>
-      'Name changes are limited. Phone number changes require verification.';
+      'For email and phone number changes, contact support.';
 
   @override
   String get profileGeneralUpdateButton => 'Update info';
@@ -2013,8 +2102,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commentsEditingBanner => 'Editing comment';
 
   @override
-  String get commentsBodyTooLong =>
-      'Comment is too long (max 2000 characters).';
+  String get commentsBodyTooLong => 'Comment is too long (max 500 characters).';
 
   @override
   String get commentsReplyTargetFallback => 'comment';
@@ -3222,6 +3310,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get editEventNoChangesToSave => 'Nothing to save.';
 
   @override
+  String get editEventSaving => 'Saving changes…';
+
+  @override
   String get editEventPendingModerationBanner =>
       'This event is still awaiting moderator approval. Changes apply to your draft.';
 
@@ -3742,13 +3833,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String createEventGearDoneSelectedCount(int count) {
     return 'Done ($count selected)';
   }
-
-  @override
-  String get createEventGearMultiselectTitle => 'Multi-select';
-
-  @override
-  String get createEventGearMultiselectMessage =>
-      'Tap each item volunteers should bring. You can select as many as needed.';
 
   @override
   String get createEventTeamSizeTitle => 'Team size';
@@ -4801,6 +4885,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get siteUpvotersRetry => 'Retry';
 
   @override
+  String get siteCoReportersLoadFailed => 'Could not load co-reporters.';
+
+  @override
+  String get siteCoReportersRetry => 'Retry';
+
+  @override
+  String get siteCoReportersOriginalReporterLabel => 'Original reporter';
+
+  @override
   String get siteDetailNoVolunteersSnack => 'No volunteers yet for this site.';
 
   @override
@@ -4942,6 +5035,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String siteHistoryByActor(String name) {
     return 'By $name';
   }
+
+  @override
+  String get deletedUser => 'Deleted user';
 
   @override
   String get siteHistoryByAdmin => 'By admin';
@@ -6510,6 +6606,62 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get eventsFilterSheetSubtitle =>
+      'Select one or more options. Leave empty to include all.';
+
+  @override
+  String get eventsFilterResetSemantic => 'Reset filters';
+
+  @override
+  String get eventsFilterSectionSelectAll => 'All';
+
+  @override
+  String get eventsFilterSectionClear => 'Clear';
+
+  @override
+  String eventsFilterShowEvents(int count) {
+    return 'Show $count events';
+  }
+
+  @override
+  String eventsFilterShowEventsPlus(int count) {
+    return 'Show $count+ events';
+  }
+
+  @override
+  String eventsFilterPreviewLiveRegion(int count) {
+    return 'Showing $count events';
+  }
+
+  @override
+  String get eventsFilterChipStatusOverrideHint =>
+      'The Upcoming or Past pill overrides status filters until you switch back to All.';
+
+  @override
+  String get eventsFilterDatePresetThisWeek => 'This week';
+
+  @override
+  String get eventsFilterDatePresetThisMonth => 'This month';
+
+  @override
+  String get eventsFilterDatePresetNext30Days => 'Next 30 days';
+
+  @override
+  String get eventsFilterDatePresetClear => 'Clear dates';
+
+  @override
+  String get eventsFilterCategoryHintOn => 'Selected';
+
+  @override
+  String get eventsFilterCategoryHintOff => 'Not selected';
+
+  @override
+  String get eventsFilterStatusHintOn => 'Selected';
+
+  @override
+  String get eventsFilterStatusHintOff => 'Not selected';
+
+  @override
   String get eventsOrganizerDashboardTitle => 'My events';
 
   @override
@@ -6790,7 +6942,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get eventsGearWheelbarrow => 'Wheelbarrow';
 
   @override
-  String get eventsGearWaterBoots => 'Water boots';
+  String get eventsGearWaterBoots => 'Rubber boots';
 
   @override
   String get eventsGearSafetyVest => 'Safety vest';
@@ -6921,7 +7073,19 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get errorUserNetwork => 'Check your connection and try again.';
+  String get errorUserNetwork =>
+      'Please check your internet connection and try again.';
+
+  @override
+  String get offlineConnectionTitle => 'No internet connection';
+
+  @override
+  String get offlineConnectionBody =>
+      'Please check your internet connection and try again.';
+
+  @override
+  String get reportDetailStaleBanner =>
+      'Could not refresh. Showing the last loaded details.';
 
   @override
   String get errorUserTimeout => 'That took too long. Please try again.';
@@ -6949,6 +7113,102 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorUserUnknown => 'Something went wrong. Please try again.';
+
+  @override
+  String get errorUserValidation => 'Please check the highlighted fields.';
+
+  @override
+  String get errorUserValidationGeneric =>
+      'Some details are invalid. Please review and try again.';
+
+  @override
+  String get errorUserConflict =>
+      'This action conflicts with something that already exists.';
+
+  @override
+  String get errorUserCancelled => 'Cancelled.';
+
+  @override
+  String get errorUserPayloadTooLarge => 'That file or request is too large.';
+
+  @override
+  String errorUserRetryAfterSeconds(int seconds) {
+    return 'Try again in ${seconds}s.';
+  }
+
+  @override
+  String get errorAlreadyJoined => 'You\'re already part of this event.';
+
+  @override
+  String get errorOrganizerCannotJoin =>
+      'Organizers can\'t join their own event as participants.';
+
+  @override
+  String get errorNotAParticipant => 'You need to join this event first.';
+
+  @override
+  String get errorOtpSendCooldown =>
+      'Wait a moment before requesting another code.';
+
+  @override
+  String get errorOtpSendFailed =>
+      'Couldn\'t send the verification code. Try again.';
+
+  @override
+  String get errorTermsVersionMismatch =>
+      'Please accept the latest terms and conditions.';
+
+  @override
+  String get errorDeviceTokenInUse =>
+      'Notifications are already set up on another device.';
+
+  @override
+  String get errorEventsOrganizerNotCertified =>
+      'Complete organizer certification to continue.';
+
+  @override
+  String get errorEventChatNotParticipant =>
+      'You need to join this event to use chat.';
+
+  @override
+  String get errorEventChatMessageUnavailable =>
+      'That message is no longer available.';
+
+  @override
+  String get errorChatUploadTooMany =>
+      'Too many attachments. Send fewer files at a time.';
+
+  @override
+  String get errorChatUploadInvalid => 'That file type or size isn\'t allowed.';
+
+  @override
+  String get errorAvatarFileRequired => 'Choose a photo to upload.';
+
+  @override
+  String get errorInvalidFileType => 'That file type isn\'t supported.';
+
+  @override
+  String get connectionOfflineBanner =>
+      'You\'re offline. Some features may not work until you\'re back online.';
+
+  @override
+  String get connectionReconnectingBanner => 'Reconnecting…';
+
+  @override
+  String get connectionLiveUpdatesDelayed =>
+      'Live updates are delayed. Pull to refresh for the latest.';
+
+  @override
+  String get notificationsInboxStaleHint =>
+      'Updates may be delayed. Pull down to refresh.';
+
+  @override
+  String get pushRegistrationFailedSnack =>
+      'Couldn\'t enable push notifications. Try again in Settings.';
+
+  @override
+  String get checkInConnectionTimeout =>
+      'Check-in timed out. Try scanning again or enter the code manually.';
 
   @override
   String get eventsFilterSheetSemantic => 'Filter events';

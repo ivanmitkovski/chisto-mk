@@ -50,7 +50,10 @@ class ParticipantsPeekViewModel extends _$ParticipantsPeekViewModel {
     _repository = repository;
   }
 
-  Future<void> loadPeek({required String youLabel}) async {
+  Future<void> loadPeek({
+    required String youLabel,
+    required String deletedUserLabel,
+  }) async {
     state = state.copyWith(peekLoading: true, peekFailed: false);
     try {
       final EventParticipantsPage page = await _repository.fetchParticipants(
@@ -61,6 +64,7 @@ class ParticipantsPeekViewModel extends _$ParticipantsPeekViewModel {
           event: _event,
           apiRows: page.items,
           youLabel: youLabel,
+          deletedUserLabel: deletedUserLabel,
         ),
         peekLoading: false,
         peekFailed: false,

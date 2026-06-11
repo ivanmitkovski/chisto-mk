@@ -22,6 +22,7 @@ import 'package:feature_home/src/presentation/controllers/map_search_coordinator
 import 'package:feature_home/src/presentation/controllers/map_viewport_controller.dart';
 import 'package:feature_home/src/presentation/location_permission_ui.dart';
 import 'package:feature_home/src/presentation/pollution_map/map_clustering_camera_controller.dart';
+import 'package:feature_home/src/presentation/pollution_map/map_updated_toast_gate.dart';
 import 'package:feature_home/src/presentation/providers/map_camera_notifier.dart';
 import 'package:feature_home/src/presentation/providers/map_cluster_expansion_notifier.dart';
 import 'package:feature_home/src/presentation/providers/map_clusters_provider.dart';

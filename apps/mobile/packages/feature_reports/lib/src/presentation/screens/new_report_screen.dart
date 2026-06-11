@@ -7,6 +7,7 @@ import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
 import 'package:design_system/design_system.dart';
 import 'package:feature_reports/src/application/report_wizard_submit_port.dart';
 import 'package:feature_reports/src/domain/draft/new_report_flow_policy.dart';
+import 'package:feature_reports/src/domain/models/report_draft.dart';
 import 'package:feature_reports/src/domain/report_field_limits.dart';
 import 'package:feature_reports/src/presentation/controllers/new_report_controller.dart';
 import 'package:feature_reports/src/presentation/controllers/new_report_submit_ui_flow.dart';
@@ -96,7 +97,7 @@ class _NewReportScreenState extends ConsumerState<NewReportScreen>
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.inactive) {
       unawaited(
-        _controller.flushPendingPersist(
+        _notifierRef.flushPendingPersist(
           titleText: _titleController.text,
           descriptionText: _descriptionController.text,
         ),
@@ -106,12 +107,13 @@ class _NewReportScreenState extends ConsumerState<NewReportScreen>
 
   @override
   void dispose() {
-    if (_controller.shouldPersistOnDispose(
+    // Use cached [_notifierRef]: [ref] is invalid once dispose begins.
+    if (_notifierRef.shouldPersistOnDispose(
       titleText: _titleController.text,
       descriptionText: _descriptionController.text,
     )) {
       unawaited(
-        _controller.flushPendingPersist(
+        _notifierRef.flushPendingPersist(
           titleText: _titleController.text,
           descriptionText: _descriptionController.text,
         ),
@@ -172,11 +174,54 @@ class _NewReportScreenState extends ConsumerState<NewReportScreen>
     if (!_controller.canAdvanceFromCurrentStage()) {
       _controller.markStageAttempted(_controller.currentStage);
       _controller.highlightStage(_controller.currentStage);
+      AppHaptics.warning(context);
+      final int invalidCount = _invalidCountForStage(_controller.currentStage);
+      if (invalidCount > 0 &&
+          mounted &&
+          MediaQuery.supportsAnnounceOf(context)) {
+        SemanticsService.sendAnnouncement(
+          View.of(context),
+          context.l10n.formValidationErrorsAnnounce(invalidCount),
+          Directionality.of(context),
+        );
+      }
+      if (_controller.currentStage == ReportStage.details &&
+          !_controller.draft.hasTitle) {
+        _titleFocus.requestFocus();
+        final BuildContext? ctx = _titleFocus.context;
+        if (ctx != null && ctx.mounted) {
+          unawaited(
+            Scrollable.ensureVisible(
+              ctx,
+              duration: AppMotion.fast,
+              curve: AppMotion.smooth,
+              alignment: 0.2,
+            ),
+          );
+        }
+      }
       return;
     }
     final ReportStage next =
         ReportStage.values[_controller.currentStageIndex + 1];
     _goToStage(next, unfocusFirst: false);
+  }
+
+  int _invalidCountForStage(ReportStage stage) {
+    final ReportDraft draft = _controller.draft;
+    switch (stage) {
+      case ReportStage.evidence:
+        return draft.hasPhotos ? 0 : 1;
+      case ReportStage.details:
+        var count = 0;
+        if (!draft.hasCategory) count++;
+        if (!draft.hasTitle) count++;
+        return count;
+      case ReportStage.location:
+        return _controller.hasValidLocation ? 0 : 1;
+      case ReportStage.review:
+        return 0;
+    }
   }
 
   Future<void> _addPhoto() async {
@@ -218,11 +263,10 @@ class _NewReportScreenState extends ConsumerState<NewReportScreen>
         final XFile selectedFile = file;
 
         final PhotoReviewResult? result =
-            await showModalBottomSheet<PhotoReviewResult>(
+            await AppBottomSheet.show<PhotoReviewResult>(
               context: context,
               isScrollControlled: true,
               backgroundColor: AppColors.transparent,
-              elevation: 0,
               builder: (_) => PhotoReviewSheet(file: selectedFile),
             );
 

@@ -54,7 +54,9 @@ export class AdminGamificationService {
 
   async listUserPoints(userId: string, page = 1, limit = 50) {
     const user = await this.prisma.user.findUnique({ where: { id: userId }, select: { id: true, pointsBalance: true } });
-    if (!user) throw new NotFoundException('User not found');
+    if (!user) {
+      throw new NotFoundException({ code: 'USER_NOT_FOUND', message: 'User not found' });
+    }
     const skip = (page - 1) * limit;
     const [data, total] = await this.prisma.$transaction([
       this.prisma.pointTransaction.findMany({
@@ -76,7 +78,9 @@ export class AdminGamificationService {
     note?: string,
   ) {
     const user = await this.prisma.user.findUnique({ where: { id: userId }, select: { id: true, pointsBalance: true } });
-    if (!user) throw new NotFoundException('User not found');
+    if (!user) {
+      throw new NotFoundException({ code: 'USER_NOT_FOUND', message: 'User not found' });
+    }
     const balanceAfter = user.pointsBalance + delta;
     const [tx] = await this.prisma.$transaction([
       this.prisma.pointTransaction.create({

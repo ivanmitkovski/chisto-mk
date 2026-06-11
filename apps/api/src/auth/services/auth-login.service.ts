@@ -22,7 +22,7 @@ export class AuthLoginService {
     private readonly sessionService: AuthSessionService,
   ) {}
 
-  async citizenLogin(dto: CitizenLoginDto): Promise<AuthResponse> {
+  async citizenLogin(dto: CitizenLoginDto, ipAddress?: string | null): Promise<AuthResponse> {
     const phoneNumber = dto.phoneNumber.trim();
     const db = this.prisma as PrismaWithLoginFailure;
     const failure = await db.loginFailure.findUnique({
@@ -110,6 +110,7 @@ export class AuthLoginService {
 
     return this.sessionService.buildAuthResponse(user, dto.rememberMe ?? true, {
       deviceId: dto.deviceId,
+      ipAddress: ipAddress ?? null,
     });
   }
 

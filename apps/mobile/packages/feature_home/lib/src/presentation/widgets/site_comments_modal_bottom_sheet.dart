@@ -1,68 +1,52 @@
 import 'package:design_system/design_system.dart';
+import 'package:feature_home/src/presentation/widgets/comments/comments_sheet_drag.dart';
 import 'package:flutter/material.dart';
 
+export 'package:feature_home/src/presentation/widgets/comments/comments_sheet_drag.dart'
+    show
+        CommentsSheetSizeConfig,
+        kCommentsSheetInitialSize,
+        kCommentsSheetMaxSize,
+        kCommentsSheetMinSize,
+        kCommentsSheetSnapSizes;
+
 /// Shared modal chrome for site comments (feed cards + site detail).
-///
-/// Matches keyboard-safe [DraggableScrollableSheet] sizing used on the feed so the
-/// composer stays visible when the software keyboard opens.
 Future<void> showPollutionSiteCommentsModalBottomSheet(
   BuildContext context, {
   required Widget Function(
     BuildContext sheetContext,
     ScrollController scrollController,
+    DraggableScrollableController sheetController,
+    CommentsSheetSizeConfig sizeConfig,
   )
   builder,
-}) async {
-  final DraggableScrollableController sheetController =
-      DraggableScrollableController();
-  await showModalBottomSheet<void>(
+}) {
+  return AppBottomSheet.showResizable<void>(
     context: context,
-    useRootNavigator: true,
-    isScrollControlled: true,
-    isDismissible: true,
-    enableDrag: false,
-    useSafeArea: true,
-    barrierColor: AppColors.overlay,
-    backgroundColor: AppColors.transparent,
-    builder: (BuildContext sheetContext) {
-      final bool keyboardOpen =
-          MediaQuery.of(sheetContext).viewInsets.bottom > 0;
-      if (keyboardOpen) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!sheetController.isAttached) {
-            return;
-          }
-          if (sheetController.size >= 0.94) {
-            return;
-          }
-          sheetController.animateTo(
-            0.95,
-            duration: AppMotion.medium,
-            curve: AppMotion.emphasized,
+    sizeConfig: AppSheetSizeConfig(
+      minSize: kCommentsSheetMinSize,
+      maxSize: kCommentsSheetMaxSize,
+      snapSizes: kCommentsSheetSnapSizes,
+      initialSize: kCommentsSheetInitialSize,
+    ),
+    builder:
+        (
+          BuildContext sheetContext,
+          ScrollController scrollController,
+          DraggableScrollableController sheetController,
+          AppSheetSizeConfig sizeConfig,
+        ) {
+          final CommentsSheetSizeConfig commentsConfig = CommentsSheetSizeConfig(
+            minSize: sizeConfig.minSize,
+            maxSize: sizeConfig.maxSize,
+            snapSizes: sizeConfig.snapSizes,
           );
-        });
-      }
-      return DraggableScrollableSheet(
-        controller: sheetController,
-        expand: false,
-        initialChildSize: keyboardOpen ? 0.95 : 0.74,
-        minChildSize: keyboardOpen ? 0.95 : 0.56,
-        maxChildSize: 0.95,
-        snap: !keyboardOpen,
-        snapSizes: keyboardOpen ? null : const <double>[0.74, 0.95],
-        builder: (BuildContext _, ScrollController scrollController) {
-          return Container(
-            decoration: const BoxDecoration(
-              color: AppColors.panelBackground,
-              borderRadius: BorderRadius.vertical(
-                top: Radius.circular(AppSpacing.radiusPill),
-              ),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: builder(sheetContext, scrollController),
+          return builder(
+            sheetContext,
+            scrollController,
+            sheetController,
+            commentsConfig,
           );
         },
-      );
-    },
   );
 }

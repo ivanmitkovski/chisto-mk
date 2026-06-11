@@ -3,6 +3,7 @@ import 'package:design_system/design_system.dart';
 import 'package:feature_events/src/domain/models/eco_event.dart';
 import 'package:feature_events/src/presentation/event_ui_mappers.dart';
 import 'package:feature_events/src/presentation/utils/events_localized_strings.dart';
+import 'package:feature_events/src/presentation/widgets/create_event/create_event_sticky_footer.dart';
 import 'package:feature_events/src/presentation/widgets/event_form/event_form_picker_tile.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,8 +14,12 @@ class CreateEventDetailsSection extends StatelessWidget {
     required this.titleFieldKey,
     required this.categorySectionKey,
     required this.titleController,
+    required this.titleFocusNode,
+    required this.descriptionFieldKey,
+    required this.descriptionFocusNode,
     required this.descriptionController,
-    required this.showValidationErrors,
+    required this.showTitleError,
+    required this.showCategoryError,
     required this.selectedCategory,
     required this.selectedScale,
     required this.selectedDifficulty,
@@ -32,8 +37,12 @@ class CreateEventDetailsSection extends StatelessWidget {
   final Key titleFieldKey;
   final Key categorySectionKey;
   final TextEditingController titleController;
+  final FocusNode titleFocusNode;
+  final Key descriptionFieldKey;
+  final FocusNode descriptionFocusNode;
   final TextEditingController descriptionController;
-  final bool showValidationErrors;
+  final bool showTitleError;
+  final bool showCategoryError;
   final EcoEventCategory? selectedCategory;
   final CleanupScale? selectedScale;
   final EventDifficulty? selectedDifficulty;
@@ -56,7 +65,8 @@ class CreateEventDetailsSection extends StatelessWidget {
           key: titleFieldKey,
           child: _CreateEventTitleField(
             controller: titleController,
-            showValidationErrors: showValidationErrors,
+            focusNode: titleFocusNode,
+            showError: showTitleError,
             onChanged: onTitleChanged,
           ),
         ),
@@ -69,7 +79,7 @@ class CreateEventDetailsSection extends StatelessWidget {
             icon: selectedCategory?.icon,
             placeholder: context.l10n.createEventPlaceholderType,
             onTap: onCategoryTap,
-            hasError: showValidationErrors && selectedCategory == null,
+            hasError: showCategoryError,
             errorText: context.l10n.createEventTypeRequired,
           ),
         ),
@@ -104,9 +114,13 @@ class CreateEventDetailsSection extends StatelessWidget {
         const SizedBox(height: AppSpacing.md),
         EventFormGearSummaryTile(selectedGear: selectedGear, onTap: onGearTap),
         const SizedBox(height: AppSpacing.lg),
-        _CreateEventDescriptionField(
-          controller: descriptionController,
-          onChanged: onDescriptionChanged,
+        KeyedSubtree(
+          key: descriptionFieldKey,
+          child: _CreateEventDescriptionField(
+            focusNode: descriptionFocusNode,
+            controller: descriptionController,
+            onChanged: onDescriptionChanged,
+          ),
         ),
       ],
     );
@@ -116,19 +130,19 @@ class CreateEventDetailsSection extends StatelessWidget {
 class _CreateEventTitleField extends StatelessWidget {
   const _CreateEventTitleField({
     required this.controller,
-    required this.showValidationErrors,
+    required this.focusNode,
+    required this.showError,
     required this.onChanged,
   });
 
   final TextEditingController controller;
-  final bool showValidationErrors;
+  final FocusNode focusNode;
+  final bool showError;
   final VoidCallback onChanged;
 
   @override
   Widget build(BuildContext context) {
     final String trimmed = controller.text.trim();
-    final bool titleError =
-        showValidationErrors && (trimmed.isEmpty || trimmed.length < 3);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -141,8 +155,12 @@ class _CreateEventTitleField extends StatelessWidget {
         const SizedBox(height: AppSpacing.sm),
         DesignSystemTextField(
           controller: controller,
+          focusNode: focusNode,
           maxLength: 60,
           textCapitalization: TextCapitalization.sentences,
+          scrollPadding: EdgeInsets.only(
+            bottom: CreateEventStickyFooter.scrollBottomReserve + AppSpacing.lg,
+          ),
           onChanged: (_) => onChanged(),
           buildCounter:
               (
@@ -165,7 +183,7 @@ class _CreateEventTitleField extends StatelessWidget {
                           Theme.of(context).textTheme,
                         ).copyWith(
                           color: currentLength >= max * 0.9
-                              ? AppColors.accentDanger
+                              ? AppColors.error
                               : AppColors.textMuted,
                         ),
                   ),
@@ -180,8 +198,8 @@ class _CreateEventTitleField extends StatelessWidget {
               Theme.of(context).textTheme,
             ),
             filled: true,
-            fillColor: titleError
-                ? AppColors.accentDanger.withValues(alpha: 0.04)
+            fillColor: showError
+                ? AppColors.error.withValues(alpha: 0.04)
                 : AppColors.panelBackground,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.md,
@@ -190,29 +208,29 @@ class _CreateEventTitleField extends StatelessWidget {
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radius14),
               borderSide: BorderSide(
-                color: titleError ? AppColors.accentDanger : AppColors.divider,
+                color: showError ? AppColors.error : AppColors.divider,
               ),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radius14),
-              borderSide: const BorderSide(color: AppColors.accentDanger),
+              borderSide: const BorderSide(color: AppColors.error),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radius14),
               borderSide: BorderSide(
-                color: titleError ? AppColors.accentDanger : AppColors.divider,
+                color: showError ? AppColors.error : AppColors.divider,
               ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radius14),
               borderSide: BorderSide(
-                color: titleError ? AppColors.accentDanger : AppColors.primary,
+                color: showError ? AppColors.error : AppColors.primary,
                 width: 1.5,
               ),
             ),
           ),
         ),
-        if (titleError)
+        if (showError)
           Padding(
             padding: const EdgeInsets.only(top: AppSpacing.xs),
             child: Text(
@@ -221,7 +239,7 @@ class _CreateEventTitleField extends StatelessWidget {
                   : context.l10n.createEventTitleMinLength,
               style: AppTypography.eventsCaptionStrong(
                 Theme.of(context).textTheme,
-                color: AppColors.accentDanger,
+                color: AppColors.error,
               ).copyWith(fontWeight: FontWeight.w500),
             ),
           ),
@@ -233,14 +251,17 @@ class _CreateEventTitleField extends StatelessWidget {
 class _CreateEventDescriptionField extends StatelessWidget {
   const _CreateEventDescriptionField({
     required this.controller,
+    required this.focusNode,
     this.onChanged,
   });
 
   final TextEditingController controller;
+  final FocusNode focusNode;
   final ValueChanged<String>? onChanged;
 
   @override
   Widget build(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -258,12 +279,16 @@ class _CreateEventDescriptionField extends StatelessWidget {
         const SizedBox(height: AppSpacing.sm),
         DesignSystemTextField(
           controller: controller,
+          focusNode: focusNode,
           minLines: 3,
           maxLines: 8,
           maxLength: 300,
           textCapitalization: TextCapitalization.sentences,
           keyboardType: TextInputType.multiline,
           onChanged: onChanged,
+          scrollPadding: EdgeInsets.only(
+            bottom: CreateEventStickyFooter.scrollBottomReserve + AppSpacing.lg,
+          ),
           style: AppTypography.eventsSearchFieldText(
             Theme.of(context).textTheme,
           ),

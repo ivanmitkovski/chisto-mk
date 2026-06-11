@@ -19,7 +19,9 @@ void main() {
   test(
     'prepareReportPhotoPathsForUpload skips missing source files and reports them',
     () async {
-      final Directory tmp = await Directory.systemTemp.createTemp('prep_missing_');
+      final Directory tmp = await Directory.systemTemp.createTemp(
+        'prep_missing_',
+      );
       try {
         final File present = File('${tmp.path}/ok.jpg');
         await present.writeAsBytes(base64Decode(_kTinyJpegBase64));
@@ -49,7 +51,9 @@ void main() {
   test(
     'compressManagedReportDraftPhotoInPlace preserves original on success and never orphans on failure',
     () async {
-      final Directory tmp = await Directory.systemTemp.createTemp('compress_safe_');
+      final Directory tmp = await Directory.systemTemp.createTemp(
+        'compress_safe_',
+      );
       try {
         final File managed = File('${tmp.path}/photo.jpg');
         final List<int> before = base64Decode(_kTinyJpegBase64);

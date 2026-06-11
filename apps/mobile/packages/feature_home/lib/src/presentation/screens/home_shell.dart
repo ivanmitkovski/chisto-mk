@@ -1,4 +1,7 @@
-import 'package:feature_auth/feature_auth.dart';
+import 'dart:async';
+
+import 'package:chisto_infrastructure/core/providers/app_providers.dart';
+import 'package:feature_auth/src/presentation/eula_acceptance_flow.dart';
 import 'package:feature_home/src/application/home_shell_controller.dart';
 import 'package:feature_home/src/presentation/screens/pollution_feed_screen.dart';
 import 'package:flutter/material.dart';
@@ -49,8 +52,6 @@ class _HomeShellState extends ConsumerState<HomeShell> {
 }
 
 /// Side effects for the signed-in shell: EULA gate and optional coach / map focus.
-///
-/// Rendered inside [buildHomeShellStatefulShellRoute]; does not own routing.
 class HomeShellBootstrap extends ConsumerStatefulWidget {
   const HomeShellBootstrap({
     super.key,
@@ -78,9 +79,7 @@ class _HomeShellBootstrapState extends ConsumerState<HomeShellBootstrap> {
           startCoachTour: widget.startCoachTour,
         );
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
       await ensureCommunityGuidelinesAccepted(context, ref);
     });
   }
@@ -100,5 +99,7 @@ class _HomeShellBootstrapState extends ConsumerState<HomeShellBootstrap> {
   }
 
   @override
-  Widget build(BuildContext context) => widget.child;
+  Widget build(BuildContext context) {
+    return widget.child;
+  }
 }

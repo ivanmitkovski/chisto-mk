@@ -34,7 +34,7 @@ class _RestoreSessionTestApiClient extends ApiClient {
     : super(
         config: AppConfig.dev,
         accessToken: () => null,
-        onUnauthorized: () {},
+        onUnauthorized: (_) {},
       );
 
   Object? getBehavior = 'ok';
@@ -263,7 +263,7 @@ void main() {
       final AuthState authState = AuthState();
       int unauthorizedCalls = 0;
       final _StaleTokenRestoreClient client = _StaleTokenRestoreClient(
-        onUnauthorized: () => unauthorizedCalls++,
+        onUnauthorized: (_) => unauthorizedCalls++,
       );
       final ApiAuthRepository repo = ApiAuthRepository(
         client: client,
@@ -299,7 +299,7 @@ void main() {
     expect(avatarSync.clearCount, 1);
   });
 
-  test('signIn syncs avatar URL from login user payload', () async {
+  test('signIn syncs avatar URL from profile after login', () async {
     SharedPreferences.setMockInitialValues(<String, Object>{});
     final _RecordingAvatarSync avatarSync = _RecordingAvatarSync();
     final ApiAuthRepository repo = ApiAuthRepository(
@@ -312,6 +312,6 @@ void main() {
 
     await repo.signIn(phoneNumber: '+38970111222', password: 'Password1!');
 
-    expect(avatarSync.lastRemoteUrl, 'https://cdn.example/login-avatar.jpg');
+    expect(avatarSync.lastRemoteUrl, 'https://cdn.example/avatar.jpg');
   });
 }

@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Default-deny cleartext; allow only listed dev hosts. Production stays
-     HTTPS-only (api-dev, api-staging, api.chisto.mk). -->
+<!-- Default-deny cleartext; allow only listed dev hosts. Prod (api.chisto.mk)
+     stays HTTPS-only. TEMP: the dev backend (api-dev.chisto.mk) has no valid
+     TLS cert yet, so cleartext is allowed for that host until it is fixed. -->
 <network-security-config>
     <base-config cleartextTrafficPermitted="false"/>
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="false">127.0.0.1</domain>
         <domain includeSubdomains="false">localhost</domain>
         <domain includeSubdomains="false">10.0.2.2</domain>
+        <!-- TEMP dev backend over HTTP (no valid TLS cert yet). -->
+        <domain includeSubdomains="false">api-dev.chisto.mk</domain>
         <!-- Internal AWS dev ALB used by emulator builds during development. -->
         <domain includeSubdomains="true">elb.amazonaws.com</domain>
     </domain-config>

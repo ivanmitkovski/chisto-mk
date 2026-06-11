@@ -120,7 +120,9 @@ void main() {
       'lease_${DateTime.now().microsecondsSinceEpoch}.db',
     );
     addTearDown(db.close);
-    final SqfliteReportOutboxRepository repo = SqfliteReportOutboxRepository(db);
+    final SqfliteReportOutboxRepository repo = SqfliteReportOutboxRepository(
+      db,
+    );
 
     final Completer<void> releaseSubmit = Completer<void>();
     final _LeaseStubApi api = _LeaseStubApi(

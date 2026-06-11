@@ -1,12 +1,16 @@
 import 'dart:async';
 
+import 'package:chisto_infrastructure/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_infrastructure/core/navigation/app_go_router.dart';
 import 'package:chisto_infrastructure/core/navigation/app_routes.dart';
+import 'package:chisto_infrastructure/core/navigation/event_detail_navigation_guard.dart';
 import 'package:feature_auth/src/domain/models/password_reset_target.dart';
 import 'package:feature_events/src/data/discovery_analytics.dart';
 import 'package:feature_events/src/domain/models/eco_event.dart';
 import 'package:feature_home/src/application/home_shell_controller.dart';
+import 'package:feature_home/src/domain/models/pollution_site.dart';
 import 'package:feature_home/src/presentation/navigation/home_shell_tab_locations.dart';
+import 'package:feature_profile/src/domain/models/profile_user.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -83,6 +87,36 @@ class AppNavigation {
     _router.go(homeShellTabIndexToLocation(tabIndex));
   }
 
+  /// Opens the notifications inbox on the root stack (preserves back navigation).
+  static Future<int?> pushNotifications({
+    List<PollutionSite> availableSites = const <PollutionSite>[],
+  }) {
+    return _router.push<int>(
+      AppRoutes.notifications,
+      extra: NotificationsRouteExtra(availableSites: availableSites),
+    );
+  }
+
+  static Future<void> pushReportDetail({required String reportId}) {
+    final String trimmed = reportId.trim();
+    return _router.push<void>('${AppRoutes.reportDetail}/$trimmed');
+  }
+
+  /// Opens the signed-in user's points & level history on the root stack.
+  static Future<bool> pushProfilePointsHistory() async {
+    try {
+      final ProfileUser user =
+          await AppBootstrap.instance.profileRepository.getMe();
+      await _router.push<void>(
+        AppRoutes.profilePointsHistory,
+        extra: ProfilePointsHistoryRouteExtra(summaryUser: user),
+      );
+      return true;
+    } on Object {
+      return false;
+    }
+  }
+
   static void focusMapSite(String siteId) {
     homeShellController.applyInitialFocus(mapSiteIdToFocus: siteId);
     _router.go('/map');
@@ -98,19 +132,21 @@ class AppNavigation {
     required String eventId,
     bool enableThumbnailHero = true,
   }) {
-    unawaited(
-      DiscoveryAnalytics.instance.maybeTrack(
-        DiscoveryFunnelStep.detailView,
-        eventId: eventId,
-      ),
-    );
-    return _router.push<void>(
-      '${AppRoutes.eventsDetail}/$eventId',
-      extra: EventRouteArguments(
-        eventId: eventId,
-        enableThumbnailHero: enableThumbnailHero,
-      ),
-    );
+    return EventDetailNavigationGuard.coalescedPush(eventId, () async {
+      unawaited(
+        DiscoveryAnalytics.instance.maybeTrack(
+          DiscoveryFunnelStep.detailView,
+          eventId: eventId,
+        ),
+      );
+      await _router.push<void>(
+        EventDetailNavigationGuard.eventDetailPath(eventId),
+        extra: EventRouteArguments(
+          eventId: eventId,
+          enableThumbnailHero: enableThumbnailHero,
+        ),
+      );
+    });
   }
 
   /// Hero-safe replacement between two event detail screens.
@@ -178,6 +214,24 @@ class AppNavigation {
     AppRoutes.onboarding,
     AppRoutes.signIn,
   };
+
+  /// Routes reachable while the session is not authenticated (auth flows only).
+  static const Set<String> publicUnauthenticatedPaths = <String>{
+    AppRoutes.splash,
+    AppRoutes.initialRoute,
+    AppRoutes.onboarding,
+    AppRoutes.signIn,
+    AppRoutes.signUp,
+    AppRoutes.otp,
+    AppRoutes.forgotPasswordRequest,
+    AppRoutes.forgotPasswordOtp,
+    AppRoutes.forgotPasswordNew,
+    AppRoutes.forgotPasswordSuccess,
+    AppRoutes.location,
+  };
+
+  static bool isPublicUnauthenticatedPath(String path) =>
+      publicUnauthenticatedPaths.contains(path);
 
   static bool isOnAuthGateRoute() {
     return authGatePaths.contains(

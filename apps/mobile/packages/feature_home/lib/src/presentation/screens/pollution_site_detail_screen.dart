@@ -2,6 +2,7 @@ library;
 
 import 'dart:async';
 
+import 'package:chisto_infrastructure/core/concurrency/single_flight.dart';
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/core/providers/app_providers.dart';
@@ -24,6 +25,7 @@ import 'package:feature_home/src/presentation/providers/repository_providers.dar
 import 'package:feature_home/src/presentation/providers/site_engagement_provider.dart';
 import 'package:feature_home/src/presentation/providers/site_history_providers.dart';
 import 'package:feature_home/src/presentation/utils/site_comment_mapping.dart';
+import 'package:feature_home/src/presentation/utils/site_comments_engagement_count.dart';
 import 'package:feature_home/src/presentation/utils/site_engagement_outcome_snack.dart';
 import 'package:feature_home/src/presentation/widgets/comments_bottom_sheet.dart';
 import 'package:feature_home/src/presentation/widgets/pollution_site_card_sheets.dart';
@@ -78,6 +80,7 @@ class _PollutionSiteDetailScreenState
   List<Comment> _comments = <Comment>[];
   bool _detailRefreshFailed = false;
   bool _initialActionHandled = false;
+  final SingleFlight<void> _commentsSheetFlight = SingleFlight<void>();
 
   @override
   void initState() {

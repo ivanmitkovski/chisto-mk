@@ -7,6 +7,7 @@ import { SitesAdminListService } from './services/sites-admin-list.service';
 import { SitesAdminService } from './services/sites-admin.service';
 import { SitesFeedModule } from './sites-feed.module';
 import { SitesMapModule } from './sites-map.module';
+import { SitesEngagementModule } from './sites-engagement.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { SitesMapModule } from './sites-map.module';
     SiteHistoryModule,
     forwardRef(() => SitesFeedModule),
     forwardRef(() => SitesMapModule),
+    SitesEngagementModule,
   ],
   providers: [SitesAdminService, SitesAdminBulkService, SitesAdminListService],
   exports: [SitesAdminService, SitesAdminBulkService, SitesAdminListService],

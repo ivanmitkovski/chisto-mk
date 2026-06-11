@@ -75,6 +75,12 @@ void main() {
     );
   });
 
+  test('feedStatusPriorityForCode uses status codes not localized labels', () {
+    expect(feedStatusPriorityForCode('IN_PROGRESS'), 2);
+    expect(feedStatusPriorityForCode('REPORTED'), 4);
+    expect(feedStatusPriorityForCode('Во тек'), 0);
+  });
+
   test('computeVisibleSitesForFilter urgent prefers urgencyLabel sites', () {
     final List<PollutionSite> sites = <PollutionSite>[
       _dummy(id: '1', urgencyLabel: 'needs_attention'),
@@ -179,6 +185,25 @@ void main() {
       expect(withPreview.commentsCount, 3);
     },
   );
+
+  test('patchPollutionSitesShareCount updates matching id only', () {
+    final List<PollutionSite> sites = <PollutionSite>[
+      _dummy(id: '1').copyWith(shareCount: 2),
+      _dummy(id: '2').copyWith(shareCount: 0),
+    ];
+    final List<PollutionSite> out = patchPollutionSitesShareCount(sites, '1', 5);
+    expect(out[0].shareCount, 5);
+    expect(out[1].shareCount, 0);
+    expect(identical(out, sites), isFalse);
+  });
+
+  test('patchPollutionSitesShareCount empty siteId returns copy of source', () {
+    final List<PollutionSite> sites = <PollutionSite>[
+      _dummy(id: '1').copyWith(shareCount: 1),
+    ];
+    final List<PollutionSite> out = patchPollutionSitesShareCount(sites, '', 9);
+    expect(out[0].shareCount, 1);
+  });
 
   test('nearby filter uses user location when server distance is unknown', () {
     final List<PollutionSite> out = computeVisibleSitesForFilter(

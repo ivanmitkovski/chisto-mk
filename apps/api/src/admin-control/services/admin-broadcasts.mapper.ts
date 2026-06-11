@@ -1,6 +1,6 @@
 import { randomBytes } from 'node:crypto';
 import type { BroadcastAudience, BroadcastCampaign as BroadcastCampaignRow, BroadcastCampaignStatus } from '../../prisma-client';
-import type { BroadcastCampaign, BroadcastCampaignStatus as ApiBroadcastCampaignStatus } from './admin-broadcasts.types';
+import type { BroadcastCampaign, BroadcastCampaignStatus as ApiBroadcastCampaignStatus } from '../types/admin-broadcasts.types';
 
 export function newBroadcastCampaignId(): string {
   return `bc_${Date.now()}_${randomBytes(4).toString('hex')}`;

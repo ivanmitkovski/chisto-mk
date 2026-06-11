@@ -2,6 +2,9 @@
  * Localized display titles for gamification levels (mobile profile contract).
  * Keep `NUMERIC_LEVEL_MAX` and prestige count in sync with `gamification-tiers.ts`.
  */
+import type { AppLocale } from './app-locale';
+import { normalizeAppLocale } from './app-locale';
+
 const NUMERIC_LEVEL_MAX = 10;
 
 export const PRESTIGE_TIER_NAME_COUNT = 40;
@@ -92,25 +95,76 @@ const PRESTIGE_TIER_NAMES_MK: readonly string[] = [
   'Партнер на планетата',
 ];
 
-function isMacedonianLocale(locale: string): boolean {
-  const s = locale.replace(/_/g, '-').trim().toLowerCase();
-  return s === 'mk' || s.startsWith('mk-');
+/** Aligned with mobile `profile_level_tier.dart` `_prestigeSq`. */
+const PRESTIGE_TIER_NAMES_SQ: readonly string[] = [
+  'Vrojtues i lumenjve',
+  'Ruajtës i luginës',
+  'Kujdestar i fushës',
+  'Rojtar i pyllit',
+  'Përgjegjës i qiellit',
+  'Hapës shtigjesh',
+  'Zëri i burimit',
+  'Rojtar i gurit',
+  'Lajmëtues i livadhit',
+  'Vrapues i kreshtës',
+  'Mbrojtës i përroit',
+  'Vrojtues i kodrës',
+  'Aleat i kurorës së pemëve',
+  'Avokat i tokës',
+  'Dëgjues i erës',
+  'Patrullues i agimit',
+  'Rojtar i muzgut',
+  'Udhërrëfyes i shtegut të egër',
+  'Kalorës i ujit të pastër',
+  'Kampion i brezit të gjelbër',
+  'Aleat i rrënjëve urbane',
+  'Ruajtës i parkut',
+  'Mbrojtës i bregut të lumit',
+  'Skaut i majës',
+  'Zëri i luginës',
+  'Eko-kartograf',
+  'Kapiten pastrimi',
+  'Steward i rrethit',
+  'Ndihmës në port',
+  'Mbrojtës i fushës së hapur',
+  'Mik i pyllit',
+  'Vrojtues i liqenit',
+  'Shok i malit',
+  'Udhëheqës i gjelbërit urban',
+  'Naturalist i fqinjësisë',
+  'Shkencëtar qytetar',
+  'Korrier klimatik',
+  'Luftëtar zero-mbeturina',
+  'Menç i ekonomisë qarkulluese',
+  'Partner i planetit',
+];
+
+function prestigeNames(locale: AppLocale): readonly string[] {
+  switch (locale) {
+    case 'sq':
+      return PRESTIGE_TIER_NAMES_SQ;
+    case 'mk':
+      return PRESTIGE_TIER_NAMES_MK;
+    default:
+      return PRESTIGE_TIER_NAMES_EN;
+  }
 }
 
 /**
  * Human-readable level title for API responses (`levelDisplayName`).
  */
 export function resolveLevelDisplayTitle(level: number, locale: string): string {
-  const mk = isMacedonianLocale(locale);
+  const loc = normalizeAppLocale(locale);
   if (level <= 0) {
-    return mk ? 'Ниво 1' : 'Level 1';
+    return loc === 'mk' ? 'Ниво 1' : loc === 'sq' ? 'Niveli 1' : 'Level 1';
   }
   if (level <= NUMERIC_LEVEL_MAX) {
-    return mk ? `Ниво ${level}` : `Level ${level}`;
+    return loc === 'mk' ? `Ниво ${level}` : loc === 'sq' ? `Niveli ${level}` : `Level ${level}`;
   }
   const idx = level - NUMERIC_LEVEL_MAX - 1;
+  const names = prestigeNames(loc);
   if (idx >= 0 && idx < PRESTIGE_TIER_NAME_COUNT) {
-    return mk ? PRESTIGE_TIER_NAMES_MK[idx]! : PRESTIGE_TIER_NAMES_EN[idx]!;
+    return names[idx]!;
   }
-  return mk ? 'Легенда на Чисто' : 'Chisto Legend';
+  return loc === 'mk' ? 'Легенда на Чисто' : loc === 'sq' ? 'Legjenda e Chisto' : 'Chisto Legend';
 }

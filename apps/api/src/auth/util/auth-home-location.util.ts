@@ -1,16 +1,13 @@
 import { BadRequestException } from '@nestjs/common';
 
-/** Rough bounding box for North Macedonia (matches mobile onboarding map). */
+import { isWithinMacedonia } from '../../common/geo/macedonia-bounds';
+
+/** Rejects home-location coordinates outside Macedonia (shared bbox). */
 export function assertHomeLocationInMacedonia(latitude: number, longitude: number): void {
-  const inMk =
-    latitude >= 40.8 &&
-    latitude <= 42.4 &&
-    longitude >= 20.4 &&
-    longitude <= 23.1;
-  if (!inMk) {
+  if (!isWithinMacedonia(latitude, longitude)) {
     throw new BadRequestException({
       code: 'VALIDATION_ERROR',
-      message: 'Home location must be within North Macedonia',
+      message: 'Home location must be within Macedonia',
     });
   }
 }

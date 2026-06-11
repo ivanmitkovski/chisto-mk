@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chisto_infrastructure/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_infrastructure/core/bootstrap/cold_start_coordinator.dart';
 import 'package:chisto_infrastructure/core/deep_links/deep_link_router.dart';
 import 'package:chisto_infrastructure/core/navigation/app_go_router.dart';
@@ -21,6 +22,8 @@ class InitialRouteScreen extends ConsumerStatefulWidget {
 
 class _InitialRouteScreenState extends ConsumerState<InitialRouteScreen> {
   bool _navigated = false;
+  int _coldStartApplyAttempts = 0;
+  static const int _maxColdStartApplyAttempts = 120;
 
   @override
   void initState() {
@@ -56,6 +59,8 @@ class _InitialRouteScreenState extends ConsumerState<InitialRouteScreen> {
         AppNavigation.goSignIn();
       case InitialRouteDestination.onboarding:
         AppNavigation.goOnboarding();
+      case InitialRouteDestination.location:
+        AppNavigation.goLocation();
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _applyColdStartLaunchIntent();
@@ -63,11 +68,22 @@ class _InitialRouteScreenState extends ConsumerState<InitialRouteScreen> {
   }
 
   void _applyColdStartLaunchIntent() {
+    ColdStartCoordinator.instance.markSessionReady();
     final BuildContext? ctx =
         appGoRouter.routerDelegate.navigatorKey.currentContext;
     if (ctx == null || !ctx.mounted) {
+      if (_coldStartApplyAttempts >= _maxColdStartApplyAttempts) {
+        return;
+      }
+      _coldStartApplyAttempts += 1;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _applyColdStartLaunchIntent();
+        }
+      });
       return;
     }
+    _coldStartApplyAttempts = 0;
     if (!ColdStartCoordinator.instance.tryApply(
       router: appGoRouter,
       context: ctx,

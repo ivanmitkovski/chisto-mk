@@ -1,3 +1,4 @@
+import 'package:chisto_infrastructure/core/auth/session_teardown_reason.dart';
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:feature_auth/src/domain/models/auth_session_dtos.dart';
 import 'package:feature_auth/src/domain/repositories/auth_repository.dart';
@@ -168,7 +169,10 @@ class FakeAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<void> invalidateLocalSession() async {
+  Future<void> invalidateLocalSession({
+    int? observedEpoch,
+    SessionTeardownReason? reason,
+  }) async {
     isAuthenticated = false;
   }
 
@@ -186,7 +190,11 @@ class FakeAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<void> verifyOtp(String phoneNumberE164, String code) async {
+  Future<void> verifyOtp(
+    String phoneNumberE164,
+    String code, {
+    bool rememberMe = true,
+  }) async {
     if (verifyOtpError != null) throw verifyOtpError!;
     final f = _verifyOtpImpl;
     if (f != null) await f(phoneNumberE164, code);

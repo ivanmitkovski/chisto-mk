@@ -8,12 +8,14 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:chisto_infrastructure/core/l10n/app_error_localizations.dart';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/core/providers/events_providers.dart';
 import 'package:chisto_infrastructure/core/widgets/state_rebuild_mixin.dart';
 import 'package:chisto_infrastructure/shared/utils/app_haptics.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_back_button.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
+import 'package:chisto_infrastructure/shared/widgets/organisms/app_confirm_dialog.dart';
 import 'package:chisto_infrastructure/shared/widgets/organisms/app_surface/report_surface_aliases.dart';
 import 'package:design_system/design_system.dart';
 import 'package:feature_events/src/domain/models/eco_event.dart';

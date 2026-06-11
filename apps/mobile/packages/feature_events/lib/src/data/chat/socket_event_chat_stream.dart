@@ -2,6 +2,9 @@ import 'dart:async';
 
 import 'package:chisto_infrastructure/core/auth/auth_state.dart';
 import 'package:chisto_infrastructure/core/logging/app_log.dart';
+import 'package:chisto_infrastructure/core/network/realtime_disruption_signal.dart';
+import 'package:chisto_infrastructure/core/network/realtime_socket_options.dart';
+import 'package:chisto_infrastructure/core/network/realtime_socket_transport_policy.dart';
 import 'package:feature_auth/feature_auth.dart';
 import 'package:feature_events/src/data/chat/event_chat_connection_status.dart';
 import 'package:feature_events/src/data/chat/event_chat_message.dart';
@@ -28,15 +31,28 @@ class SocketEventChatStream {
     required AuthState authState,
     Future<RefreshOutcome> Function()? sessionRefresh,
     void Function()? onAuthRejected,
+    RealtimeSocketTransportPolicy? transportPolicy,
+    RealtimeDisruptionSignal? disruptionSignal,
   }) : _baseUrl = baseUrl.replaceFirst(RegExp(r'/$'), ''),
        _authState = authState,
        _sessionRefresh = sessionRefresh,
-       _onAuthRejected = onAuthRejected;
+       _onAuthRejected = onAuthRejected,
+       _transportPolicy = transportPolicy ?? RealtimeSocketTransportPolicy() {
+    _disruption =
+        disruptionSignal ??
+        RealtimeDisruptionSignal(
+          channel: 'chat',
+          resolveHost: () => Uri.tryParse(_baseUrl)?.host ?? _baseUrl,
+          resolveTransports: _transportPolicy.describeTransports,
+        );
+  }
 
   final String _baseUrl;
   final AuthState _authState;
   final Future<RefreshOutcome> Function()? _sessionRefresh;
   final void Function()? _onAuthRejected;
+  final RealtimeSocketTransportPolicy _transportPolicy;
+  late final RealtimeDisruptionSignal _disruption;
 
   sio.Socket? _socket;
   String? _currentEventId;
@@ -54,6 +70,22 @@ class SocketEventChatStream {
 
   EventChatConnectionStatus get connectionStatus => _lastStatus;
 
+  ValueNotifier<bool> get disruptionVisible => _disruption.visible;
+
+  String get _debugHost => Uri.tryParse(_baseUrl)?.host ?? _baseUrl;
+
+  void _syncDisruptionForStatus(EventChatConnectionStatus status) {
+    switch (status) {
+      case EventChatConnectionStatus.connected:
+        _disruption.setLive(isLive: true);
+      case EventChatConnectionStatus.disconnected:
+        _disruption.setLive(isLive: true);
+        _disruption.visible.value = false;
+      case EventChatConnectionStatus.reconnecting:
+        _disruption.setLive(isLive: false);
+    }
+  }
+
   void connect(String eventId) {
     _currentEventId = eventId;
     final sio.Socket? existing = _socket;
@@ -70,41 +102,34 @@ class SocketEventChatStream {
 
     _emitStatus(EventChatConnectionStatus.reconnecting);
 
-    // Socket.IO expects an http(s) origin; the client opens ws/wss internally.
     final String origin = '$_baseUrl/chat';
-    final String debugHost = Uri.tryParse(_baseUrl)?.host ?? _baseUrl;
+    final String debugHost = _debugHost;
+    final List<String> transports = _transportPolicy.currentTransports();
+
+    AppLog.verbose(
+      '[chat:ws] connect host=$debugHost event=$eventId transports=${transports.join(",")}',
+    );
 
     _socket = sio.io(
       origin,
-      sio.OptionBuilder()
-          // Polling handshake first, then upgrades to WebSocket (reliable behind ALB/proxies).
-          .setTransports(<String>['polling', 'websocket'])
-          // Fresh token on every connect/reconnect (access JWT is short-lived; static
-          // setAuth would keep the expired token after proactive refresh).
-          .setAuthFn((void Function(Map<dynamic, dynamic> data) submit) {
-            final String? t = _authState.accessToken;
-            if (t == null || t.isEmpty) {
-              submit(<String, dynamic>{});
-              return;
-            }
-            submit(<String, String>{'token': t});
-          })
-          .enableReconnection()
-          .setReconnectionDelay(1000)
-          .setReconnectionDelayMax(30000)
-          // Slow TLS / ALB cold path: default 20s can abort before handshake completes.
-          .setTimeout(60000)
-          .build(),
+      RealtimeSocketOptions.build(
+        transportPolicy: _transportPolicy,
+        authSubmit: RealtimeSocketOptions.tokenAuthSubmit(
+          () => _authState.accessToken,
+        ),
+      ).build(),
     );
 
     _socket!
       ..onConnect((_) {
         AppLog.verbose('[chat:ws] connect host=$debugHost event=$eventId');
+        _transportPolicy.recordConnectSuccess();
         _tokenAtHandshake = _authState.accessToken;
         _emitStatus(EventChatConnectionStatus.connected);
         scheduleMicrotask(_emitJoin);
       })
       ..onReconnect((_) {
+        _transportPolicy.recordConnectSuccess();
         _tokenAtHandshake = _authState.accessToken;
         _emitStatus(EventChatConnectionStatus.connected);
         scheduleMicrotask(_emitJoin);
@@ -119,7 +144,7 @@ class SocketEventChatStream {
         AppLog.verbose(
           '[chat:ws] connect_error host=$debugHost event=$eventId type=${data.runtimeType}',
         );
-        _emitStatus(EventChatConnectionStatus.reconnecting);
+        _handleHandshakeFailure(eventId);
       })
       ..onReconnectError((dynamic data) {
         AppLog.verbose(
@@ -134,7 +159,7 @@ class SocketEventChatStream {
         AppLog.verbose(
           '[chat:ws] engine error host=$debugHost event=$eventId type=${err.runtimeType}',
         );
-        _emitStatus(EventChatConnectionStatus.reconnecting);
+        _handleHandshakeFailure(eventId);
       })
       ..on('error', (dynamic data) {
         if (data is Map && data['code'] == 'AUTH_FAILED') {
@@ -169,6 +194,21 @@ class SocketEventChatStream {
       );
 
     _socket!.connect();
+  }
+
+  void _handleHandshakeFailure(String eventId) {
+    if (_socket?.connected ?? false) {
+      return;
+    }
+    _emitStatus(EventChatConnectionStatus.reconnecting);
+    if (_transportPolicy.recordConnectFailure()) {
+      AppLog.warn(
+        '[chat:ws] falling back to polling+websocket host=$_debugHost event=$eventId',
+        category: 'realtime',
+      );
+      _disconnectSocketOnly();
+      connect(eventId);
+    }
   }
 
   Future<void> _onAuthFailed(String eventId) async {
@@ -272,7 +312,9 @@ class SocketEventChatStream {
       _socket = null;
     }
     _tokenAtHandshake = null;
+    _transportPolicy.reset();
     _currentEventId = null;
+    _disruption.dispose();
     _controller.close();
   }
 
@@ -482,6 +524,7 @@ class SocketEventChatStream {
   void _emitStatus(EventChatConnectionStatus status) {
     if (_lastStatus == status) return;
     _lastStatus = status;
+    _syncDisruptionForStatus(status);
     _addEvent(EventChatStreamConnectionChanged(status));
   }
 

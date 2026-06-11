@@ -1,0 +1,18 @@
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 16px;
+}
+
+.main,
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (max-width: 64rem) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}

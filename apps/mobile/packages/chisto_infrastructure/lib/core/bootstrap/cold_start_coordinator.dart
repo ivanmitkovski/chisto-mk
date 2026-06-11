@@ -109,18 +109,22 @@ class ColdStartCoordinator {
         if (uri == null) {
           return false;
         }
-        final bool handled = DeepLinkRouter.handleUri(
-          router,
-          uri,
-          isAuthenticated: readRoot(authStateProvider).isAuthenticated,
+        unawaited(
+          DeepLinkRouter.handleUriAsync(
+            router,
+            uri,
+            isAuthenticated: readRoot(authStateProvider).isAuthenticated,
+            context: context.mounted ? context : null,
+          ).then((bool handled) {
+            if (handled) {
+              unawaited(_trackShareOpen(uri));
+            } else {
+              AppLog.verbose('[ColdStart] Unhandled deep link: $uri');
+            }
+          }),
         );
-        if (handled) {
-          unawaited(_trackShareOpen(uri));
-        } else {
-          AppLog.verbose('[ColdStart] Unhandled deep link: $uri');
-        }
         _queuedDeepLink = null;
-        return handled;
+        return true;
     }
   }
 

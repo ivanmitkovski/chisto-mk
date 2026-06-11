@@ -1,4 +1,4 @@
-# Non-workspace overrides only (iOS simulator workaround + analyzer/test pin).
+# Non-workspace overrides only (analyzer/test pin).
 dependency_overrides:
   analyzer: ^7.7.1
   path_provider_foundation: 2.4.3

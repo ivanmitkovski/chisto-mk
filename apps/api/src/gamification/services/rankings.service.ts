@@ -1,7 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Role } from '../../prisma-client';
+import { ReportsUploadService } from '../../reports/services/reports-upload.service';
 import { getSkopjeWeekBoundsUtc } from '../util/week-skopje';
+import {
+  projectLeaderboardIdentity,
+  resolveActorIdentity,
+} from '../../common/projections/public-identity.projection';
 
 /** Weekly totals: sum of positive `PointTransaction.delta` in the Skopje week, citizens (`USER`) only. */
 
@@ -9,6 +14,7 @@ export type WeeklyLeaderboardEntry = {
   rank: number;
   userId?: string;
   displayName: string;
+  avatarUrl?: string | null;
   weeklyPoints: number;
   isCurrentUser: boolean;
 };
@@ -45,7 +51,10 @@ export type AdminWeeklyLeaderboardResult = {
 
 @Injectable()
 export class RankingsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly reportsUpload: ReportsUploadService,
+  ) {}
 
   async getUserWeeklySummary(userId: string, now: Date = new Date()): Promise<UserWeeklySummary> {
     const bounds = getSkopjeWeekBoundsUtc(now);
@@ -85,31 +94,63 @@ export class RankingsService {
         firstName: string;
         lastName: string;
         showOnLeaderboard: boolean;
+        avatarObjectKey: string | null;
+        status: import('../../prisma-client').UserStatus;
       }>
     >`
       SELECT pt."userId",
              SUM(pt.delta)::int AS pts,
              u."firstName",
              u."lastName",
-             u."showOnLeaderboard"
+             u."showOnLeaderboard",
+             u."avatarObjectKey",
+             u.status
       FROM "PointTransaction" pt
       INNER JOIN "User" u ON u.id = pt."userId"
       WHERE pt."createdAt" >= ${bounds.weekStartsAt}
         AND pt."createdAt" <= ${bounds.weekEndsAt}
         AND pt.delta > 0
         AND u.role = 'USER'::"Role"
-      GROUP BY pt."userId", u."firstName", u."lastName", u."showOnLeaderboard"
+      GROUP BY pt."userId", u."firstName", u."lastName", u."showOnLeaderboard", u."avatarObjectKey", u.status
       HAVING SUM(pt.delta) > 0
       ORDER BY pts DESC
       LIMIT ${capped}
     `;
 
+    const avatarKeys = new Set<string>();
+    for (const row of rows) {
+      if (row.showOnLeaderboard && row.avatarObjectKey) {
+        avatarKeys.add(row.avatarObjectKey);
+      }
+    }
+    const avatarUrlByKey = new Map<string, string | null>();
+    await Promise.all(
+      [...avatarKeys].map(async (key) => {
+        avatarUrlByKey.set(key, await this.reportsUpload.signPrivateObjectKey(key));
+      }),
+    );
+
     const entries: WeeklyLeaderboardEntry[] = rows.map((row, index) => {
       const isCurrentUser = row.userId === currentUserId;
+      const identity = projectLeaderboardIdentity(
+        {
+          id: row.userId,
+          firstName: row.firstName,
+          lastName: row.lastName,
+          showOnLeaderboard: row.showOnLeaderboard,
+          status: row.status,
+        },
+        currentUserId,
+      );
+      const avatarKey =
+        row.showOnLeaderboard && row.avatarObjectKey ? row.avatarObjectKey : null;
+      const avatarUrl =
+        avatarKey != null ? (avatarUrlByKey.get(avatarKey) ?? null) : null;
       return {
         rank: index + 1,
-        ...(isCurrentUser ? { userId: row.userId } : {}),
-        displayName: this.leaderboardDisplayName(row),
+        ...(identity.userId ? { userId: identity.userId } : {}),
+        displayName: identity.displayLabel,
+        avatarUrl,
         weeklyPoints: row.pts,
         isCurrentUser,
       };
@@ -142,6 +183,7 @@ export class RankingsService {
         lastName: string;
         email: string;
         showOnLeaderboard: boolean;
+        status: import('../../prisma-client').UserStatus;
       }>
     >`
       SELECT pt."userId",
@@ -149,48 +191,44 @@ export class RankingsService {
              u."firstName",
              u."lastName",
              u."email",
-             u."showOnLeaderboard"
+             u."showOnLeaderboard",
+             u.status
       FROM "PointTransaction" pt
       INNER JOIN "User" u ON u.id = pt."userId"
       WHERE pt."createdAt" >= ${bounds.weekStartsAt}
         AND pt."createdAt" <= ${bounds.weekEndsAt}
         AND pt.delta > 0
         AND u.role = 'USER'::"Role"
-      GROUP BY pt."userId", u."firstName", u."lastName", u."email", u."showOnLeaderboard"
+      GROUP BY pt."userId", u."firstName", u."lastName", u."email", u."showOnLeaderboard", u.status
       HAVING SUM(pt.delta) > 0
       ORDER BY pts DESC
       LIMIT ${capped}
     `;
 
-    const entries: AdminWeeklyLeaderboardEntry[] = rows.map((row, index) => ({
-      rank: index + 1,
-      userId: row.userId,
-      displayName: `${row.firstName} ${row.lastName}`.trim(),
-      email: row.email,
-      weeklyPoints: row.pts,
-      showOnLeaderboard: row.showOnLeaderboard,
-    }));
+    const entries: AdminWeeklyLeaderboardEntry[] = rows.map((row, index) => {
+      const identity = resolveActorIdentity(
+        {
+          firstName: row.firstName,
+          lastName: row.lastName,
+          status: row.status,
+        },
+        { actorUserId: row.userId },
+      );
+      return {
+        rank: index + 1,
+        userId: row.userId,
+        displayName: identity.displayName ?? 'Anonymous',
+        email: row.email,
+        weeklyPoints: row.pts,
+        showOnLeaderboard: row.showOnLeaderboard,
+      };
+    });
 
     return {
       weekStartsAt: bounds.weekStartsAtIso,
       weekEndsAt: bounds.weekEndsAtIso,
       entries,
     };
-  }
-
-  private leaderboardDisplayName(row: {
-    firstName: string;
-    lastName: string;
-    showOnLeaderboard: boolean;
-    userId: string;
-  }): string {
-    if (!row.showOnLeaderboard) {
-      const suffix = row.userId.slice(-4);
-      return `Citizen ·${suffix}`;
-    }
-    const first = row.firstName.trim();
-    const lastInitial = row.lastName.trim().charAt(0);
-    return lastInitial ? `${first} ${lastInitial}.` : first;
   }
 
   private async sumWeeklyPointsForUser(

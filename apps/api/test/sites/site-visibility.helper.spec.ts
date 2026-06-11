@@ -30,8 +30,8 @@ describe('siteVisibilityPrismaWhere', () => {
 describe('siteVisibilitySql', () => {
   it('uses status column for anonymous viewers', () => {
     const sql = siteVisibilitySql({
-      siteIdSql: Prisma.sql`"siteId"`,
-      siteStatusSql: Prisma.sql`"status"`,
+      siteIdSql: Prisma.sql`s."siteId"`,
+      siteStatusSql: Prisma.sql`s."status"`,
       viewerUserId: null,
     });
     const text = (sql as { strings: string[] }).strings.join('');
@@ -41,8 +41,8 @@ describe('siteVisibilitySql', () => {
 
   it('includes reporter and co-reporter clauses for authenticated viewers', () => {
     const sql = siteVisibilitySql({
-      siteIdSql: Prisma.sql`"siteId"`,
-      siteStatusSql: Prisma.sql`"status"`,
+      siteIdSql: Prisma.sql`s."siteId"`,
+      siteStatusSql: Prisma.sql`s."status"`,
       viewerUserId: 'user-abc',
     });
     const text = (sql as { strings: string[] }).strings.join('');

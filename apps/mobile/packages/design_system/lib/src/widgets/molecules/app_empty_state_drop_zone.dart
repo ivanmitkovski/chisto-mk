@@ -66,8 +66,8 @@ class _AppEmptyStateDropZoneState extends State<AppEmptyStateDropZone>
 
   @override
   Widget build(BuildContext context) {
-    final String effectiveSemantics = widget.semanticsLabel ??
-        '${widget.title}. ${widget.subtitle}';
+    final String effectiveSemantics =
+        widget.semanticsLabel ?? '${widget.title}. ${widget.subtitle}';
 
     return Semantics(
       button: true,
@@ -132,9 +132,9 @@ class _AppEmptyStateDropZoneState extends State<AppEmptyStateDropZone>
                             widget.hint!,
                             style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(
-                              color: AppColors.primaryDark,
-                              fontSize: 13,
-                            ),
+                                  color: AppColors.primaryDark,
+                                  fontSize: 13,
+                                ),
                           ),
                         ],
                       ),

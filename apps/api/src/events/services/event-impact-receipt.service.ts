@@ -5,6 +5,7 @@ import { ReportsUploadService } from '../../reports/services/reports-upload.serv
 import { ObservabilityStore } from '../../observability/observability.store';
 import { EcoEventLifecycleStatus } from '../../prisma-client';
 import { visibilityWhere } from '../util/events-query.include.shared';
+import { resolveActorIdentity } from '../../common/projections/public-identity.projection';
 import { lifecycleToMobile } from '../util/events-mobile.mapper';
 import type {
   EventImpactReceiptEvidenceItemDto,
@@ -40,6 +41,7 @@ export class EventImpactReceiptService {
         participantCount: true,
         checkedInCount: true,
         afterImageKeys: true,
+        organizerId: true,
         site: {
           select: {
             address: true,
@@ -47,7 +49,7 @@ export class EventImpactReceiptService {
           },
         },
         organizer: {
-          select: { firstName: true, lastName: true },
+          select: { firstName: true, lastName: true, status: true },
         },
         liveMetric: {
           select: { reportedBagsCollected: true, updatedAt: true },
@@ -87,9 +89,10 @@ export class EventImpactReceiptService {
     }
 
     const siteLabel = this.siteLabel(row.site);
-    const organizerName = row.organizer
-      ? `${row.organizer.firstName} ${row.organizer.lastName}`.trim()
-      : '';
+    const organizerIdentity = resolveActorIdentity(row.organizer, {
+      actorUserId: row.organizerId,
+    });
+    const organizerName = organizerIdentity.displayName ?? '';
 
     const afterKeys = row.afterImageKeys.slice(0, MAX_AFTER_IMAGES_ON_RECEIPT);
     const afterSigned = await this.uploads.signUrls(this.uploads.getPublicUrlsForKeys(afterKeys));

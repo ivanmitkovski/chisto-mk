@@ -185,15 +185,25 @@ class _AppButtonState extends State<AppButton> {
                 : AppLoadingIndicatorSize.md,
             color: _foregroundColor(busy, canPress),
           )
-        else
+        else if (widget.expand)
           Flexible(
             child: Text(
               widget.label,
               textAlign: TextAlign.center,
-              maxLines: 1,
+              maxLines: 2,
+              softWrap: true,
               overflow: TextOverflow.ellipsis,
               style: labelStyle,
             ),
+          )
+        else
+          Text(
+            widget.label,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            softWrap: true,
+            overflow: TextOverflow.visible,
+            style: labelStyle,
           ),
       ],
     );
@@ -202,8 +212,8 @@ class _AppButtonState extends State<AppButton> {
       scale: _pressed && canPress ? 0.985 : 1,
       duration: AppMotion.xFast,
       curve: AppMotion.emphasized,
-      child: SizedBox(
-        height: height,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: height),
         child: Listener(
           onPointerDown: (_) {
             if (canPress) _setPressed(true);

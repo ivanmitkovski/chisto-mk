@@ -1,4 +1,7 @@
 import { localeFromAcceptLanguage } from '../../common/utils/format-relative-time-since';
+import {
+  formatOtpCodeValidityPhrase,
+} from '../../common/i18n/duration-copy';
 import { OtpSmsPurpose } from '../types/otp-sender.interface';
 
 /** Shown in SMS; keep ASCII in templates when possible for GSM-7 single-segment delivery. */
@@ -30,29 +33,29 @@ export type BuildOtpSmsBodyInput = {
 
 /**
  * Builds the outbound SMS body. Copy is intentionally short and avoids URLs.
- * Macedonian (`mk`) uses Cyrillic (UCS-2 segments may apply); Albanian (`sq`) uses Latin.
+ * Time units use {@link formatOtpCodeValidityPhrase} (full words, native pluralization).
  */
 export function buildOtpSmsBody(input: BuildOtpSmsBodyInput): string {
   const { code, purpose, locale, expiryMinutes } = input;
-  const m = Math.max(1, Math.round(expiryMinutes));
+  const validity = formatOtpCodeValidityPhrase(locale, expiryMinutes);
 
   if (purpose === OtpSmsPurpose.PasswordReset) {
     switch (locale) {
       case 'mk':
-        return `${OTP_SMS_APP_LABEL}: ${code} е кодот за ресетирање на лозинката. Важи ${m} мин.`;
+        return `${OTP_SMS_APP_LABEL}: ${code} е кодот за ресетирање на лозинката. ${validity}`;
       case 'sq':
-        return `${OTP_SMS_APP_LABEL}: ${code} eshte kodi per rivendosjen e fjalekalimit. Skadon per ${m} min.`;
+        return `${OTP_SMS_APP_LABEL}: ${code} eshte kodi per rivendosjen e fjalekalimit. ${validity}`;
       default:
-        return `${OTP_SMS_APP_LABEL}: ${code} is your password reset code. Expires in ${m} min.`;
+        return `${OTP_SMS_APP_LABEL}: ${code} is your password reset code. ${validity}`;
     }
   }
 
   switch (locale) {
     case 'mk':
-      return `${OTP_SMS_APP_LABEL}: ${code} е кодот за верификација на телефонот. Важи ${m} мин.`;
+      return `${OTP_SMS_APP_LABEL}: ${code} е кодот за верификација на телефонот. ${validity}`;
     case 'sq':
-      return `${OTP_SMS_APP_LABEL}: ${code} eshte kodi per verifikimin e telefonit. Skadon per ${m} min.`;
+      return `${OTP_SMS_APP_LABEL}: ${code} eshte kodi per verifikimin e telefonit. ${validity}`;
     default:
-      return `${OTP_SMS_APP_LABEL}: ${code} is your verification code. Expires in ${m} min.`;
+      return `${OTP_SMS_APP_LABEL}: ${code} is your verification code. ${validity}`;
   }
 }

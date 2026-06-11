@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:chisto_infrastructure/core/debug/chisto_submit_debug_log.dart';
+import 'package:chisto_infrastructure/core/auth/session_invalidation.dart';
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
-import 'package:chisto_infrastructure/core/navigation/app_navigation.dart';
 import 'package:chisto_infrastructure/core/providers/refresh_signals_providers.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
 import 'package:feature_auth/feature_auth.dart';
@@ -23,6 +23,7 @@ import 'package:feature_reports/src/presentation/controllers/new_report_submit_e
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/semantics.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Where to go after the post-submit success dialog closes.
 sealed class NewReportPostSubmitNavigation {
@@ -101,8 +102,8 @@ abstract final class NewReportSubmitUiFlow {
     if (submitFailure != null || submitResult == null) {
       if (submitFailure is TimeoutException ||
           (submitFailure is AppError && submitFailure.code == 'TIMEOUT')) {
-        final ReportSubmitResult? recovered =
-            await controller.recoverResultIfWizardSucceeded();
+        final ReportSubmitResult? recovered = await controller
+            .recoverResultIfWizardSucceeded();
         if (recovered != null) {
           submitResult = recovered;
           submitFailure = null;
@@ -245,11 +246,13 @@ abstract final class NewReportSubmitUiFlow {
       return null;
     }
     return switch (dialogResult) {
-      NewReportWizardReportAnother() => const NewReportPostSubmitReportAnother(),
+      NewReportWizardReportAnother() =>
+        const NewReportPostSubmitReportAnother(),
       NewReportWizardViewReport(:final String reportId) =>
         NewReportPostSubmitExit(NewReportWizardViewReport(reportId)),
-      NewReportWizardViewReports() =>
-        const NewReportPostSubmitExit(NewReportWizardViewReports()),
+      NewReportWizardViewReports() => const NewReportPostSubmitExit(
+        NewReportWizardViewReports(),
+      ),
       _ => const NewReportPostSubmitExit(NewReportWizardViewReports()),
     };
   }
@@ -263,10 +266,23 @@ abstract final class NewReportSubmitUiFlow {
     if (error.code == 'PHONE_NOT_VERIFIED') {
       return handlePhoneNotVerifiedGuardError(context, error);
     }
-    if (error.code == 'UNAUTHORIZED' ||
-        error.code == 'INVALID_TOKEN_USER' ||
-        error.code == 'ACCOUNT_NOT_ACTIVE') {
-      AppNavigation.goSignInAndClearStack();
+    if (kLocationGuardErrorCodes.contains(error.code)) {
+      if (context.mounted) {
+        try {
+          final ProviderContainer container = ProviderScope.containerOf(context);
+          return handleLocationGuardErrorWithRead(
+            context,
+            container.read,
+            error,
+          );
+        } on Object {
+          return true;
+        }
+      }
+      return true;
+    }
+    if (SessionInvalidation.shouldHandle(error)) {
+      unawaited(SessionInvalidation.fromError(error));
       return true;
     }
     if (error.code == 'REPORTING_COOLDOWN') {

@@ -29,6 +29,7 @@ class GeoPosition {
     required this.latitude,
     required this.longitude,
     this.horizontalAccuracyMeters,
+    this.isMocked,
   });
 
   final double latitude;
@@ -36,6 +37,10 @@ class GeoPosition {
 
   /// Best-effort horizontal accuracy in meters when the platform provides it.
   final double? horizontalAccuracyMeters;
+
+  /// True when the platform reports a mocked/fake location (Android). Used as an
+  /// anti-spoofing signal during location verification. Null when unknown (e.g. iOS).
+  final bool? isMocked;
 }
 
 /// Abstraction over device location APIs for map, feed, and tests.
@@ -53,4 +58,9 @@ abstract class LocationService {
 
   /// Foreground-only position stream.
   Stream<GeoPosition> watchPosition({required GeoWatchOptions options});
+}
+
+/// Optional capability for platforms that cache a recent fix.
+mixin LastKnownLocationReader on LocationService {
+  Future<GeoPosition?> getLastKnownPosition();
 }

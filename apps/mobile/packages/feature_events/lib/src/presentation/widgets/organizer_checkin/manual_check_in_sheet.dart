@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:chisto_infrastructure/core/l10n/app_error_localizations.dart';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/core/providers/events_providers.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
@@ -19,7 +20,7 @@ import 'package:flutter/material.dart';
 /// below the top safe area / parent max). The host sheet uses
 /// `isScrollControlled: true` and clears [MediaQuery.viewInsets] so the keyboard
 /// does not resize the sheet or move the footer; list + field scroll instead.
-/// `useSafeArea: true` on `showModalBottomSheet` keeps layout below the notch.
+/// `useSafeArea: true` on `AppBottomSheet.show` keeps layout below the notch.
 /// Taps on the sheet dismiss the keyboard (same pattern as `KeyboardAwareFormScroll`).
 class ManualCheckInSheet extends StatefulWidget {
   const ManualCheckInSheet({super.key, required this.eventId});
@@ -142,8 +143,8 @@ class _ManualCheckInSheetState extends State<ManualCheckInSheet> {
 
   String _errorMessage(BuildContext context) {
     final Object? e = _error;
-    if (e is AppError && e.message.isNotEmpty) {
-      return e.message;
+    if (e is AppError) {
+      return localizedAppErrorMessage(context.l10n, e);
     }
     return context.l10n.eventsParticipantsLoadFailed;
   }

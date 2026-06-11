@@ -13,6 +13,9 @@ import { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { NotificationInboxService } from '../services/notification-inbox.service';
 import { NotificationDispatcherService } from '../services/notification-dispatcher.service';
 import { NotificationType } from '../../prisma-client';
+import { PrismaService } from '../../prisma/prisma.service';
+import { userLocalesByUserId } from '../../common/i18n/notification-locale.resolver';
+import { adminTestPushCopy } from '../util/notification-templates';
 import { ObservabilityStore } from '../../observability/observability.store';
 import {
   DeadLetterPageDto,
@@ -31,6 +34,7 @@ export class NotificationsAdminController {
   constructor(
     private readonly inbox: NotificationInboxService,
     private readonly dispatcher: NotificationDispatcherService,
+    private readonly prisma: PrismaService,
   ) {}
 
   @Idempotent('notifications_admin_test_push')
@@ -41,9 +45,11 @@ export class NotificationsAdminController {
   })
   @ApiOkResponse({ description: 'Test notification dispatched' })
   async testPush(@CurrentUser() user: AuthenticatedUser) {
+    const localeBy = await userLocalesByUserId(this.prisma, [user.userId]);
+    const copy = adminTestPushCopy(localeBy.get(user.userId)!);
     await this.dispatcher.dispatchToUser(user.userId, {
-      title: 'Chisto test push',
-      body: 'If you see this, push delivery is working.',
+      title: copy.title,
+      body: copy.body,
       type: NotificationType.SYSTEM,
       data: { kind: 'test_push' },
     });

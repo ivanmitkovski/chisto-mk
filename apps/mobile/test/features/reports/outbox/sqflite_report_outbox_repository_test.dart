@@ -364,7 +364,9 @@ void main() {
         title: 'Changed',
         description: 'new',
       );
-      final ReportOutboxEntry? row = await repo.getById(kReportWizardDraftRowId);
+      final ReportOutboxEntry? row = await repo.getById(
+        kReportWizardDraftRowId,
+      );
       expect(row?.state, ReportOutboxState.succeeded);
       expect(row?.reportId, 'report-99');
       expect(row?.title, 'Original');

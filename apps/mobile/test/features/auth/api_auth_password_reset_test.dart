@@ -15,12 +15,37 @@ class _PathCapturingApiClient extends ApiClient {
     : super(
         config: AppConfig.dev,
         accessToken: () => null,
-        onUnauthorized: () {},
+        onUnauthorized: (_) {},
       );
 
   String? lastPostPath;
   Object? lastPostBody;
   Map<String, dynamic>? jsonOverride;
+  Map<String, dynamic>? meJsonOverride;
+
+  @override
+  Future<ApiResponse> get(
+    String path, {
+    Map<String, String>? headers,
+    RequestCancellationToken? cancellation,
+  }) async {
+    if (path == '/auth/me') {
+      return ApiResponse(
+        statusCode: 200,
+        json: meJsonOverride ??
+            <String, dynamic>{
+              'id': 'u1',
+              'firstName': 'A',
+              'lastName': 'B',
+              'phoneNumber': '+38970123456',
+              'homeLatitude': null,
+              'homeLongitude': null,
+              'homeLocationSetAt': null,
+            },
+      );
+    }
+    return super.get(path, headers: headers, cancellation: cancellation);
+  }
 
   @override
   Future<ApiResponse> post(

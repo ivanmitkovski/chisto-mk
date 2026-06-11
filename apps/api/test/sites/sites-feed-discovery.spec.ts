@@ -74,6 +74,9 @@ function makeFeedStack(prisma: any, feedRanking?: FeedRankingService) {
     submitFeedFeedback: jest.fn(),
   } as any;
   const feedCandidates = new SitesFeedCandidatesService(prisma);
+  const siteCommentsCount = {
+    countVisibleBatch: jest.fn(async () => new Map<string, number>()),
+  };
   const feedEnrichment = new SitesFeedEnrichmentService(
     prisma,
     reportsUpload,
@@ -81,6 +84,7 @@ function makeFeedStack(prisma: any, feedRanking?: FeedRankingService) {
     feedV2,
     feedCache,
     feedPreferences,
+    siteCommentsCount as never,
   );
   const feedQuery = new SitesFeedQueryService(feedCandidates, feedEnrichment);
   const sitesFeed = new SitesFeedService(feedQuery, feedCache, feedPreferences, feedTracking);

@@ -21,6 +21,7 @@ import { CurrentUser } from '../../auth/decorators/current-user.decorator';
 import type { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { EventAnalyticsResponseDto } from '../../events/dto/event-analytics-response.dto';
 import { CleanupEventsService } from '../services/cleanup-events.service';
+import { CleanupEventsCheckInRiskSignalsService } from '../services/cleanup-events-check-in-risk-signals.service';
 import { CreateCleanupEventDto } from '../dto/create-cleanup-event.dto';
 import { PatchCleanupEventDto } from '../dto/patch-cleanup-event.dto';
 import { ListCleanupEventsQueryDto } from '../dto/list-cleanup-events-query.dto';
@@ -35,7 +36,10 @@ import { ApiStandardHttpErrorResponses } from '../../common/openapi/standard-htt
 @ApiStandardHttpErrorResponses()
 @Controller('admin/cleanup-events')
 export class CleanupEventsController {
-  constructor(private readonly cleanupEventsService: CleanupEventsService) {}
+  constructor(
+    private readonly cleanupEventsService: CleanupEventsService,
+    private readonly checkInRiskSignals: CleanupEventsCheckInRiskSignalsService,
+  ) {}
 
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard, ThrottlerGuard)
@@ -58,7 +62,7 @@ export class CleanupEventsController {
   @ApiOkResponse({ description: 'Paginated risk signals' })
   @ApiAdminCleanupEventsStandardErrors()
   listCheckInRiskSignals(@Query() query: ListCheckInRiskSignalsQueryDto) {
-    return this.cleanupEventsService.listCheckInRiskSignals(query);
+    return this.checkInRiskSignals.listCheckInRiskSignals(query);
   }
 
   @Idempotent('cleanup-events_check_in_risk_signal_patch')
@@ -76,7 +80,7 @@ export class CleanupEventsController {
     @Body() dto: PatchCheckInRiskSignalDto,
     @CurrentUser() actor: AuthenticatedUser,
   ) {
-    return this.cleanupEventsService.patchCheckInRiskSignal(id, dto, actor);
+    return this.checkInRiskSignals.patchCheckInRiskSignal(id, dto, actor);
   }
 
   @Get(':id/participants')

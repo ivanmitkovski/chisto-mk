@@ -20,7 +20,7 @@ Future<CentralFabDraftChoice> showCentralFabDraftChoiceSheet({
   );
   chistoReportsBreadcrumb('report_draft', 'central_fab_sheet_shown');
   final CentralFabDraftChoice?
-  choice = await showAppPanelBottomSheet<CentralFabDraftChoice>(
+  choice = await AppBottomSheet.show<CentralFabDraftChoice>(
     context: context,
     // Root overlay so the sheet covers the home shell bottom bar + FAB when the
     // caller context is under the tab branch navigator (e.g. Reports list +).

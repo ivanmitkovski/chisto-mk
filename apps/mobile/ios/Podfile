@@ -44,6 +44,7 @@ post_install do |installer|
     # register TCC entries (no prompt, app missing under Settings > Privacy > Microphone).
     # https://github.com/Baseflow/flutter-permission-handler/blob/main/permission_handler/README.md
     target.build_configurations.each do |config|
+      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'i386'
       config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [
         '$(inherited)',
         'PERMISSION_EVENTS=1',

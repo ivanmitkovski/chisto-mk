@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
+import { IsBoolean, IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
 
 export class VerifyOtpDto {
   @ApiProperty({
@@ -32,4 +32,13 @@ export class VerifyOtpDto {
   @IsString()
   @MaxLength(128)
   deviceId?: string;
+
+  @ApiPropertyOptional({
+    description:
+      'When true (default), issues a long-lived refresh session. When false, a shorter session-only refresh window.',
+    default: true,
+  })
+  @IsOptional()
+  @IsBoolean()
+  rememberMe?: boolean;
 }

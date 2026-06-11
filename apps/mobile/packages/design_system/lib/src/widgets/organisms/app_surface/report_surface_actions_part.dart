@@ -1,6 +1,6 @@
 part of 'app_surface_primitives.dart';
 
-enum AppActionTileVariant { standard, compact }
+enum AppActionTileVariant { standard, compact, grouped }
 
 class AppActionTile extends StatelessWidget {
   const AppActionTile({
@@ -28,31 +28,42 @@ class AppActionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final _AppSurfacePalette palette = _AppSurfacePalette.fromTone(tone);
     final bool isCompact = variant == AppActionTileVariant.compact;
-    final BorderRadius borderRadius = BorderRadius.circular(
-      isCompact ? AppSpacing.radius14 : AppSpacing.radius18,
-    );
+    final bool isGrouped = variant == AppActionTileVariant.grouped;
+    final BorderRadius borderRadius = isGrouped
+        ? BorderRadius.zero
+        : BorderRadius.circular(
+            isCompact ? AppSpacing.radius14 : AppSpacing.radius18,
+          );
+    final Color backgroundColor = isGrouped
+        ? (tone == AppSurfaceTone.neutral
+              ? AppColors.transparent
+              : palette.background)
+        : isCompact
+        ? AppColors.inputFill.withValues(alpha: 0.6)
+        : tone == AppSurfaceTone.neutral
+        ? AppColors.inputFill
+        : palette.background;
+    final BorderSide borderSide = isGrouped || isCompact
+        ? BorderSide.none
+        : BorderSide(color: palette.border.withValues(alpha: 0.85));
+    final List<BoxShadow>? elevationShadow = isGrouped || isCompact
+        ? null
+        : AppShadows.panel(Theme.of(context).colorScheme);
 
-    final Widget tile = Material(
-      color: AppColors.transparent,
+    // Paint fill + ripple on [Material] with [clipBehavior]; keep [boxShadow] on
+    // an outer [DecoratedBox] so anti-aliased corners do not show the scrim behind.
+    Widget tile = Material(
+      color: backgroundColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: borderRadius,
+        side: borderSide,
+      ),
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
         borderRadius: borderRadius,
-        child: Ink(
+        child: Padding(
           padding: const EdgeInsets.all(AppSpacing.sm),
-          decoration: BoxDecoration(
-            color: isCompact
-                ? AppColors.inputFill.withValues(alpha: 0.6)
-                : tone == AppSurfaceTone.neutral
-                ? AppColors.inputFill
-                : palette.background,
-            borderRadius: borderRadius,
-            border: isCompact
-                ? null
-                : Border.all(color: palette.border.withValues(alpha: 0.85)),
-            boxShadow: isCompact
-                ? null
-                : AppShadows.panel(Theme.of(context).colorScheme),
-          ),
           child: Row(
             crossAxisAlignment: subtitle != null
                 ? CrossAxisAlignment.start
@@ -62,20 +73,24 @@ class AppActionTile extends StatelessWidget {
                 width: isCompact ? 36 : 40,
                 height: isCompact ? 36 : 40,
                 decoration: BoxDecoration(
-                  color: isCompact
+                  color: isCompact || isGrouped
                       ? AppColors.panelBackground
                       : palette.iconBackground,
                   borderRadius: BorderRadius.circular(
-                    isCompact ? AppSpacing.radius10 : AppSpacing.radiusMd,
+                    isCompact || isGrouped
+                        ? AppSpacing.radius10
+                        : AppSpacing.radiusMd,
                   ),
-                  border: isCompact
+                  border: isCompact || isGrouped
                       ? Border.all(color: AppColors.divider, width: 1)
                       : null,
                 ),
                 child: Icon(
                   icon,
-                  size: isCompact ? 18 : 20,
-                  color: isCompact ? AppColors.textPrimary : palette.foreground,
+                  size: isCompact || isGrouped ? 18 : 20,
+                  color: isCompact || isGrouped
+                      ? AppColors.textPrimary
+                      : palette.foreground,
                 ),
               ),
               const SizedBox(width: AppSpacing.md),
@@ -116,6 +131,16 @@ class AppActionTile extends StatelessWidget {
       ),
     );
 
+    if (elevationShadow != null) {
+      tile = DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: borderRadius,
+          boxShadow: elevationShadow,
+        ),
+        child: tile,
+      );
+    }
+
     if (semanticsHint == null) {
       return tile;
     }
@@ -143,45 +168,42 @@ class AppCircleIconButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final IconData resolvedIcon = isLoading ? Icons.sync_rounded : icon;
 
-    final Widget child = Material(
-      color: AppColors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        customBorder: const CircleBorder(),
-        child: SizedBox(
-          width: 44,
-          height: 44,
-          child: Stack(
-            alignment: Alignment.center,
-            clipBehavior: Clip.none,
-            children: <Widget>[
-              if (isLoading)
-                Positioned.fill(
-                  child: IgnorePointer(
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: AppColors.primary.withValues(alpha: 0.22),
-                          width: 2,
+    final Widget child = DecoratedBox(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        boxShadow: AppShadows.panel(Theme.of(context).colorScheme),
+      ),
+      child: Material(
+        color: AppColors.inputFill,
+        shape: CircleBorder(
+          side: BorderSide(color: AppColors.divider.withValues(alpha: 0.8)),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          customBorder: const CircleBorder(),
+          child: SizedBox(
+            width: 44,
+            height: 44,
+            child: Stack(
+              alignment: Alignment.center,
+              clipBehavior: Clip.none,
+              children: <Widget>[
+                if (isLoading)
+                  Positioned.fill(
+                    child: IgnorePointer(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: AppColors.primary.withValues(alpha: 0.22),
+                            width: 2,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              Container(
-                width: 44,
-                height: 44,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: AppColors.inputFill,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: AppColors.divider.withValues(alpha: 0.8),
-                  ),
-                  boxShadow: AppShadows.panel(Theme.of(context).colorScheme),
-                ),
-                child: AnimatedSwitcher(
+                AnimatedSwitcher(
                   duration: AppMotion.fast,
                   switchInCurve: AppMotion.emphasized,
                   switchOutCurve: AppMotion.emphasized,
@@ -192,8 +214,8 @@ class AppCircleIconButton extends StatelessWidget {
                     color: AppColors.textPrimary,
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

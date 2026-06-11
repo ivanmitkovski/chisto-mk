@@ -54,7 +54,7 @@ extension _NotificationsInboxPreferences on _NotificationsScreenState {
       ),
       _SnoozeDuration(context.l10n.notificationsSnoozePermanent, null),
     ];
-    showModalBottomSheet<_SnoozeDuration>(
+    AppBottomSheet.show<_SnoozeDuration>(
       context: context,
       backgroundColor: AppColors.panelBackground,
       shape: const RoundedRectangleBorder(
@@ -198,7 +198,7 @@ extension _NotificationsInboxPreferences on _NotificationsScreenState {
 
   void _openPreferencesSheet() {
     unawaited(
-      showModalBottomSheet<void>(
+      AppBottomSheet.show<void>(
         context: context,
         useRootNavigator: true,
         isScrollControlled: true,

@@ -2,12 +2,12 @@ import type { ConfigService } from '@nestjs/config';
 
 export const AUTH_ENV_RUNTIME = 'AUTH_ENV_RUNTIME' as const;
 
-const REMEMBER_ME_SHORT_DAYS = 1;
-
 export type AuthEnvRuntime = {
   saltRounds: number;
   accessTokenTtl: number;
   refreshTokenTtlDays: number;
+  refreshTokenStandardDays: number;
+  jwtClockToleranceSeconds: number;
   maxSessionsPerUser: number;
   refreshTokenRotationGraceSeconds: number;
   shouldReturnDevCode: boolean;
@@ -28,17 +28,39 @@ export function loadAuthEnvRuntime(configService: ConfigService | null): AuthEnv
     throw new Error(`JWT_ACCESS_EXPIRES_IN must be an integer between 60 and 86400 (got: ${accessRaw})`);
   }
   const refreshRaw = cfg('JWT_REFRESH_EXPIRES_DAYS');
-  const refreshTokenTtlDays = refreshRaw ? Number(refreshRaw) : 30;
+  const refreshTokenTtlDays = refreshRaw ? Number(refreshRaw) : 90;
   if (!Number.isFinite(refreshTokenTtlDays) || refreshTokenTtlDays < 1 || refreshTokenTtlDays > 365) {
     throw new Error(`JWT_REFRESH_EXPIRES_DAYS must be an integer between 1 and 365 (got: ${refreshRaw})`);
   }
+  const standardRaw = cfg('JWT_REFRESH_STANDARD_DAYS');
+  const refreshTokenStandardDays = standardRaw ? Number(standardRaw) : 7;
+  if (
+    !Number.isFinite(refreshTokenStandardDays) ||
+    refreshTokenStandardDays < 1 ||
+    refreshTokenStandardDays > 365
+  ) {
+    throw new Error(
+      `JWT_REFRESH_STANDARD_DAYS must be an integer between 1 and 365 (got: ${standardRaw})`,
+    );
+  }
+  const clockToleranceRaw = cfg('JWT_CLOCK_TOLERANCE_SECONDS');
+  const jwtClockToleranceSeconds = clockToleranceRaw ? Number(clockToleranceRaw) : 30;
+  if (
+    !Number.isFinite(jwtClockToleranceSeconds) ||
+    jwtClockToleranceSeconds < 0 ||
+    jwtClockToleranceSeconds > 300
+  ) {
+    throw new Error(
+      `JWT_CLOCK_TOLERANCE_SECONDS must be an integer between 0 and 300 (got: ${clockToleranceRaw})`,
+    );
+  }
   const maxSessionsRaw = cfg('MAX_SESSIONS_PER_USER');
-  const maxSessionsPerUser = maxSessionsRaw ? Number(maxSessionsRaw) : 10;
+  const maxSessionsPerUser = maxSessionsRaw ? Number(maxSessionsRaw) : 20;
   if (!Number.isFinite(maxSessionsPerUser) || maxSessionsPerUser < 1 || maxSessionsPerUser > 100) {
     throw new Error(`MAX_SESSIONS_PER_USER must be an integer between 1 and 100 (got: ${maxSessionsRaw})`);
   }
   const graceRaw = cfg('REFRESH_TOKEN_ROTATION_GRACE_SECONDS');
-  const refreshTokenRotationGraceSeconds = graceRaw ? Number(graceRaw) : 60;
+  const refreshTokenRotationGraceSeconds = graceRaw ? Number(graceRaw) : 120;
   if (
     !Number.isFinite(refreshTokenRotationGraceSeconds) ||
     refreshTokenRotationGraceSeconds < 0 ||
@@ -52,10 +74,10 @@ export function loadAuthEnvRuntime(configService: ConfigService | null): AuthEnv
     saltRounds: 12,
     accessTokenTtl,
     refreshTokenTtlDays,
+    refreshTokenStandardDays,
+    jwtClockToleranceSeconds,
     maxSessionsPerUser,
     refreshTokenRotationGraceSeconds,
     shouldReturnDevCode,
   };
 }
-
-export { REMEMBER_ME_SHORT_DAYS };

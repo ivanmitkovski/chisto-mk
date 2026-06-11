@@ -10,7 +10,7 @@ class _StubApiClient extends ApiClient {
     : super(
         config: AppConfig.dev,
         accessToken: () => null,
-        onUnauthorized: () {},
+        onUnauthorized: (_) {},
       );
 
   ApiResponse? nextGet;
@@ -66,7 +66,7 @@ void main() {
             ],
           },
         ],
-        'meta': <String, dynamic>{'page': 1, 'limit': 20, 'total': 1},
+        'meta': <String, dynamic>{'page': 1, 'limit': 20, 'total': 1, 'engagementTotal': 2},
       },
     );
 
@@ -78,6 +78,7 @@ void main() {
     expect(r.items.first.replies.first.id, 'reply-1');
     expect(r.items.first.replies.first.isLikedByMe, isTrue);
     expect(r.total, 1);
+    expect(r.engagementTotal, 2);
   });
 
   test('getSiteUpvotes maps hasMore from meta', () async {

@@ -9,7 +9,7 @@ class _RecordingApiClient extends ApiClient {
     : super(
         config: AppConfig.dev,
         accessToken: () => 'token',
-        onUnauthorized: () {},
+        onUnauthorized: (_) {},
       );
 
   final List<(String method, String path, Object? body)> calls =

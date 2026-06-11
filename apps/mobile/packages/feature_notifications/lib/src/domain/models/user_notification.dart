@@ -126,6 +126,7 @@ class UserNotification {
   }
 
   String? get targetSiteId => data?['siteId'] as String?;
+  String? get targetReportId => data?['reportId'] as String?;
   String? get targetTab => data?['targetTab'] as String?;
   String? get targetAction => data?['targetAction'] as String?;
   String? get targetEventId => data?['eventId'] as String?;

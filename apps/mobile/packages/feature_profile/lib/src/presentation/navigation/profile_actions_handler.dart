@@ -100,7 +100,7 @@ abstract final class ProfileActionsHandler {
       AppNavigation.goSignInAndClearStack();
     } on AppError catch (e) {
       if (!context.mounted) return;
-      AppSnack.show(context, message: e.message, type: AppSnackType.error);
+      AppSnack.failure(context, error: e);
     } catch (_) {
       if (!context.mounted) return;
       AppSnack.show(
@@ -147,7 +147,7 @@ abstract final class ProfileActionsHandler {
       AppNavigation.goSignInAndClearStack();
     } on AppError catch (e) {
       if (!context.mounted) return;
-      AppSnack.show(context, message: e.message, type: AppSnackType.error);
+      AppSnack.failure(context, error: e);
     } catch (_) {
       if (!context.mounted) return;
       AppSnack.show(

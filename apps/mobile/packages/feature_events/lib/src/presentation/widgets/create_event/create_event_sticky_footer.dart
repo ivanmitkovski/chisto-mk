@@ -1,15 +1,13 @@
 import 'package:chisto_infrastructure/shared/widgets/atoms/primary_button.dart';
+import 'package:design_system/design_system.dart';
 import 'package:feature_profile/feature_profile.dart';
 import 'package:flutter/material.dart';
 
-/// Pinned bottom bar for create-event: primary CTA.
+/// Pinned bottom bar for create-event: primary CTA via [Scaffold.bottomNavigationBar].
 ///
-/// Extra bottom inset on the form sliver so the last field can scroll above the
-/// sticky bar (~footer height + small buffer). Kept modest to avoid a large empty
-/// band above the CTA when the form is short. The create-event scaffold uses
-/// [Scaffold.resizeToAvoidBottomInset] false and [ProfilePrimaryActionBar] with
-/// [ProfilePrimaryActionBar.padForKeyboard] false so the CTA stays pinned to the
-/// bottom safe area (the keyboard may cover it; users scroll the form to focus).
+/// With [Scaffold.resizeToAvoidBottomInset] enabled, the scaffold insets the
+/// layout once and this bar stays at the bottom of the viewport. The form adds
+/// [scrollBottomReserve] so fields can scroll above the footer.
 class CreateEventStickyFooter extends StatelessWidget {
   const CreateEventStickyFooter({
     super.key,
@@ -22,8 +20,10 @@ class CreateEventStickyFooter extends StatelessWidget {
   final String submitLabel;
   final VoidCallback onSubmit;
 
-  /// Extra bottom padding for [CustomScrollView] / form content.
-  static const double scrollBottomReserve = 88;
+  /// Space reserved at the bottom of the form scroll for this footer
+  /// (md + button + lg padding, with safe-area headroom).
+  static const double scrollBottomReserve =
+      AppSpacing.md + 56 + AppSpacing.lg + AppSpacing.lg;
 
   @override
   Widget build(BuildContext context) {

@@ -8,7 +8,7 @@ extension _ChatInputBarAttachments on _ChatInputBarState {
     if (_mediaBlockedByNetwork()) {
       return;
     }
-    showModalBottomSheet<void>(
+    AppBottomSheet.show<void>(
       context: context,
       backgroundColor: AppColors.panelBackground,
       shape: const RoundedRectangleBorder(

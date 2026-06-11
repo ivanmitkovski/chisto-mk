@@ -39,6 +39,9 @@ export class SiteListItemResponseDto {
   @ApiPropertyOptional({ type: [String] })
   latestReportMediaUrls?: string[];
 
+  @ApiPropertyOptional({ type: [String], description: 'Canonical hero image from earliest approved report with media' })
+  heroMediaUrls?: string[];
+
   @ApiPropertyOptional({ nullable: true })
   latestReportReporterName?: string | null;
 

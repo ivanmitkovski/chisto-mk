@@ -4,8 +4,7 @@ import 'package:chisto_infrastructure/core/errors/app_error.dart';
 enum ReportOutboxErrorKind { terminal, cooldown, retryable }
 
 ReportOutboxErrorKind classifyReportSubmitError(AppError e) {
-  if (e.code == 'REPORTING_COOLDOWN' ||
-      e.code == 'DUPLICATE_SUBMIT_INFLIGHT') {
+  if (e.code == 'REPORTING_COOLDOWN' || e.code == 'DUPLICATE_SUBMIT_INFLIGHT') {
     return ReportOutboxErrorKind.cooldown;
   }
   if (e.retryable && e.code == 'CONFLICT') {
@@ -29,7 +28,8 @@ ReportOutboxErrorKind classifyReportSubmitError(AppError e) {
 }
 
 int? cooldownUntilMsFromAppError(AppError e) {
-  final bool usesRetryAfter = e.code == 'REPORTING_COOLDOWN' ||
+  final bool usesRetryAfter =
+      e.code == 'REPORTING_COOLDOWN' ||
       e.code == 'DUPLICATE_SUBMIT_INFLIGHT' ||
       (e.retryable && e.code == 'CONFLICT');
   if (!usesRetryAfter) {

@@ -171,7 +171,10 @@ class ReportDraftRepository {
         return const ReportDraftLoadResult.empty();
       }
       if (isReportWizardDraftTerminalSubmit(raw)) {
-        chistoReportsBreadcrumb('report_draft', 'restore_clear_terminal_submit');
+        chistoReportsBreadcrumb(
+          'report_draft',
+          'restore_clear_terminal_submit',
+        );
         await clear();
         return const ReportDraftLoadResult.empty();
       }

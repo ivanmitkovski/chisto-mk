@@ -1,5 +1,6 @@
 import 'package:chisto_infrastructure/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:feature_profile/src/presentation/providers/profile_app_version_provider.dart';
 import 'package:feature_profile/src/presentation/widgets/profile_settings_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,9 +17,19 @@ void main() {
     await tester.binding.setSurfaceSize(const Size(390, 720));
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
+    final ProviderContainer container = ProviderContainer(
+      parent: AppBootstrap.instance.providerContainer,
+      overrides: <Override>[
+        profileAppVersionProvider.overrideWith(
+          (Ref ref) => Future<String>.value('1.0.0'),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
     await tester.pumpWidget(
       UncontrolledProviderScope(
-        container: AppBootstrap.instance.providerContainer,
+        container: container,
         child: const MaterialApp(
           debugShowCheckedModeBanner: false,
           locale: Locale('en'),
@@ -46,7 +57,7 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     await expectLater(
       find.byType(ProfileSettingsSection),

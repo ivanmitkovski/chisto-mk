@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
   Report,
   ReportSideEffectKind,
@@ -15,6 +16,9 @@ import type { ModerationStatusSideEffectPayload } from '../side-effects/report-s
 import { ALLOWED_REPORT_STATUS_TRANSITIONS } from '../util/reports-moderation-transitions';
 import { SiteHistoryWriterService } from '../../sites/history/site-history-writer.service';
 import { SiteHistoryReportRecorderService } from '../../sites/history/site-history-report-recorder.service';
+import { SiteHeroImageService, type RecomputeSiteHeroResult } from '../../sites/services/site-hero-image.service';
+import { emitGamificationPointsCredited } from '../../gamification/util/gamification-credit-events.util';
+import type { EcoEventPointsCreditResult } from '../../gamification/services/eco-event-points.service';
 
 @Injectable()
 export class ReportsModerationStatusService {
@@ -26,6 +30,8 @@ export class ReportsModerationStatusService {
     private readonly reportSideEffectProcessor: ReportSideEffectProcessorService,
     private readonly siteHistoryWriter: SiteHistoryWriterService,
     private readonly siteHistoryReportRecorder: SiteHistoryReportRecorderService,
+    private readonly siteHeroImage: SiteHeroImageService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async updateStatus(
@@ -73,6 +79,7 @@ export class ReportsModerationStatusService {
     const now = new Date();
 
     const updatedResult = await this.prisma.$transaction(async (tx) => {
+      let approvalCredit: { userId: string; credit: EcoEventPointsCreditResult } | null = null;
       const updatedReport = await tx.report.update({
         where: { id: reportId },
         data: {
@@ -84,7 +91,7 @@ export class ReportsModerationStatusService {
       });
 
       if (dto.status === 'APPROVED') {
-        await this.reportApprovalPoints.creditApprovalIfEligible(tx, {
+        const pointsResult = await this.reportApprovalPoints.creditApprovalIfEligible(tx, {
           report: {
             id: updatedReport.id,
             reporterId: updatedReport.reporterId,
@@ -95,6 +102,12 @@ export class ReportsModerationStatusService {
           },
           now,
         });
+        if (updatedReport.reporterId != null && pointsResult.credit.granted > 0) {
+          approvalCredit = {
+            userId: updatedReport.reporterId,
+            credit: pointsResult.credit,
+          };
+        }
       }
 
       if (dto.status === 'DELETED' && report.status === 'APPROVED' && report.reporterId) {
@@ -165,7 +178,14 @@ export class ReportsModerationStatusService {
         );
       }
 
-      const coReporterUserIds = report.coReporters.map((c) => c.userId);
+      let heroResult: RecomputeSiteHeroResult | null = null;
+      if (dto.status === 'APPROVED' || dto.status === 'DELETED') {
+        heroResult = await this.siteHeroImage.recomputeSiteHero(tx, updatedReport.siteId);
+      }
+
+      const coReporterUserIds = report.coReporters
+        .map((c) => c.userId)
+        .filter((id): id is string => id != null);
       const moderationPayload: ModerationStatusSideEffectPayload = {
         moderatorUserId: moderator.userId,
         reportId,
@@ -195,10 +215,21 @@ export class ReportsModerationStatusService {
         },
       });
 
-      return { updatedReport, siteStatusEvent, effectId: effect.id };
+      return { updatedReport, siteStatusEvent, effectId: effect.id, heroResult, approvalCredit };
     });
     const updated = updatedResult.updatedReport;
     await this.reportSideEffectProcessor.processModerationStatusPost(updatedResult.effectId);
+    const approvalCredit = updatedResult.approvalCredit;
+    if (approvalCredit != null) {
+      emitGamificationPointsCredited(
+        this.eventEmitter,
+        approvalCredit.userId,
+        approvalCredit.credit,
+      );
+    }
+    if (updatedResult.heroResult?.changed) {
+      this.siteHeroImage.emitIfChanged(updated.siteId, updatedResult.heroResult);
+    }
     this.siteHistoryWriter.emitHistoryAppended(updated.siteId, updated.id);
     this.logger.log({
       msg: 'report_moderation_status_updated',

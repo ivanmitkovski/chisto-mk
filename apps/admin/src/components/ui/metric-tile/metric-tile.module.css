@@ -59,7 +59,7 @@
 }
 
 .tone_success {
-  color: var(--color-status-success-fg);
+  color: var(--color-success-fg);
 }
 
 .tone_warning {

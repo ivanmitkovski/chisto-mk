@@ -22,6 +22,7 @@ export class SiteUpvotesRepository {
             firstName: true,
             lastName: true,
             avatarObjectKey: true,
+            status: true,
           },
         },
       },

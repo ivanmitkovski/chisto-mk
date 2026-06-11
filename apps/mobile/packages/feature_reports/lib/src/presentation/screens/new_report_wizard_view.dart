@@ -258,61 +258,71 @@ class NewReportWizardView extends StatelessWidget {
       body: GestureDetector(
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         behavior: HitTestBehavior.translucent,
-        child: SafeArea(
-          bottom: false,
-          child: Column(
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.lg,
-                  AppSpacing.xs,
-                  AppSpacing.lg,
-                  0,
-                ),
-                child: NewReportFlowHeader(
-                  title:
-                      entryLabel ??
-                      (hasInitialPhoto
-                          ? context.l10n.reportEntryLabelCamera
-                          : context.l10n.reportEntryLabelGuided),
-                  currentStage: s.currentStage,
-                  currentStageIndex: c.currentStageIndex,
-                  isStageComplete: isStageComplete,
-                  canNavigateToStage: canNavigateToStage,
-                  onBackFromEvidence: () => Navigator.of(context).maybePop(),
-                  onBackToPreviousStage: () =>
-                      onGoToStage(ReportStage.values[c.currentStageIndex - 1]),
-                  onTapStage: onGoToStage,
-                  showDraftRestoredChip: showDraftRestoredChip,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Expanded(
-                child: AnimatedSwitcher(
-                  duration: AppMotion.medium,
-                  switchInCurve: AppMotion.emphasized,
-                  switchOutCurve: AppMotion.emphasized,
-                  transitionBuilder:
-                      (Widget child, Animation<double> animation) {
-                        final Animation<Offset> slide = Tween<Offset>(
-                          begin: const Offset(
-                            ReportTokens.wizardStageSlideOffset,
-                            0,
-                          ),
-                          end: Offset.zero,
-                        ).animate(animation);
-                        return FadeTransition(
-                          opacity: animation,
-                          child: SlideTransition(position: slide, child: child),
-                        );
-                      },
-                  child: KeyedSubtree(
-                    key: ValueKey<ReportStage>(s.currentStage),
-                    child: buildCurrentStage(),
+        child: EdgeSwipeBack(
+          enabled: !s.submitting,
+          onSwipeBack: () {
+            if (c.currentStageIndex == 0) {
+              Navigator.of(context).maybePop();
+              return;
+            }
+            onGoToStage(ReportStage.values[c.currentStageIndex - 1]);
+          },
+          child: SafeArea(
+            bottom: false,
+            child: Column(
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.lg,
+                    AppSpacing.xs,
+                    AppSpacing.lg,
+                    0,
+                  ),
+                  child: NewReportFlowHeader(
+                    title:
+                        entryLabel ??
+                        (hasInitialPhoto
+                            ? context.l10n.reportEntryLabelCamera
+                            : context.l10n.reportEntryLabelGuided),
+                    currentStage: s.currentStage,
+                    currentStageIndex: c.currentStageIndex,
+                    isStageComplete: isStageComplete,
+                    canNavigateToStage: canNavigateToStage,
+                    onBackFromEvidence: () => Navigator.of(context).maybePop(),
+                    onBackToPreviousStage: () =>
+                        onGoToStage(ReportStage.values[c.currentStageIndex - 1]),
+                    onTapStage: onGoToStage,
+                    showDraftRestoredChip: showDraftRestoredChip,
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(height: AppSpacing.sm),
+                Expanded(
+                  child: AnimatedSwitcher(
+                    duration: AppMotion.medium,
+                    switchInCurve: AppMotion.emphasized,
+                    switchOutCurve: AppMotion.emphasized,
+                    transitionBuilder:
+                        (Widget child, Animation<double> animation) {
+                          final Animation<Offset> slide = Tween<Offset>(
+                            begin: const Offset(
+                              ReportTokens.wizardStageSlideOffset,
+                              0,
+                            ),
+                            end: Offset.zero,
+                          ).animate(animation);
+                          return FadeTransition(
+                            opacity: animation,
+                            child: SlideTransition(position: slide, child: child),
+                          );
+                        },
+                    child: KeyedSubtree(
+                      key: ValueKey<ReportStage>(s.currentStage),
+                      child: buildCurrentStage(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

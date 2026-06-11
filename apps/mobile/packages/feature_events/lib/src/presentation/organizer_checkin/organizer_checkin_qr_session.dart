@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:chisto_infrastructure/core/l10n/app_error_localizations.dart';
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
 import 'package:feature_events/src/domain/models/check_in_payload.dart';
 import 'package:feature_events/src/domain/repositories/check_in_repository.dart';
@@ -115,11 +116,7 @@ class OrganizerCheckInQrSessionController {
       if (isMounted()) {
         final String msg = e.code == 'TOO_MANY_REQUESTS'
             ? l10n.eventsOrganizerQrRateLimited
-            : (e.code == 'UNAUTHORIZED'
-                  ? l10n.errorUserUnauthorized
-                  : (e.message.isNotEmpty
-                        ? e.message
-                        : l10n.eventsOrganizerQrLoadFailedGeneric));
+            : localizedAppErrorMessage(l10n, e);
         qrLoadError = msg;
         if (_remainingPayloadMs <= 0) {
           payload = null;

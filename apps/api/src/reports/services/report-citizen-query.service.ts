@@ -14,6 +14,7 @@ import {
   listLocationLabel,
   optionalReportNarrative,
 } from '../util/report-copy.helpers';
+import { resolveActorIdentity } from '../../common/projections/public-identity.projection';
 
 @Injectable()
 export class ReportCitizenQueryService {
@@ -183,13 +184,13 @@ export class ReportCitizenQueryService {
           },
         },
         reporter: {
-          select: { firstName: true, lastName: true },
+          select: { firstName: true, lastName: true, status: true },
         },
         coReporters: {
           select: {
             userId: true,
             user: {
-              select: { firstName: true, lastName: true },
+              select: { firstName: true, lastName: true, status: true },
             },
           },
         },
@@ -214,14 +215,17 @@ export class ReportCitizenQueryService {
 
     const viewerRole: UserReportViewerRole = isPrimaryReporter ? 'primary' : 'co_reporter';
 
-    const reporterName = report.reporter
-      ? `${report.reporter.firstName} ${report.reporter.lastName}`.trim()
-      : null;
+    const reporterIdentity = resolveActorIdentity(report.reporter, {
+      actorUserId: report.reporterId,
+    });
+    const reporterName = reporterIdentity.isDeleted ? null : reporterIdentity.displayName;
+    const reporterIsDeleted = reporterIdentity.isDeleted;
     const coReporterNames = report.coReporters
-      .map((cr) =>
-        cr.user ? `${cr.user.firstName} ${cr.user.lastName}`.trim() : null,
-      )
-      .filter((n): n is string => !!n);
+      .map((cr) => {
+        const identity = resolveActorIdentity(cr.user, { actorUserId: cr.userId });
+        return identity.isDeleted ? null : identity.displayName;
+      })
+      .filter((n): n is string => n != null && n.length > 0);
 
     const mediaUrls = await this.reportsUploadService.signUrls(report.mediaUrls);
     let pointsAwarded = 0;
@@ -249,6 +253,7 @@ export class ReportCitizenQueryService {
         address: report.site.address,
       },
       reporterName,
+      reporterIsDeleted,
       coReporterNames,
       location: listLocationLabel(report.site, report.description),
       pointsAwarded,
