@@ -2,6 +2,7 @@ import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
 import 'package:design_system/design_system.dart';
 import 'package:feature_events/src/domain/models/eco_event.dart';
+import 'package:feature_events/src/presentation/event_ui_mappers.dart';
 import 'package:feature_events/src/presentation/utils/events_localized_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';

@@ -21,8 +21,9 @@ void main() {
     });
 
     test('queues deep link for replay after sign-in', () {
+      const String eventId = '550e8400-e29b-41d4-a716-446655440000';
       final Uri uri = Uri.parse(
-        'https://chisto.mk/app/events/detail/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+        'https://chisto.mk/app/events/detail/$eventId',
       );
       DeepLinkRouter.handleUri(router, uri, isAuthenticated: false);
       expect(DeepLinkRouter.pendingAuthenticatedUriForTest, uri);
@@ -31,17 +32,16 @@ void main() {
       DeepLinkRouter.replayPendingAuthenticatedRoute(router);
       expect(
         router.routeInformationProvider.value.uri.path,
-        '${AppRoutes.eventsDetail}/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+        '${AppRoutes.eventsDetail}/$eventId',
       );
       expect(DeepLinkRouter.pendingAuthenticatedUriForTest, isNull);
     });
 
     test('routes unauthenticated event-detail to sign-in', () {
+      const String eventId = '550e8400-e29b-41d4-a716-446655440000';
       final bool handled = DeepLinkRouter.handleUri(
         router,
-        Uri.parse(
-          'https://chisto.mk/app/events/detail/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
-        ),
+        Uri.parse('https://chisto.mk/app/events/detail/$eventId'),
         isAuthenticated: false,
       );
       expect(handled, isTrue);

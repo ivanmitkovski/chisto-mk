@@ -62,7 +62,7 @@ void main() {
         l10n,
         const AppError(code: 'UNKNOWN', message: 'Server said'),
       ),
-      'Server said',
+      l10n.errorUserUnknown,
     );
   });
 }

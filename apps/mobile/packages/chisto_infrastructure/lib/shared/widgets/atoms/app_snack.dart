@@ -408,18 +408,23 @@ class _AppSnackOverlay extends StatefulWidget {
 }
 
 class _AppSnackOverlayState extends State<_AppSnackOverlay> {
+  Timer? _autoDismissTimer;
+
   @override
   void initState() {
     super.initState();
-    Future<void>.delayed(widget.duration, () {
-      if (!mounted) return;
-      if (Navigator.of(context).canPop()) {
-        Navigator.of(context).pop();
-      }
-    });
+    _autoDismissTimer = Timer(widget.duration, _dismiss);
+  }
+
+  @override
+  void dispose() {
+    _autoDismissTimer?.cancel();
+    super.dispose();
   }
 
   void _dismiss() {
+    _autoDismissTimer?.cancel();
+    _autoDismissTimer = null;
     if (mounted && Navigator.of(context).canPop()) {
       Navigator.of(context).pop();
     }

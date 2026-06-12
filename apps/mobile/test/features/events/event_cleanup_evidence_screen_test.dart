@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/providers/events_providers.dart';
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations_en.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_back_button.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/primary_button.dart';
 import 'package:feature_events/src/domain/models/eco_event.dart';
@@ -133,6 +134,7 @@ void main() {
   testWidgets('save failure then retry succeeds', (WidgetTester tester) async {
     const String assetPhoto =
         'assets/images/references/onboarding_reference.png';
+    final AppLocalizationsEn l10n = AppLocalizationsEn();
     int attempts = 0;
 
     await tester.pumpWidget(
@@ -168,8 +170,8 @@ void main() {
     await tester.tapAt(tester.getCenter(saveKey));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 800));
-    expect(find.text('Upload failed'), findsOneWidget);
-    await tester.tap(find.text('Try again'));
+    expect(find.text(l10n.errorUserServer), findsOneWidget);
+    await tester.tap(find.text(l10n.commonTryAgain));
     await tester.pumpAndSettle();
     expect(saveKey, findsOneWidget);
     final PrimaryButton saveBtn = tester.widget<PrimaryButton>(saveKey);
