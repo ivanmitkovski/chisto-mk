@@ -213,7 +213,9 @@ class AppSnack {
         ),
         padding: EdgeInsets.zero,
         content: DefaultTextStyle.merge(
-          style: const TextStyle(decoration: TextDecoration.none),
+          style: Theme.of(hostContext).textTheme.bodyMedium!.copyWith(
+            decoration: TextDecoration.none,
+          ),
           child: _AppSnackCard(
             message: message,
             type: type,

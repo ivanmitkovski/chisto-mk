@@ -1,3 +1,5 @@
+import 'package:design_system/src/theme/app_colors.dart';
+import 'package:design_system/src/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -47,8 +49,8 @@ class AuthOtpHiddenField extends StatelessWidget {
           autocorrect: false,
           enableSuggestions: false,
           textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: Colors.transparent,
+          style: AppTypography.textTheme.bodyMedium!.copyWith(
+            color: AppColors.transparent,
             fontSize: 1,
             height: 1,
           ),

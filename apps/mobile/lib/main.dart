@@ -211,31 +211,28 @@ class _BootstrapErrorApp extends StatelessWidget {
                     color: AppColors.textPrimary,
                   ),
                   const SizedBox(height: 16),
-                  const Text(
+                  AppText(
                     'Could not start Chisto',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
-                    ),
+                    color: AppColors.textPrimary,
+                    styleBuilder: (TextTheme theme) =>
+                        AppTypography.sectionHeader(theme).copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
+                  const AppText.meta(
                     'Please close the app and open it again. If the problem '
                     'continues, reinstall the app or contact support.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 14, color: AppColors.textPrimary),
+                    color: AppColors.textPrimary,
                   ),
                   if (!kReleaseMode) ...<Widget>[
                     const SizedBox(height: 16),
-                    Text(
+                    AppText.caption(
                       '$error',
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textPrimary,
-                      ),
+                      color: AppColors.textPrimary,
                     ),
                   ],
                 ],
