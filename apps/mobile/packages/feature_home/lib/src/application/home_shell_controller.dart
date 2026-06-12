@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:chisto_infrastructure/core/providers/root_container.dart';
-import 'package:feature_auth/src/presentation/utils/auth_guard_ui.dart';
+import 'package:feature_auth/feature_auth.dart';
 import 'package:feature_events/feature_events.dart';
 import 'package:feature_home/src/application/home_shell_state.dart';
 import 'package:feature_home/src/presentation/utils/open_report_linked_pollution_site.dart';

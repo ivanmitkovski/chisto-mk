@@ -11,7 +11,7 @@ import 'package:chisto_infrastructure/core/widgets/state_rebuild_mixin.dart';
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
 import 'package:design_system/design_system.dart';
-import 'package:feature_auth/src/presentation/utils/auth_guard_ui.dart';
+import 'package:feature_auth/feature_auth.dart';
 import 'package:feature_reports/src/data/report_detail_cache.dart';
 import 'package:feature_reports/src/data/report_image_prefetch_coordinator.dart';
 import 'package:feature_reports/src/data/reports_realtime/reports_owner_event.dart';
@@ -423,7 +423,10 @@ class _ReportsListScreenState extends ConsumerState<ReportsListScreen>
           ),
           if (_isOpeningReportDetail)
             const Positioned.fill(
-              child: ModalBarrier(dismissible: false, color: Colors.transparent),
+              child: ModalBarrier(
+                dismissible: false,
+                color: AppColors.transparent,
+              ),
             ),
         ],
       ),

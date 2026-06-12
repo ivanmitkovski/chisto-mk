@@ -11,7 +11,6 @@ import 'package:chisto_infrastructure/shared/current_user.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
 import 'package:feature_events/feature_events.dart';
 import 'package:feature_home/feature_home.dart';
-import 'package:feature_home/src/presentation/navigation/feed_shell_route_extras.dart';
 import 'package:feature_notifications/src/data/event_chat_open_guard.dart';
 import 'package:feature_notifications/src/data/notification_inbox_actions.dart';
 import 'package:feature_notifications/src/data/notification_navigation_origin.dart';

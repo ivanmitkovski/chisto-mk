@@ -274,12 +274,13 @@ extension EventCleanupEvidenceBody on _EventCleanupEvidenceScreenState {
 
   void _showDiscardDialog(BuildContext context) {
     unawaited(() async {
+      final AppLocalizations l10n = context.l10n;
       final bool? discard = await AppConfirmDialog.show(
         context: context,
-        title: context.l10n.eventsDiscardChangesTitle,
-        body: context.l10n.eventsDiscardChangesBody,
-        confirmLabel: context.l10n.commonDiscard,
-        cancelLabel: context.l10n.commonKeepEditing,
+        title: l10n.eventsDiscardChangesTitle,
+        body: l10n.eventsDiscardChangesBody,
+        confirmLabel: l10n.commonDiscard,
+        cancelLabel: l10n.commonKeepEditing,
         isDestructive: true,
       );
       if ((discard ?? false) && context.mounted) {

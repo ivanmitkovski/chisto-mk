@@ -401,21 +401,26 @@ class _EditEventSheetState extends State<EditEventSheet>
     if (!_isDirty) {
       return true;
     }
+    final AppLocalizations l10n = context.l10n;
     final bool? discard = await AppConfirmDialog.show(
       context: context,
-      title: context.l10n.editEventDiscardTitle,
-      body: context.l10n.editEventDiscardMessage,
-      confirmLabel: context.l10n.editEventDiscardConfirm,
-      cancelLabel: context.l10n.editEventDiscardKeepEditing,
+      title: l10n.editEventDiscardTitle,
+      body: l10n.editEventDiscardMessage,
+      confirmLabel: l10n.editEventDiscardConfirm,
+      cancelLabel: l10n.editEventDiscardKeepEditing,
       isDestructive: true,
     );
     return discard ?? false;
   }
 
   Future<void> _requestClose() async {
-    if (await confirmDismiss() && mounted) {
-      Navigator.of(context, rootNavigator: true).pop();
+    if (!await confirmDismiss()) {
+      return;
     }
+    if (!mounted) {
+      return;
+    }
+    Navigator.of(context, rootNavigator: true).pop();
   }
 
   @override

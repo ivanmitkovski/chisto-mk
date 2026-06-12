@@ -94,9 +94,8 @@ class _BannerBody extends StatelessWidget {
                         maxLines: 4,
                         softWrap: true,
                         overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          height: 1.35,
-                          color: AppColors.textPrimary,
+                        style: AppTypographySurfaces.reportsOutboxBannerBody(
+                          Theme.of(context).textTheme,
                         ),
                       ),
                     ),

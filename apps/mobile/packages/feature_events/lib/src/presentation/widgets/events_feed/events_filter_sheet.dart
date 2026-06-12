@@ -11,6 +11,7 @@ import 'package:feature_events/src/domain/models/eco_event_search_params.dart';
 import 'package:feature_events/src/domain/models/events_list_page_snapshot.dart';
 import 'package:feature_events/src/domain/repositories/events_repository.dart';
 import 'package:feature_events/src/presentation/utils/event_calendar_date_format.dart';
+import 'package:feature_events/src/presentation/event_ui_mappers.dart';
 import 'package:feature_events/src/presentation/utils/events_localized_strings.dart';
 import 'package:feature_events/src/presentation/widgets/date_picker_sheet.dart';
 import 'package:feature_events/src/presentation/widgets/events_feed/events_filter_preview_controller.dart';
@@ -230,11 +231,12 @@ class _EventsFilterSheetState extends State<EventsFilterSheet> {
               ? _dateTo
               : kEventsFilterMaxDate)
         : kEventsFilterMaxDate;
+    final AppLocalizations l10n = context.l10n;
     final DateTime? picked = await DatePickerSheet.show(
       context,
       title: isFrom
-          ? context.l10n.eventsFilterSheetDateFrom
-          : context.l10n.eventsFilterSheetDateTo,
+          ? l10n.eventsFilterSheetDateFrom
+          : l10n.eventsFilterSheetDateTo,
       initialDate: initial,
       minimumDate: minimumDate,
       maximumDate: maximumDate,

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/l10n/app_error_localizations.dart';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
 import 'package:chisto_infrastructure/core/l10n/duplicate_event_conflict.dart';
 import 'package:chisto_infrastructure/core/network/connectivity_gate.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
@@ -102,11 +103,12 @@ class _ExtendEventEndSheetState extends State<ExtendEventEndSheet> {
     if (!mounted) {
       return;
     }
+    final AppLocalizations l10n = context.l10n;
     await AppConfirmDialog.showInfo(
       context: context,
-      title: context.l10n.editEventDuplicateSubmitTitle,
-      body: context.l10n.editEventDuplicateSubmitBody(dup.title, when),
-      confirmLabel: context.l10n.commonGotIt,
+      title: l10n.editEventDuplicateSubmitTitle,
+      body: l10n.editEventDuplicateSubmitBody(dup.title, when),
+      confirmLabel: l10n.commonGotIt,
     );
   }
 
@@ -247,15 +249,16 @@ class _ExtendEventEndSheetState extends State<ExtendEventEndSheet> {
       if (!mounted) {
         return;
       }
+      final AppLocalizations l10n = context.l10n;
       final bool? goAhead = await AppConfirmDialog.show(
         context: context,
-        title: context.l10n.eventsScheduleConflictPreviewTitle,
-        body: context.l10n.eventsScheduleConflictPreviewBody(
+        title: l10n.eventsScheduleConflictPreviewTitle,
+        body: l10n.eventsScheduleConflictPreviewBody(
           hint.title,
           _formatConflictWhen(context, hint.scheduledAt),
         ),
-        confirmLabel: context.l10n.eventsScheduleConflictContinue,
-        cancelLabel: context.l10n.eventsScheduleConflictAdjustTime,
+        confirmLabel: l10n.eventsScheduleConflictContinue,
+        cancelLabel: l10n.eventsScheduleConflictAdjustTime,
       );
       if (goAhead != true || !mounted) {
         return;

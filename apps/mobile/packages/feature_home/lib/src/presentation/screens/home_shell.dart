@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:chisto_infrastructure/core/providers/app_providers.dart';
-import 'package:feature_auth/src/presentation/eula_acceptance_flow.dart';
+import 'package:feature_auth/feature_auth.dart';
 import 'package:feature_home/src/application/home_shell_controller.dart';
 import 'package:feature_home/src/presentation/screens/pollution_feed_screen.dart';
 import 'package:flutter/material.dart';

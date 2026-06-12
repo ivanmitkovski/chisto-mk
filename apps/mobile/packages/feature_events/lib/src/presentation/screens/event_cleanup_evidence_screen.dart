@@ -10,6 +10,7 @@ import 'dart:io';
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/l10n/app_error_localizations.dart';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
 import 'package:chisto_infrastructure/core/providers/events_providers.dart';
 import 'package:chisto_infrastructure/core/widgets/state_rebuild_mixin.dart';
 import 'package:chisto_infrastructure/shared/utils/app_haptics.dart';

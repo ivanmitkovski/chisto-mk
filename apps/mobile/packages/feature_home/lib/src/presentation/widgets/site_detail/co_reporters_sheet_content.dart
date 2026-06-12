@@ -1,5 +1,6 @@
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/shared/utils/civic_actor_display.dart';
+import 'package:chisto_infrastructure/shared/widgets/atoms/app_loading_indicator.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_avatar.dart';
 import 'package:design_system/design_system.dart';
 import 'package:feature_home/src/domain/repositories/sites_repository.dart';
@@ -160,7 +161,7 @@ class _CoReportersSheetContentState extends ConsumerState<CoReportersSheetConten
         if (data.initialLoading)
           const SliverFillRemaining(
             hasScrollBody: false,
-            child: Center(child: CircularProgressIndicator()),
+            child: Center(child: AppLoadingIndicator()),
           )
         else if (data.error != null)
           SliverFillRemaining(
@@ -207,7 +208,7 @@ class _CoReportersSheetContentState extends ConsumerState<CoReportersSheetConten
                 return data.loadingMore
                     ? const Padding(
                         padding: EdgeInsets.all(AppSpacing.md),
-                        child: Center(child: CircularProgressIndicator()),
+                        child: Center(child: AppLoadingIndicator()),
                       )
                     : const SizedBox.shrink();
               }
@@ -224,9 +225,9 @@ class _CoReportersSheetContentState extends ConsumerState<CoReportersSheetConten
                 subtitle: item.isOriginalReporter
                     ? Text(
                         context.l10n.siteCoReportersOriginalReporterLabel,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
+                        style: AppTypography.cardSubtitle(
+                          Theme.of(context).textTheme,
+                        ).copyWith(color: AppColors.textSecondary),
                       )
                     : null,
               );

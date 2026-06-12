@@ -70,8 +70,13 @@ Future<void> compressManagedReportDraftPhotoInPlace(String absolutePath) async {
       );
     }
     try {
-      final List<int> bytes = await outFile.readAsBytes();
-      await inFile.writeAsBytes(bytes, flush: true);
+      final IOSink sink = inFile.openWrite(mode: FileMode.write);
+      try {
+        await outFile.openRead().pipe(sink);
+        await sink.flush();
+      } finally {
+        await sink.close();
+      }
     } on Object catch (e, st) {
       AppLog.warn(
         'report_photo_prep: byte-copy fallback failed; original preserved',

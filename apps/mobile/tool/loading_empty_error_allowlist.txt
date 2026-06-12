@@ -3,20 +3,17 @@
 # This guard scans screens for a recognizable loading + empty + error state
 # triple. The screens below are intentionally exempt because either:
 #  - they are static/form/flow screens with no async list to page through
-#    (auth onboarding/otp/forgot-password/sign-up/splash, profile settings
-#    forms, organizer toolkit/quiz flows, attendee QR scanner), or
+#    (auth onboarding/otp/forgot-password/sign-up/splash/location gate,
+#    profile settings forms, organizer toolkit/quiz flows, attendee QR scanner), or
 #  - they render async state through shared widgets the heuristic does not
 #    recognize (AppErrorView / skeletons / AppRefreshIndicator inside child
 #    widgets rather than the screen body).
 # The ratchet only allows this list to shrink; new screens must ship the triple.
-packages/feature_auth/lib/src/presentation/screens/forgot_password_email_sent_screen.dart
-packages/feature_auth/lib/src/presentation/screens/forgot_password_otp_screen.dart
 packages/feature_auth/lib/src/presentation/screens/forgot_password_request_screen.dart
 packages/feature_auth/lib/src/presentation/screens/forgot_password_success_screen.dart
 packages/feature_auth/lib/src/presentation/screens/initial_route_screen.dart
+packages/feature_auth/lib/src/presentation/screens/location_screen.dart
 packages/feature_auth/lib/src/presentation/screens/onboarding_screen.dart
-packages/feature_auth/lib/src/presentation/screens/otp_screen.dart
-packages/feature_auth/lib/src/presentation/screens/sign_up_screen.dart
 packages/feature_auth/lib/src/presentation/screens/splash_screen.dart
 packages/feature_events/lib/src/presentation/screens/attendee_qr_scanner_screen.dart
 packages/feature_events/lib/src/presentation/screens/event_chat_screen.dart

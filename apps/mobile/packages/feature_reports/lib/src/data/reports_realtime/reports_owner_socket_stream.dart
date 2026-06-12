@@ -209,6 +209,9 @@ class ReportsOwnerSocketStream {
     unawaited(_ensureConnected());
   }
 
+  /// Lifecycle alias for [start] (realtime client shape guard).
+  void connect() => start();
+
   void stop() {
     _stopInternal(clearLive: false);
   }

@@ -1,5 +1,8 @@
+import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/core/navigation/app_routes.dart';
-import 'package:chisto_infrastructure/shared/widgets/atoms/app_loading_indicator.dart';
+import 'package:chisto_infrastructure/shared/widgets/molecules/app_error_view.dart';
+import 'package:design_system/design_system.dart';
 import 'package:feature_profile/src/domain/models/profile_user.dart';
 import 'package:feature_profile/src/presentation/providers/profile_providers.dart';
 import 'package:feature_profile/src/presentation/screens/profile_points_history_screen.dart';
@@ -41,9 +44,37 @@ class _ProfilePointsHistoryRouteScreenState
             body: Center(child: AppLoadingIndicator()),
           );
         }
+        if (snapshot.hasError) {
+          final Object err = snapshot.error!;
+          final AppError appError =
+              err is AppError ? err : AppError.unknown(cause: err);
+          return Scaffold(
+            body: AppErrorView(
+              error: appError,
+              onRetry: () {
+                setState(() {
+                  _userFuture = ref.read(profileRepositoryProvider).getMe();
+                });
+              },
+            ),
+          );
+        }
         final ProfileUser? user = snapshot.data;
         if (user == null) {
-          return const Scaffold(body: SizedBox.shrink());
+          return Scaffold(
+            body: AppEmptyState(
+              icon: Icons.person_outline_rounded,
+              title: context.l10n.profileErrorSemantic,
+              action: AppButton.outlined(
+                label: context.l10n.commonRetry,
+                onPressed: () {
+                  setState(() {
+                    _userFuture = ref.read(profileRepositoryProvider).getMe();
+                  });
+                },
+              ),
+            ),
+          );
         }
         return ProfilePointsHistoryScreen(summaryUser: user);
       },

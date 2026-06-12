@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
 import 'package:design_system/design_system.dart';
-import 'package:feature_auth/src/presentation/utils/auth_guard_ui.dart';
+import 'package:feature_auth/feature_auth.dart';
 import 'package:feature_events/src/data/discovery_analytics.dart';
 import 'package:feature_events/src/domain/models/eco_event.dart';
 import 'package:feature_events/src/presentation/navigation/events_navigation.dart';

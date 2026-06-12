@@ -15,7 +15,7 @@ import 'package:chisto_infrastructure/shared/widgets/atoms/app_back_button.dart'
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
 import 'package:chisto_infrastructure/shared/widgets/organisms/app_confirm_dialog.dart';
 import 'package:design_system/design_system.dart';
-import 'package:feature_auth/src/presentation/utils/auth_guard_ui.dart';
+import 'package:feature_auth/feature_auth.dart';
 import 'package:feature_events/src/application/schedule_conflict_preview_controller.dart';
 import 'package:feature_events/src/data/event_site_resolver.dart';
 import 'package:feature_events/src/domain/models/eco_event.dart';
@@ -571,12 +571,13 @@ class _CreateEventSheetState extends ConsumerState<CreateEventSheet>
   }
 
   Future<bool> _confirmDiscard() async {
+    final AppLocalizations l10n = context.l10n;
     final bool? discard = await AppConfirmDialog.show(
       context: context,
-      title: context.l10n.createEventDiscardTitle,
-      body: context.l10n.createEventDiscardBody,
-      confirmLabel: context.l10n.commonDiscard,
-      cancelLabel: context.l10n.createEventDiscardKeepEditing,
+      title: l10n.createEventDiscardTitle,
+      body: l10n.createEventDiscardBody,
+      confirmLabel: l10n.commonDiscard,
+      cancelLabel: l10n.createEventDiscardKeepEditing,
       isDestructive: true,
     );
     return discard ?? false;

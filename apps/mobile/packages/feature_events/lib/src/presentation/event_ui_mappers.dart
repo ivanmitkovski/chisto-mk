@@ -15,3 +15,28 @@ extension EventTimeUI on EventTime {
   static EventTime fromTimeOfDay(TimeOfDay tod) =>
       EventTime(hour: tod.hour, minute: tod.minute);
 }
+
+extension EcoEventCategoryUI on EcoEventCategory {
+  IconData get icon => switch (this) {
+    EcoEventCategory.generalCleanup => Icons.cleaning_services_outlined,
+    EcoEventCategory.riverAndLake => Icons.water_outlined,
+    EcoEventCategory.treeAndGreen => Icons.park_outlined,
+    EcoEventCategory.recyclingDrive => Icons.recycling_outlined,
+    EcoEventCategory.hazardousRemoval => Icons.warning_amber_outlined,
+    EcoEventCategory.awarenessAndEducation => Icons.campaign_outlined,
+    EcoEventCategory.other => Icons.more_horiz,
+  };
+}
+
+extension EventGearUI on EventGear {
+  IconData get icon => switch (this) {
+    EventGear.trashBags => Icons.shopping_bag_outlined,
+    EventGear.gloves => Icons.back_hand_outlined,
+    EventGear.rakes => Icons.agriculture_outlined,
+    EventGear.wheelbarrow => Icons.construction_outlined,
+    EventGear.waterBoots => Icons.water_drop_outlined,
+    EventGear.safetyVest => Icons.security_outlined,
+    EventGear.firstAid => Icons.medical_services_outlined,
+    EventGear.sunscreen => Icons.wb_sunny_outlined,
+  };
+}

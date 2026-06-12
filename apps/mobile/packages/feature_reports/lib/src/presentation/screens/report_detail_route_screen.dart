@@ -6,15 +6,15 @@ import 'package:chisto_infrastructure/core/navigation/app_navigation.dart';
 import 'package:chisto_infrastructure/core/navigation/app_routes.dart';
 import 'package:chisto_infrastructure/core/network/request_cancellation.dart';
 import 'package:chisto_infrastructure/core/providers/home_providers.dart';
-import 'package:chisto_infrastructure/shared/widgets/atoms/app_loading_indicator.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
 import 'package:chisto_infrastructure/shared/widgets/molecules/app_error_view.dart';
+import 'package:design_system/design_system.dart';
 import 'package:feature_reports/src/application/reports_providers.dart';
 import 'package:feature_reports/src/data/report_detail_cache.dart';
 import 'package:feature_reports/src/domain/models/report_detail.dart';
 import 'package:feature_reports/src/domain/models/report_list_item.dart';
-import 'package:feature_reports/src/presentation/widgets/reports_list/report_detail_open_resolver.dart';
 import 'package:feature_reports/src/presentation/widgets/map/report_external_maps.dart';
+import 'package:feature_reports/src/presentation/widgets/reports_list/report_detail_open_resolver.dart';
 import 'package:feature_reports/src/presentation/widgets/reports_list/report_detail_sheet.dart';
 import 'package:feature_reports/src/presentation/widgets/reports_list/report_sheet_view_model.dart';
 import 'package:flutter/material.dart';
@@ -107,11 +107,13 @@ class _ReportDetailRouteScreenState extends ConsumerState<ReportDetailRouteScree
                 : listItem != null
                     ? _buildFromListItem(context, listItem, isStaleFallback: true)
                     : Scaffold(
-                        body: AppErrorView(
-                          error: AppError.notFound(
-                            message: context.l10n.notificationsSiteUnavailable,
+                        body: AppEmptyState(
+                          icon: Icons.description_outlined,
+                          title: context.l10n.notificationsSiteUnavailable,
+                          action: AppButton.outlined(
+                            label: context.l10n.commonRetry,
+                            onPressed: () => unawaited(_retry()),
                           ),
-                          onRetry: () => unawaited(_retry()),
                         ),
                       ),
           ReportDetailOpenBlocked(:final AppError error) => Scaffold(

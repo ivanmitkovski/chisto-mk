@@ -124,7 +124,7 @@ class _ReportSeveritySliderState extends State<ReportSeveritySlider> {
                     width: width,
                     decoration: BoxDecoration(
                       color: AppColors.inputBorder.withValues(alpha: 0.35),
-                      borderRadius: BorderRadius.circular(2),
+                      borderRadius: AppRadii.handle,
                     ),
                   ),
                   Container(
@@ -132,7 +132,7 @@ class _ReportSeveritySliderState extends State<ReportSeveritySlider> {
                     width: activeWidth.clamp(0, width),
                     decoration: BoxDecoration(
                       color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(2),
+                      borderRadius: AppRadii.handle,
                     ),
                   ),
                   Positioned(
@@ -143,13 +143,7 @@ class _ReportSeveritySliderState extends State<ReportSeveritySlider> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: AppColors.white,
-                        boxShadow: <BoxShadow>[
-                          BoxShadow(
-                            color: AppColors.black.withValues(alpha: 0.12),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
+                        boxShadow: AppShadows.profileAvatarBadge(),
                       ),
                     ),
                   ),

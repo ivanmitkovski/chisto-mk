@@ -5,6 +5,7 @@ import 'package:chisto_infrastructure/core/location/device_location_reader.dart'
 import 'package:chisto_infrastructure/core/location/location_service.dart';
 import 'package:chisto_infrastructure/core/location/macedonia_bounds.dart';
 import 'package:chisto_infrastructure/core/deep_links/deep_link_router.dart';
+import 'package:chisto_infrastructure/core/logging/app_log.dart';
 import 'package:chisto_infrastructure/core/navigation/app_go_router.dart';
 import 'package:chisto_infrastructure/core/navigation/app_navigation.dart';
 import 'package:chisto_infrastructure/core/navigation/app_routes.dart';
@@ -142,7 +143,13 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
   Future<void> _markGuidePending() async {
     try {
       await ref.read(featureGuideRepositoryProvider).markPostRegistrationGuidePending();
-    } catch (_) {}
+    } on Object catch (e, st) {
+      AppLog.warn(
+        '[LocationScreen] markPostRegistrationGuidePending failed',
+        error: e,
+        stackTrace: st,
+      );
+    }
   }
 
   Future<void> _navigateHomeWithCoachPending() async {

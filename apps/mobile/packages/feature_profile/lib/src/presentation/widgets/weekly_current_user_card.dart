@@ -26,7 +26,7 @@ class WeeklyCurrentUserCard extends StatelessWidget {
         boxShadow: AppShadows.softCard(Theme.of(context).colorScheme),
       ),
       child: Material(
-        color: Colors.transparent,
+        color: AppColors.transparent,
         borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
         child: InkWell(
           onTap: onTap,

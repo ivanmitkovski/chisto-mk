@@ -145,16 +145,13 @@ class FirstReportModal extends StatelessWidget {
                 children: <Widget>[
                   Text(
                     reporterLabel,
-                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
-                    ),
+                    style: AppTypography.cardTitle(Theme.of(context).textTheme),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     report.reportedAgo,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.textMuted,
+                    style: AppTypography.cardSubtitle(
+                      Theme.of(context).textTheme,
                     ),
                   ),
                 ],

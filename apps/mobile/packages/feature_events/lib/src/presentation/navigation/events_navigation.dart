@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:chisto_infrastructure/core/auth/auth_state.dart';
 import 'package:chisto_infrastructure/core/navigation/app_navigation.dart';
 import 'package:chisto_infrastructure/core/navigation/app_routes.dart';
-import 'package:feature_auth/src/presentation/utils/auth_guard_ui.dart';
+import 'package:feature_auth/feature_auth.dart';
 import 'package:feature_events/src/domain/models/eco_event.dart';
 import 'package:feature_events/src/presentation/navigation/organizer_certification_navigation.dart';
 import 'package:feature_events/src/presentation/screens/organizer_toolkit/organizer_toolkit_screen.dart';

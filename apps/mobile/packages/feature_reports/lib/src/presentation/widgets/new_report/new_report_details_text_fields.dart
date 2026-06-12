@@ -109,11 +109,9 @@ class NewReportDetailsTitleField extends StatelessWidget {
           const SizedBox(height: AppSpacing.xs),
           Text(
             titleErrorText,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.error,
-              fontWeight: FontWeight.w500,
-              height: 1.3,
-            ),
+            style: AppTypography.eventsFormError(
+              Theme.of(context).textTheme,
+            ).copyWith(height: 1.3),
           ),
         ],
       ],

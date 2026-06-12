@@ -75,10 +75,8 @@ class NotificationTypeBadge extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+        style: AppTypography.badgeLabel(Theme.of(context).textTheme).copyWith(
           color: labelColor,
-          fontWeight: FontWeight.w700,
-          fontSize: 11,
           height: 1.1,
         ),
       ),

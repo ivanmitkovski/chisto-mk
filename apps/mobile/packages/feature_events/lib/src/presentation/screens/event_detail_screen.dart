@@ -16,7 +16,7 @@ import 'package:chisto_infrastructure/shared/widgets/atoms/app_back_button.dart'
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
 import 'package:chisto_infrastructure/shared/widgets/organisms/app_surface/report_surface_aliases.dart';
 import 'package:design_system/design_system.dart';
-import 'package:feature_auth/src/presentation/utils/auth_guard_ui.dart';
+import 'package:feature_auth/feature_auth.dart';
 import 'package:feature_events/src/data/discovery_analytics.dart';
 import 'package:feature_events/src/data/event_feedback_local_cache.dart';
 import 'package:feature_events/src/data/field_mode_queue.dart';
