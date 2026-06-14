@@ -9,6 +9,7 @@ import {
   ADMIN_REFRESH_COOKIE_KEY,
   ADMIN_REMEMBER_DEVICE_COOKIE_KEY,
 } from './auth-constants';
+import { executeAdminFetch } from '../api/admin-fetch';
 import { getApiBaseUrl } from '../api/api-base-url';
 
 export type AdminTokenPair = {
@@ -224,29 +225,73 @@ export async function refreshAdminTokens(
   return refreshPromise;
 }
 
+const REFRESH_MAX_ATTEMPTS = 3;
+const REFRESH_TIMEOUT_MS = 15_000;
+
+function refreshAttemptDelayMs(attempt: number): number {
+  return 200 * attempt + Math.floor(Math.random() * 250);
+}
+
+function isRefreshTransientHttpStatus(status: number): boolean {
+  return status === 429 || status === 502 || status === 503 || status === 504;
+}
+
 async function refreshAdminTokensUncached(
   refreshToken: string,
   deviceId?: string,
 ): Promise<AdminRefreshResult> {
-  let res: Response | null;
-  try {
-    res = await fetch(`${getApiBaseUrl()}/auth/refresh`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify({
-        refreshToken,
-        ...(deviceId ? { deviceId } : {}),
-      }),
-      cache: 'no-store',
-      signal: AbortSignal.timeout(15_000),
-    });
-  } catch {
-    return { ok: false, reason: 'network' };
+  const url = `${getApiBaseUrl()}/auth/refresh`;
+  const body = JSON.stringify({
+    refreshToken,
+    ...(deviceId ? { deviceId } : {}),
+  });
+
+  for (let attempt = 1; attempt <= REFRESH_MAX_ATTEMPTS; attempt += 1) {
+    let res: Response;
+    try {
+      res = await executeAdminFetch(
+        url,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body,
+          cache: 'no-store',
+        },
+        {
+          path: '/auth/refresh',
+          timeoutMs: REFRESH_TIMEOUT_MS,
+          method: 'POST',
+          retryOnGatewayError: false,
+          requestId: crypto.randomUUID(),
+        },
+      );
+    } catch {
+      if (attempt < REFRESH_MAX_ATTEMPTS) {
+        await new Promise((resolve) => setTimeout(resolve, refreshAttemptDelayMs(attempt)));
+        continue;
+      }
+      return { ok: false, reason: 'network' };
+    }
+
+    if (res.ok) {
+      const payload = (await res.json().catch(() => null)) as unknown;
+      if (!isAdminTokenPair(payload)) return { ok: false, reason: 'unauthorized' };
+      return { ok: true, tokens: payload };
+    }
+
+    if (isRefreshTransientHttpStatus(res.status) && attempt < REFRESH_MAX_ATTEMPTS) {
+      await new Promise((resolve) => setTimeout(resolve, refreshAttemptDelayMs(attempt)));
+      continue;
+    }
+
+    if (isRefreshTransientHttpStatus(res.status)) {
+      return { ok: false, reason: 'network' };
+    }
+
+    return { ok: false, reason: 'unauthorized' };
   }
-  if (!res.ok) return { ok: false, reason: 'unauthorized' };
-  const payload = (await res.json().catch(() => null)) as unknown;
-  if (!isAdminTokenPair(payload)) return { ok: false, reason: 'unauthorized' };
-  return { ok: true, tokens: payload };
+
+  return { ok: false, reason: 'network' };
 }
 
 export function getTokenExpiryMs(token: string): number | null {

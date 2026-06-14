@@ -19,6 +19,17 @@ if (process.env.VERCEL === '1' && !process.env.NEXT_PUBLIC_API_BASE_URL?.trim())
   );
 }
 
+if (
+  process.env.VERCEL === '1' &&
+  process.env.NODE_ENV === 'production' &&
+  !process.env.SERVER_API_BASE_URL?.trim() &&
+  !process.env.API_BASE_URL?.trim()
+) {
+  console.warn(
+    '[admin] SERVER_API_BASE_URL is unset on Vercel. BFF routes (auth refresh, proxy) rely on the build-time NEXT_PUBLIC_API_BASE_URL. Set SERVER_API_BASE_URL=https://api.chisto.mk for runtime-safe server/Edge fetches.',
+  );
+}
+
 const S3_MEDIA_HOST = process.env.NEXT_PUBLIC_S3_MEDIA_HOST ?? 'chisto-dev-media.s3.eu-central-1.amazonaws.com';
 const S3_MEDIA_HOSTS = Array.from(
   new Set([

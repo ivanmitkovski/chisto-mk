@@ -10,6 +10,9 @@ const PROXY_PATH_PREFIXES = [
   '/notifications/',
 ] as const;
 
+/** Read-only citizen routes the admin UI calls through the BFF (narrow allowlist). */
+const PROXY_EXACT_PATHS = ['/events/check-conflict'] as const;
+
 export function normalizeProxyPathSegments(segments: string[]): string | null {
   if (segments.length === 0) return null;
   for (const segment of segments) {
@@ -26,5 +29,6 @@ export function normalizeProxyPathSegments(segments: string[]): string | null {
 
 export function isProxyPathAllowed(path: string): boolean {
   if (!path.startsWith('/')) return false;
+  if (PROXY_EXACT_PATHS.some((exact) => path === exact)) return true;
   return PROXY_PATH_PREFIXES.some((prefix) => path.startsWith(prefix));
 }

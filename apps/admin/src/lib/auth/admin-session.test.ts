@@ -174,4 +174,14 @@ describe('admin session helpers', () => {
     const result = await refreshAdminTokens('refresh-1', 'device-1');
     expect(result).toEqual({ ok: false, reason: 'network' });
   });
+
+  it('returns network reason when backend responds with 503', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(new Response(JSON.stringify({ code: 'UNAVAILABLE' }), { status: 503 })),
+    );
+
+    const result = await refreshAdminTokens('refresh-1', 'device-1');
+    expect(result).toEqual({ ok: false, reason: 'network' });
+  });
 });
