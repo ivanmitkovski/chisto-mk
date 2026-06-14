@@ -146,6 +146,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
+          flutter-version: '3.44.0'
       - name: Melos workspace (pub get)
         run: |
           cd apps/mobile

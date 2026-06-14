@@ -5,7 +5,6 @@ import 'package:feature_auth/src/application/initial_route_controller.dart';
 import 'package:feature_auth/src/application/sign_in_controller.dart';
 import 'package:feature_auth/src/application/splash_session_controller.dart';
 import 'package:feature_auth/src/domain/models/password_reset_target.dart';
-import 'package:feature_auth/src/presentation/constants/splash_constants.dart';
 import 'package:feature_auth/src/presentation/screens/forgot_password_new_screen.dart';
 import 'package:feature_auth/src/presentation/screens/forgot_password_otp_screen.dart';
 import 'package:feature_auth/src/presentation/screens/forgot_password_request_screen.dart';
@@ -172,18 +171,7 @@ void main() {
           ),
         );
         await tester.pump();
-        if (entry.key == 'location') {
-          await tester.pump(const Duration(milliseconds: 950));
-        } else if (entry.key == 'initial_route') {
-          await tester.pump(SplashConstants.initialRouteMinDisplayTime);
-          await tester.pump(SplashConstants.initialRouteSessionTimeout);
-        } else if (entry.key == 'splash' ||
-            entry.key == 'otp' ||
-            entry.key == 'forgot_otp') {
-          await tester.pump(const Duration(milliseconds: 400));
-        } else {
-          await tester.pumpAndSettle();
-        }
+        await settleAuthGolden(tester, entry.key);
 
         await expectLater(
           find.byType(MaterialApp),
@@ -209,6 +197,7 @@ void main() {
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 200));
+    await settleAuthGoldenAssets(tester);
     await expectLater(
       find.byType(MaterialApp),
       matchesGoldenFile('__goldens__/sign_in_error_mk.png'),

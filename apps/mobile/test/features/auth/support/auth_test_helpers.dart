@@ -3,6 +3,7 @@ import 'package:chisto_infrastructure/core/config/app_config.dart';
 import 'package:chisto_infrastructure/core/providers/app_providers.dart';
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
 import 'package:feature_auth/src/domain/repositories/auth_repository.dart';
+import 'package:feature_auth/src/presentation/constants/splash_constants.dart';
 import 'package:feature_auth/src/presentation/widgets/auth_otp_input.dart';
 import 'package:feature_onboarding/src/domain/feature_guide_repository.dart';
 import 'package:flutter/material.dart';
@@ -26,7 +27,35 @@ const MediaQueryData kAuthTestMediaQuery = MediaQueryData(
 
 Future<void> authGoldenSurface(WidgetTester tester) async {
   await tester.binding.setSurfaceSize(kAuthTestSurfaceSize);
-  addTearDown(() => tester.binding.setSurfaceSize(null));
+  final double previousDevicePixelRatio = tester.view.devicePixelRatio;
+  tester.view.devicePixelRatio = 1.0;
+  addTearDown(() {
+    tester.view.devicePixelRatio = previousDevicePixelRatio;
+    tester.binding.setSurfaceSize(null);
+  });
+}
+
+Future<void> settleAuthGoldenAssets(WidgetTester tester) async {
+  await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 100)));
+  await tester.pump();
+  await tester.pump();
+}
+
+/// Pumps auth goldens until animations, timers, and raster assets are stable.
+Future<void> settleAuthGolden(WidgetTester tester, String screenKey) async {
+  if (screenKey == 'location') {
+    await tester.pump(const Duration(milliseconds: 950));
+  } else if (screenKey == 'initial_route') {
+    await tester.pump(SplashConstants.initialRouteMinDisplayTime);
+    await tester.pump(SplashConstants.initialRouteSessionTimeout);
+  } else if (screenKey == 'splash' ||
+      screenKey == 'otp' ||
+      screenKey == 'forgot_otp') {
+    await tester.pump(const Duration(milliseconds: 400));
+  } else {
+    await tester.pumpAndSettle();
+  }
+  await settleAuthGoldenAssets(tester);
 }
 
 /// Provider overrides for isolated auth screen tests.
