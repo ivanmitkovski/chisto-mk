@@ -18,6 +18,7 @@ import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
 
 import '../../../shared/widget_test_bootstrap.dart';
+import '../report_test_jpeg_bytes.dart';
 
 Future<Database> _openTestDbIn(Directory parent, String fileName) {
   final String path = p.join(parent.path, fileName);
@@ -137,8 +138,10 @@ void main() {
         ),
       );
 
-      final File f1 = File(p.join(tmp.path, 'p1.jpg'))..writeAsBytes(<int>[1]);
-      final File f2 = File(p.join(tmp.path, 'p2.jpg'))..writeAsBytes(<int>[2]);
+      final File f1 = File(p.join(tmp.path, 'p1.jpg'));
+      await f1.writeAsBytes(kReportTestJpegBytes);
+      final File f2 = File(p.join(tmp.path, 'p2.jpg'));
+      await f2.writeAsBytes(kReportTestJpegBytes);
       final ProviderContainer container1 = _testContainer(draftRepo);
       addTearDown(container1.dispose);
       final NewReportController c = _createTestController(
@@ -182,7 +185,8 @@ void main() {
         rootOverride: Directory(p.join(tmp.path, 'ph')),
       ),
     );
-    final File f = File(p.join(tmp.path, 'cam.jpg'))..writeAsBytes(<int>[9]);
+    final File f = File(p.join(tmp.path, 'cam.jpg'));
+    await f.writeAsBytes(kReportTestJpegBytes);
     final ProviderContainer container = _testContainer(draftRepo);
     addTearDown(container.dispose);
     final NewReportController c = _createTestController(
@@ -216,8 +220,8 @@ void main() {
     seed.updateTitle('old');
     await seed.flushPendingPersist(titleText: 'old', descriptionText: '');
 
-    final File incoming = File(p.join(tmp.path, 'new.jpg'))
-      ..writeAsBytes(<int>[8]);
+    final File incoming = File(p.join(tmp.path, 'new.jpg'));
+    await incoming.writeAsBytes(kReportTestJpegBytes);
     final ProviderContainer container = _testContainer(draftRepo);
     addTearDown(container.dispose);
     final NewReportController c = _createTestController(

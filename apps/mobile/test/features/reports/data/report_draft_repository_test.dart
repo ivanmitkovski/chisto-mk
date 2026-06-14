@@ -13,6 +13,7 @@ import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
 
 import '../../../shared/widget_test_bootstrap.dart';
+import '../report_test_jpeg_bytes.dart';
 
 Future<Database> _openTestDbIn(Directory parent, String fileName) {
   final String path = p.join(parent.path, fileName);
@@ -87,7 +88,7 @@ void main() {
     expect(empty.hasDraft, isFalse);
 
     final File src = File(p.join(tmp.path, 'a.jpg'));
-    await src.writeAsBytes(<int>[9, 9, 9]);
+    await src.writeAsBytes(kReportTestJpegBytes);
     final XFile managed = await repo.registerPhoto(XFile(src.path));
 
     await repo.save(
