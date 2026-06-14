@@ -1,6 +1,6 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 import { Badge, Card, SectionState, StatusDot } from '@/components/ui';
 import type { PanelState } from '../data/operations-adapter';
@@ -24,6 +24,7 @@ export function OperationsPanelCard({
 }) {
   const t = useTranslations('operations');
   const tCommon = useTranslations('common');
+  const locale = useLocale();
   const health = derivePanelHealth(panelKey, state);
 
   let body: ReactNode = children;
@@ -46,7 +47,7 @@ export function OperationsPanelCard({
       </div>
       {body}
       {footer}
-      <p className={styles.updated}>{tCommon('updated', { time: panelUpdatedAt(state) })}</p>
+      <p className={styles.updated}>{tCommon('updated', { time: panelUpdatedAt(state, locale) })}</p>
     </Card>
   );
 }

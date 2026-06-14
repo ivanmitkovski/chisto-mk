@@ -1,8 +1,12 @@
 import { ADMIN_LOCALE_BCP47, normalizeLocale, type AdminLocale } from '@/lib/preferences/admin-locale';
 
+/** Fixed TZ for admin UI — keeps Node SSR and browser hydration aligned. */
+export const ADMIN_DISPLAY_TIME_ZONE = 'Europe/Skopje';
+
 const DEFAULT_OPTIONS: Intl.DateTimeFormatOptions = {
   dateStyle: 'medium',
   timeStyle: 'short',
+  timeZone: ADMIN_DISPLAY_TIME_ZONE,
 };
 
 const GRANULAR_DATE_TIME_KEYS = [
@@ -31,19 +35,19 @@ function mergeDateTimeFormatOptions(
     return DEFAULT_OPTIONS;
   }
   if (hasGranularDateTimeOptions(overrides)) {
-    return overrides;
+    return { timeZone: ADMIN_DISPLAY_TIME_ZONE, ...overrides };
   }
   return { ...DEFAULT_OPTIONS, ...overrides };
 }
 
 function mergeDateFormatOptions(overrides?: Intl.DateTimeFormatOptions): Intl.DateTimeFormatOptions {
   if (!overrides) {
-    return { dateStyle: 'medium' };
+    return { dateStyle: 'medium', timeZone: ADMIN_DISPLAY_TIME_ZONE };
   }
   if (hasGranularDateTimeOptions(overrides)) {
-    return overrides;
+    return { timeZone: ADMIN_DISPLAY_TIME_ZONE, ...overrides };
   }
-  return { dateStyle: 'medium', ...overrides };
+  return { dateStyle: 'medium', timeZone: ADMIN_DISPLAY_TIME_ZONE, ...overrides };
 }
 
 function resolveBcp47(locale: string | AdminLocale): string {

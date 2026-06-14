@@ -1,7 +1,8 @@
+import { ADMIN_DISPLAY_TIME_ZONE } from '@/lib/i18n/format-admin-datetime';
 import { ADMIN_LOCALE_BCP47, normalizeLocale } from '@/lib/preferences/admin-locale';
 
 /** North Macedonia schedule display for admin; fixed TZ avoids SSR/client hydration mismatches. */
-export const EVENT_ADMIN_TZ = 'Europe/Skopje';
+export const EVENT_ADMIN_TZ = ADMIN_DISPLAY_TIME_ZONE;
 
 export function toAdminBcp47Locale(locale: string): string {
   return ADMIN_LOCALE_BCP47[normalizeLocale(locale)];

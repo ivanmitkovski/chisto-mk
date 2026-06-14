@@ -9,7 +9,7 @@ export function DashboardLastUpdated() {
   const t = useTranslations('dashboard.timeAgo');
   const tCommon = useTranslations('common');
   const ctx = useDashboardSSE();
-  const lastUpdatedAt = ctx?.lastUpdatedAt ?? Date.now();
+  const lastUpdatedAt = ctx?.lastUpdatedAt ?? 0;
   const [label, setLabel] = useState(() => tCommon('updated', { time: t('justNow') }));
 
   useEffect(() => {
@@ -24,6 +24,10 @@ export function DashboardLastUpdated() {
     }
 
     const tick = () => {
+      if (lastUpdatedAt <= 0) {
+        setLabel(tCommon('updated', { time: t('justNow') }));
+        return;
+      }
       setLabel(tCommon('updated', { time: formatTimeAgo(Date.now() - lastUpdatedAt) }));
     };
 

@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import { Icon } from '@/components/ui';
+import { formatAdminDate } from '@/lib/i18n/format-admin-datetime';
 import type { ReportsTrendItem } from '../types';
 import { ReportsTrendChartSkeleton } from './reports-trend-chart-skeleton';
 import styles from './reports-trend-chart.module.css';
@@ -30,9 +31,8 @@ const ReportsTrendChartInner = dynamic(
   }
 );
 
-function formatDateLabel(dateStr: string): string {
-  const d = new Date(dateStr);
-  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+function formatDateLabel(dateStr: string, locale: string): string {
+  return formatAdminDate(dateStr, locale, { month: 'short', day: 'numeric' });
 }
 
 type ReportsTrendChartProps = {
@@ -43,11 +43,12 @@ const RANGE_OPTIONS: TrendRange[] = [7, 14, 30];
 
 export function ReportsTrendChart({ data }: ReportsTrendChartProps) {
   const t = useTranslations('dashboard.reportsTrend');
+  const locale = useLocale();
   const [range, setRange] = useState<TrendRange>(30);
   const filteredData = filterByRange(data, range);
   const chartData = filteredData.map((item) => ({
     ...item,
-    dateLabel: formatDateLabel(item.date),
+    dateLabel: formatDateLabel(item.date, locale),
   }));
 
   const showChart = chartData.length >= 2;

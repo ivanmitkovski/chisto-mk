@@ -1,13 +1,15 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Card, StatusDot } from '@/components/ui';
+import { formatAdminDateTime } from '@/lib/i18n/format-admin-datetime';
 import type { OperationsSnapshot, PanelState } from '../data/operations-adapter';
 import { deriveSystemStatus } from '../lib/operations-health';
 import styles from './operations-status-header.module.css';
 
 export function OperationsStatusHeader({ snapshot }: { snapshot: OperationsSnapshot }) {
   const t = useTranslations('operations');
+  const locale = useLocale();
   const summary = deriveSystemStatus(snapshot);
   const latestUpdatedAt = Object.values(snapshot).reduce((latest, panel) => {
     const ts = Date.parse(panel.updatedAt);
@@ -37,13 +39,16 @@ export function OperationsStatusHeader({ snapshot }: { snapshot: OperationsSnaps
       </div>
       <p className={styles.updated}>
         {t('status.lastUpdated', {
-          time: latestUpdatedAt > 0 ? new Date(latestUpdatedAt).toLocaleTimeString() : '—',
+          time:
+            latestUpdatedAt > 0
+              ? formatAdminDateTime(latestUpdatedAt, locale, { hour: '2-digit', minute: '2-digit' })
+              : '—',
         })}
       </p>
     </Card>
   );
 }
 
-export function panelUpdatedAt(panel: PanelState<unknown>): string {
-  return new Date(panel.updatedAt).toLocaleTimeString();
+export function panelUpdatedAt(panel: PanelState<unknown>, locale: string): string {
+  return formatAdminDateTime(panel.updatedAt, locale, { hour: '2-digit', minute: '2-digit' });
 }

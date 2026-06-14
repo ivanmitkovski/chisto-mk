@@ -1,9 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Card, Icon, SectionState } from '@/components/ui';
 import type { IconName } from '@/components/ui';
+import { useClientHydrated } from '@/lib/hooks/use-client-hydrated';
+import { formatAdminDate, formatAdminDateTime } from '@/lib/i18n/format-admin-datetime';
 import type { RecentActivityItem } from '../types';
 import { formatRelativeTime } from '../utils/relative-time';
 import styles from './recent-activity-feed.module.css';
@@ -35,14 +37,37 @@ const DISPLAY_LIMIT = 5;
 export function RecentActivityFeed({ items }: RecentActivityFeedProps) {
   const t = useTranslations('dashboard.activity');
   const tCommon = useTranslations('common');
+  const locale = useLocale();
+  const hydrated = useClientHydrated();
 
   function getDayLabel(dateStr: string): string {
     const date = new Date(dateStr);
+    if (!hydrated) {
+      return formatAdminDate(dateStr, locale, {
+        weekday: 'long',
+        month: 'short',
+        day: 'numeric',
+      });
+    }
     const now = new Date();
     const diffDay = Math.floor((now.getTime() - date.getTime()) / (24 * 60 * 60 * 1000));
     if (diffDay === 0) return tCommon('today');
     if (diffDay === 1) return tCommon('yesterday');
-    return date.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
+    return formatAdminDate(dateStr, locale, {
+      weekday: 'long',
+      month: 'short',
+      day: 'numeric',
+    });
+  }
+
+  function getItemTimeLabel(dateStr: string): string {
+    if (!hydrated) {
+      return formatAdminDateTime(dateStr, locale, {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    }
+    return formatRelativeTime(dateStr);
   }
 
   if (items.length === 0) {
@@ -89,7 +114,7 @@ export function RecentActivityFeed({ items }: RecentActivityFeedProps) {
                       </span>
                     </span>
                     <span className={styles.time}>
-                      {formatRelativeTime(item.createdAt)}
+                      {getItemTimeLabel(item.createdAt)}
                     </span>
                   </span>
                 );

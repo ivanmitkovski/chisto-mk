@@ -1,12 +1,14 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
+import { formatAdminDateTime } from '@/lib/i18n/format-admin-datetime';
 import { useActiveUsersLive } from '../hooks/use-active-users-live';
 import styles from './activity-feed.module.css';
 
 export function ActivityFeedPanel() {
   const t = useTranslations('activeUsers');
+  const locale = useLocale();
   const { feed, hasMore, isLoadingMore, loadMore } = useActiveUsersLive();
   const panelRef = useRef<HTMLElement>(null);
   const sentinelRef = useRef<HTMLLIElement>(null);
@@ -39,7 +41,9 @@ export function ActivityFeedPanel() {
           feed.map((item) => (
             <li key={item.id} className={styles.item}>
               <span className={styles.message}>{item.message}</span>
-              <span className={styles.time}>{new Date(item.occurredAt).toLocaleTimeString()}</span>
+              <span className={styles.time}>
+                {formatAdminDateTime(item.occurredAt, locale, { hour: '2-digit', minute: '2-digit' })}
+              </span>
             </li>
           ))
         )}

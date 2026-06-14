@@ -1,8 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Card, Icon } from '@/components/ui';
+import { useClientHydrated } from '@/lib/hooks/use-client-hydrated';
+import { formatAdminDate } from '@/lib/i18n/format-admin-datetime';
 import styles from './upcoming-cleanups-card.module.css';
 
 type UpcomingEvent = {
@@ -20,15 +22,22 @@ type UpcomingCleanupsCardProps = {
 export function UpcomingCleanupsCard({ upcoming, completed, upcomingEvents = [] }: UpcomingCleanupsCardProps) {
   const t = useTranslations('dashboard.events');
   const tCommon = useTranslations('common');
+  const locale = useLocale();
+  const hydrated = useClientHydrated();
 
   function formatEventDate(dateStr: string): string {
     const d = new Date(dateStr);
+    if (!hydrated) {
+      return formatAdminDate(dateStr, locale, { month: 'short', day: 'numeric' });
+    }
     const now = new Date();
     const diffDays = Math.floor((d.getTime() - now.getTime()) / (24 * 60 * 60 * 1000));
     if (diffDays === 0) return tCommon('today');
     if (diffDays === 1) return tCommon('tomorrow');
-    if (diffDays < 7) return d.toLocaleDateString(undefined, { weekday: 'short' });
-    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    if (diffDays < 7) {
+      return formatAdminDate(dateStr, locale, { weekday: 'short' });
+    }
+    return formatAdminDate(dateStr, locale, { month: 'short', day: 'numeric' });
   }
 
   return (

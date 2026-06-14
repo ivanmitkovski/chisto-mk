@@ -9,6 +9,7 @@ const DEBUG_REALTIME_FLAG = 'chisto:debug-realtime';
 
 let sharedCtx: AudioContext | null = null;
 let unlocked = false;
+let unlockInFlight: Promise<boolean> | null = null;
 
 function isRealtimeDebugEnabled(): boolean {
   if (typeof window === 'undefined') return false;
@@ -92,39 +93,48 @@ export function isReportAudioUnlocked(): boolean {
 /** Call from pointer/tap/key handlers until it returns true (browser autoplay policy). */
 export async function unlockReportAudioFromUserGesture(): Promise<boolean> {
   if (typeof window === 'undefined') return false;
-  const htmlPrimed = await primeHtmlAudioFromUserGesture();
-  const Ctor = getAudioContextConstructor();
-  if (!Ctor) {
+  if (unlocked) return true;
+  if (unlockInFlight) return unlockInFlight;
+
+  unlockInFlight = (async () => {
+    const htmlPrimed = await primeHtmlAudioFromUserGesture();
+    const Ctor = getAudioContextConstructor();
+    if (!Ctor) {
+      unlocked = htmlPrimed;
+      if (isRealtimeDebugEnabled()) {
+        console.info('[realtime] audio-unlock-no-context-needed');
+      }
+      return htmlPrimed;
+    }
+    if (!sharedCtx) {
+      sharedCtx = new Ctor();
+    }
+    try {
+      await sharedCtx.resume();
+    } catch {
+      if (isRealtimeDebugEnabled()) {
+        console.info('[realtime] audio-unlock-resume-failed');
+      }
+      unlocked = htmlPrimed;
+      return htmlPrimed;
+    }
+    if (sharedCtx.state === 'running') {
+      unlocked = true;
+      if (isRealtimeDebugEnabled()) {
+        console.info('[realtime] audio-unlocked', { state: sharedCtx.state });
+      }
+      return true;
+    }
+    if (isRealtimeDebugEnabled()) {
+      console.info('[realtime] audio-unlock-not-running', { state: sharedCtx.state });
+    }
     unlocked = htmlPrimed;
-    if (isRealtimeDebugEnabled()) {
-      console.info('[realtime] audio-unlock-no-context-needed');
-    }
     return htmlPrimed;
-  }
-  if (!sharedCtx) {
-    sharedCtx = new Ctor();
-  }
-  try {
-    await sharedCtx.resume();
-  } catch {
-    if (isRealtimeDebugEnabled()) {
-      console.info('[realtime] audio-unlock-resume-failed');
-    }
-    unlocked = htmlPrimed;
-    return htmlPrimed;
-  }
-  if (sharedCtx.state === 'running') {
-    unlocked = true;
-    if (isRealtimeDebugEnabled()) {
-      console.info('[realtime] audio-unlocked', { state: sharedCtx.state });
-    }
-    return true;
-  }
-  if (isRealtimeDebugEnabled()) {
-    console.info('[realtime] audio-unlock-not-running', { state: sharedCtx.state });
-  }
-  unlocked = htmlPrimed;
-  return htmlPrimed;
+  })().finally(() => {
+    unlockInFlight = null;
+  });
+
+  return unlockInFlight;
 }
 
 /** Web Audio chime; falls back to HTMLAudio if oscillators throw. */

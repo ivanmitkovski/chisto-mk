@@ -1,11 +1,13 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
+import { formatAdminDateTime } from '@/lib/i18n/format-admin-datetime';
 import type { ActiveUserRow } from '../data/active-users.types';
 import styles from './active-users-table.module.css';
 
 export function ActiveUsersTable({ rows }: { rows: ActiveUserRow[] }) {
   const t = useTranslations('activeUsers');
+  const locale = useLocale();
 
   if (rows.length === 0) {
     return <p className={styles.empty}>{t('noActiveUsers')}</p>;
@@ -35,7 +37,7 @@ export function ActiveUsersTable({ rows }: { rows: ActiveUserRow[] }) {
               <td>{row.currentScreen ?? '—'}</td>
               <td>{row.platform ?? '—'} {row.appVersion ? `(${row.appVersion})` : ''}</td>
               <td>{[row.city, row.country].filter(Boolean).join(', ') || '—'}</td>
-              <td>{new Date(row.lastActivity).toLocaleTimeString()}</td>
+              <td>{formatAdminDateTime(row.lastActivity, locale, { hour: '2-digit', minute: '2-digit' })}</td>
             </tr>
           ))}
         </tbody>
