@@ -34,6 +34,7 @@
     "feed:simulate": "tsx scripts/feed-v2-simulation.ts",
     "seed": "tsx prisma/seed.ts",
     "db:resolve:report-title": "prisma migrate resolve --applied 20260326190001_add_report_title",
+    "db:resolve:site-hero-fkey": "prisma migrate resolve --applied 20260607120200_site_hero_report_id_fkey",
     "db:migrate:status": "prisma migrate status",
     "email:preview": "tsx scripts/render-email-preview.ts",
     "backfill:site-history": "tsx scripts/backfill-site-history.ts",
