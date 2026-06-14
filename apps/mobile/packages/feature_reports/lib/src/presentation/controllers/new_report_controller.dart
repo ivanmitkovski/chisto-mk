@@ -582,8 +582,7 @@ class NewReportController extends _$NewReportController {
     if (kept.length != photos.length) {
       _setDraft(state.draft.copyWith(photos: kept));
       AppLog.warn(
-        'pruneUnreachableDraftPhotos: removed ${photos.length - kept.length} '
-        'missing photo(s)',
+        'pruneUnreachableDraftPhotos: removed ${photos.length - kept.length} missing photo(s)',
         category: 'reports_wizard',
       );
     }

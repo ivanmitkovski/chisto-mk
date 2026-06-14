@@ -88,6 +88,17 @@ bool _lineIsAssertMessage(List<String> lines, int index) {
   return false;
 }
 
+bool _lineIsLogContinuation(List<String> lines, int index) {
+  for (int j = index; j >= 0 && j > index - 6; j--) {
+    if (lines[j].contains('AppLog.') ||
+        lines[j].contains('debugPrint(') ||
+        lines[j].contains('Sentry.capture')) {
+      return true;
+    }
+  }
+  return false;
+}
+
 List<String> scanHardcodedEnglish({
   required Iterable<String> rootPaths,
   bool skipDataLayer = false,
@@ -106,10 +117,15 @@ List<String> scanHardcodedEnglish({
         if (allowlistedHardcodedLine(line)) continue;
         if (line.trimLeft().startsWith('//')) continue;
         final bool assertMessage = _lineIsAssertMessage(lines, i);
+        final bool logContinuation = _lineIsLogContinuation(lines, i);
         for (final String lit in hardcodedLiteralsInLine(line)) {
           if (allowlistedHardcodedLiteral(
             lit,
-            line: assertMessage ? 'assert($line' : line,
+            line: assertMessage
+                ? 'assert($line'
+                : logContinuation
+                ? 'AppLog.$line'
+                : line,
           )) {
             continue;
           }

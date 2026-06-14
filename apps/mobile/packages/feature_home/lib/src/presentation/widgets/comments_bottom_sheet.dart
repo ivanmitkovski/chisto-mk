@@ -8,6 +8,7 @@ import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
 import 'package:chisto_infrastructure/shared/widgets/organisms/app_confirm_dialog.dart';
 import 'package:chisto_infrastructure/shared/widgets/organisms/app_surface/report_surface_aliases.dart';
 import 'package:design_system/design_system.dart';
+import 'package:feature_home/src/presentation/widgets/comments/comment_actions_sheet.dart';
 import 'package:feature_home/src/domain/models/comment.dart';
 import 'package:feature_home/src/presentation/utils/comment_input_validator.dart';
 import 'package:feature_home/src/presentation/utils/comment_mutation_snack.dart';
@@ -20,7 +21,6 @@ import 'package:feature_home/src/presentation/widgets/comments/comments_sheet_co
 import 'package:feature_home/src/presentation/widgets/comments/comments_sheet_drag.dart';
 import 'package:feature_home/src/presentation/widgets/comments/comments_thread_flatten.dart';
 import 'package:feature_safety/feature_safety.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -418,37 +418,14 @@ class _CommentsBottomSheetState extends ConsumerState<CommentsBottomSheet> {
   }
 
   Future<void> _openPeerCommentActions(Comment comment) async {
-    final l10n = context.l10n;
-    final String? action = await showAppActionSheet<String>(
-      context: context,
-      builder: (BuildContext sheetContext) {
-        return CupertinoActionSheet(
-          title: Text(l10n.commentsSheetTitle),
-          message: Text(l10n.commentsSheetSubtitle),
-          actions: <Widget>[
-            CupertinoActionSheetAction(
-              onPressed: () => Navigator.of(sheetContext).pop('report'),
-              child: Text(l10n.safetyReportTitle),
-            ),
-            CupertinoActionSheetAction(
-              isDestructiveAction: true,
-              onPressed: () => Navigator.of(sheetContext).pop('block'),
-              child: Text(l10n.safetyBlockUserTitle),
-            ),
-          ],
-          cancelButton: CupertinoActionSheetAction(
-            onPressed: () => Navigator.of(sheetContext).pop(),
-            child: Text(l10n.commonCancel),
-          ),
-        );
-      },
-    );
+    final CommentPeerAction? action =
+        await CommentPeerActionsSheet.show(context);
     if (!mounted || action == null) return;
-    if (action == 'report') {
+    if (action == CommentPeerAction.report) {
       await _openCommentReport(comment);
       return;
     }
-    if (action == 'block') {
+    if (action == CommentPeerAction.block) {
       await _blockCommentAuthor(comment);
     }
   }
@@ -459,37 +436,14 @@ class _CommentsBottomSheetState extends ConsumerState<CommentsBottomSheet> {
       await _openPeerCommentActions(comment);
       return;
     }
-    final l10n = context.l10n;
-    final String? action = await showAppActionSheet<String>(
-      context: context,
-      builder: (BuildContext sheetContext) {
-        return CupertinoActionSheet(
-          title: Text(l10n.commentsSheetTitle),
-          message: Text(l10n.commentsSheetSubtitle),
-          actions: <Widget>[
-            CupertinoActionSheetAction(
-              onPressed: () => Navigator.of(sheetContext).pop('edit'),
-              child: Text(l10n.commentsEditTitle),
-            ),
-            CupertinoActionSheetAction(
-              isDestructiveAction: true,
-              onPressed: () => Navigator.of(sheetContext).pop('delete'),
-              child: Text(l10n.commentsDeleteTitle),
-            ),
-          ],
-          cancelButton: CupertinoActionSheetAction(
-            onPressed: () => Navigator.of(sheetContext).pop(),
-            child: Text(l10n.commonCancel),
-          ),
-        );
-      },
-    );
+    final CommentOwnerAction? action =
+        await CommentOwnerActionsSheet.show(context);
     if (!mounted || action == null) return;
-    if (action == 'edit') {
+    if (action == CommentOwnerAction.edit) {
       _startInlineEdit(comment);
       return;
     }
-    if (action == 'delete') {
+    if (action == CommentOwnerAction.delete) {
       final bool confirmed = await _confirmDeleteComment();
       if (!confirmed || !mounted) return;
       await _deleteComment(comment);

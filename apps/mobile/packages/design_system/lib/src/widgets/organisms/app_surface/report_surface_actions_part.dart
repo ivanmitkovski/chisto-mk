@@ -65,9 +65,7 @@ class AppActionTile extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.sm),
           child: Row(
-            crossAxisAlignment: subtitle != null
-                ? CrossAxisAlignment.start
-                : CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Container(
                 width: isCompact ? 36 : 40,
