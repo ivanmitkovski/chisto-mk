@@ -1,3 +1,4 @@
+import 'package:chisto_infrastructure/core/assets/app_assets.dart';
 import 'package:chisto_infrastructure/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_infrastructure/core/config/app_config.dart';
 import 'package:chisto_infrastructure/core/providers/app_providers.dart';
@@ -7,7 +8,9 @@ import 'package:feature_auth/src/presentation/constants/splash_constants.dart';
 import 'package:feature_auth/src/presentation/widgets/auth_otp_input.dart';
 import 'package:feature_onboarding/src/domain/feature_guide_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -25,7 +28,10 @@ const MediaQueryData kAuthTestMediaQuery = MediaQueryData(
   disableAnimations: true,
 );
 
+bool _authGoldenAssetsPrecached = false;
+
 Future<void> authGoldenSurface(WidgetTester tester) async {
+  await ensureAuthGoldenAssetsPrecached(tester);
   await tester.binding.setSurfaceSize(kAuthTestSurfaceSize);
   final double previousDevicePixelRatio = tester.view.devicePixelRatio;
   tester.view.devicePixelRatio = 1.0;
@@ -35,9 +41,53 @@ Future<void> authGoldenSurface(WidgetTester tester) async {
   });
 }
 
-Future<void> settleAuthGoldenAssets(WidgetTester tester) async {
-  await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 100)));
+Future<void> settleAuthGoldenAssets(
+  WidgetTester tester, {
+  Duration delay = const Duration(milliseconds: 100),
+}) async {
+  await tester.runAsync(() => Future<void>.delayed(delay));
   await tester.pump();
+  await tester.pump();
+}
+
+/// Loads raster assets used by auth goldens so snapshots are stable on Linux CI.
+Future<void> precacheAuthGoldenAssets(WidgetTester tester) async {
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Builder(
+        builder: (BuildContext context) {
+          precacheImage(AssetImage(AppAssets.peopleCleaning), context);
+          return const SizedBox.shrink();
+        },
+      ),
+    ),
+  );
+  await tester.pump();
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Center(
+        child: SizedBox(
+          width: 146,
+          height: 146,
+          child: SvgPicture.asset(AppAssets.otpIllustration),
+        ),
+      ),
+    ),
+  );
+  await settleAuthGoldenAssets(tester, delay: const Duration(milliseconds: 300));
+}
+
+Future<void> ensureAuthGoldenAssetsPrecached(WidgetTester tester) async {
+  if (_authGoldenAssetsPrecached) {
+    return;
+  }
+  await precacheAuthGoldenAssets(tester);
+  _authGoldenAssetsPrecached = true;
+}
+
+Future<void> hideOtpKeyboardForGolden(WidgetTester tester) async {
+  FocusManager.instance.primaryFocus?.unfocus();
+  await SystemChannels.textInput.invokeMethod<void>('TextInput.hide');
   await tester.pump();
 }
 
@@ -52,10 +102,19 @@ Future<void> settleAuthGolden(WidgetTester tester, String screenKey) async {
       screenKey == 'otp' ||
       screenKey == 'forgot_otp') {
     await tester.pump(const Duration(milliseconds: 400));
+    await hideOtpKeyboardForGolden(tester);
+  } else if (screenKey == 'onboarding') {
+    await tester.pump(const Duration(milliseconds: 400));
+    await settleAuthGoldenAssets(
+      tester,
+      delay: const Duration(milliseconds: 300),
+    );
   } else {
     await tester.pumpAndSettle();
   }
-  await settleAuthGoldenAssets(tester);
+  if (screenKey != 'onboarding') {
+    await settleAuthGoldenAssets(tester);
+  }
 }
 
 /// Provider overrides for isolated auth screen tests.

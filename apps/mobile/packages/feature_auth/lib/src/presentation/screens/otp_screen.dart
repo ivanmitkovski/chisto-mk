@@ -32,6 +32,9 @@ class OtpScreen extends ConsumerStatefulWidget {
     this.rememberMe = true,
   });
 
+  @visibleForTesting
+  static bool disableResendTimerForTests = false;
+
   final String phoneNumber;
 
   /// When `true`, calls `/auth/otp/send` once on open (e.g. unverified sign-in).
@@ -100,7 +103,9 @@ class _OtpScreenState extends ConsumerState<OtpScreen>
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      unawaited(ensureOtpKeyboardVisible(_codeFocusNode));
+      if (!OtpScreen.disableResendTimerForTests) {
+        unawaited(ensureOtpKeyboardVisible(_codeFocusNode));
+      }
       if (widget.requestOtpOnOpen) {
         unawaited(_requestOtp());
       }
@@ -116,6 +121,9 @@ class _OtpScreenState extends ConsumerState<OtpScreen>
   void _startResendCountdown() {
     _resendTimer?.cancel();
     setState(() => _secondsRemaining = kAuthOtpResendSeconds);
+    if (OtpScreen.disableResendTimerForTests) {
+      return;
+    }
     _resendTimer = Timer.periodic(const Duration(seconds: 1), (Timer timer) {
       if (!mounted) {
         timer.cancel();
