@@ -41,7 +41,10 @@ export function OperationsStatusHeader({ snapshot }: { snapshot: OperationsSnaps
         {t('status.lastUpdated', {
           time:
             latestUpdatedAt > 0
-              ? formatAdminDateTime(latestUpdatedAt, locale, { hour: '2-digit', minute: '2-digit' })
+              ? formatAdminDateTime(new Date(latestUpdatedAt), locale, {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })
               : '—',
         })}
       </p>
