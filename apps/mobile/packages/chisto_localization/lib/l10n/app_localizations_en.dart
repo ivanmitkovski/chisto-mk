@@ -4246,6 +4246,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get eventsCtaJoinEcoAction => 'Join eco action';
 
   @override
+  String get eventsCtaRegistrationClosed => 'Registration closed';
+
+  @override
+  String get eventsDetailJoinClosedCallout =>
+      'Registration for this action has closed. You can still view details and photos.';
+
+  @override
   String get eventsStatusUpcoming => 'Upcoming';
 
   @override
@@ -5268,6 +5275,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commentsDeleteSubtitle => 'Remove it from this thread';
 
   @override
+  String get commentsDeleteConfirmBody =>
+      'Your comment will be permanently removed from this thread. This can\'t be undone.';
+
+  @override
   String get commentsEditFailedSnack => 'Could not edit comment right now.';
 
   @override
@@ -5768,6 +5779,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get reportFlowCameraUnavailableSnack =>
       'Unable to open the camera right now. Please try again in a moment.';
+
+  @override
+  String get reportFlowUnsupportedPhotoFormatSnack =>
+      'This file type isn\'t supported. Choose a JPEG, PNG, or WebP photo.';
 
   @override
   String get reportSemanticsLocationPinThenConfirm =>

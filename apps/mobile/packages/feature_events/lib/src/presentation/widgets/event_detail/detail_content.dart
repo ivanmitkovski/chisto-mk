@@ -112,6 +112,18 @@ class DetailContent extends StatelessWidget {
             ),
           ),
         ],
+        if (event.isVolunteerJoinClosed) ...<Widget>[
+          const SizedBox(height: AppSpacing.sm),
+          StaggeredSection(
+            delay: EventDetailStagger.eventFullBanner,
+            child: ReportInfoBanner(
+              message: context.l10n.eventsDetailJoinClosedCallout,
+              icon: CupertinoIcons.clock_fill,
+              tone: ReportSurfaceTone.neutral,
+              emphasis: ReportInfoBannerEmphasis.secondary,
+            ),
+          ),
+        ],
         if (event.status == EcoEventStatus.completed) ...<Widget>[
           const SizedBox(height: AppSpacing.lg),
           StaggeredSection(

@@ -371,6 +371,19 @@ class EcoEvent {
   /// New joins allowed until scheduled start + [volunteerJoinGraceAfterStart].
   bool get canVolunteerJoinNow => isJoinable && _isBeforeVolunteerJoinDeadline;
 
+  /// Volunteer-facing join is closed while the event may still show API status `upcoming`.
+  bool get isVolunteerJoinClosed =>
+      !isOrganizer && !isJoined && isJoinable && !canVolunteerJoinNow;
+
+  /// Past for discovery lists: completed/cancelled, or join window closed for guests.
+  bool get isPastForPublicDiscovery =>
+      status == EcoEventStatus.completed ||
+      status == EcoEventStatus.cancelled ||
+      (status == EcoEventStatus.upcoming &&
+          !isOrganizer &&
+          !isJoined &&
+          !canVolunteerJoinNow);
+
   /// Rebuild join CTA periodically near the join cutoff or when the start is soon.
   bool get shouldTickVolunteerJoinNearDeadline {
     if (!isJoinable || isJoined || isOrganizer) {

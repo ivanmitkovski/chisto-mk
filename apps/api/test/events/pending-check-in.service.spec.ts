@@ -5,7 +5,26 @@ import { ConfigService } from '@nestjs/config';
 import { PendingCheckInService } from '../../src/events/services/pending-check-in.service';
 
 describe('PendingCheckInService', () => {
+  const originalRedisUrl = process.env.REDIS_URL;
+  const originalRequireRedis = process.env.CHECK_IN_REQUIRE_REDIS;
+
+  afterEach(() => {
+    if (originalRedisUrl !== undefined) {
+      process.env.REDIS_URL = originalRedisUrl;
+    } else {
+      delete process.env.REDIS_URL;
+    }
+    if (originalRequireRedis !== undefined) {
+      process.env.CHECK_IN_REQUIRE_REDIS = originalRequireRedis;
+    } else {
+      delete process.env.CHECK_IN_REQUIRE_REDIS;
+    }
+  });
+
   it('allows in-memory fallback when NODE_ENV is test and CHECK_IN_REQUIRE_REDIS is unset', () => {
+    delete process.env.REDIS_URL;
+    delete process.env.CHECK_IN_REQUIRE_REDIS;
+
     const config = {
       get: jest.fn((key: string) => {
         if (key === 'NODE_ENV') return 'test';
@@ -21,6 +40,9 @@ describe('PendingCheckInService', () => {
   });
 
   it('throws on module init when Redis is required but REDIS_URL is missing', () => {
+    delete process.env.REDIS_URL;
+    delete process.env.CHECK_IN_REQUIRE_REDIS;
+
     const config = {
       get: jest.fn((key: string) => {
         if (key === 'NODE_ENV') return 'production';
@@ -44,6 +66,9 @@ describe('PendingCheckInService', () => {
   });
 
   it('throws on module init when CHECK_IN_REQUIRE_REDIS is true without REDIS_URL', () => {
+    delete process.env.REDIS_URL;
+    delete process.env.CHECK_IN_REQUIRE_REDIS;
+
     const config = {
       get: jest.fn((key: string) => {
         if (key === 'NODE_ENV') return 'development';

@@ -456,7 +456,7 @@ class _StatusPill extends StatelessWidget {
         border: Border.all(color: AppColors.white.withValues(alpha: 0.18)),
       ),
       child: Text(
-        event.status.localizedLabel(context.l10n),
+        event.volunteerDiscoveryStatusLabel(context.l10n),
         style: AppTypography.pillLabel(
           textTheme,
         ).copyWith(fontSize: 12, color: AppColors.white, letterSpacing: 0.1),

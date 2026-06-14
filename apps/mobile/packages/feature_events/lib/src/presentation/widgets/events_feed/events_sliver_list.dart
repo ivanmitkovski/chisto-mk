@@ -36,6 +36,7 @@ class EventsSliverList extends StatelessWidget {
     this.userLatitude,
     this.userLongitude,
     this.startIndex = 0,
+    this.animateEntrance = false,
   });
 
   final List<EcoEvent> events;
@@ -43,6 +44,7 @@ class EventsSliverList extends StatelessWidget {
   final double? userLatitude;
   final double? userLongitude;
   final int startIndex;
+  final bool animateEntrance;
 
   @override
   Widget build(BuildContext context) {
@@ -53,14 +55,19 @@ class EventsSliverList extends StatelessWidget {
         separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.sm),
         itemBuilder: (BuildContext context, int index) {
           final EcoEvent event = events[index];
+          final EcoEventCard card = EcoEventCard(
+            key: ValueKey<String>(event.id),
+            event: event,
+            onTap: () => onTap(event),
+            userLatitude: userLatitude,
+            userLongitude: userLongitude,
+          );
+          if (!animateEntrance) {
+            return card;
+          }
           return AnimatedListItem(
             index: startIndex + index,
-            child: EcoEventCard(
-              event: event,
-              onTap: () => onTap(event),
-              userLatitude: userLatitude,
-              userLongitude: userLongitude,
-            ),
+            child: card,
           );
         },
       ),

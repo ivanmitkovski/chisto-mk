@@ -47,4 +47,15 @@ void main() {
       EcoEventStatus.cancelled,
     });
   });
+
+  test('serverFetchGroup clusters client-only chips', () {
+    expect(
+      EventsFeedSearchMerge.serverFetchGroup(EcoEventFilter.all),
+      EventsFeedSearchMerge.serverFetchGroup(EcoEventFilter.nearby),
+    );
+    expect(
+      EventsFeedSearchMerge.serverFetchGroup(EcoEventFilter.upcoming),
+      isNot(EventsFeedSearchMerge.serverFetchGroup(EcoEventFilter.past)),
+    );
+  });
 }

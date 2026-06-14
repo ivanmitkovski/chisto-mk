@@ -4287,6 +4287,13 @@ class AppLocalizationsSq extends AppLocalizations {
   String get eventsCtaJoinEcoAction => 'Bashkohu me aksionin';
 
   @override
+  String get eventsCtaRegistrationClosed => 'Regjistrimi u mbyll';
+
+  @override
+  String get eventsDetailJoinClosedCallout =>
+      'Regjistrimi për këtë aksion u mbyll. Ende mund të shihni detajet dhe fotot.';
+
+  @override
   String get eventsStatusUpcoming => 'Në pritje';
 
   @override
@@ -5321,6 +5328,10 @@ class AppLocalizationsSq extends AppLocalizations {
   String get commentsDeleteSubtitle => 'Hiqe nga biseda';
 
   @override
+  String get commentsDeleteConfirmBody =>
+      'Komenti yt do të hiqet përgjithmonë nga biseda. Ky veprim nuk mund të zhbëhet.';
+
+  @override
   String get commentsEditFailedSnack => 'Nuk u përpunua komenti.';
 
   @override
@@ -5824,6 +5835,10 @@ class AppLocalizationsSq extends AppLocalizations {
   @override
   String get reportFlowCameraUnavailableSnack =>
       'Kamera nuk mund të hapet tani. Provo përsëri pas pak.';
+
+  @override
+  String get reportFlowUnsupportedPhotoFormatSnack =>
+      'Ky lloj skedari nuk mbështetet. Zgjidh një foto JPEG, PNG ose WebP.';
 
   @override
   String get reportSemanticsLocationPinThenConfirm =>

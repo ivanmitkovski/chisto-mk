@@ -177,7 +177,9 @@ class _CtaContent extends StatelessWidget {
     } else if (event.isJoined) {
       onPrimary = onToggleReminder;
       onSecondary = onToggleJoin;
-    } else if (event.moderationApproved && event.isJoinable) {
+    } else if (event.moderationApproved &&
+        event.isJoinable &&
+        event.canVolunteerJoinNow) {
       onPrimary = onToggleJoin;
     }
 

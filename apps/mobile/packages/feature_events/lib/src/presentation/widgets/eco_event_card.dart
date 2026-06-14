@@ -180,7 +180,7 @@ class _EcoEventCardState extends State<EcoEventCard> {
                                 style: metaStyle,
                                 children: <InlineSpan>[
                                   TextSpan(
-                                    text: event.status.localizedLabel(
+                                    text: event.volunteerDiscoveryStatusLabel(
                                       context.l10n,
                                     ),
                                     style: metaStyle.copyWith(
@@ -342,7 +342,7 @@ class _EcoEventCardState extends State<EcoEventCard> {
       ..write(', ')
       ..write(formatEventCalendarDate(context, event.date))
       ..write(', ')
-      ..write(event.status.localizedLabel(context.l10n));
+      ..write(event.volunteerDiscoveryStatusLabel(context.l10n));
     if (event.participantCount > 0) {
       a11y
         ..write(', ')

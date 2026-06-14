@@ -6,6 +6,7 @@ import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/core/providers/reports_providers.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
 import 'package:design_system/design_system.dart';
+import 'package:feature_reports/src/data/report_upload_image_validator.dart';
 import 'package:feature_reports/src/domain/models/report_capacity.dart';
 import 'package:feature_reports/src/domain/models/report_draft_summary.dart';
 import 'package:feature_reports/src/presentation/navigation/new_report_wizard_pop_result.dart';
@@ -107,6 +108,19 @@ class ReportEntryFlow {
       return null;
     }
     final XFile selectedFile = file;
+
+    final ReportUploadImageValidation validation =
+        await validateReportUploadImage(selectedFile);
+    if (!validation.isSupported) {
+      if (context.mounted) {
+        AppSnack.show(
+          context,
+          message: context.l10n.reportFlowUnsupportedPhotoFormatSnack,
+          type: AppSnackType.warning,
+        );
+      }
+      return null;
+    }
 
     final PhotoReviewResult? result =
         await AppBottomSheet.show<PhotoReviewResult>(

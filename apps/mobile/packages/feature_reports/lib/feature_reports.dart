@@ -4,6 +4,7 @@ library;
 export 'src/application/report_draft_summary_notifier.dart';
 export 'src/application/reports_providers.dart';
 export 'src/data/report_photo_upload_prep.dart';
+export 'src/data/report_upload_image_validator.dart';
 export 'src/domain/models/report_capacity.dart';
 export 'src/domain/models/report_draft.dart';
 export 'src/domain/models/report_draft_summary.dart';

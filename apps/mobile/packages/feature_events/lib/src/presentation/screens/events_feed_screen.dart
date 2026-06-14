@@ -54,6 +54,7 @@ class EventsFeedScreenState extends ConsumerState<EventsFeedScreen> {
   final FocusNode _searchFocusNode = FocusNode();
   String? _lastCoverPrecacheSignature;
   late final EventsSearchController _searchController;
+  bool _hasShownListEntrance = false;
 
   EventsFeedController get _feed =>
       ref.read(eventsFeedControllerProvider.notifier);
@@ -284,17 +285,11 @@ class EventsFeedScreenState extends ConsumerState<EventsFeedScreen> {
   }
 
   void _onFilterChanged(EcoEventFilter filter) {
-    unawaited(() async {
-      final bool ok = await _feed.setActiveFilter(filter);
-      if (!ok && mounted) {
-        logEventsDiagnostic('events_feed_refresh_failed');
-        AppSnack.show(
-          context,
-          message: context.l10n.eventsFeedRefreshFailed,
-          type: AppSnackType.warning,
-        );
-      }
-    }());
+    if (filter == _feed.activeFilter) {
+      return;
+    }
+    unawaited(_feed.setActiveFilter(filter));
+    unawaited(scrollToTop());
   }
 
   Future<void> _onRefresh() async {
@@ -486,6 +481,15 @@ class EventsFeedScreenState extends ConsumerState<EventsFeedScreen> {
 
     final bool isOrganizer = _feed.events.any((EcoEvent e) => e.isOrganizer);
     final String phase = _feed.feedPhase();
+    if (phase == 'content' && !_hasShownListEntrance) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          setState(() => _hasShownListEntrance = true);
+        }
+      });
+    }
+    final bool animateListEntrance =
+        !_hasShownListEntrance && phase == 'content';
 
     return Scaffold(
       backgroundColor: AppColors.appBackground,
@@ -559,6 +563,7 @@ class EventsFeedScreenState extends ConsumerState<EventsFeedScreen> {
                     phase: phase,
                     userLatitude: feedState.userLatitude,
                     userLongitude: feedState.userLongitude,
+                    animateListEntrance: animateListEntrance,
                   ),
                 ],
               );

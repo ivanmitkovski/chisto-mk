@@ -119,7 +119,9 @@ EventDetailCtaPresentation resolveEventDetailCtaPresentation({
   }
   if (!event.canVolunteerJoinNow) {
     return EventDetailCtaPresentation(
-      primaryLabel: l10n.eventsCtaJoinEcoAction,
+      primaryLabel: event.isVolunteerJoinClosed
+          ? l10n.eventsCtaRegistrationClosed
+          : l10n.eventsCtaJoinEcoAction,
       primaryEnabled: false,
       showsSecondaryRow: false,
     );

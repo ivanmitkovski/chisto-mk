@@ -4294,6 +4294,13 @@ class AppLocalizationsMk extends AppLocalizations {
   String get eventsCtaJoinEcoAction => 'Придружи се на акцијата';
 
   @override
+  String get eventsCtaRegistrationClosed => 'Пријавувањето е затворено';
+
+  @override
+  String get eventsDetailJoinClosedCallout =>
+      'Пријавувањето за оваа акција е затворено. Сè уште можете да ги прегледате деталите и фотографиите.';
+
+  @override
   String get eventsStatusUpcoming => 'Претстоен';
 
   @override
@@ -5332,6 +5339,10 @@ class AppLocalizationsMk extends AppLocalizations {
   String get commentsDeleteSubtitle => 'Отстрани го од нишката';
 
   @override
+  String get commentsDeleteConfirmBody =>
+      'Вашиот коментар трајно ќе биде отстранет од нишката. Ова не може да се врати.';
+
+  @override
   String get commentsEditFailedSnack => 'Не можеше да се уреди коментарот.';
 
   @override
@@ -5835,6 +5846,10 @@ class AppLocalizationsMk extends AppLocalizations {
   @override
   String get reportFlowCameraUnavailableSnack =>
       'Камерата не може да се отвори сега. Обиди се повторно за момент.';
+
+  @override
+  String get reportFlowUnsupportedPhotoFormatSnack =>
+      'Овој тип на датотека не е поддржан. Одберете JPEG, PNG или WebP фотографија.';
 
   @override
   String get reportSemanticsLocationPinThenConfirm =>

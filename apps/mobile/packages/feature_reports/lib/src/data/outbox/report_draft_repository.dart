@@ -10,6 +10,7 @@ import 'package:feature_reports/src/data/outbox/report_outbox_constants.dart';
 import 'package:feature_reports/src/data/outbox/report_outbox_entry.dart';
 import 'package:feature_reports/src/data/outbox/report_outbox_repository.dart';
 import 'package:feature_reports/src/data/report_photo_upload_prep.dart';
+import 'package:feature_reports/src/data/report_upload_image_validator.dart';
 import 'package:feature_reports/src/domain/models/report_draft.dart';
 import 'package:feature_reports/src/domain/models/report_draft_summary.dart';
 import 'package:feature_reports/src/domain/models/report_wizard_restore_snapshot.dart';
@@ -343,6 +344,13 @@ class ReportDraftRepository {
   /// Copies a picker/camera file into the managed store; returns an [XFile] whose
   /// [XFile.path] is absolute (for [FileImage] / upload prep).
   Future<XFile> registerPhoto(XFile pickerFile) async {
+    final ReportUploadImageValidation validation =
+        await validateReportUploadImage(pickerFile);
+    if (!validation.isSupported) {
+      throw UnsupportedReportUploadImageException(
+        validation.rejection ?? ReportUploadImageRejection.unsupportedFormat,
+      );
+    }
     final String rel = await _photoStore.importPhoto(pickerFile);
     chistoReportsBreadcrumb('report_draft', 'photo_added');
     final String abs = await _photoStore.absolutePath(rel);

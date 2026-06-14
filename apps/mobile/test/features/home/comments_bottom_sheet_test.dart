@@ -193,7 +193,7 @@ void main() {
     expect(editedBody, '@Ivan Mitkovski updated');
   });
 
-  testWidgets('deletes comment directly from actions sheet', (tester) async {
+  testWidgets('deletes comment after confirmation dialog', (tester) async {
     final comments = <Comment>[
       Comment(
         id: 'c1',
@@ -221,7 +221,53 @@ void main() {
     await tester.tap(find.text('Delete comment'));
     await tester.pumpAndSettle();
 
+    expect(find.text('Delete comment'), findsWidgets);
+    expect(
+      find.text(
+        'Your comment will be permanently removed from this thread. This can\'t be undone.',
+      ),
+      findsOneWidget,
+    );
+    await tester.tap(find.text('Delete'));
+    await tester.pumpAndSettle();
+
     expect(deletedId, 'c1');
+  });
+
+  testWidgets('does not delete comment when confirmation is cancelled', (
+    tester,
+  ) async {
+    final comments = <Comment>[
+      Comment(
+        id: 'c1',
+        authorName: 'Ivan Mitkovski',
+        text: 'Keep me',
+        createdAt: commentTime,
+        isOwnedByMe: true,
+      ),
+    ];
+    String? deletedId;
+
+    await tester.pumpWidget(
+      _wrapCommentsTest(
+        CommentsBottomSheet(
+          comments: comments,
+          onCommentDeleted: (commentId) async {
+            deletedId = commentId;
+          },
+        ),
+      ),
+    );
+
+    await tester.tap(find.byIcon(Icons.more_horiz_rounded));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Delete comment'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+
+    expect(deletedId, isNull);
+    expect(find.byIcon(Icons.more_horiz_rounded), findsOneWidget);
   });
 
   testWidgets('posts comment within max length optimistically', (

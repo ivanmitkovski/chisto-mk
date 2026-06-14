@@ -10,6 +10,7 @@ import 'package:feature_reports/src/application/report_wizard_submit_port.dart';
 import 'package:feature_reports/src/application/reports_providers.dart';
 import 'package:feature_reports/src/data/outbox/report_draft_repository.dart';
 import 'package:feature_reports/src/data/report_flow_preferences.dart';
+import 'package:feature_reports/src/data/report_upload_image_validator.dart';
 import 'package:feature_reports/src/data/outbox/report_outbox_entry.dart';
 import 'package:feature_reports/src/domain/draft/new_report_flow_policy.dart';
 import 'package:feature_reports/src/domain/models/report_capacity.dart';
@@ -82,6 +83,11 @@ class NewReportController extends _$NewReportController {
       try {
         final XFile managed = await _draftRepo.registerPhoto(initialPhoto);
         _setDraft(state.draft.copyWith(photos: <XFile>[managed]));
+      } on UnsupportedReportUploadImageException {
+        chistoReportsBreadcrumb(
+          'report_draft',
+          'initial_photo_unsupported_format',
+        );
       } catch (e, st) {
         chistoReportsBreadcrumb(
           'report_draft',

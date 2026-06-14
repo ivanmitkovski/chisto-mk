@@ -4,6 +4,7 @@ import { ReportViewerPresenceService } from '../../src/reports/services/report-v
 
 describe('ReportViewerPresenceService', () => {
   const actor = { userId: 'mod-1', email: 'mod@example.com' };
+  const originalRedisUrl = process.env.REDIS_URL;
 
   function createService(options?: { reportExists?: boolean }) {
     const prisma: any = {
@@ -19,11 +20,17 @@ describe('ReportViewerPresenceService', () => {
   }
 
   beforeEach(() => {
+    delete process.env.REDIS_URL;
     jest.useFakeTimers();
   });
 
   afterEach(() => {
     jest.useRealTimers();
+    if (originalRedisUrl !== undefined) {
+      process.env.REDIS_URL = originalRedisUrl;
+    } else {
+      delete process.env.REDIS_URL;
+    }
   });
 
   it('registers a viewer on heartbeat and emits debounced SSE update', async () => {

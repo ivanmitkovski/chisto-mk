@@ -39,6 +39,16 @@ extension EcoEventStatusLocalized on EcoEventStatus {
   }
 }
 
+extension EcoEventVolunteerDiscovery on EcoEvent {
+  /// Discovery status when API lifecycle has not caught up to the local join window.
+  String volunteerDiscoveryStatusLabel(AppLocalizations l10n) {
+    if (isVolunteerJoinClosed) {
+      return l10n.eventsCountdownStarted;
+    }
+    return status.localizedLabel(l10n);
+  }
+}
+
 extension EcoEventCategoryLocalized on EcoEventCategory {
   String localizedLabel(AppLocalizations l10n) {
     switch (this) {

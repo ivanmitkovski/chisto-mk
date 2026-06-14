@@ -28,7 +28,7 @@ class EventsFeedController extends _$EventsFeedController {
   final TextEditingController searchController = TextEditingController();
 
   String? _derivedCacheKey;
-  List<EcoEvent>? _cachedFiltered;
+  _EventsFeedDerived? _cachedDerived;
 
   Future<void>? _initialLoadFuture;
   bool _alive = true;
@@ -111,7 +111,7 @@ class EventsFeedController extends _$EventsFeedController {
 
   void _invalidateDerived() {
     _derivedCacheKey = null;
-    _cachedFiltered = null;
+    _cachedDerived = null;
   }
 
   void setUserLocationHint({
@@ -138,8 +138,8 @@ class EventsFeedController extends _$EventsFeedController {
     return h;
   }
 
-  String _filteredMemoKey(AppLocalizations l10n) =>
-      '${_eventsFingerprint(events)}|${state.activeFilter}|${state.searchQuery}|${l10n.localeName}|${state.repositoryEpoch}|${state.userLatitude?.toStringAsFixed(4)}|${state.userLongitude?.toStringAsFixed(4)}';
+  String _filteredMemoKey(AppLocalizations? l10n) =>
+      '${_eventsFingerprint(events)}|${state.activeFilter}|${state.searchQuery}|${l10n?.localeName ?? ''}|${state.repositoryEpoch}|${state.userLatitude?.toStringAsFixed(4)}|${state.userLongitude?.toStringAsFixed(4)}';
 
   /// Single server refresh path for the active chip + advanced filters + cleared global list when empty.
   Future<void> refreshMergedList() async {
@@ -353,15 +353,30 @@ class EventsFeedController extends _$EventsFeedController {
   }
 
   Future<bool> setActiveFilter(EcoEventFilter filter) async {
+    if (filter == state.activeFilter) {
+      return true;
+    }
+    final EcoEventFilter previous = state.activeFilter;
+    final bool serverGroupChanged =
+        EventsFeedSearchMerge.serverFetchGroup(previous) !=
+        EventsFeedSearchMerge.serverFetchGroup(filter);
+
     state = state.copyWith(activeFilter: filter);
     _invalidateDerived();
-    try {
-      await refreshMergedList();
-      await _discoveryPreferences.writeActiveFilter(filter);
+    state = state.copyWith(repositoryEpoch: state.repositoryEpoch + 1);
+
+    unawaited(_discoveryPreferences.writeActiveFilter(filter));
+
+    if (!serverGroupChanged) {
       return true;
-    } on Object catch (_) {
-      return false;
     }
+
+    unawaited(
+      refreshMergedList().catchError((Object _) {
+        // Keep showing the client-filtered in-memory snapshot; pull-to-refresh retries.
+      }),
+    );
+    return true;
   }
 
   /// Resets chip to [EcoEventFilter.all], clears advanced sheet params, and clears search.
@@ -384,13 +399,59 @@ class EventsFeedController extends _$EventsFeedController {
   }
 
   List<EcoEvent> filteredEvents(AppLocalizations l10n) {
+    return _derived(l10n).filtered;
+  }
+
+  /// In-progress rows for sectioned feed (from full [events], not client-filtered list).
+  List<EcoEvent> get happeningNow => _derivedWithoutL10n().happeningNow;
+
+  /// Upcoming rows for hero + sections (from full [events]).
+  List<EcoEvent> get comingUp => _derivedWithoutL10n().comingUp;
+
+  List<EcoEvent> get recentlyCompleted => _derivedWithoutL10n().recentlyCompleted;
+
+  EcoEvent? get heroEvent => _derivedWithoutL10n().hero;
+
+  _EventsFeedDerived _derivedWithoutL10n() => _derived(null);
+
+  _EventsFeedDerived _derived(AppLocalizations? l10n) {
     final String key = _filteredMemoKey(l10n);
-    if (_derivedCacheKey == key && _cachedFiltered != null) {
-      return _cachedFiltered!;
+    if (_derivedCacheKey == key && _cachedDerived != null) {
+      return _cachedDerived!;
     }
     _derivedCacheKey = key;
-    _cachedFiltered = _computeFiltered(l10n);
-    return _cachedFiltered!;
+    _cachedDerived = _computeDerived();
+    return _cachedDerived!;
+  }
+
+  _EventsFeedDerived _computeDerived() {
+    final List<EcoEvent> filtered = _computeFiltered();
+    final List<EcoEvent> happeningNowRows = events
+        .where((EcoEvent e) => e.status == EcoEventStatus.inProgress)
+        .where(_visibleInPublicDiscovery)
+        .toList();
+    final List<EcoEvent> comingUpRows = _applyDiscoverySort(
+      events
+          .where((EcoEvent e) => e.status == EcoEventStatus.upcoming)
+          .where(_visibleInPublicDiscovery)
+          .where(
+            (EcoEvent e) =>
+                e.isOrganizer || e.isJoined || e.canVolunteerJoinNow,
+          )
+          .toList(),
+    );
+    final List<EcoEvent> recentlyCompletedRows =
+        events.where((EcoEvent e) => e.isPastForPublicDiscovery).toList()
+          ..sort((EcoEvent a, EcoEvent b) => b.date.compareTo(a.date));
+    final EcoEvent? hero =
+        comingUpRows.isNotEmpty ? comingUpRows.first : null;
+    return _EventsFeedDerived(
+      filtered: filtered,
+      happeningNow: happeningNowRows,
+      comingUp: comingUpRows,
+      recentlyCompleted: recentlyCompletedRows,
+      hero: hero,
+    );
   }
 
   List<EcoEvent> _applyDiscoverySort(List<EcoEvent> source) {
@@ -432,13 +493,18 @@ class EventsFeedController extends _$EventsFeedController {
     }
   }
 
-  List<EcoEvent> _computeFiltered(AppLocalizations _) {
+  List<EcoEvent> _computeFiltered() {
     List<EcoEvent> list = _applyDiscoverySort(List<EcoEvent>.from(events));
     switch (state.activeFilter) {
       case EcoEventFilter.all:
+        break;
       case EcoEventFilter.upcoming:
       case EcoEventFilter.past:
-        break;
+        list = EventsFeedSearchMerge.applyChipClientFilter(
+          list,
+          state.activeFilter,
+          visibleInPublicDiscovery: _visibleInPublicDiscovery,
+        );
       case EcoEventFilter.nearby:
         list.sort((EcoEvent a, EcoEvent b) {
           final int dist = _distanceForSort(a).compareTo(_distanceForSort(b));
@@ -452,32 +518,6 @@ class EventsFeedController extends _$EventsFeedController {
     }
     return list;
   }
-
-  /// In-progress rows for sectioned feed (from full [events], not client-filtered list).
-  List<EcoEvent> get happeningNow => events
-      .where((EcoEvent e) => e.status == EcoEventStatus.inProgress)
-      .where(_visibleInPublicDiscovery)
-      .toList();
-
-  /// Upcoming rows for hero + sections (from full [events]).
-  List<EcoEvent> get comingUp => _applyDiscoverySort(
-    events
-        .where((EcoEvent e) => e.status == EcoEventStatus.upcoming)
-        .where(_visibleInPublicDiscovery)
-        .toList(),
-  );
-
-  List<EcoEvent> get recentlyCompleted =>
-      events
-          .where(
-            (EcoEvent e) =>
-                e.status == EcoEventStatus.completed ||
-                e.status == EcoEventStatus.cancelled,
-          )
-          .toList()
-        ..sort((EcoEvent a, EcoEvent b) => b.date.compareTo(a.date));
-
-  EcoEvent? get heroEvent => comingUp.isNotEmpty ? comingUp.first : null;
 
   double _distanceForSort(EcoEvent event) {
     final double base = event.siteDistanceKm;
@@ -499,4 +539,20 @@ class EventsFeedController extends _$EventsFeedController {
       LatLng(event.siteLat!, event.siteLng!),
     );
   }
+}
+
+class _EventsFeedDerived {
+  const _EventsFeedDerived({
+    required this.filtered,
+    required this.happeningNow,
+    required this.comingUp,
+    required this.recentlyCompleted,
+    required this.hero,
+  });
+
+  final List<EcoEvent> filtered;
+  final List<EcoEvent> happeningNow;
+  final List<EcoEvent> comingUp;
+  final List<EcoEvent> recentlyCompleted;
+  final EcoEvent? hero;
 }

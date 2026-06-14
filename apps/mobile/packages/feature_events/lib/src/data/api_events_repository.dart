@@ -292,13 +292,19 @@ class ApiEventsRepository extends _ApiEventsRepositoryBase
 
   Future<void> _doRefreshEvents({EcoEventSearchParams? params}) async {
     if (params != _activeParams) {
+      _stashActiveListSnapshot();
       _activeParams = params;
-      _nextCursor = null;
-      _hasMore = false;
+      if (_tryRestoreListSnapshot(params)) {
+        notifyListeners();
+      } else {
+        _nextCursor = null;
+        _hasMore = false;
+      }
     }
     try {
       await _fetchPage(replace: true, params: params);
       await _persistEventsDisk();
+      _stashActiveListSnapshot();
       _lastGlobalListLoadFailed = false;
       _isShowingStaleCachedEvents = false;
       notifyListeners();

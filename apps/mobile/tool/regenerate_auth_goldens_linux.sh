@@ -16,6 +16,10 @@ docker run --rm --platform linux/amd64 \
     set -euo pipefail
     git config --global --add safe.directory /opt/flutter 2>/dev/null || true
     git config --global --add safe.directory /sdks/flutter 2>/dev/null || true
+    if command -v apt-get >/dev/null 2>&1; then
+      apt-get update -qq
+      apt-get install -y -qq libsqlite3-0 >/dev/null
+    fi
     flutter --version
     flutter pub get
     flutter test test/features/auth/golden/auth_screens_golden_test.dart --update-goldens

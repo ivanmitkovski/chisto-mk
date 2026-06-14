@@ -5,6 +5,7 @@ import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/core/providers/app_providers.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
+import 'package:chisto_infrastructure/shared/widgets/organisms/app_confirm_dialog.dart';
 import 'package:chisto_infrastructure/shared/widgets/organisms/app_surface/report_surface_aliases.dart';
 import 'package:design_system/design_system.dart';
 import 'package:feature_home/src/domain/models/comment.dart';
@@ -489,8 +490,23 @@ class _CommentsBottomSheetState extends ConsumerState<CommentsBottomSheet> {
       return;
     }
     if (action == 'delete') {
+      final bool confirmed = await _confirmDeleteComment();
+      if (!confirmed || !mounted) return;
       await _deleteComment(comment);
     }
+  }
+
+  Future<bool> _confirmDeleteComment() async {
+    final l10n = context.l10n;
+    final bool? confirmed = await AppConfirmDialog.show(
+      context: context,
+      title: l10n.commentsDeleteTitle,
+      body: l10n.commentsDeleteConfirmBody,
+      confirmLabel: l10n.commonDelete,
+      cancelLabel: l10n.commonCancel,
+      isDestructive: true,
+    );
+    return confirmed == true;
   }
 
   void _startInlineEdit(Comment comment) {

@@ -4,6 +4,7 @@ import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/shared/utils/app_haptics.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
 import 'package:design_system/design_system.dart';
+import 'package:feature_reports/src/data/report_upload_image_validator.dart';
 import 'package:feature_reports/src/domain/report_field_limits.dart';
 import 'package:feature_reports/src/presentation/controllers/new_report_controller.dart';
 import 'package:feature_reports/src/presentation/widgets/photo_review_sheet.dart';
@@ -68,6 +69,19 @@ Future<void> runNewReportScreenPickAndReview({
 
       if (!context.mounted || file == null) return;
       final XFile selectedFile = file;
+
+      final ReportUploadImageValidation validation =
+          await validateReportUploadImage(selectedFile);
+      if (!validation.isSupported) {
+        if (context.mounted) {
+          AppSnack.show(
+            context,
+            message: context.l10n.reportFlowUnsupportedPhotoFormatSnack,
+            type: AppSnackType.warning,
+          );
+        }
+        continue;
+      }
 
       final PhotoReviewResult? result =
           await AppBottomSheet.show<PhotoReviewResult>(

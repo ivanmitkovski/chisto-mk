@@ -51,8 +51,22 @@ extension EventCleanupEvidenceActions on _EventCleanupEvidenceScreenState {
         return;
       }
 
+      final ({List<XFile> supported, int unsupportedCount}) partitioned =
+          await partitionReportUploadImages(picked);
+      if (partitioned.unsupportedCount > 0 && mounted) {
+        AppSnack.show(
+          context,
+          message: context.l10n.reportFlowUnsupportedPhotoFormatSnack,
+          type: AppSnackType.warning,
+        );
+      }
+      if (partitioned.supported.isEmpty) {
+        if (mounted) rebuildState(() => _isPicking = false);
+        return;
+      }
+
       final ReportPhotoPrepResult prepared =
-          await prepareReportPhotoPathsForUpload(picked);
+          await prepareReportPhotoPathsForUpload(partitioned.supported);
       if (!mounted) {
         deleteReportUploadTempFiles(prepared.paths);
         return;

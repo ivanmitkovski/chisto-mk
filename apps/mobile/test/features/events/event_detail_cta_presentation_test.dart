@@ -70,7 +70,7 @@ void main() {
       event: event,
       l10n: l10n,
     );
-    expect(p.primaryLabel, l10n.eventsCtaJoinEcoAction);
+    expect(p.primaryLabel, l10n.eventsCtaRegistrationClosed);
     expect(p.primaryEnabled, isFalse);
     expect(p.showsSecondaryRow, isFalse);
   });

@@ -17,6 +17,7 @@ extension EventsFeedContentSlivers on EventsFeedScreenState {
     required String phase,
     required double? userLatitude,
     required double? userLongitude,
+    required bool animateListEntrance,
   }) {
     return <Widget>[
       if (phase == 'content' && _feed.repository.isShowingStaleCachedEvents)
@@ -102,6 +103,7 @@ extension EventsFeedContentSlivers on EventsFeedScreenState {
               userLatitude: userLatitude,
               userLongitude: userLongitude,
               startIndex: 0,
+              animateEntrance: animateListEntrance,
             ),
             const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.lg)),
           ],
@@ -113,6 +115,7 @@ extension EventsFeedContentSlivers on EventsFeedScreenState {
               userLatitude: userLatitude,
               userLongitude: userLongitude,
               startIndex: happeningNowRows.length,
+              animateEntrance: animateListEntrance,
             ),
             const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.lg)),
           ],
@@ -124,6 +127,7 @@ extension EventsFeedContentSlivers on EventsFeedScreenState {
               userLatitude: userLatitude,
               userLongitude: userLongitude,
               startIndex: happeningNowRows.length + comingUpRows.length,
+              animateEntrance: animateListEntrance,
             ),
           ],
           if (happeningNowRows.isEmpty &&
@@ -166,6 +170,7 @@ extension EventsFeedContentSlivers on EventsFeedScreenState {
               onTap: _navigateToDetail,
               userLatitude: userLatitude,
               userLongitude: userLongitude,
+              animateEntrance: animateListEntrance,
             ),
         ],
 

@@ -7170,6 +7170,18 @@ abstract class AppLocalizations {
   /// **'Join eco action'**
   String get eventsCtaJoinEcoAction;
 
+  /// No description provided for @eventsCtaRegistrationClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Registration closed'**
+  String get eventsCtaRegistrationClosed;
+
+  /// No description provided for @eventsDetailJoinClosedCallout.
+  ///
+  /// In en, this message translates to:
+  /// **'Registration for this action has closed. You can still view details and photos.'**
+  String get eventsDetailJoinClosedCallout;
+
   /// No description provided for @eventsStatusUpcoming.
   ///
   /// In en, this message translates to:
@@ -8856,6 +8868,12 @@ abstract class AppLocalizations {
   /// **'Remove it from this thread'**
   String get commentsDeleteSubtitle;
 
+  /// No description provided for @commentsDeleteConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your comment will be permanently removed from this thread. This can\'t be undone.'**
+  String get commentsDeleteConfirmBody;
+
   /// No description provided for @commentsEditFailedSnack.
   ///
   /// In en, this message translates to:
@@ -9491,6 +9509,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unable to open the camera right now. Please try again in a moment.'**
   String get reportFlowCameraUnavailableSnack;
+
+  /// No description provided for @reportFlowUnsupportedPhotoFormatSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'This file type isn\'t supported. Choose a JPEG, PNG, or WebP photo.'**
+  String get reportFlowUnsupportedPhotoFormatSnack;
 
   /// No description provided for @reportSemanticsLocationPinThenConfirm.
   ///

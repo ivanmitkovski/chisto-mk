@@ -170,8 +170,19 @@ void main() {
         );
         expect(e.isJoinable, isTrue);
         expect(e.canVolunteerJoinNow, isFalse);
+        expect(e.isVolunteerJoinClosed, isTrue);
+        expect(e.isPastForPublicDiscovery, isTrue);
       },
     );
+
+    test('joined upcoming event is not volunteer join closed', () {
+      final EcoEvent e = buildEvent(organizerId: 'other').copyWith(
+        isJoined: true,
+        scheduledAtUtc: DateTime.utc(2020, 1, 1, 12, 0, 0),
+      );
+      expect(e.isVolunteerJoinClosed, isFalse);
+      expect(e.isPastForPublicDiscovery, isFalse);
+    });
 
     test('isValidRange validates time ranges', () {
       expect(
