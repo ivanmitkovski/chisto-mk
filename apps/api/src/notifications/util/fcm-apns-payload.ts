@@ -1,5 +1,8 @@
 /** APNS / FCM payload helpers (Instagram/Slack-style delivery metadata). */
 
+import type * as admin from 'firebase-admin';
+import { DevicePlatform } from '../../prisma-client';
+
 const APNS_TTL_SECONDS = 4 * 60 * 60;
 
 export type FcmPushData = Record<string, string> | undefined;
@@ -183,5 +186,95 @@ export function buildAndroidFcmOptions(data?: FcmPushData): {
     ...(collapseKey ? { collapseKey } : {}),
     ttl: APNS_TTL_SECONDS * 1000,
     ...(tag ? { notification: { tag } } : {}),
+  };
+}
+
+export function resolveAndroidChannel(data?: FcmPushData): string {
+  const type = data?.['notificationType'] ?? data?.['type'];
+  switch (type) {
+    case 'REPORT_STATUS':
+    case 'NEARBY_REPORT':
+      return 'chisto_reports';
+    case 'CLEANUP_EVENT':
+      return 'chisto_events';
+    case 'EVENT_CHAT':
+      return 'chisto_event_chat';
+    case 'UPVOTE':
+    case 'COMMENT':
+      return 'chisto_social';
+    case 'SYSTEM':
+    case 'ACHIEVEMENT':
+    case 'WELCOME':
+      return 'chisto_system';
+    default:
+      return 'chisto_default';
+  }
+}
+
+export function buildFcmOutgoingMessage(input: {
+  token: string;
+  title: string;
+  body: string;
+  subtitle?: string;
+  badge: number;
+  data?: Record<string, string>;
+  androidChannelId?: string;
+  platform?: DevicePlatform;
+}): admin.messaging.Message {
+  const baseData = input.data ?? {};
+  const silent = isSilentBadgeSync(baseData as FcmPushData);
+  const data: Record<string, string> = silent
+    ? { ...baseData }
+    : {
+        ...baseData,
+        title: input.title,
+        body: input.body,
+      };
+  const clientDisplayed = isEventChatClientDisplayed(data);
+  const channelId = input.androidChannelId ?? resolveAndroidChannel(input.data);
+  const apns = buildApnsConfig({
+    title: input.title,
+    body: input.body,
+    ...(input.subtitle ? { subtitle: input.subtitle } : {}),
+    badge: input.badge,
+    data,
+    clientDisplayed,
+  });
+  const androidOpts = buildAndroidFcmOptions(data);
+  const omitSystemNotification = silent || clientDisplayed;
+  const includeApns = input.platform !== DevicePlatform.ANDROID;
+
+  return {
+    token: input.token,
+    ...(omitSystemNotification
+      ? {}
+      : {
+          notification: {
+            title: input.title,
+            body: input.body,
+          },
+        }),
+    data,
+    android: {
+      priority: 'high',
+      ttl: androidOpts.ttl,
+      ...(androidOpts.collapseKey ? { collapseKey: androidOpts.collapseKey } : {}),
+      ...(omitSystemNotification
+        ? {}
+        : {
+            notification: {
+              channelId,
+              ...(androidOpts.notification?.tag ? { tag: androidOpts.notification.tag } : {}),
+            },
+          }),
+    },
+    ...(includeApns
+      ? {
+          apns: {
+            headers: apns.headers,
+            payload: apns.payload,
+          },
+        }
+      : {}),
   };
 }

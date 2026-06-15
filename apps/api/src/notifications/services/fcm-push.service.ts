@@ -5,13 +5,7 @@ import { DevicePlatform } from '../../prisma-client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ObservabilityStore } from '../../observability/observability.store';
 import { CircuitBreaker, CircuitBreakerOpenError } from '../../common/resilience/circuit-breaker';
-import {
-  buildAndroidFcmOptions,
-  buildApnsConfig,
-  isEventChatClientDisplayed,
-  isSilentBadgeSync,
-  type FcmPushData,
-} from '../util/fcm-apns-payload';
+import { buildFcmOutgoingMessage } from '../util/fcm-apns-payload';
 import {
   FCM_CONFIG_ERROR_CODES,
   FCM_REVOKE_ERROR_CODES,
@@ -31,8 +25,6 @@ export type FcmSendPayload = {
 };
 
 const BADGE_SYNC_THROTTLE_MS = 15 * 60 * 1000;
-
-export { FCM_CONFIG_ERROR_CODES, FCM_REVOKE_ERROR_CODES } from '../util/fcm-error-codes';
 
 export type FcmSendResult = {
   success: boolean;
@@ -136,63 +128,16 @@ export class FcmPushService implements OnModuleInit {
       badge = 0;
     }
 
-    const baseData = payload.data ?? {};
-    const silent = isSilentBadgeSync(baseData as FcmPushData);
-    const data: Record<string, string> = silent
-      ? { ...baseData }
-      : {
-          ...baseData,
-          title: payload.title,
-          body: payload.body,
-        };
-    const clientDisplayed = isEventChatClientDisplayed(data);
-    const channelId = payload.androidChannelId ?? this.resolveAndroidChannel(payload.data);
-    const apns = buildApnsConfig({
+    const message = buildFcmOutgoingMessage({
+      token,
       title: payload.title,
       body: payload.body,
       ...(payload.subtitle ? { subtitle: payload.subtitle } : {}),
       badge,
-      data,
-      clientDisplayed,
+      ...(payload.data ? { data: payload.data } : {}),
+      ...(payload.androidChannelId ? { androidChannelId: payload.androidChannelId } : {}),
+      ...(payload.platform ? { platform: payload.platform } : {}),
     });
-    const androidOpts = buildAndroidFcmOptions(data);
-    const omitSystemNotification = silent || clientDisplayed;
-
-    const includeApns = payload.platform !== DevicePlatform.ANDROID;
-
-    const message: admin.messaging.Message = {
-      token,
-      ...(omitSystemNotification
-        ? {}
-        : {
-            notification: {
-              title: payload.title,
-              body: payload.body,
-            },
-          }),
-      data,
-      android: {
-        priority: 'high',
-        ttl: androidOpts.ttl,
-        ...(androidOpts.collapseKey ? { collapseKey: androidOpts.collapseKey } : {}),
-        ...(omitSystemNotification
-          ? {}
-          : {
-              notification: {
-                channelId,
-                ...(androidOpts.notification?.tag ? { tag: androidOpts.notification.tag } : {}),
-              },
-            }),
-      },
-      ...(includeApns
-        ? {
-            apns: {
-              headers: apns.headers,
-              payload: apns.payload,
-            },
-          }
-        : {}),
-    };
 
     const notificationType = payload.data?.['notificationType'] ?? payload.data?.['type'] ?? 'unknown';
 
@@ -232,28 +177,6 @@ export class FcmPushService implements OnModuleInit {
       }
       const code = fcmErrorCode(error);
       return { success: false, errorCode: code };
-    }
-  }
-
-  private resolveAndroidChannel(data?: Record<string, string>): string {
-    const type = data?.['notificationType'] ?? data?.['type'];
-    switch (type) {
-      case 'REPORT_STATUS':
-      case 'NEARBY_REPORT':
-        return 'chisto_reports';
-      case 'CLEANUP_EVENT':
-        return 'chisto_events';
-      case 'EVENT_CHAT':
-        return 'chisto_event_chat';
-      case 'UPVOTE':
-      case 'COMMENT':
-        return 'chisto_social';
-      case 'SYSTEM':
-      case 'ACHIEVEMENT':
-      case 'WELCOME':
-        return 'chisto_system';
-      default:
-        return 'chisto_default';
     }
   }
 
