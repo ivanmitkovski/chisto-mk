@@ -48,8 +48,8 @@ app.*.map.json
 bugreport*.zip
 flutter_*.png
 
-# Golden-test failure artifacts (transient diffs; never commit)
-test/**/golden/failures/
+# Golden/widget test failure artifacts (transient diffs; never commit)
+test/**/failures/
 
 # Firebase (download from console or CI secrets; see apps/api/docs/push-notifications-setup.md)
 android/app/google-services.json
