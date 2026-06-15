@@ -10,9 +10,10 @@ const redisUrl = process.env.REDIS_URL?.trim();
   let left: RedisReportEventBus;
   let right: RedisReportEventBus;
 
-  beforeAll(() => {
+  beforeAll(async () => {
     left = new RedisReportEventBus(redisUrl!);
     right = new RedisReportEventBus(redisUrl!);
+    await Promise.all([left.whenReady(), right.whenReady()]);
   });
 
   afterAll(() => {
@@ -22,7 +23,7 @@ const redisUrl = process.env.REDIS_URL?.trim();
 
   it('delivers publish from one connection to a subscriber on another', async () => {
     const evt: OwnerReportEvent = {
-      eventId: 'evt-redis-1',
+      eventId: `evt-redis-${Date.now()}`,
       type: 'report_updated',
       ownerId: 'user-a',
       reportId: 'rep-a',
@@ -38,7 +39,6 @@ const redisUrl = process.env.REDIS_URL?.trim();
       ),
     );
 
-    await new Promise((r) => setTimeout(r, 250));
     left.publish(evt);
     const out = await received;
     expect(out.reportId).toBe('rep-a');
@@ -63,7 +63,6 @@ const redisUrl = process.env.REDIS_URL?.trim();
       ),
     );
 
-    await new Promise((r) => setTimeout(r, 250));
     left.publish(evt);
     const out = await received;
     expect(out.mutation.kind).toBe('media_appended');
