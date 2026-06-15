@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chisto_infrastructure/core/deep_links/deep_link_router.dart';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/core/logging/app_log.dart';
 import 'package:chisto_infrastructure/core/navigation/app_go_router.dart';
@@ -150,6 +151,11 @@ class NotificationNavigationExecutor {
         return true;
       case NotificationOpenProfileAchievements():
         return _openProfileAchievements(context, prefix: prefix);
+      case NotificationOpenDeepLink(:final String path):
+        return _openDeepLink(context, path: path, prefix: prefix);
+      case NotificationOpenInformational():
+        NotificationOpenDiagnostics.recordOpenSuccess('${prefix}_informational');
+        return true;
       case NotificationOpenFailure(:final NotificationOpenFailureReason reason):
         NotificationOpenDiagnostics.recordOpenFailure('${prefix}_$reason');
         final BuildContext? resolved = _resolveContext(context);
@@ -317,7 +323,7 @@ class NotificationNavigationExecutor {
       _showSnack(
         context,
         message:
-            _resolveContext(context)?.l10n.notificationsSiteUnavailable ??
+            _resolveContext(context)?.l10n.eventsEventNotFoundBody ??
             'Event unavailable',
       );
       return false;
@@ -371,6 +377,39 @@ class NotificationNavigationExecutor {
     return true;
   }
 
+  static Future<bool> _openDeepLink(
+    BuildContext? context, {
+    required String path,
+    required String prefix,
+  }) async {
+    final String trimmed = path.trim();
+    if (trimmed.isEmpty) {
+      NotificationOpenDiagnostics.recordOpenSuccess('${prefix}_informational');
+      return true;
+    }
+
+    final Uri uri = Uri.parse(trimmed.startsWith('/') ? trimmed : '/$trimmed');
+    final BuildContext? resolved = _resolveContext(context);
+    if (resolved == null) {
+      NotificationOpenDiagnostics.recordOpenFailure('${prefix}_deeplink_no_context');
+      return false;
+    }
+
+    final bool handled = await DeepLinkRouter.handleUriAsync(
+      _router,
+      uri,
+      isAuthenticated: true,
+      context: resolved,
+    );
+    if (handled) {
+      NotificationOpenDiagnostics.recordOpenSuccess('${prefix}_deeplink');
+      return true;
+    }
+
+    NotificationOpenDiagnostics.recordOpenSuccess('${prefix}_deeplink_unhandled');
+    return true;
+  }
+
   static Future<bool> _openProfileAchievements(
     BuildContext? context, {
     required String prefix,
@@ -417,12 +456,14 @@ class NotificationNavigationExecutor {
   ) {
     switch (reason) {
       case NotificationOpenFailureReason.missingSiteId:
+        return context.l10n.notificationsSiteUnavailable;
       case NotificationOpenFailureReason.missingReportId:
+        return context.l10n.notificationsReportUnavailable;
       case NotificationOpenFailureReason.missingEventId:
       case NotificationOpenFailureReason.invalidEventId:
-        return context.l10n.notificationsSiteUnavailable;
+        return context.l10n.eventsEventNotFoundBody;
       case NotificationOpenFailureReason.unsupportedType:
-        return context.l10n.notificationsSiteUnavailable;
+        return context.l10n.notificationsOpenUnsupported;
     }
   }
 }

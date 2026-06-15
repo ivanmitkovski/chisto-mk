@@ -40,7 +40,8 @@
     "running": "Running dependency checks…",
     "failed": "Unable to run diagnostics.",
     "readiness": "Dependency readiness",
-    "systemInfo": "System info"
+    "systemInfo": "System info",
+    "pushDelivery": "Push delivery"
   },
   "metricsDrawer": {
     "button": "Raw metrics",
@@ -103,6 +104,9 @@
     "activeLeases": "Active leases",
     "tokenRevocations": "Token revocations",
     "queueRetries": "Queue retries",
+    "outboxDelivered": "Outbox delivered (all time)",
+    "outboxFailedPermanent": "Outbox dead letters (all time)",
+    "outboxPending": "Outbox pending",
     "emailQueueDepth": "Email queue depth",
     "version": "Version",
     "gitSha": "Git SHA",
@@ -117,7 +121,21 @@
   "deadLetters": {
     "loadFailed": "Unable to load dead letters.",
     "emptyTitle": "No push dead letters",
-    "emptyDescription": "Failed push deliveries will appear here after permanent failure."
+    "emptyDescription": "Failed push deliveries will appear here after permanent failure.",
+    "requeueAll": "Requeue all",
+    "purgeTerminal": "Purge undeliverable",
+    "requeueConfirmTitle": "Requeue push dead letters?",
+    "requeueConfirmDescription": "Resets actionable dead letters with active device tokens so the delivery worker can retry them. Fix Firebase/APNs configuration first if errors were due to misconfiguration.",
+    "purgeConfirmTitle": "Purge undeliverable dead letters?",
+    "purgeConfirmDescription": "Permanently removes dead letters for revoked or invalid tokens. Inbox notifications are kept.",
+    "requeueSuccessTitle": "Dead letters requeued",
+    "requeueSuccessMessage": "{count} dead letter(s) returned to the delivery queue.",
+    "requeueFailedTitle": "Requeue failed",
+    "requeueFailedMessage": "Unable to requeue dead letters.",
+    "purgeSuccessTitle": "Undeliverable dead letters purged",
+    "purgeSuccessMessage": "{count} dead letter(s) removed.",
+    "purgeFailedTitle": "Purge failed",
+    "purgeFailedMessage": "Unable to purge dead letters."
   },
   "emailDeadLetters": {
     "loadFailed": "Unable to load email dead letters.",

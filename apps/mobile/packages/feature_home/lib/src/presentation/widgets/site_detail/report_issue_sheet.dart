@@ -29,7 +29,7 @@ class ReportIssueSheet extends ConsumerStatefulWidget {
     return AppBottomSheet.show<bool>(
       context: context,
       useRootNavigator: true,
-      keyboardInsetMode: SheetKeyboardInsetMode.overlay,
+      keyboardInsetMode: SheetKeyboardInsetMode.lift,
       builder: (BuildContext context) {
         return ReportIssueSheet(
           site: site,

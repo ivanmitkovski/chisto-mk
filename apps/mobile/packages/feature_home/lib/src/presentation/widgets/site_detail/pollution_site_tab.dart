@@ -1,6 +1,8 @@
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:design_system/design_system.dart';
 import 'package:feature_home/src/domain/models/pollution_site.dart';
+import 'package:feature_home/src/presentation/utils/site_resolution_helpers.dart';
+import 'package:feature_home/src/presentation/widgets/site_detail/cleanup_evidence_gallery_section.dart';
 import 'package:feature_home/src/presentation/widgets/site_detail/site_detail_widgets.dart';
 import 'package:flutter/material.dart';
 
@@ -45,6 +47,10 @@ class PollutionSiteTab extends StatefulWidget {
 class _PollutionSiteTabState extends State<PollutionSiteTab> {
   late bool _isSaved;
 
+  bool get _isResolved => isPollutionSiteResolved(widget.site);
+
+  bool get _hasPendingResolution => hasMyPendingResolution(widget.site);
+
   @override
   void initState() {
     super.initState();
@@ -78,6 +84,39 @@ class _PollutionSiteTabState extends State<PollutionSiteTab> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
+              if (_isResolved) ...<Widget>[
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(AppSpacing.sm),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                    border: Border.all(
+                      color: AppColors.primary.withValues(alpha: 0.2),
+                    ),
+                  ),
+                  child: Row(
+                    children: <Widget>[
+                      const Icon(
+                        Icons.check_circle_rounded,
+                        color: AppColors.primary,
+                        size: 20,
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: Text(
+                          context.l10n.siteDetailResolvedBanner,
+                          style: AppTypography.cardSubtitle(textTheme).copyWith(
+                            color: AppColors.primaryDark,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+              ],
               DetailHeroCarousel(site: widget.site),
               const SizedBox(height: AppSpacing.md),
               SiteStatsRow(
@@ -116,6 +155,20 @@ class _PollutionSiteTabState extends State<PollutionSiteTab> {
                   onTap: widget.onReportedTap,
                 ),
               ],
+              if (_isResolved) ...<Widget>[
+                const SizedBox(height: AppSpacing.lg),
+                CleanupEvidenceGallerySection(
+                  key: ValueKey<String>('cleanup-evidence-${widget.site.id}'),
+                  siteId: widget.site.id,
+                ),
+              ],
+              if (_hasPendingResolution) ...<Widget>[
+                const SizedBox(height: AppSpacing.md),
+                AppInlineBanner(
+                  message: context.l10n.siteDetailCleanupUnderReviewBanner,
+                  tone: AppInlineBannerTone.info,
+                ),
+              ],
               const SizedBox(height: AppSpacing.lg),
               SiteInfoCard(onTap: widget.onTakeAction),
               const SizedBox(height: AppSpacing.md),
@@ -132,10 +185,18 @@ class _PollutionSiteTabState extends State<PollutionSiteTab> {
             ],
           ),
         ),
-        StickyBottomCTA(
-          label: context.l10n.pollutionSiteTabTakeAction,
-          onPressed: widget.onTakeAction,
-        ),
+        if (_hasPendingResolution)
+          StickyBottomCTA(
+            label: context.l10n.siteDetailCleanupUnderReviewCta,
+            onPressed: null,
+          )
+        else
+          StickyBottomCTA(
+            label: _isResolved
+                ? context.l10n.siteDetailAddCleanupPhotoCta
+                : context.l10n.pollutionSiteTabTakeAction,
+            onPressed: widget.onTakeAction,
+          ),
       ],
     );
   }

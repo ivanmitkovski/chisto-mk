@@ -40,7 +40,8 @@
     "running": "Се извршуваат проверки…",
     "failed": "Не може да се изврши дијагностика.",
     "readiness": "Подготвеност на зависности",
-    "systemInfo": "Системски информации"
+    "systemInfo": "Системски информации",
+    "pushDelivery": "Push достава"
   },
   "metricsDrawer": {
     "button": "Raw метрики",
@@ -103,6 +104,9 @@
     "activeLeases": "Активни закупи",
     "tokenRevocations": "Повлекувања на токени",
     "queueRetries": "Повторни обиди во ред",
+    "outboxDelivered": "Outbox доставено (севкупно)",
+    "outboxFailedPermanent": "Outbox dead letters (севкупно)",
+    "outboxPending": "Outbox во очекување",
     "emailQueueDepth": "Длабочина на ред за е-пошта",
     "version": "Верзија",
     "gitSha": "Git SHA ознака",
@@ -117,7 +121,21 @@
   "deadLetters": {
     "loadFailed": "Не може да се вчитаат dead letters.",
     "emptyTitle": "Нема push dead letters",
-    "emptyDescription": "Неуспешни push достави ќе се појават тука."
+    "emptyDescription": "Неуспешни push достави ќе се појават тука.",
+    "requeueAll": "Повторно стави во ред",
+    "purgeTerminal": "Избриши недоставливи",
+    "requeueConfirmTitle": "Повторно стави push dead letters?",
+    "requeueConfirmDescription": "Ги ресетира actionable dead letters со активни токени за повторна достава. Прво поправете Firebase/APNs конфигурација ако грешките се од misconfiguration.",
+    "purgeConfirmTitle": "Избриши недоставливи dead letters?",
+    "purgeConfirmDescription": "Трајно ги отстранува dead letters за revoked или invalid токени. Inbox известувањата остануваат.",
+    "requeueSuccessTitle": "Dead letters се вратени во ред",
+    "requeueSuccessMessage": "{count} dead letter(s) се вратени во delivery queue.",
+    "requeueFailedTitle": "Requeue не успеа",
+    "requeueFailedMessage": "Не може да се requeue dead letters.",
+    "purgeSuccessTitle": "Недоставливи dead letters се избришани",
+    "purgeSuccessMessage": "{count} dead letter(s) се отстранети.",
+    "purgeFailedTitle": "Purge не успеа",
+    "purgeFailedMessage": "Не може да се purge dead letters."
   },
   "emailDeadLetters": {
     "loadFailed": "Не може да се вчитаат email dead letters.",

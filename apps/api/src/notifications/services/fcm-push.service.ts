@@ -1,6 +1,7 @@
 import { Injectable, Logger, OnModuleInit, Optional } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as admin from 'firebase-admin';
+import { DevicePlatform } from '../../prisma-client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ObservabilityStore } from '../../observability/observability.store';
 import { CircuitBreaker, CircuitBreakerOpenError } from '../../common/resilience/circuit-breaker';
@@ -11,6 +12,10 @@ import {
   isSilentBadgeSync,
   type FcmPushData,
 } from '../util/fcm-apns-payload';
+import {
+  FCM_CONFIG_ERROR_CODES,
+  FCM_REVOKE_ERROR_CODES,
+} from '../util/fcm-error-codes';
 
 export type FcmSendPayload = {
   title: string;
@@ -21,22 +26,20 @@ export type FcmSendPayload = {
   androidChannelId?: string;
   /** When set, skips per-send unread count query (dispatcher provides truth). */
   unreadCount?: number;
+  /** When known, omits APNS payload for ANDROID (avoids APNs auth errors on Android tokens). */
+  platform?: DevicePlatform;
 };
 
 const BADGE_SYNC_THROTTLE_MS = 15 * 60 * 1000;
 
-const FCM_REVOKE_ERROR_CODES = new Set([
-  'messaging/registration-token-not-registered',
-  'messaging/invalid-registration-token',
-  'messaging/invalid-argument',
-  'messaging/mismatched-credential',
-  'messaging/sender-id-mismatch',
-]);
+export { FCM_CONFIG_ERROR_CODES, FCM_REVOKE_ERROR_CODES } from '../util/fcm-error-codes';
 
 export type FcmSendResult = {
   success: boolean;
   canonicalToken?: string;
   shouldRevoke?: boolean;
+  /** Permanent misconfiguration (APNs key, service account, project mismatch). */
+  isConfigError?: boolean;
   errorCode?: string;
 };
 
@@ -49,6 +52,7 @@ function fcmErrorCode(error: unknown): string {
 export class FcmPushService implements OnModuleInit {
   private readonly logger = new Logger(FcmPushService.name);
   private app: admin.app.App | null = null;
+  private projectId: string | null = null;
   private readonly lastBadgeSyncAtByUser = new Map<string, number>();
   private readonly circuitBreaker = new CircuitBreaker({
     name: 'fcm',
@@ -77,11 +81,19 @@ export class FcmPushService implements OnModuleInit {
     }
 
     try {
-      const credential = admin.credential.cert(JSON.parse(credentialsJson));
+      const parsed = JSON.parse(credentialsJson) as admin.ServiceAccount & { project_id?: string };
+      const credential = admin.credential.cert(parsed);
       this.app = admin.initializeApp({ credential });
-      this.logger.log('Firebase Admin initialized');
+      this.projectId = parsed.project_id ?? parsed.projectId ?? null;
+      const projectLabel = this.projectId ?? 'unknown';
+      this.logger.log(`Firebase Admin initialized (project_id=${projectLabel})`);
     } catch (error) {
-      this.logger.error('Failed to initialize Firebase Admin', error);
+      const detail = error instanceof Error ? error.message : String(error);
+      this.logger.error(
+        `Failed to initialize Firebase Admin (${detail}). ` +
+          'Ensure FIREBASE_SERVICE_ACCOUNT_JSON is valid single-line JSON for project chisto-mk-dev, ' +
+          'e.g. FIREBASE_SERVICE_ACCOUNT_JSON=$(jq -c . ./firebase-adminsdk.json)',
+      );
     }
   }
 
@@ -95,6 +107,10 @@ export class FcmPushService implements OnModuleInit {
 
   isReady(): boolean {
     return this.app !== null;
+  }
+
+  getProjectId(): string | null {
+    return this.projectId;
   }
 
   async resolveUnreadBadge(userId: string): Promise<number> {
@@ -142,6 +158,8 @@ export class FcmPushService implements OnModuleInit {
     const androidOpts = buildAndroidFcmOptions(data);
     const omitSystemNotification = silent || clientDisplayed;
 
+    const includeApns = payload.platform !== DevicePlatform.ANDROID;
+
     const message: admin.messaging.Message = {
       token,
       ...(omitSystemNotification
@@ -166,10 +184,14 @@ export class FcmPushService implements OnModuleInit {
               },
             }),
       },
-      apns: {
-        headers: apns.headers,
-        payload: apns.payload,
-      },
+      ...(includeApns
+        ? {
+            apns: {
+              headers: apns.headers,
+              payload: apns.payload,
+            },
+          }
+        : {}),
     };
 
     const notificationType = payload.data?.['notificationType'] ?? payload.data?.['type'] ?? 'unknown';
@@ -186,6 +208,15 @@ export class FcmPushService implements OnModuleInit {
           if (FCM_REVOKE_ERROR_CODES.has(code)) {
             ObservabilityStore.recordPushSend('revoked', notificationType);
             return { success: false, shouldRevoke: true, errorCode: code } as const;
+          }
+
+          if (FCM_CONFIG_ERROR_CODES.has(code)) {
+            this.logger.error(
+              `FCM config error (${code}): check FIREBASE_SERVICE_ACCOUNT_JSON project matches the mobile app ` +
+                'and upload a valid APNs Auth Key (.p8) in Firebase Console → Project settings → Cloud Messaging.',
+            );
+            ObservabilityStore.recordPushSend('failure', notificationType);
+            return { success: false, isConfigError: true, errorCode: code } as const;
           }
 
           this.logger.warn(`FCM send failed: ${code}`);

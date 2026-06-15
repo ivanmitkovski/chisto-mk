@@ -19,6 +19,8 @@ import { FcmPushService } from './services/fcm-push.service';
 import { PushDeliveryWorkerService } from './services/push-delivery-worker.service';
 import { PushDeliveryOutboxService } from './services/push-delivery-outbox.service';
 import { PushDeliverySenderService } from './services/push-delivery-sender.service';
+import { PushDeadLetterRequeueService } from './services/push-dead-letter-requeue.service';
+import { PushDiagnosticsService } from './services/push-diagnostics.service';
 import { NotificationDispatcherService } from './services/notification-dispatcher.service';
 import { CleanupEventNotificationsService } from './services/cleanup-event-notifications.service';
 import { NearbyUsersForReportService } from './services/nearby-users-for-report.service';
@@ -51,6 +53,8 @@ import { NotificationsRoomEmitterService } from './services/notifications-room-e
     FcmPushService,
     PushDeliveryOutboxService,
     PushDeliverySenderService,
+    PushDeadLetterRequeueService,
+    PushDiagnosticsService,
     PushDeliveryWorkerService,
     NotificationDispatcherService,
     CleanupEventNotificationsService,

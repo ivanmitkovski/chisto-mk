@@ -11,7 +11,8 @@ import {
   StatusPill,
 } from '@/components/ui';
 import { formatAdminDateTime, useAdminBcp47Locale } from '@/lib/i18n';
-import type { OperationsSnapshot } from '../data/operations-adapter';
+import type { OperationsSnapshot } from '../data/operations-snapshot';
+import { normalizePushStats } from '../data/operations-snapshot';
 import { useOperationsLive } from './operations-live-provider';
 import { OperationsActionsPanel } from './operations-actions-panel';
 import { OperationsDeadLettersPanel } from './operations-dead-letters-panel';
@@ -35,6 +36,8 @@ export function OperationsWorkspace({ snapshot }: { snapshot: OperationsSnapshot
   const tCommon = useTranslations('common');
   const locale = useAdminBcp47Locale();
   const { getSeries } = useOperationsLive();
+  const pushStats =
+    snapshot.pushStats.status === 'ok' ? normalizePushStats(snapshot.pushStats.data) : null;
 
   return (
     <>
@@ -52,36 +55,47 @@ export function OperationsWorkspace({ snapshot }: { snapshot: OperationsSnapshot
         <h2 className={styles.sectionTitle}>{t('sections.delivery')}</h2>
         <div className={styles.grid}>
           <OperationsPanelCard panelKey="pushStats" title={t('cards.pushDelivery')} state={snapshot.pushStats}>
-            {snapshot.pushStats.status === 'ok' ? (
+            {pushStats ? (
               <>
                 <MetricTileGrid>
-                  <MetricTile label={t('metrics.totalSends')} value={snapshot.pushStats.data.sendsTotal} />
+                  <MetricTile label={t('metrics.totalSends')} value={pushStats.sendsTotal} />
                   <MetricTile
                     label={t('metrics.success')}
-                    value={snapshot.pushStats.data.sendsSuccess}
+                    value={pushStats.sendsSuccess}
                     tone="success"
                     sparkline={<Sparkline data={getSeries('pushSendsSuccess')} ariaLabel={t('metrics.success')} />}
                   />
                   <MetricTile
                     label={t('metrics.failures')}
-                    value={snapshot.pushStats.data.sendsFailure}
+                    value={pushStats.sendsFailure}
                     tone="danger"
                     sparkline={<Sparkline data={getSeries('pushSendsFailure')} ariaLabel={t('metrics.failures')} />}
                   />
-                  <MetricTile label={t('metrics.revoked')} value={snapshot.pushStats.data.sendsRevoked} />
-                  <MetricTile label={t('metrics.deadLetters')} value={snapshot.pushStats.data.deadLetterCount} />
+                  <MetricTile label={t('metrics.revoked')} value={pushStats.sendsRevoked} />
+                  <MetricTile label={t('metrics.deadLetters')} value={pushStats.deadLetterCount} />
+                  <MetricTile
+                    label={t('metrics.outboxDelivered')}
+                    value={pushStats.outbox.deliveredTotal}
+                    tone="success"
+                  />
+                  <MetricTile
+                    label={t('metrics.outboxFailedPermanent')}
+                    value={pushStats.outbox.failedPermanentlyTotal}
+                    tone="danger"
+                  />
+                  <MetricTile label={t('metrics.outboxPending')} value={pushStats.outbox.pendingTotal} />
                   <MetricTile
                     label={t('metrics.queueDepth')}
-                    value={snapshot.pushStats.data.queueDepth}
+                    value={pushStats.queueDepth}
                     sparkline={<Sparkline data={getSeries('pushQueueDepth')} ariaLabel={t('metrics.queueDepth')} />}
                   />
-                  <MetricTile label={t('metrics.activeLeases')} value={snapshot.pushStats.data.activeLeases} />
-                  <MetricTile label={t('metrics.tokenRevocations')} value={snapshot.pushStats.data.tokenRevocations} />
-                  <MetricTile label={t('metrics.queueRetries')} value={snapshot.pushStats.data.queueRetries} />
+                  <MetricTile label={t('metrics.activeLeases')} value={pushStats.activeLeases} />
+                  <MetricTile label={t('metrics.tokenRevocations')} value={pushStats.tokenRevocations} />
+                  <MetricTile label={t('metrics.queueRetries')} value={pushStats.queueRetries} />
                 </MetricTileGrid>
-                {Object.keys(snapshot.pushStats.data.sendsByType).length > 0 ? (
+                {Object.keys(pushStats.sendsByType).length > 0 ? (
                   <ul className={styles.breakdownList}>
-                    {Object.entries(snapshot.pushStats.data.sendsByType).slice(0, 5).map(([type, stats]) => (
+                    {Object.entries(pushStats.sendsByType).slice(0, 5).map(([type, stats]) => (
                       <li key={type}>
                         <strong>{type}</strong> — {stats.success}/{stats.failure}/{stats.revoked}
                       </li>

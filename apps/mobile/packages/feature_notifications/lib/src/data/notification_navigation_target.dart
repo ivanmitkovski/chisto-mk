@@ -66,6 +66,18 @@ final class NotificationOpenProfileAchievements
   const NotificationOpenProfileAchievements();
 }
 
+/// Admin broadcast deeplink or other in-app path-only link from notification data.
+final class NotificationOpenDeepLink extends NotificationNavigationTarget {
+  const NotificationOpenDeepLink({required this.path});
+
+  final String path;
+}
+
+/// Informational SYSTEM notifications (test push, broadcast without link, etc.).
+final class NotificationOpenInformational extends NotificationNavigationTarget {
+  const NotificationOpenInformational();
+}
+
 enum NotificationOpenFailureReason {
   missingReportId,
   missingSiteId,
@@ -160,6 +172,20 @@ NotificationNavigationTarget resolveNotificationNavigationTarget({
     return NotificationOpenSiteDetail(siteId: siteId);
   }
 
+  if (type == 'SYSTEM') {
+    final NotificationNavigationTarget? systemTarget =
+        _resolveSystemNotificationTarget(
+          dataKind: dataKind,
+          reportId: reportId,
+          siteId: siteId,
+          eventId: eventId,
+          data: data,
+        );
+    if (systemTarget != null) {
+      return systemTarget;
+    }
+  }
+
   if (type == 'ACHIEVEMENT') {
     return const NotificationOpenProfileAchievements();
   }
@@ -177,6 +203,32 @@ NotificationNavigationTarget resolveNotificationNavigationTarget({
   return const NotificationOpenFailure(
     NotificationOpenFailureReason.unsupportedType,
   );
+}
+
+NotificationNavigationTarget? _resolveSystemNotificationTarget({
+  required String? dataKind,
+  required String? reportId,
+  required String? siteId,
+  required String? eventId,
+  required Map<String, dynamic>? data,
+}) {
+  if (dataKind == 'test_push') {
+    return const NotificationOpenInformational();
+  }
+
+  if (dataKind == 'admin_broadcast') {
+    final String? deeplink = _trimId(data?['deeplink']);
+    if (deeplink != null) {
+      return NotificationOpenDeepLink(path: deeplink);
+    }
+    return const NotificationOpenInformational();
+  }
+
+  if (reportId == null && siteId == null && eventId == null) {
+    return const NotificationOpenInformational();
+  }
+
+  return null;
 }
 
 NotificationInboxHighlight? _highlightFromData(

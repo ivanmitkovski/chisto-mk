@@ -6,116 +6,18 @@ import {
   OPS_MAP_DEEP_TIMEOUT_MS,
   OPS_PROBE_TIMEOUT_MS,
 } from '../config';
+import {
+  normalizeDeliveryReport,
+  normalizePushStats,
+  sanitizeOperationsSnapshot,
+  type OperationsSnapshot,
+  type PanelState,
+  type PushStatsData,
+  type DeliveryReportData,
+} from './operations-snapshot';
 
-export type PanelState<T> =
-  | { status: 'ok'; data: T; updatedAt: string }
-  | { status: 'error'; error: string; updatedAt: string }
-  | { status: 'forbidden'; updatedAt: string };
-
-export type OperationsSnapshot = {
-  pushStats: PanelState<{
-    sendsTotal: number;
-    sendsSuccess: number;
-    sendsFailure: number;
-    sendsRevoked: number;
-    sendsByType: Record<string, { success: number; failure: number; revoked: number }>;
-    tokenRevocations: number;
-    queueRetries: number;
-    inboxReads: number;
-    queueDepth: number;
-    activeLeases: number;
-    deadLetterCount: number;
-  }>;
-  deliveryReport: PanelState<{
-    sends: {
-      total: number;
-      success: number;
-      failure: number;
-      revoked: number;
-      byType: Record<string, { success: number; failure: number; revoked: number }>;
-    };
-    inbox: { notificationsSent: number; notificationsOpened: number; openRate: number };
-    queue: { depth: number; activeLeases: number; deadLetterCount: number; retries: number };
-  }>;
-  deadLetters: PanelState<{
-    data: Array<{
-      id: string;
-      userNotificationId: string;
-      deviceTokenSuffix: string;
-      attempts: number;
-      lastErrorCode: string | null;
-      lastErrorMessage: string | null;
-      lastAttemptAt: string | null;
-      createdAt: string;
-    }>;
-    meta: { page: number; limit: number; total: number };
-  }>;
-  emailDeadLetters: PanelState<{
-    data: Array<{
-      id: string;
-      userId: string;
-      templateId: string;
-      attempts: number;
-      lastError: string | null;
-      lastAttemptAt: string | null;
-      createdAt: string;
-    }>;
-    meta: { page: number; limit: number; total: number };
-  }>;
-  mapHealth: PanelState<{
-    status: string;
-    mapUseProjection: boolean;
-    outboxPending: number;
-    staleHotProjectionRows: number;
-    alerts: string[];
-  }>;
-  mapDeep: PanelState<{
-    status: string;
-    durationMs: number;
-    matchCount: number;
-    queryPath: string;
-    alerts: string[];
-  }>;
-  gdprAudit: PanelState<{
-    data: Array<{ id: string; action: string; createdAt: string; actorEmail: string | null }>;
-    meta: { total: number };
-  }>;
-  feedDiagnostics: PanelState<{
-    reasonCodes: Array<{ code: string; count: number }>;
-    rankDriftSnapshot: Array<{ siteId: string; score: number; reasons: string[] }>;
-    recentIntegrityDemotions: number;
-  }>;
-  sideEffects: PanelState<{ pendingCount: number }>;
-  emailSuppressions: PanelState<{ meta: { total: number } }>;
-  systemInfo: PanelState<{
-    version: string;
-    gitSha: string | null;
-    nodeEnv: string;
-    region: string | null;
-    startedAt: string;
-    uptimeSeconds: number;
-    fcmEnabled: boolean;
-  }>;
-  workers: PanelState<{
-    workers: Array<{
-      name: string;
-      running: boolean;
-      intervalMs: number;
-      startedAt: string;
-      lastRunAt: string | null;
-      lastSuccessAt: string | null;
-      lastError: string | null;
-      stale: boolean;
-    }>;
-    perReplica: boolean;
-  }>;
-  readiness: PanelState<{
-    status: 'ok' | 'degraded';
-    database: 'ok' | 'fail';
-    redis: string;
-    s3: string;
-  }>;
-};
+export type { OperationsSnapshot, PanelState, PushStatsData } from './operations-snapshot';
+export { normalizePushStats, sanitizeOperationsSnapshot } from './operations-snapshot';
 
 async function capture<T>(fn: () => Promise<T>): Promise<PanelState<T>> {
   const updatedAt = new Date().toISOString();
@@ -168,18 +70,18 @@ export async function getOperationsSnapshot(): Promise<OperationsSnapshot> {
     readiness,
   ] = await Promise.all([
     capture(() =>
-      fetchWithTimeout<OperationsSnapshot['pushStats'] extends PanelState<infer T> ? T : never>(
+      fetchWithTimeout<Partial<PushStatsData>>(
         '/notifications/admin/push-stats',
         OPS_PROBE_TIMEOUT_MS,
         fetchOptions,
-      ),
+      ).then(normalizePushStats),
     ),
     capture(() =>
-      fetchWithTimeout<OperationsSnapshot['deliveryReport'] extends PanelState<infer T> ? T : never>(
+      fetchWithTimeout<Partial<DeliveryReportData>>(
         '/notifications/admin/delivery-report',
         OPS_PROBE_TIMEOUT_MS,
         fetchOptions,
-      ),
+      ).then(normalizeDeliveryReport),
     ),
     capture(() =>
       fetchWithTimeout<OperationsSnapshot['deadLetters'] extends PanelState<infer T> ? T : never>(
@@ -260,7 +162,7 @@ export async function getOperationsSnapshot(): Promise<OperationsSnapshot> {
     ),
   ]);
 
-  return {
+  return sanitizeOperationsSnapshot({
     pushStats,
     deliveryReport,
     deadLetters,
@@ -274,7 +176,7 @@ export async function getOperationsSnapshot(): Promise<OperationsSnapshot> {
     systemInfo,
     workers,
     readiness,
-  };
+  });
 }
 
 export async function fetchOperationsMetricsSnapshot() {

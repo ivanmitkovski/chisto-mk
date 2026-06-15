@@ -1,5 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+export class PushOutboxTotalsDto {
+  @ApiProperty()
+  deliveredTotal!: number;
+
+  @ApiProperty()
+  failedPermanentlyTotal!: number;
+
+  @ApiProperty()
+  pendingTotal!: number;
+}
+
 export class PushStatsDto {
   @ApiProperty()
   sendsTotal!: number;
@@ -33,6 +44,9 @@ export class PushStatsDto {
 
   @ApiProperty()
   deadLetterCount!: number;
+
+  @ApiProperty({ type: PushOutboxTotalsDto })
+  outbox!: PushOutboxTotalsDto;
 }
 
 export class DeliveryReportSendsDto {
@@ -86,6 +100,9 @@ export class DeliveryReportDto {
 
   @ApiProperty({ type: DeliveryReportQueueDto })
   queue!: DeliveryReportQueueDto;
+
+  @ApiProperty({ type: PushOutboxTotalsDto })
+  outbox!: PushOutboxTotalsDto;
 }
 
 export class DeadLetterRowDto {
@@ -131,4 +148,47 @@ export class DeadLetterPageDto {
 
   @ApiProperty({ type: PaginationMetaDto })
   meta!: PaginationMetaDto;
+}
+
+export class DeadLetterRequeueResultDto {
+  @ApiProperty()
+  requeued!: number;
+}
+
+export class DeadLetterRequeueOneResultDto {
+  @ApiProperty()
+  requeued!: boolean;
+}
+
+export class DeadLetterPurgeResultDto {
+  @ApiProperty()
+  purged!: number;
+}
+
+export class PushDiagnosticsTopErrorCodeDto {
+  @ApiProperty()
+  code!: string;
+
+  @ApiProperty()
+  count!: number;
+}
+
+export class PushDiagnosticsDto {
+  @ApiProperty()
+  fcmEnabled!: boolean;
+
+  @ApiProperty()
+  fcmReady!: boolean;
+
+  @ApiProperty({ nullable: true })
+  projectId!: string | null;
+
+  @ApiProperty()
+  deadLetterTotal!: number;
+
+  @ApiProperty({ type: [PushDiagnosticsTopErrorCodeDto] })
+  topErrorCodes!: PushDiagnosticsTopErrorCodeDto[];
+
+  @ApiProperty({ nullable: true })
+  remediation!: string | null;
 }

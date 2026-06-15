@@ -27,7 +27,7 @@ Future<bool?> showUgcReportSheet(
   return AppBottomSheet.show<bool>(
     context: context,
     maxHeightFactor: 0.82,
-    keyboardInsetMode: SheetKeyboardInsetMode.overlay,
+    keyboardInsetMode: SheetKeyboardInsetMode.lift,
     builder: (BuildContext ctx) => _UgcReportSheetBody(
       subjectType: subjectType,
       subjectId: subjectId,

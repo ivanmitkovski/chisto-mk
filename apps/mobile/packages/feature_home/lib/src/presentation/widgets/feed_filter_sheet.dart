@@ -4,7 +4,7 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-enum FeedFilter { all, urgent, nearby, mostVoted, recent, saved }
+enum FeedFilter { all, urgent, nearby, mostVoted, recent, saved, resolved }
 
 extension FeedFilterUi on FeedFilter {
   String displayName(AppLocalizations l10n) {
@@ -21,6 +21,8 @@ extension FeedFilterUi on FeedFilter {
         return l10n.feedFilterRecentName;
       case FeedFilter.saved:
         return l10n.feedFilterSavedName;
+      case FeedFilter.resolved:
+        return l10n.feedFilterResolvedName;
     }
   }
 
@@ -38,6 +40,8 @@ extension FeedFilterUi on FeedFilter {
         return l10n.feedFilterRecentDesc;
       case FeedFilter.saved:
         return l10n.feedFilterSavedDesc;
+      case FeedFilter.resolved:
+        return l10n.feedFilterResolvedDesc;
     }
   }
 }

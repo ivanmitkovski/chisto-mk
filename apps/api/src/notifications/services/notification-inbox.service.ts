@@ -132,4 +132,8 @@ export class NotificationInboxService {
   listDeadLetters(page?: number, limit?: number) {
     return this.inboxAdmin.listDeadLetters(page, limit);
   }
+
+  countOutboxTotals() {
+    return this.inboxAdmin.countOutboxTotals();
+  }
 }

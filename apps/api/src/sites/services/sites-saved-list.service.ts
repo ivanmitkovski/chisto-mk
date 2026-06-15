@@ -10,12 +10,15 @@ import { mapWithConcurrency } from '../util/sites-feed-query-async.util';
 import { signPublicMediaUrlsDeduped } from '../../storage/util/batch-private-object-sign';
 import type { FeedSiteRow } from '../types/sites-feed-candidate.types';
 import type { SitesFeedListResult } from '../types/sites-feed.types';
+import { SiteResolutionQueryService } from '../resolutions/services/site-resolution-query.service';
+import { viewerResolutionStatusForSite } from '../resolutions/util/viewer-resolution-status';
 
 @Injectable()
 export class SitesSavedListService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly reportsUploadService: ReportsUploadService,
+    private readonly siteResolutionQuery: SiteResolutionQueryService,
   ) {}
 
   private siteInclude(userId: string) {
@@ -112,6 +115,7 @@ export class SitesSavedListService {
         sharesCount: siteBase.sharesCount,
         isUpvotedByMe: Array.isArray(votes) && votes.length > 0,
         isSavedByMe: true,
+        viewerResolutionStatus: 'none' as const,
         rankingScore: latestReportDate.getTime(),
         rankingReasons: ['saved_by_you'],
         distanceKm,
@@ -134,11 +138,20 @@ export class SitesSavedListService {
       };
     });
 
+    const resolutionStatusBySite = await this.siteResolutionQuery.getViewerStatusBySiteIds(
+      userId,
+      enrichedSigned.map((row) => row.id),
+    );
+    const enrichedWithResolution = enrichedSigned.map((row) => ({
+      ...row,
+      viewerResolutionStatus: viewerResolutionStatusForSite(resolutionStatusBySite, row.id),
+    }));
+
     const nextCursor =
-      skip + enrichedSigned.length < total ? String(query.page + 1) : null;
+      skip + enrichedWithResolution.length < total ? String(query.page + 1) : null;
 
     return {
-      data: enrichedSigned as SitesFeedListResult['data'],
+      data: enrichedWithResolution as SitesFeedListResult['data'],
       meta: {
         page: query.page,
         limit: query.limit,

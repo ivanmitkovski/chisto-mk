@@ -1,14 +1,17 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:design_system/src/widgets/organisms/app_bottom_sheet/app_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 
 /// How a scroll-controlled sheet reacts when the software keyboard opens.
 enum SheetKeyboardInsetMode {
-  /// Lifts the whole sheet above the keyboard (forms with pinned footers).
+  /// Lifts the whole sheet above the keyboard via bottom padding on the modal
+  /// host. Use for form sheets with text fields and pinned footers.
   lift,
 
   /// Keeps sheet height stable; keyboard overlays; child scrolls internally.
+  /// Use for map/search sheets that need a fixed height cap — not form sheets.
   overlay,
 }
 
@@ -20,15 +23,19 @@ Widget wrapScrollControlledBottomSheet({
   SheetKeyboardInsetMode keyboardInsetMode = SheetKeyboardInsetMode.lift,
 }) {
   final double keyboardBottom = keyboardInsetMode == SheetKeyboardInsetMode.lift
-      ? MediaQuery.viewInsetsOf(context).bottom
+      ? MediaQueryData.fromView(View.of(context)).viewInsets.bottom
       : 0;
 
   return Padding(
     padding: EdgeInsets.only(bottom: keyboardBottom),
     child: LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        final double heightCap = maxHeight ?? constraints.maxHeight;
+        final double heightCap = maxHeight == null
+            ? constraints.maxHeight
+            : math.min(maxHeight, constraints.maxHeight);
 
+        // Content-hugging sheets must size to the child; lift padding sits in the
+        // transparent band below the painted panel (not inside the sheet chrome).
         return Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,

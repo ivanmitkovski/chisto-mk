@@ -35,6 +35,8 @@ import {
 } from '../util/sites-feed-geo-scope.util';
 import { resolveActorIdentity } from '../../common/projections/public-identity.projection';
 import { PrismaService } from '../../prisma/prisma.service';
+import { SiteResolutionQueryService } from '../resolutions/services/site-resolution-query.service';
+import { viewerResolutionStatusForSite } from '../resolutions/util/viewer-resolution-status';
 
 @Injectable()
 export class SitesFeedEnrichmentService {
@@ -46,6 +48,7 @@ export class SitesFeedEnrichmentService {
     private readonly feedCache: SitesFeedCacheService,
     private readonly preferences: SitesFeedPreferencesService,
     private readonly siteCommentsCount: SiteCommentsCountService,
+    private readonly siteResolutionQuery: SiteResolutionQueryService,
   ) {}
 
   async buildFeedListResponse(
@@ -127,15 +130,29 @@ export class SitesFeedEnrichmentService {
 
     const responseData = mapToFeedResponseData(data, query);
     if (user?.userId) {
-      const visibleCounts = await this.siteCommentsCount.countVisibleBatch(
-        data.map((row) => row.id),
-        user,
-      );
+      const [visibleCounts, resolutionStatusBySite] = await Promise.all([
+        this.siteCommentsCount.countVisibleBatch(
+          data.map((row) => row.id),
+          user,
+        ),
+        this.siteResolutionQuery.getViewerStatusBySiteIds(
+          user.userId,
+          data.map((row) => row.id),
+        ),
+      ]);
       for (const item of responseData) {
         const visible = visibleCounts.get(item.id);
         if (visible != null) {
           item.commentsCount = visible;
         }
+        item.viewerResolutionStatus = viewerResolutionStatusForSite(
+          resolutionStatusBySite,
+          item.id,
+        );
+      }
+    } else {
+      for (const item of responseData) {
+        item.viewerResolutionStatus = 'none';
       }
     }
     const response: SitesFeedListResult = {
@@ -261,6 +278,7 @@ export class SitesFeedEnrichmentService {
       latestReportReporterId,
       isUpvotedByMe: Array.isArray(votes) && votes.length > 0,
       isSavedByMe: Array.isArray(saves) && saves.length > 0,
+      viewerResolutionStatus: 'none' as const,
       rankingScore: rankingDetail.score,
       rankingReasons: rankingDetail.reasonCodes,
       ...(query.explain ? { rankingComponents: rankingDetail.components } : {}),

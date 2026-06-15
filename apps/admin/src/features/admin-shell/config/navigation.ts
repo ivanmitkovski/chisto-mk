@@ -6,6 +6,7 @@ export const adminNavigation: ReadonlyArray<NavItem> = [
   { key: 'duplicates', labelKey: 'duplicates', href: '/dashboard/reports/duplicates', icon: 'document-forward' },
   { key: 'users', href: '/dashboard/users', icon: 'users' },
   { key: 'sites', href: '/dashboard/sites', icon: 'location' },
+  { key: 'resolutions', labelKey: 'resolutions', href: '/dashboard/resolutions', icon: 'check-circle' },
   { key: 'map', href: '/dashboard/map', icon: 'map' },
   { key: 'events', href: '/dashboard/events', icon: 'calendar' },
   { key: 'risk-signals', href: '/dashboard/events/risk-signals', icon: 'alert-triangle' },

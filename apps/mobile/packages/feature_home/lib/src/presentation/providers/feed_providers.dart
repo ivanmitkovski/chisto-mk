@@ -43,6 +43,23 @@ feedApiParamsForFilter(FeedFilter filter) {
       );
     case FeedFilter.saved:
       return (sort: 'recent', mode: 'latest', radiusKm: 100.0, scope: 'local');
+    case FeedFilter.resolved:
+      return (
+        sort: 'recent',
+        mode: 'latest',
+        radiusKm: 150.0,
+        scope: 'discovery',
+      );
+  }
+}
+
+/// Site status query for feed list API (`VERIFIED` default; `CLEANED` for resolved tab).
+String feedStatusForFilter(FeedFilter filter) {
+  switch (filter) {
+    case FeedFilter.resolved:
+      return 'CLEANED';
+    default:
+      return 'VERIFIED';
   }
 }
 
@@ -60,6 +77,8 @@ int feedServerFetchGroup(FeedFilter filter) {
       return 0;
     case FeedFilter.saved:
       return 5;
+    case FeedFilter.resolved:
+      return 6;
   }
 }
 
@@ -456,7 +475,7 @@ class FeedSitesNotifier extends AutoDisposeNotifier<FeedSitesState> {
       latitude: state.userLatitude,
       longitude: state.userLongitude,
       radiusKm: api.radiusKm,
-      status: 'VERIFIED',
+      status: feedStatusForFilter(filter),
       page: page,
       limit: 24,
       mode: api.mode,

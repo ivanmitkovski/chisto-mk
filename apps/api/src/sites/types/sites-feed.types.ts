@@ -21,6 +21,7 @@ export type SitesFeedListResult = {
       sharesCount: number;
       isUpvotedByMe: boolean;
       isSavedByMe: boolean;
+      viewerResolutionStatus: 'none' | 'pending' | 'approved';
       rankingScore: number;
       rankingReasons: string[];
       rankingComponents?: Record<string, number>;

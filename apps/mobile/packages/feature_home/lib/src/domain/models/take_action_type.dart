@@ -1,1 +1,7 @@
-enum TakeActionType { createEcoAction, joinAction, donateContribute, shareSite }
+enum TakeActionType {
+  createEcoAction,
+  joinAction,
+  donateContribute,
+  shareSite,
+  submitResolution,
+}

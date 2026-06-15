@@ -1,5 +1,6 @@
 import 'package:feature_home/src/data/sites_json_mapper.dart';
 import 'package:feature_home/src/domain/models/pollution_site.dart';
+import 'package:feature_home/src/domain/models/site_resolution_viewer_status.dart';
 import 'package:feature_home/src/domain/repositories/sites_repository_types.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -40,6 +41,28 @@ void main() {
     expect(r.sites.first.mediaUrls.first, 'https://cdn.example/a.jpg');
     expect(r.total, 99);
     expect(r.nextCursor, 'abc');
+  });
+
+  test('siteListItemFromJson parses viewerResolutionStatus', () {
+    final PollutionSite site = mapper.siteListItemFromJson(<String, dynamic>{
+      'id': 's-pending',
+      'description': 'Site',
+      'status': 'VERIFIED',
+      'viewerResolutionStatus': 'pending',
+    });
+    expect(site.viewerResolutionStatus, SiteResolutionViewerStatus.pending);
+  });
+
+  test('siteDetailFromJson parses viewerResolutionStatus', () {
+    final PollutionSite site = mapper.siteDetailFromJson(<String, dynamic>{
+      'id': 'site-approved',
+      'description': 'Site',
+      'status': 'VERIFIED',
+      'viewerResolutionStatus': 'approved',
+      'reports': <dynamic>[],
+      'events': <dynamic>[],
+    });
+    expect(site.viewerResolutionStatus, SiteResolutionViewerStatus.approved);
   });
 
   test(

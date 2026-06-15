@@ -410,6 +410,21 @@ exports.Prisma.SiteHistoryEntryScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.SiteResolutionScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  siteId: 'siteId',
+  submittedById: 'submittedById',
+  note: 'note',
+  mediaUrls: 'mediaUrls',
+  status: 'status',
+  isReporterSubmission: 'isReporterSubmission',
+  moderatedAt: 'moderatedAt',
+  moderationReason: 'moderationReason',
+  moderatedById: 'moderatedById'
+};
+
 exports.Prisma.ReportScalarFieldEnum = {
   id: 'id',
   createdAt: 'createdAt',
@@ -1016,7 +1031,8 @@ exports.AdminModerationCategory = exports.$Enums.AdminModerationCategory = {
   NEW_REPORT: 'NEW_REPORT',
   EVENT_PENDING: 'EVENT_PENDING',
   UGC_REPORT: 'UGC_REPORT',
-  CHECKIN_RISK: 'CHECKIN_RISK'
+  CHECKIN_RISK: 'CHECKIN_RISK',
+  SITE_RESOLUTION: 'SITE_RESOLUTION'
 };
 
 exports.AdminEmailOutboxStatus = exports.$Enums.AdminEmailOutboxStatus = {
@@ -1060,7 +1076,16 @@ exports.SiteHistoryEntryKind = exports.$Enums.SiteHistoryEntryKind = {
   CLEANUP_EVENT_CANCELLED: 'CLEANUP_EVENT_CANCELLED',
   ARCHIVED_BY_ADMIN: 'ARCHIVED_BY_ADMIN',
   UNARCHIVED_BY_ADMIN: 'UNARCHIVED_BY_ADMIN',
-  ADMIN_NOTE: 'ADMIN_NOTE'
+  ADMIN_NOTE: 'ADMIN_NOTE',
+  RESOLUTION_SUBMITTED: 'RESOLUTION_SUBMITTED',
+  RESOLUTION_APPROVED: 'RESOLUTION_APPROVED',
+  RESOLUTION_REJECTED: 'RESOLUTION_REJECTED'
+};
+
+exports.SiteResolutionStatus = exports.$Enums.SiteResolutionStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED'
 };
 
 exports.ReportCleanupEffort = exports.$Enums.ReportCleanupEffort = {
@@ -1226,6 +1251,7 @@ exports.Prisma.ModelName = {
   PointTransaction: 'PointTransaction',
   Site: 'Site',
   SiteHistoryEntry: 'SiteHistoryEntry',
+  SiteResolution: 'SiteResolution',
   Report: 'Report',
   ReportCoReporter: 'ReportCoReporter',
   ReportSubmitIdempotency: 'ReportSubmitIdempotency',

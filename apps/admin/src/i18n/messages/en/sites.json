@@ -113,5 +113,22 @@
   },
   "mapPicker": {
     "hint": "Click the map to set coordinates."
+  },
+  "resolutions": {
+    "panelTitle": "Cleanup confirmations",
+    "openQueue": "Open resolution queue",
+    "noPending": "No pending cleanup confirmations for this site.",
+    "reporterSubmission": "Reporter",
+    "communitySubmission": "Community",
+    "approve": "Approve & mark cleaned",
+    "reject": "Reject",
+    "approveConfirmTitle": "Approve cleanup evidence?",
+    "approveConfirmDescription": "This will mark the pollution site as cleaned if it is not already resolved.",
+    "rejectConfirmTitle": "Reject submission?",
+    "rejectConfirmDescription": "The submitter can send new evidence after rejection.",
+    "rejectReasonLabel": "Rejection reason",
+    "rejectReasonPlaceholder": "Explain why the evidence was not accepted…",
+    "approvedMessage": "Resolution approved.",
+    "rejectedMessage": "Resolution rejected."
   }
 }

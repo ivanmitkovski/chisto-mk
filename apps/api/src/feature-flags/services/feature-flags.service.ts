@@ -14,7 +14,6 @@ const DEFAULT_FLAGS: Array<{ key: string; enabled: boolean }> = [
   { key: 'cleanup_events_mobile', enabled: false },
   { key: 'reports_map_heatmap', enabled: true },
   { key: 'notifications_inbox_enabled', enabled: true },
-  { key: 'push_fcm_enabled', enabled: false },
   { key: 'push_realtime_socket_enabled', enabled: true },
   { key: 'push_quiet_hours_enabled', enabled: false },
   { key: 'email_enabled', enabled: false },

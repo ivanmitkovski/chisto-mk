@@ -3554,6 +3554,30 @@ abstract class AppLocalizations {
   /// **'Sites you bookmarked'**
   String get feedFilterSavedDesc;
 
+  /// No description provided for @feedFilterResolvedName.
+  ///
+  /// In en, this message translates to:
+  /// **'Cleaned'**
+  String get feedFilterResolvedName;
+
+  /// No description provided for @feedFilterResolvedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Sites confirmed cleaned by the community'**
+  String get feedFilterResolvedDesc;
+
+  /// No description provided for @feedEmptyResolvedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No cleaned sites yet'**
+  String get feedEmptyResolvedTitle;
+
+  /// No description provided for @feedEmptyResolvedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'When pollution sites are confirmed cleaned, they will appear here.'**
+  String get feedEmptyResolvedHint;
+
   /// No description provided for @feedFiltersSheetTitle.
   ///
   /// In en, this message translates to:
@@ -4837,6 +4861,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This site is no longer available.'**
   String get notificationsSiteUnavailable;
+
+  /// No description provided for @notificationsReportUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This report is no longer available.'**
+  String get notificationsReportUnavailable;
+
+  /// No description provided for @notificationsOpenUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'This notification can\'t be opened.'**
+  String get notificationsOpenUnsupported;
 
   /// No description provided for @notificationsReadStateUpdateFailed.
   ///
@@ -8165,6 +8201,228 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Help others discover this site'**
   String get takeActionShareSubtitle;
+
+  /// No description provided for @takeActionSubmitResolutionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm site cleaned'**
+  String get takeActionSubmitResolutionTitle;
+
+  /// No description provided for @takeActionSubmitResolutionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Share after photos and help close this report'**
+  String get takeActionSubmitResolutionSubtitle;
+
+  /// No description provided for @submitResolutionSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm cleanup'**
+  String get submitResolutionSheetTitle;
+
+  /// No description provided for @submitResolutionSheetSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add photos showing {siteTitle} after cleanup'**
+  String submitResolutionSheetSubtitle(String siteTitle);
+
+  /// No description provided for @submitResolutionSheetSubtitleGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Add photos showing the site after cleanup'**
+  String get submitResolutionSheetSubtitleGeneric;
+
+  /// No description provided for @submitResolutionNoteLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Note (optional)'**
+  String get submitResolutionNoteLabel;
+
+  /// No description provided for @submitResolutionNoteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Anything else we should know?'**
+  String get submitResolutionNoteHint;
+
+  /// No description provided for @submitResolutionSubmitButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit for review'**
+  String get submitResolutionSubmitButton;
+
+  /// No description provided for @submitResolutionHelpText.
+  ///
+  /// In en, this message translates to:
+  /// **'An admin will review your photos before the site is marked resolved.'**
+  String get submitResolutionHelpText;
+
+  /// No description provided for @submitResolutionSuccessSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Cleanup evidence submitted. We\'ll review it soon.'**
+  String get submitResolutionSuccessSnack;
+
+  /// No description provided for @submitResolutionFailedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not submit cleanup evidence. Try again.'**
+  String get submitResolutionFailedSnack;
+
+  /// No description provided for @submitResolutionNotAvailableSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Cleanup confirmation is not available for this site.'**
+  String get submitResolutionNotAvailableSnack;
+
+  /// No description provided for @submitResolutionSiteAlreadyResolvedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'This site is already marked as resolved.'**
+  String get submitResolutionSiteAlreadyResolvedSnack;
+
+  /// No description provided for @submitResolutionAlreadyUnderReviewSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Your cleanup is already under review.'**
+  String get submitResolutionAlreadyUnderReviewSnack;
+
+  /// No description provided for @submitResolutionErrorBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t submit your cleanup photos. Check your connection and try again.'**
+  String get submitResolutionErrorBody;
+
+  /// No description provided for @resolutionSubmittedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitted for review'**
+  String get resolutionSubmittedTitle;
+
+  /// No description provided for @resolutionSubmittedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Thanks for helping clean up. An admin will review your photos before the site is marked resolved.'**
+  String get resolutionSubmittedBody;
+
+  /// No description provided for @resolutionSubmittedViewMyReports.
+  ///
+  /// In en, this message translates to:
+  /// **'View my reports'**
+  String get resolutionSubmittedViewMyReports;
+
+  /// No description provided for @resolutionSubmittedDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get resolutionSubmittedDone;
+
+  /// No description provided for @resolutionSubmittedSemanticsSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Cleanup submitted for review'**
+  String get resolutionSubmittedSemanticsSuccess;
+
+  /// No description provided for @siteDetailCleanupUnderReviewCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Cleanup under review'**
+  String get siteDetailCleanupUnderReviewCta;
+
+  /// No description provided for @siteDetailCleanupUnderReviewBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Your cleanup photos are being reviewed. We\'ll notify you when a decision is made.'**
+  String get siteDetailCleanupUnderReviewBanner;
+
+  /// No description provided for @reportCleanupSubmissionPendingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your cleanup is under review'**
+  String get reportCleanupSubmissionPendingTitle;
+
+  /// No description provided for @reportCleanupSubmissionPendingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We received your cleanup photos and an admin is reviewing them.'**
+  String get reportCleanupSubmissionPendingBody;
+
+  /// No description provided for @reportCleanupSubmissionApprovedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cleanup confirmed'**
+  String get reportCleanupSubmissionApprovedTitle;
+
+  /// No description provided for @reportCleanupSubmissionApprovedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your cleanup evidence was approved and the site is marked resolved.'**
+  String get reportCleanupSubmissionApprovedBody;
+
+  /// No description provided for @reportCleanupSubmissionPhotoSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Your cleanup photo'**
+  String get reportCleanupSubmissionPhotoSemantic;
+
+  /// No description provided for @reportCleanupSubmissionOpenGallerySemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Open your cleanup photo gallery'**
+  String get reportCleanupSubmissionOpenGallerySemantic;
+
+  /// No description provided for @reportCleanupSubmissionLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load your cleanup submission.'**
+  String get reportCleanupSubmissionLoadFailed;
+
+  /// No description provided for @siteDetailResolvedBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'This site has been marked as resolved.'**
+  String get siteDetailResolvedBanner;
+
+  /// No description provided for @siteDetailAddCleanupPhotoCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Add cleanup photo'**
+  String get siteDetailAddCleanupPhotoCta;
+
+  /// No description provided for @cleanupEvidenceSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'After cleanup'**
+  String get cleanupEvidenceSectionTitle;
+
+  /// No description provided for @cleanupEvidenceEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No cleanup photos yet.'**
+  String get cleanupEvidenceEmpty;
+
+  /// No description provided for @cleanupEvidenceLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load cleanup photos.'**
+  String get cleanupEvidenceLoadFailed;
+
+  /// No description provided for @cleanupEvidenceOpenGallerySemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Open cleanup photo gallery'**
+  String get cleanupEvidenceOpenGallerySemantic;
+
+  /// No description provided for @cleanupEvidencePhotoSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Cleanup photo'**
+  String get cleanupEvidencePhotoSemantic;
+
+  /// No description provided for @reportDetailMarkAsCleanedCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as cleaned'**
+  String get reportDetailMarkAsCleanedCta;
 
   /// No description provided for @shareSheetSemanticDragHandle.
   ///

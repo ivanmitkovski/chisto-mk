@@ -12,6 +12,7 @@ const MESSAGE_NAMESPACES = [
   'moderation',
   'events',
   'sites',
+  'resolutions',
   'map',
   'users',
   'team',

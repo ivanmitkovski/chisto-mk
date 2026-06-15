@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { DevicePlatform } from '../../prisma-client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { FcmPushService } from './fcm-push.service';
 import { ObservabilityStore } from '../../observability/observability.store';
@@ -32,6 +33,8 @@ export class PushDeliverySenderService {
     claimed: OutboxEntry[],
     userIdLookup: Map<string, string>,
   ): Promise<number> {
+    const platformByToken = await this.loadPlatformByToken(claimed.map((e) => e.deviceToken));
+
     let delivered = 0;
     for (const entry of claimed) {
       const minRetryAt = entry.lastAttemptAt
@@ -51,9 +54,12 @@ export class PushDeliverySenderService {
         body: string;
         subtitle?: string;
         unreadCount?: number;
+        platform?: DevicePlatform;
         data?: Record<string, string>;
       };
       const userId = userIdLookup.get(entry.userNotificationId);
+      const platform =
+        payload.platform ?? platformByToken.get(entry.deviceToken);
       const result = await this.fcm.sendToToken(entry.deviceToken, {
         title: payload.title,
         body: payload.body,
@@ -61,6 +67,7 @@ export class PushDeliverySenderService {
         ...(payload.data ? { data: payload.data } : {}),
         ...(payload.unreadCount !== undefined ? { unreadCount: payload.unreadCount } : {}),
         ...(userId ? { userId } : {}),
+        ...(platform ? { platform } : {}),
       });
 
       if (result.success) {
@@ -102,6 +109,24 @@ export class PushDeliverySenderService {
         continue;
       }
 
+      if (result.isConfigError) {
+        const errorCode = result.errorCode ?? 'FCM_CONFIG_ERROR';
+        await this.prisma.notificationOutbox.update({
+          where: { id: entry.id },
+          data: {
+            failedPermanently: true,
+            attempts: entry.attempts + 1,
+            lastAttemptAt: new Date(),
+            processingAt: null,
+            leaseOwner: null,
+            lastErrorCode: errorCode,
+            lastErrorMessage:
+              'FCM misconfiguration (APNs key or Firebase project). Fix Firebase Console / FIREBASE_SERVICE_ACCOUNT_JSON.',
+          },
+        });
+        continue;
+      }
+
       await this.fcm.incrementFailureCount(entry.deviceToken);
       const newAttempts = entry.attempts + 1;
       const errorCode = result.errorCode ?? 'FCM_SEND_FAILED';
@@ -121,5 +146,17 @@ export class PushDeliverySenderService {
       ObservabilityStore.recordPushQueueRetry();
     }
     return delivered;
+  }
+
+  private async loadPlatformByToken(tokens: string[]): Promise<Map<string, DevicePlatform>> {
+    const unique = [...new Set(tokens)];
+    if (unique.length === 0) {
+      return new Map();
+    }
+    const rows = await this.prisma.userDeviceToken.findMany({
+      where: { token: { in: unique } },
+      select: { token: true, platform: true },
+    });
+    return new Map(rows.map((row) => [row.token, row.platform]));
   }
 }

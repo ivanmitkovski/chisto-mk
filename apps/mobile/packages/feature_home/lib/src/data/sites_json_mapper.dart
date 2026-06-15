@@ -5,6 +5,7 @@ import 'package:feature_home/src/data/sites_api_json_helpers.dart';
 import 'package:feature_home/src/domain/models/cleaning_event.dart';
 import 'package:feature_home/src/domain/models/co_reporter_profile.dart';
 import 'package:feature_home/src/domain/models/pollution_site.dart';
+import 'package:feature_home/src/domain/models/site_resolution_viewer_status.dart';
 import 'package:feature_home/src/domain/models/site_report.dart';
 import 'package:feature_home/src/domain/repositories/sites_repository_types.dart';
 import 'package:feature_home/src/domain/site_defaults.dart';
@@ -84,6 +85,9 @@ class SitesJsonMapper {
       'sharesCount': s.shareCount,
       'isUpvotedByMe': s.isUpvotedByMe,
       'isSavedByMe': s.isSavedByMe,
+      'viewerResolutionStatus': siteResolutionViewerStatusToApi(
+        s.viewerResolutionStatus,
+      ),
       'latitude': s.latitude,
       'longitude': s.longitude,
       'latestReportMediaUrls': s.mediaUrls,
@@ -133,6 +137,11 @@ class SitesJsonMapper {
       'isSavedByMe',
       'is_saved_by_me',
     );
+    final SiteResolutionViewerStatus viewerResolutionStatus =
+        siteResolutionViewerStatusFromApi(
+      json['viewerResolutionStatus'] as String? ??
+          json['viewer_resolution_status'] as String?,
+    );
     final double? lat = (json['latitude'] as num?)?.toDouble();
     final double? lng = (json['longitude'] as num?)?.toDouble();
     final List<dynamic> heroMediaJson =
@@ -171,6 +180,7 @@ class SitesJsonMapper {
       shareCount: sharesCount,
       isUpvotedByMe: isUpvotedByMe,
       isSavedByMe: isSavedByMe,
+      viewerResolutionStatus: viewerResolutionStatus,
       participantCount: 0,
       mediaUrls: imageUrls,
       commentsCount: commentsCount,
@@ -495,6 +505,11 @@ class SitesJsonMapper {
       'isSavedByMe',
       'is_saved_by_me',
     );
+    final SiteResolutionViewerStatus viewerResolutionStatus =
+        siteResolutionViewerStatusFromApi(
+      root['viewerResolutionStatus'] as String? ??
+          root['viewer_resolution_status'] as String?,
+    );
 
     int totalParticipants = 0;
     final List<CleaningEvent> cleaningEvents = <CleaningEvent>[];
@@ -557,6 +572,7 @@ class SitesJsonMapper {
       shareCount: sharesCount,
       isUpvotedByMe: isUpvotedByMe,
       isSavedByMe: isSavedByMe,
+      viewerResolutionStatus: viewerResolutionStatus,
       participantCount: totalParticipants,
       mediaUrls: heroMediaUrls,
       commentsCount: commentsCount,

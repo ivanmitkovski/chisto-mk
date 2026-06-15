@@ -18,23 +18,14 @@ Widget _wrapVolunteerCapPicker({required double keyboardInset}) {
       ),
       child: Builder(
         builder: (BuildContext context) {
-          final MediaQueryData sheetMediaQuery = MediaQuery.of(context);
           Widget sheet = wrapScrollControlledBottomSheet(
             context: context,
             maxHeight: _surfaceSize.height * 0.88,
-            keyboardInsetMode: SheetKeyboardInsetMode.overlay,
-            child: MediaQuery(
-              data: sheetMediaQuery,
-              child: CreateEventVolunteerCapPickerSheet(
-                initial: 30,
-                onApply: (_) {},
-              ),
+            keyboardInsetMode: SheetKeyboardInsetMode.lift,
+            child: CreateEventVolunteerCapPickerSheet(
+              initial: 30,
+              onApply: (_) {},
             ),
-          );
-          sheet = MediaQuery.removeViewInsets(
-            context: context,
-            removeBottom: true,
-            child: sheet,
           );
           return Align(
             alignment: Alignment.bottomCenter,

@@ -33,6 +33,8 @@ class FeedEmptyState extends StatelessWidget {
         return l10n.feedEmptyRecentTitle;
       case FeedFilter.saved:
         return l10n.feedEmptySavedTitle;
+      case FeedFilter.resolved:
+        return l10n.feedEmptyResolvedTitle;
       case FeedFilter.all:
         return l10n.feedEmptyAllTitle;
     }
@@ -53,6 +55,8 @@ class FeedEmptyState extends StatelessWidget {
         return l10n.feedEmptyRecentHint;
       case FeedFilter.saved:
         return l10n.feedEmptySavedHint;
+      case FeedFilter.resolved:
+        return l10n.feedEmptyResolvedHint;
       case FeedFilter.all:
         return l10n.feedEmptyAllHint;
     }
@@ -72,6 +76,8 @@ class FeedEmptyState extends StatelessWidget {
         return Icons.schedule_rounded;
       case FeedFilter.saved:
         return Icons.bookmark_outline_rounded;
+      case FeedFilter.resolved:
+        return Icons.check_circle_outline_rounded;
     }
   }
 

@@ -57,6 +57,20 @@ export const REASON_REPORT_APPROVAL_REVOKED = 'REPORT_APPROVAL_REVOKED' as const
 /** Max positive points from {@link REASON_REPORT_APPROVED} per user per Skopje calendar day. */
 export const DAILY_REPORT_APPROVAL_POINTS_CAP = 80;
 
+/** Single idempotent grant per resolution when moderation sets status to APPROVED (non-reporter only). */
+export const REASON_SITE_RESOLUTION_APPROVED = 'SITE_RESOLUTION_APPROVED' as const;
+
+/** One-time clawback when an APPROVED resolution is moved to REJECTED. */
+export const REASON_SITE_RESOLUTION_APPROVAL_REVOKED = 'SITE_RESOLUTION_APPROVAL_REVOKED' as const;
+
+export const SITE_RESOLUTION_POINTS_BASE = 10;
+export const SITE_RESOLUTION_POINTS_MEDIA_PER_PHOTO = 1;
+export const SITE_RESOLUTION_POINTS_MEDIA_PER_PHOTO_MAX = 5;
+export const SITE_RESOLUTION_POINTS_PIONEER = 20;
+export const SITE_RESOLUTION_MAX_REWARDED_CONTRIBUTORS = 5;
+export const DAILY_SITE_RESOLUTION_POINTS_CAP = 60;
+export const SITE_RESOLUTION_POINTS_METADATA_VERSION = 1;
+
 /** `PointTransaction.metadata.version` for report approval grants. */
 export const REPORT_APPROVAL_POINTS_METADATA_VERSION = 1;
 

@@ -1,5 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { SiteStatus } from '../../prisma-client';
+import {
+  VIEWER_RESOLUTION_STATUS_VALUES,
+  type ViewerResolutionStatusDto,
+} from './site-detail-response.dto';
+
+export { VIEWER_RESOLUTION_STATUS_VALUES, type ViewerResolutionStatusDto };
 
 /** One row in `GET /sites` feed (public contract; maps from service layer). */
 export class SiteListItemResponseDto {
@@ -65,6 +71,9 @@ export class SiteListItemResponseDto {
 
   @ApiProperty()
   isSavedByMe!: boolean;
+
+  @ApiProperty({ enum: VIEWER_RESOLUTION_STATUS_VALUES })
+  viewerResolutionStatus!: ViewerResolutionStatusDto;
 
   @ApiProperty()
   rankingScore!: number;

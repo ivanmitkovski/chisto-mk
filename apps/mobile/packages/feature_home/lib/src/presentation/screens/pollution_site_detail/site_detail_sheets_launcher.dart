@@ -30,9 +30,18 @@ extension SiteDetailSheetsLauncher on _PollutionSiteDetailScreenState {
   }
 
   Future<void> _openTakeActionDialog(BuildContext context) async {
+    if (isPollutionSiteResolved(_site)) {
+      await SubmitResolutionSheet.show(
+        context,
+        siteId: _site.id,
+        siteTitle: _site.title,
+      );
+      return;
+    }
     final TakeActionType? action = await TakeActionSheet.show(
       context,
       canCreateEcoAction: true,
+      canSubmitResolution: canSubmitSiteResolution(_site),
     );
     if (action == null || !context.mounted) return;
     final TakeActionCoordinatorOutcome outcome =

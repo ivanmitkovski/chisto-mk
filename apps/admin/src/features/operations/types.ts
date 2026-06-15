@@ -1,1 +1,1 @@
-export type { OperationsSnapshot } from './data/operations-adapter';
+export type { OperationsSnapshot } from './data/operations-snapshot';

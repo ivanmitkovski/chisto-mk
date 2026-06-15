@@ -1,4 +1,7 @@
+import 'dart:ui';
+
 import 'package:design_system/design_system.dart';
+import 'package:design_system/src/widgets/organisms/app_panel_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -132,5 +135,252 @@ void main() {
       ),
       findsOneWidget,
     );
+  });
+
+  testWidgets('overlay sheet title stays below the notch', (
+    WidgetTester tester,
+  ) async {
+    const double topInset = 59;
+
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    tester.view.viewPadding = const FakeViewPadding(top: topInset);
+    addTearDown(() async {
+      await tester.binding.setSurfaceSize(null);
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+      tester.view.resetViewPadding();
+    });
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (BuildContext context) {
+            return Scaffold(
+              body: Center(
+                child: ElevatedButton(
+                  onPressed: () {
+                    AppBottomSheet.show<void>(
+                      context: context,
+                      keyboardInsetMode: SheetKeyboardInsetMode.overlay,
+                      maxHeightFactor: 1,
+                      builder: (BuildContext sheetContext) {
+                        return AppSheetScaffold(
+                          title: 'Notch probe',
+                          fillAvailableHeight: true,
+                          child: const SizedBox(height: 200),
+                        );
+                      },
+                    );
+                  },
+                  child: const Text('Open'),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Open'));
+    await tester.pumpAndSettle();
+
+    final Offset titleTopLeft = tester.getTopLeft(find.text('Notch probe'));
+    expect(
+      titleTopLeft.dy,
+      greaterThanOrEqualTo(topInset + AppSpacing.xs - 1),
+      reason: 'Sheet title must render below the platform top safe area',
+    );
+  });
+
+  testWidgets('lift mode sheet title stays below the notch', (
+    WidgetTester tester,
+  ) async {
+    const double topInset = 59;
+
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    tester.view.viewPadding = const FakeViewPadding(top: topInset);
+    addTearDown(() async {
+      await tester.binding.setSurfaceSize(null);
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+      tester.view.resetViewPadding();
+    });
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (BuildContext context) {
+            return Scaffold(
+              body: Center(
+                child: ElevatedButton(
+                  onPressed: () {
+                    AppBottomSheet.show<void>(
+                      context: context,
+                      keyboardInsetMode: SheetKeyboardInsetMode.lift,
+                      maxHeightFactor: 1,
+                      builder: (BuildContext sheetContext) {
+                        return AppSheetScaffold(
+                          title: 'Lift notch probe',
+                          fillAvailableHeight: true,
+                          child: const SizedBox(height: 200),
+                        );
+                      },
+                    );
+                  },
+                  child: const Text('Open'),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Open'));
+    await tester.pumpAndSettle();
+
+    final Offset titleTopLeft = tester.getTopLeft(find.text('Lift notch probe'));
+    expect(
+      titleTopLeft.dy,
+      greaterThanOrEqualTo(topInset + AppSpacing.xs - 1),
+      reason: 'Lift-mode sheet title must render below the platform top safe area',
+    );
+  });
+
+  testWidgets('overlay sheet lifts footer when view metrics change', (
+    WidgetTester tester,
+  ) async {
+    const double keyboardInset = 300;
+
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    tester.view.viewInsets = FakeViewPadding.zero;
+    addTearDown(() async {
+      await tester.binding.setSurfaceSize(null);
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+      tester.view.resetViewInsets();
+    });
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (BuildContext context) {
+            return Scaffold(
+              body: Center(
+                child: ElevatedButton(
+                  onPressed: () {
+                    AppBottomSheet.show<void>(
+                      context: context,
+                      keyboardInsetMode: SheetKeyboardInsetMode.overlay,
+                      builder: (BuildContext sheetContext) {
+                        return AppSheetScaffold(
+                          title: 'Keyboard probe',
+                          fillAvailableHeight: true,
+                          padFooterForKeyboard: true,
+                          footer: const PrimaryButton(
+                            label: 'Save',
+                            onPressed: null,
+                          ),
+                          child: const SizedBox(height: 200),
+                        );
+                      },
+                    );
+                  },
+                  child: const Text('Open'),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Open'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(AnimatedPadding), findsNothing);
+
+    tester.view.viewInsets = FakeViewPadding(bottom: keyboardInset);
+    await tester.pump();
+
+    final Finder liftFinder = find.byType(AnimatedPadding);
+    expect(liftFinder, findsOneWidget);
+    expect(
+      (tester.widget<AnimatedPadding>(liftFinder).padding as EdgeInsets).bottom,
+      keyboardInset,
+    );
+  });
+
+  testWidgets('lift mode keeps text field focus when keyboard metrics change', (
+    WidgetTester tester,
+  ) async {
+    const double keyboardInset = 300;
+
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    tester.view.viewInsets = FakeViewPadding.zero;
+    addTearDown(() async {
+      await tester.binding.setSurfaceSize(null);
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+      tester.view.resetViewInsets();
+    });
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (BuildContext context) {
+            return Scaffold(
+              body: Center(
+                child: ElevatedButton(
+                  onPressed: () {
+                    AppBottomSheet.show<void>(
+                      context: context,
+                      keyboardInsetMode: SheetKeyboardInsetMode.lift,
+                      builder: (BuildContext sheetContext) {
+                        return AppSheetScaffold(
+                          title: 'Lift keyboard probe',
+                          fillAvailableHeight: true,
+                          padFooterForKeyboard: false,
+                          child: const TextField(
+                            decoration: InputDecoration(hintText: 'Type here'),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                  child: const Text('Open'),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Open'));
+    await tester.pumpAndSettle();
+
+    final Finder field = find.byType(TextField);
+    await tester.tap(field);
+    await tester.pump();
+
+    EditableText editableText(WidgetTester t) {
+      return t.widget<EditableText>(find.byType(EditableText));
+    }
+    expect(editableText(tester).focusNode.hasFocus, isTrue);
+
+    tester.view.viewInsets = FakeViewPadding(bottom: keyboardInset);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 600));
+
+    expect(editableText(tester).focusNode.hasFocus, isTrue);
   });
 }

@@ -22,6 +22,14 @@ type DiagnosticsPayload = {
     redis: string;
     s3: string;
   };
+  pushDiagnostics: {
+    fcmEnabled: boolean;
+    fcmReady: boolean;
+    projectId: string | null;
+    deadLetterTotal: number;
+    topErrorCodes: Array<{ code: string; count: number }>;
+    remediation: string | null;
+  };
 };
 
 export function OperationsDiagnosticsDrawer() {
@@ -35,11 +43,14 @@ export function OperationsDiagnosticsDrawer() {
     setLoading(true);
     setError(null);
     try {
-      const [systemInfo, readiness] = await Promise.all([
+      const [systemInfo, readiness, pushDiagnostics] = await Promise.all([
         adminBrowserFetch<DiagnosticsPayload['systemInfo']>('/admin/operations/system-info', { method: 'GET' }),
         adminBrowserFetch<DiagnosticsPayload['readiness']>('/admin/operations/readiness', { method: 'GET' }),
+        adminBrowserFetch<DiagnosticsPayload['pushDiagnostics']>('/notifications/admin/push-diagnostics', {
+          method: 'GET',
+        }),
       ]);
-      setPayload({ systemInfo, readiness });
+      setPayload({ systemInfo, readiness, pushDiagnostics });
     } catch (fetchError) {
       setError(fetchError instanceof Error ? fetchError.message : t('diagnostics.failed'));
     } finally {
@@ -67,6 +78,38 @@ export function OperationsDiagnosticsDrawer() {
         {error ? <SectionState variant="error" message={error} /> : null}
         {payload ? (
           <div className={styles.stack}>
+            <div>
+              <h3>{t('diagnostics.pushDelivery')}</h3>
+              <p>
+                <StatusPill
+                  status={
+                    payload.pushDiagnostics.fcmReady && payload.pushDiagnostics.deadLetterTotal === 0
+                      ? 'OK'
+                      : 'DEGRADED'
+                  }
+                />
+              </p>
+              <MetadataView
+                value={{
+                  fcmEnabled: payload.pushDiagnostics.fcmEnabled,
+                  fcmReady: payload.pushDiagnostics.fcmReady,
+                  projectId: payload.pushDiagnostics.projectId,
+                  deadLetterTotal: payload.pushDiagnostics.deadLetterTotal,
+                }}
+              />
+              {payload.pushDiagnostics.topErrorCodes.length > 0 ? (
+                <ul className={styles.errorCodeList}>
+                  {payload.pushDiagnostics.topErrorCodes.map((row) => (
+                    <li key={row.code}>
+                      <strong>{row.code}</strong> — {row.count}
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+              {payload.pushDiagnostics.remediation ? (
+                <p className={styles.remediation}>{payload.pushDiagnostics.remediation}</p>
+              ) : null}
+            </div>
             <div>
               <h3>{t('diagnostics.readiness')}</h3>
               <p>

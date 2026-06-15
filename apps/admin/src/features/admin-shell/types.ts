@@ -6,6 +6,7 @@ export type NavItemKey =
   | 'duplicates'
   | 'users'
   | 'sites'
+  | 'resolutions'
   | 'map'
   | 'events'
   | 'risk-signals'

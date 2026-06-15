@@ -164,6 +164,10 @@
       "CHECKIN_RISK": {
         "title": "Check-in risk signals",
         "description": "When a participant checks in far from the event site."
+      },
+      "SITE_RESOLUTION": {
+        "title": "Site cleanup confirmations",
+        "description": "When a citizen submits cleanup evidence for a pollution site."
       }
     }
   },

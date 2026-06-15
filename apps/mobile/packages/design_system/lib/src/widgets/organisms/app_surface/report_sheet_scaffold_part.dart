@@ -85,7 +85,9 @@ class AppSheetScaffold extends StatelessWidget {
     this.subtitleMaxLines,
     this.animateHandleFadeIn = false,
     this.fillAvailableHeight = false,
+    this.boundedScrollBody = false,
     this.padFooterForKeyboard = false,
+    this.shrinkForKeyboard = true,
   });
 
   final String title;
@@ -134,36 +136,55 @@ class AppSheetScaffold extends StatelessWidget {
   /// Use for scrollable filter panels so toggling rows does not resize the modal.
   final bool fillAvailableHeight;
 
+  /// When true, the scroll body hugs short content but scrolls within the remaining
+  /// height budget (header + footer pinned). Use for keyboard-lifted form sheets.
+  final bool boundedScrollBody;
+
   /// When true, lifts [footer] above the keyboard via [MediaQuery.viewInsets].
   /// Use with overlay modal hosts that keep sheet height stable.
   final bool padFooterForKeyboard;
+
+  /// When false, the sheet keeps [restingCap] height while the keyboard is open.
+  /// Use with overlay pinned-footers that stay at the screen bottom behind the IME.
+  final bool shrinkForKeyboard;
 
   Widget? _resolvedFooter(BuildContext context) {
     final Widget? bar = footer;
     if (bar == null) {
       return null;
     }
-    final double homeInset = addBottomInset
-        ? MediaQuery.viewPaddingOf(context).bottom
-        : 0;
     final double keyboardInset = padFooterForKeyboard
         ? MediaQuery.viewInsetsOf(context).bottom
         : 0;
-    final double totalBottom = homeInset + keyboardInset;
-    if (totalBottom <= 0) {
+    // Home-indicator footer padding stacks on top of the keyboard and reads as
+    // a white band above the IME in overlay-model sheets (see [_homeIndicatorInset]).
+    final double homeInset = addBottomInset && keyboardInset == 0
+        ? MediaQuery.viewPaddingOf(context).bottom
+        : 0;
+    if (homeInset <= 0) {
       return bar;
     }
-    if (padFooterForKeyboard) {
-      return AnimatedPadding(
-        duration: AppMotion.medium,
-        curve: AppMotion.smooth,
-        padding: EdgeInsets.only(bottom: totalBottom),
-        child: bar,
-      );
-    }
     return Padding(
-      padding: EdgeInsets.only(bottom: totalBottom),
+      padding: EdgeInsets.only(bottom: homeInset),
       child: bar,
+    );
+  }
+
+  Widget _wrapKeyboardLift(BuildContext context, Widget sheet) {
+    if (!padFooterForKeyboard) {
+      return sheet;
+    }
+    final double keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
+    if (keyboardInset <= 0) {
+      return sheet;
+    }
+    // Lift the whole panel above the IME; padding sits outside the painted sheet
+    // so footer CTAs stay flush without an internal white band (overlay sheets).
+    return AnimatedPadding(
+      duration: AppMotion.medium,
+      curve: AppMotion.smooth,
+      padding: EdgeInsets.only(bottom: keyboardInset),
+      child: sheet,
     );
   }
 
@@ -173,7 +194,8 @@ class AppSheetScaffold extends StatelessWidget {
     }
     // Home-indicator scroll padding stacks on top of the keyboard and reads as
     // a white band above the IME in overlay-model sheets.
-    if (MediaQuery.viewInsetsOf(context).bottom > 0) {
+    final double keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
+    if (keyboardInset > 0) {
       return 0;
     }
     return MediaQuery.viewPaddingOf(context).bottom;
@@ -199,10 +221,18 @@ class AppSheetScaffold extends StatelessWidget {
         titleTextStyle ?? AppTypography.sheetTitle(textTheme);
     final TextStyle resolvedSubtitleStyle =
         subtitleTextStyle ?? _reportSheetSubtitleStyle();
-    final MediaQueryData media = MediaQuery.of(context);
-    final double topPadding = media.padding.top;
-    final double heightCap = media.size.height * maxHeightFactor;
+    final MediaQueryData viewMq = MediaQueryData.fromView(View.of(context));
+    final double topInset = appSheetViewportTopInset(context);
+    final double keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
+    final double viewHeight = viewMq.size.height;
+    final double restingCap = (viewHeight - topInset) * maxHeightFactor;
+    final double keyboardSlotCap = viewHeight - topInset - keyboardInset;
+    final double heightCap = keyboardInset > 0 && shrinkForKeyboard
+        ? math.min(restingCap, keyboardSlotCap)
+        : restingCap;
     final double homeIndicatorInset = _homeIndicatorInset(context);
+    final double headerTopGap =
+        topInset > 0 ? AppSpacing.xs : AppSpacing.radius14;
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
@@ -210,6 +240,8 @@ class AppSheetScaffold extends StatelessWidget {
         final double maxSheetHeight = parentMax.isFinite
             ? math.min(parentMax, heightCap)
             : heightCap;
+        final double minSheetHeight =
+            fillAvailableHeight ? maxSheetHeight : 0;
 
         final BorderRadius sheetRadius = useModalRouteShape
             ? const BorderRadius.vertical(
@@ -230,7 +262,9 @@ class AppSheetScaffold extends StatelessWidget {
               ];
 
         if (fitToContent) {
-          return DecoratedBox(
+          return _wrapKeyboardLift(
+            context,
+            DecoratedBox(
             decoration: BoxDecoration(
               color: AppColors.panelBackground,
               borderRadius: sheetRadius,
@@ -268,9 +302,7 @@ class AppSheetScaffold extends StatelessWidget {
                               ),
                             ),
                           SizedBox(
-                            height: topPadding > 0
-                                ? AppSpacing.xs
-                                : AppSpacing.radius14,
+                            height: headerTopGap,
                           ),
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -325,13 +357,16 @@ class AppSheetScaffold extends StatelessWidget {
                 ),
               ),
             ),
+          ),
           );
         }
 
         // DecoratedBox paints the card; hard-edge clip avoids iOS anti-alias seams.
         // Material(type: transparency) supplies a Material ancestor for Text/InkWell
         // (avoids debug yellow underlines) without painting another opaque surface.
-        return DecoratedBox(
+        return _wrapKeyboardLift(
+          context,
+          DecoratedBox(
           decoration: BoxDecoration(
             color: AppColors.panelBackground,
             borderRadius: sheetRadius,
@@ -343,7 +378,7 @@ class AppSheetScaffold extends StatelessWidget {
             child: ConstrainedBox(
               constraints: BoxConstraints(
                 maxHeight: maxSheetHeight,
-                minHeight: fillAvailableHeight ? maxSheetHeight : 0,
+                minHeight: minSheetHeight,
               ),
               child: Material(
                 type: MaterialType.transparency,
@@ -370,9 +405,7 @@ class AppSheetScaffold extends StatelessWidget {
                             ),
                           ),
                         SizedBox(
-                          height: topPadding > 0
-                              ? AppSpacing.xs
-                              : AppSpacing.radius14,
+                          height: headerTopGap,
                         ),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -419,8 +452,17 @@ class AppSheetScaffold extends StatelessWidget {
                           const SizedBox(height: AppSpacing.sm),
                         if (fillAvailableHeight)
                           Expanded(child: _scrollBody(context))
+                        else if (boundedScrollBody)
+                          _scrollBody(context)
                         else
-                          Flexible(child: _scrollBody(context)),
+                          Flexible(
+                            fit: FlexFit.loose,
+                            child: Align(
+                              alignment: Alignment.topCenter,
+                              heightFactor: 1,
+                              child: _scrollBody(context),
+                            ),
+                          ),
                         if (resolvedFooter != null) ...<Widget>[
                           const SizedBox(height: AppSpacing.lg),
                           resolvedFooter,
@@ -432,6 +474,7 @@ class AppSheetScaffold extends StatelessWidget {
               ),
             ),
           ),
+        ),
         );
       },
     );

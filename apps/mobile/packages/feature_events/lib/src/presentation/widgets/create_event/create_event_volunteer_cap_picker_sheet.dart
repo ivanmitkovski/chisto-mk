@@ -81,7 +81,7 @@ class _CreateEventVolunteerCapPickerSheetState
       ),
       maxHeightFactor: 0.88,
       fillAvailableHeight: true,
-      padFooterForKeyboard: true,
+      padFooterForKeyboard: false,
       addBottomInset: true,
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.lg,

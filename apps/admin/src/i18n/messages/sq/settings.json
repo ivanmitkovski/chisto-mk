@@ -164,6 +164,10 @@
       "CHECKIN_RISK": {
         "title": "Sinjale rreziku të check-in",
         "description": "Kur një pjesëmarrës bën check-in larg vendit të ngjarjes."
+      },
+      "SITE_RESOLUTION": {
+        "title": "Konfirmime pastrimi vendi",
+        "description": "Kur një qytetar dorëzon prova pastrimi për një vend ndotjeje."
       }
     }
   },

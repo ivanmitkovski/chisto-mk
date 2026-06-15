@@ -113,5 +113,22 @@
   },
   "mapPicker": {
     "hint": "Кликнете на мапата за координати."
+  },
+  "resolutions": {
+    "panelTitle": "Потврди за исчистување",
+    "openQueue": "Отвори ред за резолуции",
+    "noPending": "Нема pending потврди за исчистување за оваа локација.",
+    "reporterSubmission": "Пријавувач",
+    "communitySubmission": "Заедница",
+    "approve": "Одобри и означи исчистено",
+    "reject": "Одбиј",
+    "approveConfirmTitle": "Да се одобрат доказите за исчистување?",
+    "approveConfirmDescription": "Локацијата ќе биде означена како исчистена ако веќе не е решена.",
+    "rejectConfirmTitle": "Да се одбие поднесокот?",
+    "rejectConfirmDescription": "Поднесувачот може повторно да испрати докази по одбивање.",
+    "rejectReasonLabel": "Причина за одбивање",
+    "rejectReasonPlaceholder": "Објасни зошто доказите не се прифатени…",
+    "approvedMessage": "Резолуцијата е одобрена.",
+    "rejectedMessage": "Резолуцијата е одбиена."
   }
 }

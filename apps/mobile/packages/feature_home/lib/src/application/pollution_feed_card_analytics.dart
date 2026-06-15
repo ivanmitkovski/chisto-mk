@@ -19,6 +19,7 @@ enum PollutionFeedCardEventType {
   ctaJoinStarted('cta_join_started'),
   ctaShareStarted('cta_share_started'),
   ctaDonateStarted('cta_donate_started'),
+  ctaResolutionStarted('cta_resolution_started'),
   ctaCreateFinished('cta_create_finished'),
   ctaJoinFinished('cta_join_finished'),
   ctaShareCancelled('cta_share_cancelled'),

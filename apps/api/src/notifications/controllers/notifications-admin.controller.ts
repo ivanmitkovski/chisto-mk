@@ -1,5 +1,5 @@
 import { Idempotent } from '../../common/idempotency/idempotency.decorator';
-import { Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../../auth/decorators/current-user.decorator';
@@ -17,9 +17,15 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { userLocalesByUserId } from '../../common/i18n/notification-locale.resolver';
 import { adminTestPushCopy } from '../util/notification-templates';
 import { ObservabilityStore } from '../../observability/observability.store';
+import { PushDeadLetterRequeueService } from '../services/push-dead-letter-requeue.service';
+import { PushDiagnosticsService } from '../services/push-diagnostics.service';
 import {
   DeadLetterPageDto,
+  DeadLetterPurgeResultDto,
+  DeadLetterRequeueOneResultDto,
+  DeadLetterRequeueResultDto,
   DeliveryReportDto,
+  PushDiagnosticsDto,
   PushStatsDto,
 } from '../dto/push-operations.dto';
 import { ApiStandardHttpErrorResponses } from '../../common/openapi/standard-http-error-responses.decorator';
@@ -35,6 +41,8 @@ export class NotificationsAdminController {
     private readonly inbox: NotificationInboxService,
     private readonly dispatcher: NotificationDispatcherService,
     private readonly prisma: PrismaService,
+    private readonly deadLetterRequeue: PushDeadLetterRequeueService,
+    private readonly pushDiagnostics: PushDiagnosticsService,
   ) {}
 
   @Idempotent('notifications_admin_test_push')
@@ -60,8 +68,9 @@ export class NotificationsAdminController {
   @RequirePermission(ADMIN_PERMISSIONS['operations:read'])
   @ApiOperation({ summary: 'Push delivery statistics (admin only)' })
   @ApiOkResponse({ type: PushStatsDto })
-  pushStats(): PushStatsDto {
+  async pushStats(): Promise<PushStatsDto> {
     const s = ObservabilityStore.snapshot();
+    const outbox = await this.inbox.countOutboxTotals();
     return {
       sendsTotal: s.pushSendsTotal,
       sendsSuccess: s.pushSendsSuccess,
@@ -74,6 +83,7 @@ export class NotificationsAdminController {
       queueDepth: s.pushQueueDepth,
       activeLeases: s.pushActiveLeases,
       deadLetterCount: s.pushDeadLetterCount,
+      outbox,
     };
   }
 
@@ -83,9 +93,10 @@ export class NotificationsAdminController {
   @ApiOkResponse({ type: DeliveryReportDto })
   async deliveryReport(): Promise<DeliveryReportDto> {
     const s = ObservabilityStore.snapshot();
-    const [sent, opened] = await Promise.all([
+    const [sent, opened, outbox] = await Promise.all([
       this.inbox.countSentNotifications(),
       this.inbox.countOpenedNotifications(),
+      this.inbox.countOutboxTotals(),
     ]);
     return {
       sends: {
@@ -106,7 +117,16 @@ export class NotificationsAdminController {
         deadLetterCount: s.pushDeadLetterCount,
         retries: s.pushQueueRetries,
       },
+      outbox,
     };
+  }
+
+  @Get('admin/push-diagnostics')
+  @RequirePermission(ADMIN_PERMISSIONS['operations:read'])
+  @ApiOperation({ summary: 'FCM/APNs push delivery diagnostics (admin only)' })
+  @ApiOkResponse({ type: PushDiagnosticsDto })
+  getPushDiagnostics(): Promise<PushDiagnosticsDto> {
+    return this.pushDiagnostics.getDiagnostics();
   }
 
   @Get('admin/dead-letters')
@@ -121,5 +141,32 @@ export class NotificationsAdminController {
       Number(page ?? '1'),
       Number(limit ?? '20'),
     );
+  }
+
+  @Idempotent('notifications_admin_dead_letters_requeue')
+  @Post('admin/dead-letters/requeue')
+  @RequirePermission(ADMIN_PERMISSIONS['operations:write'])
+  @ApiOperation({ summary: 'Requeue actionable push dead letters with active device tokens' })
+  @ApiOkResponse({ type: DeadLetterRequeueResultDto })
+  requeueDeadLetters(): Promise<DeadLetterRequeueResultDto> {
+    return this.deadLetterRequeue.requeueAll();
+  }
+
+  @Idempotent('notifications_admin_dead_letters_purge')
+  @Post('admin/dead-letters/purge-terminal')
+  @RequirePermission(ADMIN_PERMISSIONS['operations:write'])
+  @ApiOperation({ summary: 'Purge undeliverable push dead letters (revoked tokens / invalid registration)' })
+  @ApiOkResponse({ type: DeadLetterPurgeResultDto })
+  purgeTerminalDeadLetters(): Promise<DeadLetterPurgeResultDto> {
+    return this.deadLetterRequeue.purgeTerminal();
+  }
+
+  @Idempotent('notifications_admin_dead_letter_requeue_one')
+  @Post('admin/dead-letters/:id/requeue')
+  @RequirePermission(ADMIN_PERMISSIONS['operations:write'])
+  @ApiOperation({ summary: 'Requeue a single push dead letter when actionable' })
+  @ApiOkResponse({ type: DeadLetterRequeueOneResultDto })
+  requeueDeadLetter(@Param('id') id: string): Promise<DeadLetterRequeueOneResultDto> {
+    return this.deadLetterRequeue.requeueOne(id);
   }
 }

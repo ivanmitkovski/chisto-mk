@@ -13,9 +13,13 @@ function makePrisma() {
   const userNotification = {
     findMany: jest.fn().mockResolvedValue([]),
   };
+  const userDeviceToken = {
+    findMany: jest.fn().mockResolvedValue([]),
+  };
   return {
     notificationOutbox,
     userNotification,
+    userDeviceToken,
     $transaction: jest.fn(async (ops: Promise<unknown>[]) => Promise.all(ops)),
   };
 }
@@ -241,6 +245,66 @@ describe('PushDeliveryWorkerService', () => {
           failedPermanently: true,
           lastErrorCode: 'messaging/mismatched-credential',
           lastErrorMessage: 'Push token revoked or invalid (messaging/mismatched-credential)',
+        }),
+      }),
+    );
+  });
+
+  it('fails permanently on third-party-auth-error without retrying or revoking token', async () => {
+    const prisma = makePrisma() as any;
+    const fcm = makeFcm() as any;
+
+    prisma.notificationOutbox.count.mockResolvedValue(0);
+    prisma.notificationOutbox.findMany
+      .mockResolvedValueOnce([
+        {
+          id: 'out_5',
+          userNotificationId: 'n_5',
+          deviceToken: 'token-apns',
+          payload: { title: 'T', body: 'B', data: {} },
+          attempts: 0,
+          lastAttemptAt: null,
+          deliveredAt: null,
+          failedPermanently: false,
+        },
+      ])
+      .mockResolvedValueOnce([
+        {
+          id: 'out_5',
+          userNotificationId: 'n_5',
+          deviceToken: 'token-apns',
+          payload: { title: 'T', body: 'B', data: {} },
+          attempts: 0,
+          lastAttemptAt: null,
+          deliveredAt: null,
+          failedPermanently: false,
+        },
+      ]);
+    prisma.notificationOutbox.updateMany.mockResolvedValue({ count: 1 });
+    prisma.userDeviceToken.findMany.mockResolvedValue([
+      { token: 'token-apns', platform: 'IOS' },
+    ]);
+    fcm.sendToToken.mockResolvedValue({
+      success: false,
+      isConfigError: true,
+      errorCode: 'messaging/third-party-auth-error',
+    });
+
+    const sender = new PushDeliverySenderService(prisma, fcm);
+    const outbox = new PushDeliveryOutboxService(prisma, fcm, sender);
+    const service = new PushDeliveryWorkerService(fcm, outbox);
+    await service.processOutbox();
+
+    expect(fcm.revokeToken).not.toHaveBeenCalled();
+    expect(fcm.incrementFailureCount).not.toHaveBeenCalled();
+    expect(prisma.notificationOutbox.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 'out_5' },
+        data: expect.objectContaining({
+          failedPermanently: true,
+          attempts: 1,
+          lastErrorCode: 'messaging/third-party-auth-error',
+          lastErrorMessage: expect.stringContaining('FCM misconfiguration'),
         }),
       }),
     );

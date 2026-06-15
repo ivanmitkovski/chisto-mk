@@ -9,6 +9,8 @@ import { SiteStatus } from '../../prisma-client';
 import { SiteDetailRepository } from '../repositories/site-detail.repository';
 import { buildSiteCoReporterSummaries } from '../util/site-co-reporter-summaries.util';
 import { projectPublicReporter, viewerIsModerator } from '../../common/projections/public-identity.projection';
+import { SiteResolutionQueryService } from '../resolutions/services/site-resolution-query.service';
+import { viewerResolutionStatusForSite } from '../resolutions/util/viewer-resolution-status';
 
 @Injectable()
 export class SitesDetailService {
@@ -18,6 +20,7 @@ export class SitesDetailService {
   constructor(
     private readonly siteDetailRepository: SiteDetailRepository,
     private readonly reportsUploadService: ReportsUploadService,
+    private readonly siteResolutionQuery: SiteResolutionQueryService,
   ) {}
 
   async findOne(
@@ -163,13 +166,16 @@ export class SitesDetailService {
 
     let isUpvotedByMe = false;
     let isSavedByMe = false;
+    let viewerResolutionStatus: 'none' | 'pending' | 'approved' = 'none';
     if (user) {
-      const [vote, save] = await Promise.all([
+      const [vote, save, resolutionStatusBySite] = await Promise.all([
         this.siteDetailRepository.findVoteBySiteAndUser(siteId, user.userId),
         this.siteDetailRepository.findSaveBySiteAndUser(siteId, user.userId),
+        this.siteResolutionQuery.getViewerStatusBySiteIds(user.userId, [siteId]),
       ]);
       isUpvotedByMe = Boolean(vote);
       isSavedByMe = Boolean(save);
+      viewerResolutionStatus = viewerResolutionStatusForSite(resolutionStatusBySite, siteId);
     }
 
     const coReporterSummaries = isModerator
@@ -238,6 +244,7 @@ export class SitesDetailService {
       sharesCount: site.sharesCount,
       isUpvotedByMe,
       isSavedByMe,
+      viewerResolutionStatus,
     };
   }
 }

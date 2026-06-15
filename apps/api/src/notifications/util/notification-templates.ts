@@ -277,3 +277,63 @@ export function formatSiteStatusLabel(
   }
   return status;
 }
+
+export function siteResolutionApprovedCopy(locale: AppLocale): CopyResult {
+  switch (locale) {
+    case 'en':
+      return {
+        title: 'Cleanup confirmed',
+        body: 'Your cleanup evidence was approved. Thank you for helping keep the community informed.',
+      };
+    case 'sq':
+      return {
+        title: 'Pastrimi u konfirmua',
+        body: 'Dëshmia juaj e pastrimit u miratua. Faleminderit që ndihmoni komunitetin.',
+      };
+    default:
+      return {
+        title: 'Чистењето е потврдено',
+        body: 'Вашата доказна фотографија за чистење е одобрена. Ви благодариме.',
+      };
+  }
+}
+
+export function siteResolutionRejectedCopy(locale: AppLocale): CopyResult {
+  switch (locale) {
+    case 'en':
+      return {
+        title: 'Cleanup evidence not accepted',
+        body: 'Your cleanup submission was not accepted. You can submit new evidence if the site is cleaned.',
+      };
+    case 'sq':
+      return {
+        title: 'Dëshmia e pastrimit nuk u pranua',
+        body: 'Dorëzimi juaj i pastrimit nuk u pranua. Mund të dorëzoni dëshmi të reja nëse vendi është pastruar.',
+      };
+    default:
+      return {
+        title: 'Доказот за чистење не е прифатен',
+        body: 'Вашето поднесување не е прифатено. Можете да поднесете нови докази ако локалитетот е исчистен.',
+      };
+  }
+}
+
+export function siteResolvedCopy(locale: AppLocale): CopyResult {
+  switch (locale) {
+    case 'en':
+      return {
+        title: 'Site resolved',
+        body: 'A pollution site you follow has been marked as cleaned.',
+      };
+    case 'sq':
+      return {
+        title: 'Vendi u zgjidh',
+        body: 'Një vend ndotjeje që ndiqni u shënua si i pastruar.',
+      };
+    default:
+      return {
+        title: 'Локалитетот е решен',
+        body: 'Локалитет за загадување што го следите е означен како исчистен.',
+      };
+  }
+}

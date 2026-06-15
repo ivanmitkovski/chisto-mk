@@ -4,6 +4,7 @@ import { FeatureFlagsModule } from '../feature-flags/feature-flags.module';
 import { ModerationModule } from '../moderation/moderation.module';
 import { ReportsUploadModule } from '../reports/reports-upload.module';
 import { SiteCommentsCountModule } from './site-comments-count.module';
+import { SiteResolutionQueryModule } from './resolutions/site-resolution-query.module';
 import { FeedRankingService } from './services/feed-ranking.service';
 import { SitesFeedService } from './services/sites-feed.service';
 import { SitesFeedCandidatesService } from './services/sites-feed-candidates.service';
@@ -33,7 +34,7 @@ import { PersonalRetriever } from './feed/candidates/personal.retriever';
 import { FeedCacheRedisService } from './feed/feed-cache-redis.service';
 
 @Module({
-  imports: [ConfigModule, ReportsUploadModule, FeatureFlagsModule, ModerationModule, SiteCommentsCountModule],
+  imports: [ConfigModule, ReportsUploadModule, FeatureFlagsModule, ModerationModule, SiteCommentsCountModule, SiteResolutionQueryModule],
   providers: [
     SitesFeedCacheService,
     SitesFeedPreferencesService,

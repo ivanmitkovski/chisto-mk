@@ -20,14 +20,18 @@ export 'app_sheet_drag.dart';
 /// - [showResizable] — snap-detent sheets with header drag + overscroll dismiss.
 abstract final class AppBottomSheet {
   /// Height cap for [maxHeightFactor] accounting for modal [useSafeArea].
+  ///
+  /// Reads top inset from the platform [View] because modal routes strip top
+  /// padding from descendant [MediaQuery]s.
   static double _maxSheetHeight(
-    MediaQueryData mq,
+    BuildContext context,
     double maxHeightFactor,
     bool useSafeArea,
   ) {
-    final double topInset = mq.padding.top;
-    final double bottomInset = useSafeArea ? mq.padding.bottom : 0;
-    return (mq.size.height - topInset - bottomInset) * maxHeightFactor;
+    final MediaQueryData viewData = MediaQueryData.fromView(View.of(context));
+    final double topInset = viewData.viewPadding.top;
+    final double bottomInset = useSafeArea ? viewData.viewPadding.bottom : 0;
+    return (viewData.size.height - topInset - bottomInset) * maxHeightFactor;
   }
 
   /// Bottom scroll padding clearing the home indicator in edge-to-edge sheets.
@@ -57,10 +61,9 @@ abstract final class AppBottomSheet {
     AnimationStyle? sheetAnimationStyle,
     Clip clipBehavior = Clip.antiAlias,
   }) {
-    final MediaQueryData mq = MediaQuery.of(context);
     final double? maxHeight = maxHeightFactor == null
         ? null
-        : _maxSheetHeight(mq, maxHeightFactor, useSafeArea);
+        : _maxSheetHeight(context, maxHeightFactor, useSafeArea);
 
     return showModalBottomSheet<T>(
       context: context,
@@ -91,7 +94,6 @@ abstract final class AppBottomSheet {
           ? null
           : BoxConstraints(maxHeight: maxHeight),
       builder: (BuildContext sheetContext) {
-        final MediaQueryData sheetMediaQuery = MediaQuery.of(sheetContext);
         Widget body = builder(sheetContext);
 
         if (canDismiss != null) {
@@ -105,12 +107,7 @@ abstract final class AppBottomSheet {
           context: sheetContext,
           maxHeight: maxHeight,
           keyboardInsetMode: keyboardInsetMode,
-          child: keyboardInsetMode == SheetKeyboardInsetMode.overlay
-              ? MediaQuery(
-                  data: sheetMediaQuery,
-                  child: body,
-                )
-              : body,
+          child: _ModalSheetViewportMediaQuery(child: body),
         );
 
         if (keyboardInsetMode == SheetKeyboardInsetMode.overlay) {
@@ -179,6 +176,36 @@ abstract final class AppBottomSheet {
 
         return sheet;
       },
+    );
+  }
+}
+
+/// Merges live platform [View] insets into the sheet [MediaQuery].
+///
+/// Modal routes strip top padding from descendant [MediaQuery]s. This re-exposes
+/// notch [viewPadding] and keyboard [viewInsets] from the platform [View] for
+/// layout and scroll padding. Overlay hosts additionally strip bottom
+/// [viewInsets] via [MediaQuery.removeViewInsets] after this wrapper.
+///
+/// Intentionally stateless: rely on [showModalBottomSheet] route rebuilds on
+/// metrics changes. A [WidgetsBindingObserver] here forced full-tree [setState]
+/// during IME animation and dropped text-field focus on iOS.
+class _ModalSheetViewportMediaQuery extends StatelessWidget {
+  const _ModalSheetViewportMediaQuery({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final MediaQueryData routeMq = MediaQuery.of(context);
+    final MediaQueryData viewMq = MediaQueryData.fromView(View.of(context));
+    return MediaQuery(
+      data: routeMq.copyWith(
+        viewInsets: viewMq.viewInsets,
+        viewPadding: viewMq.viewPadding,
+        padding: routeMq.padding.copyWith(top: viewMq.viewPadding.top),
+      ),
+      child: child,
     );
   }
 }

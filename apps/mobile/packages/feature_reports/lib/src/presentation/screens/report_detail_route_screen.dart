@@ -22,9 +22,23 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Root-stack report detail for notification and deep-link entry.
 class ReportDetailRouteScreen extends ConsumerStatefulWidget {
-  const ReportDetailRouteScreen({super.key, required this.reportId});
+  const ReportDetailRouteScreen({
+    super.key,
+    required this.reportId,
+    this.onMarkSiteAsCleaned,
+    this.cleanupSectionBuilder,
+  });
 
   final String reportId;
+
+  final Future<void> Function(String siteId, ReportSheetViewModel snapshot)?
+  onMarkSiteAsCleaned;
+
+  final Widget Function(
+    BuildContext context,
+    String siteId,
+    ReportSheetViewModel report,
+  )? cleanupSectionBuilder;
 
   @override
   ConsumerState<ReportDetailRouteScreen> createState() =>
@@ -166,6 +180,8 @@ class _ReportDetailRouteScreenState extends ConsumerState<ReportDetailRouteScree
                 siteId: siteId,
                 snapshot: snapshot,
               ),
+          onMarkSiteAsCleaned: widget.onMarkSiteAsCleaned,
+          cleanupSectionBuilder: widget.cleanupSectionBuilder,
         ),
       ),
     );

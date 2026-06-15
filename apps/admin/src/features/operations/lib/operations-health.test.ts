@@ -20,11 +20,21 @@ function baseSnapshot(overrides: Partial<OperationsSnapshot> = {}): OperationsSn
       queueDepth: 0,
       activeLeases: 0,
       deadLetterCount: 0,
+      outbox: {
+        deliveredTotal: 0,
+        failedPermanentlyTotal: 0,
+        pendingTotal: 0,
+      },
     }),
     deliveryReport: okPanel({
       sends: { total: 0, success: 0, failure: 0, revoked: 0, byType: {} },
       inbox: { notificationsSent: 100, notificationsOpened: 50, openRate: 0.5 },
       queue: { depth: 0, activeLeases: 0, deadLetterCount: 0, retries: 0 },
+      outbox: {
+        deliveredTotal: 0,
+        failedPermanentlyTotal: 0,
+        pendingTotal: 0,
+      },
     }),
     deadLetters: okPanel({ data: [], meta: { page: 1, limit: 5, total: 0 } }),
     emailDeadLetters: okPanel({ data: [], meta: { page: 1, limit: 5, total: 0 } }),

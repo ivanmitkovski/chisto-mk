@@ -4,7 +4,9 @@ import 'package:chisto_infrastructure/core/providers/root_container.dart';
 import 'package:feature_auth/feature_auth.dart';
 import 'package:feature_events/feature_events.dart';
 import 'package:feature_home/src/application/home_shell_state.dart';
+import 'package:feature_home/src/presentation/utils/open_mark_site_as_cleaned.dart';
 import 'package:feature_home/src/presentation/utils/open_report_linked_pollution_site.dart';
+import 'package:feature_home/src/presentation/widgets/report_cleanup_submission_slot.dart';
 import 'package:feature_onboarding/feature_onboarding.dart';
 import 'package:feature_reports/feature_reports.dart';
 import 'package:flutter/material.dart';
@@ -76,6 +78,23 @@ class HomeShellController extends _$HomeShellController {
                 ref: ref,
                 siteId: siteId,
                 snapshot: snapshot,
+              ),
+          onMarkSiteAsCleaned: (String siteId, snapshot) =>
+              openMarkSiteAsCleanedFromReport(
+                context: context,
+                ref: ref,
+                siteId: siteId,
+                snapshot: snapshot,
+              ),
+          cleanupSectionBuilder: (
+            BuildContext context,
+            String siteId,
+            ReportSheetViewModel report,
+          ) =>
+              ReportCleanupSubmissionSlot(
+                siteId: siteId,
+                reportApproved: report.status == ReportSheetStatus.approved,
+                snapshot: report,
               ),
         );
       },

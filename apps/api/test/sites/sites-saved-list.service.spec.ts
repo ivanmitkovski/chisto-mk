@@ -30,9 +30,17 @@ describe('SitesSavedListService', () => {
       signUrls: jest.fn(async (urls: string[]) => urls),
       signPrivateObjectKey: jest.fn(async () => null),
     };
+    const siteResolutionQuery = {
+      getViewerStatusBySiteIds: jest.fn(async () => new Map([['site_a', 'pending']])),
+    };
     return {
-      service: new SitesSavedListService(prisma as never, reportsUploadService as never),
+      service: new SitesSavedListService(
+        prisma as never,
+        reportsUploadService as never,
+        siteResolutionQuery as never,
+      ),
       prisma,
+      siteResolutionQuery,
     };
   }
 
@@ -44,6 +52,7 @@ describe('SitesSavedListService', () => {
     );
     expect(out.data).toHaveLength(1);
     expect(out.data[0].isSavedByMe).toBe(true);
+    expect(out.data[0].viewerResolutionStatus).toBe('pending');
     expect(out.meta.nextCursor).toBe('2');
     expect(out.feedVariant).toBe('v1');
   });

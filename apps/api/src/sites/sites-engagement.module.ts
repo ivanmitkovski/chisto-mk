@@ -24,6 +24,7 @@ import { SiteDetailRepository } from './repositories/site-detail.repository';
 import { SiteMediaRepository } from './repositories/site-media.repository';
 import { SiteUpvotesRepository } from './repositories/site-upvotes.repository';
 import { SitesFeedModule } from './sites-feed.module';
+import { SiteResolutionQueryModule } from './resolutions/site-resolution-query.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { SitesFeedModule } from './sites-feed.module';
     ModerationModule,
     SiteHistoryModule,
     SiteCommentsCountModule,
+    SiteResolutionQueryModule,
     forwardRef(() => SitesFeedModule),
   ],
   controllers: [SitesCommentsController, SitesEngagementController],
