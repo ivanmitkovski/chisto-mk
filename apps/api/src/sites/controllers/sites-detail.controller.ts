@@ -22,6 +22,7 @@ import { ListSiteMediaQueryDto } from '../dto/list-site-media-query.dto';
 import { UpdateSiteArchiveDto } from '../dto/update-site-archive.dto';
 import { UpdateSiteStatusDto } from '../dto/update-site-status.dto';
 import { SiteDetailResponseDto } from '../dto/site-detail-response.dto';
+import { SitePublicShareCardResponseDto } from '../dto/site-public-share-card.dto';
 import { SiteMediaListResponseDto } from '../dto/site-media-response.dto';
 import { SiteCoReportersListResponseDto } from '../dto/site-co-reporters-response.dto';
 import { ListSiteCoReportersQueryDto } from '../dto/list-site-co-reporters-query.dto';
@@ -31,6 +32,7 @@ import { PaginationQueryDto20 } from '../../common/dto/pagination-query.dto';
 import { SitesAdminService } from '../services/sites-admin.service';
 import { SitesDetailService } from '../services/sites-detail.service';
 import { SitesMediaService } from '../services/sites-media.service';
+import { SitesShareCardQueryService } from '../services/sites-share-card-query.service';
 import { SiteCoReportersListService } from '../services/site-co-reporters-list.service';
 import { ParseCuidPipe } from '../../common/pipes/parse-cuid.pipe';
 import { ApiStandardHttpErrorResponses } from '../../common/openapi/standard-http-error-responses.decorator';
@@ -45,7 +47,25 @@ export class SitesDetailController {
     private readonly sitesAdmin: SitesAdminService,
     private readonly coReportersList: SiteCoReportersListService,
     private readonly cleanupEvidence: SiteCleanupEvidenceService,
+    private readonly shareCard: SitesShareCardQueryService,
   ) {}
+
+  @Get(':id/share-card')
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 120 } })
+  @ApiOperation({
+    summary: 'Public share card for HTTPS `/sites/:id` landing (public visibility only)',
+  })
+  @ApiOkResponse({ type: SitePublicShareCardResponseDto })
+  @ApiNotFoundResponse({ description: 'Site not found or not publicly visible' })
+  @ApiBadRequestResponse({
+    description: 'Malformed site id',
+    schema: { example: { code: 'INVALID_CUID', message: 'Invalid resource id' } },
+  })
+  @ApiTooManyRequestsResponse({ description: 'Too many requests' })
+  getPublicShareCard(@Param('id', ParseCuidPipe) id: string) {
+    return this.shareCard.findPublicShareCard(id);
+  }
 
   @Get(':id/cleanup-evidence')
   @UseGuards(ThrottlerGuard, OptionalJwtAuthGuard)

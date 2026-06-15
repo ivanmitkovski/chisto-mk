@@ -124,6 +124,12 @@ jobs:
       - name: Build workspace
         run: pnpm build
 
+      - name: Landing unit tests
+        run: pnpm --filter @chisto/landing test
+
+      - name: Landing help content lint
+        run: pnpm --filter @chisto/landing run lint:help-content
+
       - name: API OpenAPI snapshot check
         run: pnpm --filter @chisto/api run snapshot:openapi:check
 

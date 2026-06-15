@@ -3,22 +3,11 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { defaultLocale, isLocale, type Locale } from "@/i18n/config";
+import { chistoApiBase, chistoPublicSiteBase } from "@/lib/share-api";
 import { eventShareStrings } from "./event-share-strings";
 import styles from "./event-share-page.module.css";
 
 type Props = { params: Promise<{ id: string }> };
-
-function apiBase(): string {
-  const raw = process.env.NEXT_PUBLIC_CHISTO_API_URL?.trim();
-  const b = raw && raw.length > 0 ? raw : "https://api.chisto.mk";
-  return b.replace(/\/+$/, "");
-}
-
-function publicSiteBase(): string {
-  const raw = process.env.NEXT_PUBLIC_CHISTO_SITE_URL?.trim();
-  const b = raw && raw.length > 0 ? raw : "https://chisto.mk";
-  return b.replace(/\/+$/, "");
-}
 
 type ShareCard = {
   id: string;
@@ -30,7 +19,7 @@ type ShareCard = {
 };
 
 async function loadShareCard(id: string): Promise<ShareCard | null> {
-  const res = await fetch(`${apiBase()}/events/${encodeURIComponent(id)}/share-card`, {
+  const res = await fetch(`${chistoApiBase()}/events/${encodeURIComponent(id)}/share-card`, {
     next: { revalidate: 120 },
   });
   if (res.status === 404) {
@@ -62,7 +51,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: "Chisto.mk" };
   }
   const description = `${card.siteLabel} · ${card.title}`;
-  const canonical = `${publicSiteBase()}/events/${encodeURIComponent(id)}`;
+  const canonical = `${chistoPublicSiteBase()}/events/${encodeURIComponent(id)}`;
   const ogLocale = "mk_MK";
   return {
     title: `${card.title} · Chisto.mk`,
@@ -97,8 +86,9 @@ export default async function EventSharePage({ params }: Props) {
   const uiLocale: Locale = rawLocale && isLocale(rawLocale) ? rawLocale : defaultLocale;
   const t = eventShareStrings(uiLocale);
 
-  const appUniversal = `https://chisto.mk/app/events/detail/${encodeURIComponent(id)}`;
-  const webHome = `https://chisto.mk/${uiLocale}`;
+  const siteBase = chistoPublicSiteBase();
+  const appUniversal = `${siteBase}/app/events/detail/${encodeURIComponent(id)}`;
+  const webHome = `${siteBase}/${uiLocale}`;
   const schedule = scheduleLine(card, uiLocale);
   const jsonLd = {
     "@context": "https://schema.org",

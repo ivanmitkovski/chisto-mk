@@ -1,0 +1,42 @@
+.linkPrimary,
+.linkSecondary {
+  display: inline-block;
+  padding: 12px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: box-shadow 0.15s ease, outline-offset 0.15s ease;
+}
+
+.linkPrimary:focus,
+.linkSecondary:focus,
+.textLink:focus {
+  outline: none;
+}
+
+.linkPrimary:focus-visible,
+.linkSecondary:focus-visible {
+  outline: 3px solid #0f766e;
+  outline-offset: 3px;
+}
+
+.linkPrimary {
+  background: #0d9488;
+  color: #fff;
+}
+
+.linkSecondary {
+  border: 1px solid #cbd5e1;
+  color: #0f172a;
+}
+
+.textLink {
+  color: #0f766e;
+  text-decoration: none;
+}
+
+.textLink:focus-visible {
+  outline: 2px solid #0f766e;
+  outline-offset: 2px;
+  border-radius: 2px;
+}

@@ -1,0 +1,4 @@
+# Playwright (run from apps/landing)
+/test-results/
+/playwright-report/
+/blob-report/

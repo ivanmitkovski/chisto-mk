@@ -14,6 +14,7 @@ import { SiteCommentsService } from './services/site-comments.service';
 import { SitesCommentsController } from './controllers/sites-comments.controller';
 import { SitesEngagementController } from './controllers/sites-engagement.controller';
 import { SitesDetailService } from './services/sites-detail.service';
+import { SitesShareCardQueryService } from './services/sites-share-card-query.service';
 import { SitesMediaService } from './services/sites-media.service';
 import { SitesEngagementSnapshotService } from './services/sites-engagement-snapshot.service';
 import { SitesReporterNotificationService } from './services/sites-reporter-notification.service';
@@ -39,6 +40,7 @@ import { SiteResolutionQueryModule } from './resolutions/site-resolution-query.m
   controllers: [SitesCommentsController, SitesEngagementController],
   providers: [
     SitesDetailService,
+    SitesShareCardQueryService,
     SitesMediaService,
     SitesSiteUpvotesListService,
     SiteCoReportersListService,
@@ -56,6 +58,6 @@ import { SiteResolutionQueryModule } from './resolutions/site-resolution-query.m
     SiteMediaRepository,
     SiteUpvotesRepository,
   ],
-  exports: [SitesDetailService, SitesMediaService, SiteEngagementService, SiteCoReportersListService, SiteHistoryModule, SitesReporterNotificationService],
+  exports: [SitesDetailService, SitesMediaService, SitesShareCardQueryService, SiteEngagementService, SiteCoReportersListService, SiteHistoryModule, SitesReporterNotificationService],
 })
 export class SitesEngagementModule {}

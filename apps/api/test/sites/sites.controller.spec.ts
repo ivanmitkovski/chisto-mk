@@ -82,6 +82,7 @@ describe('SitesController', () => {
         sitesAdmin,
         {} as never,
         {} as never,
+        {} as never,
       ),
       sitesAdmin,
     };

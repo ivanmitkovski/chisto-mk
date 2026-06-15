@@ -5,7 +5,7 @@ import next from '@next/eslint-plugin-next';
 import globals from 'globals';
 
 const ignoreConfig = {
-  ignores: ['**/node_modules/**', '**/.next/**', '**/dist/**', 'next-env.d.ts'],
+  ignores: ['**/node_modules/**', '**/.next/**', '**/dist/**', 'next-env.d.ts', 'e2e/**', 'playwright.config.ts'],
 };
 
 const baseConfig = {
