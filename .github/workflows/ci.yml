@@ -240,7 +240,7 @@ jobs:
             sleep 2
           done
           curl -sf "http://127.0.0.1:3001" >/dev/null
-          CI=true ADMIN_E2E_BASE_URL=http://127.0.0.1:3001 pnpm --filter @chisto/admin exec playwright test tests/a11y
+          CI=true ADMIN_E2E_BASE_URL=http://127.0.0.1:3001 pnpm --filter @chisto/admin run test:a11y
 
   e2e:
     name: API E2E Tests
