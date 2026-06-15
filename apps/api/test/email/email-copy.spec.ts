@@ -23,6 +23,7 @@ const TEMPLATE_IDS: EmailTemplateId[] = [
   'admin_moderation_event_pending',
   'admin_moderation_ugc_report',
   'admin_moderation_checkin_risk',
+  'admin_moderation_site_resolution',
 ];
 
 /** Shared fixture: each template reads only fields it needs */
@@ -60,6 +61,11 @@ const ctx: Record<string, unknown> = {
   detailsPreview: 'Repeated spam links in comments',
   reportedAt: '2026-06-05T11:00:00.000Z',
   occurredAt: '2026-06-05T12:00:00.000Z',
+  submitterName: 'Ana Citizen',
+  submitterEmail: 'citizen@example.test',
+  isReporterSubmission: true,
+  photoCount: 3,
+  notePreview: 'Site looks clean after community cleanup.',
 };
 
 describe('email-copy', () => {
@@ -161,5 +167,16 @@ describe('email-copy', () => {
   it('admin_moderation_checkin_risk includes when row', () => {
     const copy = getCopy('admin_moderation_checkin_risk', 'en', ctx, 'https://chisto.mk');
     expect((copy.detailRows ?? []).some((r) => r.label === 'When')).toBe(true);
+  });
+
+  it('admin_moderation_site_resolution includes site and submitter detail rows', () => {
+    const copy = getCopy('admin_moderation_site_resolution', 'en', ctx, 'https://chisto.mk');
+    const labels = (copy.detailRows ?? []).map((r) => r.label);
+    expect(labels).toEqual(
+      expect.arrayContaining(['Site', 'Submitted by', 'Submitter type', 'Photos', 'Submitted']),
+    );
+    expect(copy.accent).toBe('success');
+    expect(copy.ctaUrl).toBe(ctx.actionUrl);
+    expect(copy.extraLines?.[0]).toContain('Site looks clean');
   });
 });

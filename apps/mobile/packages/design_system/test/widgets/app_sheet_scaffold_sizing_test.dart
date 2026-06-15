@@ -66,5 +66,24 @@ void main() {
 
     expect(sheetBox.size.height, lessThan(screenHeight * 0.55));
     expect(sheetBox.size.height, greaterThan(280));
+
+    final Rect lastActionRect = tester.getRect(find.text('Action 2'));
+    final Rect sheetRect = tester.getRect(
+      find.ancestor(
+        of: find.text('Take action'),
+        matching: find.byWidgetPredicate(
+          (Widget widget) =>
+              widget is DecoratedBox &&
+              widget.decoration is BoxDecoration &&
+              (widget.decoration as BoxDecoration).color ==
+                  AppColors.panelBackground,
+        ),
+      ),
+    );
+    expect(
+      sheetRect.bottom - lastActionRect.bottom,
+      lessThan(56),
+      reason: 'Last action row should sit near the sheet bottom without dead band',
+    );
   });
 }

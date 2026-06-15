@@ -37,4 +37,5 @@ export type EmailTemplateId =
   | 'admin_moderation_new_report'
   | 'admin_moderation_event_pending'
   | 'admin_moderation_ugc_report'
-  | 'admin_moderation_checkin_risk';
+  | 'admin_moderation_checkin_risk'
+  | 'admin_moderation_site_resolution';

@@ -1,0 +1,21 @@
+{
+  "pageTitle": "Site resolutions",
+  "approve": "Approve",
+  "reject": "Reject",
+  "filters": {
+    "status": "Status",
+    "all": "All",
+    "pending": "Pending review",
+    "approved": "Approved",
+    "rejected": "Rejected"
+  },
+  "table": {
+    "submitted": "Submitted",
+    "site": "Site",
+    "submitter": "Submitter",
+    "status": "Status",
+    "photos": "Photos",
+    "actions": "Actions",
+    "empty": "No resolution submissions match your filters."
+  }
+}

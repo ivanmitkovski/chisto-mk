@@ -2607,6 +2607,48 @@
         ]
       }
     },
+    "/notifications/admin/push-diagnostics": {
+      "get": {
+        "operationId": "NotificationsAdminController_getPushDiagnostics",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PushDiagnosticsDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "FCM/APNs push delivery diagnostics (admin only)",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
     "/notifications/admin/dead-letters": {
       "get": {
         "operationId": "NotificationsAdminController_deadLetters",
@@ -2661,6 +2703,141 @@
           }
         ],
         "summary": "List dead-letter push outbox entries (admin only)",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/notifications/admin/dead-letters/requeue": {
+      "post": {
+        "operationId": "NotificationsAdminController_requeueDeadLetters",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeadLetterRequeueResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Requeue actionable push dead letters with active device tokens",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/notifications/admin/dead-letters/purge-terminal": {
+      "post": {
+        "operationId": "NotificationsAdminController_purgeTerminalDeadLetters",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeadLetterPurgeResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Purge undeliverable push dead letters (revoked tokens / invalid registration)",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/notifications/admin/dead-letters/{id}/requeue": {
+      "post": {
+        "operationId": "NotificationsAdminController_requeueDeadLetter",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeadLetterRequeueOneResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Requeue a single push dead letter when actionable",
         "tags": [
           "notifications"
         ]
@@ -6296,6 +6473,73 @@
         ]
       }
     },
+    "/sites/{id}/cleanup-evidence": {
+      "get": {
+        "operationId": "SitesDetailController_findCleanupEvidence",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CleanupEvidenceListResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Unified after-cleanup evidence gallery for a site",
+        "tags": [
+          "sites"
+        ]
+      }
+    },
     "/sites/{id}": {
       "get": {
         "operationId": "SitesDetailController_findOne",
@@ -6584,6 +6828,299 @@
           }
         ],
         "summary": "Archive or unarchive site from default map visibility",
+        "tags": [
+          "sites"
+        ]
+      }
+    },
+    "/sites/admin/resolutions": {
+      "get": {
+        "operationId": "SiteResolutionsAdminController_list",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "PENDING",
+                "APPROVED",
+                "REJECTED"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "siteId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSiteResolutionListResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List site resolution submissions for admin moderation",
+        "tags": [
+          "sites"
+        ]
+      }
+    },
+    "/sites/admin/resolutions/{resolutionId}/status": {
+      "patch": {
+        "operationId": "SiteResolutionsAdminController_updateStatus",
+        "parameters": [
+          {
+            "name": "resolutionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSiteResolutionStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteResolutionResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Approve or reject a site resolution submission",
+        "tags": [
+          "sites"
+        ]
+      }
+    },
+    "/sites/{siteId}/resolutions/upload": {
+      "post": {
+        "operationId": "SiteResolutionsController_uploadPhotos",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportMediaUrlsResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload cleanup evidence photos (max 5, jpeg/png/webp, 10MB each)",
+        "tags": [
+          "sites"
+        ]
+      }
+    },
+    "/sites/{siteId}/resolutions": {
+      "post": {
+        "operationId": "SiteResolutionsController_submitResolution",
+        "parameters": [
+          {
+            "name": "siteId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSiteResolutionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteResolutionResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Submit cleanup confirmation with evidence for a pollution site",
+        "tags": [
+          "sites"
+        ]
+      },
+      "get": {
+        "operationId": "SiteResolutionsController_listResolutions",
+        "parameters": [
+          {
+            "name": "siteId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteResolutionListResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List approved resolutions and caller pending submissions for a site",
         "tags": [
           "sites"
         ]
@@ -18477,6 +19014,25 @@
           "platform"
         ]
       },
+      "PushOutboxTotalsDto": {
+        "type": "object",
+        "properties": {
+          "deliveredTotal": {
+            "type": "number"
+          },
+          "failedPermanentlyTotal": {
+            "type": "number"
+          },
+          "pendingTotal": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "deliveredTotal",
+          "failedPermanentlyTotal",
+          "pendingTotal"
+        ]
+      },
       "PushStatsDto": {
         "type": "object",
         "properties": {
@@ -18513,6 +19069,9 @@
           },
           "deadLetterCount": {
             "type": "number"
+          },
+          "outbox": {
+            "$ref": "#/components/schemas/PushOutboxTotalsDto"
           }
         },
         "required": [
@@ -18526,7 +19085,8 @@
           "inboxReads",
           "queueDepth",
           "activeLeases",
-          "deadLetterCount"
+          "deadLetterCount",
+          "outbox"
         ]
       },
       "DeliveryReportSendsDto": {
@@ -18610,12 +19170,67 @@
           },
           "queue": {
             "$ref": "#/components/schemas/DeliveryReportQueueDto"
+          },
+          "outbox": {
+            "$ref": "#/components/schemas/PushOutboxTotalsDto"
           }
         },
         "required": [
           "sends",
           "inbox",
-          "queue"
+          "queue",
+          "outbox"
+        ]
+      },
+      "PushDiagnosticsTopErrorCodeDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "count": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "code",
+          "count"
+        ]
+      },
+      "PushDiagnosticsDto": {
+        "type": "object",
+        "properties": {
+          "fcmEnabled": {
+            "type": "boolean"
+          },
+          "fcmReady": {
+            "type": "boolean"
+          },
+          "projectId": {
+            "type": "object",
+            "nullable": true
+          },
+          "deadLetterTotal": {
+            "type": "number"
+          },
+          "topErrorCodes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PushDiagnosticsTopErrorCodeDto"
+            }
+          },
+          "remediation": {
+            "type": "object",
+            "nullable": true
+          }
+        },
+        "required": [
+          "fcmEnabled",
+          "fcmReady",
+          "projectId",
+          "deadLetterTotal",
+          "topErrorCodes",
+          "remediation"
         ]
       },
       "DeadLetterRowDto": {
@@ -18697,6 +19312,39 @@
           "meta"
         ]
       },
+      "DeadLetterRequeueResultDto": {
+        "type": "object",
+        "properties": {
+          "requeued": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "requeued"
+        ]
+      },
+      "DeadLetterPurgeResultDto": {
+        "type": "object",
+        "properties": {
+          "purged": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "purged"
+        ]
+      },
+      "DeadLetterRequeueOneResultDto": {
+        "type": "object",
+        "properties": {
+          "requeued": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "requeued"
+        ]
+      },
       "PatchFeatureFlagDto": {
         "type": "object",
         "properties": {
@@ -18726,7 +19374,8 @@
               "NEW_REPORT",
               "EVENT_PENDING",
               "UGC_REPORT",
-              "CHECKIN_RISK"
+              "CHECKIN_RISK",
+              "SITE_RESOLUTION"
             ]
           },
           "enabled": {
@@ -18927,6 +19576,14 @@
           "isSavedByMe": {
             "type": "boolean"
           },
+          "viewerResolutionStatus": {
+            "type": "string",
+            "enum": [
+              "none",
+              "pending",
+              "approved"
+            ]
+          },
           "rankingScore": {
             "type": "number"
           },
@@ -18960,6 +19617,7 @@
           "sharesCount",
           "isUpvotedByMe",
           "isSavedByMe",
+          "viewerResolutionStatus",
           "rankingScore",
           "rankingReasons"
         ]
@@ -19288,7 +19946,10 @@
               "CLEANUP_EVENT_CANCELLED",
               "ARCHIVED_BY_ADMIN",
               "UNARCHIVED_BY_ADMIN",
-              "ADMIN_NOTE"
+              "ADMIN_NOTE",
+              "RESOLUTION_SUBMITTED",
+              "RESOLUTION_APPROVED",
+              "RESOLUTION_REJECTED"
             ]
           },
           "occurredAt": {
@@ -19765,6 +20426,110 @@
           "feedbackType"
         ]
       },
+      "CleanupEvidenceSubmitterDto": {
+        "type": "object",
+        "properties": {
+          "displayLabel": {
+            "type": "object",
+            "nullable": true
+          },
+          "isDeleted": {
+            "type": "boolean"
+          },
+          "isAnonymous": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "isDeleted",
+          "isAnonymous"
+        ]
+      },
+      "CleanupEvidenceItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "RESOLUTION",
+              "CLEANUP_EVENT_AFTER",
+              "CLEANUP_EVENT_EVIDENCE"
+            ]
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "caption": {
+            "type": "object",
+            "nullable": true
+          },
+          "submitter": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CleanupEvidenceSubmitterDto"
+              }
+            ]
+          },
+          "resolutionId": {
+            "type": "object",
+            "nullable": true
+          },
+          "cleanupEventId": {
+            "type": "object",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "url",
+          "source",
+          "createdAt"
+        ]
+      },
+      "CleanupEvidenceListMetaDto": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "page",
+          "limit",
+          "total"
+        ]
+      },
+      "CleanupEvidenceListResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CleanupEvidenceItemDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/CleanupEvidenceListMetaDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
       "SiteDetailReporterDto": {
         "type": "object",
         "properties": {
@@ -19998,6 +20763,14 @@
           "isSavedByMe": {
             "type": "boolean"
           },
+          "viewerResolutionStatus": {
+            "type": "string",
+            "enum": [
+              "none",
+              "pending",
+              "approved"
+            ]
+          },
           "coReporterNames": {
             "type": "array",
             "items": {
@@ -20038,6 +20811,7 @@
           "sharesCount",
           "isUpvotedByMe",
           "isSavedByMe",
+          "viewerResolutionStatus",
           "coReporterNames",
           "mergedDuplicateChildCountTotal"
         ]
@@ -20223,6 +20997,251 @@
         },
         "required": [
           "archived"
+        ]
+      },
+      "AdminSiteResolutionListItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "siteId": {
+            "type": "string"
+          },
+          "siteAddress": {
+            "type": "object",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "APPROVED",
+              "REJECTED"
+            ]
+          },
+          "mediaUrls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "note": {
+            "type": "object",
+            "nullable": true
+          },
+          "isReporterSubmission": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "submitterDisplayLabel": {
+            "type": "object",
+            "nullable": true
+          },
+          "siteStatus": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "siteId",
+          "status",
+          "mediaUrls",
+          "isReporterSubmission",
+          "createdAt",
+          "siteStatus"
+        ]
+      },
+      "AdminSiteResolutionListMetaDto": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "page",
+          "limit",
+          "total"
+        ]
+      },
+      "AdminSiteResolutionListResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminSiteResolutionListItemDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/AdminSiteResolutionListMetaDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "UpdateSiteResolutionStatusDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "APPROVED",
+              "REJECTED"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "description": "Required when rejecting a resolution submission.",
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "SiteResolutionSubmitterDto": {
+        "type": "object",
+        "properties": {
+          "displayLabel": {
+            "type": "object",
+            "nullable": true
+          },
+          "isSelf": {
+            "type": "boolean"
+          },
+          "isDeleted": {
+            "type": "boolean"
+          },
+          "isAnonymous": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "isSelf",
+          "isDeleted",
+          "isAnonymous"
+        ]
+      },
+      "SiteResolutionResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "siteId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "APPROVED",
+              "REJECTED"
+            ]
+          },
+          "mediaUrls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "note": {
+            "type": "object",
+            "nullable": true
+          },
+          "isReporterSubmission": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "moderatedAt": {
+            "type": "object",
+            "nullable": true
+          },
+          "submitter": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SiteResolutionSubmitterDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "siteId",
+          "status",
+          "mediaUrls",
+          "isReporterSubmission",
+          "createdAt"
+        ]
+      },
+      "ReportMediaUrlsResponseDto": {
+        "type": "object",
+        "properties": {
+          "urls": {
+            "description": "HTTPS object URLs (or keys when virtual-hosted base is unset) for uploaded images",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "urls"
+        ]
+      },
+      "CreateSiteResolutionDto": {
+        "type": "object",
+        "properties": {
+          "mediaUrls": {
+            "description": "Cleanup evidence photo URLs (from POST /sites/:siteId/resolutions/upload)",
+            "minItems": 1,
+            "maxItems": 5,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "note": {
+            "type": "string",
+            "description": "Optional note about the cleanup",
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "mediaUrls"
+        ]
+      },
+      "SiteResolutionListResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SiteResolutionResponseDto"
+            }
+          },
+          "meta": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
         ]
       },
       "AdminReportEvidenceDto": {
@@ -20732,21 +21751,6 @@
           "siteId",
           "isNewSite",
           "pointsAwarded"
-        ]
-      },
-      "ReportMediaUrlsResponseDto": {
-        "type": "object",
-        "properties": {
-          "urls": {
-            "description": "HTTPS object URLs (or keys when virtual-hosted base is unset) for uploaded images",
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "required": [
-          "urls"
         ]
       },
       "ReportCapacityDto": {

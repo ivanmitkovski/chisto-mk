@@ -2,8 +2,10 @@ import 'package:feature_home/src/domain/repositories/feed_analytics_repository.d
 import 'package:feature_home/src/domain/repositories/feed_sites_repository.dart';
 import 'package:feature_home/src/domain/repositories/site_comments_repository.dart';
 import 'package:feature_home/src/domain/repositories/site_engagement_repository.dart';
+import 'package:feature_home/src/domain/repositories/site_resolution_repository.dart';
 
 export 'sites_repository_types.dart';
+export 'site_resolution_repository.dart';
 
 /// Single mobile HTTP implementation ([ApiSitesRepository]) implements all narrow contracts.
 abstract interface class SitesRepository
@@ -11,7 +13,8 @@ abstract interface class SitesRepository
         FeedSitesRepository,
         SiteEngagementRepository,
         SiteCommentsRepository,
-        FeedAnalyticsRepository {
+        FeedAnalyticsRepository,
+        SiteResolutionRepository {
   /// [getSitesForMap] JSON shape: `full` (default API) vs `lite` (smaller payload, map-optimized).
   static const String mapDetailFull = FeedSitesRepository.mapDetailFull;
   static const String mapDetailLite = FeedSitesRepository.mapDetailLite;

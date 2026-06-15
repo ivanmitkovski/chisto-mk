@@ -192,6 +192,8 @@ List<PollutionSite> computeVisibleSitesForFilter({
       }
       // GET /sites/saved (or stale cache) may omit isSavedByMe; trust the list.
       return List<PollutionSite>.from(source);
+    case FeedFilter.resolved:
+      return List<PollutionSite>.from(source);
   }
 }
 

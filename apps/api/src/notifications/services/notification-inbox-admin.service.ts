@@ -17,6 +17,27 @@ export class NotificationInboxAdminService {
     });
   }
 
+  async countOutboxTotals(): Promise<{
+    deliveredTotal: number;
+    failedPermanentlyTotal: number;
+    pendingTotal: number;
+  }> {
+    const [deliveredTotal, failedPermanentlyTotal, pendingTotal] =
+      await this.prisma.$transaction([
+        this.prisma.notificationOutbox.count({
+          where: { deliveredAt: { not: null } },
+        }),
+        this.prisma.notificationOutbox.count({
+          where: { failedPermanently: true },
+        }),
+        this.prisma.notificationOutbox.count({
+          where: { deliveredAt: null, failedPermanently: false },
+        }),
+      ]);
+
+    return { deliveredTotal, failedPermanentlyTotal, pendingTotal };
+  }
+
   async listDeadLetters(page = 1, limit = 20) {
     const safePage = Math.max(1, page);
     const safeLimit = Math.min(100, Math.max(1, limit));

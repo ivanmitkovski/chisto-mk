@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:design_system/src/widgets/organisms/app_panel_bottom_sheet.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/primary_button.dart';
 import 'package:feature_events/src/domain/models/eco_event.dart';
@@ -40,8 +42,14 @@ void main() {
     const Size surfaceSize = Size(390, 844);
 
     await tester.binding.setSurfaceSize(surfaceSize);
+    tester.view.physicalSize = surfaceSize;
+    tester.view.devicePixelRatio = 1.0;
+    tester.view.viewInsets = const FakeViewPadding(bottom: keyboardInset);
     addTearDown(() async {
       await tester.binding.setSurfaceSize(null);
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+      tester.view.resetViewInsets();
     });
 
     Future<double> sheetHeight({
@@ -50,28 +58,24 @@ void main() {
       await tester.pumpWidget(
         wrapForWidgetTest(
           MediaQuery(
-            data: const MediaQueryData(
-              size: surfaceSize,
-              viewInsets: EdgeInsets.only(bottom: keyboardInset),
-            ),
+            data: const MediaQueryData(size: surfaceSize),
             child: Builder(
               builder: (BuildContext context) {
-                final MediaQueryData sheetMediaQuery = MediaQuery.of(context);
+                final MediaQueryData viewMq =
+                    MediaQueryData.fromView(View.of(context));
                 Widget sheet = wrapScrollControlledBottomSheet(
                   context: context,
                   keyboardInsetMode: mode,
-                  child: mode == SheetKeyboardInsetMode.overlay
-                      ? MediaQuery(
-                          data: sheetMediaQuery,
-                          child: buildEventFeedbackSheet(
-                            context,
-                            event: _completedEvent(),
-                          ),
-                        )
-                      : buildEventFeedbackSheet(
-                          context,
-                          event: _completedEvent(),
-                        ),
+                  child: MediaQuery(
+                    data: MediaQuery.of(context).copyWith(
+                      viewInsets: viewMq.viewInsets,
+                      viewPadding: viewMq.viewPadding,
+                    ),
+                    child: buildEventFeedbackSheet(
+                      context,
+                      event: _completedEvent(),
+                    ),
+                  ),
                 );
                 if (mode == SheetKeyboardInsetMode.overlay) {
                   sheet = MediaQuery.removeViewInsets(
@@ -119,25 +123,32 @@ void main() {
     const Size surfaceSize = Size(390, 844);
 
     await tester.binding.setSurfaceSize(surfaceSize);
+    tester.view.physicalSize = surfaceSize;
+    tester.view.devicePixelRatio = 1.0;
+    tester.view.viewInsets = const FakeViewPadding(bottom: keyboardInset);
     addTearDown(() async {
       await tester.binding.setSurfaceSize(null);
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+      tester.view.resetViewInsets();
     });
 
     await tester.pumpWidget(
       wrapForWidgetTest(
         MediaQuery(
-          data: const MediaQueryData(
-            size: surfaceSize,
-            viewInsets: EdgeInsets.only(bottom: keyboardInset),
-          ),
+          data: const MediaQueryData(size: surfaceSize),
           child: Builder(
             builder: (BuildContext context) {
-              final MediaQueryData sheetMediaQuery = MediaQuery.of(context);
+              final MediaQueryData viewMq =
+                  MediaQueryData.fromView(View.of(context));
               Widget sheet = wrapScrollControlledBottomSheet(
                 context: context,
                 keyboardInsetMode: SheetKeyboardInsetMode.overlay,
                 child: MediaQuery(
-                  data: sheetMediaQuery,
+                  data: MediaQuery.of(context).copyWith(
+                    viewInsets: viewMq.viewInsets,
+                    viewPadding: viewMq.viewPadding,
+                  ),
                   child: buildEventFeedbackSheet(
                     context,
                     event: _completedEvent(),

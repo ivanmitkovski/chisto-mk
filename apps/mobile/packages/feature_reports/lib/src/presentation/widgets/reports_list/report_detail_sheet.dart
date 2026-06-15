@@ -36,6 +36,8 @@ class ReportDetailSheet extends StatefulWidget {
     this.isStaleFallback = false,
     this.onShowSiteOnMap,
     this.onOpenLinkedPollutionSiteDetail,
+    this.onMarkSiteAsCleaned,
+    this.cleanupSectionBuilder,
   });
 
   final ReportSheetViewModel report;
@@ -49,6 +51,17 @@ class ReportDetailSheet extends StatefulWidget {
   /// [snapshot] is the row shown in the sheet (used for coordinate fallbacks). Implement in a shell screen.
   final Future<void> Function(String siteId, ReportSheetViewModel snapshot)?
   onOpenLinkedPollutionSiteDetail;
+
+  /// Opens cleanup confirmation flow after this sheet is popped from the root navigator.
+  final Future<void> Function(String siteId, ReportSheetViewModel snapshot)?
+  onMarkSiteAsCleaned;
+
+  /// Optional cleanup submission section (injected from feature_home).
+  final Widget Function(
+    BuildContext context,
+    String siteId,
+    ReportSheetViewModel report,
+  )? cleanupSectionBuilder;
 
   @override
   State<ReportDetailSheet> createState() => _ReportDetailSheetState();
@@ -95,6 +108,12 @@ class _ReportDetailSheetState extends State<ReportDetailSheet> {
     return report.status == ReportSheetStatus.approved ||
         report.status == ReportSheetStatus.alreadyReported;
   }
+
+  bool get _canMarkAsCleaned =>
+      report.status == ReportSheetStatus.approved &&
+      report.siteId != null &&
+      report.siteId!.trim().isNotEmpty &&
+      widget.onMarkSiteAsCleaned != null;
 
   bool get _canTapLocation => _canOpenExternalMaps || _canOpenInAppMap;
 
@@ -153,6 +172,14 @@ class _ReportDetailSheetState extends State<ReportDetailSheet> {
         type: AppSnackType.warning,
       );
     }
+  }
+
+  Future<void> _markSiteAsCleaned() async {
+    if (!_canMarkAsCleaned) return;
+    final String siteId = report.siteId!.trim();
+    if (!mounted) return;
+    Navigator.of(context, rootNavigator: true).pop();
+    await widget.onMarkSiteAsCleaned!(siteId, report);
   }
 
   @override
@@ -436,6 +463,21 @@ class _ReportDetailSheetState extends State<ReportDetailSheet> {
           const SizedBox(height: AppSpacing.md),
           Divider(color: AppColors.divider.withValues(alpha: 0.7), height: 1),
           const SizedBox(height: AppSpacing.lg),
+          if (widget.cleanupSectionBuilder != null &&
+              report.siteId != null &&
+              report.siteId!.trim().isNotEmpty)
+            widget.cleanupSectionBuilder!(
+              context,
+              report.siteId!.trim(),
+              report,
+            )
+          else if (_canMarkAsCleaned) ...<Widget>[
+            PrimaryButton(
+              label: l10n.reportDetailMarkAsCleanedCta,
+              onPressed: _markSiteAsCleaned,
+            ),
+            const SizedBox(height: AppSpacing.lg),
+          ],
           ReportInfoBanner(
             title: banner.title,
             icon: banner.icon,

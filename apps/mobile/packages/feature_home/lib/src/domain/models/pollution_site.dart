@@ -4,6 +4,7 @@ import 'package:feature_home/src/domain/models/cleaning_event.dart';
 import 'package:feature_home/src/domain/models/co_reporter_profile.dart';
 import 'package:feature_home/src/domain/models/comment.dart';
 import 'package:feature_home/src/domain/models/site_report.dart';
+import 'package:feature_home/src/domain/models/site_resolution_viewer_status.dart';
 import 'package:flutter/material.dart';
 
 class PollutionSite {
@@ -19,6 +20,7 @@ class PollutionSite {
     this.shareCount = 0,
     this.isUpvotedByMe = false,
     this.isSavedByMe = false,
+    this.viewerResolutionStatus = SiteResolutionViewerStatus.none,
     required this.participantCount,
     this.mediaUrls = const <String>[],
     this.comments = const [],
@@ -54,6 +56,7 @@ class PollutionSite {
   final int shareCount;
   final bool isUpvotedByMe;
   final bool isSavedByMe;
+  final SiteResolutionViewerStatus viewerResolutionStatus;
   final int participantCount;
 
   /// Ordered site media URLs (feed: `latestReportMediaUrls`; detail: aggregated report URLs).
@@ -133,6 +136,7 @@ class PollutionSite {
     int? shareCount,
     bool? isUpvotedByMe,
     bool? isSavedByMe,
+    SiteResolutionViewerStatus? viewerResolutionStatus,
     int? participantCount,
     List<String>? mediaUrls,
     List<Comment>? comments,
@@ -167,6 +171,8 @@ class PollutionSite {
       shareCount: shareCount ?? this.shareCount,
       isUpvotedByMe: isUpvotedByMe ?? this.isUpvotedByMe,
       isSavedByMe: isSavedByMe ?? this.isSavedByMe,
+      viewerResolutionStatus:
+          viewerResolutionStatus ?? this.viewerResolutionStatus,
       participantCount: participantCount ?? this.participantCount,
       mediaUrls: mediaUrls ?? this.mediaUrls,
       comments: comments ?? this.comments,

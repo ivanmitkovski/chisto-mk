@@ -6,7 +6,10 @@ import 'package:feature_home/src/data/api_feed_sites_repository.dart';
 import 'package:feature_home/src/data/api_site_comments_repository.dart';
 import 'package:feature_home/src/data/api_site_engagement_http.dart';
 import 'package:feature_home/src/data/api_site_engagement_repository.dart';
+import 'package:chisto_infrastructure/core/network/request_cancellation.dart';
+import 'package:feature_home/src/data/api_site_resolution_repository.dart';
 import 'package:feature_home/src/domain/models/pollution_site.dart';
+import 'package:feature_home/src/domain/repositories/site_resolution_repository.dart';
 import 'package:feature_home/src/domain/repositories/sites_repository.dart';
 
 /// Composes [ApiFeedSitesRepository], engagement HTTP, comments, and feed analytics.
@@ -25,6 +28,7 @@ class ApiSitesRepository implements SitesRepository {
     );
     _engagement = ApiSiteEngagementRepository(_engagementHttp);
     _comments = ApiSiteCommentsRepository(client);
+    _resolution = ApiSiteResolutionRepository(client: client);
   }
 
   late final ApiFeedSitesRepository _feed;
@@ -32,6 +36,7 @@ class ApiSitesRepository implements SitesRepository {
   late final ApiSiteEngagementHttp _engagementHttp;
   late final ApiSiteEngagementRepository _engagement;
   late final ApiSiteCommentsRepository _comments;
+  late final ApiSiteResolutionRepository _resolution;
 
   @override
   Future<SitesListResult> getSites({
@@ -236,10 +241,53 @@ class ApiSitesRepository implements SitesRepository {
     required String feedbackType,
     String? sessionId,
     Map<String, dynamic>? metadata,
-  }) => _analytics.submitFeedFeedback(
+  }  ) => _analytics.submitFeedFeedback(
     siteId,
     feedbackType: feedbackType,
     sessionId: sessionId,
     metadata: metadata,
+  );
+
+  @override
+  Future<List<String>> uploadResolutionPhotos(
+    String siteId,
+    List<String> filePaths,
+  ) => _resolution.uploadResolutionPhotos(siteId, filePaths);
+
+  @override
+  Future<SiteResolutionSubmitResult> submitSiteResolution({
+    required String siteId,
+    required List<String> mediaUrls,
+    String? note,
+  }) => _resolution.submitSiteResolution(
+    siteId: siteId,
+    mediaUrls: mediaUrls,
+    note: note,
+  );
+
+  @override
+  Future<CleanupEvidenceListResult> getCleanupEvidence(
+    String siteId, {
+    int page = 1,
+    int limit = 24,
+    RequestCancellationToken? cancellation,
+  }) => _resolution.getCleanupEvidence(
+    siteId,
+    page: page,
+    limit: limit,
+    cancellation: cancellation,
+  );
+
+  @override
+  Future<SiteResolutionListResult> listSiteResolutions(
+    String siteId, {
+    int page = 1,
+    int limit = 20,
+    RequestCancellationToken? cancellation,
+  }) => _resolution.listSiteResolutions(
+    siteId,
+    page: page,
+    limit: limit,
+    cancellation: cancellation,
   );
 }

@@ -23,6 +23,7 @@ export type FeedEnrichedRow = SiteBaseRow & {
   sharesCount: number;
   isUpvotedByMe: boolean;
   isSavedByMe: boolean;
+  viewerResolutionStatus: 'none' | 'pending' | 'approved';
   rankingScore: number;
   rankingReasons: string[];
   rankingComponents?: Record<string, number> | undefined;
@@ -97,6 +98,7 @@ export function mapToFeedResponseData(
     sharesCount: row.sharesCount,
     isUpvotedByMe: row.isUpvotedByMe,
     isSavedByMe: row.isSavedByMe,
+    viewerResolutionStatus: row.viewerResolutionStatus,
     rankingScore: row.rankingScore,
     rankingReasons: row.rankingReasons,
     ...(query.explain ? { rankingComponents: row.rankingComponents } : {}),

@@ -27,7 +27,7 @@ extension _CreateEventSheetPickers on _CreateEventSheetState {
   void _showVolunteerCapPicker() {
     AppBottomSheet.show<void>(
       context: context,
-      keyboardInsetMode: SheetKeyboardInsetMode.overlay,
+      keyboardInsetMode: SheetKeyboardInsetMode.lift,
       builder: (BuildContext ctx) {
         return CreateEventVolunteerCapPickerSheet(
           initial: _maxParticipants,

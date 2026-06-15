@@ -2,7 +2,8 @@ export type ModerationEmailCategory =
   | 'NEW_REPORT'
   | 'EVENT_PENDING'
   | 'UGC_REPORT'
-  | 'CHECKIN_RISK';
+  | 'CHECKIN_RISK'
+  | 'SITE_RESOLUTION';
 
 export type ModerationEmailPreferenceRow = {
   category: ModerationEmailCategory;

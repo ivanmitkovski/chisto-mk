@@ -2093,6 +2093,20 @@ class AppLocalizationsSq extends AppLocalizations {
   String get feedFilterSavedDesc => 'Vendet që keni ruajtur';
 
   @override
+  String get feedFilterResolvedName => 'Të pastruara';
+
+  @override
+  String get feedFilterResolvedDesc =>
+      'Vende të konfirmuara të pastruara nga komuniteti';
+
+  @override
+  String get feedEmptyResolvedTitle => 'Ende nuk ka vende të pastruara';
+
+  @override
+  String get feedEmptyResolvedHint =>
+      'Kur vendet konfirmohen si të pastruara, do të shfaqen këtu.';
+
+  @override
   String get feedFiltersSheetTitle => 'Filtra të rrjedhës';
 
   @override
@@ -2852,6 +2866,13 @@ class AppLocalizationsSq extends AppLocalizations {
   @override
   String get notificationsSiteUnavailable =>
       'Ky vend nuk është më i disponueshëm.';
+
+  @override
+  String get notificationsReportUnavailable =>
+      'Ky raport nuk është më i disponueshëm.';
+
+  @override
+  String get notificationsOpenUnsupported => 'Ky njoftim nuk mund të hapet.';
 
   @override
   String get notificationsReadStateUpdateFailed =>
@@ -4878,6 +4899,137 @@ class AppLocalizationsSq extends AppLocalizations {
   @override
   String get takeActionShareSubtitle =>
       'Ndihmo të tjerët ta zbulojnë këtë lokacion';
+
+  @override
+  String get takeActionSubmitResolutionTitle => 'Konfirmo vendin e pastruar';
+
+  @override
+  String get takeActionSubmitResolutionSubtitle =>
+      'Ndaj foto \"pas\" dhe ndihmo të mbyllet raporti';
+
+  @override
+  String get submitResolutionSheetTitle => 'Konfirmo pastrimin';
+
+  @override
+  String submitResolutionSheetSubtitle(String siteTitle) {
+    return 'Shto foto të $siteTitle pas pastrimit';
+  }
+
+  @override
+  String get submitResolutionSheetSubtitleGeneric =>
+      'Shto foto të vendit pas pastrimit';
+
+  @override
+  String get submitResolutionNoteLabel => 'Shënim (opsional)';
+
+  @override
+  String get submitResolutionNoteHint => 'Diçka tjetër që duhet të dimë?';
+
+  @override
+  String get submitResolutionSubmitButton => 'Dërgo për shqyrtim';
+
+  @override
+  String get submitResolutionHelpText =>
+      'Një administrator do t\'i shqyrtojë fotot para se vendi të shënohet si i zgjidhur.';
+
+  @override
+  String get submitResolutionSuccessSnack =>
+      'Dëshmitë e pastrimit u dërguan. Do t\'i shqyrtojmë së shpejti.';
+
+  @override
+  String get submitResolutionFailedSnack =>
+      'Nuk u dërguan dëshmitë e pastrimit. Provo përsëri.';
+
+  @override
+  String get submitResolutionNotAvailableSnack =>
+      'Konfirmimi i pastrimit nuk është i disponueshëm për këtë vend.';
+
+  @override
+  String get submitResolutionSiteAlreadyResolvedSnack =>
+      'Ky vend është tashmë i shënuar si i zgjidhur.';
+
+  @override
+  String get submitResolutionAlreadyUnderReviewSnack =>
+      'Pastrimi juaj është tashmë në shqyrtim.';
+
+  @override
+  String get submitResolutionErrorBody =>
+      'Nuk u dërguan fotot e pastrimit. Kontrolloni lidhjen dhe provoni përsëri.';
+
+  @override
+  String get resolutionSubmittedTitle => 'Dërguar për shqyrtim';
+
+  @override
+  String get resolutionSubmittedBody =>
+      'Faleminderit që ndihmoni. Një administrator do t\'i shqyrtojë fotot para se vendi të shënohet si i zgjidhur.';
+
+  @override
+  String get resolutionSubmittedViewMyReports => 'Shiko raportet e mia';
+
+  @override
+  String get resolutionSubmittedDone => 'U krye';
+
+  @override
+  String get resolutionSubmittedSemanticsSuccess =>
+      'Pastrimi u dërgua për shqyrtim';
+
+  @override
+  String get siteDetailCleanupUnderReviewCta => 'Pastrimi në shqyrtim';
+
+  @override
+  String get siteDetailCleanupUnderReviewBanner =>
+      'Fotot tuaja të pastrimit po shqyrtohen. Do t\'ju njoftojmë kur të merret vendimi.';
+
+  @override
+  String get reportCleanupSubmissionPendingTitle =>
+      'Pastrimi juaj është në shqyrtim';
+
+  @override
+  String get reportCleanupSubmissionPendingBody =>
+      'Morëm fotot tuaja dhe një administrator po i shqyrton.';
+
+  @override
+  String get reportCleanupSubmissionApprovedTitle => 'Pastrimi u konfirmua';
+
+  @override
+  String get reportCleanupSubmissionApprovedBody =>
+      'Dëshmitë tuaja të pastrimit u miratuan dhe vendi është shënuar si i zgjidhur.';
+
+  @override
+  String get reportCleanupSubmissionPhotoSemantic => 'Foto juaj e pastrimit';
+
+  @override
+  String get reportCleanupSubmissionOpenGallerySemantic =>
+      'Hap galerinë e fotove tuaja';
+
+  @override
+  String get reportCleanupSubmissionLoadFailed =>
+      'Nuk u ngarkua dërgimi juaj i pastrimit.';
+
+  @override
+  String get siteDetailResolvedBanner => 'Ky vend është shënuar si i zgjidhur.';
+
+  @override
+  String get siteDetailAddCleanupPhotoCta => 'Shto foto pas pastrimit';
+
+  @override
+  String get cleanupEvidenceSectionTitle => 'Pas pastrimit';
+
+  @override
+  String get cleanupEvidenceEmpty => 'Ende nuk ka foto pas pastrimit.';
+
+  @override
+  String get cleanupEvidenceLoadFailed => 'Nuk u ngarkuan fotot e pastrimit.';
+
+  @override
+  String get cleanupEvidenceOpenGallerySemantic =>
+      'Hap galerinë e fotove pas pastrimit';
+
+  @override
+  String get cleanupEvidencePhotoSemantic => 'Foto pas pastrimit';
+
+  @override
+  String get reportDetailMarkAsCleanedCta => 'Shëno si të pastruar';
 
   @override
   String get shareSheetSemanticDragHandle =>

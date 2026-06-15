@@ -24,14 +24,18 @@ import 'package:feature_home/src/application/home_shell_controller.dart';
 import 'package:feature_home/src/presentation/navigation/home_shell_router.dart';
 import 'package:feature_home/src/domain/models/pollution_site.dart';
 import 'package:feature_home/src/presentation/navigation/home_shell_tab_locations.dart';
+import 'package:feature_home/src/presentation/utils/open_mark_site_as_cleaned.dart';
+import 'package:feature_home/src/presentation/widgets/report_cleanup_submission_slot.dart';
 import 'package:feature_home/src/presentation/screens/site_detail_route_screen.dart';
 import 'package:feature_notifications/src/presentation/notifications_inbox/notifications_inbox_screen.dart';
 import 'package:feature_profile/src/presentation/screens/profile_points_history_route_screen.dart';
 import 'package:feature_reports/src/presentation/screens/new_report_screen.dart';
+import 'package:feature_reports/src/presentation/widgets/reports_list/report_sheet_view_model.dart';
 import 'package:feature_reports/src/presentation/screens/report_detail_route_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -225,7 +229,31 @@ GoRouter buildAppGoRouter({String initialLocation = AppRoutes.splash}) {
           }
           return CupertinoPage<void>(
             key: state.pageKey,
-            child: ReportDetailRouteScreen(reportId: reportId),
+            child: Consumer(
+              builder: (BuildContext context, WidgetRef ref, Widget? _) {
+                return ReportDetailRouteScreen(
+                  reportId: reportId,
+                  onMarkSiteAsCleaned: (String siteId, snapshot) =>
+                      openMarkSiteAsCleanedFromReport(
+                        context: context,
+                        ref: ref,
+                        siteId: siteId,
+                        snapshot: snapshot,
+                      ),
+                  cleanupSectionBuilder: (
+                    BuildContext ctx,
+                    String siteId,
+                    ReportSheetViewModel report,
+                  ) =>
+                      ReportCleanupSubmissionSlot(
+                        siteId: siteId,
+                        reportApproved:
+                            report.status == ReportSheetStatus.approved,
+                        snapshot: report,
+                      ),
+                );
+              },
+            ),
           );
         },
       ),

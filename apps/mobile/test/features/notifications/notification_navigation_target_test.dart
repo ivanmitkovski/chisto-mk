@@ -126,6 +126,49 @@ void main() {
       expect(target, isA<NotificationOpenFeatureGuide>());
     });
 
+    test('SYSTEM test_push is informational only', () {
+      final NotificationNavigationTarget target =
+          resolveNotificationNavigationTarget(
+            type: 'SYSTEM',
+            data: const <String, dynamic>{'kind': 'test_push'},
+          );
+      expect(target, isA<NotificationOpenInformational>());
+    });
+
+    test('SYSTEM admin_broadcast without deeplink is informational only', () {
+      final NotificationNavigationTarget target =
+          resolveNotificationNavigationTarget(
+            type: 'SYSTEM',
+            data: const <String, dynamic>{'kind': 'admin_broadcast'},
+          );
+      expect(target, isA<NotificationOpenInformational>());
+    });
+
+    test('SYSTEM admin_broadcast with deeplink opens deep link', () {
+      final NotificationNavigationTarget target =
+          resolveNotificationNavigationTarget(
+            type: 'SYSTEM',
+            data: const <String, dynamic>{
+              'kind': 'admin_broadcast',
+              'deeplink': '/app/home?tab=events',
+            },
+          );
+      expect(target, isA<NotificationOpenDeepLink>());
+      expect(
+        (target as NotificationOpenDeepLink).path,
+        '/app/home?tab=events',
+      );
+    });
+
+    test('SYSTEM without entity ids is informational only', () {
+      final NotificationNavigationTarget target =
+          resolveNotificationNavigationTarget(
+            type: 'SYSTEM',
+            data: const <String, dynamic>{},
+          );
+      expect(target, isA<NotificationOpenInformational>());
+    });
+
     test('unknown type returns unsupported failure', () {
       final NotificationNavigationTarget target =
           resolveNotificationNavigationTarget(

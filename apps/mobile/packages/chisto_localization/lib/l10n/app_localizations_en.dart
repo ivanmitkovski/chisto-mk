@@ -2083,6 +2083,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get feedFilterSavedDesc => 'Sites you bookmarked';
 
   @override
+  String get feedFilterResolvedName => 'Cleaned';
+
+  @override
+  String get feedFilterResolvedDesc =>
+      'Sites confirmed cleaned by the community';
+
+  @override
+  String get feedEmptyResolvedTitle => 'No cleaned sites yet';
+
+  @override
+  String get feedEmptyResolvedHint =>
+      'When pollution sites are confirmed cleaned, they will appear here.';
+
+  @override
   String get feedFiltersSheetTitle => 'Feed filters';
 
   @override
@@ -2827,6 +2841,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get notificationsSiteUnavailable =>
       'This site is no longer available.';
+
+  @override
+  String get notificationsReportUnavailable =>
+      'This report is no longer available.';
+
+  @override
+  String get notificationsOpenUnsupported =>
+      'This notification can\'t be opened.';
 
   @override
   String get notificationsReadStateUpdateFailed =>
@@ -4828,6 +4850,137 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get takeActionShareSubtitle => 'Help others discover this site';
+
+  @override
+  String get takeActionSubmitResolutionTitle => 'Confirm site cleaned';
+
+  @override
+  String get takeActionSubmitResolutionSubtitle =>
+      'Share after photos and help close this report';
+
+  @override
+  String get submitResolutionSheetTitle => 'Confirm cleanup';
+
+  @override
+  String submitResolutionSheetSubtitle(String siteTitle) {
+    return 'Add photos showing $siteTitle after cleanup';
+  }
+
+  @override
+  String get submitResolutionSheetSubtitleGeneric =>
+      'Add photos showing the site after cleanup';
+
+  @override
+  String get submitResolutionNoteLabel => 'Note (optional)';
+
+  @override
+  String get submitResolutionNoteHint => 'Anything else we should know?';
+
+  @override
+  String get submitResolutionSubmitButton => 'Submit for review';
+
+  @override
+  String get submitResolutionHelpText =>
+      'An admin will review your photos before the site is marked resolved.';
+
+  @override
+  String get submitResolutionSuccessSnack =>
+      'Cleanup evidence submitted. We\'ll review it soon.';
+
+  @override
+  String get submitResolutionFailedSnack =>
+      'Could not submit cleanup evidence. Try again.';
+
+  @override
+  String get submitResolutionNotAvailableSnack =>
+      'Cleanup confirmation is not available for this site.';
+
+  @override
+  String get submitResolutionSiteAlreadyResolvedSnack =>
+      'This site is already marked as resolved.';
+
+  @override
+  String get submitResolutionAlreadyUnderReviewSnack =>
+      'Your cleanup is already under review.';
+
+  @override
+  String get submitResolutionErrorBody =>
+      'We couldn\'t submit your cleanup photos. Check your connection and try again.';
+
+  @override
+  String get resolutionSubmittedTitle => 'Submitted for review';
+
+  @override
+  String get resolutionSubmittedBody =>
+      'Thanks for helping clean up. An admin will review your photos before the site is marked resolved.';
+
+  @override
+  String get resolutionSubmittedViewMyReports => 'View my reports';
+
+  @override
+  String get resolutionSubmittedDone => 'Done';
+
+  @override
+  String get resolutionSubmittedSemanticsSuccess =>
+      'Cleanup submitted for review';
+
+  @override
+  String get siteDetailCleanupUnderReviewCta => 'Cleanup under review';
+
+  @override
+  String get siteDetailCleanupUnderReviewBanner =>
+      'Your cleanup photos are being reviewed. We\'ll notify you when a decision is made.';
+
+  @override
+  String get reportCleanupSubmissionPendingTitle =>
+      'Your cleanup is under review';
+
+  @override
+  String get reportCleanupSubmissionPendingBody =>
+      'We received your cleanup photos and an admin is reviewing them.';
+
+  @override
+  String get reportCleanupSubmissionApprovedTitle => 'Cleanup confirmed';
+
+  @override
+  String get reportCleanupSubmissionApprovedBody =>
+      'Your cleanup evidence was approved and the site is marked resolved.';
+
+  @override
+  String get reportCleanupSubmissionPhotoSemantic => 'Your cleanup photo';
+
+  @override
+  String get reportCleanupSubmissionOpenGallerySemantic =>
+      'Open your cleanup photo gallery';
+
+  @override
+  String get reportCleanupSubmissionLoadFailed =>
+      'Could not load your cleanup submission.';
+
+  @override
+  String get siteDetailResolvedBanner =>
+      'This site has been marked as resolved.';
+
+  @override
+  String get siteDetailAddCleanupPhotoCta => 'Add cleanup photo';
+
+  @override
+  String get cleanupEvidenceSectionTitle => 'After cleanup';
+
+  @override
+  String get cleanupEvidenceEmpty => 'No cleanup photos yet.';
+
+  @override
+  String get cleanupEvidenceLoadFailed => 'Could not load cleanup photos.';
+
+  @override
+  String get cleanupEvidenceOpenGallerySemantic => 'Open cleanup photo gallery';
+
+  @override
+  String get cleanupEvidencePhotoSemantic => 'Cleanup photo';
+
+  @override
+  String get reportDetailMarkAsCleanedCta => 'Mark as cleaned';
 
   @override
   String get shareSheetSemanticDragHandle => 'Drag to resize or dismiss';

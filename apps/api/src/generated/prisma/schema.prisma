@@ -94,6 +94,8 @@ model User {
   checkInRiskSignals          CheckInRiskSignal[]
   resolvedCheckInRiskSignals  CheckInRiskSignal[]          @relation("CheckInRiskSignalResolvedBy")
   archivedSites               Site[]                       @relation("SiteArchivedBy")
+  siteResolutionsSubmitted    SiteResolution[]             @relation("SiteResolutionSubmitter")
+  siteResolutionsModerated    SiteResolution[]             @relation("SiteResolutionModerator")
   passwordResetEmailCode      PasswordResetEmailCode?
   blocksInitiated             UserBlock[]                  @relation("BlockBlocker")
   blocksReceived              UserBlock[]                  @relation("BlockBlocked")
@@ -352,6 +354,7 @@ enum AdminModerationCategory {
   EVENT_PENDING
   UGC_REPORT
   CHECKIN_RISK
+  SITE_RESOLUTION
 }
 
 model AdminEmailPreference {
@@ -526,6 +529,7 @@ model Site {
   feedImpressions FeedImpression[]
   mapProjection   MapSiteProjection?
   historyEntries  SiteHistoryEntry[]
+  resolutions     SiteResolution[]
 
   /// Earliest APPROVED report with media — canonical image for feed, map, and detail.
   heroReportId String? @unique
@@ -590,6 +594,45 @@ enum SiteHistoryEntryKind {
   ARCHIVED_BY_ADMIN
   UNARCHIVED_BY_ADMIN
   ADMIN_NOTE
+  RESOLUTION_SUBMITTED
+  RESOLUTION_APPROVED
+  RESOLUTION_REJECTED
+}
+
+enum SiteResolutionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+/// Citizen-submitted cleanup confirmation for a pollution site (moderated before site → CLEANED).
+model SiteResolution {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  siteId String
+  site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  submittedById String?
+  submittedBy   User?   @relation("SiteResolutionSubmitter", fields: [submittedById], references: [id], onDelete: SetNull)
+
+  note      String?
+  mediaUrls String[] @default([])
+
+  status SiteResolutionStatus @default(PENDING)
+
+  /// True when submitter is reporter or co-reporter on this site (excluded from resolution points).
+  isReporterSubmission Boolean @default(false)
+
+  moderatedAt      DateTime?
+  moderationReason String?
+  moderatedById    String?
+  moderatedBy      User?     @relation("SiteResolutionModerator", fields: [moderatedById], references: [id], onDelete: SetNull)
+
+  @@index([siteId, status, createdAt(sort: Desc)])
+  @@index([submittedById])
+  @@index([status, createdAt(sort: Desc)])
 }
 
 // User-submitted pollution report

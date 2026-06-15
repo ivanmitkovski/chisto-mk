@@ -434,7 +434,8 @@ class _EditEventSheetState extends State<EditEventSheet>
           headerDividerGap: AppSpacing.lg,
           maxHeightFactor: 0.92,
           fillAvailableHeight: true,
-          padFooterForKeyboard: true,
+          shrinkForKeyboard: false,
+          padFooterForKeyboard: false,
           addBottomInset: true,
           trailing: Row(
             mainAxisSize: MainAxisSize.min,

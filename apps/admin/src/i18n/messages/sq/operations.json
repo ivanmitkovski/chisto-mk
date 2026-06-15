@@ -40,7 +40,8 @@
     "running": "Duke ekzekutuar kontrollet…",
     "failed": "Nuk u ekzekutua diagnostika.",
     "readiness": "Gatishmëria e varësive",
-    "systemInfo": "Informacioni i sistemit"
+    "systemInfo": "Informacioni i sistemit",
+    "pushDelivery": "Dorëzimi push"
   },
   "metricsDrawer": {
     "button": "Metrikat raw",
@@ -103,6 +104,9 @@
     "activeLeases": "Leasing aktiv",
     "tokenRevocations": "Revokime tokeni",
     "queueRetries": "Riprova radhe",
+    "outboxDelivered": "Outbox dorëzuar (gjithsej)",
+    "outboxFailedPermanent": "Outbox dead letters (gjithsej)",
+    "outboxPending": "Outbox në pritje",
     "emailQueueDepth": "Thellësia e radhës email",
     "version": "Versioni",
     "gitSha": "Kodi Git SHA",
@@ -117,7 +121,21 @@
   "deadLetters": {
     "loadFailed": "Nuk u ngarkuan dead letters.",
     "emptyTitle": "Nuk ka push dead letters",
-    "emptyDescription": "Dështimet e përhershme të push do të shfaqen këtu."
+    "emptyDescription": "Dështimet e përhershme të push do të shfaqen këtu.",
+    "requeueAll": "Rivendos në radhë",
+    "purgeTerminal": "Pastro të padërueshmet",
+    "requeueConfirmTitle": "Rivendos push dead letters?",
+    "requeueConfirmDescription": "Rivendos dead letters actionable me tokenë aktivë për riprovim. Së pari rregulloni Firebase/APNs nëse gabimet vijnë nga konfigurimi.",
+    "purgeConfirmTitle": "Pastro dead letters të padërueshme?",
+    "purgeConfirmDescription": "Heq përgjithmonë dead letters për tokenë të revokuar ose invalid. Njoftimet në inbox mbeten.",
+    "requeueSuccessTitle": "Dead letters u rivendosën",
+    "requeueSuccessMessage": "{count} dead letter(s) u kthyen në radhën e dorëzimit.",
+    "requeueFailedTitle": "Rivendosja dështoi",
+    "requeueFailedMessage": "Nuk u rivendosën dead letters.",
+    "purgeSuccessTitle": "Dead letters të padërueshme u pastruan",
+    "purgeSuccessMessage": "{count} dead letter(s) u hoqën.",
+    "purgeFailedTitle": "Pastrimi dështoi",
+    "purgeFailedMessage": "Nuk u pastruan dead letters."
   },
   "emailDeadLetters": {
     "loadFailed": "Nuk u ngarkuan email dead letters.",

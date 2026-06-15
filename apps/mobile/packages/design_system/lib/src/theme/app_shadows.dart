@@ -321,6 +321,29 @@ abstract final class AppShadows {
     ),
   ];
 
+  /// Empty photo gallery placeholder — fixed ink so IME rebuilds do not shift shadow.
+  static List<BoxShadow> photoGridEmptyCard() => <BoxShadow>[
+    BoxShadow(
+      color: AppColors.black.withValues(alpha: 0.06),
+      blurRadius: AppSpacing.md,
+      offset: const Offset(0, 4),
+    ),
+    BoxShadow(
+      color: AppColors.black.withValues(alpha: 0.08),
+      blurRadius: AppSpacing.lg,
+      offset: const Offset(0, 8),
+    ),
+  ];
+
+  /// Compact add tile in the thumbnail strip — same fixed ink as [photoGridEmptyCard].
+  static List<BoxShadow> photoGridCompactAddTile() => <BoxShadow>[
+    BoxShadow(
+      color: AppColors.black.withValues(alpha: 0.05),
+      blurRadius: 8,
+      offset: const Offset(0, 2),
+    ),
+  ];
+
   static List<BoxShadow> emphasizedListRow({required bool emphasized}) =>
       <BoxShadow>[
         BoxShadow(

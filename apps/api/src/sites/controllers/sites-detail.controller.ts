@@ -25,6 +25,9 @@ import { SiteDetailResponseDto } from '../dto/site-detail-response.dto';
 import { SiteMediaListResponseDto } from '../dto/site-media-response.dto';
 import { SiteCoReportersListResponseDto } from '../dto/site-co-reporters-response.dto';
 import { ListSiteCoReportersQueryDto } from '../dto/list-site-co-reporters-query.dto';
+import { CleanupEvidenceListResponseDto } from '../resolutions/dto/cleanup-evidence.dto';
+import { SiteCleanupEvidenceService } from '../resolutions/services/site-cleanup-evidence.service';
+import { PaginationQueryDto20 } from '../../common/dto/pagination-query.dto';
 import { SitesAdminService } from '../services/sites-admin.service';
 import { SitesDetailService } from '../services/sites-detail.service';
 import { SitesMediaService } from '../services/sites-media.service';
@@ -41,7 +44,21 @@ export class SitesDetailController {
     private readonly sitesMedia: SitesMediaService,
     private readonly sitesAdmin: SitesAdminService,
     private readonly coReportersList: SiteCoReportersListService,
+    private readonly cleanupEvidence: SiteCleanupEvidenceService,
   ) {}
+
+  @Get(':id/cleanup-evidence')
+  @UseGuards(ThrottlerGuard, OptionalJwtAuthGuard)
+  @Throttle({ default: { limit: 120, ttl: 60_000 } })
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Unified after-cleanup evidence gallery for a site' })
+  @ApiOkResponse({ type: CleanupEvidenceListResponseDto })
+  findCleanupEvidence(
+    @Param('id', ParseCuidPipe) id: string,
+    @Query() query: PaginationQueryDto20,
+  ) {
+    return this.cleanupEvidence.listForSite(id, query);
+  }
 
   @Get(':id')
   @UseGuards(ThrottlerGuard, OptionalJwtAuthGuard)

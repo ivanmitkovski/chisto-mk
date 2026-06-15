@@ -19,6 +19,7 @@ Widget buildEventFeedbackSheet(
     subtitle: event.title,
     maxHeightFactor: 0.92,
     fillAvailableHeight: true,
+    shrinkForKeyboard: false,
     addBottomInset: true,
     child: FeedbackSheetContent(event: event, current: current),
   );

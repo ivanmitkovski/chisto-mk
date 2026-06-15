@@ -8,6 +8,7 @@ import { ADMIN_PERMISSIONS } from '@/lib/auth/rbac/permissions';
 import { requirePagePermission } from '@/lib/auth/rbac/server';
 import { getSiteDetail } from '@/features/sites';
 import { SiteDetailClient } from '@/features/sites';
+import { getSiteResolutionsForSite } from '@/features/sites/data/resolutions-adapter';
 
 type PageProps = { params: Promise<{ id: string }> };
 
@@ -18,8 +19,9 @@ export default async function SiteDetailPage(props: PageProps) {
   const initialSidebarCollapsed = cookieStore.get(DESKTOP_SIDEBAR_COOKIE_KEY)?.value === '1';
 
   let site: Awaited<ReturnType<typeof getSiteDetail>>;
+  let resolutions: Awaited<ReturnType<typeof getSiteResolutionsForSite>>;
   try {
-    site = await getSiteDetail(id);
+    [site, resolutions] = await Promise.all([getSiteDetail(id), getSiteResolutionsForSite(id)]);
   } catch (error) {
     if (error instanceof ApiError && (error.code === 'SITE_NOT_FOUND' || error.status === 404)) {
       notFound();
@@ -59,6 +61,7 @@ export default async function SiteDetailPage(props: PageProps) {
         description={s.description}
         reportCount={reportCount}
         createdAt={s.createdAt}
+        initialResolutions={resolutions.data}
       />
     </AdminShell>
   );

@@ -24,6 +24,7 @@ import 'package:feature_home/src/presentation/widgets/pollution_site_card_conten
 import 'package:feature_home/src/presentation/widgets/pollution_site_card_sheets.dart';
 import 'package:feature_home/src/presentation/widgets/site_card/feed_feedback_sheet.dart';
 import 'package:feature_home/src/presentation/widgets/site_card/site_card_image_carousel.dart';
+import 'package:feature_home/src/presentation/utils/site_resolution_helpers.dart';
 import 'package:feature_home/src/presentation/widgets/take_action_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -412,7 +413,8 @@ class _PollutionSiteCardState extends ConsumerState<PollutionSiteCard>
     );
     final TakeActionType? action = await TakeActionSheet.show(
       context,
-      canCreateEcoAction: true,
+      canCreateEcoAction: !isPollutionSiteResolved(site),
+      canSubmitResolution: canSubmitSiteResolution(site),
     );
     if (action == null || !mounted) return;
     final PollutionFeedCardEventType actionEvent = switch (action) {
@@ -420,6 +422,8 @@ class _PollutionSiteCardState extends ConsumerState<PollutionSiteCard>
         PollutionFeedCardEventType.ctaCreateStarted,
       TakeActionType.joinAction => PollutionFeedCardEventType.ctaJoinStarted,
       TakeActionType.shareSite => PollutionFeedCardEventType.ctaShareStarted,
+      TakeActionType.submitResolution =>
+        PollutionFeedCardEventType.ctaResolutionStarted,
       TakeActionType.donateContribute =>
         PollutionFeedCardEventType.ctaDonateStarted,
     };

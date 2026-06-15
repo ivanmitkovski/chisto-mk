@@ -62,6 +62,9 @@ function makeSitesService(
     prisma,
     moderation as never,
   );
+  const siteResolutionQuery = {
+    getViewerStatusBySiteIds: jest.fn(async () => new Map()),
+  } as any;
   const feedEnrichment = new SitesFeedEnrichmentService(
     prisma,
     reportsUpload,
@@ -70,6 +73,7 @@ function makeSitesService(
     feedCache,
     feedPreferences,
     siteCommentsCount,
+    siteResolutionQuery,
   );
   const feedQuery = new SitesFeedQueryService(feedCandidates, feedEnrichment);
   const sitesFeed = new SitesFeedService(feedQuery, feedCache, feedPreferences, feedTracking);
@@ -86,7 +90,11 @@ function makeSitesService(
     findSaveBySiteAndUser: jest.fn(async () => null),
     viewerCanAccessReportedSite: jest.fn(async () => true),
   } as any;
-  const sitesDetail = new SitesDetailService(siteDetailRepository, reportsUpload);
+  const sitesDetail = new SitesDetailService(
+    siteDetailRepository,
+    reportsUpload,
+    siteResolutionQuery,
+  );
   const eventEmitter = { emit: jest.fn() } as any;
   const reporterNotifications = new SitesReporterNotificationService(prisma, eventEmitter);
   const siteComments = new SiteCommentsService(
@@ -113,6 +121,7 @@ function makeSitesService(
     unlikeSiteComment: (siteId: string, commentId: string, user: any) =>
       siteComments.unlikeSiteComment(siteId, commentId, user),
     findOne: (siteId: string, user?: any) => sitesDetail.findOne(siteId, user),
+    siteResolutionQuery,
   };
 }
 
@@ -607,6 +616,9 @@ describe('Sites public feed and comment engagement', () => {
         signUrls: jest.fn(async (v: string[]) => v),
         signPrivateObjectKey: jest.fn(async () => null),
       } as any,
+      {
+        getViewerStatusBySiteIds: jest.fn(async () => new Map()),
+      } as any,
     );
 
     await expect(
@@ -619,5 +631,47 @@ describe('Sites public feed and comment engagement', () => {
     ).rejects.toMatchObject({
       response: { code: 'SITE_NOT_FOUND' },
     });
+  });
+
+  it('findOne exposes viewerResolutionStatus for authenticated viewer', async () => {
+    const prismaMock = {
+      site: {
+        findUnique: jest.fn(async () => ({
+          id: 'site_res',
+          latitude: 41.6,
+          longitude: 21.7,
+          address: null,
+          description: 'Site',
+          status: 'VERIFIED',
+          createdAt: new Date('2026-03-01'),
+          updatedAt: new Date('2026-03-01'),
+          upvotesCount: 0,
+          commentsCount: 0,
+          savesCount: 0,
+          sharesCount: 0,
+          reports: [],
+          events: [],
+        })),
+      },
+      siteVote: { findUnique: jest.fn(async () => null) },
+      siteSave: { findUnique: jest.fn(async () => null) },
+    } as any;
+
+    const { findOne, siteResolutionQuery } = makeSitesService(prismaMock, {
+      reportsUpload: {
+        signUrls: jest.fn(async (urls: string[]) => urls),
+        signPrivateObjectKey: jest.fn(async () => null),
+      } as any,
+    });
+    (siteResolutionQuery.getViewerStatusBySiteIds as jest.Mock).mockResolvedValueOnce(
+      new Map([['site_res', 'pending']]),
+    );
+
+    const out = await findOne('site_res', { userId: 'user_1' });
+    expect(out.viewerResolutionStatus).toBe('pending');
+    expect(siteResolutionQuery.getViewerStatusBySiteIds).toHaveBeenCalledWith(
+      'user_1',
+      ['site_res'],
+    );
   });
 });

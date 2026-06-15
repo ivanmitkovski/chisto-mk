@@ -18,6 +18,9 @@ class PhotoGrid extends StatefulWidget {
     required this.onRemovePhoto,
     this.reportId = 'draft',
     this.maxPhotos = ReportFieldLimits.maxPhotos,
+    this.compact = false,
+    this.showExpandedAddCard = false,
+    this.hideExpandedAddCard = false,
   });
 
   final List<XFile> photos;
@@ -27,6 +30,18 @@ class PhotoGrid extends StatefulWidget {
   /// Stable id for [Hero] tags (`report-photo-{reportId}-{index}`).
   final String reportId;
   final int maxPhotos;
+
+  /// When true and [photos] are non-empty, shows only the count + thumbnail strip
+  /// (keyboard-friendly). Empty state always uses the large add-photo card.
+  final bool compact;
+
+  /// When true and more photos can be added, keeps the large add-photo card
+  /// ("Camera or library") above the thumbnail strip instead of a compact Add tile.
+  final bool showExpandedAddCard;
+
+  /// When true, hides the large add-photo card with animation (resolution sheet
+  /// keyboard mode). Only applies when [showExpandedAddCard] is true and photos exist.
+  final bool hideExpandedAddCard;
 
   @override
   State<PhotoGrid> createState() => _PhotoGridState();
@@ -62,91 +77,181 @@ class _PhotoGridState extends State<PhotoGrid> {
     );
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        if (!hasPhotos)
-          _EmptyPhotoGalleryCard(onTap: widget.onAddPhoto)
-        else ...<Widget>[
-          Text(
-            l10n.reportPhotoGridAttachedCount(
-              widget.photos.length,
-              widget.maxPhotos,
+          if (!hasPhotos)
+            _EmptyPhotoGalleryCard(onTap: widget.onAddPhoto)
+          else if (widget.compact) ...<Widget>[
+            Text(
+              l10n.reportPhotoGridAttachedCount(
+                widget.photos.length,
+                widget.maxPhotos,
+              ),
+              style: AppTypographySurfaces.reportsPhotoGridCount(
+                Theme.of(context).textTheme,
+              ),
             ),
-            style: AppTypographySurfaces.reportsPhotoGridCount(
-              Theme.of(context).textTheme,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          ImmersivePhotoGallery(
-            items: galleryItems,
-            selectedIndex: _selectedIndex,
-            onPageChanged: (int index) {
-              if (!mounted) return;
-              setState(() => _selectedIndex = index);
-            },
-            openLabel: l10n.reportPhotoOpenGallerySemantic,
-            bottomCenterBuilder:
-                (BuildContext context, int currentIndex, int totalCount) {
-                  return GalleryGlassPill(
-                    child: Text(
-                      totalCount > 1
-                          ? l10n.reportPhotoTapToReviewMany
-                          : l10n.reportPhotoTapToReviewSingle,
-                      style: AppTypographySurfaces.reportsPhotoGalleryPill(
-                        Theme.of(context).textTheme,
+            const SizedBox(height: AppSpacing.sm),
+            if (widget.showExpandedAddCard && canAdd)
+              AnimatedSize(
+                duration: AppMotion.medium,
+                curve: AppMotion.smooth,
+                alignment: Alignment.topCenter,
+                clipBehavior: Clip.hardEdge,
+                child: widget.hideExpandedAddCard
+                    ? const SizedBox(width: double.infinity)
+                    : Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: <Widget>[
+                          _EmptyPhotoGalleryCard(onTap: widget.onAddPhoto),
+                          const SizedBox(height: AppSpacing.md),
+                        ],
                       ),
-                    ),
-                  );
-                },
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Text(
-            widget.photos.length == 1
-                ? l10n.reportPhotoStackCaptionSingle
-                : l10n.reportPhotoStackCaptionMany(widget.photos.length),
-            style: AppTypographySurfaces.reportsPhotoGridHint(
-              Theme.of(context).textTheme,
+              ),
+            _buildThumbnailStrip(
+              canAdd: canAdd && !widget.showExpandedAddCard,
             ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          SizedBox(
-            height: 86,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: widget.photos.length + (canAdd ? 1 : 0),
-              separatorBuilder: (BuildContext context, int index) =>
-                  const SizedBox(width: AppSpacing.sm),
-              itemBuilder: (BuildContext context, int index) {
-                if (index == widget.photos.length && canAdd) {
-                  return _AddPhotoTile.compact(onTap: widget.onAddPhoto);
-                }
-                return _PhotoThumbnail(
-                  file: widget.photos[index],
-                  index: index,
-                  totalCount: widget.photos.length,
-                  isSelected: index == _selectedIndex,
-                  onSelect: () {
-                    setState(() => _selectedIndex = index);
-                  },
-                  onRemove: () => widget.onRemovePhoto(index),
-                );
+          ] else ...<Widget>[
+            Text(
+              l10n.reportPhotoGridAttachedCount(
+                widget.photos.length,
+                widget.maxPhotos,
+              ),
+              style: AppTypographySurfaces.reportsPhotoGridCount(
+                Theme.of(context).textTheme,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            ImmersivePhotoGallery(
+              items: galleryItems,
+              selectedIndex: _selectedIndex,
+              onPageChanged: (int index) {
+                if (!mounted) return;
+                setState(() => _selectedIndex = index);
               },
+              openLabel: l10n.reportPhotoOpenGallerySemantic,
+              bottomCenterBuilder:
+                  (BuildContext context, int currentIndex, int totalCount) {
+                    return GalleryGlassPill(
+                      child: Text(
+                        totalCount > 1
+                            ? l10n.reportPhotoTapToReviewMany
+                            : l10n.reportPhotoTapToReviewSingle,
+                        style: AppTypographySurfaces.reportsPhotoGalleryPill(
+                          Theme.of(context).textTheme,
+                        ),
+                      ),
+                    );
+                  },
             ),
-          ),
+            const SizedBox(height: AppSpacing.md),
+            Text(
+              widget.photos.length == 1
+                  ? l10n.reportPhotoStackCaptionSingle
+                  : l10n.reportPhotoStackCaptionMany(widget.photos.length),
+              style: AppTypographySurfaces.reportsPhotoGridHint(
+                Theme.of(context).textTheme,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            _buildThumbnailStrip(canAdd: canAdd),
+          ],
+          if (!widget.compact) ...<Widget>[
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              hasPhotos
+                  ? (_selectedIndex == 0
+                        ? l10n.reportPhotoVerificationHelpPrimarySelected
+                        : l10n.reportPhotoVerificationHelpPrimaryOther)
+                  : l10n.reportPhotoVerificationHelpEmpty,
+              style: AppTypographySurfaces.reportsPhotoGridHint(
+                Theme.of(context).textTheme,
+              ),
+            ),
+          ],
         ],
-        const SizedBox(height: AppSpacing.sm),
-        Text(
-          hasPhotos
-              ? (_selectedIndex == 0
-                    ? l10n.reportPhotoVerificationHelpPrimarySelected
-                    : l10n.reportPhotoVerificationHelpPrimaryOther)
-              : l10n.reportPhotoVerificationHelpEmpty,
-          style: AppTypographySurfaces.reportsPhotoGridHint(
-            Theme.of(context).textTheme,
-          ),
+    );
+  }
+
+  static const double _thumbTileWidth = 72;
+  static const double _stripHeight = 86;
+
+  double _stripContentWidth({required int photoCount, required bool canAdd}) {
+    if (photoCount == 0) {
+      return canAdd ? _thumbTileWidth : 0;
+    }
+    double width =
+        photoCount * _thumbTileWidth + (photoCount - 1) * AppSpacing.sm;
+    if (canAdd) {
+      width += AppSpacing.sm + _thumbTileWidth;
+    }
+    return width;
+  }
+
+  Widget _buildThumbnailStrip({required bool canAdd}) {
+    final List<Widget> children = <Widget>[];
+    for (int index = 0; index < widget.photos.length; index++) {
+      if (index > 0) {
+        children.add(const SizedBox(width: AppSpacing.sm));
+      }
+      children.add(
+        _PhotoThumbnail(
+          file: widget.photos[index],
+          index: index,
+          totalCount: widget.photos.length,
+          isSelected: index == _selectedIndex,
+          onSelect: () {
+            setState(() => _selectedIndex = index);
+          },
+          onRemove: () => widget.onRemovePhoto(index),
         ),
-      ],
+      );
+    }
+    if (canAdd) {
+      if (widget.photos.isNotEmpty) {
+        children.add(const SizedBox(width: AppSpacing.sm));
+      }
+      children.add(
+        KeyedSubtree(
+          key: const ValueKey<String>('photo-grid-add-tile'),
+          child: _AddPhotoTile.compact(onTap: widget.onAddPhoto),
+        ),
+      );
+    }
+
+    final Widget row = Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: children,
+    );
+
+    final double contentWidth = _stripContentWidth(
+      photoCount: widget.photos.length,
+      canAdd: canAdd,
+    );
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          final bool needsHorizontalScroll =
+              contentWidth > constraints.maxWidth;
+          return SizedBox(
+            height: _stripHeight,
+            width: constraints.maxWidth,
+            child: needsHorizontalScroll
+                ? SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    clipBehavior: Clip.none,
+                    physics: const ClampingScrollPhysics(),
+                    child: row,
+                  )
+                : Align(alignment: Alignment.centerLeft, child: row),
+          );
+        },
+      ),
     );
   }
 }
@@ -289,6 +394,7 @@ class _AddPhotoTile extends StatelessWidget {
               width: 1.2,
             ),
             color: AppColors.inputFill,
+            boxShadow: _isCompact ? AppShadows.photoGridCompactAddTile() : null,
           ),
           child: Center(
             child: Column(
@@ -341,18 +447,26 @@ class _EmptyPhotoGalleryCard extends StatelessWidget {
 
   final VoidCallback onTap;
 
+  static const EdgeInsets _shadowBleed = EdgeInsets.fromLTRB(0, 2, 0, 10);
+
   @override
   Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: 16 / 9,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AppColors.inputFill,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-          border: Border.all(color: AppColors.divider.withValues(alpha: 0.8)),
-          boxShadow: AppShadows.card(Theme.of(context).colorScheme),
+    return Padding(
+      padding: _shadowBleed,
+      child: AspectRatio(
+        aspectRatio: 16 / 9,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: AppColors.inputFill,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+            border: Border.all(color: AppColors.divider.withValues(alpha: 0.8)),
+            boxShadow: AppShadows.photoGridEmptyCard(),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+            child: _AddPhotoTile.expanded(onTap: onTap),
+          ),
         ),
-        child: _AddPhotoTile.expanded(onTap: onTap),
       ),
     );
   }

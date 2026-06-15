@@ -971,6 +971,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/notifications/admin/push-diagnostics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** FCM/APNs push delivery diagnostics (admin only) */
+        get: operations["NotificationsAdminController_getPushDiagnostics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/notifications/admin/dead-letters": {
         parameters: {
             query?: never;
@@ -982,6 +999,57 @@ export interface paths {
         get: operations["NotificationsAdminController_deadLetters"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/notifications/admin/dead-letters/requeue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Requeue actionable push dead letters with active device tokens */
+        post: operations["NotificationsAdminController_requeueDeadLetters"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/notifications/admin/dead-letters/purge-terminal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Purge undeliverable push dead letters (revoked tokens / invalid registration) */
+        post: operations["NotificationsAdminController_purgeTerminalDeadLetters"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/notifications/admin/dead-letters/{id}/requeue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Requeue a single push dead letter when actionable */
+        post: operations["NotificationsAdminController_requeueDeadLetter"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1882,6 +1950,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/sites/{id}/cleanup-evidence": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Unified after-cleanup evidence gallery for a site */
+        get: operations["SitesDetailController_findCleanupEvidence"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/sites/{id}": {
         parameters: {
             query?: never;
@@ -1965,6 +2050,75 @@ export interface paths {
         head?: never;
         /** Archive or unarchive site from default map visibility */
         patch: operations["SitesDetailController_updateArchiveStatus"];
+        trace?: never;
+    };
+    "/sites/admin/resolutions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List site resolution submissions for admin moderation */
+        get: operations["SiteResolutionsAdminController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sites/admin/resolutions/{resolutionId}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Approve or reject a site resolution submission */
+        patch: operations["SiteResolutionsAdminController_updateStatus"];
+        trace?: never;
+    };
+    "/sites/{siteId}/resolutions/upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Upload cleanup evidence photos (max 5, jpeg/png/webp, 10MB each) */
+        post: operations["SiteResolutionsController_uploadPhotos"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sites/{siteId}/resolutions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List approved resolutions and caller pending submissions for a site */
+        get: operations["SiteResolutionsController_listResolutions"];
+        put?: never;
+        /** Submit cleanup confirmation with evidence for a pollution site */
+        post: operations["SiteResolutionsController_submitResolution"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/reports": {
@@ -4313,6 +4467,11 @@ export interface components {
             appVersion?: string;
             locale?: string;
         };
+        PushOutboxTotalsDto: {
+            deliveredTotal: number;
+            failedPermanentlyTotal: number;
+            pendingTotal: number;
+        };
         PushStatsDto: {
             sendsTotal: number;
             sendsSuccess: number;
@@ -4327,6 +4486,7 @@ export interface components {
             queueDepth: number;
             activeLeases: number;
             deadLetterCount: number;
+            outbox: components["schemas"]["PushOutboxTotalsDto"];
         };
         DeliveryReportSendsDto: {
             total: number;
@@ -4352,6 +4512,19 @@ export interface components {
             sends: components["schemas"]["DeliveryReportSendsDto"];
             inbox: components["schemas"]["DeliveryReportInboxDto"];
             queue: components["schemas"]["DeliveryReportQueueDto"];
+            outbox: components["schemas"]["PushOutboxTotalsDto"];
+        };
+        PushDiagnosticsTopErrorCodeDto: {
+            code: string;
+            count: number;
+        };
+        PushDiagnosticsDto: {
+            fcmEnabled: boolean;
+            fcmReady: boolean;
+            projectId: Record<string, never> | null;
+            deadLetterTotal: number;
+            topErrorCodes: components["schemas"]["PushDiagnosticsTopErrorCodeDto"][];
+            remediation: Record<string, never> | null;
         };
         DeadLetterRowDto: {
             id: string;
@@ -4372,6 +4545,15 @@ export interface components {
             data: components["schemas"]["DeadLetterRowDto"][];
             meta: components["schemas"]["PaginationMetaDto"];
         };
+        DeadLetterRequeueResultDto: {
+            requeued: number;
+        };
+        DeadLetterPurgeResultDto: {
+            purged: number;
+        };
+        DeadLetterRequeueOneResultDto: {
+            requeued: boolean;
+        };
         PatchFeatureFlagDto: {
             enabled?: boolean;
             metadata?: Record<string, never>;
@@ -4382,7 +4564,7 @@ export interface components {
         };
         PatchModerationEmailPreferenceDto: {
             /** @enum {string} */
-            category: "NEW_REPORT" | "EVENT_PENDING" | "UGC_REPORT" | "CHECKIN_RISK";
+            category: "NEW_REPORT" | "EVENT_PENDING" | "UGC_REPORT" | "CHECKIN_RISK" | "SITE_RESOLUTION";
             enabled: boolean;
         };
         PatchAdminUgcReportDto: {
@@ -4445,6 +4627,8 @@ export interface components {
             sharesCount: number;
             isUpvotedByMe: boolean;
             isSavedByMe: boolean;
+            /** @enum {string} */
+            viewerResolutionStatus: "none" | "pending" | "approved";
             rankingScore: number;
             rankingReasons: string[];
             rankingComponents?: Record<string, never>;
@@ -4553,7 +4737,7 @@ export interface components {
         SiteHistoryEntryDto: {
             id: string;
             /** @enum {string} */
-            kind: "SITE_CREATED" | "REPORT_SUBMITTED" | "REPORT_APPROVED" | "REPORT_REJECTED" | "REPORT_MERGED" | "STATUS_CHANGED" | "CLEANUP_EVENT_SCHEDULED" | "CLEANUP_EVENT_STARTED" | "CLEANUP_EVENT_COMPLETED" | "CLEANUP_EVENT_CANCELLED" | "ARCHIVED_BY_ADMIN" | "UNARCHIVED_BY_ADMIN" | "ADMIN_NOTE";
+            kind: "SITE_CREATED" | "REPORT_SUBMITTED" | "REPORT_APPROVED" | "REPORT_REJECTED" | "REPORT_MERGED" | "STATUS_CHANGED" | "CLEANUP_EVENT_SCHEDULED" | "CLEANUP_EVENT_STARTED" | "CLEANUP_EVENT_COMPLETED" | "CLEANUP_EVENT_CANCELLED" | "ARCHIVED_BY_ADMIN" | "UNARCHIVED_BY_ADMIN" | "ADMIN_NOTE" | "RESOLUTION_SUBMITTED" | "RESOLUTION_APPROVED" | "RESOLUTION_REJECTED";
             occurredAt: string;
             /** @enum {string} */
             fromStatus?: "REPORTED" | "VERIFIED" | "CLEANUP_SCHEDULED" | "IN_PROGRESS" | "CLEANED" | "DISPUTED";
@@ -4684,6 +4868,31 @@ export interface components {
             sessionId?: string;
             metadata?: Record<string, never>;
         };
+        CleanupEvidenceSubmitterDto: {
+            displayLabel?: Record<string, never> | null;
+            isDeleted: boolean;
+            isAnonymous: boolean;
+        };
+        CleanupEvidenceItemDto: {
+            id: string;
+            url: string;
+            /** @enum {string} */
+            source: "RESOLUTION" | "CLEANUP_EVENT_AFTER" | "CLEANUP_EVENT_EVIDENCE";
+            createdAt: string;
+            caption?: Record<string, never> | null;
+            submitter?: components["schemas"]["CleanupEvidenceSubmitterDto"] | null;
+            resolutionId?: Record<string, never> | null;
+            cleanupEventId?: Record<string, never> | null;
+        };
+        CleanupEvidenceListMetaDto: {
+            page: number;
+            limit: number;
+            total: number;
+        };
+        CleanupEvidenceListResponseDto: {
+            data: components["schemas"]["CleanupEvidenceItemDto"][];
+            meta: components["schemas"]["CleanupEvidenceListMetaDto"];
+        };
         SiteDetailReporterDto: {
             firstName: string;
             lastName: string;
@@ -4745,6 +4954,8 @@ export interface components {
             sharesCount: number;
             isUpvotedByMe: boolean;
             isSavedByMe: boolean;
+            /** @enum {string} */
+            viewerResolutionStatus: "none" | "pending" | "approved";
             coReporterNames: string[];
             mergedDuplicateChildCountTotal: number;
             reports?: components["schemas"]["SiteDetailReportResponseDto"][];
@@ -4804,6 +5015,66 @@ export interface components {
              * @example Resolved and hidden from default map view after municipal cleanup verification.
              */
             reason?: string;
+        };
+        AdminSiteResolutionListItemDto: {
+            id: string;
+            siteId: string;
+            siteAddress?: Record<string, never> | null;
+            /** @enum {string} */
+            status: "PENDING" | "APPROVED" | "REJECTED";
+            mediaUrls: string[];
+            note?: Record<string, never> | null;
+            isReporterSubmission: boolean;
+            createdAt: string;
+            submitterDisplayLabel?: Record<string, never> | null;
+            siteStatus: string;
+        };
+        AdminSiteResolutionListMetaDto: {
+            page: number;
+            limit: number;
+            total: number;
+        };
+        AdminSiteResolutionListResponseDto: {
+            data: components["schemas"]["AdminSiteResolutionListItemDto"][];
+            meta: components["schemas"]["AdminSiteResolutionListMetaDto"];
+        };
+        UpdateSiteResolutionStatusDto: {
+            /** @enum {string} */
+            status: "APPROVED" | "REJECTED";
+            /** @description Required when rejecting a resolution submission. */
+            reason?: string;
+        };
+        SiteResolutionSubmitterDto: {
+            displayLabel?: Record<string, never> | null;
+            isSelf: boolean;
+            isDeleted: boolean;
+            isAnonymous: boolean;
+        };
+        SiteResolutionResponseDto: {
+            id: string;
+            siteId: string;
+            /** @enum {string} */
+            status: "PENDING" | "APPROVED" | "REJECTED";
+            mediaUrls: string[];
+            note?: Record<string, never> | null;
+            isReporterSubmission: boolean;
+            createdAt: string;
+            moderatedAt?: Record<string, never> | null;
+            submitter?: components["schemas"]["SiteResolutionSubmitterDto"] | null;
+        };
+        ReportMediaUrlsResponseDto: {
+            /** @description HTTPS object URLs (or keys when virtual-hosted base is unset) for uploaded images */
+            urls: string[];
+        };
+        CreateSiteResolutionDto: {
+            /** @description Cleanup evidence photo URLs (from POST /sites/:siteId/resolutions/upload) */
+            mediaUrls: string[];
+            /** @description Optional note about the cleanup */
+            note?: string;
+        };
+        SiteResolutionListResponseDto: {
+            data: components["schemas"]["SiteResolutionResponseDto"][];
+            meta: Record<string, never>;
         };
         AdminReportEvidenceDto: {
             id: string;
@@ -4979,10 +5250,6 @@ export interface components {
             pointsAwarded: number;
             /** @description Breakdown from the latest approval grant metadata (or legacy submit grant) when available */
             pointsBreakdown?: components["schemas"]["ReportSubmitPointsBreakdownLineDto"][];
-        };
-        ReportMediaUrlsResponseDto: {
-            /** @description HTTPS object URLs (or keys when virtual-hosted base is unset) for uploaded images */
-            urls: string[];
         };
         ReportCapacityDto: {
             /** @description Number of standard report credits currently available */
@@ -9564,6 +9831,60 @@ export interface operations {
             };
         };
     };
+    NotificationsAdminController_getPushDiagnostics: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PushDiagnosticsDto"];
+                };
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     NotificationsAdminController_deadLetters: {
         parameters: {
             query: {
@@ -9582,6 +9903,170 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DeadLetterPageDto"];
+                };
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    NotificationsAdminController_requeueDeadLetters: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeadLetterRequeueResultDto"];
+                };
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    NotificationsAdminController_purgeTerminalDeadLetters: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeadLetterPurgeResultDto"];
+                };
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    NotificationsAdminController_requeueDeadLetter: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeadLetterRequeueOneResultDto"];
                 };
             };
             /** @description Validation or bad request */
@@ -13067,6 +13552,65 @@ export interface operations {
             };
         };
     };
+    SitesDetailController_findCleanupEvidence: {
+        parameters: {
+            query?: {
+                page?: components["schemas"]["Object"];
+                limit?: components["schemas"]["Object"];
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CleanupEvidenceListResponseDto"];
+                };
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     SitesDetailController_findOne: {
         parameters: {
             query?: never;
@@ -13354,6 +13898,295 @@ export interface operations {
                 content?: never;
             };
             /** @description Too many requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SiteResolutionsAdminController_list: {
+        parameters: {
+            query?: {
+                page?: components["schemas"]["Object"];
+                limit?: components["schemas"]["Object"];
+                status?: "PENDING" | "APPROVED" | "REJECTED";
+                siteId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminSiteResolutionListResponseDto"];
+                };
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SiteResolutionsAdminController_updateStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                resolutionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateSiteResolutionStatusDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteResolutionResponseDto"];
+                };
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SiteResolutionsController_uploadPhotos: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportMediaUrlsResponseDto"];
+                };
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SiteResolutionsController_listResolutions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                siteId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteResolutionListResponseDto"];
+                };
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SiteResolutionsController_submitResolution: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                siteId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateSiteResolutionDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteResolutionResponseDto"];
+                };
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
             429: {
                 headers: {
                     [name: string]: unknown;

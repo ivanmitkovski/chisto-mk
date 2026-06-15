@@ -1,0 +1,29 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card {
+  padding: 16px;
+}
+
+.toolbar {
+  margin-bottom: 12px;
+}
+
+.filterLabel {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.siteLink {
+  color: var(--text-link);
+}
+
+.rowActions {
+  display: flex;
+  gap: 8px;
+}

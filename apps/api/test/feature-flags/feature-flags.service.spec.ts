@@ -9,7 +9,7 @@ describe('FeatureFlagsService', () => {
         upsert: jest.fn().mockResolvedValue({}),
         findMany: jest.fn().mockResolvedValue([
           { key: 'email_enabled', enabled: false },
-          { key: 'push_fcm_enabled', enabled: false },
+          { key: 'notifications_inbox_enabled', enabled: true },
         ]),
       },
     };
@@ -21,7 +21,7 @@ describe('FeatureFlagsService', () => {
     );
     const map = await service.getPublicMap();
     expect(map.email_enabled).toBe(false);
-    expect(map.push_fcm_enabled).toBe(false);
+    expect(map.notifications_inbox_enabled).toBe(true);
   });
 
   it('ensureDefaults is idempotent on repeated calls', async () => {

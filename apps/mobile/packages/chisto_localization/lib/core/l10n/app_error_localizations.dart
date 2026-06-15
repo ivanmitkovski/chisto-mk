@@ -224,6 +224,14 @@ String? _messageForKnownCode(AppLocalizations l10n, AppError error) {
     case 'SUBMIT_FAILED_RETRYABLE':
       return l10n.errorUserNetwork;
 
+    // Site resolutions (cleanup evidence)
+    case 'SITE_RESOLUTION_NOT_ALLOWED':
+      return l10n.submitResolutionNotAvailableSnack;
+    case 'SITE_RESOLUTION_PENDING_EXISTS':
+      return l10n.submitResolutionAlreadyUnderReviewSnack;
+    case 'RESOLUTION_UPLOAD_STORAGE_ERROR':
+      return l10n.submitResolutionFailedSnack;
+
     // Chat
     case 'EVENT_CHAT_NOT_PARTICIPANT':
       return l10n.errorEventChatNotParticipant;

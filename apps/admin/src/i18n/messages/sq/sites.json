@@ -113,5 +113,22 @@
   },
   "mapPicker": {
     "hint": "Klikoni hartën për koordinatat."
+  },
+  "resolutions": {
+    "panelTitle": "Konfirmime pastrimi",
+    "openQueue": "Hap radhën e rezolucioneve",
+    "noPending": "Nuk ka konfirmime pastrimi në pritje për këtë vend.",
+    "reporterSubmission": "Raportues",
+    "communitySubmission": "Komunitet",
+    "approve": "Aprovo dhe shëno të pastruar",
+    "reject": "Refuzo",
+    "approveConfirmTitle": "Të aprovohen dëshmitë e pastrimit?",
+    "approveConfirmDescription": "Vendi do të shënohet si i pastruar nëse nuk është zgjidhur tashmë.",
+    "rejectConfirmTitle": "Të refuzohet dorëzimi?",
+    "rejectConfirmDescription": "Dorëzuesi mund të dërgojë dëshmi të reja pas refuzimit.",
+    "rejectReasonLabel": "Arsye refuzimi",
+    "rejectReasonPlaceholder": "Shpjego pse dëshmitë nuk u pranuan…",
+    "approvedMessage": "Rezolucioni u aprovua.",
+    "rejectedMessage": "Rezolucioni u refuzua."
   }
 }

@@ -4,19 +4,27 @@ import 'package:feature_home/src/domain/models/take_action_type.dart';
 import 'package:flutter/material.dart';
 
 class TakeActionSheet extends StatelessWidget {
-  const TakeActionSheet({super.key, this.canCreateEcoAction = true});
+  const TakeActionSheet({
+    super.key,
+    this.canCreateEcoAction = true,
+    this.canSubmitResolution = false,
+  });
 
   final bool canCreateEcoAction;
+  final bool canSubmitResolution;
 
   static Future<TakeActionType?> show(
     BuildContext context, {
     bool canCreateEcoAction = true,
+    bool canSubmitResolution = false,
   }) {
     return AppBottomSheet.show<TakeActionType>(
       context: context,
       useRootNavigator: true,
-      builder: (BuildContext context) =>
-          TakeActionSheet(canCreateEcoAction: canCreateEcoAction),
+      builder: (BuildContext context) => TakeActionSheet(
+        canCreateEcoAction: canCreateEcoAction,
+        canSubmitResolution: canSubmitResolution,
+      ),
     );
   }
 
@@ -42,6 +50,14 @@ class TakeActionSheet extends StatelessWidget {
                 title: context.l10n.takeActionCreateEcoTitle,
                 subtitle: context.l10n.takeActionCreateEcoSubtitle,
                 onTap: () => _popWith(context, TakeActionType.createEcoAction),
+              ),
+            if (canSubmitResolution)
+              _TakeActionTile(
+                icon: Icons.check_circle_outline_rounded,
+                title: context.l10n.takeActionSubmitResolutionTitle,
+                subtitle: context.l10n.takeActionSubmitResolutionSubtitle,
+                onTap: () =>
+                    _popWith(context, TakeActionType.submitResolution),
               ),
             _TakeActionTile(
               icon: Icons.groups_rounded,

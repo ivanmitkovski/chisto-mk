@@ -937,6 +937,84 @@ export function getCopy(
       };
     }
 
+    case 'admin_moderation_site_resolution': {
+      const actionUrl = typeof ctx.actionUrl === 'string' ? ctx.actionUrl.trim() : url;
+      const address = typeof ctx.address === 'string' ? ctx.address : null;
+      const latitude = typeof ctx.latitude === 'number' ? ctx.latitude : null;
+      const longitude = typeof ctx.longitude === 'number' ? ctx.longitude : null;
+      const submitterName =
+        typeof ctx.submitterName === 'string' ? ctx.submitterName.trim() : '';
+      const submitterEmail =
+        typeof ctx.submitterEmail === 'string' ? ctx.submitterEmail.trim() : '';
+      const isReporterSubmission = ctx.isReporterSubmission === true;
+      const photoCount =
+        typeof ctx.photoCount === 'number' && ctx.photoCount > 0
+          ? String(ctx.photoCount)
+          : '';
+      const submittedAt = ctx.submittedAt;
+      const notePreview = truncatePreview(
+        typeof ctx.notePreview === 'string' ? ctx.notePreview : '',
+      );
+
+      const locationLabel = formatLocationLabel(locale, { address, latitude, longitude });
+      const submittedLabel = formatDateTime(locale, submittedAt);
+
+      const detailRows: { label: string; value: string }[] = [];
+      detailRows.push({ label: en ? 'Site' : 'Локалитет', value: locationLabel });
+      if (submitterName || submitterEmail) {
+        const submitterValue =
+          submitterName && submitterEmail
+            ? `${submitterName} (${submitterEmail})`
+            : submitterName || submitterEmail;
+        detailRows.push({
+          label: en ? 'Submitted by' : 'Поднесено од',
+          value: submitterValue,
+        });
+      }
+      detailRows.push({
+        label: en ? 'Submitter type' : 'Тип на подносител',
+        value: isReporterSubmission
+          ? en
+            ? 'Reporter'
+            : 'Пријавувач'
+          : en
+            ? 'Citizen'
+            : 'Граѓанин',
+      });
+      if (photoCount) {
+        detailRows.push({
+          label: en ? 'Photos' : 'Фотографии',
+          value: photoCount,
+        });
+      }
+      if (submittedLabel) {
+        detailRows.push({ label: en ? 'Submitted' : 'Поднесено', value: submittedLabel });
+      }
+
+      const lead = en
+        ? 'A citizen submitted cleanup evidence for a pollution site. Review the photos and approve or reject the resolution.'
+        : 'Граѓанин поднесе доказ за исчистен локалитет. Прегледајте ги фотографиите и одобрете или одбијте ја резолуцијата.';
+
+      const extraLines = notePreview
+        ? [
+            en
+              ? `Note: “${notePreview}”`
+              : `Забелешка: „${notePreview}"`,
+          ]
+        : undefined;
+
+      return {
+        subject: en ? 'Site cleanup needs review' : 'Потврда за чистење бара преглед',
+        headline: en ? 'Cleanup evidence submitted' : 'Поднесен доказ за чистење',
+        lead,
+        detailRows,
+        ...(extraLines ? { extraLines } : {}),
+        ctaUrl: actionUrl,
+        ctaLabel: lbl(en, CTA_LABELS.reviewInAdmin),
+        accent: 'success',
+      };
+    }
+
     default:
       return en
         ? withCta(

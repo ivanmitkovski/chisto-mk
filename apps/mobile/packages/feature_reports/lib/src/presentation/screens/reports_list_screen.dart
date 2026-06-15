@@ -47,6 +47,8 @@ class ReportsListScreen extends ConsumerStatefulWidget {
     this.refreshTrigger,
     this.onShowSiteOnMap,
     this.onOpenLinkedPollutionSiteDetail,
+    this.onMarkSiteAsCleaned,
+    this.cleanupSectionBuilder,
   });
 
   final String? initialReportIdToOpen;
@@ -57,6 +59,15 @@ class ReportsListScreen extends ConsumerStatefulWidget {
   /// Shell (e.g. home tab host) implements site fetch + in-app pollution site navigation.
   final Future<void> Function(String siteId, ReportSheetViewModel snapshot)?
   onOpenLinkedPollutionSiteDetail;
+
+  final Future<void> Function(String siteId, ReportSheetViewModel snapshot)?
+  onMarkSiteAsCleaned;
+
+  final Widget Function(
+    BuildContext context,
+    String siteId,
+    ReportSheetViewModel report,
+  )? cleanupSectionBuilder;
 
   @override
   ConsumerState<ReportsListScreen> createState() => _ReportsListScreenState();
@@ -368,6 +379,8 @@ class _ReportsListScreenState extends ConsumerState<ReportsListScreen>
                   onShowSiteOnMap: widget.onShowSiteOnMap,
                   onOpenLinkedPollutionSiteDetail:
                       widget.onOpenLinkedPollutionSiteDetail,
+                  onMarkSiteAsCleaned: widget.onMarkSiteAsCleaned,
+                  cleanupSectionBuilder: widget.cleanupSectionBuilder,
         );
       },
     );

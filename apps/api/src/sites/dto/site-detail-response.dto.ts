@@ -1,6 +1,9 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { SiteStatus } from '../../prisma-client';
 
+export const VIEWER_RESOLUTION_STATUS_VALUES = ['none', 'pending', 'approved'] as const;
+export type ViewerResolutionStatusDto = (typeof VIEWER_RESOLUTION_STATUS_VALUES)[number];
+
 export class SiteDetailReporterDto {
   @ApiProperty()
   firstName!: string;
@@ -151,6 +154,9 @@ export class SiteDetailResponseDto {
 
   @ApiProperty()
   isSavedByMe!: boolean;
+
+  @ApiProperty({ enum: VIEWER_RESOLUTION_STATUS_VALUES })
+  viewerResolutionStatus!: ViewerResolutionStatusDto;
 
   @ApiProperty({ type: [String] })
   coReporterNames!: string[];

@@ -1,6 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { ConfigService } from '@nestjs/config';
 import { isPgOutboxNotifyEnabled, NOTIFY_SQL } from '../../common/pg/outbox-pg-notify';
 import { Prisma } from '../../prisma-client';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -27,7 +26,6 @@ export class NotificationDispatcherService {
     private readonly writer: NotificationWriterService,
     private readonly deviceTokens: DeviceTokenService,
     private readonly fcm: FcmPushService,
-    private readonly configService: ConfigService,
     private readonly emailOutbox: EmailDeliveryOutboxService,
     private readonly roomEmitter: NotificationsRoomEmitterService,
     private readonly featureFlags: FeatureFlagsService,
@@ -102,13 +100,19 @@ export class NotificationDispatcherService {
       }
     }
 
-    if (!(await this.isPushEnabled()) || !this.fcm.isReady()) {
+    if (!this.fcm.isEnabled() || !this.fcm.isReady()) {
+      this.logger.warn(
+        `push skipped (enabled=${this.fcm.isEnabled()} ready=${this.fcm.isReady()}) user=${userId} notification=${notificationId}`,
+      );
       await this.emailOutbox.enqueue(userId, notificationId, event);
       return;
     }
 
     const tokens = await this.deviceTokens.getActiveTokensForUser(userId);
     if (tokens.length === 0) {
+      this.logger.warn(
+        `push skipped (no active device tokens) user=${userId} notification=${notificationId}`,
+      );
       await this.emailOutbox.enqueue(userId, notificationId, event);
       return;
     }
@@ -158,6 +162,7 @@ export class NotificationDispatcherService {
         body: event.body,
         subtitle: event.subtitle,
         unreadCount,
+        platform: t.platform,
         data: pushData,
       } as unknown as Prisma.InputJsonValue,
       idempotencyKey: `${notificationId}:${t.token}`,
@@ -179,14 +184,5 @@ export class NotificationDispatcherService {
     });
 
     await this.emailOutbox.enqueue(userId, notificationId, event);
-  }
-
-  private async isPushEnabled(): Promise<boolean> {
-    const fromEnv = this.configService.get<string>('PUSH_FCM_ENABLED', 'false') === 'true';
-    const row = await this.prisma.featureFlag.findUnique({
-      where: { key: 'push_fcm_enabled' },
-      select: { enabled: true },
-    });
-    return row?.enabled ?? fromEnv;
   }
 }

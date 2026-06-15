@@ -2096,6 +2096,20 @@ class AppLocalizationsMk extends AppLocalizations {
   String get feedFilterSavedDesc => 'Локации што си ги зачувал';
 
   @override
+  String get feedFilterResolvedName => 'Исчистени';
+
+  @override
+  String get feedFilterResolvedDesc =>
+      'Локации потврдено исчистени од заедницата';
+
+  @override
+  String get feedEmptyResolvedTitle => 'Сè уште нема исчистени локации';
+
+  @override
+  String get feedEmptyResolvedHint =>
+      'Кога локациите ќе бидат потврдено исчистени, ќе се појават тука.';
+
+  @override
   String get feedFiltersSheetTitle => 'Филтри на фидот';
 
   @override
@@ -2857,6 +2871,14 @@ class AppLocalizationsMk extends AppLocalizations {
   @override
   String get notificationsSiteUnavailable =>
       'Оваа локација повеќе не е достапна.';
+
+  @override
+  String get notificationsReportUnavailable =>
+      'Овој извештај повеќе не е достапен.';
+
+  @override
+  String get notificationsOpenUnsupported =>
+      'Ова известување не може да се отвори.';
 
   @override
   String get notificationsReadStateUpdateFailed =>
@@ -4886,6 +4908,141 @@ class AppLocalizationsMk extends AppLocalizations {
   @override
   String get takeActionShareSubtitle =>
       'Помогни и други да ја откријат оваа локација';
+
+  @override
+  String get takeActionSubmitResolutionTitle => 'Потврди исчистена локација';
+
+  @override
+  String get takeActionSubmitResolutionSubtitle =>
+      'Сподели фотографии „после“ и помогни да се затвори пријавата';
+
+  @override
+  String get submitResolutionSheetTitle => 'Потврди исчистување';
+
+  @override
+  String submitResolutionSheetSubtitle(String siteTitle) {
+    return 'Додај фотографии од $siteTitle по исчистувањето';
+  }
+
+  @override
+  String get submitResolutionSheetSubtitleGeneric =>
+      'Додај фотографии од локацијата по исчистувањето';
+
+  @override
+  String get submitResolutionNoteLabel => 'Белешка (опционално)';
+
+  @override
+  String get submitResolutionNoteHint => 'Нешто друго што треба да знаеме?';
+
+  @override
+  String get submitResolutionSubmitButton => 'Поднеси за преглед';
+
+  @override
+  String get submitResolutionHelpText =>
+      'Администратор ќе ги прегледа фотографиите пред локацијата да биде означена како решена.';
+
+  @override
+  String get submitResolutionSuccessSnack =>
+      'Доказите за исчистување се поднесени. Наскоро ќе ги прегледаме.';
+
+  @override
+  String get submitResolutionFailedSnack =>
+      'Не успеавме да ги поднесеме доказите. Обиди се повторно.';
+
+  @override
+  String get submitResolutionNotAvailableSnack =>
+      'Потврдата за исчистување не е достапна за оваа локација.';
+
+  @override
+  String get submitResolutionSiteAlreadyResolvedSnack =>
+      'Оваа локација веќе е означена како решена.';
+
+  @override
+  String get submitResolutionAlreadyUnderReviewSnack =>
+      'Вашето исчистување веќе се прегледува.';
+
+  @override
+  String get submitResolutionErrorBody =>
+      'Не успеавме да ги поднесеме фотографиите. Проверете ја врската и обидете се повторно.';
+
+  @override
+  String get resolutionSubmittedTitle => 'Поднесено за преглед';
+
+  @override
+  String get resolutionSubmittedBody =>
+      'Ви благодариме што помагате. Администратор ќе ги прегледа фотографиите пред локацијата да биде означена како решена.';
+
+  @override
+  String get resolutionSubmittedViewMyReports => 'Мои пријави';
+
+  @override
+  String get resolutionSubmittedDone => 'Готово';
+
+  @override
+  String get resolutionSubmittedSemanticsSuccess =>
+      'Исчистувањето е поднесено за преглед';
+
+  @override
+  String get siteDetailCleanupUnderReviewCta => 'Исчистување се прегледува';
+
+  @override
+  String get siteDetailCleanupUnderReviewBanner =>
+      'Вашите фотографии од исчистување се прегледуваат. Ќе ве известиме кога ќе има одлука.';
+
+  @override
+  String get reportCleanupSubmissionPendingTitle =>
+      'Вашето исчистување се прегледува';
+
+  @override
+  String get reportCleanupSubmissionPendingBody =>
+      'Ги примивме вашите фотографии и администратор ги прегледува.';
+
+  @override
+  String get reportCleanupSubmissionApprovedTitle =>
+      'Исчистувањето е потврдено';
+
+  @override
+  String get reportCleanupSubmissionApprovedBody =>
+      'Вашите докази за исчистување се одобрени и локацијата е означена како решена.';
+
+  @override
+  String get reportCleanupSubmissionPhotoSemantic =>
+      'Ваша фотографија од исчистување';
+
+  @override
+  String get reportCleanupSubmissionOpenGallerySemantic =>
+      'Отвори галерија од вашите фотографии';
+
+  @override
+  String get reportCleanupSubmissionLoadFailed =>
+      'Не успеавме да ја вчитаме вашата поднесена потврда.';
+
+  @override
+  String get siteDetailResolvedBanner =>
+      'Оваа локација е означена како решена.';
+
+  @override
+  String get siteDetailAddCleanupPhotoCta => 'Додај фотографија по исчистување';
+
+  @override
+  String get cleanupEvidenceSectionTitle => 'По исчистувањето';
+
+  @override
+  String get cleanupEvidenceEmpty => 'Сè уште нема фотографии по исчистување.';
+
+  @override
+  String get cleanupEvidenceLoadFailed =>
+      'Не успеавме да ги вчитаме фотографиите.';
+
+  @override
+  String get cleanupEvidenceOpenGallerySemantic =>
+      'Отвори галерија на фотографии по исчистување';
+
+  @override
+  String get cleanupEvidencePhotoSemantic => 'Фотографија по исчистување';
+
+  @override
+  String get reportDetailMarkAsCleanedCta => 'Означи како исчистено';
 
   @override
   String get shareSheetSemanticDragHandle =>

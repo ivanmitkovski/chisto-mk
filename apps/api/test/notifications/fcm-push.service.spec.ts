@@ -1,4 +1,5 @@
 import { FcmPushService } from '../../src/notifications/services/fcm-push.service';
+import { DevicePlatform } from '../../src/prisma-client';
 
 describe('FcmPushService badge count', () => {
   const prisma = {
@@ -82,5 +83,24 @@ describe('FcmPushService badge count', () => {
       apns: { payload: { aps: { badge: number } } };
     };
     expect(message.apns.payload.aps.badge).toBe(3);
+  });
+
+  it('omits APNS block for ANDROID platform tokens', async () => {
+    prisma.userNotification.count.mockResolvedValue(1);
+    const send = jest.fn().mockResolvedValue('msg-id');
+    (service as unknown as { app: { messaging: () => { send: typeof send } } }).app = {
+      messaging: () => ({ send }),
+    };
+
+    await service.sendToToken('token-android', {
+      title: 'Test',
+      body: 'Body',
+      userId: 'user-1',
+      platform: DevicePlatform.ANDROID,
+    });
+
+    const message = send.mock.calls[0][0] as { apns?: unknown; android: unknown };
+    expect(message.apns).toBeUndefined();
+    expect(message.android).toBeDefined();
   });
 });

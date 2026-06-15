@@ -15,7 +15,9 @@ import 'package:feature_home/src/domain/repositories/sites_repository_types.dart
 import 'package:feature_home/src/presentation/navigation/feed_shell_route_extras.dart';
 import 'package:feature_home/src/presentation/navigation/site_share_result.dart';
 import 'package:feature_home/src/presentation/screens/pollution_site_detail_screen.dart';
+import 'package:feature_home/src/presentation/utils/site_resolution_helpers.dart';
 import 'package:feature_home/src/presentation/widgets/site_card/share_sheet.dart';
+import 'package:feature_home/src/presentation/widgets/submit_resolution_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -74,6 +76,9 @@ class TakeActionCoordinator {
         case TakeActionType.donateContribute:
           // Donate is intentionally disabled for this release.
           return const TakeActionCoordinatorFinished();
+        case TakeActionType.submitResolution:
+          await _handleSubmitResolution(context, site: site);
+          return const TakeActionCoordinatorFinished();
         case TakeActionType.shareSite:
           final SiteShareResult share = await _handleShareSite(
             context,
@@ -118,6 +123,38 @@ class TakeActionCoordinator {
         );
       }
     }
+  }
+
+  static Future<void> _handleSubmitResolution(
+    BuildContext context, {
+    required PollutionSite site,
+  }) async {
+    if (hasMyPendingResolution(site)) {
+      if (context.mounted) {
+        AppSnack.show(
+          context,
+          message: context.l10n.submitResolutionAlreadyUnderReviewSnack,
+          type: AppSnackType.info,
+        );
+      }
+      return;
+    }
+    if (!canSubmitSiteResolution(site) && !isPollutionSiteResolved(site)) {
+      if (context.mounted) {
+        AppSnack.show(
+          context,
+          message: context.l10n.submitResolutionNotAvailableSnack,
+          type: AppSnackType.warning,
+        );
+      }
+      return;
+    }
+    if (!context.mounted) return;
+    await SubmitResolutionSheet.show(
+      context,
+      siteId: site.id,
+      siteTitle: site.title,
+    );
   }
 
   static Future<void> _handleJoinAction(
