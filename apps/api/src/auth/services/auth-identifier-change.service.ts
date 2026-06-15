@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, OnModuleDestroy } from '@nestjs/common';
 import { createHash, randomInt } from 'node:crypto';
 import Redis from 'ioredis';
 import { NotificationType } from '../../prisma-client';
@@ -22,7 +22,7 @@ type PendingChange = {
 };
 
 @Injectable()
-export class AuthIdentifierChangeService {
+export class AuthIdentifierChangeService implements OnModuleDestroy {
   private readonly redis: Redis | null;
 
   constructor(
@@ -223,5 +223,9 @@ export class AuthIdentifierChangeService {
 
   private async clearPending(userId: string): Promise<void> {
     if (this.redis) await this.redis.del(this.key(userId));
+  }
+
+  async onModuleDestroy(): Promise<void> {
+    await this.redis?.quit().catch(() => undefined);
   }
 }

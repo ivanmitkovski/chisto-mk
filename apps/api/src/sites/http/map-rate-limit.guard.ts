@@ -4,6 +4,7 @@ import {
   HttpException,
   Injectable,
   Logger,
+  OnModuleDestroy,
   ServiceUnavailableException,
 } from '@nestjs/common';
 import type { Request } from 'express';
@@ -14,7 +15,7 @@ import { MAP_RATE_LIMIT_INCR_SCRIPT } from './map-rate-limit-lua';
 type MemoryCounter = { count: number; expiresAtMs: number };
 
 @Injectable()
-export class MapRateLimitGuard implements CanActivate {
+export class MapRateLimitGuard implements CanActivate, OnModuleDestroy {
   private static readonly cfg = loadMapConfig();
   private readonly logger = new Logger(MapRateLimitGuard.name);
   private readonly redis: Redis | null;
@@ -133,5 +134,9 @@ export class MapRateLimitGuard implements CanActivate {
       this._memoryIncrAndCheck(key, limit);
       return true;
     }
+  }
+
+  async onModuleDestroy(): Promise<void> {
+    await this.redis?.quit().catch(() => undefined);
   }
 }

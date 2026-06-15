@@ -15,6 +15,7 @@ export async function createE2eApplication(): Promise<{
 }> {
   validateEnv();
   const app = await NestFactory.create(AppModule, { logger: false, bufferLogs: true });
+  app.enableShutdownHooks();
   app.setGlobalPrefix('v1', {
     exclude: [
       'health',

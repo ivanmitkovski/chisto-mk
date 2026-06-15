@@ -1,11 +1,11 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import Redis from 'ioredis';
 import { loadMapConfig } from '../../config/map.config';
 import { ObservabilityStore } from '../../observability/observability.store';
 import { MapResponse } from './map-types';
 
 @Injectable()
-export class MapCacheService {
+export class MapCacheService implements OnModuleDestroy {
   private static readonly REDIS_KEY_PREFIX = 'sites:map:v2';
   private static readonly REDIS_INDEX_KEY = 'sites:map:v2:index';
   private static readonly cfg = loadMapConfig();
@@ -141,5 +141,9 @@ export class MapCacheService {
       }
     }
     this.memoryCache.delete(cacheKey);
+  }
+
+  async onModuleDestroy(): Promise<void> {
+    await this.redis?.quit().catch(() => undefined);
   }
 }

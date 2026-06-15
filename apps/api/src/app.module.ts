@@ -84,9 +84,11 @@ import { RequestMetricsInterceptor } from './observability/util/request-metrics.
     EventEmitterModule.forRoot(),
     StorageModule,
     HealthModule,
-    ThrottlerModule.forRoot({
-      throttlers: [{ ttl: 60_000, limit: 60 }],
-      storage: new RedisThrottlerStorage(),
+    ThrottlerModule.forRootAsync({
+      useFactory: () => ({
+        throttlers: [{ ttl: 60_000, limit: 60 }],
+        storage: new RedisThrottlerStorage(),
+      }),
     }),
     PrismaModule,
     AuditModule,

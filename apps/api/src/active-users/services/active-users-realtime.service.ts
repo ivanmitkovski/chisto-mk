@@ -48,9 +48,15 @@ export class ActiveUsersRealtimeService implements OnModuleDestroy {
     }
   }
 
-  onModuleDestroy(): void {
-    void this.publisher?.quit();
-    void this.subscriber?.quit();
+  async onModuleDestroy(): Promise<void> {
+    const publisher = this.publisher;
+    const subscriber = this.subscriber;
+    this.publisher = null;
+    this.subscriber = null;
+    await Promise.all([
+      publisher?.quit().catch(() => undefined),
+      subscriber?.quit().catch(() => undefined),
+    ]);
   }
 
   getEvents(): Observable<ActiveUsersRealtimeEvent> {
@@ -88,42 +94,52 @@ export class ActiveUsersRealtimeService implements OnModuleDestroy {
     this.avgSampleCount += 1;
 
     if (this.publisher) {
-      const todayKey = this.todayKey();
-      const weekKey = this.weekKey();
-      const currentPeakToday = Number((await this.publisher.get(PRESENCE_REDIS_KEYS.peakToday)) ?? 0);
-      const currentPeakWeek = Number((await this.publisher.get(PRESENCE_REDIS_KEYS.peakWeek)) ?? 0);
-      if (count > currentPeakToday) {
-        await this.publisher.set(PRESENCE_REDIS_KEYS.peakToday, String(count), 'EX', 86400);
+      try {
+        const todayKey = this.todayKey();
+        const weekKey = this.weekKey();
+        const currentPeakToday = Number((await this.publisher.get(PRESENCE_REDIS_KEYS.peakToday)) ?? 0);
+        const currentPeakWeek = Number((await this.publisher.get(PRESENCE_REDIS_KEYS.peakWeek)) ?? 0);
+        if (count > currentPeakToday) {
+          await this.publisher.set(PRESENCE_REDIS_KEYS.peakToday, String(count), 'EX', 86400);
+        }
+        if (count > currentPeakWeek) {
+          await this.publisher.set(PRESENCE_REDIS_KEYS.peakWeek, String(count), 'EX', 7 * 86400);
+        }
+        const sampleMember = `${now}:${count}`;
+        await this.publisher
+          .multi()
+          .zadd(PRESENCE_REDIS_KEYS.trendSamples, now, sampleMember)
+          .zremrangebyscore(PRESENCE_REDIS_KEYS.trendSamples, '-inf', cutoff1h - 1)
+          .expire(PRESENCE_REDIS_KEYS.trendSamples, 86400)
+          .hincrby(PRESENCE_REDIS_KEYS.avgStats, 'sum', count)
+          .hincrby(PRESENCE_REDIS_KEYS.avgStats, 'count', 1)
+          .expire(PRESENCE_REDIS_KEYS.avgStats, 86400 * 2)
+          .exec();
+        await this.publisher.lpush(`${PRESENCE_REDIS_KEYS.trendPrefix}${todayKey}`, sampleMember);
+        await this.publisher.ltrim(`${PRESENCE_REDIS_KEYS.trendPrefix}${todayKey}`, 0, 240);
+        await this.publisher.expire(`${PRESENCE_REDIS_KEYS.trendPrefix}${todayKey}`, 86400);
+        void weekKey;
+      } catch (err) {
+        this.logger.warn(
+          `recordConcurrentSample failed: ${err instanceof Error ? err.message : String(err)}`,
+        );
       }
-      if (count > currentPeakWeek) {
-        await this.publisher.set(PRESENCE_REDIS_KEYS.peakWeek, String(count), 'EX', 7 * 86400);
-      }
-      const sampleMember = `${now}:${count}`;
-      await this.publisher
-        .multi()
-        .zadd(PRESENCE_REDIS_KEYS.trendSamples, now, sampleMember)
-        .zremrangebyscore(PRESENCE_REDIS_KEYS.trendSamples, '-inf', cutoff1h - 1)
-        .expire(PRESENCE_REDIS_KEYS.trendSamples, 86400)
-        .hincrby(PRESENCE_REDIS_KEYS.avgStats, 'sum', count)
-        .hincrby(PRESENCE_REDIS_KEYS.avgStats, 'count', 1)
-        .expire(PRESENCE_REDIS_KEYS.avgStats, 86400 * 2)
-        .exec();
-      await this.publisher.lpush(`${PRESENCE_REDIS_KEYS.trendPrefix}${todayKey}`, sampleMember);
-      await this.publisher.ltrim(`${PRESENCE_REDIS_KEYS.trendPrefix}${todayKey}`, 0, 240);
-      await this.publisher.expire(`${PRESENCE_REDIS_KEYS.trendPrefix}${todayKey}`, 86400);
-      void weekKey;
     }
   }
 
   async recordDau(userId: string): Promise<void> {
     if (!this.publisher) return;
-    const key = `${PRESENCE_REDIS_KEYS.dauPrefix}${this.todayKey()}`;
-    await this.publisher.pfadd(key, userId);
-    await this.publisher.expire(key, 86400 * 2);
-    await this.publisher.pfadd(PRESENCE_REDIS_KEYS.wauKey, userId);
-    await this.publisher.expire(PRESENCE_REDIS_KEYS.wauKey, 86400 * 8);
-    await this.publisher.pfadd(PRESENCE_REDIS_KEYS.mauKey, userId);
-    await this.publisher.expire(PRESENCE_REDIS_KEYS.mauKey, 86400 * 32);
+    try {
+      const key = `${PRESENCE_REDIS_KEYS.dauPrefix}${this.todayKey()}`;
+      await this.publisher.pfadd(key, userId);
+      await this.publisher.expire(key, 86400 * 2);
+      await this.publisher.pfadd(PRESENCE_REDIS_KEYS.wauKey, userId);
+      await this.publisher.expire(PRESENCE_REDIS_KEYS.wauKey, 86400 * 8);
+      await this.publisher.pfadd(PRESENCE_REDIS_KEYS.mauKey, userId);
+      await this.publisher.expire(PRESENCE_REDIS_KEYS.mauKey, 86400 * 32);
+    } catch (err) {
+      this.logger.warn(`recordDau failed: ${err instanceof Error ? err.message : String(err)}`);
+    }
   }
 
   async getPeakToday(): Promise<number> {

@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import Redis from 'ioredis';
 import { loadFeatureFlags } from '../../config/feature-flags';
 import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
-export class SitesMapAdminTimelineService {
+export class SitesMapAdminTimelineService implements OnModuleDestroy {
   private timelineRedis: Redis | null | undefined;
 
   constructor(private readonly prisma: PrismaService) {}
@@ -84,5 +84,12 @@ export class SitesMapAdminTimelineService {
       enableReadyCheck: true,
     });
     return this.timelineRedis;
+  }
+
+  async onModuleDestroy(): Promise<void> {
+    if (!this.timelineRedis) return;
+    const client = this.timelineRedis;
+    this.timelineRedis = null;
+    await client.quit().catch(() => undefined);
   }
 }

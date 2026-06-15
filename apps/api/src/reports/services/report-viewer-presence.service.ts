@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, OnModuleDestroy } from '@nestjs/common';
 import Redis from 'ioredis';
 import { ReportPresenceEventsService } from '../../admin-realtime/services/report-presence-events.service';
 import { ReportViewerPresenceEntry } from '../../admin-realtime/types/report-presence-events.types';
@@ -11,7 +11,7 @@ const PRESENCE_TTL_MS = 45_000;
 const SSE_DEBOUNCE_MS = 300;
 
 @Injectable()
-export class ReportViewerPresenceService {
+export class ReportViewerPresenceService implements OnModuleDestroy {
   private static zsetKey(reportId: string): string {
     return `admin:report-viewers:${reportId}`;
   }
@@ -225,5 +225,9 @@ export class ReportViewerPresenceService {
     }, SSE_DEBOUNCE_MS);
 
     this.publishTimers.set(reportId, timer);
+  }
+
+  async onModuleDestroy(): Promise<void> {
+    await this.redis?.quit().catch(() => undefined);
   }
 }
