@@ -171,4 +171,33 @@ class StubSitesRepository implements SitesRepository {
     String? sessionId,
     Map<String, dynamic>? metadata,
   }) => throw UnimplementedError();
+
+  @override
+  Future<CleanupEvidenceListResult> getCleanupEvidence(
+    String siteId, {
+    int page = 1,
+    int limit = 24,
+    RequestCancellationToken? cancellation,
+  }) => throw UnimplementedError();
+
+  @override
+  Future<SiteResolutionListResult> listSiteResolutions(
+    String siteId, {
+    int page = 1,
+    int limit = 20,
+    RequestCancellationToken? cancellation,
+  }) => throw UnimplementedError();
+
+  @override
+  Future<SiteResolutionSubmitResult> submitSiteResolution({
+    required String siteId,
+    required List<String> mediaUrls,
+    String? note,
+  }) => throw UnimplementedError();
+
+  @override
+  Future<List<String>> uploadResolutionPhotos(
+    String siteId,
+    List<String> filePaths,
+  ) => throw UnimplementedError();
 }
