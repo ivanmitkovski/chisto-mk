@@ -50,7 +50,8 @@
       "fast-xml-parser": "5.8.0",
       "tmp": "0.2.7",
       "@grpc/grpc-js": "1.14.4",
-      "ws": "8.21.0"
+      "ws": "8.21.0",
+      "form-data": "4.0.6"
     }
   },
   "devDependencies": {

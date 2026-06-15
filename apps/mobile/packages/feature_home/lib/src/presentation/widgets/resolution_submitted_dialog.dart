@@ -3,8 +3,7 @@ import 'dart:async';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/shared/utils/app_haptics.dart';
 import 'package:design_system/design_system.dart';
-import 'package:feature_reports/src/presentation/widgets/new_report/report_submitted_checkmark_painter.dart';
-import 'package:feature_reports/src/presentation/widgets/new_report/report_submitted_dialog_action_button.dart';
+import 'package:feature_reports/feature_reports.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 

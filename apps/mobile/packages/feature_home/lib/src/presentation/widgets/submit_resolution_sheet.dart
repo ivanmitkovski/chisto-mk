@@ -11,11 +11,7 @@ import 'package:chisto_infrastructure/shared/widgets/organisms/app_surface/repor
 import 'package:design_system/design_system.dart';
 import 'package:feature_home/src/domain/repositories/sites_repository.dart';
 import 'package:feature_home/src/presentation/widgets/resolution_submitted_dialog.dart';
-import 'package:feature_reports/src/data/report_upload_image_validator.dart';
-import 'package:feature_reports/src/domain/report_field_limits.dart';
-import 'package:feature_reports/src/presentation/widgets/photo_grid.dart';
-import 'package:feature_reports/src/presentation/widgets/photo_review_sheet.dart';
-import 'package:feature_reports/src/presentation/widgets/photo_source_modal.dart';
+import 'package:feature_reports/feature_reports.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -248,6 +244,7 @@ class _SubmitResolutionSheetState extends ConsumerState<SubmitResolutionSheet>
         _submitError = null;
       });
       try {
+        final AppLocalizations l10n = context.l10n;
         final List<String> paths =
             _photos.map((XFile f) => f.path).toList(growable: false);
         final List<String> mediaUrls = await _repository.uploadResolutionPhotos(
@@ -255,7 +252,7 @@ class _SubmitResolutionSheetState extends ConsumerState<SubmitResolutionSheet>
           paths,
         );
         if (mediaUrls.isEmpty) {
-          throw StateError('empty upload');
+          throw AppError.validation(message: l10n.submitResolutionErrorBody);
         }
         await _repository.submitSiteResolution(
           siteId: widget.siteId,

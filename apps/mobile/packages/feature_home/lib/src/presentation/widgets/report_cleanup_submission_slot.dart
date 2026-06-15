@@ -100,7 +100,7 @@ class _ReportCleanupSubmissionSlotState
             tone: AppInlineBannerTone.warning,
           ),
           const SizedBox(height: AppSpacing.sm),
-          TextButton(onPressed: _load, child: Text(l10n.commonRetry)),
+          AppButton.text(label: l10n.commonRetry, onPressed: _load),
           const SizedBox(height: AppSpacing.lg),
         ],
       );

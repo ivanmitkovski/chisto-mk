@@ -1,9 +1,9 @@
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/network/api_client.dart';
 import 'package:chisto_infrastructure/core/network/request_cancellation.dart';
+import 'package:chisto_infrastructure/core/serialization/safe_json.dart';
 import 'package:feature_home/src/domain/repositories/site_resolution_repository.dart';
-import 'package:feature_reports/src/data/api_reports_multipart.dart';
-import 'package:feature_reports/src/data/report_multipart_parts_result.dart';
+import 'package:feature_reports/feature_reports.dart';
 
 class ApiSiteResolutionRepository implements SiteResolutionRepository {
   ApiSiteResolutionRepository({required ApiClient client}) : _client = client;
@@ -54,9 +54,8 @@ class ApiSiteResolutionRepository implements SiteResolutionRepository {
     if (json == null) {
       throw AppError.unknown();
     }
-    final Map<String, dynamic> payload = json['data'] is Map<String, dynamic>
-        ? json['data'] as Map<String, dynamic>
-        : json;
+    final Map<String, dynamic> payload =
+        safeAsStringKeyedMap(json['data']) ?? json;
     return SiteResolutionSubmitResult(
       id: payload['id'] as String? ?? '',
       siteId: payload['siteId'] as String? ?? siteId,
@@ -79,8 +78,8 @@ class ApiSiteResolutionRepository implements SiteResolutionRepository {
     if (json == null) {
       throw AppError.unknown();
     }
-    final List<dynamic> data = json['data'] as List<dynamic>? ?? <dynamic>[];
-    final Map<String, dynamic>? meta = json['meta'] as Map<String, dynamic>?;
+    final List<dynamic> data = safeAsList(json['data']) ?? <dynamic>[];
+    final Map<String, dynamic>? meta = safeAsStringKeyedMap(json['meta']);
     final List<CleanupEvidenceItem> items = data
         .whereType<Map<String, dynamic>>()
         .map(
@@ -90,9 +89,9 @@ class ApiSiteResolutionRepository implements SiteResolutionRepository {
             source: row['source'] as String? ?? 'RESOLUTION',
             createdAt: row['createdAt'] as String? ?? '',
             caption: row['caption'] as String?,
-            submitterDisplayLabel: row['submitter'] is Map
-                ? (row['submitter'] as Map)['displayLabel'] as String?
-                : null,
+            submitterDisplayLabel:
+                safeAsStringKeyedMap(row['submitter'])?['displayLabel']
+                    as String?,
             resolutionId: row['resolutionId'] as String?,
             cleanupEventId: row['cleanupEventId'] as String?,
           ),
@@ -121,16 +120,15 @@ class ApiSiteResolutionRepository implements SiteResolutionRepository {
     if (json == null) {
       throw AppError.unknown();
     }
-    final List<dynamic> data = json['data'] as List<dynamic>? ?? <dynamic>[];
-    final Map<String, dynamic>? meta = json['meta'] as Map<String, dynamic>?;
+    final List<dynamic> data = safeAsList(json['data']) ?? <dynamic>[];
+    final Map<String, dynamic>? meta = safeAsStringKeyedMap(json['meta']);
     final List<SiteResolutionListItem> items = data
         .whereType<Map<String, dynamic>>()
         .map((Map<String, dynamic> row) {
-          final Map<String, dynamic>? submitter = row['submitter'] is Map
-              ? row['submitter'] as Map<String, dynamic>
-              : null;
+          final Map<String, dynamic>? submitter =
+              safeAsStringKeyedMap(row['submitter']);
           final List<dynamic> mediaRaw =
-              row['mediaUrls'] as List<dynamic>? ?? <dynamic>[];
+              safeAsList(row['mediaUrls']) ?? <dynamic>[];
           return SiteResolutionListItem(
             id: row['id'] as String? ?? '',
             siteId: row['siteId'] as String? ?? siteId,
