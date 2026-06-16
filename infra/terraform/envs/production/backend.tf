@@ -1,0 +1,26 @@
+terraform {
+  required_version = ">= 1.6.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.6"
+    }
+    tls = {
+      source  = "hashicorp/tls"
+      version = "~> 4.0"
+    }
+  }
+
+  backend "s3" {
+    bucket         = "chisto-terraform-state-975829620383"
+    key            = "production/terraform.tfstate"
+    region         = "eu-central-1"
+    dynamodb_table = "chisto-terraform-locks"
+    encrypt        = true
+  }
+}

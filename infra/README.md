@@ -1,14 +1,26 @@
 # Chisto.mk infrastructure
 
-Target AWS layout (Terraform modules under `terraform/`):
+Production AWS layout is implemented as modular Terraform under [`terraform/`](terraform/README.md).
 
-- **ECS Fargate** — API service (non-root container), separate one-shot migration task
+## Production (Terraform)
+
+- **VPC** `10.1.0.0/16` — dedicated prod network (dev remains `10.0.0.0/16`)
+- **ECS Fargate** — API service + one-shot migration task
 - **ALB + WAF** — HTTPS termination, rate limits at edge
-- **RDS PostgreSQL** — PITR backups (7d staging, 30d production), quarterly restore drill per `apps/api/docs/runbooks/db-restore.md`
-- **ElastiCache Redis** — throttler, Socket.IO adapter, idempotency, feed cache L2, auth refresh replay cache
-  - Realtime runbook: [`apps/api/docs/runbooks/redis-realtime.md`](../apps/api/docs/runbooks/redis-realtime.md)
-  - awsDev bootstrap: [`scripts/configure-awsdev-redis.sh`](scripts/configure-awsdev-redis.sh)
-- **S3** — report media, avatars
-- **Secrets Manager** — `JWT_SECRET`, provider keys, Firebase service account
+- **RDS PostgreSQL** — Multi-AZ, 30d backups, private subnets
+- **ElastiCache Redis** — replication group, TLS, multi-AZ
+- **S3** — `chisto-prod-media`
+- **Secrets Manager** — `chisto/production/api` (no plaintext env on tasks)
+
+Quick start: [`terraform/README.md`](terraform/README.md)
+
+## Dev (manual / CLI)
+
+Dev resources (`chisto-dev`) were created via console/CLI. Redis bootstrap: [`scripts/configure-awsdev-redis.sh`](scripts/configure-awsdev-redis.sh)
+
+## Runbooks
+
+- DB restore: [`apps/api/docs/runbooks/db-restore.md`](../apps/api/docs/runbooks/db-restore.md)
+- Redis realtime: [`apps/api/docs/runbooks/redis-realtime.md`](../apps/api/docs/runbooks/redis-realtime.md)
 
 Deploy migrations via CI (`db:migrate:deploy`), not app container boot. See `apps/api/docker-entrypoint.sh`.
