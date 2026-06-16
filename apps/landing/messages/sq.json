@@ -80,7 +80,16 @@
     "phoneDeckDotsLabel": "Zgjidhni ekranin e aplikacionit",
     "phoneDeckSlideLogin": "Ekrani i hyrjes",
     "phoneDeckSlideWelcome": "Ekrani i mirëseardhjes",
-    "phoneDeckSlideMap": "Ekrani i hartës"
+    "phoneDeckSlideFeed": "Feed i ndotjes",
+    "phoneDeckSlideMap": "Ekrani i hartës",
+    "phoneDeckSlideSiteDetail": "Detajet e vendit të ndotjes"
+  },
+  "screenshots": {
+    "welcomeAlt": "Ekrani i mirëseardhjes së Chisto.mk me mesazhin Shih. Raporto. Pastro.",
+    "signInAlt": "Ekrani i hyrjes së Chisto.mk me fusha për numrin e telefonit dhe fjalëkalimin.",
+    "mapAlt": "Ekrani i hartës së Chisto.mk që tregon raportet e verifikuara të ndotjes si pin foto.",
+    "feedAlt": "Feed-i kryesor i Chisto.mk me vende të verifikuara ndotjeje dhe butonin Merr veprim.",
+    "siteDetailAlt": "Ekrani i detajeve të vendit të ndotjes së Chisto.mk me foto, përshkrim dhe opsione veprimi komunitar."
   },
   "howItWorks": {
     "title": "Si funksionon",
@@ -327,13 +336,20 @@
     "boilerplateTitle": "Përshkrim i shkurtër",
     "boilerplate": "Chisto.mk është një platformë qytetare mjedisore në Maqedoni. Njerëzit raportojnë mbeturina, hedhje të paligjshme dhe tym në një hartë publike me foto dhe vendndodhje, dhe mund të bashkohen në aksione lokale pastrimi kur organizatorët i postojnë në aplikacion."
   },
+  "legalNav": {
+    "ariaLabel": "Dokumente ligjore",
+    "terms": "Kushtet e përdorimit",
+    "privacy": "Politika e privatësisë",
+    "cookies": "Politika e cookies",
+    "data": "Të dhënat tuaja dhe llogaria"
+  },
   "termsPage": {
     "badge": "Ligjore",
     "title": "Kushtet e përdorimit",
     "lastUpdatedLabel": "Përditësuar për herë të fundit",
-    "lastUpdated": "30 prill 2026",
-    "noticeTitle": "Para se të mbështeteni në këto kushte",
-    "noticeBody": "Plotësoni të gjitha fushat në kllapa me të dhëna të verifikuara ligjore dhe operative para se ta trajtoni këtë tekst si përfundimtar. Deklaratat e privatësisë në dyqanet e aplikacioneve duhet të përputhen me këtë dokument dhe aplikacionin e publikuar. Jo këshillë ligjore dhe nuk garanton miratimin në dyqan. Konsideroni rishikim nga këshilltar i kualifikuar në Maqedoni (dhe, për përdorues në EEA, në BE) ku është e përshtatshme.",
+    "lastUpdated": "[DATE]",
+    "effectiveDateLabel": "Data e hyrjes në fuqi",
+    "effectiveDate": "[EFFECTIVE_DATE]",
     "sections": [
       {
         "title": "Hyrje",
@@ -413,9 +429,9 @@
     "badge": "Ligjore",
     "title": "Politika e privatësisë",
     "lastUpdatedLabel": "Përditësuar për herë të fundit",
-    "lastUpdated": "30 prill 2026",
-    "noticeTitle": "Para se të mbështeteni në këtë politikë",
-    "noticeBody": "Plotësoni fushat në kllapa me detaje të sakta. Etiketat Apple App Privacy dhe Google Play Data safety duhet të përputhen me këtë Politikë dhe versionin publik (përfshirë push Firebase, pllakat e hartës dhe analitikën opsionale të uebsajtit). Përditësoni Politikën kur ndryshoni SDK ose praktikat e ruajtjes. Jo këshillë ligjore.",
+    "lastUpdated": "[DATE]",
+    "effectiveDateLabel": "Data e hyrjes në fuqi",
+    "effectiveDate": "[EFFECTIVE_DATE]",
     "sections": [
       {
         "title": "1. Hyrje",
@@ -487,11 +503,12 @@
     "badge": "Ligjore",
     "title": "Politika e cookies",
     "lastUpdatedLabel": "Përditësuar për herë të fundit",
-    "lastUpdated": "30 prill 2026",
+    "lastUpdated": "[DATE]",
     "effectiveDateLabel": "Data e hyrjes në fuqi",
-    "effectiveDate": "29 prill 2026",
-    "noticeTitle": "Para se të mbështeteni në këtë politikë cookies",
-    "noticeBody": "Çfarë bën uebsajti i publikuar (ruajtje e pëlqimit, identifikues opsionalë analitike) duhet të përputhet me këtë tabelë dhe Politikën e privatësisë. Aplikacionet celulare përdorin ruajtje në pajisje dhe token push siç përshkruhet atje, jo këtë përmbledhje vetëm për shfletuesin. URL me kllapa konfigurohen përmes mjedisit të deployimit. Jo këshillë ligjore.",
+    "effectiveDate": "[EFFECTIVE_DATE]",
+    "settingsTitle": "Cilësimet e cookies",
+    "settingsBody": "Rihapni banderolën e pëlqimit për të lejuar ose refuzuar analitikën opsionale në këtë uebsajt.",
+    "settingsButton": "Hap cilësimet e cookies",
     "tableTitle": "8. Tabela e detajuar e cookies dhe ruajtjes (uebsajt)",
     "tableIntro": "Kjo tabelë përshkruan teknologjitë në uebsajtin publik Chisto.mk. Aplikacionet përdorin ruajtje në pajisje dhe token Firebase Cloud Messaging në vend të kësaj; shihni Politikën e privatësisë.\n\nDUKE VAZHDUAR TË PËRDORNI FAQEN TONË, JU PRANONI SE KENI LEXUAR DHE KUPTUAR KËTË POLITIKË COOKIES.",
     "colName": "Emri",
@@ -589,15 +606,13 @@
     "title": "Të dhënat tuaja dhe llogaria",
     "lead": "Kjo është faqja publike e Chisto.mk për fshirjen e llogarisë dhe të drejtat e të dhënave. Shpjegon si të kërkoni fshirjen e llogarisë dhe të dhënave personale të lidhura, eksportin e të dhënave, korrigjimin e gabimeve, kundërshtimin ose kufizimin e përpunimit ku zbatohet dhe kontaktin për pyetje privatësie.",
     "requestTitle": "Fshini llogarinë dhe të dhënat tuaja",
-    "requestIntro": "Përdorni kanalin më poshtë për fshirje llogarie, anonimizim raportesh ku zbatohet, kopje ose eksport të të dhënave personale, korrigjime, kufizim, kundërshtim ku zbatohet ose mbështetje tjetër për privatësi. Kërkesat me email shkojnë te info@ekohab.mk. Mund të kërkojmë provë të arsyeshme identiteti, si email nga adresa juaj e regjistruar ose një hap verifikimi një herë, para se të veprojmë për kërkesa të ndjeshme.",
+    "requestIntro": "Përdorni kanalin më poshtë për fshirje llogarie, anonimizim raportesh ku zbatohet, kopje ose eksport të të dhënave personale, korrigjime, kufizim, kundërshtim ku zbatohet ose mbështetje tjetër për privatësi. Kërkesat me email shkojnë te [PRIVACY_EMAIL]. Mund të kërkojmë provë të arsyeshme identiteti, si email nga adresa juaj e regjistruar ose një hap verifikimi një herë, para se të veprojmë për kërkesa të ndjeshme.",
     "requestCta": "Hap kanalin e kërkesave për të dhëna",
-    "requestMissing": "Kanali i kërkesave për të dhëna përkohësisht nuk është i disponueshëm. Na shkruani në info@ekohab.mk.",
+    "requestMissing": "Kanali i kërkesave për të dhëna përkohësisht nuk është i disponueshëm. Na shkruani në [PRIVACY_EMAIL].",
     "linkPrivacy": "Politika e privatësisë",
     "linkTerms": "Kushtet e përdorimit",
     "lastUpdatedLabel": "Përditësuar së fundmi",
-    "lastUpdated": "30 prill 2026",
-    "noticeTitle": "Para se të mbështeteni në këtë faqe",
-    "noticeBody": "Kjo faqe është kanali publik në ueb për fshirje llogarie dhe kërkesa privatësie. Përgjigjet në Apple App Privacy dhe Google Play Data safety duhet të përputhen me këtë faqe dhe Politikën e privatësisë. Jo këshillë ligjore.",
+    "lastUpdated": "[DATE]",
     "sections": [
       {
         "title": "1. Llogaria dhe profili",

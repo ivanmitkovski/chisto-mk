@@ -80,7 +80,16 @@
     "phoneDeckDotsLabel": "Choose app screen",
     "phoneDeckSlideLogin": "Login screen",
     "phoneDeckSlideWelcome": "Welcome screen",
-    "phoneDeckSlideMap": "Map screen"
+    "phoneDeckSlideFeed": "Pollution feed",
+    "phoneDeckSlideMap": "Map screen",
+    "phoneDeckSlideSiteDetail": "Pollution site detail"
+  },
+  "screenshots": {
+    "welcomeAlt": "Chisto.mk onboarding screen welcoming users with the tagline See it. Report it. Clean it.",
+    "signInAlt": "Chisto.mk sign-in screen with phone number and password fields.",
+    "mapAlt": "Chisto.mk map screen showing verified pollution reports as photo pins across a city map.",
+    "feedAlt": "Chisto.mk home feed listing nearby verified pollution sites with photos and a Take action button.",
+    "siteDetailAlt": "Chisto.mk pollution site detail screen with photos, description, and community action options."
   },
   "howItWorks": {
     "title": "How it works",
@@ -327,13 +336,20 @@
     "boilerplateTitle": "Short description",
     "boilerplate": "Chisto.mk is a civic environmental platform in Macedonia. People report litter, illegal dumping, and dirty air on a public map with photos and locations, and can join local cleanup actions when organisers post them in the app."
   },
+  "legalNav": {
+    "ariaLabel": "Legal documents",
+    "terms": "Terms of use",
+    "privacy": "Privacy policy",
+    "cookies": "Cookie policy",
+    "data": "Your data and account"
+  },
   "termsPage": {
     "badge": "Legal",
     "title": "Terms of use",
     "lastUpdatedLabel": "Last updated",
-    "lastUpdated": "30 April 2026",
-    "noticeTitle": "Before you rely on these terms",
-    "noticeBody": "Complete all bracketed fields with verified legal and operational information before treating this text as final. App store privacy declarations should match this document and your published app. This is not legal advice and does not guarantee store approval. Consider review by qualified counsel in Macedonia (and, for EEA users, EU counsel) where appropriate.",
+    "lastUpdated": "[DATE]",
+    "effectiveDateLabel": "Effective date",
+    "effectiveDate": "[EFFECTIVE_DATE]",
     "sections": [
       {
         "title": "Introduction",
@@ -413,9 +429,9 @@
     "badge": "Legal",
     "title": "Privacy policy",
     "lastUpdatedLabel": "Last updated",
-    "lastUpdated": "30 April 2026",
-    "noticeTitle": "Before you rely on this policy",
-    "noticeBody": "Complete all bracketed fields with accurate details. Apple App Privacy labels and Google Play Data safety should match this Policy and your live build (including Firebase push, map tiles, and optional website analytics). Update this Policy when you change SDKs or retention practices. Not legal advice.",
+    "lastUpdated": "[DATE]",
+    "effectiveDateLabel": "Effective date",
+    "effectiveDate": "[EFFECTIVE_DATE]",
     "sections": [
       {
         "title": "1. Introduction",
@@ -487,11 +503,12 @@
     "badge": "Legal",
     "title": "Cookie policy",
     "lastUpdatedLabel": "Last updated",
-    "lastUpdated": "30 April 2026",
+    "lastUpdated": "[DATE]",
     "effectiveDateLabel": "Effective date",
-    "effectiveDate": "29 April 2026",
-    "noticeTitle": "Before you rely on this cookie policy",
-    "noticeBody": "What the live website does (consent storage, optional analytics identifiers) should match this table and the Privacy Policy. Mobile apps use on-device storage and push tokens as described there, not this browser-focused summary. Bracketed URLs are set through your deployment environment. Not legal advice.",
+    "effectiveDate": "[EFFECTIVE_DATE]",
+    "settingsTitle": "Cookie settings",
+    "settingsBody": "Reopen the consent banner to allow or refuse optional analytics on this website.",
+    "settingsButton": "Open cookie settings",
     "tableTitle": "8. Detailed cookie and storage table (website)",
     "tableIntro": "This table describes technologies on the public Chisto.mk website. The apps use on-device storage and Firebase messaging tokens instead; see the Privacy Policy.\n\nBY CONTINUING TO USE OUR WEBSITE, YOU ACKNOWLEDGE THAT YOU HAVE READ AND UNDERSTOOD THIS COOKIE POLICY.",
     "colName": "Name",
@@ -589,15 +606,13 @@
     "title": "Your data and account",
     "lead": "This is Chisto.mk's public account deletion and data rights page. It explains how to request deletion of your account and associated personal data, export your data, correct mistakes, object or restrict processing where applicable, and contact us about privacy questions.",
     "requestTitle": "Delete your account and data",
-    "requestIntro": "Use the channel below to request account deletion, report anonymisation where applicable, a copy or export of your personal data, corrections, restriction, objection where applicable, or other privacy support. Email requests go to info@ekohab.mk. We may ask for reasonable proof of identity, such as an email from your registered address or a one-time verification step, before acting on sensitive requests.",
+    "requestIntro": "Use the channel below to request account deletion, report anonymisation where applicable, a copy or export of your personal data, corrections, restriction, objection where applicable, or other privacy support. Email requests go to [PRIVACY_EMAIL]. We may ask for reasonable proof of identity, such as an email from your registered address or a one-time verification step, before acting on sensitive requests.",
     "requestCta": "Open data request channel",
-    "requestMissing": "The data request channel is temporarily unavailable. Email us at info@ekohab.mk.",
+    "requestMissing": "The data request channel is temporarily unavailable. Email us at [PRIVACY_EMAIL].",
     "linkPrivacy": "Privacy policy",
     "linkTerms": "Terms of use",
     "lastUpdatedLabel": "Last updated",
-    "lastUpdated": "30 April 2026",
-    "noticeTitle": "Before you rely on this page",
-    "noticeBody": "This page is the public web channel for account deletion and privacy requests. Apple App Privacy and Google Play Data safety answers should match this page and the Privacy Policy. Not legal advice.",
+    "lastUpdated": "[DATE]",
     "sections": [
       {
         "title": "1. Account and profile",

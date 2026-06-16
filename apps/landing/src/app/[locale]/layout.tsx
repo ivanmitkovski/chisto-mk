@@ -10,6 +10,10 @@ import "../globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
+  icons: {
+    icon: [{ url: "/brand/chisto-mark-green.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/brand/chisto-mark-green.svg", type: "image/svg+xml" }],
+  },
 };
 
 const inter = Inter({

@@ -1,9 +1,29 @@
 import { describe, expect, it } from "vitest";
+import { buildLocaleLegalUrls } from "./legal-public-config";
 import {
   substituteCookieRows,
   substituteLegalSections,
   substituteLegalText,
+  getLegalPlaceholderMap,
 } from "./substitute-placeholders";
+
+describe("buildLocaleLegalUrls", () => {
+  it("uses mk as default locale segment", () => {
+    const urls = buildLocaleLegalUrls("mk");
+    expect(urls.websiteUrl).toBe("https://chisto.mk/mk");
+    expect(urls.privacyPolicyUrl).toContain("/mk/privacy");
+  });
+});
+
+describe("getLegalPlaceholderMap", () => {
+  it("prefers locale URLs over legacy defaults when env is unset", () => {
+    const map = getLegalPlaceholderMap("sq");
+    expect(map["[PRIVACY_POLICY_URL]"]).toBe("https://chisto.mk/sq/privacy");
+    expect(map["[COOKIE_PREFERENCES_URL]"]).toBe(
+      "https://chisto.mk/sq/cookies#cookie-settings",
+    );
+  });
+});
 
 describe("substituteLegalText", () => {
   it("replaces longest keys first via map order in implementation", () => {

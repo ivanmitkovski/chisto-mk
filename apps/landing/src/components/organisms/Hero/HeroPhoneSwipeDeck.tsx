@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { useTranslations } from "next-intl";
 import {
+  HERO_PHONE_DECK_LABEL_KEYS,
   HERO_PHONE_VARIANTS,
   PhoneScreen,
   type HeroPhoneVariant,
@@ -33,16 +34,7 @@ const SHADOW_FRONT =
 const SHADOW_BACK =
   "shadow-[0_12px_32px_rgba(0,0,0,0.06),0_4px_14px_rgba(0,0,0,0.04)]";
 
-const slideLabelKey = (v: HeroPhoneVariant) => {
-  switch (v) {
-    case "login":
-      return "phoneDeckSlideLogin" as const;
-    case "welcome":
-      return "phoneDeckSlideWelcome" as const;
-    case "map":
-      return "phoneDeckSlideMap" as const;
-  }
-};
+const slideLabelKey = (v: HeroPhoneVariant) => HERO_PHONE_DECK_LABEL_KEYS[v];
 
 export function HeroPhoneSwipeDeck() {
   const t = useTranslations("hero");

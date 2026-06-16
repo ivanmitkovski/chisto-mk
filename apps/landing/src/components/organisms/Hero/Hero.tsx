@@ -4,10 +4,9 @@ import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { Container } from "@/components/layout/Container";
 import { Section } from "@/components/layout/Section";
-import { AppStoreButton } from "@/components/molecules/AppStoreButton";
+import { StoreDownloadButtons, hasStoreDownloadLinks } from "@/components/molecules/StoreDownloadButtons";
 import { PhoneMockup } from "@/components/molecules/PhoneMockup";
 import { PhoneScreen } from "@/components/molecules/PhoneDemoScreens";
-import { FloatingPhone } from "@/components/molecules/FloatingPhone";
 import { fadeInUp, staggerContainer } from "@/lib/animations/variants";
 import { HeroPhoneSwipeDeck } from "./HeroPhoneSwipeDeck";
 
@@ -105,19 +104,20 @@ export function Hero() {
             {t("subtitle")}
           </motion.p>
 
-          <motion.div
-            id="download"
-            className="mt-10 flex flex-wrap items-center justify-center gap-3 sm:gap-4"
-            variants={fadeInUp}
-          >
-            <AppStoreButton store="apple" />
-            <AppStoreButton store="google" />
-          </motion.div>
+          {hasStoreDownloadLinks() ? (
+            <motion.div
+              id="download"
+              className="mt-10 flex flex-wrap items-center justify-center gap-3 sm:gap-4"
+              variants={fadeInUp}
+            >
+              <StoreDownloadButtons />
+            </motion.div>
+          ) : null}
         </motion.div>
 
         <div className="relative mx-auto mt-12 max-w-5xl md:mt-16">
           <div
-            className="absolute inset-x-[6%] -bottom-2 top-[38%] hidden rounded-[2rem] bg-gradient-to-b from-white via-gray-100/95 to-gray-200/80 shadow-[0_14px_40px_rgba(0,0,0,0.045),0_6px_20px_rgba(0,0,0,0.03)] ring-1 ring-black/[0.05] md:block md:inset-x-[10%] md:top-[35%] md:rounded-[2.25rem]"
+            className="absolute inset-x-[6%] -bottom-2 top-[38%] hidden rounded-[2rem] bg-gradient-to-b from-white/25 via-gray-100/20 to-gray-200/15 shadow-[0_14px_40px_rgba(0,0,0,0.02),0_6px_20px_rgba(0,0,0,0.012)] ring-1 ring-black/[0.025] md:block md:inset-x-[10%] md:top-[35%] md:rounded-[2.25rem]"
             aria-hidden
           />
           <div className="relative z-10 flex items-end justify-center pb-2">
@@ -126,23 +126,23 @@ export function Hero() {
             </div>
 
             <div className="hidden w-full items-end justify-center gap-2 sm:gap-4 md:flex md:gap-6">
-              <FloatingPhone className="w-56 lg:w-64" delay={0.05}>
+              <div className="w-56 lg:w-64">
                 <PhoneMockup>
-                  <PhoneScreen variant="login" />
+                  <PhoneScreen variant="signIn" />
                 </PhoneMockup>
-              </FloatingPhone>
+              </div>
 
-              <FloatingPhone className="z-10 w-[min(100%,17.5rem)] sm:w-60 lg:w-72" delay={0.15}>
+              <div className="z-10 w-[min(100%,17.5rem)] sm:w-60 lg:w-72">
                 <PhoneMockup>
-                  <PhoneScreen variant="welcome" />
+                  <PhoneScreen variant="feed" priority />
                 </PhoneMockup>
-              </FloatingPhone>
+              </div>
 
-              <FloatingPhone className="w-56 lg:w-64" delay={0.25}>
+              <div className="w-56 lg:w-64">
                 <PhoneMockup>
                   <PhoneScreen variant="map" />
                 </PhoneMockup>
-              </FloatingPhone>
+              </div>
             </div>
           </div>
         </div>

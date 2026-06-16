@@ -1,11 +1,16 @@
-import { getPublicLegalValue } from "@/lib/legal/legal-public-config";
+import type { AppLocale } from "@/i18n/routing";
+import {
+  buildLocaleLegalUrls,
+  getPublicLegalValue,
+} from "@/lib/legal/legal-public-config";
 
 /**
  * Replace [PLACEHOLDER] tokens in legal copy with values from public env vars.
  * Longer tokens are applied first so composite placeholders match before short keys.
  */
-export function getLegalPlaceholderMap(): Record<string, string> {
+export function getLegalPlaceholderMap(locale: AppLocale = "mk"): Record<string, string> {
   const m: Record<string, string> = {};
+  const localeUrls = buildLocaleLegalUrls(locale);
 
   const set = (key: string, value: string | undefined) => {
     if (value && value.trim()) m[key] = value.trim();
@@ -68,10 +73,22 @@ export function getLegalPlaceholderMap(): Record<string, string> {
   set("[CONTACT_PHONE]", getPublicLegalValue(process.env.NEXT_PUBLIC_CONTACT_PHONE, "contactPhone"));
   set("[ENTITY_TYPE]", getPublicLegalValue(process.env.NEXT_PUBLIC_ENTITY_TYPE, "entityType"));
   set("[TAX_ID]", getPublicLegalValue(process.env.NEXT_PUBLIC_TAX_ID, "taxId"));
-  set("[WEBSITE_URL]", getPublicLegalValue(process.env.NEXT_PUBLIC_SITE_URL, "siteUrl"));
-  set("[PRIVACY_POLICY_URL]", getPublicLegalValue(process.env.NEXT_PUBLIC_PRIVACY_POLICY_URL, "privacyPolicyUrl"));
-  set("[TERMS_URL]", getPublicLegalValue(process.env.NEXT_PUBLIC_TERMS_URL, "termsUrl"));
-  set("[COOKIE_PREFERENCES_URL]", getPublicLegalValue(process.env.NEXT_PUBLIC_COOKIE_PREFERENCES_URL, "cookiePreferencesUrl"));
+  set(
+    "[WEBSITE_URL]",
+    process.env.NEXT_PUBLIC_SITE_URL?.trim() || localeUrls.websiteUrl,
+  );
+  set(
+    "[PRIVACY_POLICY_URL]",
+    process.env.NEXT_PUBLIC_PRIVACY_POLICY_URL?.trim() || localeUrls.privacyPolicyUrl,
+  );
+  set(
+    "[TERMS_URL]",
+    process.env.NEXT_PUBLIC_TERMS_URL?.trim() || localeUrls.termsUrl,
+  );
+  set(
+    "[COOKIE_PREFERENCES_URL]",
+    process.env.NEXT_PUBLIC_COOKIE_PREFERENCES_URL?.trim() || localeUrls.cookiePreferencesUrl,
+  );
   set("[AD_PROVIDER]", getPublicLegalValue(process.env.NEXT_PUBLIC_AD_PROVIDER, "adProvider"));
   set("[AD_PURPOSE]", getPublicLegalValue(process.env.NEXT_PUBLIC_AD_PURPOSE, "adPurpose"));
   set("[AD_COOKIE_1]", getPublicLegalValue(process.env.NEXT_PUBLIC_AD_COOKIE_NAME, "adCookieName"));
@@ -107,12 +124,18 @@ export function getLegalPlaceholderMap(): Record<string, string> {
       process.env.NEXT_PUBLIC_SUPERVISORY_AUTHORITY_ADDRESS?.trim() ||
       getPublicLegalValue(undefined, "supervisoryAuthorityAddress"),
   );
-  set("[COOKIE_POLICY_URL]", getPublicLegalValue(process.env.NEXT_PUBLIC_COOKIE_POLICY_URL, "cookiePolicyUrl"));
+  set(
+    "[COOKIE_POLICY_URL]",
+    process.env.NEXT_PUBLIC_COOKIE_POLICY_URL?.trim() || localeUrls.cookiePolicyUrl,
+  );
 
   return m;
 }
 
-export function substituteLegalText(text: string, map = getLegalPlaceholderMap()): string {
+export function substituteLegalText(
+  text: string,
+  map: Record<string, string> = getLegalPlaceholderMap(),
+): string {
   const entries = Object.entries(map).sort((a, b) => b[0].length - a[0].length);
   let out = text;
   for (const [token, value] of entries) {
@@ -123,7 +146,7 @@ export function substituteLegalText(text: string, map = getLegalPlaceholderMap()
 
 export function substituteLegalSections(
   sections: { title: string; body: string }[],
-  map = getLegalPlaceholderMap(),
+  map: Record<string, string> = getLegalPlaceholderMap(),
 ): { title: string; body: string }[] {
   return sections.map((s) => ({
     ...s,
@@ -140,7 +163,7 @@ export function substituteCookieRows(
     duration: string;
     type: string;
   }[],
-  map = getLegalPlaceholderMap(),
+  map: Record<string, string> = getLegalPlaceholderMap(),
 ): {
   name: string;
   provider: string;
