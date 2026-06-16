@@ -1,0 +1,11 @@
+*.tfvars
+!*.tfvars.example
+.terraform/
+# .terraform.lock.hcl is committed on purpose (pinned provider versions).
+*.tfstate
+*.tfstate.*
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
