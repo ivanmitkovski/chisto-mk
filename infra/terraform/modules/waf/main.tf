@@ -30,6 +30,16 @@ resource "aws_wafv2_web_acl" "main" {
       managed_rule_group_statement {
         name        = "AWSManagedRulesCommonRuleSet"
         vendor_name = "AWS"
+
+        # Report/event/chat/avatar uploads are authenticated multipart POSTs (up to 10MB
+        # server-side). SizeRestrictions_BODY blocks at 8KB and returns a plain HTML 403
+        # that mobile maps to generic FORBIDDEN ("You don't have permission to do that").
+        rule_action_override {
+          name = "SizeRestrictions_BODY"
+          action_to_use {
+            count {}
+          }
+        }
       }
     }
 
