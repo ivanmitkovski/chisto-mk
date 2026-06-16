@@ -1,7 +1,4 @@
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
-import 'package:chisto_infrastructure/core/theme/app_colors.dart';
-import 'package:chisto_infrastructure/core/theme/app_spacing.dart';
-import 'package:chisto_infrastructure/core/theme/app_typography.dart';
 import 'package:design_system/design_system.dart';
 import 'package:feature_profile/src/domain/models/weekly_rankings_result.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +10,6 @@ class WeeklyRankingRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
     final bool isTopThree = entry.rank <= 3;
     final bool isCurrentUser = entry.isCurrentUser;
 

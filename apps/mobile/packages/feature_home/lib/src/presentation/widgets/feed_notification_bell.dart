@@ -118,13 +118,13 @@ class FeedNotificationBellState extends State<FeedNotificationBell>
           colors: hasUnread
               ? <Color>[
                   AppColors.white,
-                  AppColors.accentDanger.withValues(alpha: 0.04),
+                  AppColors.error.withValues(alpha: 0.04),
                 ]
               : <Color>[AppColors.white, AppColors.inputFill],
         ),
         border: Border.all(
           color: hasUnread
-              ? AppColors.accentDanger.withValues(alpha: 0.22)
+              ? AppColors.error.withValues(alpha: 0.22)
               : AppColors.divider,
           width: 1,
         ),
@@ -136,7 +136,7 @@ class FeedNotificationBellState extends State<FeedNotificationBell>
           width: icon,
           height: icon,
           colorFilter: ColorFilter.mode(
-            hasUnread ? AppColors.accentDanger : AppColors.textPrimary,
+            hasUnread ? AppColors.error : AppColors.textPrimary,
             BlendMode.srcIn,
           ),
         ),
@@ -184,7 +184,7 @@ class FeedNotificationBellState extends State<FeedNotificationBell>
                     child: Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: AppColors.accentDanger.withValues(alpha: 0.14),
+                        color: AppColors.error.withValues(alpha: 0.14),
                       ),
                     ),
                   ),
@@ -219,7 +219,7 @@ class FeedNotificationBellState extends State<FeedNotificationBell>
                     height: badgeHeight,
                     padding: EdgeInsets.symmetric(horizontal: badgeHPad),
                     decoration: BoxDecoration(
-                      color: AppColors.accentDanger,
+                      color: AppColors.error,
                       borderRadius: BorderRadius.circular(
                         AppSpacing.radiusPill,
                       ),

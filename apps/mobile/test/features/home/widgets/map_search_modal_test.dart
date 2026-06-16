@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
 import 'package:design_system/design_system.dart';
 import 'package:feature_home/src/domain/models/pollution_site.dart';
@@ -176,7 +174,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // The modal autofocuses its field; simulate the IME opening.
-      tester.view.viewInsets = FakeViewPadding(bottom: keyboardInset);
+      tester.view.viewInsets = const FakeViewPadding(bottom: keyboardInset);
       await tester.pumpAndSettle();
 
       final RenderBox modalBox = tester.renderObject<RenderBox>(
@@ -228,7 +226,7 @@ void main() {
     await tester.binding.setSurfaceSize(const Size(390, screenHeight));
     tester.view.physicalSize = const Size(390, screenHeight);
     tester.view.devicePixelRatio = 1.0;
-    tester.view.viewPadding = FakeViewPadding(top: topInset, bottom: 34);
+    tester.view.viewPadding = const FakeViewPadding(top: topInset, bottom: 34);
     addTearDown(() async {
       await tester.binding.setSurfaceSize(null);
       tester.view.resetPhysicalSize();

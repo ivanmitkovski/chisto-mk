@@ -5,7 +5,7 @@ import 'dart:io';
 
 /// Paths excluded from coverage accounting (generated or non-product code).
 bool shouldExcludeCoveragePath(String path) {
-  final String normalized = path.replaceAll('\\', '/');
+  final String normalized = path.replaceAll(r'\', '/');
   if (normalized.contains('/.dart_tool/')) return true;
   if (normalized.contains('/generated/')) return true;
   if (normalized.endsWith('.g.dart')) return true;
@@ -18,7 +18,7 @@ bool shouldExcludeCoveragePath(String path) {
 }
 
 String? coverageLayerForPath(String path) {
-  final String normalized = path.replaceAll('\\', '/');
+  final String normalized = path.replaceAll(r'\', '/');
   if (normalized.contains('/application/')) return 'application';
   if (normalized.contains('/data/')) return 'data';
   if (normalized.contains('/domain/')) return 'domain';
@@ -124,7 +124,7 @@ void _parseLcovContent(String content, Map<String, Map<int, int>> merged) {
 }
 
 String _normalizeLcovPath(String path) {
-  var normalized = path.replaceAll('\\', '/');
+  var normalized = path.replaceAll(r'\', '/');
   const String marker = '/apps/mobile/';
   final int markerIndex = normalized.indexOf(marker);
   if (markerIndex >= 0) {
@@ -134,7 +134,7 @@ String _normalizeLcovPath(String path) {
 }
 
 String? packageNameForPath(String path) {
-  final String normalized = path.replaceAll('\\', '/');
+  final String normalized = path.replaceAll(r'\', '/');
   if (normalized.startsWith('packages/')) {
     final List<String> parts = normalized.split('/');
     if (parts.length >= 2) return parts[1];

@@ -1,6 +1,6 @@
+import 'package:chisto_infrastructure/core/auth/session_teardown_reason.dart';
 import 'package:feature_auth/src/domain/models/auth_session_dtos.dart';
 import 'package:feature_auth/src/domain/refresh_outcome.dart';
-import 'package:chisto_infrastructure/core/auth/session_teardown_reason.dart';
 
 abstract class AuthRepository {
   bool get isAuthenticated;

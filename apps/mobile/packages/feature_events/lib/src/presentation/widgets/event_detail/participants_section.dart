@@ -9,7 +9,6 @@ import 'package:feature_events/src/presentation/view_models/participants_peek_vi
 import 'package:feature_events/src/presentation/widgets/event_detail/avatar_stack.dart';
 import 'package:feature_events/src/presentation/widgets/event_detail/event_detail_surface_decoration.dart';
 import 'package:feature_events/src/presentation/widgets/event_detail/participant_roster_sheet.dart';
-import 'package:feature_events/src/presentation/widgets/events_modal_sheet.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

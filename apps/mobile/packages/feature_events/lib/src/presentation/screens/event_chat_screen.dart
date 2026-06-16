@@ -32,7 +32,6 @@ import 'package:feature_events/src/data/chat/outbox/chat_outbox_store.dart';
 import 'package:feature_events/src/domain/repositories/events_repository.dart';
 import 'package:feature_events/src/presentation/event_chat/event_chat_load_error.dart';
 import 'package:feature_events/src/presentation/event_chat/widgets/event_chat_scroll_behavior.dart';
-import 'package:feature_events/src/presentation/widgets/event_detail/event_detail_not_found_view.dart';
 import 'package:feature_events/src/presentation/event_chat/widgets/event_chat_search_panel.dart';
 import 'package:feature_events/src/presentation/utils/event_chat_message_grouping.dart';
 import 'package:feature_events/src/presentation/utils/event_chat_message_list_order.dart';
@@ -55,6 +54,7 @@ import 'package:feature_events/src/presentation/widgets/chat/chat_system_message
 import 'package:feature_events/src/presentation/widgets/chat/chat_theme.dart';
 import 'package:feature_events/src/presentation/widgets/chat/chat_typing_indicator_row.dart';
 import 'package:feature_events/src/presentation/widgets/chat/event_chat_audio_playback_scope.dart';
+import 'package:feature_events/src/presentation/widgets/event_detail/event_detail_not_found_view.dart';
 import 'package:feature_notifications/feature_notifications.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';

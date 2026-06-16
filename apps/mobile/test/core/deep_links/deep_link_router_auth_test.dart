@@ -1,4 +1,3 @@
-import 'package:chisto_infrastructure/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_infrastructure/core/deep_links/deep_link_router.dart';
 import 'package:chisto_infrastructure/core/navigation/app_go_router.dart';
 import 'package:chisto_infrastructure/core/navigation/app_routes.dart';

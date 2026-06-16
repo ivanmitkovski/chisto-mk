@@ -39,7 +39,6 @@ import 'package:feature_events/src/presentation/widgets/event_detail/hero_image_
 import 'package:feature_events/src/presentation/widgets/event_detail/reminder_picker_sheet.dart';
 import 'package:feature_events/src/presentation/widgets/event_detail/sticky_bottom_cta.dart';
 import 'package:feature_events/src/presentation/widgets/event_detail_skeleton.dart';
-import 'package:feature_events/src/presentation/widgets/events_modal_sheet.dart';
 import 'package:feature_events/src/presentation/widgets/extend_event_end_sheet.dart';
 import 'package:feature_notifications/feature_notifications.dart';
 import 'package:flutter/cupertino.dart';

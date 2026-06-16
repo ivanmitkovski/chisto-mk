@@ -140,7 +140,7 @@ Color siteHistoryEntryAccentColor(SiteHistoryEntryKind kind) {
     case SiteHistoryEntryKind.reportApproved:
       return AppColors.primaryDark;
     case SiteHistoryEntryKind.reportRejected:
-      return AppColors.accentDanger;
+      return AppColors.error;
     case SiteHistoryEntryKind.reportMerged:
       return AppColors.notificationComment;
     case SiteHistoryEntryKind.statusChanged:

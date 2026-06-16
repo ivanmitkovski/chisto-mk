@@ -7,7 +7,7 @@ void main() {
 
   group('AppTypography tokens', () {
     test('cardTitle derives from titleSmall scale', () {
-      final TextTheme theme = AppTypography.textTheme;
+      const TextTheme theme = AppTypography.textTheme;
       final TextStyle style = AppTypography.cardTitle(theme);
       expect(style.fontSize, 16);
       expect(style.fontWeight, FontWeight.w600);
@@ -50,9 +50,9 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.light,
-          home: MediaQuery(
-            data: const MediaQueryData(textScaler: TextScaler.linear(1.3)),
-            child: const Scaffold(
+          home: const MediaQuery(
+            data: MediaQueryData(textScaler: TextScaler.linear(1.3)),
+            child: Scaffold(
               body: SizedBox(
                 width: 200,
                 child: AppText.body('Scaled body text'),

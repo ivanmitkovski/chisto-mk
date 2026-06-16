@@ -1,14 +1,13 @@
 import 'dart:convert';
 
 import 'package:chisto_infrastructure/core/logging/app_log.dart';
-
 import 'package:feature_reports/src/data/outbox/report_draft_json_codec.dart';
 import 'package:feature_reports/src/data/outbox/report_draft_summary_projector.dart';
 import 'package:feature_reports/src/data/outbox/report_outbox_constants.dart';
 import 'package:feature_reports/src/data/outbox/report_outbox_dao.dart';
 import 'package:feature_reports/src/data/outbox/report_outbox_database.dart';
-import 'package:feature_reports/src/domain/draft/report_idempotency_key.dart';
 import 'package:feature_reports/src/data/outbox/report_outbox_entry.dart';
+import 'package:feature_reports/src/domain/draft/report_idempotency_key.dart';
 import 'package:feature_reports/src/domain/models/report_draft.dart';
 import 'package:sqflite/sqflite.dart';
 

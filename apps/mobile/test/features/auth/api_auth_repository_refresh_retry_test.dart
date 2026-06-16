@@ -7,7 +7,6 @@ import 'package:chisto_infrastructure/core/network/api_client.dart';
 import 'package:chisto_infrastructure/core/network/request_cancellation.dart';
 import 'package:chisto_infrastructure/core/storage/secure_token_storage.dart';
 import 'package:feature_auth/src/data/api_auth_repository.dart';
-import 'package:feature_auth/src/domain/refresh_outcome.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';

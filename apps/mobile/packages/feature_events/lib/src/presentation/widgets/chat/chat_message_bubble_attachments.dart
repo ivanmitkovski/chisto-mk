@@ -676,7 +676,7 @@ class _LocationPreview extends StatelessWidget {
                                 child: const Icon(
                                   CupertinoIcons.location_solid,
                                   size: 34,
-                                  color: AppColors.accentDanger,
+                                  color: AppColors.error,
                                 ),
                               ),
                             ],

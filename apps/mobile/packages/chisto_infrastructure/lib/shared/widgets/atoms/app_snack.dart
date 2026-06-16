@@ -8,7 +8,6 @@ import 'package:chisto_infrastructure/core/logging/app_log.dart';
 import 'package:chisto_infrastructure/core/navigation/app_navigator_key.dart';
 import 'package:chisto_infrastructure/shared/utils/app_haptics.dart';
 import 'package:design_system/design_system.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 enum AppSnackType { info, success, warning, error }

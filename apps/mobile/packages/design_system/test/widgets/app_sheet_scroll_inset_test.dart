@@ -12,9 +12,9 @@ void main() {
       MaterialApp(
         home: AppSheetScrollInset.wrap(
           bottom: inset,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-            child: const SizedBox(height: 100),
+          child: const SingleChildScrollView(
+            padding: EdgeInsets.only(bottom: AppSpacing.sm),
+            child: SizedBox(height: 100),
           ),
         ),
       ),

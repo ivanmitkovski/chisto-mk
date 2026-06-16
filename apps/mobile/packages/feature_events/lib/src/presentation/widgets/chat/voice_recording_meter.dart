@@ -214,7 +214,7 @@ class _VoiceRecordingMeterState extends State<VoiceRecordingMeter>
     }
 
     final Color barColor = widget.cancelled
-        ? AppColors.accentDanger
+        ? AppColors.error
         : AppColors.primary;
 
     return Semantics(

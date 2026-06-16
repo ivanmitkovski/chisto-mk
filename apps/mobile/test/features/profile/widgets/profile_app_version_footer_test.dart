@@ -22,11 +22,11 @@ void main() {
             (Ref ref) => Future<String>.value('1.0.0'),
           ),
         ],
-        child: MaterialApp(
+        child: const MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          locale: const Locale('en'),
-          home: const Scaffold(body: ProfileAppVersionFooter()),
+          locale: Locale('en'),
+          home: Scaffold(body: ProfileAppVersionFooter()),
         ),
       ),
     );

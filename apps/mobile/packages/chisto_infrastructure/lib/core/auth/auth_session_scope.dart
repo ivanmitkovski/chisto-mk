@@ -5,9 +5,9 @@ import 'package:chisto_infrastructure/core/navigation/app_navigation.dart';
 import 'package:chisto_infrastructure/core/providers/app_providers.dart';
 import 'package:chisto_infrastructure/core/providers/notifications_providers.dart';
 import 'package:chisto_infrastructure/core/providers/root_container.dart';
-import 'package:feature_home/src/application/home_shell_controller.dart';
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
+import 'package:feature_home/src/application/home_shell_controller.dart';
 import 'package:flutter/material.dart';
 
 /// Navigates to sign-in when the session becomes unauthenticated outside explicit sign-out.

@@ -166,7 +166,7 @@ class CommentsInputBar extends StatelessWidget {
                     style: AppTypographySurfaces.homeCommentsComposerCounter(
                       Theme.of(context).textTheme,
                       color: used > maxLen - 50
-                          ? AppColors.accentDanger
+                          ? AppColors.error
                           : AppColors.textMuted,
                     ),
                   ),

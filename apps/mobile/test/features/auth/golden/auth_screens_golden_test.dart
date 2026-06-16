@@ -13,7 +13,6 @@ import 'package:feature_auth/src/presentation/screens/initial_route_screen.dart'
 import 'package:feature_auth/src/presentation/screens/location_screen.dart';
 import 'package:feature_auth/src/presentation/screens/onboarding_screen.dart';
 import 'package:feature_auth/src/presentation/screens/otp_screen.dart';
-import 'package:feature_auth/src/presentation/screens/otp_screen.dart';
 import 'package:feature_auth/src/presentation/screens/sign_in_screen.dart';
 import 'package:feature_auth/src/presentation/screens/sign_up_screen.dart';
 import 'package:feature_auth/src/presentation/screens/splash_screen.dart';

@@ -112,7 +112,7 @@ void main() {
     final _FakeApiClient client = _FakeApiClient();
     client.stubPost(
       '/auth/me/organizer-certification',
-      ApiResponse(
+      const ApiResponse(
         statusCode: 200,
         json: <String, dynamic>{
           'passed': true,

@@ -1,5 +1,3 @@
-import 'package:chisto_infrastructure/core/theme/app_colors.dart';
-import 'package:chisto_infrastructure/core/theme/app_spacing.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 

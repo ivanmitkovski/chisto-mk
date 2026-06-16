@@ -11,7 +11,7 @@ Future<GeoPosition?> readDeviceLocationFix(
       timeLimit: timeLimit,
     );
   } catch (_) {
-    if (location case LastKnownLocationReader reader) {
+    if (location case final LastKnownLocationReader reader) {
       try {
         return await reader.getLastKnownPosition();
       } catch (_) {

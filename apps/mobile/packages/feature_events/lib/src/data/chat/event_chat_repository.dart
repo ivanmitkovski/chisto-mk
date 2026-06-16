@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:feature_events/src/data/chat/event_chat_connection_status.dart';
 import 'package:feature_events/src/data/chat/event_chat_fetch_result.dart';
 import 'package:feature_events/src/data/chat/event_chat_message.dart';

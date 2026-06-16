@@ -38,7 +38,9 @@ void main() {
       await tester.binding.setSurfaceSize(const Size(390, screenHeight));
       tester.view.physicalSize = const Size(390, screenHeight);
       tester.view.devicePixelRatio = 1.0;
-      tester.view.viewPadding = FakeViewPadding(bottom: homeIndicatorInset);
+      tester.view.viewPadding = const FakeViewPadding(
+        bottom: homeIndicatorInset,
+      );
       addTearDown(() async {
         await tester.binding.setSurfaceSize(null);
         tester.view.resetPhysicalSize();

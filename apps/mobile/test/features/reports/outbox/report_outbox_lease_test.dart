@@ -3,15 +3,14 @@ import 'dart:io';
 
 import 'package:feature_reports/src/data/outbox/report_outbox_constants.dart';
 import 'package:feature_reports/src/data/outbox/report_outbox_coordinator.dart';
+import 'package:feature_reports/src/data/outbox/report_outbox_database.dart';
 import 'package:feature_reports/src/data/outbox/report_outbox_entry.dart';
 import 'package:feature_reports/src/data/outbox/report_outbox_repository.dart';
 import 'package:feature_reports/src/domain/models/report_draft.dart';
 import 'package:feature_reports/src/domain/models/report_submit_result.dart';
 import 'package:feature_reports/src/domain/repositories/reports_api_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:feature_reports/src/data/outbox/report_outbox_database.dart';
 import 'package:path/path.dart' as p;
-import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import '../../../shared/widget_test_bootstrap.dart';

@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:chisto_infrastructure/core/debug/chisto_submit_debug_log.dart';
 import 'package:chisto_infrastructure/core/auth/session_invalidation.dart';
+import 'package:chisto_infrastructure/core/debug/chisto_submit_debug_log.dart';
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/core/providers/refresh_signals_providers.dart';
@@ -14,12 +14,12 @@ import 'package:feature_reports/src/domain/models/report_draft.dart';
 import 'package:feature_reports/src/domain/models/report_submit_result.dart';
 import 'package:feature_reports/src/domain/report_input_sanitizer.dart';
 import 'package:feature_reports/src/presentation/controllers/new_report_controller.dart';
+import 'package:feature_reports/src/presentation/controllers/new_report_submit_error_display.dart';
 import 'package:feature_reports/src/presentation/controllers/new_report_submit_support.dart';
 import 'package:feature_reports/src/presentation/l10n/report_category_l10n.dart';
 import 'package:feature_reports/src/presentation/navigation/new_report_wizard_pop_result.dart';
 import 'package:feature_reports/src/presentation/widgets/new_report/report_submitted_dialog.dart';
 import 'package:feature_reports/src/presentation/widgets/new_report/reporting_capacity_guard.dart';
-import 'package:feature_reports/src/presentation/controllers/new_report_submit_error_display.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/semantics.dart';

@@ -146,9 +146,7 @@ class TimeRangePicker extends StatelessWidget {
             color: AppColors.panelBackground,
             borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
             border: hasError
-                ? Border.all(
-                    color: AppColors.accentDanger.withValues(alpha: 0.4),
-                  )
+                ? Border.all(color: AppColors.error.withValues(alpha: 0.4))
                 : null,
             boxShadow: AppShadows.softCard(Theme.of(context).colorScheme),
           ),

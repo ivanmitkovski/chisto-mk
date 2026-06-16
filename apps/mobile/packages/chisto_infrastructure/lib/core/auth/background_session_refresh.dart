@@ -5,7 +5,6 @@ import 'package:chisto_infrastructure/core/logging/app_log.dart';
 import 'package:chisto_infrastructure/core/network/api_client.dart';
 import 'package:chisto_infrastructure/core/storage/secure_token_storage.dart';
 import 'package:feature_auth/src/data/auth_refresh_retry_policy.dart';
-import 'package:feature_auth/src/domain/refresh_outcome.dart';
 import 'package:flutter/foundation.dart';
 
 /// Headless `/auth/refresh` for background isolates (no [AppBootstrap]).

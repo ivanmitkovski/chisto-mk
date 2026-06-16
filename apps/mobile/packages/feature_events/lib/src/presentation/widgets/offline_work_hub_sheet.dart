@@ -9,7 +9,6 @@ import 'package:feature_events/src/data/chat/outbox/chat_outbox_store.dart';
 import 'package:feature_events/src/data/event_offline_work_coordinator.dart';
 import 'package:feature_events/src/presentation/navigation/events_navigation.dart';
 import 'package:feature_events/src/presentation/screens/field_mode_screen.dart';
-import 'package:feature_events/src/presentation/widgets/events_modal_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

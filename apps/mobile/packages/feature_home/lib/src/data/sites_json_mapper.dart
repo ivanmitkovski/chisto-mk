@@ -5,8 +5,8 @@ import 'package:feature_home/src/data/sites_api_json_helpers.dart';
 import 'package:feature_home/src/domain/models/cleaning_event.dart';
 import 'package:feature_home/src/domain/models/co_reporter_profile.dart';
 import 'package:feature_home/src/domain/models/pollution_site.dart';
-import 'package:feature_home/src/domain/models/site_resolution_viewer_status.dart';
 import 'package:feature_home/src/domain/models/site_report.dart';
+import 'package:feature_home/src/domain/models/site_resolution_viewer_status.dart';
 import 'package:feature_home/src/domain/repositories/sites_repository_types.dart';
 import 'package:feature_home/src/domain/site_defaults.dart';
 import 'package:feature_reports/feature_reports.dart';
@@ -532,7 +532,7 @@ class SitesJsonMapper {
     final double? lat = (root['latitude'] as num?)?.toDouble();
     final double? lng = (root['longitude'] as num?)?.toDouble();
     final String? addressRaw = root['address'] as String?;
-    final String? address = addressRaw?.trim().isNotEmpty == true
+    final String? address = addressRaw?.trim().isNotEmpty ?? false
         ? addressRaw!.trim()
         : null;
     int mergedDuplicateChildCountTotal =
@@ -642,7 +642,7 @@ class SitesJsonMapper {
       case 'CLEANED':
         return ('Cleaned', AppColors.primary);
       case 'DISPUTED':
-        return ('Disputed', AppColors.accentDanger);
+        return ('Disputed', AppColors.error);
       case 'ARCHIVED':
         return ('Archived', AppColors.textMuted);
       default:

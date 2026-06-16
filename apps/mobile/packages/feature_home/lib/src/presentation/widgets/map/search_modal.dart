@@ -315,7 +315,7 @@ class _MapSearchStatusRow extends StatelessWidget {
                       context.l10n.mapSearchRemoteError,
                       style: AppTypographySurfaces.homeMutedCaption(
                         Theme.of(context).textTheme,
-                      ).copyWith(color: AppColors.accentDanger),
+                      ).copyWith(color: AppColors.error),
                     ),
                   ),
                   AppButton.text(

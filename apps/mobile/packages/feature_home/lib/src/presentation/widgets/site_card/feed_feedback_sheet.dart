@@ -124,10 +124,10 @@ class FeedFeedbackTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final Color iconColor = isDestructive
-        ? AppColors.accentDanger
+        ? AppColors.error
         : AppColors.textPrimary;
     final Color textColor = isDestructive
-        ? AppColors.accentDanger
+        ? AppColors.error
         : AppColors.textPrimary;
     return Material(
       color: AppColors.transparent,

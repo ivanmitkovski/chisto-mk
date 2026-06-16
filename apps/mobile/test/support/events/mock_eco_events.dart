@@ -33,7 +33,7 @@ List<EcoEvent> buildMockEcoEventsSeed() {
       status: EcoEventStatus.upcoming,
       isJoined: true,
       createdAt: now.subtract(const Duration(days: 2)),
-      gear: <EventGear>[
+      gear: const <EventGear>[
         EventGear.trashBags,
         EventGear.gloves,
         EventGear.waterBoots,
@@ -60,7 +60,7 @@ List<EcoEvent> buildMockEcoEventsSeed() {
       participantCount: 8,
       status: EcoEventStatus.upcoming,
       createdAt: now.subtract(const Duration(days: 1)),
-      gear: <EventGear>[EventGear.trashBags, EventGear.gloves],
+      gear: const <EventGear>[EventGear.trashBags, EventGear.gloves],
       scale: CleanupScale.small,
       difficulty: EventDifficulty.easy,
       moderationApproved: true,
@@ -84,7 +84,7 @@ List<EcoEvent> buildMockEcoEventsSeed() {
       maxParticipants: 25,
       status: EcoEventStatus.upcoming,
       createdAt: now.subtract(const Duration(days: 3)),
-      gear: <EventGear>[
+      gear: const <EventGear>[
         EventGear.gloves,
         EventGear.safetyVest,
         EventGear.wheelbarrow,
@@ -113,7 +113,7 @@ List<EcoEvent> buildMockEcoEventsSeed() {
       status: EcoEventStatus.inProgress,
       isJoined: true,
       createdAt: now.subtract(const Duration(days: 5)),
-      gear: <EventGear>[
+      gear: const <EventGear>[
         EventGear.gloves,
         EventGear.rakes,
         EventGear.wheelbarrow,
@@ -142,7 +142,7 @@ List<EcoEvent> buildMockEcoEventsSeed() {
       status: EcoEventStatus.completed,
       isJoined: true,
       createdAt: now.subtract(const Duration(days: 10)),
-      gear: <EventGear>[
+      gear: const <EventGear>[
         EventGear.gloves,
         EventGear.trashBags,
         EventGear.firstAid,
@@ -169,7 +169,7 @@ List<EcoEvent> buildMockEcoEventsSeed() {
       participantCount: 10,
       status: EcoEventStatus.completed,
       createdAt: now.subtract(const Duration(days: 14)),
-      gear: <EventGear>[EventGear.trashBags, EventGear.gloves],
+      gear: const <EventGear>[EventGear.trashBags, EventGear.gloves],
       scale: CleanupScale.medium,
       difficulty: EventDifficulty.easy,
       moderationApproved: true,
@@ -193,7 +193,7 @@ List<EcoEvent> buildMockEcoEventsSeed() {
       maxParticipants: 40,
       status: EcoEventStatus.upcoming,
       createdAt: now.subtract(const Duration(days: 1)),
-      gear: <EventGear>[
+      gear: const <EventGear>[
         EventGear.trashBags,
         EventGear.gloves,
         EventGear.sunscreen,
@@ -221,7 +221,11 @@ List<EcoEvent> buildMockEcoEventsSeed() {
       participantCount: 4,
       status: EcoEventStatus.cancelled,
       createdAt: now.subtract(const Duration(days: 20)),
-      gear: <EventGear>[EventGear.rakes, EventGear.gloves, EventGear.sunscreen],
+      gear: const <EventGear>[
+        EventGear.rakes,
+        EventGear.gloves,
+        EventGear.sunscreen,
+      ],
       scale: CleanupScale.small,
       difficulty: EventDifficulty.easy,
       moderationApproved: true,
@@ -244,7 +248,11 @@ List<EcoEvent> buildMockEcoEventsSeed() {
       participantCount: 6,
       status: EcoEventStatus.upcoming,
       createdAt: now.subtract(const Duration(hours: 8)),
-      gear: <EventGear>[EventGear.trashBags, EventGear.gloves, EventGear.rakes],
+      gear: const <EventGear>[
+        EventGear.trashBags,
+        EventGear.gloves,
+        EventGear.rakes,
+      ],
       scale: CleanupScale.small,
       difficulty: EventDifficulty.moderate,
       moderationApproved: true,

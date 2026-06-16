@@ -1,8 +1,8 @@
 import 'package:feature_home/feature_home.dart';
-import 'package:feature_notifications/src/data/notification_navigation_origin.dart';
-import 'package:feature_notifications/src/data/notification_navigation_executor.dart';
-import 'package:feature_notifications/src/data/notification_navigation_target.dart';
 import 'package:feature_notifications/src/data/notification_inbox_actions.dart';
+import 'package:feature_notifications/src/data/notification_navigation_executor.dart';
+import 'package:feature_notifications/src/data/notification_navigation_origin.dart';
+import 'package:feature_notifications/src/data/notification_navigation_target.dart';
 import 'package:feature_notifications/src/domain/models/notification_inbox_highlight.dart';
 import 'package:feature_notifications/src/domain/models/user_notification.dart';
 import 'package:flutter/material.dart';

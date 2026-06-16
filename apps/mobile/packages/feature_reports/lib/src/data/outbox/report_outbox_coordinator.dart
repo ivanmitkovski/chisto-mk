@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/debug/chisto_submit_debug_log.dart';
+import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/logging/app_log.dart';
 import 'package:chisto_infrastructure/core/network/connectivity_gate.dart';
 import 'package:chisto_infrastructure/core/observability/chisto_sentry.dart';

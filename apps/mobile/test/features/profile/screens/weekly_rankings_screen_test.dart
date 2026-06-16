@@ -1,10 +1,9 @@
 import 'package:chisto_infrastructure/core/theme/app_spacing.dart';
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
+import 'package:chisto_infrastructure/shared/widgets/organisms/app_refresh_indicator.dart';
 import 'package:feature_profile/src/domain/models/weekly_rankings_result.dart';
 import 'package:feature_profile/src/presentation/providers/profile_providers.dart';
-import 'package:feature_profile/src/presentation/providers/weekly_rankings_notifier.dart';
 import 'package:feature_profile/src/presentation/screens/weekly_rankings_screen.dart';
-import 'package:chisto_infrastructure/shared/widgets/organisms/app_refresh_indicator.dart';
 import 'package:feature_profile/src/presentation/widgets/profile_sub_screen_header.dart';
 import 'package:feature_profile/src/presentation/widgets/profile_sub_screen_panel.dart';
 import 'package:flutter/material.dart';
@@ -43,11 +42,11 @@ Widget _wrapRankingsScreen(WeeklyRankingsResult payload) {
         ),
       ),
     ],
-    child: MaterialApp(
+    child: const MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      locale: const Locale('en'),
-      home: const WeeklyRankingsScreen(),
+      locale: Locale('en'),
+      home: WeeklyRankingsScreen(),
     ),
   );
 }

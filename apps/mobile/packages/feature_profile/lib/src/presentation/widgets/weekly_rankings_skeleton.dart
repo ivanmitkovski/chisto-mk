@@ -1,7 +1,4 @@
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
-import 'package:chisto_infrastructure/core/theme/app_colors.dart';
-import 'package:chisto_infrastructure/core/theme/app_motion.dart';
-import 'package:chisto_infrastructure/core/theme/app_spacing.dart';
 import 'package:design_system/design_system.dart';
 import 'package:feature_profile/src/presentation/widgets/profile_sub_screen_header.dart';
 import 'package:feature_profile/src/presentation/widgets/profile_sub_screen_panel.dart';

@@ -325,7 +325,7 @@ void main() {
     });
 
     test('fromJson filters non-String gear items instead of throwing', () {
-      final EcoEvent event = EcoEvent.fromJson(<String, dynamic>{
+      final EcoEvent event = EcoEvent.fromJson(const <String, dynamic>{
         'id': 'evt-gear',
         'title': 'T',
         'description': 'D',
@@ -349,7 +349,7 @@ void main() {
     });
 
     test('fromJson falls back gracefully for unknown enum values', () {
-      final EcoEvent event = EcoEvent.fromJson(<String, dynamic>{
+      final EcoEvent event = EcoEvent.fromJson(const <String, dynamic>{
         'id': 'evt-unk',
         'title': 'T',
         'description': 'D',
@@ -377,7 +377,7 @@ void main() {
     });
 
     test('fromJson converts UTC attendeeCheckedInAt to local time', () {
-      final EcoEvent event = EcoEvent.fromJson(<String, dynamic>{
+      final EcoEvent event = EcoEvent.fromJson(const <String, dynamic>{
         'id': 'evt-tz',
         'title': 'TZ',
         'description': 'D',
@@ -403,7 +403,7 @@ void main() {
     });
 
     test('fromJson converts UTC reminderAt to local time', () {
-      final EcoEvent event = EcoEvent.fromJson(<String, dynamic>{
+      final EcoEvent event = EcoEvent.fromJson(const <String, dynamic>{
         'id': 'evt-rem-tz',
         'title': 'TZ',
         'description': 'D',

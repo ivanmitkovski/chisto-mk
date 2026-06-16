@@ -1,7 +1,6 @@
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 
 class ChatEmptyState extends StatefulWidget {
   const ChatEmptyState({super.key, this.onSayHello});

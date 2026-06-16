@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/l10n/app_error_localizations.dart';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
-import 'package:chisto_infrastructure/l10n/app_localizations.dart';
 import 'package:chisto_infrastructure/core/l10n/duplicate_event_conflict.dart';
 import 'package:chisto_infrastructure/core/network/connectivity_gate.dart';
+import 'package:chisto_infrastructure/l10n/app_localizations.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
 import 'package:chisto_infrastructure/shared/widgets/organisms/app_confirm_dialog.dart';
 import 'package:chisto_infrastructure/shared/widgets/organisms/app_surface/report_surface_aliases.dart';
@@ -18,7 +18,6 @@ import 'package:feature_events/src/domain/repositories/events_repository.dart';
 import 'package:feature_events/src/presentation/utils/event_schedule_constraints.dart';
 import 'package:feature_events/src/presentation/utils/extend_event_end_policy.dart';
 import 'package:feature_events/src/presentation/widgets/edit_event/edit_event_schedule_conflict_callout.dart';
-import 'package:feature_events/src/presentation/widgets/events_modal_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 

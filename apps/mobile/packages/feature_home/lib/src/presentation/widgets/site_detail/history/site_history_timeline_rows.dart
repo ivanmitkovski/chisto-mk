@@ -66,13 +66,13 @@ List<SiteHistoryTimelineRow> buildSiteHistoryTimelineRows({
     switch (row.kind) {
       case SiteHistoryTimelineRowKind.sectionHeader:
         return SiteHistoryTimelineRow.sectionHeader(
-          label: row.label!,
+          label: row.label,
           showLineAbove: showLineAbove,
           showLineBelow: showLineBelow,
         );
       case SiteHistoryTimelineRowKind.entry:
         return SiteHistoryTimelineRow.entry(
-          entry: row.entry!,
+          entry: row.entry,
           showLineAbove: showLineAbove,
           showLineBelow: showLineBelow,
         );

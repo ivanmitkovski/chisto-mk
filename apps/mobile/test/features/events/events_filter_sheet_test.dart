@@ -1,4 +1,3 @@
-import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
 import 'package:design_system/design_system.dart';
 import 'package:feature_events/src/domain/models/eco_event.dart';
@@ -18,12 +17,12 @@ void main() {
     await bootstrapWidgetTests();
   });
 
-  Future<void> _openFilterSheet(WidgetTester tester) async {
+  Future<void> openFilterSheet(WidgetTester tester) async {
     await tester.tap(find.text('Open filter'));
     await tester.pumpAndSettle();
   }
 
-  Future<void> _tapDateFromTile(WidgetTester tester, String label) async {
+  Future<void> tapDateFromTile(WidgetTester tester, String label) async {
     final Finder fromTile = find.ancestor(
       of: find.text(label),
       matching: find.byType(InkWell),
@@ -34,7 +33,7 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  Widget _host({
+  Widget host({
     required RecordingEventsRepository repository,
     required EcoEventFilter activeChip,
     required void Function(BuildContext context) onOpen,
@@ -67,7 +66,7 @@ void main() {
     final RecordingEventsRepository repository = RecordingEventsRepository();
 
     await tester.pumpWidget(
-      _host(
+      host(
         repository: repository,
         activeChip: EcoEventFilter.all,
         onOpen: (BuildContext context) {
@@ -82,7 +81,7 @@ void main() {
       ),
     );
 
-    await _openFilterSheet(tester);
+    await openFilterSheet(tester);
 
     expect(find.text(l10n.eventsFilterSheetSubtitle), findsOneWidget);
     expect(find.byType(AppFilterInsetGroup), findsNWidgets(2));
@@ -101,7 +100,7 @@ void main() {
       final RecordingEventsRepository repository = RecordingEventsRepository();
 
       await tester.pumpWidget(
-        _host(
+        host(
           repository: repository,
           activeChip: EcoEventFilter.all,
           onOpen: (BuildContext context) {
@@ -116,11 +115,11 @@ void main() {
         ),
       );
 
-      await _openFilterSheet(tester);
+      await openFilterSheet(tester);
 
       expect(find.text(l10n.eventsFilterSheetTitle), findsOneWidget);
 
-      await _tapDateFromTile(tester, l10n.eventsFilterSheetDateFrom);
+      await tapDateFromTile(tester, l10n.eventsFilterSheetDateFrom);
 
       expect(find.byType(EventCalendar), findsOneWidget);
 
@@ -160,7 +159,7 @@ void main() {
     final RecordingEventsRepository repository = RecordingEventsRepository();
 
     await tester.pumpWidget(
-      _host(
+      host(
         repository: repository,
         activeChip: EcoEventFilter.all,
         onOpen: (BuildContext context) async {
@@ -175,9 +174,9 @@ void main() {
       ),
     );
 
-    await _openFilterSheet(tester);
+    await openFilterSheet(tester);
 
-    await _tapDateFromTile(tester, l10n.eventsFilterSheetDateFrom);
+    await tapDateFromTile(tester, l10n.eventsFilterSheetDateFrom);
 
     await tester.tap(
       find.descendant(
@@ -214,14 +213,14 @@ void main() {
       final RecordingEventsRepository repository = RecordingEventsRepository();
 
       await tester.pumpWidget(
-        _host(
+        host(
           repository: repository,
           activeChip: EcoEventFilter.upcoming,
           onOpen: (BuildContext context) {
             l10n = AppLocalizations.of(context)!;
             EventsFilterSheet.show(
               context,
-              current: EcoEventSearchParams(
+              current: const EcoEventSearchParams(
                 statuses: <EcoEventStatus>{EcoEventStatus.completed},
               ),
               activeChip: EcoEventFilter.upcoming,
@@ -231,7 +230,7 @@ void main() {
         ),
       );
 
-      await _openFilterSheet(tester);
+      await openFilterSheet(tester);
 
       expect(
         find.text(l10n.eventsFilterChipStatusOverrideHint),

@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
+import 'package:chisto_networking/src/network/request_cancellation.dart';
 import 'package:feature_reports/src/data/report_detail_cache.dart';
 import 'package:feature_reports/src/domain/models/report_detail.dart';
-import 'package:feature_reports/src/domain/models/report_draft.dart';
 import 'package:feature_reports/src/domain/models/report_list_item.dart';
 import 'package:feature_reports/src/domain/repositories/reports_api_repository.dart';
 import 'package:feature_reports/src/presentation/widgets/reports_list/report_detail_open_resolver.dart';
@@ -15,8 +15,10 @@ class _StubReportsApiRepository implements ReportsApiRepository {
   final Future<ReportDetail> Function(String id) getReportByIdImpl;
 
   @override
-  Future<ReportDetail> getReportById(String id, {cancellation}) =>
-      getReportByIdImpl(id);
+  Future<ReportDetail> getReportById(
+    String id, {
+    RequestCancellationToken? cancellation,
+  }) => getReportByIdImpl(id);
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);

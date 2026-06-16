@@ -31,7 +31,6 @@ import 'package:feature_events/src/presentation/widgets/event_calendar.dart';
 import 'package:feature_events/src/presentation/widgets/event_form/event_form_field_primitives.dart';
 import 'package:feature_events/src/presentation/widgets/event_form/event_form_gear_sheet_footer.dart';
 import 'package:feature_events/src/presentation/widgets/event_form/event_form_picker_tile.dart';
-import 'package:feature_events/src/presentation/widgets/events_modal_sheet.dart';
 import 'package:feature_events/src/presentation/widgets/time_range_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

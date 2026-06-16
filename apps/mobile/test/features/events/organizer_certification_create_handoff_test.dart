@@ -1,10 +1,6 @@
-import 'dart:async';
-
 import 'package:chisto_infrastructure/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_infrastructure/core/providers/events_providers.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_back_button.dart';
-import 'package:feature_events/src/application/events_providers.dart'
-    show setOrganizerCertificationRepositoryTestOverride;
 import 'package:feature_events/src/domain/models/organizer_certification_submit_result.dart';
 import 'package:feature_events/src/domain/models/organizer_quiz_payload.dart';
 import 'package:feature_events/src/domain/repositories/organizer_certification_repository.dart';
@@ -35,7 +31,7 @@ class _FakeOrganizerCertificationRepository
 
   final OrganizerCertificationSubmitResult submitResult;
 
-  static final OrganizerQuizPayload _payload = OrganizerQuizPayload(
+  static const OrganizerQuizPayload _payload = OrganizerQuizPayload(
     session: 'test-session',
     rawQuestions: <dynamic>[
       <String, Object>{
@@ -217,7 +213,7 @@ void main() {
                     onPressed: () {
                       Navigator.of(context).push<void>(
                         MaterialPageRoute<void>(
-                          builder: (_) => CreateEventSheet(
+                          builder: (_) => const CreateEventSheet(
                             clock: createEventSheetTestClock,
                           ),
                         ),

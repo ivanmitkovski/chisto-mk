@@ -4,14 +4,13 @@ import 'package:chisto_infrastructure/shared/utils/app_haptics.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_search_query_chip.dart';
 import 'package:chisto_infrastructure/shared/widgets/organisms/app_surface/report_surface_aliases.dart';
 import 'package:design_system/design_system.dart';
-import 'package:design_system/src/theme/app_typography_surfaces.dart';
 import 'package:feature_events/src/domain/models/eco_event.dart';
 import 'package:feature_events/src/domain/models/eco_event_filter.dart';
 import 'package:feature_events/src/domain/models/eco_event_search_params.dart';
 import 'package:feature_events/src/domain/models/events_list_page_snapshot.dart';
 import 'package:feature_events/src/domain/repositories/events_repository.dart';
-import 'package:feature_events/src/presentation/utils/event_calendar_date_format.dart';
 import 'package:feature_events/src/presentation/event_ui_mappers.dart';
+import 'package:feature_events/src/presentation/utils/event_calendar_date_format.dart';
 import 'package:feature_events/src/presentation/utils/events_localized_strings.dart';
 import 'package:feature_events/src/presentation/widgets/date_picker_sheet.dart';
 import 'package:feature_events/src/presentation/widgets/events_feed/events_filter_preview_controller.dart';
@@ -541,7 +540,7 @@ class _EventsFilterSheetState extends State<EventsFilterSheet> {
                           const SizedBox(width: AppSpacing.xs),
                           _DatePresetChip(
                             label: l10n.eventsFilterDatePresetClear,
-                            onTap: () => _applyDatePreset(),
+                            onTap: _applyDatePreset,
                           ),
                         ],
                       ),

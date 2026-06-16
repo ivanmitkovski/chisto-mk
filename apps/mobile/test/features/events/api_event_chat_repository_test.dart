@@ -312,8 +312,8 @@ void main() {
       'Posted',
       clientMessageId: 'client-1',
       replyToId: 'm0',
-      locationLat: 41.0,
-      locationLng: 21.0,
+      locationLat: 41,
+      locationLng: 21,
       locationLabel: 'Skopje',
     );
 

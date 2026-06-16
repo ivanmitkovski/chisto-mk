@@ -1,7 +1,6 @@
 import 'package:chisto_infrastructure/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/location/location_service.dart';
-import 'package:chisto_infrastructure/core/providers/app_providers.dart';
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
 import 'package:feature_auth/src/presentation/utils/auth_guard_ui.dart';
 import 'package:flutter/material.dart';

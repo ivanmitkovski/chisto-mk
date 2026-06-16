@@ -258,7 +258,7 @@ mixin _ChatInputBarVoiceMixin
   Widget _buildVoiceRecordingPanel(BuildContext context) {
     final double pull = math.max(0, -_voicePanDx);
     final double cancelT = (pull / _kVoiceCancelEnterPx).clamp(0.0, 1.0);
-    const Color danger = AppColors.accentDanger;
+    const Color danger = AppColors.error;
     const Color baseFill = AppColors.inputFill;
     final Color bgColor = Color.lerp(
       baseFill,
@@ -461,7 +461,7 @@ mixin _ChatInputBarVoiceMixin
           width: 44,
           child: Material(
             color: _voiceRecording
-                ? AppColors.accentDanger.withValues(alpha: 0.12)
+                ? AppColors.error.withValues(alpha: 0.12)
                 : AppColors.inputFill,
             shape: const CircleBorder(),
             clipBehavior: Clip.antiAlias,
@@ -490,7 +490,7 @@ mixin _ChatInputBarVoiceMixin
                     CupertinoIcons.mic_fill,
                     size: 22,
                     color: _voiceRecording
-                        ? AppColors.accentDanger.withValues(alpha: 0.95)
+                        ? AppColors.error.withValues(alpha: 0.95)
                         : AppColors.primary.withValues(alpha: 0.85),
                   ),
                 ),

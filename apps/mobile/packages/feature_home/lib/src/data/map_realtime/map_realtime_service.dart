@@ -6,7 +6,6 @@ import 'dart:math' as math;
 import 'package:chisto_infrastructure/core/auth/auth_state.dart';
 import 'package:chisto_infrastructure/core/config/app_config.dart';
 import 'package:chisto_infrastructure/core/logging/app_log.dart';
-import 'package:chisto_infrastructure/core/network/connectivity_gate.dart';
 import 'package:chisto_networking/chisto_networking.dart';
 import 'package:clock/clock.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';

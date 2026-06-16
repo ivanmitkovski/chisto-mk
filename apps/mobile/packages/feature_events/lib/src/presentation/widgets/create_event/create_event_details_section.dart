@@ -158,7 +158,7 @@ class _CreateEventTitleField extends StatelessWidget {
           focusNode: focusNode,
           maxLength: 60,
           textCapitalization: TextCapitalization.sentences,
-          scrollPadding: EdgeInsets.only(
+          scrollPadding: const EdgeInsets.only(
             bottom: CreateEventStickyFooter.scrollBottomReserve + AppSpacing.lg,
           ),
           onChanged: (_) => onChanged(),
@@ -261,7 +261,6 @@ class _CreateEventDescriptionField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -286,7 +285,7 @@ class _CreateEventDescriptionField extends StatelessWidget {
           textCapitalization: TextCapitalization.sentences,
           keyboardType: TextInputType.multiline,
           onChanged: onChanged,
-          scrollPadding: EdgeInsets.only(
+          scrollPadding: const EdgeInsets.only(
             bottom: CreateEventStickyFooter.scrollBottomReserve + AppSpacing.lg,
           ),
           style: AppTypography.eventsSearchFieldText(

@@ -105,7 +105,7 @@ class OrganizerEventSummaryCard extends StatelessWidget {
                   if (event.isDeclined)
                     _ModerationPill(
                       label: context.l10n.eventsDeclinedDashboardPill,
-                      color: AppColors.accentDanger,
+                      color: AppColors.error,
                     )
                   else if (!event.moderationApproved)
                     _ModerationPill(
@@ -202,7 +202,7 @@ class OrganizerEventSummaryCard extends StatelessWidget {
                       const Icon(
                         CupertinoIcons.xmark_circle,
                         size: 14,
-                        color: AppColors.accentDanger,
+                        color: AppColors.error,
                       ),
                       const SizedBox(width: AppSpacing.xxs),
                       Expanded(
@@ -210,7 +210,7 @@ class OrganizerEventSummaryCard extends StatelessWidget {
                           context.l10n.eventsDeclinedResubmitCta,
                           style: AppTypography.eventsListCardMeta(
                             textTheme,
-                          ).copyWith(color: AppColors.accentDanger),
+                          ).copyWith(color: AppColors.error),
                         ),
                       ),
                     ],

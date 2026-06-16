@@ -19,8 +19,8 @@ bool _matchesLine(String line) {
   if (trimmed.startsWith('//')) {
     return false;
   }
-  if (trimmed.contains("'\$err'") ||
-      trimmed.contains('"\$err"') ||
+  if (trimmed.contains(r"'$err'") ||
+      trimmed.contains(r'"$err"') ||
       (trimmed.contains('.toString()') &&
           (trimmed.contains('AppSnack') ||
               trimmed.contains('ApiErrorBanner') ||

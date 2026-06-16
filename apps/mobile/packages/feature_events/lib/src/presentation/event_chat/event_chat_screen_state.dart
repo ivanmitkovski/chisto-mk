@@ -332,6 +332,8 @@ class _EventChatScreenState extends ConsumerState<EventChatScreen>
                                 reverse: true,
                                 keyboardDismissBehavior:
                                     ScrollViewKeyboardDismissBehavior.onDrag,
+                                // scrollCacheExtent replacement is not in the pinned SDK.
+                                // ignore: deprecated_member_use
                                 cacheExtent: 1400,
                                 addAutomaticKeepAlives: false,
                                 padding: const EdgeInsets.symmetric(

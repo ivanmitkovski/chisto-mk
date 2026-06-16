@@ -42,7 +42,7 @@ class CheckedInRow extends StatelessWidget {
           padding: const EdgeInsets.only(right: AppSpacing.lg),
           margin: const EdgeInsets.only(bottom: AppSpacing.sm),
           decoration: BoxDecoration(
-            color: AppColors.accentDanger,
+            color: AppColors.error,
             borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
           ),
           child: const Icon(

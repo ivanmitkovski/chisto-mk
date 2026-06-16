@@ -472,7 +472,6 @@ class _OrganizerAnalyticsSectionState
   }
 
   Widget _emptyCaption(BuildContext context, String text) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
       child: Text(

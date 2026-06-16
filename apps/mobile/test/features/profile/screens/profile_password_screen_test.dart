@@ -49,7 +49,7 @@ void main() {
         home: MediaQuery(
           data: MediaQueryData(
             size: Size(440, 956),
-            devicePixelRatio: 3.0,
+            devicePixelRatio: 3,
             padding: EdgeInsets.only(top: 59, bottom: 34),
             viewPadding: EdgeInsets.only(top: 59, bottom: 34),
             textScaler: TextScaler.linear(1.3),

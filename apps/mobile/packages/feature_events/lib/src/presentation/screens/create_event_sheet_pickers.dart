@@ -95,7 +95,7 @@ extension _CreateEventSheetPickers on _CreateEventSheetState {
                     ),
                   )
                   .toList(growable: false),
-              isSelected: (EventGear gear) => _selectedGear.contains(gear),
+              isSelected: _selectedGear.contains,
               onOptionTap: (EventGear gear) {
                 final bool isActive = _selectedGear.contains(gear);
                 setModalState(() {

@@ -18,9 +18,7 @@ class ChatMessageActionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color fg = destructive
-        ? AppColors.accentDanger
-        : AppColors.textPrimary;
+    final Color fg = destructive ? AppColors.error : AppColors.textPrimary;
     return Semantics(
       button: true,
       label: label,

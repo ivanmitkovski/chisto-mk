@@ -68,7 +68,7 @@ void main() {
           (Widget w) =>
               w is DecoratedBox &&
               w.decoration is BoxDecoration &&
-              (w.decoration! as BoxDecoration).boxShadow != null,
+              (w.decoration as BoxDecoration).boxShadow != null,
         ),
       ),
       findsNothing,

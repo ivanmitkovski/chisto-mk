@@ -11,7 +11,7 @@ class PasswordStrengthIndicator extends StatelessWidget {
   static const int _segmentCount = 3;
 
   Color get _neutralColor => AppColors.inputBorder;
-  Color get _weakColor => AppColors.accentDanger;
+  Color get _weakColor => AppColors.error;
   Color get _fairColor => AppColors.accentWarning;
   Color get _strongColor => AppColors.primaryDark;
 

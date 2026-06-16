@@ -6,7 +6,6 @@ import 'package:feature_reports/src/data/reports_realtime/reports_realtime_conne
 import 'package:feature_reports/src/data/reports_realtime/reports_realtime_service.dart';
 import 'package:feature_reports/src/presentation/widgets/reports_list/reports_list_realtime_banner.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -31,10 +30,10 @@ void main() {
         overrides: <Override>[
           reportsRealtimeServiceProvider.overrideWithValue(svc),
         ],
-        child: MaterialApp(
+        child: const MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          home: const Scaffold(body: ReportsListRealtimeBanner()),
+          home: Scaffold(body: ReportsListRealtimeBanner()),
         ),
       ),
     );
@@ -65,10 +64,10 @@ void main() {
         overrides: <Override>[
           reportsRealtimeServiceProvider.overrideWithValue(svc),
         ],
-        child: MaterialApp(
+        child: const MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          home: const Scaffold(body: ReportsListRealtimeBanner()),
+          home: Scaffold(body: ReportsListRealtimeBanner()),
         ),
       ),
     );

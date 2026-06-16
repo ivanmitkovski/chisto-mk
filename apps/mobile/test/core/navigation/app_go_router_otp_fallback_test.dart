@@ -1,5 +1,4 @@
 import 'package:chisto_infrastructure/core/bootstrap/app_bootstrap.dart';
-import 'package:chisto_infrastructure/core/navigation/app_go_router.dart';
 import 'package:chisto_infrastructure/core/navigation/app_routes.dart';
 import 'package:feature_auth/src/presentation/screens/otp_screen.dart';
 import 'package:feature_auth/src/presentation/screens/sign_in_screen.dart';
@@ -18,7 +17,7 @@ Future<void> _pumpLegacyOtpRoute(
   final MaterialPageRoute<void> route =
       AppRouter.onGenerateRoute(
             RouteSettings(name: AppRoutes.otp, arguments: arguments),
-          )!
+          )
           as MaterialPageRoute<void>;
   await pumpAuthWidget(tester, home: Builder(builder: route.builder));
 }

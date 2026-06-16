@@ -1,10 +1,9 @@
 import 'package:chisto_persistence/chisto_persistence.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class _TestDatabaseException extends DatabaseException {
-  _TestDatabaseException(String message) : super(message);
+  _TestDatabaseException(String super.message);
 
   @override
   int? getResultCode() => null;

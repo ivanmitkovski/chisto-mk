@@ -30,7 +30,7 @@ class OrganizerQuizResultScreen extends StatelessWidget {
                   width: 96,
                   height: 96,
                   decoration: BoxDecoration(
-                    color: (passed ? AppColors.primary : AppColors.accentDanger)
+                    color: (passed ? AppColors.primary : AppColors.error)
                         .withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
@@ -39,9 +39,7 @@ class OrganizerQuizResultScreen extends StatelessWidget {
                         ? CupertinoIcons.checkmark_seal_fill
                         : CupertinoIcons.xmark_circle_fill,
                     size: 48,
-                    color: passed
-                        ? AppColors.primaryDark
-                        : AppColors.accentDanger,
+                    color: passed ? AppColors.primaryDark : AppColors.error,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.xl),

@@ -24,8 +24,8 @@ import 'package:feature_events/src/presentation/screens/event_detail_screen.dart
 import 'package:feature_events/src/presentation/screens/event_impact_receipt_screen.dart';
 import 'package:feature_events/src/presentation/screens/organizer_checkin_screen.dart';
 import 'package:feature_events/src/presentation/screens/organizer_dashboard_screen.dart';
-import 'package:feature_home/src/presentation/screens/home_shell.dart';
 import 'package:feature_home/src/domain/models/pollution_site.dart';
+import 'package:feature_home/src/presentation/screens/home_shell.dart';
 import 'package:feature_home/src/presentation/screens/site_detail_route_screen.dart';
 import 'package:feature_notifications/src/domain/models/notification_inbox_highlight.dart';
 import 'package:feature_profile/src/domain/models/profile_user.dart';

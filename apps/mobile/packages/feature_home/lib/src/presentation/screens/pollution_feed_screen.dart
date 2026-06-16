@@ -3,12 +3,11 @@ import 'dart:math' as math;
 
 import 'package:chisto_infrastructure/core/auth/auth_state.dart';
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
-import 'package:chisto_infrastructure/core/l10n/app_error_localizations.dart';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
-import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
 import 'package:chisto_infrastructure/core/location/location_service.dart';
 import 'package:chisto_infrastructure/core/navigation/app_navigation.dart';
 import 'package:chisto_infrastructure/core/providers/app_providers.dart';
+import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
 import 'package:chisto_infrastructure/shared/widgets/molecules/app_error_view.dart';
 import 'package:design_system/design_system.dart';
 import 'package:feature_home/src/domain/models/pollution_site.dart';
@@ -29,7 +28,6 @@ import 'package:feature_home/src/presentation/widgets/feed_stale_banner.dart';
 import 'package:feature_home/src/presentation/widgets/pollution_site_card.dart';
 import 'package:feature_notifications/feature_notifications.dart';
 import 'package:feature_profile/feature_profile.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

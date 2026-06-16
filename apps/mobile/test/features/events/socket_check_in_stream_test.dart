@@ -14,7 +14,7 @@ void main() {
       );
       expect(stream.connectionStatus, CheckInWsConnectionStatus.disconnected);
       stream.dispose();
-      expect(() => stream.dispose(), returnsNormally);
+      expect(stream.dispose, returnsNormally);
     });
 
     test('connect without token does not crash', () {

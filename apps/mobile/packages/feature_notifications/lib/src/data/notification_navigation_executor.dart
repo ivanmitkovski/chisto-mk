@@ -6,7 +6,6 @@ import 'package:chisto_infrastructure/core/logging/app_log.dart';
 import 'package:chisto_infrastructure/core/navigation/app_go_router.dart';
 import 'package:chisto_infrastructure/core/navigation/app_navigation.dart';
 import 'package:chisto_infrastructure/core/navigation/app_routes.dart';
-import 'package:chisto_infrastructure/core/providers/home_providers.dart';
 import 'package:chisto_infrastructure/core/providers/root_container.dart';
 import 'package:chisto_infrastructure/shared/current_user.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
@@ -15,13 +14,12 @@ import 'package:feature_home/feature_home.dart';
 import 'package:feature_notifications/src/data/event_chat_open_guard.dart';
 import 'package:feature_notifications/src/data/notification_inbox_actions.dart';
 import 'package:feature_notifications/src/data/notification_navigation_origin.dart';
-import 'package:feature_notifications/src/data/notification_open_diagnostics.dart';
 import 'package:feature_notifications/src/data/notification_navigation_target.dart';
+import 'package:feature_notifications/src/data/notification_open_diagnostics.dart';
 import 'package:feature_notifications/src/data/notification_stack_policy.dart';
 import 'package:feature_notifications/src/domain/models/notification_inbox_highlight.dart';
 import 'package:feature_notifications/src/domain/models/user_notification.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 /// Performs navigation for [NotificationNavigationTarget] (push + inbox).

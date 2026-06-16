@@ -1,6 +1,4 @@
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
-import 'dart:ui';
-
 import 'package:design_system/design_system.dart';
 import 'package:feature_home/src/presentation/utils/comment_input_validator.dart';
 import 'package:feature_home/src/presentation/widgets/comments/comments_input_bar.dart';
@@ -160,7 +158,7 @@ void main() {
       tester.view.resetViewInsets();
     });
 
-    tester.view.viewInsets = FakeViewPadding(bottom: keyboardInset);
+    tester.view.viewInsets = const FakeViewPadding(bottom: keyboardInset);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetDevicePixelRatio);
 

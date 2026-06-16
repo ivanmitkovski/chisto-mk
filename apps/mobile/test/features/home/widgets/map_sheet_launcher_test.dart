@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:design_system/design_system.dart';
 import 'package:feature_home/src/presentation/widgets/map/map_sheet_launcher.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +14,7 @@ void main() {
     await tester.binding.setSurfaceSize(const Size(390, 844));
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1.0;
-    tester.view.viewPadding = FakeViewPadding(top: topInset);
+    tester.view.viewPadding = const FakeViewPadding(top: topInset);
     addTearDown(() async {
       await tester.binding.setSurfaceSize(null);
       tester.view.resetPhysicalSize();

@@ -98,16 +98,14 @@ void main() {
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
+      const MaterialApp(
+        localizationsDelegates: <LocalizationsDelegate<dynamic>>[
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
         ],
-        supportedLocales: const <Locale>[Locale('en')],
-        home: const Scaffold(
-          body: CommentsBottomSheetHeader(siteTitle: 'Test site'),
-        ),
+        supportedLocales: <Locale>[Locale('en')],
+        home: Scaffold(body: CommentsBottomSheetHeader(siteTitle: 'Test site')),
       ),
     );
     await tester.pumpAndSettle();

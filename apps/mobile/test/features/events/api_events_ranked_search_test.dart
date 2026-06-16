@@ -52,7 +52,7 @@ void main() {
     });
 
     test('sorts and joins categories and statuses', () {
-      final EcoEventSearchParams params = EcoEventSearchParams(
+      const EcoEventSearchParams params = EcoEventSearchParams(
         query: 'cleanup',
         categories: <EcoEventCategory>{
           EcoEventCategory.riverAndLake,

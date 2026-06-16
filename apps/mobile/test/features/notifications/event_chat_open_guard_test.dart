@@ -1,5 +1,4 @@
 import 'package:chisto_infrastructure/core/providers/events_providers.dart';
-import 'package:chisto_infrastructure/core/providers/root_container.dart';
 import 'package:feature_notifications/src/data/event_chat_open_guard.dart';
 import 'package:flutter_test/flutter_test.dart';
 

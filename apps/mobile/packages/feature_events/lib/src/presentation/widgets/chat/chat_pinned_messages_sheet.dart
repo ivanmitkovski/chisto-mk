@@ -77,12 +77,12 @@ Future<void> showChatPinnedMessagesSheet({
                           end: AppSpacing.md,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.accentDanger.withValues(alpha: 0.1),
+                          color: AppColors.error.withValues(alpha: 0.1),
                           borderRadius: ChatTheme.bubbleRadiusSymmetric,
                         ),
                         child: const Icon(
                           CupertinoIcons.pin_slash,
-                          color: AppColors.accentDanger,
+                          color: AppColors.error,
                         ),
                       ),
                       confirmDismiss: (_) async => true,

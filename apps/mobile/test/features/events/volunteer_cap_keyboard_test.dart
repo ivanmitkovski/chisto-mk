@@ -18,7 +18,7 @@ Widget _wrapVolunteerCapPicker({required double keyboardInset}) {
       ),
       child: Builder(
         builder: (BuildContext context) {
-          Widget sheet = wrapScrollControlledBottomSheet(
+          final Widget sheet = wrapScrollControlledBottomSheet(
             context: context,
             maxHeight: _surfaceSize.height * 0.88,
             keyboardInsetMode: SheetKeyboardInsetMode.lift,

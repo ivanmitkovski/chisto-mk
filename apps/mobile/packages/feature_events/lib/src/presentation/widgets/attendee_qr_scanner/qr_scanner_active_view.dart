@@ -164,7 +164,7 @@ extension QrScannerActiveView on _AttendeeQrScannerScreenState {
                                               _lastFeedbackStatus!,
                                             ))
                                         ? AppColors.accentWarning
-                                        : AppColors.accentDanger,
+                                        : AppColors.error,
                                     fontWeight: FontWeight.w600,
                                     height: 1.35,
                                   ),

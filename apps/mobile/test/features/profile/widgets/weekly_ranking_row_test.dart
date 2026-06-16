@@ -107,13 +107,13 @@ void main() {
     final SemanticsHandle semantics = tester.ensureSemantics();
     try {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          locale: const Locale('en'),
+          locale: Locale('en'),
           home: Scaffold(
             body: WeeklyRankingRow(
-              entry: const WeeklyLeaderboardEntry(
+              entry: WeeklyLeaderboardEntry(
                 rank: 2,
                 userId: 'u4',
                 displayName: 'Carol',

@@ -1,11 +1,9 @@
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
-import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
 import 'package:chisto_infrastructure/shared/widgets/molecules/app_error_view.dart';
 import 'package:design_system/design_system.dart';
 import 'package:feature_home/src/domain/models/pollution_site.dart';
-import 'package:feature_home/src/domain/models/site_history_entry.dart';
 import 'package:feature_home/src/presentation/providers/site_history_providers.dart';
 import 'package:feature_home/src/presentation/widgets/site_detail/history/site_history_empty_state.dart';
 import 'package:feature_home/src/presentation/widgets/site_detail/history/site_history_footer.dart';

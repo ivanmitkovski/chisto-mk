@@ -48,8 +48,7 @@ class _DescriptionSectionState extends State<DescriptionSection> {
       textScaler: MediaQuery.textScalerOf(context),
     )..layout(maxWidth: availableWidth);
 
-    _needsExpansion = tp.didExceedMaxLines;
-    return _needsExpansion;
+    return _needsExpansion = tp.didExceedMaxLines;
   }
 
   @override

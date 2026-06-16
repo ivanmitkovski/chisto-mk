@@ -20,7 +20,7 @@ void main() {
     });
 
     test('fromPollutionSite uses first media URL or fallback asset', () {
-      final PollutionSite withImage = PollutionSite(
+      const PollutionSite withImage = PollutionSite(
         id: 's1',
         title: 'River site',
         description: 'Desc',
@@ -29,7 +29,7 @@ void main() {
         distanceKm: 2,
         score: 1,
         participantCount: 0,
-        mediaUrls: const <String>['https://cdn.example/primary.webp'],
+        mediaUrls: <String>['https://cdn.example/primary.webp'],
         latitude: 41.99,
         longitude: 21.43,
       );

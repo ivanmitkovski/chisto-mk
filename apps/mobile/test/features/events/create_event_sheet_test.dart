@@ -389,8 +389,8 @@ void main() {
 
     await tester.pumpWidget(
       wrapForWidgetTest(
-        MediaQuery(
-          data: const MediaQueryData(
+        const MediaQuery(
+          data: MediaQueryData(
             size: surfaceSize,
             viewInsets: EdgeInsets.only(bottom: 280),
           ),

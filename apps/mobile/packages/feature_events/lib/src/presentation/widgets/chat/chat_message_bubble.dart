@@ -13,7 +13,6 @@ import 'package:feature_events/src/presentation/widgets/chat/chat_document_open_
 import 'package:feature_events/src/presentation/widgets/chat/chat_image_gallery_screen.dart';
 import 'package:feature_events/src/presentation/widgets/chat/chat_linkified_text.dart';
 import 'package:feature_events/src/presentation/widgets/chat/chat_location_fullscreen_screen.dart';
-import 'package:feature_events/src/presentation/widgets/chat/chat_message_action_row.dart';
 import 'package:feature_events/src/presentation/widgets/chat/chat_message_bubble_image_tile.dart';
 import 'package:feature_events/src/presentation/widgets/chat/chat_theme.dart';
 import 'package:feature_events/src/presentation/widgets/chat/chat_video_player_screen.dart';
@@ -194,7 +193,7 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble>
     final Color fg = m.isDeleted
         ? AppColors.textMuted
         : m.failed
-        ? AppColors.accentDanger
+        ? AppColors.error
         : AppColors.textPrimary;
 
     final Color borderColor = m.failed
@@ -429,7 +428,7 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble>
                   const Icon(
                     Icons.error_outline,
                     size: 14,
-                    color: AppColors.accentDanger,
+                    color: AppColors.error,
                   ),
                   const SizedBox(width: AppSpacing.xxs),
                   Text(

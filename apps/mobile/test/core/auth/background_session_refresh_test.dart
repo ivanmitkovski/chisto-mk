@@ -4,7 +4,6 @@ import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/network/api_client.dart';
 import 'package:chisto_infrastructure/core/network/request_cancellation.dart';
 import 'package:chisto_infrastructure/core/storage/secure_token_storage.dart';
-import 'package:feature_auth/src/domain/refresh_outcome.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 

@@ -1,8 +1,7 @@
 import 'package:design_system/design_system.dart';
-import 'package:design_system/src/widgets/organisms/app_surface/app_surface_primitives.dart';
 
-export 'package:design_system/src/widgets/organisms/app_surface/app_surface_primitives.dart';
 export 'package:design_system/design_system.dart' show AppSelectionInstruction;
+export 'package:design_system/src/widgets/organisms/app_surface/app_surface_primitives.dart';
 
 typedef ReportSheetScaffold = AppSheetScaffold;
 typedef ReportCircleIconButton = AppCircleIconButton;

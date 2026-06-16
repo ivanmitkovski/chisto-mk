@@ -694,7 +694,7 @@ class _OrganizerCheckInScreenState extends ConsumerState<OrganizerCheckInScreen>
                                                         sec,
                                                       ),
                                                   color: sec <= 3
-                                                      ? AppColors.accentDanger
+                                                      ? AppColors.error
                                                       : sec <= 10
                                                       ? AppColors
                                                             .accentWarningDark

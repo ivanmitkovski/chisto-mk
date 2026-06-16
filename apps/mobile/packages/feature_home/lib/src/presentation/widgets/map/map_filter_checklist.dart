@@ -1,5 +1,4 @@
 import 'package:design_system/design_system.dart';
-import 'package:design_system/src/theme/app_typography_surfaces.dart';
 import 'package:flutter/material.dart';
 
 /// Back-compat aliases for map filter tests and call sites.

@@ -41,9 +41,7 @@ class NewReportDetailsCategoryField extends StatelessWidget {
           context.l10n.reportReviewCategoryTitle,
           style: AppTypographySurfaces.reportsFormFieldLabel(
             Theme.of(context).textTheme,
-            color: hasCategoryError
-                ? AppColors.accentDanger
-                : AppColors.textSecondary,
+            color: hasCategoryError ? AppColors.error : AppColors.textSecondary,
           ),
         ),
         const SizedBox(height: AppSpacing.sm),

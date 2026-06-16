@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:chisto_infrastructure/core/auth/auth_state.dart';
-import 'package:chisto_infrastructure/core/auth/session_recovery.dart';
-import 'package:chisto_infrastructure/core/auth/session_teardown_reason.dart';
-import 'package:chisto_infrastructure/core/auth/session_refresh_coordinator.dart';
 import 'package:chisto_infrastructure/core/auth/session_cleanup_coordinator.dart';
+import 'package:chisto_infrastructure/core/auth/session_recovery.dart';
+import 'package:chisto_infrastructure/core/auth/session_refresh_coordinator.dart';
+import 'package:chisto_infrastructure/core/auth/session_teardown_reason.dart';
 import 'package:chisto_infrastructure/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_infrastructure/core/bootstrap/cold_start_coordinator.dart';
 import 'package:chisto_infrastructure/core/deep_links/deep_link_router.dart';

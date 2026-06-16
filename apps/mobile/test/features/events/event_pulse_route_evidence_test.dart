@@ -5,7 +5,7 @@ void main() {
   group('EventRouteSegmentModel.fromJson', () {
     test('parses full segment payload', () {
       final EventRouteSegmentModel segment =
-          EventRouteSegmentModel.fromJson(<String, dynamic>{
+          EventRouteSegmentModel.fromJson(const <String, dynamic>{
             'id': 'seg-1',
             'sortOrder': 2,
             'label': 'North bank',
@@ -31,7 +31,7 @@ void main() {
 
     test('applies defaults for missing fields', () {
       final EventRouteSegmentModel segment = EventRouteSegmentModel.fromJson(
-        <String, dynamic>{},
+        const <String, dynamic>{},
       );
 
       expect(segment.id, '');
@@ -52,24 +52,24 @@ void main() {
       const EventRouteSegmentModel a = EventRouteSegmentModel(
         id: 'seg-1',
         sortOrder: 1,
-        latitude: 41.0,
-        longitude: 21.0,
+        latitude: 41,
+        longitude: 21,
         status: 'open',
         label: 'A',
       );
       const EventRouteSegmentModel b = EventRouteSegmentModel(
         id: 'seg-1',
         sortOrder: 1,
-        latitude: 41.0,
-        longitude: 21.0,
+        latitude: 41,
+        longitude: 21,
         status: 'open',
         label: 'A',
       );
       const EventRouteSegmentModel c = EventRouteSegmentModel(
         id: 'seg-2',
         sortOrder: 1,
-        latitude: 41.0,
-        longitude: 21.0,
+        latitude: 41,
+        longitude: 21,
         status: 'open',
       );
 
@@ -82,7 +82,7 @@ void main() {
   group('EventEvidenceStripItem.fromJson', () {
     test('parses evidence item payload', () {
       final EventEvidenceStripItem item =
-          EventEvidenceStripItem.fromJson(<String, dynamic>{
+          EventEvidenceStripItem.fromJson(const <String, dynamic>{
             'id': 'ev-1',
             'kind': 'before',
             'imageUrl': 'https://cdn.example.com/before.jpg',
@@ -99,7 +99,7 @@ void main() {
 
     test('table-driven: defaults for sparse json', () {
       final EventEvidenceStripItem item = EventEvidenceStripItem.fromJson(
-        <String, dynamic>{'createdAt': '2026-03-27T12:00:00.000Z'},
+        const <String, dynamic>{'createdAt': '2026-03-27T12:00:00.000Z'},
       );
 
       expect(item.id, '');

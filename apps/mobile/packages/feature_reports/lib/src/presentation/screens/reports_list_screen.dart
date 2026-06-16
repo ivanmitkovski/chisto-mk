@@ -17,8 +17,8 @@ import 'package:feature_reports/src/data/report_image_prefetch_coordinator.dart'
 import 'package:feature_reports/src/data/reports_realtime/reports_owner_event.dart';
 import 'package:feature_reports/src/data/reports_realtime/reports_realtime_connection_state.dart';
 import 'package:feature_reports/src/data/reports_realtime/reports_realtime_service.dart';
-import 'package:feature_reports/src/domain/models/report_detail.dart';
 import 'package:feature_reports/src/domain/models/report_capacity.dart';
+import 'package:feature_reports/src/domain/models/report_detail.dart';
 import 'package:feature_reports/src/domain/models/report_draft_summary.dart';
 import 'package:feature_reports/src/domain/models/report_list_item.dart';
 import 'package:feature_reports/src/presentation/controllers/reports_list_controller.dart';
@@ -30,8 +30,8 @@ import 'package:feature_reports/src/presentation/widgets/draft/draft_choice_shee
 import 'package:feature_reports/src/presentation/widgets/reports_list/report_detail_open_resolver.dart';
 import 'package:feature_reports/src/presentation/widgets/reports_list/report_offline_error_sheet.dart';
 import 'package:feature_reports/src/presentation/widgets/reports_list/reports_list_actions.dart';
-import 'package:feature_reports/src/presentation/widgets/reports_list/reports_list_realtime_coalescer.dart';
 import 'package:feature_reports/src/presentation/widgets/reports_list/reports_list_empty_state.dart';
+import 'package:feature_reports/src/presentation/widgets/reports_list/reports_list_realtime_coalescer.dart';
 import 'package:feature_reports/src/presentation/widgets/reports_list/reports_list_screen_slivers.dart';
 import 'package:feature_reports/src/presentation/widgets/reports_list/reports_list_widgets.dart';
 import 'package:flutter/material.dart';

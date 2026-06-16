@@ -518,7 +518,7 @@ class _SettingsRowSkeleton extends StatelessWidget {
             height: 32,
             radius: AppSpacing.radiusMd,
             t: t,
-            baseTint: destructiveTone ? AppColors.accentDanger : null,
+            baseTint: destructiveTone ? AppColors.error : null,
           ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
@@ -530,7 +530,7 @@ class _SettingsRowSkeleton extends StatelessWidget {
                   height: 14,
                   radius: 7,
                   t: t,
-                  baseTint: destructiveTone ? AppColors.accentDanger : null,
+                  baseTint: destructiveTone ? AppColors.error : null,
                 ),
                 if (hasSubtitle) ...<Widget>[
                   const SizedBox(height: AppSpacing.xxs / 2),

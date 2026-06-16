@@ -549,7 +549,7 @@ class EcoEvent {
       siteDistanceKm: siteDistanceKm ?? this.siteDistanceKm,
       organizerId: organizerId,
       organizerName: organizerName,
-      organizerIsDeleted: this.organizerIsDeleted,
+      organizerIsDeleted: organizerIsDeleted,
       organizerAvatarUrl: clearOrganizerAvatarUrl
           ? null
           : organizerAvatarUrl ?? this.organizerAvatarUrl,

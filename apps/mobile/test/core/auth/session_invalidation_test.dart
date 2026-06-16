@@ -1,7 +1,6 @@
 import 'package:chisto_infrastructure/core/auth/session_invalidation.dart';
 import 'package:chisto_infrastructure/core/bootstrap/app_bootstrap.dart';
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
-import 'package:feature_auth/src/domain/refresh_outcome.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../shared/widget_test_bootstrap.dart';

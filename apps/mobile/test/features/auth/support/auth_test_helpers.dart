@@ -56,7 +56,7 @@ Future<void> precacheAuthGoldenAssets(WidgetTester tester) async {
     MaterialApp(
       home: Builder(
         builder: (BuildContext context) {
-          precacheImage(AssetImage(AppAssets.peopleCleaning), context);
+          precacheImage(const AssetImage(AppAssets.peopleCleaning), context);
           return const SizedBox.shrink();
         },
       ),
@@ -126,12 +126,11 @@ class AuthTestOverrides {
     AuthRepository? authRepository,
     FeatureGuideRepository? featureGuideRepository,
     Map<String, Object>? preferenceValues,
-    Locale? localeOverride,
+    this.localeOverride,
   }) : authRepository = authRepository ?? FakeAuthRepository(),
        featureGuideRepository =
            featureGuideRepository ?? FakeFeatureGuideRepository(),
-       preferenceValues = preferenceValues ?? <String, Object>{},
-       localeOverride = localeOverride;
+       preferenceValues = preferenceValues ?? <String, Object>{};
 
   final AuthRepository authRepository;
   final FeatureGuideRepository featureGuideRepository;

@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:chisto_infrastructure/core/providers/root_container.dart';
 import 'package:feature_notifications/src/application/notifications_providers.dart';
-import 'package:feature_notifications/src/data/notification_navigation_origin.dart';
 import 'package:feature_notifications/src/data/notification_navigation_executor.dart';
+import 'package:feature_notifications/src/data/notification_navigation_origin.dart';
 import 'package:feature_notifications/src/data/notification_navigation_target.dart';
 import 'package:feature_notifications/src/data/notification_open_diagnostics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';

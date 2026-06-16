@@ -37,14 +37,13 @@ import 'package:feature_events/src/presentation/widgets/create_event/create_even
 import 'package:feature_events/src/presentation/widgets/create_event/create_event_volunteer_cap_picker_sheet.dart';
 import 'package:feature_events/src/presentation/widgets/event_form/event_form_gear_sheet_footer.dart';
 import 'package:feature_events/src/presentation/widgets/event_success_dialog.dart';
-import 'package:feature_events/src/presentation/widgets/events_modal_sheet.dart';
 import 'package:feature_home/feature_home.dart';
 import 'package:feature_profile/feature_profile.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:go_router/go_router.dart';
 
 part 'create_event_sheet_build.dart';
 part 'create_event_sheet_pickers.dart';
@@ -170,15 +169,6 @@ class _CreateEventSheetState extends ConsumerState<CreateEventSheet>
       ),
     );
   }
-
-  bool get _isValid => createEventFormIsSubmittable(
-    hasSite: _selectedSite != null,
-    hasDate: _selectedDate != null,
-    category: _selectedCategory,
-    titleTrimmed: _titleController.text.trim(),
-    timeRangeValid: _isTimeRangeValid,
-    scheduleValid: _isScheduleValid,
-  );
 
   bool get _isDirty => !_initialSnapshot.matches(_captureFormFields());
 

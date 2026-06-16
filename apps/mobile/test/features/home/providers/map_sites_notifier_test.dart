@@ -8,8 +8,8 @@ import 'package:feature_home/src/data/map_realtime/map_sync_inline_notice.dart';
 import 'package:feature_home/src/domain/models/pollution_site.dart';
 import 'package:feature_home/src/domain/repositories/sites_repository.dart';
 import 'package:feature_home/src/presentation/providers/map_sites_notifier.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 

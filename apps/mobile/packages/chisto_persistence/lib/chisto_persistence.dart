@@ -2,9 +2,9 @@
 library;
 
 export 'src/cache/image_cache_diagnostics.dart';
-export 'src/cache/safe_precache_image.dart';
 export 'src/cache/report_image_provider.dart';
 export 'src/cache/report_images_cache.dart';
+export 'src/cache/safe_precache_image.dart';
 export 'src/cache/site_image_prefetch_queue.dart';
 export 'src/cache/site_image_provider.dart';
 export 'src/cache/site_images_cache.dart';

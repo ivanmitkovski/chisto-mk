@@ -278,7 +278,7 @@ class CommentListTile extends StatelessWidget {
                               key: ValueKey<bool>(isLikedByMe),
                               size: 18,
                               color: isLikedByMe
-                                  ? AppColors.accentDanger
+                                  ? AppColors.error
                                   : AppColors.textMuted,
                             ),
                     ),

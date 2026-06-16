@@ -2,9 +2,9 @@ import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/providers/events_providers.dart';
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/primary_button.dart';
+import 'package:design_system/src/widgets/organisms/app_panel_bottom_sheet.dart';
 import 'package:feature_events/src/domain/models/eco_event.dart';
 import 'package:feature_events/src/domain/models/event_schedule_conflict_preview.dart';
-import 'package:design_system/src/widgets/organisms/app_panel_bottom_sheet.dart';
 import 'package:feature_events/src/presentation/screens/edit_event_sheet.dart';
 import 'package:feature_events/src/presentation/widgets/edit_event/edit_event_submit_banner.dart';
 import 'package:flutter/cupertino.dart';
@@ -12,8 +12,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'recording_events_repository.dart';
 import '../../shared/widget_test_bootstrap.dart';
+import 'recording_events_repository.dart';
 
 EcoEvent _baseEvent() {
   // Keep the schedule in the future relative to "now" so the upcoming event

@@ -53,7 +53,7 @@ void main() {
     );
 
     expect(km, isNotNull);
-    expect(km!, lessThan(0.01));
+    expect(km, lessThan(0.01));
   });
 
   test('returns null when user location is unavailable', () {

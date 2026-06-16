@@ -183,6 +183,8 @@ class _MapActionsMenuState extends State<MapActionsMenu>
                     child: SizeTransition(
                       sizeFactor: _animationAt(idx),
                       axis: Axis.vertical,
+                      // alignment replacement is not in the pinned SDK.
+                      // ignore: deprecated_member_use
                       axisAlignment: 1,
                       child: SlideTransition(
                         position:

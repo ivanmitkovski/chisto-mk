@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:chisto_infrastructure/core/navigation/app_navigation.dart';
 import 'package:chisto_infrastructure/core/navigation/app_routes.dart';
-import 'package:chisto_infrastructure/core/providers/app_providers.dart';
-import 'package:chisto_infrastructure/core/providers/root_container.dart';
 import 'package:feature_auth/src/presentation/utils/auth_guard_ui.dart';
 import 'package:feature_notifications/src/data/notification_open_payload.dart';
 import 'package:flutter/material.dart';

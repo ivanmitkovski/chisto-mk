@@ -1,5 +1,4 @@
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
-import 'package:feature_reports/src/domain/models/report_draft.dart';
 import 'package:feature_reports/src/domain/models/report_list_item.dart';
 import 'package:feature_reports/src/presentation/widgets/reports_list/report_moderation_display.dart';
 import 'package:feature_reports/src/presentation/widgets/reports_list/report_sheet_view_model.dart';

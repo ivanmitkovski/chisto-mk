@@ -19,7 +19,7 @@ extension _CreateEventSheetBuild on _CreateEventSheetState {
             delegate: CreateEventStepProgressDelegate(steps: steps),
           ),
           SliverPadding(
-            padding: EdgeInsets.fromLTRB(
+            padding: const EdgeInsets.fromLTRB(
               AppSpacing.lg,
               AppSpacing.sm,
               AppSpacing.lg,

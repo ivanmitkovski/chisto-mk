@@ -6,13 +6,12 @@ import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/core/providers/app_providers.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
 import 'package:chisto_infrastructure/shared/widgets/organisms/app_confirm_dialog.dart';
-import 'package:chisto_infrastructure/shared/widgets/organisms/app_surface/report_surface_aliases.dart';
 import 'package:design_system/design_system.dart';
-import 'package:feature_home/src/presentation/widgets/comments/comment_actions_sheet.dart';
 import 'package:feature_home/src/domain/models/comment.dart';
 import 'package:feature_home/src/presentation/utils/comment_input_validator.dart';
 import 'package:feature_home/src/presentation/utils/comment_mutation_snack.dart';
 import 'package:feature_home/src/presentation/utils/comment_thread_navigation.dart';
+import 'package:feature_home/src/presentation/widgets/comments/comment_actions_sheet.dart';
 import 'package:feature_home/src/presentation/widgets/comments/comment_thread_ops.dart';
 import 'package:feature_home/src/presentation/widgets/comments/comments_bottom_sheet_header.dart';
 import 'package:feature_home/src/presentation/widgets/comments/comments_input_bar.dart';
@@ -462,7 +461,7 @@ class _CommentsBottomSheetState extends ConsumerState<CommentsBottomSheet> {
       cancelLabel: l10n.commonCancel,
       isDestructive: true,
     );
-    return confirmed == true;
+    return confirmed ?? false;
   }
 
   void _startInlineEdit(Comment comment) {

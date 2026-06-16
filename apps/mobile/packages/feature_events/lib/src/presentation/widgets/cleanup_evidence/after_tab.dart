@@ -104,7 +104,7 @@ class AfterTab extends StatelessWidget {
                     child: const Icon(
                       CupertinoIcons.trash,
                       size: 18,
-                      color: AppColors.accentDanger,
+                      color: AppColors.error,
                     ),
                   ),
                 ),
@@ -235,7 +235,7 @@ class AfterTab extends StatelessWidget {
                                 child: const Icon(
                                   CupertinoIcons.minus_circle_fill,
                                   size: 20,
-                                  color: AppColors.accentDanger,
+                                  color: AppColors.error,
                                 ),
                               ),
                             ),

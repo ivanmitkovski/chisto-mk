@@ -211,6 +211,8 @@ class MapSitesNotifier extends AutoDisposeNotifier<MapSitesState> {
 
   @visibleForTesting
   void debugSetLastSuccessfulSyncAtForTest(DateTime at) {
+    // Test-only bridge to the coordinator's own @visibleForTesting hook.
+    // ignore: invalid_use_of_visible_for_testing_member
     _coordinator.debugSetLastSuccessfulSyncAt(at);
     _onCoordinatorChanged();
   }

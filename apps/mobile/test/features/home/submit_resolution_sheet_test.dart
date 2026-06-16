@@ -1,12 +1,9 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
-import 'package:chisto_infrastructure/shared/widgets/atoms/primary_button.dart';
 import 'package:chisto_infrastructure/shared/widgets/molecules/api_error_banner.dart';
 import 'package:chisto_infrastructure/shared/widgets/molecules/app_error_view.dart';
 import 'package:design_system/design_system.dart';
-import 'package:design_system/src/widgets/organisms/app_panel_bottom_sheet.dart';
 import 'package:feature_home/src/domain/repositories/sites_repository.dart';
 import 'package:feature_home/src/presentation/widgets/submit_resolution_sheet.dart';
 import 'package:flutter/material.dart';
@@ -296,7 +293,7 @@ void main() {
 
     expect(editableText(tester).focusNode.hasFocus, isTrue);
 
-    tester.view.viewInsets = FakeViewPadding(bottom: _keyboardInset);
+    tester.view.viewInsets = const FakeViewPadding(bottom: _keyboardInset);
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 600));
 
@@ -320,7 +317,7 @@ void main() {
     expect(scrollViews, isNotEmpty);
     final SingleChildScrollView bodyScrollView = scrollViews.first;
     expect(
-      (bodyScrollView.padding as EdgeInsets).bottom,
+      (bodyScrollView.padding! as EdgeInsets).bottom,
       _keyboardInset,
       reason:
           'Overlay host keeps footer at screen bottom; note scroll pads for IME',
@@ -349,7 +346,7 @@ void main() {
           child: Builder(
             builder: (BuildContext context) => _wrapOverlaySheet(
               context,
-              SubmitResolutionSheet(siteId: 'site-test'),
+              const SubmitResolutionSheet(siteId: 'site-test'),
             ),
           ),
         ),
@@ -517,7 +514,7 @@ void main() {
     expect(scaffold.padFooterForKeyboard, isFalse);
     expect(scaffold.shrinkForKeyboard, isFalse);
 
-    tester.view.viewInsets = FakeViewPadding(bottom: _keyboardInset);
+    tester.view.viewInsets = const FakeViewPadding(bottom: _keyboardInset);
     await tester.pump();
 
     expect(find.byType(AnimatedPadding), findsNothing);

@@ -75,6 +75,7 @@ class ApiProfileRepository implements ProfileRepository {
   }
 
   /// Persists the user's in-app language for server-side notification copy.
+  @override
   Future<void> updateLocale(String locale) async {
     final String code = locale.trim();
     if (code != 'en' && code != 'mk' && code != 'sq') {

@@ -156,7 +156,7 @@ void main() {
     final _FakeApiClient client = _FakeApiClient();
     client.stubGet(
       '/sites/site-1/history?limit=10&beforeId=cursor-9',
-      ApiResponse(
+      const ApiResponse(
         statusCode: 200,
         json: <String, dynamic>{'items': <dynamic>[], 'nextBeforeId': null},
       ),

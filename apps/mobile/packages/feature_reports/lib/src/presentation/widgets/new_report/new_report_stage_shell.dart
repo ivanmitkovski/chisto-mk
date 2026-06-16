@@ -91,7 +91,7 @@ class NewReportStageSurface extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
         border: Border.all(
           color: isHighlighted
-              ? AppColors.accentDanger.withValues(alpha: 0.32)
+              ? AppColors.error.withValues(alpha: 0.32)
               : AppColors.divider.withValues(alpha: 0.7),
         ),
         boxShadow: AppShadows.card(Theme.of(context).colorScheme),

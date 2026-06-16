@@ -78,7 +78,7 @@ void main() {
         'chisto_home_location_set_at_user-1',
         '2026-06-08T12:00:00.000Z',
       );
-      await prefs.setDouble(kUserHomeLatitudeKey, 42.0);
+      await prefs.setDouble(kUserHomeLatitudeKey, 42);
       await prefs.setDouble(kUserHomeLongitudeKey, 21.5);
 
       await UserHomeLocationStore.clearAllForSession(prefs, userId: 'user-1');

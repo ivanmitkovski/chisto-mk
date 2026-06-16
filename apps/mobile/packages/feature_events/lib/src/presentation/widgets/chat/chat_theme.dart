@@ -25,8 +25,7 @@ abstract final class ChatTheme {
   static Color get bubbleDeletedFill =>
       AppColors.inputFill.withValues(alpha: 0.6);
 
-  static Color get bubbleFailedFill =>
-      AppColors.accentDanger.withValues(alpha: 0.06);
+  static Color get bubbleFailedFill => AppColors.error.withValues(alpha: 0.06);
 
   static List<BoxShadow> get bubblePeerShadow => AppShadows.chatBubblePeer();
 
@@ -49,8 +48,7 @@ abstract final class ChatTheme {
   static Color bubbleNormalBorder({required bool own}) =>
       own ? bubbleOwnHairline : bubblePeerBorder;
 
-  static Color get failedBorder =>
-      AppColors.accentDanger.withValues(alpha: 0.55);
+  static Color get failedBorder => AppColors.error.withValues(alpha: 0.55);
 
   static List<BoxShadow> highlightPulse(double t) =>
       AppShadows.chatHighlightPulse(t);

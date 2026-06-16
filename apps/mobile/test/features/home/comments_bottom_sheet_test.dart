@@ -224,7 +224,7 @@ void main() {
     expect(find.text('Delete comment'), findsWidgets);
     expect(
       find.text(
-        'Your comment will be permanently removed from this thread. This can\'t be undone.',
+        "Your comment will be permanently removed from this thread. This can't be undone.",
       ),
       findsOneWidget,
     );

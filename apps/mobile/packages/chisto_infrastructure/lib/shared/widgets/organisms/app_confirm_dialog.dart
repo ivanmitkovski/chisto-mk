@@ -335,7 +335,7 @@ class _AppConfirmDialogState extends State<AppConfirmDialog> {
                   style: ElevatedButton.styleFrom(
                     elevation: 0,
                     backgroundColor: widget.isDestructive
-                        ? AppColors.accentDanger
+                        ? AppColors.error
                         : AppColors.primary,
                     foregroundColor: AppColors.white,
                     disabledBackgroundColor: AppColors.inputFill,

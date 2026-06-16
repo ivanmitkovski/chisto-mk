@@ -1,10 +1,10 @@
 import 'dart:async';
 
+import 'package:chisto_infrastructure/core/deep_links/deep_link_router.dart';
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/location/device_location_reader.dart';
 import 'package:chisto_infrastructure/core/location/location_service.dart';
 import 'package:chisto_infrastructure/core/location/macedonia_bounds.dart';
-import 'package:chisto_infrastructure/core/deep_links/deep_link_router.dart';
 import 'package:chisto_infrastructure/core/logging/app_log.dart';
 import 'package:chisto_infrastructure/core/navigation/app_go_router.dart';
 import 'package:chisto_infrastructure/core/navigation/app_navigation.dart';
@@ -19,7 +19,6 @@ import 'package:feature_auth/src/application/home_location_controller.dart';
 import 'package:feature_auth/src/presentation/constants/auth_error_messages.dart';
 import 'package:feature_auth/src/presentation/utils/location_permission_ui.dart';
 import 'package:feature_auth/src/presentation/widgets/auth_form_scroll_physics.dart';
-import 'package:feature_onboarding/feature_onboarding.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

@@ -1,7 +1,4 @@
-import 'dart:ui';
-
 import 'package:design_system/design_system.dart';
-import 'package:design_system/src/widgets/organisms/app_panel_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -166,10 +163,10 @@ void main() {
                       keyboardInsetMode: SheetKeyboardInsetMode.overlay,
                       maxHeightFactor: 1,
                       builder: (BuildContext sheetContext) {
-                        return AppSheetScaffold(
+                        return const AppSheetScaffold(
                           title: 'Notch probe',
                           fillAvailableHeight: true,
-                          child: const SizedBox(height: 200),
+                          child: SizedBox(height: 200),
                         );
                       },
                     );
@@ -223,10 +220,10 @@ void main() {
                       keyboardInsetMode: SheetKeyboardInsetMode.lift,
                       maxHeightFactor: 1,
                       builder: (BuildContext sheetContext) {
-                        return AppSheetScaffold(
+                        return const AppSheetScaffold(
                           title: 'Lift notch probe',
                           fillAvailableHeight: true,
-                          child: const SizedBox(height: 200),
+                          child: SizedBox(height: 200),
                         );
                       },
                     );
@@ -282,15 +279,12 @@ void main() {
                       context: context,
                       keyboardInsetMode: SheetKeyboardInsetMode.overlay,
                       builder: (BuildContext sheetContext) {
-                        return AppSheetScaffold(
+                        return const AppSheetScaffold(
                           title: 'Keyboard probe',
                           fillAvailableHeight: true,
                           padFooterForKeyboard: true,
-                          footer: const PrimaryButton(
-                            label: 'Save',
-                            onPressed: null,
-                          ),
-                          child: const SizedBox(height: 200),
+                          footer: PrimaryButton(label: 'Save', onPressed: null),
+                          child: SizedBox(height: 200),
                         );
                       },
                     );
@@ -309,7 +303,7 @@ void main() {
 
     expect(find.byType(AnimatedPadding), findsNothing);
 
-    tester.view.viewInsets = FakeViewPadding(bottom: keyboardInset);
+    tester.view.viewInsets = const FakeViewPadding(bottom: keyboardInset);
     await tester.pump();
 
     final Finder liftFinder = find.byType(AnimatedPadding);
@@ -348,11 +342,11 @@ void main() {
                       context: context,
                       keyboardInsetMode: SheetKeyboardInsetMode.lift,
                       builder: (BuildContext sheetContext) {
-                        return AppSheetScaffold(
+                        return const AppSheetScaffold(
                           title: 'Lift keyboard probe',
                           fillAvailableHeight: true,
                           padFooterForKeyboard: false,
-                          child: const TextField(
+                          child: TextField(
                             decoration: InputDecoration(hintText: 'Type here'),
                           ),
                         );
@@ -381,7 +375,7 @@ void main() {
 
     expect(editableText(tester).focusNode.hasFocus, isTrue);
 
-    tester.view.viewInsets = FakeViewPadding(bottom: keyboardInset);
+    tester.view.viewInsets = const FakeViewPadding(bottom: keyboardInset);
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 600));
 

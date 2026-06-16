@@ -42,7 +42,7 @@ void main() {
   test(
     '401 teardown passes the session epoch observed at request send',
     () async {
-      var epoch = 3;
+      const epoch = 3;
       int? observedEpoch;
       final client = ApiClient(
         config: AppConfig.local,

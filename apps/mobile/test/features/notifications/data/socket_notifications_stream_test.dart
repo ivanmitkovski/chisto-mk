@@ -41,7 +41,7 @@ void main() {
         authState: AuthState(),
       );
       expect(stream.isConnected, isFalse);
-      expect(() => stream.resume(), returnsNormally);
+      expect(stream.resume, returnsNormally);
       expect(stream.isConnected, isFalse);
       stream.dispose();
     });
@@ -57,7 +57,7 @@ void main() {
         baseUrl: 'http://127.0.0.1:9',
         authState: auth,
       );
-      expect(() => stream.disconnect(), returnsNormally);
+      expect(stream.disconnect, returnsNormally);
       expect(stream.isConnected, isFalse);
       stream.dispose();
     });

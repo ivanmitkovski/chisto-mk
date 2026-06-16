@@ -101,27 +101,27 @@ class _ProfileAvatarSourceTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color surfaceColor = destructive
-        ? AppColors.accentDanger.withValues(alpha: 0.06)
+        ? AppColors.error.withValues(alpha: 0.06)
         : emphasized
         ? AppColors.primary.withValues(alpha: 0.08)
         : AppColors.inputFill;
     final Color borderColor = destructive
-        ? AppColors.accentDanger.withValues(alpha: 0.28)
+        ? AppColors.error.withValues(alpha: 0.28)
         : emphasized
         ? AppColors.primaryDark.withValues(alpha: 0.22)
         : AppColors.divider.withValues(alpha: 0.9);
     final Color iconBackground = destructive
-        ? AppColors.accentDanger.withValues(alpha: 0.12)
+        ? AppColors.error.withValues(alpha: 0.12)
         : emphasized
         ? AppColors.primary.withValues(alpha: 0.16)
         : AppColors.panelBackground;
     final Color chevronBackground = destructive
-        ? AppColors.accentDanger.withValues(alpha: 0.1)
+        ? AppColors.error.withValues(alpha: 0.1)
         : emphasized
         ? AppColors.primary.withValues(alpha: 0.12)
         : AppColors.panelBackground;
     final Color chevronColor = destructive
-        ? AppColors.accentDanger
+        ? AppColors.error
         : emphasized
         ? AppColors.primaryDark
         : AppColors.textMuted;
@@ -134,10 +134,10 @@ class _ProfileAvatarSourceTile extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           splashColor: destructive
-              ? AppColors.accentDanger.withValues(alpha: 0.12)
+              ? AppColors.error.withValues(alpha: 0.12)
               : AppColors.primary.withValues(alpha: 0.08),
           highlightColor: destructive
-              ? AppColors.accentDanger.withValues(alpha: 0.06)
+              ? AppColors.error.withValues(alpha: 0.06)
               : AppColors.primary.withValues(alpha: 0.04),
           borderRadius: BorderRadius.circular(AppSpacing.radius22),
           child: Ink(
@@ -165,7 +165,7 @@ class _ProfileAvatarSourceTile extends StatelessWidget {
                     icon,
                     size: 22,
                     color: destructive
-                        ? AppColors.accentDanger
+                        ? AppColors.error
                         : emphasized
                         ? AppColors.primaryDark
                         : AppColors.textPrimary,

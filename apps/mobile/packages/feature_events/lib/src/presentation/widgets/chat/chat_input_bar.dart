@@ -275,7 +275,7 @@ class _ChatInputBarState extends ConsumerState<ChatInputBar>
                         style: AppTypography.eventsCaptionStrong(
                           Theme.of(context).textTheme,
                           color: dangerLimit
-                              ? AppColors.accentDanger
+                              ? AppColors.error
                               : nearLimit
                               ? AppColors.accentWarning
                               : AppColors.textMuted,

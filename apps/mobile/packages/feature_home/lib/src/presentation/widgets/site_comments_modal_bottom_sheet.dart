@@ -23,7 +23,7 @@ Future<void> showPollutionSiteCommentsModalBottomSheet(
 }) {
   return AppBottomSheet.showResizable<void>(
     context: context,
-    sizeConfig: AppSheetSizeConfig(
+    sizeConfig: const AppSheetSizeConfig(
       minSize: kCommentsSheetMinSize,
       maxSize: kCommentsSheetMaxSize,
       snapSizes: kCommentsSheetSnapSizes,

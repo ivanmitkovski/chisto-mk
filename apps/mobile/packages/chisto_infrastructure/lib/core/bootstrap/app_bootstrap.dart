@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:ui' show PlatformDispatcher;
 
+import 'package:chisto_infrastructure/core/auth/auth_state.dart';
 import 'package:chisto_infrastructure/core/auth/session_recovery.dart';
 import 'package:chisto_infrastructure/core/auth/session_teardown_reason.dart';
-import 'package:chisto_infrastructure/core/auth/auth_state.dart';
 import 'package:chisto_infrastructure/core/bootstrap/cold_start_coordinator.dart';
 import 'package:chisto_infrastructure/core/cache/report_images_cache.dart';
 import 'package:chisto_infrastructure/core/config/app_config.dart';
@@ -11,9 +11,9 @@ import 'package:chisto_infrastructure/core/l10n/app_locale_resolution.dart';
 import 'package:chisto_infrastructure/core/location/geolocator_location_service.dart';
 import 'package:chisto_infrastructure/core/location/location_service.dart';
 import 'package:chisto_infrastructure/core/network/api_client.dart';
+import 'package:chisto_infrastructure/core/presence/presence_service.dart';
 import 'package:chisto_infrastructure/core/providers/app_providers.dart';
 import 'package:chisto_infrastructure/core/storage/secure_token_storage.dart';
-import 'package:chisto_infrastructure/core/presence/presence_service.dart';
 import 'package:chisto_infrastructure/core/time/server_clock.dart';
 import 'package:feature_auth/src/data/api_auth_repository.dart';
 import 'package:feature_auth/src/domain/repositories/auth_repository.dart';

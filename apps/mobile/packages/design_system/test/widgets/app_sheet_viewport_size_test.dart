@@ -75,7 +75,7 @@ void main() {
       keyboardInset: keyboardInset,
     );
     final double sheetHeight = config.maxSize * slotHeight;
-    final double sheetTop = topInset;
+    const double sheetTop = topInset;
     final double sheetBottom = sheetTop + sheetHeight;
 
     expect(sheetTop, greaterThanOrEqualTo(topInset));

@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:feature_reports/src/data/outbox/report_draft_photo_store.dart';
 import 'package:feature_reports/src/data/outbox/report_draft_repository.dart';
-import 'package:feature_reports/src/data/outbox/report_outbox_database.dart';
 import 'package:feature_reports/src/data/outbox/report_outbox_constants.dart';
+import 'package:feature_reports/src/data/outbox/report_outbox_database.dart';
 import 'package:feature_reports/src/data/outbox/report_outbox_entry.dart';
 import 'package:feature_reports/src/data/outbox/report_outbox_repository.dart';
 import 'package:feature_reports/src/domain/models/report_draft.dart';
@@ -175,7 +175,7 @@ void main() {
   });
 
   test('isReportWizardDraftEntryResumable false for succeeded submit', () {
-    final int t = 1;
+    const int t = 1;
     final ReportOutboxEntry succeeded = ReportOutboxEntry(
       id: kReportWizardDraftRowId,
       idempotencyKey: 'k',

@@ -1,13 +1,10 @@
-import 'dart:ui';
-
 import 'package:chisto_infrastructure/core/auth/auth_state.dart';
 import 'package:chisto_infrastructure/core/providers/app_providers.dart';
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';
 import 'package:design_system/design_system.dart';
 import 'package:feature_home/src/domain/models/comment.dart';
-import 'package:feature_home/src/presentation/widgets/comments_bottom_sheet.dart';
-import 'package:feature_home/src/presentation/widgets/comments/comments_sheet_drag.dart';
 import 'package:feature_home/src/presentation/widgets/comments/comments_thread_empty_state.dart';
+import 'package:feature_home/src/presentation/widgets/comments_bottom_sheet.dart';
 import 'package:feature_home/src/presentation/widgets/site_comments_modal_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -30,7 +27,7 @@ void main() {
     await tester.binding.setSurfaceSize(const Size(390, screenHeight));
     tester.view.physicalSize = const Size(390, screenHeight);
     tester.view.devicePixelRatio = 1.0;
-    tester.view.viewPadding = FakeViewPadding(top: topInset, bottom: 34);
+    tester.view.viewPadding = const FakeViewPadding(top: topInset, bottom: 34);
     addTearDown(() async {
       await tester.binding.setSurfaceSize(null);
       tester.view.resetPhysicalSize();
@@ -90,7 +87,7 @@ void main() {
     await tester.tap(find.text('Open comments'));
     await tester.pumpAndSettle();
 
-    tester.view.viewInsets = FakeViewPadding(bottom: keyboardInset);
+    tester.view.viewInsets = const FakeViewPadding(bottom: keyboardInset);
     await tester.pumpAndSettle();
     await tester.tap(find.byType(TextField));
     await tester.pumpAndSettle();
@@ -98,7 +95,7 @@ void main() {
     final RenderBox sheetBox = tester.renderObject<RenderBox>(
       find.byType(AppResizableSheet),
     );
-    final double keyboardTop = screenHeight - keyboardInset;
+    const double keyboardTop = screenHeight - keyboardInset;
 
     expect(
       sheetBox.localToGlobal(Offset.zero).dy,
@@ -134,7 +131,7 @@ void main() {
     await tester.binding.setSurfaceSize(const Size(390, screenHeight));
     tester.view.physicalSize = const Size(390, screenHeight);
     tester.view.devicePixelRatio = 1.0;
-    tester.view.viewPadding = FakeViewPadding(top: topInset, bottom: 34);
+    tester.view.viewPadding = const FakeViewPadding(top: topInset, bottom: 34);
     addTearDown(() async {
       await tester.binding.setSurfaceSize(null);
       tester.view.resetPhysicalSize();
@@ -202,11 +199,11 @@ void main() {
     );
 
     // The IME animates up: metrics change several times before settling.
-    tester.view.viewInsets = FakeViewPadding(bottom: 120);
+    tester.view.viewInsets = const FakeViewPadding(bottom: 120);
     await tester.pump();
-    tester.view.viewInsets = FakeViewPadding(bottom: 240);
+    tester.view.viewInsets = const FakeViewPadding(bottom: 240);
     await tester.pump();
-    tester.view.viewInsets = FakeViewPadding(bottom: keyboardInset);
+    tester.view.viewInsets = const FakeViewPadding(bottom: keyboardInset);
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
     await tester.pumpAndSettle();
@@ -241,7 +238,7 @@ void main() {
     await tester.binding.setSurfaceSize(const Size(390, screenHeight));
     tester.view.physicalSize = const Size(390, screenHeight);
     tester.view.devicePixelRatio = 1.0;
-    tester.view.viewPadding = FakeViewPadding(top: topInset, bottom: 34);
+    tester.view.viewPadding = const FakeViewPadding(top: topInset, bottom: 34);
     addTearDown(() async {
       await tester.binding.setSurfaceSize(null);
       tester.view.resetPhysicalSize();

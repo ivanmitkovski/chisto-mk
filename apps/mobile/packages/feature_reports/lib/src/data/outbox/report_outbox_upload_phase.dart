@@ -1,5 +1,5 @@
-import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/debug/chisto_submit_debug_log.dart';
+import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/logging/app_log.dart';
 import 'package:chisto_infrastructure/core/observability/chisto_sentry.dart';
 import 'package:feature_reports/src/data/outbox/report_outbox_entry.dart';

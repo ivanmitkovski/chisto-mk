@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -16,7 +14,7 @@ void main() {
     await tester.binding.setSurfaceSize(const Size(390, screenHeight));
     tester.view.physicalSize = const Size(390, screenHeight);
     tester.view.devicePixelRatio = 1.0;
-    tester.view.viewPadding = FakeViewPadding(top: topInset, bottom: 34);
+    tester.view.viewPadding = const FakeViewPadding(top: topInset, bottom: 34);
     addTearDown(() async {
       await tester.binding.setSurfaceSize(null);
       tester.view.resetPhysicalSize();

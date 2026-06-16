@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 enum ReportSheetStatus {
   underReview(AppColors.accentWarning, AppColors.reportChipUnderReviewFill),
   approved(AppColors.primary, AppColors.reportChipApprovedFill),
-  declined(AppColors.accentDanger, AppColors.reportChipDeclinedFill),
+  declined(AppColors.error, AppColors.reportChipDeclinedFill),
   alreadyReported(AppColors.accentInfo, AppColors.reportChipLinkedFill);
 
   const ReportSheetStatus(this.color, this.background);

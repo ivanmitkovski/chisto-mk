@@ -69,10 +69,7 @@ class AppRecentQueriesShelf extends StatelessWidget {
             padding: EdgeInsets.zero,
             titleStyle: resolvedTitleStyle,
             trailing: onClear != null && clearLabel != null
-                ? AppSectionHeaderAction(
-                    label: clearLabel!,
-                    onPressed: onClear!,
-                  )
+                ? AppSectionHeaderAction(label: clearLabel!, onPressed: onClear)
                 : null,
           ),
           const SizedBox(height: AppSpacing.xxs),

@@ -1,8 +1,8 @@
 // Run from apps/mobile: dart run tool/check_no_raw_bottom_sheet_in_features.dart
 import 'dart:io';
 
-import 'feature_roots_guard_util.dart';
 import 'design_system_guard_util.dart';
+import 'feature_roots_guard_util.dart';
 
 const List<String> _skip = <String>['site_comments_modal_bottom_sheet.dart'];
 

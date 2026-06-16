@@ -4,8 +4,8 @@ import 'package:feature_home/src/domain/repositories/site_comments_repository.da
 import 'package:feature_home/src/domain/repositories/site_engagement_repository.dart';
 import 'package:feature_home/src/domain/repositories/site_resolution_repository.dart';
 
-export 'sites_repository_types.dart';
 export 'site_resolution_repository.dart';
+export 'sites_repository_types.dart';
 
 /// Single mobile HTTP implementation ([ApiSitesRepository]) implements all narrow contracts.
 abstract interface class SitesRepository

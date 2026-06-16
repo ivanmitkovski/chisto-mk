@@ -114,7 +114,7 @@ void main() {
   test('getNotifications onlyUnread adds query flag', () async {
     client.stub(
       'GET /notifications?page=2&limit=10&onlyUnread=true',
-      ApiResponse(
+      const ApiResponse(
         statusCode: 200,
         json: <String, dynamic>{
           'data': <dynamic>[],
@@ -131,7 +131,10 @@ void main() {
   test('getUnreadCount reads unreadCount field', () async {
     client.stub(
       'GET /notifications/unread-count',
-      ApiResponse(statusCode: 200, json: <String, dynamic>{'unreadCount': 7}),
+      const ApiResponse(
+        statusCode: 200,
+        json: <String, dynamic>{'unreadCount': 7},
+      ),
     );
 
     expect(await repo.getUnreadCount(), 7);
@@ -170,7 +173,7 @@ void main() {
   test('getPreferences maps preference rows', () async {
     client.stub(
       'GET /notifications/preferences',
-      ApiResponse(
+      const ApiResponse(
         statusCode: 200,
         json: <String, dynamic>{
           'data': <dynamic>[
@@ -194,7 +197,7 @@ void main() {
   test('setPreference PATCHes type-specific path', () async {
     client.stub(
       'PATCH /notifications/preferences/EVENT_CHAT',
-      ApiResponse(
+      const ApiResponse(
         statusCode: 200,
         json: <String, dynamic>{'type': 'EVENT_CHAT', 'muted': false},
       ),

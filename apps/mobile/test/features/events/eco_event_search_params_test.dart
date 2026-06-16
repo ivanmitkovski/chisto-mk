@@ -31,11 +31,11 @@ void main() {
     test('offlineListCacheSuffix is stable for same logical params', () {
       final EcoEventSearchParams a = EcoEventSearchParams(
         query: ' mk ',
-        categories: <EcoEventCategory>{
+        categories: const <EcoEventCategory>{
           EcoEventCategory.riverAndLake,
           EcoEventCategory.generalCleanup,
         },
-        statuses: <EcoEventStatus>{
+        statuses: const <EcoEventStatus>{
           EcoEventStatus.upcoming,
           EcoEventStatus.inProgress,
         },
@@ -44,11 +44,11 @@ void main() {
       );
       final EcoEventSearchParams b = EcoEventSearchParams(
         query: 'mk',
-        categories: <EcoEventCategory>{
+        categories: const <EcoEventCategory>{
           EcoEventCategory.generalCleanup,
           EcoEventCategory.riverAndLake,
         },
-        statuses: <EcoEventStatus>{
+        statuses: const <EcoEventStatus>{
           EcoEventStatus.inProgress,
           EcoEventStatus.upcoming,
         },

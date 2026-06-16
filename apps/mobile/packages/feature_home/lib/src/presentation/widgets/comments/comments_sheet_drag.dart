@@ -128,7 +128,7 @@ CommentsSheetDragEndResult resolveSheetDragEnd({
   );
   switch (result.action) {
     case AppSheetDragEndAction.animateTo:
-      return CommentsSheetDragEndResult.animateTo(result.targetSize!);
+      return CommentsSheetDragEndResult.animateTo(result.targetSize);
     case AppSheetDragEndAction.dismiss:
       return const CommentsSheetDragEndResult.dismiss();
   }

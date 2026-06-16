@@ -1,7 +1,5 @@
-import 'dart:ui';
-
-import 'package:design_system/src/widgets/organisms/app_panel_bottom_sheet.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/primary_button.dart';
+import 'package:design_system/src/widgets/organisms/app_panel_bottom_sheet.dart';
 import 'package:feature_events/src/domain/models/eco_event.dart';
 import 'package:feature_events/src/presentation/widgets/event_detail/feedback_sheet.dart';
 import 'package:flutter/material.dart';

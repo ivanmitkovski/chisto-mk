@@ -13,7 +13,7 @@ void main() {
     await bootstrapWidgetTests();
   });
 
-  Widget _wrap(Widget child) {
+  Widget wrap(Widget child) {
     return MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
@@ -27,7 +27,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        _wrap(
+        wrap(
           NewReportStageScrollBody(
             currentStage: ReportStage.details,
             apiError: null,
@@ -50,7 +50,7 @@ void main() {
       var retried = false;
 
       await tester.pumpWidget(
-        _wrap(
+        wrap(
           NewReportStageScrollBody(
             currentStage: ReportStage.location,
             apiError: AppError.network(message: 'Network down'),
@@ -84,7 +84,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        _wrap(
+        wrap(
           NewReportStageSurface(
             stage: ReportStage.evidence,
             isHighlighted: false,
@@ -108,7 +108,7 @@ void main() {
       var dismissed = false;
 
       await tester.pumpWidget(
-        _wrap(
+        wrap(
           NewReportStageSurface(
             stage: ReportStage.evidence,
             isHighlighted: false,
@@ -137,7 +137,7 @@ void main() {
       var helpPressed = false;
 
       await tester.pumpWidget(
-        _wrap(
+        wrap(
           NewReportStageSurface(
             stage: ReportStage.review,
             isHighlighted: true,

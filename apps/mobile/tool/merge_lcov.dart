@@ -2,8 +2,6 @@
 // Usage: dart run tool/merge_lcov.dart part1.info part2.info out.info
 import 'dart:io';
 
-import 'lcov_util.dart';
-
 void main(List<String> args) {
   if (args.length < 2) {
     stderr.writeln('Usage: dart run tool/merge_lcov.dart <inputs...> <output>');
@@ -45,7 +43,7 @@ void _parseInto(String content, Map<String, Map<int, int>> merged) {
   for (final String rawLine in content.split('\n')) {
     final String line = rawLine.trim();
     if (line.startsWith('SF:')) {
-      currentPath = line.substring(3).replaceAll('\\', '/');
+      currentPath = line.substring(3).replaceAll(r'\', '/');
       currentHits = merged.putIfAbsent(currentPath, () => <int, int>{});
       continue;
     }

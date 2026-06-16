@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -135,10 +133,10 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: MediaQuery(
-            data: MediaQueryData(
-              size: const Size(390, 844),
-              viewPadding: const EdgeInsets.only(bottom: homeIndicator),
-              viewInsets: const EdgeInsets.only(bottom: keyboardInset),
+            data: const MediaQueryData(
+              size: Size(390, 844),
+              viewPadding: EdgeInsets.only(bottom: homeIndicator),
+              viewInsets: EdgeInsets.only(bottom: keyboardInset),
             ),
             child: SizedBox(
               height: 500,
@@ -240,7 +238,7 @@ void main() {
           'Sheet panel should lift above keyboard outside the painted surface',
     );
 
-    final double keyboardTop = 844 - keyboardInset;
+    const double keyboardTop = 844 - keyboardInset;
     final Rect footerRect = tester.getRect(find.text('Save'));
     expect(
       footerRect.bottom,
@@ -272,16 +270,16 @@ void main() {
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: MediaQuery(
-          data: const MediaQueryData(size: Size(390, 844)),
+          data: MediaQueryData(size: Size(390, 844)),
           child: Align(
             alignment: Alignment.bottomCenter,
             child: AppSheetScaffold(
               title: 'Compact sheet',
               maxHeightFactor: 0.92,
               fillAvailableHeight: false,
-              footer: const PrimaryButton(label: 'Save', onPressed: null),
+              footer: PrimaryButton(label: 'Save', onPressed: null),
               child: SingleChildScrollView(child: Text('Short body')),
             ),
           ),
@@ -310,7 +308,7 @@ void main() {
     tester.view.physicalSize = surfaceSize;
     tester.view.devicePixelRatio = 1.0;
     tester.view.viewPadding = const FakeViewPadding(top: topInset);
-    tester.view.viewInsets = FakeViewPadding(bottom: keyboardInset);
+    tester.view.viewInsets = const FakeViewPadding(bottom: keyboardInset);
     addTearDown(() async {
       await tester.binding.setSurfaceSize(null);
       tester.view.resetPhysicalSize();
@@ -324,14 +322,14 @@ void main() {
         home: SizedBox(
           width: surfaceSize.width,
           height: surfaceSize.height,
-          child: Align(
+          child: const Align(
             alignment: Alignment.bottomCenter,
             child: AppSheetScaffold(
               title: 'Keyboard slot probe',
               maxHeightFactor: 1,
               fillAvailableHeight: true,
-              footer: const PrimaryButton(label: 'Save', onPressed: null),
-              child: const SizedBox(height: 120),
+              footer: PrimaryButton(label: 'Save', onPressed: null),
+              child: SizedBox(height: 120),
             ),
           ),
         ),

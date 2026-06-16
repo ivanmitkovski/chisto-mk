@@ -68,7 +68,7 @@ Color mapStatusColor(String statusCode) {
     case mapStatusCleaned:
       return AppColors.primaryDark;
     case mapStatusDisputed:
-      return AppColors.accentDanger;
+      return AppColors.error;
     case mapStatusArchived:
       return AppColors.textMuted;
     default:

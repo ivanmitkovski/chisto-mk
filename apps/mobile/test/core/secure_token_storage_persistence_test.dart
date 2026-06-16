@@ -1,4 +1,3 @@
-import 'package:chisto_infrastructure/core/storage/secure_token_storage.dart';
 import 'package:chisto_persistence/chisto_persistence.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';

@@ -13,7 +13,6 @@ class MapMarkerSpringAxis {
   final double start;
   final double end;
   SpringSimulation _simulation;
-  double _elapsed = 0;
 
   double valueAt(double elapsedSeconds) {
     return _simulation.x(elapsedSeconds);
@@ -35,7 +34,6 @@ class MapMarkerSpringAxis {
   }) {
     final double velocity = velocityAt(elapsedSeconds);
     _simulation = SpringSimulation(spring, from, to, velocity);
-    _elapsed = 0;
   }
 }
 

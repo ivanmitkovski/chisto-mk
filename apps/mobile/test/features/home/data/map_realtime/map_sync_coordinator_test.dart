@@ -460,7 +460,7 @@ void main() {
               String? status,
               bool includeArchived = false,
             }) async {
-              return MapSitesResult(sites: const <PollutionSite>[]);
+              return const MapSitesResult(sites: <PollutionSite>[]);
             },
         onGetSiteById: (_) async =>
             _buildSite('foreign-reported', statusCode: 'REPORTED'),

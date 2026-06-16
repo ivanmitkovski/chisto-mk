@@ -1,8 +1,8 @@
 import 'package:design_system/design_system.dart';
 import 'package:feature_home/src/domain/models/pollution_site.dart';
 import 'package:feature_home/src/presentation/widgets/map/cluster_bucket.dart';
-import 'package:feature_home/src/presentation/widgets/map/map_marker_entrance_cache.dart';
 import 'package:feature_home/src/presentation/widgets/map/map_marker_builder.dart';
+import 'package:feature_home/src/presentation/widgets/map/map_marker_entrance_cache.dart';
 import 'package:feature_home/src/presentation/widgets/map/map_marker_spring_motion.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';

@@ -102,7 +102,7 @@ class _CreateEventVolunteerCapPickerSheetState
                 _customError!,
                 style: AppTypography.eventsCaptionStrong(
                   textTheme,
-                  color: AppColors.accentDanger,
+                  color: AppColors.error,
                 ).copyWith(fontWeight: FontWeight.w500),
               ),
               const SizedBox(height: AppSpacing.sm),

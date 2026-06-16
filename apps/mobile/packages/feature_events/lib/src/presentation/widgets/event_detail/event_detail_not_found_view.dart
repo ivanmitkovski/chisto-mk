@@ -2,7 +2,6 @@ import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:design_system/design_system.dart';
 import 'package:feature_events/src/presentation/navigation/events_navigation.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 
 /// Full-screen body when an event id cannot be loaded (removed or invalid link).
 class EventDetailNotFoundView extends StatelessWidget {

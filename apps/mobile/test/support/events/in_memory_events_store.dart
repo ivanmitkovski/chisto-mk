@@ -6,11 +6,11 @@ import 'package:feature_events/src/data/events_local_cache.dart';
 import 'package:feature_events/src/domain/models/eco_event.dart';
 import 'package:feature_events/src/domain/models/eco_event_join_toggle_result.dart';
 import 'package:feature_events/src/domain/models/eco_event_search_params.dart';
-import 'package:feature_events/src/domain/models/events_list_page_snapshot.dart';
 import 'package:feature_events/src/domain/models/event_impact_receipt.dart';
 import 'package:feature_events/src/domain/models/event_participant_row.dart';
 import 'package:feature_events/src/domain/models/event_schedule_conflict_preview.dart';
 import 'package:feature_events/src/domain/models/event_update_payload.dart';
+import 'package:feature_events/src/domain/models/events_list_page_snapshot.dart';
 import 'package:feature_events/src/domain/repositories/events_repository.dart';
 import 'package:flutter/foundation.dart';
 

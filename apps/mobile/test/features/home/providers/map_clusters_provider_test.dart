@@ -110,7 +110,7 @@ void main() {
     final int keyBefore = container.read(mapClusterComputationKeyProvider);
     container
         .read(mapCameraNotifierProvider.notifier)
-        .setCamera(centerLat: 42.0, centerLng: 22.0, zoom: 15);
+        .setCamera(centerLat: 42, centerLng: 22, zoom: 15);
     final int keyAfterPan = container.read(mapClusterComputationKeyProvider);
     expect(keyAfterPan, keyBefore);
   });

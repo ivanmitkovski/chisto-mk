@@ -3,33 +3,32 @@ library;
 import 'dart:async';
 
 import 'package:chisto_infrastructure/core/auth/session_invalidation.dart';
+import 'package:chisto_infrastructure/core/cache/report_image_provider.dart';
+import 'package:chisto_infrastructure/core/cache/site_image_prefetch_queue.dart';
+import 'package:chisto_infrastructure/core/cache/site_image_provider.dart';
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/l10n/app_error_localizations.dart';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/core/location/location_service.dart';
+import 'package:chisto_infrastructure/core/navigation/event_detail_navigation_guard.dart';
 import 'package:chisto_infrastructure/core/providers/app_providers.dart';
 import 'package:chisto_infrastructure/core/providers/events_providers.dart';
-import 'package:chisto_infrastructure/core/providers/home_providers.dart';
 import 'package:chisto_infrastructure/shared/widgets/atoms/app_snack.dart';
 import 'package:chisto_infrastructure/shared/widgets/molecules/app_error_view.dart';
 import 'package:design_system/design_system.dart';
 import 'package:feature_events/src/data/api_events_repository.dart';
 import 'package:feature_events/src/domain/models/eco_event.dart';
 import 'package:feature_events/src/presentation/controllers/events_feed_controller.dart';
+import 'package:feature_events/src/presentation/controllers/events_feed_state.dart';
 import 'package:feature_events/src/presentation/controllers/events_search_controller.dart';
 import 'package:feature_events/src/presentation/navigation/events_navigation.dart';
 import 'package:feature_events/src/presentation/utils/events_diagnostic_log.dart';
 import 'package:feature_events/src/presentation/utils/events_scroll_interaction.dart';
-import 'package:chisto_infrastructure/core/navigation/event_detail_navigation_guard.dart';
-import 'package:chisto_infrastructure/core/cache/report_image_provider.dart';
-import 'package:chisto_infrastructure/core/cache/site_image_prefetch_queue.dart';
-import 'package:chisto_infrastructure/core/cache/site_image_provider.dart';
 import 'package:feature_events/src/presentation/widgets/events_calendar_view.dart';
 import 'package:feature_events/src/presentation/widgets/events_feed/events_feed_widgets.dart';
 import 'package:feature_events/src/presentation/widgets/events_feed/events_filter_sheet.dart';
 import 'package:feature_events/src/presentation/widgets/events_feed_skeleton.dart';
 import 'package:feature_events/src/presentation/widgets/events_filter_chips.dart';
-import 'package:feature_events/src/presentation/controllers/events_feed_state.dart';
 import 'package:feature_home/feature_home.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -177,7 +176,7 @@ class EventsFeedScreenState extends ConsumerState<EventsFeedScreen> {
         lng = pos.longitude;
       }
 
-      if (lat == null || lng == null || !mounted) {
+      if (!mounted) {
         return;
       }
       _feed.setUserLocationHint(latitude: lat, longitude: lng);

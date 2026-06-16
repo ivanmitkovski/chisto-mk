@@ -1,5 +1,5 @@
-import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/core/assets/app_assets.dart';
+import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:feature_auth/src/presentation/constants/splash_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';

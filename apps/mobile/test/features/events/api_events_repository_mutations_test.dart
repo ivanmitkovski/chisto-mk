@@ -5,8 +5,8 @@ import 'package:chisto_infrastructure/core/network/request_cancellation.dart';
 import 'package:feature_events/src/data/api_events_repository.dart';
 import 'package:feature_events/src/domain/models/eco_event.dart';
 import 'package:feature_events/src/domain/models/eco_event_join_toggle_result.dart';
-import 'package:feature_events/src/domain/models/event_update_payload.dart';
 import 'package:feature_events/src/domain/models/event_impact_receipt.dart';
+import 'package:feature_events/src/domain/models/event_update_payload.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
