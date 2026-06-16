@@ -44,15 +44,12 @@ void main() {
   test('resolveNotificationBody strips empty sender suffix', () {
     final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
     expect(
-      EventChatPushPreview.resolveNotificationBody(
-        <String, dynamic>{
-          'type': 'EVENT_CHAT',
-          'messageType': 'AUDIO',
-          'senderName': 'Alex',
-          'body': 'Alex: ',
-        },
-        strings: en,
-      ),
+      EventChatPushPreview.resolveNotificationBody(<String, dynamic>{
+        'type': 'EVENT_CHAT',
+        'messageType': 'AUDIO',
+        'senderName': 'Alex',
+        'body': 'Alex: ',
+      }, strings: en),
       'Alex: ${en.eventChatPushPreviewVoice}',
     );
   });

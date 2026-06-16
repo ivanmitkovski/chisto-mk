@@ -24,10 +24,7 @@ void main() {
 
   test('notificationRelativeTime formats older dates with locale', () {
     final AppLocalizations en = lookupAppLocalizations(const Locale('en'));
-    final String label = notificationRelativeTime(
-      en,
-      DateTime(2026, 1, 5),
-    );
+    final String label = notificationRelativeTime(en, DateTime(2026, 1, 5));
     expect(label, '05.01');
   });
 }
