@@ -605,7 +605,16 @@
     "/auth/otp/verify": {
       "post": {
         "operationId": "AuthSessionController_verifyOtp",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "accept-language",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
