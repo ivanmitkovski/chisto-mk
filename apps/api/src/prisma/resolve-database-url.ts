@@ -33,13 +33,14 @@ function withConnectionTimeout(url: string, seconds = 30): string {
   return `${url}${sep}connect_timeout=${seconds}`;
 }
 
-/** Same URL shaping as PrismaService (dev ssl relax + connect timeout). */
+/** Same URL shaping as PrismaService (local ssl off, remote tls with no-verify + connect timeout). */
 export function resolveDatabaseUrl(raw: string): string {
-  const nodeEnv = process.env.NODE_ENV ?? 'development';
   let url = raw;
   if (isLocalPostgresHost(url)) {
     url = connectionStringWithSslDisabled(url);
-  } else if (nodeEnv !== 'production') {
+  } else {
+    // Managed Postgres (e.g. RDS) uses CAs that node-postgres does not trust with
+    // sslmode=require unless sslrootcert is configured. Keep TLS, skip verification.
     url = connectionStringWithNoVerify(url);
   }
   return withConnectionTimeout(url);
