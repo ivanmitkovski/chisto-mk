@@ -1,6 +1,6 @@
 import type { Logger } from '@nestjs/common';
 import { Client } from 'pg';
-import { resolveDatabaseUrl } from '../../prisma/resolve-database-url';
+import { resolvePgPoolConfig } from '../../prisma/resolve-database-url';
 import { isPgOutboxListenEnabled } from './outbox-pg-notify';
 
 export type StartPgOutboxListenerArgs = {
@@ -30,7 +30,7 @@ export async function startPgOutboxListener(
     return null;
   }
 
-  const client = new Client({ connectionString: resolveDatabaseUrl(url) });
+  const client = new Client(resolvePgPoolConfig(url));
   try {
     await client.connect();
     await client.query(`LISTEN ${args.channel}`);

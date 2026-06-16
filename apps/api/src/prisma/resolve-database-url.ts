@@ -45,3 +45,19 @@ export function resolveDatabaseUrl(raw: string): string {
   }
   return withConnectionTimeout(url);
 }
+
+/** Pool/client config for node-postgres and @prisma/adapter-pg. */
+export function resolvePgPoolConfig(raw: string): {
+  connectionString: string;
+  ssl?: { rejectUnauthorized: false };
+} {
+  const connectionString = resolveDatabaseUrl(raw);
+  if (isLocalPostgresHost(raw)) {
+    return { connectionString };
+  }
+  // Explicit ssl beats connection-string parsing (pg treats sslmode=require as verify-full).
+  return {
+    connectionString,
+    ssl: { rejectUnauthorized: false },
+  };
+}

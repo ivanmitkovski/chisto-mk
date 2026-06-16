@@ -21,7 +21,11 @@ export class AdminAlertEvaluationService implements OnModuleInit, OnModuleDestro
 
   onModuleInit(): void {
     if (process.env.ADMIN_ALERTS_ENABLED === 'false') return;
-    this.timer = setInterval(() => void this.evaluate(), 30_000);
+    this.timer = setInterval(() => {
+      void this.evaluate().catch((err: unknown) => {
+        this.logger.error('Admin alert evaluation tick failed', err);
+      });
+    }, 30_000);
   }
 
   onModuleDestroy(): void {

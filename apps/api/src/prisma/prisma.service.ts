@@ -1,15 +1,14 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../prisma-client';
-import { resolveDatabaseUrl } from './resolve-database-url';
+import { resolvePgPoolConfig } from './resolve-database-url';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   private readonly slowQueryLogger = new Logger(PrismaService.name);
 
   constructor() {
-    const connectionString = resolveDatabaseUrl(process.env.DATABASE_URL!);
-    const adapter = new PrismaPg({ connectionString });
+    const adapter = new PrismaPg(resolvePgPoolConfig(process.env.DATABASE_URL!));
     super({ adapter });
   }
 
