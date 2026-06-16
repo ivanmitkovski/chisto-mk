@@ -2,6 +2,12 @@ name: Update Flutter goldens
 
 on:
   workflow_dispatch:
+  # TEMP: one-shot regen on develop (reverted in the following commit).
+  push:
+    branches:
+      - develop
+    paths:
+      - '.github/workflows/flutter-goldens.yml'
 
 permissions:
   contents: write
