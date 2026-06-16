@@ -7264,7 +7264,9 @@ export interface operations {
     AuthSessionController_verifyOtp: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                "accept-language": string;
+            };
             path?: never;
             cookie?: never;
         };
