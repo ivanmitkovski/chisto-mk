@@ -33,6 +33,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
+          flutter-version: '3.44.0'
           cache: true
 
       - name: Flutter pub get
@@ -51,6 +52,10 @@ jobs:
           INTEGRATION_TEST_API_URL: ${{ secrets.INTEGRATION_TEST_API_URL }}
           INTEGRATION_TEST_ACCESS_TOKEN: ${{ secrets.INTEGRATION_TEST_ACCESS_TOKEN }}
         run: |
+          if [ -z "${INTEGRATION_TEST_API_URL// }" ]; then
+            echo "No INTEGRATION_TEST_API_URL configured (e.g. PRs without staging secrets); skipping integration smoke."
+            exit 0
+          fi
           set +e
           for attempt in 1 2 3; do
             flutter test integration_test/auth_api_smoke_test.dart integration_test/events_journey_smoke_test.dart integration_test/event_chat_smoke_test.dart integration_test/report_submit_flow_test.dart \
