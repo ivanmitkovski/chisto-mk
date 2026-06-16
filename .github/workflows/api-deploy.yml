@@ -74,6 +74,7 @@ jobs:
     if: ${{ vars.API_AWS_DEPLOY == 'true' }}
     outputs:
       image_digest: ${{ steps.push.outputs.digest }}
+      image: ${{ steps.push.outputs.image }}
     steps:
       - uses: actions/checkout@v4
 
@@ -93,15 +94,17 @@ jobs:
           REGISTRY: ${{ steps.ecr.outputs.registry }}
           GITHUB_SHA: ${{ github.sha }}
         run: |
+          # ECR repo enforces immutable tags, so publish only the unique,
+          # commit-pinned tag. Deploys reference this exact image (no :latest).
           IMAGE="${REGISTRY}/${ECR_REPOSITORY}"
-          docker build -f apps/api/Dockerfile.prod -t "${IMAGE}:${GITHUB_SHA}" -t "${IMAGE}:latest" .
+          docker build -f apps/api/Dockerfile.prod -t "${IMAGE}:${GITHUB_SHA}" .
           docker push "${IMAGE}:${GITHUB_SHA}"
-          docker push "${IMAGE}:latest"
           DIGEST=$(aws ecr describe-images \
             --repository-name "${ECR_REPOSITORY}" \
             --image-ids imageTag="${GITHUB_SHA}" \
             --query 'imageDetails[0].imageDigest' --output text)
           echo "digest=${DIGEST}" >> "$GITHUB_OUTPUT"
+          echo "image=${IMAGE}:${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
 
   migrate:
     needs: push-ecr
@@ -116,10 +119,24 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Run ECS migrate task
+        env:
+          IMAGE: ${{ needs.push-ecr.outputs.image }}
         run: |
+          # Pin the migrate task to the freshly pushed immutable image.
+          aws ecs describe-task-definition \
+            --task-definition "${{ secrets.ECS_MIGRATE_TASK_DEFINITION }}" \
+            --query 'taskDefinition' > migrate-td.json
+          jq --arg IMG "$IMAGE" '
+            .containerDefinitions[0].image = $IMG
+            | del(.taskDefinitionArn, .revision, .status, .requiresAttributes,
+                  .compatibilities, .registeredAt, .registeredBy)
+          ' migrate-td.json > migrate-td-new.json
+          MIGRATE_TD=$(aws ecs register-task-definition \
+            --cli-input-json file://migrate-td-new.json \
+            --query 'taskDefinition.taskDefinitionArn' --output text)
           TASK_ARN=$(aws ecs run-task \
             --cluster "${{ secrets.ECS_CLUSTER }}" \
-            --task-definition "${{ secrets.ECS_MIGRATE_TASK_DEFINITION }}" \
+            --task-definition "$MIGRATE_TD" \
             --launch-type FARGATE \
             --network-configuration "awsvpcConfiguration={subnets=[${{ secrets.ECS_SUBNETS }}],securityGroups=[${{ secrets.ECS_SECURITY_GROUP }}],assignPublicIp=DISABLED}" \
             --query 'tasks[0].taskArn' --output text)
@@ -129,7 +146,7 @@ jobs:
           test "$EXIT" = "0"
 
   deploy-ecs:
-    needs: migrate
+    needs: [push-ecr, migrate]
     runs-on: ubuntu-latest
     steps:
       - name: Configure AWS credentials
@@ -139,10 +156,29 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Rolling ECS deploy
+        env:
+          IMAGE: ${{ needs.push-ecr.outputs.image }}
         run: |
+          # Roll the service onto a new task-definition revision pinned to the
+          # immutable image (ECR tags are immutable, so :latest is not used).
+          CURRENT_TD=$(aws ecs describe-services \
+            --cluster "${{ secrets.ECS_CLUSTER }}" \
+            --services "${{ secrets.ECS_SERVICE }}" \
+            --query 'services[0].taskDefinition' --output text)
+          aws ecs describe-task-definition --task-definition "$CURRENT_TD" \
+            --query 'taskDefinition' > service-td.json
+          jq --arg IMG "$IMAGE" '
+            .containerDefinitions[0].image = $IMG
+            | del(.taskDefinitionArn, .revision, .status, .requiresAttributes,
+                  .compatibilities, .registeredAt, .registeredBy)
+          ' service-td.json > service-td-new.json
+          NEW_TD=$(aws ecs register-task-definition \
+            --cli-input-json file://service-td-new.json \
+            --query 'taskDefinition.taskDefinitionArn' --output text)
           aws ecs update-service \
             --cluster "${{ secrets.ECS_CLUSTER }}" \
             --service "${{ secrets.ECS_SERVICE }}" \
+            --task-definition "$NEW_TD" \
             --force-new-deployment
           aws ecs wait services-stable \
             --cluster "${{ secrets.ECS_CLUSTER }}" \

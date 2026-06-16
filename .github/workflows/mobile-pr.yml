@@ -26,7 +26,7 @@ jobs:
         # Warnings and errors are fatal; info-level lints are not, matching the
         # required CI gate in ci.yml. Remaining infos are tracked for cleanup.
         run: |
-          dart analyze --no-fatal-infos packages/chisto_core
+          dart analyze packages/chisto_core
           flutter analyze --no-fatal-infos lib packages/design_system/lib
           for pkg in packages/*/lib; do
             if [ -d "$pkg" ] && [ "$pkg" != "packages/design_system/lib" ]; then
