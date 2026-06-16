@@ -6473,6 +6473,62 @@
         ]
       }
     },
+    "/sites/{id}/share-card": {
+      "get": {
+        "operationId": "SitesDetailController_getPublicShareCard",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SitePublicShareCardResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed site id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "code": "INVALID_CUID",
+                    "message": "Invalid resource id"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Site not found or not publicly visible"
+          },
+          "429": {
+            "description": "Too many requests"
+          }
+        },
+        "summary": "Public share card for HTTPS `/sites/:id` landing (public visibility only)",
+        "tags": [
+          "sites"
+        ]
+      }
+    },
     "/sites/{id}/cleanup-evidence": {
       "get": {
         "operationId": "SitesDetailController_findCleanupEvidence",
@@ -20424,6 +20480,40 @@
         },
         "required": [
           "feedbackType"
+        ]
+      },
+      "SitePublicShareCardResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Site id (Prisma cuid)"
+          },
+          "title": {
+            "type": "string",
+            "description": "Headline from canonical hero report or first approved report"
+          },
+          "siteLabel": {
+            "type": "string",
+            "description": "City / area line (same rules as mobile siteName)"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "REPORTED",
+              "VERIFIED",
+              "CLEANUP_SCHEDULED",
+              "IN_PROGRESS",
+              "CLEANED",
+              "DISPUTED"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "siteLabel",
+          "status"
         ]
       },
       "CleanupEvidenceSubmitterDto": {

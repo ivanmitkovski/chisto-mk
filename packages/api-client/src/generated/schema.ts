@@ -1950,6 +1950,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/sites/{id}/share-card": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Public share card for HTTPS `/sites/:id` landing (public visibility only) */
+        get: operations["SitesDetailController_getPublicShareCard"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/sites/{id}/cleanup-evidence": {
         parameters: {
             query?: never;
@@ -4867,6 +4884,16 @@ export interface components {
             /** @example session_abc_123 */
             sessionId?: string;
             metadata?: Record<string, never>;
+        };
+        SitePublicShareCardResponseDto: {
+            /** @description Site id (Prisma cuid) */
+            id: string;
+            /** @description Headline from canonical hero report or first approved report */
+            title: string;
+            /** @description City / area line (same rules as mobile siteName) */
+            siteLabel: string;
+            /** @enum {string} */
+            status: "REPORTED" | "VERIFIED" | "CLEANUP_SCHEDULED" | "IN_PROGRESS" | "CLEANED" | "DISPUTED";
         };
         CleanupEvidenceSubmitterDto: {
             displayLabel?: Record<string, never> | null;
@@ -13544,6 +13571,64 @@ export interface operations {
                 content?: never;
             };
             /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SitesDetailController_getPublicShareCard: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SitePublicShareCardResponseDto"];
+                };
+            };
+            /** @description Malformed site id */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Site not found or not publicly visible */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Too many requests */
             429: {
                 headers: {
                     [name: string]: unknown;
