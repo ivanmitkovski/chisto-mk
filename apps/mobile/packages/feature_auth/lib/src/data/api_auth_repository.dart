@@ -435,10 +435,7 @@ class ApiAuthRepository implements AuthRepository {
       ).applyFromProfileJson(json);
       return;
     }
-    await UserHomeLocationStore(
-      _preferences,
-      userId: _authState.userId,
-    ).save(
+    await UserHomeLocationStore(_preferences, userId: _authState.userId).save(
       latitude: latitude,
       longitude: longitude,
       label: label,
@@ -563,8 +560,7 @@ class ApiAuthRepository implements AuthRepository {
   Future<void> invalidateLocalSession({
     int? observedEpoch,
     SessionTeardownReason? reason,
-  }) =>
-      _clearLocalSessionCore(observedEpoch: observedEpoch, reason: reason);
+  }) => _clearLocalSessionCore(observedEpoch: observedEpoch, reason: reason);
 
   @override
   Future<void> signOut() async {
@@ -943,10 +939,7 @@ class ApiAuthRepository implements AuthRepository {
 }
 
 class _RefreshAttemptResult {
-  const _RefreshAttemptResult(
-    this.outcome, {
-    this.invalidRefreshToken = false,
-  });
+  const _RefreshAttemptResult(this.outcome, {this.invalidRefreshToken = false});
 
   final RefreshOutcome outcome;
   final bool invalidRefreshToken;

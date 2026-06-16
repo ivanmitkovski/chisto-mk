@@ -20,10 +20,7 @@ Future<void> _pumpLegacyOtpRoute(
             RouteSettings(name: AppRoutes.otp, arguments: arguments),
           )!
           as MaterialPageRoute<void>;
-  await pumpAuthWidget(
-    tester,
-    home: Builder(builder: route.builder),
-  );
+  await pumpAuthWidget(tester, home: Builder(builder: route.builder));
 }
 
 void main() {
@@ -69,25 +66,27 @@ void main() {
     expect(find.byType(OtpScreen), findsNothing);
   });
 
-  testWidgets('legacy AppRouter otp route with missing args falls back to sign in', (
-    WidgetTester tester,
-  ) async {
-    await _pumpLegacyOtpRoute(tester);
-    await tester.pumpAndSettle();
+  testWidgets(
+    'legacy AppRouter otp route with missing args falls back to sign in',
+    (WidgetTester tester) async {
+      await _pumpLegacyOtpRoute(tester);
+      await tester.pumpAndSettle();
 
-    expect(find.byType(SignInScreen), findsOneWidget);
-    expect(find.byType(SignUpScreen), findsNothing);
-    expect(find.byType(OtpScreen), findsNothing);
-  });
+      expect(find.byType(SignInScreen), findsOneWidget);
+      expect(find.byType(SignUpScreen), findsNothing);
+      expect(find.byType(OtpScreen), findsNothing);
+    },
+  );
 
-  testWidgets('legacy AppRouter otp route with invalid args falls back to sign in', (
-    WidgetTester tester,
-  ) async {
-    await _pumpLegacyOtpRoute(tester, arguments: 42);
-    await tester.pumpAndSettle();
+  testWidgets(
+    'legacy AppRouter otp route with invalid args falls back to sign in',
+    (WidgetTester tester) async {
+      await _pumpLegacyOtpRoute(tester, arguments: 42);
+      await tester.pumpAndSettle();
 
-    expect(find.byType(SignInScreen), findsOneWidget);
-    expect(find.byType(SignUpScreen), findsNothing);
-    expect(find.byType(OtpScreen), findsNothing);
-  });
+      expect(find.byType(SignInScreen), findsOneWidget);
+      expect(find.byType(SignUpScreen), findsNothing);
+      expect(find.byType(OtpScreen), findsNothing);
+    },
+  );
 }

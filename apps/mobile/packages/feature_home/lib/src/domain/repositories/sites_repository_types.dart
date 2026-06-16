@@ -113,6 +113,7 @@ class SiteCommentsResult {
   final int page;
   final int limit;
   final int total;
+
   /// Viewer-visible comment total (roots + replies), from API meta.engagementTotal.
   final int? engagementTotal;
 }

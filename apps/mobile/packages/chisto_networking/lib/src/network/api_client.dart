@@ -286,10 +286,7 @@ class ApiClient {
       if (!await _refreshForUnauthorizedRetry(e, path)) {
         rethrow;
       }
-      return _retryAfterRefresh(
-        path,
-        () => _postMultipart(path, filePaths),
-      );
+      return _retryAfterRefresh(path, () => _postMultipart(path, filePaths));
     }
   }
 
@@ -387,12 +384,8 @@ class ApiClient {
       }
       return _retryAfterRefresh(
         path,
-        () => multipartPost(
-          path,
-          files: files,
-          fields: fields,
-          timeout: timeout,
-        ),
+        () =>
+            multipartPost(path, files: files, fields: fields, timeout: timeout),
       );
     }
   }
@@ -512,7 +505,10 @@ class ApiClient {
   }
 
   /// Runs a single post-refresh replay; auth failures still trigger teardown.
-  Future<T> _retryAfterRefresh<T>(String path, Future<T> Function() retry) async {
+  Future<T> _retryAfterRefresh<T>(
+    String path,
+    Future<T> Function() retry,
+  ) async {
     try {
       return await retry();
     } on AppError catch (e) {

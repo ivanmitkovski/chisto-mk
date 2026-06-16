@@ -2,11 +2,7 @@ import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 class StickyBottomCTA extends StatelessWidget {
-  const StickyBottomCTA({
-    super.key,
-    required this.label,
-    this.onPressed,
-  });
+  const StickyBottomCTA({super.key, required this.label, this.onPressed});
 
   final String label;
   final VoidCallback? onPressed;

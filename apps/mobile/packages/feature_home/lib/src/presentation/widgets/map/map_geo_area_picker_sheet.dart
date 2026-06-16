@@ -127,8 +127,7 @@ class _MapGeoAreaPickerSheetState extends State<MapGeoAreaPickerSheet> {
               placeholderStyle: AppTypography.eventsSearchFieldPlaceholder(
                 textTheme,
               ),
-              onSubmitted: (_) =>
-                  FocusManager.instance.primaryFocus?.unfocus(),
+              onSubmitted: (_) => FocusManager.instance.primaryFocus?.unfocus(),
             ),
             const SizedBox(height: AppSpacing.md),
           ] else

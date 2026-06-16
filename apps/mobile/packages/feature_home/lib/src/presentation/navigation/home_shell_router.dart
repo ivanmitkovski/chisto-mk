@@ -413,7 +413,8 @@ StatefulShellRoute buildHomeShellStatefulShellRoute() {
               return NoTransitionPage<void>(
                 key: const ValueKey<String>('branch-map'),
                 child: _MapBranchPage(
-                  mapPendingSiteFocus: _homeShellController().mapPendingSiteFocus,
+                  mapPendingSiteFocus:
+                      _homeShellController().mapPendingSiteFocus,
                 ),
               );
             },
@@ -427,7 +428,9 @@ StatefulShellRoute buildHomeShellStatefulShellRoute() {
             pageBuilder: (BuildContext context, GoRouterState state) {
               return NoTransitionPage<void>(
                 key: const ValueKey<String>('branch-events'),
-                child: EventsFeedScreen(key: _homeShellController().eventsFeedKey),
+                child: EventsFeedScreen(
+                  key: _homeShellController().eventsFeedKey,
+                ),
               );
             },
           ),

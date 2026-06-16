@@ -22,9 +22,7 @@ void main() {
 
     test('queues deep link for replay after sign-in', () {
       const String eventId = '550e8400-e29b-41d4-a716-446655440000';
-      final Uri uri = Uri.parse(
-        'https://chisto.mk/app/events/detail/$eventId',
-      );
+      final Uri uri = Uri.parse('https://chisto.mk/app/events/detail/$eventId');
       DeepLinkRouter.handleUri(router, uri, isAuthenticated: false);
       expect(DeepLinkRouter.pendingAuthenticatedUriForTest, uri);
       expect(router.routeInformationProvider.value.uri.path, AppRoutes.signIn);

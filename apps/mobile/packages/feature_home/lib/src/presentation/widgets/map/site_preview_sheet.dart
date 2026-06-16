@@ -200,7 +200,8 @@ class _SitePreviewSheetState extends State<SitePreviewSheet>
                                       height: 1.3,
                                     ),
                               ),
-                              if (_previewAddressLine(site) != null) ...<Widget>[
+                              if (_previewAddressLine(site) !=
+                                  null) ...<Widget>[
                                 const SizedBox(height: 4),
                                 Text(
                                   _previewAddressLine(site)!,

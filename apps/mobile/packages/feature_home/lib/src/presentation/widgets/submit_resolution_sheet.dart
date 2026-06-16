@@ -66,8 +66,9 @@ class SubmitResolutionSheet extends ConsumerStatefulWidget {
 
 class _SubmitResolutionSheetState extends ConsumerState<SubmitResolutionSheet>
     with WidgetsBindingObserver {
-  late final List<XFile> _photos =
-      List<XFile>.from(widget.testInitialPhotos ?? const <XFile>[]);
+  late final List<XFile> _photos = List<XFile>.from(
+    widget.testInitialPhotos ?? const <XFile>[],
+  );
   final TextEditingController _noteController = TextEditingController();
   final FocusNode _noteFocus = FocusNode();
   final ScrollController _scrollController = ScrollController();
@@ -237,16 +238,19 @@ class _SubmitResolutionSheetState extends ConsumerState<SubmitResolutionSheet>
     await _submitFlight.run(() async {
       if (!mounted || !_canSubmit) return;
       final NavigatorState navigator = Navigator.of(context);
-      final NavigatorState rootNavigator =
-          Navigator.of(context, rootNavigator: true);
+      final NavigatorState rootNavigator = Navigator.of(
+        context,
+        rootNavigator: true,
+      );
       setState(() {
         _isSubmitting = true;
         _submitError = null;
       });
       try {
         final AppLocalizations l10n = context.l10n;
-        final List<String> paths =
-            _photos.map((XFile f) => f.path).toList(growable: false);
+        final List<String> paths = _photos
+            .map((XFile f) => f.path)
+            .toList(growable: false);
         final List<String> mediaUrls = await _repository.uploadResolutionPhotos(
           widget.siteId,
           paths,

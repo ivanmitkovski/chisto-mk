@@ -105,7 +105,10 @@ void main() {
     await pumpAuthWidget(tester, home: const ForgotPasswordRequestScreen());
     await tester.pumpAndSettle();
 
-    expect(primaryElevatedWidget(tester, 'Send reset code').onPressed, isNotNull);
+    expect(
+      primaryElevatedWidget(tester, 'Send reset code').onPressed,
+      isNotNull,
+    );
   });
 
   testWidgets('invalid phone submit shows inline error', (

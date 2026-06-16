@@ -109,10 +109,7 @@ int runArbKeyParityCheck() {
   return 0;
 }
 
-bool _metadataStructureMatches(
-  Map<String, dynamic> a,
-  Map<String, dynamic> b,
-) {
+bool _metadataStructureMatches(Map<String, dynamic> a, Map<String, dynamic> b) {
   final Object? aPlaceholders = a['placeholders'];
   final Object? bPlaceholders = b['placeholders'];
   if (aPlaceholders == null && bPlaceholders == null) {

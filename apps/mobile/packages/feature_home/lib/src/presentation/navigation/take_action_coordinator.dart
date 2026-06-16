@@ -240,11 +240,11 @@ class TakeActionCoordinator {
       context: context,
       backgroundColor: AppColors.transparent,
       builder: (BuildContext sheetContext) => ShareSheet(
-          title: sheetContext.l10n.takeActionShareSiteTitle,
-          subtitle: sheetContext.l10n.takeActionShareSiteSubtitle,
-          siteTitle: site.title,
-          shareUrl: siteUrl,
-          siteImageUrl: site.primaryImageUrl,
+        title: sheetContext.l10n.takeActionShareSiteTitle,
+        subtitle: sheetContext.l10n.takeActionShareSiteSubtitle,
+        siteTitle: site.title,
+        shareUrl: siteUrl,
+        siteImageUrl: site.primaryImageUrl,
       ),
     );
     if (action == null || !context.mounted) {
@@ -301,10 +301,9 @@ class TakeActionCoordinator {
         }
         if (!context.mounted) {
           unawaited(
-            readRoot(sitesRepositoryProvider).shareSite(
-              site.id,
-              channel: 'native',
-            ),
+            readRoot(
+              sitesRepositoryProvider,
+            ).shareSite(site.id, channel: 'native'),
           );
           return const SiteShareCancelled();
         }

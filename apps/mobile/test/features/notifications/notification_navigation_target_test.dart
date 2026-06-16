@@ -15,28 +15,25 @@ void main() {
             },
           );
       expect(target, isA<NotificationOpenReportDetail>());
-      expect(
-        (target as NotificationOpenReportDetail).reportId,
-        'report_073',
-      );
+      expect((target as NotificationOpenReportDetail).reportId, 'report_073');
     });
 
-    test('SYSTEM with reportId routes to report detail even when kind is lost', () {
-      final NotificationNavigationTarget target =
-          resolveNotificationNavigationTarget(
-            type: 'SYSTEM',
-            data: <String, dynamic>{
-              'kind': 'digest_deferred',
-              'reportId': 'report_073',
-              'siteId': 'site_shared',
-            },
-          );
-      expect(target, isA<NotificationOpenReportDetail>());
-      expect(
-        (target as NotificationOpenReportDetail).reportId,
-        'report_073',
-      );
-    });
+    test(
+      'SYSTEM with reportId routes to report detail even when kind is lost',
+      () {
+        final NotificationNavigationTarget target =
+            resolveNotificationNavigationTarget(
+              type: 'SYSTEM',
+              data: <String, dynamic>{
+                'kind': 'digest_deferred',
+                'reportId': 'report_073',
+                'siteId': 'site_shared',
+              },
+            );
+        expect(target, isA<NotificationOpenReportDetail>());
+        expect((target as NotificationOpenReportDetail).reportId, 'report_073');
+      },
+    );
 
     test('REPORT_STATUS with reportId opens report detail', () {
       final NotificationNavigationTarget target =
@@ -48,10 +45,7 @@ void main() {
             },
           );
       expect(target, isA<NotificationOpenReportDetail>());
-      expect(
-        (target as NotificationOpenReportDetail).reportId,
-        'report_abc',
-      );
+      expect((target as NotificationOpenReportDetail).reportId, 'report_abc');
     });
 
     test('REPORT_STATUS with siteId only opens site detail', () {
@@ -69,10 +63,7 @@ void main() {
       final NotificationNavigationTarget target =
           resolveNotificationNavigationTarget(
             type: 'CLEANUP_EVENT',
-            data: <String, dynamic>{
-              'eventId': eventId,
-              'siteId': 'site_1',
-            },
+            data: <String, dynamic>{'eventId': eventId, 'siteId': 'site_1'},
           );
       expect(target, isA<NotificationOpenEventDetail>());
       expect((target as NotificationOpenEventDetail).eventId, eventId);
@@ -154,10 +145,7 @@ void main() {
             },
           );
       expect(target, isA<NotificationOpenDeepLink>());
-      expect(
-        (target as NotificationOpenDeepLink).path,
-        '/app/home?tab=events',
-      );
+      expect((target as NotificationOpenDeepLink).path, '/app/home?tab=events');
     });
 
     test('SYSTEM without entity ids is informational only', () {
@@ -201,10 +189,7 @@ void main() {
       final NotificationNavigationTarget target =
           resolveNotificationNavigationTargetFromItem(item);
       expect(target, isA<NotificationOpenReportDetail>());
-      expect(
-        (target as NotificationOpenReportDetail).reportId,
-        'report_073',
-      );
+      expect((target as NotificationOpenReportDetail).reportId, 'report_073');
     });
 
     test('same site different report ids resolve to distinct targets', () {

@@ -21,7 +21,8 @@ String? localizedAppErrorDetailMessage(AppLocalizations l10n, AppError error) {
   if (retry != null && retry > 0) {
     return l10n.errorUserRetryAfterSeconds(retry);
   }
-  if (error.code == 'MAP_RATE_LIMITED' || error.code == 'MAP_RATE_LIMIT_BACKEND') {
+  if (error.code == 'MAP_RATE_LIMITED' ||
+      error.code == 'MAP_RATE_LIMIT_BACKEND') {
     return l10n.mapErrorAutoRetryFootnote;
   }
   return null;

@@ -80,10 +80,7 @@ Widget _wrapOverlaySheet(BuildContext context, Widget child) {
   return SizedBox(
     width: _surfaceSize.width,
     height: _surfaceSize.height,
-    child: Align(
-      alignment: Alignment.bottomCenter,
-      child: sheet,
-    ),
+    child: Align(alignment: Alignment.bottomCenter, child: sheet),
   );
 }
 
@@ -157,7 +154,8 @@ double _sheetDecoratedHeight(WidgetTester tester) {
       (Widget widget) =>
           widget is DecoratedBox &&
           widget.decoration is BoxDecoration &&
-          (widget.decoration as BoxDecoration).color == AppColors.panelBackground,
+          (widget.decoration as BoxDecoration).color ==
+              AppColors.panelBackground,
     ),
   );
   expect(sheetShell, findsOneWidget);
@@ -171,11 +169,7 @@ Future<void> _pumpSubmitResolutionSheetViaBottomSheet(
   double topInset = 0,
 }) async {
   await tester.binding.setSurfaceSize(_surfaceSize);
-  _configureTestView(
-    tester,
-    keyboardInset: keyboardInset,
-    topInset: topInset,
-  );
+  _configureTestView(tester, keyboardInset: keyboardInset, topInset: topInset);
 
   await tester.pumpWidget(
     wrapForWidgetTest(
@@ -214,7 +208,8 @@ Finder _confirmCleanupSheetShell() {
       (Widget widget) =>
           widget is DecoratedBox &&
           widget.decoration is BoxDecoration &&
-          (widget.decoration as BoxDecoration).color == AppColors.panelBackground,
+          (widget.decoration as BoxDecoration).color ==
+              AppColors.panelBackground,
     ),
   );
 }
@@ -241,8 +236,7 @@ class _HangingSubmitSitesRepository implements SitesRepository {
   Future<List<String>> uploadResolutionPhotos(
     String siteId,
     List<String> filePaths,
-  ) =>
-      _uploadCompleter.future;
+  ) => _uploadCompleter.future;
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -299,6 +293,7 @@ void main() {
     EditableText editableText(WidgetTester t) {
       return t.widget<EditableText>(find.byType(EditableText));
     }
+
     expect(editableText(tester).focusNode.hasFocus, isTrue);
 
     tester.view.viewInsets = FakeViewPadding(bottom: _keyboardInset);
@@ -313,24 +308,22 @@ void main() {
   ) async {
     addTearDown(() => _resetTestView(tester));
 
-    await _pumpSubmitResolutionSheet(
-      tester,
-      keyboardInset: _keyboardInset,
-    );
+    await _pumpSubmitResolutionSheet(tester, keyboardInset: _keyboardInset);
 
-    final Iterable<SingleChildScrollView> scrollViews =
-        tester.widgetList<SingleChildScrollView>(
-      find.descendant(
-        of: find.byType(SubmitResolutionSheet),
-        matching: find.byType(SingleChildScrollView),
-      ),
-    );
+    final Iterable<SingleChildScrollView> scrollViews = tester
+        .widgetList<SingleChildScrollView>(
+          find.descendant(
+            of: find.byType(SubmitResolutionSheet),
+            matching: find.byType(SingleChildScrollView),
+          ),
+        );
     expect(scrollViews, isNotEmpty);
     final SingleChildScrollView bodyScrollView = scrollViews.first;
     expect(
       (bodyScrollView.padding as EdgeInsets).bottom,
       _keyboardInset,
-      reason: 'Overlay host keeps footer at screen bottom; note scroll pads for IME',
+      reason:
+          'Overlay host keeps footer at screen bottom; note scroll pads for IME',
     );
   });
 
@@ -356,9 +349,7 @@ void main() {
           child: Builder(
             builder: (BuildContext context) => _wrapOverlaySheet(
               context,
-              SubmitResolutionSheet(
-                siteId: 'site-test',
-              ),
+              SubmitResolutionSheet(siteId: 'site-test'),
             ),
           ),
         ),
@@ -395,10 +386,7 @@ void main() {
   ) async {
     addTearDown(() => _resetTestView(tester));
 
-    await _pumpSubmitResolutionSheet(
-      tester,
-      keyboardInset: _keyboardInset,
-    );
+    await _pumpSubmitResolutionSheet(tester, keyboardInset: _keyboardInset);
 
     final double keyboardTop = _surfaceSize.height - _keyboardInset;
     final Rect helpRect = tester.getRect(find.text(_helpText));
@@ -441,10 +429,7 @@ void main() {
   ) async {
     addTearDown(() => _resetTestView(tester));
 
-    await _pumpSubmitResolutionSheet(
-      tester,
-      siteTitle: _longSiteTitle,
-    );
+    await _pumpSubmitResolutionSheet(tester, siteTitle: _longSiteTitle);
 
     final Rect noteFieldRect = tester.getRect(find.byType(TextFormField));
     final Rect submitRect = _submitButtonRect(tester);
@@ -460,10 +445,7 @@ void main() {
   ) async {
     addTearDown(() => _resetTestView(tester));
 
-    await _pumpSubmitResolutionSheet(
-      tester,
-      siteTitle: _longSiteTitle,
-    );
+    await _pumpSubmitResolutionSheet(tester, siteTitle: _longSiteTitle);
 
     expect(find.text('Add a photo'), findsOneWidget);
     expect(find.text(_longSiteSubtitle), findsOneWidget);
@@ -475,10 +457,7 @@ void main() {
   ) async {
     addTearDown(() => _resetTestView(tester));
 
-    await _pumpSubmitResolutionSheet(
-      tester,
-      keyboardInset: _keyboardInset,
-    );
+    await _pumpSubmitResolutionSheet(tester, keyboardInset: _keyboardInset);
 
     expect(find.text('Add a photo'), findsOneWidget);
     expect(find.text('Add'), findsNothing);
@@ -490,10 +469,7 @@ void main() {
   ) async {
     addTearDown(() => _resetTestView(tester));
 
-    await _pumpSubmitResolutionSheet(
-      tester,
-      siteTitle: _longSiteTitle,
-    );
+    await _pumpSubmitResolutionSheet(tester, siteTitle: _longSiteTitle);
 
     expect(find.text(_longSiteSubtitle), findsOneWidget);
 
@@ -507,10 +483,7 @@ void main() {
   ) async {
     addTearDown(() => _resetTestView(tester));
 
-    await _pumpSubmitResolutionSheet(
-      tester,
-      keyboardInset: _keyboardInset,
-    );
+    await _pumpSubmitResolutionSheet(tester, keyboardInset: _keyboardInset);
 
     final Rect submitBefore = _submitButtonRect(tester);
     expect(find.byType(AnimatedPadding), findsNothing);
@@ -521,7 +494,8 @@ void main() {
     expect(
       submitAfter.bottom,
       closeTo(submitBefore.bottom, 2),
-      reason: 'Overlay host must not lift the pinned footer when keyboard opens',
+      reason:
+          'Overlay host must not lift the pinned footer when keyboard opens',
     );
     expect(
       submitAfter.bottom,
@@ -537,8 +511,9 @@ void main() {
 
     await _pumpSubmitResolutionSheetViaBottomSheet(tester);
 
-    final AppSheetScaffold scaffold =
-        tester.widget<AppSheetScaffold>(find.byType(AppSheetScaffold));
+    final AppSheetScaffold scaffold = tester.widget<AppSheetScaffold>(
+      find.byType(AppSheetScaffold),
+    );
     expect(scaffold.padFooterForKeyboard, isFalse);
     expect(scaffold.shrinkForKeyboard, isFalse);
 
@@ -642,7 +617,8 @@ void main() {
     expect(
       submitRect.bottom,
       greaterThan(keyboardTop),
-      reason: 'Pinned footer should stay at the screen bottom behind the keyboard',
+      reason:
+          'Pinned footer should stay at the screen bottom behind the keyboard',
     );
   });
 
@@ -651,10 +627,7 @@ void main() {
   ) async {
     addTearDown(() => _resetTestView(tester));
 
-    await _pumpSubmitResolutionSheet(
-      tester,
-      keyboardInset: _keyboardInset,
-    );
+    await _pumpSubmitResolutionSheet(tester, keyboardInset: _keyboardInset);
 
     expect(find.text(_helpText), findsOneWidget);
   });
@@ -664,10 +637,7 @@ void main() {
   ) async {
     addTearDown(() => _resetTestView(tester));
 
-    await _pumpSubmitResolutionSheet(
-      tester,
-      keyboardInset: _keyboardInset,
-    );
+    await _pumpSubmitResolutionSheet(tester, keyboardInset: _keyboardInset);
 
     await _focusNoteField(tester);
 
@@ -685,7 +655,8 @@ void main() {
     expect(
       submitRect.bottom,
       greaterThan(keyboardTop),
-      reason: 'Pinned footer stays behind the keyboard while note remains visible',
+      reason:
+          'Pinned footer stays behind the keyboard while note remains visible',
     );
     expect(
       noteFieldRect.height,
@@ -704,10 +675,7 @@ void main() {
   ) async {
     addTearDown(() => _resetTestView(tester));
 
-    await _pumpSubmitResolutionSheet(
-      tester,
-      keyboardInset: _keyboardInset,
-    );
+    await _pumpSubmitResolutionSheet(tester, keyboardInset: _keyboardInset);
 
     await _focusNoteField(tester);
 
@@ -765,7 +733,8 @@ void main() {
     expect(
       noteFieldRect.bottom,
       lessThanOrEqualTo(keyboardTop),
-      reason: 'Note field must stay visible above the keyboard with photos attached',
+      reason:
+          'Note field must stay visible above the keyboard with photos attached',
     );
     expect(
       noteLabelRect.top,

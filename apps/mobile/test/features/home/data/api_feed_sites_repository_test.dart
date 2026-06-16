@@ -135,8 +135,9 @@ class _StubSitesLocalCache extends SitesLocalCache {
   feedPage;
 
   @override
-  Future<({Map<String, dynamic> payload, DateTime cachedAt})?>
-  loadMapSnapshot({required String authSegment}) async {
+  Future<({Map<String, dynamic> payload, DateTime cachedAt})?> loadMapSnapshot({
+    required String authSegment,
+  }) async {
     return snapshot;
   }
 

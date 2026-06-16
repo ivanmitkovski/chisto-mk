@@ -31,16 +31,17 @@ Future<void> _pumpHeaderInSheet(
               maxChildSize: kCommentsSheetMaxSize,
               snap: true,
               snapSizes: kCommentsSheetSnapSizes,
-              builder: (BuildContext context, ScrollController scrollController) {
-                return SingleChildScrollView(
-                  controller: scrollController,
-                  child: CommentsBottomSheetHeader(
-                    siteTitle: siteTitle,
-                    sheetController: sheetController,
-                    sizeConfig: CommentsSheetSizeConfig.standard,
-                  ),
-                );
-              },
+              builder:
+                  (BuildContext context, ScrollController scrollController) {
+                    return SingleChildScrollView(
+                      controller: scrollController,
+                      child: CommentsBottomSheetHeader(
+                        siteTitle: siteTitle,
+                        sheetController: sheetController,
+                        sizeConfig: CommentsSheetSizeConfig.standard,
+                      ),
+                    );
+                  },
             ),
           ],
         ),
@@ -53,7 +54,9 @@ Future<void> _pumpHeaderInSheet(
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('drag starting on title resizes the sheet', (WidgetTester tester) async {
+  testWidgets('drag starting on title resizes the sheet', (
+    WidgetTester tester,
+  ) async {
     final DraggableScrollableController sheetController =
         DraggableScrollableController();
     addTearDown(sheetController.dispose);
@@ -69,7 +72,9 @@ void main() {
     expect(sheetController.size, lessThan(initialSize));
   });
 
-  testWidgets('drag starting on site title resizes the sheet', (WidgetTester tester) async {
+  testWidgets('drag starting on site title resizes the sheet', (
+    WidgetTester tester,
+  ) async {
     final DraggableScrollableController sheetController =
         DraggableScrollableController();
     addTearDown(sheetController.dispose);
@@ -89,7 +94,9 @@ void main() {
     expect(sheetController.size, lessThan(initialSize));
   });
 
-  testWidgets('header is inert without sheet controller', (WidgetTester tester) async {
+  testWidgets('header is inert without sheet controller', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       MaterialApp(
         localizationsDelegates: const <LocalizationsDelegate<dynamic>>[

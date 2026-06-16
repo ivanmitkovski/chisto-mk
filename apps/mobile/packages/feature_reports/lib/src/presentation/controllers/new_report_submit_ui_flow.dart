@@ -269,7 +269,9 @@ abstract final class NewReportSubmitUiFlow {
     if (kLocationGuardErrorCodes.contains(error.code)) {
       if (context.mounted) {
         try {
-          final ProviderContainer container = ProviderScope.containerOf(context);
+          final ProviderContainer container = ProviderScope.containerOf(
+            context,
+          );
           return handleLocationGuardErrorWithRead(
             context,
             container.read,

@@ -59,7 +59,8 @@ void main() {
       // when config.isProd, so the temporary cleartext dev/staging URL (which
       // would otherwise be rejected) does not block beta startup.
       expect(
-        () => AppConfig.assertReleaseTransportSecurity(AppConfig.prod.apiBaseUrl),
+        () =>
+            AppConfig.assertReleaseTransportSecurity(AppConfig.prod.apiBaseUrl),
         returnsNormally,
       );
       expect(
@@ -67,7 +68,8 @@ void main() {
           AppConfig.staging.apiBaseUrl,
         ),
         throwsStateError,
-        reason: 'cleartext dev URL is only allowed because the check is '
+        reason:
+            'cleartext dev URL is only allowed because the check is '
             'prod-only in kReleaseMode',
       );
     });

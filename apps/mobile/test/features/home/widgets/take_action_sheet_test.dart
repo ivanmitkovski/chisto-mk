@@ -29,7 +29,8 @@ Finder _takeActionSheetShell() {
       (Widget widget) =>
           widget is DecoratedBox &&
           widget.decoration is BoxDecoration &&
-          (widget.decoration as BoxDecoration).color == AppColors.panelBackground,
+          (widget.decoration as BoxDecoration).color ==
+              AppColors.panelBackground,
     ),
   );
 }

@@ -88,11 +88,9 @@ void main() {
       focus.dispose();
     });
 
-    await tester.pumpWidget(_wrapInputBar(
-      controller: controller,
-      focus: focus,
-      canPost: true,
-    ));
+    await tester.pumpWidget(
+      _wrapInputBar(controller: controller, focus: focus, canPost: true),
+    );
 
     await tester.enterText(
       find.byType(TextField),
@@ -114,14 +112,16 @@ void main() {
       focus.dispose();
     });
 
-    await tester.pumpWidget(_wrapInputBar(
-      controller: controller,
-      focus: focus,
-      canPost: false,
-      onCommit: ([String? _]) async {
-        commitCount++;
-      },
-    ));
+    await tester.pumpWidget(
+      _wrapInputBar(
+        controller: controller,
+        focus: focus,
+        canPost: false,
+        onCommit: ([String? _]) async {
+          commitCount++;
+        },
+      ),
+    );
 
     await tester.tap(find.byIcon(Icons.arrow_upward_rounded));
     await tester.pump();
@@ -141,11 +141,9 @@ void main() {
       focus.dispose();
     });
 
-    await tester.pumpWidget(_wrapInputBar(
-      controller: controller,
-      focus: focus,
-      canPost: true,
-    ));
+    await tester.pumpWidget(
+      _wrapInputBar(controller: controller, focus: focus, canPost: true),
+    );
 
     expect(find.text('80 characters left'), findsOneWidget);
   });
@@ -210,6 +208,9 @@ void main() {
     );
 
     expect(tester.takeException(), isNull);
-    expect(appSheetOverlayKeyboardInset(tester.element(find.byType(Scaffold))), keyboardInset);
+    expect(
+      appSheetOverlayKeyboardInset(tester.element(find.byType(Scaffold))),
+      keyboardInset,
+    );
   });
 }

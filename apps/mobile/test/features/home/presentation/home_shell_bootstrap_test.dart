@@ -28,9 +28,7 @@ void main() {
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
-      wrapForWidgetTest(
-        HomeShellBootstrap(child: const Text('child')),
-      ),
+      wrapForWidgetTest(HomeShellBootstrap(child: const Text('child'))),
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 600));

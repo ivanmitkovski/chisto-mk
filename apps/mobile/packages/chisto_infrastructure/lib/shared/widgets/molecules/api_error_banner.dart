@@ -49,8 +49,7 @@ class _ApiErrorBannerState extends State<ApiErrorBanner> {
       }
       final AppLocalizations l10n = AppLocalizations.of(context)!;
       final String announcement = _resolveMessage(l10n);
-      final bool hardFailure =
-          widget.error != null && !widget.error!.retryable;
+      final bool hardFailure = widget.error != null && !widget.error!.retryable;
       if (hardFailure) {
         AppHaptics.error(context);
       } else {
@@ -68,7 +67,8 @@ class _ApiErrorBannerState extends State<ApiErrorBanner> {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
     final String displayMessage = _resolveMessage(l10n);
-    final String semanticsLabel = widget.detail != null && widget.detail!.isNotEmpty
+    final String semanticsLabel =
+        widget.detail != null && widget.detail!.isNotEmpty
         ? '$displayMessage ${widget.detail}'
         : displayMessage;
 
@@ -84,9 +84,7 @@ class _ApiErrorBannerState extends State<ApiErrorBanner> {
         decoration: BoxDecoration(
           color: AppColors.error.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(AppSpacing.radius14),
-          border: Border.all(
-            color: AppColors.error.withValues(alpha: 0.35),
-          ),
+          border: Border.all(color: AppColors.error.withValues(alpha: 0.35)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

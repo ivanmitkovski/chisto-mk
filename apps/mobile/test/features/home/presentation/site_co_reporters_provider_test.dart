@@ -67,9 +67,7 @@ void main() {
   test('siteCoReportersNotifierProvider loads and dedupes by id', () async {
     final _CoReportersFakeRepo repo = _CoReportersFakeRepo();
     final ProviderContainer container = ProviderContainer(
-      overrides: <Override>[
-        sitesRepositoryProvider.overrideWithValue(repo),
-      ],
+      overrides: <Override>[sitesRepositoryProvider.overrideWithValue(repo)],
     );
     addTearDown(container.dispose);
 
@@ -84,7 +82,10 @@ void main() {
       siteCoReportersNotifierProvider('site-1'),
     );
     expect(state.items, hasLength(2));
-    expect(state.items.map((SiteCoReporterItem i) => i.id), <String>['row-1', 'row-2']);
+    expect(state.items.map((SiteCoReporterItem i) => i.id), <String>[
+      'row-1',
+      'row-2',
+    ]);
     expect(state.hasMore, isFalse);
     expect(repo.pageCalls, greaterThanOrEqualTo(2));
   });

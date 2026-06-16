@@ -12,8 +12,7 @@ class AppGroupedActionList extends StatelessWidget {
   final List<Widget> children;
 
   /// Aligns dividers with the primary text column of grouped [AppActionTile]s.
-  static const double dividerLeadingInset =
-      AppSpacing.sm + 40 + AppSpacing.md;
+  static const double dividerLeadingInset = AppSpacing.sm + 40 + AppSpacing.md;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +20,9 @@ class AppGroupedActionList extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final BorderRadius borderRadius = BorderRadius.circular(AppSpacing.radiusLg);
+    final BorderRadius borderRadius = BorderRadius.circular(
+      AppSpacing.radiusLg,
+    );
     final List<Widget> items = <Widget>[];
     for (int i = 0; i < children.length; i++) {
       items.add(children[i]);

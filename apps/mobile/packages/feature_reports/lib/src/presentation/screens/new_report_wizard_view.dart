@@ -289,8 +289,9 @@ class NewReportWizardView extends StatelessWidget {
                     isStageComplete: isStageComplete,
                     canNavigateToStage: canNavigateToStage,
                     onBackFromEvidence: () => Navigator.of(context).maybePop(),
-                    onBackToPreviousStage: () =>
-                        onGoToStage(ReportStage.values[c.currentStageIndex - 1]),
+                    onBackToPreviousStage: () => onGoToStage(
+                      ReportStage.values[c.currentStageIndex - 1],
+                    ),
                     onTapStage: onGoToStage,
                     showDraftRestoredChip: showDraftRestoredChip,
                   ),
@@ -312,7 +313,10 @@ class NewReportWizardView extends StatelessWidget {
                           ).animate(animation);
                           return FadeTransition(
                             opacity: animation,
-                            child: SlideTransition(position: slide, child: child),
+                            child: SlideTransition(
+                              position: slide,
+                              child: child,
+                            ),
                           );
                         },
                     child: KeyedSubtree(

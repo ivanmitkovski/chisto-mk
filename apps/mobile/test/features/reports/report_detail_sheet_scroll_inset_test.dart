@@ -88,7 +88,8 @@ void main() {
       expect(
         bannerBox.localToGlobal(Offset(0, bannerBox.size.height)).dy,
         lessThanOrEqualTo(screenHeight - homeIndicatorInset),
-        reason: 'Last content scrolls fully into view above the home '
+        reason:
+            'Last content scrolls fully into view above the home '
             'indicator — nothing is cut',
       );
 

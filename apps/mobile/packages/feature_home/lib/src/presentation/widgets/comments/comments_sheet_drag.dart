@@ -19,7 +19,8 @@ export 'package:design_system/design_system.dart'
         sortedAppSheetSnapCandidates;
 
 const double kCommentsSheetFlingVelocity = kAppSheetFlingVelocity;
-const double kCommentsSheetLegacyDismissVelocity = kAppSheetLegacyDismissVelocity;
+const double kCommentsSheetLegacyDismissVelocity =
+    kAppSheetLegacyDismissVelocity;
 const double kCommentsSheetDismissSlop = kAppSheetDismissSlop;
 
 const double kCommentsSheetMinSize = 0.56;

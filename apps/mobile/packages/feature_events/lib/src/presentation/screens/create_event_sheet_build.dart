@@ -25,184 +25,184 @@ extension _CreateEventSheetBuild on _CreateEventSheetState {
               AppSpacing.lg,
               AppSpacing.lg + CreateEventStickyFooter.scrollBottomReserve,
             ),
-          sliver: SliverToBoxAdapter(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                _staggeredSection(
-                  slot: 0,
-                  child: CreateEventSiteSection(
-                    sectionKey: _siteSectionKey,
-                    site: _selectedSite,
-                    showError: _showSiteError(l10n),
-                    onSelectSiteTap: () async => _showSitePicker(),
-                    onMapPreviewTap: () async =>
-                        _showSitePicker(showMapTab: true),
+            sliver: SliverToBoxAdapter(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  _staggeredSection(
+                    slot: 0,
+                    child: CreateEventSiteSection(
+                      sectionKey: _siteSectionKey,
+                      site: _selectedSite,
+                      showError: _showSiteError(l10n),
+                      onSelectSiteTap: () async => _showSitePicker(),
+                      onMapPreviewTap: () async =>
+                          _showSitePicker(showMapTab: true),
+                    ),
                   ),
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                _staggeredSection(
-                  slot: 1,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
-                      _sectionGroupCaption(
-                        context,
-                        context.l10n.createEventSectionScheduleCaption,
-                      ),
-                      Builder(
-                        builder: (BuildContext context) {
-                          final ({DateTime? minStart, DateTime? minEnd}) b =
-                              _schedulePickerBounds();
-                          return CreateEventScheduleSection(
-                            sectionKey: _scheduleSectionKey,
-                            selectedDate: _selectedDate,
-                            startTime: _startTime,
-                            endTime: _endTime,
-                            showError: _showScheduleError(l10n),
-                            isTimeRangeValid: _isTimeRangeValid,
-                            scheduleIssue: _createScheduleIssue(),
-                            minimumStartPickerTime: b.minStart,
-                            minimumEndPickerTime: b.minEnd,
-                            maximumEndPickerTime:
-                                pickerMaximumForEndSameCalendarDay(),
-                            onDateSelected: (DateTime date) {
-                              setState(() {
-                                _selectedDate = DateUtils.dateOnly(date);
-                                final ({EventTime start, EventTime end})
-                                clamped = clampCreateOrUpcomingSchedule(
-                                  dateOnly: _selectedDate!,
-                                  start: _startTime,
-                                  end: _endTime,
-                                  now: _now(),
-                                );
-                                _startTime = clamped.start;
-                                _endTime = clamped.end;
-                              });
-                              _scheduleConflictPreviewDebounced();
-                            },
-                            onStartChanged: (EventTime t) {
-                              setState(() {
-                                _startTime = t;
-                                final DateTime? d = _selectedDate;
-                                if (d == null) {
-                                  return;
-                                }
-                                final DateTime si = eventScheduleInstantLocal(
-                                  DateUtils.dateOnly(d),
-                                  _startTime,
-                                );
-                                final DateTime ei = eventScheduleInstantLocal(
-                                  DateUtils.dateOnly(d),
-                                  _endTime,
-                                );
-                                if (!ei.isAfter(si)) {
-                                  _endTime = eventTimeFromDateTime(
-                                    ceilToMinuteGrid(
-                                      si.add(const Duration(hours: 1)),
-                                    ),
+                  const SizedBox(height: AppSpacing.lg),
+                  _staggeredSection(
+                    slot: 1,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        _sectionGroupCaption(
+                          context,
+                          context.l10n.createEventSectionScheduleCaption,
+                        ),
+                        Builder(
+                          builder: (BuildContext context) {
+                            final ({DateTime? minStart, DateTime? minEnd}) b =
+                                _schedulePickerBounds();
+                            return CreateEventScheduleSection(
+                              sectionKey: _scheduleSectionKey,
+                              selectedDate: _selectedDate,
+                              startTime: _startTime,
+                              endTime: _endTime,
+                              showError: _showScheduleError(l10n),
+                              isTimeRangeValid: _isTimeRangeValid,
+                              scheduleIssue: _createScheduleIssue(),
+                              minimumStartPickerTime: b.minStart,
+                              minimumEndPickerTime: b.minEnd,
+                              maximumEndPickerTime:
+                                  pickerMaximumForEndSameCalendarDay(),
+                              onDateSelected: (DateTime date) {
+                                setState(() {
+                                  _selectedDate = DateUtils.dateOnly(date);
+                                  final ({EventTime start, EventTime end})
+                                  clamped = clampCreateOrUpcomingSchedule(
+                                    dateOnly: _selectedDate!,
+                                    start: _startTime,
+                                    end: _endTime,
+                                    now: _now(),
                                   );
-                                }
-                                _endTime = clampEndTimeToEventDay(
-                                  dateOnly: DateUtils.dateOnly(d),
-                                  end: _endTime,
-                                  start: _startTime,
-                                );
-                              });
-                              _scheduleConflictPreviewDebounced();
-                            },
-                            onEndChanged: (EventTime t) {
-                              setState(() {
-                                final DateTime? d = _selectedDate;
-                                _endTime = d == null
-                                    ? t
-                                    : clampEndTimeToEventDay(
-                                        dateOnly: DateUtils.dateOnly(d),
-                                        end: t,
-                                        start: _startTime,
-                                      );
-                              });
-                              _scheduleConflictPreviewDebounced();
-                            },
-                          );
-                        },
-                      ),
-                      if (_scheduleConflict.hint != null) ...<Widget>[
-                        const SizedBox(height: AppSpacing.sm),
-                        Container(
-                          padding: const EdgeInsets.all(AppSpacing.md),
-                          decoration: BoxDecoration(
-                            color: AppColors.accentWarning.withValues(
-                              alpha: 0.12,
-                            ),
-                            borderRadius: BorderRadius.circular(
-                              AppSpacing.radiusMd,
-                            ),
-                            border: Border.all(
+                                  _startTime = clamped.start;
+                                  _endTime = clamped.end;
+                                });
+                                _scheduleConflictPreviewDebounced();
+                              },
+                              onStartChanged: (EventTime t) {
+                                setState(() {
+                                  _startTime = t;
+                                  final DateTime? d = _selectedDate;
+                                  if (d == null) {
+                                    return;
+                                  }
+                                  final DateTime si = eventScheduleInstantLocal(
+                                    DateUtils.dateOnly(d),
+                                    _startTime,
+                                  );
+                                  final DateTime ei = eventScheduleInstantLocal(
+                                    DateUtils.dateOnly(d),
+                                    _endTime,
+                                  );
+                                  if (!ei.isAfter(si)) {
+                                    _endTime = eventTimeFromDateTime(
+                                      ceilToMinuteGrid(
+                                        si.add(const Duration(hours: 1)),
+                                      ),
+                                    );
+                                  }
+                                  _endTime = clampEndTimeToEventDay(
+                                    dateOnly: DateUtils.dateOnly(d),
+                                    end: _endTime,
+                                    start: _startTime,
+                                  );
+                                });
+                                _scheduleConflictPreviewDebounced();
+                              },
+                              onEndChanged: (EventTime t) {
+                                setState(() {
+                                  final DateTime? d = _selectedDate;
+                                  _endTime = d == null
+                                      ? t
+                                      : clampEndTimeToEventDay(
+                                          dateOnly: DateUtils.dateOnly(d),
+                                          end: t,
+                                          start: _startTime,
+                                        );
+                                });
+                                _scheduleConflictPreviewDebounced();
+                              },
+                            );
+                          },
+                        ),
+                        if (_scheduleConflict.hint != null) ...<Widget>[
+                          const SizedBox(height: AppSpacing.sm),
+                          Container(
+                            padding: const EdgeInsets.all(AppSpacing.md),
+                            decoration: BoxDecoration(
                               color: AppColors.accentWarning.withValues(
-                                alpha: 0.45,
+                                alpha: 0.12,
+                              ),
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusMd,
+                              ),
+                              border: Border.all(
+                                color: AppColors.accentWarning.withValues(
+                                  alpha: 0.45,
+                                ),
                               ),
                             ),
-                          ),
-                          child: Text(
-                            context.l10n.eventsScheduleConflictPreviewBody(
-                              _scheduleConflict.hint!.title,
-                              _scheduleConflict.formatConflictWhen(
-                                context,
-                                _scheduleConflict.hint!.scheduledAt,
+                            child: Text(
+                              context.l10n.eventsScheduleConflictPreviewBody(
+                                _scheduleConflict.hint!.title,
+                                _scheduleConflict.formatConflictWhen(
+                                  context,
+                                  _scheduleConflict.hint!.scheduledAt,
+                                ),
                               ),
+                              style: AppTypography.eventsSupportingCaption(
+                                Theme.of(context).textTheme,
+                              ).copyWith(color: AppColors.textPrimary),
                             ),
-                            style: AppTypography.eventsSupportingCaption(
-                              Theme.of(context).textTheme,
-                            ).copyWith(color: AppColors.textPrimary),
                           ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  _staggeredSection(
+                    slot: 2,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        _sectionGroupCaption(
+                          context,
+                          context.l10n.createEventSectionDetailsCaption,
+                        ),
+                        CreateEventDetailsSection(
+                          titleFieldKey: _titleFieldKey,
+                          categorySectionKey: _categorySectionKey,
+                          titleController: _titleController,
+                          titleFocusNode: _titleFocus,
+                          descriptionFieldKey: _descriptionFieldKey,
+                          descriptionFocusNode: _descriptionFocus,
+                          descriptionController: _descriptionController,
+                          showTitleError: _showTitleError(l10n),
+                          showCategoryError: _showCategoryError(l10n),
+                          selectedCategory: _selectedCategory,
+                          selectedScale: _selectedScale,
+                          selectedDifficulty: _selectedDifficulty,
+                          selectedGear: _selectedGear,
+                          maxParticipants: _maxParticipants,
+                          onTitleChanged: () => setState(() {}),
+                          onCategoryTap: _showCategoryPicker,
+                          onVolunteerCapTap: _showVolunteerCapPicker,
+                          onScaleTap: _showScalePicker,
+                          onDifficultyTap: _showDifficultyPicker,
+                          onGearTap: _showGearPicker,
+                          onDescriptionChanged: (_) => setState(() {}),
                         ),
                       ],
-                    ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                _staggeredSection(
-                  slot: 2,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
-                      _sectionGroupCaption(
-                        context,
-                        context.l10n.createEventSectionDetailsCaption,
-                      ),
-                      CreateEventDetailsSection(
-                        titleFieldKey: _titleFieldKey,
-                        categorySectionKey: _categorySectionKey,
-                        titleController: _titleController,
-                        titleFocusNode: _titleFocus,
-                        descriptionFieldKey: _descriptionFieldKey,
-                        descriptionFocusNode: _descriptionFocus,
-                        descriptionController: _descriptionController,
-                        showTitleError: _showTitleError(l10n),
-                        showCategoryError: _showCategoryError(l10n),
-                        selectedCategory: _selectedCategory,
-                        selectedScale: _selectedScale,
-                        selectedDifficulty: _selectedDifficulty,
-                        selectedGear: _selectedGear,
-                        maxParticipants: _maxParticipants,
-                        onTitleChanged: () => setState(() {}),
-                        onCategoryTap: _showCategoryPicker,
-                        onVolunteerCapTap: _showVolunteerCapPicker,
-                        onScaleTap: _showScalePicker,
-                        onDifficultyTap: _showDifficultyPicker,
-                        onGearTap: _showGearPicker,
-                        onDescriptionChanged: (_) => setState(() {}),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
-      ],
-    ),
+        ],
+      ),
     );
   }
 

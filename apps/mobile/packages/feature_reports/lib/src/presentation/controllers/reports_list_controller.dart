@@ -236,7 +236,9 @@ class ReportsListController extends _$ReportsListController {
         .map((ReportListItem r) => r.id)
         .toSet();
     final List<ReportListItem> pendingOptimistic = current
-        .where((ReportListItem r) => r.isOptimistic && !serverIds.contains(r.id))
+        .where(
+          (ReportListItem r) => r.isOptimistic && !serverIds.contains(r.id),
+        )
         .toList();
     return <ReportListItem>[...pendingOptimistic, ...serverPage];
   }

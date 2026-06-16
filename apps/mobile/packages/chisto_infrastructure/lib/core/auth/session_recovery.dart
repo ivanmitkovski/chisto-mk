@@ -57,10 +57,9 @@ abstract final class SessionRecovery {
       return false;
     }
 
-    await readRoot(authRepositoryProvider).invalidateLocalSession(
-      observedEpoch: observedEpoch,
-      reason: reason,
-    );
+    await readRoot(
+      authRepositoryProvider,
+    ).invalidateLocalSession(observedEpoch: observedEpoch, reason: reason);
     return true;
   }
 

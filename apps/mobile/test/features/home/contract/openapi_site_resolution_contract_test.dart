@@ -32,8 +32,7 @@ void main() {
       expect(mediaUrls['minItems'], 1);
       expect(mediaUrls['maxItems'], ReportFieldLimits.maxPhotos);
 
-      final Map<String, dynamic> note =
-          props['note']! as Map<String, dynamic>;
+      final Map<String, dynamic> note = props['note']! as Map<String, dynamic>;
       expect(note['maxLength'], 500);
     },
   );

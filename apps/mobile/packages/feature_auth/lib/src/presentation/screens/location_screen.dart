@@ -71,8 +71,9 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
       _block = _LocationGateBlock.none;
     });
 
-    final LocationService location =
-        ref.read(appBootstrapProvider).locationService;
+    final LocationService location = ref
+        .read(appBootstrapProvider)
+        .locationService;
     final bool permissionOk = await ensureLocationPermissionForGate(
       context: context,
       location: location,
@@ -142,7 +143,9 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
 
   Future<void> _markGuidePending() async {
     try {
-      await ref.read(featureGuideRepositoryProvider).markPostRegistrationGuidePending();
+      await ref
+          .read(featureGuideRepositoryProvider)
+          .markPostRegistrationGuidePending();
     } on Object catch (e, st) {
       AppLog.warn(
         '[LocationScreen] markPostRegistrationGuidePending failed',
@@ -214,7 +217,8 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
                       children: <Widget>[
                         const SizedBox(height: AppSpacing.radiusSm),
                         Text(
-                          isBlocked && _block == _LocationGateBlock.outsideMacedonia
+                          isBlocked &&
+                                  _block == _LocationGateBlock.outsideMacedonia
                               ? l10n.authLocationGateOutsideTitle
                               : l10n.authLocationTitle,
                           style: AppTypography.authScreenTitle(textTheme),
@@ -244,8 +248,9 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
                           Center(
                             child: AppButton.text(
                               label: l10n.feedNoLocationOpenSettings,
-                              onPressed: () =>
-                                  unawaited(showLocationOpenSettingsDialog(context)),
+                              onPressed: () => unawaited(
+                                showLocationOpenSettingsDialog(context),
+                              ),
                             ),
                           ),
                           const SizedBox(height: AppSpacing.xs),
@@ -259,9 +264,9 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
                         const SizedBox(height: AppSpacing.sm),
                         Text(
                           l10n.authLocationPrivacyNote,
-                          style: AppTypography.cardSubtitle(textTheme).copyWith(
-                            height: 1.35,
-                          ),
+                          style: AppTypography.cardSubtitle(
+                            textTheme,
+                          ).copyWith(height: 1.35),
                         ),
                         const SizedBox(height: AppSpacing.md),
                       ],
@@ -336,9 +341,14 @@ class _LocationScreenState extends ConsumerState<LocationScreen> {
                         height: 30,
                         child: Container(
                           decoration: BoxDecoration(
-                            color: AppColors.primaryDark.withValues(alpha: 0.82),
+                            color: AppColors.primaryDark.withValues(
+                              alpha: 0.82,
+                            ),
                             shape: BoxShape.circle,
-                            border: Border.all(color: AppColors.white, width: 2),
+                            border: Border.all(
+                              color: AppColors.white,
+                              width: 2,
+                            ),
                           ),
                         ),
                       ),

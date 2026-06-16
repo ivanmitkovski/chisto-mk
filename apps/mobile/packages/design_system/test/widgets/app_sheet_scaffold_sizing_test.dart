@@ -83,7 +83,8 @@ void main() {
     expect(
       sheetRect.bottom - lastActionRect.bottom,
       lessThan(56),
-      reason: 'Last action row should sit near the sheet bottom without dead band',
+      reason:
+          'Last action row should sit near the sheet bottom without dead band',
     );
   });
 }

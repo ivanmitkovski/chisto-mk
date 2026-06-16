@@ -112,11 +112,7 @@ String? _messageForConstraintKeys(
     if (!constraints.containsKey(key)) {
       continue;
     }
-    final String? message = _messageForConstraintKey(
-      key,
-      l10n,
-      clientFieldId,
-    );
+    final String? message = _messageForConstraintKey(key, l10n, clientFieldId);
     if (message != null) {
       return message;
     }

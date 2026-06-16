@@ -21,9 +21,7 @@ class CommentsBottomSheetHeader extends StatelessWidget {
   void _onVerticalDragUpdate(DragUpdateDetails details) {
     final DraggableScrollableController? controller = sheetController;
     final double? primaryDelta = details.primaryDelta;
-    if (controller == null ||
-        !controller.isAttached ||
-        primaryDelta == null) {
+    if (controller == null || !controller.isAttached || primaryDelta == null) {
       return;
     }
     final double deltaSize = controller.pixelsToSize(primaryDelta);

@@ -164,20 +164,17 @@ class _PhotoReviewSheetState extends State<PhotoReviewSheet> {
                                     );
                                   },
                               errorBuilder:
-                                  (
-                                    _,
-                                    Object error,
-                                    StackTrace? stackTrace,
-                                  ) => const ColoredBox(
-                                    color: AppColors.inputFill,
-                                    child: Center(
-                                      child: Icon(
-                                        Icons.image_not_supported_outlined,
-                                        color: AppColors.textMuted,
-                                        size: 32,
+                                  (_, Object error, StackTrace? stackTrace) =>
+                                      const ColoredBox(
+                                        color: AppColors.inputFill,
+                                        child: Center(
+                                          child: Icon(
+                                            Icons.image_not_supported_outlined,
+                                            color: AppColors.textMuted,
+                                            size: 32,
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  ),
                             ),
                           ),
                         ),

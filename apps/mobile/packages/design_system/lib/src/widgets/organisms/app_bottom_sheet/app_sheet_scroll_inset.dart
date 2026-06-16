@@ -37,10 +37,7 @@ abstract final class AppSheetScrollInset {
     return base.copyWith(bottom: base.bottom + bottom);
   }
 
-  static Widget wrap({
-    required Widget child,
-    required double bottom,
-  }) {
+  static Widget wrap({required Widget child, required double bottom}) {
     if (bottom <= 0) {
       return AppSheetScrollInsets(scrollBottom: 0, child: child);
     }
@@ -76,10 +73,7 @@ abstract final class AppSheetScrollInset {
       final bool shrinkWrap = child.shrinkWrap;
       final Axis scrollDirection = child.scrollDirection;
       final bool reverse = child.reverse;
-      final EdgeInsets mergedPadding = _mergeBottom(
-        child.padding,
-        bottom,
-      );
+      final EdgeInsets mergedPadding = _mergeBottom(child.padding, bottom);
 
       final SliverChildDelegate delegate = child.childrenDelegate;
       if (delegate is SliverChildBuilderDelegate) {

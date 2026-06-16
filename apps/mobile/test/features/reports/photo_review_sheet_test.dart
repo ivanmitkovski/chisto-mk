@@ -24,9 +24,7 @@ void main() {
             size: Size(390, 844),
             viewPadding: EdgeInsets.only(bottom: 34),
           ),
-          child: Scaffold(
-            body: PhotoReviewSheet(file: XFile('/tmp/test.jpg')),
-          ),
+          child: Scaffold(body: PhotoReviewSheet(file: XFile('/tmp/test.jpg'))),
         ),
       ),
     );

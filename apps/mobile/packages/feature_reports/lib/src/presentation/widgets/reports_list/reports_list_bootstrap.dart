@@ -63,6 +63,7 @@ extension ReportsListBootstrap on _ReportsListScreenState {
         unawaited(_loadReports());
       }
     }
+
     realtimeSvc.connectionState.addListener(onConnectionChanged);
     _realtimeConnectionListener = onConnectionChanged;
     _configureRestPollForConnection(realtimeSvc.connectionState.value);
@@ -100,7 +101,9 @@ extension ReportsListBootstrap on _ReportsListScreenState {
     _draftSummaryListenable = null;
     final VoidCallback? connectionListener = _realtimeConnectionListener;
     if (connectionListener != null) {
-      _reportsRealtimeService?.connectionState.removeListener(connectionListener);
+      _reportsRealtimeService?.connectionState.removeListener(
+        connectionListener,
+      );
       _realtimeConnectionListener = null;
     }
     _reportsRealtimeService = null;
@@ -207,9 +210,7 @@ extension ReportsListBootstrap on _ReportsListScreenState {
     });
   }
 
-  void _configureRestPollForConnection(
-    ReportsRealtimeConnectionState? state,
-  ) {
+  void _configureRestPollForConnection(ReportsRealtimeConnectionState? state) {
     _restPollTimer?.cancel();
     _restPollTimer = null;
     if (!mounted || _disposed) {

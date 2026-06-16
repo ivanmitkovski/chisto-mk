@@ -81,8 +81,9 @@ class CommentListTile extends StatelessWidget {
             SizedBox(width: indent),
             AppAvatar(
               name: authorLabel,
-              imageUrl:
-                  comment.authorIsDeleted ? null : comment.authorAvatarUrl,
+              imageUrl: comment.authorIsDeleted
+                  ? null
+                  : comment.authorAvatarUrl,
               size: 36,
               fontSize: 14,
             ),
@@ -115,10 +116,7 @@ class CommentListTile extends StatelessWidget {
                           text: TextSpan(
                             style: textStyle,
                             children: <TextSpan>[
-                              TextSpan(
-                                text: '$authorLabel ',
-                                style: nameStyle,
-                              ),
+                              TextSpan(text: '$authorLabel ', style: nameStyle),
                               TextSpan(text: comment.text),
                             ],
                           ),

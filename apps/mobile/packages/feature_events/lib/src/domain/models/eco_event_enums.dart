@@ -23,10 +23,7 @@ enum EcoEventCategory {
     'Awareness & education',
     'Workshops, talks, or community engagement on eco practices.',
   ),
-  other(
-    'Other',
-    "Custom event that doesn't match the categories above.",
-  );
+  other('Other', "Custom event that doesn't match the categories above.");
 
   const EcoEventCategory(this.label, this.description);
   final String label;

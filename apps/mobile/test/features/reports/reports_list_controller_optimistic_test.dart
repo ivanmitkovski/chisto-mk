@@ -121,50 +121,53 @@ void main() {
     },
   );
 
-  test('mergeFirstPageWithOptimistic drops reconciled rows and keeps pending', () {
-    final ReportListItem optimistic = ReportListItem(
-      id: 'pending-id',
-      reportNumber: 'R-pending',
-      title: 'Pending',
-      location: 'Skopje',
-      submittedAt: DateTime.utc(2024, 2, 1),
-      status: ApiReportStatus.new_,
-      isPotentialDuplicate: false,
-      coReporterCount: 0,
-      isOptimistic: true,
-    );
-    final ReportListItem serverRow = ReportListItem(
-      id: 'server-id',
-      reportNumber: 'R-1',
-      title: 'Server',
-      location: 'Skopje',
-      submittedAt: DateTime.utc(2024, 1, 1),
-      status: ApiReportStatus.approved,
-      isPotentialDuplicate: false,
-      coReporterCount: 0,
-    );
-    final ReportListItem reconciledOptimistic = ReportListItem(
-      id: 'server-id',
-      reportNumber: 'R-opt',
-      title: 'Optimistic duplicate',
-      location: 'Skopje',
-      submittedAt: DateTime.utc(2024, 1, 2),
-      status: ApiReportStatus.new_,
-      isPotentialDuplicate: false,
-      coReporterCount: 0,
-      isOptimistic: true,
-    );
+  test(
+    'mergeFirstPageWithOptimistic drops reconciled rows and keeps pending',
+    () {
+      final ReportListItem optimistic = ReportListItem(
+        id: 'pending-id',
+        reportNumber: 'R-pending',
+        title: 'Pending',
+        location: 'Skopje',
+        submittedAt: DateTime.utc(2024, 2, 1),
+        status: ApiReportStatus.new_,
+        isPotentialDuplicate: false,
+        coReporterCount: 0,
+        isOptimistic: true,
+      );
+      final ReportListItem serverRow = ReportListItem(
+        id: 'server-id',
+        reportNumber: 'R-1',
+        title: 'Server',
+        location: 'Skopje',
+        submittedAt: DateTime.utc(2024, 1, 1),
+        status: ApiReportStatus.approved,
+        isPotentialDuplicate: false,
+        coReporterCount: 0,
+      );
+      final ReportListItem reconciledOptimistic = ReportListItem(
+        id: 'server-id',
+        reportNumber: 'R-opt',
+        title: 'Optimistic duplicate',
+        location: 'Skopje',
+        submittedAt: DateTime.utc(2024, 1, 2),
+        status: ApiReportStatus.new_,
+        isPotentialDuplicate: false,
+        coReporterCount: 0,
+        isOptimistic: true,
+      );
 
-    final List<ReportListItem> merged =
-        ReportsListController.mergeFirstPageWithOptimistic(
-          serverPage: <ReportListItem>[serverRow],
-          current: <ReportListItem>[optimistic, reconciledOptimistic],
-        );
+      final List<ReportListItem> merged =
+          ReportsListController.mergeFirstPageWithOptimistic(
+            serverPage: <ReportListItem>[serverRow],
+            current: <ReportListItem>[optimistic, reconciledOptimistic],
+          );
 
-    expect(merged.length, 2);
-    expect(merged.first.id, 'pending-id');
-    expect(merged.first.isOptimistic, isTrue);
-    expect(merged.last.id, 'server-id');
-    expect(merged.last.isOptimistic, isFalse);
-  });
+      expect(merged.length, 2);
+      expect(merged.first.id, 'pending-id');
+      expect(merged.first.isOptimistic, isTrue);
+      expect(merged.last.id, 'server-id');
+      expect(merged.last.isOptimistic, isFalse);
+    },
+  );
 }

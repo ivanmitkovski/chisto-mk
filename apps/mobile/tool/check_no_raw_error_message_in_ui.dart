@@ -54,8 +54,7 @@ bool _matchesLine(String line) {
       return true;
     }
   }
-  if (trimmed.contains('AppSnack.show') &&
-      trimmed.contains('.message')) {
+  if (trimmed.contains('AppSnack.show') && trimmed.contains('.message')) {
     return true;
   }
   if (trimmed.contains('ApiErrorBanner') && trimmed.contains('.message')) {
@@ -73,7 +72,9 @@ void main() {
     ...allFeatureLibRoots()
         .map((String root) => '$root/src/presentation')
         .where((String path) => Directory(path).existsSync()),
-    if (Directory('packages/chisto_infrastructure/lib/shared/widgets').existsSync())
+    if (Directory(
+      'packages/chisto_infrastructure/lib/shared/widgets',
+    ).existsSync())
       'packages/chisto_infrastructure/lib/shared/widgets',
   ];
   final List<String> hits = scanDartRoots(

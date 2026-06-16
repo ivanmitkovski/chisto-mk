@@ -60,19 +60,23 @@ void main() {
     await tester.pumpAndSettle();
 
     final ScrollableState scrollable = tester.state<ScrollableState>(
-      find.descendant(
-        of: find.byType(SignInScreen),
-        matching: find.byType(Scrollable),
-      ).first,
+      find
+          .descendant(
+            of: find.byType(SignInScreen),
+            matching: find.byType(Scrollable),
+          )
+          .first,
     );
     expect(scrollable.position.maxScrollExtent, 0);
 
     final double pixelsBefore = scrollable.position.pixels;
     await tester.drag(
-      find.descendant(
-        of: find.byType(SignInScreen),
-        matching: find.byType(Scrollable),
-      ).first,
+      find
+          .descendant(
+            of: find.byType(SignInScreen),
+            matching: find.byType(Scrollable),
+          )
+          .first,
       const Offset(0, -120),
     );
     await tester.pumpAndSettle();

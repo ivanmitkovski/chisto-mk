@@ -304,9 +304,8 @@ class _CreateEventSheetState extends ConsumerState<CreateEventSheet>
         settings: const RouteSettings(
           name: organizerCertificationToolkitRouteName,
         ),
-        builder: (_) => OrganizerToolkitScreen(
-          onProceedToCreate: () => wantsCreate = true,
-        ),
+        builder: (_) =>
+            OrganizerToolkitScreen(onProceedToCreate: () => wantsCreate = true),
       ),
     );
     if (!mounted) {
@@ -454,9 +453,7 @@ class _CreateEventSheetState extends ConsumerState<CreateEventSheet>
     if (!mounted || !_titleFocus.hasFocus) {
       return;
     }
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => _ensureTitleVisible(),
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) => _ensureTitleVisible());
   }
 
   void _ensureTitleVisible() {

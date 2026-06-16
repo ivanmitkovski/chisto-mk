@@ -68,8 +68,7 @@ class _AppResizableSheetDragSurfaceState
         widget.scrollController.position.minScrollExtent + 0.5;
   }
 
-  bool get _canDragSheet =>
-      _scrollAtTop && widget.sheetController.isAttached;
+  bool get _canDragSheet => _scrollAtTop && widget.sheetController.isAttached;
 
   void _onVerticalDragStart(DragStartDetails details) {
     _unfocusedForDrag = false;

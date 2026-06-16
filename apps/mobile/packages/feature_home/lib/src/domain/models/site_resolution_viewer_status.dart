@@ -1,9 +1,5 @@
 /// Viewer's own site resolution state from GET /sites and GET /sites/:id.
-enum SiteResolutionViewerStatus {
-  none,
-  pending,
-  approved,
-}
+enum SiteResolutionViewerStatus { none, pending, approved }
 
 SiteResolutionViewerStatus siteResolutionViewerStatusFromApi(String? raw) {
   switch (raw?.trim().toLowerCase()) {

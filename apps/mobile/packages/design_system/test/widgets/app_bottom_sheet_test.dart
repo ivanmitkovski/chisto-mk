@@ -243,11 +243,14 @@ void main() {
     await tester.tap(find.text('Open'));
     await tester.pumpAndSettle();
 
-    final Offset titleTopLeft = tester.getTopLeft(find.text('Lift notch probe'));
+    final Offset titleTopLeft = tester.getTopLeft(
+      find.text('Lift notch probe'),
+    );
     expect(
       titleTopLeft.dy,
       greaterThanOrEqualTo(topInset + AppSpacing.xs - 1),
-      reason: 'Lift-mode sheet title must render below the platform top safe area',
+      reason:
+          'Lift-mode sheet title must render below the platform top safe area',
     );
   });
 
@@ -375,6 +378,7 @@ void main() {
     EditableText editableText(WidgetTester t) {
       return t.widget<EditableText>(find.byType(EditableText));
     }
+
     expect(editableText(tester).focusNode.hasFocus, isTrue);
 
     tester.view.viewInsets = FakeViewPadding(bottom: keyboardInset);

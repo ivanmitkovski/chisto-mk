@@ -74,7 +74,10 @@ Future<void> precacheAuthGoldenAssets(WidgetTester tester) async {
       ),
     ),
   );
-  await settleAuthGoldenAssets(tester, delay: const Duration(milliseconds: 300));
+  await settleAuthGoldenAssets(
+    tester,
+    delay: const Duration(milliseconds: 300),
+  );
 }
 
 Future<void> ensureAuthGoldenAssetsPrecached(WidgetTester tester) async {

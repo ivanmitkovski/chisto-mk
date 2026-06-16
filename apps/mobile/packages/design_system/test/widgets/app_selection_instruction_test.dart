@@ -90,9 +90,7 @@ void main() {
   ) async {
     await tester.pumpWidget(
       const MaterialApp(
-        home: Scaffold(
-          body: AppSelectionInstruction(message: 'With divider'),
-        ),
+        home: Scaffold(body: AppSelectionInstruction(message: 'With divider')),
       ),
     );
 

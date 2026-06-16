@@ -88,35 +88,35 @@ class _AppErrorViewState extends State<AppErrorView> {
       liveRegion: true,
       container: true,
       child: AppEmptyState(
-      icon: Icons.error_outline_rounded,
-      iconVariant: AppEmptyStateIconVariant.error,
-      title: localizedAppErrorMessage(context.l10n, widget.error),
-      contentBelowSubtitle:
-          widget.retryFootnote != null &&
-              widget.error.retryable &&
-              widget.onRetry != null
-          ? Text(
-              widget.retryFootnote!,
-              textAlign: TextAlign.center,
-              style: textTheme.bodySmall?.copyWith(
-                color: AppColors.textMuted,
-                height: 1.35,
-              ),
-            )
-          : null,
-      action: _isSessionInvalidError
-          ? AppButton.primary(
-              label: context.l10n.profileSignOutTile,
-              onPressed: () => unawaited(_handleLogoutTap()),
-              leadingIcon: const Icon(Icons.logout_rounded, size: 20),
-            )
-          : widget.error.retryable && widget.onRetry != null
-          ? AppButton.primary(
-              label: context.l10n.commonTryAgain,
-              onPressed: widget.onRetry,
-              leadingIcon: const Icon(Icons.refresh_rounded, size: 20),
-            )
-          : null,
+        icon: Icons.error_outline_rounded,
+        iconVariant: AppEmptyStateIconVariant.error,
+        title: localizedAppErrorMessage(context.l10n, widget.error),
+        contentBelowSubtitle:
+            widget.retryFootnote != null &&
+                widget.error.retryable &&
+                widget.onRetry != null
+            ? Text(
+                widget.retryFootnote!,
+                textAlign: TextAlign.center,
+                style: textTheme.bodySmall?.copyWith(
+                  color: AppColors.textMuted,
+                  height: 1.35,
+                ),
+              )
+            : null,
+        action: _isSessionInvalidError
+            ? AppButton.primary(
+                label: context.l10n.profileSignOutTile,
+                onPressed: () => unawaited(_handleLogoutTap()),
+                leadingIcon: const Icon(Icons.logout_rounded, size: 20),
+              )
+            : widget.error.retryable && widget.onRetry != null
+            ? AppButton.primary(
+                label: context.l10n.commonTryAgain,
+                onPressed: widget.onRetry,
+                leadingIcon: const Icon(Icons.refresh_rounded, size: 20),
+              )
+            : null,
       ),
     );
   }

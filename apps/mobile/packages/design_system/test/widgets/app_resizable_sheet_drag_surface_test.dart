@@ -71,9 +71,7 @@ void main() {
     await pumpDragSurfaceHarness(
       tester,
       sheetController: sheetController,
-      listChildren: const <Widget>[
-        SizedBox(height: 48, child: Text('Row 1')),
-      ],
+      listChildren: const <Widget>[SizedBox(height: 48, child: Text('Row 1'))],
     );
 
     expect(sheetController.isAttached, isTrue);

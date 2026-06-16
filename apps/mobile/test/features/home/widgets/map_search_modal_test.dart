@@ -189,7 +189,8 @@ void main() {
       expect(
         modalBottom,
         closeTo(screenHeight, 8),
-        reason: 'Sheet panel stays anchored to the screen bottom; keyboard overlays',
+        reason:
+            'Sheet panel stays anchored to the screen bottom; keyboard overlays',
       );
 
       final RenderBox scrollBox = tester.renderObject<RenderBox>(
@@ -255,11 +256,10 @@ void main() {
                     onPressed: () {
                       showMapBottomSheet<void>(
                         context: context,
-                        builder: (BuildContext sheetContext) =>
-                            MapSearchModal(
-                              onResultTap: (_) {},
-                              onDismiss: () {},
-                            ),
+                        builder: (BuildContext sheetContext) => MapSearchModal(
+                          onResultTap: (_) {},
+                          onDismiss: () {},
+                        ),
                       );
                     },
                     child: const Text('Open search'),
@@ -281,7 +281,8 @@ void main() {
     expect(
       titleBox.localToGlobal(Offset.zero).dy,
       greaterThanOrEqualTo(topInset + AppSpacing.sm - 1),
-      reason: 'Search header must start below the notch, like the comments sheet',
+      reason:
+          'Search header must start below the notch, like the comments sheet',
     );
   });
 }

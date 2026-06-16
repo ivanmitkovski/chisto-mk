@@ -44,9 +44,7 @@ class AppSelectionInstruction extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         if (label != null && labelStyle != null) ...<Widget>[
-          ExcludeSemantics(
-            child: Text(label!, style: labelStyle),
-          ),
+          ExcludeSemantics(child: Text(label!, style: labelStyle)),
           const SizedBox(height: AppSpacing.xxs),
         ],
         if (icon != null)

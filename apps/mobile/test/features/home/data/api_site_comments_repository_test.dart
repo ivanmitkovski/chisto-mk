@@ -66,7 +66,12 @@ void main() {
             ],
           },
         ],
-        'meta': <String, dynamic>{'page': 1, 'limit': 20, 'total': 1, 'engagementTotal': 2},
+        'meta': <String, dynamic>{
+          'page': 1,
+          'limit': 20,
+          'total': 1,
+          'engagementTotal': 2,
+        },
       },
     );
 

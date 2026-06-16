@@ -61,7 +61,8 @@ class ReportDetailSheet extends StatefulWidget {
     BuildContext context,
     String siteId,
     ReportSheetViewModel report,
-  )? cleanupSectionBuilder;
+  )?
+  cleanupSectionBuilder;
 
   @override
   State<ReportDetailSheet> createState() => _ReportDetailSheetState();
@@ -240,10 +241,8 @@ class _ReportDetailSheetState extends State<ReportDetailSheet> {
     try {
       final String? reportId = report.reportId;
       if (reportId == null || reportId.isEmpty) return;
-      final ReportDetail detail = await widget.reportsApiRepository.getReportById(
-        reportId,
-        cancellation: cancellation,
-      );
+      final ReportDetail detail = await widget.reportsApiRepository
+          .getReportById(reportId, cancellation: cancellation);
       widget.reportDetailCache?.put(detail);
       if (!mounted) return;
       setState(() {
@@ -317,176 +316,177 @@ class _ReportDetailSheetState extends State<ReportDetailSheet> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-          if (_showStaleBanner) ...<Widget>[
-            AppInlineBanner(
-              message: l10n.reportDetailStaleBanner,
-              tone: AppInlineBannerTone.warning,
-              onTap: _isRefreshing ? null : _refreshFromBackend,
-            ),
-            const SizedBox(height: AppSpacing.md),
-          ],
-          if (hasEvidenceImage) ...<Widget>[
-            ReportDetailEvidenceGallery(
-              evidencePaths: evidencePaths,
-              reportTag: report.reportNumber ?? 'report',
-              noPhotosLabel: l10n.reportDetailNoPhotos,
-              onImageError: _handleEvidenceImageError,
-            ),
-            const SizedBox(height: AppSpacing.md),
-          ],
-          Wrap(
-            spacing: AppSpacing.sm,
-            runSpacing: AppSpacing.xs,
-            children: <Widget>[
-              if (report.reportNumber != null)
+            if (_showStaleBanner) ...<Widget>[
+              AppInlineBanner(
+                message: l10n.reportDetailStaleBanner,
+                tone: AppInlineBannerTone.warning,
+                onTap: _isRefreshing ? null : _refreshFromBackend,
+              ),
+              const SizedBox(height: AppSpacing.md),
+            ],
+            if (hasEvidenceImage) ...<Widget>[
+              ReportDetailEvidenceGallery(
+                evidencePaths: evidencePaths,
+                reportTag: report.reportNumber ?? 'report',
+                noPhotosLabel: l10n.reportDetailNoPhotos,
+                onImageError: _handleEvidenceImageError,
+              ),
+              const SizedBox(height: AppSpacing.md),
+            ],
+            Wrap(
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.xs,
+              children: <Widget>[
+                if (report.reportNumber != null)
+                  ReportStatePill(
+                    label: report.reportNumber!,
+                    icon: Icons.tag_rounded,
+                    tone: ReportSurfaceTone.neutral,
+                  ),
+                ReportStatusBadge(status: report.status),
                 ReportStatePill(
-                  label: report.reportNumber!,
-                  icon: Icons.tag_rounded,
+                  label: _formatSubmittedDate(report.createdAt),
+                  icon: Icons.schedule_rounded,
                   tone: ReportSurfaceTone.neutral,
                 ),
-              ReportStatusBadge(status: report.status),
-              ReportStatePill(
-                label: _formatSubmittedDate(report.createdAt),
-                icon: Icons.schedule_rounded,
-                tone: ReportSurfaceTone.neutral,
-              ),
-              if (hasEvidenceImage)
-                ReportStatePill(
-                  label: l10n.reportDetailPhotoAttachedPill,
-                  icon: Icons.image_outlined,
-                  tone: ReportSurfaceTone.accent,
-                ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.md),
-          ReportDetailRow(
-            icon: report.category.icon,
-            label: l10n.reportReviewCategoryTitle,
-            semanticsValue: report.category.localizedTitle(l10n),
-            isLast:
-                report.severity == null &&
-                report.cleanupEffort == null &&
-                report.score <= 0 &&
-                !_hasLocationData,
-            child: Text(
-              report.category.localizedTitle(l10n),
-              style: AppTypographySurfaces.reportsRowValue(textTheme),
+                if (hasEvidenceImage)
+                  ReportStatePill(
+                    label: l10n.reportDetailPhotoAttachedPill,
+                    icon: Icons.image_outlined,
+                    tone: ReportSurfaceTone.accent,
+                  ),
+              ],
             ),
-          ),
-          if (report.severity != null)
+            const SizedBox(height: AppSpacing.md),
             ReportDetailRow(
-              icon: Icons.signal_cellular_alt,
-              label: l10n.reportReviewSeverityTitle,
-              semanticsValue: reportSeverityDisplayLabel(
-                l10n,
-                report.severity!,
-              ),
+              icon: report.category.icon,
+              label: l10n.reportReviewCategoryTitle,
+              semanticsValue: report.category.localizedTitle(l10n),
               isLast:
+                  report.severity == null &&
                   report.cleanupEffort == null &&
                   report.score <= 0 &&
                   !_hasLocationData,
               child: Text(
-                reportSeverityDisplayLabel(l10n, report.severity!),
+                report.category.localizedTitle(l10n),
                 style: AppTypographySurfaces.reportsRowValue(textTheme),
               ),
             ),
-          if (report.cleanupEffort != null)
-            ReportDetailRow(
-              icon: Icons.groups_2_outlined,
-              label: l10n.reportReviewCleanupEffortTitle,
-              semanticsValue: report.cleanupEffort!.localizedLabel(l10n),
-              isLast: report.score <= 0 && !_hasLocationData,
-              child: Text(
-                report.cleanupEffort!.localizedLabel(l10n),
-                style: AppTypographySurfaces.reportsRowValue(textTheme),
+            if (report.severity != null)
+              ReportDetailRow(
+                icon: Icons.signal_cellular_alt,
+                label: l10n.reportReviewSeverityTitle,
+                semanticsValue: reportSeverityDisplayLabel(
+                  l10n,
+                  report.severity!,
+                ),
+                isLast:
+                    report.cleanupEffort == null &&
+                    report.score <= 0 &&
+                    !_hasLocationData,
+                child: Text(
+                  reportSeverityDisplayLabel(l10n, report.severity!),
+                  style: AppTypographySurfaces.reportsRowValue(textTheme),
+                ),
               ),
-            ),
-          if (report.score > 0)
-            ReportDetailRow(
-              icon: Icons.emoji_events_rounded,
-              label: l10n.reportDetailPointsLabel,
-              semanticsValue: '+${report.score}',
-              isLast: !_hasLocationData,
-              child: Text(
-                '+${report.score}',
-                style: AppTypographySurfaces.reportsRowValueStrong(textTheme),
+            if (report.cleanupEffort != null)
+              ReportDetailRow(
+                icon: Icons.groups_2_outlined,
+                label: l10n.reportReviewCleanupEffortTitle,
+                semanticsValue: report.cleanupEffort!.localizedLabel(l10n),
+                isLast: report.score <= 0 && !_hasLocationData,
+                child: Text(
+                  report.cleanupEffort!.localizedLabel(l10n),
+                  style: AppTypographySurfaces.reportsRowValue(textTheme),
+                ),
               ),
-            ),
-          if (_hasLocationData)
-            ReportDetailRow(
-              icon: Icons.location_on_outlined,
-              label: l10n.reportReviewLocationTitle,
-              semanticsValue: _isOpeningMap
-                  ? l10n.reportDetailOpeningInProgress
-                  : _locationDisplayText,
-              isLast: true,
-              onTap: _canTapLocation ? _onLocationTap : null,
-              child: _isOpeningMap
-                  ? Row(
-                      children: <Widget>[
-                        const SizedBox(
-                          width: AppSpacing.iconSm,
-                          height: AppSpacing.iconSm,
-                          child: AppLoadingIndicator(
-                            size: AppLoadingIndicatorSize.sm,
-                            color: AppColors.primary,
+            if (report.score > 0)
+              ReportDetailRow(
+                icon: Icons.emoji_events_rounded,
+                label: l10n.reportDetailPointsLabel,
+                semanticsValue: '+${report.score}',
+                isLast: !_hasLocationData,
+                child: Text(
+                  '+${report.score}',
+                  style: AppTypographySurfaces.reportsRowValueStrong(textTheme),
+                ),
+              ),
+            if (_hasLocationData)
+              ReportDetailRow(
+                icon: Icons.location_on_outlined,
+                label: l10n.reportReviewLocationTitle,
+                semanticsValue: _isOpeningMap
+                    ? l10n.reportDetailOpeningInProgress
+                    : _locationDisplayText,
+                isLast: true,
+                onTap: _canTapLocation ? _onLocationTap : null,
+                child: _isOpeningMap
+                    ? Row(
+                        children: <Widget>[
+                          const SizedBox(
+                            width: AppSpacing.iconSm,
+                            height: AppSpacing.iconSm,
+                            child: AppLoadingIndicator(
+                              size: AppLoadingIndicatorSize.sm,
+                              color: AppColors.primary,
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: AppSpacing.sm),
-                        Text(
-                          l10n.reportDetailOpeningInProgress,
-                          style: AppTypographySurfaces.reportsRowValue(
-                            textTheme,
-                          ).copyWith(color: AppColors.textMuted),
-                        ),
-                      ],
-                    )
-                  : Text(
-                      _locationDisplayText,
-                      style: AppTypographySurfaces.reportsRowValue(textTheme),
-                    ),
-            ),
-          const SizedBox(height: AppSpacing.lg),
-          Text(
-            report.title,
-            style: AppTypographySurfaces.reportsSectionHeader(textTheme),
-          ),
-          if (report.description.trim() != report.title.trim()) ...[
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              report.description,
-              style:
-                  (textTheme.bodyMedium ?? AppTypography.textTheme.bodyMedium!)
-                      .copyWith(color: AppColors.textSecondary, height: 1.45),
-            ),
-          ],
-          const SizedBox(height: AppSpacing.md),
-          Divider(color: AppColors.divider.withValues(alpha: 0.7), height: 1),
-          const SizedBox(height: AppSpacing.lg),
-          if (widget.cleanupSectionBuilder != null &&
-              report.siteId != null &&
-              report.siteId!.trim().isNotEmpty)
-            widget.cleanupSectionBuilder!(
-              context,
-              report.siteId!.trim(),
-              report,
-            )
-          else if (_canMarkAsCleaned) ...<Widget>[
-            PrimaryButton(
-              label: l10n.reportDetailMarkAsCleanedCta,
-              onPressed: _markSiteAsCleaned,
-            ),
+                          const SizedBox(width: AppSpacing.sm),
+                          Text(
+                            l10n.reportDetailOpeningInProgress,
+                            style: AppTypographySurfaces.reportsRowValue(
+                              textTheme,
+                            ).copyWith(color: AppColors.textMuted),
+                          ),
+                        ],
+                      )
+                    : Text(
+                        _locationDisplayText,
+                        style: AppTypographySurfaces.reportsRowValue(textTheme),
+                      ),
+              ),
             const SizedBox(height: AppSpacing.lg),
+            Text(
+              report.title,
+              style: AppTypographySurfaces.reportsSectionHeader(textTheme),
+            ),
+            if (report.description.trim() != report.title.trim()) ...[
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                report.description,
+                style:
+                    (textTheme.bodyMedium ??
+                            AppTypography.textTheme.bodyMedium!)
+                        .copyWith(color: AppColors.textSecondary, height: 1.45),
+              ),
+            ],
+            const SizedBox(height: AppSpacing.md),
+            Divider(color: AppColors.divider.withValues(alpha: 0.7), height: 1),
+            const SizedBox(height: AppSpacing.lg),
+            if (widget.cleanupSectionBuilder != null &&
+                report.siteId != null &&
+                report.siteId!.trim().isNotEmpty)
+              widget.cleanupSectionBuilder!(
+                context,
+                report.siteId!.trim(),
+                report,
+              )
+            else if (_canMarkAsCleaned) ...<Widget>[
+              PrimaryButton(
+                label: l10n.reportDetailMarkAsCleanedCta,
+                onPressed: _markSiteAsCleaned,
+              ),
+              const SizedBox(height: AppSpacing.lg),
+            ],
+            ReportInfoBanner(
+              title: banner.title,
+              icon: banner.icon,
+              tone: banner.tone,
+              message: banner.message,
+              titleStyle: AppTypographySurfaces.reportsBannerTitle(textTheme),
+              messageStyle: AppTypographySurfaces.reportsBannerBody(textTheme),
+            ),
           ],
-          ReportInfoBanner(
-            title: banner.title,
-            icon: banner.icon,
-            tone: banner.tone,
-            message: banner.message,
-            titleStyle: AppTypographySurfaces.reportsBannerTitle(textTheme),
-            messageStyle: AppTypographySurfaces.reportsBannerBody(textTheme),
-          ),
-        ],
         ),
       ),
     );

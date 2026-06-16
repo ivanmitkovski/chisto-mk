@@ -191,7 +191,11 @@ void main() {
       _dummy(id: '1').copyWith(shareCount: 2),
       _dummy(id: '2').copyWith(shareCount: 0),
     ];
-    final List<PollutionSite> out = patchPollutionSitesShareCount(sites, '1', 5);
+    final List<PollutionSite> out = patchPollutionSitesShareCount(
+      sites,
+      '1',
+      5,
+    );
     expect(out[0].shareCount, 5);
     expect(out[1].shareCount, 0);
     expect(identical(out, sites), isFalse);

@@ -61,9 +61,9 @@ class AppSectionHeader extends StatelessWidget {
       case AppSectionHeaderVariant.detail:
         return AppTypography.sectionHeader(textTheme);
       case AppSectionHeaderVariant.feed:
-        return AppTypography.sectionHeader(textTheme).copyWith(
-          fontWeight: FontWeight.w700,
-        );
+        return AppTypography.sectionHeader(
+          textTheme,
+        ).copyWith(fontWeight: FontWeight.w700);
     }
   }
 }

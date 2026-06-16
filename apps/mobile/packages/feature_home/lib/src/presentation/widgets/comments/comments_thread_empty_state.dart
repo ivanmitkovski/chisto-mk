@@ -4,10 +4,7 @@ import 'package:flutter/material.dart';
 
 /// Empty thread placeholder for site comments (sheet or full-screen route).
 class CommentsThreadEmptyState extends StatelessWidget {
-  const CommentsThreadEmptyState({
-    super.key,
-    this.scrollController,
-  });
+  const CommentsThreadEmptyState({super.key, this.scrollController});
 
   final ScrollController? scrollController;
 

@@ -82,11 +82,8 @@ extension EventDetailOrganizerActions on _EventDetailScreenState {
     return AppBottomSheet.show<EventFeedbackSnapshot>(
       context: context,
       keyboardInsetMode: SheetKeyboardInsetMode.overlay,
-      builder: (BuildContext sheetCtx) => buildEventFeedbackSheet(
-        sheetCtx,
-        event: event,
-        current: current,
-      ),
+      builder: (BuildContext sheetCtx) =>
+          buildEventFeedbackSheet(sheetCtx, event: event, current: current),
     );
   }
 

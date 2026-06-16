@@ -154,33 +154,37 @@ void main() {
     expect(find.textContaining('at least'), findsOneWidget);
   });
 
-  testWidgets('successful title save calls repository and shows success snack', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpWidget(_app(EditEventSheet(event: _baseEvent())));
-    await tester.pump();
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 500));
+  testWidgets(
+    'successful title save calls repository and shows success snack',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(_app(EditEventSheet(event: _baseEvent())));
+      await tester.pump();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
 
-    await tester.enterText(
-      find.byType(TextField).first,
-      'Updated river cleanup',
-    );
-    await tester.pump();
+      await tester.enterText(
+        find.byType(TextField).first,
+        'Updated river cleanup',
+      );
+      await tester.pump();
 
-    await tester.tap(
-      find.descendant(
-        of: find.byType(PrimaryButton),
-        matching: find.byType(ElevatedButton),
-      ),
-    );
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 200));
+      await tester.tap(
+        find.descendant(
+          of: find.byType(PrimaryButton),
+          matching: find.byType(ElevatedButton),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 200));
 
-    expect(repo.updateEventDetailsCallCount, 1);
-    expect(repo.lastUpdateEventDetailsPayload?.title, 'Updated river cleanup');
-    expect(find.text('Event updated'), findsOneWidget);
-  });
+      expect(repo.updateEventDetailsCallCount, 1);
+      expect(
+        repo.lastUpdateEventDetailsPayload?.title,
+        'Updated river cleanup',
+      );
+      expect(find.text('Event updated'), findsOneWidget);
+    },
+  );
 
   testWidgets(
     'save stays enabled for title edits when the existing schedule is already past',
@@ -209,7 +213,8 @@ void main() {
       expect(
         saveBtn.onPressed,
         isNotNull,
-        reason: 'Save should be enabled when only the title changes, even if '
+        reason:
+            'Save should be enabled when only the title changes, even if '
             'the existing schedule is in the past',
       );
 
@@ -345,10 +350,7 @@ void main() {
                 removeBottom: true,
                 child: sheet,
               );
-              return Align(
-                alignment: Alignment.bottomCenter,
-                child: sheet,
-              );
+              return Align(alignment: Alignment.bottomCenter, child: sheet);
             },
           ),
         ),

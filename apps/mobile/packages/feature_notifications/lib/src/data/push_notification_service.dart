@@ -116,7 +116,9 @@ class PushNotificationService
   /// Call after sign-in, OTP verify, or successful session restore (not only from [initialize]).
   ///
   /// When [forceLocaleRefresh] is true, re-sends the current token if only the locale changed.
-  Future<void> syncDeviceTokenWithBackend({bool forceLocaleRefresh = false}) async {
+  Future<void> syncDeviceTokenWithBackend({
+    bool forceLocaleRefresh = false,
+  }) async {
     if (!_isAuthenticated()) return;
     if (forceLocaleRefresh) {
       final String? token = _currentToken ?? _lastRegisteredToken;
@@ -474,16 +476,9 @@ class PushNotificationService
   }
 
   @visibleForTesting
-  Future<void> registerTokenForTest(
-    String token, {
-    bool force = false,
-  }) async {
+  Future<void> registerTokenForTest(String token, {bool force = false}) async {
     _currentToken = token;
-    await _registerToken(
-      token,
-      appVersionOverride: 'test',
-      force: force,
-    );
+    await _registerToken(token, appVersionOverride: 'test', force: force);
   }
 
   @visibleForTesting

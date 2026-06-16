@@ -212,14 +212,10 @@ class _ForgotPasswordNewScreenState
                     ),
                     enableSuggestions: false,
                     autocorrect: false,
-                    autofillHints: const <String>[
-                      AutofillHints.newPassword,
-                    ],
+                    autofillHints: const <String>[AutofillHints.newPassword],
                     onFieldSubmitted: (_) => _confirmFocus.requestFocus(),
                   ),
-                  PasswordStrengthIndicator(
-                    strength: _passwordStrength,
-                  ),
+                  PasswordStrengthIndicator(strength: _passwordStrength),
                   const SizedBox(height: AppSpacing.sm),
                   AuthTextField(
                     key: _confirmFieldKey,
@@ -239,9 +235,7 @@ class _ForgotPasswordNewScreenState
                     ),
                     enableSuggestions: false,
                     autocorrect: false,
-                    autofillHints: const <String>[
-                      AutofillHints.newPassword,
-                    ],
+                    autofillHints: const <String>[AutofillHints.newPassword],
                     onFieldSubmitted: (_) => _handleReset(),
                   ),
                   const SizedBox(height: AppSpacing.radius22),

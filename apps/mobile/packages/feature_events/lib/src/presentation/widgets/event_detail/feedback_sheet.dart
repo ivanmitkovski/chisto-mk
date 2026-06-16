@@ -111,7 +111,9 @@ class _FeedbackSheetContentState extends State<FeedbackSheetContent> {
             Row(
               children: <Widget>[
                 IconButton(
-                  onPressed: _bags > 0 ? () => setState(() => _bags -= 1) : null,
+                  onPressed: _bags > 0
+                      ? () => setState(() => _bags -= 1)
+                      : null,
                   icon: const Icon(CupertinoIcons.minus_circle),
                 ),
                 Text(

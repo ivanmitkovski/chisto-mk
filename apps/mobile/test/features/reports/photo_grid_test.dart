@@ -65,7 +65,9 @@ void main() {
       expect(find.text('Add'), findsNothing);
 
       final Rect addCardRect = tester.getRect(find.text('Add a photo'));
-      final Rect thumbnailRect = tester.getRect(find.byIcon(Icons.check_rounded));
+      final Rect thumbnailRect = tester.getRect(
+        find.byIcon(Icons.check_rounded),
+      );
       expect(
         addCardRect.top,
         lessThan(thumbnailRect.top),
@@ -78,30 +80,31 @@ void main() {
     },
   );
 
-  testWidgets('hideExpandedAddCard collapses large add card but keeps thumbnails', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpWidget(
-      wrapForWidgetTest(
-        Scaffold(
-          body: PhotoGrid(
-            photos: <XFile>[XFile('/tmp/photo-a.jpg')],
-            compact: true,
-            showExpandedAddCard: true,
-            hideExpandedAddCard: true,
-            onAddPhoto: _noop,
-            onRemovePhoto: _noopIndex,
+  testWidgets(
+    'hideExpandedAddCard collapses large add card but keeps thumbnails',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        wrapForWidgetTest(
+          Scaffold(
+            body: PhotoGrid(
+              photos: <XFile>[XFile('/tmp/photo-a.jpg')],
+              compact: true,
+              showExpandedAddCard: true,
+              hideExpandedAddCard: true,
+              onAddPhoto: _noop,
+              onRemovePhoto: _noopIndex,
+            ),
           ),
         ),
-      ),
-    );
-    await tester.pump();
-    await tester.pump(AppMotion.medium);
+      );
+      await tester.pump();
+      await tester.pump(AppMotion.medium);
 
-    expect(find.text('1 of 5 photos attached'), findsOneWidget);
-    expect(find.text('Add a photo'), findsNothing);
-    expect(find.byIcon(Icons.check_rounded), findsOneWidget);
-  });
+      expect(find.text('1 of 5 photos attached'), findsOneWidget);
+      expect(find.text('Add a photo'), findsNothing);
+      expect(find.byIcon(Icons.check_rounded), findsOneWidget);
+    },
+  );
 
   testWidgets('hideExpandedAddCard restores large add card when cleared', (
     WidgetTester tester,

@@ -120,9 +120,7 @@ class FirstReportModal extends StatelessWidget {
               height: AppSpacing.sheetHandleHeight,
               decoration: BoxDecoration(
                 color: AppColors.divider,
-                borderRadius: BorderRadius.circular(
-                  AppSpacing.radiusXs,
-                ),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
               ),
             ),
           ),
@@ -162,9 +160,7 @@ class FirstReportModal extends StatelessWidget {
         const SizedBox(height: AppSpacing.md),
         if (galleryItems.isNotEmpty) ...<Widget>[
           ClipRRect(
-            borderRadius: BorderRadius.circular(
-              AppSpacing.radiusLg,
-            ),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
             child: SizedBox(
               height: 200,
               child: ImmersivePhotoGallery(

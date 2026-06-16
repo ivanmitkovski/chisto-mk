@@ -122,56 +122,54 @@ void main() {
     await tester.pumpAndSettle();
 
     final ListView listView = tester.widget<ListView>(find.byType(ListView));
-    expect(
-      listView.padding?.resolve(TextDirection.ltr).bottom,
-      homeIndicator,
-    );
+    expect(listView.padding?.resolve(TextDirection.ltr).bottom, homeIndicator);
     expect(find.text('Final scroll row'), findsOneWidget);
   });
 
-  testWidgets('scroll body skips home indicator padding when keyboard is open', (
-    WidgetTester tester,
-  ) async {
-    const double homeIndicator = 34;
-    const double keyboardInset = 336;
+  testWidgets(
+    'scroll body skips home indicator padding when keyboard is open',
+    (WidgetTester tester) async {
+      const double homeIndicator = 34;
+      const double keyboardInset = 336;
 
-    await tester.pumpWidget(
-      MaterialApp(
-        home: MediaQuery(
-          data: MediaQueryData(
-            size: const Size(390, 844),
-            viewPadding: const EdgeInsets.only(bottom: homeIndicator),
-            viewInsets: const EdgeInsets.only(bottom: keyboardInset),
-          ),
-          child: SizedBox(
-            height: 500,
-            child: AppSheetScaffold(
-              title: 'Scroll inset',
-              maxHeightFactor: 1,
-              fillAvailableHeight: true,
-              child: ListView.builder(
-                itemCount: 5,
-                itemBuilder: (BuildContext _, int index) {
-                  return SizedBox(
-                    height: 48,
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text('Row $index'),
-                    ),
-                  );
-                },
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MediaQuery(
+            data: MediaQueryData(
+              size: const Size(390, 844),
+              viewPadding: const EdgeInsets.only(bottom: homeIndicator),
+              viewInsets: const EdgeInsets.only(bottom: keyboardInset),
+            ),
+            child: SizedBox(
+              height: 500,
+              child: AppSheetScaffold(
+                title: 'Scroll inset',
+                maxHeightFactor: 1,
+                fillAvailableHeight: true,
+                child: ListView.builder(
+                  itemCount: 5,
+                  itemBuilder: (BuildContext _, int index) {
+                    return SizedBox(
+                      height: 48,
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text('Row $index'),
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
           ),
         ),
-      ),
-    );
+      );
 
-    final AppSheetScrollInsets insets = tester.widget<AppSheetScrollInsets>(
-      find.byType(AppSheetScrollInsets),
-    );
-    expect(insets.scrollBottom, 0);
-  });
+      final AppSheetScrollInsets insets = tester.widget<AppSheetScrollInsets>(
+        find.byType(AppSheetScrollInsets),
+      );
+      expect(insets.scrollBottom, 0);
+    },
+  );
 
   testWidgets('footer skips home indicator padding when keyboard is open', (
     WidgetTester tester,
@@ -208,10 +206,7 @@ void main() {
               fillAvailableHeight: true,
               padFooterForKeyboard: true,
               addBottomInset: true,
-              footer: const PrimaryButton(
-                label: 'Save',
-                onPressed: null,
-              ),
+              footer: const PrimaryButton(label: 'Save', onPressed: null),
               child: ListView.builder(
                 itemCount: 5,
                 itemBuilder: (BuildContext _, int index) {
@@ -241,7 +236,8 @@ void main() {
     expect(
       (sheetLift.padding as EdgeInsets).bottom,
       keyboardInset,
-      reason: 'Sheet panel should lift above keyboard outside the painted surface',
+      reason:
+          'Sheet panel should lift above keyboard outside the painted surface',
     );
 
     final double keyboardTop = 844 - keyboardInset;
@@ -285,13 +281,8 @@ void main() {
               title: 'Compact sheet',
               maxHeightFactor: 0.92,
               fillAvailableHeight: false,
-              footer: const PrimaryButton(
-                label: 'Save',
-                onPressed: null,
-              ),
-              child: SingleChildScrollView(
-                child: Text('Short body'),
-              ),
+              footer: const PrimaryButton(label: 'Save', onPressed: null),
+              child: SingleChildScrollView(child: Text('Short body')),
             ),
           ),
         ),
@@ -339,10 +330,7 @@ void main() {
               title: 'Keyboard slot probe',
               maxHeightFactor: 1,
               fillAvailableHeight: true,
-              footer: const PrimaryButton(
-                label: 'Save',
-                onPressed: null,
-              ),
+              footer: const PrimaryButton(label: 'Save', onPressed: null),
               child: const SizedBox(height: 120),
             ),
           ),
@@ -354,20 +342,18 @@ void main() {
     final double expectedSlotCap =
         surfaceSize.height - topInset - keyboardInset;
 
-    final Finder constrained = find.byWidgetPredicate(
-      (Widget widget) {
-        if (widget is! ConstrainedBox) {
-          return false;
-        }
-        final BoxConstraints c = widget.constraints;
-        return c.minHeight > 0 &&
-            (c.maxHeight - expectedSlotCap).abs() < 2;
-      },
-    );
+    final Finder constrained = find.byWidgetPredicate((Widget widget) {
+      if (widget is! ConstrainedBox) {
+        return false;
+      }
+      final BoxConstraints c = widget.constraints;
+      return c.minHeight > 0 && (c.maxHeight - expectedSlotCap).abs() < 2;
+    });
     expect(constrained, findsOneWidget);
 
-    final BoxConstraints constraints =
-        tester.widget<ConstrainedBox>(constrained).constraints;
+    final BoxConstraints constraints = tester
+        .widget<ConstrainedBox>(constrained)
+        .constraints;
     expect(
       constraints.maxHeight,
       closeTo(expectedSlotCap, 1),

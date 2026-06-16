@@ -6,27 +6,19 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   test('markLiveForTest sets live; connecting alone does not', () {
     final AuthState auth = AuthState()
-      ..setAuthenticated(
-        userId: 'u1',
-        displayName: 'Test',
-        accessToken: 'tok',
-      );
+      ..setAuthenticated(userId: 'u1', displayName: 'Test', accessToken: 'tok');
     final ReportsOwnerSocketStream stream = ReportsOwnerSocketStream(
       baseUrl: 'http://127.0.0.1:9',
       authState: auth,
     )..connectDisabledForTest = true;
     addTearDown(stream.dispose);
 
-    stream.connectionState.value =
-        ReportsRealtimeConnectionState.connecting;
+    stream.connectionState.value = ReportsRealtimeConnectionState.connecting;
     expect(stream.hasReachedLive.value, isFalse);
 
     stream.markLiveForTest();
     expect(stream.hasReachedLive.value, isTrue);
-    expect(
-      stream.connectionState.value,
-      ReportsRealtimeConnectionState.live,
-    );
+    expect(stream.connectionState.value, ReportsRealtimeConnectionState.live);
   });
 
   test(

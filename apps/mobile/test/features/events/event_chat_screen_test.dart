@@ -456,7 +456,10 @@ void main() {
     );
 
     await _settle(tester);
-    expect(find.text('You need to join this event to use chat.'), findsOneWidget);
+    expect(
+      find.text('You need to join this event to use chat.'),
+      findsOneWidget,
+    );
     expect(find.text('Check your connection and try again.'), findsNothing);
     expect(find.byType(ChatInputBar), findsNothing);
     await _finishChatTest(tester);

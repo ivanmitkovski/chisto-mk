@@ -60,84 +60,84 @@ mixin _ChatMessageBubbleActionsMixin on State<ChatMessageBubble> {
     final bool canBlock = _canBlockAuthor(msg);
 
     await showAppActionSheet<void>(
-        context: context,
-        builder: (BuildContext ctx) {
-          return CupertinoActionSheet(
-            actions: <Widget>[
-              if (canReport)
-                CupertinoActionSheetAction(
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    unawaited(_reportMessage(context, msg));
-                  },
-                  child: Text(context.l10n.safetyReportTitle),
-                ),
-              if (canBlock)
-                CupertinoActionSheetAction(
-                  isDestructiveAction: true,
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    unawaited(_blockAuthor(context, msg));
-                  },
-                  child: Text(context.l10n.safetyBlockUserTitle),
-                ),
-              if (canCopy)
-                CupertinoActionSheetAction(
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    widget.onCopy?.call();
-                  },
-                  child: Text(context.l10n.eventChatCopy),
-                ),
-              if (widget.onReply != null)
-                CupertinoActionSheetAction(
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    widget.onReply?.call();
-                  },
-                  child: Text(context.l10n.eventChatReply),
-                ),
-              if (widget.onEdit != null)
-                CupertinoActionSheetAction(
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    widget.onEdit?.call();
-                  },
-                  child: Text(context.l10n.eventChatEditMessage),
-                ),
-              if (widget.onPin != null)
-                CupertinoActionSheetAction(
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    widget.onPin?.call();
-                  },
-                  child: Text(context.l10n.eventChatPinMessage),
-                ),
-              if (widget.onUnpin != null)
-                CupertinoActionSheetAction(
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    widget.onUnpin?.call();
-                  },
-                  child: Text(context.l10n.eventChatUnpinMessage),
-                ),
-              if (widget.onDelete != null)
-                CupertinoActionSheetAction(
-                  isDestructiveAction: true,
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    widget.onDelete?.call();
-                  },
-                  child: Text(context.l10n.eventChatDelete),
-                ),
-            ],
-            cancelButton: CupertinoActionSheetAction(
-              isDefaultAction: true,
-              onPressed: () => Navigator.pop(ctx),
-              child: Text(context.l10n.commonCancel),
-            ),
-          );
-        },
+      context: context,
+      builder: (BuildContext ctx) {
+        return CupertinoActionSheet(
+          actions: <Widget>[
+            if (canReport)
+              CupertinoActionSheetAction(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  unawaited(_reportMessage(context, msg));
+                },
+                child: Text(context.l10n.safetyReportTitle),
+              ),
+            if (canBlock)
+              CupertinoActionSheetAction(
+                isDestructiveAction: true,
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  unawaited(_blockAuthor(context, msg));
+                },
+                child: Text(context.l10n.safetyBlockUserTitle),
+              ),
+            if (canCopy)
+              CupertinoActionSheetAction(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  widget.onCopy?.call();
+                },
+                child: Text(context.l10n.eventChatCopy),
+              ),
+            if (widget.onReply != null)
+              CupertinoActionSheetAction(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  widget.onReply?.call();
+                },
+                child: Text(context.l10n.eventChatReply),
+              ),
+            if (widget.onEdit != null)
+              CupertinoActionSheetAction(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  widget.onEdit?.call();
+                },
+                child: Text(context.l10n.eventChatEditMessage),
+              ),
+            if (widget.onPin != null)
+              CupertinoActionSheetAction(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  widget.onPin?.call();
+                },
+                child: Text(context.l10n.eventChatPinMessage),
+              ),
+            if (widget.onUnpin != null)
+              CupertinoActionSheetAction(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  widget.onUnpin?.call();
+                },
+                child: Text(context.l10n.eventChatUnpinMessage),
+              ),
+            if (widget.onDelete != null)
+              CupertinoActionSheetAction(
+                isDestructiveAction: true,
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  widget.onDelete?.call();
+                },
+                child: Text(context.l10n.eventChatDelete),
+              ),
+          ],
+          cancelButton: CupertinoActionSheetAction(
+            isDefaultAction: true,
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(context.l10n.commonCancel),
+          ),
+        );
+      },
     );
   }
 }

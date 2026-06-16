@@ -57,35 +57,28 @@ void main() {
       );
     });
 
-    test(
-      'buildPartialPayload includes scheduledAt when date changes',
-      () {
-        final EditEventFormSnapshot s = EditEventFormSnapshot.fromEvent(
-          _event(),
-        );
-        final DateTime newStart = DateTime.utc(2026, 6, 20, 10, 0);
-        final DateTime newEnd = DateTime.utc(2026, 6, 20, 12, 0);
-        final EventUpdatePayload p = s.buildPartialPayload(
-          titleTrimmed: 'River cleanup',
-          descriptionTrimmed: 'D',
-          maxParticipants: 10,
-          scheduledAtUtc: newStart,
-          endAtUtc: newEnd,
-          category: EcoEventCategory.generalCleanup,
-          gear: <EventGear>[EventGear.gloves],
-          scale: CleanupScale.small,
-          difficulty: EventDifficulty.easy,
-        );
-        final Map<String, dynamic> json = p.toPatchJson();
-        expect(json.containsKey('scheduledAt'), isTrue);
-        expect(json.containsKey('endAt'), isTrue);
-      },
-    );
+    test('buildPartialPayload includes scheduledAt when date changes', () {
+      final EditEventFormSnapshot s = EditEventFormSnapshot.fromEvent(_event());
+      final DateTime newStart = DateTime.utc(2026, 6, 20, 10, 0);
+      final DateTime newEnd = DateTime.utc(2026, 6, 20, 12, 0);
+      final EventUpdatePayload p = s.buildPartialPayload(
+        titleTrimmed: 'River cleanup',
+        descriptionTrimmed: 'D',
+        maxParticipants: 10,
+        scheduledAtUtc: newStart,
+        endAtUtc: newEnd,
+        category: EcoEventCategory.generalCleanup,
+        gear: <EventGear>[EventGear.gloves],
+        scale: CleanupScale.small,
+        difficulty: EventDifficulty.easy,
+      );
+      final Map<String, dynamic> json = p.toPatchJson();
+      expect(json.containsKey('scheduledAt'), isTrue);
+      expect(json.containsKey('endAt'), isTrue);
+    });
 
     test('buildPartialPayload includes description when only text changes', () {
-      final EditEventFormSnapshot s = EditEventFormSnapshot.fromEvent(
-        _event(),
-      );
+      final EditEventFormSnapshot s = EditEventFormSnapshot.fromEvent(_event());
       final EventUpdatePayload p = s.buildPartialPayload(
         titleTrimmed: 'River cleanup',
         descriptionTrimmed: 'Updated description',

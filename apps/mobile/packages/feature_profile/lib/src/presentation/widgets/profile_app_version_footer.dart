@@ -10,7 +10,9 @@ class ProfileAppVersionFooter extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final AsyncValue<String> versionAsync = ref.watch(profileAppVersionProvider);
+    final AsyncValue<String> versionAsync = ref.watch(
+      profileAppVersionProvider,
+    );
 
     return versionAsync.when(
       data: (String version) {
@@ -32,10 +34,7 @@ class ProfileAppVersionFooter extends ConsumerWidget {
                   textAlign: TextAlign.center,
                   style: AppTypographySurfaces.homeMutedCaption(
                     Theme.of(context).textTheme,
-                  ).copyWith(
-                    fontSize: 12,
-                    letterSpacing: 0.15,
-                  ),
+                  ).copyWith(fontSize: 12, letterSpacing: 0.15),
                 ),
               ),
             ),

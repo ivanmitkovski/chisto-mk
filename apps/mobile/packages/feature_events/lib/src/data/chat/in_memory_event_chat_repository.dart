@@ -67,8 +67,9 @@ class InMemoryEventChatRepository implements EventChatRepository {
   /// Test helper: drive reconnecting banner visibility.
   void setRealtimeDisruptionVisibleForTest(String eventId, bool visible) {
     _disruptionByEvent
-        .putIfAbsent(eventId, () => ValueNotifier<bool>(false))
-        .value = visible;
+            .putIfAbsent(eventId, () => ValueNotifier<bool>(false))
+            .value =
+        visible;
   }
 
   List<EventChatMessage> _messages(String eventId) =>

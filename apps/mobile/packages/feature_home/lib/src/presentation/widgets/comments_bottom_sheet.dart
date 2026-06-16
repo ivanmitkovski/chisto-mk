@@ -418,8 +418,9 @@ class _CommentsBottomSheetState extends ConsumerState<CommentsBottomSheet> {
   }
 
   Future<void> _openPeerCommentActions(Comment comment) async {
-    final CommentPeerAction? action =
-        await CommentPeerActionsSheet.show(context);
+    final CommentPeerAction? action = await CommentPeerActionsSheet.show(
+      context,
+    );
     if (!mounted || action == null) return;
     if (action == CommentPeerAction.report) {
       await _openCommentReport(comment);
@@ -436,8 +437,9 @@ class _CommentsBottomSheetState extends ConsumerState<CommentsBottomSheet> {
       await _openPeerCommentActions(comment);
       return;
     }
-    final CommentOwnerAction? action =
-        await CommentOwnerActionsSheet.show(context);
+    final CommentOwnerAction? action = await CommentOwnerActionsSheet.show(
+      context,
+    );
     if (!mounted || action == null) return;
     if (action == CommentOwnerAction.edit) {
       _startInlineEdit(comment);
@@ -641,12 +643,10 @@ class _CommentsBottomSheetState extends ConsumerState<CommentsBottomSheet> {
                         _replyToCommentId = comment.id;
                         _replyToAuthor = comment.authorName;
                         _commentController.text = '@${comment.authorName} ';
-                        _commentController.selection =
-                            TextSelection.fromPosition(
-                              TextPosition(
-                                offset: _commentController.text.length,
-                              ),
-                            );
+                        _commentController
+                            .selection = TextSelection.fromPosition(
+                          TextPosition(offset: _commentController.text.length),
+                        );
                       });
                       FocusScope.of(context).requestFocus(_commentFocusNode);
                     },

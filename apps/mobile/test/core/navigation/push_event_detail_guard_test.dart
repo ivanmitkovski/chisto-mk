@@ -42,10 +42,14 @@ void main() {
         await Future<void>.delayed(const Duration(milliseconds: 30));
       }
 
-      final Future<void> first =
-          EventDetailNavigationGuard.coalescedPush('evt-1', push);
-      final Future<void> second =
-          EventDetailNavigationGuard.coalescedPush('evt-1', push);
+      final Future<void> first = EventDetailNavigationGuard.coalescedPush(
+        'evt-1',
+        push,
+      );
+      final Future<void> second = EventDetailNavigationGuard.coalescedPush(
+        'evt-1',
+        push,
+      );
 
       expect(identical(first, second), isTrue);
       await Future.wait(<Future<void>>[first, second]);
@@ -108,7 +112,10 @@ void main() {
     await tester.pump();
 
     expect(EventDetailNavigationGuard.isEventDetailTopRoute(_eventId), isTrue);
-    expect(EventDetailNavigationGuard.isEventDetailTopRoute('other-id'), isFalse);
+    expect(
+      EventDetailNavigationGuard.isEventDetailTopRoute('other-id'),
+      isFalse,
+    );
   });
 
   testWidgets('coalescedPush skips when detail is already top route', (
@@ -128,5 +135,4 @@ void main() {
 
     expect(pushCount, 0);
   });
-
 }

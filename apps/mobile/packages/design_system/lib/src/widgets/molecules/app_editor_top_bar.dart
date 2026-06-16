@@ -61,10 +61,7 @@ class AppEditorTopBar extends StatelessWidget {
               ),
             ),
           ),
-          Expanded(
-            flex: 2,
-            child: center ?? const SizedBox.shrink(),
-          ),
+          Expanded(flex: 2, child: center ?? const SizedBox.shrink()),
           Expanded(
             child: Align(
               alignment: AlignmentDirectional.centerEnd,

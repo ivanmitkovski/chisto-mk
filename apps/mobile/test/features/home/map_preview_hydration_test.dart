@@ -8,10 +8,9 @@ PollutionSite _reportedSite({
   String title = 'My report',
   List<String> mediaUrls = const <String>['https://example.com/a.jpg'],
 }) {
-  return buildTestPollutionSite(id: 'site-1').copyWith(
-    title: title,
-    mediaUrls: mediaUrls,
-  );
+  return buildTestPollutionSite(
+    id: 'site-1',
+  ).copyWith(title: title, mediaUrls: mediaUrls);
 }
 
 void main() {

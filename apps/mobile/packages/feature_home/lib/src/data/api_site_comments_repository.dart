@@ -210,10 +210,10 @@ SiteUpvoterItem _siteUpvoterFromJson(Map<String, dynamic> json) {
 
 SiteCoReporterItem _siteCoReporterFromJson(Map<String, dynamic> json) {
   final String id = '${json['id'] ?? ''}'.trim();
-  final String firstName =
-      '${json['firstName'] ?? json['first_name'] ?? ''}'.trim();
-  final String lastName =
-      '${json['lastName'] ?? json['last_name'] ?? ''}'.trim();
+  final String firstName = '${json['firstName'] ?? json['first_name'] ?? ''}'
+      .trim();
+  final String lastName = '${json['lastName'] ?? json['last_name'] ?? ''}'
+      .trim();
   final String displayName =
       '${json['displayName'] ?? json['display_name'] ?? ''}'.trim();
   final Object? av = json['avatarUrl'] ?? json['avatar_url'];
@@ -224,7 +224,8 @@ SiteCoReporterItem _siteCoReporterFromJson(Map<String, dynamic> json) {
   final DateTime reportedAt = rawAt is String && rawAt.isNotEmpty
       ? (DateTime.tryParse(rawAt) ?? DateTime.fromMillisecondsSinceEpoch(0))
       : DateTime.fromMillisecondsSinceEpoch(0);
-  final bool isOriginalReporter = json['isOriginalReporter'] == true ||
+  final bool isOriginalReporter =
+      json['isOriginalReporter'] == true ||
       json['is_original_reporter'] == true;
   final bool isDeleted = json['isDeleted'] as bool? ?? false;
   final String resolvedDisplay = displayName.isNotEmpty

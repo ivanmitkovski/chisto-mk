@@ -28,7 +28,8 @@ class CoReportersSheetContent extends ConsumerStatefulWidget {
       _CoReportersSheetContentState();
 }
 
-class _CoReportersSheetContentState extends ConsumerState<CoReportersSheetContent> {
+class _CoReportersSheetContentState
+    extends ConsumerState<CoReportersSheetContent> {
   @override
   void initState() {
     super.initState();
@@ -124,9 +125,7 @@ class _CoReportersSheetContentState extends ConsumerState<CoReportersSheetConten
                 height: AppSpacing.sheetHandleHeight,
                 decoration: BoxDecoration(
                   color: AppColors.divider,
-                  borderRadius: BorderRadius.circular(
-                    AppSpacing.radiusXs,
-                  ),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
                 ),
               ),
             ),
@@ -158,86 +157,85 @@ class _CoReportersSheetContentState extends ConsumerState<CoReportersSheetConten
     SiteCoReportersState data,
   ) {
     return <Widget>[
-        if (data.initialLoading)
-          const SliverFillRemaining(
-            hasScrollBody: false,
-            child: Center(child: AppLoadingIndicator()),
-          )
-        else if (data.error != null)
-          SliverFillRemaining(
-            hasScrollBody: false,
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Text(
-                    context.l10n.siteCoReportersLoadFailed,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  PrimaryButton(
-                    label: context.l10n.siteCoReportersRetry,
-                    onPressed: () => ref
-                        .read(
-                          siteCoReportersNotifierProvider(widget.siteId)
-                              .notifier,
-                        )
-                        .loadInitial(),
-                  ),
-                ],
-              ),
-            ),
-          )
-        else if (data.items.isEmpty)
-          SliverFillRemaining(
-            hasScrollBody: false,
-            child: Center(
-              child: Text(
-                context.l10n.siteDetailNoCoReportersSnack,
-                textAlign: TextAlign.center,
-              ),
-            ),
-          )
-        else
-          SliverList(
-            delegate: SliverChildBuilderDelegate((
-              BuildContext context,
-              int index,
-            ) {
-              if (index >= data.items.length) {
-                return data.loadingMore
-                    ? const Padding(
-                        padding: EdgeInsets.all(AppSpacing.md),
-                        child: Center(child: AppLoadingIndicator()),
-                      )
-                    : const SizedBox.shrink();
-              }
-              final SiteCoReporterItem item = data.items[index];
-              final String name = _displayName(item);
-              return ListTile(
-                leading: AppAvatar(
-                  name: name,
-                  size: 40,
-                  fontSize: 14,
-                  imageUrl: item.isDeleted ? null : item.avatarUrl,
+      if (data.initialLoading)
+        const SliverFillRemaining(
+          hasScrollBody: false,
+          child: Center(child: AppLoadingIndicator()),
+        )
+      else if (data.error != null)
+        SliverFillRemaining(
+          hasScrollBody: false,
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Text(
+                  context.l10n.siteCoReportersLoadFailed,
+                  textAlign: TextAlign.center,
                 ),
-                title: Text(name),
-                subtitle: item.isOriginalReporter
-                    ? Text(
-                        context.l10n.siteCoReportersOriginalReporterLabel,
-                        style: AppTypography.cardSubtitle(
-                          Theme.of(context).textTheme,
-                        ).copyWith(color: AppColors.textSecondary),
+                const SizedBox(height: AppSpacing.sm),
+                PrimaryButton(
+                  label: context.l10n.siteCoReportersRetry,
+                  onPressed: () => ref
+                      .read(
+                        siteCoReportersNotifierProvider(widget.siteId).notifier,
                       )
-                    : null,
-              );
-            }, childCount: data.items.length + (data.loadingMore ? 1 : 0)),
+                      .loadInitial(),
+                ),
+              ],
+            ),
           ),
-        SliverPadding(
-          padding: EdgeInsets.only(
-            bottom: AppBottomSheet.homeIndicatorScrollPadding(context),
+        )
+      else if (data.items.isEmpty)
+        SliverFillRemaining(
+          hasScrollBody: false,
+          child: Center(
+            child: Text(
+              context.l10n.siteDetailNoCoReportersSnack,
+              textAlign: TextAlign.center,
+            ),
           ),
+        )
+      else
+        SliverList(
+          delegate: SliverChildBuilderDelegate((
+            BuildContext context,
+            int index,
+          ) {
+            if (index >= data.items.length) {
+              return data.loadingMore
+                  ? const Padding(
+                      padding: EdgeInsets.all(AppSpacing.md),
+                      child: Center(child: AppLoadingIndicator()),
+                    )
+                  : const SizedBox.shrink();
+            }
+            final SiteCoReporterItem item = data.items[index];
+            final String name = _displayName(item);
+            return ListTile(
+              leading: AppAvatar(
+                name: name,
+                size: 40,
+                fontSize: 14,
+                imageUrl: item.isDeleted ? null : item.avatarUrl,
+              ),
+              title: Text(name),
+              subtitle: item.isOriginalReporter
+                  ? Text(
+                      context.l10n.siteCoReportersOriginalReporterLabel,
+                      style: AppTypography.cardSubtitle(
+                        Theme.of(context).textTheme,
+                      ).copyWith(color: AppColors.textSecondary),
+                    )
+                  : null,
+            );
+          }, childCount: data.items.length + (data.loadingMore ? 1 : 0)),
         ),
+      SliverPadding(
+        padding: EdgeInsets.only(
+          bottom: AppBottomSheet.homeIndicatorScrollPadding(context),
+        ),
+      ),
     ];
   }
 }

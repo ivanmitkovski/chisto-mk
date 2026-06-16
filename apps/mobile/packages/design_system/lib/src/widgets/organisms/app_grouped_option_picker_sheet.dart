@@ -89,28 +89,30 @@ class AppGroupedOptionPickerSheet<T> extends StatelessWidget {
           if (instructionMessage != null)
             AppSelectionInstruction(message: instructionMessage!),
           AppGroupedActionList(
-            children: options.map((AppGroupedOption<T> option) {
-              final bool active = isSelected(option.value);
-              final Widget trailing =
-                  trailingBuilder?.call(option.value, isActive: active) ??
-                  defaultTrailing(isActive: active);
-              return Semantics(
-                button: true,
-                selected: active,
-                label: option.semanticsLabel ?? option.title,
-                child: AppActionTile(
-                  variant: AppActionTileVariant.grouped,
-                  icon: option.icon,
-                  title: option.title,
-                  subtitle: option.subtitle,
-                  tone: active
-                      ? AppSurfaceTone.accent
-                      : AppSurfaceTone.neutral,
-                  trailing: trailing,
-                  onTap: () => onOptionTap(option.value),
-                ),
-              );
-            }).toList(growable: false),
+            children: options
+                .map((AppGroupedOption<T> option) {
+                  final bool active = isSelected(option.value);
+                  final Widget trailing =
+                      trailingBuilder?.call(option.value, isActive: active) ??
+                      defaultTrailing(isActive: active);
+                  return Semantics(
+                    button: true,
+                    selected: active,
+                    label: option.semanticsLabel ?? option.title,
+                    child: AppActionTile(
+                      variant: AppActionTileVariant.grouped,
+                      icon: option.icon,
+                      title: option.title,
+                      subtitle: option.subtitle,
+                      tone: active
+                          ? AppSurfaceTone.accent
+                          : AppSurfaceTone.neutral,
+                      trailing: trailing,
+                      onTap: () => onOptionTap(option.value),
+                    ),
+                  );
+                })
+                .toList(growable: false),
           ),
         ],
       ),

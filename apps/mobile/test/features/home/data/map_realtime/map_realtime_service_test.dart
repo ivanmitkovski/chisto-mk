@@ -348,53 +348,56 @@ void main() {
     svc.dispose();
   });
 
-  test('token rotation defers reconnect while live stream is healthy', () async {
-    int sends = 0;
-    final StreamController<List<int>> first = StreamController<List<int>>();
-    final http.Client client = MockClient.streaming((
-      http.BaseRequest request,
-      _,
-    ) async {
-      sends += 1;
-      return http.StreamedResponse(
-        first.stream,
-        200,
-        headers: <String, String>{'content-type': 'text/event-stream'},
+  test(
+    'token rotation defers reconnect while live stream is healthy',
+    () async {
+      int sends = 0;
+      final StreamController<List<int>> first = StreamController<List<int>>();
+      final http.Client client = MockClient.streaming((
+        http.BaseRequest request,
+        _,
+      ) async {
+        sends += 1;
+        return http.StreamedResponse(
+          first.stream,
+          200,
+          headers: <String, String>{'content-type': 'text/event-stream'},
+        );
+      });
+      final AuthState auth = AuthState()
+        ..setAuthenticated(
+          userId: 'u1',
+          displayName: 'Tester',
+          accessToken: 't1',
+        );
+      final MapRealtimeService svc = MapRealtimeService(
+        config: AppConfig.local,
+        authState: auth,
+        sessionRefresh: null,
+        httpClient: client,
       );
-    });
-    final AuthState auth = AuthState()
-      ..setAuthenticated(
+      final Completer<void> sawLive = Completer<void>();
+      late final StreamSubscription<MapRealtimeConnectionState> stateSub;
+      stateSub = svc.states.listen((MapRealtimeConnectionState s) {
+        if (s == MapRealtimeConnectionState.live && !sawLive.isCompleted) {
+          sawLive.complete();
+        }
+      });
+      svc.setActive(true);
+      await sawLive.future.timeout(const Duration(seconds: 2));
+      auth.setAuthenticated(
         userId: 'u1',
         displayName: 'Tester',
-        accessToken: 't1',
+        accessToken: 't2',
       );
-    final MapRealtimeService svc = MapRealtimeService(
-      config: AppConfig.local,
-      authState: auth,
-      sessionRefresh: null,
-      httpClient: client,
-    );
-    final Completer<void> sawLive = Completer<void>();
-    late final StreamSubscription<MapRealtimeConnectionState> stateSub;
-    stateSub = svc.states.listen((MapRealtimeConnectionState s) {
-      if (s == MapRealtimeConnectionState.live && !sawLive.isCompleted) {
-        sawLive.complete();
-      }
-    });
-    svc.setActive(true);
-    await sawLive.future.timeout(const Duration(seconds: 2));
-    auth.setAuthenticated(
-      userId: 'u1',
-      displayName: 'Tester',
-      accessToken: 't2',
-    );
-    await Future<void>.delayed(const Duration(milliseconds: 100));
-    expect(sends, 1);
-    await stateSub.cancel();
-    await first.close();
-    svc.setActive(false);
-    svc.dispose();
-  });
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      expect(sends, 1);
+      await stateSub.cancel();
+      await first.close();
+      svc.setActive(false);
+      svc.dispose();
+    },
+  );
 
   test('429 applies extended backoff without auth rejection', () async {
     var authRejectedCalls = 0;

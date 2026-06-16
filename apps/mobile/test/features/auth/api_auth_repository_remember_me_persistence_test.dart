@@ -83,30 +83,33 @@ void main() {
     FlutterSecureStorage.setMockInitialValues(<String, String>{});
   });
 
-  test('rememberMe true persists tokens across storage instance restart', () async {
-    SharedPreferences.setMockInitialValues(<String, Object>{});
-    final SecureTokenStorage storage = SecureTokenStorage(
-      storage: const FlutterSecureStorage(),
-    );
-    final ApiAuthRepository repo = ApiAuthRepository(
-      client: _LoginApiClient(),
-      authState: AuthState(),
-      tokenStorage: storage,
-      preferences: await SharedPreferences.getInstance(),
-    );
+  test(
+    'rememberMe true persists tokens across storage instance restart',
+    () async {
+      SharedPreferences.setMockInitialValues(<String, Object>{});
+      final SecureTokenStorage storage = SecureTokenStorage(
+        storage: const FlutterSecureStorage(),
+      );
+      final ApiAuthRepository repo = ApiAuthRepository(
+        client: _LoginApiClient(),
+        authState: AuthState(),
+        tokenStorage: storage,
+        preferences: await SharedPreferences.getInstance(),
+      );
 
-    await repo.signIn(
-      phoneNumber: '+38970123456',
-      password: 'secret',
-      rememberMe: true,
-    );
+      await repo.signIn(
+        phoneNumber: '+38970123456',
+        password: 'secret',
+        rememberMe: true,
+      );
 
-    final SecureTokenStorage restarted = SecureTokenStorage(
-      storage: const FlutterSecureStorage(),
-    );
-    expect(await restarted.accessToken, 'access-token');
-    expect(await restarted.refreshToken, 'refresh-token');
-  });
+      final SecureTokenStorage restarted = SecureTokenStorage(
+        storage: const FlutterSecureStorage(),
+      );
+      expect(await restarted.accessToken, 'access-token');
+      expect(await restarted.refreshToken, 'refresh-token');
+    },
+  );
 
   test('rememberMe false keeps tokens out of secure storage', () async {
     SharedPreferences.setMockInitialValues(<String, Object>{});

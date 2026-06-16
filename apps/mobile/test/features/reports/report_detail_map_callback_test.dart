@@ -157,14 +157,15 @@ void main() {
     final Finder bannerTitle = find.text('Under review by moderators');
     expect(bannerTitle, findsOneWidget);
 
-    await tester.fling(find.byType(Scrollable).first, const Offset(0, -800), 2000);
+    await tester.fling(
+      find.byType(Scrollable).first,
+      const Offset(0, -800),
+      2000,
+    );
     await tester.pumpAndSettle();
 
     expect(bannerTitle, findsOneWidget);
-    expect(
-      tester.getBottomLeft(bannerTitle).dy,
-      lessThan(844 - homeIndicator),
-    );
+    expect(tester.getBottomLeft(bannerTitle).dy, lessThan(844 - homeIndicator));
   });
 
   testWidgets('report detail subtitle and status body are fully visible', (
@@ -216,13 +217,14 @@ void main() {
     );
     expect(statusBody, findsOneWidget);
 
-    await tester.fling(find.byType(Scrollable).first, const Offset(0, -1200), 2500);
+    await tester.fling(
+      find.byType(Scrollable).first,
+      const Offset(0, -1200),
+      2500,
+    );
     await tester.pumpAndSettle();
 
     expect(statusBody, findsOneWidget);
-    expect(
-      tester.getBottomLeft(statusBody).dy,
-      lessThan(844 - homeIndicator),
-    );
+    expect(tester.getBottomLeft(statusBody).dy, lessThan(844 - homeIndicator));
   });
 }

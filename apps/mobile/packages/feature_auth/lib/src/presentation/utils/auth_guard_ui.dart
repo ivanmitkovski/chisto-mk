@@ -92,8 +92,7 @@ Future<bool> ensureLocationEligibleForActionWithRead(
   BuildContext context,
   ProviderRead read,
 ) async {
-  final LocationService location =
-      read(appBootstrapProvider).locationService;
+  final LocationService location = read(appBootstrapProvider).locationService;
 
   final AppLocationPermission permission = await location.checkPermission();
   if (permission != AppLocationPermission.whileInUse &&

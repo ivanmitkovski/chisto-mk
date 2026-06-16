@@ -60,9 +60,11 @@ class _ResolutionSubmittedDialogState extends State<ResolutionSubmittedDialog>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       AppHaptics.success(context);
-      unawaited(_entryController.forward().then((_) {
-        if (mounted) _checkController.forward();
-      }));
+      unawaited(
+        _entryController.forward().then((_) {
+          if (mounted) _checkController.forward();
+        }),
+      );
     });
   }
 
@@ -165,9 +167,9 @@ class _ResolutionSubmittedDialogState extends State<ResolutionSubmittedDialog>
                   label: l10n.resolutionSubmittedViewMyReports,
                   primary: true,
                   onPressed: () {
-                    Navigator.of(context).pop(
-                      ResolutionSubmittedDialogResult.viewReports,
-                    );
+                    Navigator.of(
+                      context,
+                    ).pop(ResolutionSubmittedDialogResult.viewReports);
                   },
                 ),
                 const SizedBox(height: AppSpacing.sm),
@@ -175,7 +177,9 @@ class _ResolutionSubmittedDialogState extends State<ResolutionSubmittedDialog>
                   label: l10n.resolutionSubmittedDone,
                   primary: false,
                   onPressed: () {
-                    Navigator.of(context).pop(ResolutionSubmittedDialogResult.done);
+                    Navigator.of(
+                      context,
+                    ).pop(ResolutionSubmittedDialogResult.done);
                   },
                 ),
               ],

@@ -12,7 +12,9 @@ void main() {
     await bootstrapWidgetTests();
   });
 
-  testWidgets('confirm returns clamped selected date', (WidgetTester tester) async {
+  testWidgets('confirm returns clamped selected date', (
+    WidgetTester tester,
+  ) async {
     late AppLocalizations l10n;
     DateTime? result;
 
@@ -62,7 +64,9 @@ void main() {
     expect(result, DateTime(2024, 6, 15));
   });
 
-  testWidgets('initial date is clamped to minimumDate', (WidgetTester tester) async {
+  testWidgets('initial date is clamped to minimumDate', (
+    WidgetTester tester,
+  ) async {
     late AppLocalizations l10n;
 
     await tester.pumpWidget(

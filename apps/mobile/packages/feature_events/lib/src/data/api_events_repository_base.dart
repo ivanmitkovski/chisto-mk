@@ -112,12 +112,13 @@ class _ApiEventsRepositoryBase extends ChangeNotifier {
     if (_events.isEmpty) {
       return;
     }
-    _listSnapshotsByCacheKey[_listSnapshotKey(_activeParams)] =
-        _EventsListSnapshot(
-          events: List<EcoEvent>.from(_events),
-          nextCursor: _nextCursor,
-          hasMore: _hasMore,
-        );
+    _listSnapshotsByCacheKey[_listSnapshotKey(
+      _activeParams,
+    )] = _EventsListSnapshot(
+      events: List<EcoEvent>.from(_events),
+      nextCursor: _nextCursor,
+      hasMore: _hasMore,
+    );
   }
 
   bool _tryRestoreListSnapshot(EcoEventSearchParams? params) {

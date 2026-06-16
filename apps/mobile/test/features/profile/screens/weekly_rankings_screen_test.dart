@@ -60,7 +60,9 @@ void main() {
   testWidgets('pull-to-refresh sits below fixed header chrome', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(_wrapRankingsScreen(_rankingsPayload(entryCount: 3)));
+    await tester.pumpWidget(
+      _wrapRankingsScreen(_rankingsPayload(entryCount: 3)),
+    );
     await tester.pumpAndSettle();
 
     expect(find.byType(ProfileSubScreenHeader), findsOneWidget);
@@ -74,7 +76,9 @@ void main() {
     const double bottomInset = 34;
     await tester.pumpWidget(
       MediaQuery(
-        data: const MediaQueryData(padding: EdgeInsets.only(bottom: bottomInset)),
+        data: const MediaQueryData(
+          padding: EdgeInsets.only(bottom: bottomInset),
+        ),
         child: _wrapRankingsScreen(_rankingsPayload(entryCount: 3)),
       ),
     );
@@ -99,7 +103,9 @@ void main() {
 
     await tester.pumpWidget(
       MediaQuery(
-        data: const MediaQueryData(padding: EdgeInsets.only(bottom: bottomInset)),
+        data: const MediaQueryData(
+          padding: EdgeInsets.only(bottom: bottomInset),
+        ),
         child: _wrapRankingsScreen(
           WeeklyRankingsResult(
             weekStartsAt: '2026-06-01T00:00:00.000Z',

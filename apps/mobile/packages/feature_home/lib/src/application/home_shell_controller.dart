@@ -86,12 +86,12 @@ class HomeShellController extends _$HomeShellController {
                 siteId: siteId,
                 snapshot: snapshot,
               ),
-          cleanupSectionBuilder: (
-            BuildContext context,
-            String siteId,
-            ReportSheetViewModel report,
-          ) =>
-              ReportCleanupSubmissionSlot(
+          cleanupSectionBuilder:
+              (
+                BuildContext context,
+                String siteId,
+                ReportSheetViewModel report,
+              ) => ReportCleanupSubmissionSlot(
                 siteId: siteId,
                 reportApproved: report.status == ReportSheetStatus.approved,
                 snapshot: report,

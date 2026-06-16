@@ -82,7 +82,8 @@ abstract final class AppBottomSheet {
       backgroundColor: backgroundColor ?? AppColors.panelBackground,
       barrierColor: barrierColor ?? AppColors.overlay,
       barrierLabel: barrierLabel,
-      shape: shape ??
+      shape:
+          shape ??
           const RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(
               top: Radius.circular(AppSpacing.radiusSheet),
@@ -244,7 +245,8 @@ class _AppResizableBottomSheetHost extends StatefulWidget {
     ScrollController scrollController,
     DraggableScrollableController sheetController,
     AppSheetSizeConfig sizeConfig,
-  ) builder;
+  )
+  builder;
 
   @override
   State<_AppResizableBottomSheetHost> createState() =>
@@ -257,9 +259,7 @@ class _AppResizableBottomSheetHostState
 
   @override
   Widget build(BuildContext context) {
-    final MediaQueryData viewData = MediaQueryData.fromView(
-      View.of(context),
-    );
+    final MediaQueryData viewData = MediaQueryData.fromView(View.of(context));
     final AppSheetSizeConfig activeConfig = appSheetSizeConfigForViewport(
       widget.sizeConfig,
       viewData,
@@ -315,15 +315,16 @@ class _AppResizableBottomSheetHostState
             snapSizes: activeConfig.snapSizes.isEmpty
                 ? null
                 : activeConfig.snapSizes,
-            builder: (BuildContext sheetContext, ScrollController scrollController) {
-              return AppResizableSheet(
-                sizeConfig: activeConfig,
-                sheetController: widget.sheetController,
-                scrollController: scrollController,
-                dragHandleSemanticLabel: widget.dragHandleSemanticLabel,
-                builder: widget.builder,
-              );
-            },
+            builder:
+                (BuildContext sheetContext, ScrollController scrollController) {
+                  return AppResizableSheet(
+                    sizeConfig: activeConfig,
+                    sheetController: widget.sheetController,
+                    scrollController: scrollController,
+                    dragHandleSemanticLabel: widget.dragHandleSemanticLabel,
+                    builder: widget.builder,
+                  );
+                },
           ),
         ),
       ),

@@ -30,10 +30,7 @@ void main() {
     await tester.binding.setSurfaceSize(const Size(390, screenHeight));
     tester.view.physicalSize = const Size(390, screenHeight);
     tester.view.devicePixelRatio = 1.0;
-    tester.view.viewPadding = FakeViewPadding(
-      top: topInset,
-      bottom: 34,
-    );
+    tester.view.viewPadding = FakeViewPadding(top: topInset, bottom: 34);
     addTearDown(() async {
       await tester.binding.setSurfaceSize(null);
       tester.view.resetPhysicalSize();
@@ -112,7 +109,8 @@ void main() {
     expect(
       sheetBox.localToGlobal(Offset(0, sheetBox.size.height)).dy,
       closeTo(screenHeight, 8),
-      reason: 'Sheet bottom stays anchored at screen bottom (keyboard overlays)',
+      reason:
+          'Sheet bottom stays anchored at screen bottom (keyboard overlays)',
     );
 
     expect(find.byType(TextField), findsOneWidget);
@@ -136,10 +134,7 @@ void main() {
     await tester.binding.setSurfaceSize(const Size(390, screenHeight));
     tester.view.physicalSize = const Size(390, screenHeight);
     tester.view.devicePixelRatio = 1.0;
-    tester.view.viewPadding = FakeViewPadding(
-      top: topInset,
-      bottom: 34,
-    );
+    tester.view.viewPadding = FakeViewPadding(top: topInset, bottom: 34);
     addTearDown(() async {
       await tester.binding.setSurfaceSize(null);
       tester.view.resetPhysicalSize();
@@ -222,7 +217,8 @@ void main() {
     expect(
       identical(editableBefore, editableAfter),
       isTrue,
-      reason: 'Composer TextField must not be remounted while the keyboard '
+      reason:
+          'Composer TextField must not be remounted while the keyboard '
           'opens, or the IME connection closes and the keyboard dismisses',
     );
 
@@ -245,10 +241,7 @@ void main() {
     await tester.binding.setSurfaceSize(const Size(390, screenHeight));
     tester.view.physicalSize = const Size(390, screenHeight);
     tester.view.devicePixelRatio = 1.0;
-    tester.view.viewPadding = FakeViewPadding(
-      top: topInset,
-      bottom: 34,
-    );
+    tester.view.viewPadding = FakeViewPadding(top: topInset, bottom: 34);
     addTearDown(() async {
       await tester.binding.setSurfaceSize(null);
       tester.view.resetPhysicalSize();
@@ -331,7 +324,8 @@ void main() {
     expect(
       emptyBox.localToGlobal(Offset(0, emptyHeightWhileOpen)).dy,
       lessThanOrEqualTo(keyboardTop + 1),
-      reason: 'Empty state shrinks above the keyboard instead of sitting '
+      reason:
+          'Empty state shrinks above the keyboard instead of sitting '
           'behind it',
     );
 

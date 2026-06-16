@@ -42,19 +42,12 @@ class NotificationNavigationExecutor {
 
   static GoRouter get _router => appGoRouter;
 
-  static void _showSnack(
-    BuildContext? context, {
-    required String message,
-  }) {
+  static void _showSnack(BuildContext? context, {required String message}) {
     final BuildContext? resolved = _resolveContext(context);
     if (resolved == null) {
       return;
     }
-    AppSnack.show(
-      resolved,
-      message: message,
-      type: AppSnackType.warning,
-    );
+    AppSnack.show(resolved, message: message, type: AppSnackType.warning);
   }
 
   static Future<bool> execute({
@@ -108,9 +101,9 @@ class NotificationNavigationExecutor {
           origin: origin,
           target: target,
         )) {
-          readRoot(homeShellControllerProvider.notifier).applyInitialFocus(
-            mapSiteIdToFocus: siteId,
-          );
+          readRoot(
+            homeShellControllerProvider.notifier,
+          ).applyInitialFocus(mapSiteIdToFocus: siteId);
           NotificationOpenDiagnostics.recordOpenSuccess('${prefix}_map_focus');
           return true;
         }
@@ -139,22 +132,26 @@ class NotificationNavigationExecutor {
           origin: origin,
           target: target,
         )) {
-          readRoot(homeShellControllerProvider.notifier).applyInitialFocus(
-            startCoachTour: true,
-          );
+          readRoot(
+            homeShellControllerProvider.notifier,
+          ).applyInitialFocus(startCoachTour: true);
         } else {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             AppNavigation.navigateToFeatureGuide();
           });
         }
-        NotificationOpenDiagnostics.recordOpenSuccess('${prefix}_feature_guide');
+        NotificationOpenDiagnostics.recordOpenSuccess(
+          '${prefix}_feature_guide',
+        );
         return true;
       case NotificationOpenProfileAchievements():
         return _openProfileAchievements(context, prefix: prefix);
       case NotificationOpenDeepLink(:final String path):
         return _openDeepLink(context, path: path, prefix: prefix);
       case NotificationOpenInformational():
-        NotificationOpenDiagnostics.recordOpenSuccess('${prefix}_informational');
+        NotificationOpenDiagnostics.recordOpenSuccess(
+          '${prefix}_informational',
+        );
         return true;
       case NotificationOpenFailure(:final NotificationOpenFailureReason reason):
         NotificationOpenDiagnostics.recordOpenFailure('${prefix}_$reason');
@@ -224,7 +221,11 @@ class NotificationNavigationExecutor {
       );
       return true;
     } on Object catch (e, st) {
-      AppLog.warn('notification_nav: report push failed', error: e, stackTrace: st);
+      AppLog.warn(
+        'notification_nav: report push failed',
+        error: e,
+        stackTrace: st,
+      );
       NotificationOpenDiagnostics.recordOpenFailure(
         '${diagnosticsPrefix}_report_push_failed',
       );
@@ -261,7 +262,8 @@ class NotificationNavigationExecutor {
       );
       _showSnack(
         context,
-        message: _resolveContext(context)?.l10n.notificationsSiteUnavailable ??
+        message:
+            _resolveContext(context)?.l10n.notificationsSiteUnavailable ??
             'Site unavailable',
       );
       return false;
@@ -318,7 +320,11 @@ class NotificationNavigationExecutor {
       NotificationOpenDiagnostics.recordOpenSuccess('${prefix}_event_detail');
       return true;
     } on Object catch (e, st) {
-      AppLog.warn('notification_nav: event push failed', error: e, stackTrace: st);
+      AppLog.warn(
+        'notification_nav: event push failed',
+        error: e,
+        stackTrace: st,
+      );
       NotificationOpenDiagnostics.recordOpenFailure('${prefix}_event_missing');
       _showSnack(
         context,
@@ -344,7 +350,9 @@ class NotificationNavigationExecutor {
         eventId,
       );
       if (!available) {
-        NotificationOpenDiagnostics.recordOpenFailure('${prefix}_event_missing');
+        NotificationOpenDiagnostics.recordOpenFailure(
+          '${prefix}_event_missing',
+        );
         _showSnack(
           context,
           message:
@@ -391,7 +399,9 @@ class NotificationNavigationExecutor {
     final Uri uri = Uri.parse(trimmed.startsWith('/') ? trimmed : '/$trimmed');
     final BuildContext? resolved = _resolveContext(context);
     if (resolved == null) {
-      NotificationOpenDiagnostics.recordOpenFailure('${prefix}_deeplink_no_context');
+      NotificationOpenDiagnostics.recordOpenFailure(
+        '${prefix}_deeplink_no_context',
+      );
       return false;
     }
 
@@ -406,7 +416,9 @@ class NotificationNavigationExecutor {
       return true;
     }
 
-    NotificationOpenDiagnostics.recordOpenSuccess('${prefix}_deeplink_unhandled');
+    NotificationOpenDiagnostics.recordOpenSuccess(
+      '${prefix}_deeplink_unhandled',
+    );
     return true;
   }
 
@@ -416,7 +428,9 @@ class NotificationNavigationExecutor {
   }) async {
     final bool opened = await AppNavigation.pushProfilePointsHistory();
     if (!opened) {
-      NotificationOpenDiagnostics.recordOpenFailure('${prefix}_profile_missing');
+      NotificationOpenDiagnostics.recordOpenFailure(
+        '${prefix}_profile_missing',
+      );
       _showSnack(
         context,
         message:

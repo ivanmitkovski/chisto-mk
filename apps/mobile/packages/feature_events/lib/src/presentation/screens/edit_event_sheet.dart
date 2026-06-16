@@ -452,485 +452,465 @@ class _EditEventSheetState extends State<EditEventSheet>
     final AppLocalizations l10n = context.l10n;
 
     return ReportSheetScaffold(
-          title: l10n.eventsEditEventTitle,
-          subtitle: _event.siteName,
-          headerDividerGap: AppSpacing.lg,
-          maxHeightFactor: 0.92,
-          fillAvailableHeight: true,
-          shrinkForKeyboard: false,
-          padFooterForKeyboard: false,
-          addBottomInset: true,
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Tooltip(
-                message: l10n.editEventHelpButtonTooltip,
-                child: ReportCircleIconButton(
-                  icon: CupertinoIcons.info_circle,
-                  semanticLabel: l10n.editEventHelpButtonTooltip,
-                  onTap: () {
-                    showEditEventHelpSheet(context);
-                  },
-                ),
-              ),
-              const SizedBox(width: AppSpacing.xs),
-              ReportCircleIconButton(
-                icon: CupertinoIcons.xmark,
-                semanticLabel: l10n.commonClose,
-                onTap: () {
-                  unawaited(_requestClose());
-                },
-              ),
-            ],
+      title: l10n.eventsEditEventTitle,
+      subtitle: _event.siteName,
+      headerDividerGap: AppSpacing.lg,
+      maxHeightFactor: 0.92,
+      fillAvailableHeight: true,
+      shrinkForKeyboard: false,
+      padFooterForKeyboard: false,
+      addBottomInset: true,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Tooltip(
+            message: l10n.editEventHelpButtonTooltip,
+            child: ReportCircleIconButton(
+              icon: CupertinoIcons.info_circle,
+              semanticLabel: l10n.editEventHelpButtonTooltip,
+              onTap: () {
+                showEditEventHelpSheet(context);
+              },
+            ),
           ),
-          footer: PrimaryButton(
-            label: _submitting
-                ? l10n.editEventSaving
-                : l10n.eventsEditEventSave,
-            enabled: _isDirty && _isValid && _networkOnline,
-            isLoading: _submitting,
-            onPressed: _isDirty && _isValid && !_submitting && _networkOnline
-                ? () => unawaited(_submit())
-                : null,
+          const SizedBox(width: AppSpacing.xs),
+          ReportCircleIconButton(
+            icon: CupertinoIcons.xmark,
+            semanticLabel: l10n.commonClose,
+            onTap: () {
+              unawaited(_requestClose());
+            },
           ),
-          child: FadeTransition(
-            opacity: _entranceFade,
-            child: SingleChildScrollView(
-              controller: _scrollController,
-              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.viewInsetsOf(context).bottom,
-              ),
-              child: Semantics(
-                container: true,
-                label: '${l10n.eventsEditEventTitle}. ${_event.siteName}',
-                child: Padding(
-                  padding: const EdgeInsets.only(top: AppSpacing.sm),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
-                      if (!_networkOnline) ...<Widget>[
-                        Semantics(
-                          container: true,
-                          label: l10n.editEventOfflineSave,
-                          child: Material(
-                            color: AppColors.accentWarning.withValues(
-                              alpha: 0.12,
-                            ),
-                            borderRadius: BorderRadius.circular(
-                              AppSpacing.radiusMd,
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(AppSpacing.md),
-                              child: Row(
-                                children: <Widget>[
-                                  const Icon(
-                                    Icons.cloud_off_outlined,
-                                    size: AppSpacing.iconSm,
-                                    color: AppColors.textSecondary,
-                                  ),
-                                  const SizedBox(width: AppSpacing.sm),
-                                  Expanded(
-                                    child: Text(
-                                      l10n.editEventOfflineSave,
-                                      style:
-                                          AppTypography.eventsSupportingCaption(
-                                            textTheme,
-                                          ).copyWith(
-                                            color: AppColors.textPrimary,
-                                          ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+        ],
+      ),
+      footer: PrimaryButton(
+        label: _submitting ? l10n.editEventSaving : l10n.eventsEditEventSave,
+        enabled: _isDirty && _isValid && _networkOnline,
+        isLoading: _submitting,
+        onPressed: _isDirty && _isValid && !_submitting && _networkOnline
+            ? () => unawaited(_submit())
+            : null,
+      ),
+      child: FadeTransition(
+        opacity: _entranceFade,
+        child: SingleChildScrollView(
+          controller: _scrollController,
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.viewInsetsOf(context).bottom,
+          ),
+          child: Semantics(
+            container: true,
+            label: '${l10n.eventsEditEventTitle}. ${_event.siteName}',
+            child: Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.sm),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  if (!_networkOnline) ...<Widget>[
+                    Semantics(
+                      container: true,
+                      label: l10n.editEventOfflineSave,
+                      child: Material(
+                        color: AppColors.accentWarning.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusMd,
                         ),
-                        const SizedBox(height: AppSpacing.md),
-                      ],
-                      if (_submitFeedbackMessage != null) ...<Widget>[
-                        EditEventSubmitBanner(message: _submitFeedbackMessage!),
-                        const SizedBox(height: AppSpacing.md),
-                      ],
-                      if (!_event.moderationApproved) ...<Widget>[
-                        Semantics(
-                          container: true,
-                          label: l10n.editEventPendingModerationBanner,
-                          child: Material(
-                            color: AppColors.accentWarning.withValues(
-                              alpha: 0.12,
-                            ),
-                            borderRadius: BorderRadius.circular(
-                              AppSpacing.radiusMd,
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(AppSpacing.md),
-                              child: Text(
-                                l10n.editEventPendingModerationBanner,
-                                style: AppTypography.eventsSupportingCaption(
-                                  textTheme,
-                                ).copyWith(color: AppColors.textPrimary),
+                        child: Padding(
+                          padding: const EdgeInsets.all(AppSpacing.md),
+                          child: Row(
+                            children: <Widget>[
+                              const Icon(
+                                Icons.cloud_off_outlined,
+                                size: AppSpacing.iconSm,
+                                color: AppColors.textSecondary,
                               ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                      ],
-                      DesignSystemTextField(
-                        focusNode: _titleFocus,
-                        controller: _titleController,
-                        textInputAction: TextInputAction.next,
-                        maxLength: kEditEventTitleMaxLength,
-                        style: AppTypography.eventsEditFormFieldPrimary(
-                          textTheme,
-                        ),
-                        buildCounter:
-                            (
-                              BuildContext _, {
-                              required int currentLength,
-                              required bool isFocused,
-                              required int? maxLength,
-                            }) {
-                              return editEventLengthCounter(
-                                textTheme,
-                                currentLength,
-                                maxLength ?? kEditEventTitleMaxLength,
-                              );
-                            },
-                        decoration: editEventTextFieldDecoration(
-                          textTheme,
-                          labelText: l10n.createEventTitleLabel,
-                          errorText: _titleError(l10n),
-                        ),
-                        onChanged: (_) {
-                          markFieldDirty(_EditEventFieldIds.title);
-                          _onFieldChanged();
-                        },
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      DesignSystemTextField(
-                        focusNode: _descriptionFocus,
-                        controller: _descriptionController,
-                        minLines: 3,
-                        maxLines: 6,
-                        maxLength: kEditEventDescriptionMaxLength,
-                        style: AppTypography.eventsSearchFieldText(
-                          textTheme,
-                        ).copyWith(fontWeight: FontWeight.w500, height: 1.35),
-                        buildCounter:
-                            (
-                              BuildContext _, {
-                              required int currentLength,
-                              required bool isFocused,
-                              required int? maxLength,
-                            }) {
-                              return editEventLengthCounter(
-                                textTheme,
-                                currentLength,
-                                maxLength ?? kEditEventDescriptionMaxLength,
-                              );
-                            },
-                        decoration: editEventTextFieldDecoration(
-                          textTheme,
-                          labelText: l10n.createEventDescriptionLabel,
-                          errorText: _descriptionError(l10n),
-                        ),
-                        onChanged: (_) {
-                          markFieldDirty(_EditEventFieldIds.description);
-                          _onFieldChanged();
-                        },
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      EventFormPickerTile(
-                        label: l10n.createEventFieldType,
-                        value: _category.localizedLabel(l10n),
-                        icon: _category.icon,
-                        placeholder: l10n.createEventPlaceholderType,
-                        onTap: _showCategoryPicker,
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-                      KeyedSubtree(
-                        key: _scheduleSectionKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: <Widget>[
-                            if (_event.status ==
-                                EcoEventStatus.upcoming) ...<Widget>[
-                              Text(
-                                l10n.createEventScheduleDateLabel,
-                                style: AppTypography.eventsSheetSectionLabel(
-                                  textTheme,
-                                ),
-                              ),
-                              const SizedBox(height: AppSpacing.sm),
-                              EventCalendar(
-                                selectedDate: _selectedDate,
-                                minimumSelectableDate: DateUtils.dateOnly(
-                                  DateTime.now(),
-                                ),
-                                onDateSelected: (DateTime d) {
-                                  setState(() {
-                                    _selectedDate = DateUtils.dateOnly(d);
-                                    final ({EventTime start, EventTime end}) c =
-                                        clampCreateOrUpcomingSchedule(
-                                          dateOnly: _selectedDate,
-                                          start: _startTime,
-                                          end: _endTime,
-                                          now: DateTime.now(),
-                                        );
-                                    _startTime = c.start;
-                                    _endTime = c.end;
-                                    _clearSubmitFeedback();
-                                  });
-                                  _scheduleConflictPreviewDebounced();
-                                },
-                              ),
-                            ] else ...<Widget>[
-                              EventCalendar(
-                                selectedDate: _selectedDate,
-                                onDateSelected: (DateTime d) {
-                                  setState(() {
-                                    _selectedDate = d;
-                                    final DateTime dateOnly =
-                                        DateUtils.dateOnly(d);
-                                    final DateTime now = DateTime.now();
-                                    final ({EventTime start, EventTime end}) c =
-                                        clampInProgressEditSchedule(
-                                          dateOnly: dateOnly,
-                                          start: _startTime,
-                                          end: _endTime,
-                                          now: now,
-                                        );
-                                    _startTime = c.start;
-                                    _endTime = c.end;
-                                  });
-                                  _scheduleConflictPreviewDebounced();
-                                },
-                              ),
-                            ],
-                            const SizedBox(height: AppSpacing.lg),
-                            Divider(
-                              height: 1,
-                              thickness: 1,
-                              color: AppColors.divider.withValues(alpha: 0.55),
-                            ),
-                            const SizedBox(height: AppSpacing.lg),
-                            Builder(
-                              builder: (BuildContext context) {
-                                final ({DateTime? minStart, DateTime? minEnd})
-                                b = _editPickerBounds();
-                                return TimeRangePicker(
-                                  startTime: _startTime.toTimeOfDay(),
-                                  endTime: _endTime.toTimeOfDay(),
-                                  hasError: _showScheduleError(l10n),
-                                  minimumStartPickerTime: b.minStart,
-                                  minimumEndPickerTime: b.minEnd,
-                                  maximumEndPickerTime:
-                                      pickerMaximumForEndSameCalendarDay(),
-                                  onStartChanged: (TimeOfDay t) {
-                                    setState(() {
-                                      _startTime = EventTimeUI.fromTimeOfDay(t);
-                                      if (_event.status ==
-                                          EcoEventStatus.inProgress) {
-                                        if (!EcoEvent.isValidRange(
-                                          _startTime,
-                                          _endTime,
-                                        )) {
-                                          final DateTime sdt =
-                                              eventScheduleInstantLocal(
-                                                DateUtils.dateOnly(
-                                                  _selectedDate,
-                                                ),
-                                                _startTime,
-                                              );
-                                          _endTime = eventTimeFromDateTime(
-                                            sdt.add(const Duration(hours: 2)),
-                                          );
-                                        }
-                                        _endTime = clampEndTimeToEventDay(
-                                          dateOnly: DateUtils.dateOnly(
-                                            _selectedDate,
-                                          ),
-                                          end: _endTime,
-                                          start: _startTime,
-                                        );
-                                      } else {
-                                        final DateTime si =
-                                            eventScheduleInstantLocal(
-                                              DateUtils.dateOnly(_selectedDate),
-                                              _startTime,
-                                            );
-                                        final DateTime ei =
-                                            eventScheduleInstantLocal(
-                                              DateUtils.dateOnly(_selectedDate),
-                                              _endTime,
-                                            );
-                                        if (!ei.isAfter(si)) {
-                                          _endTime = eventTimeFromDateTime(
-                                            ceilToMinuteGrid(
-                                              si.add(const Duration(hours: 1)),
-                                            ),
-                                          );
-                                        }
-                                        _endTime = clampEndTimeToEventDay(
-                                          dateOnly: DateUtils.dateOnly(
-                                            _selectedDate,
-                                          ),
-                                          end: _endTime,
-                                          start: _startTime,
-                                        );
-                                      }
-                                    });
-                                    _scheduleConflictPreviewDebounced();
-                                  },
-                                  onEndChanged: (TimeOfDay t) {
-                                    setState(() {
-                                      _endTime = clampEndTimeToEventDay(
-                                        dateOnly: DateUtils.dateOnly(
-                                          _selectedDate,
-                                        ),
-                                        end: EventTimeUI.fromTimeOfDay(t),
-                                        start: _startTime,
-                                      );
-                                    });
-                                    _scheduleConflictPreviewDebounced();
-                                  },
-                                );
-                              },
-                            ),
-                            if (_scheduleConflict.hint != null) ...<Widget>[
-                              const SizedBox(height: AppSpacing.sm),
-                              EditEventScheduleConflictCallout(
-                                bodyText: l10n
-                                    .eventsScheduleConflictPreviewBody(
-                                      _scheduleConflict.hint!.title,
-                                      _scheduleConflict.formatConflictWhen(
-                                        context,
-                                        _scheduleConflict.hint!.scheduledAt,
-                                      ),
-                                    ),
-                              ),
-                            ],
-                            if (_scheduleConflict.previewFailed) ...<Widget>[
-                              const SizedBox(height: AppSpacing.sm),
-                              Semantics(
-                                liveRegion: true,
+                              const SizedBox(width: AppSpacing.sm),
+                              Expanded(
                                 child: Text(
-                                  l10n.editEventSchedulePreviewFailed,
+                                  l10n.editEventOfflineSave,
                                   style: AppTypography.eventsSupportingCaption(
                                     textTheme,
-                                  ),
+                                  ).copyWith(color: AppColors.textPrimary),
                                 ),
                               ),
                             ],
-                            if (_showScheduleError(l10n) &&
-                                !_isTimeValid) ...<Widget>[
-                              const SizedBox(height: AppSpacing.xs),
-                              Text(
-                                l10n.createEventEndTimeError,
-                                style: AppTypography.eventsCaptionStrong(
-                                  textTheme,
-                                  color: AppColors.error,
-                                ).copyWith(fontWeight: FontWeight.w500),
-                              ),
-                            ],
-                            if (_showScheduleError(l10n) &&
-                                _isTimeValid &&
-                                _editScheduleIssue() ==
-                                    ScheduleValidationIssue
-                                        .endAfterLocalDayEnd) ...<Widget>[
-                              const SizedBox(height: AppSpacing.xs),
-                              Text(
-                                l10n.createEventScheduleEndAfterDayError,
-                                style: AppTypography.eventsCaptionStrong(
-                                  textTheme,
-                                  color: AppColors.error,
-                                ).copyWith(fontWeight: FontWeight.w500),
-                              ),
-                            ],
-                            if (_showScheduleError(l10n) &&
-                                _isTimeValid &&
-                                _editScheduleIssue() ==
-                                    ScheduleValidationIssue
-                                        .startTooSoon) ...<Widget>[
-                              const SizedBox(height: AppSpacing.xs),
-                              Text(
-                                l10n.createEventScheduleStartInPast(
-                                  kEventScheduleMinLead.inMinutes,
-                                ),
-                                style: AppTypography.eventsCaptionStrong(
-                                  textTheme,
-                                  color: AppColors.error,
-                                ).copyWith(fontWeight: FontWeight.w500),
-                              ),
-                            ],
-                            if (_showScheduleError(l10n) &&
-                                _isTimeValid &&
-                                _editScheduleIssue() ==
-                                    ScheduleValidationIssue
-                                        .endTooSoon) ...<Widget>[
-                              const SizedBox(height: AppSpacing.xs),
-                              Text(
-                                l10n.createEventScheduleEndInPast(
-                                  kEventScheduleMinLead.inMinutes,
-                                ),
-                                style: AppTypography.eventsCaptionStrong(
-                                  textTheme,
-                                  color: AppColors.error,
-                                ).copyWith(fontWeight: FontWeight.w500),
-                              ),
-                            ],
-                          ],
+                          ),
                         ),
                       ),
-                      const SizedBox(height: AppSpacing.md),
-                      DesignSystemTextField(
-                        focusNode: _maxParticipantsFocus,
-                        controller: _maxParticipantsController,
-                        keyboardType: TextInputType.number,
-                        style: AppTypography.eventsEditFormFieldPrimary(
-                          textTheme,
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                  ],
+                  if (_submitFeedbackMessage != null) ...<Widget>[
+                    EditEventSubmitBanner(message: _submitFeedbackMessage!),
+                    const SizedBox(height: AppSpacing.md),
+                  ],
+                  if (!_event.moderationApproved) ...<Widget>[
+                    Semantics(
+                      container: true,
+                      label: l10n.editEventPendingModerationBanner,
+                      child: Material(
+                        color: AppColors.accentWarning.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusMd,
                         ),
-                        decoration: editEventTextFieldDecoration(
-                          textTheme,
-                          labelText: l10n.createEventFieldVolunteerCap,
-                          hintText: l10n.createEventVolunteerCapCustomHint,
-                          errorText: _maxParticipantsError(l10n),
+                        child: Padding(
+                          padding: const EdgeInsets.all(AppSpacing.md),
+                          child: Text(
+                            l10n.editEventPendingModerationBanner,
+                            style: AppTypography.eventsSupportingCaption(
+                              textTheme,
+                            ).copyWith(color: AppColors.textPrimary),
+                          ),
                         ),
-                        onChanged: (_) {
-                          markFieldDirty(_EditEventFieldIds.maxParticipants);
-                          _onFieldChanged();
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                  ],
+                  DesignSystemTextField(
+                    focusNode: _titleFocus,
+                    controller: _titleController,
+                    textInputAction: TextInputAction.next,
+                    maxLength: kEditEventTitleMaxLength,
+                    style: AppTypography.eventsEditFormFieldPrimary(textTheme),
+                    buildCounter:
+                        (
+                          BuildContext _, {
+                          required int currentLength,
+                          required bool isFocused,
+                          required int? maxLength,
+                        }) {
+                          return editEventLengthCounter(
+                            textTheme,
+                            currentLength,
+                            maxLength ?? kEditEventTitleMaxLength,
+                          );
                         },
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      EventFormPickerTile(
-                        label: l10n.createEventFieldTeamSize,
-                        value: _scale.localizedLabel(l10n),
-                        icon: Icons.groups_rounded,
-                        placeholder: l10n.createEventPlaceholderTeamSize,
-                        onTap: _showScalePicker,
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      EventFormPickerTile(
-                        label: l10n.createEventFieldDifficulty,
-                        value: _difficulty.localizedLabel(l10n),
-                        icon: CupertinoIcons.shield,
-                        trailingDot: _difficulty.color,
-                        placeholder: l10n.createEventPlaceholderDifficulty,
-                        onTap: _showDifficultyPicker,
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      EventFormGearSummaryTile(
-                        selectedGear: _gear,
-                        onTap: _showGearPicker,
-                      ),
-                      const SizedBox(height: AppSpacing.xxl),
-                    ],
+                    decoration: editEventTextFieldDecoration(
+                      textTheme,
+                      labelText: l10n.createEventTitleLabel,
+                      errorText: _titleError(l10n),
+                    ),
+                    onChanged: (_) {
+                      markFieldDirty(_EditEventFieldIds.title);
+                      _onFieldChanged();
+                    },
                   ),
-                ),
+                  const SizedBox(height: AppSpacing.md),
+                  DesignSystemTextField(
+                    focusNode: _descriptionFocus,
+                    controller: _descriptionController,
+                    minLines: 3,
+                    maxLines: 6,
+                    maxLength: kEditEventDescriptionMaxLength,
+                    style: AppTypography.eventsSearchFieldText(
+                      textTheme,
+                    ).copyWith(fontWeight: FontWeight.w500, height: 1.35),
+                    buildCounter:
+                        (
+                          BuildContext _, {
+                          required int currentLength,
+                          required bool isFocused,
+                          required int? maxLength,
+                        }) {
+                          return editEventLengthCounter(
+                            textTheme,
+                            currentLength,
+                            maxLength ?? kEditEventDescriptionMaxLength,
+                          );
+                        },
+                    decoration: editEventTextFieldDecoration(
+                      textTheme,
+                      labelText: l10n.createEventDescriptionLabel,
+                      errorText: _descriptionError(l10n),
+                    ),
+                    onChanged: (_) {
+                      markFieldDirty(_EditEventFieldIds.description);
+                      _onFieldChanged();
+                    },
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  EventFormPickerTile(
+                    label: l10n.createEventFieldType,
+                    value: _category.localizedLabel(l10n),
+                    icon: _category.icon,
+                    placeholder: l10n.createEventPlaceholderType,
+                    onTap: _showCategoryPicker,
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  KeyedSubtree(
+                    key: _scheduleSectionKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        if (_event.status ==
+                            EcoEventStatus.upcoming) ...<Widget>[
+                          Text(
+                            l10n.createEventScheduleDateLabel,
+                            style: AppTypography.eventsSheetSectionLabel(
+                              textTheme,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.sm),
+                          EventCalendar(
+                            selectedDate: _selectedDate,
+                            minimumSelectableDate: DateUtils.dateOnly(
+                              DateTime.now(),
+                            ),
+                            onDateSelected: (DateTime d) {
+                              setState(() {
+                                _selectedDate = DateUtils.dateOnly(d);
+                                final ({EventTime start, EventTime end}) c =
+                                    clampCreateOrUpcomingSchedule(
+                                      dateOnly: _selectedDate,
+                                      start: _startTime,
+                                      end: _endTime,
+                                      now: DateTime.now(),
+                                    );
+                                _startTime = c.start;
+                                _endTime = c.end;
+                                _clearSubmitFeedback();
+                              });
+                              _scheduleConflictPreviewDebounced();
+                            },
+                          ),
+                        ] else ...<Widget>[
+                          EventCalendar(
+                            selectedDate: _selectedDate,
+                            onDateSelected: (DateTime d) {
+                              setState(() {
+                                _selectedDate = d;
+                                final DateTime dateOnly = DateUtils.dateOnly(d);
+                                final DateTime now = DateTime.now();
+                                final ({EventTime start, EventTime end}) c =
+                                    clampInProgressEditSchedule(
+                                      dateOnly: dateOnly,
+                                      start: _startTime,
+                                      end: _endTime,
+                                      now: now,
+                                    );
+                                _startTime = c.start;
+                                _endTime = c.end;
+                              });
+                              _scheduleConflictPreviewDebounced();
+                            },
+                          ),
+                        ],
+                        const SizedBox(height: AppSpacing.lg),
+                        Divider(
+                          height: 1,
+                          thickness: 1,
+                          color: AppColors.divider.withValues(alpha: 0.55),
+                        ),
+                        const SizedBox(height: AppSpacing.lg),
+                        Builder(
+                          builder: (BuildContext context) {
+                            final ({DateTime? minStart, DateTime? minEnd}) b =
+                                _editPickerBounds();
+                            return TimeRangePicker(
+                              startTime: _startTime.toTimeOfDay(),
+                              endTime: _endTime.toTimeOfDay(),
+                              hasError: _showScheduleError(l10n),
+                              minimumStartPickerTime: b.minStart,
+                              minimumEndPickerTime: b.minEnd,
+                              maximumEndPickerTime:
+                                  pickerMaximumForEndSameCalendarDay(),
+                              onStartChanged: (TimeOfDay t) {
+                                setState(() {
+                                  _startTime = EventTimeUI.fromTimeOfDay(t);
+                                  if (_event.status ==
+                                      EcoEventStatus.inProgress) {
+                                    if (!EcoEvent.isValidRange(
+                                      _startTime,
+                                      _endTime,
+                                    )) {
+                                      final DateTime sdt =
+                                          eventScheduleInstantLocal(
+                                            DateUtils.dateOnly(_selectedDate),
+                                            _startTime,
+                                          );
+                                      _endTime = eventTimeFromDateTime(
+                                        sdt.add(const Duration(hours: 2)),
+                                      );
+                                    }
+                                    _endTime = clampEndTimeToEventDay(
+                                      dateOnly: DateUtils.dateOnly(
+                                        _selectedDate,
+                                      ),
+                                      end: _endTime,
+                                      start: _startTime,
+                                    );
+                                  } else {
+                                    final DateTime si =
+                                        eventScheduleInstantLocal(
+                                          DateUtils.dateOnly(_selectedDate),
+                                          _startTime,
+                                        );
+                                    final DateTime ei =
+                                        eventScheduleInstantLocal(
+                                          DateUtils.dateOnly(_selectedDate),
+                                          _endTime,
+                                        );
+                                    if (!ei.isAfter(si)) {
+                                      _endTime = eventTimeFromDateTime(
+                                        ceilToMinuteGrid(
+                                          si.add(const Duration(hours: 1)),
+                                        ),
+                                      );
+                                    }
+                                    _endTime = clampEndTimeToEventDay(
+                                      dateOnly: DateUtils.dateOnly(
+                                        _selectedDate,
+                                      ),
+                                      end: _endTime,
+                                      start: _startTime,
+                                    );
+                                  }
+                                });
+                                _scheduleConflictPreviewDebounced();
+                              },
+                              onEndChanged: (TimeOfDay t) {
+                                setState(() {
+                                  _endTime = clampEndTimeToEventDay(
+                                    dateOnly: DateUtils.dateOnly(_selectedDate),
+                                    end: EventTimeUI.fromTimeOfDay(t),
+                                    start: _startTime,
+                                  );
+                                });
+                                _scheduleConflictPreviewDebounced();
+                              },
+                            );
+                          },
+                        ),
+                        if (_scheduleConflict.hint != null) ...<Widget>[
+                          const SizedBox(height: AppSpacing.sm),
+                          EditEventScheduleConflictCallout(
+                            bodyText: l10n.eventsScheduleConflictPreviewBody(
+                              _scheduleConflict.hint!.title,
+                              _scheduleConflict.formatConflictWhen(
+                                context,
+                                _scheduleConflict.hint!.scheduledAt,
+                              ),
+                            ),
+                          ),
+                        ],
+                        if (_scheduleConflict.previewFailed) ...<Widget>[
+                          const SizedBox(height: AppSpacing.sm),
+                          Semantics(
+                            liveRegion: true,
+                            child: Text(
+                              l10n.editEventSchedulePreviewFailed,
+                              style: AppTypography.eventsSupportingCaption(
+                                textTheme,
+                              ),
+                            ),
+                          ),
+                        ],
+                        if (_showScheduleError(l10n) &&
+                            !_isTimeValid) ...<Widget>[
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            l10n.createEventEndTimeError,
+                            style: AppTypography.eventsCaptionStrong(
+                              textTheme,
+                              color: AppColors.error,
+                            ).copyWith(fontWeight: FontWeight.w500),
+                          ),
+                        ],
+                        if (_showScheduleError(l10n) &&
+                            _isTimeValid &&
+                            _editScheduleIssue() ==
+                                ScheduleValidationIssue
+                                    .endAfterLocalDayEnd) ...<Widget>[
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            l10n.createEventScheduleEndAfterDayError,
+                            style: AppTypography.eventsCaptionStrong(
+                              textTheme,
+                              color: AppColors.error,
+                            ).copyWith(fontWeight: FontWeight.w500),
+                          ),
+                        ],
+                        if (_showScheduleError(l10n) &&
+                            _isTimeValid &&
+                            _editScheduleIssue() ==
+                                ScheduleValidationIssue
+                                    .startTooSoon) ...<Widget>[
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            l10n.createEventScheduleStartInPast(
+                              kEventScheduleMinLead.inMinutes,
+                            ),
+                            style: AppTypography.eventsCaptionStrong(
+                              textTheme,
+                              color: AppColors.error,
+                            ).copyWith(fontWeight: FontWeight.w500),
+                          ),
+                        ],
+                        if (_showScheduleError(l10n) &&
+                            _isTimeValid &&
+                            _editScheduleIssue() ==
+                                ScheduleValidationIssue.endTooSoon) ...<Widget>[
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            l10n.createEventScheduleEndInPast(
+                              kEventScheduleMinLead.inMinutes,
+                            ),
+                            style: AppTypography.eventsCaptionStrong(
+                              textTheme,
+                              color: AppColors.error,
+                            ).copyWith(fontWeight: FontWeight.w500),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  DesignSystemTextField(
+                    focusNode: _maxParticipantsFocus,
+                    controller: _maxParticipantsController,
+                    keyboardType: TextInputType.number,
+                    style: AppTypography.eventsEditFormFieldPrimary(textTheme),
+                    decoration: editEventTextFieldDecoration(
+                      textTheme,
+                      labelText: l10n.createEventFieldVolunteerCap,
+                      hintText: l10n.createEventVolunteerCapCustomHint,
+                      errorText: _maxParticipantsError(l10n),
+                    ),
+                    onChanged: (_) {
+                      markFieldDirty(_EditEventFieldIds.maxParticipants);
+                      _onFieldChanged();
+                    },
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  EventFormPickerTile(
+                    label: l10n.createEventFieldTeamSize,
+                    value: _scale.localizedLabel(l10n),
+                    icon: Icons.groups_rounded,
+                    placeholder: l10n.createEventPlaceholderTeamSize,
+                    onTap: _showScalePicker,
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  EventFormPickerTile(
+                    label: l10n.createEventFieldDifficulty,
+                    value: _difficulty.localizedLabel(l10n),
+                    icon: CupertinoIcons.shield,
+                    trailingDot: _difficulty.color,
+                    placeholder: l10n.createEventPlaceholderDifficulty,
+                    onTap: _showDifficultyPicker,
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  EventFormGearSummaryTile(
+                    selectedGear: _gear,
+                    onTap: _showGearPicker,
+                  ),
+                  const SizedBox(height: AppSpacing.xxl),
+                ],
               ),
             ),
           ),
+        ),
+      ),
     );
   }
 }

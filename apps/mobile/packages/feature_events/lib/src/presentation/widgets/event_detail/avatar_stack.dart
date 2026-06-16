@@ -65,8 +65,9 @@ class AvatarStack extends StatelessWidget {
       displayName: event.organizerName,
       isDeleted: event.organizerIsDeleted,
     );
-    final String? organizerAvatar =
-        event.organizerIsDeleted ? null : event.organizerAvatarUrl;
+    final String? organizerAvatar = event.organizerIsDeleted
+        ? null
+        : event.organizerAvatarUrl;
 
     const double size = _size;
     const double overlap = _overlap;

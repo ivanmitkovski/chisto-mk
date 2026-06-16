@@ -10,15 +10,15 @@ void main() {
     test('inbox never uses external go navigation', () {
       const List<NotificationNavigationTarget> targets =
           <NotificationNavigationTarget>[
-        NotificationOpenHomeMapFocus(siteId: 'site_1'),
-        NotificationOpenHomeTab(tabIndex: 1),
-        NotificationOpenFeatureGuide(),
-        NotificationOpenReportDetail(reportId: 'report_1'),
-        NotificationOpenSiteDetail(siteId: 'site_1'),
-        NotificationOpenEventDetail(eventId: 'event_1'),
-        NotificationOpenEventChat(eventId: 'event_1'),
-        NotificationOpenProfileAchievements(),
-      ];
+            NotificationOpenHomeMapFocus(siteId: 'site_1'),
+            NotificationOpenHomeTab(tabIndex: 1),
+            NotificationOpenFeatureGuide(),
+            NotificationOpenReportDetail(reportId: 'report_1'),
+            NotificationOpenSiteDetail(siteId: 'site_1'),
+            NotificationOpenEventDetail(eventId: 'event_1'),
+            NotificationOpenEventChat(eventId: 'event_1'),
+            NotificationOpenProfileAchievements(),
+          ];
 
       for (final NotificationNavigationTarget target in targets) {
         expect(
@@ -98,7 +98,9 @@ void main() {
         isTrue,
       );
       expect(
-        notificationUsesRootEntityPush(const NotificationOpenProfileAchievements()),
+        notificationUsesRootEntityPush(
+          const NotificationOpenProfileAchievements(),
+        ),
         isTrue,
       );
     });

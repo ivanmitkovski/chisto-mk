@@ -69,7 +69,8 @@ void main() {
     expect(
       cta.height < screen.height / 3,
       isTrue,
-      reason: 'Update password CTA should be a bottom bar, not fill the screen '
+      reason:
+          'Update password CTA should be a bottom bar, not fill the screen '
           '(cta=${cta.height}, screen=${screen.height})',
     );
   });

@@ -175,7 +175,9 @@ class HomeRouteArgs {
 
 /// [AppRoutes.notifications] extra payload.
 class NotificationsRouteExtra {
-  const NotificationsRouteExtra({this.availableSites = const <PollutionSite>[]});
+  const NotificationsRouteExtra({
+    this.availableSites = const <PollutionSite>[],
+  });
 
   final List<PollutionSite> availableSites;
 }

@@ -89,60 +89,63 @@ void main() {
     expect(find.byType(AppFilterCheckRow), findsWidgets);
   });
 
-  testWidgets('From tile opens design-system calendar instead of Material picker', (
-    WidgetTester tester,
-  ) async {
-    await tester.binding.setSurfaceSize(const Size(800, 1600));
-    addTearDown(() async {
-      await tester.binding.setSurfaceSize(null);
-    });
+  testWidgets(
+    'From tile opens design-system calendar instead of Material picker',
+    (WidgetTester tester) async {
+      await tester.binding.setSurfaceSize(const Size(800, 1600));
+      addTearDown(() async {
+        await tester.binding.setSurfaceSize(null);
+      });
 
-    late AppLocalizations l10n;
-    final RecordingEventsRepository repository = RecordingEventsRepository();
+      late AppLocalizations l10n;
+      final RecordingEventsRepository repository = RecordingEventsRepository();
 
-    await tester.pumpWidget(
-      _host(
-        repository: repository,
-        activeChip: EcoEventFilter.all,
-        onOpen: (BuildContext context) {
-          l10n = AppLocalizations.of(context)!;
-          EventsFilterSheet.show(
-            context,
-            current: const EcoEventSearchParams(),
-            activeChip: EcoEventFilter.all,
-            repository: repository,
-          );
-        },
-      ),
-    );
+      await tester.pumpWidget(
+        _host(
+          repository: repository,
+          activeChip: EcoEventFilter.all,
+          onOpen: (BuildContext context) {
+            l10n = AppLocalizations.of(context)!;
+            EventsFilterSheet.show(
+              context,
+              current: const EcoEventSearchParams(),
+              activeChip: EcoEventFilter.all,
+              repository: repository,
+            );
+          },
+        ),
+      );
 
-    await _openFilterSheet(tester);
+      await _openFilterSheet(tester);
 
-    expect(find.text(l10n.eventsFilterSheetTitle), findsOneWidget);
+      expect(find.text(l10n.eventsFilterSheetTitle), findsOneWidget);
 
-    await _tapDateFromTile(tester, l10n.eventsFilterSheetDateFrom);
+      await _tapDateFromTile(tester, l10n.eventsFilterSheetDateFrom);
 
-    expect(find.byType(EventCalendar), findsOneWidget);
+      expect(find.byType(EventCalendar), findsOneWidget);
 
-    await tester.tap(
-      find.descendant(
-        of: find.byType(EventCalendar),
-        matching: find.text('15'),
-      ),
-    );
-    await tester.pump();
+      await tester.tap(
+        find.descendant(
+          of: find.byType(EventCalendar),
+          matching: find.text('15'),
+        ),
+      );
+      await tester.pump();
 
-    await tester.tap(find.text(l10n.eventsTimePickerConfirm));
-    await tester.pumpAndSettle();
+      await tester.tap(find.text(l10n.eventsTimePickerConfirm));
+      await tester.pumpAndSettle();
 
-    expect(
-      find.text(formatEventCalendarDate(
-        tester.element(find.byType(EventsFilterSheet)),
-        DateTime(DateTime.now().year, DateTime.now().month, 15),
-      )),
-      findsOneWidget,
-    );
-  });
+      expect(
+        find.text(
+          formatEventCalendarDate(
+            tester.element(find.byType(EventsFilterSheet)),
+            DateTime(DateTime.now().year, DateTime.now().month, 15),
+          ),
+        ),
+        findsOneWidget,
+      );
+    },
+  );
 
   testWidgets('From picker respects existing To upper bound', (
     WidgetTester tester,
@@ -199,37 +202,41 @@ void main() {
     expect(result?.dateTo, DateTime(2026, 6, 10));
   });
 
-  testWidgets('shows chip override banner when upcoming pill and status draft', (
-    WidgetTester tester,
-  ) async {
-    await tester.binding.setSurfaceSize(const Size(800, 1600));
-    addTearDown(() async {
-      await tester.binding.setSurfaceSize(null);
-    });
+  testWidgets(
+    'shows chip override banner when upcoming pill and status draft',
+    (WidgetTester tester) async {
+      await tester.binding.setSurfaceSize(const Size(800, 1600));
+      addTearDown(() async {
+        await tester.binding.setSurfaceSize(null);
+      });
 
-    late AppLocalizations l10n;
-    final RecordingEventsRepository repository = RecordingEventsRepository();
+      late AppLocalizations l10n;
+      final RecordingEventsRepository repository = RecordingEventsRepository();
 
-    await tester.pumpWidget(
-      _host(
-        repository: repository,
-        activeChip: EcoEventFilter.upcoming,
-        onOpen: (BuildContext context) {
-          l10n = AppLocalizations.of(context)!;
-          EventsFilterSheet.show(
-            context,
-            current: EcoEventSearchParams(
-              statuses: <EcoEventStatus>{EcoEventStatus.completed},
-            ),
-            activeChip: EcoEventFilter.upcoming,
-            repository: repository,
-          );
-        },
-      ),
-    );
+      await tester.pumpWidget(
+        _host(
+          repository: repository,
+          activeChip: EcoEventFilter.upcoming,
+          onOpen: (BuildContext context) {
+            l10n = AppLocalizations.of(context)!;
+            EventsFilterSheet.show(
+              context,
+              current: EcoEventSearchParams(
+                statuses: <EcoEventStatus>{EcoEventStatus.completed},
+              ),
+              activeChip: EcoEventFilter.upcoming,
+              repository: repository,
+            );
+          },
+        ),
+      );
 
-    await _openFilterSheet(tester);
+      await _openFilterSheet(tester);
 
-    expect(find.text(l10n.eventsFilterChipStatusOverrideHint), findsOneWidget);
-  });
+      expect(
+        find.text(l10n.eventsFilterChipStatusOverrideHint),
+        findsOneWidget,
+      );
+    },
+  );
 }

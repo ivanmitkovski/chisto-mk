@@ -12,10 +12,7 @@ void main() {
   testWidgets('AuthSessionScope registers onAuthUnauthorized callback', (
     WidgetTester tester,
   ) async {
-    await pumpAuthSessionScopeRouter(
-      tester,
-      initialLocation: AppRoutes.signIn,
-    );
+    await pumpAuthSessionScopeRouter(tester, initialLocation: AppRoutes.signIn);
     expect(AppBootstrap.instance.onAuthUnauthorized, isNotNull);
   });
 }

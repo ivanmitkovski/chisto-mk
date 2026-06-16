@@ -61,8 +61,9 @@ class _DescriptionSectionState extends State<DescriptionSection> {
         LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
             // Use exact available width — no MediaQuery arithmetic guessing.
-            final bool needsExpansion =
-                _needsExpansionForWidth(constraints.maxWidth);
+            final bool needsExpansion = _needsExpansionForWidth(
+              constraints.maxWidth,
+            );
 
             final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
 

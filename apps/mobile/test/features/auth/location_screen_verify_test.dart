@@ -72,10 +72,7 @@ void main() {
     await tester.tap(find.text('Use current location'));
     await tester.pumpAndSettle();
 
-    expect(
-      find.text('Chisto.mk is available in Macedonia'),
-      findsOneWidget,
-    );
+    expect(find.text('Chisto.mk is available in Macedonia'), findsOneWidget);
     expect(find.text('Try again'), findsOneWidget);
     expect(find.text('Sign out'), findsOneWidget);
     expect(find.text('Continue exploring'), findsNothing);

@@ -82,23 +82,24 @@ void main() {
     client.dispose();
   });
 
-  test('returns transient when rotation race persists without server rejection', () async {
-    final _BackgroundRefreshApiClient client = _BackgroundRefreshApiClient(
-      onRefresh: (_) => const AppError(
-        code: 'INVALID_REFRESH_TOKEN',
-        message: 'stale',
-      ),
-    );
-    final SecureTokenStorage storage = SecureTokenStorage();
+  test(
+    'returns transient when rotation race persists without server rejection',
+    () async {
+      final _BackgroundRefreshApiClient client = _BackgroundRefreshApiClient(
+        onRefresh: (_) =>
+            const AppError(code: 'INVALID_REFRESH_TOKEN', message: 'stale'),
+      );
+      final SecureTokenStorage storage = SecureTokenStorage();
 
-    final RefreshOutcome outcome = await BackgroundSessionRefresh.tryRefresh(
-      config: AppConfig.dev,
-      tokenStorage: storage,
-      clientOverride: client,
-    );
+      final RefreshOutcome outcome = await BackgroundSessionRefresh.tryRefresh(
+        config: AppConfig.dev,
+        tokenStorage: storage,
+        clientOverride: client,
+      );
 
-    expect(outcome, RefreshOutcome.transient);
-    expect(client.refreshAttempts, 3);
-    client.dispose();
-  });
+      expect(outcome, RefreshOutcome.transient);
+      expect(client.refreshAttempts, 3);
+      client.dispose();
+    },
+  );
 }

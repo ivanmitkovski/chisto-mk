@@ -53,9 +53,9 @@ class GeolocatorLocationService extends LocationService
       distanceFilter: options.distanceFilterMeters,
       timeLimit: options.timeLimit,
     );
-    return geo.Geolocator.getPositionStream(locationSettings: settings).map(
-      _mapPosition,
-    );
+    return geo.Geolocator.getPositionStream(
+      locationSettings: settings,
+    ).map(_mapPosition);
   }
 
   static AppLocationPermission _mapPermission(geo.LocationPermission p) {

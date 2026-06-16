@@ -23,12 +23,8 @@ class AppInlineBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final Color background = switch (tone) {
       AppInlineBannerTone.info => AppColors.primary.withValues(alpha: 0.08),
-      AppInlineBannerTone.warning => AppColors.error.withValues(
-        alpha: 0.08,
-      ),
-      AppInlineBannerTone.error => AppColors.error.withValues(
-        alpha: 0.12,
-      ),
+      AppInlineBannerTone.warning => AppColors.error.withValues(alpha: 0.08),
+      AppInlineBannerTone.error => AppColors.error.withValues(alpha: 0.12),
     };
 
     final Widget content = Container(

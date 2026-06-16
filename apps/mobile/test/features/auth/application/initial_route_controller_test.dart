@@ -72,99 +72,108 @@ void main() {
     );
   });
 
-  test('routes to location gate when authenticated without home location', () async {
-    await AppBootstrap.instance.preferences.setBool(
-      kMarketingOnboardingCompletedKey,
-      true,
-    );
-    AppBootstrap.instance.authState.setAuthenticated(
-      userId: 'user-1',
-      displayName: 'Test User',
-    );
-    await UserHomeLocationStore.clearAllForSession(
-      AppBootstrap.instance.preferences,
-      userId: 'user-1',
-    );
+  test(
+    'routes to location gate when authenticated without home location',
+    () async {
+      await AppBootstrap.instance.preferences.setBool(
+        kMarketingOnboardingCompletedKey,
+        true,
+      );
+      AppBootstrap.instance.authState.setAuthenticated(
+        userId: 'user-1',
+        displayName: 'Test User',
+      );
+      await UserHomeLocationStore.clearAllForSession(
+        AppBootstrap.instance.preferences,
+        userId: 'user-1',
+      );
 
-    final ProviderContainer container = ProviderContainer(
-      overrides: AuthTestOverrides(
-        authRepository: FakeAuthRepository(isAuthenticated: true),
-      ).build(),
-    );
-    addTearDown(container.dispose);
+      final ProviderContainer container = ProviderContainer(
+        overrides: AuthTestOverrides(
+          authRepository: FakeAuthRepository(isAuthenticated: true),
+        ).build(),
+      );
+      addTearDown(container.dispose);
 
-    await container
-        .read(initialRouteControllerProvider.notifier)
-        .resolveRoute();
+      await container
+          .read(initialRouteControllerProvider.notifier)
+          .resolveRoute();
 
-    expect(
-      container.read(initialRouteControllerProvider).destination,
-      InitialRouteDestination.location,
-    );
-  });
+      expect(
+        container.read(initialRouteControllerProvider).destination,
+        InitialRouteDestination.location,
+      );
+    },
+  );
 
-  test('routes to home when authenticated with confirmed home location', () async {
-    await AppBootstrap.instance.preferences.setBool(
-      kMarketingOnboardingCompletedKey,
-      true,
-    );
-    AppBootstrap.instance.authState.setAuthenticated(
-      userId: 'user-1',
-      displayName: 'Test User',
-    );
-    await UserHomeLocationStore(
-      AppBootstrap.instance.preferences,
-      userId: 'user-1',
-    ).save(
-      latitude: 41.9981,
-      longitude: 21.4254,
-      homeLocationSetAt: '2026-06-08T12:00:00.000Z',
-    );
+  test(
+    'routes to home when authenticated with confirmed home location',
+    () async {
+      await AppBootstrap.instance.preferences.setBool(
+        kMarketingOnboardingCompletedKey,
+        true,
+      );
+      AppBootstrap.instance.authState.setAuthenticated(
+        userId: 'user-1',
+        displayName: 'Test User',
+      );
+      await UserHomeLocationStore(
+        AppBootstrap.instance.preferences,
+        userId: 'user-1',
+      ).save(
+        latitude: 41.9981,
+        longitude: 21.4254,
+        homeLocationSetAt: '2026-06-08T12:00:00.000Z',
+      );
 
-    final ProviderContainer container = ProviderContainer(
-      overrides: AuthTestOverrides(
-        authRepository: FakeAuthRepository(isAuthenticated: true),
-      ).build(),
-    );
-    addTearDown(container.dispose);
+      final ProviderContainer container = ProviderContainer(
+        overrides: AuthTestOverrides(
+          authRepository: FakeAuthRepository(isAuthenticated: true),
+        ).build(),
+      );
+      addTearDown(container.dispose);
 
-    await container
-        .read(initialRouteControllerProvider.notifier)
-        .resolveRoute();
+      await container
+          .read(initialRouteControllerProvider.notifier)
+          .resolveRoute();
 
-    expect(
-      container.read(initialRouteControllerProvider).destination,
-      InitialRouteDestination.home,
-    );
-  });
+      expect(
+        container.read(initialRouteControllerProvider).destination,
+        InitialRouteDestination.home,
+      );
+    },
+  );
 
-  test('routes to location gate when coords exist but home is unconfirmed', () async {
-    await AppBootstrap.instance.preferences.setBool(
-      kMarketingOnboardingCompletedKey,
-      true,
-    );
-    AppBootstrap.instance.authState.setAuthenticated(
-      userId: 'user-1',
-      displayName: 'Test User',
-    );
-    await prefsLegacyCoordsOnly(AppBootstrap.instance.preferences);
+  test(
+    'routes to location gate when coords exist but home is unconfirmed',
+    () async {
+      await AppBootstrap.instance.preferences.setBool(
+        kMarketingOnboardingCompletedKey,
+        true,
+      );
+      AppBootstrap.instance.authState.setAuthenticated(
+        userId: 'user-1',
+        displayName: 'Test User',
+      );
+      await prefsLegacyCoordsOnly(AppBootstrap.instance.preferences);
 
-    final ProviderContainer container = ProviderContainer(
-      overrides: AuthTestOverrides(
-        authRepository: FakeAuthRepository(isAuthenticated: true),
-      ).build(),
-    );
-    addTearDown(container.dispose);
+      final ProviderContainer container = ProviderContainer(
+        overrides: AuthTestOverrides(
+          authRepository: FakeAuthRepository(isAuthenticated: true),
+        ).build(),
+      );
+      addTearDown(container.dispose);
 
-    await container
-        .read(initialRouteControllerProvider.notifier)
-        .resolveRoute();
+      await container
+          .read(initialRouteControllerProvider.notifier)
+          .resolveRoute();
 
-    expect(
-      container.read(initialRouteControllerProvider).destination,
-      InitialRouteDestination.location,
-    );
-  });
+      expect(
+        container.read(initialRouteControllerProvider).destination,
+        InitialRouteDestination.location,
+      );
+    },
+  );
 }
 
 Future<void> prefsLegacyCoordsOnly(SharedPreferences prefs) async {

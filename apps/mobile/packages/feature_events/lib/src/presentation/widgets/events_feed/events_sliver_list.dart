@@ -65,10 +65,7 @@ class EventsSliverList extends StatelessWidget {
           if (!animateEntrance) {
             return card;
           }
-          return AnimatedListItem(
-            index: startIndex + index,
-            child: card,
-          );
+          return AnimatedListItem(index: startIndex + index, child: card);
         },
       ),
     );

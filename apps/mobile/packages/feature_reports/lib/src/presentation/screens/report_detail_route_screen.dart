@@ -38,14 +38,16 @@ class ReportDetailRouteScreen extends ConsumerStatefulWidget {
     BuildContext context,
     String siteId,
     ReportSheetViewModel report,
-  )? cleanupSectionBuilder;
+  )?
+  cleanupSectionBuilder;
 
   @override
   ConsumerState<ReportDetailRouteScreen> createState() =>
       _ReportDetailRouteScreenState();
 }
 
-class _ReportDetailRouteScreenState extends ConsumerState<ReportDetailRouteScreen> {
+class _ReportDetailRouteScreenState
+    extends ConsumerState<ReportDetailRouteScreen> {
   RequestCancellationToken? _cancellation;
   Future<ReportDetailOpenResolution>? _loadFuture;
 
@@ -84,42 +86,55 @@ class _ReportDetailRouteScreenState extends ConsumerState<ReportDetailRouteScree
   Widget build(BuildContext context) {
     return FutureBuilder<ReportDetailOpenResolution>(
       future: _loadFuture,
-      builder: (BuildContext context, AsyncSnapshot<ReportDetailOpenResolution> snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(child: AppLoadingIndicator()),
-          );
-        }
-        if (snapshot.hasError) {
-          final Object err = snapshot.error!;
-          final AppError appError =
-              err is AppError ? err : AppError.unknown(cause: err);
-          return Scaffold(
-            body: AppErrorView(error: appError, onRetry: () => unawaited(_retry())),
-          );
-        }
-        final ReportDetailOpenResolution? resolution = snapshot.data;
-        if (resolution == null) {
-          return Scaffold(
-            body: AppErrorView(
-              error: AppError.notFound(
-                message: context.l10n.notificationsSiteUnavailable,
+      builder:
+          (
+            BuildContext context,
+            AsyncSnapshot<ReportDetailOpenResolution> snapshot,
+          ) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Scaffold(body: Center(child: AppLoadingIndicator()));
+            }
+            if (snapshot.hasError) {
+              final Object err = snapshot.error!;
+              final AppError appError = err is AppError
+                  ? err
+                  : AppError.unknown(cause: err);
+              return Scaffold(
+                body: AppErrorView(
+                  error: appError,
+                  onRetry: () => unawaited(_retry()),
+                ),
+              );
+            }
+            final ReportDetailOpenResolution? resolution = snapshot.data;
+            if (resolution == null) {
+              return Scaffold(
+                body: AppErrorView(
+                  error: AppError.notFound(
+                    message: context.l10n.notificationsSiteUnavailable,
+                  ),
+                  onRetry: () => unawaited(_retry()),
+                ),
+              );
+            }
+            return switch (resolution) {
+              ReportDetailOpenFresh(:final ReportDetail detail) => _buildDetail(
+                context,
+                detail,
+                isStaleFallback: false,
               ),
-              onRetry: () => unawaited(_retry()),
-            ),
-          );
-        }
-        return switch (resolution) {
-          ReportDetailOpenFresh(:final ReportDetail detail) =>
-            _buildDetail(context, detail, isStaleFallback: false),
-          ReportDetailOpenStaleFallback(
-            :final ReportDetail? detail,
-            :final ReportListItem? listItem,
-          ) =>
-            detail != null
-                ? _buildDetail(context, detail, isStaleFallback: true)
-                : listItem != null
-                    ? _buildFromListItem(context, listItem, isStaleFallback: true)
+              ReportDetailOpenStaleFallback(
+                :final ReportDetail? detail,
+                :final ReportListItem? listItem,
+              ) =>
+                detail != null
+                    ? _buildDetail(context, detail, isStaleFallback: true)
+                    : listItem != null
+                    ? _buildFromListItem(
+                        context,
+                        listItem,
+                        isStaleFallback: true,
+                      )
                     : Scaffold(
                         body: AppEmptyState(
                           icon: Icons.description_outlined,
@@ -130,11 +145,14 @@ class _ReportDetailRouteScreenState extends ConsumerState<ReportDetailRouteScree
                           ),
                         ),
                       ),
-          ReportDetailOpenBlocked(:final AppError error) => Scaffold(
-              body: AppErrorView(error: error, onRetry: () => unawaited(_retry())),
-            ),
-        };
-      },
+              ReportDetailOpenBlocked(:final AppError error) => Scaffold(
+                body: AppErrorView(
+                  error: error,
+                  onRetry: () => unawaited(_retry()),
+                ),
+              ),
+            };
+          },
     );
   }
 
@@ -143,8 +161,10 @@ class _ReportDetailRouteScreenState extends ConsumerState<ReportDetailRouteScree
     ReportDetail detail, {
     required bool isStaleFallback,
   }) {
-    final ReportSheetViewModel display =
-        ReportSheetViewModelMapper.fromDetail(detail, context.l10n);
+    final ReportSheetViewModel display = ReportSheetViewModelMapper.fromDetail(
+      detail,
+      context.l10n,
+    );
     return _buildSheet(context, display, isStaleFallback: isStaleFallback);
   }
 
@@ -222,9 +242,7 @@ Future<void> _openLinkedPollutionSiteDetail({
       }
       return;
     }
-    await AppNavigation.pushSiteDetail(
-      SiteDetailByIdRouteArgs(siteId: siteId),
-    );
+    await AppNavigation.pushSiteDetail(SiteDetailByIdRouteArgs(siteId: siteId));
   } on Object {
     if (!context.mounted) return;
     AppSnack.show(

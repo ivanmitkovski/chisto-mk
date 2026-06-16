@@ -64,25 +64,28 @@ void main() {
     expect(push.lastRegisteredTokenForTest, 'new-fcm-token');
   });
 
-  test('forceLocaleRefresh re-registers when token unchanged but locale changed', () async {
-    final _FakeNotificationsRepository repo = _FakeNotificationsRepository();
-    Locale effective = const Locale('en');
-    final PushNotificationService push = PushNotificationService(
-      repository: repo,
-      isAuthenticated: () => true,
-      resolveEffectiveLocale: () => effective,
-    );
+  test(
+    'forceLocaleRefresh re-registers when token unchanged but locale changed',
+    () async {
+      final _FakeNotificationsRepository repo = _FakeNotificationsRepository();
+      Locale effective = const Locale('en');
+      final PushNotificationService push = PushNotificationService(
+        repository: repo,
+        isAuthenticated: () => true,
+        resolveEffectiveLocale: () => effective,
+      );
 
-    await push.registerTokenForTest('same-fcm-token');
-    expect(repo.registerCalls, 1);
-    expect(repo.lastLocale, 'en');
+      await push.registerTokenForTest('same-fcm-token');
+      expect(repo.registerCalls, 1);
+      expect(repo.lastLocale, 'en');
 
-    effective = const Locale('sq');
-    await push.registerTokenForTest('same-fcm-token', force: true);
+      effective = const Locale('sq');
+      await push.registerTokenForTest('same-fcm-token', force: true);
 
-    expect(repo.registerCalls, 2);
-    expect(repo.lastLocale, 'sq');
-  });
+      expect(repo.registerCalls, 2);
+      expect(repo.lastLocale, 'sq');
+    },
+  );
 
   test('initialize is idempotent when Firebase is not ready', () async {
     final _FakeNotificationsRepository repo = _FakeNotificationsRepository();

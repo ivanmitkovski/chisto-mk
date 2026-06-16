@@ -127,9 +127,7 @@ class _CreateEventVolunteerCapPickerSheetState
                 keyboardDismissBehavior:
                     ScrollViewKeyboardDismissBehavior.onDrag,
                 physics: const BouncingScrollPhysics(),
-                padding: EdgeInsets.only(
-                  bottom: AppSpacing.md + keyboardInset,
-                ),
+                padding: EdgeInsets.only(bottom: AppSpacing.md + keyboardInset),
                 children: <Widget>[
                   AppGroupedActionList(
                     children: <Widget>[
@@ -157,7 +155,9 @@ class _CreateEventVolunteerCapPickerSheetState
                           widget.onApply(null);
                         },
                       ),
-                      ...CreateEventVolunteerCapPickerSheet.presets.map((int n) {
+                      ...CreateEventVolunteerCapPickerSheet.presets.map((
+                        int n,
+                      ) {
                         final bool isActive = _selected == n;
                         return AppActionTile(
                           variant: AppActionTileVariant.grouped,
@@ -206,11 +206,15 @@ class _CreateEventVolunteerCapPickerSheetState
                         vertical: 14,
                       ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(AppSpacing.radius14),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radius14,
+                        ),
                         borderSide: const BorderSide(color: AppColors.divider),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(AppSpacing.radius14),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radius14,
+                        ),
                         borderSide: const BorderSide(
                           color: AppColors.primary,
                           width: 1.5,

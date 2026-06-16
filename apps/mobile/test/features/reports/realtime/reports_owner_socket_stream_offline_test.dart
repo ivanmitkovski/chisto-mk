@@ -8,11 +8,7 @@ void main() {
 
   test('escalates to offline after sustained reconnecting', () async {
     final AuthState auth = AuthState()
-      ..setAuthenticated(
-        userId: 'u1',
-        displayName: 'Test',
-        accessToken: 'tok',
-      );
+      ..setAuthenticated(userId: 'u1', displayName: 'Test', accessToken: 'tok');
     final ReportsOwnerSocketStream stream = ReportsOwnerSocketStream(
       baseUrl: 'http://127.0.0.1:9',
       authState: auth,
@@ -33,11 +29,7 @@ void main() {
 
   test('requestReconnect leaves connecting and clears offline', () {
     final AuthState auth = AuthState()
-      ..setAuthenticated(
-        userId: 'u1',
-        displayName: 'Test',
-        accessToken: 'tok',
-      );
+      ..setAuthenticated(userId: 'u1', displayName: 'Test', accessToken: 'tok');
     final ReportsOwnerSocketStream stream = ReportsOwnerSocketStream(
       baseUrl: 'http://127.0.0.1:9',
       authState: auth,

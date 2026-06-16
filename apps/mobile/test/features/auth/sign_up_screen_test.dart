@@ -76,7 +76,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Full name is required'), findsOneWidget);
-    expect(find.text('You must accept the terms and conditions'), findsOneWidget);
+    expect(
+      find.text('You must accept the terms and conditions'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('invalid submit reveals inline field errors', (
@@ -102,10 +105,7 @@ void main() {
 
     expect(find.text('Enter a valid email'), findsOneWidget);
     expect(find.text('Enter an 8-digit phone number'), findsOneWidget);
-    expect(
-      find.text('Password must be at least 8 characters'),
-      findsOneWidget,
-    );
+    expect(find.text('Password must be at least 8 characters'), findsOneWidget);
   });
 
   testWidgets('Already have an account? Sign in link is present', (

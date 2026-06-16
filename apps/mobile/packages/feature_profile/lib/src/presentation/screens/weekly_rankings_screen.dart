@@ -162,8 +162,9 @@ class _WeeklyRankingsScreenState extends ConsumerState<WeeklyRankingsScreen> {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final List<WeeklyLeaderboardEntry> entries = data.entries;
     final String? weekRange = _weekRangeLine(context, data);
-    final double listBottomPadding =
-        ProfileSubScreenPanel.scrollBottomPadding(context);
+    final double listBottomPadding = ProfileSubScreenPanel.scrollBottomPadding(
+      context,
+    );
 
     WeeklyLeaderboardEntry? currentUserEntry;
     try {
@@ -269,9 +270,8 @@ class _WeeklyRankingsScreenState extends ConsumerState<WeeklyRankingsScreen> {
                 bottomExtension: kProfileScrollBottomShadowExtension,
               ),
               child: AppRefreshIndicator(
-                onRefresh: () => ref
-                    .read(weeklyRankingsNotifierProvider.notifier)
-                    .refresh(),
+                onRefresh: () =>
+                    ref.read(weeklyRankingsNotifierProvider.notifier).refresh(),
                 child: CustomScrollView(
                   controller: _scrollController,
                   clipBehavior: Clip.none,

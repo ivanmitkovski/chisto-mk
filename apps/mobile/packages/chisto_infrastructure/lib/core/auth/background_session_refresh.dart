@@ -27,7 +27,8 @@ abstract final class BackgroundSessionRefresh {
     }
 
     String? accessToken = await storage.accessToken;
-    final ApiClient client = clientOverride ??
+    final ApiClient client =
+        clientOverride ??
         ApiClient(
           config: resolvedConfig,
           accessToken: () => accessToken,
@@ -41,8 +42,10 @@ abstract final class BackgroundSessionRefresh {
         attempt < kAuthRefreshInvalidTokenMaxAttempts;
         attempt++
       ) {
-        final _BackgroundRefreshAttempt attemptResult =
-            await _refreshOnce(client: client, storage: storage);
+        final _BackgroundRefreshAttempt attemptResult = await _refreshOnce(
+          client: client,
+          storage: storage,
+        );
         lastOutcome = attemptResult.outcome;
         if (attemptResult.outcome == RefreshOutcome.success) {
           accessToken = await storage.accessToken;

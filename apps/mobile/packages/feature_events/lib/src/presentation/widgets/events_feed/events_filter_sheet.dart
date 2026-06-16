@@ -17,6 +17,7 @@ import 'package:feature_events/src/presentation/widgets/date_picker_sheet.dart';
 import 'package:feature_events/src/presentation/widgets/events_feed/events_filter_preview_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 /// Inclusive bounds for filter date pickers (matches API query range).
 final DateTime kEventsFilterMinDate = DateTime(2020, 1, 1);
 final DateTime kEventsFilterMaxDate = DateTime(2030, 12, 31);
@@ -207,7 +208,11 @@ class _EventsFilterSheetState extends State<EventsFilterSheet> {
     final DateTime now = DateTime.now();
     _applyDatePreset(
       from: DateTime(now.year, now.month, 1),
-      to: DateTime(now.year, now.month, DateUtils.getDaysInMonth(now.year, now.month)),
+      to: DateTime(
+        now.year,
+        now.month,
+        DateUtils.getDaysInMonth(now.year, now.month),
+      ),
     );
   }
 
@@ -305,7 +310,8 @@ class _EventsFilterSheetState extends State<EventsFilterSheet> {
     if (_dateFrom != null) {
       chips.add(
         _DraftSummaryChip(
-          label: '${l10n.eventsFilterSheetDateFrom}: ${_formatDate(context, _dateFrom)}',
+          label:
+              '${l10n.eventsFilterSheetDateFrom}: ${_formatDate(context, _dateFrom)}',
           onTap: () => _scrollToSection(_dateSectionKey),
           onClear: () {
             setState(() => _dateFrom = null);
@@ -317,7 +323,8 @@ class _EventsFilterSheetState extends State<EventsFilterSheet> {
     if (_dateTo != null) {
       chips.add(
         _DraftSummaryChip(
-          label: '${l10n.eventsFilterSheetDateTo}: ${_formatDate(context, _dateTo)}',
+          label:
+              '${l10n.eventsFilterSheetDateTo}: ${_formatDate(context, _dateTo)}',
           onTap: () => _scrollToSection(_dateSectionKey),
           onClear: () {
             setState(() => _dateTo = null);
@@ -439,7 +446,9 @@ class _EventsFilterSheetState extends State<EventsFilterSheet> {
               if (_showsChipStatusOverride) ...<Widget>[
                 const SizedBox(height: AppSpacing.sm),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.lg,
+                  ),
                   child: AppInlineBanner(
                     message: l10n.eventsFilterChipStatusOverrideHint,
                     tone: AppInlineBannerTone.info,

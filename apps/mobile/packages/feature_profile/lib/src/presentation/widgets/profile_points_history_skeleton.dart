@@ -43,8 +43,9 @@ class _ProfilePointsHistorySkeletonState
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
-    final double listBottomPadding =
-        ProfileSubScreenPanel.scrollBottomPadding(context);
+    final double listBottomPadding = ProfileSubScreenPanel.scrollBottomPadding(
+      context,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

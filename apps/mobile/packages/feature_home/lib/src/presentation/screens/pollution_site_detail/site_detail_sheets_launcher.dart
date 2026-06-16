@@ -199,126 +199,126 @@ extension SiteDetailSheetsLauncher on _PollutionSiteDetailScreenState {
     String? highlightActorUserId,
   }) {
     return _commentsSheetFlight.run(() async {
-    final l10n = context.l10n;
-    final String currentUserId = ref.read(authStateProvider).userId ?? '';
-    Future<List<Comment>> loadComments(String sort) async {
-      final result = await ref
-          .read(sitesRepositoryProvider)
-          .getSiteComments(_site.id, sort: sort);
-      final List<Comment> mapped = result.items
-          .map(
-            (SiteCommentItem item) =>
-                commentFromSiteCommentItem(currentUserId, item),
-          )
-          .toList();
-      if (mounted) {
-        final int n = commentCountForEngagementAfterFetch(
-          result: result,
-          mappedComments: mapped,
-        );
-        rebuildState(() {
-          _site = _site.copyWith(commentsCount: n);
-        });
+      final l10n = context.l10n;
+      final String currentUserId = ref.read(authStateProvider).userId ?? '';
+      Future<List<Comment>> loadComments(String sort) async {
+        final result = await ref
+            .read(sitesRepositoryProvider)
+            .getSiteComments(_site.id, sort: sort);
+        final List<Comment> mapped = result.items
+            .map(
+              (SiteCommentItem item) =>
+                  commentFromSiteCommentItem(currentUserId, item),
+            )
+            .toList();
+        if (mounted) {
+          final int n = commentCountForEngagementAfterFetch(
+            result: result,
+            mappedComments: mapped,
+          );
+          rebuildState(() {
+            _site = _site.copyWith(commentsCount: n);
+          });
+        }
+        return mapped;
       }
-      return mapped;
-    }
 
-    try {
-      final comments = await loadComments('top');
-      if (mounted) {
-        rebuildState(() {
-          _comments = comments;
-        });
+      try {
+        final comments = await loadComments('top');
+        if (mounted) {
+          rebuildState(() {
+            _comments = comments;
+          });
+        }
+      } catch (_) {
+        if (context.mounted) {
+          AppSnack.show(
+            context,
+            message: l10n.commentsPrefetchCouldNotRefreshSnack,
+            type: AppSnackType.info,
+          );
+        }
       }
-    } catch (_) {
-      if (context.mounted) {
-        AppSnack.show(
-          context,
-          message: l10n.commentsPrefetchCouldNotRefreshSnack,
-          type: AppSnackType.info,
-        );
-      }
-    }
-    if (!context.mounted) return;
-    await showPollutionSiteCommentsModalBottomSheet(
-      context,
-      builder:
-          (
-            BuildContext sheetContext,
-            ScrollController scrollController,
-            DraggableScrollableController sheetController,
-            CommentsSheetSizeConfig sizeConfig,
-          ) {
-            return CommentsBottomSheet(
-              siteId: _site.id,
-              comments: _comments,
-              siteTitle: _site.title,
-              scrollController: scrollController,
-              sheetController: sheetController,
-              sheetSizeConfig: sizeConfig,
-          highlightCommentId: highlightCommentId,
-          highlightActorUserId: highlightActorUserId,
-          onCommentsCountChanged: (int count) {
-            if (!mounted) return;
-            rebuildState(() {
-              _site = _site.copyWith(commentsCount: count);
-            });
-          },
-          onCommentsChanged: (comments) {
-            if (!mounted) return;
-            rebuildState(() => _comments = comments);
-          },
-          onLoadMoreDirectReplies:
-              (String parentId, int page, String sort) async {
-                final SiteCommentsResult result = await ref
-                    .read(sitesRepositoryProvider)
-                    .getSiteComments(
-                      _site.id,
-                      parentId: parentId,
-                      page: page,
-                      limit: 20,
-                      sort: sort,
-                    );
-                return result.items
-                    .map(
-                      (SiteCommentItem item) =>
-                          commentFromSiteCommentItem(currentUserId, item),
-                    )
-                    .toList();
-              },
-          onCommentSubmitted: (String text, String? parentId) {
-            return ref
-                .read(sitesRepositoryProvider)
-                .createSiteComment(_site.id, text, parentId: parentId)
-                .then(
-                  (SiteCommentItem item) =>
-                      commentFromSiteCommentItem(currentUserId, item),
-                );
-          },
-          onCommentEdited: (String commentId, String body) {
-            return ref
-                .read(sitesRepositoryProvider)
-                .updateSiteComment(_site.id, commentId, body);
-          },
-          onCommentDeleted: (String commentId) {
-            return ref
-                .read(sitesRepositoryProvider)
-                .deleteSiteComment(_site.id, commentId);
-          },
-          onCommentLikeToggled: (String commentId, bool shouldLike) {
-            return shouldLike
-                ? ref
+      if (!context.mounted) return;
+      await showPollutionSiteCommentsModalBottomSheet(
+        context,
+        builder:
+            (
+              BuildContext sheetContext,
+              ScrollController scrollController,
+              DraggableScrollableController sheetController,
+              CommentsSheetSizeConfig sizeConfig,
+            ) {
+              return CommentsBottomSheet(
+                siteId: _site.id,
+                comments: _comments,
+                siteTitle: _site.title,
+                scrollController: scrollController,
+                sheetController: sheetController,
+                sheetSizeConfig: sizeConfig,
+                highlightCommentId: highlightCommentId,
+                highlightActorUserId: highlightActorUserId,
+                onCommentsCountChanged: (int count) {
+                  if (!mounted) return;
+                  rebuildState(() {
+                    _site = _site.copyWith(commentsCount: count);
+                  });
+                },
+                onCommentsChanged: (comments) {
+                  if (!mounted) return;
+                  rebuildState(() => _comments = comments);
+                },
+                onLoadMoreDirectReplies:
+                    (String parentId, int page, String sort) async {
+                      final SiteCommentsResult result = await ref
+                          .read(sitesRepositoryProvider)
+                          .getSiteComments(
+                            _site.id,
+                            parentId: parentId,
+                            page: page,
+                            limit: 20,
+                            sort: sort,
+                          );
+                      return result.items
+                          .map(
+                            (SiteCommentItem item) =>
+                                commentFromSiteCommentItem(currentUserId, item),
+                          )
+                          .toList();
+                    },
+                onCommentSubmitted: (String text, String? parentId) {
+                  return ref
                       .read(sitesRepositoryProvider)
-                      .likeSiteComment(_site.id, commentId)
-                      .then((_) {})
-                : ref
+                      .createSiteComment(_site.id, text, parentId: parentId)
+                      .then(
+                        (SiteCommentItem item) =>
+                            commentFromSiteCommentItem(currentUserId, item),
+                      );
+                },
+                onCommentEdited: (String commentId, String body) {
+                  return ref
                       .read(sitesRepositoryProvider)
-                      .unlikeSiteComment(_site.id, commentId)
-                      .then((_) {});
-          },
-        );
-      },
-    );
+                      .updateSiteComment(_site.id, commentId, body);
+                },
+                onCommentDeleted: (String commentId) {
+                  return ref
+                      .read(sitesRepositoryProvider)
+                      .deleteSiteComment(_site.id, commentId);
+                },
+                onCommentLikeToggled: (String commentId, bool shouldLike) {
+                  return shouldLike
+                      ? ref
+                            .read(sitesRepositoryProvider)
+                            .likeSiteComment(_site.id, commentId)
+                            .then((_) {})
+                      : ref
+                            .read(sitesRepositoryProvider)
+                            .unlikeSiteComment(_site.id, commentId)
+                            .then((_) {});
+                },
+              );
+            },
+      );
     });
   }
 

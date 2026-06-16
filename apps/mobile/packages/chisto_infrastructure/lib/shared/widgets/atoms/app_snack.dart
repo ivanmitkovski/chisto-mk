@@ -163,7 +163,9 @@ class AppSnack {
     final BuildContext? hostContext = resolveHostContext(context);
     if (hostContext == null) {
       assert(() {
-        AppLog.verbose('[AppSnack] Dropped message (no host context): $message');
+        AppLog.verbose(
+          '[AppSnack] Dropped message (no host context): $message',
+        );
         return true;
       }());
       return null;
@@ -213,9 +215,9 @@ class AppSnack {
         ),
         padding: EdgeInsets.zero,
         content: DefaultTextStyle.merge(
-          style: Theme.of(hostContext).textTheme.bodyMedium!.copyWith(
-            decoration: TextDecoration.none,
-          ),
+          style: Theme.of(
+            hostContext,
+          ).textTheme.bodyMedium!.copyWith(decoration: TextDecoration.none),
           child: _AppSnackCard(
             message: message,
             type: type,

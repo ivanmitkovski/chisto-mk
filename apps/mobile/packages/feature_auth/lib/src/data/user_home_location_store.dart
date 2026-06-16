@@ -6,8 +6,7 @@ const String kUserHomeLongitudeKey = 'chisto_home_longitude';
 const String kUserHomeLocationLabelKey = 'chisto_home_location_label';
 const String kUserHomeLocationSetAtKey = 'chisto_home_location_set_at';
 
-String _scopedHomeLatitudeKey(String userId) =>
-    'chisto_home_latitude_$userId';
+String _scopedHomeLatitudeKey(String userId) => 'chisto_home_latitude_$userId';
 String _scopedHomeLongitudeKey(String userId) =>
     'chisto_home_longitude_$userId';
 String _scopedHomeLocationLabelKey(String userId) =>
@@ -100,10 +99,7 @@ class UserHomeLocationStore {
     final Object? lat = json['homeLatitude'];
     final Object? lng = json['homeLongitude'];
 
-    if (setAt == null ||
-        setAt.isEmpty ||
-        lat is! num ||
-        lng is! num) {
+    if (setAt == null || setAt.isEmpty || lat is! num || lng is! num) {
       await clear();
       return;
     }
@@ -135,10 +131,16 @@ class UserHomeLocationStore {
       await _prefs.setDouble(_scopedHomeLongitudeKey(userId), legacyLng);
       final String? legacyLabel = _prefs.getString(kUserHomeLocationLabelKey);
       if (legacyLabel != null) {
-        await _prefs.setString(_scopedHomeLocationLabelKey(userId), legacyLabel);
+        await _prefs.setString(
+          _scopedHomeLocationLabelKey(userId),
+          legacyLabel,
+        );
       }
       if (legacySetAt != null) {
-        await _prefs.setString(_scopedHomeLocationSetAtKey(userId), legacySetAt);
+        await _prefs.setString(
+          _scopedHomeLocationSetAtKey(userId),
+          legacySetAt,
+        );
       }
     }
 

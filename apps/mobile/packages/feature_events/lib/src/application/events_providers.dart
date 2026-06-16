@@ -17,7 +17,8 @@ export 'package:chisto_infrastructure/core/providers/refresh_signals_providers.d
 
 EventsRepository? _eventsRepositoryTestOverride;
 CheckInRepository? _checkInRepositoryTestOverride;
-OrganizerCertificationRepositoryPort? _organizerCertificationRepositoryTestOverride;
+OrganizerCertificationRepositoryPort?
+_organizerCertificationRepositoryTestOverride;
 
 /// Widget / integration tests can pin repositories without booting [AppBootstrap].
 @visibleForTesting

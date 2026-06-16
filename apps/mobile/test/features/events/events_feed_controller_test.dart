@@ -113,37 +113,40 @@ void main() {
     expect(repo.refreshCallCount, greaterThan(countBefore));
   });
 
-  test('setActiveFilter nearby switches instantly without refreshEvents', () async {
-    final RecordingEventsRepository repo = RecordingEventsRepository();
-    final ProviderContainer container = _feedContainer(repo);
-    final EventsFeedController c = _feedController(container);
+  test(
+    'setActiveFilter nearby switches instantly without refreshEvents',
+    () async {
+      final RecordingEventsRepository repo = RecordingEventsRepository();
+      final ProviderContainer container = _feedContainer(repo);
+      final EventsFeedController c = _feedController(container);
 
-    final bool ok = await c.setActiveFilter(EcoEventFilter.nearby);
+      final bool ok = await c.setActiveFilter(EcoEventFilter.nearby);
 
-    expect(ok, isTrue);
-    expect(c.activeFilter, EcoEventFilter.nearby);
-    expect(repo.refreshCallCount, 0);
-  });
+      expect(ok, isTrue);
+      expect(c.activeFilter, EcoEventFilter.nearby);
+      expect(repo.refreshCallCount, 0);
+    },
+  );
 
-  test('setActiveFilter past triggers refreshEvents for server lifecycle', () async {
-    final RecordingEventsRepository repo = RecordingEventsRepository();
-    final ProviderContainer container = _feedContainer(repo);
-    final EventsFeedController c = _feedController(container);
+  test(
+    'setActiveFilter past triggers refreshEvents for server lifecycle',
+    () async {
+      final RecordingEventsRepository repo = RecordingEventsRepository();
+      final ProviderContainer container = _feedContainer(repo);
+      final EventsFeedController c = _feedController(container);
 
-    final int before = repo.refreshCallCount;
-    final bool ok = await c.setActiveFilter(EcoEventFilter.past);
+      final int before = repo.refreshCallCount;
+      final bool ok = await c.setActiveFilter(EcoEventFilter.past);
 
-    expect(ok, isTrue);
-    expect(c.activeFilter, EcoEventFilter.past);
-    expect(repo.refreshCallCount, before + 1);
-    expect(
-      repo.lastRefreshParams?.statuses,
-      <EcoEventStatus>{
+      expect(ok, isTrue);
+      expect(c.activeFilter, EcoEventFilter.past);
+      expect(repo.refreshCallCount, before + 1);
+      expect(repo.lastRefreshParams?.statuses, <EcoEventStatus>{
         EcoEventStatus.completed,
         EcoEventStatus.cancelled,
-      },
-    );
-  });
+      });
+    },
+  );
 
   test('setCalendarView toggles and memoization resets', () async {
     final ProviderContainer container = _feedContainer(store);

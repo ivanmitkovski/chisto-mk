@@ -18,7 +18,8 @@ import 'package:socket_io_client/socket_io_client.dart' as sio;
 
 /// When true (`--dart-define=CHAT_WS_ONLY=true`), websocket-only (same flag as event chat).
 @Deprecated('Use RealtimeSocketTransportPolicy.kRealtimeWsOnly')
-const bool kReportsOwnerSocketWsOnly = RealtimeSocketTransportPolicy.kRealtimeWsOnly;
+const bool kReportsOwnerSocketWsOnly =
+    RealtimeSocketTransportPolicy.kRealtimeWsOnly;
 
 bool _reportsSocketNeedsReconnectForNewToken({
   required bool socketConnected,
@@ -365,7 +366,9 @@ class ReportsOwnerSocketStream {
 
     _socket!
       ..onConnect((_) {
-        AppLog.verbose('[reports-owner:ws] transport connected host=$debugHost');
+        AppLog.verbose(
+          '[reports-owner:ws] transport connected host=$debugHost',
+        );
       })
       ..onConnectError((dynamic data) {
         AppLog.verbose(
@@ -474,7 +477,10 @@ class ReportsOwnerSocketStream {
     if (_offlineEscalationTimer?.isActive ?? false) {
       return;
     }
-    _offlineEscalationTimer = Timer(_offlineEscalationAfter, _escalateToOffline);
+    _offlineEscalationTimer = Timer(
+      _offlineEscalationAfter,
+      _escalateToOffline,
+    );
   }
 
   void _escalateToOffline() {

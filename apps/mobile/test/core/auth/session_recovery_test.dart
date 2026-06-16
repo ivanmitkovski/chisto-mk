@@ -30,27 +30,33 @@ void main() {
     expect(AppBootstrap.instance.authState.isAuthenticated, isTrue);
   });
 
-  test('refreshBeforeInvalidate keeps session on transient refresh failure', () async {
-    AppBootstrap.instance.apiClient.refreshSession = () async =>
-        RefreshOutcome.transient;
+  test(
+    'refreshBeforeInvalidate keeps session on transient refresh failure',
+    () async {
+      AppBootstrap.instance.apiClient.refreshSession = () async =>
+          RefreshOutcome.transient;
 
-    final bool invalidated = await SessionRecovery.refreshBeforeInvalidate(
-      reason: SessionTeardownReason.resumeRefreshRejected,
-      delayedRetry: Duration.zero,
-    );
-    expect(invalidated, isFalse);
-    expect(AppBootstrap.instance.authState.isAuthenticated, isTrue);
-  });
+      final bool invalidated = await SessionRecovery.refreshBeforeInvalidate(
+        reason: SessionTeardownReason.resumeRefreshRejected,
+        delayedRetry: Duration.zero,
+      );
+      expect(invalidated, isFalse);
+      expect(AppBootstrap.instance.authState.isAuthenticated, isTrue);
+    },
+  );
 
-  test('refreshBeforeInvalidate clears session when refresh is serverRejected', () async {
-    AppBootstrap.instance.apiClient.refreshSession = () async =>
-        RefreshOutcome.serverRejected;
+  test(
+    'refreshBeforeInvalidate clears session when refresh is serverRejected',
+    () async {
+      AppBootstrap.instance.apiClient.refreshSession = () async =>
+          RefreshOutcome.serverRejected;
 
-    final bool invalidated = await SessionRecovery.refreshBeforeInvalidate(
-      reason: SessionTeardownReason.proactiveRefreshRejected,
-      delayedRetry: Duration.zero,
-    );
-    expect(invalidated, isTrue);
-    expect(AppBootstrap.instance.authState.isAuthenticated, isFalse);
-  });
+      final bool invalidated = await SessionRecovery.refreshBeforeInvalidate(
+        reason: SessionTeardownReason.proactiveRefreshRejected,
+        delayedRetry: Duration.zero,
+      );
+      expect(invalidated, isTrue);
+      expect(AppBootstrap.instance.authState.isAuthenticated, isFalse);
+    },
+  );
 }

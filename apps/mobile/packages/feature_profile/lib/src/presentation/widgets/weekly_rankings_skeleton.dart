@@ -39,8 +39,9 @@ class _WeeklyRankingsSkeletonState extends State<WeeklyRankingsSkeleton>
 
   @override
   Widget build(BuildContext context) {
-    final double listBottomPadding =
-        ProfileSubScreenPanel.scrollBottomPadding(context);
+    final double listBottomPadding = ProfileSubScreenPanel.scrollBottomPadding(
+      context,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

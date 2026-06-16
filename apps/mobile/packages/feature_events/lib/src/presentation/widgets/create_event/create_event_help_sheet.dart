@@ -31,38 +31,38 @@ void showCreateEventHelpSheet(BuildContext context) {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-              _HelpInfoRow(
-                icon: Icons.verified_outlined,
-                text: ctx.l10n.createEventHelpBulletModeration,
-                textTheme: textTheme,
-              ),
-              _HelpInfoRow(
-                icon: Icons.groups_2_outlined,
-                text: ctx.l10n.createEventHelpBulletVolunteers,
-                textTheme: textTheme,
-              ),
-              _HelpInfoRow(
-                icon: Icons.location_on_outlined,
-                text: ctx.l10n.createEventHelpBulletSite,
-                textTheme: textTheme,
-              ),
-              _HelpInfoRow(
-                icon: Icons.event_outlined,
-                text: ctx.l10n.createEventHelpBulletSchedule,
-                textTheme: textTheme,
-              ),
-              _HelpInfoRow(
-                icon: Icons.date_range_outlined,
-                text: ctx.l10n.createEventHelpBulletSameDay,
-                textTheme: textTheme,
-              ),
-              _HelpInfoRow(
-                icon: Icons.publish_outlined,
-                text: ctx.l10n.createEventHelpBulletSubmit,
-                textTheme: textTheme,
-              ),
-            ],
-          ),
+            _HelpInfoRow(
+              icon: Icons.verified_outlined,
+              text: ctx.l10n.createEventHelpBulletModeration,
+              textTheme: textTheme,
+            ),
+            _HelpInfoRow(
+              icon: Icons.groups_2_outlined,
+              text: ctx.l10n.createEventHelpBulletVolunteers,
+              textTheme: textTheme,
+            ),
+            _HelpInfoRow(
+              icon: Icons.location_on_outlined,
+              text: ctx.l10n.createEventHelpBulletSite,
+              textTheme: textTheme,
+            ),
+            _HelpInfoRow(
+              icon: Icons.event_outlined,
+              text: ctx.l10n.createEventHelpBulletSchedule,
+              textTheme: textTheme,
+            ),
+            _HelpInfoRow(
+              icon: Icons.date_range_outlined,
+              text: ctx.l10n.createEventHelpBulletSameDay,
+              textTheme: textTheme,
+            ),
+            _HelpInfoRow(
+              icon: Icons.publish_outlined,
+              text: ctx.l10n.createEventHelpBulletSubmit,
+              textTheme: textTheme,
+            ),
+          ],
+        ),
       );
     },
   );

@@ -80,98 +80,96 @@ class _PhotoGridState extends State<PhotoGrid> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-          if (!hasPhotos)
-            _EmptyPhotoGalleryCard(onTap: widget.onAddPhoto)
-          else if (widget.compact) ...<Widget>[
-            Text(
-              l10n.reportPhotoGridAttachedCount(
-                widget.photos.length,
-                widget.maxPhotos,
-              ),
-              style: AppTypographySurfaces.reportsPhotoGridCount(
-                Theme.of(context).textTheme,
-              ),
+        if (!hasPhotos)
+          _EmptyPhotoGalleryCard(onTap: widget.onAddPhoto)
+        else if (widget.compact) ...<Widget>[
+          Text(
+            l10n.reportPhotoGridAttachedCount(
+              widget.photos.length,
+              widget.maxPhotos,
             ),
-            const SizedBox(height: AppSpacing.sm),
-            if (widget.showExpandedAddCard && canAdd)
-              AnimatedSize(
-                duration: AppMotion.medium,
-                curve: AppMotion.smooth,
-                alignment: Alignment.topCenter,
-                clipBehavior: Clip.hardEdge,
-                child: widget.hideExpandedAddCard
-                    ? const SizedBox(width: double.infinity)
-                    : Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: <Widget>[
-                          _EmptyPhotoGalleryCard(onTap: widget.onAddPhoto),
-                          const SizedBox(height: AppSpacing.md),
-                        ],
+            style: AppTypographySurfaces.reportsPhotoGridCount(
+              Theme.of(context).textTheme,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          if (widget.showExpandedAddCard && canAdd)
+            AnimatedSize(
+              duration: AppMotion.medium,
+              curve: AppMotion.smooth,
+              alignment: Alignment.topCenter,
+              clipBehavior: Clip.hardEdge,
+              child: widget.hideExpandedAddCard
+                  ? const SizedBox(width: double.infinity)
+                  : Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        _EmptyPhotoGalleryCard(onTap: widget.onAddPhoto),
+                        const SizedBox(height: AppSpacing.md),
+                      ],
+                    ),
+            ),
+          _buildThumbnailStrip(canAdd: canAdd && !widget.showExpandedAddCard),
+        ] else ...<Widget>[
+          Text(
+            l10n.reportPhotoGridAttachedCount(
+              widget.photos.length,
+              widget.maxPhotos,
+            ),
+            style: AppTypographySurfaces.reportsPhotoGridCount(
+              Theme.of(context).textTheme,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          ImmersivePhotoGallery(
+            items: galleryItems,
+            selectedIndex: _selectedIndex,
+            onPageChanged: (int index) {
+              if (!mounted) return;
+              setState(() => _selectedIndex = index);
+            },
+            openLabel: l10n.reportPhotoOpenGallerySemantic,
+            bottomCenterBuilder:
+                (BuildContext context, int currentIndex, int totalCount) {
+                  return GalleryGlassPill(
+                    child: Text(
+                      totalCount > 1
+                          ? l10n.reportPhotoTapToReviewMany
+                          : l10n.reportPhotoTapToReviewSingle,
+                      style: AppTypographySurfaces.reportsPhotoGalleryPill(
+                        Theme.of(context).textTheme,
                       ),
-              ),
-            _buildThumbnailStrip(
-              canAdd: canAdd && !widget.showExpandedAddCard,
+                    ),
+                  );
+                },
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Text(
+            widget.photos.length == 1
+                ? l10n.reportPhotoStackCaptionSingle
+                : l10n.reportPhotoStackCaptionMany(widget.photos.length),
+            style: AppTypographySurfaces.reportsPhotoGridHint(
+              Theme.of(context).textTheme,
             ),
-          ] else ...<Widget>[
-            Text(
-              l10n.reportPhotoGridAttachedCount(
-                widget.photos.length,
-                widget.maxPhotos,
-              ),
-              style: AppTypographySurfaces.reportsPhotoGridCount(
-                Theme.of(context).textTheme,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            ImmersivePhotoGallery(
-              items: galleryItems,
-              selectedIndex: _selectedIndex,
-              onPageChanged: (int index) {
-                if (!mounted) return;
-                setState(() => _selectedIndex = index);
-              },
-              openLabel: l10n.reportPhotoOpenGallerySemantic,
-              bottomCenterBuilder:
-                  (BuildContext context, int currentIndex, int totalCount) {
-                    return GalleryGlassPill(
-                      child: Text(
-                        totalCount > 1
-                            ? l10n.reportPhotoTapToReviewMany
-                            : l10n.reportPhotoTapToReviewSingle,
-                        style: AppTypographySurfaces.reportsPhotoGalleryPill(
-                          Theme.of(context).textTheme,
-                        ),
-                      ),
-                    );
-                  },
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              widget.photos.length == 1
-                  ? l10n.reportPhotoStackCaptionSingle
-                  : l10n.reportPhotoStackCaptionMany(widget.photos.length),
-              style: AppTypographySurfaces.reportsPhotoGridHint(
-                Theme.of(context).textTheme,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            _buildThumbnailStrip(canAdd: canAdd),
-          ],
-          if (!widget.compact) ...<Widget>[
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              hasPhotos
-                  ? (_selectedIndex == 0
-                        ? l10n.reportPhotoVerificationHelpPrimarySelected
-                        : l10n.reportPhotoVerificationHelpPrimaryOther)
-                  : l10n.reportPhotoVerificationHelpEmpty,
-              style: AppTypographySurfaces.reportsPhotoGridHint(
-                Theme.of(context).textTheme,
-              ),
-            ),
-          ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          _buildThumbnailStrip(canAdd: canAdd),
         ],
+        if (!widget.compact) ...<Widget>[
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            hasPhotos
+                ? (_selectedIndex == 0
+                      ? l10n.reportPhotoVerificationHelpPrimarySelected
+                      : l10n.reportPhotoVerificationHelpPrimaryOther)
+                : l10n.reportPhotoVerificationHelpEmpty,
+            style: AppTypographySurfaces.reportsPhotoGridHint(
+              Theme.of(context).textTheme,
+            ),
+          ),
+        ],
+      ],
     );
   }
 

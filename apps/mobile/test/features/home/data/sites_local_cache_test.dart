@@ -133,18 +133,21 @@ void main() {
       expect(await cache.loadMapSnapshot(authSegment: 'anon'), isNull);
     });
 
-    test('loadMapSnapshot rejects legacy snapshot without auth segment', () async {
-      final SitesLocalCache cache = SitesLocalCache();
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString(
-        SitesLocalCache.mapPersistedCacheKey,
-        jsonEncode(<String, dynamic>{
-          'cachedAtMs': DateTime.now().millisecondsSinceEpoch,
-          'payload': <String, dynamic>{'data': <dynamic>[]},
-        }),
-      );
-      expect(await cache.loadMapSnapshot(authSegment: 'user-a'), isNull);
-    });
+    test(
+      'loadMapSnapshot rejects legacy snapshot without auth segment',
+      () async {
+        final SitesLocalCache cache = SitesLocalCache();
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString(
+          SitesLocalCache.mapPersistedCacheKey,
+          jsonEncode(<String, dynamic>{
+            'cachedAtMs': DateTime.now().millisecondsSinceEpoch,
+            'payload': <String, dynamic>{'data': <dynamic>[]},
+          }),
+        );
+        expect(await cache.loadMapSnapshot(authSegment: 'user-a'), isNull);
+      },
+    );
 
     test('loadMapSnapshot returns null for expired snapshot', () async {
       final SitesLocalCache cache = SitesLocalCache();
@@ -171,24 +174,27 @@ void main() {
   });
 
   group('SitesLocalCache map corpus', () {
-    test('roundtrips for the same auth segment, rejects another account', () async {
-      final SitesLocalCache cache = SitesLocalCache();
-      await cache.persistMapCorpus(
-        filterKey: 7,
-        sites: const <Map<String, dynamic>>[
-          <String, dynamic>{'id': 's1'},
-        ],
-        authSegment: 'user-a',
-      );
+    test(
+      'roundtrips for the same auth segment, rejects another account',
+      () async {
+        final SitesLocalCache cache = SitesLocalCache();
+        await cache.persistMapCorpus(
+          filterKey: 7,
+          sites: const <Map<String, dynamic>>[
+            <String, dynamic>{'id': 's1'},
+          ],
+          authSegment: 'user-a',
+        );
 
-      final ({int filterKey, List<Map<String, dynamic>> sites})? same =
-          await cache.loadMapCorpus(authSegment: 'user-a');
-      expect(same, isNotNull);
-      expect(same!.filterKey, 7);
-      expect(same.sites, hasLength(1));
+        final ({int filterKey, List<Map<String, dynamic>> sites})? same =
+            await cache.loadMapCorpus(authSegment: 'user-a');
+        expect(same, isNotNull);
+        expect(same!.filterKey, 7);
+        expect(same.sites, hasLength(1));
 
-      expect(await cache.loadMapCorpus(authSegment: 'user-b'), isNull);
-    });
+        expect(await cache.loadMapCorpus(authSegment: 'user-b'), isNull);
+      },
+    );
   });
 
   test('clearFeedAndMapSnapshots removes keys', () async {

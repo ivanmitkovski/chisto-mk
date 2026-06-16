@@ -408,7 +408,8 @@ class EventsFeedController extends _$EventsFeedController {
   /// Upcoming rows for hero + sections (from full [events]).
   List<EcoEvent> get comingUp => _derivedWithoutL10n().comingUp;
 
-  List<EcoEvent> get recentlyCompleted => _derivedWithoutL10n().recentlyCompleted;
+  List<EcoEvent> get recentlyCompleted =>
+      _derivedWithoutL10n().recentlyCompleted;
 
   EcoEvent? get heroEvent => _derivedWithoutL10n().hero;
 
@@ -443,8 +444,7 @@ class EventsFeedController extends _$EventsFeedController {
     final List<EcoEvent> recentlyCompletedRows =
         events.where((EcoEvent e) => e.isPastForPublicDiscovery).toList()
           ..sort((EcoEvent a, EcoEvent b) => b.date.compareTo(a.date));
-    final EcoEvent? hero =
-        comingUpRows.isNotEmpty ? comingUpRows.first : null;
+    final EcoEvent? hero = comingUpRows.isNotEmpty ? comingUpRows.first : null;
     return _EventsFeedDerived(
       filtered: filtered,
       happeningNow: happeningNowRows,

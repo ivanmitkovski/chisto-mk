@@ -387,11 +387,12 @@ class _ProfilePointsHistoryScreenState
                     reasonIcon: pointsHistoryReasonIcon(entry.reasonCode),
                     deltaLabel: deltaLabel,
                     timeLine: timeLine,
-                    semanticLabel: context.l10n.profilePointsActivityRowSemantic(
-                      reasonTitle,
-                      timeLine,
-                      deltaLabel,
-                    ),
+                    semanticLabel: context.l10n
+                        .profilePointsActivityRowSemantic(
+                          reasonTitle,
+                          timeLine,
+                          deltaLabel,
+                        ),
                   ),
                 );
             }

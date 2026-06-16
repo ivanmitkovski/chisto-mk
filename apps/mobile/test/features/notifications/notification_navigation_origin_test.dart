@@ -6,9 +6,10 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group('NotificationNavigationOrigin wiring', () {
     test('inbox router passes inbox origin to executor via API surface', () {
-      expect(NotificationNavigationOrigin.inbox, isNot(
-        NotificationNavigationOrigin.external,
-      ));
+      expect(
+        NotificationNavigationOrigin.inbox,
+        isNot(NotificationNavigationOrigin.external),
+      );
     });
 
     test('open router uses external origin enum value', () {

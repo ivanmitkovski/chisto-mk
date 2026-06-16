@@ -101,7 +101,9 @@ class _BannerBody extends StatelessWidget {
                     ),
                   ],
                 ),
-                if (offline && onTryAgain != null && tryAgainLabel != null) ...<Widget>[
+                if (offline &&
+                    onTryAgain != null &&
+                    tryAgainLabel != null) ...<Widget>[
                   Align(
                     alignment: Alignment.centerRight,
                     child: AppButton.text(

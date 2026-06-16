@@ -86,14 +86,17 @@ void main() {
     expect(find.text('jana@example.com'), findsOneWidget);
 
     // The CTA must be a short bottom bar, not a full-screen green block.
-    final Size screenSize = tester.getSize(find.byType(ProfileGeneralInfoScreen));
+    final Size screenSize = tester.getSize(
+      find.byType(ProfileGeneralInfoScreen),
+    );
     final Size ctaSize = tester.getSize(
       find.widgetWithText(PrimaryButton, 'Update info'),
     );
     expect(
       ctaSize.height < screenSize.height / 2,
       isTrue,
-      reason: 'Update info CTA should be a bottom bar, not fill the screen '
+      reason:
+          'Update info CTA should be a bottom bar, not fill the screen '
           '(cta=${ctaSize.height}, screen=${screenSize.height})',
     );
   });

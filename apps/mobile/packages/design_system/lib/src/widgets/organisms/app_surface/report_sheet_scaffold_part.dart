@@ -202,14 +202,12 @@ class AppSheetScaffold extends StatelessWidget {
   }
 
   Widget _scrollBody(BuildContext context) {
-    final double scrollBottom =
-        footer == null ? _homeIndicatorInset(context) : 0;
+    final double scrollBottom = footer == null
+        ? _homeIndicatorInset(context)
+        : 0;
     return ScrollConfiguration(
       behavior: const NoOverscrollOverlayScrollBehavior(),
-      child: AppSheetScrollInset.wrap(
-        bottom: scrollBottom,
-        child: child,
-      ),
+      child: AppSheetScrollInset.wrap(bottom: scrollBottom, child: child),
     );
   }
 
@@ -231,8 +229,9 @@ class AppSheetScaffold extends StatelessWidget {
         ? math.min(restingCap, keyboardSlotCap)
         : restingCap;
     final double homeIndicatorInset = _homeIndicatorInset(context);
-    final double headerTopGap =
-        topInset > 0 ? AppSpacing.xs : AppSpacing.radius14;
+    final double headerTopGap = topInset > 0
+        ? AppSpacing.xs
+        : AppSpacing.radius14;
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
@@ -240,8 +239,7 @@ class AppSheetScaffold extends StatelessWidget {
         final double maxSheetHeight = parentMax.isFinite
             ? math.min(parentMax, heightCap)
             : heightCap;
-        final double minSheetHeight =
-            fillAvailableHeight ? maxSheetHeight : 0;
+        final double minSheetHeight = fillAvailableHeight ? maxSheetHeight : 0;
 
         final BorderRadius sheetRadius = useModalRouteShape
             ? const BorderRadius.vertical(
@@ -265,6 +263,107 @@ class AppSheetScaffold extends StatelessWidget {
           return _wrapKeyboardLift(
             context,
             DecoratedBox(
+              decoration: BoxDecoration(
+                color: AppColors.panelBackground,
+                borderRadius: sheetRadius,
+                boxShadow: sheetShadow,
+              ),
+              child: ClipRRect(
+                borderRadius: sheetRadius,
+                clipBehavior: Clip.hardEdge,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxHeight: maxSheetHeight),
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: ScrollConfiguration(
+                      behavior: const NoOverscrollOverlayScrollBehavior(),
+                      child: SingleChildScrollView(
+                        physics: _reportSheetListPhysics(context),
+                        padding: footer == null && addBottomInset
+                            ? padding.copyWith(
+                                bottom: padding.bottom + homeIndicatorInset,
+                              )
+                            : padding,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: <Widget>[
+                            const SizedBox(height: AppSpacing.xs),
+                            if (animateHandleFadeIn)
+                              _AppSheetHandleFadeIn(
+                                semanticLabel: dragHandleSemanticLabel,
+                              )
+                            else
+                              Center(
+                                child: _AppSheetHandle(
+                                  semanticLabel: dragHandleSemanticLabel,
+                                ),
+                              ),
+                            SizedBox(height: headerTopGap),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                if (leading != null) ...<Widget>[
+                                  leading!,
+                                  const SizedBox(width: AppSpacing.sm),
+                                ],
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Text(title, style: resolvedTitleStyle),
+                                      if (subtitle != null) ...<Widget>[
+                                        const SizedBox(height: AppSpacing.xs),
+                                        Text(
+                                          subtitle!,
+                                          style: resolvedSubtitleStyle,
+                                          maxLines: subtitleMaxLines,
+                                          overflow: subtitleMaxLines != null
+                                              ? TextOverflow.ellipsis
+                                              : null,
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ),
+                                if (trailing != null) ...<Widget>[
+                                  const SizedBox(width: AppSpacing.sm),
+                                  trailing!,
+                                ],
+                              ],
+                            ),
+                            if (showHeaderDivider) ...<Widget>[
+                              SizedBox(height: headerDividerGap),
+                              Divider(
+                                color: AppColors.divider.withValues(alpha: 0.6),
+                                height: 1,
+                              ),
+                              SizedBox(height: headerDividerGap),
+                            ] else
+                              const SizedBox(height: AppSpacing.sm),
+                            child,
+                            if (resolvedFooter != null) ...<Widget>[
+                              const SizedBox(height: AppSpacing.lg),
+                              resolvedFooter,
+                            ],
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
+
+        // DecoratedBox paints the card; hard-edge clip avoids iOS anti-alias seams.
+        // Material(type: transparency) supplies a Material ancestor for Text/InkWell
+        // (avoids debug yellow underlines) without painting another opaque surface.
+        return _wrapKeyboardLift(
+          context,
+          DecoratedBox(
             decoration: BoxDecoration(
               color: AppColors.panelBackground,
               borderRadius: sheetRadius,
@@ -274,21 +373,22 @@ class AppSheetScaffold extends StatelessWidget {
               borderRadius: sheetRadius,
               clipBehavior: Clip.hardEdge,
               child: ConstrainedBox(
-                constraints: BoxConstraints(maxHeight: maxSheetHeight),
+                constraints: BoxConstraints(
+                  maxHeight: maxSheetHeight,
+                  minHeight: minSheetHeight,
+                ),
                 child: Material(
                   type: MaterialType.transparency,
-                  child: ScrollConfiguration(
-                    behavior: const NoOverscrollOverlayScrollBehavior(),
-                    child: SingleChildScrollView(
-                      physics: _reportSheetListPhysics(context),
-                      padding: footer == null && addBottomInset
-                          ? padding.copyWith(
-                              bottom: padding.bottom + homeIndicatorInset,
-                            )
-                          : padding,
+                  child: SafeArea(
+                    top: false,
+                    bottom: false,
+                    child: Padding(
+                      padding: padding,
                       child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        mainAxisSize: fillAvailableHeight
+                            ? MainAxisSize.max
+                            : MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           const SizedBox(height: AppSpacing.xs),
                           if (animateHandleFadeIn)
@@ -301,9 +401,7 @@ class AppSheetScaffold extends StatelessWidget {
                                 semanticLabel: dragHandleSemanticLabel,
                               ),
                             ),
-                          SizedBox(
-                            height: headerTopGap,
-                          ),
+                          SizedBox(height: headerTopGap),
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
@@ -345,7 +443,19 @@ class AppSheetScaffold extends StatelessWidget {
                             SizedBox(height: headerDividerGap),
                           ] else
                             const SizedBox(height: AppSpacing.sm),
-                          child,
+                          if (fillAvailableHeight)
+                            Expanded(child: _scrollBody(context))
+                          else if (boundedScrollBody)
+                            _scrollBody(context)
+                          else
+                            Flexible(
+                              fit: FlexFit.loose,
+                              child: Align(
+                                alignment: Alignment.topCenter,
+                                heightFactor: 1,
+                                child: _scrollBody(context),
+                              ),
+                            ),
                           if (resolvedFooter != null) ...<Widget>[
                             const SizedBox(height: AppSpacing.lg),
                             resolvedFooter,
@@ -358,123 +468,6 @@ class AppSheetScaffold extends StatelessWidget {
               ),
             ),
           ),
-          );
-        }
-
-        // DecoratedBox paints the card; hard-edge clip avoids iOS anti-alias seams.
-        // Material(type: transparency) supplies a Material ancestor for Text/InkWell
-        // (avoids debug yellow underlines) without painting another opaque surface.
-        return _wrapKeyboardLift(
-          context,
-          DecoratedBox(
-          decoration: BoxDecoration(
-            color: AppColors.panelBackground,
-            borderRadius: sheetRadius,
-            boxShadow: sheetShadow,
-          ),
-          child: ClipRRect(
-            borderRadius: sheetRadius,
-            clipBehavior: Clip.hardEdge,
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                maxHeight: maxSheetHeight,
-                minHeight: minSheetHeight,
-              ),
-              child: Material(
-                type: MaterialType.transparency,
-                child: SafeArea(
-                  top: false,
-                  bottom: false,
-                  child: Padding(
-                    padding: padding,
-                    child: Column(
-                      mainAxisSize: fillAvailableHeight
-                          ? MainAxisSize.max
-                          : MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        const SizedBox(height: AppSpacing.xs),
-                        if (animateHandleFadeIn)
-                          _AppSheetHandleFadeIn(
-                            semanticLabel: dragHandleSemanticLabel,
-                          )
-                        else
-                          Center(
-                            child: _AppSheetHandle(
-                              semanticLabel: dragHandleSemanticLabel,
-                            ),
-                          ),
-                        SizedBox(
-                          height: headerTopGap,
-                        ),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            if (leading != null) ...<Widget>[
-                              leading!,
-                              const SizedBox(width: AppSpacing.sm),
-                            ],
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text(title, style: resolvedTitleStyle),
-                                  if (subtitle != null) ...<Widget>[
-                                    const SizedBox(height: AppSpacing.xs),
-                                    Text(
-                                      subtitle!,
-                                      style: resolvedSubtitleStyle,
-                                      maxLines: subtitleMaxLines,
-                                      overflow: subtitleMaxLines != null
-                                          ? TextOverflow.ellipsis
-                                          : null,
-                                    ),
-                                  ],
-                                ],
-                              ),
-                            ),
-                            if (trailing != null) ...<Widget>[
-                              const SizedBox(width: AppSpacing.sm),
-                              trailing!,
-                            ],
-                          ],
-                        ),
-                        if (showHeaderDivider) ...<Widget>[
-                          SizedBox(height: headerDividerGap),
-                          Divider(
-                            color: AppColors.divider.withValues(
-                              alpha: 0.6,
-                            ),
-                            height: 1,
-                          ),
-                          SizedBox(height: headerDividerGap),
-                        ] else
-                          const SizedBox(height: AppSpacing.sm),
-                        if (fillAvailableHeight)
-                          Expanded(child: _scrollBody(context))
-                        else if (boundedScrollBody)
-                          _scrollBody(context)
-                        else
-                          Flexible(
-                            fit: FlexFit.loose,
-                            child: Align(
-                              alignment: Alignment.topCenter,
-                              heightFactor: 1,
-                              child: _scrollBody(context),
-                            ),
-                          ),
-                        if (resolvedFooter != null) ...<Widget>[
-                          const SizedBox(height: AppSpacing.lg),
-                          resolvedFooter,
-                        ],
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
         );
       },
     );

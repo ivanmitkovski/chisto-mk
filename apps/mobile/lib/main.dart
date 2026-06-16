@@ -216,9 +216,9 @@ class _BootstrapErrorApp extends StatelessWidget {
                     textAlign: TextAlign.center,
                     color: AppColors.textPrimary,
                     styleBuilder: (TextTheme theme) =>
-                        AppTypography.sectionHeader(theme).copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
+                        AppTypography.sectionHeader(
+                          theme,
+                        ).copyWith(fontWeight: FontWeight.w700),
                   ),
                   const SizedBox(height: 8),
                   const AppText.meta(
@@ -519,31 +519,31 @@ class _ChistoAppState extends State<ChistoApp> {
           child: AnnotatedRegion<SystemUiOverlayStyle>(
             value: AppSystemUi.light,
             child: MaterialApp.router(
-            builder: (BuildContext context, Widget? child) {
-              final TextScaler scaler = MediaQuery.textScalerOf(
-                context,
-              ).clamp(maxScaleFactor: 1.6);
-              return MediaQuery(
-                data: MediaQuery.of(context).copyWith(textScaler: scaler),
-                child: child ?? const SizedBox.shrink(),
-              );
-            },
-            routerConfig: _router,
-            onGenerateTitle: (BuildContext context) =>
-                AppLocalizations.of(context)!.authOnboardingBrandName,
-            debugShowCheckedModeBanner: false,
-            theme: AppTheme.light,
-            locale: override,
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            localeListResolutionCallback:
-                (List<Locale>? locales, Iterable<Locale> _) {
-                  return resolveAppLocale(
-                    override: override,
-                    platformLocales: locales ?? <Locale>[],
-                  );
-                },
-          ),
+              builder: (BuildContext context, Widget? child) {
+                final TextScaler scaler = MediaQuery.textScalerOf(
+                  context,
+                ).clamp(maxScaleFactor: 1.6);
+                return MediaQuery(
+                  data: MediaQuery.of(context).copyWith(textScaler: scaler),
+                  child: child ?? const SizedBox.shrink(),
+                );
+              },
+              routerConfig: _router,
+              onGenerateTitle: (BuildContext context) =>
+                  AppLocalizations.of(context)!.authOnboardingBrandName,
+              debugShowCheckedModeBanner: false,
+              theme: AppTheme.light,
+              locale: override,
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              localeListResolutionCallback:
+                  (List<Locale>? locales, Iterable<Locale> _) {
+                    return resolveAppLocale(
+                      override: override,
+                      platformLocales: locales ?? <Locale>[],
+                    );
+                  },
+            ),
           ),
         );
       },

@@ -17,11 +17,7 @@ void main() {
     WidgetTester tester,
   ) async {
     final AuthState auth = AuthState()
-      ..setAuthenticated(
-        userId: 'u1',
-        displayName: 'Test',
-        accessToken: 'tok',
-      );
+      ..setAuthenticated(userId: 'u1', displayName: 'Test', accessToken: 'tok');
     final ReportsOwnerSocketStream transport = ReportsOwnerSocketStream(
       baseUrl: 'http://127.0.0.1:9',
       authState: auth,
@@ -55,11 +51,7 @@ void main() {
     WidgetTester tester,
   ) async {
     final AuthState auth = AuthState()
-      ..setAuthenticated(
-        userId: 'u1',
-        displayName: 'Test',
-        accessToken: 'tok',
-      );
+      ..setAuthenticated(userId: 'u1', displayName: 'Test', accessToken: 'tok');
     final ReportsOwnerSocketStream transport = ReportsOwnerSocketStream(
       baseUrl: 'http://127.0.0.1:9',
       authState: auth,

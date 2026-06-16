@@ -40,14 +40,13 @@ class _ProfilePointsHistoryRouteScreenState
       future: _userFuture,
       builder: (BuildContext context, AsyncSnapshot<ProfileUser?> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(child: AppLoadingIndicator()),
-          );
+          return const Scaffold(body: Center(child: AppLoadingIndicator()));
         }
         if (snapshot.hasError) {
           final Object err = snapshot.error!;
-          final AppError appError =
-              err is AppError ? err : AppError.unknown(cause: err);
+          final AppError appError = err is AppError
+              ? err
+              : AppError.unknown(cause: err);
           return Scaffold(
             body: AppErrorView(
               error: appError,

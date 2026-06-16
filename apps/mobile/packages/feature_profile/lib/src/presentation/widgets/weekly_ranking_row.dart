@@ -78,9 +78,7 @@ class WeeklyRankingRow extends StatelessWidget {
             UserAvatarCircle(
               displayName: entry.displayName,
               imageUrl: entry.avatarUrl,
-              seed: entry.userId.isNotEmpty
-                  ? entry.userId
-                  : entry.displayName,
+              seed: entry.userId.isNotEmpty ? entry.userId : entry.displayName,
               size: AppSpacing.radius18 * 2,
             ),
             const SizedBox(width: AppSpacing.sm),

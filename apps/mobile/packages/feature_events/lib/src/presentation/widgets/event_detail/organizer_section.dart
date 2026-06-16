@@ -34,7 +34,9 @@ class OrganizerSection extends StatelessWidget {
             children: <Widget>[
               UserAvatarCircle(
                 displayName: organizerLabel,
-                imageUrl: event.organizerIsDeleted ? null : event.organizerAvatarUrl,
+                imageUrl: event.organizerIsDeleted
+                    ? null
+                    : event.organizerAvatarUrl,
                 size: 64,
                 seed: event.organizerId,
               ),
@@ -101,7 +103,9 @@ class OrganizerSection extends StatelessWidget {
               children: <Widget>[
                 UserAvatarCircle(
                   displayName: organizerLabel,
-                  imageUrl: event.organizerIsDeleted ? null : event.organizerAvatarUrl,
+                  imageUrl: event.organizerIsDeleted
+                      ? null
+                      : event.organizerAvatarUrl,
                   size: 40,
                   seed: event.organizerId,
                 ),

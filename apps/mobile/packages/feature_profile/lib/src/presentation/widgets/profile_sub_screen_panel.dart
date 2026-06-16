@@ -38,10 +38,7 @@ class ProfileSubScreenPanel extends StatelessWidget {
         borderRadius: AppRadii.onlyTopSheet(),
         boxShadow: AppShadows.panel(Theme.of(context).colorScheme),
       ),
-      child: ClipRRect(
-        borderRadius: AppRadii.onlyTopSheet(),
-        child: child,
-      ),
+      child: ClipRRect(borderRadius: AppRadii.onlyTopSheet(), child: child),
     );
   }
 }

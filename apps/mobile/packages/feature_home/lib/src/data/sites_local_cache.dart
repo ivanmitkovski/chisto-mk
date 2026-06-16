@@ -177,8 +177,9 @@ class SitesLocalCache {
     await prefs.setString(mapPersistedCacheKey, jsonEncode(wrapper));
   }
 
-  Future<({Map<String, dynamic> payload, DateTime cachedAt})?>
-  loadMapSnapshot({required String authSegment}) async {
+  Future<({Map<String, dynamic> payload, DateTime cachedAt})?> loadMapSnapshot({
+    required String authSegment,
+  }) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? raw = prefs.getString(mapPersistedCacheKey);
     if (raw == null || raw.isEmpty) {
@@ -228,8 +229,9 @@ class SitesLocalCache {
     await prefs.setString(mapCorpusPersistedCacheKey, jsonEncode(wrapper));
   }
 
-  Future<({int filterKey, List<Map<String, dynamic>> sites})?>
-  loadMapCorpus({required String authSegment}) async {
+  Future<({int filterKey, List<Map<String, dynamic>> sites})?> loadMapCorpus({
+    required String authSegment,
+  }) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? raw = prefs.getString(mapCorpusPersistedCacheKey);
     if (raw == null || raw.isEmpty) {

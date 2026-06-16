@@ -286,11 +286,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen>
                     ).animate(
                       CurvedAnimation(
                         parent: _entranceController,
-                        curve: const Interval(
-                          0.15,
-                          1,
-                          curve: Curves.easeOut,
-                        ),
+                        curve: const Interval(0.15, 1, curve: Curves.easeOut),
                       ),
                     ),
                 child: AutofillGroup(
@@ -300,225 +296,195 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                                if (apiError != null) ...[
-                                  ApiErrorBanner(
-                                    message: apiError,
-                                    onDismiss: () => ref
-                                        .read(signUpControllerProvider.notifier)
-                                        .clearError(),
-                                  ),
-                                  const SizedBox(height: AppSpacing.md),
-                                ],
-                                AuthTextField(
-                                  key: _fullNameFieldKey,
-                                  label: l10n.authFieldFullName,
-                                  controller: _fullNameController,
-                                  focusNode: _fullNameFocus,
-                                  hintText: l10n.authFieldFullNameHint,
-                                  textCapitalization: TextCapitalization.words,
-                                  textInputAction: TextInputAction.next,
-                                  autofillHints: const <String>[
-                                    AutofillHints.name,
-                                  ],
-                                  onFieldSubmitted: (_) =>
-                                      _emailFocus.requestFocus(),
-                                  validator: (String? v) => validateIfVisible(
-                                    FormFieldIds.fullName,
-                                    () => AuthValidators.fullName(l10n, v),
-                                  ),
-                                ),
-                                const SizedBox(height: AppSpacing.sm),
-                                AuthTextField(
-                                  key: _emailFieldKey,
-                                  label: l10n.authFieldEmail,
-                                  controller: _emailController,
-                                  focusNode: _emailFocus,
-                                  hintText: l10n.authFieldEmailHint,
-                                  keyboardType: TextInputType.emailAddress,
-                                  textInputAction: TextInputAction.next,
-                                  autofillHints: const <String>[
-                                    AutofillHints.email,
-                                  ],
-                                  onFieldSubmitted: (_) =>
-                                      _phoneFocus.requestFocus(),
-                                  validator: (String? value) =>
-                                      validateIfVisible(
-                                        FormFieldIds.email,
-                                        () => AuthValidators.email(l10n, value),
-                                      ),
-                                  enableSuggestions: false,
-                                  autocorrect: false,
-                                ),
-                                const SizedBox(height: AppSpacing.sm),
-                                AuthTextField(
-                                  key: _phoneFieldKey,
-                                  label: l10n.authFieldPhoneNumber,
-                                  hintText: l10n.authFieldPhoneHint,
-                                  prefixFixedText: '+389',
-                                  controller: _phoneController,
-                                  focusNode: _phoneFocus,
-                                  keyboardType: TextInputType.phone,
-                                  textInputAction: TextInputAction.next,
-                                  autofillHints: const <String>[
-                                    AutofillHints.telephoneNumber,
-                                  ],
-                                  onFieldSubmitted: (_) =>
-                                      _passwordFocus.requestFocus(),
-                                  validator: (String? value) =>
-                                      validateIfVisible(
-                                        FormFieldIds.phone,
-                                        () => AuthValidators.macedonianPhone(
-                                          l10n,
-                                          value,
-                                        ),
-                                      ),
-                                  inputFormatters: const <TextInputFormatter>[
-                                    MacedonianPhoneFormatter(),
-                                  ],
-                                ),
-                                const SizedBox(height: AppSpacing.sm),
-                                AuthTextField(
-                                  key: _passwordFieldKey,
-                                  label: l10n.authFieldPassword,
-                                  controller: _passwordController,
-                                  focusNode: _passwordFocus,
-                                  hintText: l10n.authFieldPasswordHint,
-                                  obscureText: true,
-                                  textInputAction: TextInputAction.done,
-                                  keyboardType: TextInputType.visiblePassword,
-                                  validator: (String? value) =>
-                                      validateIfVisible(
-                                        FormFieldIds.password,
-                                        () => AuthValidators.password(
-                                          l10n,
-                                          value,
-                                        ),
-                                      ),
-                                  enableSuggestions: false,
-                                  autocorrect: false,
-                                  scrollPadding: EdgeInsets.only(
-                                    bottom: keyboardInset + 100,
-                                  ),
-                                  autofillHints: const <String>[
-                                    AutofillHints.newPassword,
-                                  ],
-                                  onFieldSubmitted: (_) => _handleSignUp(),
-                                ),
-                                PasswordStrengthIndicator(
-                                  strength: _passwordStrength,
-                                ),
-                                const SizedBox(height: AppSpacing.xs),
-                                Text(
-                                  l10n.authPasswordRequirementsHint,
-                                  style: AppTypography.cardSubtitle(textTheme),
-                                ),
-                                const SizedBox(height: AppSpacing.md),
-                                Semantics(
-                                  checked: _termsAccepted,
-                                  child: Material(
-                                    color: AppColors.transparent,
-                                    child: CheckboxListTile(
-                                      value: _termsAccepted,
-                                      onChanged: (bool? value) {
-                                        setState(
-                                          () => _termsAccepted = value ?? false,
-                                        );
-                                        markFieldTouched(FormFieldIds.terms);
-                                        if (hasActiveValidation) {
-                                          _formKey.currentState?.validate();
-                                        }
-                                      },
-                                      contentPadding: EdgeInsets.zero,
-                                      controlAffinity:
-                                          ListTileControlAffinity.leading,
-                                      title: RichText(
-                                        text: TextSpan(
-                                          style: AppTypography.authSubtitle(
+                        if (apiError != null) ...[
+                          ApiErrorBanner(
+                            message: apiError,
+                            onDismiss: () => ref
+                                .read(signUpControllerProvider.notifier)
+                                .clearError(),
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                        ],
+                        AuthTextField(
+                          key: _fullNameFieldKey,
+                          label: l10n.authFieldFullName,
+                          controller: _fullNameController,
+                          focusNode: _fullNameFocus,
+                          hintText: l10n.authFieldFullNameHint,
+                          textCapitalization: TextCapitalization.words,
+                          textInputAction: TextInputAction.next,
+                          autofillHints: const <String>[AutofillHints.name],
+                          onFieldSubmitted: (_) => _emailFocus.requestFocus(),
+                          validator: (String? v) => validateIfVisible(
+                            FormFieldIds.fullName,
+                            () => AuthValidators.fullName(l10n, v),
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        AuthTextField(
+                          key: _emailFieldKey,
+                          label: l10n.authFieldEmail,
+                          controller: _emailController,
+                          focusNode: _emailFocus,
+                          hintText: l10n.authFieldEmailHint,
+                          keyboardType: TextInputType.emailAddress,
+                          textInputAction: TextInputAction.next,
+                          autofillHints: const <String>[AutofillHints.email],
+                          onFieldSubmitted: (_) => _phoneFocus.requestFocus(),
+                          validator: (String? value) => validateIfVisible(
+                            FormFieldIds.email,
+                            () => AuthValidators.email(l10n, value),
+                          ),
+                          enableSuggestions: false,
+                          autocorrect: false,
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        AuthTextField(
+                          key: _phoneFieldKey,
+                          label: l10n.authFieldPhoneNumber,
+                          hintText: l10n.authFieldPhoneHint,
+                          prefixFixedText: '+389',
+                          controller: _phoneController,
+                          focusNode: _phoneFocus,
+                          keyboardType: TextInputType.phone,
+                          textInputAction: TextInputAction.next,
+                          autofillHints: const <String>[
+                            AutofillHints.telephoneNumber,
+                          ],
+                          onFieldSubmitted: (_) =>
+                              _passwordFocus.requestFocus(),
+                          validator: (String? value) => validateIfVisible(
+                            FormFieldIds.phone,
+                            () => AuthValidators.macedonianPhone(l10n, value),
+                          ),
+                          inputFormatters: const <TextInputFormatter>[
+                            MacedonianPhoneFormatter(),
+                          ],
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        AuthTextField(
+                          key: _passwordFieldKey,
+                          label: l10n.authFieldPassword,
+                          controller: _passwordController,
+                          focusNode: _passwordFocus,
+                          hintText: l10n.authFieldPasswordHint,
+                          obscureText: true,
+                          textInputAction: TextInputAction.done,
+                          keyboardType: TextInputType.visiblePassword,
+                          validator: (String? value) => validateIfVisible(
+                            FormFieldIds.password,
+                            () => AuthValidators.password(l10n, value),
+                          ),
+                          enableSuggestions: false,
+                          autocorrect: false,
+                          scrollPadding: EdgeInsets.only(
+                            bottom: keyboardInset + 100,
+                          ),
+                          autofillHints: const <String>[
+                            AutofillHints.newPassword,
+                          ],
+                          onFieldSubmitted: (_) => _handleSignUp(),
+                        ),
+                        PasswordStrengthIndicator(strength: _passwordStrength),
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          l10n.authPasswordRequirementsHint,
+                          style: AppTypography.cardSubtitle(textTheme),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        Semantics(
+                          checked: _termsAccepted,
+                          child: Material(
+                            color: AppColors.transparent,
+                            child: CheckboxListTile(
+                              value: _termsAccepted,
+                              onChanged: (bool? value) {
+                                setState(() => _termsAccepted = value ?? false);
+                                markFieldTouched(FormFieldIds.terms);
+                                if (hasActiveValidation) {
+                                  _formKey.currentState?.validate();
+                                }
+                              },
+                              contentPadding: EdgeInsets.zero,
+                              controlAffinity: ListTileControlAffinity.leading,
+                              title: RichText(
+                                text: TextSpan(
+                                  style: AppTypography.authSubtitle(textTheme),
+                                  children: <TextSpan>[
+                                    TextSpan(text: l10n.authTermsPrefix),
+                                    TextSpan(
+                                      text: l10n.authTermsLink,
+                                      style:
+                                          AppTypography.authTextLinkUnderline(
                                             textTheme,
                                           ),
-                                          children: <TextSpan>[
-                                            TextSpan(
-                                              text: l10n.authTermsPrefix,
-                                            ),
-                                            TextSpan(
-                                              text: l10n.authTermsLink,
-                                              style:
-                                                  AppTypography.authTextLinkUnderline(
-                                                    textTheme,
-                                                  ),
-                                              recognizer: TapGestureRecognizer()
-                                                ..onTap = () async {
-                                                  final Uri uri = Uri.parse(
-                                                    termsUrl,
-                                                  );
-                                                  if (await canLaunchUrl(uri)) {
-                                                    await launchUrl(
-                                                      uri,
-                                                      mode: LaunchMode
-                                                          .externalApplication,
-                                                    );
-                                                  }
-                                                },
-                                            ),
-                                          ],
-                                        ),
-                                      ),
+                                      recognizer: TapGestureRecognizer()
+                                        ..onTap = () async {
+                                          final Uri uri = Uri.parse(termsUrl);
+                                          if (await canLaunchUrl(uri)) {
+                                            await launchUrl(
+                                              uri,
+                                              mode: LaunchMode
+                                                  .externalApplication,
+                                            );
+                                          }
+                                        },
                                     ),
-                                  ),
+                                  ],
                                 ),
-                                if (shouldShowFieldError(FormFieldIds.terms))
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                      top: AppSpacing.xs,
-                                    ),
-                                    child: Text(
-                                      AuthValidators.termsAccepted(
-                                            l10n,
-                                            _termsAccepted,
-                                          ) ??
-                                          '',
-                                      style: AppTypography.cardSubtitle(
+                              ),
+                            ),
+                          ),
+                        ),
+                        if (shouldShowFieldError(FormFieldIds.terms))
+                          Padding(
+                            padding: const EdgeInsets.only(top: AppSpacing.xs),
+                            child: Text(
+                              AuthValidators.termsAccepted(
+                                    l10n,
+                                    _termsAccepted,
+                                  ) ??
+                                  '',
+                              style: AppTypography.cardSubtitle(
+                                textTheme,
+                              ).copyWith(color: AppColors.error),
+                            ),
+                          ),
+                        const SizedBox(height: AppSpacing.xl),
+                        Semantics(
+                          button: true,
+                          label: l10n.authSignUpCta,
+                          child: AppButton.primary(
+                            label: l10n.authSignUpCta,
+                            enabled: !isLoading,
+                            onPressed: isLoading ? null : _handleSignUp,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.xxl),
+                        Center(
+                          child: Semantics(
+                            button: true,
+                            label:
+                                '${l10n.authSignInPrompt}${l10n.authSignInLink}',
+                            child: GestureDetector(
+                              onTap: AppNavigation.goSignIn,
+                              child: RichText(
+                                text: TextSpan(
+                                  text: l10n.authSignInPrompt,
+                                  style: AppTypography.authSubtitle(textTheme),
+                                  children: [
+                                    TextSpan(
+                                      text: l10n.authSignInLink,
+                                      style: AppTypography.authTextLink(
                                         textTheme,
-                                      ).copyWith(color: AppColors.error),
-                                    ),
-                                  ),
-                                const SizedBox(height: AppSpacing.xl),
-                                Semantics(
-                                  button: true,
-                                  label: l10n.authSignUpCta,
-                                  child: AppButton.primary(
-                                    label: l10n.authSignUpCta,
-                                    enabled: !isLoading,
-                                    onPressed: isLoading ? null : _handleSignUp,
-                                  ),
-                                ),
-                                const SizedBox(height: AppSpacing.xxl),
-                                Center(
-                                  child: Semantics(
-                                    button: true,
-                                    label:
-                                        '${l10n.authSignInPrompt}${l10n.authSignInLink}',
-                                    child: GestureDetector(
-                                      onTap: AppNavigation.goSignIn,
-                                      child: RichText(
-                                        text: TextSpan(
-                                          text: l10n.authSignInPrompt,
-                                          style: AppTypography.authSubtitle(
-                                            textTheme,
-                                          ),
-                                          children: [
-                                            TextSpan(
-                                              text: l10n.authSignInLink,
-                                              style: AppTypography.authTextLink(
-                                                textTheme,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
                                       ),
                                     ),
-                                  ),
+                                  ],
                                 ),
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),

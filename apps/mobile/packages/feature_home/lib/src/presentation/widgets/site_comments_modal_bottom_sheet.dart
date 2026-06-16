@@ -36,11 +36,12 @@ Future<void> showPollutionSiteCommentsModalBottomSheet(
           DraggableScrollableController sheetController,
           AppSheetSizeConfig sizeConfig,
         ) {
-          final CommentsSheetSizeConfig commentsConfig = CommentsSheetSizeConfig(
-            minSize: sizeConfig.minSize,
-            maxSize: sizeConfig.maxSize,
-            snapSizes: sizeConfig.snapSizes,
-          );
+          final CommentsSheetSizeConfig commentsConfig =
+              CommentsSheetSizeConfig(
+                minSize: sizeConfig.minSize,
+                maxSize: sizeConfig.maxSize,
+                snapSizes: sizeConfig.snapSizes,
+              );
           return builder(
             sheetContext,
             scrollController,

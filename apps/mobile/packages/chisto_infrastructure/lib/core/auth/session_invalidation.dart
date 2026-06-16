@@ -30,12 +30,11 @@ abstract final class SessionInvalidation {
     if (inFlight != null) {
       return inFlight;
     }
-    final Future<void> started = readRoot(
-      authRepositoryProvider,
-    ).invalidateLocalSession(
-      observedEpoch: observedEpoch,
-      reason: SessionTeardownReason.forced,
-    );
+    final Future<void> started = readRoot(authRepositoryProvider)
+        .invalidateLocalSession(
+          observedEpoch: observedEpoch,
+          reason: SessionTeardownReason.forced,
+        );
     _inFlight = started;
     return started.whenComplete(() {
       if (identical(_inFlight, started)) {

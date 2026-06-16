@@ -67,7 +67,8 @@ class ReportsListScreen extends ConsumerStatefulWidget {
     BuildContext context,
     String siteId,
     ReportSheetViewModel report,
-  )? cleanupSectionBuilder;
+  )?
+  cleanupSectionBuilder;
 
   @override
   ConsumerState<ReportsListScreen> createState() => _ReportsListScreenState();
@@ -270,7 +271,8 @@ class _ReportsListScreenState extends ConsumerState<ReportsListScreen>
   }
 
   ReportListItem? _findListItemById(String id) {
-    for (final ReportListItem item in ref.read(reportsListControllerProvider).reports) {
+    for (final ReportListItem item
+        in ref.read(reportsListControllerProvider).reports) {
       if (item.id == id) {
         return item;
       }
@@ -303,7 +305,11 @@ class _ReportsListScreenState extends ConsumerState<ReportsListScreen>
           final ReportSheetViewModel display =
               ReportSheetViewModelMapper.fromDetail(detail, l10n);
           unawaited(
-            _prefetchCoordinator.warmDetail(reportId, detail.mediaUrls, context),
+            _prefetchCoordinator.warmDetail(
+              reportId,
+              detail.mediaUrls,
+              context,
+            ),
           );
           await _showReportDetailSheet(display);
           if (!mounted) return;
@@ -330,10 +336,7 @@ class _ReportsListScreenState extends ConsumerState<ReportsListScreen>
             context: context,
             error: error,
             onRetry: () => unawaited(
-              _openReportDetailResolved(
-                reportId: reportId,
-                listItem: listItem,
-              ),
+              _openReportDetailResolved(reportId: reportId, listItem: listItem),
             ),
           );
       }
@@ -369,18 +372,16 @@ class _ReportsListScreenState extends ConsumerState<ReportsListScreen>
       ),
       builder: (BuildContext sheetContext) {
         return ReportDetailSheet(
-                  report: report,
-                  isStaleFallback: isStaleFallback,
-                  reportsRealtimeService: ref.read(
-                    reportsRealtimeServiceProvider,
-                  ),
-                  reportsApiRepository: ref.read(reportsApiRepositoryProvider),
-                  reportDetailCache: ref.read(reportDetailCacheProvider),
-                  onShowSiteOnMap: widget.onShowSiteOnMap,
-                  onOpenLinkedPollutionSiteDetail:
-                      widget.onOpenLinkedPollutionSiteDetail,
-                  onMarkSiteAsCleaned: widget.onMarkSiteAsCleaned,
-                  cleanupSectionBuilder: widget.cleanupSectionBuilder,
+          report: report,
+          isStaleFallback: isStaleFallback,
+          reportsRealtimeService: ref.read(reportsRealtimeServiceProvider),
+          reportsApiRepository: ref.read(reportsApiRepositoryProvider),
+          reportDetailCache: ref.read(reportDetailCacheProvider),
+          onShowSiteOnMap: widget.onShowSiteOnMap,
+          onOpenLinkedPollutionSiteDetail:
+              widget.onOpenLinkedPollutionSiteDetail,
+          onMarkSiteAsCleaned: widget.onMarkSiteAsCleaned,
+          cleanupSectionBuilder: widget.cleanupSectionBuilder,
         );
       },
     );

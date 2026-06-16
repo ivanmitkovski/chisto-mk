@@ -275,11 +275,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
                     ).animate(
                       CurvedAnimation(
                         parent: _entranceController,
-                        curve: const Interval(
-                          0.15,
-                          1,
-                          curve: Curves.easeOut,
-                        ),
+                        curve: const Interval(0.15, 1, curve: Curves.easeOut),
                       ),
                     ),
                 child: AutofillGroup(
@@ -289,188 +285,177 @@ class _SignInScreenState extends ConsumerState<SignInScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: <Widget>[
-                                if (apiError != null) ...[
-                                  ApiErrorBanner(
-                                    message: apiError,
-                                    onDismiss: () {
-                                      ref
-                                          .read(
-                                            signInControllerProvider.notifier,
-                                          )
-                                          .clearError();
-                                    },
-                                  ),
-                                  const SizedBox(height: AppSpacing.md),
-                                ],
-                                AuthTextField(
-                                  key: _phoneFieldKey,
-                                  label: l10n.authFieldPhone,
-                                  hintText: l10n.authFieldPhoneHint,
-                                  prefixFixedText: '+389',
-                                  controller: _phoneController,
-                                  focusNode: _phoneFocus,
-                                  keyboardType: TextInputType.phone,
-                                  textInputAction: TextInputAction.next,
-                                  autofillHints: const <String>[
-                                    AutofillHints.telephoneNumber,
-                                    AutofillHints.username,
-                                  ],
-                                  onFieldSubmitted: (_) =>
-                                      _passwordFocus.requestFocus(),
-                                  validator: (String? v) => validateIfVisible(
-                                    FormFieldIds.phone,
-                                    () =>
-                                        AuthValidators.macedonianPhone(l10n, v),
-                                  ),
-                                  inputFormatters: const <TextInputFormatter>[
-                                    MacedonianPhoneFormatter(),
-                                  ],
+                        if (apiError != null) ...[
+                          ApiErrorBanner(
+                            message: apiError,
+                            onDismiss: () {
+                              ref
+                                  .read(signInControllerProvider.notifier)
+                                  .clearError();
+                            },
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                        ],
+                        AuthTextField(
+                          key: _phoneFieldKey,
+                          label: l10n.authFieldPhone,
+                          hintText: l10n.authFieldPhoneHint,
+                          prefixFixedText: '+389',
+                          controller: _phoneController,
+                          focusNode: _phoneFocus,
+                          keyboardType: TextInputType.phone,
+                          textInputAction: TextInputAction.next,
+                          autofillHints: const <String>[
+                            AutofillHints.telephoneNumber,
+                            AutofillHints.username,
+                          ],
+                          onFieldSubmitted: (_) =>
+                              _passwordFocus.requestFocus(),
+                          validator: (String? v) => validateIfVisible(
+                            FormFieldIds.phone,
+                            () => AuthValidators.macedonianPhone(l10n, v),
+                          ),
+                          inputFormatters: const <TextInputFormatter>[
+                            MacedonianPhoneFormatter(),
+                          ],
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        AuthTextField(
+                          key: _passwordFieldKey,
+                          label: l10n.authFieldPassword,
+                          controller: _passwordController,
+                          focusNode: _passwordFocus,
+                          hintText: l10n.authFieldPasswordHint,
+                          obscureText: true,
+                          keyboardType: TextInputType.visiblePassword,
+                          validator: (String? v) => validateIfVisible(
+                            FormFieldIds.password,
+                            () => AuthValidators.loginPassword(l10n, v),
+                          ),
+                          textInputAction: TextInputAction.done,
+                          autofillHints: const <String>[AutofillHints.password],
+                          enableSuggestions: false,
+                          autocorrect: false,
+                          onFieldSubmitted: (_) => _handleSignIn(),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        _RememberMeRow(
+                          l10n: l10n,
+                          value: signInState.rememberMe,
+                          onChanged: (bool v) {
+                            ref
+                                .read(signInControllerProvider.notifier)
+                                .setRememberMe(value: v);
+                          },
+                          onForgotPassword: _handleForgotPassword,
+                        ),
+                        const SizedBox(height: AppSpacing.lg),
+                        Semantics(
+                          button: true,
+                          label: l10n.authSignInCta,
+                          child: AppButton.primary(
+                            label: l10n.authSignInCta,
+                            enabled: !isLoading,
+                            onPressed: isLoading ? null : _handleSignIn,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.radius22),
+                        Center(
+                          child: Semantics(
+                            button: true,
+                            label:
+                                '${l10n.authSignUpPrompt}${l10n.authSignUpLink}',
+                            child: GestureDetector(
+                              onTap: _handleSignUp,
+                              behavior: HitTestBehavior.opaque,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: AppSpacing.sm,
+                                  vertical: AppSpacing.sm,
                                 ),
-                                const SizedBox(height: AppSpacing.md),
-                                AuthTextField(
-                                  key: _passwordFieldKey,
-                                  label: l10n.authFieldPassword,
-                                  controller: _passwordController,
-                                  focusNode: _passwordFocus,
-                                  hintText: l10n.authFieldPasswordHint,
-                                  obscureText: true,
-                                  keyboardType: TextInputType.visiblePassword,
-                                  validator: (String? v) => validateIfVisible(
-                                    FormFieldIds.password,
-                                    () => AuthValidators.loginPassword(l10n, v),
-                                  ),
-                                  textInputAction: TextInputAction.done,
-                                  autofillHints: const <String>[
-                                    AutofillHints.password,
-                                  ],
-                                  enableSuggestions: false,
-                                  autocorrect: false,
-                                  onFieldSubmitted: (_) => _handleSignIn(),
-                                ),
-                                const SizedBox(height: AppSpacing.md),
-                                _RememberMeRow(
-                                  l10n: l10n,
-                                  value: signInState.rememberMe,
-                                  onChanged: (bool v) {
-                                    ref
-                                        .read(signInControllerProvider.notifier)
-                                        .setRememberMe(value: v);
-                                  },
-                                  onForgotPassword: _handleForgotPassword,
-                                ),
-                                const SizedBox(height: AppSpacing.lg),
-                                Semantics(
-                                  button: true,
-                                  label: l10n.authSignInCta,
-                                  child: AppButton.primary(
-                                    label: l10n.authSignInCta,
-                                    enabled: !isLoading,
-                                    onPressed: isLoading ? null : _handleSignIn,
-                                  ),
-                                ),
-                                const SizedBox(height: AppSpacing.radius22),
-                                Center(
-                                  child: Semantics(
-                                    button: true,
-                                    label:
-                                        '${l10n.authSignUpPrompt}${l10n.authSignUpLink}',
-                                    child: GestureDetector(
-                                      onTap: _handleSignUp,
-                                      behavior: HitTestBehavior.opaque,
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: AppSpacing.sm,
-                                          vertical: AppSpacing.sm,
-                                        ),
-                                        child: RichText(
-                                          text: TextSpan(
-                                            text: l10n.authSignUpPrompt,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyMedium
-                                                ?.copyWith(
-                                                  color: AppColors.textMuted,
-                                                ),
-                                            children: <TextSpan>[
-                                              TextSpan(
-                                                text: l10n.authSignUpLink,
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .bodyMedium
-                                                    ?.copyWith(
-                                                      color:
-                                                          AppColors.primaryDark,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                    ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
+                                child: RichText(
+                                  text: TextSpan(
+                                    text: l10n.authSignUpPrompt,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(color: AppColors.textMuted),
+                                    children: <TextSpan>[
+                                      TextSpan(
+                                        text: l10n.authSignUpLink,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium
+                                            ?.copyWith(
+                                              color: AppColors.primaryDark,
+                                              fontWeight: FontWeight.w600,
+                                            ),
                                       ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        Builder(
+                          builder: (BuildContext context) {
+                            final Locale? override = ref.watch(
+                              appLocaleOverrideProvider,
+                            );
+                            final Locale effective = resolveAppLocale(
+                              override: override,
+                              platformLocales:
+                                  PlatformDispatcher.instance.locales,
+                            );
+                            final String languageLabel = _languageDisplayName(
+                              l10n,
+                              effective,
+                            );
+                            return Center(
+                              child: Semantics(
+                                button: true,
+                                label: l10n.profileLanguageTile,
+                                child: InkWell(
+                                  onTap: () {
+                                    showAppLanguagePicker(context);
+                                  },
+                                  borderRadius: BorderRadius.circular(
+                                    AppSpacing.radius14,
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: AppSpacing.sm,
+                                      vertical: AppSpacing.xs,
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: <Widget>[
+                                        const Icon(
+                                          Icons.language_rounded,
+                                          size: 22,
+                                          color: AppColors.primaryDark,
+                                        ),
+                                        const SizedBox(width: AppSpacing.xs),
+                                        Text(
+                                          languageLabel,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium
+                                              ?.copyWith(
+                                                color: AppColors.textMuted,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
-                                const SizedBox(height: AppSpacing.md),
-                                Builder(
-                                  builder: (BuildContext context) {
-                                    final Locale? override = ref.watch(
-                                      appLocaleOverrideProvider,
-                                    );
-                                    final Locale effective = resolveAppLocale(
-                                      override: override,
-                                      platformLocales:
-                                          PlatformDispatcher.instance.locales,
-                                    );
-                                    final String languageLabel =
-                                        _languageDisplayName(l10n, effective);
-                                    return Center(
-                                      child: Semantics(
-                                        button: true,
-                                        label: l10n.profileLanguageTile,
-                                        child: InkWell(
-                                          onTap: () {
-                                            showAppLanguagePicker(context);
-                                          },
-                                          borderRadius: BorderRadius.circular(
-                                            AppSpacing.radius14,
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: AppSpacing.sm,
-                                              vertical: AppSpacing.xs,
-                                            ),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: <Widget>[
-                                                const Icon(
-                                                  Icons.language_rounded,
-                                                  size: 22,
-                                                  color: AppColors.primaryDark,
-                                                ),
-                                                const SizedBox(
-                                                  width: AppSpacing.xs,
-                                                ),
-                                                Text(
-                                                  languageLabel,
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .bodyMedium
-                                                      ?.copyWith(
-                                                        color:
-                                                            AppColors.textMuted,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                      ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
+                              ),
+                            );
+                          },
+                        ),
                       ],
                     ),
                   ),

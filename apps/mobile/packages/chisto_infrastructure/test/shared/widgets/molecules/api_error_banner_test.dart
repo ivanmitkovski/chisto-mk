@@ -13,10 +13,7 @@ void main() {
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
-          body: ApiErrorBanner(
-            error: AppError.network(),
-            onRetry: () {},
-          ),
+          body: ApiErrorBanner(error: AppError.network(), onRetry: () {}),
         ),
       ),
     );

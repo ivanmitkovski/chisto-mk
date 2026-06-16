@@ -202,48 +202,47 @@ void main() {
     expect(find.byType(CreateEventSheet), findsNothing);
   });
 
-  testWidgets(
-    'CreateEventSheet deep link closes when toolkit is abandoned',
-    (WidgetTester tester) async {
-      await tester.pumpWidget(
-        wrapForWidgetTest(
-          MediaQuery(
-            data: const MediaQueryData(disableAnimations: true),
-            child: Builder(
-              builder: (BuildContext context) {
-                return Scaffold(
-                  body: Center(
-                    child: TextButton(
-                      onPressed: () {
-                        Navigator.of(context).push<void>(
-                          MaterialPageRoute<void>(
-                            builder: (_) => CreateEventSheet(
-                              clock: createEventSheetTestClock,
-                            ),
+  testWidgets('CreateEventSheet deep link closes when toolkit is abandoned', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      wrapForWidgetTest(
+        MediaQuery(
+          data: const MediaQueryData(disableAnimations: true),
+          child: Builder(
+            builder: (BuildContext context) {
+              return Scaffold(
+                body: Center(
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.of(context).push<void>(
+                        MaterialPageRoute<void>(
+                          builder: (_) => CreateEventSheet(
+                            clock: createEventSheetTestClock,
                           ),
-                        );
-                      },
-                      child: const Text('open-create-sheet'),
-                    ),
+                        ),
+                      );
+                    },
+                    child: const Text('open-create-sheet'),
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            },
           ),
         ),
-      );
-      await tester.tap(find.text('open-create-sheet'));
-      await tester.pump();
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 600));
+      ),
+    );
+    await tester.tap(find.text('open-create-sheet'));
+    await tester.pump();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 600));
 
-      expect(find.byType(OrganizerToolkitScreen), findsOneWidget);
+    expect(find.byType(OrganizerToolkitScreen), findsOneWidget);
 
-      await tester.tap(_toolkitBackButton());
-      await tester.pumpAndSettle();
+    await tester.tap(_toolkitBackButton());
+    await tester.pumpAndSettle();
 
-      expect(find.byType(OrganizerToolkitScreen), findsNothing);
-      expect(find.byType(CreateEventSheet), findsNothing);
-    },
-  );
+    expect(find.byType(OrganizerToolkitScreen), findsNothing);
+    expect(find.byType(CreateEventSheet), findsNothing);
+  });
 }

@@ -270,9 +270,7 @@ void main() {
     expect(find.byIcon(Icons.more_horiz_rounded), findsOneWidget);
   });
 
-  testWidgets('posts comment within max length optimistically', (
-    tester,
-  ) async {
+  testWidgets('posts comment within max length optimistically', (tester) async {
     final comments = <Comment>[];
     List<Comment>? latestComments;
     final String body = 'a' * 400;

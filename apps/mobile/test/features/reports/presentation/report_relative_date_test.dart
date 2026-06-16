@@ -21,24 +21,24 @@ void main() {
       reportRelativeDateLabel(l10n, date, locale: 'en', now: now);
 
   group('reportRelativeDateLabel', () {
-    test(
-      'report submitted yesterday is "Yesterday" even when < 24h elapsed '
-      '(regression for CH-000077 showing "Today")',
-      () {
-        // Jun 9 18:00 UTC viewed Jun 10 17:48 UTC: ~23h48m elapsed but a
-        // different calendar day -> must be Yesterday, not Today.
-        final String result = label(
-          DateTime.utc(2026, 6, 9, 18, 0),
-          DateTime.utc(2026, 6, 10, 17, 48),
-        );
-        expect(result, l10n.profilePointsHistoryDayYesterday);
-        expect(result, isNot(l10n.eventsDateRelativeToday));
-      },
-    );
+    test('report submitted yesterday is "Yesterday" even when < 24h elapsed '
+        '(regression for CH-000077 showing "Today")', () {
+      // Jun 9 18:00 UTC viewed Jun 10 17:48 UTC: ~23h48m elapsed but a
+      // different calendar day -> must be Yesterday, not Today.
+      final String result = label(
+        DateTime.utc(2026, 6, 9, 18, 0),
+        DateTime.utc(2026, 6, 10, 17, 48),
+      );
+      expect(result, l10n.profilePointsHistoryDayYesterday);
+      expect(result, isNot(l10n.eventsDateRelativeToday));
+    });
 
     test('same calendar day is "Today"', () {
       expect(
-        label(DateTime.utc(2026, 6, 10, 1, 0), DateTime.utc(2026, 6, 10, 23, 0)),
+        label(
+          DateTime.utc(2026, 6, 10, 1, 0),
+          DateTime.utc(2026, 6, 10, 23, 0),
+        ),
         l10n.eventsDateRelativeToday,
       );
     });
@@ -52,14 +52,20 @@ void main() {
 
     test('three calendar days ago uses days-ago copy', () {
       expect(
-        label(DateTime.utc(2026, 6, 7, 12, 0), DateTime.utc(2026, 6, 10, 12, 0)),
+        label(
+          DateTime.utc(2026, 6, 7, 12, 0),
+          DateTime.utc(2026, 6, 10, 12, 0),
+        ),
         l10n.eventsDateRelativeDaysAgo(3),
       );
     });
 
     test('nine days ago uses weeks-ago copy', () {
       expect(
-        label(DateTime.utc(2026, 6, 1, 12, 0), DateTime.utc(2026, 6, 10, 12, 0)),
+        label(
+          DateTime.utc(2026, 6, 1, 12, 0),
+          DateTime.utc(2026, 6, 10, 12, 0),
+        ),
         l10n.reportListDateWeeksAgo(1),
       );
     });
@@ -72,12 +78,18 @@ void main() {
       );
     });
 
-    test('future timestamp (clock skew) is "Today", never negative buckets', () {
-      expect(
-        label(DateTime.utc(2026, 6, 11, 12, 0), DateTime.utc(2026, 6, 10, 12, 0)),
-        l10n.eventsDateRelativeToday,
-      );
-    });
+    test(
+      'future timestamp (clock skew) is "Today", never negative buckets',
+      () {
+        expect(
+          label(
+            DateTime.utc(2026, 6, 11, 12, 0),
+            DateTime.utc(2026, 6, 10, 12, 0),
+          ),
+          l10n.eventsDateRelativeToday,
+        );
+      },
+    );
 
     test('local (non-UTC) timestamps compare by their own calendar day', () {
       final DateTime date = DateTime(2026, 6, 9, 18, 0);

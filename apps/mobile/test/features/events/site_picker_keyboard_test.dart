@@ -78,10 +78,7 @@ Widget _wrapSitePicker({
             );
           }
 
-          return Align(
-            alignment: Alignment.bottomCenter,
-            child: sheet,
-          );
+          return Align(alignment: Alignment.bottomCenter, child: sheet);
         },
       ),
     ),
@@ -153,48 +150,45 @@ void main() {
     );
   });
 
-  testWidgets('last site row can be scrolled into view with the keyboard open', (
-    WidgetTester tester,
-  ) async {
-    await tester.binding.setSurfaceSize(_surfaceSize);
-    tester.view.physicalSize = _surfaceSize;
-    tester.view.devicePixelRatio = 1.0;
-    tester.view.viewInsets = const FakeViewPadding(bottom: _keyboardInset);
-    addTearDown(() async {
-      await tester.binding.setSurfaceSize(null);
-      tester.view.resetPhysicalSize();
-      tester.view.resetDevicePixelRatio();
-      tester.view.resetViewInsets();
-    });
+  testWidgets(
+    'last site row can be scrolled into view with the keyboard open',
+    (WidgetTester tester) async {
+      await tester.binding.setSurfaceSize(_surfaceSize);
+      tester.view.physicalSize = _surfaceSize;
+      tester.view.devicePixelRatio = 1.0;
+      tester.view.viewInsets = const FakeViewPadding(bottom: _keyboardInset);
+      addTearDown(() async {
+        await tester.binding.setSurfaceSize(null);
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+        tester.view.resetViewInsets();
+      });
 
-    await tester.pumpWidget(
-      _wrapSitePicker(
-        sites: _testSites(),
-      ),
-    );
-    await tester.pumpAndSettle();
+      await tester.pumpWidget(_wrapSitePicker(sites: _testSites()));
+      await tester.pumpAndSettle();
 
-    final Finder lastRow = find.text('Testqa');
-    expect(lastRow, findsOneWidget);
+      final Finder lastRow = find.text('Testqa');
+      expect(lastRow, findsOneWidget);
 
-    // With the keyboard open the list reserves bottom padding equal to the
-    // inset, so the last row is never permanently hidden — it can be scrolled
-    // into the visible sheet area.
-    await tester.dragUntilVisible(
-      lastRow,
-      find.byType(Scrollable).last,
-      const Offset(0, -80),
-    );
-    await tester.pumpAndSettle();
+      // With the keyboard open the list reserves bottom padding equal to the
+      // inset, so the last row is never permanently hidden — it can be scrolled
+      // into the visible sheet area.
+      await tester.dragUntilVisible(
+        lastRow,
+        find.byType(Scrollable).last,
+        const Offset(0, -80),
+      );
+      await tester.pumpAndSettle();
 
-    expect(lastRow, findsOneWidget);
-    final Rect rowRect = tester.getRect(lastRow);
-    expect(
-      rowRect.bottom,
-      lessThanOrEqualTo(_surfaceSize.height),
-      reason: 'Last list row scrolls into the visible sheet area',
-    );
-  });
+      expect(lastRow, findsOneWidget);
+      final Rect rowRect = tester.getRect(lastRow);
+      expect(
+        rowRect.bottom,
+        lessThanOrEqualTo(_surfaceSize.height),
+        reason: 'Last list row scrolls into the visible sheet area',
+      );
+    },
+  );
 
   testWidgets('map tab collapses map while keyboard is open', (
     WidgetTester tester,
@@ -211,10 +205,7 @@ void main() {
     });
 
     await tester.pumpWidget(
-      _wrapSitePicker(
-        sites: _testSites(),
-        initialShowMapTab: true,
-      ),
+      _wrapSitePicker(sites: _testSites(), initialShowMapTab: true),
     );
     await tester.pumpAndSettle();
 
@@ -222,10 +213,7 @@ void main() {
 
     tester.view.viewInsets = const FakeViewPadding(bottom: _keyboardInset);
     await tester.pumpWidget(
-      _wrapSitePicker(
-        sites: _testSites(),
-        initialShowMapTab: true,
-      ),
+      _wrapSitePicker(sites: _testSites(), initialShowMapTab: true),
     );
     await tester.pumpAndSettle();
 

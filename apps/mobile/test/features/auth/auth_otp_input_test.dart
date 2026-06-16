@@ -38,7 +38,9 @@ void main() {
     );
   }
 
-  testWidgets('tap on overlay field requests focus', (WidgetTester tester) async {
+  testWidgets('tap on overlay field requests focus', (
+    WidgetTester tester,
+  ) async {
     final TextEditingController controller = TextEditingController();
     final FocusNode focusNode = FocusNode();
     addTearDown(controller.dispose);

@@ -161,10 +161,7 @@ void main() {
     field.controller!.text = 'x' * 2001;
     await tester.pumpAndSettle();
 
-    expect(
-      find.text('Details must be at most 2000 characters.'),
-      findsNothing,
-    );
+    expect(find.text('Details must be at most 2000 characters.'), findsNothing);
 
     await tester.ensureVisible(find.text('Submit report'));
     await tester.tap(find.text('Submit report'));
@@ -242,12 +239,14 @@ void main() {
 
     final double sheetBottom =
         sheetBox.localToGlobal(Offset.zero).dy + sheetBox.size.height;
-    final double submitBottom = submitButtonBox.localToGlobal(Offset.zero).dy +
+    final double submitBottom =
+        submitButtonBox.localToGlobal(Offset.zero).dy +
         submitButtonBox.size.height;
     expect(
       sheetBottom - submitBottom,
       lessThan(80),
-      reason: 'Sheet should hug content with only chrome + home-indicator inset',
+      reason:
+          'Sheet should hug content with only chrome + home-indicator inset',
     );
   });
 }

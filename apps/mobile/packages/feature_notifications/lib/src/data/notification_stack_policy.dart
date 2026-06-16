@@ -15,8 +15,7 @@ bool notificationUsesExternalGoNavigation({
   return switch (target) {
     NotificationOpenHomeMapFocus() ||
     NotificationOpenHomeTab() ||
-    NotificationOpenFeatureGuide() =>
-      true,
+    NotificationOpenFeatureGuide() => true,
     _ => false,
   };
 }
@@ -28,8 +27,7 @@ bool notificationUsesRootEntityPush(NotificationNavigationTarget target) {
     NotificationOpenSiteDetail() ||
     NotificationOpenEventDetail() ||
     NotificationOpenEventChat() ||
-    NotificationOpenProfileAchievements() =>
-      true,
+    NotificationOpenProfileAchievements() => true,
     _ => false,
   };
 }

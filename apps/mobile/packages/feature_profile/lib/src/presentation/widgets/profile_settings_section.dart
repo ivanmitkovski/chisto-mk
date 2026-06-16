@@ -104,7 +104,8 @@ class ProfileSettingsSection extends ConsumerWidget {
                   child: SettingsListTile(
                     leadingIcon: Icons.description_outlined,
                     title: context.l10n.profileTermsTile,
-                    onTap: () => ProfileActionsHandler.handleTerms(context, ref),
+                    onTap: () =>
+                        ProfileActionsHandler.handleTerms(context, ref),
                     showDividerBelow: true,
                   ),
                 ),
@@ -187,7 +188,8 @@ class ProfileSettingsSection extends ConsumerWidget {
                   child: SettingsListTile(
                     leadingIcon: Icons.logout_rounded,
                     title: context.l10n.profileSignOutTile,
-                    onTap: () => ProfileActionsHandler.handleLogout(context, ref),
+                    onTap: () =>
+                        ProfileActionsHandler.handleLogout(context, ref),
                     showTrailingChevron: false,
                     showDividerBelow: true,
                   ),

@@ -79,9 +79,9 @@ class _CleanupEvidenceGallerySectionState
     if (items.isEmpty) {
       return Text(
         l10n.cleanupEvidenceEmpty,
-        style: AppTypography.cardSubtitle(textTheme).copyWith(
-          color: AppColors.textMuted,
-        ),
+        style: AppTypography.cardSubtitle(
+          textTheme,
+        ).copyWith(color: AppColors.textMuted),
       );
     }
     final List<GalleryImageItem> galleryItems = items
@@ -89,8 +89,8 @@ class _CleanupEvidenceGallerySectionState
           (CleanupEvidenceItem item) => GalleryImageItem(
             image: NetworkImage(item.url),
             heroTag: 'cleanup-evidence-${item.id}',
-            semanticLabel: item.submitterDisplayLabel ??
-                l10n.cleanupEvidencePhotoSemantic,
+            semanticLabel:
+                item.submitterDisplayLabel ?? l10n.cleanupEvidencePhotoSemantic,
           ),
         )
         .toList(growable: false);
@@ -99,9 +99,9 @@ class _CleanupEvidenceGallerySectionState
       children: <Widget>[
         Text(
           l10n.cleanupEvidenceSectionTitle,
-          style: AppTypography.cardTitle(textTheme).copyWith(
-            fontWeight: FontWeight.w700,
-          ),
+          style: AppTypography.cardTitle(
+            textTheme,
+          ).copyWith(fontWeight: FontWeight.w700),
         ),
         const SizedBox(height: AppSpacing.sm),
         ImmersivePhotoGallery(

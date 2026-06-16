@@ -37,12 +37,11 @@ void main() {
                           closeSemanticLabel: ctx.l10n.commonClose,
                           options: EventGear.values
                               .map(
-                                (EventGear gear) =>
-                                    AppGroupedOption<EventGear>(
-                                      icon: gear.icon,
-                                      title: gear.localizedLabel(ctx.l10n),
-                                      value: gear,
-                                    ),
+                                (EventGear gear) => AppGroupedOption<EventGear>(
+                                  icon: gear.icon,
+                                  title: gear.localizedLabel(ctx.l10n),
+                                  value: gear,
+                                ),
                               )
                               .toList(growable: false),
                           isSelected: (EventGear gear) => false,

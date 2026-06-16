@@ -38,36 +38,43 @@ void main() {
     expect(r.sites.single.mediaUrls, <String>['https://cdn.example/hero.jpg']);
   });
 
-  test('feed list falls back to latestReportMediaUrls when heroMediaUrls empty', () {
-    final SitesListResult r = mapper.sitesListResultFromJson(
-      <String, dynamic>{
-        'data': <dynamic>[
-          <String, dynamic>{
-            'id': 's1',
-            'description': 'River bend',
-            'status': 'VERIFIED',
-            'reportCount': 2,
-            'latestReportTitle': 'Latest',
-            'latestReportDescription': '',
-            'upvotesCount': 5,
-            'commentsCount': 1,
-            'sharesCount': 0,
-            'latestReportMediaUrls': <String>['https://cdn.example/latest.jpg'],
-            'heroMediaUrls': <String>[],
-            'distanceKm': 2.5,
+  test(
+    'feed list falls back to latestReportMediaUrls when heroMediaUrls empty',
+    () {
+      final SitesListResult r = mapper.sitesListResultFromJson(
+        <String, dynamic>{
+          'data': <dynamic>[
+            <String, dynamic>{
+              'id': 's1',
+              'description': 'River bend',
+              'status': 'VERIFIED',
+              'reportCount': 2,
+              'latestReportTitle': 'Latest',
+              'latestReportDescription': '',
+              'upvotesCount': 5,
+              'commentsCount': 1,
+              'sharesCount': 0,
+              'latestReportMediaUrls': <String>[
+                'https://cdn.example/latest.jpg',
+              ],
+              'heroMediaUrls': <String>[],
+              'distanceKm': 2.5,
+            },
+          ],
+          'meta': <String, dynamic>{
+            'total': 1,
+            'page': 1,
+            'limit': 24,
+            'nextCursor': null,
           },
-        ],
-        'meta': <String, dynamic>{
-          'total': 1,
-          'page': 1,
-          'limit': 24,
-          'nextCursor': null,
         },
-      },
-      page: 1,
-      limit: 24,
-    );
+        page: 1,
+        limit: 24,
+      );
 
-    expect(r.sites.single.mediaUrls, <String>['https://cdn.example/latest.jpg']);
-  });
+      expect(r.sites.single.mediaUrls, <String>[
+        'https://cdn.example/latest.jpg',
+      ]);
+    },
+  );
 }

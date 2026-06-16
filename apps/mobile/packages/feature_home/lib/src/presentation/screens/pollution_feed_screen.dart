@@ -164,10 +164,7 @@ class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
     final AppError? error = ref.read(
       feedSitesNotifierProvider.select((FeedSitesState s) => s.loadMoreError),
     );
-    AppSnack.failure(
-      context,
-      error: error ?? AppError.unknown(),
-    );
+    AppSnack.failure(context, error: error ?? AppError.unknown());
   }
 
   /// Shared by [AppRefreshIndicator], empty state retry, and any future triggers.
@@ -203,8 +200,9 @@ class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
 
   Future<void> _openNotifications() async {
     final List<PollutionSite> availableSites = _ensureSitesSeeded(ref);
-    final int? unreadAfter =
-        await AppNavigation.pushNotifications(availableSites: availableSites);
+    final int? unreadAfter = await AppNavigation.pushNotifications(
+      availableSites: availableSites,
+    );
     if (!mounted) return;
     final int resolvedUnread =
         unreadAfter ?? ref.read(notificationsUnreadCountProvider);

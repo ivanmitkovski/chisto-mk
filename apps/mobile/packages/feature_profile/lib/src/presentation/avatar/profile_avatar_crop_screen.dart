@@ -294,9 +294,7 @@ class _ProfileAvatarCropScreenState extends State<ProfileAvatarCropScreen> {
                         switchOutCurve: AppMotion.standardCurve,
                         child: canAct
                             ? Padding(
-                                key: const ValueKey<String>(
-                                  'avatar_crop_hint',
-                                ),
+                                key: const ValueKey<String>('avatar_crop_hint'),
                                 padding: const EdgeInsets.only(
                                   top: AppSpacing.xxs,
                                 ),
@@ -316,9 +314,7 @@ class _ProfileAvatarCropScreenState extends State<ProfileAvatarCropScreen> {
                                 ),
                               )
                             : const SizedBox(
-                                key: ValueKey<String>(
-                                  'avatar_crop_no_hint',
-                                ),
+                                key: ValueKey<String>('avatar_crop_no_hint'),
                                 height: 0,
                               ),
                       ),

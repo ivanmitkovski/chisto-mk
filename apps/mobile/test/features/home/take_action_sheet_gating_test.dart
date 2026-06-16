@@ -14,21 +14,27 @@ Widget _wrap(Widget child) {
 }
 
 void main() {
-  testWidgets('hides the create-eco-action tile when canCreateEcoAction is false', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpWidget(_wrap(const TakeActionSheet(canCreateEcoAction: false)));
-    await tester.pumpAndSettle();
-    // Only Join + Share remain.
-    expect(find.byType(AppActionTile), findsNWidgets(2));
-  });
+  testWidgets(
+    'hides the create-eco-action tile when canCreateEcoAction is false',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _wrap(const TakeActionSheet(canCreateEcoAction: false)),
+      );
+      await tester.pumpAndSettle();
+      // Only Join + Share remain.
+      expect(find.byType(AppActionTile), findsNWidgets(2));
+    },
+  );
 
-  testWidgets('shows the create-eco-action tile when canCreateEcoAction is true', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpWidget(_wrap(const TakeActionSheet(canCreateEcoAction: true)));
-    await tester.pumpAndSettle();
-    // Create + Join + Share.
-    expect(find.byType(AppActionTile), findsNWidgets(3));
-  });
+  testWidgets(
+    'shows the create-eco-action tile when canCreateEcoAction is true',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _wrap(const TakeActionSheet(canCreateEcoAction: true)),
+      );
+      await tester.pumpAndSettle();
+      // Create + Join + Share.
+      expect(find.byType(AppActionTile), findsNWidgets(3));
+    },
+  );
 }

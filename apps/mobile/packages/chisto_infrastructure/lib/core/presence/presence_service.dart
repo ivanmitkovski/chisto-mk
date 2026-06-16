@@ -148,9 +148,13 @@ class PresenceService {
 
   void _scheduleBackoff() {
     if (_backoff >= maxBackoff) return;
-    final int baseMs = _backoff.inMilliseconds == 0 ? 1000 : _backoff.inMilliseconds * 2;
+    final int baseMs = _backoff.inMilliseconds == 0
+        ? 1000
+        : _backoff.inMilliseconds * 2;
     final int jitter = _random.nextInt(500);
-    _backoff = Duration(milliseconds: min(baseMs + jitter, maxBackoff.inMilliseconds));
+    _backoff = Duration(
+      milliseconds: min(baseMs + jitter, maxBackoff.inMilliseconds),
+    );
   }
 }
 

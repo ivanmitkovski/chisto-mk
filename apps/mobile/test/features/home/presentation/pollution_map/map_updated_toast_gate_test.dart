@@ -127,7 +127,9 @@ void main() {
             lastSuccessfulSyncAt: tSyncBefore,
           ),
           next: _state(lastSuccessfulSyncAt: tSyncAfter),
-          syncNoticeVisibleSince: t1.subtract(const Duration(milliseconds: 500)),
+          syncNoticeVisibleSince: t1.subtract(
+            const Duration(milliseconds: 500),
+          ),
           lastMapUpdatedToastAt: null,
           isMapTabActive: true,
           isMapTabTickerEnabled: true,
@@ -206,25 +208,28 @@ void main() {
       );
     });
 
-    test('suppresses when next still has notice or load error or empty sites', () {
-      expect(
-        shouldShowMapUpdatedToast(
-          previous: _state(
-            syncNotice: const MapSyncInlineNotice.liveUpdatesDelayed(),
-            lastSuccessfulSyncAt: tSyncBefore,
+    test(
+      'suppresses when next still has notice or load error or empty sites',
+      () {
+        expect(
+          shouldShowMapUpdatedToast(
+            previous: _state(
+              syncNotice: const MapSyncInlineNotice.liveUpdatesDelayed(),
+              lastSuccessfulSyncAt: tSyncBefore,
+            ),
+            next: _state(
+              syncNotice: const MapSyncInlineNotice.liveUpdatesDelayed(),
+              lastSuccessfulSyncAt: tSyncAfter,
+            ),
+            syncNoticeVisibleSince: t0,
+            lastMapUpdatedToastAt: null,
+            isMapTabActive: true,
+            isMapTabTickerEnabled: true,
+            now: t1,
           ),
-          next: _state(
-            syncNotice: const MapSyncInlineNotice.liveUpdatesDelayed(),
-            lastSuccessfulSyncAt: tSyncAfter,
-          ),
-          syncNoticeVisibleSince: t0,
-          lastMapUpdatedToastAt: null,
-          isMapTabActive: true,
-          isMapTabTickerEnabled: true,
-          now: t1,
-        ),
-        isFalse,
-      );
-    });
+          isFalse,
+        );
+      },
+    );
   });
 }

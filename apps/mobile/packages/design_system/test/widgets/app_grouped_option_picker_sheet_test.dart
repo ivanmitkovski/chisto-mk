@@ -91,14 +91,15 @@ void main() {
     final RenderBox lastOptionBox = tester.renderObject<RenderBox>(
       find.text('Other'),
     );
-    final double sheetBottom = sheetBox.localToGlobal(Offset.zero).dy +
-        sheetBox.size.height;
-    final double lastOptionBottom = lastOptionBox.localToGlobal(Offset.zero).dy +
-        lastOptionBox.size.height;
+    final double sheetBottom =
+        sheetBox.localToGlobal(Offset.zero).dy + sheetBox.size.height;
+    final double lastOptionBottom =
+        lastOptionBox.localToGlobal(Offset.zero).dy + lastOptionBox.size.height;
     expect(
       sheetBottom - lastOptionBottom,
       lessThan(80),
-      reason: 'Sheet should hug content with only chrome + home-indicator inset',
+      reason:
+          'Sheet should hug content with only chrome + home-indicator inset',
     );
     expect(
       sheetBox.localToGlobal(Offset.zero).dy,

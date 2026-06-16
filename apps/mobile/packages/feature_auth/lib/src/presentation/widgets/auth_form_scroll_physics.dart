@@ -10,7 +10,8 @@ abstract final class AuthFormScrollPhysics {
   static ScrollPhysics resolve(BuildContext context) {
     final bool keyboardVisible = MediaQuery.viewInsetsOf(context).bottom > 0;
     final ScrollPhysics platform = switch (Theme.of(context).platform) {
-      TargetPlatform.iOS || TargetPlatform.macOS => const BouncingScrollPhysics(),
+      TargetPlatform.iOS ||
+      TargetPlatform.macOS => const BouncingScrollPhysics(),
       _ => const ClampingScrollPhysics(),
     };
     if (keyboardVisible) {

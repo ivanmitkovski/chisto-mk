@@ -72,8 +72,9 @@ class SitesJsonMapper {
     return <String, dynamic>{
       'id': s.id,
       'description': s.description,
-      'latestReportTitle':
-          isApiDefaultPollutionSiteTitle(s.title) ? '' : s.title,
+      'latestReportTitle': isApiDefaultPollutionSiteTitle(s.title)
+          ? ''
+          : s.title,
       'latestReportDescription': s.description,
       'address': s.address,
       'status': s.statusCode ?? s.statusLabel,
@@ -139,9 +140,9 @@ class SitesJsonMapper {
     );
     final SiteResolutionViewerStatus viewerResolutionStatus =
         siteResolutionViewerStatusFromApi(
-      json['viewerResolutionStatus'] as String? ??
-          json['viewer_resolution_status'] as String?,
-    );
+          json['viewerResolutionStatus'] as String? ??
+              json['viewer_resolution_status'] as String?,
+        );
     final double? lat = (json['latitude'] as num?)?.toDouble();
     final double? lng = (json['longitude'] as num?)?.toDouble();
     final List<dynamic> heroMediaJson =
@@ -258,11 +259,10 @@ class SitesJsonMapper {
         reporterJson,
       );
       final bool reporterIsDeleted = sitesApiReporterIsDeleted(reporterJson);
-      final String? reporterAvatarUrl =
-          reporterIsDeleted
-              ? null
-              : reporterJson?['avatarUrl'] as String? ??
-                  reporterJson?['avatar_url'] as String?;
+      final String? reporterAvatarUrl = reporterIsDeleted
+          ? null
+          : reporterJson?['avatarUrl'] as String? ??
+                reporterJson?['avatar_url'] as String?;
       final String reportTitle = (earliest['title'] as String?)?.trim() ?? '';
       final String bodyTrim =
           (earliest['description'] as String?)?.trim() ?? '';
@@ -283,12 +283,7 @@ class SitesJsonMapper {
       );
       final Map<
         String,
-        ({
-          String name,
-          DateTime? reportedAt,
-          String? avatarUrl,
-          bool isDeleted,
-        })
+        ({String name, DateTime? reportedAt, String? avatarUrl, bool isDeleted})
       >
       coByUserId =
           <
@@ -314,12 +309,11 @@ class SitesJsonMapper {
           final Map<String, dynamic>? user = sitesApiCoReporterRowUser(co);
           final DateTime? reportedAt = sitesApiCoReporterRowReportedAt(co);
           final Object? avRaw = user?['avatarUrl'] ?? user?['avatar_url'];
-          final String? avatarUrl =
-              isDeleted
-                  ? null
-                  : avRaw is String && avRaw.trim().isNotEmpty
-                  ? avRaw.trim()
-                  : null;
+          final String? avatarUrl = isDeleted
+              ? null
+              : avRaw is String && avRaw.trim().isNotEmpty
+              ? avRaw.trim()
+              : null;
           final ({
             String name,
             DateTime? reportedAt,
@@ -507,9 +501,9 @@ class SitesJsonMapper {
     );
     final SiteResolutionViewerStatus viewerResolutionStatus =
         siteResolutionViewerStatusFromApi(
-      root['viewerResolutionStatus'] as String? ??
-          root['viewer_resolution_status'] as String?,
-    );
+          root['viewerResolutionStatus'] as String? ??
+              root['viewer_resolution_status'] as String?,
+        );
 
     int totalParticipants = 0;
     final List<CleaningEvent> cleaningEvents = <CleaningEvent>[];
@@ -538,8 +532,9 @@ class SitesJsonMapper {
     final double? lat = (root['latitude'] as num?)?.toDouble();
     final double? lng = (root['longitude'] as num?)?.toDouble();
     final String? addressRaw = root['address'] as String?;
-    final String? address =
-        addressRaw?.trim().isNotEmpty == true ? addressRaw!.trim() : null;
+    final String? address = addressRaw?.trim().isNotEmpty == true
+        ? addressRaw!.trim()
+        : null;
     int mergedDuplicateChildCountTotal =
         (root['mergedDuplicateChildCountTotal'] as num?)?.toInt() ??
         (root['merged_duplicate_child_count_total'] as num?)?.toInt() ??
@@ -690,7 +685,9 @@ class SitesJsonMapper {
     final String trimmedAddr = addr?.trim() ?? '';
     final String title = trimmedAddr.isNotEmpty
         ? trimmedAddr
-        : (desc.trim().isNotEmpty ? desc.trim() : kApiDefaultPollutionSiteTitle);
+        : (desc.trim().isNotEmpty
+              ? desc.trim()
+              : kApiDefaultPollutionSiteTitle);
     final String statusStr = json['status'] as String? ?? 'REPORTED';
     final String statusCode = statusStr.toUpperCase();
     final (String statusLabel, Color statusColor) = siteStatusToLabelAndColor(

@@ -51,14 +51,7 @@ void main() {
     test('rejects GIF even when extension is .jpg', () {
       expect(
         detectReportUploadImageKind(
-          Uint8List.fromList(<int>[
-            0x47,
-            0x49,
-            0x46,
-            0x38,
-            0x39,
-            0x61,
-          ]),
+          Uint8List.fromList(<int>[0x47, 0x49, 0x46, 0x38, 0x39, 0x61]),
         ),
         ReportUploadImageKind.unsupported,
       );
@@ -85,35 +78,52 @@ void main() {
     }
 
     test('accepts JPEG file', () async {
-      final XFile file = await writeBytes(
-        'photo.jpg',
-        <int>[0xff, 0xd8, 0xff, 0xdb, 0x00],
-      );
+      final XFile file = await writeBytes('photo.jpg', <int>[
+        0xff,
+        0xd8,
+        0xff,
+        0xdb,
+        0x00,
+      ]);
       final ReportUploadImageValidation validation =
           await validateReportUploadImage(file);
       expect(validation.isSupported, isTrue);
     });
 
     test('rejects GIF file', () async {
-      final XFile file = await writeBytes(
-        'photo.gif',
-        <int>[0x47, 0x49, 0x46, 0x38, 0x39, 0x61, 0x00],
-      );
+      final XFile file = await writeBytes('photo.gif', <int>[
+        0x47,
+        0x49,
+        0x46,
+        0x38,
+        0x39,
+        0x61,
+        0x00,
+      ]);
       final ReportUploadImageValidation validation =
           await validateReportUploadImage(file);
       expect(validation.isSupported, isFalse);
-      expect(validation.rejection, ReportUploadImageRejection.unsupportedFormat);
+      expect(
+        validation.rejection,
+        ReportUploadImageRejection.unsupportedFormat,
+      );
     });
 
     test('partitionReportUploadImages counts unsupported picks', () async {
-      final XFile jpeg = await writeBytes(
-        'ok.jpg',
-        <int>[0xff, 0xd8, 0xff, 0xdb],
-      );
-      final XFile gif = await writeBytes(
-        'bad.gif',
-        <int>[0x47, 0x49, 0x46, 0x38, 0x39, 0x61],
-      );
+      final XFile jpeg = await writeBytes('ok.jpg', <int>[
+        0xff,
+        0xd8,
+        0xff,
+        0xdb,
+      ]);
+      final XFile gif = await writeBytes('bad.gif', <int>[
+        0x47,
+        0x49,
+        0x46,
+        0x38,
+        0x39,
+        0x61,
+      ]);
       final ({List<XFile> supported, int unsupportedCount}) partitioned =
           await partitionReportUploadImages(<XFile>[jpeg, gif]);
       expect(partitioned.supported, <XFile>[jpeg]);

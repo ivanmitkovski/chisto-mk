@@ -105,8 +105,8 @@ class AppNavigation {
   /// Opens the signed-in user's points & level history on the root stack.
   static Future<bool> pushProfilePointsHistory() async {
     try {
-      final ProfileUser user =
-          await AppBootstrap.instance.profileRepository.getMe();
+      final ProfileUser user = await AppBootstrap.instance.profileRepository
+          .getMe();
       await _router.push<void>(
         AppRoutes.profilePointsHistory,
         extra: ProfilePointsHistoryRouteExtra(summaryUser: user),

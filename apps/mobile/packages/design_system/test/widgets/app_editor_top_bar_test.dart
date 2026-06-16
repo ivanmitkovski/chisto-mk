@@ -22,7 +22,10 @@ void main() {
               onLeadingPressed: () {},
               trailingLabel: doneLabel,
               onTrailingPressed: () {},
-              center: const Text('Помести и размери', textAlign: TextAlign.center),
+              center: const Text(
+                'Помести и размери',
+                textAlign: TextAlign.center,
+              ),
             ),
           ),
         ),
@@ -83,10 +86,7 @@ void main() {
         theme: AppTheme.light,
         home: Scaffold(
           body: Center(
-            child: AppButton.text(
-              label: label,
-              onPressed: () {},
-            ),
+            child: AppButton.text(label: label, onPressed: () {}),
           ),
         ),
       ),

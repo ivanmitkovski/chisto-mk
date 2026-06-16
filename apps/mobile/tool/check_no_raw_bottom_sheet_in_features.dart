@@ -4,9 +4,7 @@ import 'dart:io';
 import 'feature_roots_guard_util.dart';
 import 'design_system_guard_util.dart';
 
-const List<String> _skip = <String>[
-  'site_comments_modal_bottom_sheet.dart',
-];
+const List<String> _skip = <String>['site_comments_modal_bottom_sheet.dart'];
 
 bool _matches(String line) {
   return line.contains('showModalBottomSheet(') ||

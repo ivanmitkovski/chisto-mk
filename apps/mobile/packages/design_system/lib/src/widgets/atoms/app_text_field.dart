@@ -86,11 +86,7 @@ class AppTextField extends StatelessWidget {
       ),
     );
     final Widget wrappedField = errorText != null && errorText!.isNotEmpty
-        ? Semantics(
-            label: label,
-            hint: errorText,
-            child: field,
-          )
+        ? Semantics(label: label, hint: errorText, child: field)
         : field;
     if (label == null) {
       return wrappedField;

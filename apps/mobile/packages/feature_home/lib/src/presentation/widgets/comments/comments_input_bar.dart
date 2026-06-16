@@ -195,13 +195,13 @@ class CommentsInputBar extends StatelessWidget {
                   minLines: 1,
                   maxLines: 4,
                   maxLength: CommentInputValidator.maxBodyLength,
-                  buildCounter: (
-                    BuildContext context, {
-                    required int currentLength,
-                    required int? maxLength,
-                    required bool isFocused,
-                  }) =>
-                      null,
+                  buildCounter:
+                      (
+                        BuildContext context, {
+                        required int currentLength,
+                        required int? maxLength,
+                        required bool isFocused,
+                      }) => null,
                   textCapitalization: TextCapitalization.sentences,
                   textInputAction: TextInputAction.send,
                   onChanged: onTextChanged,
@@ -286,10 +286,7 @@ class CommentsInputBar extends StatelessWidget {
       // Keep this wrapper mounted even while the keyboard is closed: toggling
       // it mid IME animation re-parents (remounts) the focused TextField,
       // which closes the input connection and dismisses the keyboard.
-      bar = Transform.translate(
-        offset: Offset(0, -keyboardInset),
-        child: bar,
-      );
+      bar = Transform.translate(offset: Offset(0, -keyboardInset), child: bar);
     }
 
     return bar;

@@ -52,17 +52,16 @@ void main() {
       tester.view.resetViewInsets();
     });
 
-    Future<double> sheetHeight({
-      required SheetKeyboardInsetMode mode,
-    }) async {
+    Future<double> sheetHeight({required SheetKeyboardInsetMode mode}) async {
       await tester.pumpWidget(
         wrapForWidgetTest(
           MediaQuery(
             data: const MediaQueryData(size: surfaceSize),
             child: Builder(
               builder: (BuildContext context) {
-                final MediaQueryData viewMq =
-                    MediaQueryData.fromView(View.of(context));
+                final MediaQueryData viewMq = MediaQueryData.fromView(
+                  View.of(context),
+                );
                 Widget sheet = wrapScrollControlledBottomSheet(
                   context: context,
                   keyboardInsetMode: mode,
@@ -84,10 +83,7 @@ void main() {
                     child: sheet,
                   );
                 }
-                return Align(
-                  alignment: Alignment.bottomCenter,
-                  child: sheet,
-                );
+                return Align(alignment: Alignment.bottomCenter, child: sheet);
               },
             ),
           ),
@@ -139,8 +135,9 @@ void main() {
           data: const MediaQueryData(size: surfaceSize),
           child: Builder(
             builder: (BuildContext context) {
-              final MediaQueryData viewMq =
-                  MediaQueryData.fromView(View.of(context));
+              final MediaQueryData viewMq = MediaQueryData.fromView(
+                View.of(context),
+              );
               Widget sheet = wrapScrollControlledBottomSheet(
                 context: context,
                 keyboardInsetMode: SheetKeyboardInsetMode.overlay,
@@ -160,10 +157,7 @@ void main() {
                 removeBottom: true,
                 child: sheet,
               );
-              return Align(
-                alignment: Alignment.bottomCenter,
-                child: sheet,
-              );
+              return Align(alignment: Alignment.bottomCenter, child: sheet);
             },
           ),
         ),

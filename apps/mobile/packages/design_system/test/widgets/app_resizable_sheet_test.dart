@@ -17,10 +17,7 @@ void main() {
   });
 
   group('resolveAppSheetDragEnd', () {
-    AppSheetDragEndResult resolve({
-      required double size,
-      double? velocity,
-    }) {
+    AppSheetDragEndResult resolve({required double size, double? velocity}) {
       return resolveAppSheetDragEnd(
         size: size,
         velocity: velocity,

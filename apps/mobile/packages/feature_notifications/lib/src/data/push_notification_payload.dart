@@ -125,10 +125,7 @@ class PushNotificationPayload {
     }
     final String trimmed = raw.trim();
     if (notificationOpenPayloadLooksLikeEventId(trimmed)) {
-      return <String, dynamic>{
-        'type': 'CLEANUP_EVENT',
-        'eventId': trimmed,
-      };
+      return <String, dynamic>{'type': 'CLEANUP_EVENT', 'eventId': trimmed};
     }
     return null;
   }

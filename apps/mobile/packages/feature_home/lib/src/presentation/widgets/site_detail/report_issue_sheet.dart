@@ -134,43 +134,43 @@ class _ReportIssueSheetState extends ConsumerState<ReportIssueSheet> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-            ...SiteReportReason.values.map(
-              (SiteReportReason reason) => _ReasonTile(
-                reason: reason,
-                isSelected: _selectedReason == reason,
-                onTap: () {
-                  setState(() => _selectedReason = reason);
-                },
+              ...SiteReportReason.values.map(
+                (SiteReportReason reason) => _ReasonTile(
+                  reason: reason,
+                  isSelected: _selectedReason == reason,
+                  onTap: () {
+                    setState(() => _selectedReason = reason);
+                  },
+                ),
               ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              context.l10n.reportIssueDetailsLabel,
-              style: AppTypographySurfaces.homeReportIssueLabel(
-                Theme.of(context).textTheme,
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                context.l10n.reportIssueDetailsLabel,
+                style: AppTypographySurfaces.homeReportIssueLabel(
+                  Theme.of(context).textTheme,
+                ),
               ),
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            AppTextField(
-              controller: _detailsController,
-              hintText: context.l10n.reportIssueDetailsHint,
-              onChanged: (_) => setState(() {}),
-              maxLength: 500,
-              maxLines: 3,
-              minLines: 2,
-              textInputAction: TextInputAction.done,
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            PrimaryButton(
-              label: _isSubmitting
-                  ? context.l10n.reportIssueSubmitting
-                  : context.l10n.reportIssueSubmit,
-              enabled: _canSubmit && !_isSubmitting,
-              onPressed: _handleSubmit,
-            ),
-          ],
+              const SizedBox(height: AppSpacing.xs),
+              AppTextField(
+                controller: _detailsController,
+                hintText: context.l10n.reportIssueDetailsHint,
+                onChanged: (_) => setState(() {}),
+                maxLength: 500,
+                maxLines: 3,
+                minLines: 2,
+                textInputAction: TextInputAction.done,
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              PrimaryButton(
+                label: _isSubmitting
+                    ? context.l10n.reportIssueSubmitting
+                    : context.l10n.reportIssueSubmit,
+                enabled: _canSubmit && !_isSubmitting,
+                onPressed: _handleSubmit,
+              ),
+            ],
+          ),
         ),
-      ),
       ),
     );
   }

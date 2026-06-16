@@ -5,10 +5,7 @@ import 'dart:typed_data';
 import 'package:image_picker/image_picker.dart';
 
 /// Why a picked file cannot be used as report/event evidence.
-enum ReportUploadImageRejection {
-  missingOrEmpty,
-  unsupportedFormat,
-}
+enum ReportUploadImageRejection { missingOrEmpty, unsupportedFormat }
 
 /// Result of validating a local image before preview, draft import, or upload prep.
 class ReportUploadImageValidation {
@@ -17,8 +14,7 @@ class ReportUploadImageValidation {
     this.rejection,
   });
 
-  const ReportUploadImageValidation.supported()
-    : this._(isSupported: true);
+  const ReportUploadImageValidation.supported() : this._(isSupported: true);
 
   const ReportUploadImageValidation.rejected(ReportUploadImageRejection reason)
     : this._(isSupported: false, rejection: reason);
@@ -40,13 +36,7 @@ class UnsupportedReportUploadImageException implements Exception {
 
 /// Matches API magic-byte allowlist in `detect-allowed-image-mime-from-buffer.ts`,
 /// plus HEIC/HEIF which we normalize to JPEG before upload.
-enum ReportUploadImageKind {
-  jpeg,
-  png,
-  webp,
-  heic,
-  unsupported,
-}
+enum ReportUploadImageKind { jpeg, png, webp, heic, unsupported }
 
 /// Detects supported upload kinds from the first bytes of [bytes] only.
 ReportUploadImageKind detectReportUploadImageKind(Uint8List bytes) {
@@ -105,7 +95,9 @@ bool isSupportedReportUploadImageKind(ReportUploadImageKind kind) =>
     kind != ReportUploadImageKind.unsupported;
 
 /// Reads up to 16 bytes and validates using magic bytes (authoritative).
-Future<ReportUploadImageValidation> validateReportUploadImage(XFile file) async {
+Future<ReportUploadImageValidation> validateReportUploadImage(
+  XFile file,
+) async {
   final File local = File(file.path);
   if (!local.existsSync()) {
     return const ReportUploadImageValidation.rejected(

@@ -14,19 +14,11 @@ void main() {
 
   group('site_resolution_helpers', () {
     test('isPollutionSiteResolved is true for CLEANED', () {
-      expect(
-        isPollutionSiteResolved(
-          _site(statusCode: 'CLEANED'),
-        ),
-        isTrue,
-      );
+      expect(isPollutionSiteResolved(_site(statusCode: 'CLEANED')), isTrue);
     });
 
     test('canSubmitSiteResolution is false for REPORTED', () {
-      expect(
-        canSubmitSiteResolution(_site(statusCode: 'REPORTED')),
-        isFalse,
-      );
+      expect(canSubmitSiteResolution(_site(statusCode: 'REPORTED')), isFalse);
     });
 
     const PollutionSite base = PollutionSite(

@@ -34,7 +34,9 @@ void main() {
     expect(find.byType(TextField), findsOneWidget);
   });
 
-  testWidgets('invalid code shows inline OTP error', (WidgetTester tester) async {
+  testWidgets('invalid code shows inline OTP error', (
+    WidgetTester tester,
+  ) async {
     final FakeAuthRepository repo = FakeAuthRepository()
       ..verifyPasswordResetCodeError = const AppError(
         code: 'OTP_INVALID',

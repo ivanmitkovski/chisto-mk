@@ -33,131 +33,137 @@ Future<void> openPollutionSiteCardCommentsSheet({
   required String? feedVariant,
 }) {
   return _pollutionSiteCardCommentsSheetFlight.run(() async {
-  trackPollutionFeedCardEvent(
-    site.id,
-    eventType: PollutionFeedCardEventType.commentOpen,
-    sessionId: feedSessionId,
-    feedVariant: feedVariant,
-  );
-
-  final sitesRepository = ref.read(sitesRepositoryProvider);
-  final String currentUserId = ref.read(authStateProvider).userId ?? '';
-
-  Future<List<Comment>> loadComments(String sort) async {
-    final SiteCommentsResult result = await sitesRepository.getSiteComments(
+    trackPollutionFeedCardEvent(
       site.id,
-      sort: sort,
+      eventType: PollutionFeedCardEventType.commentOpen,
+      sessionId: feedSessionId,
+      feedVariant: feedVariant,
     );
-    final List<Comment> mapped = result.items
-        .map(
-          (SiteCommentItem item) =>
-              commentFromSiteCommentItem(currentUserId, item),
-        )
-        .toList();
-    if (context.mounted) {
-      final int n = commentCountForEngagementAfterFetch(
-        result: result,
-        mappedComments: mapped,
-      );
-      ref
-          .read(siteEngagementNotifierProvider(site.id).notifier)
-          .setCommentCount(n);
-      ref
-          .read(feedSitesNotifierProvider.notifier)
-          .patchSiteCommentsCount(site.id, n);
-    }
-    return mapped;
-  }
 
-  List<Comment> commentsForSheet = List<Comment>.from(initialSessionComments);
-  try {
-    final List<Comment> comments = await loadComments('top');
-    if (context.mounted) {
-      onSessionCommentsReplaced(comments);
-      commentsForSheet = comments;
-    }
-  } catch (_) {
-    if (context.mounted) {
-      AppSnack.show(
-        context,
-        message: context.l10n.siteCardCommentsLoadFailedSnack,
-        type: AppSnackType.warning,
-      );
-    }
-  }
+    final sitesRepository = ref.read(sitesRepositoryProvider);
+    final String currentUserId = ref.read(authStateProvider).userId ?? '';
 
-  if (!context.mounted) return;
-
-  await showPollutionSiteCommentsModalBottomSheet(
-    context,
-    builder:
-        (
-          BuildContext sheetContext,
-          ScrollController scrollController,
-          DraggableScrollableController sheetController,
-          CommentsSheetSizeConfig sizeConfig,
-        ) {
-          return CommentsBottomSheet(
-            siteId: site.id,
-            comments: commentsForSheet,
-            siteTitle: site.title,
-            scrollController: scrollController,
-            sheetController: sheetController,
-            sheetSizeConfig: sizeConfig,
-        onCommentsCountChanged: (int count) {
-          if (!sheetContext.mounted) return;
-          ref
-              .read(siteEngagementNotifierProvider(site.id).notifier)
-              .setCommentCount(count);
-          ref
-              .read(feedSitesNotifierProvider.notifier)
-              .patchSiteCommentsCount(site.id, count);
-        },
-        onCommentsChanged: (List<Comment> comments) {
-          if (!sheetContext.mounted) return;
-          onSessionCommentsChanged(comments);
-        },
-        onLoadMoreDirectReplies:
-            (String parentId, int page, String sort) async {
-              final SiteCommentsResult result = await sitesRepository
-                  .getSiteComments(
-                    site.id,
-                    parentId: parentId,
-                    page: page,
-                    limit: 20,
-                    sort: sort,
-                  );
-              return result.items
-                  .map(
-                    (SiteCommentItem item) =>
-                        commentFromSiteCommentItem(currentUserId, item),
-                  )
-                  .toList();
-            },
-        onCommentSubmitted: (String text, String? parentId) {
-          return sitesRepository
-              .createSiteComment(site.id, text, parentId: parentId)
-              .then(
-                (SiteCommentItem item) =>
-                    commentFromSiteCommentItem(currentUserId, item),
-              );
-        },
-        onCommentEdited: (String commentId, String body) {
-          return sitesRepository.updateSiteComment(site.id, commentId, body);
-        },
-        onCommentDeleted: (String commentId) {
-          return sitesRepository.deleteSiteComment(site.id, commentId);
-        },
-        onCommentLikeToggled: (String commentId, bool shouldLike) {
-          return shouldLike
-              ? sitesRepository.likeSiteComment(site.id, commentId).then((_) {})
-              : sitesRepository
-                    .unlikeSiteComment(site.id, commentId)
-                    .then((_) {});
-        },
+    Future<List<Comment>> loadComments(String sort) async {
+      final SiteCommentsResult result = await sitesRepository.getSiteComments(
+        site.id,
+        sort: sort,
       );
-    },
-  );
+      final List<Comment> mapped = result.items
+          .map(
+            (SiteCommentItem item) =>
+                commentFromSiteCommentItem(currentUserId, item),
+          )
+          .toList();
+      if (context.mounted) {
+        final int n = commentCountForEngagementAfterFetch(
+          result: result,
+          mappedComments: mapped,
+        );
+        ref
+            .read(siteEngagementNotifierProvider(site.id).notifier)
+            .setCommentCount(n);
+        ref
+            .read(feedSitesNotifierProvider.notifier)
+            .patchSiteCommentsCount(site.id, n);
+      }
+      return mapped;
+    }
+
+    List<Comment> commentsForSheet = List<Comment>.from(initialSessionComments);
+    try {
+      final List<Comment> comments = await loadComments('top');
+      if (context.mounted) {
+        onSessionCommentsReplaced(comments);
+        commentsForSheet = comments;
+      }
+    } catch (_) {
+      if (context.mounted) {
+        AppSnack.show(
+          context,
+          message: context.l10n.siteCardCommentsLoadFailedSnack,
+          type: AppSnackType.warning,
+        );
+      }
+    }
+
+    if (!context.mounted) return;
+
+    await showPollutionSiteCommentsModalBottomSheet(
+      context,
+      builder:
+          (
+            BuildContext sheetContext,
+            ScrollController scrollController,
+            DraggableScrollableController sheetController,
+            CommentsSheetSizeConfig sizeConfig,
+          ) {
+            return CommentsBottomSheet(
+              siteId: site.id,
+              comments: commentsForSheet,
+              siteTitle: site.title,
+              scrollController: scrollController,
+              sheetController: sheetController,
+              sheetSizeConfig: sizeConfig,
+              onCommentsCountChanged: (int count) {
+                if (!sheetContext.mounted) return;
+                ref
+                    .read(siteEngagementNotifierProvider(site.id).notifier)
+                    .setCommentCount(count);
+                ref
+                    .read(feedSitesNotifierProvider.notifier)
+                    .patchSiteCommentsCount(site.id, count);
+              },
+              onCommentsChanged: (List<Comment> comments) {
+                if (!sheetContext.mounted) return;
+                onSessionCommentsChanged(comments);
+              },
+              onLoadMoreDirectReplies:
+                  (String parentId, int page, String sort) async {
+                    final SiteCommentsResult result = await sitesRepository
+                        .getSiteComments(
+                          site.id,
+                          parentId: parentId,
+                          page: page,
+                          limit: 20,
+                          sort: sort,
+                        );
+                    return result.items
+                        .map(
+                          (SiteCommentItem item) =>
+                              commentFromSiteCommentItem(currentUserId, item),
+                        )
+                        .toList();
+                  },
+              onCommentSubmitted: (String text, String? parentId) {
+                return sitesRepository
+                    .createSiteComment(site.id, text, parentId: parentId)
+                    .then(
+                      (SiteCommentItem item) =>
+                          commentFromSiteCommentItem(currentUserId, item),
+                    );
+              },
+              onCommentEdited: (String commentId, String body) {
+                return sitesRepository.updateSiteComment(
+                  site.id,
+                  commentId,
+                  body,
+                );
+              },
+              onCommentDeleted: (String commentId) {
+                return sitesRepository.deleteSiteComment(site.id, commentId);
+              },
+              onCommentLikeToggled: (String commentId, bool shouldLike) {
+                return shouldLike
+                    ? sitesRepository
+                          .likeSiteComment(site.id, commentId)
+                          .then((_) {})
+                    : sitesRepository
+                          .unlikeSiteComment(site.id, commentId)
+                          .then((_) {});
+              },
+            );
+          },
+    );
   });
 }
 

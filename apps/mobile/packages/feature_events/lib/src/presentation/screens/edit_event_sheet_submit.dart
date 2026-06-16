@@ -69,8 +69,7 @@ extension _EditEventSheetSubmit on _EditEventSheetState {
         );
         setState(() {
           _submitFeedbackMessage =
-              firstError ??
-              l10n.formValidationErrorsAnnounce(invalidCount);
+              firstError ?? l10n.formValidationErrorsAnnounce(invalidCount);
         });
         return;
       }
@@ -100,10 +99,7 @@ extension _EditEventSheetSubmit on _EditEventSheetState {
       }
 
       final DateTime startDay = DateUtils.dateOnly(_selectedDate);
-      final DateTime startDt = eventScheduleInstantLocal(
-        startDay,
-        _startTime,
-      );
+      final DateTime startDt = eventScheduleInstantLocal(startDay, _startTime);
       final DateTime endDt = eventScheduleInstantLocal(startDay, _endTime);
 
       final String titleTrimmed = _titleController.text.trim();
@@ -157,10 +153,7 @@ extension _EditEventSheetSubmit on _EditEventSheetState {
         return;
       }
       if (e.code == 'DUPLICATE_EVENT') {
-        await _showDuplicateSubmitDialog(
-          e,
-          dialogContext: _snackHostContext(),
-        );
+        await _showDuplicateSubmitDialog(e, dialogContext: _snackHostContext());
       } else {
         final String message = localizedAppErrorMessage(context.l10n, e);
         setState(() => _submitFeedbackMessage = message);

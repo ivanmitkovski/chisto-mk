@@ -58,30 +58,33 @@ void main() {
     },
   );
 
-  testWidgets('past dates are selectable when minimumSelectableDate allows them', (
+  testWidgets(
+    'past dates are selectable when minimumSelectableDate allows them',
+    (WidgetTester tester) async {
+      DateTime? picked;
+
+      await tester.pumpWidget(
+        _calendarApp(
+          EventCalendar(
+            selectedDate: DateTime(2024, 1, 15),
+            minimumSelectableDate: DateTime(2020, 1, 1),
+            onDateSelected: (DateTime d) => picked = d,
+          ),
+        ),
+      );
+
+      expect(find.textContaining('January 2024'), findsOneWidget);
+
+      await tester.tap(_dayInCalendar('10'));
+      await tester.pump();
+
+      expect(picked, DateTime(2024, 1, 10));
+    },
+  );
+
+  testWidgets('default bounds block day before today', (
     WidgetTester tester,
   ) async {
-    DateTime? picked;
-
-    await tester.pumpWidget(
-      _calendarApp(
-        EventCalendar(
-          selectedDate: DateTime(2024, 1, 15),
-          minimumSelectableDate: DateTime(2020, 1, 1),
-          onDateSelected: (DateTime d) => picked = d,
-        ),
-      ),
-    );
-
-    expect(find.textContaining('January 2024'), findsOneWidget);
-
-    await tester.tap(_dayInCalendar('10'));
-    await tester.pump();
-
-    expect(picked, DateTime(2024, 1, 10));
-  });
-
-  testWidgets('default bounds block day before today', (WidgetTester tester) async {
     final DateTime today = DateUtils.dateOnly(DateTime.now());
     if (today.day <= 1) {
       return;

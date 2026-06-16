@@ -22,7 +22,10 @@ class AppResizableSheetScrimTap extends StatelessWidget {
   final Widget child;
 
   double _visibleSheetTop(double screenHeight, double extent) {
-    final double slotHeight = (screenHeight - topInset).clamp(0.0, screenHeight);
+    final double slotHeight = (screenHeight - topInset).clamp(
+      0.0,
+      screenHeight,
+    );
     final double visibleHeight = extent * slotHeight;
     return (screenHeight - visibleHeight).clamp(0.0, screenHeight);
   }

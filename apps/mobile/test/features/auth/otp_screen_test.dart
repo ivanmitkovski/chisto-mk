@@ -97,26 +97,27 @@ void main() {
     expect(find.byType(AuthOtpInput), findsOneWidget);
   });
 
-  testWidgets('Continue is tappable when code is incomplete (validates on tap)', (
-    WidgetTester tester,
-  ) async {
-    await pumpAuthWidget(
-      tester,
-      home: const OtpScreen(phoneNumber: testPhoneE164),
-      onGenerateRoute: AppRouter.onGenerateRoute,
-    );
-    await tester.pumpAndSettle();
+  testWidgets(
+    'Continue is tappable when code is incomplete (validates on tap)',
+    (WidgetTester tester) async {
+      await pumpAuthWidget(
+        tester,
+        home: const OtpScreen(phoneNumber: testPhoneE164),
+        onGenerateRoute: AppRouter.onGenerateRoute,
+      );
+      await tester.pumpAndSettle();
 
-    final ElevatedButton continueButton = tester.widget<ElevatedButton>(
-      find
-          .ancestor(
-            of: find.text('Continue'),
-            matching: find.byType(ElevatedButton),
-          )
-          .first,
-    );
-    expect(continueButton.onPressed, isNotNull);
-  });
+      final ElevatedButton continueButton = tester.widget<ElevatedButton>(
+        find
+            .ancestor(
+              of: find.text('Continue'),
+              matching: find.byType(ElevatedButton),
+            )
+            .first,
+      );
+      expect(continueButton.onPressed, isNotNull);
+    },
+  );
 
   testWidgets('does not show validation error before user submits', (
     WidgetTester tester,

@@ -206,8 +206,9 @@ GoRouter buildAppGoRouter({String initialLocation = AppRoutes.splash}) {
         parentNavigatorKey: appRootNavigatorKey,
         pageBuilder: (BuildContext context, GoRouterState state) {
           final Object? extra = state.extra;
-          final NotificationsRouteExtra? args =
-              extra is NotificationsRouteExtra ? extra : null;
+          final NotificationsRouteExtra? args = extra is NotificationsRouteExtra
+              ? extra
+              : null;
           return CupertinoPage<int>(
             key: state.pageKey,
             child: NotificationsScreen(
@@ -220,7 +221,8 @@ GoRouter buildAppGoRouter({String initialLocation = AppRoutes.splash}) {
         path: '${AppRoutes.reportDetail}/:reportId',
         parentNavigatorKey: appRootNavigatorKey,
         pageBuilder: (BuildContext context, GoRouterState state) {
-          final String reportId = state.pathParameters['reportId']?.trim() ?? '';
+          final String reportId =
+              state.pathParameters['reportId']?.trim() ?? '';
           if (reportId.isEmpty) {
             return MaterialPage<void>(
               key: state.pageKey,
@@ -240,12 +242,12 @@ GoRouter buildAppGoRouter({String initialLocation = AppRoutes.splash}) {
                         siteId: siteId,
                         snapshot: snapshot,
                       ),
-                  cleanupSectionBuilder: (
-                    BuildContext ctx,
-                    String siteId,
-                    ReportSheetViewModel report,
-                  ) =>
-                      ReportCleanupSubmissionSlot(
+                  cleanupSectionBuilder:
+                      (
+                        BuildContext ctx,
+                        String siteId,
+                        ReportSheetViewModel report,
+                      ) => ReportCleanupSubmissionSlot(
                         siteId: siteId,
                         reportApproved:
                             report.status == ReportSheetStatus.approved,

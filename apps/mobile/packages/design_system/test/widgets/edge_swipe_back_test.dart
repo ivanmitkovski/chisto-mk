@@ -12,9 +12,7 @@ void main() {
       MaterialApp(
         home: EdgeSwipeBack(
           onSwipeBack: () => swipeCount++,
-          child: const SizedBox.expand(
-            child: ColoredBox(color: Colors.white),
-          ),
+          child: const SizedBox.expand(child: ColoredBox(color: Colors.white)),
         ),
       ),
     );
@@ -34,18 +32,12 @@ void main() {
       MaterialApp(
         home: EdgeSwipeBack(
           onSwipeBack: () => swipeCount++,
-          child: const SizedBox.expand(
-            child: ColoredBox(color: Colors.white),
-          ),
+          child: const SizedBox.expand(child: ColoredBox(color: Colors.white)),
         ),
       ),
     );
 
-    await tester.flingFrom(
-      const Offset(10, 300),
-      const Offset(120, 0),
-      800,
-    );
+    await tester.flingFrom(const Offset(10, 300), const Offset(120, 0), 800);
     await tester.pumpAndSettle();
 
     expect(swipeCount, 1);
@@ -60,9 +52,7 @@ void main() {
       MaterialApp(
         home: EdgeSwipeBack(
           onSwipeBack: () => swipeCount++,
-          child: const SizedBox.expand(
-            child: ColoredBox(color: Colors.white),
-          ),
+          child: const SizedBox.expand(child: ColoredBox(color: Colors.white)),
         ),
       ),
     );
@@ -82,9 +72,7 @@ void main() {
       MaterialApp(
         home: EdgeSwipeBack(
           onSwipeBack: () => swipeCount++,
-          child: const SizedBox.expand(
-            child: ColoredBox(color: Colors.white),
-          ),
+          child: const SizedBox.expand(child: ColoredBox(color: Colors.white)),
         ),
       ),
     );
@@ -130,9 +118,7 @@ void main() {
         home: EdgeSwipeBack(
           enabled: false,
           onSwipeBack: () => swipeCount++,
-          child: const SizedBox.expand(
-            child: ColoredBox(color: Colors.white),
-          ),
+          child: const SizedBox.expand(child: ColoredBox(color: Colors.white)),
         ),
       ),
     );

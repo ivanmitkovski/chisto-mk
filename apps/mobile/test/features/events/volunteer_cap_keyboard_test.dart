@@ -27,10 +27,7 @@ Widget _wrapVolunteerCapPicker({required double keyboardInset}) {
               onApply: (_) {},
             ),
           );
-          return Align(
-            alignment: Alignment.bottomCenter,
-            child: sheet,
-          );
+          return Align(alignment: Alignment.bottomCenter, child: sheet);
         },
       ),
     ),
@@ -54,7 +51,9 @@ void main() {
       tester.view.resetViewInsets();
     });
 
-    await tester.pumpWidget(_wrapVolunteerCapPicker(keyboardInset: _keyboardInset));
+    await tester.pumpWidget(
+      _wrapVolunteerCapPicker(keyboardInset: _keyboardInset),
+    );
     await tester.pumpAndSettle();
 
     expect(find.text('Volunteer cap'), findsOneWidget);

@@ -167,8 +167,7 @@ class _UgcReportSheetBodyState extends State<_UgcReportSheetBody>
   }
 
   Color _counterColor({required String? detailsError}) {
-    if (detailsError != null ||
-        _detailsLength >= kUgcReportDetailsMaxLength) {
+    if (detailsError != null || _detailsLength >= kUgcReportDetailsMaxLength) {
       return AppColors.error;
     }
     if (_detailsLength >= kUgcReportDetailsCounterWarningThreshold) {

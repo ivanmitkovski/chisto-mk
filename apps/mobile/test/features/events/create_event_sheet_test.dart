@@ -362,7 +362,8 @@ void main() {
     expect(
       buttonRect.bottom,
       closeTo(surfaceSize.height - keyboardInset, 48),
-      reason: 'Footer should stay at the bottom of the inset viewport without lifting',
+      reason:
+          'Footer should stay at the bottom of the inset viewport without lifting',
     );
   });
 
@@ -405,12 +406,15 @@ void main() {
       matching: find.byType(Expanded),
     );
     final Rect expandedRect = tester.getRect(expanded);
-    final Rect footerRect = tester.getRect(find.byType(CreateEventStickyFooter));
+    final Rect footerRect = tester.getRect(
+      find.byType(CreateEventStickyFooter),
+    );
 
     expect(
       expandedRect.bottom,
       closeTo(footerRect.top, 2),
-      reason: 'Form body should sit directly above the sticky footer (no gray gap)',
+      reason:
+          'Form body should sit directly above the sticky footer (no gray gap)',
     );
     expect(
       footerRect.bottom,
@@ -494,7 +498,9 @@ void main() {
     await tester.pumpAndSettle();
     await settlePastCreateEventBootstrap(tester);
 
-    final Finder descriptionHint = find.text('Describe what to expect, meeting point, etc.');
+    final Finder descriptionHint = find.text(
+      'Describe what to expect, meeting point, etc.',
+    );
     await tester.dragUntilVisible(
       descriptionHint,
       find.byType(CustomScrollView),

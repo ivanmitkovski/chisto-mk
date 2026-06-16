@@ -79,7 +79,8 @@ class AppResizableSheetHeader extends StatelessWidget {
       ),
     );
 
-    final Widget content = child ??
+    final Widget content =
+        child ??
         Padding(
           padding: const EdgeInsets.only(top: AppSpacing.sm),
           child: Center(child: grabber),
@@ -115,7 +116,8 @@ class AppResizableSheetScrollBody extends StatelessWidget {
     if (!scrollController.hasClients) {
       return true;
     }
-    return scrollController.position.pixels <= scrollController.position.minScrollExtent + 0.5;
+    return scrollController.position.pixels <=
+        scrollController.position.minScrollExtent + 0.5;
   }
 
   bool _handleOverscrollDismiss(
@@ -128,7 +130,9 @@ class AppResizableSheetScrollBody extends StatelessWidget {
     if (!sheetController.isAttached) {
       return false;
     }
-    final double deltaSize = sheetController.pixelsToSize(notification.overscroll);
+    final double deltaSize = sheetController.pixelsToSize(
+      notification.overscroll,
+    );
     final double nextSize = appSheetSizeAfterDrag(
       size: sheetController.size,
       deltaSize: deltaSize,
@@ -176,7 +180,8 @@ class AppResizableSheet extends StatelessWidget {
     ScrollController scrollController,
     DraggableScrollableController sheetController,
     AppSheetSizeConfig sizeConfig,
-  ) builder;
+  )
+  builder;
   final BorderRadius borderRadius;
   final Color backgroundColor;
   final String? dragHandleSemanticLabel;

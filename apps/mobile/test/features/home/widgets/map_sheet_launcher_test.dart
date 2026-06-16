@@ -27,33 +27,33 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Builder(
-            builder: (BuildContext context) {
-              return Scaffold(
-                body: Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      showMapBottomSheet<void>(
-                        context: context,
-                        builder: (BuildContext sheetContext) {
-                          return const DecoratedBox(
-                            decoration: BoxDecoration(color: Colors.white),
-                            child: SizedBox(
-                              height: 400,
-                              child: Align(
-                                alignment: Alignment.topCenter,
-                                child: Text('Map sheet probe'),
-                              ),
+          builder: (BuildContext context) {
+            return Scaffold(
+              body: Center(
+                child: ElevatedButton(
+                  onPressed: () {
+                    showMapBottomSheet<void>(
+                      context: context,
+                      builder: (BuildContext sheetContext) {
+                        return const DecoratedBox(
+                          decoration: BoxDecoration(color: Colors.white),
+                          child: SizedBox(
+                            height: 400,
+                            child: Align(
+                              alignment: Alignment.topCenter,
+                              child: Text('Map sheet probe'),
                             ),
-                          );
-                        },
-                      );
-                    },
-                    child: const Text('Open sheet'),
-                  ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                  child: const Text('Open sheet'),
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
+        ),
       ),
     );
 

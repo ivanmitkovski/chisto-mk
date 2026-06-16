@@ -50,84 +50,84 @@ class _PrimaryButtonState extends State<PrimaryButton> {
         child: ConstrainedBox(
           constraints: const BoxConstraints(minHeight: 56),
           child: Listener(
-          onPointerDown: (_) {
-            if (canPress) _setPressed(true);
-          },
-          onPointerUp: (_) => _setPressed(false),
-          onPointerCancel: (_) => _setPressed(false),
-          child: ElevatedButton(
-            onPressed: canPress ? widget.onPressed : null,
-            style: ElevatedButton.styleFrom(
-              elevation: 0,
-              alignment: Alignment.center,
-              padding: EdgeInsets.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              backgroundColor: busy
-                  ? AppColors.primary
-                  : (inactive ? AppColors.inputFill : AppColors.primary),
-              foregroundColor: busy
-                  ? AppColors.textPrimary
-                  : (inactive
-                        ? AppColors.textSecondary
-                        : AppColors.textPrimary),
-              side: inactive && !busy
-                  ? const BorderSide(color: AppColors.inputBorder)
-                  : BorderSide.none,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+            onPointerDown: (_) {
+              if (canPress) _setPressed(true);
+            },
+            onPointerUp: (_) => _setPressed(false),
+            onPointerCancel: (_) => _setPressed(false),
+            child: ElevatedButton(
+              onPressed: canPress ? widget.onPressed : null,
+              style: ElevatedButton.styleFrom(
+                elevation: 0,
+                alignment: Alignment.center,
+                padding: EdgeInsets.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                backgroundColor: busy
+                    ? AppColors.primary
+                    : (inactive ? AppColors.inputFill : AppColors.primary),
+                foregroundColor: busy
+                    ? AppColors.textPrimary
+                    : (inactive
+                          ? AppColors.textSecondary
+                          : AppColors.textPrimary),
+                side: inactive && !busy
+                    ? const BorderSide(color: AppColors.inputBorder)
+                    : BorderSide.none,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+                ),
               ),
-            ),
-            child: busy
-                ? const Center(
-                    // heightFactor hugs content so the button keeps its
-                    // intrinsic height (>= minHeight) instead of expanding to
-                    // fill bounded slots like Scaffold.bottomNavigationBar.
-                    heightFactor: 1,
-                    child: SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.5,
-                        color: AppColors.textPrimary,
+              child: busy
+                  ? const Center(
+                      // heightFactor hugs content so the button keeps its
+                      // intrinsic height (>= minHeight) instead of expanding to
+                      // fill bounded slots like Scaffold.bottomNavigationBar.
+                      heightFactor: 1,
+                      child: SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    )
+                  : Center(
+                      heightFactor: 1,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          if (widget.leadingIcon != null) ...<Widget>[
+                            widget.leadingIcon!,
+                            const SizedBox(width: AppSpacing.xs),
+                          ],
+                          Flexible(
+                            child: Text(
+                              widget.label,
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                              softWrap: true,
+                              overflow: TextOverflow.ellipsis,
+                              textHeightBehavior: const TextHeightBehavior(
+                                applyHeightToFirstAscent: false,
+                                applyHeightToLastDescent: false,
+                              ),
+                              style: AppTypography.buttonLabel(textTheme)
+                                  .copyWith(
+                                    color: inactive
+                                        ? AppColors.textSecondary
+                                        : AppColors.textPrimary,
+                                    height: 1,
+                                  ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  )
-                : Center(
-                    heightFactor: 1,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        if (widget.leadingIcon != null) ...<Widget>[
-                          widget.leadingIcon!,
-                          const SizedBox(width: AppSpacing.xs),
-                        ],
-                        Flexible(
-                          child: Text(
-                            widget.label,
-                            textAlign: TextAlign.center,
-                            maxLines: 2,
-                            softWrap: true,
-                            overflow: TextOverflow.ellipsis,
-                            textHeightBehavior: const TextHeightBehavior(
-                              applyHeightToFirstAscent: false,
-                              applyHeightToLastDescent: false,
-                            ),
-                            style: AppTypography.buttonLabel(textTheme)
-                                .copyWith(
-                                  color: inactive
-                                      ? AppColors.textSecondary
-                                      : AppColors.textPrimary,
-                                  height: 1,
-                                ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+            ),
           ),
         ),
-      ),
       ),
     );
   }

@@ -234,7 +234,10 @@ void main() {
       await tester.pump(const Duration(seconds: 1));
 
       expect(find.byType(SignUpScreen), findsNothing);
-      expect(appGoRouter.routeInformationProvider.value.uri.path, AppRoutes.location);
+      expect(
+        appGoRouter.routeInformationProvider.value.uri.path,
+        AppRoutes.location,
+      );
       expect(find.byType(LocationScreen), findsOneWidget);
 
       await tester.pump(const Duration(milliseconds: 900));

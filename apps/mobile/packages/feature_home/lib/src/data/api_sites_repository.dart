@@ -241,7 +241,7 @@ class ApiSitesRepository implements SitesRepository {
     required String feedbackType,
     String? sessionId,
     Map<String, dynamic>? metadata,
-  }  ) => _analytics.submitFeedFeedback(
+  }) => _analytics.submitFeedFeedback(
     siteId,
     feedbackType: feedbackType,
     sessionId: sessionId,

@@ -127,89 +127,226 @@ class _SitePickerSheetState extends State<SitePickerSheet> {
           mainAxisSize: MainAxisSize.max,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-          Semantics(
-            label:
-                '${context.l10n.createEventSitePickerTabList}, ${context.l10n.createEventSitePickerTabMap}',
-            child: SizedBox(
-              width: double.infinity,
-              child: CupertinoSlidingSegmentedControl<int>(
-                backgroundColor: AppColors.divider.withValues(alpha: 0.42),
-                thumbColor: AppColors.panelBackground,
-                padding: const EdgeInsets.all(AppSpacing.insetTight),
-                groupValue: _viewMode,
-                children: <int, Widget>{
-                  _modeList: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: _segmentVerticalPadding,
+            Semantics(
+              label:
+                  '${context.l10n.createEventSitePickerTabList}, ${context.l10n.createEventSitePickerTabMap}',
+              child: SizedBox(
+                width: double.infinity,
+                child: CupertinoSlidingSegmentedControl<int>(
+                  backgroundColor: AppColors.divider.withValues(alpha: 0.42),
+                  thumbColor: AppColors.panelBackground,
+                  padding: const EdgeInsets.all(AppSpacing.insetTight),
+                  groupValue: _viewMode,
+                  children: <int, Widget>{
+                    _modeList: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: _segmentVerticalPadding,
+                      ),
+                      child: Text(
+                        context.l10n.createEventSitePickerTabList,
+                        style: AppTypography.eventsGroupedRowPrimary(
+                          Theme.of(context).textTheme,
+                        ).copyWith(letterSpacing: -0.25),
+                      ),
                     ),
-                    child: Text(
-                      context.l10n.createEventSitePickerTabList,
-                      style: AppTypography.eventsGroupedRowPrimary(
-                        Theme.of(context).textTheme,
-                      ).copyWith(letterSpacing: -0.25),
+                    _modeMap: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: _segmentVerticalPadding,
+                      ),
+                      child: Text(
+                        context.l10n.createEventSitePickerTabMap,
+                        style: AppTypography.eventsGroupedRowPrimary(
+                          Theme.of(context).textTheme,
+                        ).copyWith(letterSpacing: -0.25),
+                      ),
                     ),
-                  ),
-                  _modeMap: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: _segmentVerticalPadding,
-                    ),
-                    child: Text(
-                      context.l10n.createEventSitePickerTabMap,
-                      style: AppTypography.eventsGroupedRowPrimary(
-                        Theme.of(context).textTheme,
-                      ).copyWith(letterSpacing: -0.25),
-                    ),
-                  ),
-                },
-                onValueChanged: (int? value) {
-                  if (value == null) {
-                    return;
-                  }
-                  setState(() => _viewMode = value);
-                },
+                  },
+                  onValueChanged: (int? value) {
+                    if (value == null) {
+                      return;
+                    }
+                    setState(() => _viewMode = value);
+                  },
+                ),
               ),
             ),
-          ),
-          if (widget.topBanners.isNotEmpty) ...<Widget>[
+            if (widget.topBanners.isNotEmpty) ...<Widget>[
+              const SizedBox(height: AppSpacing.md),
+              ...widget.topBanners.expand(
+                (Widget w) => <Widget>[
+                  w,
+                  const SizedBox(height: AppSpacing.sm),
+                ],
+              ),
+            ],
+            const SizedBox(height: AppSpacing.lg),
+            CupertinoSearchTextField(
+              controller: _searchController,
+              placeholder: context.l10n.eventsSitePickerSearchPlaceholder,
+              style: AppTypography.eventsSearchFieldText(
+                Theme.of(context).textTheme,
+              ).copyWith(letterSpacing: -0.2),
+              placeholderStyle: AppTypography.eventsSearchFieldPlaceholder(
+                Theme.of(context).textTheme,
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.panelBackground,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                border: Border.all(
+                  color: AppColors.inputBorder.withValues(alpha: 0.65),
+                ),
+                boxShadow: AppShadows.sitePickerListRow(),
+              ),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.sm,
+                vertical: AppSpacing.sm,
+              ),
+              itemColor: AppColors.textMuted,
+              itemSize: 18,
+              onChanged: (String value) => setState(() => _query = value),
+              onSubmitted: (_) => _dismissKeyboard(),
+              onSuffixTap: () {
+                _searchController.clear();
+                setState(() => _query = '');
+              },
+            ),
             const SizedBox(height: AppSpacing.md),
-            ...widget.topBanners.expand(
-              (Widget w) => <Widget>[w, const SizedBox(height: AppSpacing.sm)],
-            ),
-          ],
-          const SizedBox(height: AppSpacing.lg),
-          CupertinoSearchTextField(
-            controller: _searchController,
-            placeholder: context.l10n.eventsSitePickerSearchPlaceholder,
-            style: AppTypography.eventsSearchFieldText(
-              Theme.of(context).textTheme,
-            ).copyWith(letterSpacing: -0.2),
-            placeholderStyle: AppTypography.eventsSearchFieldPlaceholder(
-              Theme.of(context).textTheme,
-            ),
-            decoration: BoxDecoration(
-              color: AppColors.panelBackground,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-              border: Border.all(
-                color: AppColors.inputBorder.withValues(alpha: 0.65),
-              ),
-              boxShadow: AppShadows.sitePickerListRow(),
-            ),
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.sm,
-              vertical: AppSpacing.sm,
-            ),
-            itemColor: AppColors.textMuted,
-            itemSize: 18,
-            onChanged: (String value) => setState(() => _query = value),
-            onSubmitted: (_) => _dismissKeyboard(),
-            onSuffixTap: () {
-              _searchController.clear();
-              setState(() => _query = '');
-            },
-          ),
-          const SizedBox(height: AppSpacing.md),
-          if (_viewMode == _modeMap) ...<Widget>[
-            if (mappable.isEmpty)
+            if (_viewMode == _modeMap) ...<Widget>[
+              if (mappable.isEmpty)
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: AppSpacing.xl,
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Icon(
+                          CupertinoIcons.map,
+                          size: 32,
+                          color: AppColors.textMuted.withValues(alpha: 0.5),
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        Text(
+                          context.l10n.createEventSitePickerMapEmpty,
+                          style: AppTypography.eventsBodyMuted(
+                            Theme.of(context).textTheme,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              else
+                Expanded(
+                  child: LayoutBuilder(
+                    builder: (BuildContext context, BoxConstraints constraints) {
+                      final double mapHeight = collapseMapForKeyboard
+                          ? 0
+                          : (constraints.maxHeight * 0.32).clamp(180.0, 260.0);
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: <Widget>[
+                          AnimatedSize(
+                            duration: AppMotion.standard,
+                            curve: AppMotion.smooth,
+                            alignment: Alignment.topCenter,
+                            clipBehavior: Clip.hardEdge,
+                            child: mapHeight <= 0
+                                ? const SizedBox.shrink()
+                                : Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      Semantics(
+                                        label: context
+                                            .l10n
+                                            .createEventSitePickerMapSemanticLabel,
+                                        child: CreateEventSitesMap(
+                                          sites: filtered,
+                                          selectedSiteId: widget.selectedSiteId,
+                                          height: mapHeight,
+                                          onSiteTap: widget.onSelect,
+                                        ),
+                                      ),
+                                      const SizedBox(height: AppSpacing.sm),
+                                      Text(
+                                        context
+                                            .l10n
+                                            .createEventSitePickerMapHint,
+                                        style:
+                                            AppTypography.eventsListCardMeta(
+                                              Theme.of(context).textTheme,
+                                            ).copyWith(
+                                              fontWeight: FontWeight.w500,
+                                              letterSpacing: -0.1,
+                                            ),
+                                      ),
+                                      const SizedBox(height: AppSpacing.md),
+                                    ],
+                                  ),
+                          ),
+                          if (filtered.isEmpty)
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: AppSpacing.xl,
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Icon(
+                                      CupertinoIcons.search,
+                                      size: 32,
+                                      color: AppColors.textMuted.withValues(
+                                        alpha: 0.5,
+                                      ),
+                                    ),
+                                    const SizedBox(height: AppSpacing.sm),
+                                    Text(
+                                      context.l10n.eventsSitePickerNoMatch(
+                                        _query,
+                                      ),
+                                      style: AppTypography.eventsBodyMuted(
+                                        Theme.of(context).textTheme,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                          else
+                            Expanded(
+                              child: ListView.separated(
+                                padding: listPadding,
+                                keyboardDismissBehavior:
+                                    ScrollViewKeyboardDismissBehavior.onDrag,
+                                physics: const BouncingScrollPhysics(),
+                                itemCount: filtered.length,
+                                separatorBuilder: (_, _) =>
+                                    const SizedBox(height: AppSpacing.xs),
+                                itemBuilder: (BuildContext context, int index) {
+                                  final EventSiteSummary site = filtered[index];
+                                  final bool isActive =
+                                      site.id == widget.selectedSiteId;
+                                  return _SitePickerLocationRow(
+                                    title: site.title,
+                                    subtitle: _subtitleFor(context, site),
+                                    selected: isActive,
+                                    onTap: () => widget.onSelect(site),
+                                  );
+                                },
+                              ),
+                            ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+            ] else if (filtered.isEmpty)
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
@@ -217,13 +354,13 @@ class _SitePickerSheetState extends State<SitePickerSheet> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       Icon(
-                        CupertinoIcons.map,
+                        CupertinoIcons.search,
                         size: 32,
                         color: AppColors.textMuted.withValues(alpha: 0.5),
                       ),
                       const SizedBox(height: AppSpacing.sm),
                       Text(
-                        context.l10n.createEventSitePickerMapEmpty,
+                        context.l10n.eventsSitePickerNoMatch(_query),
                         style: AppTypography.eventsBodyMuted(
                           Theme.of(context).textTheme,
                         ),
@@ -235,156 +372,26 @@ class _SitePickerSheetState extends State<SitePickerSheet> {
               )
             else
               Expanded(
-                child: LayoutBuilder(
-                  builder: (BuildContext context, BoxConstraints constraints) {
-                    final double mapHeight = collapseMapForKeyboard
-                        ? 0
-                        : (constraints.maxHeight * 0.32).clamp(180.0, 260.0);
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: <Widget>[
-                        AnimatedSize(
-                          duration: AppMotion.standard,
-                          curve: AppMotion.smooth,
-                          alignment: Alignment.topCenter,
-                          clipBehavior: Clip.hardEdge,
-                          child: mapHeight <= 0
-                              ? const SizedBox.shrink()
-                              : Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: <Widget>[
-                                    Semantics(
-                                      label: context
-                                          .l10n
-                                          .createEventSitePickerMapSemanticLabel,
-                                      child: CreateEventSitesMap(
-                                        sites: filtered,
-                                        selectedSiteId: widget.selectedSiteId,
-                                        height: mapHeight,
-                                        onSiteTap: widget.onSelect,
-                                      ),
-                                    ),
-                                    const SizedBox(height: AppSpacing.sm),
-                                    Text(
-                                      context.l10n.createEventSitePickerMapHint,
-                                      style:
-                                          AppTypography.eventsListCardMeta(
-                                            Theme.of(context).textTheme,
-                                          ).copyWith(
-                                            fontWeight: FontWeight.w500,
-                                            letterSpacing: -0.1,
-                                          ),
-                                    ),
-                                    const SizedBox(height: AppSpacing.md),
-                                  ],
-                                ),
-                        ),
-                        if (filtered.isEmpty)
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: AppSpacing.xl,
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Icon(
-                                    CupertinoIcons.search,
-                                    size: 32,
-                                    color: AppColors.textMuted.withValues(
-                                      alpha: 0.5,
-                                    ),
-                                  ),
-                                  const SizedBox(height: AppSpacing.sm),
-                                  Text(
-                                    context.l10n.eventsSitePickerNoMatch(
-                                      _query,
-                                    ),
-                                    style: AppTypography.eventsBodyMuted(
-                                      Theme.of(context).textTheme,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
-                        else
-                          Expanded(
-                            child: ListView.separated(
-                              padding: listPadding,
-                              keyboardDismissBehavior:
-                                  ScrollViewKeyboardDismissBehavior.onDrag,
-                              physics: const BouncingScrollPhysics(),
-                              itemCount: filtered.length,
-                              separatorBuilder: (_, _) =>
-                                  const SizedBox(height: AppSpacing.xs),
-                              itemBuilder: (BuildContext context, int index) {
-                                final EventSiteSummary site = filtered[index];
-                                final bool isActive =
-                                    site.id == widget.selectedSiteId;
-                                return _SitePickerLocationRow(
-                                  title: site.title,
-                                  subtitle: _subtitleFor(context, site),
-                                  selected: isActive,
-                                  onTap: () => widget.onSelect(site),
-                                );
-                              },
-                            ),
-                          ),
-                      ],
+                child: ListView.separated(
+                  padding: listPadding,
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
+                  physics: const BouncingScrollPhysics(),
+                  itemCount: filtered.length,
+                  separatorBuilder: (_, _) =>
+                      const SizedBox(height: AppSpacing.xs),
+                  itemBuilder: (BuildContext context, int index) {
+                    final EventSiteSummary site = filtered[index];
+                    final bool isActive = site.id == widget.selectedSiteId;
+                    return _SitePickerLocationRow(
+                      title: site.title,
+                      subtitle: _subtitleFor(context, site),
+                      selected: isActive,
+                      onTap: () => widget.onSelect(site),
                     );
                   },
                 ),
               ),
-          ] else if (filtered.isEmpty)
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Icon(
-                      CupertinoIcons.search,
-                      size: 32,
-                      color: AppColors.textMuted.withValues(alpha: 0.5),
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      context.l10n.eventsSitePickerNoMatch(_query),
-                      style: AppTypography.eventsBodyMuted(
-                        Theme.of(context).textTheme,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-            )
-          else
-            Expanded(
-              child: ListView.separated(
-                padding: listPadding,
-                keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior.onDrag,
-                physics: const BouncingScrollPhysics(),
-                itemCount: filtered.length,
-                separatorBuilder: (_, _) =>
-                    const SizedBox(height: AppSpacing.xs),
-                itemBuilder: (BuildContext context, int index) {
-                  final EventSiteSummary site = filtered[index];
-                  final bool isActive = site.id == widget.selectedSiteId;
-                  return _SitePickerLocationRow(
-                    title: site.title,
-                    subtitle: _subtitleFor(context, site),
-                    selected: isActive,
-                    onTap: () => widget.onSelect(site),
-                  );
-                },
-              ),
-            ),
           ],
         ),
       ),

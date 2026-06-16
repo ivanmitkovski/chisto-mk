@@ -125,10 +125,7 @@ class SecureTokenStorage {
       await _deleteSession(_keyOrganizerCertifiedAt);
       return;
     }
-    await _writeSession(
-      _keyOrganizerCertifiedAt,
-      at.toUtc().toIso8601String(),
-    );
+    await _writeSession(_keyOrganizerCertifiedAt, at.toUtc().toIso8601String());
   }
 
   Future<void> clearTokens() async {

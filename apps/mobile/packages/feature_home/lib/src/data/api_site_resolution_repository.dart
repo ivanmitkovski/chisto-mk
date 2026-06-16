@@ -125,8 +125,9 @@ class ApiSiteResolutionRepository implements SiteResolutionRepository {
     final List<SiteResolutionListItem> items = data
         .whereType<Map<String, dynamic>>()
         .map((Map<String, dynamic> row) {
-          final Map<String, dynamic>? submitter =
-              safeAsStringKeyedMap(row['submitter']);
+          final Map<String, dynamic>? submitter = safeAsStringKeyedMap(
+            row['submitter'],
+          );
           final List<dynamic> mediaRaw =
               safeAsList(row['mediaUrls']) ?? <dynamic>[];
           return SiteResolutionListItem(
@@ -134,7 +135,8 @@ class ApiSiteResolutionRepository implements SiteResolutionRepository {
             siteId: row['siteId'] as String? ?? siteId,
             status: row['status'] as String? ?? 'PENDING',
             mediaUrls: mediaRaw.whereType<String>().toList(growable: false),
-            createdAt: DateTime.tryParse(row['createdAt'] as String? ?? '') ??
+            createdAt:
+                DateTime.tryParse(row['createdAt'] as String? ?? '') ??
                 DateTime.fromMillisecondsSinceEpoch(0),
             isSelf: submitter?['isSelf'] == true,
             note: row['note'] as String?,

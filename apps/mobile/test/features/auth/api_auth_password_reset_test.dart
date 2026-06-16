@@ -32,7 +32,8 @@ class _PathCapturingApiClient extends ApiClient {
     if (path == '/auth/me') {
       return ApiResponse(
         statusCode: 200,
-        json: meJsonOverride ??
+        json:
+            meJsonOverride ??
             <String, dynamic>{
               'id': 'u1',
               'firstName': 'A',

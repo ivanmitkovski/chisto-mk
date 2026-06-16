@@ -82,56 +82,69 @@ void main() {
     mapRealtime.dispose();
   });
 
-  test('brief reconnect blip does not surface connection unstable banner', () async {
-    final ProviderContainer container = ProviderContainer(
-      overrides: <Override>[
-        sitesRepositoryProvider.overrideWithValue(_EmptySitesRepository()),
-        mapRealtimeServiceProvider.overrideWithValue(mapRealtime),
-      ],
-    );
-    addTearDown(container.dispose);
-    container.listen(mapSitesNotifierProvider, (_, __) {});
+  test(
+    'brief reconnect blip does not surface connection unstable banner',
+    () async {
+      final ProviderContainer container = ProviderContainer(
+        overrides: <Override>[
+          sitesRepositoryProvider.overrideWithValue(_EmptySitesRepository()),
+          mapRealtimeServiceProvider.overrideWithValue(mapRealtime),
+        ],
+      );
+      addTearDown(container.dispose);
+      container.listen(mapSitesNotifierProvider, (_, __) {});
 
-    final MapSitesNotifier notifier =
-        container.read(mapSitesNotifierProvider.notifier);
-    notifier.connectionUnstableBannerGrace = const Duration(milliseconds: 50);
-    notifier.upsertSiteFromFocus(buildTestPollutionSite(id: 'site-1'));
+      final MapSitesNotifier notifier = container.read(
+        mapSitesNotifierProvider.notifier,
+      );
+      notifier.connectionUnstableBannerGrace = const Duration(milliseconds: 50);
+      notifier.upsertSiteFromFocus(buildTestPollutionSite(id: 'site-1'));
 
-    notifier.debugApplySseStateForTest(MapRealtimeConnectionState.reconnecting);
-    expect(container.read(mapSitesNotifierProvider).syncNotice, isNull);
+      notifier.debugApplySseStateForTest(
+        MapRealtimeConnectionState.reconnecting,
+      );
+      expect(container.read(mapSitesNotifierProvider).syncNotice, isNull);
 
-    await Future<void>.delayed(const Duration(milliseconds: 20));
-    notifier.debugApplySseStateForTest(MapRealtimeConnectionState.live);
-    await Future<void>.delayed(const Duration(milliseconds: 80));
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      notifier.debugApplySseStateForTest(MapRealtimeConnectionState.live);
+      await Future<void>.delayed(const Duration(milliseconds: 80));
 
-    expect(container.read(mapSitesNotifierProvider).syncNotice, isNull);
-  });
+      expect(container.read(mapSitesNotifierProvider).syncNotice, isNull);
+    },
+  );
 
-  test('sustained reconnecting surfaces connection unstable banner when data stale', () async {
-    final ProviderContainer container = ProviderContainer(
-      overrides: <Override>[
-        sitesRepositoryProvider.overrideWithValue(_EmptySitesRepository()),
-        mapRealtimeServiceProvider.overrideWithValue(mapRealtime),
-      ],
-    );
-    addTearDown(container.dispose);
-    container.listen(mapSitesNotifierProvider, (_, __) {});
+  test(
+    'sustained reconnecting surfaces connection unstable banner when data stale',
+    () async {
+      final ProviderContainer container = ProviderContainer(
+        overrides: <Override>[
+          sitesRepositoryProvider.overrideWithValue(_EmptySitesRepository()),
+          mapRealtimeServiceProvider.overrideWithValue(mapRealtime),
+        ],
+      );
+      addTearDown(container.dispose);
+      container.listen(mapSitesNotifierProvider, (_, __) {});
 
-    final MapSitesNotifier notifier =
-        container.read(mapSitesNotifierProvider.notifier);
-    notifier.connectionUnstableBannerGrace = const Duration(milliseconds: 50);
-    notifier.upsertSiteFromFocus(buildTestPollutionSite(id: 'site-1'));
+      final MapSitesNotifier notifier = container.read(
+        mapSitesNotifierProvider.notifier,
+      );
+      notifier.connectionUnstableBannerGrace = const Duration(milliseconds: 50);
+      notifier.upsertSiteFromFocus(buildTestPollutionSite(id: 'site-1'));
 
-    notifier.debugApplySseStateForTest(MapRealtimeConnectionState.reconnecting);
-    expect(container.read(mapSitesNotifierProvider).syncNotice, isNull);
+      notifier.debugApplySseStateForTest(
+        MapRealtimeConnectionState.reconnecting,
+      );
+      expect(container.read(mapSitesNotifierProvider).syncNotice, isNull);
 
-    await Future<void>.delayed(const Duration(milliseconds: 60));
+      await Future<void>.delayed(const Duration(milliseconds: 60));
 
-    final MapSyncInlineNotice? notice =
-        container.read(mapSitesNotifierProvider).syncNotice;
-    expect(notice, isNotNull);
-    expect(notice!.kind, MapSyncInlineNoticeKind.connectionUnstable);
-  });
+      final MapSyncInlineNotice? notice = container
+          .read(mapSitesNotifierProvider)
+          .syncNotice;
+      expect(notice, isNotNull);
+      expect(notice!.kind, MapSyncInlineNoticeKind.connectionUnstable);
+    },
+  );
 
   test('sustained reconnecting hides banner when map data is fresh', () async {
     final ProviderContainer container = ProviderContainer(
@@ -143,8 +156,9 @@ void main() {
     addTearDown(container.dispose);
     container.listen(mapSitesNotifierProvider, (_, __) {});
 
-    final MapSitesNotifier notifier =
-        container.read(mapSitesNotifierProvider.notifier);
+    final MapSitesNotifier notifier = container.read(
+      mapSitesNotifierProvider.notifier,
+    );
     notifier.connectionUnstableBannerGrace = const Duration(milliseconds: 50);
     notifier.upsertSiteFromFocus(buildTestPollutionSite(id: 'site-1'));
     notifier.debugSetLastSuccessfulSyncAtForTest(DateTime.now());
@@ -155,63 +169,73 @@ void main() {
     expect(container.read(mapSitesNotifierProvider).syncNotice, isNull);
   });
 
-  test('SSE reconnecting to live with stale data requests map reconcile sync',
-      () async {
-    final _TrackingSitesRepository repo = _TrackingSitesRepository();
-    final ProviderContainer container = ProviderContainer(
-      overrides: <Override>[
-        sitesRepositoryProvider.overrideWithValue(repo),
-        mapRealtimeServiceProvider.overrideWithValue(mapRealtime),
-      ],
-    );
-    addTearDown(container.dispose);
-    container.listen(mapSitesNotifierProvider, (_, __) {});
+  test(
+    'SSE reconnecting to live with stale data requests map reconcile sync',
+    () async {
+      final _TrackingSitesRepository repo = _TrackingSitesRepository();
+      final ProviderContainer container = ProviderContainer(
+        overrides: <Override>[
+          sitesRepositoryProvider.overrideWithValue(repo),
+          mapRealtimeServiceProvider.overrideWithValue(mapRealtime),
+        ],
+      );
+      addTearDown(container.dispose);
+      container.listen(mapSitesNotifierProvider, (_, __) {});
 
-    final MapSitesNotifier notifier =
-        container.read(mapSitesNotifierProvider.notifier);
-    notifier.setActive(true);
-    notifier.updateViewport(_testViewportQuery());
-    notifier.upsertSiteFromFocus(buildTestPollutionSite(id: 'site-1'));
-    notifier.debugSetLastSuccessfulSyncAtForTest(
-      DateTime.now().subtract(const Duration(minutes: 10)),
-    );
+      final MapSitesNotifier notifier = container.read(
+        mapSitesNotifierProvider.notifier,
+      );
+      notifier.setActive(true);
+      notifier.updateViewport(_testViewportQuery());
+      notifier.upsertSiteFromFocus(buildTestPollutionSite(id: 'site-1'));
+      notifier.debugSetLastSuccessfulSyncAtForTest(
+        DateTime.now().subtract(const Duration(minutes: 10)),
+      );
 
-    final int callsBefore = repo.getSitesForMapCalls;
+      final int callsBefore = repo.getSitesForMapCalls;
 
-    notifier.debugApplySseStateForTest(MapRealtimeConnectionState.reconnecting);
-    notifier.debugApplySseStateForTest(MapRealtimeConnectionState.live);
+      notifier.debugApplySseStateForTest(
+        MapRealtimeConnectionState.reconnecting,
+      );
+      notifier.debugApplySseStateForTest(MapRealtimeConnectionState.live);
 
-    await Future<void>.delayed(const Duration(milliseconds: 600));
+      await Future<void>.delayed(const Duration(milliseconds: 600));
 
-    expect(repo.getSitesForMapCalls, greaterThan(callsBefore));
-  });
+      expect(repo.getSitesForMapCalls, greaterThan(callsBefore));
+    },
+  );
 
-  test('SSE reconnecting to live with fresh data does not request reconcile sync',
-      () async {
-    final _TrackingSitesRepository repo = _TrackingSitesRepository();
-    final ProviderContainer container = ProviderContainer(
-      overrides: <Override>[
-        sitesRepositoryProvider.overrideWithValue(repo),
-        mapRealtimeServiceProvider.overrideWithValue(mapRealtime),
-      ],
-    );
-    addTearDown(container.dispose);
-    container.listen(mapSitesNotifierProvider, (_, __) {});
+  test(
+    'SSE reconnecting to live with fresh data does not request reconcile sync',
+    () async {
+      final _TrackingSitesRepository repo = _TrackingSitesRepository();
+      final ProviderContainer container = ProviderContainer(
+        overrides: <Override>[
+          sitesRepositoryProvider.overrideWithValue(repo),
+          mapRealtimeServiceProvider.overrideWithValue(mapRealtime),
+        ],
+      );
+      addTearDown(container.dispose);
+      container.listen(mapSitesNotifierProvider, (_, __) {});
 
-    final MapSitesNotifier notifier =
-        container.read(mapSitesNotifierProvider.notifier);
-    notifier.setActive(true);
-    notifier.updateViewport(_testViewportQuery());
-    notifier.upsertSiteFromFocus(buildTestPollutionSite(id: 'site-1'));
-    notifier.debugSetLastSuccessfulSyncAtForTest(DateTime.now());
+      final MapSitesNotifier notifier = container.read(
+        mapSitesNotifierProvider.notifier,
+      );
+      notifier.setActive(true);
+      notifier.updateViewport(_testViewportQuery());
+      notifier.upsertSiteFromFocus(buildTestPollutionSite(id: 'site-1'));
+      notifier.debugSetLastSuccessfulSyncAtForTest(DateTime.now());
 
-    final int callsBefore = repo.getSitesForMapCalls;
+      final int callsBefore = repo.getSitesForMapCalls;
 
-    notifier.debugApplySseStateForTest(MapRealtimeConnectionState.reconnecting);
-    notifier.debugApplySseStateForTest(MapRealtimeConnectionState.live);
+      notifier.debugApplySseStateForTest(
+        MapRealtimeConnectionState.reconnecting,
+      );
+      notifier.debugApplySseStateForTest(MapRealtimeConnectionState.live);
 
-    await Future<void>.delayed(const Duration(milliseconds: 600));
+      await Future<void>.delayed(const Duration(milliseconds: 600));
 
-    expect(repo.getSitesForMapCalls, callsBefore);
-  });
+      expect(repo.getSitesForMapCalls, callsBefore);
+    },
+  );
 }

@@ -59,10 +59,7 @@ void main() {
     final AppActionTile firstTile = tester.widget<AppActionTile>(
       groupedTiles.first,
     );
-    expect(
-      firstTile.title,
-      ReportCategory.values.first.localizedTitle(l10n),
-    );
+    expect(firstTile.title, ReportCategory.values.first.localizedTitle(l10n));
     expect(firstTile.variant, AppActionTileVariant.grouped);
   });
 
@@ -113,22 +110,20 @@ void main() {
     final RenderBox sheetBox = tester.renderObject<RenderBox>(
       find.byType(AppSheetScaffold),
     );
-    final String lastCategoryTitle = ReportCategory.values.last
-        .localizedTitle(l10n);
+    final String lastCategoryTitle = ReportCategory.values.last.localizedTitle(
+      l10n,
+    );
 
     expect(sheetBox.size.height, lessThan(screenHeight * 0.75));
-    expect(
-      sheetBox.localToGlobal(Offset.zero).dy,
-      greaterThan(59),
-    );
+    expect(sheetBox.localToGlobal(Offset.zero).dy, greaterThan(59));
 
     final RenderBox lastOptionBox = tester.renderObject<RenderBox>(
       find.text(lastCategoryTitle),
     );
-    final double sheetBottom = sheetBox.localToGlobal(Offset.zero).dy +
-        sheetBox.size.height;
-    final double lastOptionBottom = lastOptionBox.localToGlobal(Offset.zero).dy +
-        lastOptionBox.size.height;
+    final double sheetBottom =
+        sheetBox.localToGlobal(Offset.zero).dy + sheetBox.size.height;
+    final double lastOptionBottom =
+        lastOptionBox.localToGlobal(Offset.zero).dy + lastOptionBox.size.height;
     expect(sheetBottom - lastOptionBottom, lessThan(80));
   });
 }

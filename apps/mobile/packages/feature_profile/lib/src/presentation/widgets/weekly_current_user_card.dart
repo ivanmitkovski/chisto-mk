@@ -53,7 +53,9 @@ class WeeklyCurrentUserCard extends StatelessWidget {
                       Row(
                         children: <Widget>[
                           Text(
-                            context.l10n.profileWeeklyRankingsYouRank(entry.rank),
+                            context.l10n.profileWeeklyRankingsYouRank(
+                              entry.rank,
+                            ),
                             style: Theme.of(context).textTheme.bodyMedium
                                 ?.copyWith(
                                   color: AppColors.textPrimary,
@@ -74,10 +76,11 @@ class WeeklyCurrentUserCard extends StatelessWidget {
                             ),
                             child: Text(
                               context.l10n.profileWeeklyRankingsYouBadge,
-                              style: AppTypography.badgeLabel(textTheme).copyWith(
-                                color: AppColors.primaryDark,
-                                fontSize: 10,
-                              ),
+                              style: AppTypography.badgeLabel(textTheme)
+                                  .copyWith(
+                                    color: AppColors.primaryDark,
+                                    fontSize: 10,
+                                  ),
                             ),
                           ),
                         ],

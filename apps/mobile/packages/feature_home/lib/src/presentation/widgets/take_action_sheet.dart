@@ -56,8 +56,7 @@ class TakeActionSheet extends StatelessWidget {
                 icon: Icons.check_circle_outline_rounded,
                 title: context.l10n.takeActionSubmitResolutionTitle,
                 subtitle: context.l10n.takeActionSubmitResolutionSubtitle,
-                onTap: () =>
-                    _popWith(context, TakeActionType.submitResolution),
+                onTap: () => _popWith(context, TakeActionType.submitResolution),
               ),
             _TakeActionTile(
               icon: Icons.groups_rounded,

@@ -22,10 +22,7 @@ void main() {
   });
 
   test('shouldHandle matches indicatesInvalidOrEndedSession', () {
-    expect(
-      SessionInvalidation.shouldHandle(AppError.unauthorized()),
-      isTrue,
-    );
+    expect(SessionInvalidation.shouldHandle(AppError.unauthorized()), isTrue);
     expect(
       SessionInvalidation.shouldHandle(
         const AppError(code: 'SESSION_REVOKED', message: 'revoked'),
