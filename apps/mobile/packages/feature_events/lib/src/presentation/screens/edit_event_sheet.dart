@@ -119,6 +119,12 @@ class _EditEventSheetState extends State<EditEventSheet>
   }
 
   ScheduleValidationIssue? _editScheduleIssue() {
+    // An unchanged schedule must never block edits to other fields, even if the
+    // original start time has since passed (e.g. a draft awaiting approval).
+    // Schedule constraints are only enforced once the user edits the schedule.
+    if (!_isScheduleDirty) {
+      return null;
+    }
     return validateEditSchedule(
       status: _event.status,
       dateOnly: DateUtils.dateOnly(_selectedDate),
@@ -129,6 +135,14 @@ class _EditEventSheetState extends State<EditEventSheet>
   }
 
   bool get _isScheduleValid => _editScheduleIssue() == null;
+
+  /// Whether the user changed the event date or start/end times from the
+  /// original. Mirrors the schedule fields tracked by [_initialSnapshot].
+  bool get _isScheduleDirty {
+    return DateUtils.dateOnly(_selectedDate) != _initialSnapshot.dateOnly ||
+        _startTime != _initialSnapshot.startTime ||
+        _endTime != _initialSnapshot.endTime;
+  }
 
   ({DateTime? minStart, DateTime? minEnd}) _editPickerBounds() {
     final DateTime dateOnly = DateUtils.dateOnly(_selectedDate);
@@ -170,11 +184,17 @@ class _EditEventSheetState extends State<EditEventSheet>
     final String title = _titleController.text.trim();
     final String description = _descriptionController.text.trim();
     final String maxField = _maxParticipantsController.text.trim();
-    return editEventTitleIssueKey(title) == null &&
-        editEventDescriptionIssueKey(description) == null &&
-        editEventMaxParticipantsIssueKey(maxField) == null &&
-        _isTimeValid &&
-        _isScheduleValid;
+    if (editEventTitleIssueKey(title) != null ||
+        editEventDescriptionIssueKey(description) != null ||
+        editEventMaxParticipantsIssueKey(maxField) != null) {
+      return false;
+    }
+    // Only enforce schedule validity when the schedule was actually edited, so a
+    // now-past original schedule can't block title/description/other changes.
+    if (_isScheduleDirty && !(_isTimeValid && _isScheduleValid)) {
+      return false;
+    }
+    return true;
   }
 
   @override
@@ -338,6 +358,9 @@ class _EditEventSheetState extends State<EditEventSheet>
   }
 
   String? _scheduleValidationMessage(AppLocalizations l10n) {
+    if (!_isScheduleDirty) {
+      return null;
+    }
     if (!_isTimeValid) {
       return l10n.createEventEndTimeError;
     }

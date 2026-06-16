@@ -44,8 +44,14 @@ void main() {
     WidgetTester tester,
   ) async {
     await tester.binding.setSurfaceSize(_surfaceSize);
+    tester.view.physicalSize = _surfaceSize;
+    tester.view.devicePixelRatio = 1.0;
+    tester.view.viewInsets = const FakeViewPadding(bottom: _keyboardInset);
     addTearDown(() async {
       await tester.binding.setSurfaceSize(null);
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+      tester.view.resetViewInsets();
     });
 
     await tester.pumpWidget(_wrapVolunteerCapPicker(keyboardInset: _keyboardInset));

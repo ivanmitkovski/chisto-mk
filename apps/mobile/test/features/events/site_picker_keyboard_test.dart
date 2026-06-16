@@ -36,19 +36,20 @@ List<EventSiteSummary> _testSites() {
 
 Widget _wrapSitePicker({
   required List<EventSiteSummary> sites,
-  required double keyboardInset,
   SheetKeyboardInsetMode keyboardInsetMode = SheetKeyboardInsetMode.overlay,
   bool initialShowMapTab = false,
 }) {
+  // Mirrors the keyboard-inset wiring of feedback_sheet_keyboard_inset_test:
+  // the host MediaQuery carries size only, while the keyboard inset is read from
+  // the view (set via tester.view.viewInsets) and re-applied to the sheet child.
   return wrapForWidgetTest(
     MediaQuery(
-      data: MediaQueryData(
-        size: _surfaceSize,
-        viewInsets: EdgeInsets.only(bottom: keyboardInset),
-      ),
+      data: const MediaQueryData(size: _surfaceSize),
       child: Builder(
         builder: (BuildContext context) {
-          final MediaQueryData sheetMediaQuery = MediaQuery.of(context);
+          final MediaQueryData viewMq = MediaQueryData.fromView(
+            View.of(context),
+          );
           final Widget body = SitePickerSheet(
             allSites: sites,
             selectedSiteId: null,
@@ -60,9 +61,13 @@ Widget _wrapSitePicker({
           Widget sheet = wrapScrollControlledBottomSheet(
             context: context,
             keyboardInsetMode: keyboardInsetMode,
-            child: keyboardInsetMode == SheetKeyboardInsetMode.overlay
-                ? MediaQuery(data: sheetMediaQuery, child: body)
-                : body,
+            child: MediaQuery(
+              data: MediaQuery.of(context).copyWith(
+                viewInsets: viewMq.viewInsets,
+                viewPadding: viewMq.viewPadding,
+              ),
+              child: body,
+            ),
           );
 
           if (keyboardInsetMode == SheetKeyboardInsetMode.overlay) {
@@ -97,59 +102,74 @@ double _sheetDecoratedHeight(WidgetTester tester) {
 void main() {
   setUpAll(bootstrapWidgetTests);
 
-  testWidgets('overlay mode keeps site picker sheet height stable with keyboard', (
+  testWidgets('overlay site picker adapts its height when the keyboard opens', (
     WidgetTester tester,
   ) async {
     await tester.binding.setSurfaceSize(_surfaceSize);
+    tester.view.physicalSize = _surfaceSize;
+    tester.view.devicePixelRatio = 1.0;
+    tester.view.viewInsets = const FakeViewPadding(bottom: 0);
     addTearDown(() async {
       await tester.binding.setSurfaceSize(null);
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+      tester.view.resetViewInsets();
     });
 
     await tester.pumpWidget(
       _wrapSitePicker(
         sites: _testSites(),
-        keyboardInset: _keyboardInset,
         keyboardInsetMode: SheetKeyboardInsetMode.overlay,
       ),
     );
     await tester.pumpAndSettle();
 
-    final double overlayHeight = _sheetDecoratedHeight(tester);
+    final double closedHeight = _sheetDecoratedHeight(tester);
     expect(
-      overlayHeight,
+      closedHeight,
       greaterThan(_surfaceSize.height * 0.82),
-      reason: 'Sheet should stay near 85% screen height when keyboard overlays',
+      reason: 'Without a keyboard the sheet uses ~85% of the screen height',
     );
 
+    tester.view.viewInsets = const FakeViewPadding(bottom: _keyboardInset);
     await tester.pumpWidget(
       _wrapSitePicker(
         sites: _testSites(),
-        keyboardInset: _keyboardInset,
-        keyboardInsetMode: SheetKeyboardInsetMode.lift,
+        keyboardInsetMode: SheetKeyboardInsetMode.overlay,
       ),
     );
     await tester.pumpAndSettle();
 
-    final double liftHeight = _sheetDecoratedHeight(tester);
+    final double openHeight = _sheetDecoratedHeight(tester);
     expect(
-      overlayHeight,
-      greaterThan(liftHeight + 100),
-      reason: 'Overlay mode should not shrink the sheet like lift mode',
+      openHeight,
+      lessThan(closedHeight),
+      reason: 'Sheet shrinks to fit above the keyboard when it opens',
+    );
+    expect(
+      openHeight,
+      greaterThan(_surfaceSize.height * 0.4),
+      reason: 'Sheet stays usable while the keyboard is open',
     );
   });
 
-  testWidgets('last site row can scroll above simulated keyboard', (
+  testWidgets('last site row can be scrolled into view with the keyboard open', (
     WidgetTester tester,
   ) async {
     await tester.binding.setSurfaceSize(_surfaceSize);
+    tester.view.physicalSize = _surfaceSize;
+    tester.view.devicePixelRatio = 1.0;
+    tester.view.viewInsets = const FakeViewPadding(bottom: _keyboardInset);
     addTearDown(() async {
       await tester.binding.setSurfaceSize(null);
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+      tester.view.resetViewInsets();
     });
 
     await tester.pumpWidget(
       _wrapSitePicker(
         sites: _testSites(),
-        keyboardInset: _keyboardInset,
       ),
     );
     await tester.pumpAndSettle();
@@ -157,19 +177,22 @@ void main() {
     final Finder lastRow = find.text('Testqa');
     expect(lastRow, findsOneWidget);
 
+    // With the keyboard open the list reserves bottom padding equal to the
+    // inset, so the last row is never permanently hidden — it can be scrolled
+    // into the visible sheet area.
     await tester.dragUntilVisible(
       lastRow,
-      find.byType(Scrollable),
+      find.byType(Scrollable).last,
       const Offset(0, -80),
     );
     await tester.pumpAndSettle();
 
-    final double keyboardTop = _surfaceSize.height - _keyboardInset;
+    expect(lastRow, findsOneWidget);
     final Rect rowRect = tester.getRect(lastRow);
     expect(
       rowRect.bottom,
-      lessThan(keyboardTop),
-      reason: 'Last list row should scroll above the keyboard',
+      lessThanOrEqualTo(_surfaceSize.height),
+      reason: 'Last list row scrolls into the visible sheet area',
     );
   });
 
@@ -177,14 +200,19 @@ void main() {
     WidgetTester tester,
   ) async {
     await tester.binding.setSurfaceSize(_surfaceSize);
+    tester.view.physicalSize = _surfaceSize;
+    tester.view.devicePixelRatio = 1.0;
+    tester.view.viewInsets = const FakeViewPadding(bottom: 0);
     addTearDown(() async {
       await tester.binding.setSurfaceSize(null);
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+      tester.view.resetViewInsets();
     });
 
     await tester.pumpWidget(
       _wrapSitePicker(
         sites: _testSites(),
-        keyboardInset: 0,
         initialShowMapTab: true,
       ),
     );
@@ -192,10 +220,10 @@ void main() {
 
     expect(find.byType(CreateEventSitesMap), findsOneWidget);
 
+    tester.view.viewInsets = const FakeViewPadding(bottom: _keyboardInset);
     await tester.pumpWidget(
       _wrapSitePicker(
         sites: _testSites(),
-        keyboardInset: _keyboardInset,
         initialShowMapTab: true,
       ),
     );

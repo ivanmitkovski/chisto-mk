@@ -16,6 +16,12 @@ import 'recording_events_repository.dart';
 import '../../shared/widget_test_bootstrap.dart';
 
 EcoEvent _baseEvent() {
+  // Keep the schedule in the future relative to "now" so the upcoming event
+  // stays valid (the sheet disables Save and skips the conflict preview when
+  // the start time is in the past).
+  final DateTime futureDate = DateUtils.dateOnly(
+    DateTime.now(),
+  ).add(const Duration(days: 30));
   return EcoEvent(
     id: 'e1',
     title: 'River cleanup',
@@ -27,7 +33,7 @@ EcoEvent _baseEvent() {
     siteDistanceKm: 2,
     organizerId: 'org-1',
     organizerName: 'Org',
-    date: DateTime.utc(2026, 6, 15),
+    date: futureDate,
     startTime: const EventTime(hour: 10, minute: 0),
     endTime: const EventTime(hour: 12, minute: 0),
     participantCount: 3,
@@ -35,6 +41,34 @@ EcoEvent _baseEvent() {
     createdAt: DateTime.utc(2026, 1, 1),
     maxParticipants: 20,
     moderationApproved: true,
+  );
+}
+
+/// Upcoming event whose start time has already passed (e.g. a draft awaiting
+/// moderation). Editing non-schedule fields must still be allowed.
+EcoEvent _pastScheduleEvent() {
+  final DateTime pastDate = DateUtils.dateOnly(
+    DateTime.now(),
+  ).subtract(const Duration(days: 2));
+  return EcoEvent(
+    id: 'e1',
+    title: 'River cleanup',
+    description: 'Desc',
+    category: EcoEventCategory.riverAndLake,
+    siteId: 's1',
+    siteName: 'Vardar bend',
+    siteImageUrl: '',
+    siteDistanceKm: 2,
+    organizerId: 'org-1',
+    organizerName: 'Org',
+    date: pastDate,
+    startTime: const EventTime(hour: 10, minute: 0),
+    endTime: const EventTime(hour: 12, minute: 0),
+    participantCount: 3,
+    status: EcoEventStatus.upcoming,
+    createdAt: DateTime.utc(2026, 1, 1),
+    maxParticipants: 20,
+    moderationApproved: false,
   );
 }
 
@@ -148,6 +182,59 @@ void main() {
     expect(find.text('Event updated'), findsOneWidget);
   });
 
+  testWidgets(
+    'save stays enabled for title edits when the existing schedule is already past',
+    (WidgetTester tester) async {
+      final EcoEvent pastEvent = _pastScheduleEvent();
+      repo = RecordingEventsRepository(seed: <EcoEvent>[pastEvent]);
+      setEventsRepositoryTestOverride(repo);
+
+      await tester.pumpWidget(_app(EditEventSheet(event: pastEvent)));
+      await tester.pump();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      await tester.enterText(
+        find.byType(TextField).first,
+        'Updated title for past event',
+      );
+      await tester.pump();
+
+      final ElevatedButton saveBtn = tester.widget<ElevatedButton>(
+        find.descendant(
+          of: find.byType(PrimaryButton),
+          matching: find.byType(ElevatedButton),
+        ),
+      );
+      expect(
+        saveBtn.onPressed,
+        isNotNull,
+        reason: 'Save should be enabled when only the title changes, even if '
+            'the existing schedule is in the past',
+      );
+
+      await tester.tap(
+        find.descendant(
+          of: find.byType(PrimaryButton),
+          matching: find.byType(ElevatedButton),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 200));
+
+      expect(repo.updateEventDetailsCallCount, 1);
+      expect(
+        repo.lastUpdateEventDetailsPayload?.title,
+        'Updated title for past event',
+      );
+      expect(
+        repo.lastUpdateEventDetailsPayload?.scheduledAtUtc,
+        isNull,
+        reason: 'An unchanged schedule must not be sent in the PATCH payload',
+      );
+    },
+  );
+
   testWidgets('API error shows snack and keeps sheet open', (
     WidgetTester tester,
   ) async {
@@ -223,25 +310,33 @@ void main() {
     const Size surfaceSize = Size(800, 1600);
 
     await tester.binding.setSurfaceSize(surfaceSize);
+    tester.view.physicalSize = surfaceSize;
+    tester.view.devicePixelRatio = 1.0;
+    tester.view.viewInsets = const FakeViewPadding(bottom: keyboardInset);
     addTearDown(() async {
       await tester.binding.setSurfaceSize(null);
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+      tester.view.resetViewInsets();
     });
 
     await tester.pumpWidget(
       wrapForWidgetTest(
         MediaQuery(
-          data: const MediaQueryData(
-            size: surfaceSize,
-            viewInsets: EdgeInsets.only(bottom: keyboardInset),
-          ),
+          data: const MediaQueryData(size: surfaceSize),
           child: Builder(
             builder: (BuildContext context) {
-              final MediaQueryData sheetMediaQuery = MediaQuery.of(context);
+              final MediaQueryData viewMq = MediaQueryData.fromView(
+                View.of(context),
+              );
               Widget sheet = wrapScrollControlledBottomSheet(
                 context: context,
                 keyboardInsetMode: SheetKeyboardInsetMode.overlay,
                 child: MediaQuery(
-                  data: sheetMediaQuery,
+                  data: MediaQuery.of(context).copyWith(
+                    viewInsets: viewMq.viewInsets,
+                    viewPadding: viewMq.viewPadding,
+                  ),
                   child: EditEventSheet(event: _baseEvent()),
                 ),
               );
@@ -279,23 +374,19 @@ void main() {
     final double keyboardTop = surfaceSize.height - keyboardInset;
     final Rect saveRect = tester.getRect(saveCta);
     final Rect fieldRect = tester.getRect(titleField);
-    final double footerGap = keyboardTop - saveRect.bottom;
-    final double fieldGap = keyboardTop - fieldRect.bottom;
 
+    // The edit sheet keeps a fixed-height panel (padFooterForKeyboard: false):
+    // the footer stays pinned at the sheet bottom behind the keyboard while the
+    // focused title field remains visible above it.
     expect(
-      footerGap,
-      greaterThan(0),
-      reason: 'Edit sheet footer should sit above the keyboard',
+      fieldRect.bottom,
+      lessThan(keyboardTop),
+      reason: 'Focused title field should stay visible above the keyboard',
     );
     expect(
-      footerGap,
-      lessThan(keyboardInset / 2),
-      reason: 'Edit sheet should not be lifted by a duplicate keyboard inset',
-    );
-    expect(
-      fieldGap,
-      greaterThan(0),
-      reason: 'Focused title field should stay above the keyboard',
+      saveRect.bottom,
+      greaterThan(keyboardTop),
+      reason: 'Footer stays pinned at the sheet bottom behind the keyboard',
     );
   });
 }

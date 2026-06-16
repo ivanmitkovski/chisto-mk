@@ -148,6 +148,10 @@ class _MapSearchModalState extends ConsumerState<MapSearchModal> {
       useModalRouteShape: true,
       addBottomInset: true,
       fillAvailableHeight: true,
+      // Overlay keyboard model: keep the sheet full height and let the scroll
+      // body pad once via appSheetOverlayKeyboardInset. Shrinking here too would
+      // double-count the inset and collapse the results above the keyboard.
+      shrinkForKeyboard: false,
       maxHeightFactor: 1,
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.lg,
