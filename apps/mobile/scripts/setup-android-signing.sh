@@ -24,6 +24,12 @@ mkdir -p "${HOME}/.chisto"
 if [[ -f "${KEYSTORE}" ]]; then
   echo "Upload keystore already exists: ${KEYSTORE}"
 else
+  cat <<'WARN' >&2
+WARNING: This creates a NEW upload keystore. Only use on a brand-new Play listing.
+If mk.chisto.app is already on Play Console, you must use the original upload .jks
+(Play Console → Setup → App signing → Upload key certificate). A new key will be
+rejected until you request an upload key reset from Google.
+WARN
   PASS="$(openssl rand -base64 24 | tr -d '/+=' | head -c 24)"
   "${KEYTOOL}" -genkeypair -v \
     -keystore "${KEYSTORE}" \

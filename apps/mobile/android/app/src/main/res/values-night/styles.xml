@@ -3,7 +3,7 @@
     <!-- Light-only app: use the same launch/normal themes when the OS is in dark mode. -->
     <style name="LaunchTheme" parent="@android:style/Theme.Light.NoTitleBar">
         <item name="android:windowBackground">@drawable/launch_background</item>
-        <item name="android:navigationBarColor">#FFFFFF</item>
+        <item name="android:navigationBarColor">@color/brand_primary</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
     <style name="NormalTheme" parent="@android:style/Theme.Light.NoTitleBar">

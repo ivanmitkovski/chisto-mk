@@ -60,9 +60,34 @@ if [[ -z "${KEYTOOL}" ]]; then
   fi
 fi
 if [[ -n "${KEYTOOL}" ]]; then
-  if "${KEYTOOL}" -printcert -jarfile build/app/outputs/bundle/release/app-release.aab 2>&1 | grep -q "Android Debug"; then
+  AAB="build/app/outputs/bundle/release/app-release.aab"
+  if "${KEYTOOL}" -printcert -jarfile "${AAB}" 2>&1 | grep -q "Android Debug"; then
     echo "ERROR: AAB is signed with the Android Debug certificate. Check ANDROID_KEYSTORE_*." >&2
     exit 1
+  fi
+  KEYSTORE_SHA1="$("${KEYTOOL}" -list -v \
+    -keystore "${ANDROID_KEYSTORE_PATH}" \
+    -alias "${ANDROID_KEY_ALIAS}" \
+    -storepass "${ANDROID_KEYSTORE_PASSWORD}" 2>/dev/null \
+    | awk -F': ' '/SHA1:/ {print $2; exit}')"
+  AAB_SHA1="$("${KEYTOOL}" -printcert -jarfile "${AAB}" 2>/dev/null \
+    | awk -F': ' '/SHA1:/ {print $2; exit}')"
+  echo "Upload keystore SHA1: ${KEYSTORE_SHA1:-unknown}"
+  echo "AAB certificate SHA1: ${AAB_SHA1:-unknown}"
+  if [[ -n "${KEYSTORE_SHA1}" && -n "${AAB_SHA1}" && "${KEYSTORE_SHA1}" != "${AAB_SHA1}" ]]; then
+    echo "ERROR: AAB certificate does not match the configured upload keystore." >&2
+    exit 1
+  fi
+  if [[ -n "${PLAY_EXPECTED_UPLOAD_SHA1:-}" ]]; then
+    EXPECTED="$(echo "${PLAY_EXPECTED_UPLOAD_SHA1// /}" | tr '[:lower:]' '[:upper:]')"
+    ACTUAL="$(echo "${AAB_SHA1// /}" | tr '[:lower:]' '[:upper:]')"
+    if [[ "${ACTUAL}" != "${EXPECTED}" ]]; then
+      echo "ERROR: AAB upload cert SHA1 (${AAB_SHA1}) does not match Play Console." >&2
+      echo "       Expected: ${PLAY_EXPECTED_UPLOAD_SHA1}" >&2
+      echo "       Use the original upload .jks from Play → Setup → App signing." >&2
+      exit 1
+    fi
+    echo "Upload cert matches Play Console (PLAY_EXPECTED_UPLOAD_SHA1)."
   fi
   echo "Android AAB signing looks OK (not debug)."
 else
