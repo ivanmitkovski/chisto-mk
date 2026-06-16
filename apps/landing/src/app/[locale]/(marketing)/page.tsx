@@ -6,6 +6,7 @@ import { Features } from "@/components/organisms/Features";
 import { Stats } from "@/components/organisms/Stats";
 import { FAQ } from "@/components/organisms/FAQ";
 import { CTASection } from "@/components/organisms/CTASection";
+import { isLaunchHomeSectionVisible } from "@/config/launch";
 import { routing } from "@/i18n/routing";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -44,7 +45,7 @@ export default function HomePage() {
       <Hero />
       <HowItWorks />
       <Features />
-      <Stats />
+      {isLaunchHomeSectionVisible("stats") ? <Stats /> : null}
       <FAQ />
       <CTASection />
     </>

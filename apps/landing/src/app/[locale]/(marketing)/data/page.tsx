@@ -1,21 +1,21 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { Link } from "@/i18n/routing";
 import { Badge } from "@/components/atoms/Badge";
+import { buttonVariants } from "@/components/atoms/Button";
 import { Container } from "@/components/layout/Container";
 import { Section } from "@/components/layout/Section";
-import { buttonVariants } from "@/components/atoms/Button";
-import { cn } from "@/lib/utils/cn";
-import { getDataRequestChannelHref } from "@/lib/data-request-url";
-import { routing } from "@/i18n/routing";
+import { LegalPageNav } from "@/components/molecules/LegalPageNav";
 import type { LegalSection } from "@/components/organisms/LegalLayout";
+import { routing, type AppLocale } from "@/i18n/routing";
+import { getDataRequestChannelHref } from "@/lib/data-request-url";
+import { getPublicLegalValue } from "@/lib/legal/legal-public-config";
 import { LegalRichBody } from "@/lib/legal/legal-rich-body";
 import {
   getLegalPlaceholderMap,
   substituteLegalSections,
   substituteLegalText,
 } from "@/lib/legal/substitute-placeholders";
-import { getPublicLegalValue } from "@/lib/legal/legal-public-config";
+import { cn } from "@/lib/utils/cn";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -43,9 +43,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function DataPage() {
+export default async function DataPage({ params }: Props) {
+  const { locale } = await params;
+  const appLocale = locale as AppLocale;
   const t = await getTranslations("dataPage");
-  const map = getLegalPlaceholderMap();
+  const map = getLegalPlaceholderMap(appLocale);
   const href = getDataRequestChannelHref(
     getPublicLegalValue(process.env.NEXT_PUBLIC_DATA_REQUEST_URL, "dataRequestUrl"),
   );
@@ -61,24 +63,10 @@ export default async function DataPage() {
         </h1>
         <p className="mt-4 text-sm text-gray-500">
           <span className="font-medium text-gray-600">{t("lastUpdatedLabel")}</span>{" "}
-          <span className="tabular-nums text-gray-700">{t("lastUpdated")}</span>
+          <span className="tabular-nums text-gray-700">
+            {substituteLegalText(t("lastUpdated"), map)}
+          </span>
         </p>
-
-        <div
-          className="mt-8 rounded-2xl border border-amber-200/90 bg-amber-50/90 p-5 text-amber-950 shadow-sm shadow-amber-900/5 md:p-6"
-          role="note"
-        >
-          <p className="text-sm font-semibold tracking-tight text-amber-950">
-            {substituteLegalText(t("noticeTitle"), map)}
-          </p>
-          <div className="mt-3 text-sm leading-relaxed text-amber-950/95">
-            <LegalRichBody
-              body={substituteLegalText(t("noticeBody"), map)}
-              className="flex flex-col gap-3"
-              linkClassName="font-semibold text-amber-900 underline decoration-amber-700/45 underline-offset-2 transition-colors hover:decoration-amber-800"
-            />
-          </div>
-        </div>
 
         <div className="mt-8 text-lg leading-relaxed text-gray-600 md:text-[1.0625rem]">
           <LegalRichBody body={substituteLegalText(t("lead"), map)} className="flex flex-col gap-4" />
@@ -129,17 +117,7 @@ export default async function DataPage() {
           ))}
         </div>
 
-        <nav className="mt-14 flex flex-wrap gap-x-6 gap-y-3 border-t border-gray-200/80 pt-10 text-sm md:mt-16">
-          <Link href="/privacy" className="font-medium text-primary underline-offset-4 hover:underline">
-            {t("linkPrivacy")}
-          </Link>
-          <Link href="/cookies" className="font-medium text-primary underline-offset-4 hover:underline">
-            {t("linkCookies")}
-          </Link>
-          <Link href="/terms" className="font-medium text-primary underline-offset-4 hover:underline">
-            {t("linkTerms")}
-          </Link>
-        </nav>
+        <LegalPageNav className="mt-14 md:mt-16" />
       </Container>
     </Section>
   );

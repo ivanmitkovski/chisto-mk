@@ -1,6 +1,7 @@
 import { Badge } from "@/components/atoms/Badge";
 import { Container } from "@/components/layout/Container";
 import { Section } from "@/components/layout/Section";
+import { LegalPageNav } from "@/components/molecules/LegalPageNav";
 import { LegalRichBody } from "@/lib/legal/legal-rich-body";
 
 export type LegalSection = { title: string; body: string };
@@ -12,9 +13,8 @@ export function LegalLayout({
   lastUpdated,
   effectiveDateLabel,
   effectiveDate,
-  noticeTitle,
-  noticeBody,
   sections,
+  showPageNav = true,
 }: {
   badge: string;
   title: string;
@@ -22,9 +22,8 @@ export function LegalLayout({
   lastUpdated: string;
   effectiveDateLabel?: string;
   effectiveDate?: string;
-  noticeTitle: string;
-  noticeBody: string;
   sections: LegalSection[];
+  showPageNav?: boolean;
 }) {
   return (
     <Section className="relative overflow-hidden mesh-section-faq">
@@ -50,20 +49,6 @@ export function LegalLayout({
           ) : null}
         </div>
 
-        <div
-          className="mt-8 rounded-2xl border border-amber-200/90 bg-amber-50/90 p-5 text-amber-950 shadow-sm shadow-amber-900/5 md:p-6"
-          role="note"
-        >
-          <p className="text-sm font-semibold tracking-tight text-amber-950">{noticeTitle}</p>
-          <div className="mt-3 text-sm leading-relaxed text-amber-950/95">
-            <LegalRichBody
-              body={noticeBody}
-              className="flex flex-col gap-3"
-              linkClassName="font-semibold text-amber-900 underline decoration-amber-700/45 underline-offset-2 transition-colors hover:decoration-amber-800"
-            />
-          </div>
-        </div>
-
         <div className="mt-14 flex flex-col gap-14 md:mt-16 md:gap-16">
           {sections.map((s, i) => (
             <section
@@ -79,6 +64,8 @@ export function LegalLayout({
             </section>
           ))}
         </div>
+
+        {showPageNav ? <LegalPageNav className="mt-14 md:mt-16" /> : null}
       </Container>
     </Section>
   );

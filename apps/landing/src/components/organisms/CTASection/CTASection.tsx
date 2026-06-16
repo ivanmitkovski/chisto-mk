@@ -3,20 +3,14 @@
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { Container } from "@/components/layout/Container";
-import { AppStoreButton } from "@/components/molecules/AppStoreButton";
+import { StoreDownloadButtons, hasStoreDownloadLinks } from "@/components/molecules/StoreDownloadButtons";
 import { PhoneMockup } from "@/components/molecules/PhoneMockup";
+import { PhoneScreenshot } from "@/components/molecules/PhoneScreenshot";
 import { FloatingPhone } from "@/components/molecules/FloatingPhone";
 import { fadeInUp, staggerContainer, viewOnce } from "@/lib/animations/variants";
+import type { AppScreenshotId } from "@/lib/app-screenshots";
 
-function CTAPhone() {
-  return (
-    <div className="flex aspect-[9/19.5] flex-col items-center justify-center rounded-3xl bg-gradient-to-br from-primary/15 via-emerald-100/80 to-sky-100/60 p-6">
-      <div className="mb-4 h-16 w-16 rounded-full bg-primary/35 shadow-inner ring-2 ring-white/30" />
-      <div className="mb-2 h-4 w-32 rounded-md bg-white/95 shadow-sm" />
-      <div className="h-3 w-24 rounded-md bg-white/80" />
-    </div>
-  );
-}
+const CTA_PHONE_SCREENSHOTS: AppScreenshotId[] = ["welcome", "feed", "map"];
 
 export function CTASection() {
   const t = useTranslations("cta");
@@ -68,31 +62,28 @@ export function CTASection() {
             >
               {t("subtitle")}
             </motion.p>
-            <motion.div
-              className="mt-10 flex flex-wrap items-center gap-3 sm:gap-4"
-              variants={fadeInUp}
-            >
-              <AppStoreButton store="apple" />
-              <AppStoreButton store="google" />
-            </motion.div>
+            {hasStoreDownloadLinks() ? (
+              <motion.div
+                className="mt-10 flex flex-wrap items-center gap-3 sm:gap-4"
+                variants={fadeInUp}
+              >
+                <StoreDownloadButtons />
+              </motion.div>
+            ) : null}
           </motion.div>
 
           <div className="relative hidden min-h-[20rem] overflow-visible md:flex md:items-end md:justify-center md:gap-2 md:pb-4 lg:gap-3">
-            <FloatingPhone className="w-40" delay={0}>
-              <PhoneMockup>
-                <CTAPhone />
-              </PhoneMockup>
-            </FloatingPhone>
-            <FloatingPhone className="relative z-10 w-[11rem] lg:w-44" delay={0.12}>
-              <PhoneMockup>
-                <CTAPhone />
-              </PhoneMockup>
-            </FloatingPhone>
-            <FloatingPhone className="w-40" delay={0.22}>
-              <PhoneMockup>
-                <CTAPhone />
-              </PhoneMockup>
-            </FloatingPhone>
+            {CTA_PHONE_SCREENSHOTS.map((screenshotId, index) => (
+              <FloatingPhone
+                key={screenshotId}
+                className={index === 1 ? "relative z-10 w-[11rem] lg:w-44" : "w-40"}
+                delay={index * 0.12}
+              >
+                <PhoneMockup>
+                  <PhoneScreenshot screenshotId={screenshotId} />
+                </PhoneMockup>
+              </FloatingPhone>
+            ))}
           </div>
         </div>
       </Container>

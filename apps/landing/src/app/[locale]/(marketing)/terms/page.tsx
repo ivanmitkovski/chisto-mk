@@ -6,7 +6,7 @@ import {
   substituteLegalSections,
   substituteLegalText,
 } from "@/lib/legal/substitute-placeholders";
-import { routing } from "@/i18n/routing";
+import { routing, type AppLocale } from "@/i18n/routing";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -34,10 +34,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function TermsPage() {
+export default async function TermsPage({ params }: Props) {
+  const { locale } = await params;
+  const appLocale = locale as AppLocale;
   const t = await getTranslations("termsPage");
-  const map = getLegalPlaceholderMap();
+  const map = getLegalPlaceholderMap(appLocale);
   const sections = substituteLegalSections(t.raw("sections") as LegalSection[], map);
+  const effectiveLabel = t("effectiveDateLabel").trim();
+  const effectiveRaw = t("effectiveDate").trim();
+  const showEffectiveDate = effectiveLabel.length > 0 && effectiveRaw.length > 0;
 
   return (
     <LegalLayout
@@ -45,8 +50,12 @@ export default async function TermsPage() {
       title={t("title")}
       lastUpdatedLabel={t("lastUpdatedLabel")}
       lastUpdated={substituteLegalText(t("lastUpdated"), map)}
-      noticeTitle={substituteLegalText(t("noticeTitle"), map)}
-      noticeBody={substituteLegalText(t("noticeBody"), map)}
+      {...(showEffectiveDate
+        ? {
+            effectiveDateLabel: effectiveLabel,
+            effectiveDate: substituteLegalText(effectiveRaw, map),
+          }
+        : {})}
       sections={sections}
     />
   );

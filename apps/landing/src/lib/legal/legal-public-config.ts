@@ -1,3 +1,6 @@
+import { getSiteUrl } from "@/lib/site-url";
+import type { AppLocale } from "@/i18n/routing";
+
 export const LEGAL_PUBLIC_DEFAULTS = {
   siteUrl: "https://chisto.mk",
   dataRequestUrl: "info@ekohab.mk",
@@ -11,10 +14,10 @@ export const LEGAL_PUBLIC_DEFAULTS = {
   privacyEmail: "info@ekohab.mk",
   contactAddress: "Скопје, Република Северна Македонија",
   contactPhone: "+389 75 770 803",
-  privacyPolicyUrl: "https://chisto.mk/privacy",
-  termsUrl: "https://chisto.mk/terms",
-  cookiePolicyUrl: "https://chisto.mk/cookies",
-  cookiePreferencesUrl: "https://chisto.mk/cookies#settings",
+  privacyPolicyUrl: "https://chisto.mk/mk/privacy",
+  termsUrl: "https://chisto.mk/mk/terms",
+  cookiePolicyUrl: "https://chisto.mk/mk/cookies",
+  cookiePreferencesUrl: "https://chisto.mk/mk/cookies#cookie-settings",
   hostingProvider: "Amazon Web Services (AWS)",
   serverLocation: "AWS eu-central-1 (Frankfurt, Germany)",
   serverCountryOrRegion: "European Union / EEA",
@@ -30,7 +33,7 @@ export const LEGAL_PUBLIC_DEFAULTS = {
   courtLocation: "Skopje",
   legalEffectiveDate: "29 April 2026",
   legalLastUpdatedDate: "30 April 2026",
-  dpoEmail: "Not appointed",
+  dpoEmail: "Not applicable",
   euRepresentative: "Not applicable",
   governingLawJurisdiction: "Republic of North Macedonia",
   retentionContactMonths: "90 days",
@@ -64,4 +67,16 @@ export function getPublicOptionalUrl(envValue: string | undefined): string | nul
   const trimmed = envValue?.trim();
   if (!trimmed) return null;
   return /^https:\/\//i.test(trimmed) ? trimmed : null;
+}
+
+/** Locale-prefixed public URLs for legal cross-links (matches next-intl `localePrefix: always`). */
+export function buildLocaleLegalUrls(locale: AppLocale) {
+  const base = getSiteUrl();
+  return {
+    websiteUrl: `${base}/${locale}`,
+    privacyPolicyUrl: `${base}/${locale}/privacy`,
+    termsUrl: `${base}/${locale}/terms`,
+    cookiePolicyUrl: `${base}/${locale}/cookies`,
+    cookiePreferencesUrl: `${base}/${locale}/cookies#cookie-settings`,
+  };
 }

@@ -5,10 +5,20 @@ export const LAUNCH_PAGE_VISIBILITY = {
   press: false,
 } as const;
 
+/** Home page sections — flip to `true` when real data is available. */
+export const LAUNCH_HOME_SECTIONS = {
+  stats: false,
+} as const;
+
 export type HiddenLaunchPage = keyof typeof LAUNCH_PAGE_VISIBILITY;
+export type HiddenLaunchHomeSection = keyof typeof LAUNCH_HOME_SECTIONS;
 
 export function isLaunchPageVisible(page: HiddenLaunchPage): boolean {
   return LAUNCH_PAGE_VISIBILITY[page];
+}
+
+export function isLaunchHomeSectionVisible(section: HiddenLaunchHomeSection): boolean {
+  return LAUNCH_HOME_SECTIONS[section];
 }
 
 export const MARKETING_NAV_ITEMS = [
@@ -34,7 +44,6 @@ export const SITEMAP_PATHS = [
   "/privacy",
   "/cookies",
   "/data",
-  "/account-deletion",
   "/help",
   ...(isLaunchPageVisible("about") ? ["/about"] : []),
   ...(isLaunchPageVisible("news") ? ["/news"] : []),

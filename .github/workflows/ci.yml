@@ -130,6 +130,12 @@ jobs:
       - name: Landing help content lint
         run: pnpm --filter @chisto/landing run lint:help-content
 
+      - name: Lint landing legal content
+        run: pnpm --filter @chisto/landing run lint:legal-content
+
+      - name: Landing ESLint
+        run: pnpm --filter @chisto/landing lint
+
       - name: API OpenAPI snapshot check
         run: pnpm --filter @chisto/api run snapshot:openapi:check
 

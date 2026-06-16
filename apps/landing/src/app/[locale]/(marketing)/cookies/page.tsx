@@ -3,6 +3,8 @@ import { getTranslations } from "next-intl/server";
 import { LegalLayout, type LegalSection } from "@/components/organisms/LegalLayout";
 import { Container } from "@/components/layout/Container";
 import { Section } from "@/components/layout/Section";
+import { CookieSettingsPanel } from "@/components/molecules/CookieSettingsPanel";
+import { LegalPageNav } from "@/components/molecules/LegalPageNav";
 import { LegalRichBody } from "@/lib/legal/legal-rich-body";
 import {
   getLegalPlaceholderMap,
@@ -10,7 +12,7 @@ import {
   substituteLegalSections,
   substituteLegalText,
 } from "@/lib/legal/substitute-placeholders";
-import { routing } from "@/i18n/routing";
+import { routing, type AppLocale } from "@/i18n/routing";
 
 type CookieRow = {
   name: string;
@@ -46,9 +48,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function CookiesPage() {
+export default async function CookiesPage({ params }: Props) {
+  const { locale } = await params;
+  const appLocale = locale as AppLocale;
   const t = await getTranslations("cookiesPage");
-  const map = getLegalPlaceholderMap();
+  const map = getLegalPlaceholderMap(appLocale);
   const sections = substituteLegalSections(t.raw("sections") as LegalSection[], map);
   const rows = substituteCookieRows(t.raw("cookieRows") as CookieRow[], map);
   const effectiveLabel = t("effectiveDateLabel").trim();
@@ -68,9 +72,8 @@ export default async function CookiesPage() {
               effectiveDate: substituteLegalText(effectiveRaw, map),
             }
           : {})}
-        noticeTitle={substituteLegalText(t("noticeTitle"), map)}
-        noticeBody={substituteLegalText(t("noticeBody"), map)}
         sections={sections}
+        showPageNav={false}
       />
       <Section className="relative -mt-6 overflow-hidden pb-16 pt-2 mesh-section-faq md:-mt-8">
         <Container className="relative z-10 max-w-[min(42rem,calc(100%-1.5rem))]">
@@ -126,6 +129,9 @@ export default async function CookiesPage() {
               </table>
             </div>
           </div>
+
+          <CookieSettingsPanel />
+          <LegalPageNav />
         </Container>
       </Section>
     </>
