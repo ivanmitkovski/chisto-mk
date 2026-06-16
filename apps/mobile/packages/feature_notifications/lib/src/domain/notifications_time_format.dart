@@ -9,7 +9,7 @@ String notificationRelativeTime(AppLocalizations l10n, DateTime value) {
   }
   if (diff.inHours < 24) return l10n.notificationsTimeHours(diff.inHours);
   if (diff.inDays < 7) return l10n.notificationsTimeDays(diff.inDays);
-  return DateFormat('dd.MM').format(value);
+  return DateFormat('dd.MM', l10n.localeName).format(value);
 }
 
 String notificationDayTitle(
@@ -24,9 +24,9 @@ String notificationDayTitle(
   if (diff == 0) return l10n.notificationsDayToday;
   if (diff == 1) return l10n.notificationsDayYesterday;
   if (diff < 7) {
-    return DateFormat('EEEE').format(value);
+    return DateFormat('EEEE', l10n.localeName).format(value);
   }
-  return DateFormat('dd.MM.yyyy').format(value);
+  return DateFormat('dd.MM.yyyy', l10n.localeName).format(value);
 }
 
 String notificationGroupSummary(

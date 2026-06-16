@@ -1,15 +1,41 @@
 import type { PrismaService } from '../../prisma/prisma.service';
 import { DEFAULT_APP_LOCALE, normalizeAppLocale, type AppLocale } from './app-locale';
 
+function localeFromAcceptLanguageHint(acceptLanguageHint?: string): AppLocale | null {
+  const trimmed = acceptLanguageHint?.trim();
+  if (!trimmed) {
+    return null;
+  }
+  return normalizeAppLocale(trimmed);
+}
+
+/**
+ * Resolves notification copy locale for one user:
+ * 1. `User.locale` (authoritative, from profile / language picker)
+ * 2. Most recently seen active device token locale
+ * 3. `Accept-Language` hint when present
+ * 4. Default (`mk`)
+ */
+export async function resolveUserNotificationLocale(
+  prisma: PrismaService,
+  userId: string,
+  acceptLanguageHint?: string,
+): Promise<AppLocale> {
+  const map = await userLocalesByUserId(prisma, [userId], acceptLanguageHint);
+  return map.get(userId) ?? DEFAULT_APP_LOCALE;
+}
+
 /**
  * Resolves notification copy locale per user:
  * 1. `User.locale` (authoritative, from profile / language picker)
  * 2. Most recently seen active device token locale
- * 3. Default (`mk`)
+ * 3. `Accept-Language` hint when present (batch only, for users without steps 1–2)
+ * 4. Default (`mk`)
  */
 export async function userLocalesByUserId(
   prisma: PrismaService,
   userIds: string[],
+  acceptLanguageHint?: string,
 ): Promise<Map<string, AppLocale>> {
   const unique = [...new Set(userIds)].filter((id) => id.length > 0);
   const out = new Map<string, AppLocale>();
@@ -41,9 +67,10 @@ export async function userLocalesByUserId(
     }
   }
 
+  const hintLocale = localeFromAcceptLanguageHint(acceptLanguageHint);
   for (const id of unique) {
     if (!out.has(id)) {
-      out.set(id, DEFAULT_APP_LOCALE);
+      out.set(id, hintLocale ?? DEFAULT_APP_LOCALE);
     }
   }
   return out;
@@ -53,8 +80,9 @@ export async function userLocalesByUserId(
 export async function notificationLocalesByUserId(
   prisma: PrismaService,
   userIds: string[],
+  acceptLanguageHint?: string,
 ): Promise<Map<string, AppLocale>> {
-  return userLocalesByUserId(prisma, userIds);
+  return userLocalesByUserId(prisma, userIds, acceptLanguageHint);
 }
 
 export function resolveUserLocaleFromMaps(

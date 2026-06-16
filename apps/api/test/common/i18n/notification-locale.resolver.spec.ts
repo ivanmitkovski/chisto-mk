@@ -1,5 +1,8 @@
 /// <reference types="jest" />
-import { userLocalesByUserId } from '../../../src/common/i18n/notification-locale.resolver';
+import {
+  resolveUserNotificationLocale,
+  userLocalesByUserId,
+} from '../../../src/common/i18n/notification-locale.resolver';
 import type { PrismaService } from '../../../src/prisma/prisma.service';
 
 function mockPrisma(users: Array<{ id: string; locale: string | null }>, tokens: Array<{ userId: string; locale: string | null; lastSeenAt: Date }>) {
@@ -54,5 +57,23 @@ describe('userLocalesByUserId', () => {
     );
     const map = await userLocalesByUserId(prisma, ['u1']);
     expect(map.get('u1')).toBe('sq');
+  });
+
+  it('uses Accept-Language hint when profile and token locale are missing', async () => {
+    const prisma = mockPrisma([], []);
+    const map = await userLocalesByUserId(prisma, ['unknown'], 'en-US,en;q=0.9');
+    expect(map.get('unknown')).toBe('en');
+  });
+
+  it('prefers User.locale over Accept-Language hint', async () => {
+    const prisma = mockPrisma([{ id: 'u1', locale: 'mk' }], []);
+    const map = await userLocalesByUserId(prisma, ['u1'], 'en-US,en;q=0.9');
+    expect(map.get('u1')).toBe('mk');
+  });
+
+  it('resolveUserNotificationLocale returns hint locale for new users', async () => {
+    const prisma = mockPrisma([], []);
+    const locale = await resolveUserNotificationLocale(prisma, 'new-user', 'sq-AL');
+    expect(locale).toBe('sq');
   });
 });

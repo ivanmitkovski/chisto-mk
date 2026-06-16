@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { EventChatMessageType, NotificationType } from '../../prisma-client';
 import { NotificationDispatcherService } from '../../notifications/services/notification-dispatcher.service';
 import { buildEventChatPushPreview } from '../util/event-chat-push-preview';
+import { eventChatCoalesceExtraSuffix } from '../../common/i18n/event-chat-notification.copy';
 
 const DEFAULT_FLUSH_MS = 2_500;
 
@@ -112,7 +113,7 @@ export class EventChatPushAggregatorService {
     const body =
       batch.messageCount === 1
         ? `${senderName}: ${preview}`
-        : `${senderName}: ${preview} (+${batch.messageCount - 1})`;
+        : `${senderName}: ${preview} ${eventChatCoalesceExtraSuffix(batch.recipientLocale, batch.messageCount - 1)}`;
 
     try {
       await this.notificationDispatcher.dispatchToUser(batch.recipientUserId, {

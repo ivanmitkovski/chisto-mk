@@ -96,4 +96,74 @@ describe('EventChatPushAggregatorService', () => {
       }),
     );
   });
+
+  it('coalesces with localized mk suffix', async () => {
+    const dispatchToUser = jest.fn().mockResolvedValue(undefined);
+    const dispatcher = { dispatchToUser } as unknown as NotificationDispatcherService;
+    const aggregator = new EventChatPushAggregatorService(
+      { get: jest.fn().mockReturnValue('100') } as never,
+      dispatcher,
+    );
+
+    for (const [preview, messageId] of [
+      ['One', 'm1'],
+      ['Two', 'm2'],
+      ['Three', 'm3'],
+    ] as const) {
+      aggregator.enqueue({
+        recipientUserId: 'u2',
+        recipientLocale: 'mk',
+        eventId: 'evt1',
+        eventTitle: 'Beach cleanup',
+        senderDisplayName: 'Alex',
+        senderUserId: 'sender-1',
+        messagePreview: preview,
+        messageId,
+        messageType: EventChatMessageType.TEXT,
+      });
+    }
+
+    await jest.runAllTimersAsync();
+    expect(dispatchToUser).toHaveBeenCalledWith(
+      'u2',
+      expect.objectContaining({
+        body: 'Alex: Three (+уште 2)',
+      }),
+    );
+  });
+
+  it('coalesces with localized sq suffix', async () => {
+    const dispatchToUser = jest.fn().mockResolvedValue(undefined);
+    const dispatcher = { dispatchToUser } as unknown as NotificationDispatcherService;
+    const aggregator = new EventChatPushAggregatorService(
+      { get: jest.fn().mockReturnValue('100') } as never,
+      dispatcher,
+    );
+
+    for (const [preview, messageId] of [
+      ['One', 'm1'],
+      ['Two', 'm2'],
+      ['Three', 'm3'],
+    ] as const) {
+      aggregator.enqueue({
+        recipientUserId: 'u2',
+        recipientLocale: 'sq',
+        eventId: 'evt1',
+        eventTitle: 'Beach cleanup',
+        senderDisplayName: 'Alex',
+        senderUserId: 'sender-1',
+        messagePreview: preview,
+        messageId,
+        messageType: EventChatMessageType.TEXT,
+      });
+    }
+
+    await jest.runAllTimersAsync();
+    expect(dispatchToUser).toHaveBeenCalledWith(
+      'u2',
+      expect.objectContaining({
+        body: 'Alex: Three (+2 të tjera)',
+      }),
+    );
+  });
 });

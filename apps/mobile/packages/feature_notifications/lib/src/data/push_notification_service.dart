@@ -53,12 +53,12 @@ class PushNotificationService
     required bool Function() isAuthenticated,
     Locale Function()? resolveEffectiveLocale,
   }) : _repository = repository,
-       _isAuthenticated = isAuthenticated,
-       _resolveEffectiveLocale = resolveEffectiveLocale;
+       _isAuthenticated = isAuthenticated {
+    _resolveEffectiveLocale = resolveEffectiveLocale;
+  }
 
   final NotificationsRepository _repository;
   final bool Function() _isAuthenticated;
-  final Locale Function()? _resolveEffectiveLocale;
   void Function(AppError error)? onRegistrationFailure;
   bool _initialized = false;
   String? _lastInitReason;
@@ -457,17 +457,6 @@ class PushNotificationService
       _lastRegisteredToken = null;
       _lastRegisteredLocale = null;
     }
-  }
-
-  Locale _effectiveLocale() {
-    final Locale Function()? resolver = _resolveEffectiveLocale;
-    if (resolver != null) {
-      return resolver();
-    }
-    return resolveAppLocale(
-      override: null,
-      platformLocales: PlatformDispatcher.instance.locales,
-    );
   }
 
   bool _isLocaleUnchanged() {

@@ -132,13 +132,18 @@ export class AuthSessionController {
     type: AuthResponseDto,
   })
   @HttpCode(HttpStatus.OK)
-  verifyOtp(@Body() dto: VerifyOtpDto, @Req() req: Request) {
+  verifyOtp(
+    @Body() dto: VerifyOtpDto,
+    @Req() req: Request,
+    @Headers('accept-language') acceptLanguage?: string,
+  ) {
     return this.authOtp.verifyPhoneAndIssueSession(
       dto.phoneNumber,
       dto.code,
       dto.rememberMe ?? true,
       dto.deviceId,
       clientIp(req, req.headers['x-forwarded-for'] as string | undefined),
+      acceptLanguage != null && acceptLanguage !== '' ? acceptLanguage : undefined,
     );
   }
 }

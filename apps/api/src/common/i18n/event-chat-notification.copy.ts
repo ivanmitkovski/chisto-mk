@@ -69,3 +69,16 @@ export function eventChatMediaPreviewFallback(
       return eventChatMessageFallback(locale);
   }
 }
+
+/** Suffix appended when multiple chat messages are coalesced into one push. */
+export function eventChatCoalesceExtraSuffix(locale: AppLocale, extraCount: number): string {
+  const count = Math.max(1, Math.floor(extraCount));
+  switch (locale) {
+    case 'en':
+      return `(+${count})`;
+    case 'sq':
+      return `(+${count} të tjera)`;
+    default:
+      return `(+уште ${count})`;
+  }
+}

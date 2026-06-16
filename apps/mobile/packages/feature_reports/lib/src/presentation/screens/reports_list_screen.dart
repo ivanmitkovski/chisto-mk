@@ -258,6 +258,11 @@ class _ReportsListScreenState extends ConsumerState<ReportsListScreen>
   }
 
   Future<void> _handleRefresh() async {
+    final ReportsRealtimeConnectionState? realtimeState =
+        ref.read(reportsRealtimeServiceProvider).connectionState.value;
+    if (realtimeState != ReportsRealtimeConnectionState.live) {
+      ref.read(reportsRealtimeServiceProvider).requestReconnect();
+    }
     await _loadReports();
   }
 

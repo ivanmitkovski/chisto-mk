@@ -146,6 +146,10 @@ class ReportsOwnerSocketStream {
     if (connectionState.value == ReportsRealtimeConnectionState.live) {
       return;
     }
+    if (connectionState.value == ReportsRealtimeConnectionState.offline) {
+      requestReconnect();
+      return;
+    }
     _scheduleConnectivityReconnect();
   }
 
@@ -161,6 +165,7 @@ class ReportsOwnerSocketStream {
       return;
     }
     if (connectionState.value == ReportsRealtimeConnectionState.offline) {
+      requestReconnect();
       return;
     }
     _connectivityReconnectDebounce?.cancel();

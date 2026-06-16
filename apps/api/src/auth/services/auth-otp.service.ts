@@ -13,7 +13,7 @@ import { AuthSessionService } from './auth-session.service';
 import { AuthResponse } from '../types/auth-response.type';
 import { EmailService } from '../../email/services/email.service';
 import type { EmailLocale } from '../../email/types/email.types';
-import { notificationLocalesByUserId } from '../../common/i18n/notification-locale.resolver';
+import { resolveUserNotificationLocale } from '../../common/i18n/notification-locale.resolver';
 import type { AppLocale } from '../../common/i18n/app-locale';
 import { welcomePushCopy } from '../../notifications/util/notification-templates';
 import { AuthIdentifierThrottleService } from './auth-identifier-throttle.service';
@@ -127,6 +127,7 @@ export class AuthOtpService {
     rememberMe = true,
     deviceId?: string,
     ipAddress?: string | null,
+    acceptLanguage?: string,
   ): Promise<AuthResponse> {
     const normalized = phoneNumber.trim();
     await this.otpService.verifyAndConsumeOtp(normalized, code);
@@ -155,8 +156,11 @@ export class AuthOtpService {
       resourceId: user.id,
     });
 
-    const localeBy = await notificationLocalesByUserId(this.prisma, [user.id]);
-    const locale = localeBy.get(user.id)!;
+    const locale = await resolveUserNotificationLocale(
+      this.prisma,
+      user.id,
+      acceptLanguage,
+    );
     if (isFirstVerification) {
       void this.emitWelcomePushIfNew(user.id, locale).catch((err: unknown) => {
         this.logger.warn({

@@ -1,6 +1,22 @@
 part of 'push_notification_service.dart';
 
 mixin PushNotificationLocal {
+  Locale Function()? _resolveEffectiveLocale;
+
+  Locale _effectiveLocale() {
+    final Locale Function()? resolver = _resolveEffectiveLocale;
+    if (resolver != null) {
+      return resolver();
+    }
+    return resolveAppLocale(
+      override: null,
+      platformLocales: PlatformDispatcher.instance.locales,
+    );
+  }
+
+  AppLocalizations _pushLocalizations() =>
+      lookupAppLocalizations(_effectiveLocale());
+
   final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
   bool _localNotificationsInitialized = false;
@@ -401,13 +417,9 @@ mixin PushNotificationLocal {
   Future<void> _showForegroundBanner(RemoteMessage message) async {
     await _initLocalNotifications();
 
+    final AppLocalizations strings = _pushLocalizations();
     final String? type = message.data['type'] as String?;
     if (type == 'EVENT_CHAT' && _eventChatNotificationDetails != null) {
-      final Locale effectiveLocale = resolveAppLocale(
-        override: null,
-        platformLocales: PlatformDispatcher.instance.locales,
-      );
-      final AppLocalizations strings = lookupAppLocalizations(effectiveLocale);
       await EventChatLocalNotificationPresenter.show(
         _localNotifications,
         message: message,
@@ -418,7 +430,7 @@ mixin PushNotificationLocal {
     }
 
     final ({String? title, String? body}) resolved =
-        PushNotificationPayload.resolveTitleBody(message);
+        PushNotificationPayload.resolveTitleBody(message, strings: strings);
     final String? title = resolved.title;
     final String? body = resolved.body;
     if (title == null || title.isEmpty || body == null || body.isEmpty) {
@@ -427,6 +439,7 @@ mixin PushNotificationLocal {
 
     final AndroidChannelInfo ch = PushNotificationPayload.resolveAndroidChannel(
       type,
+      strings: strings,
     );
     final String? notificationId = message.data['notificationId'] as String?;
     final int androidId = notificationId != null && notificationId.isNotEmpty

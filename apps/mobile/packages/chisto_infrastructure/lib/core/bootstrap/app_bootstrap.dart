@@ -466,7 +466,7 @@ class AppBootstrap {
     if (locale == null) {
       await prefs.remove(_appLocaleCodeKey);
       container.read(appLocaleOverrideProvider.notifier).state = null;
-      await syncUserLocaleToServer(patchProfile: false);
+      await syncUserLocaleToServer(patchProfile: true);
       return;
     }
     final String code = locale.languageCode;
