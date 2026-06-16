@@ -110,6 +110,31 @@ chmod +x ../../scripts/verify-production.sh
 
 Confirm SNS alarm email subscription. Schedule RDS PITR drill per [`apps/api/docs/runbooks/db-restore.md`](../../apps/api/docs/runbooks/db-restore.md).
 
+## Prod database access (TablePlus)
+
+Production RDS is **private** (no direct internet access). Use the SSM bastion (`chisto-prod-db-bastion`) and port forwarding:
+
+1. Install [Session Manager plugin](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html) (`brew install --cask session-manager-plugin`).
+2. Run the tunnel (keep the terminal open):
+
+```bash
+./infra/scripts/prod-db-tunnel.sh
+```
+
+3. In TablePlus → PostgreSQL:
+
+| Field | Value |
+|-------|-------|
+| Host | `127.0.0.1` |
+| Port | `15432` (or `LOCAL_PORT=5433 ./infra/scripts/prod-db-tunnel.sh`) |
+| User | `chisto` |
+| Database | `chisto_prod` |
+| SSL | require |
+
+The script prints the password from Secrets Manager (`chisto/production/api`).
+
+**Dev** (`chisto-dev`) is publicly reachable from the admin CIDR and can connect directly using credentials in your local `.env`.
+
 ## Modules
 
 | Module | Purpose |
