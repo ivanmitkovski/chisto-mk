@@ -6,6 +6,7 @@ import 'package:chisto_infrastructure/core/auth/session_invalidation.dart';
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/core/network/request_cancellation.dart';
+import 'package:chisto_infrastructure/core/providers/app_providers.dart';
 import 'package:chisto_infrastructure/core/providers/reports_providers.dart';
 import 'package:chisto_infrastructure/core/widgets/state_rebuild_mixin.dart';
 import 'package:chisto_infrastructure/l10n/app_localizations.dart';

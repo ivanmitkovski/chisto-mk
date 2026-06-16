@@ -196,6 +196,10 @@ class ReportsOwnerSocketStream {
     if (token == null || token.isEmpty) {
       return;
     }
+    if (connectionState.value == ReportsRealtimeConnectionState.offline) {
+      requestReconnect();
+      return;
+    }
     final bool connected = _socket != null && _socket!.connected;
     if (_reportsSocketNeedsReconnectForNewToken(
       socketConnected: connected,
@@ -212,6 +216,11 @@ class ReportsOwnerSocketStream {
     }
     _enabled = true;
     _ensureConnectivitySubscription();
+    if (_authState.isAuthenticated &&
+        connectionState.value == ReportsRealtimeConnectionState.offline) {
+      requestReconnect();
+      return;
+    }
     unawaited(_ensureConnected());
   }
 
@@ -230,7 +239,9 @@ class ReportsOwnerSocketStream {
     if (clearLive) {
       hasReachedLive.value = false;
       reconnectStreakSinceLive.value = 0;
-      _setConnectionState(ReportsRealtimeConnectionState.offline);
+      connectionState.value = null;
+      _disruption.setLive(isLive: true);
+      _disruption.visible.value = false;
     }
   }
 

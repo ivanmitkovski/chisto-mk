@@ -49,6 +49,11 @@ extension ReportsListBootstrap on _ReportsListScreenState {
     );
     _reportsRealtimeService = realtimeSvc;
     _realtimeSub = realtimeSvc.events.listen(_onReportsOwnerEvent);
+    if (ref.read(authStateProvider).isAuthenticated &&
+        realtimeSvc.connectionState.value ==
+            ReportsRealtimeConnectionState.offline) {
+      realtimeSvc.requestReconnect();
+    }
     void onConnectionChanged() {
       if (!mounted || _disposed) {
         return;

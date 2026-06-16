@@ -76,4 +76,69 @@ void main() {
       ReportsRealtimeConnectionState.connecting,
     );
   });
+
+  test('logout clears connection state to null not offline', () {
+    final AuthState auth = AuthState()
+      ..setAuthenticated(userId: 'u1', displayName: 'Test', accessToken: 'tok');
+    final ReportsOwnerSocketStream stream = ReportsOwnerSocketStream(
+      baseUrl: 'http://127.0.0.1:9',
+      authState: auth,
+    )..connectDisabledForTest = true;
+    addTearDown(stream.dispose);
+
+    stream.start();
+    stream.connectionState.value = ReportsRealtimeConnectionState.live;
+    stream.hasReachedLive.value = true;
+
+    auth.setUnauthenticated();
+
+    expect(stream.connectionState.value, isNull);
+    expect(stream.hasReachedLive.value, isFalse);
+  });
+
+  test('start after re-login recovers from stale offline', () {
+    final AuthState auth = AuthState()
+      ..setAuthenticated(userId: 'u1', displayName: 'Test', accessToken: 'tok');
+    final ReportsOwnerSocketStream stream = ReportsOwnerSocketStream(
+      baseUrl: 'http://127.0.0.1:9',
+      authState: auth,
+    )..connectDisabledForTest = true;
+    addTearDown(stream.dispose);
+
+    stream.start();
+    auth.setUnauthenticated();
+    expect(stream.connectionState.value, isNull);
+
+    auth.setAuthenticated(
+      userId: 'u1',
+      displayName: 'Test',
+      accessToken: 'tok-new',
+    );
+    // Pre-fix logout left offline; start() must recover without pull-to-refresh.
+    stream.connectionState.value = ReportsRealtimeConnectionState.offline;
+    stream.start();
+
+    expect(
+      stream.connectionState.value,
+      ReportsRealtimeConnectionState.connecting,
+    );
+  });
+
+  test('start from stale offline enters connecting', () {
+    final AuthState auth = AuthState()
+      ..setAuthenticated(userId: 'u1', displayName: 'Test', accessToken: 'tok');
+    final ReportsOwnerSocketStream stream = ReportsOwnerSocketStream(
+      baseUrl: 'http://127.0.0.1:9',
+      authState: auth,
+    )..connectDisabledForTest = true;
+    addTearDown(stream.dispose);
+
+    stream.connectionState.value = ReportsRealtimeConnectionState.offline;
+    stream.start();
+
+    expect(
+      stream.connectionState.value,
+      ReportsRealtimeConnectionState.connecting,
+    );
+  });
 }
