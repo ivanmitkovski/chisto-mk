@@ -78,10 +78,9 @@ void main() {
 
   test('uploadResolutionPhotos throws when no readable files', () async {
     await expectLater(
-      repo.uploadResolutionPhotos(
-        'site-1',
-        <String>['/tmp/does-not-exist-${DateTime.now().microsecondsSinceEpoch}.jpg'],
-      ),
+      repo.uploadResolutionPhotos('site-1', <String>[
+        '/tmp/does-not-exist-${DateTime.now().microsecondsSinceEpoch}.jpg',
+      ]),
       throwsA(isA<AppError>()),
     );
   });
