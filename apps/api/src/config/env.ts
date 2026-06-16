@@ -40,13 +40,15 @@ export function validateEnv(): void {
     ADMIN_APP_BASE_URL: Joi.string().trim().uri().optional(),
     ADMIN_INVITE_TTL_HOURS: Joi.number().integer().min(1).max(720).default(72),
     TERMS_VERSION: Joi.string().trim().min(1).max(32).default('1'),
+    CHAT_WS_CORS_ORIGINS: Joi.string().allow('').optional(),
+    CHECKIN_WS_CORS_ORIGINS: Joi.string().allow('').optional(),
   });
 
-  const nodeEnvForValidate = (process.env.NODE_ENV ?? 'development').trim();
-  const allowUnknown = nodeEnvForValidate !== 'production' && nodeEnvForValidate !== 'staging';
-  const validatedSchema = allowUnknown ? schema.unknown(true) : schema.unknown(false);
+  // ECS tasks and Docker images inject many env vars (secrets, NODE_VERSION, AWS_*).
+  // Production requirements are enforced below via requireEnv() and explicit checks.
+  const validatedSchema = schema.unknown(true);
 
-  const { error, value } = validatedSchema.validate(process.env, { abortEarly: false, allowUnknown });
+  const { error, value } = validatedSchema.validate(process.env, { abortEarly: false });
   if (error) {
     for (const detail of error.details) {
       console.error(detail.message);

@@ -34,6 +34,7 @@ locals {
     { name = "REFRESH_TOKEN_ROTATION_GRACE_SECONDS", value = "120" },
     { name = "MAX_SESSIONS_PER_USER", value = "20" },
     { name = "CORS_ORIGINS", value = var.cors_origins },
+    { name = "CHAT_WS_CORS_ORIGINS", value = var.chat_ws_cors_origins },
     { name = "ADMIN_APP_BASE_URL", value = var.admin_app_base_url },
     { name = "SHARE_BASE_URL", value = var.share_base_url },
     { name = "SMS_PROVIDER", value = "twilio" },

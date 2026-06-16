@@ -134,6 +134,7 @@ module "ecs" {
   share_base_url          = var.share_base_url
   admin_app_base_url      = var.admin_app_base_url
   cors_origins            = var.cors_origins
+  chat_ws_cors_origins    = var.chat_ws_cors_origins
   tags                    = local.common_tags
 }
 

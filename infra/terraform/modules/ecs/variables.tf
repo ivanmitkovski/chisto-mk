@@ -111,6 +111,11 @@ variable "cors_origins" {
   type = string
 }
 
+variable "chat_ws_cors_origins" {
+  type        = string
+  description = "Comma-separated origins for Socket.IO (/chat, /notifications, /reports-owner, /check-in)."
+}
+
 variable "tags" {
   type    = map(string)
   default = {}

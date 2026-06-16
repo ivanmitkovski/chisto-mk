@@ -48,6 +48,12 @@ variable "cors_origins" {
   default = "https://admin.chisto.mk"
 }
 
+variable "chat_ws_cors_origins" {
+  type        = string
+  default     = "https://admin.chisto.mk,https://chisto.mk"
+  description = "Socket.IO CORS allowlist (comma-separated). Native mobile clients omit Origin; browser/admin clients need explicit entries."
+}
+
 variable "s3_bucket_name" {
   type    = string
   default = "chisto-prod-media"
