@@ -296,6 +296,25 @@ export const SITES_API_ERROR_CODES = [
 
 export type SitesApiErrorCode = (typeof SITES_API_ERROR_CODES)[number];
 
+/**
+ * Site cleanup resolutions (`src/sites/resolutions`) — submission, moderation, and upload HTTP errors plus
+ * stable point-breakdown codes in approval payloads (mirrors `REPORTS_API_ERROR_CODES`).
+ */
+export const SITE_RESOLUTION_API_ERROR_CODES = [
+  'SITE_RESOLUTION_NOT_FOUND',
+  'SITE_RESOLUTION_NOT_ALLOWED',
+  'SITE_RESOLUTION_PENDING_EXISTS',
+  'INVALID_SITE_RESOLUTION_STATUS',
+  'INVALID_SITE_RESOLUTION_STATUS_TRANSITION',
+  'RESOLUTION_REJECTION_REASON_REQUIRED',
+  'RESOLUTION_UPLOAD_STORAGE_ERROR',
+  'SITE_RESOLUTION_BASE',
+  'SITE_RESOLUTION_MEDIA',
+  'SITE_RESOLUTION_PIONEER',
+] as const;
+
+export type SiteResolutionApiErrorCode = (typeof SITE_RESOLUTION_API_ERROR_CODES)[number];
+
 /** Citizen reports (`src/reports`) — HTTP errors and stable point-breakdown codes in approval payloads. */
 export const REPORTS_API_ERROR_CODES = [
   'REPORT_NOT_FOUND',
@@ -406,6 +425,7 @@ const MERGED_ERROR_CODE_SET = new Set<string>([
   ...GAMIFICATION_API_ERROR_CODES,
   ...NOTIFICATION_ERROR_CODES,
   ...SITES_API_ERROR_CODES,
+  ...SITE_RESOLUTION_API_ERROR_CODES,
   ...REPORTS_API_ERROR_CODES,
   ...UPLOAD_ERROR_CODES,
   ...ADMIN_CONTROL_ERROR_CODES,
