@@ -1,0 +1,15 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appIDs": ["M3775AG5D8.mk.chisto.chistoMobile"],
+        "components": [
+          { "/": "/sites/*" },
+          { "/": "/events/*" },
+          { "/": "/app/*" }
+        ]
+      }
+    ]
+  }
+}

@@ -13,7 +13,7 @@ flutter test test/
 dart run tool/check_haptics_usage.dart
 ```
 
-Release version: `pubspec.yaml` (`1.0.0+4`). Store-submission mechanics (certificates, provisioning, screenshots, metadata) are documented in the launch-readiness submission guide (`docs/launch-readiness/phase-13-submission-guide.md`, produced in Phase 13).
+Release version: `pubspec.yaml` (`1.0.0+12`). Store submission: [`docs/store-release.md`](docs/store-release.md).
 
 ```sh
 # Staging beta IPA / AAB (requires signing secrets — see checklist)

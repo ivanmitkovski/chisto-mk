@@ -13,6 +13,7 @@ out/
 # Environment
 .env
 .env.local
+.env.release
 .env.*.local
 .env.staging
 .env.production
