@@ -130,6 +130,7 @@ class ReportSheetViewModelMapper {
       createdAt: r.submittedAt,
       isOptimistic: r.isOptimistic,
       declineReason: declineReasonFromApi(r.status, r.moderationReason),
+      siteId: r.siteId,
     );
   }
 

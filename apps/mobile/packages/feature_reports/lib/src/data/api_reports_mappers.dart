@@ -14,6 +14,7 @@ ReportListItem reportListItemFromApiJson(Map<String, dynamic> json) {
   final String? categoryStr = json['category'] as String?;
   final num? severityNum = json['severity'] as num?;
   final String? cleanupStr = json['cleanupEffort'] as String?;
+  final Map<String, dynamic>? siteJson = safeAsStringKeyedMap(json['site']);
   final ReportViewerRole viewerRole =
       (json['viewerRole'] as String?) == 'co_reporter'
       ? ReportViewerRole.coReporter
@@ -35,6 +36,7 @@ ReportListItem reportListItemFromApiJson(Map<String, dynamic> json) {
     cleanupEffort: CleanupEffort.fromApiString(cleanupStr),
     viewerRole: viewerRole,
     moderationReason: json['moderationReason'] as String?,
+    siteId: siteJson?['id'] as String?,
   );
 }
 

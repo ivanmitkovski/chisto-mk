@@ -59,6 +59,8 @@ export class ReportCitizenQueryService {
           reportNumber: true,
           site: {
             select: {
+              id: true, // Add this line
+              id: true, // Add this line
               latitude: true,
               longitude: true,
               description: true,
