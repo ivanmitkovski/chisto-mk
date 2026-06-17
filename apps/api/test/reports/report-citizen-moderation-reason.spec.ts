@@ -178,7 +178,7 @@ describe('ReportCitizenQueryService moderationReason', () => {
             potentialDuplicateOfId: null,
             potentialDuplicates: [],
             coReporters: [],
-            site: { latitude: 1, longitude: 2, description: null, address: 'A' },
+            site: { id: 'site-2', latitude: 1, longitude: 2, description: null, address: 'A' },
             mediaUrls: [],
             severity: null,
             cleanupEffort: null,
@@ -194,5 +194,6 @@ describe('ReportCitizenQueryService moderationReason', () => {
       { page: 1, limit: 20 } as never,
     );
     expect(list.data[0].moderationReason).toBe(rejectedReason);
+    expect(list.data[0].site).toEqual({ id: 'site-2' });
   });
 });

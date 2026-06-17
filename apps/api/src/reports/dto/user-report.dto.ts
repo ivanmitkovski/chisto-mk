@@ -82,5 +82,10 @@ export class UserReportListItemDto {
       'Moderator rejection reason and optional notes when status is DELETED; null for other statuses',
   })
   moderationReason!: string | null;
+
+  @ApiProperty({
+    description: 'Linked pollution site id for map and cleanup actions',
+  })
+  site!: { id: string };
 }
 

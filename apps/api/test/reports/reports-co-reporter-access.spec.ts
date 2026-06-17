@@ -154,7 +154,7 @@ describe('ReportCitizenQueryService co-reporter access', () => {
             potentialDuplicateOfId: null,
             potentialDuplicates: [],
             coReporters: [{ userId: 'user-co' }],
-            site: { latitude: 1, longitude: 2, description: null, address: 'A' },
+            site: { id: 'site-1', latitude: 1, longitude: 2, description: null, address: 'A' },
             mediaUrls: [],
             severity: null,
             cleanupEffort: null,
@@ -180,5 +180,6 @@ describe('ReportCitizenQueryService co-reporter access', () => {
     expect(list.data).toHaveLength(1);
     expect(list.data[0].viewerRole).toBe('co_reporter');
     expect(list.data[0].pointsAwarded).toBe(0);
+    expect(list.data[0].site).toEqual({ id: 'site-1' });
   });
 });

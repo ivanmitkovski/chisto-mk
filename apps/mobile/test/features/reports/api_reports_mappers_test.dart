@@ -25,6 +25,7 @@ Map<String, dynamic> _listItemFixture() {
     'cleanupEffort': 'THREE_TO_FIVE',
     'viewerRole': 'co_reporter',
     'moderationReason': null,
+    'site': <String, dynamic>{'id': 'site-9'},
   };
 }
 
@@ -67,6 +68,7 @@ void main() {
       expect(item.cleanupEffort, CleanupEffort.threeToFive);
       expect(item.viewerRole, ReportViewerRole.coReporter);
       expect(item.moderationReason, isNull);
+      expect(item.siteId, 'site-9');
     });
 
     test('maps moderationReason for deleted status', () {
@@ -103,6 +105,7 @@ void main() {
       expect(item.cleanupEffort, isNull);
       expect(item.viewerRole, ReportViewerRole.primary);
       expect(item.moderationReason, isNull);
+      expect(item.siteId, isNull);
     });
   });
 

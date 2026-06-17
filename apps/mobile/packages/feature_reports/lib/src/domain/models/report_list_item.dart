@@ -26,6 +26,7 @@ class ReportListItem {
     this.viewerRole = ReportViewerRole.primary,
     this.isOptimistic = false,
     this.moderationReason,
+    this.siteId,
   });
 
   final String id;
@@ -51,6 +52,7 @@ class ReportListItem {
 
   /// Moderator rejection reason + notes when [status] is [ApiReportStatus.deleted].
   final String? moderationReason;
+  final String? siteId;
 
   ReportListItem copyWith({
     String? id,
@@ -71,6 +73,7 @@ class ReportListItem {
     bool? isOptimistic,
     String? moderationReason,
     bool clearModerationReason = false,
+    String? siteId,
   }) {
     return ReportListItem(
       id: id ?? this.id,
@@ -92,6 +95,7 @@ class ReportListItem {
       moderationReason: clearModerationReason
           ? null
           : (moderationReason ?? this.moderationReason),
+      siteId: siteId ?? this.siteId,
     );
   }
 }

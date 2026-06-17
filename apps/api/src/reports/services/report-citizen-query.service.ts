@@ -59,8 +59,7 @@ export class ReportCitizenQueryService {
           reportNumber: true,
           site: {
             select: {
-              id: true, // Add this line
-              id: true, // Add this line
+              id: true,
               latitude: true,
               longitude: true,
               description: true,
@@ -146,6 +145,9 @@ export class ReportCitizenQueryService {
           report.status,
           report.moderationReason,
         ),
+        site: {
+          id: report.site.id,
+        },
       };
     });
 

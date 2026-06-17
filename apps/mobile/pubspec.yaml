@@ -2,7 +2,7 @@ name: chisto_mobile
 description: Chisto.mk civic environmental platform mobile app. Report pollution, join cleanup events.
 publish_to: 'none'
 
-version: 1.0.0+15
+version: 1.0.0+16
 
 environment:
   sdk: ^3.11.0
