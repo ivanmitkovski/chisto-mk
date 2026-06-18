@@ -51,7 +51,9 @@ import { SITE_HISTORY_WRITER } from './ports/site-history-writer.port';
     OwnerEventsModule,
     SiteHistoryModule,
   ],
-  controllers: [ReportsController, ReportsAdminController],
+  // Register admin routes before citizen routes: static paths like queue-summary and
+  // duplicates must not be captured by ReportsController @Get(':id').
+  controllers: [ReportsAdminController, ReportsController],
   providers: [
     ReportsModerationListService,
     ReportsModerationStatusService,
