@@ -7,7 +7,6 @@ REGION="${AWS_REGION:-eu-central-1}"
 LOCAL_PORT="${LOCAL_PORT:-15432}"
 BASTION_NAME="${BASTION_NAME:-chisto-prod-db-bastion}"
 RDS_HOST="${RDS_HOST:-chisto-prod.cfs2eqk4qbnk.eu-central-1.rds.amazonaws.com}"
-SECRET_ID="${SECRET_ID:-chisto/production/api}"
 
 if ! command -v session-manager-plugin >/dev/null 2>&1; then
   echo "Session Manager plugin not found."
@@ -37,13 +36,8 @@ echo "  User:     chisto"
 echo "  Database: chisto_prod"
 echo "  SSL:      require"
 echo ""
-echo "Password (from Secrets Manager):"
-aws secretsmanager get-secret-value \
-  --secret-id "$SECRET_ID" \
-  --region "$REGION" \
-  --query 'SecretString' \
-  --output text \
-  | python3 -c "import sys,json,urllib.parse; d=json.load(sys.stdin); print(urllib.parse.unquote(urllib.parse.urlparse(d['DATABASE_URL']).password))"
+echo "Password: run in another terminal (clipboard, not printed):"
+echo "  COPY_PASSWORD=1 ./infra/scripts/prod-db-password.sh"
 echo ""
 echo "Press Ctrl+C to close the tunnel."
 echo ""
