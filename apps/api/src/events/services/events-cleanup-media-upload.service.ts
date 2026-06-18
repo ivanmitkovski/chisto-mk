@@ -2,8 +2,9 @@ import { BadRequestException, Injectable, ServiceUnavailableException } from '@n
 import { randomUUID } from 'crypto';
 import { ImageContentValidator } from '../../storage/util/image-content-validator';
 import { S3StorageClient } from '../../storage/util/s3-storage.client';
+import { CITIZEN_IMAGE_UPLOAD_MAX_BYTES } from '../../storage/constants/citizen-media-upload.constants';
 
-const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
+const MAX_FILE_SIZE_BYTES = CITIZEN_IMAGE_UPLOAD_MAX_BYTES;
 
 /**
  * After-cleanup event photos — lives in events bounded context (not reports).

@@ -41,6 +41,10 @@ import { ReportsService } from '../services/reports.service';
 import { ReportsUploadService } from '../services/reports-upload.service';
 import { ReportSubmitMediaAppendService } from '../services/report-submit-media-append.service';
 import { NonEmptyUploadedFilesPipe } from '../pipes/non-empty-uploaded-files.pipe';
+import {
+  CITIZEN_IMAGE_UPLOAD_MAX_BYTES,
+  CITIZEN_IMAGE_UPLOAD_MAX_FILES,
+} from '../../storage/constants/citizen-media-upload.constants';
 import { ReportsUserThrottlerGuard } from '../guards/reports-user-throttler.guard';
 import { ParseCuidPipe } from '../../common/pipes/parse-cuid.pipe';
 import { ApiStandardHttpErrorResponses } from '../../common/openapi/standard-http-error-responses.decorator';
@@ -91,12 +95,12 @@ export class ReportsController {
   @UseGuards(JwtAuthGuard, ReportsUserThrottlerGuard)
   @ApiBearerAuth()
   @UseInterceptors(
-    FilesInterceptor('files', 5, {
+    FilesInterceptor('files', CITIZEN_IMAGE_UPLOAD_MAX_FILES, {
       storage: multer.memoryStorage(),
-      limits: { fileSize: 10 * 1024 * 1024 },
+      limits: { fileSize: CITIZEN_IMAGE_UPLOAD_MAX_BYTES },
     }),
   )
-  @ApiOperation({ summary: 'Upload report photos (max 5, jpeg/png/webp, 10MB each)' })
+  @ApiOperation({ summary: 'Upload report photos (max 5, jpeg/png/webp, 12MB each)' })
   @ApiOkResponse({ description: 'Uploaded file URLs', type: ReportMediaUrlsResponseDto })
   async upload(
     @CurrentUser() user: AuthenticatedUser,
@@ -112,9 +116,9 @@ export class ReportsController {
   @UseGuards(JwtAuthGuard, ReportsUserThrottlerGuard)
   @ApiBearerAuth()
   @UseInterceptors(
-    FilesInterceptor('files', 5, {
+    FilesInterceptor('files', CITIZEN_IMAGE_UPLOAD_MAX_FILES, {
       storage: multer.memoryStorage(),
-      limits: { fileSize: 10 * 1024 * 1024 },
+      limits: { fileSize: CITIZEN_IMAGE_UPLOAD_MAX_BYTES },
     }),
   )
   @ApiOperation({

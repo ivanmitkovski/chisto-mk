@@ -36,6 +36,10 @@ import { SiteResolutionUploadService } from '../services/site-resolution-upload.
 import { SiteResolutionSubmitService } from '../services/site-resolution-submit.service';
 import { SiteResolutionQueryService } from '../services/site-resolution-query.service';
 import { OptionalJwtAuthGuard } from '../../../auth/guards/optional-jwt-auth.guard';
+import {
+  CITIZEN_IMAGE_UPLOAD_MAX_BYTES,
+  CITIZEN_IMAGE_UPLOAD_MAX_FILES,
+} from '../../../storage/constants/citizen-media-upload.constants';
 
 @ApiTags('sites')
 @ApiStandardHttpErrorResponses()
@@ -53,12 +57,12 @@ export class SiteResolutionsController {
   @UseGuards(JwtAuthGuard, ThrottlerGuard)
   @ApiBearerAuth()
   @UseInterceptors(
-    FilesInterceptor('files', 5, {
+    FilesInterceptor('files', CITIZEN_IMAGE_UPLOAD_MAX_FILES, {
       storage: multer.memoryStorage(),
-      limits: { fileSize: 10 * 1024 * 1024 },
+      limits: { fileSize: CITIZEN_IMAGE_UPLOAD_MAX_BYTES },
     }),
   )
-  @ApiOperation({ summary: 'Upload cleanup evidence photos (max 5, jpeg/png/webp, 10MB each)' })
+  @ApiOperation({ summary: 'Upload cleanup evidence photos (max 5, jpeg/png/webp, 12MB each)' })
   @ApiOkResponse({ type: ReportMediaUrlsResponseDto })
   async uploadPhotos(
     @CurrentUser() user: AuthenticatedUser,

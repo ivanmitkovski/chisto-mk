@@ -52,6 +52,7 @@ import { EventImpactReceiptService } from '../services/event-impact-receipt.serv
 import { ApiEventsJwtStandardErrors } from '../openapi/events-openapi.decorators';
 import { ApiStandardHttpErrorResponses } from '../../common/openapi/standard-http-error-responses.decorator';
 import { Idempotent } from '../../common/idempotency/idempotency.decorator';
+import { CITIZEN_IMAGE_UPLOAD_MAX_BYTES } from '../../storage/constants/citizen-media-upload.constants';
 
 @ApiTags('events')
 @ApiStandardHttpErrorResponses()
@@ -254,7 +255,7 @@ export class EventsController {
   @UseInterceptors(
     FilesInterceptor('files', 10, {
       storage: multer.memoryStorage(),
-      limits: { fileSize: 10 * 1024 * 1024 },
+      limits: { fileSize: CITIZEN_IMAGE_UPLOAD_MAX_BYTES },
     }),
   )
   @ApiConsumes('multipart/form-data')

@@ -7075,7 +7075,7 @@
             "bearer": []
           }
         ],
-        "summary": "Upload cleanup evidence photos (max 5, jpeg/png/webp, 10MB each)",
+        "summary": "Upload cleanup evidence photos (max 5, jpeg/png/webp, 12MB each)",
         "tags": [
           "sites"
         ]
@@ -7416,7 +7416,7 @@
             "bearer": []
           }
         ],
-        "summary": "Upload report photos (max 5, jpeg/png/webp, 10MB each)",
+        "summary": "Upload report photos (max 5, jpeg/png/webp, 12MB each)",
         "tags": [
           "reports"
         ]

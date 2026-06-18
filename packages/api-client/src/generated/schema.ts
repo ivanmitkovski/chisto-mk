@@ -2112,7 +2112,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Upload cleanup evidence photos (max 5, jpeg/png/webp, 10MB each) */
+        /** Upload cleanup evidence photos (max 5, jpeg/png/webp, 12MB each) */
         post: operations["SiteResolutionsController_uploadPhotos"];
         delete?: never;
         options?: never;
@@ -2165,7 +2165,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Upload report photos (max 5, jpeg/png/webp, 10MB each) */
+        /** Upload report photos (max 5, jpeg/png/webp, 12MB each) */
         post: operations["ReportsController_upload"];
         delete?: never;
         options?: never;

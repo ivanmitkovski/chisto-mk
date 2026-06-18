@@ -10,8 +10,9 @@ import { ImageContentValidator } from '../../storage/util/image-content-validato
 import { ReportMediaSignedUrlService } from '../../storage/services/report-media-signed-url.service';
 import { S3StorageClient } from '../../storage/util/s3-storage.client';
 import { UsersAvatarService } from '../../users/users-avatar.service';
+import { CITIZEN_IMAGE_UPLOAD_MAX_BYTES } from '../../storage/constants/citizen-media-upload.constants';
 
-const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
+const MAX_FILE_SIZE_BYTES = CITIZEN_IMAGE_UPLOAD_MAX_BYTES;
 
 @Injectable()
 export class ReportsUploadService {

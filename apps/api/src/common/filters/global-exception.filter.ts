@@ -11,6 +11,10 @@ import * as Sentry from '@sentry/node';
 import { MulterError } from 'multer';
 import { Prisma } from '../../prisma-client';
 import { ObservabilityStore } from '../../observability/observability.store';
+import {
+  CITIZEN_IMAGE_UPLOAD_MAX_BYTES,
+  CITIZEN_IMAGE_UPLOAD_MAX_FILES,
+} from '../../storage/constants/citizen-media-upload.constants';
 import { ErrorResponse } from '../errors/error-response.type';
 import { localizeErrorMessage } from '../i18n/error-messages/localize-error-message';
 import { shouldSampleClientErrorLog } from '../logging/sampled-warn.util';
@@ -381,7 +385,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     if (path.includes('/avatar')) {
       return { maxBytes: 8 * 1024 * 1024, maxFiles: 1 };
     }
-    return { maxBytes: 10 * 1024 * 1024, maxFiles: 5 };
+    return { maxBytes: CITIZEN_IMAGE_UPLOAD_MAX_BYTES, maxFiles: CITIZEN_IMAGE_UPLOAD_MAX_FILES };
   }
 
   private codeForStatus(status: number): string {

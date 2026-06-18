@@ -1,9 +1,3 @@
-locals {
-  common_tags = merge(var.tags, {
-    Module = "waf"
-  })
-}
-
 resource "aws_wafv2_web_acl" "main" {
   name  = "${var.name_prefix}-waf"
   scope = "REGIONAL"
@@ -31,13 +25,39 @@ resource "aws_wafv2_web_acl" "main" {
         name        = "AWSManagedRulesCommonRuleSet"
         vendor_name = "AWS"
 
-        # Report/event/chat/avatar uploads are authenticated multipart POSTs (up to 10MB
-        # server-side). SizeRestrictions_BODY blocks at 8KB and returns a plain HTML 403
-        # that mobile maps to generic FORBIDDEN ("You don't have permission to do that").
-        rule_action_override {
-          name = "SizeRestrictions_BODY"
-          action_to_use {
-            count {}
+        # Skip CRS on known JWT-protected multipart routes (image bytes look like XSS/LFI).
+        scope_down_statement {
+          not_statement {
+            statement {
+              or_statement {
+                dynamic "statement" {
+                  for_each = local.multipart_upload_uri_regexes
+                  content {
+                    regex_match_statement {
+                      regex_string = statement.value
+                      field_to_match {
+                        uri_path {}
+                      }
+                      text_transformation {
+                        priority = 0
+                        type     = "NONE"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        # Belt-and-suspenders for JSON/form POST bodies elsewhere in the API.
+        dynamic "rule_action_override" {
+          for_each = local.crs_body_rule_count_overrides
+          content {
+            name = rule_action_override.value
+            action_to_use {
+              count {}
+            }
           }
         }
       }
@@ -106,6 +126,30 @@ resource "aws_wafv2_web_acl" "main" {
       managed_rule_group_statement {
         name        = "AWSManagedRulesSQLiRuleSet"
         vendor_name = "AWS"
+
+        scope_down_statement {
+          not_statement {
+            statement {
+              or_statement {
+                dynamic "statement" {
+                  for_each = local.multipart_upload_uri_regexes
+                  content {
+                    regex_match_statement {
+                      regex_string = statement.value
+                      field_to_match {
+                        uri_path {}
+                      }
+                      text_transformation {
+                        priority = 0
+                        type     = "NONE"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
 
