@@ -2156,91 +2156,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/reports/upload": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Upload report photos (max 5, jpeg/png/webp, 12MB each) */
-        post: operations["ReportsController_upload"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/reports/{id}/media": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Append photos to an existing report (reporter or co-reporter only) */
-        post: operations["ReportsController_appendMedia"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/reports/me": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List reports created by the authenticated user (paginated) */
-        get: operations["ReportsController_findForCurrentUser"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/reports/capacity": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get current reporting capacity and emergency allowance status */
-        get: operations["ReportsController_getCapacityForCurrentUser"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/reports/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get report details (admin: full moderation view, citizen: own reports only) */
-        get: operations["ReportsController_findOne"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/reports/queue-summary": {
         parameters: {
             query?: never;
@@ -2388,6 +2303,91 @@ export interface paths {
         put?: never;
         /** Approve and merge child duplicate reports into a primary report */
         post: operations["ReportsAdminController_mergeDuplicates"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reports/upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Upload report photos (max 5, jpeg/png/webp, 12MB each) */
+        post: operations["ReportsController_upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reports/{id}/media": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Append photos to an existing report (reporter or co-reporter only) */
+        post: operations["ReportsController_appendMedia"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reports/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List reports created by the authenticated user (paginated) */
+        get: operations["ReportsController_findForCurrentUser"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reports/capacity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get current reporting capacity and emergency allowance status */
+        get: operations["ReportsController_getCapacityForCurrentUser"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reports/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get report details (admin: full moderation view, citizen: own reports only) */
+        get: operations["ReportsController_findOne"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -5103,6 +5103,193 @@ export interface components {
             data: components["schemas"]["SiteResolutionResponseDto"][];
             meta: Record<string, never>;
         };
+        AdminReportListItemDto: {
+            id: string;
+            /**
+             * @description Human-friendly report number for queue operations
+             * @example R-01
+             */
+            reportNumber: string;
+            /**
+             * @description Short descriptive title for the report
+             * @example Illegal waste dump
+             */
+            name: string;
+            /**
+             * @description High-level location label used in tables
+             * @example Skopje
+             */
+            location: string;
+            /**
+             * @description ISO timestamp when the report was created
+             * @example 2025-10-23T09:15:00.000Z
+             */
+            dateReportedAt: string;
+            /** @enum {string} */
+            status: "NEW" | "IN_REVIEW" | "APPROVED" | "DELETED";
+            /**
+             * @description Whether this report is flagged as a potential duplicate
+             * @default false
+             */
+            isPotentialDuplicate: boolean;
+            /**
+             * @description Number of additional co-reporters attached to this report
+             * @default 0
+             */
+            coReporterCount: number;
+            /**
+             * @description Citizen estimate of cleanup team size, when provided
+             * @example 3–5 people
+             */
+            cleanupEffortLabel: Record<string, never> | null;
+        };
+        AdminReportListMetaDto: {
+            page: number;
+            limit: number;
+            total: number;
+        };
+        AdminReportListResponseDto: {
+            data: components["schemas"]["AdminReportListItemDto"][];
+            meta: components["schemas"]["AdminReportListMetaDto"];
+        };
+        AdminReportsQueueSummaryDto: {
+            total: number;
+            needAttentionCount: number;
+            duplicatesCount: number;
+            byStatus: {
+                [key: string]: number;
+            };
+        };
+        AdminDuplicateReportItemDto: {
+            id: string;
+            /**
+             * @description Human-friendly report number for queue operations
+             * @example R-25-ABCD
+             */
+            reportNumber: string;
+            /**
+             * @description Short descriptive title for the report
+             * @example Illegal waste dump
+             */
+            title: string;
+            /**
+             * @description High-level location label used in tables
+             * @example Skopje
+             */
+            location: string;
+            /**
+             * @description ISO timestamp when the report was created
+             * @example 2025-10-23T09:15:00.000Z
+             */
+            submittedAt: string;
+            /** @enum {string} */
+            status: "NEW" | "IN_REVIEW" | "APPROVED" | "DELETED";
+            /**
+             * @description Number of additional co-reporters attached to this report
+             * @default 0
+             */
+            coReporterCount: number;
+            /**
+             * @description Number of media assets attached to this report
+             * @default 0
+             */
+            mediaCount: number;
+        };
+        AdminDuplicateReportGroupDto: {
+            primaryReport: components["schemas"]["AdminDuplicateReportItemDto"];
+            duplicateReports: components["schemas"]["AdminDuplicateReportItemDto"][];
+            /**
+             * @description Total reports in the duplicate group including the primary report
+             * @example 3
+             */
+            totalReports: number;
+        };
+        AdminDuplicateReportGroupsMetaDto: {
+            page: number;
+            limit: number;
+            total: number;
+        };
+        AdminDuplicateReportGroupsResponseDto: {
+            data: components["schemas"]["AdminDuplicateReportGroupDto"][];
+            meta: components["schemas"]["AdminDuplicateReportGroupsMetaDto"];
+        };
+        ReportViewerPresenceEntryDto: {
+            sessionId: string;
+            userId: string;
+            displayName: string;
+        };
+        ReportViewerPresenceResponseDto: {
+            viewers: components["schemas"]["ReportViewerPresenceEntryDto"][];
+        };
+        ReportViewerHeartbeatDto: {
+            /**
+             * @description Stable per-tab session id generated by the admin client
+             * @example f47ac10b-58cc-4372-a567-0e02b2c3d479
+             */
+            sessionId: string;
+            /**
+             * @description Display name shown to other moderators viewing the same report
+             * @example Ana Petrova
+             */
+            displayName: string;
+        };
+        UpdateReportStatusDto: {
+            /** @enum {string} */
+            status: "NEW" | "IN_REVIEW" | "APPROVED" | "DELETED";
+            /**
+             * @description Required when moving a report to DELETED (moderation narrative). Ignored for other statuses.
+             * @example Evidence was insufficient to verify this report.
+             */
+            reason?: string;
+        };
+        AssignReportDto: {
+            /**
+             * @description Target moderator user id; omit to assign to the authenticated moderator
+             * @example cm1234567890abcdefghijkl
+             */
+            moderatorId?: string;
+            /**
+             * @description When true, clears the current assignee without changing report status
+             * @default false
+             */
+            unassign: boolean;
+        };
+        AssignReportResponseDto: {
+            reportId: string;
+            assignedModeratorId: Record<string, never> | null;
+            assignedModeratorName: Record<string, never> | null;
+            /** @enum {string} */
+            status: "NEW" | "IN_REVIEW" | "APPROVED" | "DELETED";
+        };
+        MergeDuplicateReportsDto: {
+            /** @description IDs of child duplicate reports to merge into the primary report */
+            childReportIds: string[];
+            /**
+             * @description Optional human-readable moderation reason
+             * @example Merged duplicate reports after manual verification.
+             */
+            reason?: string;
+        };
+        MergedCoReporterItemDto: {
+            userId: string;
+            /** @description Display name from user profile */
+            name: string;
+            /** @description ISO timestamp when this person originally submitted their report */
+            reportedAt: string;
+        };
+        MergeDuplicateReportsResponseDto: {
+            primaryReportId: string;
+            mergedChildCount: number;
+            /** @description Number of duplicate report media objects removed from storage (best-effort S3 deletes) */
+            mergedMediaCount: number;
+            mergedCoReporterCount: number;
+            /** @enum {string} */
+            primaryStatus: "NEW" | "IN_REVIEW" | "APPROVED" | "DELETED";
+            /** @description Co-reporters on the primary report after merge (original submitters of merged duplicates) */
+            coReporters: components["schemas"]["MergedCoReporterItemDto"][];
+            /** @description Total distinct people who reported this issue (primary reporter + co-reporters) */
+            reporterCount: number;
+        };
         AdminReportEvidenceDto: {
             id: string;
             label: string;
@@ -5293,193 +5480,6 @@ export interface components {
             nextRefillAtMs?: Record<string, never> | null;
             /** @description Human guidance on how to unlock more reports */
             unlockHint: string;
-        };
-        AdminReportListItemDto: {
-            id: string;
-            /**
-             * @description Human-friendly report number for queue operations
-             * @example R-01
-             */
-            reportNumber: string;
-            /**
-             * @description Short descriptive title for the report
-             * @example Illegal waste dump
-             */
-            name: string;
-            /**
-             * @description High-level location label used in tables
-             * @example Skopje
-             */
-            location: string;
-            /**
-             * @description ISO timestamp when the report was created
-             * @example 2025-10-23T09:15:00.000Z
-             */
-            dateReportedAt: string;
-            /** @enum {string} */
-            status: "NEW" | "IN_REVIEW" | "APPROVED" | "DELETED";
-            /**
-             * @description Whether this report is flagged as a potential duplicate
-             * @default false
-             */
-            isPotentialDuplicate: boolean;
-            /**
-             * @description Number of additional co-reporters attached to this report
-             * @default 0
-             */
-            coReporterCount: number;
-            /**
-             * @description Citizen estimate of cleanup team size, when provided
-             * @example 3–5 people
-             */
-            cleanupEffortLabel: Record<string, never> | null;
-        };
-        AdminReportListMetaDto: {
-            page: number;
-            limit: number;
-            total: number;
-        };
-        AdminReportListResponseDto: {
-            data: components["schemas"]["AdminReportListItemDto"][];
-            meta: components["schemas"]["AdminReportListMetaDto"];
-        };
-        AdminReportsQueueSummaryDto: {
-            total: number;
-            needAttentionCount: number;
-            duplicatesCount: number;
-            byStatus: {
-                [key: string]: number;
-            };
-        };
-        AdminDuplicateReportItemDto: {
-            id: string;
-            /**
-             * @description Human-friendly report number for queue operations
-             * @example R-25-ABCD
-             */
-            reportNumber: string;
-            /**
-             * @description Short descriptive title for the report
-             * @example Illegal waste dump
-             */
-            title: string;
-            /**
-             * @description High-level location label used in tables
-             * @example Skopje
-             */
-            location: string;
-            /**
-             * @description ISO timestamp when the report was created
-             * @example 2025-10-23T09:15:00.000Z
-             */
-            submittedAt: string;
-            /** @enum {string} */
-            status: "NEW" | "IN_REVIEW" | "APPROVED" | "DELETED";
-            /**
-             * @description Number of additional co-reporters attached to this report
-             * @default 0
-             */
-            coReporterCount: number;
-            /**
-             * @description Number of media assets attached to this report
-             * @default 0
-             */
-            mediaCount: number;
-        };
-        AdminDuplicateReportGroupDto: {
-            primaryReport: components["schemas"]["AdminDuplicateReportItemDto"];
-            duplicateReports: components["schemas"]["AdminDuplicateReportItemDto"][];
-            /**
-             * @description Total reports in the duplicate group including the primary report
-             * @example 3
-             */
-            totalReports: number;
-        };
-        AdminDuplicateReportGroupsMetaDto: {
-            page: number;
-            limit: number;
-            total: number;
-        };
-        AdminDuplicateReportGroupsResponseDto: {
-            data: components["schemas"]["AdminDuplicateReportGroupDto"][];
-            meta: components["schemas"]["AdminDuplicateReportGroupsMetaDto"];
-        };
-        ReportViewerPresenceEntryDto: {
-            sessionId: string;
-            userId: string;
-            displayName: string;
-        };
-        ReportViewerPresenceResponseDto: {
-            viewers: components["schemas"]["ReportViewerPresenceEntryDto"][];
-        };
-        ReportViewerHeartbeatDto: {
-            /**
-             * @description Stable per-tab session id generated by the admin client
-             * @example f47ac10b-58cc-4372-a567-0e02b2c3d479
-             */
-            sessionId: string;
-            /**
-             * @description Display name shown to other moderators viewing the same report
-             * @example Ana Petrova
-             */
-            displayName: string;
-        };
-        UpdateReportStatusDto: {
-            /** @enum {string} */
-            status: "NEW" | "IN_REVIEW" | "APPROVED" | "DELETED";
-            /**
-             * @description Required when moving a report to DELETED (moderation narrative). Ignored for other statuses.
-             * @example Evidence was insufficient to verify this report.
-             */
-            reason?: string;
-        };
-        AssignReportDto: {
-            /**
-             * @description Target moderator user id; omit to assign to the authenticated moderator
-             * @example cm1234567890abcdefghijkl
-             */
-            moderatorId?: string;
-            /**
-             * @description When true, clears the current assignee without changing report status
-             * @default false
-             */
-            unassign: boolean;
-        };
-        AssignReportResponseDto: {
-            reportId: string;
-            assignedModeratorId: Record<string, never> | null;
-            assignedModeratorName: Record<string, never> | null;
-            /** @enum {string} */
-            status: "NEW" | "IN_REVIEW" | "APPROVED" | "DELETED";
-        };
-        MergeDuplicateReportsDto: {
-            /** @description IDs of child duplicate reports to merge into the primary report */
-            childReportIds: string[];
-            /**
-             * @description Optional human-readable moderation reason
-             * @example Merged duplicate reports after manual verification.
-             */
-            reason?: string;
-        };
-        MergedCoReporterItemDto: {
-            userId: string;
-            /** @description Display name from user profile */
-            name: string;
-            /** @description ISO timestamp when this person originally submitted their report */
-            reportedAt: string;
-        };
-        MergeDuplicateReportsResponseDto: {
-            primaryReportId: string;
-            mergedChildCount: number;
-            /** @description Number of duplicate report media objects removed from storage (best-effort S3 deletes) */
-            mergedMediaCount: number;
-            mergedCoReporterCount: number;
-            /** @enum {string} */
-            primaryStatus: "NEW" | "IN_REVIEW" | "APPROVED" | "DELETED";
-            /** @description Co-reporters on the primary report after merge (original submitters of merged duplicates) */
-            coReporters: components["schemas"]["MergedCoReporterItemDto"][];
-            /** @description Total distinct people who reported this issue (primary reporter + co-reporters) */
-            reporterCount: number;
         };
         AdminOverviewCleanupEventItemDto: {
             id: string;
@@ -14410,286 +14410,6 @@ export interface operations {
             };
         };
     };
-    ReportsController_upload: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Uploaded file URLs */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ReportMediaUrlsResponseDto"];
-                };
-            };
-            /** @description Validation or bad request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Missing or invalid bearer token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Insufficient permissions */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Resource not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Rate limited */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    ReportsController_appendMedia: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Media appended successfully */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ReportMediaUrlsResponseDto"];
-                };
-            };
-            /** @description Validation or bad request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Missing or invalid bearer token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Insufficient permissions */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Resource not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Rate limited */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    ReportsController_findForCurrentUser: {
-        parameters: {
-            query?: {
-                page?: components["schemas"]["Object"];
-                limit?: components["schemas"]["Object"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Reports for the current user fetched successfully */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Validation or bad request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Missing or invalid bearer token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Insufficient permissions */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Resource not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Rate limited */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    ReportsController_getCapacityForCurrentUser: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Reporting capacity fetched successfully */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ReportCapacityDto"];
-                };
-            };
-            /** @description Validation or bad request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Missing or invalid bearer token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Insufficient permissions */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Resource not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Rate limited */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    ReportsController_findOne: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Report fetched successfully (shape depends on moderator vs citizen access) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminReportDetailDto"] | components["schemas"]["CitizenReportDetailDto"];
-                };
-            };
-            /** @description Validation or bad request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Missing or invalid bearer token */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Insufficient permissions */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Resource not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Rate limited */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
     ReportsAdminController_getQueueSummary: {
         parameters: {
             query?: never;
@@ -15189,6 +14909,286 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MergeDuplicateReportsResponseDto"];
+                };
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ReportsController_upload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Uploaded file URLs */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportMediaUrlsResponseDto"];
+                };
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ReportsController_appendMedia: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Media appended successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportMediaUrlsResponseDto"];
+                };
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ReportsController_findForCurrentUser: {
+        parameters: {
+            query?: {
+                page?: components["schemas"]["Object"];
+                limit?: components["schemas"]["Object"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Reports for the current user fetched successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ReportsController_getCapacityForCurrentUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Reporting capacity fetched successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportCapacityDto"];
+                };
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ReportsController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Report fetched successfully (shape depends on moderator vs citizen access) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminReportDetailDto"] | components["schemas"]["CitizenReportDetailDto"];
                 };
             };
             /** @description Validation or bad request */
