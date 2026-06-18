@@ -7192,56 +7192,6 @@
       }
     },
     "/reports": {
-      "post": {
-        "operationId": "ReportsController_createWithLocation",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateReportWithLocationDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Report created successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ReportSubmitResponseDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Create a report by location (finds or creates site; approval awards points later)",
-        "tags": [
-          "reports"
-        ]
-      },
       "get": {
         "operationId": "ReportsAdminController_findAllForModeration",
         "parameters": [
@@ -7378,19 +7328,27 @@
         "tags": [
           "reports"
         ]
-      }
-    },
-    "/reports/upload": {
+      },
       "post": {
-        "operationId": "ReportsController_upload",
+        "operationId": "ReportsController_createWithLocation",
         "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateReportWithLocationDto"
+              }
+            }
+          }
+        },
         "responses": {
-          "200": {
-            "description": "Uploaded file URLs",
+          "201": {
+            "description": "Report created successfully",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ReportMediaUrlsResponseDto"
+                  "$ref": "#/components/schemas/ReportSubmitResponseDto"
                 }
               }
             }
@@ -7416,210 +7374,7 @@
             "bearer": []
           }
         ],
-        "summary": "Upload report photos (max 5, jpeg/png/webp, 12MB each)",
-        "tags": [
-          "reports"
-        ]
-      }
-    },
-    "/reports/{id}/media": {
-      "post": {
-        "operationId": "ReportsController_appendMedia",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Media appended successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ReportMediaUrlsResponseDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Append photos to an existing report (reporter or co-reporter only)",
-        "tags": [
-          "reports"
-        ]
-      }
-    },
-    "/reports/me": {
-      "get": {
-        "operationId": "ReportsController_findForCurrentUser",
-        "parameters": [
-          {
-            "name": "page",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "$ref": "#/components/schemas/Object"
-            }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "$ref": "#/components/schemas/Object"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Reports for the current user fetched successfully"
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "List reports created by the authenticated user (paginated)",
-        "tags": [
-          "reports"
-        ]
-      }
-    },
-    "/reports/capacity": {
-      "get": {
-        "operationId": "ReportsController_getCapacityForCurrentUser",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Reporting capacity fetched successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ReportCapacityDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get current reporting capacity and emergency allowance status",
-        "tags": [
-          "reports"
-        ]
-      }
-    },
-    "/reports/{id}": {
-      "get": {
-        "operationId": "ReportsController_findOne",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Report fetched successfully (shape depends on moderator vs citizen access)",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/AdminReportDetailDto"
-                    },
-                    {
-                      "$ref": "#/components/schemas/CitizenReportDetailDto"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Validation or bad request"
-          },
-          "401": {
-            "description": "Missing or invalid bearer token"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Resource not found"
-          },
-          "429": {
-            "description": "Rate limited"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get report details (admin: full moderation view, citizen: own reports only)",
+        "summary": "Create a report by location (finds or creates site; approval awards points later)",
         "tags": [
           "reports"
         ]
@@ -8199,6 +7954,251 @@
           }
         ],
         "summary": "Approve and merge child duplicate reports into a primary report",
+        "tags": [
+          "reports"
+        ]
+      }
+    },
+    "/reports/upload": {
+      "post": {
+        "operationId": "ReportsController_upload",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Uploaded file URLs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportMediaUrlsResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload report photos (max 5, jpeg/png/webp, 12MB each)",
+        "tags": [
+          "reports"
+        ]
+      }
+    },
+    "/reports/{id}/media": {
+      "post": {
+        "operationId": "ReportsController_appendMedia",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Media appended successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportMediaUrlsResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Append photos to an existing report (reporter or co-reporter only)",
+        "tags": [
+          "reports"
+        ]
+      }
+    },
+    "/reports/me": {
+      "get": {
+        "operationId": "ReportsController_findForCurrentUser",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reports for the current user fetched successfully"
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List reports created by the authenticated user (paginated)",
+        "tags": [
+          "reports"
+        ]
+      }
+    },
+    "/reports/capacity": {
+      "get": {
+        "operationId": "ReportsController_getCapacityForCurrentUser",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Reporting capacity fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportCapacityDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get current reporting capacity and emergency allowance status",
+        "tags": [
+          "reports"
+        ]
+      }
+    },
+    "/reports/{id}": {
+      "get": {
+        "operationId": "ReportsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Report fetched successfully (shape depends on moderator vs citizen access)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/AdminReportDetailDto"
+                    },
+                    {
+                      "$ref": "#/components/schemas/CitizenReportDetailDto"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get report details (admin: full moderation view, citizen: own reports only)",
         "tags": [
           "reports"
         ]
@@ -21343,6 +21343,461 @@
           "meta"
         ]
       },
+      "AdminReportListItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "reportNumber": {
+            "type": "string",
+            "description": "Human-friendly report number for queue operations",
+            "example": "R-01"
+          },
+          "name": {
+            "type": "string",
+            "description": "Short descriptive title for the report",
+            "example": "Illegal waste dump"
+          },
+          "location": {
+            "type": "string",
+            "description": "High-level location label used in tables",
+            "example": "Skopje"
+          },
+          "dateReportedAt": {
+            "type": "string",
+            "description": "ISO timestamp when the report was created",
+            "example": "2025-10-23T09:15:00.000Z"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "NEW",
+              "IN_REVIEW",
+              "APPROVED",
+              "DELETED"
+            ]
+          },
+          "isPotentialDuplicate": {
+            "type": "boolean",
+            "description": "Whether this report is flagged as a potential duplicate",
+            "default": false
+          },
+          "coReporterCount": {
+            "type": "number",
+            "description": "Number of additional co-reporters attached to this report",
+            "default": 0
+          },
+          "cleanupEffortLabel": {
+            "type": "object",
+            "nullable": true,
+            "description": "Citizen estimate of cleanup team size, when provided",
+            "example": "3–5 people"
+          }
+        },
+        "required": [
+          "id",
+          "reportNumber",
+          "name",
+          "location",
+          "dateReportedAt",
+          "status",
+          "isPotentialDuplicate",
+          "coReporterCount",
+          "cleanupEffortLabel"
+        ]
+      },
+      "AdminReportListMetaDto": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "page",
+          "limit",
+          "total"
+        ]
+      },
+      "AdminReportListResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminReportListItemDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/AdminReportListMetaDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "AdminReportsQueueSummaryDto": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number"
+          },
+          "needAttentionCount": {
+            "type": "number"
+          },
+          "duplicatesCount": {
+            "type": "number"
+          },
+          "byStatus": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "number"
+            }
+          }
+        },
+        "required": [
+          "total",
+          "needAttentionCount",
+          "duplicatesCount",
+          "byStatus"
+        ]
+      },
+      "AdminDuplicateReportItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "reportNumber": {
+            "type": "string",
+            "description": "Human-friendly report number for queue operations",
+            "example": "R-25-ABCD"
+          },
+          "title": {
+            "type": "string",
+            "description": "Short descriptive title for the report",
+            "example": "Illegal waste dump"
+          },
+          "location": {
+            "type": "string",
+            "description": "High-level location label used in tables",
+            "example": "Skopje"
+          },
+          "submittedAt": {
+            "type": "string",
+            "description": "ISO timestamp when the report was created",
+            "example": "2025-10-23T09:15:00.000Z"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "NEW",
+              "IN_REVIEW",
+              "APPROVED",
+              "DELETED"
+            ]
+          },
+          "coReporterCount": {
+            "type": "number",
+            "description": "Number of additional co-reporters attached to this report",
+            "default": 0
+          },
+          "mediaCount": {
+            "type": "number",
+            "description": "Number of media assets attached to this report",
+            "default": 0
+          }
+        },
+        "required": [
+          "id",
+          "reportNumber",
+          "title",
+          "location",
+          "submittedAt",
+          "status",
+          "coReporterCount",
+          "mediaCount"
+        ]
+      },
+      "AdminDuplicateReportGroupDto": {
+        "type": "object",
+        "properties": {
+          "primaryReport": {
+            "$ref": "#/components/schemas/AdminDuplicateReportItemDto"
+          },
+          "duplicateReports": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminDuplicateReportItemDto"
+            }
+          },
+          "totalReports": {
+            "type": "number",
+            "description": "Total reports in the duplicate group including the primary report",
+            "example": 3
+          }
+        },
+        "required": [
+          "primaryReport",
+          "duplicateReports",
+          "totalReports"
+        ]
+      },
+      "AdminDuplicateReportGroupsMetaDto": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "page",
+          "limit",
+          "total"
+        ]
+      },
+      "AdminDuplicateReportGroupsResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminDuplicateReportGroupDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/AdminDuplicateReportGroupsMetaDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "ReportViewerPresenceEntryDto": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "sessionId",
+          "userId",
+          "displayName"
+        ]
+      },
+      "ReportViewerPresenceResponseDto": {
+        "type": "object",
+        "properties": {
+          "viewers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReportViewerPresenceEntryDto"
+            }
+          }
+        },
+        "required": [
+          "viewers"
+        ]
+      },
+      "ReportViewerHeartbeatDto": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "description": "Stable per-tab session id generated by the admin client",
+            "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+          },
+          "displayName": {
+            "type": "string",
+            "description": "Display name shown to other moderators viewing the same report",
+            "example": "Ana Petrova"
+          }
+        },
+        "required": [
+          "sessionId",
+          "displayName"
+        ]
+      },
+      "UpdateReportStatusDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "NEW",
+              "IN_REVIEW",
+              "APPROVED",
+              "DELETED"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "description": "Required when moving a report to DELETED (moderation narrative). Ignored for other statuses.",
+            "maxLength": 500,
+            "example": "Evidence was insufficient to verify this report."
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "AssignReportDto": {
+        "type": "object",
+        "properties": {
+          "moderatorId": {
+            "type": "string",
+            "description": "Target moderator user id; omit to assign to the authenticated moderator",
+            "example": "cm1234567890abcdefghijkl"
+          },
+          "unassign": {
+            "type": "boolean",
+            "description": "When true, clears the current assignee without changing report status",
+            "default": false
+          }
+        }
+      },
+      "AssignReportResponseDto": {
+        "type": "object",
+        "properties": {
+          "reportId": {
+            "type": "string"
+          },
+          "assignedModeratorId": {
+            "type": "object",
+            "nullable": true
+          },
+          "assignedModeratorName": {
+            "type": "object",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "NEW",
+              "IN_REVIEW",
+              "APPROVED",
+              "DELETED"
+            ]
+          }
+        },
+        "required": [
+          "reportId",
+          "assignedModeratorId",
+          "assignedModeratorName",
+          "status"
+        ]
+      },
+      "MergeDuplicateReportsDto": {
+        "type": "object",
+        "properties": {
+          "childReportIds": {
+            "description": "IDs of child duplicate reports to merge into the primary report",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "reason": {
+            "type": "string",
+            "description": "Optional human-readable moderation reason",
+            "maxLength": 500,
+            "example": "Merged duplicate reports after manual verification."
+          }
+        },
+        "required": [
+          "childReportIds"
+        ]
+      },
+      "MergedCoReporterItemDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name from user profile"
+          },
+          "reportedAt": {
+            "type": "string",
+            "description": "ISO timestamp when this person originally submitted their report"
+          }
+        },
+        "required": [
+          "userId",
+          "name",
+          "reportedAt"
+        ]
+      },
+      "MergeDuplicateReportsResponseDto": {
+        "type": "object",
+        "properties": {
+          "primaryReportId": {
+            "type": "string"
+          },
+          "mergedChildCount": {
+            "type": "number"
+          },
+          "mergedMediaCount": {
+            "type": "number",
+            "description": "Number of duplicate report media objects removed from storage (best-effort S3 deletes)"
+          },
+          "mergedCoReporterCount": {
+            "type": "number"
+          },
+          "primaryStatus": {
+            "type": "string",
+            "enum": [
+              "NEW",
+              "IN_REVIEW",
+              "APPROVED",
+              "DELETED"
+            ]
+          },
+          "coReporters": {
+            "description": "Co-reporters on the primary report after merge (original submitters of merged duplicates)",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MergedCoReporterItemDto"
+            }
+          },
+          "reporterCount": {
+            "type": "number",
+            "description": "Total distinct people who reported this issue (primary reporter + co-reporters)"
+          }
+        },
+        "required": [
+          "primaryReportId",
+          "mergedChildCount",
+          "mergedMediaCount",
+          "mergedCoReporterCount",
+          "primaryStatus",
+          "coReporters",
+          "reporterCount"
+        ]
+      },
       "AdminReportEvidenceDto": {
         "type": "object",
         "properties": {
@@ -21894,461 +22349,6 @@
           "retryAfterSeconds",
           "nextEmergencyReportAvailableAt",
           "unlockHint"
-        ]
-      },
-      "AdminReportListItemDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "reportNumber": {
-            "type": "string",
-            "description": "Human-friendly report number for queue operations",
-            "example": "R-01"
-          },
-          "name": {
-            "type": "string",
-            "description": "Short descriptive title for the report",
-            "example": "Illegal waste dump"
-          },
-          "location": {
-            "type": "string",
-            "description": "High-level location label used in tables",
-            "example": "Skopje"
-          },
-          "dateReportedAt": {
-            "type": "string",
-            "description": "ISO timestamp when the report was created",
-            "example": "2025-10-23T09:15:00.000Z"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "NEW",
-              "IN_REVIEW",
-              "APPROVED",
-              "DELETED"
-            ]
-          },
-          "isPotentialDuplicate": {
-            "type": "boolean",
-            "description": "Whether this report is flagged as a potential duplicate",
-            "default": false
-          },
-          "coReporterCount": {
-            "type": "number",
-            "description": "Number of additional co-reporters attached to this report",
-            "default": 0
-          },
-          "cleanupEffortLabel": {
-            "type": "object",
-            "nullable": true,
-            "description": "Citizen estimate of cleanup team size, when provided",
-            "example": "3–5 people"
-          }
-        },
-        "required": [
-          "id",
-          "reportNumber",
-          "name",
-          "location",
-          "dateReportedAt",
-          "status",
-          "isPotentialDuplicate",
-          "coReporterCount",
-          "cleanupEffortLabel"
-        ]
-      },
-      "AdminReportListMetaDto": {
-        "type": "object",
-        "properties": {
-          "page": {
-            "type": "number"
-          },
-          "limit": {
-            "type": "number"
-          },
-          "total": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "page",
-          "limit",
-          "total"
-        ]
-      },
-      "AdminReportListResponseDto": {
-        "type": "object",
-        "properties": {
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/AdminReportListItemDto"
-            }
-          },
-          "meta": {
-            "$ref": "#/components/schemas/AdminReportListMetaDto"
-          }
-        },
-        "required": [
-          "data",
-          "meta"
-        ]
-      },
-      "AdminReportsQueueSummaryDto": {
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "number"
-          },
-          "needAttentionCount": {
-            "type": "number"
-          },
-          "duplicatesCount": {
-            "type": "number"
-          },
-          "byStatus": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "number"
-            }
-          }
-        },
-        "required": [
-          "total",
-          "needAttentionCount",
-          "duplicatesCount",
-          "byStatus"
-        ]
-      },
-      "AdminDuplicateReportItemDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "reportNumber": {
-            "type": "string",
-            "description": "Human-friendly report number for queue operations",
-            "example": "R-25-ABCD"
-          },
-          "title": {
-            "type": "string",
-            "description": "Short descriptive title for the report",
-            "example": "Illegal waste dump"
-          },
-          "location": {
-            "type": "string",
-            "description": "High-level location label used in tables",
-            "example": "Skopje"
-          },
-          "submittedAt": {
-            "type": "string",
-            "description": "ISO timestamp when the report was created",
-            "example": "2025-10-23T09:15:00.000Z"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "NEW",
-              "IN_REVIEW",
-              "APPROVED",
-              "DELETED"
-            ]
-          },
-          "coReporterCount": {
-            "type": "number",
-            "description": "Number of additional co-reporters attached to this report",
-            "default": 0
-          },
-          "mediaCount": {
-            "type": "number",
-            "description": "Number of media assets attached to this report",
-            "default": 0
-          }
-        },
-        "required": [
-          "id",
-          "reportNumber",
-          "title",
-          "location",
-          "submittedAt",
-          "status",
-          "coReporterCount",
-          "mediaCount"
-        ]
-      },
-      "AdminDuplicateReportGroupDto": {
-        "type": "object",
-        "properties": {
-          "primaryReport": {
-            "$ref": "#/components/schemas/AdminDuplicateReportItemDto"
-          },
-          "duplicateReports": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/AdminDuplicateReportItemDto"
-            }
-          },
-          "totalReports": {
-            "type": "number",
-            "description": "Total reports in the duplicate group including the primary report",
-            "example": 3
-          }
-        },
-        "required": [
-          "primaryReport",
-          "duplicateReports",
-          "totalReports"
-        ]
-      },
-      "AdminDuplicateReportGroupsMetaDto": {
-        "type": "object",
-        "properties": {
-          "page": {
-            "type": "number"
-          },
-          "limit": {
-            "type": "number"
-          },
-          "total": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "page",
-          "limit",
-          "total"
-        ]
-      },
-      "AdminDuplicateReportGroupsResponseDto": {
-        "type": "object",
-        "properties": {
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/AdminDuplicateReportGroupDto"
-            }
-          },
-          "meta": {
-            "$ref": "#/components/schemas/AdminDuplicateReportGroupsMetaDto"
-          }
-        },
-        "required": [
-          "data",
-          "meta"
-        ]
-      },
-      "ReportViewerPresenceEntryDto": {
-        "type": "object",
-        "properties": {
-          "sessionId": {
-            "type": "string"
-          },
-          "userId": {
-            "type": "string"
-          },
-          "displayName": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "sessionId",
-          "userId",
-          "displayName"
-        ]
-      },
-      "ReportViewerPresenceResponseDto": {
-        "type": "object",
-        "properties": {
-          "viewers": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ReportViewerPresenceEntryDto"
-            }
-          }
-        },
-        "required": [
-          "viewers"
-        ]
-      },
-      "ReportViewerHeartbeatDto": {
-        "type": "object",
-        "properties": {
-          "sessionId": {
-            "type": "string",
-            "description": "Stable per-tab session id generated by the admin client",
-            "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
-          },
-          "displayName": {
-            "type": "string",
-            "description": "Display name shown to other moderators viewing the same report",
-            "example": "Ana Petrova"
-          }
-        },
-        "required": [
-          "sessionId",
-          "displayName"
-        ]
-      },
-      "UpdateReportStatusDto": {
-        "type": "object",
-        "properties": {
-          "status": {
-            "type": "string",
-            "enum": [
-              "NEW",
-              "IN_REVIEW",
-              "APPROVED",
-              "DELETED"
-            ]
-          },
-          "reason": {
-            "type": "string",
-            "description": "Required when moving a report to DELETED (moderation narrative). Ignored for other statuses.",
-            "maxLength": 500,
-            "example": "Evidence was insufficient to verify this report."
-          }
-        },
-        "required": [
-          "status"
-        ]
-      },
-      "AssignReportDto": {
-        "type": "object",
-        "properties": {
-          "moderatorId": {
-            "type": "string",
-            "description": "Target moderator user id; omit to assign to the authenticated moderator",
-            "example": "cm1234567890abcdefghijkl"
-          },
-          "unassign": {
-            "type": "boolean",
-            "description": "When true, clears the current assignee without changing report status",
-            "default": false
-          }
-        }
-      },
-      "AssignReportResponseDto": {
-        "type": "object",
-        "properties": {
-          "reportId": {
-            "type": "string"
-          },
-          "assignedModeratorId": {
-            "type": "object",
-            "nullable": true
-          },
-          "assignedModeratorName": {
-            "type": "object",
-            "nullable": true
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "NEW",
-              "IN_REVIEW",
-              "APPROVED",
-              "DELETED"
-            ]
-          }
-        },
-        "required": [
-          "reportId",
-          "assignedModeratorId",
-          "assignedModeratorName",
-          "status"
-        ]
-      },
-      "MergeDuplicateReportsDto": {
-        "type": "object",
-        "properties": {
-          "childReportIds": {
-            "description": "IDs of child duplicate reports to merge into the primary report",
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "reason": {
-            "type": "string",
-            "description": "Optional human-readable moderation reason",
-            "maxLength": 500,
-            "example": "Merged duplicate reports after manual verification."
-          }
-        },
-        "required": [
-          "childReportIds"
-        ]
-      },
-      "MergedCoReporterItemDto": {
-        "type": "object",
-        "properties": {
-          "userId": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string",
-            "description": "Display name from user profile"
-          },
-          "reportedAt": {
-            "type": "string",
-            "description": "ISO timestamp when this person originally submitted their report"
-          }
-        },
-        "required": [
-          "userId",
-          "name",
-          "reportedAt"
-        ]
-      },
-      "MergeDuplicateReportsResponseDto": {
-        "type": "object",
-        "properties": {
-          "primaryReportId": {
-            "type": "string"
-          },
-          "mergedChildCount": {
-            "type": "number"
-          },
-          "mergedMediaCount": {
-            "type": "number",
-            "description": "Number of duplicate report media objects removed from storage (best-effort S3 deletes)"
-          },
-          "mergedCoReporterCount": {
-            "type": "number"
-          },
-          "primaryStatus": {
-            "type": "string",
-            "enum": [
-              "NEW",
-              "IN_REVIEW",
-              "APPROVED",
-              "DELETED"
-            ]
-          },
-          "coReporters": {
-            "description": "Co-reporters on the primary report after merge (original submitters of merged duplicates)",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/MergedCoReporterItemDto"
-            }
-          },
-          "reporterCount": {
-            "type": "number",
-            "description": "Total distinct people who reported this issue (primary reporter + co-reporters)"
-          }
-        },
-        "required": [
-          "primaryReportId",
-          "mergedChildCount",
-          "mergedMediaCount",
-          "mergedCoReporterCount",
-          "primaryStatus",
-          "coReporters",
-          "reporterCount"
         ]
       },
       "AdminOverviewCleanupEventItemDto": {
