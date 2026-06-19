@@ -16,7 +16,7 @@ RUN pnpm --filter @chisto/api build
 
 FROM base AS deploy
 COPY --from=builder /app/ ./
-RUN pnpm --filter @chisto/api deploy --prod /deployed
+RUN pnpm --filter @chisto/api deploy --prod --legacy /deployed
 
 FROM base AS runner
 ENV NODE_ENV=production

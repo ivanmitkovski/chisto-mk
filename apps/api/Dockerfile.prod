@@ -20,13 +20,13 @@ RUN pnpm --filter @chisto/api build
 
 FROM base AS deploy
 COPY --from=builder /app/ ./
-RUN pnpm --filter @chisto/api deploy --prod /deployed
+RUN pnpm --filter @chisto/api deploy --prod --legacy /deployed
 
 # Prisma CLI + engines for migrate/generate (isolated npm install; pnpm symlinks are not COPY-safe).
 FROM base AS prisma-cli
 WORKDIR /opt/prisma-cli
 RUN npm init -y \
-  && npm install prisma@7.8.0 \
+  && npm install prisma@7.8.0 tar@7.5.16 \
   && rm -f package.json package-lock.json
 
 FROM node:20-bookworm-slim AS runner
