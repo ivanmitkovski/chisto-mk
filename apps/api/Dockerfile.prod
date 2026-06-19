@@ -25,13 +25,17 @@ RUN pnpm --filter @chisto/api deploy --prod --legacy /deployed
 # Prisma CLI + engines for migrate/generate (isolated npm install; pnpm symlinks are not COPY-safe).
 FROM base AS prisma-cli
 WORKDIR /opt/prisma-cli
-RUN npm init -y \
-  && npm install prisma@7.8.0 tar@7.5.16 \
-  && rm -f package.json package-lock.json
+COPY apps/api/scripts/prisma-cli.package.json ./package.json
+RUN npm install --omit=dev \
+  && rm -f package-lock.json
 
 FROM node:20-bookworm-slim AS runner
 ENV NODE_ENV=production
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates wget && rm -rf /var/lib/apt/lists/*
+# Patch distro packages with available security fixes (Trivy image scan).
+RUN apt-get update \
+  && apt-get -y upgrade \
+  && apt-get install -y --no-install-recommends ca-certificates wget \
+  && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 RUN groupadd --gid 1001 chisto && useradd --uid 1001 --gid chisto --create-home chisto
 COPY --from=deploy /deployed ./
