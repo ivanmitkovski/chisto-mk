@@ -3,7 +3,7 @@
 FROM node:20-bookworm-slim AS base
 # wget: required by ECS task-definition container health check (`wget -qO- http://localhost:3000/health`).
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates wget && rm -rf /var/lib/apt/lists/*
-RUN corepack enable && corepack prepare pnpm@9.14.2 --activate
+RUN corepack enable && corepack prepare pnpm@10.27.0 --activate
 WORKDIR /app
 
 FROM base AS deps
@@ -29,8 +29,10 @@ RUN npm init -y \
   && npm install prisma@7.8.0 \
   && rm -f package.json package-lock.json
 
-FROM base AS runner
+FROM node:20-bookworm-slim AS runner
 ENV NODE_ENV=production
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates wget && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
 RUN groupadd --gid 1001 chisto && useradd --uid 1001 --gid chisto --create-home chisto
 COPY --from=deploy /deployed ./
 COPY --from=builder /app/apps/api/prisma ./prisma
