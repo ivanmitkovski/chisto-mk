@@ -5,16 +5,8 @@ import { Badge, StatusDot } from '@/components/ui';
 import type { OperationsSnapshot } from '../data/operations-snapshot';
 import styles from './operations-workspace.module.css';
 
-type PushDiagnosticsData = OperationsSnapshot['pushDiagnostics'] extends {
-  status: 'ok';
-  data: infer T;
-}
-  ? T
-  : never;
-
-type PushHealthData = OperationsSnapshot['pushHealth'] extends { status: 'ok'; data: infer T }
-  ? T
-  : never;
+type PushDiagnosticsData = Extract<OperationsSnapshot['pushDiagnostics'], { status: 'ok' }>['data'];
+type PushHealthData = Extract<OperationsSnapshot['pushHealth'], { status: 'ok' }>['data'];
 
 export function OperationsPushStatusRow({
   pushDiagnostics,

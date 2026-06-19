@@ -20,8 +20,8 @@ export function getBroadcastUserDisplayParts(
 ): { primary: string; secondary?: string } {
   const name = `${user.firstName} ${user.lastName}`.trim();
   if (name) {
-    const secondary = user.email || user.phoneNumber || undefined;
-    return { primary: name, secondary };
+    const secondary = user.email || user.phoneNumber;
+    return secondary ? { primary: name, secondary } : { primary: name };
   }
   const fallback = user.email || user.phoneNumber || user.id;
   return { primary: fallback };

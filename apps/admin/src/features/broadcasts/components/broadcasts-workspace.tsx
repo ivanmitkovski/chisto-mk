@@ -17,7 +17,7 @@ import {
 } from '../lib/broadcast-campaign-policy';
 import type { BroadcastCampaign } from '../types';
 import { BROADCAST_PREFILL_STORAGE_KEY } from '../types';
-import { audienceTranslationKey } from '../config/broadcast-audience-options';
+import { audienceTranslationKey, normalizeBroadcastAudience } from '../config/broadcast-audience-options';
 import styles from './broadcasts-workspace.module.css';
 
 const CAMPAIGNS_PAGE_SIZE = 10;
@@ -128,8 +128,8 @@ export function BroadcastsWorkspace({ initialCampaigns }: { initialCampaigns: Br
   async function handleSend(campaign: BroadcastCampaign) {
     try {
       const preview = await previewBroadcastAudience({
-        audience: campaign.audience as BroadcastCampaign['audience'],
-        audienceUserIds: campaign.audienceUserIds,
+        audience: normalizeBroadcastAudience(campaign.audience),
+        ...(campaign.audienceUserIds != null ? { audienceUserIds: campaign.audienceUserIds } : {}),
       });
       setSendRecipientCount(preview.recipientCount);
     } catch {
