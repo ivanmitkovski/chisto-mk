@@ -32,6 +32,7 @@ export class AdminBroadcastsController {
     return this.broadcasts.list();
   }
 
+  // safe-to-retry: read-only audience count preview
   @Post('audience-preview')
   @Roles(...ADMIN_PANEL_ROLES)
   @RequirePermission(ADMIN_PERMISSIONS['notifications:read'])
@@ -43,6 +44,7 @@ export class AdminBroadcastsController {
     });
   }
 
+  // safe-to-retry: read-only user lookup for audience chips
   @Post('audience-users/lookup')
   @Roles(...ADMIN_PANEL_ROLES)
   @RequirePermission(ADMIN_PERMISSIONS['notifications:read'])
