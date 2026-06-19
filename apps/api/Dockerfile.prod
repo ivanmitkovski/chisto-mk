@@ -9,6 +9,7 @@ WORKDIR /app
 FROM base AS deps
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY apps/api/package.json ./apps/api/
+COPY packages/prisma-cli/package.json ./packages/prisma-cli/
 RUN pnpm install --frozen-lockfile
 
 FROM base AS builder
@@ -22,12 +23,9 @@ FROM base AS deploy
 COPY --from=builder /app/ ./
 RUN pnpm --filter @chisto/api deploy --prod --legacy /deployed
 
-# Prisma CLI + engines for migrate/generate (isolated npm install; pnpm symlinks are not COPY-safe).
-FROM base AS prisma-cli
-WORKDIR /opt/prisma-cli
-COPY apps/api/scripts/prisma-cli.package.json ./package.json
-RUN npm install --omit=dev \
-  && rm -f package-lock.json
+# Prisma CLI bundle (pnpm deploy inherits root security overrides; npm install does not).
+FROM builder AS prisma-cli
+RUN pnpm --filter @chisto/prisma-cli deploy --prod --legacy /opt/prisma-cli
 
 FROM node:20-bookworm-slim AS runner
 ENV NODE_ENV=production
