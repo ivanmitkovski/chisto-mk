@@ -11,7 +11,7 @@
 
 .remediation {
   margin-top: var(--space-2);
-  color: var(--color-text-secondary);
-  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
   line-height: 1.5;
 }

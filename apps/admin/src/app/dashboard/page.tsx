@@ -14,6 +14,7 @@ import {
   StatsFallback,
   StatsSection,
 } from '@/features/dashboard-overview';
+import { OperationsDegradedBanner } from '@/features/operations/components/operations-degraded-banner.server';
 import { QuickActionsDropdown } from '@/features/dashboard-overview';
 import { ADMIN_PERMISSIONS } from '@/lib/auth/rbac/permissions';
 import { requirePagePermission } from '@/lib/auth/rbac/server';
@@ -34,6 +35,7 @@ export default async function DashboardPage() {
     >
       <div className={styles.page}>
         <DashboardOfflineBanner />
+        <OperationsDegradedBanner />
         <DashboardKeyboardShortcuts />
         <a href="#reports-section" className="skipLink">
           {tCommon('skipToReports')}

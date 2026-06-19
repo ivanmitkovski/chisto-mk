@@ -133,4 +133,11 @@ export class PushDeliveryWorkerService implements OnModuleInit, OnModuleDestroy 
   processOutbox(): Promise<number> {
     return this.outbox.processOutbox(this.workerId);
   }
+
+  getPgListenerStatus(): { enabled: boolean; connected: boolean } {
+    return {
+      enabled: this.fcm?.isEnabled() ?? false,
+      connected: this.pgListenConnected,
+    };
+  }
 }

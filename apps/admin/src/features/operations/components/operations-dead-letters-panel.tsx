@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button, EmptyState, Pagination, SectionState, useToast } from '@/components/ui';
 import { ActionConfirmModal } from '@/features/reports/components/action-confirm-modal';
@@ -30,9 +30,11 @@ type DeadLettersResponse = {
 export function OperationsDeadLettersPanel({
   initialData,
   initialMeta,
+  snapshotUpdatedAt,
 }: {
   initialData: DeadLetterRow[];
   initialMeta: { page: number; limit: number; total: number };
+  snapshotUpdatedAt?: string;
 }) {
   const t = useTranslations('operations');
   const locale = useAdminBcp47Locale();
@@ -45,6 +47,13 @@ export function OperationsDeadLettersPanel({
   const [error, setError] = useState<string | null>(null);
   const [busyAction, setBusyAction] = useState<'requeue' | 'purge' | null>(null);
   const [confirmAction, setConfirmAction] = useState<'requeue' | 'purge' | null>(null);
+  const [rowBusyId, setRowBusyId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setRows(initialData);
+    setMeta(initialMeta);
+    setPage(initialMeta.page);
+  }, [snapshotUpdatedAt, initialData, initialMeta]);
 
   const loadPage = useCallback(async (nextPage: number) => {
     setLoading(true);
@@ -116,6 +125,33 @@ export function OperationsDeadLettersPanel({
     }
   }
 
+  async function runRequeueOne(id: string) {
+    setRowBusyId(id);
+    try {
+      const result = await adminBrowserFetch<{ requeued: boolean }>(
+        `/notifications/admin/dead-letters/${id}/requeue`,
+        { method: 'POST' },
+      );
+      showToast({
+        tone: result.requeued ? 'success' : 'warning',
+        title: result.requeued ? t('deadLetters.requeueOneSuccessTitle') : t('deadLetters.requeueOneSkippedTitle'),
+        message: result.requeued
+          ? t('deadLetters.requeueOneSuccessMessage')
+          : t('deadLetters.requeueOneSkippedMessage'),
+      });
+      refresh();
+      await loadPage(page);
+    } catch (fetchError) {
+      showToast({
+        tone: 'warning',
+        title: t('deadLetters.requeueFailedTitle'),
+        message: fetchError instanceof Error ? fetchError.message : t('deadLetters.requeueFailedMessage'),
+      });
+    } finally {
+      setRowBusyId(null);
+    }
+  }
+
   if (error) {
     return <SectionState variant="error" message={error} />;
   }
@@ -155,6 +191,17 @@ export function OperationsDeadLettersPanel({
               {row.lastErrorMessage ? (
                 <span className={styles.deadLetterMessage}>{row.lastErrorMessage}</span>
               ) : null}
+              <Can permission="operations:write">
+                <div className={styles.deadLetterRowActions}>
+                  <Button
+                    variant="ghost"
+                    disabled={rowBusyId != null || busyAction != null}
+                    onClick={() => void runRequeueOne(row.id)}
+                  >
+                    {t('deadLetters.requeueOne')}
+                  </Button>
+                </div>
+              </Can>
             </li>
           ))}
         </ul>

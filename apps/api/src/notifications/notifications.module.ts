@@ -5,6 +5,7 @@ import { PrismaModule } from '../prisma/prisma.module';
 import { EmailModule } from '../email/email.module';
 import { AdminModerationEmailModule } from '../admin-moderation-email/admin-moderation-email.module';
 import { ReportsUploadModule } from '../reports/reports-upload.module';
+import { AuditModule } from '../audit/audit.module';
 import { NotificationsInboxController } from './controllers/notifications-inbox.controller';
 import { NotificationsStateController } from './controllers/notifications-state.controller';
 import { NotificationsAdminController } from './controllers/notifications-admin.controller';
@@ -21,6 +22,7 @@ import { PushDeliveryOutboxService } from './services/push-delivery-outbox.servi
 import { PushDeliverySenderService } from './services/push-delivery-sender.service';
 import { PushDeadLetterRequeueService } from './services/push-dead-letter-requeue.service';
 import { PushDiagnosticsService } from './services/push-diagnostics.service';
+import { PushPipelineHealthService } from './services/push-pipeline-health.service';
 import { NotificationDispatcherService } from './services/notification-dispatcher.service';
 import { CleanupEventNotificationsService } from './services/cleanup-event-notifications.service';
 import { NearbyUsersForReportService } from './services/nearby-users-for-report.service';
@@ -36,6 +38,7 @@ import { NotificationsRoomEmitterService } from './services/notifications-room-e
     EmailModule,
     AdminModerationEmailModule,
     ReportsUploadModule,
+    AuditModule,
   ],
   controllers: [
     NotificationsInboxController,
@@ -55,6 +58,7 @@ import { NotificationsRoomEmitterService } from './services/notifications-room-e
     PushDeliverySenderService,
     PushDeadLetterRequeueService,
     PushDiagnosticsService,
+    PushPipelineHealthService,
     PushDeliveryWorkerService,
     NotificationDispatcherService,
     CleanupEventNotificationsService,
@@ -74,6 +78,8 @@ import { NotificationsRoomEmitterService } from './services/notifications-room-e
     NotificationStateService,
     NotificationPreferencesService,
     NotificationsRoomEmitterService,
+    PushPipelineHealthService,
+    PushDiagnosticsService,
   ],
 })
 export class NotificationsModule {}

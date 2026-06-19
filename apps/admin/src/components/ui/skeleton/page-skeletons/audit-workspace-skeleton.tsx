@@ -4,7 +4,7 @@ import styles from '../skeleton.module.css';
 
 export function AuditWorkspaceSkeleton() {
   return (
-    <>
+    <div className={styles.pageStack}>
       <SkeletonStatStrip count={2} />
       <div className={styles.auditFiltersCard} aria-hidden>
         <span className={`${styles.shimmerBlock} ${styles.sectionLabelBar}`} />
@@ -19,6 +19,6 @@ export function AuditWorkspaceSkeleton() {
         </div>
       </div>
       <SkeletonTable rows={10} cols={5} />
-    </>
+    </div>
   );
 }

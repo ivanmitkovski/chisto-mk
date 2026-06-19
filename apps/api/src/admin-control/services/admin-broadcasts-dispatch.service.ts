@@ -1,19 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../../audit/services/audit.service';
-import { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { NotificationDispatcherService } from '../../notifications/services/notification-dispatcher.service';
 import { NotificationType } from '../../prisma-client';
 import { AdminBroadcastsService } from './admin-broadcasts.service';
+import { AdminBroadcastsAudienceResolver } from './admin-broadcasts-audience.resolver';
 import type { BroadcastCampaign } from '../types/admin-broadcasts.types';
+import type { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 
 const DISPATCH_CHUNK_SIZE = 50;
 
 @Injectable()
 export class AdminBroadcastsDispatchService {
   constructor(
-    private readonly prisma: PrismaService,
     private readonly broadcasts: AdminBroadcastsService,
+    private readonly audienceResolver: AdminBroadcastsAudienceResolver,
     private readonly dispatcher: NotificationDispatcherService,
     private readonly audit?: AuditService,
   ) {}
@@ -45,7 +45,7 @@ export class AdminBroadcastsDispatchService {
   private async dispatchNotifications(
     campaign: BroadcastCampaign,
   ): Promise<{ sentCount: number; failedCount: number }> {
-    const userIds = await this.resolveAudience(campaign);
+    const userIds = await this.audienceResolver.resolveAudienceUserIds(campaign);
     let sentCount = 0;
     let failedCount = 0;
 
@@ -75,17 +75,5 @@ export class AdminBroadcastsDispatchService {
     }
 
     return { sentCount, failedCount };
-  }
-
-  private async resolveAudience(campaign: BroadcastCampaign): Promise<string[]> {
-    if (campaign.audience === 'users' && campaign.audienceUserIds?.length) {
-      return campaign.audienceUserIds;
-    }
-    const where =
-      campaign.audience === 'active'
-        ? { status: 'ACTIVE' as const, lastActiveAt: { gte: new Date(Date.now() - 30 * 86400000) } }
-        : { status: 'ACTIVE' as const };
-    const users = await this.prisma.user.findMany({ where, select: { id: true }, take: 5000 });
-    return users.map((u) => u.id);
   }
 }

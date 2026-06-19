@@ -200,3 +200,42 @@
   gap: var(--space-2);
   margin-bottom: var(--space-3);
 }
+
+.pushStatusBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.remediationBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-default);
+  background: var(--surface-subtle);
+}
+
+.remediationBanner p {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.deadLetterRowActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-2);
+}
+
+.metricsDetails {
+  margin-top: var(--space-4);
+}
+
+.metricsDetails summary {
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}

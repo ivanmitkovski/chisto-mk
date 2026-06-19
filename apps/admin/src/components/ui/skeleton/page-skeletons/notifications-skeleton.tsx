@@ -2,7 +2,7 @@ import styles from '../skeleton.module.css';
 
 export function NotificationsSkeleton() {
   return (
-    <>
+    <div className={styles.pageStack}>
       <header className={styles.notificationsHeader} aria-hidden>
         <div className={styles.notificationsHeaderText}>
           <span className={`${styles.shimmerBlock} ${styles.bar} ${styles.reportsTitleBar}`} />
@@ -28,6 +28,6 @@ export function NotificationsSkeleton() {
           ))}
         </div>
       </div>
-    </>
+    </div>
   );
 }

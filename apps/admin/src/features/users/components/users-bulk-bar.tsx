@@ -10,9 +10,11 @@ type UsersBulkBarProps = {
   isBulkLoading: boolean;
   canBulkWrite: boolean;
   canBulkRole: boolean;
+  canBroadcast: boolean;
   onActivate: () => void;
   onSuspend: () => void;
   onChangeRole: () => void;
+  onSendBroadcast: () => void;
   onClear: () => void;
 };
 
@@ -21,9 +23,11 @@ export function UsersBulkBar({
   isBulkLoading,
   canBulkWrite,
   canBulkRole,
+  canBroadcast,
   onActivate,
   onSuspend,
   onChangeRole,
+  onSendBroadcast,
   onClear,
 }: UsersBulkBarProps) {
   const t = useTranslations('users');
@@ -59,6 +63,12 @@ export function UsersBulkBar({
           <Button variant="outline" size="sm" onClick={onChangeRole} disabled={isBulkLoading}>
             <Icon name="users" size={12} aria-hidden />
             {t('bulk.changeRole')}
+          </Button>
+        ) : null}
+        {canBroadcast ? (
+          <Button variant="outline" size="sm" onClick={onSendBroadcast} disabled={isBulkLoading}>
+            <Icon name="document-forward" size={12} aria-hidden />
+            {t('bulk.sendBroadcast')}
           </Button>
         ) : null}
         <button type="button" className={styles.bulkClear} onClick={onClear}>

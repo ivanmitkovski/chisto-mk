@@ -4,12 +4,16 @@ import * as admin from 'firebase-admin';
 import { DevicePlatform } from '../../prisma-client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ObservabilityStore } from '../../observability/observability.store';
-import { CircuitBreaker, CircuitBreakerOpenError } from '../../common/resilience/circuit-breaker';
+import { CircuitBreaker, CircuitBreakerOpenError, CircuitState } from '../../common/resilience/circuit-breaker';
 import { buildFcmOutgoingMessage } from '../util/fcm-apns-payload';
 import {
   FCM_CONFIG_ERROR_CODES,
   FCM_REVOKE_ERROR_CODES,
 } from '../util/fcm-error-codes';
+import {
+  validateFirebaseServiceAccountJson,
+  type FirebaseCredentialValidation,
+} from '../util/firebase-credential-validator';
 
 export type FcmSendPayload = {
   title: string;
@@ -45,6 +49,7 @@ export class FcmPushService implements OnModuleInit {
   private readonly logger = new Logger(FcmPushService.name);
   private app: admin.app.App | null = null;
   private projectId: string | null = null;
+  private credentialValidation: FirebaseCredentialValidation | null = null;
   private readonly lastBadgeSyncAtByUser = new Map<string, number>();
   private readonly circuitBreaker = new CircuitBreaker({
     name: 'fcm',
@@ -67,13 +72,23 @@ export class FcmPushService implements OnModuleInit {
     const credentialsJson =
       this.configService?.get<string>('FIREBASE_SERVICE_ACCOUNT_JSON') ??
       process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
-    if (!credentialsJson) {
+    this.credentialValidation = validateFirebaseServiceAccountJson(credentialsJson);
+    if (this.credentialValidation.status === 'missing') {
       this.logger.warn('FCM credentials missing — FIREBASE_SERVICE_ACCOUNT_JSON not set');
+      return;
+    }
+    if (this.credentialValidation.status !== 'valid') {
+      this.logger.error(
+        `FCM credentials invalid (${this.credentialValidation.status}): ` +
+          `${this.credentialValidation.parseError ?? 'unknown'}. ` +
+          'Ensure FIREBASE_SERVICE_ACCOUNT_JSON is valid single-line JSON, ' +
+          'e.g. FIREBASE_SERVICE_ACCOUNT_JSON=$(jq -c . ./firebase-adminsdk.json)',
+      );
       return;
     }
 
     try {
-      const parsed = JSON.parse(credentialsJson) as admin.ServiceAccount & { project_id?: string };
+      const parsed = JSON.parse(credentialsJson!) as admin.ServiceAccount & { project_id?: string };
       const credential = admin.credential.cert(parsed);
       this.app = admin.initializeApp({ credential });
       this.projectId = parsed.project_id ?? parsed.projectId ?? null;
@@ -103,6 +118,20 @@ export class FcmPushService implements OnModuleInit {
 
   getProjectId(): string | null {
     return this.projectId;
+  }
+
+  getCredentialValidation(): FirebaseCredentialValidation {
+    if (this.credentialValidation != null) {
+      return this.credentialValidation;
+    }
+    const credentialsJson =
+      this.configService?.get<string>('FIREBASE_SERVICE_ACCOUNT_JSON') ??
+      process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
+    return validateFirebaseServiceAccountJson(credentialsJson);
+  }
+
+  getCircuitBreakerState(): CircuitState {
+    return this.circuitBreaker.currentState;
   }
 
   async resolveUnreadBadge(userId: string): Promise<number> {

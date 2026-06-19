@@ -14,6 +14,8 @@ export const OPS_THRESHOLDS = {
   sideEffectsPendingCritical: 50,
   openRateWarn: 0.05,
   emailDeadLettersWarn: 1,
+  emailQueueDepthWarn: 10,
+  emailQueueDepthCritical: 50,
 } as const;
 
 export const METRIC_HISTORY_STORAGE_KEY = 'chisto_admin_ops_metric_history';

@@ -17,6 +17,8 @@ import { useOperationsLive } from './operations-live-provider';
 import { OperationsActionsPanel } from './operations-actions-panel';
 import { OperationsDeadLettersPanel } from './operations-dead-letters-panel';
 import { OperationsEmailDeadLettersPanel } from './operations-email-dead-letters-panel';
+import { OperationsFeedDiagnosticsPanel } from './operations-feed-diagnostics-panel';
+import { OperationsPushStatusRow } from './operations-push-status-row';
 import { OperationsPanelCard } from './operations-panel-card';
 import { OperationsRefreshBar } from './operations-refresh-bar';
 import { OperationsStatusHeader } from './operations-status-header';
@@ -38,6 +40,9 @@ export function OperationsWorkspace({ snapshot }: { snapshot: OperationsSnapshot
   const { getSeries } = useOperationsLive();
   const pushStats =
     snapshot.pushStats.status === 'ok' ? normalizePushStats(snapshot.pushStats.data) : null;
+  const pushDiagnostics =
+    snapshot.pushDiagnostics.status === 'ok' ? snapshot.pushDiagnostics.data : null;
+  const pushHealth = snapshot.pushHealth.status === 'ok' ? snapshot.pushHealth.data : null;
 
   return (
     <>
@@ -57,6 +62,7 @@ export function OperationsWorkspace({ snapshot }: { snapshot: OperationsSnapshot
           <OperationsPanelCard panelKey="pushStats" title={t('cards.pushDelivery')} state={snapshot.pushStats}>
             {pushStats ? (
               <>
+                <OperationsPushStatusRow pushDiagnostics={pushDiagnostics} pushHealth={pushHealth} />
                 <MetricTileGrid>
                   <MetricTile label={t('metrics.totalSends')} value={pushStats.sendsTotal} />
                   <MetricTile
@@ -129,11 +135,30 @@ export function OperationsWorkspace({ snapshot }: { snapshot: OperationsSnapshot
             ) : null}
           </OperationsPanelCard>
 
+          <OperationsPanelCard panelKey="emailHealth" title={t('cards.emailHealth')} state={snapshot.emailHealth}>
+            {snapshot.emailHealth.status === 'ok' ? (
+              <>
+                <MetricTileGrid>
+                  <MetricTile label={t('metrics.status')} value={snapshot.emailHealth.data.status} />
+                  <MetricTile
+                    label={t('metrics.emailQueueDepth')}
+                    value={snapshot.emailHealth.data.outbox.pending}
+                  />
+                  <MetricTile label={t('metrics.deadLetters')} value={snapshot.emailHealth.data.outbox.deadLetter} />
+                </MetricTileGrid>
+                {snapshot.emailHealth.data.alerts.length > 0 ? (
+                  <p className={styles.alert}>{snapshot.emailHealth.data.alerts.join(', ')}</p>
+                ) : null}
+              </>
+            ) : null}
+          </OperationsPanelCard>
+
           <OperationsPanelCard panelKey="deadLetters" title={t('cards.pushDeadLetters')} state={snapshot.deadLetters}>
             {snapshot.deadLetters.status === 'ok' ? (
               <OperationsDeadLettersPanel
                 initialData={snapshot.deadLetters.data.data}
                 initialMeta={snapshot.deadLetters.data.meta}
+                snapshotUpdatedAt={snapshot.deadLetters.updatedAt}
               />
             ) : null}
           </OperationsPanelCard>
@@ -143,6 +168,7 @@ export function OperationsWorkspace({ snapshot }: { snapshot: OperationsSnapshot
               <OperationsEmailDeadLettersPanel
                 initialData={snapshot.emailDeadLetters.data.data}
                 initialMeta={snapshot.emailDeadLetters.data.meta}
+                snapshotUpdatedAt={snapshot.emailDeadLetters.updatedAt}
               />
             ) : null}
           </OperationsPanelCard>
@@ -193,31 +219,7 @@ export function OperationsWorkspace({ snapshot }: { snapshot: OperationsSnapshot
 
           <OperationsPanelCard panelKey="feedDiagnostics" title={t('cards.feedDiagnostics')} state={snapshot.feedDiagnostics}>
             {snapshot.feedDiagnostics.status === 'ok' ? (
-              <>
-                <MetricTileGrid>
-                  <MetricTile label={t('metrics.reasonCodes')} value={snapshot.feedDiagnostics.data.reasonCodes.length} />
-                  <MetricTile label={t('metrics.rankDriftRows')} value={snapshot.feedDiagnostics.data.rankDriftSnapshot.length} />
-                  <MetricTile label={t('metrics.integrityDemotions')} value={snapshot.feedDiagnostics.data.recentIntegrityDemotions} />
-                </MetricTileGrid>
-                {snapshot.feedDiagnostics.data.reasonCodes.length > 0 ? (
-                  <ul className={styles.breakdownList}>
-                    {snapshot.feedDiagnostics.data.reasonCodes.slice(0, 5).map((item) => (
-                      <li key={item.code}>
-                        <strong>{item.code}</strong> — {item.count}
-                      </li>
-                    ))}
-                  </ul>
-                ) : null}
-                {snapshot.feedDiagnostics.data.rankDriftSnapshot.length > 0 ? (
-                  <ul className={styles.breakdownList}>
-                    {snapshot.feedDiagnostics.data.rankDriftSnapshot.slice(0, 3).map((item) => (
-                      <li key={item.siteId}>
-                        {item.siteId.slice(0, 8)}… · score {item.score.toFixed(2)}
-                      </li>
-                    ))}
-                  </ul>
-                ) : null}
-              </>
+              <OperationsFeedDiagnosticsPanel data={snapshot.feedDiagnostics.data} />
             ) : null}
           </OperationsPanelCard>
 
@@ -286,6 +288,11 @@ export function OperationsWorkspace({ snapshot }: { snapshot: OperationsSnapshot
                   label={t('metrics.fcmEnabled')}
                   value={snapshot.systemInfo.data.fcmEnabled ? tCommon('yes') : tCommon('no')}
                 />
+                <MetricTile
+                  label={t('metrics.fcmReady')}
+                  value={snapshot.systemInfo.data.fcmReady ? tCommon('yes') : tCommon('no')}
+                />
+                <MetricTile label={t('metrics.fcmProject')} value={snapshot.systemInfo.data.fcmProjectId ?? '—'} />
               </MetricTileGrid>
             ) : null}
           </OperationsPanelCard>

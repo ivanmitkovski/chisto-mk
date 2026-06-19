@@ -12,9 +12,12 @@ import { EmailUnsubscribeController } from './controllers/email-unsubscribe.cont
 import { EmailUnsubscribeTokenService } from './services/email-unsubscribe-token.service';
 import { EmailDeliveryOutboxService } from './services/email-delivery-outbox.service';
 import { EmailDeliveryWorkerService } from './services/email-delivery-worker.service';
+import { EmailPipelineHealthService } from './services/email-pipeline-health.service';
+import { EmailDeadLetterRequeueService } from './services/email-dead-letter-requeue.service';
+import { AuditModule } from '../audit/audit.module';
 
 @Module({
-  imports: [PrismaModule, ConfigModule, FeatureFlagsModule],
+  imports: [PrismaModule, ConfigModule, FeatureFlagsModule, AuditModule],
   controllers: [EmailUnsubscribeController],
   providers: [
     EmailUnsubscribeTokenService,
@@ -26,6 +29,8 @@ import { EmailDeliveryWorkerService } from './services/email-delivery-worker.ser
     EmailService,
     EmailDeliveryOutboxService,
     EmailDeliveryWorkerService,
+    EmailPipelineHealthService,
+    EmailDeadLetterRequeueService,
   ],
   exports: [
     EmailService,
@@ -33,6 +38,8 @@ import { EmailDeliveryWorkerService } from './services/email-delivery-worker.ser
     EmailTemplateService,
     EmailSendEligibilityService,
     EmailSuppressionService,
+    EmailPipelineHealthService,
+    EmailDeadLetterRequeueService,
   ],
 })
 export class EmailModule {}

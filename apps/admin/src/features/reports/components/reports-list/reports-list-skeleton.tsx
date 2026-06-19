@@ -40,7 +40,7 @@ export function ReportsListSkeleton({ embedded = false }: ReportsListSkeletonPro
       </div>
       <span className={`${skeletonStyles.shimmerBlock} ${skeletonStyles.sectionLabelBar}`} />
       <div className={styles.reportsHeader}>
-        <div>
+        <div className={skeletonStyles.reportsHeaderText}>
           <div className={styles.titleSkeleton} />
           <div className={styles.subtitleSkeleton} />
         </div>

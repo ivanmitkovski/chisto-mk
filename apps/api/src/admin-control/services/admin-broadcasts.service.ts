@@ -9,6 +9,7 @@ import {
   parseOptionalDate,
   toApiCampaign,
 } from './admin-broadcasts.mapper';
+import { AdminBroadcastsAudienceResolver } from './admin-broadcasts-audience.resolver';
 import type {
   BroadcastCampaign,
   CreateBroadcastInput,
@@ -21,6 +22,7 @@ export type { BroadcastCampaign, CreateBroadcastInput, UpdateBroadcastInput } fr
 export class AdminBroadcastsService {
   constructor(
     private readonly prisma: PrismaService,
+    private readonly audienceResolver: AdminBroadcastsAudienceResolver,
     private readonly audit?: AuditService,
   ) {}
 
@@ -79,7 +81,16 @@ export class AdminBroadcastsService {
       });
     }
 
+    const validatedUserIds =
+      input.audience === 'users' ? await this.audienceResolver.validateAudienceUserIds(input.audienceUserIds ?? []) : [];
+
     const scheduledAt = input.scheduledAt ? parseOptionalDate(input.scheduledAt) : undefined;
+    if (scheduledAt && scheduledAt <= new Date()) {
+      throw new BadRequestException({
+        code: 'BROADCAST_SCHEDULE_IN_PAST',
+        message: 'Scheduled time must be in the future',
+      });
+    }
     const row = await this.prisma.broadcastCampaign.create({
       data: {
         id: newBroadcastCampaignId(),
@@ -88,7 +99,7 @@ export class AdminBroadcastsService {
         type: input.type?.trim() || 'SYSTEM',
         deeplink: input.deeplink?.trim() || null,
         audience: audienceFromApi(input.audience),
-        audienceUserIds: input.audience === 'users' ? (input.audienceUserIds ?? []) : [],
+        audienceUserIds: input.audience === 'users' ? validatedUserIds : [],
         status: scheduledAt ? 'SCHEDULED' : 'DRAFT',
         scheduledAt: scheduledAt ?? null,
         createdById: actor?.userId ?? input.createdById ?? null,
@@ -129,9 +140,20 @@ export class AdminBroadcastsService {
       });
     }
 
+    const validatedUserIds =
+      audience === 'users'
+        ? await this.audienceResolver.validateAudienceUserIds(audienceUserIds ?? [])
+        : [];
+
     let scheduledAt = current.scheduledAt ? new Date(current.scheduledAt) : null;
     if (input.scheduledAt !== undefined) {
       scheduledAt = parseOptionalDate(input.scheduledAt) ?? null;
+    }
+    if (scheduledAt && scheduledAt <= new Date()) {
+      throw new BadRequestException({
+        code: 'BROADCAST_SCHEDULE_IN_PAST',
+        message: 'Scheduled time must be in the future',
+      });
     }
 
     let status = current.status;
@@ -149,7 +171,7 @@ export class AdminBroadcastsService {
         type: input.type?.trim() || current.type,
         deeplink: input.deeplink !== undefined ? input.deeplink?.trim() || null : current.deeplink ?? null,
         audience: audienceFromApi(audience),
-        audienceUserIds: audience === 'users' ? (audienceUserIds ?? []) : [],
+        audienceUserIds: audience === 'users' ? validatedUserIds : [],
         scheduledAt,
         status: status === 'scheduled' ? 'SCHEDULED' : status === 'draft' ? 'DRAFT' : 'DRAFT',
       },
@@ -229,6 +251,15 @@ export class AdminBroadcastsService {
       data: { sentCount, updatedAt: new Date() },
     });
     return toApiCampaign(row);
+  }
+
+  async previewAudience(input: { audience: BroadcastCampaign['audience']; audienceUserIds?: string[] }) {
+    return this.audienceResolver.countAudience(input);
+  }
+
+  async lookupAudienceUsers(userIds: string[]) {
+    const users = await this.audienceResolver.lookupUsers(userIds);
+    return { users };
   }
 
   async listDueScheduled(limit = 10): Promise<BroadcastCampaign[]> {

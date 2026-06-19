@@ -1,10 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Optional } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { AuditService } from '../../audit/services/audit.service';
 import { FCM_REVOKE_ERROR_CODES } from '../util/fcm-error-codes';
 
 @Injectable()
 export class PushDeadLetterRequeueService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Optional() private readonly audit?: AuditService,
+  ) {}
 
   async requeueAll(): Promise<{ requeued: number }> {
     const deadRows = await this.prisma.notificationOutbox.findMany({
@@ -53,6 +57,14 @@ export class PushDeadLetterRequeueService {
       },
     });
 
+    await this.audit?.log({
+      actorId: null,
+      action: 'PUSH_DLQ_REQUEUE',
+      resourceType: 'NotificationOutbox',
+      resourceId: 'bulk',
+      metadata: { requeued: result.count },
+    });
+
     return { requeued: result.count };
   }
 
@@ -90,6 +102,14 @@ export class PushDeadLetterRequeueService {
       },
     });
 
+    await this.audit?.log({
+      actorId: null,
+      action: 'PUSH_DLQ_REQUEUE',
+      resourceType: 'NotificationOutbox',
+      resourceId: id,
+      metadata: { requeued: true },
+    });
+
     return { requeued: true };
   }
 
@@ -123,6 +143,14 @@ export class PushDeadLetterRequeueService {
 
     const result = await this.prisma.notificationOutbox.deleteMany({
       where: { id: { in: terminalIds } },
+    });
+
+    await this.audit?.log({
+      actorId: null,
+      action: 'PUSH_DLQ_PURGE',
+      resourceType: 'NotificationOutbox',
+      resourceId: 'bulk',
+      metadata: { purged: result.count },
     });
 
     return { purged: result.count };

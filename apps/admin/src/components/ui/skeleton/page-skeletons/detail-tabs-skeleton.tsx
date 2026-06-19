@@ -5,7 +5,7 @@ import styles from '../skeleton.module.css';
 
 export function DetailTabsSkeleton() {
   return (
-    <>
+    <div className={styles.pageStack}>
       <SkeletonPageHeader />
       <SkeletonTabs count={5} />
       <SkeletonCard lines={6} />
@@ -13,6 +13,6 @@ export function DetailTabsSkeleton() {
         <SkeletonCard lines={4} />
         <SkeletonCard lines={3} />
       </div>
-    </>
+    </div>
   );
 }

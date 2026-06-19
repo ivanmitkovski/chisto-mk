@@ -183,12 +183,167 @@ export class PushDiagnosticsDto {
   @ApiProperty({ nullable: true })
   projectId!: string | null;
 
+  @ApiProperty({ enum: ['valid', 'missing', 'invalid_json', 'invalid_structure'] })
+  credentialStatus!: string;
+
+  @ApiProperty({ nullable: true })
+  credentialParseError!: string | null;
+
   @ApiProperty()
   deadLetterTotal!: number;
 
   @ApiProperty({ type: [PushDiagnosticsTopErrorCodeDto] })
   topErrorCodes!: PushDiagnosticsTopErrorCodeDto[];
 
+  @ApiProperty({ type: [PushDiagnosticsTopErrorCodeDto] })
+  errorsLast1h!: PushDiagnosticsTopErrorCodeDto[];
+
+  @ApiProperty({ type: [PushDiagnosticsTopErrorCodeDto] })
+  errorsLast24h!: PushDiagnosticsTopErrorCodeDto[];
+
+  @ApiProperty()
+  queueDepth!: number;
+
+  @ApiProperty()
+  activeLeases!: number;
+
+  @ApiProperty()
+  pendingCount!: number;
+
+  @ApiProperty()
+  registeredDeviceTokens!: number;
+
+  @ApiProperty({ type: 'object', additionalProperties: true })
+  workerStatus!: {
+    expected: boolean;
+    running: boolean;
+    stale: boolean;
+    lastError?: string;
+  };
+
   @ApiProperty({ nullable: true })
   remediation!: string | null;
+}
+
+export class TestPushFunnelDto {
+  @ApiProperty()
+  inboxCreated!: boolean;
+
+  @ApiProperty()
+  pushEnabled!: boolean;
+
+  @ApiProperty()
+  fcmReady!: boolean;
+
+  @ApiProperty()
+  activeTokenCount!: number;
+
+  @ApiProperty()
+  outboxEnqueued!: number;
+
+  @ApiProperty({ nullable: true })
+  notificationId!: string | null;
+}
+
+export class TestPushResultDto {
+  @ApiProperty()
+  success!: boolean;
+
+  @ApiProperty({ type: TestPushFunnelDto })
+  funnel!: TestPushFunnelDto;
+
+  @ApiProperty({ nullable: true })
+  remediation!: string | null;
+}
+
+export class PushHealthDto {
+  @ApiProperty({ enum: ['ok', 'degraded', 'disabled'] })
+  status!: 'ok' | 'degraded' | 'disabled';
+
+  @ApiProperty()
+  fcmEnabled!: boolean;
+
+  @ApiProperty()
+  fcmReady!: boolean;
+
+  @ApiProperty({ nullable: true })
+  projectId!: string | null;
+
+  @ApiProperty({ enum: ['valid', 'missing', 'invalid_json', 'invalid_structure'] })
+  credentialStatus!: string;
+
+  @ApiProperty({ nullable: true })
+  credentialParseError!: string | null;
+
+  @ApiProperty({ type: 'object', additionalProperties: true })
+  worker!: {
+    expected: boolean;
+    running: boolean;
+    stale: boolean;
+    lastError?: string;
+  };
+
+  @ApiProperty({ type: 'object', additionalProperties: true })
+  outbox!: {
+    pending: number;
+    leased: number;
+    deadLetter: number;
+    oldestPendingAgeSec: number | null;
+  };
+
+  @ApiProperty({ type: 'object', additionalProperties: true })
+  circuitBreaker!: { state: 'closed' | 'open' | 'half_open' };
+
+  @ApiProperty({ type: 'object', additionalProperties: true })
+  pgListener!: { enabled: boolean; connected: boolean };
+
+  @ApiProperty({ type: 'object', additionalProperties: true })
+  dispatchSkips!: {
+    fcmNotReady: number;
+    noTokens: number;
+    writerNull: number;
+  };
+
+  @ApiProperty({ type: [String] })
+  alerts!: string[];
+}
+
+export class EmailHealthDto {
+  @ApiProperty({ enum: ['ok', 'degraded', 'disabled'] })
+  status!: 'ok' | 'degraded' | 'disabled';
+
+  @ApiProperty()
+  emailEnabled!: boolean;
+
+  @ApiProperty({ type: 'object', additionalProperties: true })
+  worker!: {
+    expected: boolean;
+    running: boolean;
+    stale: boolean;
+    lastError?: string;
+  };
+
+  @ApiProperty({ type: 'object', additionalProperties: true })
+  outbox!: {
+    pending: number;
+    deadLetter: number;
+  };
+
+  @ApiProperty({ type: [String] })
+  alerts!: string[];
+}
+
+export class EmailDeadLetterRequeueResultDto {
+  @ApiProperty()
+  requeued!: number;
+}
+
+export class EmailDeadLetterRequeueOneResultDto {
+  @ApiProperty()
+  requeued!: boolean;
+}
+
+export class EmailDeadLetterPurgeResultDto {
+  @ApiProperty()
+  purged!: number;
 }

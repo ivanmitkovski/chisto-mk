@@ -5,7 +5,7 @@ import styles from '../skeleton.module.css';
 
 export function TeamSkeleton() {
   return (
-    <>
+    <div className={styles.pageStack}>
       <SkeletonPageHeader />
       <SkeletonToolbar pills={1} />
       <section className={styles.teamSection} aria-busy="true">
@@ -16,6 +16,6 @@ export function TeamSkeleton() {
         <span className={`${styles.shimmerBlock} ${styles.sectionTitleBar}`} />
         <SkeletonTable rows={4} cols={5} />
       </section>
-    </>
+    </div>
   );
 }

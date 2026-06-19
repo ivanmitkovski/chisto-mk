@@ -11,6 +11,7 @@ import { AdminGamificationController } from './controllers/admin-gamification.co
 import { AdminAppConfigController } from './controllers/admin-app-config.controller';
 import { AdminCommsController } from './controllers/admin-comms.controller';
 import { AdminOperationsController } from './controllers/admin-operations.controller';
+import { AdminBroadcastsAudienceResolver } from './services/admin-broadcasts-audience.resolver';
 import { AdminBroadcastsService } from './services/admin-broadcasts.service';
 import { AdminBroadcastsDispatchService } from './services/admin-broadcasts-dispatch.service';
 import { AdminBroadcastScheduleWorkerService } from './services/admin-broadcast-schedule-worker.service';
@@ -18,6 +19,7 @@ import { AdminGamificationService } from './services/admin-gamification.service'
 import { AdminAppConfigService } from './services/admin-app-config.service';
 import { AdminCommsService } from './services/admin-comms.service';
 import { OperationsStatusService } from './services/operations-status.service';
+import { OperationsDiagnosticsBundleService } from './services/operations-diagnostics-bundle.service';
 
 @Module({
   imports: [PrismaModule, AuditModule, EmailModule, NotificationsModule, GamificationModule, ReportsModule, StorageModule],
@@ -29,6 +31,7 @@ import { OperationsStatusService } from './services/operations-status.service';
     AdminOperationsController,
   ],
   providers: [
+    AdminBroadcastsAudienceResolver,
     AdminBroadcastsService,
     AdminBroadcastsDispatchService,
     AdminBroadcastScheduleWorkerService,
@@ -36,6 +39,7 @@ import { OperationsStatusService } from './services/operations-status.service';
     AdminAppConfigService,
     AdminCommsService,
     OperationsStatusService,
+    OperationsDiagnosticsBundleService,
   ],
 })
 export class AdminControlModule {}

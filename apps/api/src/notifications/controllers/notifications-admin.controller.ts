@@ -19,6 +19,9 @@ import { adminTestPushCopy } from '../util/notification-templates';
 import { ObservabilityStore } from '../../observability/observability.store';
 import { PushDeadLetterRequeueService } from '../services/push-dead-letter-requeue.service';
 import { PushDiagnosticsService } from '../services/push-diagnostics.service';
+import { FcmPushService } from '../services/fcm-push.service';
+import { DeviceTokenService } from '../services/device-token.service';
+import { remediationForFcmErrorCode } from '../util/fcm-error-codes';
 import {
   DeadLetterPageDto,
   DeadLetterPurgeResultDto,
@@ -27,6 +30,7 @@ import {
   DeliveryReportDto,
   PushDiagnosticsDto,
   PushStatsDto,
+  TestPushResultDto,
 } from '../dto/push-operations.dto';
 import { ApiStandardHttpErrorResponses } from '../../common/openapi/standard-http-error-responses.decorator';
 
@@ -43,6 +47,8 @@ export class NotificationsAdminController {
     private readonly prisma: PrismaService,
     private readonly deadLetterRequeue: PushDeadLetterRequeueService,
     private readonly pushDiagnostics: PushDiagnosticsService,
+    private readonly fcm: FcmPushService,
+    private readonly deviceTokens: DeviceTokenService,
   ) {}
 
   @Idempotent('notifications_admin_test_push')
@@ -51,17 +57,67 @@ export class NotificationsAdminController {
   @ApiOperation({
     summary: 'Send a test push to the current admin user (full outbox → FCM pipeline)',
   })
-  @ApiOkResponse({ description: 'Test notification dispatched' })
-  async testPush(@CurrentUser() user: AuthenticatedUser) {
+  @ApiOkResponse({ type: TestPushResultDto })
+  async testPush(@CurrentUser() user: AuthenticatedUser): Promise<TestPushResultDto> {
     const localeBy = await userLocalesByUserId(this.prisma, [user.userId]);
     const copy = adminTestPushCopy(localeBy.get(user.userId)!);
+    const pushEnabled = this.fcm.isEnabled();
+    const fcmReady = this.fcm.isReady();
+    const activeTokenCount = (await this.deviceTokens.getActiveTokensForUser(user.userId)).length;
+
     await this.dispatcher.dispatchToUser(user.userId, {
       title: copy.title,
       body: copy.body,
       type: NotificationType.SYSTEM,
       data: { kind: 'test_push' },
     });
-    return { success: true };
+
+    const notification = await this.prisma.userNotification.findFirst({
+      where: {
+        userId: user.userId,
+        type: NotificationType.SYSTEM,
+        data: { path: ['kind'], equals: 'test_push' },
+      },
+      orderBy: { createdAt: 'desc' },
+      select: { id: true },
+    });
+
+    const outboxEnqueued =
+      notification != null
+        ? await this.prisma.notificationOutbox.count({
+            where: { userNotificationId: notification.id },
+          })
+        : 0;
+
+    const inboxCreated = notification != null;
+    let remediation: string | null = null;
+    if (!inboxCreated) {
+      remediation = 'Inbox notification was not created. Check NOTIFICATIONS_INBOX_ENABLED and user mute settings.';
+    } else if (!pushEnabled) {
+      remediation = 'Push is disabled (PUSH_FCM_ENABLED=false). Enable FCM to deliver test pushes.';
+    } else if (!fcmReady) {
+      remediation =
+        remediationForFcmErrorCode('FCM_NOT_READY') ??
+        'FCM is enabled but not ready. Check FIREBASE_SERVICE_ACCOUNT_JSON.';
+    } else if (activeTokenCount === 0) {
+      remediation =
+        'No active device tokens for this user. Log in on a physical device with notifications allowed.';
+    } else if (outboxEnqueued === 0) {
+      remediation = 'Push was skipped after inbox write. Check API logs for dispatch skip reason.';
+    }
+
+    return {
+      success: true,
+      funnel: {
+        inboxCreated,
+        pushEnabled,
+        fcmReady,
+        activeTokenCount,
+        outboxEnqueued,
+        notificationId: notification?.id ?? null,
+      },
+      remediation,
+    };
   }
 
   @Get('admin/push-stats')

@@ -9,7 +9,7 @@ import { requirePagePermission } from '@/lib/auth/rbac/server';
 import { handleServerLoadError } from '@/lib/server/handle-server-load-error';
 
 export default async function BroadcastsPage() {
-  await requirePagePermission(ADMIN_PERMISSIONS['notifications:broadcast']);
+  await requirePagePermission(ADMIN_PERMISSIONS['notifications:read']);
   const t = await getTranslations('broadcasts');
   const cookieStore = await cookies();
   const initialSidebarCollapsed = cookieStore.get(DESKTOP_SIDEBAR_COOKIE_KEY)?.value === '1';

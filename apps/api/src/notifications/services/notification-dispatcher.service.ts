@@ -3,6 +3,7 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { isPgOutboxNotifyEnabled, NOTIFY_SQL } from '../../common/pg/outbox-pg-notify';
 import { Prisma } from '../../prisma-client';
 import { PrismaService } from '../../prisma/prisma.service';
+import { ObservabilityStore } from '../../observability/observability.store';
 import { NotificationWriterService } from './notification-writer.service';
 import { DeviceTokenService } from './device-token.service';
 import { FcmPushService } from './fcm-push.service';
@@ -57,6 +58,7 @@ export class NotificationDispatcherService {
     });
 
     if (written == null) {
+      ObservabilityStore.recordPushDispatchSkippedWriterNull();
       return;
     }
 
@@ -101,6 +103,7 @@ export class NotificationDispatcherService {
     }
 
     if (!this.fcm.isEnabled() || !this.fcm.isReady()) {
+      ObservabilityStore.recordPushDispatchSkippedFcmNotReady();
       this.logger.warn(
         `push skipped (enabled=${this.fcm.isEnabled()} ready=${this.fcm.isReady()}) user=${userId} notification=${notificationId}`,
       );
@@ -110,6 +113,7 @@ export class NotificationDispatcherService {
 
     const tokens = await this.deviceTokens.getActiveTokensForUser(userId);
     if (tokens.length === 0) {
+      ObservabilityStore.recordPushDispatchSkippedNoTokens();
       this.logger.warn(
         `push skipped (no active device tokens) user=${userId} notification=${notificationId}`,
       );

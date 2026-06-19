@@ -8,38 +8,55 @@
     "body": "Body",
     "deeplink": "Deeplink (optional)",
     "audience": "Audience",
-    "userIds": "User IDs (comma or space separated)",
+    "searchUsers": "Search users",
+    "searchUsersPlaceholder": "Search by name or email…",
+    "searchUsersHint": "Type a name or email to find users.",
+    "searchingUsers": "Searching users…",
+    "selectedUsers": "Selected users ({count})",
+    "noUsersSelected": "No users selected yet.",
+    "noUsersFound": "No users match your search.",
+    "removeUser": "Remove {name}",
+    "userSearchFailed": "Unable to search users. Try again.",
+    "maxRecipientsReached": "You reached the maximum of 5,000 recipients for a single broadcast.",
     "schedule": "Schedule for later (optional)",
     "saveDraft": "Save draft",
     "cancelEdit": "Cancel edit"
   },
   "actions": {
-    "edit": "Edit"
+    "edit": "Edit",
+    "editAria": "Edit {title}",
+    "sendAria": "Send {title}",
+    "deleteAria": "Delete {title}",
+    "cancelAria": "Cancel {title}"
   },
   "card": {
     "audienceLabel": "Audience: {audience}",
     "userCount": "{count} user(s)",
+    "selectedUsers": "{count} selected user(s)",
     "scheduledAt": "Scheduled {date}",
     "sentAt": "Sent {date}",
     "updatedAt": "Updated {date}",
     "deliveredTo": "Delivered to {count} users"
   },
   "audiencePreview": {
+    "loading": "Calculating recipients…",
+    "recipientCount": "About {count} recipients will receive this broadcast.",
+    "recipientCountCapped": "About {count} recipients will receive this broadcast (capped at {cap}).",
     "recipientCap": "{label} (up to 5,000 recipients)",
-    "userIdCount": "{label} ({count} user ID)",
-    "userIdCountPlural": "{label} ({count} user IDs)"
+    "userCount": "{label} ({count} selected users)"
   },
   "validation": {
     "titleRequired": "Title is required.",
     "bodyRequired": "Body is required.",
-    "userIdsRequired": "Enter at least one user ID for a specific audience.",
+    "usersRequired": "Select at least one user for a specific audience.",
     "deeplinkInvalid": "Deeplink must start with / and contain only letters, numbers, /, _, or -.",
-    "scheduleInvalid": "Scheduled time is not a valid date."
+    "scheduleInvalid": "Scheduled time is not a valid date.",
+    "scheduleInPast": "Scheduled time must be in the future."
   },
   "audience": {
     "all": "All users",
     "active": "Active users (30 days)",
-    "specific": "Specific user IDs"
+    "specific": "Specific users"
   },
   "status": {
     "draft": "Draft",
@@ -47,9 +64,17 @@
     "sent": "Sent",
     "cancelled": "Cancelled"
   },
+  "filters": {
+    "statusLabel": "Filter campaigns by status",
+    "all": "All"
+  },
+  "list": {
+    "campaignsCount": "{count} campaign(s) · page {page}"
+  },
   "empty": "No broadcast campaigns yet.",
+  "emptyFiltered": "No campaigns match this filter.",
   "confirmSendTitle": "Send broadcast now?",
-  "confirmSendDescription": "Send \"{title}\" to {audience}? This cannot be undone.",
+  "confirmSendDescription": "Send \"{title}\" to {audience}? About {count} recipients will receive it. This cannot be undone.",
   "confirmSendPhrase": "SEND",
   "sendNow": "Send now",
   "confirmDeleteTitle": "Delete campaign?",

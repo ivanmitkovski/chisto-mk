@@ -23,6 +23,8 @@ describe('getOperationsSnapshot', () => {
     const origin = getApiOrigin();
     expect(serverAuthenticatedFetch).toHaveBeenCalledWith('/health/map', expect.objectContaining({ baseUrl: origin }));
     expect(serverAuthenticatedFetch).toHaveBeenCalledWith('/health/map-deep', expect.objectContaining({ baseUrl: origin }));
+    expect(serverAuthenticatedFetch).toHaveBeenCalledWith('/health/push', expect.objectContaining({ baseUrl: origin }));
+    expect(serverAuthenticatedFetch).toHaveBeenCalledWith('/health/email', expect.objectContaining({ baseUrl: origin }));
     expect(origin.endsWith('/v1')).toBe(false);
   });
 

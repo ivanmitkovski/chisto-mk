@@ -16,6 +16,7 @@
     "status": "Statusi",
     "photos": "Foto",
     "actions": "Veprime",
-    "empty": "Asnjë dorëzim nuk përputhet me filtrat."
+    "empty": "Asnjë dorëzim nuk përputhet me filtrat.",
+    "resolutionsCount": "{count} rezolucione · faqja {page}"
   }
 }

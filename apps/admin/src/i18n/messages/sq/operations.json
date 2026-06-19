@@ -32,22 +32,36 @@
   },
   "panels": {
     "insufficientPermission": "Nuk keni leje për këtë panel.",
+    "insufficientPermissionFor": "Kërkon lejen {permission}.",
     "restricted": "E kufizuar"
+  },
+  "pushStatus": {
+    "fcmReady": "FCM gati",
+    "fcmNotReady": "FCM jo gati",
+    "fcmDisabled": "FCM i çaktivizuar",
+    "workerOk": "Worker i shëndetshëm",
+    "workerStale": "Worker i vjetruar",
+    "credential": "Kredenciale: {status}",
+    "deviceTokens": "{count} tokenë pajisjeje"
   },
   "diagnostics": {
     "button": "Ekzekuto diagnostikën",
     "title": "Diagnostika backend",
     "running": "Duke ekzekutuar kontrollet…",
     "failed": "Nuk u ekzekutua diagnostika.",
+    "retry": "Riprovo",
     "readiness": "Gatishmëria e varësive",
     "systemInfo": "Informacioni i sistemit",
-    "pushDelivery": "Dorëzimi push"
+    "pushDelivery": "Dorëzimi push",
+    "emailDelivery": "Dorëzimi email",
+    "feedIntegrity": "Integriteti i feed-it"
   },
   "metricsDrawer": {
     "button": "Metrikat raw",
     "title": "Snapshot i metrikave",
     "loading": "Duke ngarkuar metrikat…",
-    "failed": "Nuk u ngarkuan metrikat."
+    "failed": "Nuk u ngarkuan metrikat.",
+    "rawSnapshot": "Snapshot raw"
   },
   "testPush": {
     "button": "Dërgo push test",
@@ -57,11 +71,19 @@
     "successTitle": "Push test u dërgua",
     "successMessage": "Kontrollo pajisjen për njoftimin test.",
     "failedTitle": "Push test dështoi",
-    "failedMessage": "Nuk mund të dërgohet push test."
+    "failedMessage": "Nuk mund të dërgohet push test.",
+    "resultTitle": "Hinka e push test",
+    "funnelHint": "Synon llogarinë me të cilën jeni të kyçur në një pajisje me njoftime të aktivizuara.",
+    "inboxCreated": "Njoftimi inbox u krijua",
+    "pushEnabled": "Push aktiv në API",
+    "fcmReady": "FCM gati",
+    "activeTokens": "Tokenë aktivë pajisjeje: {count}",
+    "outboxEnqueued": "Hyrjet outbox në radhë: {count}"
   },
   "cards": {
     "pushDelivery": "Dorëzimi push",
     "deliveryFunnel": "Hinkat e dorëzimit",
+    "emailHealth": "Shëndeti i dorëzimit email",
     "mapPipeline": "Procesi i hartës",
     "mapDeepProbe": "Prova e thellë e hartës",
     "pushDeadLetters": "Mesazhe push të padërguara",
@@ -106,7 +128,6 @@
     "queueRetries": "Riprova radhe",
     "outboxDelivered": "Outbox dorëzuar (gjithsej)",
     "outboxFailedPermanent": "Outbox dead letters (gjithsej)",
-    "outboxPending": "Outbox në pritje",
     "emailQueueDepth": "Thellësia e radhës email",
     "version": "Versioni",
     "gitSha": "Kodi Git SHA",
@@ -114,6 +135,16 @@
     "region": "Rajoni",
     "uptime": "Koha e punës",
     "fcmEnabled": "FCM aktiv",
+    "fcmReady": "FCM gati",
+    "fcmProject": "Projekti FCM",
+    "httpRequests": "Kërkesa HTTP",
+    "httpFailures": "Dështime HTTP",
+    "p95Latency": "Latenca p95",
+    "mapOutboxFailed": "Map outbox dështoi",
+    "feedRequests": "Kërkesat e feed-it",
+    "feedCacheHitRate": "Shkalla e feed cache hit",
+    "paginationIssues": "Probleme pagination",
+    "rankerMode": "Mënyra ranker",
     "database": "Baza e të dhënave",
     "redis": "Serveri Redis",
     "s3": "S3"
@@ -135,16 +166,43 @@
     "purgeSuccessTitle": "Dead letters të padërueshme u pastruan",
     "purgeSuccessMessage": "{count} dead letter(s) u hoqën.",
     "purgeFailedTitle": "Pastrimi dështoi",
-    "purgeFailedMessage": "Nuk u pastruan dead letters."
+    "purgeFailedMessage": "Nuk u pastruan dead letters.",
+    "requeueOne": "Rivendos në radhë",
+    "requeueOneSuccessTitle": "Dead letter u rivendos",
+    "requeueOneSuccessMessage": "Ky dead letter u kthye në radhën e dorëzimit.",
+    "requeueOneSkippedTitle": "Nuk u rivendos",
+    "requeueOneSkippedMessage": "Ky dead letter nuk është actionable ose tokeni i pajisjes është joaktiv."
   },
   "emailDeadLetters": {
     "loadFailed": "Nuk u ngarkuan email dead letters.",
     "emptyTitle": "Nuk ka email dead letters",
-    "emptyDescription": "Dështimet e përhershme të email do të shfaqen këtu."
+    "emptyDescription": "Dështimet e përhershme të email do të shfaqen këtu.",
+    "requeueAll": "Rivendos të gjitha",
+    "purgeTerminal": "Pastro terminal",
+    "requeueOne": "Rivendos në radhë",
+    "requeueConfirmTitle": "Rivendos email dead letters?",
+    "requeueConfirmDescription": "Rivendos email dead letters actionable që worker-i t'i riprovojë.",
+    "purgeConfirmTitle": "Pastro email dead letters terminal?",
+    "purgeConfirmDescription": "Heq përgjithmonë email dead letters që nuk mund të dorëzohen.",
+    "requeueSuccessTitle": "Email dead letters u rivendosën",
+    "requeueSuccessMessage": "{count} email dead letter(s) u kthyen në radhën e dorëzimit.",
+    "requeueFailedTitle": "Rivendosja dështoi",
+    "requeueFailedMessage": "Nuk u rivendosën email dead letters.",
+    "purgeSuccessTitle": "Email dead letters terminal u pastruan",
+    "purgeSuccessMessage": "{count} email dead letter(s) u hoqën.",
+    "purgeFailedTitle": "Pastrimi dështoi",
+    "purgeFailedMessage": "Nuk u pastruan email dead letters.",
+    "requeueOneSuccessTitle": "Email dead letter u rivendos",
+    "requeueOneSuccessMessage": "Ky email dead letter u kthye në radhën e dorëzimit.",
+    "requeueOneSkippedTitle": "Nuk u rivendos",
+    "requeueOneSkippedMessage": "Ky email dead letter nuk është actionable."
   },
   "workers": {
     "perReplicaNote": "Heartbeats e worker janë për replikë API.",
     "lastRun": "Ekzekutimi i fundit {time}",
     "neverRun": "Ende pa ekzekutime"
+  },
+  "dashboardOpsBanner": {
+    "message": "Shëndeti i operacioneve është degraduar ({count} alarm(e)). Hap Operacionet për detaje."
   }
 }

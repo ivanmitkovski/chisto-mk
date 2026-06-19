@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import type { ReactElement, ReactNode } from 'react';
 import { ToastProvider } from '@/components/ui';
 
+import enBroadcasts from '@/i18n/messages/en/broadcasts.json';
 import enCommon from '@/i18n/messages/en/common.json';
 import enErrors from '@/i18n/messages/en/errors.json';
 import enNav from '@/i18n/messages/en/nav.json';
@@ -11,6 +12,7 @@ import enReports from '@/i18n/messages/en/reports.json';
 import enUi from '@/i18n/messages/en/ui.json';
 
 const messages = {
+  broadcasts: enBroadcasts,
   common: enCommon,
   errors: enErrors,
   nav: enNav,

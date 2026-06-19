@@ -3,7 +3,7 @@ import styles from '../skeleton.module.css';
 
 export function AppConfigSkeleton() {
   return (
-    <>
+    <div className={styles.pageStack}>
       <SkeletonPageHeader />
       <div className={styles.configStack} aria-hidden>
         {Array.from({ length: 4 }).map((_, i) => (
@@ -16,6 +16,6 @@ export function AppConfigSkeleton() {
           </div>
         ))}
       </div>
-    </>
+    </div>
   );
 }

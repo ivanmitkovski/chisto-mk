@@ -12,12 +12,15 @@ import { ADMIN_PANEL_ROLES } from '../auth/constants/admin-roles';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { SkipThrottle } from '@nestjs/throttler';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import Redis from 'ioredis';
 import { loadFeatureFlags } from '../config/feature-flags';
 import { PrismaService } from '../prisma/prisma.service';
 import { S3StorageClient } from '../storage/util/s3-storage.client';
 import { ApiStandardHttpErrorResponses } from '../common/openapi/standard-http-error-responses.decorator';
+import { PushPipelineHealthService } from '../notifications/services/push-pipeline-health.service';
+import { EmailPipelineHealthService } from '../email/services/email-pipeline-health.service';
+import { PushHealthDto, EmailHealthDto } from '../notifications/dto/push-operations.dto';
 
 @ApiTags('health')
 @ApiStandardHttpErrorResponses()
@@ -29,6 +32,8 @@ export class HealthController implements OnModuleDestroy {
   constructor(
     private readonly prisma: PrismaService,
     private readonly s3: S3StorageClient,
+    private readonly pushHealth: PushPipelineHealthService,
+    private readonly emailHealth: EmailPipelineHealthService,
   ) {}
 
   async onModuleDestroy(): Promise<void> {
@@ -235,5 +240,29 @@ export class HealthController implements OnModuleDestroy {
         };
       }
     }
+  }
+
+  /**
+   * Push notification pipeline signals (FCM, worker, outbox).
+   * Always 200 — use `alerts` for non-empty human-readable warnings.
+   */
+  @Get('push')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(...ADMIN_PANEL_ROLES)
+  @ApiOkResponse({ type: PushHealthDto })
+  async pushPipeline(): Promise<PushHealthDto> {
+    return this.pushHealth.getHealthSnapshot();
+  }
+
+  /**
+   * Email delivery pipeline signals (outbox, worker).
+   * Always 200 — use `alerts` for non-empty human-readable warnings.
+   */
+  @Get('email')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(...ADMIN_PANEL_ROLES)
+  @ApiOkResponse({ type: EmailHealthDto })
+  async emailPipeline(): Promise<EmailHealthDto> {
+    return this.emailHealth.getHealthSnapshot();
   }
 }

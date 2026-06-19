@@ -2,6 +2,11 @@ export type BroadcastAudience = 'all' | 'active' | 'users';
 
 export type BroadcastCampaignStatus = 'draft' | 'scheduled' | 'sent' | 'cancelled';
 
+export type BroadcastAudienceUser = {
+  id: string;
+  label: string;
+};
+
 export type BroadcastCampaign = {
   id: string;
   title: string;
@@ -27,10 +32,12 @@ export type BroadcastCampaignFormValues = {
   title: string;
   body: string;
   audience: BroadcastAudience;
-  audienceUserIds: string;
+  selectedAudienceUsers: BroadcastAudienceUser[];
   deeplink: string;
   /** datetime-local value (YYYY-MM-DDTHH:mm) or empty for immediate draft */
   scheduledAt: string;
 };
 
 export type BroadcastFormMode = 'create' | 'edit';
+
+export const BROADCAST_PREFILL_STORAGE_KEY = 'broadcast_prefill_users';

@@ -32,36 +32,58 @@
   },
   "panels": {
     "insufficientPermission": "You do not have permission to view this panel.",
+    "insufficientPermissionFor": "Requires {permission} permission.",
     "restricted": "Restricted"
+  },
+  "pushStatus": {
+    "fcmReady": "FCM ready",
+    "fcmNotReady": "FCM not ready",
+    "fcmDisabled": "FCM disabled",
+    "workerOk": "Worker healthy",
+    "workerStale": "Worker stale",
+    "credential": "Credential: {status}",
+    "deviceTokens": "{count} device tokens"
   },
   "diagnostics": {
     "button": "Run diagnostics",
     "title": "Backend diagnostics",
     "running": "Running dependency checks…",
     "failed": "Unable to run diagnostics.",
+    "retry": "Retry",
     "readiness": "Dependency readiness",
     "systemInfo": "System info",
-    "pushDelivery": "Push delivery"
+    "pushDelivery": "Push delivery",
+    "emailDelivery": "Email delivery",
+    "feedIntegrity": "Feed integrity"
   },
   "metricsDrawer": {
     "button": "Raw metrics",
     "title": "Metrics snapshot",
     "loading": "Loading metrics snapshot…",
-    "failed": "Unable to load metrics snapshot."
+    "failed": "Unable to load metrics snapshot.",
+    "rawSnapshot": "Raw snapshot"
   },
   "testPush": {
     "button": "Send test push",
     "confirmTitle": "Send test push",
-    "confirmDescription": "This sends a test notification to your registered admin device. Continue?",
+    "confirmDescription": "This sends a test notification to your registered admin device.",
     "confirmLabel": "Send test push",
     "successTitle": "Test push sent",
-    "successMessage": "Check your device for the test notification.",
+    "successMessage": "Review the funnel result for delivery details.",
     "failedTitle": "Test push failed",
-    "failedMessage": "Unable to send test push."
+    "failedMessage": "Unable to send test push.",
+    "resultTitle": "Test push funnel",
+    "funnelHint": "Targets the account you are logged in as on a device with notifications enabled.",
+    "inboxCreated": "Inbox notification created",
+    "pushEnabled": "Push enabled on API",
+    "fcmReady": "FCM ready",
+    "activeTokens": "Active device tokens: {count}",
+    "outboxEnqueued": "Outbox entries enqueued: {count}"
   },
   "cards": {
     "pushDelivery": "Push delivery",
     "deliveryFunnel": "Delivery funnel",
+    "emailHealth": "Email delivery health",
     "mapPipeline": "Map pipeline",
     "mapDeepProbe": "Map deep probe",
     "pushDeadLetters": "Push dead letters",
@@ -114,6 +136,16 @@
     "region": "Region",
     "uptime": "Uptime",
     "fcmEnabled": "FCM enabled",
+    "fcmReady": "FCM ready",
+    "fcmProject": "FCM project",
+    "httpRequests": "HTTP requests",
+    "httpFailures": "HTTP failures",
+    "p95Latency": "p95 latency",
+    "mapOutboxFailed": "Map outbox failed",
+    "feedRequests": "Feed requests",
+    "feedCacheHitRate": "Feed cache hit rate",
+    "paginationIssues": "Pagination issues",
+    "rankerMode": "Ranker mode",
     "database": "Database",
     "redis": "Redis",
     "s3": "S3"
@@ -135,16 +167,43 @@
     "purgeSuccessTitle": "Undeliverable dead letters purged",
     "purgeSuccessMessage": "{count} dead letter(s) removed.",
     "purgeFailedTitle": "Purge failed",
-    "purgeFailedMessage": "Unable to purge dead letters."
+    "purgeFailedMessage": "Unable to purge dead letters.",
+    "requeueOne": "Requeue",
+    "requeueOneSuccessTitle": "Dead letter requeued",
+    "requeueOneSuccessMessage": "This dead letter was returned to the delivery queue.",
+    "requeueOneSkippedTitle": "Not requeued",
+    "requeueOneSkippedMessage": "This dead letter is not actionable or the device token is inactive."
   },
   "emailDeadLetters": {
     "loadFailed": "Unable to load email dead letters.",
     "emptyTitle": "No email dead letters",
-    "emptyDescription": "Failed email deliveries will appear here after permanent failure."
+    "emptyDescription": "Failed email deliveries will appear here after permanent failure.",
+    "requeueAll": "Requeue all",
+    "purgeTerminal": "Purge terminal",
+    "requeueOne": "Requeue",
+    "requeueConfirmTitle": "Requeue email dead letters?",
+    "requeueConfirmDescription": "Resets actionable email dead letters so the delivery worker can retry them.",
+    "purgeConfirmTitle": "Purge terminal email dead letters?",
+    "purgeConfirmDescription": "Permanently removes email dead letters that cannot be delivered.",
+    "requeueSuccessTitle": "Email dead letters requeued",
+    "requeueSuccessMessage": "{count} email dead letter(s) returned to the delivery queue.",
+    "requeueFailedTitle": "Requeue failed",
+    "requeueFailedMessage": "Unable to requeue email dead letters.",
+    "purgeSuccessTitle": "Terminal email dead letters purged",
+    "purgeSuccessMessage": "{count} email dead letter(s) removed.",
+    "purgeFailedTitle": "Purge failed",
+    "purgeFailedMessage": "Unable to purge email dead letters.",
+    "requeueOneSuccessTitle": "Email dead letter requeued",
+    "requeueOneSuccessMessage": "This email dead letter was returned to the delivery queue.",
+    "requeueOneSkippedTitle": "Not requeued",
+    "requeueOneSkippedMessage": "This email dead letter is not actionable."
   },
   "workers": {
     "perReplicaNote": "Worker heartbeats are per running API replica.",
     "lastRun": "Last run {time}",
     "neverRun": "No runs recorded yet"
+  },
+  "dashboardOpsBanner": {
+    "message": "Operations health degraded ({count} alert(s)). Open Operations for details."
   }
 }

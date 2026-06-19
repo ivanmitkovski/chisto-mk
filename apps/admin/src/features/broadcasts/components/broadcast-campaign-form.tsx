@@ -1,12 +1,15 @@
 'use client';
 
+import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
-import { Button, Card, Input } from '@/components/ui';
+import { Button, Card, Input, Select } from '@/components/ui';
 import {
   audienceTranslationKey,
   BROADCAST_AUDIENCE_VALUES,
 } from '../config/broadcast-audience-options';
+import { useAudiencePreview } from '../hooks/use-audience-preview';
 import type { BroadcastCampaignFormValues, BroadcastFormMode } from '../types';
+import { BroadcastAudienceUserPicker } from './broadcast-audience-user-picker';
 import styles from './broadcast-campaign-form.module.css';
 
 type BroadcastCampaignFormProps = {
@@ -14,6 +17,7 @@ type BroadcastCampaignFormProps = {
   values: BroadcastCampaignFormValues;
   busy: boolean;
   onChange: <K extends keyof BroadcastCampaignFormValues>(key: K, value: BroadcastCampaignFormValues[K]) => void;
+  onSelectedUsersChange: (users: BroadcastCampaignFormValues['selectedAudienceUsers']) => void;
   onSubmit: () => void;
   onCancel?: () => void;
 };
@@ -23,11 +27,20 @@ export function BroadcastCampaignForm({
   values,
   busy,
   onChange,
+  onSelectedUsersChange,
   onSubmit,
   onCancel,
 }: BroadcastCampaignFormProps) {
   const t = useTranslations('broadcasts');
   const tCommon = useTranslations('common');
+  const audienceUserIds = useMemo(
+    () => values.selectedAudienceUsers.map((user) => user.id),
+    [values.selectedAudienceUsers],
+  );
+  const { preview, loading: previewLoading } = useAudiencePreview({
+    audience: values.audience,
+    audienceUserIds,
+  });
 
   return (
     <Card padding="md" className={styles.card}>
@@ -50,27 +63,33 @@ export function BroadcastCampaignForm({
           onChange={(e) => onChange('deeplink', e.target.value)}
           placeholder="/reports/123"
         />
-        <div className={styles.audienceRow}>
-          <label htmlFor="broadcast-audience">{t('form.audience')}</label>
-          <select
-            id="broadcast-audience"
-            className={styles.audienceSelect}
-            value={values.audience}
-            onChange={(e) => onChange('audience', e.target.value as BroadcastCampaignFormValues['audience'])}
-          >
-            {BROADCAST_AUDIENCE_VALUES.map((value) => (
-              <option key={value} value={value}>
-                {t(`audience.${audienceTranslationKey(value)}`)}
-              </option>
-            ))}
-          </select>
-        </div>
+        <Select
+          label={t('form.audience')}
+          value={values.audience}
+          options={BROADCAST_AUDIENCE_VALUES.map((value) => ({
+            value,
+            label: t(`audience.${audienceTranslationKey(value)}`),
+          }))}
+          onChange={(e) => onChange('audience', e.target.value as BroadcastCampaignFormValues['audience'])}
+        />
         {values.audience === 'users' ? (
-          <Input
-            label={t('form.userIds')}
-            value={values.audienceUserIds}
-            onChange={(e) => onChange('audienceUserIds', e.target.value)}
+          <BroadcastAudienceUserPicker
+            selectedUsers={values.selectedAudienceUsers}
+            onChange={onSelectedUsersChange}
+            disabled={busy}
           />
+        ) : null}
+        {preview ? (
+          <p className={styles.preview} aria-live="polite">
+            {previewLoading
+              ? t('audiencePreview.loading')
+              : preview.capped
+                ? t('audiencePreview.recipientCountCapped', {
+                    count: preview.recipientCount,
+                    cap: preview.cap,
+                  })
+                : t('audiencePreview.recipientCount', { count: preview.recipientCount })}
+          </p>
         ) : null}
         <Input
           label={t('form.schedule')}

@@ -4,7 +4,7 @@ import styles from '../skeleton.module.css';
 
 export function DetailMultiSectionSkeleton() {
   return (
-    <>
+    <div className={styles.pageStack}>
       <span className={`${styles.shimmerBlock} ${styles.backLink}`} aria-hidden />
       <SkeletonPageHeader />
       <div className={styles.insightsSectionSkeleton} aria-hidden>
@@ -24,8 +24,10 @@ export function DetailMultiSectionSkeleton() {
           ))}
         </div>
       </div>
-      <SkeletonCard lines={6} />
-      <SkeletonCard lines={4} />
-    </>
+      <div className={styles.cardStack}>
+        <SkeletonCard lines={6} />
+        <SkeletonCard lines={4} />
+      </div>
+    </div>
   );
 }

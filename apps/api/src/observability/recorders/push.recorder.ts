@@ -10,6 +10,9 @@ let pushInboxReads = 0;
 let pushQueueDepth = 0;
 let pushActiveLeases = 0;
 let pushDeadLetterCount = 0;
+let pushDispatchSkippedFcmNotReady = 0;
+let pushDispatchSkippedNoTokens = 0;
+let pushDispatchSkippedWriterNull = 0;
 const pushSendsByType: Record<string, { success: number; failure: number; revoked: number }> = {};
 
 export function recordPushSend(
@@ -47,6 +50,18 @@ export function recordPushInboxRead(): void {
   pushInboxReads += 1;
 }
 
+export function recordPushDispatchSkippedFcmNotReady(): void {
+  pushDispatchSkippedFcmNotReady += 1;
+}
+
+export function recordPushDispatchSkippedNoTokens(): void {
+  pushDispatchSkippedNoTokens += 1;
+}
+
+export function recordPushDispatchSkippedWriterNull(): void {
+  pushDispatchSkippedWriterNull += 1;
+}
+
 export function setPushQueueStats(input: {
   queueDepth: number;
   activeLeases: number;
@@ -71,5 +86,8 @@ export function snapshot() {
     pushQueueDepth,
     pushActiveLeases,
     pushDeadLetterCount,
+    pushDispatchSkippedFcmNotReady,
+    pushDispatchSkippedNoTokens,
+    pushDispatchSkippedWriterNull,
   };
 }

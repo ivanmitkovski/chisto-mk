@@ -5,6 +5,16 @@ type SkeletonTableProps = {
   cols?: number;
 };
 
+const CELL_BAR_WIDTHS = [
+  styles.tableCellBarWide,
+  styles.tableCellBarMedium,
+  styles.tableCellBarNarrow,
+] as const;
+
+function tableCellBarClass(colIndex: number): string {
+  return CELL_BAR_WIDTHS[colIndex % CELL_BAR_WIDTHS.length];
+}
+
 export function SkeletonTable({ rows = 5, cols = 4 }: SkeletonTableProps) {
   return (
     <div className={styles.tableWrap}>
@@ -13,7 +23,7 @@ export function SkeletonTable({ rows = 5, cols = 4 }: SkeletonTableProps) {
           <tr>
             {Array.from({ length: cols }).map((_, i) => (
               <th key={i}>
-                <span className={styles.bar} />
+                <span className={`${styles.shimmerBlock} ${styles.tableCellBar} ${tableCellBarClass(i)}`} />
               </th>
             ))}
           </tr>
@@ -23,7 +33,9 @@ export function SkeletonTable({ rows = 5, cols = 4 }: SkeletonTableProps) {
             <tr key={rowIndex}>
               {Array.from({ length: cols }).map((_, colIndex) => (
                 <td key={colIndex}>
-                  <span className={styles.bar} />
+                  <span
+                    className={`${styles.shimmerBlock} ${styles.tableCellBar} ${tableCellBarClass(colIndex)}`}
+                  />
                 </td>
               ))}
             </tr>

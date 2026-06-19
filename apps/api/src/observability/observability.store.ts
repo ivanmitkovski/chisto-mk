@@ -115,6 +115,9 @@ export class ObservabilityStore {
   static recordPushTokenRevocation = PushRecorder.recordPushTokenRevocation;
   static recordPushQueueRetry = PushRecorder.recordPushQueueRetry;
   static recordPushInboxRead = PushRecorder.recordPushInboxRead;
+  static recordPushDispatchSkippedFcmNotReady = PushRecorder.recordPushDispatchSkippedFcmNotReady;
+  static recordPushDispatchSkippedNoTokens = PushRecorder.recordPushDispatchSkippedNoTokens;
+  static recordPushDispatchSkippedWriterNull = PushRecorder.recordPushDispatchSkippedWriterNull;
   static recordMapRequest = MapRecorder.recordMapRequest;
   static recordMapSseConnected = MapRecorder.recordMapSseConnected;
   static recordMapSseDisconnected = MapRecorder.recordMapSseDisconnected;

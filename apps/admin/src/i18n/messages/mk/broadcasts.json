@@ -8,38 +8,55 @@
     "body": "Содржина",
     "deeplink": "Deeplink (опционално)",
     "audience": "Публика",
-    "userIds": "ID на корисници (одделени со запирка или празно место)",
+    "searchUsers": "Пребарај корисници",
+    "searchUsersPlaceholder": "Пребарај по име или е-пошта…",
+    "searchUsersHint": "Внесете име или е-пошта за да најдете корисници.",
+    "searchingUsers": "Се пребаруваат корисници…",
+    "selectedUsers": "Избрани корисници ({count})",
+    "noUsersSelected": "Сè уште нема избрани корисници.",
+    "noUsersFound": "Нема корисници што одговараат на пребарувањето.",
+    "removeUser": "Отстрани {name}",
+    "userSearchFailed": "Не може да се пребараат корисници. Обидете се повторно.",
+    "maxRecipientsReached": "Го достигнавте максимумот од 5.000 примачи за едно емитување.",
     "schedule": "Закажи за подоцна (опционално)",
     "saveDraft": "Зачувај нацрт",
     "cancelEdit": "Откажи уредување"
   },
   "actions": {
-    "edit": "Уреди"
+    "edit": "Уреди",
+    "editAria": "Уреди {title}",
+    "sendAria": "Испрати {title}",
+    "deleteAria": "Избриши {title}",
+    "cancelAria": "Откажи {title}"
   },
   "card": {
     "audienceLabel": "Публика: {audience}",
     "userCount": "{count} корисник(и)",
+    "selectedUsers": "{count} избрани корисник(и)",
     "scheduledAt": "Закажано {date}",
     "sentAt": "Испратено {date}",
     "updatedAt": "Ажурирано {date}",
     "deliveredTo": "Доставено до {count} корисници"
   },
   "audiencePreview": {
+    "loading": "Се пресметува бројот на примачи…",
+    "recipientCount": "Околу {count} примачи ќе го добијат емитувањето.",
+    "recipientCountCapped": "Околу {count} примачи ќе го добијат емитувањето (ограничено на {cap}).",
     "recipientCap": "{label} (до 5.000 примачи)",
-    "userIdCount": "{label} ({count} ID на корисник)",
-    "userIdCountPlural": "{label} ({count} ID на корисници)"
+    "userCount": "{label} ({count} избрани корисници)"
   },
   "validation": {
     "titleRequired": "Насловот е задолжителен.",
     "bodyRequired": "Содржината е задолжителна.",
-    "userIdsRequired": "Внесете барем еден ID на корисник за конкретна публика.",
+    "usersRequired": "Изберете барем еден корисник за конкретна публика.",
     "deeplinkInvalid": "Deeplink мора да започнува со / и да содржи само букви, бројки, /, _ или -.",
-    "scheduleInvalid": "Закажаното време не е валиден датум."
+    "scheduleInvalid": "Закажаното време не е валиден датум.",
+    "scheduleInPast": "Закажаното време мора да биде во иднина."
   },
   "audience": {
     "all": "Сите корисници",
     "active": "Активни корисници (30 дена)",
-    "specific": "Конкретни ID на корисници"
+    "specific": "Конкретни корисници"
   },
   "status": {
     "draft": "Нацрт",
@@ -47,13 +64,25 @@
     "sent": "Испратено",
     "cancelled": "Откажано"
   },
+  "filters": {
+    "statusLabel": "Филтрирај кампањи по статус",
+    "all": "Сите"
+  },
+  "list": {
+    "campaignsCount": "{count} кампањи · страница {page}"
+  },
   "empty": "Сè уште нема кампањи за емитување.",
+  "emptyFiltered": "Нема кампањи што одговараат на филтерот.",
   "confirmSendTitle": "Да се испрати емитувањето сега?",
-  "confirmSendDescription": "Да се испрати \"{title}\" до {audience}? Ова не може да се врати.",
+  "confirmSendDescription": "Да се испрати \"{title}\" до {audience}? Околу {count} примачи ќе го добијат. Ова не може да се врати.",
   "confirmSendPhrase": "SEND",
   "sendNow": "Испрати сега",
   "confirmDeleteTitle": "Да се избрише кампањата?",
   "confirmDeleteDescription": "Трајно да се отстрани \"{title}\"? Ова не може да се врати.",
+  "confirmCancelTitle": "Откажи закажано емитување?",
+  "confirmCancelDescription": "Откажи „{title}\"? Нема да биде испратен.",
+  "confirmDiscardEditTitle": "Отфрли измени на кампањата?",
+  "confirmDiscardEditDescription": "Незачуваните измени во формата ќе се изгубат.",
   "toast": {
     "validationTitle": "Валидација",
     "draftCreatedTitle": "Нацртот е креиран",
@@ -77,9 +106,5 @@
     "cancelFailedMessage": "Не може да се откаже кампањата.",
     "deleteFailedTitle": "Бришењето не успеа",
     "deleteFailedMessage": "Не може да се избрише кампањата."
-  },
-  "confirmCancelTitle": "Откажи закажан broadcast?",
-  "confirmCancelDescription": "Откажи „{title}\"? Нема да биде испратен.",
-  "confirmDiscardEditTitle": "Отфрли измени на кампањата?",
-  "confirmDiscardEditDescription": "Незачуваните измени во формата ќе се изгубат."
+  }
 }

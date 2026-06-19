@@ -1,7 +1,9 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { BROADCAST_PREFILL_STORAGE_KEY } from '@/features/broadcasts/types';
 import { WorkspaceRefreshOverlay } from '@/features/admin-shell/components/workspace-refresh-overlay';
 import { useWorkspaceRefresh } from '@/features/admin-shell/hooks/use-workspace-refresh';
 import { useServerSyncedState } from '@/features/admin-shell/hooks/use-server-synced-state';
@@ -27,6 +29,7 @@ type UsersWorkspaceProps = {
 export function UsersWorkspace({ initialData, initialMeta, initialStats }: UsersWorkspaceProps) {
   const t = useTranslations('users');
   const tCommon = useTranslations('common');
+  const router = useRouter();
   const { refresh: refreshPage, isRefreshing } = useWorkspaceRefresh();
   const [data] = useServerSyncedState(initialData);
   const [meta] = useServerSyncedState(initialMeta);
@@ -34,7 +37,8 @@ export function UsersWorkspace({ initialData, initialMeta, initialStats }: Users
   const { can } = usePermissions();
   const canBulkWrite = can('users:write');
   const canBulkRole = can('users:role:write');
-  const showBulkUi = canBulkWrite || canBulkRole;
+  const canBroadcast = can('notifications:broadcast');
+  const showBulkUi = canBulkWrite || canBulkRole || canBroadcast;
 
   const url = useUsersListUrl();
   const selectionKey = `${url.role}|${url.status}|${url.page}|${url.searchTerm}|${url.sort}|${url.dir}`;
@@ -50,6 +54,21 @@ export function UsersWorkspace({ initialData, initialMeta, initialStats }: Users
   async function handleBulkRoleConfirm(role: string) {
     const ok = await bulk.runBulkAction('changeRole', selection.selectedIds, role);
     if (ok) selection.clearSelection();
+  }
+
+  function handleSendBroadcast() {
+    const ids = Array.from(selection.selectedIds);
+    if (ids.length === 0) return;
+
+    if (ids.length <= 20) {
+      router.push(
+        `/dashboard/broadcasts?audience=users&userIds=${encodeURIComponent(ids.join(','))}`,
+      );
+    } else {
+      sessionStorage.setItem(BROADCAST_PREFILL_STORAGE_KEY, JSON.stringify(ids));
+      router.push('/dashboard/broadcasts?audience=users&prefill=storage');
+    }
+    selection.clearSelection();
   }
 
   return (
@@ -115,9 +134,11 @@ export function UsersWorkspace({ initialData, initialMeta, initialStats }: Users
                 isBulkLoading={bulk.isBulkLoading}
                 canBulkWrite={canBulkWrite}
                 canBulkRole={canBulkRole}
+                canBroadcast={canBroadcast}
                 onActivate={() => bulk.setBulkModal('activate')}
                 onSuspend={() => bulk.setBulkModal('suspend')}
                 onChangeRole={() => bulk.setRoleModalOpen(true)}
+                onSendBroadcast={handleSendBroadcast}
                 onClear={selection.clearSelection}
               />
             ) : null}

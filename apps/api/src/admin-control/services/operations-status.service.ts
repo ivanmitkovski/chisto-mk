@@ -29,6 +29,7 @@ export class OperationsStatusService {
       process.env.GIT_SHA?.trim() ||
       process.env.SENTRY_RELEASE?.trim() ||
       null;
+    const credential = this.fcmPush.getCredentialValidation();
     return {
       version: process.env.APP_VERSION?.trim() || process.env.npm_package_version || '0.0.0',
       gitSha,
@@ -37,6 +38,9 @@ export class OperationsStatusService {
       startedAt: PROCESS_STARTED_AT,
       uptimeSeconds: Math.floor(process.uptime()),
       fcmEnabled: this.fcmPush.isEnabled(),
+      fcmReady: this.fcmPush.isReady(),
+      fcmProjectId: this.fcmPush.getProjectId() ?? credential.projectId,
+      credentialStatus: credential.status,
     };
   }
 
@@ -65,6 +69,9 @@ export class OperationsStatusService {
       reportSideEffectFailedTotal: snap.reportSideEffectFailedTotal,
       emailQueueDepth: snap.emailQueueDepth,
       emailDeadLetterCount: snap.emailDeadLetterCount,
+      pushDispatchSkippedFcmNotReady: snap.pushDispatchSkippedFcmNotReady,
+      pushDispatchSkippedNoTokens: snap.pushDispatchSkippedNoTokens,
+      pushDispatchSkippedWriterNull: snap.pushDispatchSkippedWriterNull,
       processMemory: {
         rssMb: Math.round(memory.rss / 1024 / 1024),
         heapUsedMb: Math.round(memory.heapUsed / 1024 / 1024),

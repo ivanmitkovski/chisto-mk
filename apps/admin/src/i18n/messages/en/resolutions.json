@@ -16,6 +16,7 @@
     "status": "Status",
     "photos": "Photos",
     "actions": "Actions",
-    "empty": "No resolution submissions match your filters."
+    "empty": "No resolution submissions match your filters.",
+    "resolutionsCount": "{count} resolution(s) · page {page}"
   }
 }

@@ -1,13 +1,87 @@
 .stack {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-6);
+  min-width: 0;
+  width: 100%;
 }
 
-.campaignsTableArea {
-  min-width: 0;
+.listPanel {
+  padding: var(--space-5);
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(8, 54, 39, 0.08);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 20px rgba(8, 54, 39, 0.06);
+}
+
+.listToolbar {
+  margin-bottom: var(--space-4);
+}
+
+.filtersRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.filterButton,
+.filterActive {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+
+.filterActive {
+  border-color: rgba(37, 219, 134, 0.35);
+  background: rgba(37, 219, 134, 0.1);
+  color: var(--color-green-700);
+}
+
+.filterButton:focus-visible,
+.filterActive:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.listFooter {
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid rgba(8, 54, 39, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.meta {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: rgba(8, 54, 39, 0.55);
+  font-weight: 500;
 }
 
 .listPagination {
-  margin-top: var(--space-4);
+  margin-left: auto;
+  display: flex;
+  justify-content: flex-end;
+  max-width: 100%;
+}
+
+@media (max-width: 48rem) {
+  .listFooter {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .listPagination {
+    margin-left: 0;
+    width: 100%;
+    justify-content: center;
+  }
 }

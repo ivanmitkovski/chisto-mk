@@ -1,9 +1,9 @@
 import { adminBrowserFetch } from '@/lib/api';
 import type { BroadcastCampaign, BroadcastCampaignFormValues, BroadcastDeliveryReport } from '../types';
-import { fromDatetimeLocalValue, parseAudienceUserIds } from '../lib/broadcast-campaign-policy';
+import { fromDatetimeLocalValue } from '../lib/broadcast-campaign-policy';
 
 function buildAudiencePayload(values: BroadcastCampaignFormValues, mode: 'create' | 'update' = 'create') {
-  const audienceUserIds = parseAudienceUserIds(values.audienceUserIds);
+  const audienceUserIds = values.selectedAudienceUsers.map((user) => user.id);
   const scheduledAt = fromDatetimeLocalValue(values.scheduledAt);
   return {
     title: values.title.trim(),

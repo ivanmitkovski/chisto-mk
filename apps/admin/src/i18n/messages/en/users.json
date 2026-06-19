@@ -47,6 +47,7 @@
     "activateDescription": "Activate {count} selected user(s)? They will be able to sign in again.",
     "suspend": "Suspend",
     "activate": "Activate",
+    "sendBroadcast": "Send broadcast",
     "changeRoleTitle": "Change role for selected users",
     "changeRoleDescription": "Assign a new role to {count} selected user(s). Super admins cannot change their own role in bulk.",
     "targetRole": "Target role",

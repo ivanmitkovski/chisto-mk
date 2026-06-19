@@ -5,7 +5,16 @@ import { PrismaService } from '../../src/prisma/prisma.service';
 import { S3StorageClient } from '../../src/storage/util/s3-storage.client';
 
 describe('OperationsStatusService', () => {
-  const fcmPush = { isEnabled: jest.fn().mockReturnValue(true) } as unknown as FcmPushService;
+  const fcmPush = {
+    isEnabled: jest.fn().mockReturnValue(true),
+    isReady: jest.fn().mockReturnValue(false),
+    getProjectId: jest.fn().mockReturnValue(null),
+    getCredentialValidation: jest.fn().mockReturnValue({
+      status: 'invalid_json',
+      projectId: null,
+      parseError: 'Unexpected token',
+    }),
+  } as unknown as FcmPushService;
   const prisma = {
     $queryRaw: jest.fn().mockResolvedValue([{ '?column?': 1 }]),
   } as unknown as PrismaService;
@@ -19,6 +28,8 @@ describe('OperationsStatusService', () => {
     const service = new OperationsStatusService(fcmPush, prisma, s3);
     const info = service.getSystemInfo();
     expect(info.fcmEnabled).toBe(true);
+    expect(info.fcmReady).toBe(false);
+    expect(info.credentialStatus).toBe('invalid_json');
     expect(info.uptimeSeconds).toBeGreaterThanOrEqual(0);
     expect(info.version).toBeTruthy();
   });

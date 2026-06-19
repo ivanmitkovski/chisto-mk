@@ -3,19 +3,17 @@ import type { BroadcastAudience, BroadcastCampaign, BroadcastCampaignStatus } fr
 export type BroadcastFormValidationError =
   | 'titleRequired'
   | 'bodyRequired'
-  | 'userIdsRequired'
+  | 'usersRequired'
   | 'deeplinkInvalid'
-  | 'scheduleInvalid';
+  | 'scheduleInvalid'
+  | 'scheduleInPast';
 
+/** @deprecated Use selected user IDs from form state directly. */
 export function parseAudienceUserIds(text: string): string[] {
   return text
     .split(/[\s,]+/)
     .map((id) => id.trim())
     .filter(Boolean);
-}
-
-export function formatAudienceUserIds(ids: string[] | undefined): string {
-  return ids?.join(', ') ?? '';
 }
 
 export function isBroadcastEditable(status: string): boolean {
@@ -45,7 +43,7 @@ export function validateBroadcastForm(input: {
   if (!input.title.trim()) return 'titleRequired';
   if (!input.body.trim()) return 'bodyRequired';
   if (input.audience === 'users' && input.audienceUserIds.length === 0) {
-    return 'userIdsRequired';
+    return 'usersRequired';
   }
   const deeplink = input.deeplink?.trim() ?? '';
   if (deeplink && !/^\/[a-zA-Z0-9/_-]*$/.test(deeplink)) {
@@ -56,6 +54,9 @@ export function validateBroadcastForm(input: {
     const parsed = new Date(scheduledAt);
     if (Number.isNaN(parsed.getTime())) {
       return 'scheduleInvalid';
+    }
+    if (parsed.getTime() <= Date.now()) {
+      return 'scheduleInPast';
     }
   }
   return null;
@@ -80,7 +81,7 @@ export function fromDatetimeLocalValue(value: string): string | undefined {
 type AudiencePreviewTranslator = {
   audienceLabel: (audience: BroadcastAudience) => string;
   recipientCap: (label: string) => string;
-  userIdCount: (label: string, count: number) => string;
+  userCount: (label: string, count: number) => string;
 };
 
 export function formatAudiencePreview(
@@ -89,10 +90,20 @@ export function formatAudiencePreview(
 ): string {
   const label = translate.audienceLabel(campaign.audience as BroadcastAudience);
   if (campaign.audience === 'users' && campaign.audienceUserIds?.length) {
-    return translate.userIdCount(label, campaign.audienceUserIds.length);
+    return translate.userCount(label, campaign.audienceUserIds.length);
   }
   if (campaign.audience === 'active' || campaign.audience === 'all') {
     return translate.recipientCap(label);
   }
   return label;
+}
+
+export type BroadcastStatusFilter = 'all' | BroadcastCampaignStatus;
+
+export function filterCampaignsByStatus<T extends { status: string }>(
+  campaigns: T[],
+  filter: BroadcastStatusFilter,
+): T[] {
+  if (filter === 'all') return campaigns;
+  return campaigns.filter((campaign) => campaign.status === filter);
 }

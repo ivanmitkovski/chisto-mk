@@ -1,6 +1,5 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
 import { SectionState } from '@/components/ui';
 import type { BroadcastCampaign } from '../types';
 import { BroadcastCampaignCard } from './broadcast-campaign-card';
@@ -10,6 +9,7 @@ type BroadcastCampaignListProps = {
   campaigns: BroadcastCampaign[];
   busy: boolean;
   editingId: string | null;
+  emptyMessage: string;
   onEdit: (campaign: BroadcastCampaign) => void;
   onSend: (campaign: BroadcastCampaign) => void;
   onCancel: (campaign: BroadcastCampaign) => void;
@@ -20,15 +20,14 @@ export function BroadcastCampaignList({
   campaigns,
   busy,
   editingId,
+  emptyMessage,
   onEdit,
   onSend,
   onCancel,
   onDelete,
 }: BroadcastCampaignListProps) {
-  const t = useTranslations('broadcasts');
-
   if (campaigns.length === 0) {
-    return <SectionState variant="empty" message={t('empty')} />;
+    return <SectionState variant="empty" message={emptyMessage} />;
   }
 
   return (

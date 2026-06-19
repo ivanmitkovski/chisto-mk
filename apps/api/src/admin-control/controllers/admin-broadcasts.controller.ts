@@ -9,7 +9,7 @@ import { ADMIN_PANEL_ROLES, ADMIN_WRITE_ROLES } from '../../auth/constants/admin
 import { ADMIN_PERMISSIONS } from '../../auth/constants/admin-permissions';
 import { CurrentUser } from '../../auth/decorators/current-user.decorator';
 import type { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
-import { CreateBroadcastDto, UpdateBroadcastDto } from '../dto/admin-broadcast.dto';
+import { CreateBroadcastDto, UpdateBroadcastDto, AudiencePreviewDto, AudienceUserLookupDto } from '../dto/admin-broadcast.dto';
 import { AdminBroadcastsService } from '../services/admin-broadcasts.service';
 import { AdminBroadcastsDispatchService } from '../services/admin-broadcasts-dispatch.service';
 import { Idempotent } from '../../common/idempotency/idempotency.decorator';
@@ -30,6 +30,25 @@ export class AdminBroadcastsController {
   @ApiOperation({ summary: 'List broadcast campaigns' })
   list() {
     return this.broadcasts.list();
+  }
+
+  @Post('audience-preview')
+  @Roles(...ADMIN_PANEL_ROLES)
+  @RequirePermission(ADMIN_PERMISSIONS['notifications:read'])
+  @ApiOperation({ summary: 'Preview broadcast audience recipient count' })
+  previewAudience(@Body() body: AudiencePreviewDto) {
+    return this.broadcasts.previewAudience({
+      audience: body.audience,
+      ...(body.audienceUserIds !== undefined ? { audienceUserIds: body.audienceUserIds } : {}),
+    });
+  }
+
+  @Post('audience-users/lookup')
+  @Roles(...ADMIN_PANEL_ROLES)
+  @RequirePermission(ADMIN_PERMISSIONS['notifications:read'])
+  @ApiOperation({ summary: 'Lookup users for broadcast audience chips' })
+  lookupAudienceUsers(@Body() body: AudienceUserLookupDto) {
+    return this.broadcasts.lookupAudienceUsers(body.userIds);
   }
 
   @Get(':id')

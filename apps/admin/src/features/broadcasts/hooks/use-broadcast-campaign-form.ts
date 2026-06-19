@@ -1,14 +1,16 @@
 'use client';
 
 import { useCallback, useMemo, useState } from 'react';
-import type { BroadcastCampaign, BroadcastCampaignFormValues, BroadcastFormMode } from '../types';
-import { formatAudienceUserIds, toDatetimeLocalValue } from '../lib/broadcast-campaign-policy';
+import type { BroadcastCampaign, BroadcastCampaignFormValues, BroadcastFormMode, BroadcastAudienceUser } from '../types';
+import { toDatetimeLocalValue } from '../lib/broadcast-campaign-policy';
+import { formatBroadcastUserLabel } from '../lib/format-user-display-label';
+import { lookupBroadcastAudienceUsers } from '../data/broadcast-audience-api';
 
 const EMPTY_FORM: BroadcastCampaignFormValues = {
   title: '',
   body: '',
   audience: 'all',
-  audienceUserIds: '',
+  selectedAudienceUsers: [],
   deeplink: '',
   scheduledAt: '',
 };
@@ -20,12 +22,8 @@ export function useBroadcastCampaignForm() {
   const [baseline, setBaseline] = useState<BroadcastCampaignFormValues>(EMPTY_FORM);
 
   const parsedUserIds = useMemo(
-    () =>
-      values.audienceUserIds
-        .split(/[\s,]+/)
-        .map((id) => id.trim())
-        .filter(Boolean),
-    [values.audienceUserIds],
+    () => values.selectedAudienceUsers.map((user) => user.id),
+    [values.selectedAudienceUsers],
   );
 
   const isDirty = useMemo(
@@ -47,23 +45,66 @@ export function useBroadcastCampaignForm() {
     setBaseline(EMPTY_FORM);
   }, []);
 
-  const startEdit = useCallback((campaign: BroadcastCampaign) => {
-    const nextValues: BroadcastCampaignFormValues = {
-      title: campaign.title,
-      body: campaign.body,
-      audience: campaign.audience === 'active' || campaign.audience === 'users' ? campaign.audience : 'all',
-      audienceUserIds: formatAudienceUserIds(campaign.audienceUserIds),
-      deeplink: campaign.deeplink ?? '',
-      scheduledAt: toDatetimeLocalValue(campaign.scheduledAt),
-    };
-    setMode('edit');
-    setEditingId(campaign.id);
-    setValues(nextValues);
-    setBaseline(nextValues);
+  const hydrateSelectedUsers = useCallback(async (userIds: string[]) => {
+    if (userIds.length === 0) {
+      return [] as BroadcastAudienceUser[];
+    }
+    const { users } = await lookupBroadcastAudienceUsers(userIds);
+    const byId = new Map(users.map((user) => [user.id, user]));
+    return userIds.map((id) => {
+      const user = byId.get(id);
+      return {
+        id,
+        label: user ? formatBroadcastUserLabel(user) : id,
+      };
+    });
   }, []);
+
+  const startEdit = useCallback(
+    async (campaign: BroadcastCampaign) => {
+      const userIds = campaign.audienceUserIds ?? [];
+      const selectedAudienceUsers =
+        campaign.audience === 'users' && userIds.length > 0
+          ? await hydrateSelectedUsers(userIds)
+          : [];
+
+      const nextValues: BroadcastCampaignFormValues = {
+        title: campaign.title,
+        body: campaign.body,
+        audience: campaign.audience === 'active' || campaign.audience === 'users' ? campaign.audience : 'all',
+        selectedAudienceUsers,
+        deeplink: campaign.deeplink ?? '',
+        scheduledAt: toDatetimeLocalValue(campaign.scheduledAt),
+      };
+      setMode('edit');
+      setEditingId(campaign.id);
+      setValues(nextValues);
+      setBaseline(nextValues);
+    },
+    [hydrateSelectedUsers],
+  );
+
+  const prefillUsers = useCallback(
+    async (userIds: string[]) => {
+      const selectedAudienceUsers = await hydrateSelectedUsers(userIds);
+      setMode('create');
+      setEditingId(null);
+      setValues({
+        ...EMPTY_FORM,
+        audience: 'users',
+        selectedAudienceUsers,
+      });
+      setBaseline(EMPTY_FORM);
+    },
+    [hydrateSelectedUsers],
+  );
 
   const updateField = useCallback(<K extends keyof BroadcastCampaignFormValues>(key: K, value: BroadcastCampaignFormValues[K]) => {
     setValues((current) => ({ ...current, [key]: value }));
+  }, []);
+
+  const setSelectedAudienceUsers = useCallback((users: BroadcastAudienceUser[]) => {
+    setValues((current) => ({ ...current, selectedAudienceUsers: users }));
   }, []);
 
   return {
@@ -75,6 +116,8 @@ export function useBroadcastCampaignForm() {
     resetForm,
     startCreate,
     startEdit,
+    prefillUsers,
     updateField,
+    setSelectedAudienceUsers,
   };
 }

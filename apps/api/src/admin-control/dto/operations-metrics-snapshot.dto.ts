@@ -75,6 +75,15 @@ export class OperationsMetricsSnapshotDto {
   @ApiProperty({ example: 0 })
   emailDeadLetterCount!: number;
 
+  @ApiProperty({ example: 0 })
+  pushDispatchSkippedFcmNotReady!: number;
+
+  @ApiProperty({ example: 0 })
+  pushDispatchSkippedNoTokens!: number;
+
+  @ApiProperty({ example: 0 })
+  pushDispatchSkippedWriterNull!: number;
+
   @ApiProperty({ type: ProcessMemoryDto })
   processMemory!: ProcessMemoryDto;
 

@@ -47,6 +47,7 @@
     "activateDescription": "Të aktivizohen {count} përdorues të zgjedhur? Do të mund të hyjnë përsëri.",
     "suspend": "Pezullo",
     "activate": "Aktivizo",
+    "sendBroadcast": "Dërgo transmetim",
     "changeRoleTitle": "Ndrysho rolin për përdoruesit e zgjedhur",
     "changeRoleDescription": "Cakto një rol të ri për {count} përdorues të zgjedhur. Super admin nuk mund të ndryshojë rolin e vet në masë.",
     "targetRole": "Roli i synuar",

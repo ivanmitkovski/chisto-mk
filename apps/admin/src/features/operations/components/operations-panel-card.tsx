@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
 import { Badge, Card, SectionState, StatusDot } from '@/components/ui';
 import type { PanelState } from '../data/operations-adapter';
 import type { OperationsPanelKey } from '../lib/operations-health';
-import { derivePanelHealth, healthToBadgeTone } from '../lib/operations-health';
+import { derivePanelHealth, healthToBadgeTone, PANEL_REQUIRED_PERMISSION } from '../lib/operations-health';
 import { panelUpdatedAt } from './operations-status-header';
 import styles from './operations-workspace.module.css';
 
@@ -29,7 +29,17 @@ export function OperationsPanelCard({
 
   let body: ReactNode = children;
   if (state.status === 'forbidden') {
-    body = <SectionState variant="empty" message={t('panels.insufficientPermission')} />;
+    const permission = PANEL_REQUIRED_PERMISSION[panelKey];
+    body = (
+      <SectionState
+        variant="empty"
+        message={
+          permission
+            ? t('panels.insufficientPermissionFor', { permission })
+            : t('panels.insufficientPermission')
+        }
+      />
+    );
   } else if (state.status === 'error') {
     body = <SectionState variant="error" message={state.error} />;
   }

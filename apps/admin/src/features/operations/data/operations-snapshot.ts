@@ -40,6 +40,36 @@ export type DeliveryReportData = {
 export type OperationsSnapshot = {
   pushStats: PanelState<PushStatsData>;
   deliveryReport: PanelState<DeliveryReportData>;
+  pushDiagnostics: PanelState<{
+    fcmEnabled: boolean;
+    fcmReady: boolean;
+    projectId: string | null;
+    credentialStatus: string;
+    credentialParseError: string | null;
+    deadLetterTotal: number;
+    queueDepth: number;
+    activeLeases: number;
+    registeredDeviceTokens: number;
+    workerStatus: { expected: boolean; running: boolean; stale: boolean; lastError?: string };
+    remediation: string | null;
+  }>;
+  pushHealth: PanelState<{
+    status: string;
+    fcmEnabled: boolean;
+    fcmReady: boolean;
+    projectId: string | null;
+    credentialStatus: string;
+    worker: { expected: boolean; running: boolean; stale: boolean; lastError?: string };
+    outbox: { pending: number; leased: number; deadLetter: number };
+    alerts: string[];
+  }>;
+  emailHealth: PanelState<{
+    status: string;
+    emailEnabled: boolean;
+    worker: { expected: boolean; running: boolean; stale: boolean; lastError?: string };
+    outbox: { pending: number; deadLetter: number };
+    alerts: string[];
+  }>;
   deadLetters: PanelState<{
     data: Array<{
       id: string;
@@ -85,8 +115,10 @@ export type OperationsSnapshot = {
   }>;
   feedDiagnostics: PanelState<{
     reasonCodes: Array<{ code: string; count: number }>;
-    rankDriftSnapshot: Array<{ siteId: string; score: number; reasons: string[] }>;
     recentIntegrityDemotions: number;
+    paginationContinuityIssues?: number;
+    rankerMode?: string;
+    rankDriftSnapshot?: Array<{ siteId: string; score: number; reasons: string[] }>;
   }>;
   sideEffects: PanelState<{ pendingCount: number }>;
   emailSuppressions: PanelState<{ meta: { total: number } }>;
@@ -98,6 +130,9 @@ export type OperationsSnapshot = {
     startedAt: string;
     uptimeSeconds: number;
     fcmEnabled: boolean;
+    fcmReady?: boolean;
+    fcmProjectId?: string | null;
+    credentialStatus?: string;
   }>;
   workers: PanelState<{
     workers: Array<{
@@ -180,6 +215,69 @@ export function normalizeDeliveryReport(
 }
 
 /** Ensures panel payloads match current UI expectations (legacy API / stale RSC props). */
+const DEFAULT_WORKER_STATUS = { expected: false, running: false, stale: false };
+
+function normalizePushDiagnostics(
+  raw: Partial<OperationsSnapshot['pushDiagnostics'] extends PanelState<infer T> ? T : never> | null | undefined,
+) {
+  return {
+    fcmEnabled: raw?.fcmEnabled ?? false,
+    fcmReady: raw?.fcmReady ?? false,
+    projectId: raw?.projectId ?? null,
+    credentialStatus: raw?.credentialStatus ?? 'missing',
+    credentialParseError: raw?.credentialParseError ?? null,
+    deadLetterTotal: raw?.deadLetterTotal ?? 0,
+    queueDepth: raw?.queueDepth ?? 0,
+    activeLeases: raw?.activeLeases ?? 0,
+    registeredDeviceTokens: raw?.registeredDeviceTokens ?? 0,
+    workerStatus: {
+      ...DEFAULT_WORKER_STATUS,
+      ...raw?.workerStatus,
+    },
+    remediation: raw?.remediation ?? null,
+  };
+}
+
+function normalizePushHealth(
+  raw: Partial<OperationsSnapshot['pushHealth'] extends PanelState<infer T> ? T : never> | null | undefined,
+) {
+  return {
+    status: raw?.status ?? 'ok',
+    fcmEnabled: raw?.fcmEnabled ?? false,
+    fcmReady: raw?.fcmReady ?? false,
+    projectId: raw?.projectId ?? null,
+    credentialStatus: raw?.credentialStatus ?? 'missing',
+    worker: {
+      ...DEFAULT_WORKER_STATUS,
+      ...raw?.worker,
+    },
+    outbox: {
+      pending: raw?.outbox?.pending ?? 0,
+      leased: raw?.outbox?.leased ?? 0,
+      deadLetter: raw?.outbox?.deadLetter ?? 0,
+    },
+    alerts: raw?.alerts ?? [],
+  };
+}
+
+function normalizeEmailHealth(
+  raw: Partial<OperationsSnapshot['emailHealth'] extends PanelState<infer T> ? T : never> | null | undefined,
+) {
+  return {
+    status: raw?.status ?? 'ok',
+    emailEnabled: raw?.emailEnabled ?? false,
+    worker: {
+      ...DEFAULT_WORKER_STATUS,
+      ...raw?.worker,
+    },
+    outbox: {
+      pending: raw?.outbox?.pending ?? 0,
+      deadLetter: raw?.outbox?.deadLetter ?? 0,
+    },
+    alerts: raw?.alerts ?? [],
+  };
+}
+
 export function sanitizeOperationsSnapshot(snapshot: OperationsSnapshot): OperationsSnapshot {
   return {
     ...snapshot,
@@ -187,6 +285,18 @@ export function sanitizeOperationsSnapshot(snapshot: OperationsSnapshot): Operat
       snapshot.pushStats.status === 'ok'
         ? { ...snapshot.pushStats, data: normalizePushStats(snapshot.pushStats.data) }
         : snapshot.pushStats,
+    pushDiagnostics:
+      snapshot.pushDiagnostics.status === 'ok'
+        ? { ...snapshot.pushDiagnostics, data: normalizePushDiagnostics(snapshot.pushDiagnostics.data) }
+        : snapshot.pushDiagnostics,
+    pushHealth:
+      snapshot.pushHealth.status === 'ok'
+        ? { ...snapshot.pushHealth, data: normalizePushHealth(snapshot.pushHealth.data) }
+        : snapshot.pushHealth,
+    emailHealth:
+      snapshot.emailHealth.status === 'ok'
+        ? { ...snapshot.emailHealth, data: normalizeEmailHealth(snapshot.emailHealth.data) }
+        : snapshot.emailHealth,
     deliveryReport:
       snapshot.deliveryReport.status === 'ok'
         ? { ...snapshot.deliveryReport, data: normalizeDeliveryReport(snapshot.deliveryReport.data) }

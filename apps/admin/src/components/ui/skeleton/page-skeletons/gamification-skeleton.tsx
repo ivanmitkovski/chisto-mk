@@ -4,13 +4,13 @@ import styles from '../skeleton.module.css';
 
 export function GamificationSkeleton() {
   return (
-    <>
+    <div className={styles.pageStack}>
       <SkeletonPageHeader />
       <div className={styles.tabsRow} aria-hidden>
         <span className={`${styles.shimmerBlock} ${styles.tabPill}`} />
         <span className={`${styles.shimmerBlock} ${styles.tabPill}`} />
       </div>
       <SkeletonCard lines={6} />
-    </>
+    </div>
   );
 }

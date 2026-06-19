@@ -39,7 +39,8 @@
 .detailActionPill,
 .headerPill,
 .insightsBar,
-.moderationBar {
+.moderationBar,
+.tableCellBar {
   background: var(--skeleton-base);
   border-radius: var(--skeleton-radius);
   animation: skeletonPulse var(--skeleton-duration) var(--skeleton-ease) infinite;
@@ -114,6 +115,7 @@
   .headerPill,
   .insightsBar,
   .moderationBar,
+  .tableCellBar,
   .skeletonSurface {
     animation: none;
     opacity: 1;
@@ -163,6 +165,7 @@ html.chisto-admin-reduced-motion .detailActionPill,
 html.chisto-admin-reduced-motion .headerPill,
 html.chisto-admin-reduced-motion .insightsBar,
 html.chisto-admin-reduced-motion .moderationBar,
+html.chisto-admin-reduced-motion .tableCellBar,
 html.chisto-admin-reduced-motion .skeletonSurface {
   animation: none;
   opacity: 1;
@@ -178,6 +181,58 @@ html.chisto-admin-reduced-motion .skeletonSurface {
 .bar.title {
   height: 1.25rem;
   max-width: 60%;
+}
+
+.pageStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  min-width: 0;
+}
+
+.workspaceTableCard {
+  padding: var(--space-5);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
+  min-width: 0;
+}
+
+.workspaceTableCardInner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-width: 0;
+}
+
+.workspaceTableCardInner .toolbarSkeleton {
+  margin-bottom: 0;
+}
+
+.cardStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-width: 0;
+}
+
+.tableCellBar {
+  display: block;
+  height: 0.875rem;
+  border-radius: var(--radius-full);
+  max-width: 100%;
+}
+
+.tableCellBarNarrow {
+  width: 60%;
+}
+
+.tableCellBarMedium {
+  width: 72%;
+}
+
+.tableCellBarWide {
+  width: 85%;
 }
 
 .tableWrap {
@@ -581,7 +636,6 @@ html.chisto-admin-reduced-motion .skeletonSurface {
   flex-direction: column;
   gap: var(--space-4);
   min-width: 0;
-  margin-bottom: var(--space-6);
 }
 
 .insightsHeadingBar {
@@ -675,7 +729,6 @@ html.chisto-admin-reduced-motion .skeletonSurface {
   border: 1px solid var(--border-default);
   border-radius: var(--radius-lg);
   background: var(--bg-surface);
-  margin-bottom: var(--space-4);
 }
 
 .filterGrid {
@@ -776,7 +829,6 @@ html.chisto-admin-reduced-motion .skeletonSurface {
   border: 1px solid var(--border-default);
   border-radius: var(--radius-lg);
   background: var(--bg-surface);
-  margin-bottom: var(--space-4);
 }
 
 .formCardTitle {
@@ -802,7 +854,6 @@ html.chisto-admin-reduced-motion .skeletonSurface {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  margin-bottom: var(--space-5);
 }
 
 .sectionTitleBar {
@@ -834,7 +885,6 @@ html.chisto-admin-reduced-motion .skeletonSurface {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-  margin-bottom: var(--space-4);
 }
 
 .notificationsHeaderText {

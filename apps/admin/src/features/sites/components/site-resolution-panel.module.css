@@ -23,12 +23,12 @@
 
 .queueLink {
   font-size: 0.875rem;
-  color: var(--text-link);
+  color: var(--color-green-700);
 }
 
 .empty {
   margin: 0;
-  color: var(--text-muted);
+  color: var(--color-muted);
   font-size: 0.875rem;
 }
 

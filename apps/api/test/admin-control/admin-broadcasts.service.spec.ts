@@ -27,6 +27,9 @@ describe('AdminBroadcastsService', () => {
   let service: AdminBroadcastsService;
   let rows: Row[];
   let auditActions: string[];
+  let prisma: {
+    broadcastCampaign: Record<string, unknown>;
+  };
 
   beforeEach(() => {
     rows = [];
@@ -36,7 +39,7 @@ describe('AdminBroadcastsService', () => {
         auditActions.push(action);
       },
     };
-    const prisma = {
+    const prismaMock = {
       broadcastCampaign: {
         findMany: async ({
           where,
@@ -116,7 +119,14 @@ describe('AdminBroadcastsService', () => {
         },
       },
     };
-    service = new AdminBroadcastsService(prisma as never, audit as never);
+    prisma = prismaMock;
+    const audienceResolver = {
+      validateAudienceUserIds: async (ids: string[]) => ids,
+      countAudience: async () => ({ recipientCount: 0, capped: false, cap: 5000 }),
+      lookupUsers: async () => [],
+      resolveAudienceUserIds: async () => [],
+    };
+    service = new AdminBroadcastsService(prismaMock as never, audienceResolver as never, audit as never);
   });
 
   it('creates, updates, and deletes a draft campaign', async () => {
@@ -188,16 +198,62 @@ describe('AdminBroadcastsService', () => {
       body: 'Now',
       type: 'SYSTEM',
       audience: 'all',
-      scheduledAt: new Date(Date.now() - 60_000).toISOString(),
+      scheduledAt: new Date(Date.now() + 3600_000).toISOString(),
     });
+    const dueRow = rows.find((row) => row.id === due.id);
+    if (dueRow) {
+      dueRow.scheduledAt = new Date(Date.now() - 60_000);
+    }
+
     await service.create({
       title: 'Future',
       body: 'Later',
       type: 'SYSTEM',
       audience: 'all',
-      scheduledAt: new Date(Date.now() + 3600_000).toISOString(),
+      scheduledAt: new Date(Date.now() + 7200_000).toISOString(),
     });
     const list = await service.listDueScheduled();
     expect(list.map((row) => row.id)).toEqual([due.id]);
+  });
+
+  it('rejects schedule in the past', async () => {
+    await expect(
+      service.create({
+        title: 'Late',
+        body: 'Body',
+        type: 'SYSTEM',
+        audience: 'all',
+        scheduledAt: new Date(Date.now() - 60_000).toISOString(),
+      }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it('rejects invalid user IDs on create', async () => {
+    const invalidResolver = {
+      validateAudienceUserIds: async () => {
+        throw new BadRequestException({
+          code: 'BROADCAST_INVALID_USER_IDS',
+          message: 'One or more user IDs are invalid',
+          invalidIds: ['missing-id'],
+        });
+      },
+      countAudience: async () => ({ recipientCount: 0, capped: false, cap: 5000 }),
+      lookupUsers: async () => [],
+      resolveAudienceUserIds: async () => [],
+    };
+    const invalidService = new AdminBroadcastsService(
+      prisma as never,
+      invalidResolver as never,
+      undefined,
+    );
+    await expect(
+      invalidService.create({
+        title: 'Users',
+        body: 'Body',
+        type: 'SYSTEM',
+        audience: 'users',
+        audienceUserIds: ['missing-id'],
+      }),
+    ).rejects.toBeInstanceOf(BadRequestException);
   });
 });

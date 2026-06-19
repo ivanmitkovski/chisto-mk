@@ -21,4 +21,16 @@ export class SystemInfoDto {
 
   @ApiProperty({ example: true })
   fcmEnabled!: boolean;
+
+  @ApiProperty({ example: true })
+  fcmReady!: boolean;
+
+  @ApiProperty({ nullable: true, example: 'chisto-mk-dev' })
+  fcmProjectId!: string | null;
+
+  @ApiProperty({
+    enum: ['valid', 'missing', 'invalid_json', 'invalid_structure'],
+    example: 'valid',
+  })
+  credentialStatus!: 'valid' | 'missing' | 'invalid_json' | 'invalid_structure';
 }

@@ -8,38 +8,55 @@
     "body": "Trupi",
     "deeplink": "Deeplink (opsionale)",
     "audience": "Audienca",
-    "userIds": "ID e përdoruesve (të ndara me presje ose hapësirë)",
+    "searchUsers": "Kërko përdorues",
+    "searchUsersPlaceholder": "Kërko sipas emrit ose emailit…",
+    "searchUsersHint": "Shkruani emrin ose emailin për të gjetur përdorues.",
+    "searchingUsers": "Po kërkohen përdoruesit…",
+    "selectedUsers": "Përdorues të zgjedhur ({count})",
+    "noUsersSelected": "Ende pa përdorues të zgjedhur.",
+    "noUsersFound": "Asnjë përdorues nuk përputhet me kërkimin.",
+    "removeUser": "Hiq {name}",
+    "userSearchFailed": "Nuk mund të kërkohen përdoruesit. Provoni përsëri.",
+    "maxRecipientsReached": "Keni arritur maksimumin prej 5.000 marrësish për një transmetim.",
     "schedule": "Planifiko për më vonë (opsionale)",
     "saveDraft": "Ruaj draftin",
     "cancelEdit": "Anulo redaktimin"
   },
   "actions": {
-    "edit": "Redakto"
+    "edit": "Redakto",
+    "editAria": "Redakto {title}",
+    "sendAria": "Dërgo {title}",
+    "deleteAria": "Fshi {title}",
+    "cancelAria": "Anulo {title}"
   },
   "card": {
     "audienceLabel": "Audienca: {audience}",
     "userCount": "{count} përdorues",
+    "selectedUsers": "{count} përdorues të zgjedhur",
     "scheduledAt": "E planifikuar {date}",
     "sentAt": "E dërguar {date}",
     "updatedAt": "E përditësuar {date}",
     "deliveredTo": "Dorëzuar te {count} përdorues"
   },
   "audiencePreview": {
+    "loading": "Po llogaritet numri i marrësve…",
+    "recipientCount": "Rreth {count} marrës do ta marrin këtë transmetim.",
+    "recipientCountCapped": "Rreth {count} marrës do ta marrin këtë transmetim (kufizuar në {cap}).",
     "recipientCap": "{label} (deri në 5.000 marrës)",
-    "userIdCount": "{label} ({count} ID përdoruesi)",
-    "userIdCountPlural": "{label} ({count} ID përdoruesish)"
+    "userCount": "{label} ({count} përdorues të zgjedhur)"
   },
   "validation": {
     "titleRequired": "Titulli është i detyrueshëm.",
     "bodyRequired": "Trupi është i detyrueshëm.",
-    "userIdsRequired": "Vendosni të paktën një ID përdoruesi për audiencë specifike.",
+    "usersRequired": "Zgjidhni të paktën një përdorues për audiencë specifike.",
     "deeplinkInvalid": "Deeplink duhet të fillojë me / dhe të përmbajë vetëm shkronja, numra, /, _ ose -.",
-    "scheduleInvalid": "Koha e planifikuar nuk është datë e vlefshme."
+    "scheduleInvalid": "Koha e planifikuar nuk është datë e vlefshme.",
+    "scheduleInPast": "Koha e planifikuar duhet të jetë në të ardhmen."
   },
   "audience": {
     "all": "Të gjithë përdoruesit",
     "active": "Përdorues aktivë (30 ditë)",
-    "specific": "ID specifike përdoruesish"
+    "specific": "Përdorues specifikë"
   },
   "status": {
     "draft": "Draft",
@@ -47,13 +64,25 @@
     "sent": "E dërguar",
     "cancelled": "E anuluar"
   },
+  "filters": {
+    "statusLabel": "Filtro fushatat sipas statusit",
+    "all": "Të gjitha"
+  },
+  "list": {
+    "campaignsCount": "{count} fushata · faqja {page}"
+  },
   "empty": "Ende pa fushata transmetimi.",
+  "emptyFiltered": "Asnjë fushatë nuk përputhet me këtë filtër.",
   "confirmSendTitle": "Të dërgohet transmetimi tani?",
-  "confirmSendDescription": "Të dërgohet \"{title}\" te {audience}? Kjo nuk mund të kthehet.",
+  "confirmSendDescription": "Të dërgohet \"{title}\" te {audience}? Rreth {count} marrës do ta marrin. Kjo nuk mund të kthehet.",
   "confirmSendPhrase": "SEND",
   "sendNow": "Dërgo tani",
   "confirmDeleteTitle": "Të fshihet fushata?",
   "confirmDeleteDescription": "Të hiqet përgjithmonë \"{title}\"? Kjo nuk mund të kthehet.",
+  "confirmCancelTitle": "Anulo transmetimin e planifikuar?",
+  "confirmCancelDescription": "Anulo „{title}\"? Nuk do të dërgohet.",
+  "confirmDiscardEditTitle": "Hidh poshtë ndryshimet e fushatës?",
+  "confirmDiscardEditDescription": "Ndryshimet e paruajtura në formular do të humbasin.",
   "toast": {
     "validationTitle": "Validim",
     "draftCreatedTitle": "Drafti u krijua",
@@ -77,9 +106,5 @@
     "cancelFailedMessage": "Nuk mund të anulohet fushata.",
     "deleteFailedTitle": "Fshirja dështoi",
     "deleteFailedMessage": "Nuk mund të fshihet fushata."
-  },
-  "confirmCancelTitle": "Anulo transmetimin e planifikuar?",
-  "confirmCancelDescription": "Anulo „{title}\"? Nuk do të dërgohet.",
-  "confirmDiscardEditTitle": "Hidh poshtë ndryshimet e fushatës?",
-  "confirmDiscardEditDescription": "Ndryshimet e paruajtura në formular do të humbasin."
+  }
 }

@@ -9,6 +9,7 @@ import {
   SkeletonCard,
   SkeletonTable,
 } from '@/components/ui';
+import skeletonStyles from '@/components/ui/skeleton/skeleton.module.css';
 import {
   ApiConnectionError,
   ApiError,
@@ -202,8 +203,23 @@ export async function ReportsSection() {
 
 export function ReportsFallback() {
   return (
-    <section className={styles.reportsSection} aria-busy>
-      <SkeletonTable rows={5} cols={4} />
+    <section className={`${styles.reportsSection} ${skeletonStyles.overviewReportsSection}`} aria-busy>
+      <div className={skeletonStyles.summaryStripSkeleton}>
+        {Array.from({ length: 3 }).map((_, i) => (
+          <span key={i} className={`${skeletonStyles.shimmerBlock} ${skeletonStyles.summaryBar}`} />
+        ))}
+      </div>
+      <span className={`${skeletonStyles.shimmerBlock} ${skeletonStyles.sectionLabelBar}`} />
+      <div className={skeletonStyles.reportsHeaderSkeleton}>
+        <span className={`${skeletonStyles.shimmerBlock} ${skeletonStyles.bar} ${skeletonStyles.reportsTitleBar}`} />
+        <span className={`${skeletonStyles.shimmerBlock} ${skeletonStyles.toolbarPill}`} />
+      </div>
+      <div className={skeletonStyles.filterChipsRow} aria-hidden>
+        {Array.from({ length: 5 }).map((_, i) => (
+          <span key={i} className={`${skeletonStyles.shimmerBlock} ${skeletonStyles.filterChip}`} />
+        ))}
+      </div>
+      <SkeletonTable rows={5} cols={5} />
     </section>
   );
 }
@@ -299,8 +315,9 @@ export async function InsightsSection() {
 
 export function InsightsFallback() {
   return (
-    <section className={styles.insightsSection} aria-busy>
-      <div className={styles.insightsRow}>
+    <section className={`${styles.insightsSection} ${skeletonStyles.overviewInsightsSection}`} aria-busy>
+      <span className={`${skeletonStyles.shimmerBlock} ${skeletonStyles.bar} ${skeletonStyles.insightsHeadingBar}`} />
+      <div className={skeletonStyles.insightsRow}>
         <SkeletonCard lines={3} />
         <SkeletonCard lines={4} />
         <SkeletonCard lines={3} />

@@ -57,12 +57,15 @@ export async function getOperationsSnapshot(): Promise<OperationsSnapshot> {
   const [
     pushStats,
     deliveryReport,
+    pushDiagnostics,
+    pushHealth,
+    emailHealth,
     deadLetters,
     emailDeadLetters,
     mapHealth,
     mapDeep,
     gdprAudit,
-    overview,
+    feedDiagnostics,
     sideEffects,
     emailSuppressions,
     systemInfo,
@@ -82,6 +85,27 @@ export async function getOperationsSnapshot(): Promise<OperationsSnapshot> {
         OPS_PROBE_TIMEOUT_MS,
         fetchOptions,
       ).then(normalizeDeliveryReport),
+    ),
+    capture(() =>
+      fetchWithTimeout<OperationsSnapshot['pushDiagnostics'] extends PanelState<infer T> ? T : never>(
+        '/notifications/admin/push-diagnostics',
+        OPS_PROBE_TIMEOUT_MS,
+        fetchOptions,
+      ),
+    ),
+    capture(() =>
+      fetchWithTimeout<OperationsSnapshot['pushHealth'] extends PanelState<infer T> ? T : never>(
+        '/health/push',
+        OPS_PROBE_TIMEOUT_MS,
+        healthFetchOptions,
+      ),
+    ),
+    capture(() =>
+      fetchWithTimeout<OperationsSnapshot['emailHealth'] extends PanelState<infer T> ? T : never>(
+        '/health/email',
+        OPS_PROBE_TIMEOUT_MS,
+        healthFetchOptions,
+      ),
     ),
     capture(() =>
       fetchWithTimeout<OperationsSnapshot['deadLetters'] extends PanelState<infer T> ? T : never>(
@@ -119,11 +143,11 @@ export async function getOperationsSnapshot(): Promise<OperationsSnapshot> {
       ),
     ),
     capture(() =>
-      fetchWithTimeout<{ feedDiagnostics: OperationsSnapshot['feedDiagnostics'] extends PanelState<infer T> ? T : never }>(
-        '/admin/overview',
+      fetchWithTimeout<OperationsSnapshot['feedDiagnostics'] extends PanelState<infer T> ? T : never>(
+        '/admin/operations/feed-diagnostics',
         OPS_PROBE_TIMEOUT_MS,
         fetchOptions,
-      ).then((response) => response.feedDiagnostics),
+      ),
     ),
     capture(() =>
       fetchWithTimeout<{ pendingCount: number }>(
@@ -165,12 +189,15 @@ export async function getOperationsSnapshot(): Promise<OperationsSnapshot> {
   return sanitizeOperationsSnapshot({
     pushStats,
     deliveryReport,
+    pushDiagnostics,
+    pushHealth,
+    emailHealth,
     deadLetters,
     emailDeadLetters,
     mapHealth,
     mapDeep,
     gdprAudit,
-    feedDiagnostics: overview,
+    feedDiagnostics,
     sideEffects,
     emailSuppressions,
     systemInfo,

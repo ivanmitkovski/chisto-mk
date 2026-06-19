@@ -14,6 +14,7 @@ import { ReportSideEffectPendingCountDto } from '../dto/report-side-effect-pendi
 import { SystemInfoDto } from '../dto/system-info.dto';
 import { WorkerStatusListDto } from '../dto/worker-status.dto';
 import { OperationsStatusService } from '../services/operations-status.service';
+import { OperationsDiagnosticsBundleService } from '../services/operations-diagnostics-bundle.service';
 
 @ApiTags('admin-operations')
 @Controller('admin/operations')
@@ -23,6 +24,7 @@ export class AdminOperationsController {
   constructor(
     private readonly reportSideEffects: ReportSideEffectQueryService,
     private readonly operationsStatus: OperationsStatusService,
+    private readonly diagnosticsBundle: OperationsDiagnosticsBundleService,
   ) {}
 
   @Get('report-side-effects/pending-count')
@@ -69,5 +71,22 @@ export class AdminOperationsController {
   @ApiOkResponse({ type: OperationsReadinessDto })
   readiness(): Promise<OperationsReadinessDto> {
     return this.operationsStatus.getReadiness();
+  }
+
+  @Get('diagnostics-bundle')
+  @Roles(...ADMIN_PANEL_ROLES)
+  @RequirePermission(ADMIN_PERMISSIONS['operations:read'])
+  @ApiOperation({ summary: 'Aggregated operations diagnostics bundle' })
+  getDiagnosticsBundle() {
+    return this.diagnosticsBundle.getBundle();
+  }
+
+  @Get('feed-diagnostics')
+  @Roles(...ADMIN_PANEL_ROLES)
+  @RequirePermission(ADMIN_PERMISSIONS['operations:read'])
+  @ApiOperation({ summary: 'Feed ranking diagnostics for operations dashboard' })
+  async feedDiagnostics() {
+    const bundle = await this.diagnosticsBundle.getBundle();
+    return bundle.feedDiagnostics;
   }
 }

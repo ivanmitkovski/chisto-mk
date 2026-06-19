@@ -14,7 +14,7 @@ export function OverviewStatsSkeleton() {
 
 export function OverviewSkeleton() {
   return (
-    <>
+    <div className={styles.pageStack}>
       <header className={styles.overviewTopBar} aria-hidden>
         <OverviewStatsSkeleton />
         <span className={`${styles.shimmerBlock} ${styles.actionPill}`} />
@@ -47,6 +47,6 @@ export function OverviewSkeleton() {
           ))}
         </div>
       </section>
-    </>
+    </div>
   );
 }

@@ -3,7 +3,7 @@ import styles from '../skeleton.module.css';
 
 export function BroadcastsSkeleton() {
   return (
-    <>
+    <div className={styles.pageStack}>
       <SkeletonPageHeader />
       <div className={styles.formCardSkeleton} aria-hidden>
         <span className={`${styles.shimmerBlock} ${styles.bar} ${styles.formCardTitle}`} />
@@ -17,6 +17,6 @@ export function BroadcastsSkeleton() {
           <span key={i} className={`${styles.shimmerBlock} ${styles.campaignCard}`} />
         ))}
       </div>
-    </>
+    </div>
   );
 }

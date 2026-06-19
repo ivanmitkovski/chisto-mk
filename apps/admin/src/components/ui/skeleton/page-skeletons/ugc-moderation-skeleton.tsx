@@ -5,7 +5,7 @@ import styles from '../skeleton.module.css';
 
 export function UgcModerationSkeleton() {
   return (
-    <>
+    <div className={styles.pageStack}>
       <SkeletonPageHeader />
       <SkeletonSplitLayout
         queue={
@@ -28,6 +28,6 @@ export function UgcModerationSkeleton() {
           </>
         }
       />
-    </>
+    </div>
   );
 }
