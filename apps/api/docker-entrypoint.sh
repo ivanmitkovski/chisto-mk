@@ -1,7 +1,11 @@
 #!/bin/sh
 set -e
 cd /app
-prisma generate
+
+# Prisma client is generated during the Docker build; re-generate only when explicitly requested.
+if [ "${PRISMA_GENERATE_ON_START:-0}" = "1" ]; then
+  prisma generate
+fi
 
 # Optional manual overrides (set on the ECS task for one deploy, then remove):
 # PRISMA_RESOLVE_APPLIED_MIGRATION   — prisma migrate resolve --applied <name>

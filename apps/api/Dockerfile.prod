@@ -25,7 +25,8 @@ RUN pnpm --filter @chisto/api deploy --prod --legacy /deployed
 
 # Prisma CLI bundle (pnpm deploy inherits root security overrides; npm install does not).
 FROM builder AS prisma-cli
-RUN pnpm --filter @chisto/prisma-cli deploy --prod --legacy /opt/prisma-cli
+RUN pnpm --filter @chisto/prisma-cli deploy --prod --legacy /opt/prisma-cli \
+  && cd /opt/prisma-cli && DATABASE_URL="postgresql://build:build@localhost:5432/build" node node_modules/prisma/build/index.js version
 
 FROM node:20-bookworm-slim AS runner
 ENV NODE_ENV=production
@@ -41,10 +42,11 @@ RUN groupadd --gid 1001 chisto && useradd --uid 1001 --gid chisto --create-home 
 COPY --from=deploy /deployed ./
 COPY --from=builder /app/apps/api/prisma ./prisma
 COPY --from=builder /app/apps/api/docker-entrypoint.sh ./docker-entrypoint.sh
-COPY --from=prisma-cli /opt/prisma-cli/node_modules /opt/prisma-cli/node_modules
+COPY --from=prisma-cli /opt/prisma-cli /opt/prisma-cli
 ENV PATH="/opt/prisma-cli/node_modules/.bin:${PATH}"
 ENV NODE_PATH="/opt/prisma-cli/node_modules"
-RUN chmod +x ./docker-entrypoint.sh && chown -R chisto:chisto /app
+RUN chmod +x ./docker-entrypoint.sh \
+  && chown -R chisto:chisto /app /opt/prisma-cli
 USER chisto
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
