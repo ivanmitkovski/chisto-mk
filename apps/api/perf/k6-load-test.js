@@ -18,6 +18,11 @@ const mapLatency = new Trend('map_latency', true);
 const BASE = (__ENV.API_BASE_URL || 'http://127.0.0.1:3000').replace(/\/$/, '');
 const AUTH_TOKEN = __ENV.AUTH_TOKEN || '';
 
+/** Per-VU coordinate spread for load tests (deterministic, not security-sensitive). */
+function loadTestCoordinateJitter(seed) {
+  return ((seed * 1_007 + __ITER * 997) % 10_000) / 1_000_000;
+}
+
 export const options = {
   scenarios: {
     health_baseline: {
@@ -137,8 +142,8 @@ export function reportSubmit() {
   }
   group('Report Submit', () => {
     const payload = JSON.stringify({
-      latitude: 41.9973 + Math.random() * 0.01,
-      longitude: 21.428 + Math.random() * 0.01,
+      latitude: 41.9973 + loadTestCoordinateJitter(__VU),
+      longitude: 21.428 + loadTestCoordinateJitter(__VU + 10_000),
       description: `k6 load test report ${Date.now()}`,
       category: 'ILLEGAL_DUMP',
     });

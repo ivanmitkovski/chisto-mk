@@ -1,15 +1,16 @@
+import { randomInt } from 'node:crypto';
 import type { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { apiPath } from './api-path';
 
 export function uniquePhone(): string {
-  const n = String(1_000_000 + Math.floor(Math.random() * 8_999_999));
+  const n = randomInt(1_000_000, 9_999_999);
   return `+1555${n}`;
 }
 
 /** Isolated throttle bucket per e2e flow (register, OTP, password-reset). */
 export function e2eThrottleIp(): string {
-  return `203.0.${Math.floor(Math.random() * 254) + 1}.${Math.floor(Math.random() * 254) + 1}`;
+  return `203.0.${randomInt(1, 254)}.${randomInt(1, 254)}`;
 }
 
 function withE2eIp(req: request.Test, ip: string): request.Test {
