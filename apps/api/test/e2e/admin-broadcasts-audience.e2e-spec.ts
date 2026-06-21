@@ -1,5 +1,6 @@
 /// <reference types="jest" />
 
+import { randomUUID } from 'node:crypto';
 import type { INestApplication } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
 import request from 'supertest';
@@ -30,7 +31,7 @@ async function createAdminAccessToken(prisma: PrismaService): Promise<{ token: s
   const session = await prisma.userSession.create({
     data: {
       userId: adminUser.id,
-      tokenId: 'admbrdcast1234567890',
+      tokenId: randomUUID(),
       refreshTokenHash: 'hash',
       expiresAt: new Date(Date.now() + 86400000),
     },
