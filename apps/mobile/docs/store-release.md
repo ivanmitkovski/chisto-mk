@@ -18,6 +18,15 @@ Prod artifacts: `./scripts/build-prod.sh` (requires Android upload keystore).
 
 Smoke-test the IPA (TestFlight) and AAB (Play internal track) on physical devices against `https://api.chisto.mk`.
 
+**Android media permissions (Play policy):** `./scripts/release-qa.sh` runs `tool/check_android_play_media_permissions.dart`, which merges the release manifest and fails if `READ_MEDIA_*` or `READ_EXTERNAL_STORAGE` appear. Before production upload, smoke-test on Android 13+:
+
+| Flow | Action |
+|------|--------|
+| Pollution report | Camera + choose from library |
+| Profile avatar | Selfie + gallery |
+| Event chat | Attach photo, video, document |
+| Chat attachment | Open a non-PDF document |
+
 ## Upload
 
 | Platform | Artifact | Console |
@@ -26,6 +35,17 @@ Smoke-test the IPA (TestFlight) and AAB (Play internal track) on physical device
 | Android | `build/app/outputs/bundle/release/app-release.aab` | Play Console → Production (or internal first) |
 
 **Review notes:** provide a demo phone/email for OTP, explain permissions, point to Profile → Delete account.
+
+### Google Play resubmission (photo/video permissions fix)
+
+1. **Publishing overview** → resolve the Photo and Video Permissions policy issue.
+2. **Release** → internal testing first (recommended), then production → create new release.
+3. Upload `app-release.aab` with a **new versionCode** (must be higher than the rejected build).
+4. **Deactivate** older builds on all active tracks that still declare `READ_MEDIA_IMAGES` / `READ_MEDIA_VIDEO`.
+5. **App content → Sensitive app permissions / Photo and video permissions:** declare no broad photo/video library access; one-time attachments use the system picker.
+6. **Data safety:** align declarations with the manifest (no persistent photo-library read permission).
+7. Release notes example: “Removed unnecessary media storage permissions; photo/video selection uses the Android system picker.”
+8. Submit for review.
 
 ## Verify deep links
 

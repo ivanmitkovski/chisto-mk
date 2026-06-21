@@ -24,6 +24,8 @@ jobs:
         run: flutter pub get
       - name: Verify release env guard
         run: dart run tool/check_release_env.dart
+      - name: Verify Android Play media permission policy
+        run: dart run tool/check_android_play_media_permissions.dart
       - name: Analyze and test
         run: |
           flutter analyze --fatal-infos lib
