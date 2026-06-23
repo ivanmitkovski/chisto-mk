@@ -2,12 +2,16 @@ import { BadRequestException } from '@nestjs/common';
 import {
   assertValidSlug,
   assertValidTranslations,
+  normalizeSlug,
   paragraphsToBody,
 } from '../../src/news/services/news-posts-validation';
 import type { NewsTranslations } from '../../src/news/types/news.types';
 
 describe('news-posts-validation', () => {
   it('normalizes and validates slug', () => {
+    expect(normalizeSlug('  Hello World!  ')).toBe('hello-world');
+    expect(normalizeSlug('---foo---')).toBe('foo');
+    expect(normalizeSlug('-'.repeat(1_000))).toBe('');
     expect(() => assertValidSlug('valid-slug-2026')).not.toThrow();
     expect(() => assertValidSlug('Invalid Slug!')).toThrow(BadRequestException);
   });

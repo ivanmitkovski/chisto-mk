@@ -7,14 +7,23 @@ const MAX_TITLE_LENGTH = 300;
 const MAX_EXCERPT_LENGTH = 500;
 const MAX_PARAGRAPH_LENGTH = 10_000;
 const MAX_BODY_BLOCKS = 50;
+const HYPHEN_CODE = '-'.charCodeAt(0);
+
+/** Linear-time trim; avoids polynomial regex on user-controlled slug input. */
+function trimEdgeHyphens(value: string): string {
+  let start = 0;
+  let end = value.length;
+  while (start < end && value.charCodeAt(start) === HYPHEN_CODE) start += 1;
+  while (end > start && value.charCodeAt(end - 1) === HYPHEN_CODE) end -= 1;
+  return value.slice(start, end);
+}
 
 export function normalizeSlug(input: string): string {
-  return input
+  const normalized = input
     .trim()
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 120);
+    .replace(/[^a-z0-9]+/g, '-');
+  return trimEdgeHyphens(normalized).slice(0, 120);
 }
 
 export function assertValidSlug(slug: string): void {
