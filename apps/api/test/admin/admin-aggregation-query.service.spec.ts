@@ -23,6 +23,7 @@ describe('AdminAggregationQueryService', () => {
     completedEvents: 4,
     usersCount: 10,
     usersNewLast7d: 1,
+    usersSuspendedCount: 0,
     sessionsActive: 2,
     reportCountsByDay: [{ date: '2026-01-01', count: 5n }],
     recentLogs: [],
