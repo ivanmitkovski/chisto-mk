@@ -1,4 +1,5 @@
 /// <reference types="jest" />
+import { createHash } from 'node:crypto';
 import { AuthIdentifierChangeService } from '../../src/auth/services/auth-identifier-change.service';
 
 describe('AuthIdentifierChangeService', () => {
@@ -64,7 +65,7 @@ describe('AuthIdentifierChangeService', () => {
 
   it('confirmEmailChange revokes sessions and logs admin metadata', async () => {
     const code = '123456';
-    const codeHash = require('node:crypto').createHash('sha256').update(code).digest('hex');
+    const codeHash = createHash('sha256').update(code).digest('hex');
     const pending = JSON.stringify({
       kind: 'email',
       newValue: 'new@test.local',
