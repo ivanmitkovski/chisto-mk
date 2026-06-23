@@ -84,6 +84,7 @@ export class AdminNewsController {
     );
   }
 
+  // safe-to-retry: repeated Patch is acceptable
   @Patch('posts/:id')
   @Roles(...ADMIN_WRITE_ROLES)
   @RequirePermission(ADMIN_PERMISSIONS['news:write'])
@@ -105,6 +106,7 @@ export class AdminNewsController {
     );
   }
 
+  // safe-to-retry: repeated Delete is acceptable
   @Delete('posts/:id')
   @Roles(...ADMIN_WRITE_ROLES)
   @RequirePermission(ADMIN_PERMISSIONS['news:write'])
@@ -114,6 +116,7 @@ export class AdminNewsController {
     return { ok: true };
   }
 
+  // safe-to-retry: repeated publish is acceptable
   @Post('posts/:id/publish')
   @Roles(...ADMIN_WRITE_ROLES)
   @RequirePermission(ADMIN_PERMISSIONS['news:write'])
@@ -122,6 +125,7 @@ export class AdminNewsController {
     return this.posts.publish(id, actor);
   }
 
+  // safe-to-retry: repeated unpublish is acceptable
   @Post('posts/:id/unpublish')
   @Roles(...ADMIN_WRITE_ROLES)
   @RequirePermission(ADMIN_PERMISSIONS['news:write'])
@@ -130,6 +134,7 @@ export class AdminNewsController {
     return this.posts.unpublish(id, actor);
   }
 
+  // safe-to-retry: repeated archive is acceptable
   @Post('posts/:id/archive')
   @Roles(...ADMIN_WRITE_ROLES)
   @RequirePermission(ADMIN_PERMISSIONS['news:write'])
@@ -138,6 +143,7 @@ export class AdminNewsController {
     return this.posts.archive(id, actor);
   }
 
+  @Idempotent('admin_news_media_upload')
   @Post('posts/:id/media')
   @Roles(...ADMIN_WRITE_ROLES)
   @RequirePermission(ADMIN_PERMISSIONS['news:write'])
@@ -169,6 +175,7 @@ export class AdminNewsController {
     });
   }
 
+  // safe-to-retry: repeated Delete is acceptable
   @Delete('media/:mediaId')
   @Roles(...ADMIN_WRITE_ROLES)
   @RequirePermission(ADMIN_PERMISSIONS['news:write'])
