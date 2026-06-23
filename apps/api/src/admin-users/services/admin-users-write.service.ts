@@ -9,12 +9,12 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { UserEventsService } from '../../admin-realtime/services/user-events.service';
 import type { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { AuditService } from '../../audit/services/audit.service';
-import { BulkAdminUsersDto } from '../dto/bulk-admin-users.dto';
 import { PatchAdminUserDto } from '../dto/patch-admin-user.dto';
 import { PatchAdminUserRoleDto } from '../dto/patch-admin-user-role.dto';
 import { AuthSessionRevocationService } from '../../auth/services/auth-session-revocation.service';
 import { UserAuthSnapshotCacheService } from '../../auth/services/user-auth-snapshot-cache.service';
 import { AccountErasureService } from '../../auth/services/account-erasure.service';
+import { AdminUsersStatusHistoryService } from './admin-users-status-history.service';
 
 @Injectable()
 export class AdminUsersWriteService {
@@ -25,6 +25,7 @@ export class AdminUsersWriteService {
     private readonly sessionRevocation: AuthSessionRevocationService,
     private readonly authSnapshotCache: UserAuthSnapshotCacheService,
     private readonly accountErasure: AccountErasureService,
+    private readonly statusHistory: AdminUsersStatusHistoryService,
   ) {}
 
   async patch(
@@ -122,7 +123,7 @@ export class AdminUsersWriteService {
     }
 
     if (dto.status != null && dto.status !== target.status && !shouldErase) {
-      await this.recordStatusAction({
+      await this.statusHistory.recordStatusAction({
         userId: id,
         actorId: actor.userId,
         fromStatus: target.status,
@@ -202,217 +203,5 @@ export class AdminUsersWriteService {
     this.authSnapshotCache.invalidate(id);
     this.userEventsService.emitUserUpdated(id);
     return updated;
-  }
-
-  async bulk(dto: BulkAdminUsersDto, actor: AuthenticatedUser) {
-    if (dto.action === 'changeRole' && actor.role !== Role.SUPER_ADMIN) {
-      throw new ForbiddenException({
-        code: 'FORBIDDEN',
-        message: 'Only a super admin can change roles in bulk',
-      });
-    }
-    if (dto.action === 'changeRole' && dto.role == null) {
-      throw new ConflictException({
-        code: 'ROLE_REQUIRED',
-        message: 'role is required when action is changeRole',
-      });
-    }
-    const statusUpdate =
-      dto.action === 'suspend'
-        ? UserStatus.SUSPENDED
-        : dto.action === 'activate'
-          ? UserStatus.ACTIVE
-          : undefined;
-
-    const targets = await this.prisma.user.findMany({
-      where: { id: { in: dto.userIds } },
-      select: { id: true, role: true, status: true },
-    });
-
-    for (const t of targets) {
-      if (t.role === Role.SUPER_ADMIN && actor.role !== Role.SUPER_ADMIN) continue;
-      if (actor.userId === t.id && dto.action === 'changeRole' && dto.role !== actor.role) continue;
-    }
-
-    const data: Prisma.UserUpdateInput = {};
-    if (statusUpdate != null) {
-      data.status = statusUpdate;
-    }
-    if (dto.action === 'changeRole' && dto.role != null) {
-      if (dto.role === Role.SUPER_ADMIN && actor.role !== Role.SUPER_ADMIN) {
-        throw new ForbiddenException({
-          code: 'FORBIDDEN',
-          message: 'Only a super admin can assign this role',
-        });
-      }
-      data.role = dto.role;
-    }
-
-    const toUpdate = dto.userIds.filter((id) => {
-      const t = targets.find((x) => x.id === id);
-      if (!t) return false;
-      if (t.role === Role.SUPER_ADMIN && actor.role !== Role.SUPER_ADMIN) return false;
-      if (actor.userId === id && dto.action === 'changeRole' && dto.role !== actor.role) return false;
-      return true;
-    });
-
-    await this.prisma.user.updateMany({
-      where: { id: { in: toUpdate } },
-      data,
-    });
-
-    if (statusUpdate != null) {
-      for (const row of targets) {
-        if (!toUpdate.includes(row.id)) continue;
-        if (row.status === statusUpdate) continue;
-        await this.recordStatusAction({
-          userId: row.id,
-          actorId: actor.userId,
-          fromStatus: row.status,
-          toStatus: statusUpdate,
-          reasonCode: dto.reasonCode ?? 'bulk_admin_action',
-          note: dto.note ?? null,
-        });
-      }
-    }
-
-    if (dto.action === 'suspend') {
-      for (const userId of toUpdate) {
-        await this.sessionRevocation.revokeAllForUser(userId, 'status_changed');
-        this.authSnapshotCache.invalidate(userId);
-      }
-    } else {
-      for (const userId of toUpdate) {
-        this.authSnapshotCache.invalidate(userId);
-      }
-    }
-
-    await this.audit.log({
-      actorId: actor.userId,
-      action: 'USERS_BULK_UPDATED',
-      resourceType: 'User',
-      metadata: {
-        userIds: toUpdate,
-        action: dto.action,
-        role: dto.role,
-        skippedCount: dto.userIds.length - toUpdate.length,
-      } as Prisma.InputJsonValue,
-    });
-
-    for (const userId of toUpdate) {
-      this.userEventsService.emitUserUpdated(userId);
-    }
-    return { updatedCount: toUpdate.length, skippedCount: dto.userIds.length - toUpdate.length };
-  }
-
-  async revokeSession(
-    userId: string,
-    sessionId: string,
-    actor: AuthenticatedUser,
-  ): Promise<{ ok: true }> {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-      select: { id: true, role: true },
-    });
-    if (!user) {
-      throw new NotFoundException({
-        code: 'USER_NOT_FOUND',
-        message: 'User not found',
-      });
-    }
-    if (user.role === Role.SUPER_ADMIN && actor.role !== Role.SUPER_ADMIN) {
-      throw new ForbiddenException({
-        code: 'FORBIDDEN',
-        message: 'Only a super admin can revoke sessions for this account',
-      });
-    }
-    return this.sessionRevocation.revokeSessionForUser(userId, sessionId, actor.userId);
-  }
-
-  async revokeAllSessions(userId: string, actor: AuthenticatedUser): Promise<{ ok: true }> {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-      select: { id: true, role: true },
-    });
-    if (!user) {
-      throw new NotFoundException({
-        code: 'USER_NOT_FOUND',
-        message: 'User not found',
-      });
-    }
-    if (user.role === Role.SUPER_ADMIN && actor.role !== Role.SUPER_ADMIN) {
-      throw new ForbiddenException({
-        code: 'FORBIDDEN',
-        message: 'Only a super admin can revoke sessions for this account',
-      });
-    }
-
-    await this.sessionRevocation.revokeAllForUser(userId, 'admin_action');
-
-    await this.audit.log({
-      actorId: actor.userId,
-      action: 'USER_SESSIONS_REVOKED_ALL',
-      resourceType: 'User',
-      resourceId: userId,
-      metadata: {} as Prisma.InputJsonValue,
-    });
-
-    this.authSnapshotCache.invalidate(userId);
-    this.userEventsService.emitUserUpdated(userId);
-    return { ok: true };
-  }
-
-  async createModerationNote(
-    userId: string,
-    body: string,
-    actor: AuthenticatedUser,
-  ): Promise<{ id: string; createdAt: string; body: string; authorEmail: string; authorName: string }> {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-      select: { id: true },
-    });
-    if (!user) {
-      throw new NotFoundException({
-        code: 'USER_NOT_FOUND',
-        message: 'User not found',
-      });
-    }
-
-    const note = await this.prisma.userModerationNote.create({
-      data: {
-        userId,
-        authorId: actor.userId,
-        body: body.trim(),
-      },
-      select: { id: true, createdAt: true },
-    });
-
-    return {
-      id: note.id,
-      createdAt: note.createdAt.toISOString(),
-      body: body.trim(),
-      authorEmail: actor.email,
-      authorName: actor.email,
-    };
-  }
-
-  private async recordStatusAction(input: {
-    userId: string;
-    actorId: string;
-    fromStatus: UserStatus;
-    toStatus: UserStatus;
-    reasonCode: string;
-    note: string | null;
-  }): Promise<void> {
-    await this.prisma.userStatusAction.create({
-      data: {
-        userId: input.userId,
-        actorId: input.actorId,
-        fromStatus: input.fromStatus,
-        toStatus: input.toStatus,
-        reasonCode: input.reasonCode,
-        note: input.note,
-      },
-    });
   }
 }

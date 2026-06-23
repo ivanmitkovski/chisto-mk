@@ -18,9 +18,13 @@ function actor(overrides: Partial<AuthenticatedUser> = {}): AuthenticatedUser {
 function makeSvc(prisma: never) {
   const audit = { log: jest.fn().mockResolvedValue(undefined) } as never;
   const userEvents = { emitUserUpdated: jest.fn() } as never;
-  const sessionRevocation = { revokeAllForUser: jest.fn().mockResolvedValue(undefined), revokeSessionForUser: jest.fn().mockResolvedValue({ ok: true }) };
+  const sessionRevocation = {
+    revokeAllForUser: jest.fn().mockResolvedValue(undefined),
+    revokeSessionForUser: jest.fn().mockResolvedValue({ ok: true }),
+  };
   const authSnapshotCache = { invalidate: jest.fn() };
   const accountErasure = { eraseUserAccount: jest.fn().mockResolvedValue(undefined) };
+  const statusHistory = { recordStatusAction: jest.fn().mockResolvedValue(undefined) };
   return {
     svc: new AdminUsersWriteService(
       prisma,
@@ -29,15 +33,16 @@ function makeSvc(prisma: never) {
       sessionRevocation as never,
       authSnapshotCache as never,
       accountErasure as never,
+      statusHistory as never,
     ),
     sessionRevocation,
     accountErasure,
     authSnapshotCache,
+    statusHistory,
   };
 }
 
 describe('AdminUsersWriteService', () => {
-
   it('patchRole forbids changing own role', async () => {
     const prisma = {} as never;
     const { svc } = makeSvc(prisma);
@@ -77,25 +82,6 @@ describe('AdminUsersWriteService', () => {
     await expect(
       svc.patchRole('sa-1', { role: Role.ADMIN } as never, actor({ role: Role.ADMIN })),
     ).rejects.toBeInstanceOf(ForbiddenException);
-  });
-
-  it('bulk changeRole requires super admin', async () => {
-    const prisma = {} as never;
-    const { svc } = makeSvc(prisma);
-    await expect(
-      svc.bulk(
-        { action: 'changeRole', userIds: ['u1'], role: Role.SUPPORT } as never,
-        actor({ role: Role.ADMIN }),
-      ),
-    ).rejects.toBeInstanceOf(ForbiddenException);
-  });
-
-  it('bulk changeRole requires role when action is changeRole', async () => {
-    const prisma = {} as never;
-    const { svc } = makeSvc(prisma);
-    await expect(
-      svc.bulk({ action: 'changeRole', userIds: ['u1'] } as never, actor({ role: Role.SUPER_ADMIN })),
-    ).rejects.toBeInstanceOf(ConflictException);
   });
 
   it('patch rejects duplicate phone', async () => {
@@ -169,39 +155,13 @@ describe('AdminUsersWriteService', () => {
         update: jest.fn().mockResolvedValue(updatedUser),
         findUniqueOrThrow: jest.fn().mockResolvedValue(updatedUser),
       },
-      userStatusAction: {
-        create: jest.fn().mockResolvedValue({ id: 'action-1' }),
-      },
     } as never;
-    const { svc, sessionRevocation } = makeSvc(prisma);
+    const { svc, sessionRevocation, statusHistory } = makeSvc(prisma);
 
     await svc.patch('u1', { status: UserStatus.SUSPENDED } as never, actor());
 
     expect(sessionRevocation.revokeAllForUser).toHaveBeenCalledWith('u1', 'status_changed');
-  });
-
-  it('bulk suspend revokes sessions for each updated user', async () => {
-    const prisma = {
-      user: {
-        findMany: jest.fn().mockResolvedValue([
-          { id: 'u1', role: Role.USER, status: UserStatus.ACTIVE },
-          { id: 'u2', role: Role.USER, status: UserStatus.ACTIVE },
-        ]),
-        updateMany: jest.fn().mockResolvedValue({ count: 2 }),
-      },
-      userStatusAction: {
-        create: jest.fn().mockResolvedValue({ id: 'action-1' }),
-      },
-    } as never;
-    const { svc, sessionRevocation, authSnapshotCache } = makeSvc(prisma);
-
-    await svc.bulk({ action: 'suspend', userIds: ['u1', 'u2'] } as never, actor());
-
-    expect(sessionRevocation.revokeAllForUser).toHaveBeenCalledTimes(2);
-    expect(sessionRevocation.revokeAllForUser).toHaveBeenCalledWith('u1', 'status_changed');
-    expect(sessionRevocation.revokeAllForUser).toHaveBeenCalledWith('u2', 'status_changed');
-    expect(authSnapshotCache.invalidate).toHaveBeenCalledWith('u1');
-    expect(authSnapshotCache.invalidate).toHaveBeenCalledWith('u2');
+    expect(statusHistory.recordStatusAction).toHaveBeenCalled();
   });
 
   it('patch routes status DELETED through account erasure', async () => {
@@ -234,17 +194,5 @@ describe('AdminUsersWriteService', () => {
 
     expect(accountErasure.eraseUserAccount).toHaveBeenCalledWith('u1');
     expect(sessionRevocation.revokeAllForUser).not.toHaveBeenCalled();
-  });
-
-  it('revokeSession delegates to session revocation service', async () => {
-    const prisma = {
-      user: {
-        findUnique: jest.fn().mockResolvedValue({ id: 'u1', role: Role.USER }),
-      },
-    } as never;
-    const { svc, sessionRevocation } = makeSvc(prisma);
-
-    await expect(svc.revokeSession('u1', 'session-1', actor())).resolves.toEqual({ ok: true });
-    expect(sessionRevocation.revokeSessionForUser).toHaveBeenCalledWith('u1', 'session-1', 'actor-1');
   });
 });

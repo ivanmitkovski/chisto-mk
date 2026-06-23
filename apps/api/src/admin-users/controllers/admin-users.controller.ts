@@ -13,6 +13,7 @@ import { CurrentUser } from '../../auth/decorators/current-user.decorator';
 import type { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { ADMIN_PANEL_ROLES, ADMIN_WRITE_ROLES, SUPER_ADMIN_ROLES } from '../../auth/constants/admin-roles';
 import { AdminUsersService } from '../services/admin-users.service';
+import { AdminUsersModerationService } from '../services/admin-users-moderation.service';
 import { BulkAdminUsersDto } from '../dto/bulk-admin-users.dto';
 import { CreateUserModerationNoteDto } from '../dto/create-user-moderation-note.dto';
 import { ListAdminUsersQueryDto } from '../dto/list-admin-users-query.dto';
@@ -28,7 +29,10 @@ import { ApiStandardHttpErrorResponses } from '../../common/openapi/standard-htt
 @ApiStandardHttpErrorResponses()
 @Controller('admin/users')
 export class AdminUsersController {
-  constructor(private readonly adminUsersService: AdminUsersService) {}
+  constructor(
+    private readonly adminUsersService: AdminUsersService,
+    private readonly moderationService: AdminUsersModerationService,
+  ) {}
 
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -61,7 +65,7 @@ export class AdminUsersController {
     @Query('page') page?: number,
     @Query('limit') limit?: number,
   ) {
-    return this.adminUsersService.getModerationNotes(id, page ?? 1, limit ?? 20);
+    return this.moderationService.getModerationNotes(id, page ?? 1, limit ?? 20);
   }
 
   @Get(':id/status-history')
@@ -74,7 +78,7 @@ export class AdminUsersController {
     @Query('page') page?: number,
     @Query('limit') limit?: number,
   ) {
-    return this.adminUsersService.getStatusHistory(id, page ?? 1, limit ?? 20);
+    return this.moderationService.getStatusHistory(id, page ?? 1, limit ?? 20);
   }
 
   @Idempotent('admin-users_moderation_note_create')
@@ -88,7 +92,7 @@ export class AdminUsersController {
     @Body() dto: CreateUserModerationNoteDto,
     @CurrentUser() actor: AuthenticatedUser,
   ) {
-    return this.adminUsersService.createModerationNote(id, dto.body, actor);
+    return this.moderationService.createModerationNote(id, dto.body, actor);
   }
 
   @Get(':id/safety-summary')
@@ -98,7 +102,7 @@ export class AdminUsersController {
   @ApiOperation({ summary: 'Get user safety and trust summary' })
   @ApiOkResponse({ description: 'User safety summary' })
   getSafetySummary(@Param('id') id: string) {
-    return this.adminUsersService.getSafetySummary(id);
+    return this.moderationService.getSafetySummary(id);
   }
 
   @Get(':id/data-export')
@@ -143,7 +147,7 @@ export class AdminUsersController {
   @ApiOperation({ summary: 'Revoke all sessions for user' })
   @ApiOkResponse({ description: 'All sessions revoked' })
   revokeAllSessions(@Param('id') id: string, @CurrentUser() actor: AuthenticatedUser) {
-    return this.adminUsersService.revokeAllSessions(id, actor);
+    return this.moderationService.revokeAllSessions(id, actor);
   }
 
   // safe-to-retry: repeated Delete is acceptable
@@ -158,7 +162,7 @@ export class AdminUsersController {
     @Param('sessionId') sessionId: string,
     @CurrentUser() actor: AuthenticatedUser,
   ) {
-    return this.adminUsersService.revokeSession(id, sessionId, actor);
+    return this.moderationService.revokeSession(id, sessionId, actor);
   }
 
   @Idempotent('admin-users_email_change_request')

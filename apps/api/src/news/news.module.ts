@@ -7,6 +7,7 @@ import { NewsMediaSignedUrlService } from './services/news-media-signed-url.serv
 import { NewsMediaUploadService } from './services/news-media-upload.service';
 import { NewsPostsQueryService } from './services/news-posts-query.service';
 import { NewsPostsService } from './services/news-posts.service';
+import { NewsPostsDeleteService } from './services/news-posts-delete.service';
 import { NewsRevalidateService } from './services/news-revalidate.service';
 
 @Module({
@@ -14,6 +15,7 @@ import { NewsRevalidateService } from './services/news-revalidate.service';
   controllers: [PublicNewsController, AdminNewsController],
   providers: [
     NewsPostsService,
+    NewsPostsDeleteService,
     NewsPostsQueryService,
     NewsMediaUploadService,
     NewsMediaSignedUrlService,

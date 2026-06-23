@@ -11,6 +11,7 @@ import {
 } from '../dto/admin-email-change.dto';
 import { AdminUsersIdentifierService } from './admin-users-identifier.service';
 import { AdminUsersQueryService } from './admin-users-query.service';
+import { AdminUsersBulkWriteService } from './admin-users-bulk-write.service';
 import { AdminUsersWriteService } from './admin-users-write.service';
 
 @Injectable()
@@ -18,6 +19,7 @@ export class AdminUsersService {
   constructor(
     private readonly query: AdminUsersQueryService,
     private readonly write: AdminUsersWriteService,
+    private readonly bulkWrite: AdminUsersBulkWriteService,
     private readonly identifier: AdminUsersIdentifierService,
     private readonly dsarExport: UserDsarExportService,
   ) {}
@@ -46,32 +48,8 @@ export class AdminUsersService {
     return this.query.getSessions(userId);
   }
 
-  getSafetySummary(userId: string) {
-    return this.query.getSafetySummary(userId);
-  }
-
-  revokeSession(userId: string, sessionId: string, actor: AuthenticatedUser) {
-    return this.write.revokeSession(userId, sessionId, actor);
-  }
-
-  revokeAllSessions(userId: string, actor: AuthenticatedUser) {
-    return this.write.revokeAllSessions(userId, actor);
-  }
-
-  getModerationNotes(userId: string, page: number, limit: number) {
-    return this.query.getModerationNotes(userId, page, limit);
-  }
-
-  getStatusHistory(userId: string, page: number, limit: number) {
-    return this.query.getStatusHistory(userId, page, limit);
-  }
-
-  createModerationNote(userId: string, body: string, actor: AuthenticatedUser) {
-    return this.write.createModerationNote(userId, body, actor);
-  }
-
   bulk(dto: BulkAdminUsersDto, actor: AuthenticatedUser) {
-    return this.write.bulk(dto, actor);
+    return this.bulkWrite.bulk(dto, actor);
   }
 
   getDataExport(userId: string) {

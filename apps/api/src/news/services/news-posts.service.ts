@@ -7,11 +7,12 @@ import type { Prisma } from '../../prisma-client';
 import { AuditService } from '../../audit/services/audit.service';
 import type { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { PrismaService } from '../../prisma/prisma.service';
-import { S3StorageClient } from '../../storage/util/s3-storage.client';
 import type { NewsCategoryApi, NewsTranslations } from '../types/news.types';
 import { categoryFromApi, toAdminDto } from './news-posts.mapper';
+import { NEWS_POST_ADMIN_INCLUDE, signNewsPostMedia } from './news-posts-signing';
 import { NewsMediaSignedUrlService } from './news-media-signed-url.service';
 import { NewsRevalidateService } from './news-revalidate.service';
+import { NewsPostsDeleteService } from './news-posts-delete.service';
 import {
   assertValidCategory,
   assertValidSlug,
@@ -38,32 +39,18 @@ export class NewsPostsService {
     private readonly prisma: PrismaService,
     private readonly signedUrls: NewsMediaSignedUrlService,
     private readonly revalidate: NewsRevalidateService,
-    private readonly s3: S3StorageClient,
+    private readonly deleteService: NewsPostsDeleteService,
     private readonly audit?: AuditService,
   ) {}
-
-  private postInclude = {
-    media: { orderBy: { sortOrder: 'asc' as const } },
-    coverMedia: true,
-  };
-
-  private async signPostMedia(
-    post: Prisma.NewsPostGetPayload<{ include: { media: true; coverMedia: true } }>,
-  ) {
-    const keys: string[] = [];
-    for (const m of post.media) keys.push(m.objectKey);
-    if (post.coverMedia) keys.push(post.coverMedia.objectKey);
-    return this.signedUrls.signMany(keys);
-  }
 
   async list() {
     const rows = await this.prisma.newsPost.findMany({
       orderBy: [{ publishedAt: 'desc' }, { createdAt: 'desc' }],
-      include: this.postInclude,
+      include: NEWS_POST_ADMIN_INCLUDE,
     });
     const result = [];
     for (const row of rows) {
-      const signed = await this.signPostMedia(row);
+      const signed = await signNewsPostMedia(this.signedUrls, row);
       result.push(toAdminDto(row, signed));
     }
     return result;
@@ -72,7 +59,7 @@ export class NewsPostsService {
   async getById(id: string) {
     const row = await this.prisma.newsPost.findUnique({
       where: { id },
-      include: this.postInclude,
+      include: NEWS_POST_ADMIN_INCLUDE,
     });
     if (!row) {
       throw new NotFoundException({
@@ -80,7 +67,7 @@ export class NewsPostsService {
         message: 'News post not found',
       });
     }
-    const signed = await this.signPostMedia(row);
+    const signed = await signNewsPostMedia(this.signedUrls, row);
     return toAdminDto(row, signed);
   }
 
@@ -107,7 +94,7 @@ export class NewsPostsService {
         createdById: actor?.userId ?? null,
         updatedById: actor?.userId ?? null,
       },
-      include: this.postInclude,
+      include: NEWS_POST_ADMIN_INCLUDE,
     });
 
     await this.audit?.log({
@@ -118,7 +105,7 @@ export class NewsPostsService {
       metadata: { slug: row.slug },
     });
 
-    const signed = await this.signPostMedia(row);
+    const signed = await signNewsPostMedia(this.signedUrls, row);
     return toAdminDto(row, signed);
   }
 
@@ -172,7 +159,7 @@ export class NewsPostsService {
     const row = await this.prisma.newsPost.update({
       where: { id },
       data,
-      include: this.postInclude,
+      include: NEWS_POST_ADMIN_INCLUDE,
     });
 
     await this.audit?.log({
@@ -183,14 +170,14 @@ export class NewsPostsService {
       metadata: { slug: row.slug },
     });
 
-    const signed = await this.signPostMedia(row);
+    const signed = await signNewsPostMedia(this.signedUrls, row);
     return toAdminDto(row, signed);
   }
 
   async publish(id: string, actor?: AuthenticatedUser) {
     const existing = await this.prisma.newsPost.findUnique({
       where: { id },
-      include: this.postInclude,
+      include: NEWS_POST_ADMIN_INCLUDE,
     });
     if (!existing) {
       throw new NotFoundException({
@@ -214,7 +201,7 @@ export class NewsPostsService {
         publishedAt,
         updatedById: actor?.userId ?? null,
       },
-      include: this.postInclude,
+      include: NEWS_POST_ADMIN_INCLUDE,
     });
 
     await this.audit?.log({
@@ -227,7 +214,7 @@ export class NewsPostsService {
 
     void this.revalidate.triggerLandingRevalidate();
 
-    const signed = await this.signPostMedia(row);
+    const signed = await signNewsPostMedia(this.signedUrls, row);
     return toAdminDto(row, signed);
   }
 
@@ -248,7 +235,7 @@ export class NewsPostsService {
         scheduledAt: null,
         updatedById: actor?.userId ?? null,
       },
-      include: this.postInclude,
+      include: NEWS_POST_ADMIN_INCLUDE,
     });
 
     await this.audit?.log({
@@ -261,7 +248,7 @@ export class NewsPostsService {
 
     void this.revalidate.triggerLandingRevalidate();
 
-    const signed = await this.signPostMedia(row);
+    const signed = await signNewsPostMedia(this.signedUrls, row);
     return toAdminDto(row, signed);
   }
 
@@ -277,7 +264,7 @@ export class NewsPostsService {
     const row = await this.prisma.newsPost.update({
       where: { id },
       data: { status: 'ARCHIVED', updatedById: actor?.userId ?? null },
-      include: this.postInclude,
+      include: NEWS_POST_ADMIN_INCLUDE,
     });
 
     await this.audit?.log({
@@ -290,43 +277,11 @@ export class NewsPostsService {
 
     void this.revalidate.triggerLandingRevalidate();
 
-    const signed = await this.signPostMedia(row);
+    const signed = await signNewsPostMedia(this.signedUrls, row);
     return toAdminDto(row, signed);
   }
 
-  async delete(id: string, actor?: AuthenticatedUser) {
-    const existing = await this.prisma.newsPost.findUnique({
-      where: { id },
-      include: { media: true },
-    });
-    if (!existing) {
-      throw new NotFoundException({
-        code: 'NEWS_POST_NOT_FOUND',
-        message: 'News post not found',
-      });
-    }
-
-    for (const m of existing.media) {
-      this.signedUrls.invalidateKey(m.objectKey);
-      if (this.s3.enabled) {
-        try {
-        await this.s3.deleteObject(m.objectKey);
-        } catch {
-          // best effort
-        }
-      }
-    }
-
-    await this.prisma.newsPost.delete({ where: { id } });
-
-    await this.audit?.log({
-      actorId: actor?.userId ?? null,
-      action: 'news.post.delete',
-      resourceType: 'NewsPost',
-      resourceId: id,
-      metadata: { slug: existing.slug },
-    });
-
-    void this.revalidate.triggerLandingRevalidate();
+  delete(id: string, actor?: AuthenticatedUser) {
+    return this.deleteService.delete(id, actor);
   }
 }
