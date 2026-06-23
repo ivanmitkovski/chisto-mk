@@ -16,7 +16,8 @@ test.describe("home download scroll", () => {
       .poll(async () => page.evaluate(() => window.scrollY))
       .toBeLessThan(8);
 
-    const appStoreLink = page.getByRole("link", {
+    const downloadRegion = page.getByRole("region", { name: /Download the app/i });
+    const appStoreLink = downloadRegion.getByRole("link", {
       name: /download on the app store/i,
     });
     await expect(appStoreLink).toBeVisible();
@@ -37,7 +38,8 @@ test.describe("home download scroll", () => {
       .poll(async () => page.evaluate(() => window.scrollY))
       .toBeLessThan(8);
 
-    const appStoreLink = page.getByRole("link", {
+    const downloadRegion = page.getByRole("region", { name: /Download the app/i });
+    const appStoreLink = downloadRegion.getByRole("link", {
       name: /download on the app store/i,
     });
     await expect(appStoreLink).toBeVisible();

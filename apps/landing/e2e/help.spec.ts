@@ -87,7 +87,7 @@ test.describe("Help centre", () => {
     await context.grantPermissions(["clipboard-read", "clipboard-write"]);
     await page.goto("/en/help/report-a-site#before-you-start");
     const section = page.locator("#before-you-start");
-    const copyBtn = section.getByRole("button", { name: /copy link to section/i });
+    const copyBtn = section.getByRole("button", { name: /copy link to this section/i });
     await copyBtn.focus();
     await copyBtn.press("Enter");
     const text = await page.evaluate(() => navigator.clipboard.readText());

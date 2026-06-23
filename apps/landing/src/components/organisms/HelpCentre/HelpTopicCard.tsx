@@ -16,6 +16,7 @@ export function HelpTopicCard({
   index,
   selected = false,
   highlightQuery = "",
+  listboxOptionId,
 }: {
   slug: HelpArticleSlug;
   title: string;
@@ -24,6 +25,8 @@ export function HelpTopicCard({
   index: number;
   selected?: boolean;
   highlightQuery?: string;
+  /** When set, the card link participates in a listbox (id + role on the anchor). */
+  listboxOptionId?: string;
 }) {
   const reduceMotion = useReducedMotion();
 
@@ -51,9 +54,17 @@ export function HelpTopicCard({
     </div>
   );
 
+  const linkProps = listboxOptionId
+    ? { id: listboxOptionId, role: "option" as const, "aria-selected": selected }
+    : {};
+
   if (reduceMotion) {
     return (
-      <Link href={`/help/${slug}`} className="block h-full outline-none ring-offset-2 focus-visible:ring-2 focus-visible:ring-primary">
+      <Link
+        href={`/help/${slug}`}
+        className="block h-full outline-none ring-offset-2 focus-visible:ring-2 focus-visible:ring-primary"
+        {...linkProps}
+      >
         {inner}
       </Link>
     );
@@ -68,7 +79,11 @@ export function HelpTopicCard({
       viewport={{ once: true, amount: 0.2 }}
       transition={{ delay: Math.min(index, 8) * 0.04 }}
     >
-      <Link href={`/help/${slug}`} className="block h-full outline-none ring-offset-2 focus-visible:ring-2 focus-visible:ring-primary">
+      <Link
+        href={`/help/${slug}`}
+        className="block h-full outline-none ring-offset-2 focus-visible:ring-2 focus-visible:ring-primary"
+        {...linkProps}
+      >
         {inner}
       </Link>
     </motion.div>

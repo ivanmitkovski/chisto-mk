@@ -252,9 +252,7 @@ export function HelpSearch({
                       return (
                         <li
                           key={item.slug}
-                          id={`help-result-${item.slug}`}
-                          role="option"
-                          aria-selected={selected}
+                          role="presentation"
                           className="min-h-[8.5rem]"
                         >
                           <HelpTopicCard
@@ -265,6 +263,7 @@ export function HelpSearch({
                             index={i}
                             selected={selected}
                             highlightQuery={deferredQuery}
+                            listboxOptionId={`help-result-${item.slug}`}
                           />
                         </li>
                       );
