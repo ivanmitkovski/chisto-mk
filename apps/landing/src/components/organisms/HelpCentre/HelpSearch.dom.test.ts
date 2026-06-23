@@ -14,8 +14,15 @@ vi.mock("next/navigation", () => ({
 }));
 
 vi.mock("@/i18n/routing", () => ({
-  Link: ({ href, children }: { href: string; children: React.ReactNode }) =>
-    React.createElement("a", { href }, children),
+  Link: ({
+    href,
+    children,
+    ...rest
+  }: {
+    href: string;
+    children: React.ReactNode;
+    [key: string]: unknown;
+  }) => React.createElement("a", { href, ...rest }, children),
   useRouter: () => ({ replace: replace }),
   usePathname: () => "/en/help",
 }));
