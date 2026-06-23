@@ -15,7 +15,7 @@ export default defineConfig({
     trace: "on-first-retry",
   },
   webServer: {
-    command: `pnpm run build && pnpm exec next start -p ${port}`,
+    command: `LANDING_E2E_NEWS_FIXTURE=1 pnpm run build && LANDING_E2E_NEWS_FIXTURE=1 pnpm exec next start -p ${port}`,
     url: `${baseURL}/en/help`,
     reuseExistingServer: !process.env.CI,
     timeout: 240_000,

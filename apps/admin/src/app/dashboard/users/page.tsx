@@ -1,12 +1,17 @@
-import { cookies } from 'next/headers';
+import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { AdminShell } from '@/features/admin-shell';
-import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell';
+import { readDashboardShellState } from '@/features/admin-shell/server';
 import { SectionState } from '@/components/ui';
 import { getUsers, getUsersStats } from '@/features/users';
 import { UsersWorkspace } from '@/features/users';
 import { ADMIN_PERMISSIONS } from '@/lib/auth/rbac/permissions';
 import { requirePagePermission } from '@/lib/auth/rbac/server';
+import { handleServerLoadError } from '@/lib/server/handle-server-load-error';
+
+export const metadata: Metadata = {
+  title: 'Users',
+};
 
 type UsersPageProps = {
   searchParams: Promise<{
@@ -16,15 +21,16 @@ type UsersPageProps = {
     page?: string;
     sort?: string;
     dir?: string;
+    lastActiveBefore?: string;
+    lastActiveAfter?: string;
+    createdAfter?: string;
   }>;
 };
 
 export default async function UsersPage({ searchParams }: UsersPageProps) {
   await requirePagePermission(ADMIN_PERMISSIONS['users:read']);
   const tNav = await getTranslations('nav');
-  const tErrors = await getTranslations('errors');
-  const cookieStore = await cookies();
-  const initialSidebarCollapsed = cookieStore.get(DESKTOP_SIDEBAR_COOKIE_KEY)?.value === '1';
+  const { initialSidebarCollapsed } = await readDashboardShellState();
   const params = await searchParams;
 
   let result: Awaited<ReturnType<typeof getUsers>>;
@@ -36,6 +42,9 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
     const status = params.status;
     const sort = params.sort;
     const dir = params.dir;
+    const lastActiveBefore = params.lastActiveBefore;
+    const lastActiveAfter = params.lastActiveAfter;
+    const createdAfter = params.createdAfter;
     const page = params.page ? Math.max(1, parseInt(params.page, 10)) : 1;
 
     [result, stats] = await Promise.all([
@@ -47,13 +56,17 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
         ...(status ? { status } : {}),
         ...(sort ? { sort } : {}),
         ...(dir ? { dir } : {}),
+        ...(lastActiveBefore ? { lastActiveBefore } : {}),
+        ...(lastActiveAfter ? { lastActiveAfter } : {}),
+        ...(createdAfter ? { createdAfter } : {}),
       }),
       getUsersStats(),
     ]);
-  } catch {
+  } catch (error) {
+    const message = await handleServerLoadError(error, { fallbackMessageKey: 'unableToLoadUsers' });
     return (
       <AdminShell title={tNav('users')} activeItem="users" initialSidebarCollapsed={initialSidebarCollapsed}>
-        <SectionState variant="error" message={tErrors('unableToLoadUsers')} />
+        <SectionState variant="error" message={message} />
       </AdminShell>
     );
   }

@@ -121,6 +121,17 @@ export class AdminUsersWriteService {
       changes.status = { from: target.status, to: shouldErase ? UserStatus.DELETED : dto.status };
     }
 
+    if (dto.status != null && dto.status !== target.status && !shouldErase) {
+      await this.recordStatusAction({
+        userId: id,
+        actorId: actor.userId,
+        fromStatus: target.status,
+        toStatus: dto.status,
+        reasonCode: dto.reasonCode ?? 'admin_action',
+        note: dto.note ?? null,
+      });
+    }
+
     await this.audit.log({
       actorId: actor.userId,
       action: 'USER_UPDATED',
@@ -215,7 +226,7 @@ export class AdminUsersWriteService {
 
     const targets = await this.prisma.user.findMany({
       where: { id: { in: dto.userIds } },
-      select: { id: true, role: true },
+      select: { id: true, role: true, status: true },
     });
 
     for (const t of targets) {
@@ -249,6 +260,32 @@ export class AdminUsersWriteService {
       where: { id: { in: toUpdate } },
       data,
     });
+
+    if (statusUpdate != null) {
+      for (const row of targets) {
+        if (!toUpdate.includes(row.id)) continue;
+        if (row.status === statusUpdate) continue;
+        await this.recordStatusAction({
+          userId: row.id,
+          actorId: actor.userId,
+          fromStatus: row.status,
+          toStatus: statusUpdate,
+          reasonCode: dto.reasonCode ?? 'bulk_admin_action',
+          note: dto.note ?? null,
+        });
+      }
+    }
+
+    if (dto.action === 'suspend') {
+      for (const userId of toUpdate) {
+        await this.sessionRevocation.revokeAllForUser(userId, 'status_changed');
+        this.authSnapshotCache.invalidate(userId);
+      }
+    } else {
+      for (const userId of toUpdate) {
+        this.authSnapshotCache.invalidate(userId);
+      }
+    }
 
     await this.audit.log({
       actorId: actor.userId,
@@ -290,5 +327,92 @@ export class AdminUsersWriteService {
       });
     }
     return this.sessionRevocation.revokeSessionForUser(userId, sessionId, actor.userId);
+  }
+
+  async revokeAllSessions(userId: string, actor: AuthenticatedUser): Promise<{ ok: true }> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, role: true },
+    });
+    if (!user) {
+      throw new NotFoundException({
+        code: 'USER_NOT_FOUND',
+        message: 'User not found',
+      });
+    }
+    if (user.role === Role.SUPER_ADMIN && actor.role !== Role.SUPER_ADMIN) {
+      throw new ForbiddenException({
+        code: 'FORBIDDEN',
+        message: 'Only a super admin can revoke sessions for this account',
+      });
+    }
+
+    await this.sessionRevocation.revokeAllForUser(userId, 'admin_action');
+
+    await this.audit.log({
+      actorId: actor.userId,
+      action: 'USER_SESSIONS_REVOKED_ALL',
+      resourceType: 'User',
+      resourceId: userId,
+      metadata: {} as Prisma.InputJsonValue,
+    });
+
+    this.authSnapshotCache.invalidate(userId);
+    this.userEventsService.emitUserUpdated(userId);
+    return { ok: true };
+  }
+
+  async createModerationNote(
+    userId: string,
+    body: string,
+    actor: AuthenticatedUser,
+  ): Promise<{ id: string; createdAt: string; body: string; authorEmail: string; authorName: string }> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true },
+    });
+    if (!user) {
+      throw new NotFoundException({
+        code: 'USER_NOT_FOUND',
+        message: 'User not found',
+      });
+    }
+
+    const note = await this.prisma.userModerationNote.create({
+      data: {
+        userId,
+        authorId: actor.userId,
+        body: body.trim(),
+      },
+      select: { id: true, createdAt: true },
+    });
+
+    return {
+      id: note.id,
+      createdAt: note.createdAt.toISOString(),
+      body: body.trim(),
+      authorEmail: actor.email,
+      authorName: actor.email,
+    };
+  }
+
+  private async recordStatusAction(input: {
+    userId: string;
+    actorId: string;
+    fromStatus: UserStatus;
+    toStatus: UserStatus;
+    reasonCode: string;
+    note: string | null;
+  }): Promise<void> {
+    await this.prisma.userStatusAction.create({
+      data: {
+        userId: input.userId,
+        actorId: input.actorId,
+        fromStatus: input.fromStatus,
+        toStatus: input.toStatus,
+        reasonCode: input.reasonCode,
+        note: input.note,
+      },
+    });
   }
 }

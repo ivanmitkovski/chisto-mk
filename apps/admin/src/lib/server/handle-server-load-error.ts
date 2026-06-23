@@ -15,6 +15,7 @@ type ErrorsNamespaceKey =
   | 'unableToLoadEmailSuppressions'
   | 'unableToLoadSite'
   | 'unableToLoadBroadcasts'
+  | 'unableToLoadNews'
   | 'unableToLoadWebhookLogs'
   | 'unableToLoadAudit'
   | 'unableToLoadUser'
@@ -25,6 +26,10 @@ type ErrorsNamespaceKey =
   | 'unableToLoadDuplicates'
   | 'unableToLoadUgcReports'
   | 'unableToLoadNotifications'
+  | 'unableToLoadActiveUsers'
+  | 'unableToLoadResolutions'
+  | 'unableToLoadDeclineReason'
+  | 'unableToLoadModerationEmailPrefs'
   | 'apiConnectionFailed'
   | 'somethingWentWrongTryAgain';
 

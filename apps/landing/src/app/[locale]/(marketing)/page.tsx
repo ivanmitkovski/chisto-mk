@@ -3,49 +3,90 @@ import { getTranslations } from "next-intl/server";
 import { Hero } from "@/components/organisms/Hero";
 import { HowItWorks } from "@/components/organisms/HowItWorks";
 import { Features } from "@/components/organisms/Features";
-import { Stats } from "@/components/organisms/Stats";
 import { FAQ } from "@/components/organisms/FAQ";
 import { CTASection } from "@/components/organisms/CTASection";
-import { isLaunchHomeSectionVisible } from "@/config/launch";
-import { routing } from "@/i18n/routing";
+import { getAppStoreUrl } from "@/lib/store-links";
+import { buildMarketingMetadata } from "@/lib/seo/marketing-metadata";
+import { LEGAL_PUBLIC_DEFAULTS } from "@/lib/legal/legal-public-config";
 
 type Props = { params: Promise<{ locale: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "metadata" });
-  const title = t("home.title");
-  const description = t("home.description");
-  const languages = Object.fromEntries(
-    routing.locales.map((l) => [l, `/${l}`]),
-  ) as Record<string, string>;
-
-  return {
-    title,
-    description,
-    alternates: { languages },
-    openGraph: {
-      title,
-      description,
-      type: "website",
-      locale: locale === "mk" ? "mk_MK" : locale === "sq" ? "sq_AL" : "en_US",
-      siteName: t("siteName"),
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-    },
-  };
+  return buildMarketingMetadata({
+    locale,
+    path: "/",
+    title: t("home.title"),
+    description: t("home.description"),
+    siteName: t("siteName"),
+  });
 }
 
-export default function HomePage() {
+export default async function HomePage({ params }: Props) {
+  const { locale } = await params;
+  const tFaq = await getTranslations({ locale, namespace: "faq" });
+  const appStoreUrl = getAppStoreUrl();
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim() || LEGAL_PUBLIC_DEFAULTS.siteUrl;
+
+  const faqItems = tFaq.raw("items") as { title: string; content: string }[];
+
+  const jsonLdBlocks: Record<string, unknown>[] = [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: "Chisto.mk",
+      url: siteUrl,
+      inLanguage: ["mk", "en", "sq"],
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: LEGAL_PUBLIC_DEFAULTS.legalEntityName,
+      url: siteUrl,
+      logo: `${siteUrl}/brand/chisto-mark-green.svg`,
+      contactPoint: {
+        "@type": "ContactPoint",
+        email: LEGAL_PUBLIC_DEFAULTS.contactEmail,
+        contactType: "customer support",
+        availableLanguage: ["Macedonian", "English", "Albanian"],
+      },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: faqItems.map((item) => ({
+        "@type": "Question",
+        name: item.title,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: item.content,
+        },
+      })),
+    },
+  ];
+
+  if (appStoreUrl) {
+    jsonLdBlocks.push({
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      name: "Chisto.mk",
+      operatingSystem: "iOS",
+      applicationCategory: "LifestyleApplication",
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      downloadUrl: appStoreUrl,
+    });
+  }
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdBlocks) }}
+      />
       <Hero />
       <HowItWorks />
       <Features />
-      {isLaunchHomeSectionVisible("stats") ? <Stats /> : null}
       <FAQ />
       <CTASection />
     </>

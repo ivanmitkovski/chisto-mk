@@ -3,19 +3,19 @@
     "siteName": "Chisto.mk",
     "home": {
       "title": "Chisto.mk | Civic environmental platform",
-      "description": "Report litter, illegal dumping, or dirty air where you live. Chisto.mk is a Macedonian app for real places and real follow-up."
+      "description": "Report pollution sites across Macedonia. Map waste, illegal dumping, and air or water issues with photos, then join local cleanup events."
     },
     "about": {
       "title": "About us | Chisto.mk",
-      "description": "Civic app for litter and dirty air in Macedonia."
+      "description": "Civic platform for pollution reporting and cleanup events in Macedonia."
     },
     "contact": {
       "title": "Contact | Chisto.mk",
-      "description": "Questions, partnerships, or bug reports. Write to us; we read every message."
+      "description": "Questions, partnerships, or app issues. Send a message and we will reply."
     },
     "news": {
       "title": "News | Chisto.mk",
-      "description": "Product updates, field notes, and stories from the Chisto.mk team."
+      "description": "Official announcements and field coverage from the Chisto.mk civic environmental platform."
     },
     "press": {
       "title": "Press & media | Chisto.mk",
@@ -56,6 +56,7 @@
     "send": "Send",
     "subscribe": "Subscribe",
     "language": "Language",
+    "close": "Close",
     "scrollToTop": "Back to top",
     "skipToContent": "Skip to main content"
   },
@@ -74,46 +75,49 @@
     "cancel": "Cancel"
   },
   "hero": {
-    "title": "Live in a clean environment.",
-    "subtitle": "Environmental issues are easier to solve once they are on a map with a photo. Chisto.mk does that in public, across Macedonia.",
+    "title": "Snap it. Report it. Clean it.",
+    "subtitle": "Be part of the solution. Not the problem. For a cleaner Macedonia.",
+    "downloadRegionLabel": "Download the app",
     "phoneDeckRegionLabel": "App preview. Swipe horizontally or use the left and right arrow keys to change the screen.",
     "phoneDeckDotsLabel": "Choose app screen",
     "phoneDeckSlideLogin": "Login screen",
     "phoneDeckSlideWelcome": "Welcome screen",
     "phoneDeckSlideFeed": "Pollution feed",
     "phoneDeckSlideMap": "Map screen",
-    "phoneDeckSlideSiteDetail": "Pollution site detail"
+    "phoneDeckSlideSiteDetail": "Pollution site detail",
+    "phoneDeckSlideEvents": "Cleanup events"
   },
   "screenshots": {
-    "welcomeAlt": "Chisto.mk onboarding screen welcoming users with the tagline See it. Report it. Clean it.",
+    "welcomeAlt": "Chisto.mk onboarding screen welcoming users with the tagline Snap it. Report it. Clean it.",
     "signInAlt": "Chisto.mk sign-in screen with phone number and password fields.",
     "mapAlt": "Chisto.mk map screen showing verified pollution reports as photo pins across a city map.",
     "feedAlt": "Chisto.mk home feed listing nearby verified pollution sites with photos and a Take action button.",
-    "siteDetailAlt": "Chisto.mk pollution site detail screen with photos, description, and community action options."
+    "siteDetailAlt": "Chisto.mk pollution site detail screen with photos, description, and community action options.",
+    "eventsAlt": "Chisto.mk cleanup event listing with RSVP and Take action options linked to a pollution site."
   },
   "howItWorks": {
     "title": "How it works",
-    "subtitle": "No workshop jargon. Install, report, show up.",
+    "subtitle": "Download, report a site, join a cleanup event.",
     "steps": [
       {
         "title": "Get the app",
-        "description": "iOS or Android. Sign up with an email you actually check."
+        "description": "Download from the App Store. Create an account with your phone number and verify it by SMS."
       },
       {
-        "title": "Drop a pin",
-        "description": "Waste by the path? Smoky chimney? Put it on the map with a short note and a picture if you can."
+        "title": "Report a pollution site",
+        "description": "Add a photo, category, and location. Waste, illegal dumping, and air or water pollution all belong on the map."
       },
       {
-        "title": "Join a cleanup",
-        "description": "When someone organises a pick-up or planting day nearby, you will see it in the app."
+        "title": "Join cleanup events",
+        "description": "Browse events near you, RSVP when registration is open, and follow organiser updates in the app."
       }
     ]
   },
   "features": {
     "badge": "Features",
-    "block1Title": "What you see is where it happened",
-    "block2Title": "When posting is not enough",
-    "block2Body": "Open reports stay visible so neighbours, journalists, and officials cannot pretend the mess was never there. When a group schedules work, you can join instead of only liking a post.",
+    "block1Title": "Every pin is a real place",
+    "block2Title": "Reports that lead to action",
+    "block2Body": "Approved reports become public pollution sites on the map. When organisers schedule cleanup events, you can RSVP from the same place you found the issue.",
     "mock": {
       "urgent": "Urgent",
       "pollutionSites": "Pollution sites",
@@ -122,38 +126,27 @@
     },
     "items": [
       {
-        "title": "Pins, not walls of text",
-        "description": "A map beats a comment thread when you need to find the same ditch or playground again."
+        "title": "Map-first reporting",
+        "description": "Find the same riverbank, playground, or roadside again without scrolling through posts."
       },
       {
-        "title": "Photos and dates",
-        "description": "Rough category, timestamp, optional before/after. Enough for a volunteer group or a municipal desk to start from."
+        "title": "Photos with context",
+        "description": "Category, timestamp, and optional before-and-after images give volunteers and partners something concrete to work from."
       },
       {
-        "title": "From report to broom",
-        "description": "If there is a scheduled action, it lives next to the reports so people can show up with gloves, not just opinions."
+        "title": "From report to cleanup event",
+        "description": "Scheduled cleanups sit next to the sites they target so you can join with a tap on Take action."
       }
     ]
   },
   "stats": {
-    "items": [
-      {
-        "number": "10000+",
-        "label": "Active users"
-      },
-      {
-        "number": "800kg",
-        "label": "Trash collected"
-      },
-      {
-        "number": "1750",
-        "label": "Reports"
-      },
-      {
-        "number": "120",
-        "label": "Eco actions"
-      }
-    ]
+    "asOf": "Community figures as of {date}",
+    "labels": {
+      "reports": "Reports submitted",
+      "sites": "Public pollution sites",
+      "events": "Cleanup events hosted",
+      "appStore": "On the App Store"
+    }
   },
   "faq": {
     "badge": "FAQ",
@@ -161,7 +154,7 @@
     "items": [
       {
         "title": "What is Chisto.mk?",
-        "content": "A mobile app and website from people in the region. You report environmental damage or mess, it stays public on a map, and you can hook into volunteer actions when they exist.",
+        "content": "Chisto.mk is a civic environmental platform for Macedonia. You report pollution sites with photos and locations, follow them on a public map, and join cleanup events when organisers publish them.",
         "variant": "green"
       },
       {
@@ -171,17 +164,17 @@
       },
       {
         "title": "Who sees my reports?",
-        "content": "Reports are designed to be visible to the community and relevant actors so issues can be verified and addressed. You can read more in our privacy policy.",
+        "content": "Reports are tied to your account and shown on the public map after review. Communities, journalists, and partners use the map to verify and follow up. See our privacy policy for how we handle personal data.",
         "variant": "white"
       },
       {
         "title": "Can I report anonymously?",
-        "content": "Account options and privacy settings depend on the version of the app you use. Check in-app settings or contact us for the latest options.",
+        "content": "You need an account to submit reports. Your name is not shown on every screen, but reports are linked to your account and visible on the public map. See the privacy policy for details.",
         "variant": "green"
       },
       {
         "title": "How do cleanup events work?",
-        "content": "Organisers can publish actions in the app. You can browse nearby events, sign up where available, and see outcomes after the activity.",
+        "content": "Organisers publish cleanup events in the app, often linked to a pollution site. Browse nearby events, RSVP when registration is open, and check outcomes after the activity.",
         "variant": "green"
       },
       {
@@ -192,8 +185,8 @@
     ]
   },
   "cta": {
-    "title": "Try the app",
-    "subtitle": "If you walk past the same rubbish every week, it costs nothing to document it once. Someone else might already be organising a pick-up."
+    "title": "Download Chisto.mk",
+    "subtitle": "Document a pollution site once from your phone. Neighbours and organisers may already be tracking the same place."
   },
   "footer": {
     "links": "Links",
@@ -217,7 +210,8 @@
     "privacy": "Privacy policy",
     "cookies": "Cookie policy",
     "cookieSettings": "Cookie settings",
-    "linkData": "Your data & account"
+    "linkData": "Your data and account",
+    "downloadApp": "Get the app"
   },
   "contact": {
     "kicker": "Contact",
@@ -252,7 +246,7 @@
     "loginSubtitle": "Sign in to continue",
     "loginButton": "Sign in",
     "welcomeTitle": "Nearby reports",
-    "welcomeSubtitle": "Pins from people in your area. Tap one to see the photo.",
+    "welcomeSubtitle": "Pollution sites near you. Tap one to open the photo and details.",
     "welcomeButton": "Continue"
   },
   "errors": {
@@ -265,50 +259,26 @@
   },
   "aboutPage": {
     "badge": "About us",
-    "title": "Chisto.mk is a civic app for litter and dirty air in Macedonia.",
-    "subtitle": "You report waste, illegal dumping, or dirty air with a photo and a pin on the map. The same place stays visible for everyone.",
+    "title": "A civic platform for pollution reporting in Macedonia.",
+    "subtitle": "We build tools so anyone can report a pollution site with a photo and location, keep it visible on a public map, and connect with cleanup events.",
     "creatorsPhotoPlaceholder": "Photo coming soon",
     "creatorsSectionTitle": "Team",
     "teamCarouselPrev": "Previous team member",
     "teamCarouselNext": "Next team member",
     "creators": [
       {
-        "name": "TBC",
-        "role": "Bio later",
-        "imageAlt": "Team placeholder, Chisto.mk",
-        "imageSrc": ""
-      },
-      {
-        "name": "TBC",
-        "role": "Bio later",
-        "imageAlt": "Team placeholder, Chisto.mk",
-        "imageSrc": ""
-      },
-      {
-        "name": "TBC",
-        "role": "Bio later",
-        "imageAlt": "Team placeholder, Chisto.mk",
-        "imageSrc": ""
-      },
-      {
-        "name": "TBC",
-        "role": "Bio later",
-        "imageAlt": "Team placeholder, Chisto.mk",
-        "imageSrc": ""
-      },
-      {
-        "name": "TBC",
-        "role": "Bio later",
-        "imageAlt": "Team placeholder, Chisto.mk",
+        "name": "Chisto.mk team",
+        "role": "Building civic environmental tools in Macedonia.",
+        "imageAlt": "Chisto.mk team",
         "imageSrc": ""
       }
     ]
   },
   "newsPage": {
     "badge": "News",
-    "title": "Updates from the team",
-    "lead": "Release notes, partnerships, and occasional write-ups when something worth sharing happens.",
-    "demoNotice": "These articles are sample content for the site. A managed news feed will replace them when our publishing tools go live.",
+    "title": "News from Chisto.mk",
+    "lead": "Official announcements, product releases, and field coverage from the civic environmental platform.",
+    "demoNotice": "",
     "featuredLabel": "Featured",
     "latestHeading": "More stories",
     "readMore": "Read more",
@@ -320,13 +290,13 @@
       "product": "Product"
     },
     "emptyTitle": "Fresh posts soon",
-    "emptyBody": "We are still wiring a simple feed here. Until then, follow our social channels or drop us a line if you have a story tip.",
+    "emptyBody": "We are preparing this section. Follow our social channels or contact us if you have a story to share.",
     "contactCta": "Suggest a story or ask a question"
   },
   "pressPage": {
     "badge": "Press",
     "title": "Media resources",
-    "lead": "Journalists and partners can use the materials below. For anything else, send us an email. We answer serious inquiries.",
+    "lead": "Journalists and partners can use the materials below. Contact us for interviews and partnership questions.",
     "assetsTitle": "Brand",
     "logoTitle": "Mark",
     "logoBody": "SVG suitable for light backgrounds. Use clear space around the symbol; do not stretch or change colours.",
@@ -334,7 +304,7 @@
     "inquiriesTitle": "Contact",
     "inquiriesLead": "Press and partnership questions:",
     "boilerplateTitle": "Short description",
-    "boilerplate": "Chisto.mk is a civic environmental platform in Macedonia. People report litter, illegal dumping, and dirty air on a public map with photos and locations, and can join local cleanup actions when organisers post them in the app."
+    "boilerplate": "Chisto.mk is a civic environmental platform in Macedonia. Residents report pollution sites on a public map with photos and locations, join cleanup events, and follow site updates in the iOS app."
   },
   "legalNav": {
     "ariaLabel": "Legal documents",
@@ -353,7 +323,7 @@
     "sections": [
       {
         "title": "Introduction",
-        "body": "These Terms of Use (\"Terms\") constitute a legally binding agreement between you (\"User,\" \"you,\" or \"your\") and [LEGAL_ENTITY_NAME], a [ENTITY_TYPE] registered in the Republic of North Macedonia with registration number [REGISTRATION_NUMBER], registered office at [REGISTERED_ADDRESS] (\"Chisto.mk,\" \"we,\" \"us,\" or \"our\").\n\nBy accessing or using the Chisto.mk mobile application and web platform (collectively, the \"Platform\"), you agree to be bound by these Terms. If you do not agree, you must immediately discontinue use of the Platform.\n\nEffective date: [EFFECTIVE_DATE]."
+        "body": "These Terms of Use (\"Terms\") constitute a legally binding agreement between you (\"User,\" \"you,\" or \"your\") and [LEGAL_ENTITY_NAME], a [ENTITY_TYPE] registered in the Republic of Macedonia with registration number [REGISTRATION_NUMBER], registered office at [REGISTERED_ADDRESS] (\"Chisto.mk,\" \"we,\" \"us,\" or \"our\").\n\nBy accessing or using the Chisto.mk mobile application and web platform (collectively, the \"Platform\"), you agree to be bound by these Terms. If you do not agree, you must immediately discontinue use of the Platform.\n\nEffective date: [EFFECTIVE_DATE]."
       },
       {
         "title": "1. Definitions",
@@ -361,7 +331,7 @@
       },
       {
         "title": "2. Legal framework and applicability",
-        "body": "2.1 These Terms are governed by:\n\nLaw on Obligations of the Republic of North Macedonia (Official Gazette No. 18/2001)\nLaw on Consumer Protection (Official Gazette No. 26/2023)\nLaw on Electronic Commerce (Official Gazette No. 39/2014)\nLaw on Personal Data Protection (Official Gazette No. 42/2020)\nRegulation (EU) 2016/679 (General Data Protection Regulation)\nConsumer Rights Directive 2011/83/EU\n\n2.2 These Terms apply to all users accessing the Platform from any jurisdiction, with specific consumer protections applicable to users within the Republic of North Macedonia and the European Union."
+        "body": "2.1 These Terms are governed by:\n\nLaw on Obligations of the Republic of Macedonia (Official Gazette No. 18/2001)\nLaw on Consumer Protection (Official Gazette No. 26/2023)\nLaw on Electronic Commerce (Official Gazette No. 39/2014)\nLaw on Personal Data Protection (Official Gazette No. 42/2020)\nRegulation (EU) 2016/679 (General Data Protection Regulation)\nConsumer Rights Directive 2011/83/EU\n\n2.2 These Terms apply to all users accessing the Platform from any jurisdiction, with specific consumer protections applicable to users within the Republic of Macedonia and the European Union."
       },
       {
         "title": "3. Platform description and scope",
@@ -405,11 +375,11 @@
       },
       {
         "title": "13. Dispute resolution and complaints",
-        "body": "13.1 Complaint procedure\n\nBefore initiating formal proceedings, we encourage users to contact us at:\n\nEmail: [CONTACT_EMAIL]\nAddress: [CONTACT_ADDRESS]\nPhone: [CONTACT_PHONE]\n\nWe will attempt to resolve complaints within 30 days of receipt.\n\n13.2 Amicable settlement\n\nWe are committed to resolving disputes amicably and in good faith.\n\n13.3 Mediation\n\nIf direct resolution fails, parties may pursue mediation through recognized mediation services in the Republic of North Macedonia.\n\n13.4 Consumer ADR\n\nEU consumers may use the EU Online Dispute Resolution platform: https://ec.europa.eu/consumers/odr"
+        "body": "13.1 Complaint procedure\n\nBefore initiating formal proceedings, we encourage users to contact us at:\n\nEmail: [CONTACT_EMAIL]\nAddress: [CONTACT_ADDRESS]\nPhone: [CONTACT_PHONE]\n\nWe will attempt to resolve complaints within 30 days of receipt.\n\n13.2 Amicable settlement\n\nWe are committed to resolving disputes amicably and in good faith.\n\n13.3 Mediation\n\nIf direct resolution fails, parties may pursue mediation through recognized mediation services in the Republic of Macedonia.\n\n13.4 Consumer ADR\n\nEU consumers may use the EU Online Dispute Resolution platform: https://ec.europa.eu/consumers/odr"
       },
       {
         "title": "14. Governing law and jurisdiction",
-        "body": "14.1 Governing law\n\nThese Terms are governed by and construed in accordance with the laws of the Republic of North Macedonia, without regard to conflict of law principles.\n\n14.2 Jurisdiction\n\n14.2.1 For disputes with consumers: competent courts in the Republic of North Macedonia as determined by mandatory consumer protection laws (generally, the consumer's place of residence).\n\n14.2.2 For disputes with users who are not consumers (for example organisations using the Platform in a professional capacity): courts of [COURT_LOCATION], Republic of North Macedonia, have exclusive jurisdiction.\n\n14.3 Mandatory consumer rights\n\nNothing in this Section limits mandatory consumer rights under EU or Macedonian law, including the right to bring proceedings in the consumer's country of residence."
+        "body": "14.1 Governing law\n\nThese Terms are governed by and construed in accordance with the laws of the Republic of Macedonia, without regard to conflict of law principles.\n\n14.2 Jurisdiction\n\n14.2.1 For disputes with consumers: competent courts in the Republic of Macedonia as determined by mandatory consumer protection laws (generally, the consumer's place of residence).\n\n14.2.2 For disputes with users who are not consumers (for example organisations using the Platform in a professional capacity): courts of [COURT_LOCATION], Republic of Macedonia, have exclusive jurisdiction.\n\n14.3 Mandatory consumer rights\n\nNothing in this Section limits mandatory consumer rights under EU or Macedonian law, including the right to bring proceedings in the consumer's country of residence."
       },
       {
         "title": "15. Force majeure",
@@ -421,7 +391,7 @@
       },
       {
         "title": "17. Contact information",
-        "body": "Service provider:\n\n[LEGAL_ENTITY_NAME]\n[ENTITY_TYPE]\nRegistration number: [REGISTRATION_NUMBER]\nTax ID: [TAX_ID]\nRegistered address: [REGISTERED_ADDRESS]\n\nContact:\n\nEmail: [CONTACT_EMAIL]\nPhone: [CONTACT_PHONE]\nWebsite: [WEBSITE_URL]\n\nData protection officer (if applicable):\n\nEmail: [DPO_EMAIL]\n\nRegulatory authority:\n\nAgency for Personal Data Protection\nRepublic of North Macedonia\nWebsite: https://www.dzlp.mk\n\nBY USING THE PLATFORM, YOU ACKNOWLEDGE THAT YOU HAVE READ, UNDERSTOOD, AND AGREE TO BE BOUND BY THESE TERMS OF USE."
+        "body": "Service provider:\n\n[LEGAL_ENTITY_NAME]\n[ENTITY_TYPE]\nRegistration number: [REGISTRATION_NUMBER]\nTax ID: [TAX_ID]\nRegistered address: [REGISTERED_ADDRESS]\n\nContact:\n\nEmail: [CONTACT_EMAIL]\nPhone: [CONTACT_PHONE]\nWebsite: [WEBSITE_URL]\n\nData protection officer (if applicable):\n\nEmail: [DPO_EMAIL]\n\nRegulatory authority:\n\nAgency for Personal Data Protection\nRepublic of Macedonia\nWebsite: https://www.dzlp.mk\n\nBY USING THE PLATFORM, YOU ACKNOWLEDGE THAT YOU HAVE READ, UNDERSTOOD, AND AGREE TO BE BOUND BY THESE TERMS OF USE."
       }
     ]
   },
@@ -435,7 +405,7 @@
     "sections": [
       {
         "title": "1. Introduction",
-        "body": "1.1 Who we are\n\nThis Privacy Policy describes how [LEGAL_ENTITY_NAME], a [ENTITY_TYPE] registered in the Republic of North Macedonia with registration number [REGISTRATION_NUMBER] and registered office at [REGISTERED_ADDRESS] (\"Chisto.mk,\" \"we,\" \"us,\" or \"our\"), collects, uses, stores, and protects your personal data when you use our mobile applications (iOS and Android) and our public website (collectively, the \"Platform\").\n\nWe operate Chisto.mk as a civic environmental initiative focused on transparency and community reporting about local environmental conditions.\n\nMost account, reporting, and map interaction features run in the apps. The website is mainly marketing, legal information, and contact; it may use a small number of cookies or local storage as described in our Cookie Policy.\n\nEffective date: [EFFECTIVE_DATE].\n\n1.2 Our commitment\n\nWe are committed to protecting your privacy and complying with applicable data protection laws, including:\n\nLaw on Personal Data Protection of the Republic of North Macedonia (Official Gazette No. 42/2020)\nRegulation (EU) 2016/679 - General Data Protection Regulation (\"GDPR\")\nLaw on Electronic Communications (Official Gazette No. 39/2014)\n\n1.3 Contact information\n\nData controller:\n[LEGAL_ENTITY_NAME]\n[REGISTERED_ADDRESS]\nEmail: [PRIVACY_EMAIL]\nPhone: [CONTACT_PHONE]\nData protection officer (if applicable):\nEmail: [DPO_EMAIL]\nSupervisory authority:\nAgency for Personal Data Protection\nRepublic of North Macedonia\nWebsite: https://www.dzlp.mk\nEmail: info@dzlp.mk"
+        "body": "1.1 Who we are\n\nThis Privacy Policy describes how [LEGAL_ENTITY_NAME], a [ENTITY_TYPE] registered in the Republic of Macedonia with registration number [REGISTRATION_NUMBER] and registered office at [REGISTERED_ADDRESS] (\"Chisto.mk,\" \"we,\" \"us,\" or \"our\"), collects, uses, stores, and protects your personal data when you use our mobile applications (iOS and Android) and our public website (collectively, the \"Platform\").\n\nWe operate Chisto.mk as a civic environmental initiative focused on transparency and community reporting about local environmental conditions.\n\nMost account, reporting, and map interaction features run in the apps. The website is mainly marketing, legal information, and contact; it may use a small number of cookies or local storage as described in our Cookie Policy.\n\nEffective date: [EFFECTIVE_DATE].\n\n1.2 Our commitment\n\nWe are committed to protecting your privacy and complying with applicable data protection laws, including:\n\nLaw on Personal Data Protection of the Republic of Macedonia (Official Gazette No. 42/2020)\nRegulation (EU) 2016/679 - General Data Protection Regulation (\"GDPR\")\nLaw on Electronic Communications (Official Gazette No. 39/2014)\n\n1.3 Contact information\n\nData controller:\n[LEGAL_ENTITY_NAME]\n[REGISTERED_ADDRESS]\nEmail: [PRIVACY_EMAIL]\nPhone: [CONTACT_PHONE]\nData protection officer (if applicable):\nEmail: [DPO_EMAIL]\nSupervisory authority:\nAgency for Personal Data Protection\nRepublic of Macedonia\nWebsite: https://www.dzlp.mk\nEmail: info@dzlp.mk"
       },
       {
         "title": "2. Scope and application",
@@ -459,7 +429,7 @@
       },
       {
         "title": "7. International data transfers",
-        "body": "7.1 Data storage locations\n\nYour personal data is primarily stored on servers located in [SERVER_COUNTRY/REGION].\n\n7.2 Transfers outside EU/EEA\n\nIf we transfer data to countries outside the European Economic Area that do not have an adequacy decision from the European Commission, we ensure appropriate safeguards:\n\nEU Standard Contractual Clauses (SCCs)\nBinding Corporate Rules (where applicable)\nRecipient's certification under approved frameworks\nYour explicit consent for specific transfers\n\n7.3 Macedonian context\n\nAs a candidate country for EU membership, the Republic of North Macedonia aligns its data protection framework with EU standards. We treat data protection with the same rigor as EU member states."
+        "body": "7.1 Data storage locations\n\nYour personal data is primarily stored on servers located in [SERVER_COUNTRY/REGION].\n\n7.2 Transfers outside EU/EEA\n\nIf we transfer data to countries outside the European Economic Area that do not have an adequacy decision from the European Commission, we ensure appropriate safeguards:\n\nEU Standard Contractual Clauses (SCCs)\nBinding Corporate Rules (where applicable)\nRecipient's certification under approved frameworks\nYour explicit consent for specific transfers\n\n7.3 Macedonian context\n\nAs a candidate country for EU membership, the Republic of Macedonia aligns its data protection framework with EU standards. We treat data protection with the same rigor as EU member states."
       },
       {
         "title": "8. Data retention",
@@ -467,7 +437,7 @@
       },
       {
         "title": "9. Your rights under GDPR",
-        "body": "Under GDPR and Macedonian data protection law, you have the following rights:\n\n9.1 Right of access (Article 15)\n\nYou have the right to obtain:\n\nConfirmation whether we process your personal data\nA copy of your personal data\nInformation about processing purposes, categories, recipients, and retention periods\n\nHow to exercise: Email [PRIVACY_EMAIL] with subject \"Data Access Request\"\nResponse time: Within 30 days (may extend to 60 days for complex requests)\nCost: Free for the first request; reasonable fee for excessive requests\n\n9.2 Right to rectification (Article 16)\n\nYou have the right to correct inaccurate or incomplete personal data.\n\nHow to exercise:\n\nUpdate directly through account settings in the apps where available\nEmail [PRIVACY_EMAIL] with correct information\nResponse time: Without undue delay, maximum 30 days\n\n9.3 Right to erasure / \"Right to be forgotten\" (Article 17)\n\nYou have the right to request deletion of your personal data when:\n\nData is no longer necessary for original purposes\nYou withdraw consent (where consent was the legal basis)\nYou object to processing and there are no overriding legitimate grounds\nData was unlawfully processed\nLegal obligation requires deletion\n\nExceptions: We may refuse deletion when required for:\n\nLegal compliance (e.g., tax records)\nLegal claims defense\nPublic interest or scientific research\n\nHow to exercise: Account settings > Delete Account in the apps where available, or email [PRIVACY_EMAIL]\nResponse time: 30 days; data purged within 90 days including backups\n\n9.4 Right to restriction of processing (Article 18)\n\nYou have the right to limit processing when:\n\nYou contest data accuracy (during verification)\nProcessing is unlawful but you oppose deletion\nWe no longer need data, but you need it for legal claims\nYou objected to processing (pending verification of legitimate grounds)\n\nHow to exercise: Email [PRIVACY_EMAIL] with specific restriction request\nEffect: Data marked and stored, but not actively processed\n\n9.5 Right to data portability (Article 20)\n\nYou have the right to receive your personal data in a structured, commonly used, machine-readable format and transmit it to another controller.\n\nApplies to:\n\nData provided by you\nProcessing based on consent or contract\nProcessing carried out by automated means\n\nHow to exercise: Account settings > Export Data in the apps where available, or email [PRIVACY_EMAIL]\nFormat: JSON, CSV, or PDF\nResponse time: 30 days\n\n9.6 Right to object (Article 21)\n\n9.6.1 Marketing\n\nYou have the absolute right to object to direct marketing.\n\nHow to exercise: Click \"Unsubscribe\" in emails, or update preferences in account settings in the apps where available\n\n9.6.2 Legitimate interest processing\n\nYou have the right to object to processing based on legitimate interests.\n\nHow to exercise: Email [PRIVACY_EMAIL] with specific objection\nEffect: We will cease processing unless we demonstrate compelling legitimate grounds\n\n9.6.3 Profiling and automated decision-making (Article 22)\n\nWe do not currently engage in automated decision-making with legal or significant effects. If this changes, you will have the right to:\n\nObtain human intervention\nExpress your point of view\nContest the decision\n\n9.7 Right to withdraw consent\n\nWhere processing is based on consent, you can withdraw at any time without affecting prior lawful processing.\n\nHow to exercise: Account settings > Privacy Preferences in the apps where available, or email [PRIVACY_EMAIL]\n\n9.8 Right to lodge a complaint\n\nYou have the right to file a complaint with the supervisory authority:\n\nAgency for Personal Data Protection\nRepublic of North Macedonia\nAddress: [SUPERVISORY_AUTHORITY_ADDRESS]\nWebsite: https://www.dzlp.mk\nEmail: info@dzlp.mk\nPhone: [SUPERVISORY_AUTHORITY_PHONE]\n\nFor EU residents: You may also lodge a complaint with the supervisory authority in your EU member state of residence."
+        "body": "Under GDPR and Macedonian data protection law, you have the following rights:\n\n9.1 Right of access (Article 15)\n\nYou have the right to obtain:\n\nConfirmation whether we process your personal data\nA copy of your personal data\nInformation about processing purposes, categories, recipients, and retention periods\n\nHow to exercise: Email [PRIVACY_EMAIL] with subject \"Data Access Request\"\nResponse time: Within 30 days (may extend to 60 days for complex requests)\nCost: Free for the first request; reasonable fee for excessive requests\n\n9.2 Right to rectification (Article 16)\n\nYou have the right to correct inaccurate or incomplete personal data.\n\nHow to exercise:\n\nUpdate directly through account settings in the apps where available\nEmail [PRIVACY_EMAIL] with correct information\nResponse time: Without undue delay, maximum 30 days\n\n9.3 Right to erasure / \"Right to be forgotten\" (Article 17)\n\nYou have the right to request deletion of your personal data when:\n\nData is no longer necessary for original purposes\nYou withdraw consent (where consent was the legal basis)\nYou object to processing and there are no overriding legitimate grounds\nData was unlawfully processed\nLegal obligation requires deletion\n\nExceptions: We may refuse deletion when required for:\n\nLegal compliance (e.g., tax records)\nLegal claims defense\nPublic interest or scientific research\n\nHow to exercise: Account settings > Delete Account in the apps where available, or email [PRIVACY_EMAIL]\nResponse time: 30 days; data purged within 90 days including backups\n\n9.4 Right to restriction of processing (Article 18)\n\nYou have the right to limit processing when:\n\nYou contest data accuracy (during verification)\nProcessing is unlawful but you oppose deletion\nWe no longer need data, but you need it for legal claims\nYou objected to processing (pending verification of legitimate grounds)\n\nHow to exercise: Email [PRIVACY_EMAIL] with specific restriction request\nEffect: Data marked and stored, but not actively processed\n\n9.5 Right to data portability (Article 20)\n\nYou have the right to receive your personal data in a structured, commonly used, machine-readable format and transmit it to another controller.\n\nApplies to:\n\nData provided by you\nProcessing based on consent or contract\nProcessing carried out by automated means\n\nHow to exercise: Account settings > Export Data in the apps where available, or email [PRIVACY_EMAIL]\nFormat: JSON, CSV, or PDF\nResponse time: 30 days\n\n9.6 Right to object (Article 21)\n\n9.6.1 Marketing\n\nYou have the absolute right to object to direct marketing.\n\nHow to exercise: Click \"Unsubscribe\" in emails, or update preferences in account settings in the apps where available\n\n9.6.2 Legitimate interest processing\n\nYou have the right to object to processing based on legitimate interests.\n\nHow to exercise: Email [PRIVACY_EMAIL] with specific objection\nEffect: We will cease processing unless we demonstrate compelling legitimate grounds\n\n9.6.3 Profiling and automated decision-making (Article 22)\n\nWe do not currently engage in automated decision-making with legal or significant effects. If this changes, you will have the right to:\n\nObtain human intervention\nExpress your point of view\nContest the decision\n\n9.7 Right to withdraw consent\n\nWhere processing is based on consent, you can withdraw at any time without affecting prior lawful processing.\n\nHow to exercise: Account settings > Privacy Preferences in the apps where available, or email [PRIVACY_EMAIL]\n\n9.8 Right to lodge a complaint\n\nYou have the right to file a complaint with the supervisory authority:\n\nAgency for Personal Data Protection\nRepublic of Macedonia\nAddress: [SUPERVISORY_AUTHORITY_ADDRESS]\nWebsite: https://www.dzlp.mk\nEmail: info@dzlp.mk\nPhone: [SUPERVISORY_AUTHORITY_PHONE]\n\nFor EU residents: You may also lodge a complaint with the supervisory authority in your EU member state of residence."
       },
       {
         "title": "10. Data security",
@@ -491,7 +461,7 @@
       },
       {
         "title": "15. Specific provisions for Macedonian users",
-        "body": "15.1 Language\n\nThis Privacy Policy is provided in Macedonian, English, and Albanian. In case of conflict, the Macedonian version prevails for users in the Republic of North Macedonia.\n\n15.2 Supervisory authority\n\nThe competent supervisory authority for data protection matters in Macedonia is:\nАгенција за заштита на личните податоци\n(Agency for Personal Data Protection)\nAddress: [AUTHORITY_ADDRESS]\nWebsite: https://www.dzlp.mk\nEmail: info@dzlp.mk\n\n15.3 Legal basis\n\nProcessing of personal data is conducted in accordance with:\n\nЗакон за заштита на личните податоци (Official Gazette No. 42/2020)\nEU GDPR principles as adopted in Macedonian legislation"
+        "body": "15.1 Language\n\nThis Privacy Policy is provided in Macedonian, English, and Albanian. In case of conflict, the Macedonian version prevails for users in the Republic of Macedonia.\n\n15.2 Supervisory authority\n\nThe competent supervisory authority for data protection matters in Macedonia is:\nАгенција за заштита на личните податоци\n(Agency for Personal Data Protection)\nAddress: [AUTHORITY_ADDRESS]\nWebsite: https://www.dzlp.mk\nEmail: info@dzlp.mk\n\n15.3 Legal basis\n\nProcessing of personal data is conducted in accordance with:\n\nЗакон за заштита на личните податоци (Official Gazette No. 42/2020)\nEU GDPR principles as adopted in Macedonian legislation"
       },
       {
         "title": "16. Contact us",
@@ -675,7 +645,7 @@
     },
     "hub": {
       "title": "Help centre",
-      "subtitle": "Practical guides for using Chisto.mk on the web and in the app: map and sites, reporting, cleanups, safety, offline use, your account, and fixes when something breaks.",
+      "subtitle": "Practical guides for Chisto.mk on the web and in the app: pollution sites, reporting, cleanup events, safety, offline use, your account, and troubleshooting.",
       "searchPlaceholder": "Search guides",
       "searchLabel": "Search help",
       "clearSearch": "Clear",
@@ -683,7 +653,7 @@
       "empty": "No guides match that search. Try shorter words, or jump to a category below.",
       "searchTipsTitle": "Search tips",
       "searchTips": [
-        "Try everyday words: report, site, map, cleanup, account, password, notification.",
+        "Try everyday words: report, pollution site, map, cleanup event, account, password, notification.",
         "If nothing matches, browse the topic cards by category.",
         "Long guides have a table of contents at the top of the article."
       ],
@@ -720,8 +690,8 @@
         "cardTitle": "Set up Chisto.mk",
         "cardSummary": "Install the app, create your account, pick a language, and learn where notifications and privacy settings live.",
         "title": "Set up Chisto.mk",
-        "lastUpdated": "15 April 2026",
-        "lastReviewed": "16 April 2026",
+        "lastUpdated": "22 June 2026",
+        "lastReviewed": "22 June 2026",
         "datePublished": "2024-01-01T00:00:00.000Z",
         "dateModified": "2026-04-16T00:00:00.000Z",
         "sections": [
@@ -731,7 +701,7 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Chisto.mk runs on iOS and Android. Install from the App Store or Google Play, or tap the download buttons on the chisto.mk home page."
+                "text": "Download Chisto.mk from the App Store, or use the download buttons on the chisto.mk home page."
               },
               {
                 "type": "bullets",
@@ -750,7 +720,7 @@
               {
                 "type": "callout",
                 "variant": "note",
-                "text": "In these guides, words like report, site, and cleanup follow the same meanings as in the app so you always know which screen we mean."
+                "text": "In these guides, words like report, pollution site, and cleanup event match the app so you always know which screen we mean."
               }
             ]
           },
@@ -827,8 +797,8 @@
         "cardTitle": "File a pollution report",
         "cardSummary": "Capture useful photos, place the pin accurately, and follow the review journey after you send it.",
         "title": "File a pollution report",
-        "lastUpdated": "15 April 2026",
-        "lastReviewed": "16 April 2026",
+        "lastUpdated": "22 June 2026",
+        "lastReviewed": "22 June 2026",
         "sections": [
           {
             "id": "before-you-start",
@@ -879,7 +849,7 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Move the pin to the exact polluted spot inside Macedonia. Zoom until the building, shoreline, or roadside matches what you see on the ground."
+                "text": "Move the pin to the exact pollution site inside Macedonia. Zoom until the building, shoreline, or roadside matches what you see on the ground."
               },
               {
                 "type": "bullets",
@@ -917,8 +887,8 @@
         "cardTitle": "Join a cleanup event",
         "cardSummary": "Browse cleanups near you, RSVP, and follow organiser guidance before, during, and after the shift.",
         "title": "Join a cleanup event",
-        "lastUpdated": "15 April 2026",
-        "lastReviewed": "16 April 2026",
+        "lastUpdated": "22 June 2026",
+        "lastReviewed": "22 June 2026",
         "sections": [
           {
             "id": "find-an-event",
@@ -926,7 +896,7 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Open the Events area in the app to browse cleanups in Macedonia, read organiser notes, and join when registration is open."
+                "text": "Open the Events area in the app to browse cleanup events in Macedonia, read organiser notes, and join when registration is open."
               },
               {
                 "type": "bullets",
@@ -1002,8 +972,8 @@
         "cardTitle": "Your account and data",
         "cardSummary": "Protect your login, understand what we store, and use the right pages for privacy and data requests.",
         "title": "Your account, privacy, and data requests",
-        "lastUpdated": "16 April 2026",
-        "lastReviewed": "16 April 2026",
+        "lastUpdated": "22 June 2026",
+        "lastReviewed": "22 June 2026",
         "sections": [
           {
             "id": "what-the-app-stores",
@@ -1011,13 +981,13 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Your Chisto.mk account connects the reports you file, events you join, and notification preferences so civic work in Macedonia stays coherent."
+                "text": "Your Chisto.mk account connects the reports you file, cleanup events you join, and notification preferences across Macedonia."
               },
               {
                 "type": "bullets",
                 "title": "What may be linked to you",
                 "items": [
-                  "Sign in identifiers such as email or phone number.",
+                  "Sign-in identifiers such as your phone number and email.",
                   "Approximate map pins and descriptions from reports you submit.",
                   "RSVP status, attendance notes, and organiser messages for events you join."
                 ]
@@ -1107,8 +1077,8 @@
         "cardTitle": "Notifications",
         "cardSummary": "Choose which updates you get for reports, cleanup events, and account activity.",
         "title": "Notifications in the app",
-        "lastUpdated": "16 April 2026",
-        "lastReviewed": "16 April 2026",
+        "lastUpdated": "22 June 2026",
+        "lastReviewed": "22 June 2026",
         "sections": [
           {
             "id": "types-of-alerts",
@@ -1154,7 +1124,7 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Batching alerts keeps organisers from waking volunteers and keeps residents from feeling watched. Turn off what you do not need, especially overnight."
+                "text": "Batching alerts limits noise for volunteers and neighbours. Turn off categories you do not need, especially overnight."
               },
               {
                 "type": "bullets",
@@ -1197,8 +1167,8 @@
         "cardTitle": "Troubleshooting",
         "cardSummary": "Fix sign-in, map location, camera uploads, and know when to update or contact support.",
         "title": "Troubleshooting common issues",
-        "lastUpdated": "16 April 2026",
-        "lastReviewed": "16 April 2026",
+        "lastUpdated": "22 June 2026",
+        "lastReviewed": "22 June 2026",
         "sections": [
           {
             "id": "cannot-sign-in",
@@ -1305,8 +1275,8 @@
         "cardTitle": "Use the map and site pages",
         "cardSummary": "Understand pins, open a site page, and read public information before you report or join a cleanup.",
         "title": "Use the map and site pages",
-        "lastUpdated": "15 April 2026",
-        "lastReviewed": "15 April 2026",
+        "lastUpdated": "22 June 2026",
+        "lastReviewed": "22 June 2026",
         "sections": [
           {
             "id": "what-the-map-shows",
@@ -1314,7 +1284,7 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "The map is a shared civic view of reported places in Macedonia. Each pin is a site where someone documented an environmental concern."
+                "text": "The map is a shared civic view of pollution sites in Macedonia. Each pin is a place where someone documented an environmental concern."
               },
               {
                 "type": "bullets",
@@ -1400,8 +1370,8 @@
         "cardTitle": "Trust, safety, and moderation",
         "cardSummary": "Why moderation exists, how to contribute respectfully, and where the binding legal text lives.",
         "title": "Trust, safety, and moderation",
-        "lastUpdated": "15 April 2026",
-        "lastReviewed": "15 April 2026",
+        "lastUpdated": "22 June 2026",
+        "lastReviewed": "22 June 2026",
         "sections": [
           {
             "id": "why-moderation-exists",
@@ -1500,8 +1470,8 @@
         "cardTitle": "Host a cleanup event",
         "cardSummary": "Plan logistics, manage sign ups, keep people safe on the day, and close the loop afterwards.",
         "title": "Host a cleanup event",
-        "lastUpdated": "15 April 2026",
-        "lastReviewed": "15 April 2026",
+        "lastUpdated": "22 June 2026",
+        "lastReviewed": "22 June 2026",
         "sections": [
           {
             "id": "plan-before-you-publish",
@@ -1509,7 +1479,7 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Organisers set the tone. Clear logistics reduce no shows and keep volunteers safer around roads, water edges, and weather shifts in Macedonia."
+                "text": "Organisers set the tone. Clear logistics reduce no-shows and keep volunteers safer around roads, water edges, and weather shifts in Macedonia."
               },
               {
                 "type": "bullets",
@@ -1595,8 +1565,8 @@
         "cardTitle": "Offline and slow networks",
         "cardSummary": "Understand pending uploads, retries, and when to wait instead of duplicating a report.",
         "title": "Offline and slow networks",
-        "lastUpdated": "15 April 2026",
-        "lastReviewed": "15 April 2026",
+        "lastUpdated": "22 June 2026",
+        "lastReviewed": "22 June 2026",
         "sections": [
           {
             "id": "how-the-app-uses-network",
@@ -1685,8 +1655,8 @@
         "cardTitle": "Partnerships for organisations",
         "cardSummary": "How municipalities, NGOs, and journalists can collaborate with Chisto.mk without surprises.",
         "title": "Partnerships for municipalities, NGOs, and media",
-        "lastUpdated": "15 April 2026",
-        "lastReviewed": "15 April 2026",
+        "lastUpdated": "22 June 2026",
+        "lastReviewed": "22 June 2026",
         "sections": [
           {
             "id": "who-this-guide-is-for",
@@ -1766,8 +1736,8 @@
         "cardTitle": "Verify sites in the field",
         "cardSummary": "Plan a safe visit, compare the pin to what you see, and file a new report when the evidence clearly changed.",
         "title": "Verifying pollution sites on the ground",
-        "lastUpdated": "15 April 2026",
-        "lastReviewed": "15 April 2026",
+        "lastUpdated": "22 June 2026",
+        "lastReviewed": "22 June 2026",
         "sections": [
           {
             "id": "plan-the-visit",

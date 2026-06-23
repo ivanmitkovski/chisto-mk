@@ -5,24 +5,22 @@ interface PhoneMockupProps {
   className?: string;
 }
 
+/** iPhone-style device frame (see `.phone-mockup--iphone` in globals.css). */
 export function PhoneMockup({ children, className }: PhoneMockupProps) {
   return (
     <div
       className={cn(
-        "relative rounded-[3rem]", // matches bezel so shadows on this wrapper stay rounded
+        "phone-mockup phone-mockup--iphone shadow-[var(--shadow-phone)]",
         className,
       )}
+      aria-hidden
     >
-      <div
-        className={cn(
-          "relative rounded-[3rem] bg-black p-3",
-          "shadow-[0_16px_44px_rgba(0,0,0,0.09),0_6px_20px_rgba(0,0,0,0.05),0_4px_16px_rgba(0,217,142,0.04)]",
-          "ring-1 ring-white/10",
-        )}
-      >
-        <div className="relative overflow-hidden rounded-[2.5rem] bg-white ring-1 ring-black/5">
-          {children}
-        </div>
+      <div className="phone-mockup__frame">
+        <span className="phone-mockup__button phone-mockup__button--mute" />
+        <span className="phone-mockup__button phone-mockup__button--volume-up" />
+        <span className="phone-mockup__button phone-mockup__button--volume-down" />
+        <span className="phone-mockup__button phone-mockup__button--power" />
+        <div className="phone-mockup__screen">{children}</div>
       </div>
     </div>
   );

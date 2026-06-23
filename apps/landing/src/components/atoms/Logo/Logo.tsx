@@ -36,7 +36,7 @@ export function Logo({ className }: LogoProps) {
         />
         <span>
           <span className="font-bold text-black">Chisto</span>
-          <span className="font-medium text-[#25DB86]">.mk</span>
+          <span className="font-medium text-primary">.mk</span>
         </span>
       </span>
     </Link>

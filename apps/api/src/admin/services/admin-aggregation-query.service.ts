@@ -99,6 +99,7 @@ export class AdminAggregationQueryService {
       },
       usersCount: raw.usersCount,
       usersNewLast7d: raw.usersNewLast7d,
+      usersSuspendedCount: raw.usersSuspendedCount,
       sessionsActive: raw.sessionsActive,
       reportsTrend,
       recentActivity,

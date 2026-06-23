@@ -3,6 +3,7 @@
 import { validateContactForm, type ContactFormData, type FieldError } from "@/lib/utils/validators";
 import { escapeHtml } from "@/lib/email/escape-html";
 import { getResend, getResendMailConfig } from "@/lib/email/resend";
+import { checkRateLimit } from "@/lib/utils/rate-limit";
 
 interface ContactResult {
   ok: boolean;
@@ -11,7 +12,20 @@ interface ContactResult {
   serverError?: boolean;
 }
 
-export async function submitContactForm(data: ContactFormData): Promise<ContactResult> {
+export type ContactFormPayload = ContactFormData & {
+  /** Honeypot — must stay empty for legitimate submissions. */
+  companyWebsite?: string;
+};
+
+export async function submitContactForm(data: ContactFormPayload): Promise<ContactResult> {
+  if (data.companyWebsite?.trim()) {
+    return { ok: true };
+  }
+
+  if (!checkRateLimit(`contact:${data.email.trim().toLowerCase()}`)) {
+    return { ok: false, serverError: true };
+  }
+
   const errors = validateContactForm(data);
   if (errors.length > 0) return { ok: false, errors };
 
@@ -33,7 +47,7 @@ export async function submitContactForm(data: ContactFormData): Promise<ContactR
   const { error } = await resend.emails.send({
     from: mail.from,
     to: mail.to,
-    subject: `Chisto.mk contact — ${subjectName}`,
+    subject: `Chisto.mk contact: ${subjectName}`,
     replyTo: data.email.trim(),
     html: `
       <p><strong>Name:</strong> ${safe.fullName}</p>

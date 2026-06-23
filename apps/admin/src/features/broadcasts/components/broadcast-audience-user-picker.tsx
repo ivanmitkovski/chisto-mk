@@ -200,49 +200,57 @@ export function BroadcastAudienceUserPicker({
   };
 
   const activeOptionId = activeIndex >= 0 ? `${listId}-option-${activeIndex}` : undefined;
+  const showPanel = open && (loading || error || debouncedQuery.length > 0);
+  const helperId = `${inputId}-help`;
 
   return (
     <div className={styles.root} ref={rootRef}>
-      <Field label={t('form.searchUsers')} htmlFor={inputId} className={styles.searchField}>
-        <input
-          id={inputId}
-          className={styles.searchInput}
-          role="combobox"
-          aria-expanded={open}
-          aria-controls={listId}
-          aria-activedescendant={open ? activeOptionId : undefined}
-          aria-autocomplete="list"
-          aria-haspopup="listbox"
-          disabled={disabled || atCap}
-          value={query}
-          placeholder={t('form.searchUsersPlaceholder')}
-          onChange={(event) => {
-            setQuery(event.target.value);
-            setOpen(true);
-          }}
-          onFocus={() => setOpen(true)}
-          onKeyDown={onKeyDown}
-        />
-        {open ? (
-          <div id={listId} className={styles.options} role="listbox" aria-labelledby={inputId}>
-            {loading ? (
-              <div className={styles.statusMessage} role="presentation">
-                {t('form.searchingUsers')}
-              </div>
-            ) : error ? (
-              <div className={styles.statusMessage} role="presentation">
-                {t('form.userSearchFailed')}
-              </div>
-            ) : !debouncedQuery ? (
-              <div className={styles.statusMessage} role="presentation">
-                {t('form.searchUsersHint')}
-              </div>
-            ) : availableResults.length === 0 ? (
-              <div className={styles.emptyOption} role="presentation">
-                {t('form.noUsersFound')}
-              </div>
-            ) : (
-              availableResults.map((user, index) => {
+      <Field
+        label={t('form.searchUsers')}
+        htmlFor={inputId}
+        helperText={t('form.searchUsersHint')}
+        className={styles.searchField}
+      >
+        <div className={styles.combobox}>
+          <input
+            id={inputId}
+            className={styles.searchInput}
+            type="search"
+            role="combobox"
+            aria-expanded={showPanel}
+            aria-controls={showPanel ? listId : undefined}
+            aria-activedescendant={showPanel ? activeOptionId : undefined}
+            aria-autocomplete="list"
+            aria-haspopup="listbox"
+            aria-describedby={helperId}
+            disabled={disabled || atCap}
+            value={query}
+            placeholder={t('form.searchUsersPlaceholder')}
+            onChange={(event) => {
+              setQuery(event.target.value);
+              setOpen(true);
+            }}
+            onFocus={() => {
+              if (query.trim()) setOpen(true);
+            }}
+            onKeyDown={onKeyDown}
+          />
+          {showPanel ? (
+            <div id={listId} className={styles.options} role="listbox" aria-labelledby={inputId}>
+              {loading ? (
+                <div className={styles.statusMessage} role="presentation">
+                  {t('form.searchingUsers')}
+                </div>
+              ) : error ? (
+                <div className={styles.statusMessage} role="presentation">
+                  {t('form.userSearchFailed')}
+                </div>
+              ) : availableResults.length === 0 ? (
+                <div className={styles.emptyOption} role="presentation">
+                  {t('form.noUsersFound')}
+                </div>
+              ) : (
+                availableResults.map((user, index) => {
                 const { primary, secondary } = getBroadcastUserDisplayParts(user);
                 const isActive = index === activeIndex;
                 return (
@@ -272,6 +280,7 @@ export function BroadcastAudienceUserPicker({
             )}
           </div>
         ) : null}
+        </div>
       </Field>
 
       <div className={styles.selectedSection}>
@@ -296,7 +305,7 @@ export function BroadcastAudienceUserPicker({
             ))}
           </div>
         ) : (
-          <p className={styles.statusMessage}>{t('form.noUsersSelected')}</p>
+          <p className={styles.emptySelected}>{t('form.noUsersSelected')}</p>
         )}
       </div>
 

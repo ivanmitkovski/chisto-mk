@@ -19,14 +19,6 @@ export { ReportsPageClient } from './components/reports-page-client';
 export { ReportDetailPage } from './components/report-detail-page';
 export { ReportsListSkeleton } from './components/reports-list/reports-list-skeleton';
 export { DuplicateReportsWorkspace } from './components/duplicate-reports-workspace';
-export {
-  getDuplicateReportGroup,
-  getDuplicateReportGroups,
-  getReportDetail,
-  getReports,
-  getReportsPage,
-  getReportsQueueSummary,
-} from './data/reports-adapter';
 export type { ReportsQueueSummary } from './data/reports-adapter';
 export type {
   DuplicateReportGroup,

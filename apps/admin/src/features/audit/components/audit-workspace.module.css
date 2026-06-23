@@ -43,7 +43,7 @@
 
 .statIconPage {
   background: rgba(139, 92, 246, 0.12);
-  color: #5b21b6;
+  color: var(--color-stat-participants-fg);
 }
 
 .statValue {
@@ -83,6 +83,10 @@
   grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
   gap: var(--space-4);
   margin-bottom: var(--space-4);
+}
+
+.datePicker {
+  min-width: 0;
 }
 
 .field label {
@@ -195,7 +199,7 @@
 
 .pillAuth {
   background: rgba(36, 172, 249, 0.16);
-  color: #1a6e98;
+  color: var(--color-status-info-fg);
 }
 
 .pillCreate {
@@ -205,7 +209,7 @@
 
 .pillUpdate {
   background: rgba(139, 92, 246, 0.14);
-  color: #5b21b6;
+  color: var(--color-stat-participants-fg);
 }
 
 .pillDelete {
@@ -215,12 +219,12 @@
 
 .pillMerge {
   background: rgba(139, 92, 246, 0.18);
-  color: #5b21b6;
+  color: var(--color-stat-participants-fg);
 }
 
 .pillWarning {
   background: rgba(248, 187, 0, 0.2);
-  color: #8b6914;
+  color: var(--color-status-warning-fg);
 }
 
 .pillDefault {

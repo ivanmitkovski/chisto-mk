@@ -10,6 +10,18 @@
   margin-bottom: var(--space-3);
 }
 
+@media (max-width: 48rem) {
+  .bulkActionBar {
+    position: sticky;
+    bottom: 0;
+    z-index: var(--z-sticky);
+    margin-bottom: 0;
+    padding-bottom: max(var(--space-3), env(safe-area-inset-bottom));
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    box-shadow: var(--elevation-sticky);
+  }
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;

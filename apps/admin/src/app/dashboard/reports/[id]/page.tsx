@@ -1,17 +1,18 @@
-import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 import { AdminShell } from '@/features/admin-shell';
-import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell';
+import { readDashboardShellState } from '@/features/admin-shell/server';
 import { SectionState } from '@/components/ui';
 import { ApiError } from '@/lib/api';
 import { ADMIN_PERMISSIONS } from '@/lib/auth/rbac/permissions';
 import { requirePagePermission } from '@/lib/auth/rbac/server';
-import { getMeProfile } from '@/features/auth';
-import { getReportDetail } from '@/features/reports';
+import { getMeProfile } from '@/features/auth/data/me-adapter';
+import { getReportDetail } from '@/features/reports/data/reports-adapter';
 import { ReportDetailPage } from '@/features/reports';
 import { canAssignToOthers } from '@/features/reports/utils/can-assign-to-others';
 import { listEligibleModerators } from '@/features/reports/data/eligible-moderators';
 import type { EligibleModerator } from '@/features/reports/data/eligible-moderators';
+import { handleServerLoadError } from '@/lib/server/handle-server-load-error';
 import styles from './report-detail-page.module.css';
 
 
@@ -19,10 +20,14 @@ type ReportDetailPageProps = {
   params: Promise<{ id: string }>;
 };
 
-function reportErrorShell(message: string, initialSidebarCollapsed: boolean) {
+function reportErrorShell(
+  message: string,
+  title: string,
+  initialSidebarCollapsed: boolean,
+) {
   return (
     <AdminShell
-      title="Report"
+      title={title}
       activeItem="reports"
       initialSidebarCollapsed={initialSidebarCollapsed}
     >
@@ -35,8 +40,8 @@ function reportErrorShell(message: string, initialSidebarCollapsed: boolean) {
 
 export default async function ReportDetailRoute({ params }: ReportDetailPageProps) {
   await requirePagePermission(ADMIN_PERMISSIONS['reports:read']);
-  const cookieStore = await cookies();
-  const initialSidebarCollapsed = cookieStore.get(DESKTOP_SIDEBAR_COOKIE_KEY)?.value === '1';
+  const tReports = await getTranslations('reports');
+  const { initialSidebarCollapsed } = await readDashboardShellState();
   const { id } = await params;
 
   let report;
@@ -51,10 +56,8 @@ export default async function ReportDetailRoute({ params }: ReportDetailPageProp
     if (error instanceof ApiError && (error.code === 'REPORT_NOT_FOUND' || error.status === 404)) {
       notFound();
     }
-    return reportErrorShell(
-      'Unable to load this report. Please try again or sign in again.',
-      initialSidebarCollapsed,
-    );
+    const message = await handleServerLoadError(error, { fallbackMessageKey: 'unableToLoadReport' });
+    return reportErrorShell(message, tReports('detailTitle'), initialSidebarCollapsed);
   }
 
   return (

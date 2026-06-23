@@ -45,14 +45,14 @@ export async function middleware(request: NextRequest) {
     ? buildAdminReportOnlyContentSecurityPolicy(nonce, isDev)
     : null;
 
+  const { pathname } = request.nextUrl;
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set('x-nonce', nonce);
+  requestHeaders.set('x-pathname', pathname);
   requestHeaders.set('Content-Security-Policy', csp);
   if (reportOnlyCsp) {
     requestHeaders.set('Content-Security-Policy-Report-Only', reportOnlyCsp);
   }
-
-  const { pathname } = request.nextUrl;
   const token = getAdminAccessToken(request);
   const refreshToken = getAdminRefreshToken(request);
   const deviceId = getOrCreateAdminDeviceId(request);

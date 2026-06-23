@@ -7,7 +7,7 @@ import { useTranslations } from 'next-intl';
 import { MapContainer, TileLayer, useMap, useMapEvents } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import '@/features/map/leaflet-setup';
 import 'react-leaflet-cluster/dist/assets/MarkerCluster.css';
 import 'react-leaflet-cluster/dist/assets/MarkerCluster.Default.css';
 import { Spinner } from '@/components/ui';

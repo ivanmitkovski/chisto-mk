@@ -53,7 +53,7 @@ export class AdminGamificationService {
   }
 
   async listUserPoints(userId: string, page = 1, limit = 50) {
-    const user = await this.prisma.user.findUnique({ where: { id: userId }, select: { id: true, pointsBalance: true } });
+    const user = await this.prisma.user.findUnique({ where: { id: userId }, select: { id: true, pointsBalance: true, reportCreditsAvailable: true, reportCreditsSpentTotal: true } });
     if (!user) {
       throw new NotFoundException({ code: 'USER_NOT_FOUND', message: 'User not found' });
     }
@@ -67,7 +67,14 @@ export class AdminGamificationService {
       }),
       this.prisma.pointTransaction.count({ where: { userId } }),
     ]);
-    return { userId, balance: user.pointsBalance, data, meta: { page, limit, total } };
+    return {
+      userId,
+      balance: user.pointsBalance,
+      reportCreditsAvailable: user.reportCreditsAvailable,
+      reportCreditsSpentTotal: user.reportCreditsSpentTotal,
+      data,
+      meta: { page, limit, total },
+    };
   }
 
   async adjustPoints(
@@ -77,7 +84,7 @@ export class AdminGamificationService {
     actor: AuthenticatedUser,
     note?: string,
   ) {
-    const user = await this.prisma.user.findUnique({ where: { id: userId }, select: { id: true, pointsBalance: true } });
+    const user = await this.prisma.user.findUnique({ where: { id: userId }, select: { id: true, pointsBalance: true, reportCreditsAvailable: true, reportCreditsSpentTotal: true } });
     if (!user) {
       throw new NotFoundException({ code: 'USER_NOT_FOUND', message: 'User not found' });
     }
@@ -104,5 +111,48 @@ export class AdminGamificationService {
       metadata: { delta, balanceAfter, reasonCode, note: note ?? null },
     });
     return tx;
+  }
+
+  async adjustReportCredits(
+    userId: string,
+    delta: number,
+    reasonCode: string,
+    actor: AuthenticatedUser,
+    note?: string,
+  ) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, reportCreditsAvailable: true },
+    });
+    if (!user) {
+      throw new NotFoundException({ code: 'USER_NOT_FOUND', message: 'User not found' });
+    }
+    const availableAfter = Math.max(0, user.reportCreditsAvailable + delta);
+    const spentDelta = delta < 0 ? -delta : 0;
+    const updated = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        reportCreditsAvailable: availableAfter,
+        ...(spentDelta > 0 ? { reportCreditsSpentTotal: { increment: spentDelta } } : {}),
+      },
+      select: {
+        id: true,
+        reportCreditsAvailable: true,
+        reportCreditsSpentTotal: true,
+      },
+    });
+    await this.audit?.log({
+      actorId: actor.userId,
+      action: 'REPORT_CREDITS_ADJUSTED',
+      resourceType: 'User',
+      resourceId: userId,
+      metadata: {
+        delta,
+        availableAfter: updated.reportCreditsAvailable,
+        reasonCode,
+        note: note ?? null,
+      },
+    });
+    return updated;
   }
 }

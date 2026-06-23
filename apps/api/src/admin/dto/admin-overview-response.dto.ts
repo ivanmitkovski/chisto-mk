@@ -106,6 +106,9 @@ export class AdminOverviewResponseDto {
   usersNewLast7d!: number;
 
   @ApiProperty()
+  usersSuspendedCount!: number;
+
+  @ApiProperty()
   sessionsActive!: number;
 
   @ApiProperty({ type: [AdminOverviewReportsTrendItemDto] })

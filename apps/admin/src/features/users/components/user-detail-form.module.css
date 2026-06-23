@@ -22,6 +22,13 @@
   background: var(--surface-subtle);
 }
 
+.emailRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
 .summaryItemEmail {
   min-width: 0;
 }
@@ -64,7 +71,7 @@
   width: 100%;
   min-height: 2.75rem;
   border-radius: var(--radius-md);
-  border: 1px solid rgba(8, 54, 39, 0.12);
+  border: 1px solid var(--border-default);
   padding-block: var(--space-3);
   padding-inline: var(--space-3) var(--native-select-chevron-padding-end);
   font-size: var(--font-size-md);

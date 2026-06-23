@@ -11,6 +11,7 @@ export type AdminOverviewStats = {
   };
   usersCount: number;
   usersNewLast7d: number;
+  usersSuspendedCount: number;
   sessionsActive: number;
   reportsTrend: Array<{ date: string; count: number }>;
   recentActivity: Array<{

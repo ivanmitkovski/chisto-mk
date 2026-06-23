@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AuditModule } from '../audit/audit.module';
 import { PrismaModule } from '../prisma/prisma.module';
+import { ReportsUploadModule } from '../reports/reports-upload.module';
 import { AdminActiveUsersController } from './controllers/admin-active-users.controller';
 import { PresenceController } from './controllers/presence.controller';
 import { UserActivityListener } from './listeners/user-activity.listener';
@@ -16,7 +17,7 @@ import { PresenceStoreService } from './services/presence-store.service';
 import { UserActivityService } from './services/user-activity.service';
 
 @Module({
-  imports: [PrismaModule, AuditModule],
+  imports: [PrismaModule, AuditModule, ReportsUploadModule],
   controllers: [PresenceController, AdminActiveUsersController],
   providers: [
     GeoIpService,

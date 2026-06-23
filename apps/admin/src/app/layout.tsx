@@ -9,7 +9,7 @@ import { MotionProvider } from '@/components/providers/motion-provider';
 import { ReducedMotionSync } from '@/components/providers/reduced-motion-sync';
 import { QueryProvider } from '@/components/providers/query-provider';
 import { ToastProvider } from '@/components/ui';
-import { GlobalErrorReporter } from '@/lib/observability';
+import { GlobalErrorReporter, WebVitalsReporter } from '@/lib/observability';
 import {
   ADMIN_LOCALE_OPEN_GRAPH,
   isAdminLocale,
@@ -97,6 +97,7 @@ export default async function RootLayout({
       <body className={roboto.className}>
         <LocaleSync serverLocale={locale} />
         <GlobalErrorReporter />
+        <WebVitalsReporter />
         <ReducedMotionSync serverReducedMotion={serverReducedMotion} />
         <IntlProvider locale={locale} messages={messages}>
           <MotionProvider>

@@ -54,7 +54,7 @@ export function UsersBulkBar({
               disabled={isBulkLoading}
               className={styles.bulkDanger}
             >
-              <Icon name="trash" size={12} aria-hidden />
+              <Icon name="shield" size={12} aria-hidden />
               {t('bulk.suspend')}
             </Button>
           </>

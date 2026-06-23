@@ -245,11 +245,11 @@
   text-transform: uppercase;
 }
 
-.badgeReported { background: rgba(248, 187, 0, 0.22); color: #7a5a08; }
-.badgeVerified { background: rgba(22, 141, 99, 0.18); color: #0f5132; }
-.badgeScheduled { background: rgba(36, 172, 249, 0.18); color: #0c4a6e; }
+.badgeReported { background: rgba(248, 187, 0, 0.22); color: var(--color-status-warning-fg); }
+.badgeVerified { background: rgba(22, 141, 99, 0.18); color: var(--color-success-fg); }
+.badgeScheduled { background: rgba(36, 172, 249, 0.18); color: var(--color-status-info-fg); }
 .badgeInProgress { background: rgba(37, 219, 134, 0.22); color: var(--color-green-900); }
-.badgeCleaned { background: rgba(177, 248, 190, 0.55); color: #14532d; }
+.badgeCleaned { background: rgba(177, 248, 190, 0.55); color: var(--color-success-fg); }
 .badgeDisputed { background: rgba(255, 215, 212, 0.85); color: var(--color-error); }
 .badgeDefault { background: rgba(8, 54, 39, 0.08); color: rgba(8, 54, 39, 0.65); }
 
@@ -299,7 +299,7 @@
   background: none;
   font-size: var(--font-size-xs);
   font-weight: 600;
-  color: #15995f;
+  color: var(--color-status-success-fg);
   cursor: pointer;
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -447,7 +447,11 @@
 
 .linkPrimary {
   grid-column: 1 / -1;
-  background: linear-gradient(180deg, #2ee89a, var(--color-primary));
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-primary) 80%, white),
+    var(--color-primary)
+  );
   color: var(--color-green-900);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.35) inset,
@@ -464,7 +468,7 @@
 
 .linkSecondary {
   background: rgba(255, 255, 255, 0.75);
-  color: #15995f;
+  color: var(--color-status-success-fg);
   border: 1px solid rgba(22, 141, 99, 0.25);
 }
 

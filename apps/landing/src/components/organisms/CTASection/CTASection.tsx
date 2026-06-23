@@ -4,13 +4,11 @@ import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { Container } from "@/components/layout/Container";
 import { StoreDownloadButtons, hasStoreDownloadLinks } from "@/components/molecules/StoreDownloadButtons";
-import { PhoneMockup } from "@/components/molecules/PhoneMockup";
-import { PhoneScreenshot } from "@/components/molecules/PhoneScreenshot";
 import { FloatingPhone } from "@/components/molecules/FloatingPhone";
+import { PhoneMockup } from "@/components/molecules/PhoneMockup";
+import { PhoneScreen } from "@/components/molecules/PhoneDemoScreens";
+import { MARKETING_PHONE_SCREENSHOTS } from "@/lib/app-screenshots";
 import { fadeInUp, staggerContainer, viewOnce } from "@/lib/animations/variants";
-import type { AppScreenshotId } from "@/lib/app-screenshots";
-
-const CTA_PHONE_SCREENSHOTS: AppScreenshotId[] = ["welcome", "feed", "map"];
 
 export function CTASection() {
   const t = useTranslations("cta");
@@ -72,15 +70,28 @@ export function CTASection() {
             ) : null}
           </motion.div>
 
+          <div className="relative flex min-h-[14rem] items-end justify-center overflow-visible md:hidden">
+            <FloatingPhone className="w-[11rem]" delay={0}>
+              <PhoneMockup className="shadow-[var(--shadow-phone-lg)]">
+                <PhoneScreen variant="feed" priority />
+              </PhoneMockup>
+            </FloatingPhone>
+          </div>
+
           <div className="relative hidden min-h-[20rem] overflow-visible md:flex md:items-end md:justify-center md:gap-2 md:pb-4 lg:gap-3">
-            {CTA_PHONE_SCREENSHOTS.map((screenshotId, index) => (
+            {MARKETING_PHONE_SCREENSHOTS.map((screenshotId, index) => (
               <FloatingPhone
                 key={screenshotId}
                 className={index === 1 ? "relative z-10 w-[11rem] lg:w-44" : "w-40"}
                 delay={index * 0.12}
               >
-                <PhoneMockup>
-                  <PhoneScreenshot screenshotId={screenshotId} />
+                <PhoneMockup
+                  {...(index === 1 ? { className: "shadow-[var(--shadow-phone-lg)]" } : {})}
+                >
+                  <PhoneScreen
+                    variant={screenshotId}
+                    {...(index === 1 ? { priority: true } : {})}
+                  />
                 </PhoneMockup>
               </FloatingPhone>
             ))}

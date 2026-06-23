@@ -12,6 +12,7 @@ export const adminNavigation: ReadonlyArray<NavItem> = [
   { key: 'risk-signals', href: '/dashboard/events/risk-signals', icon: 'alert-triangle' },
   { key: 'moderation', href: '/dashboard/moderation/ugc', icon: 'clipboard-close' },
   { key: 'broadcasts', href: '/dashboard/broadcasts', icon: 'megaphone' },
+  { key: 'news', href: '/dashboard/news', icon: 'newspaper' },
   { key: 'team', href: '/dashboard/team', icon: 'user-cog' },
   { key: 'gamification', href: '/dashboard/gamification', icon: 'trophy' },
   { key: 'app-config', href: '/dashboard/app-config', icon: 'sliders' },

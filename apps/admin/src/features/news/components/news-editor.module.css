@@ -1,0 +1,24 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.coverPreview {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  height: 240px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.coverImage {
+  object-fit: cover;
+}

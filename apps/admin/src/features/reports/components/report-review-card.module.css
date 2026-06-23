@@ -78,12 +78,12 @@
 
 .statusNew {
   background: rgba(248, 187, 0, 0.18);
-  color: #8d6600;
+  color: var(--color-status-warning-fg);
 }
 
 .statusInReview {
   background: rgba(36, 172, 249, 0.15);
-  color: #1178ad;
+  color: var(--color-status-info-fg);
 }
 
 .statusApproved {
@@ -114,17 +114,17 @@
 
 .priorityMedium {
   background: rgba(36, 172, 249, 0.14);
-  color: #1a6e98;
+  color: var(--color-status-info-fg);
 }
 
 .priorityHigh {
   background: rgba(248, 187, 0, 0.18);
-  color: #8d6600;
+  color: var(--color-status-warning-fg);
 }
 
 .priorityCritical {
   background: rgba(241, 67, 54, 0.18);
-  color: #a32f26;
+  color: var(--color-status-danger-fg);
 }
 
 .evidenceList {
@@ -180,7 +180,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #0f8752;
+  color: var(--color-status-success-fg);
   background: rgba(37, 219, 134, 0.12);
 }
 
@@ -239,7 +239,7 @@
 }
 
 .timelineToneInfo {
-  background: #24acf9;
+  background: var(--color-info);
 }
 
 .timelineToneSuccess {
@@ -247,7 +247,7 @@
 }
 
 .timelineToneWarning {
-  background: #f14336;
+  background: var(--color-error);
 }
 
 .timelineBody {

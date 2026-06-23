@@ -4,9 +4,10 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
-import { Button, Card, Icon, PageHeader, Pagination, useToast } from '@/components/ui';
+import { Button, Card, DatePicker, Icon, PageHeader, Pagination, useToast } from '@/components/ui';
 import { WorkspaceRefreshOverlay } from '@/features/admin-shell/components/workspace-refresh-overlay';
 import { useWorkspaceRefresh } from '@/features/admin-shell/hooks/use-workspace-refresh';
+import { useServerSyncedState } from '@/features/admin-shell/hooks/use-server-synced-state';
 import type { AuditRow } from '@/features/audit/data/audit-adapter';
 import { buildAuditExportCsv, validateAuditDateRange } from '@/features/audit/lib/audit-filters';
 import { adminBrowserFetch } from '@/lib/api';
@@ -25,8 +26,8 @@ export function AuditWorkspace({ initialData, initialMeta }: AuditWorkspaceProps
   const { refresh: refreshPage, isRefreshing } = useWorkspaceRefresh();
   const reduceMotion = useReducedMotion();
   const searchParams = useSearchParams();
-  const [data, setData] = useState(initialData);
-  const [meta, setMeta] = useState(initialMeta);
+  const [data] = useServerSyncedState(initialData);
+  const [meta] = useServerSyncedState(initialMeta);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const { showToast } = useToast();
 
@@ -50,11 +51,6 @@ export function AuditWorkspace({ initialData, initialMeta }: AuditWorkspaceProps
     setTo(searchParams.get('to') ?? '');
     setDateError(null);
   }, [searchParams]);
-
-  useEffect(() => {
-    setData(initialData);
-    setMeta(initialMeta);
-  }, [initialData, initialMeta]);
 
   const buildUrl = useCallback(
     (updates: {
@@ -246,26 +242,20 @@ export function AuditWorkspace({ initialData, initialMeta }: AuditWorkspaceProps
               className={styles.input}
             />
           </div>
-          <div className={styles.field}>
-            <label htmlFor="audit-from">{t('filters.from')}</label>
-            <input
-              id="audit-from"
-              type="date"
-              value={from}
-              onChange={(e) => setFrom(e.target.value)}
-              className={styles.input}
-            />
-          </div>
-          <div className={styles.field}>
-            <label htmlFor="audit-to">{t('filters.to')}</label>
-            <input
-              id="audit-to"
-              type="date"
-              value={to}
-              onChange={(e) => setTo(e.target.value)}
-              className={styles.input}
-            />
-          </div>
+          <DatePicker
+            label={t('filters.from')}
+            value={from}
+            onValueChange={setFrom}
+            size="sm"
+            className={styles.datePicker}
+          />
+          <DatePicker
+            label={t('filters.to')}
+            value={to}
+            onValueChange={setTo}
+            size="sm"
+            className={styles.datePicker}
+          />
         </div>
         {dateError ? <p className={styles.dateError} role="alert">{dateError}</p> : null}
         <div className={styles.filterActions}>

@@ -145,7 +145,7 @@
 
 .contextItem.slaUrgent .contextIcon,
 .contextItem.slaUrgent dd {
-  color: #b45309;
+  color: var(--color-status-warning-fg);
 }
 
 .contextItem.slaUrgent {
@@ -160,7 +160,7 @@
 
 .contextItem.slaCritical .contextIcon,
 .contextItem.slaCritical dd {
-  color: #a32f26;
+  color: var(--color-status-danger-fg);
 }
 
 .contextItem.slaCritical {

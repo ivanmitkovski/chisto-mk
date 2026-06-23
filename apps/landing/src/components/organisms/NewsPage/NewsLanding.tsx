@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { Link, type AppLocale } from "@/i18n/routing";
-import type { NewsCategory, ResolvedNewsPost } from "@/data/mock-news";
+import type { NewsCategory, ResolvedNewsPost } from "@/data/news-posts";
 import { Badge } from "@/components/atoms/Badge";
 import { Container } from "@/components/layout/Container";
 import { Section } from "@/components/layout/Section";
@@ -60,12 +60,14 @@ export function NewsLanding({ locale, posts, copy, categoryLabel }: NewsLandingP
           <h1 className="mt-3 max-w-copy text-section-title font-bold text-gray-900">{copy.title}</h1>
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-gray-600">{copy.lead}</p>
 
-          <p
-            className="mt-8 max-w-2xl rounded-xl border border-amber-200/90 bg-amber-50/90 px-4 py-3 text-sm leading-relaxed text-amber-950 shadow-sm backdrop-blur-sm"
-            role="note"
-          >
-            {copy.demoNotice}
-          </p>
+          {copy.demoNotice ? (
+            <p
+              className="mt-8 max-w-2xl rounded-xl border border-amber-200/90 bg-amber-50/90 px-4 py-3 text-sm leading-relaxed text-amber-950 shadow-sm backdrop-blur-sm"
+              role="note"
+            >
+              {copy.demoNotice}
+            </p>
+          ) : null}
 
           {posts.length === 0 ? (
             <div className="mt-14 max-w-2xl rounded-2xl border border-gray-200/90 bg-white/70 p-8 shadow-sm backdrop-blur-sm md:p-10">

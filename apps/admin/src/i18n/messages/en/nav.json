@@ -10,6 +10,7 @@
   "risk-signals": "Check-in risk signals",
   "moderation": "UGC Moderation",
   "broadcasts": "Broadcasts",
+  "news": "News",
   "team": "Team",
   "gamification": "Gamification",
   "app-config": "App config",
@@ -41,6 +42,10 @@
       "label": "Go to Sites",
       "description": "Pollution sites and lifecycle status"
     },
+    "goResolutions": {
+      "label": "Go to Site Resolutions",
+      "description": "Review and manage site resolution workflows"
+    },
     "goMap": {
       "label": "Go to Map",
       "description": "Sites on the map"
@@ -61,6 +66,10 @@
       "label": "Go to Broadcasts",
       "description": "Send notification campaigns"
     },
+    "goNews": {
+      "label": "Go to News",
+      "description": "Manage landing news posts and media"
+    },
     "goTeam": {
       "label": "Go to Team",
       "description": "Invite staff and manage admin roles"
@@ -76,6 +85,10 @@
     "goOperations": {
       "label": "Go to Operations",
       "description": "Platform health and delivery ops"
+    },
+    "goActiveUsers": {
+      "label": "Go to Active Users",
+      "description": "Live sessions, engagement, and activity analytics"
     },
     "goEmailSuppressions": {
       "label": "Go to Email Suppressions",

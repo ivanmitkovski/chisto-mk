@@ -28,10 +28,9 @@ function formatToken(value: string): string {
 
 const ROLE_LABEL_KEY_BY_VALUE: Record<string, string> = {
   USER: 'filters.roleUser',
-  MODERATOR: 'filters.roleModerator',
+  SUPPORT: 'filters.roleSupport',
   ADMIN: 'filters.roleAdmin',
   SUPER_ADMIN: 'filters.roleSuperAdmin',
-  SUPPORT: 'filters.roleSupport',
 };
 
 const STATUS_LABEL_KEY_BY_VALUE: Record<string, string> = {
@@ -63,7 +62,7 @@ function rolePillClass(role: string): string {
   const map: Record<string, string> = {
     ADMIN: styles.roleAdmin,
     SUPER_ADMIN: styles.roleSuperAdmin,
-    MODERATOR: styles.roleModerator,
+    SUPPORT: styles.roleSupport,
     USER: styles.roleUser,
   };
   return `${styles.rolePill} ${map[role] ?? styles.roleDefault}`;
@@ -72,6 +71,7 @@ function rolePillClass(role: string): string {
 type UsersTableProps = {
   data: UserRow[];
   canBulk: boolean;
+  highlightedUserIds?: Set<string>;
   selectedIds: Set<string>;
   allSelected: boolean;
   selectAllRef: RefObject<HTMLInputElement | null>;
@@ -85,6 +85,7 @@ type UsersTableProps = {
 export function UsersTable({
   data,
   canBulk,
+  highlightedUserIds = new Set(),
   selectedIds,
   allSelected,
   selectAllRef,
@@ -168,6 +169,12 @@ export function UsersTable({
       render: (u) => formatDate(u.lastActiveAt, locale),
     },
     {
+      key: 'createdAt',
+      header: t('table.created'),
+      sortable: true,
+      render: (u) => formatDate(u.createdAt, locale),
+    },
+    {
       key: 'pointsBalance',
       header: t('table.points'),
       sortable: true,
@@ -192,8 +199,18 @@ export function UsersTable({
       sortKey={sortKey}
       sortDir={sortDir}
       onSort={onSort}
-      getRowClassName={(u) => (selectedIds.has(u.id) ? styles.rowSelected : undefined)}
-      getMobileCardClassName={(u) => (selectedIds.has(u.id) ? styles.mobileCardSelected : undefined)}
+      getRowClassName={(u) => {
+        const classes: string[] = [];
+        if (selectedIds.has(u.id)) classes.push(styles.rowSelected);
+        if (highlightedUserIds.has(u.id)) classes.push(styles.rowHighlighted);
+        return classes.length > 0 ? classes.join(' ') : undefined;
+      }}
+      getMobileCardClassName={(u) => {
+        const classes: string[] = [];
+        if (selectedIds.has(u.id)) classes.push(styles.mobileCardSelected);
+        if (highlightedUserIds.has(u.id)) classes.push(styles.rowHighlighted);
+        return classes.length > 0 ? classes.join(' ') : undefined;
+      }}
       renderMobileCard={(u) => (
         <>
           <div className={styles.mobileCardHeader}>
@@ -218,6 +235,9 @@ export function UsersTable({
           </DataTableMobileField>
           <DataTableMobileField label={t('table.lastActive')}>
             {formatDate(u.lastActiveAt, locale)}
+          </DataTableMobileField>
+          <DataTableMobileField label={t('table.created')}>
+            {formatDate(u.createdAt, locale)}
           </DataTableMobileField>
           <DataTableMobileField label={t('table.points')}>{u.pointsBalance}</DataTableMobileField>
           <div className={styles.mobileCardActions}>

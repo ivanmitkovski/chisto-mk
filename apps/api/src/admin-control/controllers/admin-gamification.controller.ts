@@ -69,6 +69,19 @@ export class AdminGamificationController {
     return this.gamification.adjustPoints(userId, body.delta, body.reasonCode, actor, body.note);
   }
 
+  @Idempotent('admin_gamification_report_credits_adjust')
+  @Post('users/:userId/report-credits/adjust')
+  @Roles(...ADMIN_WRITE_ROLES)
+  @RequirePermission(ADMIN_PERMISSIONS['gamification:write'])
+  @ApiOperation({ summary: 'Adjust user report credits' })
+  adjustReportCredits(
+    @Param('userId') userId: string,
+    @Body() body: { delta: number; reasonCode: string; note?: string },
+    @CurrentUser() actor: AuthenticatedUser,
+  ) {
+    return this.gamification.adjustReportCredits(userId, body.delta, body.reasonCode, actor, body.note);
+  }
+
   @Get('rankings/weekly')
   @Roles(...ADMIN_PANEL_ROLES)
   @RequirePermission(ADMIN_PERMISSIONS['gamification:read'])

@@ -1,9 +1,11 @@
 'use client';
 
 import { useEffect, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import '@/features/map/leaflet-setup';
+import { Card, SectionState } from '@/components/ui';
 import { MapAttributionStrip } from '@/features/map/components/map-attribution-strip';
 import { MapZoomControls } from '@/features/map/components/map-zoom-controls';
 import { useTileUrl } from '@/features/map/hooks/use-tile-url';
@@ -34,7 +36,6 @@ function clusterPosition(cluster: GeoCluster, index: number): [number, number] {
   return [baseLat + (index % 5) * 0.08, baseLng + Math.floor(index / 5) * 0.12];
 }
 
-/** Fit the full country in the small sidebar embed (320px). */
 function FitMacedoniaBounds() {
   const map = useMap();
   useEffect(() => {
@@ -47,8 +48,18 @@ function FitMacedoniaBounds() {
   return null;
 }
 
-export function ActiveUsersGeoMap({ clusters }: { clusters: GeoCluster[] }) {
+type ActiveUsersGeoMapProps = {
+  clusters: GeoCluster[];
+  loadError?: string;
+};
+
+export function ActiveUsersGeoMap({ clusters, loadError }: ActiveUsersGeoMapProps) {
+  const t = useTranslations('activeUsers');
   const tileUrl = useTileUrl();
+  const totalUsers = useMemo(
+    () => clusters.reduce((sum, cluster) => sum + cluster.count, 0),
+    [clusters],
+  );
   const markers = useMemo(
     () =>
       clusters.map((cluster, index) => ({
@@ -58,39 +69,59 @@ export function ActiveUsersGeoMap({ clusters }: { clusters: GeoCluster[] }) {
     [clusters],
   );
 
+  function formatLocation(cluster: GeoCluster): string {
+    const parts = [cluster.city, cluster.country].filter(Boolean);
+    return parts.length > 0 ? parts.join(', ') : t('geo.unknownCity');
+  }
+
   return (
-    <div className={`${mapStyles.mapWrap} ${styles.embed}`}>
-      <MapContainer
-        center={[...MACEDONIA_CENTER]}
-        zoom={INITIAL_ZOOM}
-        className={mapStyles.map}
-        zoomControl={false}
-        scrollWheelZoom={true}
-        wheelDebounceTime={100}
-        wheelPxPerZoomLevel={120}
-        maxBounds={[
-          [MACEDONIA_BOUNDS.minLat, MACEDONIA_BOUNDS.minLng],
-          [MACEDONIA_BOUNDS.maxLat, MACEDONIA_BOUNDS.maxLng],
-        ]}
-        maxBoundsViscosity={0.85}
-        attributionControl={false}
-      >
-        <TileLayer url={tileUrl} attribution="" />
-        <FitMacedoniaBounds />
-        <MapZoomControls />
-        {markers.map(({ cluster, position }, idx) => (
-          <Marker
-            key={`${cluster.city}-${cluster.country}-${idx}`}
-            position={position}
-            icon={createCountClusterIcon(cluster.count)}
+    <Card padding="md" className={styles.panel}>
+      <div className={styles.header}>
+        <h3 className={styles.title}>{t('geo.title')}</h3>
+        <p className={styles.subtitle}>{t('geo.userCount', { count: totalUsers })}</p>
+      </div>
+
+      {loadError ? (
+        <SectionState variant="error" message={loadError} />
+      ) : (
+        <div
+          className={`${mapStyles.mapWrap} ${styles.embed}`}
+          role="img"
+          aria-label={t('geo.mapDescription')}
+        >
+          <MapContainer
+            center={[...MACEDONIA_CENTER]}
+            zoom={INITIAL_ZOOM}
+            className={mapStyles.map}
+            zoomControl={false}
+            scrollWheelZoom={true}
+            wheelDebounceTime={100}
+            wheelPxPerZoomLevel={120}
+            maxBounds={[
+              [MACEDONIA_BOUNDS.minLat, MACEDONIA_BOUNDS.minLng],
+              [MACEDONIA_BOUNDS.maxLat, MACEDONIA_BOUNDS.maxLng],
+            ]}
+            maxBoundsViscosity={0.85}
+            attributionControl={false}
           >
-            <Popup>
-              {[cluster.city, cluster.country].filter(Boolean).join(', ') || 'Unknown'} — {cluster.count}
-            </Popup>
-          </Marker>
-        ))}
-      </MapContainer>
-      <MapAttributionStrip />
-    </div>
+            <TileLayer url={tileUrl} attribution="" />
+            <FitMacedoniaBounds />
+            <MapZoomControls />
+            {markers.map(({ cluster, position }, idx) => (
+              <Marker
+                key={`${cluster.city}-${cluster.country}-${idx}`}
+                position={position}
+                icon={createCountClusterIcon(cluster.count)}
+              >
+                <Popup>
+                  {formatLocation(cluster)} — {cluster.count}
+                </Popup>
+              </Marker>
+            ))}
+          </MapContainer>
+          <MapAttributionStrip />
+        </div>
+      )}
+    </Card>
   );
 }

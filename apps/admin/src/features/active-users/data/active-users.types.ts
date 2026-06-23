@@ -18,6 +18,7 @@ export type ActiveUserRow = {
   firstName: string;
   lastName: string;
   email: string;
+  avatarUrl?: string | null;
   status: 'online' | 'away' | 'offline';
   currentScreen: string | null;
   platform: string | null;

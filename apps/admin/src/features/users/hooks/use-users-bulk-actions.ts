@@ -3,14 +3,22 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/components/ui';
+import { useOptimisticMutation } from '@/features/admin-shell/hooks/use-optimistic-mutation';
 import { adminBrowserFetch } from '@/lib/api';
 
 type BulkAction = 'suspend' | 'activate' | 'changeRole';
 
+type BulkMutationPayload = {
+  action: BulkAction;
+  userIds: string[];
+  role?: string;
+  reasonCode?: string;
+  note?: string;
+};
+
 const ROLE_LABEL_KEY_BY_VALUE: Record<string, string> = {
   USER: 'filters.roleUser',
   SUPPORT: 'filters.roleSupport',
-  MODERATOR: 'filters.roleModerator',
   ADMIN: 'filters.roleAdmin',
   SUPER_ADMIN: 'filters.roleSuperAdmin',
 };
@@ -19,58 +27,69 @@ export function useUsersBulkActions(refresh: () => void) {
   const t = useTranslations('users');
   const tCommon = useTranslations('common');
   const { showToast } = useToast();
-  const [isBulkLoading, setIsBulkLoading] = useState(false);
   const [bulkModal, setBulkModal] = useState<BulkAction | null>(null);
   const [roleModalOpen, setRoleModalOpen] = useState(false);
 
-  async function runBulkAction(action: BulkAction, selectedIds: Set<string>, role?: string) {
-    if (selectedIds.size === 0) return;
-    setIsBulkLoading(true);
-    try {
+  const bulkMutation = useOptimisticMutation({
+    mutate: async (payload: BulkMutationPayload) => {
       const body =
-        action === 'changeRole'
-          ? { userIds: Array.from(selectedIds), action, role }
-          : { userIds: Array.from(selectedIds), action };
-      const res = await adminBrowserFetch<{ updatedCount: number; skippedCount: number }>(
-        '/admin/users/bulk',
-        {
-          method: 'POST',
-          body,
-        },
-      );
+        payload.action === 'changeRole'
+          ? { userIds: payload.userIds, action: payload.action, role: payload.role }
+          : {
+              userIds: payload.userIds,
+              action: payload.action,
+              ...(payload.reasonCode ? { reasonCode: payload.reasonCode } : {}),
+              ...(payload.note ? { note: payload.note } : {}),
+            };
+      return adminBrowserFetch<{ updatedCount: number; skippedCount: number }>('/admin/users/bulk', {
+        method: 'POST',
+        body,
+      });
+    },
+    onSuccess: (res, variables) => {
       const message =
-        action === 'suspend'
+        variables.action === 'suspend'
           ? t('bulk.suspendedMessage', { count: res.updatedCount })
-          : action === 'activate'
+          : variables.action === 'activate'
             ? t('bulk.activatedMessage', { count: res.updatedCount })
             : t('bulk.roleUpdatedMessage', {
                 count: res.updatedCount,
-                role: role ? t(ROLE_LABEL_KEY_BY_VALUE[role] ?? role) : tCommon('unknown'),
+                role: variables.role
+                  ? t(ROLE_LABEL_KEY_BY_VALUE[variables.role] ?? variables.role)
+                  : tCommon('unknown'),
               });
       const skippedSuffix =
-        res.skippedCount > 0
-          ? t('bulk.skippedSuffix', { count: res.skippedCount })
-          : '';
+        res.skippedCount > 0 ? t('bulk.skippedSuffix', { count: res.skippedCount }) : '';
+      setBulkModal(null);
+      setRoleModalOpen(false);
+      refresh();
       showToast({
         tone: 'success',
         title: t('bulk.completeTitle'),
         message: `${message}${skippedSuffix}`,
       });
-      setBulkModal(null);
-      setRoleModalOpen(false);
-      refresh();
-      return true;
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : tCommon('requestFailed');
-      showToast({ tone: 'error', title: t('bulk.failedTitle'), message: msg });
-      return false;
-    } finally {
-      setIsBulkLoading(false);
-    }
+    },
+    errorToast: { title: t('bulk.failedTitle'), message: tCommon('requestFailed') },
+  });
+
+  async function runBulkAction(
+    action: BulkAction,
+    selectedIds: Set<string>,
+    options?: { role?: string; reasonCode?: string; note?: string },
+  ) {
+    if (selectedIds.size === 0) return false;
+    const result = await bulkMutation.run({
+      action,
+      userIds: Array.from(selectedIds),
+      ...(options?.role ? { role: options.role } : {}),
+      ...(options?.reasonCode ? { reasonCode: options.reasonCode } : {}),
+      ...(options?.note ? { note: options.note } : {}),
+    });
+    return result != null;
   }
 
   return {
-    isBulkLoading,
+    isBulkLoading: bulkMutation.isPending,
     bulkModal,
     setBulkModal,
     roleModalOpen,

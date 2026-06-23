@@ -1,11 +1,13 @@
 {
   "pageTitle": "Përdoruesit",
+  "pageDescription": "Kërko, shqyrto dhe modero llogaritë e qytetarëve në platformë.",
   "deletedUser": "Përdorues i fshirë",
   "detailTitle": "Përdoruesi",
   "stats": {
     "totalUsers": "Gjithsej përdorues",
     "new7d": "Të rinj (7 ditë)",
-    "activeSessions": "Sesione aktive"
+    "activeSessions": "Sesione aktive",
+    "suspended": "Të pezulluar"
   },
   "filters": {
     "allRoles": "Të gjitha rolet",
@@ -21,7 +23,12 @@
     "searchPlaceholder": "Kërko përdorues…",
     "searchAria": "Kërko përdorues",
     "filterByRole": "Filtro sipas rolit",
-    "filterByStatus": "Filtro sipas statusit"
+    "filterByStatus": "Filtro sipas statusit",
+    "quickFiltersAria": "Filtra të shpejtë të statusit",
+    "lastActiveRange": "Intervali i aktivitetit të fundit",
+    "lastActiveAfter": "Aktiv pas",
+    "lastActiveBefore": "Aktiv para",
+    "viewActiveUsers": "Shiko analitikën e përdoruesve aktivë"
   },
   "table": {
     "selectAllAria": "Zgjidh të gjitha",
@@ -72,6 +79,7 @@
     "status": "Statusi",
     "saveChanges": "Ruaj ndryshimet",
     "savedMessage": "Përdoruesi u përditësua.",
+    "savedWithRoleMessage": "Profili dhe roli u përditësuan.",
     "roleUpdatedMessage": "Roli i përdoruesit u përditësua.",
     "roleUpdateFailed": "Përditësimi i rolit dështoi",
     "validation": {
@@ -81,6 +89,7 @@
     },
     "confirmRoleTitle": "Konfirmo ndryshimin e rolit",
     "confirmRoleDescription": "Ndryshimet e rolit kanë ndikim të lartë. Të konfirmohet përditësimi i rolit të përdoruesit?",
+    "confirmSaveWithRoleDescription": "Të ruhen ndryshimet e profilit dhe roli nga {fromRole} në {toRole}?",
     "updateRole": "Përditëso rolin",
     "suspendUserTitle": "Pezullo përdoruesin",
     "markDeletedTitle": "Shëno përdoruesin si të fshirë",
@@ -95,6 +104,8 @@
     "viewProfile": "Shiko profilin",
     "tabs": {
       "profile": "Profili",
+      "safety": "Siguria dhe besimi",
+      "activity": "Aktiviteti",
       "privacy": "Privatësia dhe verifikimi",
       "points": "Pikët",
       "sessions": "Sesionet ({count})",
@@ -112,7 +123,22 @@
       "privacyAccepted": "Privatësia u pranua",
       "requiresTerms": "Kërkon pranimin e kushteve",
       "totalPointsEarned": "Pikat totale të fituara",
-      "created": "Krijuar"
+      "created": "Krijuar",
+      "exportData": "Eksporto të dhënat e përdoruesit",
+      "exportDataSuccess": "Eksporti i të dhënave të përdoruesit u shkarkua."
+    },
+    "reportCredits": {
+      "title": "Kreditë e raporteve",
+      "available": "Kreditë të disponueshme: {count}",
+      "spentTotal": "Totali i shpenzuar: {count}",
+      "delta": "Ndryshim (+/-)",
+      "reasonCode": "Kodi i arsyes",
+      "noteOptional": "Shënim (opsional)",
+      "adjust": "Rregullo kreditët",
+      "adjustedTitle": "Kreditët e raporteve u rregulluan",
+      "adjustedMessage": "Bilanci i krediteve u përditësua.",
+      "adjustFailed": "Rregullimi dështoi",
+      "adjustFailedMessage": "Nuk mund të rregullohen kreditët e raporteve."
     },
     "sessions": {
       "created": "Krijuar",
@@ -137,7 +163,8 @@
       "action": "Veprimi",
       "resource": "Burimi",
       "actor": "Aktori",
-      "empty": "Asnjë hyrje auditimi"
+      "empty": "Asnjë hyrje auditimi",
+      "loadFailed": "Historia e auditimit nuk mund të ngarkohej."
     },
     "points": {
       "currentBalance": "Bilanci aktual: {balance}",
@@ -152,6 +179,119 @@
       "deltaCol": "Ndryshim",
       "balance": "Bilanci",
       "reason": "Arsyeja"
+    },
+    "auditLoadFailed": "Historia e auditimit nuk mund të ngarkohej.",
+    "header": {
+      "lastActive": "Aktiv i fundit: {value}",
+      "copyId": "Kopjo ID",
+      "copyIdSuccess": "ID e përdoruesit u kopjua."
+    },
+    "moderation": {
+      "title": "Moderimi",
+      "railAria": "Veprimet e moderimit të përdoruesit",
+      "toolbarAria": "Veprimet e moderimit",
+      "suspend": "Pezullo",
+      "activate": "Aktivizo",
+      "activateTitle": "Aktivizo përdoruesin",
+      "activateDescription": "Riaktivizo llogarinë që të mund të hyjë përsëri.",
+      "revokeAllSessions": "Revoko të gjitha sesionet",
+      "revokeAllTitle": "Të revokohen të gjitha sesionet?",
+      "revokeAllDescription": "Çdo sesion aktiv i përdoruesit do të shkëputet menjëherë.",
+      "revokeAllSuccessTitle": "Sesionet u revokuan",
+      "revokeAllSuccessMessage": "Të gjitha sesionet e përdoruesit u revokuan.",
+      "revokeAllFailedTitle": "Revokimi dështoi",
+      "revokeAllFailedMessage": "Nuk mund të revokohen të gjitha sesionet.",
+      "viewUgcQueue": "Shiko raportet UGC",
+      "readOnlyHint": "Keni qasje vetëm për lexim në moderimin e përdoruesve.",
+      "profileDirtyBlocked": "Ruaj ose hidh poshtë ndryshimet e profilit para moderimit.",
+      "shortcutHint": "Shkurtore: S pezullo, A aktivizo, R revoko sesionet."
+    },
+    "safety": {
+      "ugcReports": "Raportet UGC (subjekt)",
+      "reportsFiled": "Raportet e paraqitura",
+      "blocksGiven": "Bllokimet e dhëna",
+      "blocksReceived": "Bllokimet e marra",
+      "viewUgcReports": "Hap radhën UGC",
+      "viewReports": "Kërko raporte",
+      "recentUgc": "Raportet e fundit UGC",
+      "noRecentUgc": "Nuk ka raporte UGC kundër këtij përdoruesi."
+    },
+    "activity": {
+      "sessionsToday": "Sesione sot: {count}",
+      "lastActive": "Aktiv i fundit: {value}",
+      "timeline": "Kronologjia e aktivitetit",
+      "noEvents": "Nuk ka ngjarje të fundit të aktivitetit.",
+      "empty": "Të dhënat e aktivitetit nuk janë të disponueshme."
+    },
+    "suspendReason": {
+      "title": "Pezullo përdoruesin",
+      "description": "Zgjidh një arsye për pezullimin. Do të ruhet në gjurmën e auditimit.",
+      "reasonLabel": "Arsyeja",
+      "noteLabel": "Shënim (opsional)"
+    },
+    "suspensionReasons": {
+      "spam": "Mesazhe të padëshiruara",
+      "harassment": "Ngacmim",
+      "tosViolation": "Shkelje e kushteve",
+      "fraudAbuse": "Mashtrim ose abuzim",
+      "adminRequest": "Kërkesë admin",
+      "other": "Tjetër"
+    },
+    "notes": {
+      "title": "Shënimet e moderatorit",
+      "addLabel": "Shto shënim",
+      "add": "Shto shënim",
+      "added": "Shënimi u shtua.",
+      "addFailed": "Shënimi nuk mund të shtohej.",
+      "empty": "Ende nuk ka shënime moderatorësh."
+    },
+    "statusHistory": {
+      "title": "Historia e statusit",
+      "empty": "Ende nuk janë regjistruar ndryshime statusi."
+    },
+    "changeEmail": {
+      "action": "Ndrysho emailin",
+      "title": "Ndrysho emailin e përdoruesit",
+      "requestDescription": "Dërgo një kod verifikimi në adresën e re. Emaili aktual: {currentEmail}",
+      "confirmDescription": "Vendos kodin 6-shifror të dërguar në {email}.",
+      "newEmailLabel": "Email i ri",
+      "reasonLabel": "Arsyeja",
+      "noteLabel": "Shënim (opsional)",
+      "codeLabel": "Kodi i verifikimit",
+      "sendCode": "Dërgo kodin",
+      "confirm": "Konfirmo ndryshimin",
+      "back": "Mbrapa",
+      "requestSuccessTitle": "Kodi u dërgua",
+      "requestSuccessMessage": "Një kod verifikimi u dërgua në {email}.",
+      "confirmSuccessTitle": "Emaili u përditësua",
+      "confirmSuccessMessage": "Emaili i përdoruesit u ndryshua dhe të gjitha sesionet u revokuan.",
+      "reasons": {
+        "userRequest": "Kërkesë e përdoruesit",
+        "typoCorrection": "Korrigjim gabimi",
+        "accountRecovery": "Rikuperim llogarie",
+        "mergedAccount": "Llogari e bashkuar",
+        "other": "Tjetër"
+      },
+      "errors": {
+        "emailInUse": "Ky email është tashmë i regjistruar në një llogari tjetër.",
+        "emailUnchanged": "Emaili i ri duhet të jetë i ndryshëm nga ai aktual.",
+        "invalidCode": "Kod verifikimi i pavlefshëm ose i skaduar.",
+        "serviceUnavailable": "Ndryshimi i emailit është përkohësisht i padisponueshëm. Provo përsëri.",
+        "userDeleted": "Nuk mund të ndryshohet emaili për një përdorues të fshirë.",
+        "generic": "Nuk u ndryshua emaili. Provo përsëri."
+      }
+    },
+    "identifierHistory": {
+      "title": "Ndryshime identifikuesi",
+      "entry": "{field} u ndryshua ({initiatedBy})",
+      "fields": {
+        "email": "Email",
+        "phone": "Telefon"
+      },
+      "initiatedBy": {
+        "admin": "me ndihmë admini",
+        "user": "vetë-shërbim"
+      }
     },
     "tabsAria": "Seksionet e detajeve të përdoruesit"
   }

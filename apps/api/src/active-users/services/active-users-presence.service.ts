@@ -1,6 +1,7 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { DevicePlatform } from '../../prisma-client';
 import { PrismaService } from '../../prisma/prisma.service';
+import { ReportsUploadService } from '../../reports/services/reports-upload.service';
 import { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { PRESENCE_CONFIG, presenceMemberKey } from '../config/presence.config';
 import type { ActiveUserRow, PresenceAppState, PresenceMeta, PresenceStatus } from '../types/presence.types';
@@ -30,6 +31,7 @@ export class ActiveUsersPresenceService implements OnModuleDestroy {
     private readonly realtime: ActiveUsersRealtimeService,
     private readonly activity: UserActivityService,
     private readonly store: PresenceStoreService,
+    private readonly reportsUploadService: ReportsUploadService,
   ) {}
 
   onModuleDestroy(): void {
@@ -141,6 +143,13 @@ export class ActiveUsersPresenceService implements OnModuleDestroy {
           })
         : [];
     const userById = new Map(users.map((u) => [u.id, u]));
+    const avatarUrlByUserId = new Map<string, string | null>();
+    await Promise.all(
+      users.map(async (u) => {
+        const url = await this.reportsUploadService.signPrivateObjectKey(u.avatarObjectKey);
+        avatarUrlByUserId.set(u.id, url);
+      }),
+    );
 
     let rows: ActiveUserRow[] = metas.map((meta) => {
       const u = userById.get(meta.userId);
@@ -152,7 +161,7 @@ export class ActiveUsersPresenceService implements OnModuleDestroy {
         firstName: u?.firstName ?? '',
         lastName: u?.lastName ?? '',
         email: u?.email ?? '',
-        avatarUrl: null,
+        avatarUrl: avatarUrlByUserId.get(meta.userId) ?? null,
         status: this.resolveStatus(meta, now),
         currentScreen: meta.screen,
         platform: String(meta.platform),

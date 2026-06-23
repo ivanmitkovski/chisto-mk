@@ -21,7 +21,7 @@ export function FAQ() {
   const items = t.raw("items") as FaqEntry[];
 
   return (
-    <Section className="relative overflow-hidden mesh-section-faq">
+    <Section className="relative overflow-hidden mesh-section-faq" defer>
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" aria-hidden />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-gray-200/90 to-transparent" aria-hidden />
       <div

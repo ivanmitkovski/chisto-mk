@@ -1,8 +1,16 @@
 {
   "pageTitle": "Përdorues aktivë",
+  "pageDescription": "Prania live, trendet e angazhimit dhe aktiviteti në platformë.",
+  "refresh": "Rifresko",
+  "refreshing": "Duke u rifreskuar…",
+  "retry": "Provo përsëri",
+  "loadingSummary": "Duke ngarkuar përmbledhjen…",
+  "liveConnected": "Përditësimet live janë lidhur",
   "currentActive": "Aktivë tani",
   "online": "Në linjë",
   "away": "Larg",
+  "offlineEstimate": "Jashtë linje (24h)",
+  "offlineEstimateUnavailable": "Vlerësimi nuk është ende i disponueshëm",
   "peakToday": "Piku sot",
   "peakWeek": "Piku këtë javë",
   "avgConcurrent": "Mesatar concurrent",
@@ -10,13 +18,17 @@
   "trend15m": "Trend 15m",
   "trend1h": "Trend 1h",
   "user": "Përdorues",
-  "status": "Statusi",
+  "statusLabel": "Statusi",
   "screen": "Ekrani",
-  "platform": "Platforma",
+  "screenLabel": "Ekrani",
+  "platformLabel": "Platforma",
+  "deviceModel": "Pajisja",
   "location": "Vendndodhja",
+  "sessionDuration": "Sesioni",
   "lastActivity": "Aktiviteti i fundit",
+  "devicesCount": "{count, plural, one {# pajisje} other {# pajisje}}",
   "noActiveUsers": "Nuk ka përdorues aktivë",
-  "activityFeed": "Feed live",
+  "activityFeed": "Feed live i aktivitetit",
   "noActivity": "Nuk ka aktivitet",
   "engagement": "Angazhimi",
   "realtimeMetrics": "Metrika realtime",
@@ -26,11 +38,120 @@
   "reportsToday": "Raporte sot",
   "registrationsToday": "Regjistrime sot",
   "dauMauTrend": "Trend DAU / MAU",
-  "alerts": "Alarmet",
+  "alertsTitle": "Alarmet",
   "noAlerts": "Nuk ka rregulla alarmi",
   "enabled": "Aktiv",
   "disabled": "Joaktiv",
   "loadMore": "Ngarko më shumë",
   "loadingMore": "Duke u ngarkuar…",
-  "feedEnd": "Fund i feed-it të aktivitetit"
+  "feedEnd": "Fund i feed-it të aktivitetit",
+  "feedDomCap": "Shfaqen {count} ngjarjet e fundit. Përdorni filtrat për aktivitet më të vjetër.",
+  "sections": {
+    "kpi": "Metrikat kryesore",
+    "engagement": "Angazhimi dhe trendet",
+    "presence": "Tabela e pranisë",
+    "sidebar": "Aktiviteti, harta dhe alarmet"
+  },
+  "filters": {
+    "searchLabel": "Kërko",
+    "searchPlaceholder": "Emri ose emaili",
+    "searchAria": "Kërko sipas emrit ose emailit",
+    "statusLabel": "Statusi",
+    "statusGroupAria": "Filtro sipas statusit të pranisë",
+    "platformLabel": "Platforma",
+    "toolbarAria": "Filtro përdoruesit aktivë",
+    "allStatuses": "Të gjitha statuset",
+    "allPlatforms": "Të gjitha platformat"
+  },
+  "status": {
+    "online": "Në linjë",
+    "away": "Larg",
+    "offline": "Jashtë linje"
+  },
+  "platform": {
+    "ios": "iOS",
+    "android": "Androidi"
+  },
+  "metrics": {
+    "dau": "DAU",
+    "wau": "WAU",
+    "mau": "MAU",
+    "dauMauRatio": "Raporti DAU / MAU",
+    "avgSessionMinutes": "Sesioni mesatar (min)",
+    "cleanupParticipants": "Pjesëmarrës në pastrim"
+  },
+  "chart": {
+    "concurrent": "Përdorues të njëkohshëm",
+    "noHistory": "Ende nuk ka të dhëna historike"
+  },
+  "feed": {
+    "allTypes": "Të gjitha",
+    "filterLabel": "Filtro sipas llojit të ngjarjes",
+    "types": {
+      "login": "Hyrje",
+      "logout": "Dalje",
+      "appOpened": "Aplikacioni u hap",
+      "screenView": "Shikim ekrani",
+      "reportSubmitted": "Raport i dorëzuar",
+      "reportCreated": "Raport i krijuar",
+      "eventJoined": "U bashkua në ngjarje",
+      "checkIn": "Regjistrim në vend",
+      "unknown": "Aktivitet"
+    }
+  },
+  "geo": {
+    "title": "Shpërndarja gjeografike",
+    "userCount": "{count, plural, =0 {Nuk ka përdorues të lokalizuar} one {# përdorues në hartë} other {# përdorues në hartë}}",
+    "unknownCity": "E panjohur",
+    "mapDescription": "Harta me grupe të përafërta përdoruesish aktivë sipas qytetit"
+  },
+  "alerts": {
+    "add": "Shto rregull",
+    "create": "Krijo rregull",
+    "createTitle": "Krijo rregull alarmi",
+    "editTitle": "Ndrysho rregullin e alarmit",
+    "formDescription": "Njofto kur një metrikë kalon pragun brenda dritares së vlerësimit.",
+    "metricLabel": "Metrika",
+    "comparatorLabel": "Kushti",
+    "thresholdLabel": "Pragu",
+    "windowLabel": "Dritarja (sekonda)",
+    "enabledLabel": "Rregulli është aktiv",
+    "enable": "Aktivizo",
+    "disable": "Çaktivizo",
+    "deleteTitle": "Fshi rregullin e alarmit?",
+    "deleteDescription": "Ky rregull nuk do të dërgojë më njoftime.",
+    "createdTitle": "Alarmi u krijua",
+    "createdMessage": "Rregulli i alarmit është aktiv.",
+    "updatedMessage": "Rregulli i alarmit u ruajt.",
+    "deletedTitle": "Alarmi u fshi",
+    "deletedMessage": "Rregulli i alarmit u hoq.",
+    "saveFailed": "Nuk u ruajt dot rregulli i alarmit.",
+    "deleteFailed": "Nuk u fshi dot rregulli i alarmit.",
+    "triggeredTitle": "Alarmi u aktivizua",
+    "triggeredMessage": "{metric} kaloi pragun {threshold}",
+    "lastTriggered": "Aktivizuar së fundmi: {value}",
+    "comparators": {
+      "gt": "Më e madhe se",
+      "gte": "Më e madhe ose e barabartë me",
+      "lt": "Më e vogël se",
+      "lte": "Më e vogël ose e barabartë me"
+    },
+    "metrics": {
+      "CONCURRENT": "Përdorues të njëkohshëm",
+      "TRAFFIC_SPIKE": "Rritje trafiku",
+      "ERROR_RATE": "Shkalla e gabimeve",
+      "REPORT_ACTIVITY": "Aktivitet raportesh",
+      "API_DEGRADATION": "Degradim API"
+    }
+  },
+  "errors": {
+    "summaryFailed": "Nuk u ngarkuan dot metrikat e përmbledhjes.",
+    "listFailed": "Nuk u ngarkua dot lista e pranisë.",
+    "feedFailed": "Nuk u ngarkua dot feed-i i aktivitetit.",
+    "realtimeFailed": "Nuk u ngarkuan dot metrikat realtime.",
+    "engagementFailed": "Nuk u ngarkua dot analitika e angazhimit.",
+    "geoFailed": "Nuk u ngarkuan dot grupet gjeografike.",
+    "alertsFailed": "Nuk u ngarkuan dot rregullat e alarmit.",
+    "loadFailed": "Nuk u ngarkuan dot të dhënat e përdoruesve aktivë."
+  }
 }

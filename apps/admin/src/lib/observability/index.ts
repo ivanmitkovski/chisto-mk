@@ -5,3 +5,4 @@ export { logger, setTelemetrySink } from './logger';
 export { clientLogger } from './client-logger';
 export { getErrorReference } from './error-reference';
 export { GlobalErrorReporter } from './global-error-reporter';
+export { WebVitalsReporter } from './web-vitals-reporter';

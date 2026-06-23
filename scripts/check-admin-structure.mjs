@@ -164,6 +164,47 @@ if (shimmerOutsideKit.length > 0) {
   );
 }
 
+// 8. Heavy chart/map libs must not be statically imported outside client/dynamic chunks
+const HEAVY_IMPORT_RE = /from ['"](?:recharts|leaflet)['"]/;
+const HEAVY_IMPORT_ALLOW = [
+  /-(client|inner)\.tsx$/,
+  /leaflet-setup\.ts$/,
+  /sparkline-inner\.tsx$/,
+  /reports-trend-chart-inner\.tsx$/,
+  /engagement-charts-inner\.tsx$/,
+  /active-users-summary-trend-inner\.tsx$/,
+  /^features\/map\//,
+  /active-users-geo-map\.tsx$/,
+  /sites-map-picker\.tsx$/,
+];
+
+const heavyImportViolations = adminFiles.filter((file) => {
+  const rel = path.relative(adminSrc, file);
+  if (!HEAVY_IMPORT_RE.test(fs.readFileSync(file, 'utf8'))) return false;
+  return !HEAVY_IMPORT_ALLOW.some((pattern) => pattern.test(rel));
+});
+
+if (heavyImportViolations.length > 0) {
+  fail(
+    `Static recharts/leaflet imports must live in *-client.tsx, *-inner.tsx, or leaflet-setup.ts:\n${heavyImportViolations
+      .map((f) => `  - ${path.relative(root, f)}`)
+      .join('\n')}`,
+  );
+}
+
+// 9. Command palette navigation must derive from adminNavigation
+const navConfigPath = path.join(featuresDir, 'admin-shell', 'config', 'navigation.ts');
+const buildNavCommandsPath = path.join(featuresDir, 'admin-shell', 'commands', 'build-navigation-commands.ts');
+if (fs.existsSync(navConfigPath) && fs.existsSync(buildNavCommandsPath)) {
+  const buildNavSource = fs.readFileSync(buildNavCommandsPath, 'utf8');
+  if (!buildNavSource.includes('adminNavigation')) {
+    fail('build-navigation-commands.ts must import adminNavigation');
+  }
+  if (!buildNavSource.includes('`go-${item.key}`')) {
+    fail('build-navigation-commands.ts must map palette ids from adminNavigation keys');
+  }
+}
+
 if (failed) {
   process.exit(1);
 }

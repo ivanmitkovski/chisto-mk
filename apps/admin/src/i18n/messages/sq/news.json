@@ -1,0 +1,70 @@
+{
+  "pageTitle": "Lajme",
+  "pageDescription": "Menaxho postimet e lajmeve në faqen chisto.mk",
+  "create": {
+    "title": "Postim i ri",
+    "description": "Krijo një draft. Shto përmbajtje të plotë në të gjitha gjuhët para publikimit."
+  },
+  "table": {
+    "title": "Titulli",
+    "status": "Statusi",
+    "category": "Kategoria",
+    "published": "Publikuar",
+    "edit": "Ndrysho",
+    "empty": "Nuk ka postime ende."
+  },
+  "form": {
+    "slug": "Adresa URL (slug)",
+    "category": "Kategoria",
+    "scheduledAt": "Planifiko publikimin (opsionale)",
+    "title": "Titulli",
+    "excerpt": "Përmbledhje",
+    "cover": "Imazh ose video kopertine",
+    "body": "Përmbajtja",
+    "addParagraph": "Shto paragraf",
+    "removeBlock": "Hiq",
+    "addImage": "Ngarko imazh",
+    "addVideo": "Ngarko video"
+  },
+  "category": {
+    "release": "Publikim",
+    "partnership": "Partneritet",
+    "community": "Komunitet",
+    "product": "Produkt"
+  },
+  "status": {
+    "draft": "Draft",
+    "scheduled": "Planifikuar",
+    "published": "Publikuar",
+    "archived": "Arkivuar"
+  },
+  "actions": {
+    "new": "Postim i ri",
+    "back": "Kthehu",
+    "save": "Ruaj draftin",
+    "publish": "Publiko",
+    "unpublish": "Hiq publikimin",
+    "archive": "Arkivo",
+    "delete": "Fshi",
+    "createDraft": "Krijo draft"
+  },
+  "editor": {
+    "status": "Statusi: {status}"
+  },
+  "delete": {
+    "title": "Fshi postimin?",
+    "body": "Kjo e heq përgjithmonë postimin dhe mediat.",
+    "confirm": "Fshi"
+  },
+  "toast": {
+    "saved": "Postimi u ruajt",
+    "created": "Drafti u krijua",
+    "published": "Postimi u publikua",
+    "unpublished": "Publikimi u hoq",
+    "archived": "Postimi u arkivua",
+    "deleted": "Postimi u fshi",
+    "mediaUploaded": "Media u ngarkua",
+    "error": "Diçka shkoi keq"
+  },
+  "unableToLoad": "Nuk mund të ngarkohen postimet."
+}

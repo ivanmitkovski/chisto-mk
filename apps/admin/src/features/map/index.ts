@@ -1,4 +1,5 @@
 export { SitesMap } from './components/sites-map-client';
+export { MapWorkspace } from './components/map-workspace';
 export { MapToolbar } from './components/map-toolbar';
 export { MapMarker } from './components/map-marker';
 export { SitePreviewPanel } from './components/site-preview-panel';

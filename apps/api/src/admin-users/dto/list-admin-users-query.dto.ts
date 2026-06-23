@@ -33,6 +33,11 @@ export class ListAdminUsersQueryDto extends PaginationQueryDto {
   @IsEnum(Role)
   role?: Role;
 
+  @ApiPropertyOptional({ description: 'Filter users created after this ISO date' })
+  @IsOptional()
+  @IsDateString()
+  createdAfter?: string;
+
   @ApiPropertyOptional({ description: 'Filter users last active before this ISO date' })
   @IsOptional()
   @IsDateString()

@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { motion } from 'framer-motion';
 import { Button, Icon } from '@/components/ui';
 import { Can } from '@/lib/auth/rbac';
 import type { ReportRow } from '@/features/reports/types';
@@ -20,8 +19,6 @@ type ReportListCardProps = {
 
 type ReportListMobileCardProps = {
   report: ReportRow;
-  index?: number;
-  reducedMotion?: boolean;
   onApprove?: (report: ReportRow) => void;
   onReject?: (report: ReportRow) => void;
 };
@@ -154,19 +151,8 @@ export function ReportListCard({ report, onApprove, onReject }: ReportListCardPr
   );
 }
 
-const ROW_STAGGER_DELAY = 0.03;
-const MAX_STAGGER_DELAY = 0.15;
-
-function getRowTransition(index: number, reducedMotion?: boolean) {
-  if (reducedMotion) return { duration: 0 };
-  const delay = Math.min(index * ROW_STAGGER_DELAY, MAX_STAGGER_DELAY);
-  return { type: 'spring' as const, stiffness: 400, damping: 30, delay };
-}
-
 export function ReportListMobileCard({
   report,
-  index = 0,
-  reducedMotion,
   onApprove,
   onReject,
 }: ReportListMobileCardProps) {
@@ -180,11 +166,7 @@ export function ReportListMobileCard({
   const actionsDisabled = isReportFinalStatus(report.status);
 
   return (
-    <motion.article
-      initial={reducedMotion ? false : { opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={getRowTransition(index, reducedMotion)}
-    >
+    <article>
       <div className={styles.mobileCardWrapper}>
         <Link
           href={href}
@@ -270,6 +252,6 @@ export function ReportListMobileCard({
           </Can>
         )}
       </div>
-    </motion.article>
+    </article>
   );
 }

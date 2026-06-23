@@ -1,9 +1,9 @@
-import { ListWorkspaceSkeleton } from '@/components/ui';
 import { createDashboardLoadingPage } from '@/features/admin-shell/server';
+import { ActiveUsersWorkspaceSkeleton } from '@/features/active-users/components/active-users-workspace-skeleton';
 
 export default async function ActiveUsersLoading() {
   return createDashboardLoadingPage({
     activeItem: 'active-users',
-    children: <ListWorkspaceSkeleton statCount={4} tableCols={7} />,
+    children: <ActiveUsersWorkspaceSkeleton />,
   });
 }

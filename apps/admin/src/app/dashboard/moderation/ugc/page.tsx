@@ -1,7 +1,6 @@
-import { cookies } from 'next/headers';
 import { getTranslations } from 'next-intl/server';
 import { AdminShell } from '@/features/admin-shell';
-import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell';
+import { readDashboardShellState } from '@/features/admin-shell/server';
 import { PageHeader, SectionState } from '@/components/ui';
 import {
   getUgcModerationReport,
@@ -28,8 +27,7 @@ export default async function UgcModerationPage({ searchParams }: UgcModerationP
   await requirePagePermission(ADMIN_PERMISSIONS['moderation:read']);
   const tNav = await getTranslations('nav');
   const t = await getTranslations('moderation');
-  const cookieStore = await cookies();
-  const initialSidebarCollapsed = cookieStore.get(DESKTOP_SIDEBAR_COOKIE_KEY)?.value === '1';
+  const { initialSidebarCollapsed } = await readDashboardShellState();
   const params = await searchParams;
   const page = Math.max(1, Number.parseInt(params.page ?? '1', 10) || 1);
   const status = params.status ?? '';

@@ -8,10 +8,12 @@ import { Container } from "@/components/layout/Container";
 import { Logo } from "@/components/atoms/Logo";
 import { Button } from "@/components/atoms/Button";
 import { SocialIcon } from "@/components/molecules/SocialIcon";
+import { StoreDownloadButtons } from "@/components/molecules/StoreDownloadButtons";
 import { subscribeNewsletter } from "@/app/actions/newsletter";
 import { Mail, Phone } from "lucide-react";
 import { handleHomeNavigationClick } from "@/lib/utils/smooth-scroll";
 import { getPublicOptionalUrl, LEGAL_PUBLIC_DEFAULTS } from "@/lib/legal/legal-public-config";
+import { hasStoreDownloadLinks } from "@/lib/store-links";
 import { isLaunchPageVisible } from "@/config/launch";
 
 export function Footer() {
@@ -35,11 +37,15 @@ export function Footer() {
   const instagramUrl = getPublicOptionalUrl(process.env.NEXT_PUBLIC_INSTAGRAM_URL);
   const hasSocialLinks = Boolean(facebookUrl || instagramUrl);
 
-  async function handleSubscribe(e: React.FormEvent) {
+  async function handleSubscribe(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setStatus("loading");
     setNewsletterError(null);
-    const result = await subscribeNewsletter(email);
+    const fd = new FormData(e.currentTarget);
+    const result = await subscribeNewsletter(
+      email,
+      (fd.get("companyWebsite") as string) ?? "",
+    );
     if (result.ok) {
       setStatus("success");
       setEmail("");
@@ -85,6 +91,12 @@ export function Footer() {
                 {instagramUrl && <SocialIcon platform="instagram" href={instagramUrl} />}
               </div>
             )}
+            {hasStoreDownloadLinks() && (
+              <div className="mt-6">
+                <p className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-gray-900">{t("downloadApp")}</p>
+                <StoreDownloadButtons />
+              </div>
+            )}
           </div>
 
           <div className="md:col-span-6 lg:col-span-2">
@@ -120,16 +132,6 @@ export function Footer() {
                   </Link>
                 </li>
               )}
-              {isLaunchPageVisible("press") && (
-                <li>
-                  <Link
-                    href="/press"
-                    className="text-sm text-gray-600 transition-colors duration-300 ease-out hover:text-gray-900"
-                  >
-                    {t("linkPress")}
-                  </Link>
-                </li>
-              )}
               <li>
                 <Link
                   href="/help"
@@ -146,6 +148,16 @@ export function Footer() {
                   {t("linkContact")}
                 </Link>
               </li>
+              {isLaunchPageVisible("press") && (
+                <li>
+                  <Link
+                    href="/press"
+                    className="text-sm text-gray-600 transition-colors duration-300 ease-out hover:text-gray-900"
+                  >
+                    {t("linkPress")}
+                  </Link>
+                </li>
+              )}
             </ul>
           </div>
 
@@ -188,7 +200,15 @@ export function Footer() {
             <h4 className="mb-4 text-xs font-bold uppercase tracking-[0.14em] text-gray-900">{t("newsletter")}</h4>
             <p className="mb-4 text-sm text-gray-500">{t("stayUpToDate")}</p>
             <form onSubmit={handleSubscribe} className="w-full max-w-[20.4rem] space-y-2">
-              <div className="rounded-full bg-gradient-to-r from-primary/55 via-emerald-400/45 to-sky-400/50 p-px shadow-[0_10px_36px_rgba(0,217,142,0.18)] transition-shadow focus-within:shadow-[0_12px_44px_rgba(0,217,142,0.28)]">
+              <input
+                type="text"
+                name="companyWebsite"
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden
+                className="absolute left-[-9999px] h-px w-px opacity-0"
+              />
+              <div className="rounded-full bg-gradient-to-r from-primary/55 via-emerald-400/45 to-sky-400/50 p-px shadow-[var(--shadow-lift)] transition-shadow focus-within:shadow-[0_12px_44px_rgba(0,217,142,0.28)]">
                 <div className="flex min-w-0 items-center gap-2 rounded-full bg-white py-1 pl-4 pr-1.5 shadow-inner ring-1 ring-black/[0.04] transition-shadow focus-within:ring-2 focus-within:ring-primary/30">
                   <input
                     type="email"

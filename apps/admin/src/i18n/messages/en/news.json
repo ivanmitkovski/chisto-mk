@@ -1,0 +1,70 @@
+{
+  "pageTitle": "News",
+  "pageDescription": "Manage landing page news posts for chisto.mk",
+  "create": {
+    "title": "New news post",
+    "description": "Create a draft post. Add full content in all locales before publishing."
+  },
+  "table": {
+    "title": "Title",
+    "status": "Status",
+    "category": "Category",
+    "published": "Published",
+    "edit": "Edit",
+    "empty": "No news posts yet."
+  },
+  "form": {
+    "slug": "URL slug",
+    "category": "Category",
+    "scheduledAt": "Schedule publish (optional)",
+    "title": "Title",
+    "excerpt": "Excerpt",
+    "cover": "Cover image or video",
+    "body": "Body",
+    "addParagraph": "Add paragraph",
+    "removeBlock": "Remove",
+    "addImage": "Upload image block",
+    "addVideo": "Upload video block"
+  },
+  "category": {
+    "release": "Release",
+    "partnership": "Partnership",
+    "community": "Community",
+    "product": "Product"
+  },
+  "status": {
+    "draft": "Draft",
+    "scheduled": "Scheduled",
+    "published": "Published",
+    "archived": "Archived"
+  },
+  "actions": {
+    "new": "New post",
+    "back": "Back",
+    "save": "Save draft",
+    "publish": "Publish",
+    "unpublish": "Unpublish",
+    "archive": "Archive",
+    "delete": "Delete",
+    "createDraft": "Create draft"
+  },
+  "editor": {
+    "status": "Status: {status}"
+  },
+  "delete": {
+    "title": "Delete post?",
+    "body": "This permanently removes the post and its media.",
+    "confirm": "Delete"
+  },
+  "toast": {
+    "saved": "Post saved",
+    "created": "Draft created",
+    "published": "Post published",
+    "unpublished": "Post unpublished",
+    "archived": "Post archived",
+    "deleted": "Post deleted",
+    "mediaUploaded": "Media uploaded",
+    "error": "Something went wrong"
+  },
+  "unableToLoad": "Could not load news posts."
+}

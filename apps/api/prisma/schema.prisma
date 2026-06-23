@@ -102,6 +102,10 @@ model User {
   ugcReportsFiled             UgcContentReport[]       @relation("UgcReporter")
   activityEvents              UserActivityEvent[]
   adminAlertRulesCreated      AdminAlertRule[]         @relation("AdminAlertRuleCreator")
+  moderationNotes             UserModerationNote[]     @relation("UserModerationNotes")
+  moderationNotesAuthored     UserModerationNote[]     @relation("UserModerationNoteAuthor")
+  statusActions               UserStatusAction[]       @relation("UserStatusActions")
+  statusActionsPerformed      UserStatusAction[]       @relation("UserStatusActionActor")
 
   @@index([role])
   @@index([status])
@@ -120,6 +124,35 @@ model UserBlock {
   @@unique([blockerId, blockedUserId])
   @@index([blockerId])
   @@index([blockedUserId])
+}
+
+model UserModerationNote {
+  id        String   @id @default(cuid())
+  userId    String
+  authorId  String
+  body      String
+  createdAt DateTime @default(now())
+
+  user   User @relation("UserModerationNotes", fields: [userId], references: [id], onDelete: Cascade)
+  author User @relation("UserModerationNoteAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+model UserStatusAction {
+  id         String     @id @default(cuid())
+  userId     String
+  actorId    String
+  fromStatus UserStatus
+  toStatus   UserStatus
+  reasonCode String
+  note       String?
+  createdAt  DateTime   @default(now())
+
+  user  User @relation("UserStatusActions", fields: [userId], references: [id], onDelete: Cascade)
+  actor User @relation("UserStatusActionActor", fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
 }
 
 /// Citizen-reported UGC (comments, chat, profiles) for admin moderation queue.
@@ -1678,4 +1711,68 @@ model AdminMutationIdempotency {
   @@unique([actorUserId, purpose, clientJobId])
   @@index([createdAt])
   @@map("admin_mutation_idempotency")
+}
+
+enum NewsPostStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHED
+  ARCHIVED
+}
+
+enum NewsCategory {
+  RELEASE
+  PARTNERSHIP
+  COMMUNITY
+  PRODUCT
+}
+
+enum NewsMediaKind {
+  COVER
+  INLINE_IMAGE
+  INLINE_VIDEO
+}
+
+model NewsPost {
+  id          String         @id @default(cuid())
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  slug        String         @unique
+  category    NewsCategory
+  status      NewsPostStatus @default(DRAFT)
+  publishedAt DateTime?
+  scheduledAt DateTime?
+
+  coverMediaId String? @unique
+  coverMedia   NewsMedia? @relation("NewsCover", fields: [coverMediaId], references: [id], onDelete: SetNull)
+
+  translations Json
+  createdById  String?
+  updatedById  String?
+
+  media NewsMedia[] @relation("NewsPostMedia")
+
+  @@index([status, publishedAt(sort: Desc)])
+}
+
+model NewsMedia {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  postId String
+  post   NewsPost @relation("NewsPostMedia", fields: [postId], references: [id], onDelete: Cascade)
+
+  kind            NewsMediaKind
+  objectKey       String        @unique
+  mimeType        String
+  fileName        String?
+  sizeBytes       Int
+  width           Int?
+  height          Int?
+  durationSeconds Int?
+  altText         Json?
+  sortOrder       Int           @default(0)
+
+  coverForPost NewsPost? @relation("NewsCover")
 }

@@ -29,4 +29,16 @@ export class PatchAdminUserDto {
   @IsOptional()
   @IsEnum(UserStatus)
   status?: UserStatus;
+
+  @ApiPropertyOptional({ description: 'Reason code when changing status' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  reasonCode?: string;
+
+  @ApiPropertyOptional({ description: 'Optional moderator note for status change' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(2000)
+  note?: string;
 }

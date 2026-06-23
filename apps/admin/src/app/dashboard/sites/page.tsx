@@ -1,20 +1,21 @@
-import { cookies } from 'next/headers';
 import { getTranslations } from 'next-intl/server';
 import { AdminShell } from '@/features/admin-shell';
-import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell';
+import { readDashboardShellState } from '@/features/admin-shell/server';
 import { SectionState } from '@/components/ui';
-import { getSitesList, getSitesStats } from '@/features/sites';
 import { SitesWorkspace } from '@/features/sites';
+import { getSitesList, getSitesStats } from '@/features/sites/data/sites-adapter';
+import { ADMIN_PERMISSIONS } from '@/lib/auth/rbac/permissions';
+import { requirePagePermission } from '@/lib/auth/rbac/server';
+import { handleServerLoadError } from '@/lib/server/handle-server-load-error';
 
 type PageProps = {
   searchParams: Promise<{ status?: string; page?: string; search?: string }>;
 };
 
 export default async function SitesPage(props: PageProps) {
+  await requirePagePermission(ADMIN_PERMISSIONS['sites:read']);
   const tNav = await getTranslations('nav');
-  const tErrors = await getTranslations('errors');
-  const cookieStore = await cookies();
-  const initialSidebarCollapsed = cookieStore.get(DESKTOP_SIDEBAR_COOKIE_KEY)?.value === '1';
+  const { initialSidebarCollapsed } = await readDashboardShellState();
   const params = await props.searchParams;
   const page = Math.max(1, parseInt(params.page ?? '1', 10) || 1);
   const limit = 20;
@@ -28,10 +29,11 @@ export default async function SitesPage(props: PageProps) {
       getSitesList({ page, limit, ...(status ? { status } : {}), ...(search ? { search } : {}) }),
       getSitesStats(),
     ]);
-  } catch {
+  } catch (error) {
+    const message = await handleServerLoadError(error, { fallbackMessageKey: 'unableToLoadSites' });
     return (
       <AdminShell title={tNav('sites')} activeItem="sites" initialSidebarCollapsed={initialSidebarCollapsed}>
-        <SectionState variant="error" message={tErrors('unableToLoadSites')} />
+        <SectionState variant="error" message={message} />
       </AdminShell>
     );
   }

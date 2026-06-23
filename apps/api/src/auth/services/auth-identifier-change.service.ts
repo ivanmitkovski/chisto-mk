@@ -12,13 +12,30 @@ import type { EmailLocale } from '../../email/types/email.types';
 import { OTP_SENDER, type OtpSender, OtpSmsPurpose } from '../../otp/types/otp-sender.interface';
 import { generateOtpCode } from '../../otp/util/otp-code.util';
 import { UserAuthSnapshotCacheService } from './user-auth-snapshot-cache.service';
+import { AuthSessionRevocationService } from './auth-session-revocation.service';
 import { AUTH_ENV_RUNTIME, type AuthEnvRuntime } from '../constants/auth-env.config';
+
+export type AdminEmailChangeContext = {
+  actorId: string;
+  reasonCode: string;
+  note?: string;
+};
+
+export type EmailChangeRequestOptions = {
+  adminContext?: AdminEmailChangeContext;
+};
+
+export type EmailChangeConfirmResult = {
+  initiatedBy: 'admin' | 'user';
+  adminContext?: AdminEmailChangeContext;
+};
 
 type PendingChange = {
   kind: 'email' | 'phone';
   newValue: string;
   codeHash: string;
   expiresAt: string;
+  adminContext?: AdminEmailChangeContext;
 };
 
 @Injectable()
@@ -31,6 +48,7 @@ export class AuthIdentifierChangeService implements OnModuleDestroy {
     private readonly authSnapshotCache: UserAuthSnapshotCacheService,
     private readonly audit: AuditService,
     private readonly identifierThrottle: AuthIdentifierThrottleService,
+    private readonly sessionRevocation: AuthSessionRevocationService,
     @Inject(OTP_SENDER) private readonly otpSender: OtpSender,
     @Inject(AUTH_ENV_RUNTIME) private readonly env: AuthEnvRuntime,
   ) {
@@ -42,6 +60,7 @@ export class AuthIdentifierChangeService implements OnModuleDestroy {
   async requestEmailChange(
     userId: string,
     newEmail: string,
+    options?: EmailChangeRequestOptions,
   ): Promise<{ expiresIn: number; devCode?: string }> {
     const normalized = newEmail.trim().toLowerCase();
     await this.identifierThrottle.assertAllowed('email_change', userId, 3, 3600);
@@ -59,14 +78,24 @@ export class AuthIdentifierChangeService implements OnModuleDestroy {
     if (!user?.email) {
       throw new BadRequestException({ code: 'USER_NOT_FOUND', message: 'User not found' });
     }
+    if (user.email === normalized) {
+      throw new BadRequestException({
+        code: 'EMAIL_UNCHANGED',
+        message: 'New email must differ from the current email',
+      });
+    }
 
     const code = String(randomInt(100_000, 999_999));
-    await this.storePending(userId, {
+    const pending: PendingChange = {
       kind: 'email',
       newValue: normalized,
       codeHash: this.hashCode(code),
       expiresAt: new Date(Date.now() + 600_000).toISOString(),
-    });
+    };
+    if (options?.adminContext) {
+      pending.adminContext = options.adminContext;
+    }
+    await this.storePending(userId, pending);
 
     const locales = await notificationLocalesByUserId(this.prisma, [userId]);
     const rawLocale = locales.get(userId) ?? 'en';
@@ -99,7 +128,11 @@ export class AuthIdentifierChangeService implements OnModuleDestroy {
     return result;
   }
 
-  async confirmEmailChange(userId: string, newEmail: string, code: string): Promise<void> {
+  async confirmEmailChange(
+    userId: string,
+    newEmail: string,
+    code: string,
+  ): Promise<EmailChangeConfirmResult> {
     const normalized = newEmail.trim().toLowerCase();
     const pending = await this.loadPending(userId);
     if (!pending || pending.kind !== 'email' || pending.newValue !== normalized) {
@@ -119,19 +152,32 @@ export class AuthIdentifierChangeService implements OnModuleDestroy {
       data: { email: normalized },
     });
 
+    const adminContext = pending.adminContext;
+    const initiatedBy = adminContext ? 'admin' : 'user';
+    const actorId = adminContext?.actorId ?? userId;
+
     await this.clearPending(userId);
     this.authSnapshotCache.invalidate(userId);
+    await this.sessionRevocation.revokeAllForUser(userId, 'identifier_changed');
     await this.audit.log({
-      actorId: userId,
+      actorId,
       action: 'IDENTIFIER_CHANGED',
       resourceType: 'User',
       resourceId: userId,
       metadata: {
         field: 'email',
+        initiatedBy,
+        reasonCode: adminContext?.reasonCode ?? null,
         oldHash: before?.email ? hashPiiForLog(before.email) : null,
         newHash: hashPiiForLog(normalized),
       },
     });
+
+    const result: EmailChangeConfirmResult = { initiatedBy };
+    if (adminContext) {
+      result.adminContext = adminContext;
+    }
+    return result;
   }
 
   async requestPhoneChange(
@@ -184,6 +230,7 @@ export class AuthIdentifierChangeService implements OnModuleDestroy {
     });
     await this.clearPending(userId);
     this.authSnapshotCache.invalidate(userId);
+    await this.sessionRevocation.revokeAllForUser(userId, 'identifier_changed');
     await this.audit.log({
       actorId: userId,
       action: 'IDENTIFIER_CHANGED',
@@ -191,6 +238,7 @@ export class AuthIdentifierChangeService implements OnModuleDestroy {
       resourceId: userId,
       metadata: {
         field: 'phone',
+        initiatedBy: 'user',
         oldHash: before?.phoneNumber ? hashPiiForLog(before.phoneNumber) : null,
         newHash: hashPiiForLog(normalized),
       },

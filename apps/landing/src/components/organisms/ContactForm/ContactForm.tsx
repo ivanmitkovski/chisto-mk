@@ -70,6 +70,7 @@ export function ContactForm() {
       phone: fd.get("phone") as string,
       email: fd.get("email") as string,
       message: fd.get("message") as string,
+      companyWebsite: (fd.get("companyWebsite") as string) ?? "",
     });
 
     if (result.ok) {
@@ -111,6 +112,14 @@ export function ContactForm() {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="mt-12 md:mt-14">
+            <input
+              type="text"
+              name="companyWebsite"
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden
+              className="absolute left-[-9999px] h-px w-px opacity-0"
+            />
             <div className="grid gap-6 sm:gap-8 md:grid-cols-3">
               <FormField label={tc("fullName")}>
                 <Input

@@ -47,7 +47,7 @@
   position: absolute;
   inset: 0;
   border: 0;
-  background: rgba(5, 20, 14, 0.52);
+  background: var(--shell-overlay-scrim);
   cursor: pointer;
   opacity: 1;
 }

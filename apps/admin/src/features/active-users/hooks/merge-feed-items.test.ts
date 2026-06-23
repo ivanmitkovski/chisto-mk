@@ -23,4 +23,10 @@ describe('mergeFeedItems', () => {
 
     expect(merged.map((row) => row.id)).toEqual(['c', 'a', 'b']);
   });
+
+  it('returns incoming when existing is empty', () => {
+    const merged = mergeFeedItems([], [item('x', '2026-06-08T10:00:00.000Z')]);
+    expect(merged).toHaveLength(1);
+    expect(merged[0]?.id).toBe('x');
+  });
 });

@@ -12,7 +12,8 @@ export type SessionRevokeReason =
   | 'admin_action'
   | 'user_revoke_others'
   | 'refresh_token_reuse'
-  | 'account_deleted';
+  | 'account_deleted'
+  | 'identifier_changed';
 
 @Injectable()
 export class AuthSessionRevocationService {

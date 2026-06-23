@@ -12,6 +12,7 @@ import {
   EcoEventDifficulty,
 } from '../src/prisma-client';
 import * as bcrypt from 'bcrypt';
+import { seedNewsLaunchPost } from './seed-news';
 
 function connectionStringWithNoVerify(url: string): string {
   const noVerify = 'sslmode=no-verify';
@@ -547,6 +548,8 @@ function printEventSeedSummary(args: {
 ║   ${cancelledEvent.id}
 ╚══════════════════════════════════════════════════════════════════════════════╝
 `);
+
+  await seedNewsLaunchPost(prisma);
 }
 
 main()

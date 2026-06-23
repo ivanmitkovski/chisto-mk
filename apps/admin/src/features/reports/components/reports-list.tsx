@@ -144,7 +144,6 @@ function ReportsListInner({
               reports={query.paginatedReports}
               highlightedReportIds={highlightedReportIds}
               isOverview={query.isOverview}
-              reducedMotion={!!reducedMotion}
               onSort={query.handleSort}
               sortIconName={query.sortIconName}
               ariaSortValue={query.ariaSortValue}
@@ -155,7 +154,6 @@ function ReportsListInner({
             <ReportsListMobileList
               reports={query.paginatedReports}
               highlightedReportIds={highlightedReportIds}
-              reducedMotion={!!reducedMotion}
               onApprove={confirm.openApproveModal}
               onReject={confirm.openRejectModal}
             />

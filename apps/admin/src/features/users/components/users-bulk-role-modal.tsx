@@ -8,7 +8,6 @@ import styles from './users-bulk-role-modal.module.css';
 const ROLE_OPTIONS = [
   { value: 'USER', labelKey: 'filters.roleUser' },
   { value: 'SUPPORT', labelKey: 'filters.roleSupport' },
-  { value: 'MODERATOR', labelKey: 'filters.roleModerator' },
   { value: 'ADMIN', labelKey: 'filters.roleAdmin' },
   { value: 'SUPER_ADMIN', labelKey: 'filters.roleSuperAdmin' },
 ] as const;

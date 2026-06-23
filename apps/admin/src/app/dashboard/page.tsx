@@ -1,8 +1,7 @@
 import { Suspense } from 'react';
-import { cookies } from 'next/headers';
 import { getTranslations } from 'next-intl/server';
 import { AdminShell } from '@/features/admin-shell';
-import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell';
+import { readDashboardShellState } from '@/features/admin-shell/server';
 import {
   DashboardKeyboardShortcuts,
   DashboardOfflineBanner,
@@ -24,8 +23,7 @@ export default async function DashboardPage() {
   await requirePagePermission(ADMIN_PERMISSIONS['dashboard:view']);
   const t = await getTranslations('dashboard');
   const tCommon = await getTranslations('common');
-  const cookieStore = await cookies();
-  const initialSidebarCollapsed = cookieStore.get(DESKTOP_SIDEBAR_COOKIE_KEY)?.value === '1';
+  const { initialSidebarCollapsed } = await readDashboardShellState();
 
   return (
     <AdminShell

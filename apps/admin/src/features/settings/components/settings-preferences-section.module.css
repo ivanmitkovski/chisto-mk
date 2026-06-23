@@ -36,14 +36,14 @@
   background: none;
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
-  color: #0f766e;
+  color: var(--color-status-success-fg);
   cursor: pointer;
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
 .soundTestButton:hover {
-  color: #0b5f59;
+  color: var(--color-green-900);
 }
 
 .soundTestButton:focus-visible {

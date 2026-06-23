@@ -1,20 +1,38 @@
 .root {
   display: grid;
   gap: var(--space-3);
+  min-width: 0;
 }
 
 .searchField {
+  min-width: 0;
+}
+
+.combobox {
   position: relative;
+  width: 100%;
+  min-width: 0;
 }
 
 .searchInput {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
   min-height: 2.5rem;
-  border: 1px solid var(--border-default);
+  border: 1px solid var(--color-green-010);
   border-radius: var(--radius-lg);
   padding: 0 var(--space-3);
-  background: var(--bg-surface);
+  background: var(--bg-app);
   color: var(--text-primary);
   font: inherit;
+  font-size: var(--font-size-md);
+  transition:
+    border-color var(--motion-duration-fast) var(--motion-ease-out),
+    box-shadow var(--motion-duration-fast) var(--motion-ease-out);
+}
+
+.searchInput:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--color-primary) 40%, transparent);
 }
 
 .searchInput:focus-visible {
@@ -26,6 +44,10 @@
 .searchInput:disabled {
   opacity: 0.65;
   cursor: not-allowed;
+}
+
+.searchInput::placeholder {
+  color: var(--text-secondary);
 }
 
 .options {
@@ -60,7 +82,7 @@
 .options button:hover,
 .options button[aria-selected='true'],
 .optionActive {
-  background: rgba(8, 54, 39, 0.08);
+  background: color-mix(in srgb, var(--color-primary) 8%, transparent);
 }
 
 .options button:disabled {
@@ -142,13 +164,19 @@
 }
 
 .chipRemove:hover {
-  background: rgba(8, 54, 39, 0.08);
+  background: color-mix(in srgb, var(--color-primary) 8%, transparent);
   color: var(--text-primary);
 }
 
 .chipRemove:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
+}
+
+.emptySelected {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
 }
 
 .warning {

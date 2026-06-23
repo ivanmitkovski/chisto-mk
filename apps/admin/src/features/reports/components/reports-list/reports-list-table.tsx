@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { motion } from 'framer-motion';
 import { Icon, type IconName } from '@/components/ui';
 import { getColumnOptions } from '@/features/reports/config/table';
 import type { ReportRow, SortKey } from '@/features/reports/types';
@@ -13,7 +12,6 @@ type ReportsListTableProps = {
   reports: ReportRow[];
   highlightedReportIds: Set<string>;
   isOverview: boolean;
-  reducedMotion: boolean;
   onSort: (key: SortKey) => void;
   sortIconName: (key: SortKey) => IconName;
   ariaSortValue: (key: SortKey) => 'none' | 'ascending' | 'descending';
@@ -26,7 +24,6 @@ export function ReportsListTable({
   reports,
   highlightedReportIds,
   isOverview,
-  reducedMotion,
   onSort,
   sortIconName,
   ariaSortValue,
@@ -68,20 +65,13 @@ export function ReportsListTable({
           <span className={`${styles.headerCell} ${styles.actionsHeader}`}>{t('columnsActions')}</span>
         </div>
         <div className={styles.rowList} role="list">
-          {reports.map((report, index) => (
-            <motion.div
+          {reports.map((report) => (
+            <div
               key={report.id}
               className={`${styles.tableRow} ${highlightedReportIds.has(report.id) ? styles.tableRowNew : ''}`}
-              initial={reducedMotion ? false : { opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={
-                reducedMotion
-                  ? { duration: 0 }
-                  : { type: 'spring', stiffness: 400, damping: 30, delay: Math.min(index * 0.03, 0.15) }
-              }
             >
               <ReportListCard report={report} onApprove={onApprove} onReject={onReject} />
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>

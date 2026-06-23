@@ -17,6 +17,8 @@ type UserPointsPanelProps = {
   initialPage?: number;
   pageSize?: number;
   loadError?: string | null;
+  initialReportCreditsAvailable?: number;
+  initialReportCreditsSpentTotal?: number;
 };
 
 export function UserPointsPanel({
@@ -27,6 +29,8 @@ export function UserPointsPanel({
   initialPage = 1,
   pageSize = 20,
   loadError = null,
+  initialReportCreditsAvailable = 0,
+  initialReportCreditsSpentTotal = 0,
 }: UserPointsPanelProps) {
   const t = useTranslations('users');
   const tCommon = useTranslations('common');
@@ -40,6 +44,12 @@ export function UserPointsPanel({
   const [reasonCode, setReasonCode] = useState('admin_adjustment');
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState(false);
+  const [reportCreditsAvailable, setReportCreditsAvailable] = useState(initialReportCreditsAvailable);
+  const [reportCreditsSpentTotal, setReportCreditsSpentTotal] = useState(initialReportCreditsSpentTotal);
+  const [creditsDelta, setCreditsDelta] = useState('');
+  const [creditsReasonCode, setCreditsReasonCode] = useState('admin_adjustment');
+  const [creditsNote, setCreditsNote] = useState('');
+  const [creditsBusy, setCreditsBusy] = useState(false);
   const { showToast } = useToast();
 
   const loadLedgerPage = useCallback(
@@ -49,10 +59,19 @@ export function UserPointsPanel({
         const refreshed = await adminBrowserFetch<{
           data: UserPointLedgerEntry[];
           meta: { total: number; page: number; limit: number };
+          reportCreditsAvailable?: number;
+          reportCreditsSpentTotal?: number;
         }>(`/admin/gamification/users/${encodeURIComponent(userId)}/points?limit=${pageSize}&page=${nextPage}`);
         setLedger(refreshed.data);
         setTotal(refreshed.meta.total);
         setPage(refreshed.meta.page);
+        if (refreshed.reportCreditsAvailable != null) {
+          setReportCreditsAvailable(refreshed.reportCreditsAvailable);
+        }
+        if (refreshed.reportCreditsSpentTotal != null) {
+          setReportCreditsSpentTotal(refreshed.reportCreditsSpentTotal);
+        }
+        return refreshed;
       } finally {
         setLedgerLoading(false);
       }
@@ -69,9 +88,9 @@ export function UserPointsPanel({
         method: 'POST',
         body: { delta: parsedDelta, reasonCode, note: note.trim() || undefined },
       });
-      await loadLedgerPage(1);
-      if (ledger[0]) {
-        setBalance(ledger[0].balanceAfter);
+      const refreshed = await loadLedgerPage(1);
+      if (refreshed.data[0]) {
+        setBalance(refreshed.data[0].balanceAfter);
       } else {
         setBalance((b) => b + parsedDelta);
       }
@@ -90,6 +109,42 @@ export function UserPointsPanel({
       });
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function adjustReportCredits() {
+    const parsedDelta = Number(creditsDelta);
+    if (!Number.isFinite(parsedDelta) || parsedDelta === 0) return;
+    setCreditsBusy(true);
+    try {
+      const updated = await adminBrowserFetch<{
+        reportCreditsAvailable: number;
+        reportCreditsSpentTotal: number;
+      }>(`/admin/gamification/users/${encodeURIComponent(userId)}/report-credits/adjust`, {
+        method: 'POST',
+        body: {
+          delta: parsedDelta,
+          reasonCode: creditsReasonCode,
+          note: creditsNote.trim() || undefined,
+        },
+      });
+      setReportCreditsAvailable(updated.reportCreditsAvailable);
+      setReportCreditsSpentTotal(updated.reportCreditsSpentTotal);
+      setCreditsDelta('');
+      setCreditsNote('');
+      showToast({
+        tone: 'success',
+        title: t('detail.reportCredits.adjustedTitle'),
+        message: t('detail.reportCredits.adjustedMessage'),
+      });
+    } catch (error) {
+      showToast({
+        tone: 'warning',
+        title: t('detail.reportCredits.adjustFailed'),
+        message: error instanceof Error ? error.message : t('detail.reportCredits.adjustFailedMessage'),
+      });
+    } finally {
+      setCreditsBusy(false);
     }
   }
 
@@ -123,6 +178,38 @@ export function UserPointsPanel({
           </Button>
         </div>
       </Can>
+      <div className={styles.creditsSection}>
+        <h3>{t('detail.reportCredits.title')}</h3>
+        <p className={styles.balance}>
+          {t('detail.reportCredits.available', { count: reportCreditsAvailable })}
+        </p>
+        <p className={styles.creditsMeta}>
+          {t('detail.reportCredits.spentTotal', { count: reportCreditsSpentTotal })}
+        </p>
+        <Can permission="gamification:write">
+          <div className={styles.form}>
+            <Input
+              label={t('detail.reportCredits.delta')}
+              type="number"
+              value={creditsDelta}
+              onChange={(e) => setCreditsDelta(e.target.value)}
+            />
+            <Input
+              label={t('detail.reportCredits.reasonCode')}
+              value={creditsReasonCode}
+              onChange={(e) => setCreditsReasonCode(e.target.value)}
+            />
+            <Input
+              label={t('detail.reportCredits.noteOptional')}
+              value={creditsNote}
+              onChange={(e) => setCreditsNote(e.target.value)}
+            />
+            <Button disabled={creditsBusy || !creditsDelta} onClick={() => void adjustReportCredits()}>
+              {t('detail.reportCredits.adjust')}
+            </Button>
+          </div>
+        </Can>
+      </div>
       <h3>{t('detail.points.recentLedger', { count: total })}</h3>
       <table className={styles.table}>
         <thead>

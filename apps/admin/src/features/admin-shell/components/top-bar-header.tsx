@@ -71,6 +71,7 @@ export function TopBarHeader({
           className={styles.searchInput}
           readOnly
           value=""
+          data-command-palette-trigger=""
           leftSlot={<Icon name="magnifying-glass" size={14} />}
           rightSlot={<span className={styles.shortcutPill}>{shortcutLabel}</span>}
           onClick={() => onOpenPalette()}

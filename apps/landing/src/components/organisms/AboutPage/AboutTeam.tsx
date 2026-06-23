@@ -51,7 +51,8 @@ function initialsFromName(name: string): string {
 }
 
 function TeamPortraitPlaceholder({ name, caption }: { name: string; caption: string }) {
-  const useIcon = isPlaceholderDisplayName(name);
+  const useBrandMark = /chisto/i.test(name);
+  const useIcon = !useBrandMark && isPlaceholderDisplayName(name);
   const initials = useIcon ? "" : initialsFromName(name);
   const showInitials = initials.length > 0;
 
@@ -77,7 +78,16 @@ function TeamPortraitPlaceholder({ name, caption }: { name: string; caption: str
         aria-hidden
       />
       <div className="relative flex flex-1 flex-col items-center justify-center px-4 pt-6 pb-2">
-        {useIcon || !showInitials ? (
+        {useBrandMark ? (
+          <Image
+            src="/brand/chisto-mark-green.svg"
+            alt=""
+            width={80}
+            height={92}
+            className="h-20 w-auto opacity-90"
+            unoptimized
+          />
+        ) : useIcon || !showInitials ? (
           <div className="rounded-full bg-primary/10 p-5 ring-1 ring-primary/15">
             <UserRound
               className="h-14 w-14 text-primary/40 sm:h-[4.5rem] sm:w-[4.5rem]"

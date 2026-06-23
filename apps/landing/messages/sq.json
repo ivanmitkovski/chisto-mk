@@ -3,19 +3,19 @@
     "siteName": "Chisto.mk",
     "home": {
       "title": "Chisto.mk | Platformë qytetare mjedisore",
-      "description": "Raportoni mbeturina, hedhje të paligjshme ose tym aty ku jetoni. Chisto.mk është një aplikacion maqedonas për vende reale dhe përgjigje reale."
+      "description": "Raportoni vende ndotjeje në të gjithë Maqedoninë. Hartëzoni mbeturina, hedhje të paligjshme dhe probleme ajri ose uji me foto, pastaj bashkohuni në aksione pastrimi lokale."
     },
     "about": {
       "title": "Rreth nesh | Chisto.mk",
-      "description": "Aplikacion qytetar për mbeturina dhe ajër të ndotur në Maqedoni."
+      "description": "Platformë qytetare për raportimin e ndotjes dhe aksionet e pastrimit në Maqedoni."
     },
     "contact": {
       "title": "Kontakt | Chisto.mk",
-      "description": "Pyetje, partneritet ose raportim defektesh në aplikacion. Na shkruani, i lexojmë të gjitha mesazhet."
+      "description": "Pyetje, partneritete ose probleme me aplikacionin. Dërgoni një mesazh dhe do t'ju përgjigjemi."
     },
     "news": {
       "title": "Lajme | Chisto.mk",
-      "description": "Përditësime produkti, shënime nga terreni dhe histori nga ekipi i Chisto.mk."
+      "description": "Njoftime zyrtare dhe mbulim nga terreni nga platforma qytetare mjedisore Chisto.mk."
     },
     "press": {
       "title": "Shtypi & media | Chisto.mk",
@@ -56,6 +56,7 @@
     "send": "Dërgo",
     "subscribe": "Abonohu",
     "language": "Gjuha",
+    "close": "Mbyll",
     "scrollToTop": "Kthehu lart",
     "skipToContent": "Kalo te përmbajtja kryesore"
   },
@@ -74,94 +75,86 @@
     "cancel": "Anulo"
   },
   "hero": {
-    "title": "Jetoni në një mjedis të pastër.",
-    "subtitle": "Problemet mjedisore zgjidhen më lehtë kur janë në hartë me foto. Chisto.mk e bën këtë publikisht, nëpër Maqedoni.",
+    "title": "Fotografo. Raporto. Pastro.",
+    "subtitle": "Bëhu pjesë e zgjidhjes. Jo e problemit. Për një Maqedoni më të pastër.",
+    "downloadRegionLabel": "Shkarkoni aplikacionin",
     "phoneDeckRegionLabel": "Parapamje e aplikacionit. Rrëshqitni horizontalisht ose përdorni shigjetat majtas dhe djathtas për të ndryshuar ekranin.",
     "phoneDeckDotsLabel": "Zgjidhni ekranin e aplikacionit",
     "phoneDeckSlideLogin": "Ekrani i hyrjes",
     "phoneDeckSlideWelcome": "Ekrani i mirëseardhjes",
-    "phoneDeckSlideFeed": "Feed i ndotjes",
+    "phoneDeckSlideFeed": "Rrjedha e ndotjes",
     "phoneDeckSlideMap": "Ekrani i hartës",
-    "phoneDeckSlideSiteDetail": "Detajet e vendit të ndotjes"
+    "phoneDeckSlideSiteDetail": "Detajet e vendit të ndotjes",
+    "phoneDeckSlideEvents": "Ngjarjet e pastrimit"
   },
   "screenshots": {
-    "welcomeAlt": "Ekrani i mirëseardhjes së Chisto.mk me mesazhin Shih. Raporto. Pastro.",
+    "welcomeAlt": "Ekrani i mirëseardhjes së Chisto.mk me mesazhin Fotografo. Raporto. Pastro.",
     "signInAlt": "Ekrani i hyrjes së Chisto.mk me fusha për numrin e telefonit dhe fjalëkalimin.",
     "mapAlt": "Ekrani i hartës së Chisto.mk që tregon raportet e verifikuara të ndotjes si pin foto.",
-    "feedAlt": "Feed-i kryesor i Chisto.mk me vende të verifikuara ndotjeje dhe butonin Merr veprim.",
-    "siteDetailAlt": "Ekrani i detajeve të vendit të ndotjes së Chisto.mk me foto, përshkrim dhe opsione veprimi komunitar."
+    "feedAlt": "Rrjedha e ndotjes së Chisto.mk me vende të verifikuara ndotjeje dhe butonin Vepro tani.",
+    "siteDetailAlt": "Ekrani i detajeve të vendit të ndotjes së Chisto.mk me foto, përshkrim dhe opsione veprimi komunitar.",
+    "eventsAlt": "Ekrani i ngjarjes së pastrimit të Chisto.mk me RSVP dhe opsionin Merr pjesë të lidhur me një vend ndotjeje."
   },
   "howItWorks": {
     "title": "Si funksionon",
-    "subtitle": "Pa zhargon. Instaloni, raportoni, dilni.",
+    "subtitle": "Shkarko, raporto një vend, bashkohu në një aksion pastrimi.",
     "steps": [
       {
         "title": "Merrni aplikacionin",
-        "description": "iOS ose Android. Regjistrohuni me një email që e hapni vërtet."
+        "description": "Shkarkoni nga App Store. Krijoni një llogari me numrin e telefonit dhe verifikojeni me SMS."
       },
       {
-        "title": "Vendosni një pin",
-        "description": "Mbeturina përgjatë shtigjit? Tym nga oxhaku? Vendoseni në hartë me një shënim të shkurtër dhe foto nëse mundeni."
+        "title": "Raportoni një vend ndotjeje",
+        "description": "Shtoni foto, kategori dhe vendndodhje. Mbeturinat, hedhja e paligjshme dhe ndotja e ajrit ose ujit i përkasin hartës."
       },
       {
-        "title": "Në aksion pastrimi",
-        "description": "Kur dikush organizon mbledhje ose mbjellje afër, do ta shihni në aplikacion."
+        "title": "Bashkohuni në aksione pastrimi",
+        "description": "Shfletoni ngjarje afër jush, regjistrohuni kur është hapur regjistrimi dhe ndiqni përditësimet e organizatorëve."
       }
     ]
   },
   "features": {
     "badge": "Veçoritë",
-    "block1Title": "Ajo që shihni është aty ku ndodhi",
-    "block2Title": "Kur postimi nuk mjafton",
-    "block2Body": "Raportet e hapura mbeten të dukshme që fqinjët, gazetarët dhe zyrtarët të mos pretendojnë se nuk pati problem. Kur një grup planifikon punë, mund të bashkoheni në vend që të pëlqeni vetëm një postim.",
+    "block1Title": "Çdo pin është një vend i vërtetë",
+    "block2Title": "Raporte që çojnë në veprim",
+    "block2Body": "Raportet e miratuara bëhen vende publike ndotjeje në hartë. Kur organizatorët planifikojnë aksione pastrimi, mund të regjistroheni nga i njëjti vend ku e gjetët problemin.",
     "mock": {
       "urgent": "Urgjente",
       "pollutionSites": "Vendet e ndotjes",
-      "takeAction": "Veproni",
+      "takeAction": "Vepro tani",
       "before": "Para"
     },
     "items": [
       {
-        "title": "Pin, jo mure teksti",
-        "description": "Harta fiton kur duhet të gjeni të njëjtën gropë ose kënd lojërash përsëri."
+        "title": "Raportim përmes hartës",
+        "description": "Gjeni përsëri të njëjtin breg lumi, shesh lojërash ose rrugë pa lëvizur nëpër postime."
       },
       {
-        "title": "Foto dhe data",
-        "description": "Kategori e përafërt, kohë, opsionale para/pas. Mjaftueshëm që një grup vullnetarësh ose zyra komunale të fillojë."
+        "title": "Foto me kontekst",
+        "description": "Kategoria, koha dhe imazhet opsionale para/pas u japin vullnetarëve dhe partnerëve diçka konkrete."
       },
       {
-        "title": "Nga raport te fshesa",
-        "description": "Nëse ka një aksion të planifikuar, qëndron pranë raporteve që të vini me doreza, jo vetëm me mendime."
+        "title": "Nga raporti te aksioni i pastrimit",
+        "description": "Pastrimet e planifikuara qëndrojnë pranë vendeve që synojnë, që të bashkoheni me një prekje te Vepro tani."
       }
     ]
   },
   "stats": {
-    "items": [
-      {
-        "number": "10000+",
-        "label": "Përdorues aktivë"
-      },
-      {
-        "number": "800kg",
-        "label": "Mbeturina e grumbulluar"
-      },
-      {
-        "number": "1750",
-        "label": "Raporte"
-      },
-      {
-        "number": "120",
-        "label": "Aksione ekologjike"
-      }
-    ]
+    "asOf": "Shifrat e komunitetit nga {date}",
+    "labels": {
+      "reports": "Raporte të dërguara",
+      "sites": "Vende publike ndotjeje",
+      "events": "Ngjarje pastrimi të organizuara",
+      "appStore": "Në App Store"
+    }
   },
   "faq": {
-    "badge": "PyPy",
+    "badge": "FAQ",
     "title": "Pyetje të shpeshta",
     "items": [
       {
         "title": "Çfarë është Chisto.mk?",
-        "content": "Aplikacion celular dhe sajt nga njerëz në rajon. Raportoni dëmtime ose rrëmujë mjedisore; qëndron publike në hartë dhe mund të lidheni me aksione vullnetare kur ekzistojnë.",
+        "content": "Chisto.mk është një platformë qytetare mjedisore për Maqedoni. Raportoni vende ndotjeje me foto dhe vendndodhje, ndiqni ato në një hartë publike dhe bashkohuni në aksione pastrimi kur organizatorët i publikojnë.",
         "variant": "green"
       },
       {
@@ -171,17 +164,17 @@
       },
       {
         "title": "Kush i sheh raportet e mia?",
-        "content": "Raportet janë të dizajnuara të jenë të dukshme për bashkësinë dhe aktorët përkatës që problemet të verifikohen dhe adresohen. Lexoni më shumë në politikën e privatësisë.",
+        "content": "Raportet lidhen me llogarinë tuaj dhe shfaqen në hartën publike pas shqyrtimit. Komunitetet, gazetarët dhe partnerët e përdorin hartën për verifikim dhe ndjekje. Lexoni politikën e privatësisë për të dhënat personale.",
         "variant": "white"
       },
       {
         "title": "A mund të raportoj në mënyrë anonime?",
-        "content": "Opsionet e llogarisë dhe privatësisë varen nga versioni i aplikacionit. Kontrolloni cilësimet ose na kontaktoni për opsionet më të fundit.",
+        "content": "Ju nevojitet një llogari për të dërguar raporte. Emri juaj nuk shfaqet në çdo ekran, por raportet lidhen me llogarinë dhe janë të dukshme në hartën publike. Detaje në politikën e privatësisë.",
         "variant": "green"
       },
       {
         "title": "Si funksionojnë aksionet e pastrimit?",
-        "content": "Organizatorët mund të publikojnë aksione në aplikacion. Mund të shfletoni ngjarje afër jush, të regjistroheni ku është e mundur dhe të shihni rezultatet pas aktivitetit.",
+        "content": "Organizatorët publikojnë aksione pastrimi në aplikacion, shpesh të lidhura me një vend ndotjeje. Shfletoni ngjarje afër jush, regjistrohuni kur është hapur regjistrimi dhe kontrolloni rezultatet pas aktivitetit.",
         "variant": "green"
       },
       {
@@ -192,8 +185,8 @@
     ]
   },
   "cta": {
-    "title": "Provoni aplikacionin",
-    "subtitle": "Nëse kaloni çdo javë pranë të njëjtave mbeturina, nuk kushton asgjë t'i dokumentoni një herë. Dikush tjetër mund të jetë duke organizuar një mbledhje."
+    "title": "Shkarkoni Chisto.mk",
+    "subtitle": "Dokumentoni një vend ndotjeje një herë nga telefoni. Fqinjët dhe organizatorët mund ta ndjekin tashmë të njëjtin vend."
   },
   "footer": {
     "links": "Lidhje",
@@ -217,7 +210,8 @@
     "privacy": "Politika e privatësisë",
     "cookies": "Politika e cookies",
     "cookieSettings": "Cilësimet e cookies",
-    "linkData": "Të dhënat dhe llogaria juaj"
+    "linkData": "Të dhënat dhe llogaria juaj",
+    "downloadApp": "Merr aplikacionin"
   },
   "contact": {
     "kicker": "Kontakt",
@@ -252,7 +246,7 @@
     "loginSubtitle": "Hyni për të vazhduar",
     "loginButton": "Hyr",
     "welcomeTitle": "Raporte afër jush",
-    "welcomeSubtitle": "Pin nga njerëz në zonën tuaj. Prekni për të parë foton.",
+    "welcomeSubtitle": "Vende ndotjeje afër jush. Prekni për të hapur foton dhe detajet.",
     "welcomeButton": "Vazhdo"
   },
   "errors": {
@@ -265,50 +259,26 @@
   },
   "aboutPage": {
     "badge": "Rreth nesh",
-    "title": "Chisto.mk është aplikacion qytetar për mbeturina dhe ajër të ndotur në Maqedoni.",
-    "subtitle": "Raportoni mbeturina, hedhje të paligjshme ose ajër të ndotur me foto dhe pikë në hartë. I njëjti vend mbetet i dukshëm për të gjithë.",
+    "title": "Platformë qytetare për raportimin e ndotjes në Maqedoni.",
+    "subtitle": "Ndërtojmë mjete që çdokush të raportojë një vend ndotjeje me foto dhe vendndodhje, ta mbajë të dukshëm në një hartë publike dhe të lidhet me aksione pastrimi.",
     "creatorsPhotoPlaceholder": "Foto së shpejti",
     "creatorsSectionTitle": "Ekipi",
     "teamCarouselPrev": "Anëtari i mëparshëm i ekipit",
     "teamCarouselNext": "Anëtari tjetër i ekipit",
     "creators": [
       {
-        "name": "Emri më vonë",
-        "role": "Bio më vonë",
-        "imageAlt": "Vend mbajtës, ekip Chisto.mk",
-        "imageSrc": ""
-      },
-      {
-        "name": "Emri më vonë",
-        "role": "Bio më vonë",
-        "imageAlt": "Vend mbajtës, ekip Chisto.mk",
-        "imageSrc": ""
-      },
-      {
-        "name": "Emri më vonë",
-        "role": "Bio më vonë",
-        "imageAlt": "Vend mbajtës, ekip Chisto.mk",
-        "imageSrc": ""
-      },
-      {
-        "name": "Emri më vonë",
-        "role": "Bio më vonë",
-        "imageAlt": "Vend mbajtës, ekip Chisto.mk",
-        "imageSrc": ""
-      },
-      {
-        "name": "Emri më vonë",
-        "role": "Bio më vonë",
-        "imageAlt": "Vend mbajtës, ekip Chisto.mk",
+        "name": "Ekipi Chisto.mk",
+        "role": "Ndërtojmë mjete qytetare mjedisore në Maqedoni.",
+        "imageAlt": "Ekipi Chisto.mk",
         "imageSrc": ""
       }
     ]
   },
   "newsPage": {
     "badge": "Lajme",
-    "title": "Përditësime nga ekipi",
-    "lead": "Shënime versionesh, partneritete dhe herë pas here artikuj kur ka diçka për t'u ndarë.",
-    "demoNotice": "Këto artikuj janë përmbajtje demonstruese. Një sistem i menaxhueshëm lajmesh do t'i zëvendësojë kur të jetë gati.",
+    "title": "Lajme nga Chisto.mk",
+    "lead": "Njoftime zyrtare, publikime produkti dhe mbulim nga terreni nga platforma qytetare mjedisore.",
+    "demoNotice": "",
     "featuredLabel": "Në fokus",
     "latestHeading": "Më shumë histori",
     "readMore": "Lexo më shumë",
@@ -320,13 +290,13 @@
       "product": "Produkt"
     },
     "emptyTitle": "Postime të reja së shpejti",
-    "emptyBody": "Po përgatisim një listë të thjeshtë këtu. Deri atëherë na ndiqni në rrjetet sociale ose na shkruani nëse keni një sugjerim historie.",
+    "emptyBody": "Po e përgatisim këtë seksion. Na ndiqni në rrjetet sociale ose na kontaktoni nëse keni një histori për të ndarë.",
     "contactCta": "Sugjero një histori ose bëj një pyetje"
   },
   "pressPage": {
     "badge": "Media",
     "title": "Burime për media",
-    "lead": "Materialet më poshtë janë për gazetarë dhe partnerë. Për gjithçka tjetër na shkruani me email. Përgjigjemi pyetjeve serioze.",
+    "lead": "Materialet më poshtë janë për gazetarë dhe partnerë. Na kontaktoni për intervista dhe pyetje partneriteti.",
     "assetsTitle": "Marka",
     "logoTitle": "Shenja",
     "logoBody": "SVG për sfonde të çelëta. Lini hapësirë rreth simbolit; mos e zgjatni dhe mos i ndryshoni ngjyrat.",
@@ -334,7 +304,7 @@
     "inquiriesTitle": "Kontakt",
     "inquiriesLead": "Pyetje për shtyp dhe partneritet:",
     "boilerplateTitle": "Përshkrim i shkurtër",
-    "boilerplate": "Chisto.mk është një platformë qytetare mjedisore në Maqedoni. Njerëzit raportojnë mbeturina, hedhje të paligjshme dhe tym në një hartë publike me foto dhe vendndodhje, dhe mund të bashkohen në aksione lokale pastrimi kur organizatorët i postojnë në aplikacion."
+    "boilerplate": "Chisto.mk është një platformë qytetare mjedisore në Maqedoni. Banorët raportojnë vende ndotjeje në një hartë publike me foto dhe vendndodhje, bashkohen në aksione pastrimi dhe ndjekin përditësimet në aplikacionin për iOS."
   },
   "legalNav": {
     "ariaLabel": "Dokumente ligjore",
@@ -720,8 +690,8 @@
         "cardTitle": "Konfiguroni Chisto.mk",
         "cardSummary": "Instaloni aplikacionin, krijoni llogarinë, zgjidhni gjuhën dhe mësoni ku janë njoftimet dhe cilësimet e privatësisë.",
         "title": "Konfiguroni Chisto.mk",
-        "lastUpdated": "15 prill 2026",
-        "lastReviewed": "16 prill 2026",
+        "lastUpdated": "22 qershor 2026",
+        "lastReviewed": "22 qershor 2026",
         "datePublished": "2024-01-01T00:00:00.000Z",
         "dateModified": "2026-04-16T00:00:00.000Z",
         "sections": [
@@ -731,7 +701,7 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Chisto.mk funksionon në iOS dhe Android. Instaloni nga App Store ose Google Play, ose prekni butonat e shkarkimit në faqen kryesore të chisto.mk."
+                "text": "Shkarkoni Chisto.mk nga App Store ose përdorni butonat e shkarkimit në faqen kryesore chisto.mk."
               },
               {
                 "type": "bullets",
@@ -827,8 +797,8 @@
         "cardTitle": "Paraqisni një raport ndotjeje",
         "cardSummary": "Bëni foto të dobishme, vendoseni kunjin saktë dhe ndiqni moderimin pasi ta dërgoni.",
         "title": "Paraqisni një raport ndotjeje",
-        "lastUpdated": "15 prill 2026",
-        "lastReviewed": "16 prill 2026",
+        "lastUpdated": "22 qershor 2026",
+        "lastReviewed": "22 qershor 2026",
         "sections": [
           {
             "id": "before-you-start",
@@ -879,7 +849,7 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Vendosni kunjin te vendi i saktë i ndotjes në Maqedoni. Zmadhoni derisa ndërtesa ose rruga përputhet me atë që shihni."
+                "text": "Vendosni kunjin te vendi i saktë i ndotjes në Maqedoni. Zmadhoni derisa ndërtesa, bregu ose rruga përputhet me atë që shihni."
               },
               {
                 "type": "bullets",
@@ -917,8 +887,8 @@
         "cardTitle": "Bashkohuni në një aksion",
         "cardSummary": "Shfletoni aksione pranë jush, konfirmoni pjesëmarrjen dhe ndiqni udhëzimet e organizatorit para, gjatë dhe pas turnit.",
         "title": "Bashkohuni në një aksion pastrimi",
-        "lastUpdated": "15 prill 2026",
-        "lastReviewed": "16 prill 2026",
+        "lastUpdated": "22 qershor 2026",
+        "lastReviewed": "22 qershor 2026",
         "sections": [
           {
             "id": "find-an-event",
@@ -1002,8 +972,8 @@
         "cardTitle": "Llogaria dhe të dhënat tuaja",
         "cardSummary": "Mbrojni hyrjen, kuptoni çfarë ruajmë dhe përdorni faqet e duhura për privatësi dhe kërkesa të dhënash.",
         "title": "Llogaria, privatësia dhe kërkesat për të dhëna",
-        "lastUpdated": "16 prill 2026",
-        "lastReviewed": "16 prill 2026",
+        "lastUpdated": "22 qershor 2026",
+        "lastReviewed": "22 qershor 2026",
         "sections": [
           {
             "id": "what-the-app-stores",
@@ -1011,7 +981,7 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Llogaria juaj në Chisto.mk lidh raportet që dërgoni, ngjarjet ku regjistroheni dhe preferencat e njoftimeve që puna qytetare në Maqedoni të mbetet e qartë."
+                "text": "Llogaria juaj në Chisto.mk lidh raportet që dërgoni, aksionet e pastrimit ku merrni pjesë dhe preferencat e njoftimeve në të gjithë Maqedoninë."
               },
               {
                 "type": "bullets",
@@ -1107,8 +1077,8 @@
         "cardTitle": "Njoftimet",
         "cardSummary": "Zgjidhni cilat përditësime doni për raporte, aksione pastrimi dhe veprimtari të llogarisë.",
         "title": "Njoftimet në aplikacion",
-        "lastUpdated": "16 prill 2026",
-        "lastReviewed": "16 prill 2026",
+        "lastUpdated": "22 qershor 2026",
+        "lastReviewed": "22 qershor 2026",
         "sections": [
           {
             "id": "types-of-alerts",
@@ -1197,8 +1167,8 @@
         "cardTitle": "Zgjidhja e problemeve",
         "cardSummary": "Hapa për hyrje, vendndodhje, kamerë dhe kur të kërkoni ndihmë.",
         "title": "Zgjidhja e problemeve të zakonshme",
-        "lastUpdated": "16 prill 2026",
-        "lastReviewed": "16 prill 2026",
+        "lastUpdated": "22 qershor 2026",
+        "lastReviewed": "22 qershor 2026",
         "sections": [
           {
             "id": "cannot-sign-in",
@@ -1206,16 +1176,16 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Hyrja varet nga email i saktë, rrjet i qëndrueshëm dhe ora e telefonit që përputhet me realitetin. Nëse skadon kodi, kërkoni një të ri."
+                "text": "Shumica e problemeve të hyrjes lidhen me rrjetin, orën e pajisjes ose një version të vjetër. Kaloni nëpër listën më poshtë para se të supozoni se fjalëkalimi është gabim."
               },
               {
                 "type": "bullets",
-                "title": "Kontrolloni fillimisht",
+                "title": "Provoni fillimisht",
                 "items": [
-                  "Shihni nëse jeni në Wi-Fi ose të dhëna celulare dhe nëse faqja e hyrjes hapet.",
-                  "Fikni VPN ose proxy që mund të bllokojnë mesazhet.",
-                  "Verifikoni orën automatike dhe zonën kohore; orë e gabuar shpesh prish kodet.",
-                  "Kontrolloni që email-i të jetë i saktë dhe nëse mesazhi ka përfunduar te spam ose promocione."
+                  "Fikni modalitetin avion, prisni disa sekonda, pastaj rilidhu me Wi-Fi ose të dhëna celulare.",
+                  "Vendosni datën dhe orën automatikisht. Devijim i madh mund të prishë kodet SMS ose email.",
+                  "Kërkoni një kod të ri, prisni dhe ngjitni me kujdes. Kodet skadojnë shpejt.",
+                  "Përditësoni Chisto.mk nga dyqani, pastaj rinisni aplikacionin."
                 ]
               },
               {
@@ -1227,19 +1197,20 @@
           },
           {
             "id": "location-permission",
-            "title": "Harta ose GPS",
+            "title": "Probleme me hartën ose GPS",
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Harta mund të punojë edhe pa GPS të saktë, por për navigim te kunji dhe për raporte me vendndodhje ju duhet leja."
+                "text": "Harta ka nevojë për qasje në vendndodhje kur vendosni ose verifikoni pin. Nëse pika blu lëviz ose zhduket, rregulloni lejet para se të dërgoni një raport."
               },
               {
                 "type": "bullets",
-                "title": "Rregulloni lejen",
+                "title": "Lista kontrolluese",
                 "items": [
-                  "iOS: Settings → Privacy & Security → Location Services → Chisto.mk.",
-                  "Android: Settings → Location → App permissions → Chisto.mk.",
-                  "Nëse keni zgjedhur «vetëm gjatë përdorimit», hapni përsëri aplikacionin para se të shtoni foto me vendndodhje."
+                  "iOS: Settings → Privacy & Security → Location Services → Chisto.mk → While using the app.",
+                  "Android: Settings → Location → App permissions → Chisto.mk → Allow only while in use kur është e mundur.",
+                  "Qëndroni në hapësirë të hapur disa sekonda që GPS të stabilizohet, veçanërisht midis ndërtesave të larta.",
+                  "Çaktivizoni vendndodhjen e rremë ose mjetet e zhvilluesit për GPS gjatë përdorimit të Chisto.mk."
                 ]
               },
               {
@@ -1251,19 +1222,20 @@
           },
           {
             "id": "photos-or-upload",
-            "title": "Kamera ose ngarkimi",
+            "title": "Kamera ose dështim ngarkimi",
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Kamera dhe galeria kanë nevojë për leje. Cilësia e rrjetit ndikon në shpejtësinë e ngarkimit."
+                "text": "Fotot e mëdha dhe rrjeti i dobët nuk përputhen. Jepuni kohë ngarkimit, ose bëni një foto më të vogël kur radha vazhdon të dështojë."
               },
               {
                 "type": "bullets",
-                "title": "Ndryshime të zakonshme",
+                "title": "Provoni fillimisht",
                 "items": [
-                  "Kontrolloni që Chisto.mk të ketë leje për kamerë dhe për foto.",
-                  "Ul numrin e skedarëve shumë të mëdhenj ose fikni Live Photo nëse ngarkimi ngec.",
-                  "Kaloni në Wi-Fi më të mirë ose prisni sinjal më të fortë para se të riprovoni."
+                  "Kontrolloni që Chisto.mk të ketë leje për kamerë dhe bibliotekën e fotove.",
+                  "Lironi pak hapësirë në pajisje.",
+                  "Kalo në Wi-Fi për ngarkim me shumë foto.",
+                  "Mbyllni aplikacionin një herë, rihapeni dhe riprovoni të njëjtin draft raporti nëse ende ekziston."
                 ]
               },
               {
@@ -1303,8 +1275,8 @@
         "cardTitle": "Lexoni hartën",
         "cardSummary": "Çfarë do të thotë çdo kunj, si duket faqja e një vendi dhe çfarë është publikisht i dukshëm.",
         "title": "Harta dhe faqet e vendeve",
-        "lastUpdated": "15 prill 2026",
-        "lastReviewed": "15 prill 2026",
+        "lastUpdated": "22 qershor 2026",
+        "lastReviewed": "22 qershor 2026",
         "sections": [
           {
             "id": "what-the-map-shows",
@@ -1312,7 +1284,7 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Harta është një pamje qytetare e vendeve të raportuara në Maqedoni. Çdo kunj përfaqëson një vend ku njerëzit dokumentuan një shqetësim mjedisor."
+                "text": "Harta është një pamje qytetare e vendeve të ndotjes në Maqedoni. Çdo kunj përfaqëson një vend ku dikush dokumentoi një shqetësim mjedisor."
               },
               {
                 "type": "bullets",
@@ -1398,8 +1370,8 @@
         "cardTitle": "Besim, siguri dhe moderim",
         "cardSummary": "Si funksionon shqyrtimi, sjellja respektuese dhe ku janë politikat zyrtare.",
         "title": "Besim, siguri dhe moderim",
-        "lastUpdated": "15 prill 2026",
-        "lastReviewed": "15 prill 2026",
+        "lastUpdated": "22 qershor 2026",
+        "lastReviewed": "22 qershor 2026",
         "sections": [
           {
             "id": "why-moderation-exists",
@@ -1498,8 +1470,8 @@
         "cardTitle": "Organizoni një aksion pastrimi",
         "cardSummary": "Planifikoni logjistikën, menaxhoni regjistrimet, mbani njerëzit të sigurt në ditën e ngjarjes dhe mbyllni ciklin më pas.",
         "title": "Organizoni një aksion pastrimi",
-        "lastUpdated": "15 prill 2026",
-        "lastReviewed": "15 prill 2026",
+        "lastUpdated": "22 qershor 2026",
+        "lastReviewed": "22 qershor 2026",
         "sections": [
           {
             "id": "plan-before-you-publish",
@@ -1593,8 +1565,8 @@
         "cardTitle": "Oflajn dhe rrjete të ngadalta",
         "cardSummary": "Çfarë do të thotë në pritje, si provohen përsëri ngarkimet dhe kur të ndaloni raportimin.",
         "title": "Oflajn dhe rrjete të ngadalta",
-        "lastUpdated": "15 prill 2026",
-        "lastReviewed": "15 prill 2026",
+        "lastUpdated": "22 qershor 2026",
+        "lastReviewed": "22 qershor 2026",
         "sections": [
           {
             "id": "how-the-app-uses-network",
@@ -1683,8 +1655,8 @@
         "cardTitle": "Partneritete për organizata",
         "cardSummary": "Si bashkitë, OJQ-të dhe mediat mund të punojnë me Chisto.mk me përgjegësi.",
         "title": "Partneritete për bashki, OJQ dhe media",
-        "lastUpdated": "15 prill 2026",
-        "lastReviewed": "15 prill 2026",
+        "lastUpdated": "22 qershor 2026",
+        "lastReviewed": "22 qershor 2026",
         "sections": [
           {
             "id": "who-this-guide-is-for",
@@ -1764,8 +1736,8 @@
         "cardTitle": "Verifikimi në terren",
         "cardSummary": "Planifikoni vizitë të sigurt, krahasoni pinin me realitetin dhe kur një raport i ri është më i mirë se supozimi.",
         "title": "Verifikimi i vendeve të ndotjes në terren",
-        "lastUpdated": "15 prill 2026",
-        "lastReviewed": "15 prill 2026",
+        "lastUpdated": "22 qershor 2026",
+        "lastReviewed": "22 qershor 2026",
         "sections": [
           {
             "id": "plan-the-visit",

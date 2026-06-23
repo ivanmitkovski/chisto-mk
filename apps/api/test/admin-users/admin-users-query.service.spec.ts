@@ -18,6 +18,7 @@ describe('AdminUsersQueryService', () => {
       role: Role.USER,
       status: UserStatus.ACTIVE,
       lastActiveAt: new Date('2026-01-01T00:00:00.000Z'),
+      createdAt: new Date('2026-01-01T00:00:00.000Z'),
       pointsBalance: 0,
     };
     const prisma = {
@@ -27,7 +28,7 @@ describe('AdminUsersQueryService', () => {
         count: jest.fn().mockResolvedValue(1),
       },
     } as never;
-    const svc = new AdminUsersQueryService(prisma, audit);
+    const svc = new AdminUsersQueryService(prisma, audit, { signPrivateObjectKey: jest.fn() } as never);
     const out = await svc.list({ page: 1, limit: 10 } as ListAdminUsersQueryDto);
     expect(out.data).toHaveLength(1);
     expect(out.data[0]!.lastActiveAt).toBe('2026-01-01T00:00:00.000Z');
@@ -40,7 +41,7 @@ describe('AdminUsersQueryService', () => {
         findUnique: jest.fn().mockResolvedValue(null),
       },
     } as never;
-    const svc = new AdminUsersQueryService(prisma, audit);
+    const svc = new AdminUsersQueryService(prisma, audit, { signPrivateObjectKey: jest.fn() } as never);
     await expect(svc.findOne('missing')).rejects.toBeInstanceOf(NotFoundException);
   });
 
@@ -59,6 +60,11 @@ describe('AdminUsersQueryService', () => {
           pointsBalance: 1,
           totalPointsEarned: 2,
           totalPointsSpent: 0,
+          organizerCertifiedAt: null,
+          termsAcceptedAt: null,
+          termsVersion: null,
+          privacyAcceptedAt: null,
+          avatarObjectKey: 'avatars/u1.jpg',
           lastActiveAt: null,
           createdAt: new Date('2026-01-02T00:00:00.000Z'),
           _count: { reports: 3 },
@@ -66,9 +72,13 @@ describe('AdminUsersQueryService', () => {
       },
       userSession: { count: jest.fn().mockResolvedValue(2) },
     } as never;
-    const svc = new AdminUsersQueryService(prisma, audit);
+    const reportsUploadService = {
+      signPrivateObjectKey: jest.fn().mockResolvedValue('https://signed.example/avatar.jpg'),
+    };
+    const svc = new AdminUsersQueryService(prisma, audit, reportsUploadService as never);
     const out = await svc.findOne('u1');
     expect(out.reportsCount).toBe(3);
     expect(out.sessionsCount).toBe(2);
+    expect(out.avatarUrl).toBe('https://signed.example/avatar.jpg');
   });
 });

@@ -1,7 +1,6 @@
-import { cookies } from 'next/headers';
 import { getTranslations } from 'next-intl/server';
 import { AdminShell } from '@/features/admin-shell';
-import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell';
+import { readDashboardShellState } from '@/features/admin-shell/server';
 import { SectionState } from '@/components/ui';
 import { WebhookLogsWorkspace, getWebhookLogs } from '@/features/comms';
 import { ADMIN_PERMISSIONS } from '@/lib/auth/rbac/permissions';
@@ -15,8 +14,7 @@ type PageProps = {
 export default async function WebhookLogsPage(props: PageProps) {
   await requirePagePermission(ADMIN_PERMISSIONS['comms:read']);
   const t = await getTranslations('comms.webhookLogs');
-  const cookieStore = await cookies();
-  const initialSidebarCollapsed = cookieStore.get(DESKTOP_SIDEBAR_COOKIE_KEY)?.value === '1';
+  const { initialSidebarCollapsed } = await readDashboardShellState();
   const params = await props.searchParams;
   const page = Math.max(1, parseInt(params.page ?? '1', 10) || 1);
   const action = params.action ?? '';

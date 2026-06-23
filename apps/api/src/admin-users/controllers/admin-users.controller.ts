@@ -14,9 +14,14 @@ import type { AuthenticatedUser } from '../../auth/types/authenticated-user.type
 import { ADMIN_PANEL_ROLES, ADMIN_WRITE_ROLES, SUPER_ADMIN_ROLES } from '../../auth/constants/admin-roles';
 import { AdminUsersService } from '../services/admin-users.service';
 import { BulkAdminUsersDto } from '../dto/bulk-admin-users.dto';
+import { CreateUserModerationNoteDto } from '../dto/create-user-moderation-note.dto';
 import { ListAdminUsersQueryDto } from '../dto/list-admin-users-query.dto';
 import { PatchAdminUserDto } from '../dto/patch-admin-user.dto';
 import { PatchAdminUserRoleDto } from '../dto/patch-admin-user-role.dto';
+import {
+  AdminConfirmEmailChangeDto,
+  AdminRequestEmailChangeDto,
+} from '../dto/admin-email-change.dto';
 import { ApiStandardHttpErrorResponses } from '../../common/openapi/standard-http-error-responses.decorator';
 
 @ApiTags('admin-users')
@@ -46,6 +51,66 @@ export class AdminUsersController {
     return this.adminUsersService.bulk(dto, actor);
   }
 
+  @Get(':id/moderation-notes')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(...ADMIN_PANEL_ROLES)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'List moderator notes for user' })
+  getModerationNotes(
+    @Param('id') id: string,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ) {
+    return this.adminUsersService.getModerationNotes(id, page ?? 1, limit ?? 20);
+  }
+
+  @Get(':id/status-history')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(...ADMIN_PANEL_ROLES)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'List status change history for user' })
+  getStatusHistory(
+    @Param('id') id: string,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ) {
+    return this.adminUsersService.getStatusHistory(id, page ?? 1, limit ?? 20);
+  }
+
+  @Idempotent('admin-users_moderation_note_create')
+  @Post(':id/moderation-notes')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(...ADMIN_WRITE_ROLES)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Add moderator note for user' })
+  createModerationNote(
+    @Param('id') id: string,
+    @Body() dto: CreateUserModerationNoteDto,
+    @CurrentUser() actor: AuthenticatedUser,
+  ) {
+    return this.adminUsersService.createModerationNote(id, dto.body, actor);
+  }
+
+  @Get(':id/safety-summary')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(...ADMIN_PANEL_ROLES)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get user safety and trust summary' })
+  @ApiOkResponse({ description: 'User safety summary' })
+  getSafetySummary(@Param('id') id: string) {
+    return this.adminUsersService.getSafetySummary(id);
+  }
+
+  @Get(':id/data-export')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(...ADMIN_PANEL_ROLES)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Export user data (admin DSAR)' })
+  @ApiOkResponse({ description: 'User data export JSON' })
+  getDataExport(@Param('id') id: string) {
+    return this.adminUsersService.getDataExport(id);
+  }
+
   @Get(':id/audit')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(...ADMIN_PANEL_ROLES)
@@ -70,6 +135,17 @@ export class AdminUsersController {
     return this.adminUsersService.getSessions(id);
   }
 
+  // safe-to-retry: repeated revoke-all is acceptable
+  @Post(':id/sessions/revoke-all')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(...ADMIN_WRITE_ROLES)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Revoke all sessions for user' })
+  @ApiOkResponse({ description: 'All sessions revoked' })
+  revokeAllSessions(@Param('id') id: string, @CurrentUser() actor: AuthenticatedUser) {
+    return this.adminUsersService.revokeAllSessions(id, actor);
+  }
+
   // safe-to-retry: repeated Delete is acceptable
   @Delete(':id/sessions/:sessionId')
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -83,6 +159,36 @@ export class AdminUsersController {
     @CurrentUser() actor: AuthenticatedUser,
   ) {
     return this.adminUsersService.revokeSession(id, sessionId, actor);
+  }
+
+  @Idempotent('admin-users_email_change_request')
+  @Post(':id/email/change-request')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(...ADMIN_WRITE_ROLES)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Request admin-assisted email change (OTP to new address)' })
+  @ApiOkResponse({ description: 'Verification code sent to new email' })
+  requestEmailChange(
+    @Param('id') id: string,
+    @Body() dto: AdminRequestEmailChangeDto,
+    @CurrentUser() actor: AuthenticatedUser,
+  ) {
+    return this.adminUsersService.requestEmailChange(id, dto, actor);
+  }
+
+  @Idempotent('admin-users_email_change_confirm')
+  @Post(':id/email/confirm')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(...ADMIN_WRITE_ROLES)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Confirm admin-assisted email change with OTP' })
+  @ApiOkResponse({ description: 'Email updated' })
+  confirmEmailChange(
+    @Param('id') id: string,
+    @Body() dto: AdminConfirmEmailChangeDto,
+    @CurrentUser() actor: AuthenticatedUser,
+  ) {
+    return this.adminUsersService.confirmEmailChange(id, dto, actor);
   }
 
   @Get(':id')

@@ -164,6 +164,25 @@ exports.Prisma.UserBlockScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.UserModerationNoteScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  authorId: 'authorId',
+  body: 'body',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.UserStatusActionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  actorId: 'actorId',
+  fromStatus: 'fromStatus',
+  toStatus: 'toStatus',
+  reasonCode: 'reasonCode',
+  note: 'note',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.UgcContentReportScalarFieldEnum = {
   id: 'id',
   reporterId: 'reporterId',
@@ -949,6 +968,37 @@ exports.Prisma.AdminMutationIdempotencyScalarFieldEnum = {
   clientJobId: 'clientJobId'
 };
 
+exports.Prisma.NewsPostScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  slug: 'slug',
+  category: 'category',
+  status: 'status',
+  publishedAt: 'publishedAt',
+  scheduledAt: 'scheduledAt',
+  coverMediaId: 'coverMediaId',
+  translations: 'translations',
+  createdById: 'createdById',
+  updatedById: 'updatedById'
+};
+
+exports.Prisma.NewsMediaScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  postId: 'postId',
+  kind: 'kind',
+  objectKey: 'objectKey',
+  mimeType: 'mimeType',
+  fileName: 'fileName',
+  sizeBytes: 'sizeBytes',
+  width: 'width',
+  height: 'height',
+  durationSeconds: 'durationSeconds',
+  altText: 'altText',
+  sortOrder: 'sortOrder'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1230,9 +1280,31 @@ exports.MapEventOutboxStatus = exports.$Enums.MapEventOutboxStatus = {
   FAILED: 'FAILED'
 };
 
+exports.NewsCategory = exports.$Enums.NewsCategory = {
+  RELEASE: 'RELEASE',
+  PARTNERSHIP: 'PARTNERSHIP',
+  COMMUNITY: 'COMMUNITY',
+  PRODUCT: 'PRODUCT'
+};
+
+exports.NewsPostStatus = exports.$Enums.NewsPostStatus = {
+  DRAFT: 'DRAFT',
+  SCHEDULED: 'SCHEDULED',
+  PUBLISHED: 'PUBLISHED',
+  ARCHIVED: 'ARCHIVED'
+};
+
+exports.NewsMediaKind = exports.$Enums.NewsMediaKind = {
+  COVER: 'COVER',
+  INLINE_IMAGE: 'INLINE_IMAGE',
+  INLINE_VIDEO: 'INLINE_VIDEO'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   UserBlock: 'UserBlock',
+  UserModerationNote: 'UserModerationNote',
+  UserStatusAction: 'UserStatusAction',
   UgcContentReport: 'UgcContentReport',
   PasswordResetEmailCode: 'PasswordResetEmailCode',
   UserSession: 'UserSession',
@@ -1293,7 +1365,9 @@ exports.Prisma.ModelName = {
   MapSiteProjection: 'MapSiteProjection',
   MapEventOutbox: 'MapEventOutbox',
   MapCdnPurgeLog: 'MapCdnPurgeLog',
-  AdminMutationIdempotency: 'AdminMutationIdempotency'
+  AdminMutationIdempotency: 'AdminMutationIdempotency',
+  NewsPost: 'NewsPost',
+  NewsMedia: 'NewsMedia'
 };
 
 /**

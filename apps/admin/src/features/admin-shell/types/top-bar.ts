@@ -1,35 +1,9 @@
-import { IconName } from '@/components/ui';
-import type { AdminPermission } from '@/lib/auth/rbac/permissions';
+import type { IconName } from '@/components/ui';
+import type { ResolvedCommand } from '../commands/types';
 
-export type TopBarCommandAction =
-  | {
-      type: 'navigate';
-      href: string;
-    }
-  | {
-      type: 'open-profile';
-    }
-  | {
-      type: 'sign-out';
-    };
+export type TopBarCommandAction = ResolvedCommand['action'];
 
-export type TopBarCommandDefinition = {
-  id: string;
-  labelKey: string;
-  descriptionKey?: string;
-  /** Defaults to `nav`. Use `common` for global command palette entries. */
-  messageNamespace?: 'nav' | 'common';
-  icon: IconName;
-  keywords: readonly string[];
-  /** When set, command is hidden unless the user has this permission. */
-  permission?: AdminPermission;
-  action: TopBarCommandAction;
-};
-
-export type TopBarCommand = TopBarCommandDefinition & {
-  label: string;
-  description?: string;
-};
+export type TopBarCommand = ResolvedCommand;
 
 export type TopBarNotification = {
   id: string;

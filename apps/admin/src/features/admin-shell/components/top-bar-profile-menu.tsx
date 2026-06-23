@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Button, Icon } from '@/components/ui';
 import { signOutAndRedirectToLogin } from '@/features/auth/lib/admin-auth';
-import { profileMenuActions } from '../data/top-bar-mocks';
+import { profileMenuActions } from '../data/profile-menu-actions';
 import barStyles from './top-bar.module.css';
 import styles from './top-bar-profile-menu.module.css';
 

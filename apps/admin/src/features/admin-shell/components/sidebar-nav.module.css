@@ -5,8 +5,8 @@
   position: sticky;
   top: 0;
   z-index: var(--z-sticky);
-  background: rgba(255, 255, 255, 0.76);
-  border-right: 1px solid rgba(37, 219, 134, 0.2);
+  background: var(--shell-sidebar-bg);
+  border-right: 1px solid var(--shell-sidebar-border);
   padding: var(--space-6) var(--space-4) var(--space-4);
   backdrop-filter: blur(12px);
   display: grid;
@@ -79,15 +79,18 @@
   border-radius: var(--radius-md);
   padding: 0.62rem var(--space-3);
   text-decoration: none;
-  color: #4b5e5d;
+  color: var(--shell-nav-link-fg);
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-medium);
-  transition: background-color 150ms ease, color 150ms ease, transform 150ms ease;
+  transition:
+    background-color var(--motion-duration-fast) ease,
+    color var(--motion-duration-fast) ease,
+    transform var(--motion-duration-fast) ease;
 }
 
 .navLink:hover {
-  background: rgba(37, 219, 134, 0.1);
-  color: #0d8a54;
+  background: var(--shell-nav-link-hover-bg);
+  color: var(--shell-nav-link-hover-fg);
   transform: translateX(1px);
 }
 
@@ -97,8 +100,8 @@
 }
 
 .navLinkActive {
-  background: rgba(37, 219, 134, 0.16);
-  color: #0f8d56;
+  background: var(--shell-nav-link-active-bg);
+  color: var(--shell-nav-link-active-fg);
 }
 
 .navIconWrap {
@@ -108,7 +111,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  transition: transform 150ms ease;
+  transition: transform var(--motion-duration-fast) ease;
 }
 
 .navIcon {
@@ -124,14 +127,14 @@
 }
 
 .footer {
-  border-top: 1px solid rgba(37, 219, 134, 0.18);
+  border-top: 1px solid var(--shell-sidebar-border);
   padding-top: var(--space-3);
 }
 
 .collapseButton {
   width: 100%;
   justify-content: flex-start;
-  color: #4b5e5d;
+  color: var(--shell-nav-link-fg);
   padding-left: var(--space-2);
   padding-right: var(--space-2);
 }
@@ -188,7 +191,7 @@
 
 @media (max-width: 48rem) {
   .sidebar {
-    border-right: 1px solid rgba(37, 219, 134, 0.18);
+    border-right: 1px solid var(--shell-sidebar-border);
     padding: var(--space-5) var(--space-4) var(--space-4);
   }
 }

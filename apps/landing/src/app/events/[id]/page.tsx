@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { defaultLocale, isLocale, type Locale } from "@/i18n/config";
+import { SharePageShell } from "@/components/layout/SharePageLayout/SharePageShell";
 import { chistoApiBase, chistoPublicSiteBase } from "@/lib/share-api";
+import { homeDownloadSectionUrl } from "@/lib/store-links";
 import { eventShareStrings } from "./event-share-strings";
-import styles from "./event-share-page.module.css";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -41,7 +41,7 @@ function scheduleLine(card: ShareCard, locale: Locale): string {
   if (end == null || Number.isNaN(end.getTime())) {
     return dtf.format(start);
   }
-  return `${dtf.format(start)} — ${dtf.format(end)}`;
+  return `${dtf.format(start)} · ${dtf.format(end)}`;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -89,6 +89,7 @@ export default async function EventSharePage({ params }: Props) {
   const siteBase = chistoPublicSiteBase();
   const appUniversal = `${siteBase}/app/events/detail/${encodeURIComponent(id)}`;
   const webHome = `${siteBase}/${uiLocale}`;
+  const downloadUrl = homeDownloadSectionUrl(siteBase, uiLocale);
   const schedule = scheduleLine(card, uiLocale);
   const jsonLd = {
     "@context": "https://schema.org",
@@ -103,35 +104,17 @@ export default async function EventSharePage({ params }: Props) {
   };
 
   return (
-    <main
-      style={{
-        fontFamily: "var(--font-sans), system-ui, sans-serif",
-        padding: 24,
-        maxWidth: 560,
-        margin: "0 auto",
-        lineHeight: 1.5,
-      }}
-    >
+    <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <p style={{ fontSize: 13, color: "#64748b", marginBottom: 8 }}>Chisto.mk</p>
-      <h1 style={{ fontSize: "1.5rem", margin: "0 0 8px", color: "#0f172a" }}>{card.title}</h1>
-      <p style={{ color: "#475569", margin: "0 0 8px" }}>{card.siteLabel}</p>
-      <p style={{ color: "#64748b", margin: "0 0 24px" }}>
-        {t.schedulePrefix}: {schedule}
-      </p>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
-        <Link href={appUniversal} className={styles.linkPrimary}>
-          {t.openInApp}
-        </Link>
-        <a href={webHome} className={styles.linkSecondary}>
-          {t.getTheApp}
-        </a>
-      </div>
-      <p style={{ marginTop: 28, fontSize: 14 }}>
-        <a href={webHome} className={styles.textLink}>
-          {t.signInCta}
-        </a>
-      </p>
-    </main>
+      <SharePageShell
+        homeHref={webHome}
+        homeLabel={t.signInCta}
+        title={card.title}
+        lines={[card.siteLabel, `${t.schedulePrefix}: ${schedule}`]}
+        primary={{ href: appUniversal, label: t.openInApp }}
+        secondary={{ href: downloadUrl, label: t.getTheApp }}
+        footerLink={{ href: webHome, label: t.signInCta }}
+      />
+    </>
   );
 }

@@ -41,6 +41,20 @@ describe('BroadcastAudienceUserPicker', () => {
     vi.useRealTimers();
   });
 
+  it('shows helper text without opening an empty results panel on focus', async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+
+    renderWithProviders(
+      <BroadcastAudienceUserPicker selectedUsers={[]} onChange={vi.fn()} />,
+    );
+
+    const input = screen.getByRole('combobox');
+    await user.click(input);
+
+    expect(screen.getByText('Type a name or email to find users.')).toBeInTheDocument();
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+  });
+
   it('adds and removes selected users', async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     const onChange = vi.fn();

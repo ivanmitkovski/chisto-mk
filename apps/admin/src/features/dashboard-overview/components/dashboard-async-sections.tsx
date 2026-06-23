@@ -27,7 +27,8 @@ import { RecentActivityFeed } from './recent-activity-feed';
 import { ReportsTrendChart } from './reports-trend-chart';
 import { StatsOverview } from './stats-overview';
 import { UpcomingCleanupsCard } from './upcoming-cleanups-card';
-import { getReportsPage, ReportsList } from '@/features/reports';
+import { getReportsPage } from '@/features/reports/data/reports-adapter';
+import { ReportsList } from '@/features/reports';
 import styles from './dashboard-async-sections.module.css';
 
 const getOverviewCached = cache(getDashboardOverview);

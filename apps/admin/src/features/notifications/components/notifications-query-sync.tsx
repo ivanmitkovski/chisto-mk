@@ -19,10 +19,10 @@ export function NotificationsQuerySync() {
   const { data } = useQuery({
     queryKey: adminQueryKeys.notifications({ page: 1, limit: 10 }),
     queryFn: () => fetchNotifications({ page: 1, limit: 10 }),
-    staleTime: 0,
+    staleTime: 90_000,
     gcTime: 600_000,
     retry: 1,
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: false,
   });
 
   useEffect(() => {

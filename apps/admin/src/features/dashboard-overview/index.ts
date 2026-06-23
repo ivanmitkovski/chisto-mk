@@ -7,6 +7,7 @@ export { DashboardSectionError } from './components/dashboard-section-error';
 export { DashboardRealtimeSync } from './components/dashboard-realtime-sync';
 export { DashboardSSEClient } from './components/dashboard-sse-client';
 export { NewReportSoundEffect } from './components/new-report-sound-effect';
+export { DashboardReportSoundEffect } from './components/dashboard-report-sound-effect';
 export { DashboardPollingFallback } from './components/dashboard-polling-fallback';
 export { DashboardSSEProvider } from './context/dashboard-sse-context';
 export { DashboardSSEStatusIndicator } from './components/dashboard-sse-status-indicator';

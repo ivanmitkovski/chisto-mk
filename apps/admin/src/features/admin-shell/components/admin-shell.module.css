@@ -1,6 +1,11 @@
 .appFrame {
   min-height: 100vh;
-  background: radial-gradient(circle at 10% 0%, rgba(37, 219, 134, 0.08), transparent 30%), var(--bg-app);
+  background: radial-gradient(
+      circle at 10% 0%,
+      color-mix(in srgb, var(--color-primary) 8%, transparent),
+      transparent 30%
+    ),
+    var(--bg-app);
   color: var(--text-primary);
 }
 
@@ -101,7 +106,7 @@ html.chisto-admin-reduced-motion .contentFrame {
   border: 0;
   padding: 0;
   margin: 0;
-  background: rgba(15, 23, 42, 0.38);
+  background: var(--shell-scrim);
   backdrop-filter: blur(2px);
 }
 

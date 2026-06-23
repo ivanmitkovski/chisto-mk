@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import '@/features/map/leaflet-setup';
 import { MACEDONIA_CENTER } from '@/features/map/map-constants';
 import styles from './sites-map-picker.module.css';
 

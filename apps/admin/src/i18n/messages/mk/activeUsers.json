@@ -1,8 +1,16 @@
 {
   "pageTitle": "Активни корисници",
+  "pageDescription": "Live присуство, трендови на ангажман и активност на платформата.",
+  "refresh": "Освежи",
+  "refreshing": "Се освежува…",
+  "retry": "Обиди повторно",
+  "loadingSummary": "Се вчитува резиме…",
+  "liveConnected": "Live ажурирања се поврзани",
   "currentActive": "Активни сега",
   "online": "Онлајн",
   "away": "Отсутни",
+  "offlineEstimate": "Офлајн (24ч)",
+  "offlineEstimateUnavailable": "Проценката сè уште не е достапна",
   "peakToday": "Врв денес",
   "peakWeek": "Врв оваа недела",
   "avgConcurrent": "Просечно concurrent",
@@ -10,13 +18,17 @@
   "trend15m": "Тренд 15m",
   "trend1h": "Тренд 1h",
   "user": "Корисник",
-  "status": "Статус",
+  "statusLabel": "Статус",
   "screen": "Екран",
-  "platform": "Платформа",
+  "screenLabel": "Екран",
+  "platformLabel": "Платформа",
+  "deviceModel": "Уред",
   "location": "Локација",
+  "sessionDuration": "Сесија",
   "lastActivity": "Последна активност",
+  "devicesCount": "{count, plural, one {# уред} other {# уреди}}",
   "noActiveUsers": "Нема активни корисници",
-  "activityFeed": "Live feed",
+  "activityFeed": "Live feed на активност",
   "noActivity": "Нема активност",
   "engagement": "Ангажман",
   "realtimeMetrics": "Realtime метрики",
@@ -26,11 +38,120 @@
   "reportsToday": "Поднесени извештаи денес",
   "registrationsToday": "Регистрации денес",
   "dauMauTrend": "DAU / MAU тренд",
-  "alerts": "Аларми",
+  "alertsTitle": "Аларми",
   "noAlerts": "Нема правила за аларми",
   "enabled": "Овозможено",
   "disabled": "Оневозможено",
   "loadMore": "Вчитај повеќе",
   "loadingMore": "Се вчитува…",
-  "feedEnd": "Крај на feed-от"
+  "feedEnd": "Крај на feed-от",
+  "feedDomCap": "Прикажани се последните {count} настани. Користете филтри за постара активност.",
+  "sections": {
+    "kpi": "Клучни метрики",
+    "engagement": "Ангажман и трендови",
+    "presence": "Табела на присуство",
+    "sidebar": "Активност, мапа и аларми"
+  },
+  "filters": {
+    "searchLabel": "Пребарај",
+    "searchPlaceholder": "Име или е-пошта",
+    "searchAria": "Пребарај по име или е-пошта",
+    "statusLabel": "Статус",
+    "statusGroupAria": "Филтер по статус на присуство",
+    "platformLabel": "Платформа",
+    "toolbarAria": "Филтрирај активни корисници",
+    "allStatuses": "Сите статуси",
+    "allPlatforms": "Сите платформи"
+  },
+  "status": {
+    "online": "Онлајн",
+    "away": "Отсутен",
+    "offline": "Офлајн"
+  },
+  "platform": {
+    "ios": "iOS",
+    "android": "Андроид"
+  },
+  "metrics": {
+    "dau": "DAU",
+    "wau": "WAU",
+    "mau": "MAU",
+    "dauMauRatio": "Сооднос DAU / MAU",
+    "avgSessionMinutes": "Просечна сесија (мин)",
+    "cleanupParticipants": "Учесници во чистење"
+  },
+  "chart": {
+    "concurrent": "Истовремени корисници",
+    "noHistory": "Сè уште нема историски податоци"
+  },
+  "feed": {
+    "allTypes": "Сите",
+    "filterLabel": "Филтер по тип на настан",
+    "types": {
+      "login": "Најава",
+      "logout": "Одјава",
+      "appOpened": "Ап отворена",
+      "screenView": "Преглед на екран",
+      "reportSubmitted": "Поднесен извештај",
+      "reportCreated": "Креиран извештај",
+      "eventJoined": "Приклучен на настан",
+      "checkIn": "Пријава на локација",
+      "unknown": "Активност"
+    }
+  },
+  "geo": {
+    "title": "Географска распределба",
+    "userCount": "{count, plural, =0 {Нема лоцирани корисници} one {# корисник на мапа} other {# корисници на мапа}}",
+    "unknownCity": "Непознато",
+    "mapDescription": "Мапа со приближни кластери на активни корисници по град"
+  },
+  "alerts": {
+    "add": "Додај правило",
+    "create": "Креирај правило",
+    "createTitle": "Креирај правило за аларм",
+    "editTitle": "Уреди правило за аларм",
+    "formDescription": "Извести кога метриката ја преминува прагот во зададениот прозорец.",
+    "metricLabel": "Метрика",
+    "comparatorLabel": "Услов",
+    "thresholdLabel": "Праг",
+    "windowLabel": "Прозорец (секунди)",
+    "enabledLabel": "Правилото е овозможено",
+    "enable": "Овозможи",
+    "disable": "Оневозможи",
+    "deleteTitle": "Избриши правило за аларм?",
+    "deleteDescription": "Правилото повеќе нема да испраќа известувања.",
+    "createdTitle": "Алармот е креиран",
+    "createdMessage": "Правилото за аларм е активно.",
+    "updatedMessage": "Правилото за аларм е зачувано.",
+    "deletedTitle": "Алармот е избришан",
+    "deletedMessage": "Правилото за аларм е отстрането.",
+    "saveFailed": "Неуспешно зачувување на правилото.",
+    "deleteFailed": "Неуспешно бришење на правилото.",
+    "triggeredTitle": "Аларм активиран",
+    "triggeredMessage": "{metric} го премина прагот {threshold}",
+    "lastTriggered": "Последно активиран: {value}",
+    "comparators": {
+      "gt": "Поголемо од",
+      "gte": "Поголемо или еднакво на",
+      "lt": "Помало од",
+      "lte": "Помало или еднакво на"
+    },
+    "metrics": {
+      "CONCURRENT": "Истовремени корисници",
+      "TRAFFIC_SPIKE": "Скок на сообраќај",
+      "ERROR_RATE": "Стапка на грешки",
+      "REPORT_ACTIVITY": "Активност на извештаи",
+      "API_DEGRADATION": "Деградација на API"
+    }
+  },
+  "errors": {
+    "summaryFailed": "Неуспешно вчитување на резиме метрики.",
+    "listFailed": "Неуспешно вчитување на листа на присуство.",
+    "feedFailed": "Неуспешно вчитување на feed на активност.",
+    "realtimeFailed": "Неуспешно вчитување на realtime метрики.",
+    "engagementFailed": "Неуспешно вчитување на аналитика за ангажман.",
+    "geoFailed": "Неуспешно вчитување на географски кластери.",
+    "alertsFailed": "Неуспешно вчитување на правила за аларми.",
+    "loadFailed": "Неуспешно вчитување на податоци за активни корисници."
+  }
 }

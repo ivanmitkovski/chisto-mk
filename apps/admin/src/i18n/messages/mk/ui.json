@@ -8,5 +8,13 @@
   "export": "Извези",
   "selectedCount": "{count} избрани",
   "selectedCountOfTotal": "{count} избрани од {total}",
-  "dismissNotification": "Отфрли известување"
+  "dismissNotification": "Отфрли известување",
+  "calendar": {
+    "previousMonth": "Претходен месец",
+    "nextMonth": "Следен месец",
+    "today": "Денес",
+    "selectDate": "Избери датум",
+    "clearDate": "Исчисти датум",
+    "days": "Денови од календарот"
+  }
 }

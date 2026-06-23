@@ -14,6 +14,7 @@ export type NavItemKey =
   | 'operations'
   | 'active-users'
   | 'broadcasts'
+  | 'news'
   | 'gamification'
   | 'app-config'
   | 'audit'

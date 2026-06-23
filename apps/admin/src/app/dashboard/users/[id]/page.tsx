@@ -1,21 +1,38 @@
-import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 import { AdminShell } from '@/features/admin-shell';
-import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell';
+import { readDashboardShellState } from '@/features/admin-shell/server';
 import { SectionState } from '@/components/ui';
 import { ApiConnectionError, ApiError } from '@/lib/api';
 import { can } from '@/lib/auth/rbac';
-import { getMeProfile } from '@/features/auth';
-import { getUserDetail, getUserAudit, getUserSessions } from '@/features/users';
+import { ADMIN_PERMISSIONS } from '@/lib/auth/rbac/permissions';
+import { requirePagePermission } from '@/lib/auth/rbac/server';
+import { getMeProfile } from '@/features/auth/data/me-adapter';
+import {
+  getUserDetail,
+  getUserAudit,
+  getUserSessions,
+  getUserSafetySummary,
+  getUserActivityDetails,
+  getUserModerationNotes,
+  getUserStatusHistory,
+} from '@/features/users';
 import { getUserPointLedger } from '@/features/gamification';
 import { UserDetailTabs } from '@/features/users';
 
-type PageProps = { params: Promise<{ id: string }> };
+type PageProps = {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ safety?: string }>;
+};
 
 export default async function UserDetailPage(props: PageProps) {
+  await requirePagePermission(ADMIN_PERMISSIONS['users:read']);
   const { id } = await props.params;
-  const cookieStore = await cookies();
-  const initialSidebarCollapsed = cookieStore.get(DESKTOP_SIDEBAR_COOKIE_KEY)?.value === '1';
+  const searchParams = await props.searchParams;
+  const initialActiveTab = searchParams.safety === 'ugc' ? 'safety' : undefined;
+  const tNav = await getTranslations('nav');
+  const tErrors = await getTranslations('errors');
+  const { initialSidebarCollapsed } = await readDashboardShellState();
 
   let user: Awaited<ReturnType<typeof getUserDetail>>;
   try {
@@ -26,10 +43,10 @@ export default async function UserDetailPage(props: PageProps) {
     }
     const message =
       error instanceof ApiConnectionError
-        ? 'Unable to reach the API. Check your connection and try again.'
-        : 'Unable to load user.';
+        ? tErrors('couldNotReachApi')
+        : tErrors('unableToLoadUser');
     return (
-      <AdminShell title="User" activeItem="users" initialSidebarCollapsed={initialSidebarCollapsed}>
+      <AdminShell title={tNav('users')} activeItem="users" initialSidebarCollapsed={initialSidebarCollapsed}>
         <SectionState variant="error" message={message} />
       </AdminShell>
     );
@@ -55,18 +72,24 @@ export default async function UserDetailPage(props: PageProps) {
     termsVersion: string | null;
     requiresTermsAcceptance: boolean;
     privacyAcceptedAt: string | null;
+    lastActiveAt: string | null;
     createdAt: string;
     reportsCount: number;
     sessionsCount: number;
+    avatarUrl?: string | null;
   };
 
   let audit: Awaited<ReturnType<typeof getUserAudit>>;
   let sessions: Awaited<ReturnType<typeof getUserSessions>>;
   let pointLedger: Awaited<ReturnType<typeof getUserPointLedger>>;
+  let safetySummary: Awaited<ReturnType<typeof getUserSafetySummary>> | null = null;
+  let activityDetails: Awaited<ReturnType<typeof getUserActivityDetails>> | null = null;
   let canViewSessions = false;
   let auditError: string | null = null;
   let sessionsError: string | null = null;
   let pointsError: string | null = null;
+  let safetyError: string | null = null;
+  let activityError: string | null = null;
 
   try {
     const me = await getMeProfile();
@@ -81,8 +104,8 @@ export default async function UserDetailPage(props: PageProps) {
     audit = { data: [], meta: { page: 1, limit: 20, total: 0 } };
     auditError =
       error instanceof ApiConnectionError
-        ? 'Unable to load audit history.'
-        : 'Audit history could not be loaded.';
+        ? tErrors('couldNotReachApi')
+        : tErrors('unableToLoadAudit');
   }
 
   try {
@@ -91,8 +114,47 @@ export default async function UserDetailPage(props: PageProps) {
     pointLedger = { data: [], meta: { page: 1, limit: 20, total: 0 } };
     pointsError =
       error instanceof ApiConnectionError
-        ? 'Unable to load points ledger.'
-        : 'Points ledger could not be loaded.';
+        ? tErrors('couldNotReachApi')
+        : tErrors('unableToLoadUserPoints');
+  }
+
+  let moderationNotes: Awaited<ReturnType<typeof getUserModerationNotes>> = {
+    data: [],
+    meta: { page: 1, limit: 20, total: 0 },
+  };
+  let statusHistory: Awaited<ReturnType<typeof getUserStatusHistory>> = {
+    data: [],
+    meta: { page: 1, limit: 20, total: 0 },
+  };
+
+  try {
+    moderationNotes = await getUserModerationNotes(id, 1, 20);
+  } catch {
+    moderationNotes = { data: [], meta: { page: 1, limit: 20, total: 0 } };
+  }
+
+  try {
+    statusHistory = await getUserStatusHistory(id, 1, 20);
+  } catch {
+    statusHistory = { data: [], meta: { page: 1, limit: 20, total: 0 } };
+  }
+
+  try {
+    safetySummary = await getUserSafetySummary(id);
+  } catch (error) {
+    safetyError =
+      error instanceof ApiConnectionError
+        ? tErrors('couldNotReachApi')
+        : tErrors('somethingWentWrongTryAgain');
+  }
+
+  try {
+    activityDetails = await getUserActivityDetails(id);
+  } catch (error) {
+    activityError =
+      error instanceof ApiConnectionError
+        ? tErrors('couldNotReachApi')
+        : tErrors('somethingWentWrongTryAgain');
   }
 
   if (canViewSessions) {
@@ -102,15 +164,20 @@ export default async function UserDetailPage(props: PageProps) {
       sessions = [];
       sessionsError =
         error instanceof ApiConnectionError
-          ? 'Unable to load sessions.'
-          : 'Sessions could not be loaded.';
+          ? tErrors('couldNotReachApi')
+          : tErrors('unableToLoadUserSessions');
     }
   } else {
     sessions = [];
   }
 
+  const displayName =
+    u.status === 'DELETED'
+      ? (await getTranslations('users'))('deletedUser')
+      : `${u.firstName} ${u.lastName}`.trim();
+
   return (
-    <AdminShell title={`${u.firstName} ${u.lastName}`} activeItem="users" initialSidebarCollapsed={initialSidebarCollapsed}>
+    <AdminShell title={displayName} activeItem="users" initialSidebarCollapsed={initialSidebarCollapsed}>
       <UserDetailTabs
         userId={u.id}
         initialFirstName={u.firstName}
@@ -119,6 +186,8 @@ export default async function UserDetailPage(props: PageProps) {
         initialStatus={u.status}
         initialPhoneNumber={u.phoneNumber ?? ''}
         email={u.email}
+        avatarUrl={u.avatarUrl ?? null}
+        lastActiveAt={u.lastActiveAt ?? null}
         pointsBalance={u.pointsBalance}
         totalPointsEarned={u.totalPointsEarned ?? 0}
         isPhoneVerified={u.isPhoneVerified ?? false}
@@ -131,6 +200,12 @@ export default async function UserDetailPage(props: PageProps) {
         reportsCount={u.reportsCount}
         sessionsCount={u.sessionsCount}
         canViewSessions={canViewSessions}
+        safetySummary={safetySummary}
+        safetyError={safetyError}
+        moderationNotes={moderationNotes.data}
+        statusHistory={statusHistory.data}
+        activityDetails={activityDetails}
+        activityError={activityError}
         audit={audit}
         auditError={auditError}
         sessions={sessions}
@@ -140,6 +215,13 @@ export default async function UserDetailPage(props: PageProps) {
         pointLedgerPage={pointLedger.meta.page}
         pointLedgerLimit={pointLedger.meta.limit}
         pointsError={pointsError}
+        initialReportCreditsAvailable={
+          (pointLedger as { reportCreditsAvailable?: number }).reportCreditsAvailable ?? 0
+        }
+        initialReportCreditsSpentTotal={
+          (pointLedger as { reportCreditsSpentTotal?: number }).reportCreditsSpentTotal ?? 0
+        }
+        {...(initialActiveTab ? { initialActiveTab } : {})}
       />
     </AdminShell>
   );

@@ -85,3 +85,23 @@ export function subscribeReportViewersUpdated(listener: ReportViewersUpdatedList
     reportViewersUpdatedListeners.delete(listener);
   };
 }
+
+type UserUpdatedListener = (payload: { userId: string; atMs: number }) => void;
+const userUpdatedListeners = new Set<UserUpdatedListener>();
+
+export function emitUserUpdatedSignal(userId: string): void {
+  const payload = { userId, atMs: Date.now() };
+  if (isRealtimeDebugEnabled()) {
+    console.debug('[realtime] emitUserUpdatedSignal', payload);
+  }
+  for (const listener of userUpdatedListeners) {
+    listener(payload);
+  }
+}
+
+export function subscribeUserUpdatedSignal(listener: UserUpdatedListener): () => void {
+  userUpdatedListeners.add(listener);
+  return () => {
+    userUpdatedListeners.delete(listener);
+  };
+}

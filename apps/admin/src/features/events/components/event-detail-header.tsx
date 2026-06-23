@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Badge, Icon, PageHeader } from '@/components/ui';
+import { Badge, Icon, PageHeader, SectionState } from '@/components/ui';
 import type { CleanupEventDetail } from '@/features/events/data/events-adapter';
 import { formatEventAdminDateTime } from '@/features/events/lib/event-admin-datetime';
 import { useAdminBcp47Locale } from '@/lib/i18n';
@@ -10,6 +10,7 @@ import styles from './event-detail.module.css';
 type EventDetailHeaderProps = {
   event: CleanupEventDetail;
   declineReason?: string | null;
+  declineReasonLoadError?: string | null;
 };
 
 function moderationTone(status: string): 'warning' | 'success' | 'danger' | 'neutral' {
@@ -19,7 +20,11 @@ function moderationTone(status: string): 'warning' | 'success' | 'danger' | 'neu
   return 'neutral';
 }
 
-export function EventDetailHeader({ event, declineReason = null }: EventDetailHeaderProps) {
+export function EventDetailHeader({
+  event,
+  declineReason = null,
+  declineReasonLoadError = null,
+}: EventDetailHeaderProps) {
   const tDetail = useTranslations('events.detail');
   const tTable = useTranslations('events.table');
   const locale = useAdminBcp47Locale();
@@ -39,6 +44,9 @@ export function EventDetailHeader({ event, declineReason = null }: EventDetailHe
         <Badge tone="neutral">{event.lifecycleStatus}</Badge>
         <Badge tone={moderationTone(event.status ?? 'APPROVED')}>{event.status ?? 'APPROVED'}</Badge>
       </div>
+      {event.status === 'DECLINED' && declineReasonLoadError ? (
+        <SectionState variant="error" message={declineReasonLoadError} />
+      ) : null}
       {event.status === 'DECLINED' && declineReason ? (
         <div className={styles.declineReasonBox} role="note">
           <span className={styles.metaLabel}>{tDetail('declineReasonLabel')}</span>

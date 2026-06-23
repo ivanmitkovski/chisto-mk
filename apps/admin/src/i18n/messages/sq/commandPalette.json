@@ -1,0 +1,32 @@
+{
+  "groups": {
+    "recent": "Të fundit",
+    "navigation": "Navigim",
+    "actions": "Veprime",
+    "context": "Kjo faqe",
+    "users": "Përdorues",
+    "reports": "Raportime",
+    "sites": "Vendore",
+    "events": "Ngjarje"
+  },
+  "openNotificationsPanel": "Hap panelin e njoftimeve",
+  "openNotificationsPanelDescription": "Shfaq listën e njoftimeve në kokë",
+  "refreshPage": "Rifresko faqen",
+  "refreshPageDescription": "Ringarko të dhënat e faqes aktuale",
+  "clearRecents": "Pastro komandat e fundit",
+  "clearRecentsDescription": "Hiq komandat e përdorura së fundmi nga lista",
+  "reportsInReview": "Raportime në shqyrtim",
+  "reportsInReviewDescription": "Hap radhën e raportimeve të filtruara në shqyrtim",
+  "suspendedUsers": "Përdorues të pezulluar",
+  "suspendedUsersDescription": "Hap përdoruesit e filtruar si të pezulluar",
+  "eventsPendingModeration": "Ngjarje në moderim",
+  "eventsPendingModerationDescription": "Hap ngjarjet e pastrimit që presin moderim",
+  "unreadNotifications": "Njoftime të palexuara",
+  "unreadNotificationsDescription": "Filtro vetëm njoftimet e palexuara",
+  "resultCount": "{count, plural, =0 {Asnjë rezultat} one {# rezultat} other {# rezultate}}",
+  "entitySearchFailed": "Disa rezultate kërkimi nuk u ngarkuan.",
+  "footerNavigateLabel": "Lëviz",
+  "footerSelectLabel": "Zgjidh",
+  "footerCloseLabel": "Mbyll",
+  "footerToggleLabel": "Ndërro"
+}

@@ -25,9 +25,15 @@ type EventDetailViewProps = {
   event: CleanupEventDetail;
   canWriteCleanupEvents: boolean;
   declineReason?: string | null;
+  declineReasonLoadError?: string | null;
 };
 
-export function EventDetailView({ event, canWriteCleanupEvents, declineReason = null }: EventDetailViewProps) {
+export function EventDetailView({
+  event,
+  canWriteCleanupEvents,
+  declineReason = null,
+  declineReasonLoadError = null,
+}: EventDetailViewProps) {
   const form = useEventDetailForm(event);
   const mutations = useEventDetailMutations(event, form);
   useUnsavedChangesGuard(form.isDirty);
@@ -84,7 +90,11 @@ export function EventDetailView({ event, canWriteCleanupEvents, declineReason = 
 
       <div className={styles.detailGrid}>
         <div className={styles.mainColumn}>
-          <EventDetailHeader event={event} declineReason={declineReason} />
+          <EventDetailHeader
+            event={event}
+            declineReason={declineReason}
+            declineReasonLoadError={declineReasonLoadError}
+          />
 
           <EventDetailContextSection event={event} />
 

@@ -8612,6 +8612,15 @@
             }
           },
           {
+            "name": "createdAfter",
+            "required": false,
+            "in": "query",
+            "description": "Filter users created after this ISO date",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "lastActiveBefore",
             "required": false,
             "in": "query",
@@ -8735,6 +8744,266 @@
         ]
       }
     },
+    "/admin/users/{id}/moderation-notes": {
+      "get": {
+        "operationId": "AdminUsersController_getModerationNotes",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List moderator notes for user",
+        "tags": [
+          "admin-users"
+        ]
+      },
+      "post": {
+        "operationId": "AdminUsersController_createModerationNote",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserModerationNoteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Add moderator note for user",
+        "tags": [
+          "admin-users"
+        ]
+      }
+    },
+    "/admin/users/{id}/status-history": {
+      "get": {
+        "operationId": "AdminUsersController_getStatusHistory",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List status change history for user",
+        "tags": [
+          "admin-users"
+        ]
+      }
+    },
+    "/admin/users/{id}/safety-summary": {
+      "get": {
+        "operationId": "AdminUsersController_getSafetySummary",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User safety summary"
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get user safety and trust summary",
+        "tags": [
+          "admin-users"
+        ]
+      }
+    },
+    "/admin/users/{id}/data-export": {
+      "get": {
+        "operationId": "AdminUsersController_getDataExport",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User data export JSON"
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Export user data (admin DSAR)",
+        "tags": [
+          "admin-users"
+        ]
+      }
+    },
     "/admin/users/{id}/audit": {
       "get": {
         "operationId": "AdminUsersController_getAudit",
@@ -8839,6 +9108,50 @@
         ]
       }
     },
+    "/admin/users/{id}/sessions/revoke-all": {
+      "post": {
+        "operationId": "AdminUsersController_revokeAllSessions",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All sessions revoked"
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Revoke all sessions for user",
+        "tags": [
+          "admin-users"
+        ]
+      }
+    },
     "/admin/users/{id}/sessions/{sessionId}": {
       "delete": {
         "operationId": "AdminUsersController_revokeSession",
@@ -8886,6 +9199,114 @@
           }
         ],
         "summary": "Revoke a user session",
+        "tags": [
+          "admin-users"
+        ]
+      }
+    },
+    "/admin/users/{id}/email/change-request": {
+      "post": {
+        "operationId": "AdminUsersController_requestEmailChange",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminRequestEmailChangeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verification code sent to new email"
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Request admin-assisted email change (OTP to new address)",
+        "tags": [
+          "admin-users"
+        ]
+      }
+    },
+    "/admin/users/{id}/email/confirm": {
+      "post": {
+        "operationId": "AdminUsersController_confirmEmailChange",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminConfirmEmailChangeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email updated"
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Confirm admin-assisted email change with OTP",
         "tags": [
           "admin-users"
         ]
@@ -17604,6 +18025,35 @@
         ]
       }
     },
+    "/admin/gamification/users/{userId}/report-credits/adjust": {
+      "post": {
+        "operationId": "AdminGamificationController_adjustReportCredits",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Adjust user report credits",
+        "tags": [
+          "admin-gamification"
+        ]
+      }
+    },
     "/admin/gamification/rankings/weekly": {
       "get": {
         "operationId": "AdminGamificationController_weeklyRankings",
@@ -18275,6 +18725,582 @@
         "summary": "Feed ranking diagnostics for operations dashboard",
         "tags": [
           "admin-operations"
+        ]
+      }
+    },
+    "/news/posts": {
+      "get": {
+        "operationId": "PublicNewsController_list",
+        "parameters": [
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "en",
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 50,
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 0,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "summary": "List published news posts for a locale",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/news/slugs": {
+      "get": {
+        "operationId": "PublicNewsController_slugs",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "summary": "List published news slugs for sitemap",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/news/posts/{slug}": {
+      "get": {
+        "operationId": "PublicNewsController_getBySlug",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "summary": "Get a published news post by slug",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/admin/news/posts": {
+      "get": {
+        "operationId": "AdminNewsController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all news posts",
+        "tags": [
+          "admin-news"
+        ]
+      },
+      "post": {
+        "operationId": "AdminNewsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateNewsPostDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create news post draft",
+        "tags": [
+          "admin-news"
+        ]
+      }
+    },
+    "/admin/news/posts/{id}": {
+      "get": {
+        "operationId": "AdminNewsController_getById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get news post by id",
+        "tags": [
+          "admin-news"
+        ]
+      },
+      "patch": {
+        "operationId": "AdminNewsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateNewsPostDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update news post",
+        "tags": [
+          "admin-news"
+        ]
+      },
+      "delete": {
+        "operationId": "AdminNewsController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete news post",
+        "tags": [
+          "admin-news"
+        ]
+      }
+    },
+    "/admin/news/posts/{id}/publish": {
+      "post": {
+        "operationId": "AdminNewsController_publish",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Publish news post",
+        "tags": [
+          "admin-news"
+        ]
+      }
+    },
+    "/admin/news/posts/{id}/unpublish": {
+      "post": {
+        "operationId": "AdminNewsController_unpublish",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Unpublish news post to draft",
+        "tags": [
+          "admin-news"
+        ]
+      }
+    },
+    "/admin/news/posts/{id}/archive": {
+      "post": {
+        "operationId": "AdminNewsController_archive",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Archive news post",
+        "tags": [
+          "admin-news"
+        ]
+      }
+    },
+    "/admin/news/posts/{id}/media": {
+      "post": {
+        "operationId": "AdminNewsController_uploadMedia",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "kind",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "cover",
+                "inline_image",
+                "inline_video"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload news media (cover or inline)",
+        "tags": [
+          "admin-news"
+        ]
+      }
+    },
+    "/admin/news/media/{mediaId}": {
+      "delete": {
+        "operationId": "AdminNewsController_deleteMedia",
+        "parameters": [
+          {
+            "name": "mediaId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete news media",
+        "tags": [
+          "admin-news"
         ]
       }
     }
@@ -20417,7 +21443,14 @@
         "type": "object",
         "properties": {
           "metric": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "CONCURRENT",
+              "TRAFFIC_SPIKE",
+              "ERROR_RATE",
+              "REPORT_ACTIVITY",
+              "API_DEGRADATION"
+            ]
           },
           "threshold": {
             "type": "number",
@@ -23021,6 +24054,9 @@
           "usersNewLast7d": {
             "type": "number"
           },
+          "usersSuspendedCount": {
+            "type": "number"
+          },
           "sessionsActive": {
             "type": "number"
           },
@@ -23047,6 +24083,7 @@
           "cleanupEvents",
           "usersCount",
           "usersNewLast7d",
+          "usersSuspendedCount",
           "sessionsActive",
           "reportsTrend",
           "recentActivity",
@@ -23082,11 +24119,67 @@
               "ADMIN",
               "SUPER_ADMIN"
             ]
+          },
+          "reasonCode": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
           }
         },
         "required": [
           "userIds",
           "action"
+        ]
+      },
+      "CreateUserModerationNoteDto": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "string",
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "body"
+        ]
+      },
+      "AdminRequestEmailChangeDto": {
+        "type": "object",
+        "properties": {
+          "newEmail": {
+            "type": "string",
+            "example": "new.user@example.com"
+          },
+          "reasonCode": {
+            "type": "string",
+            "example": "user_request"
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "newEmail",
+          "reasonCode"
+        ]
+      },
+      "AdminConfirmEmailChangeDto": {
+        "type": "object",
+        "properties": {
+          "newEmail": {
+            "type": "string",
+            "example": "new.user@example.com"
+          },
+          "code": {
+            "type": "string",
+            "example": "123456"
+          }
+        },
+        "required": [
+          "newEmail",
+          "code"
         ]
       },
       "PatchAdminUserDto": {
@@ -23114,6 +24207,14 @@
               "SUSPENDED",
               "DELETED"
             ]
+          },
+          "reasonCode": {
+            "type": "string",
+            "description": "Reason code when changing status"
+          },
+          "note": {
+            "type": "string",
+            "description": "Optional moderator note for status change"
           }
         }
       },
@@ -26046,6 +27147,120 @@
           "redis",
           "s3"
         ]
+      },
+      "NewsBodyBlockDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "paragraph",
+              "image",
+              "video"
+            ]
+          },
+          "text": {
+            "type": "string"
+          },
+          "mediaId": {
+            "type": "string"
+          },
+          "caption": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "NewsLocaleContentDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "excerpt": {
+            "type": "string"
+          },
+          "body": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NewsBodyBlockDto"
+            }
+          }
+        },
+        "required": [
+          "title",
+          "excerpt",
+          "body"
+        ]
+      },
+      "NewsTranslationsDto": {
+        "type": "object",
+        "properties": {
+          "en": {
+            "$ref": "#/components/schemas/NewsLocaleContentDto"
+          },
+          "mk": {
+            "$ref": "#/components/schemas/NewsLocaleContentDto"
+          },
+          "sq": {
+            "$ref": "#/components/schemas/NewsLocaleContentDto"
+          }
+        },
+        "required": [
+          "en",
+          "mk",
+          "sq"
+        ]
+      },
+      "CreateNewsPostDto": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "release",
+              "partnership",
+              "community",
+              "product"
+            ]
+          },
+          "translations": {
+            "$ref": "#/components/schemas/NewsTranslationsDto"
+          }
+        },
+        "required": [
+          "category",
+          "translations"
+        ]
+      },
+      "UpdateNewsPostDto": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "release",
+              "partnership",
+              "community",
+              "product"
+            ]
+          },
+          "translations": {
+            "$ref": "#/components/schemas/NewsTranslationsDto"
+          },
+          "scheduledAt": {
+            "type": "object",
+            "nullable": true
+          }
+        }
       }
     }
   }

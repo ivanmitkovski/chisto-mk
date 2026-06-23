@@ -2,7 +2,7 @@
 
 import { ReactNode, useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Modal } from '@/components/ui';
 import { adminNavigation } from '../config/navigation';
 import { NAV_PERMISSIONS } from '@/lib/auth/rbac';
@@ -24,11 +24,29 @@ type AdminShellProps = {
 };
 
 const SIDEBAR_PREFERENCE_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
+const SIDEBAR_PERSIST_DEBOUNCE_MS = 250;
+let sidebarPersistTimer: ReturnType<typeof setTimeout> | null = null;
 
-function persistSidebarPreference(nextIsCollapsed: boolean) {
+function writeSidebarPreference(nextIsCollapsed: boolean) {
   const serializedValue = nextIsCollapsed ? '1' : '0';
   window.localStorage.setItem(DESKTOP_SIDEBAR_STORAGE_KEY, serializedValue);
   document.cookie = `${DESKTOP_SIDEBAR_COOKIE_KEY}=${serializedValue}; path=/; max-age=${SIDEBAR_PREFERENCE_COOKIE_MAX_AGE_SECONDS}; samesite=lax`;
+}
+
+function persistSidebarPreference(nextIsCollapsed: boolean, immediate = false) {
+  if (immediate) {
+    if (sidebarPersistTimer) {
+      clearTimeout(sidebarPersistTimer);
+      sidebarPersistTimer = null;
+    }
+    writeSidebarPreference(nextIsCollapsed);
+    return;
+  }
+  if (sidebarPersistTimer) clearTimeout(sidebarPersistTimer);
+  sidebarPersistTimer = setTimeout(() => {
+    sidebarPersistTimer = null;
+    writeSidebarPreference(nextIsCollapsed);
+  }, SIDEBAR_PERSIST_DEBOUNCE_MS);
 }
 
 export function AdminShell({
@@ -50,6 +68,8 @@ export function AdminShell({
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isSidebarPreferenceHydrated, setIsSidebarPreferenceHydrated] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
+  const [paletteShortcutLabel, setPaletteShortcutLabel] = useState('Ctrl+K');
+  const reduceMotion = useReducedMotion();
 
   useAdminSessionKeepalive();
 
@@ -76,9 +96,9 @@ export function AdminShell({
       if (persistedIsCollapsed !== initialSidebarCollapsed) {
         setIsSidebarCollapsed(persistedIsCollapsed);
       }
-      persistSidebarPreference(persistedIsCollapsed);
+      persistSidebarPreference(persistedIsCollapsed, true);
     } else {
-      persistSidebarPreference(initialSidebarCollapsed);
+      persistSidebarPreference(initialSidebarCollapsed, true);
     }
 
     const animationFrameId = window.requestAnimationFrame(() => {
@@ -107,6 +127,11 @@ export function AdminShell({
       document.body.style.overflow = '';
     };
   }, [isMobile, isMobileSidebarOpen]);
+
+  useEffect(() => {
+    const platformLabel = window.navigator.platform.toLowerCase().includes('mac') ? '⌘K' : 'Ctrl+K';
+    setPaletteShortcutLabel(platformLabel);
+  }, []);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -185,10 +210,10 @@ export function AdminShell({
               type="button"
               className={styles.sidebarBackdrop}
               aria-label={tCommon('closeNavigationMenu')}
-              initial={{ opacity: 0 }}
+              initial={reduceMotion ? false : { opacity: 0 }}
               animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.18 }}
+              {...(reduceMotion ? {} : { exit: { opacity: 0 } })}
+              transition={{ duration: reduceMotion ? 0 : 0.18 }}
               onClick={closeMobileSidebar}
             />
           ) : null}
@@ -212,6 +237,10 @@ export function AdminShell({
           <div>
             <dt>?</dt>
             <dd>{tCommon('shortcutShowPanel')}</dd>
+          </div>
+          <div>
+            <dt>{paletteShortcutLabel}</dt>
+            <dd>{tCommon('openCommandPalette')}</dd>
           </div>
           <div>
             <dt>Esc</dt>

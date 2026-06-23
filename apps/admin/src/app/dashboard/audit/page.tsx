@@ -1,7 +1,6 @@
-import { cookies } from 'next/headers';
 import { getTranslations } from 'next-intl/server';
 import { AdminShell } from '@/features/admin-shell';
-import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell';
+import { readDashboardShellState } from '@/features/admin-shell/server';
 import { SectionState } from '@/components/ui';
 import { AuditWorkspace } from '@/features/audit';
 import { getAuditLog } from '@/features/audit';
@@ -25,8 +24,7 @@ export default async function AuditPage(props: PageProps) {
   const tNav = await getTranslations('nav');
   const tErrors = await getTranslations('errors');
   const searchParams = await props.searchParams;
-  const cookieStore = await cookies();
-  const initialSidebarCollapsed = cookieStore.get(DESKTOP_SIDEBAR_COOKIE_KEY)?.value === '1';
+  const { initialSidebarCollapsed } = await readDashboardShellState();
 
   const page = Math.max(1, parseInt(searchParams.page ?? '1', 10) || 1);
   const limit = 20;

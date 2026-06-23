@@ -31,6 +31,7 @@ import { Idempotent } from '../../common/idempotency/idempotency.decorator';
 import { AuditService } from '../../audit/services/audit.service';
 import { clientIp } from '../../sites/http/client-ip';
 import { PrismaService } from '../../prisma/prisma.service';
+import { AdminAlertComparator } from '../../prisma-client';
 import {
   ActiveUsersListQueryDto,
   ActivityFeedQueryDto,
@@ -140,10 +141,10 @@ export class AdminActiveUsersController {
   createAlertRule(@CurrentUser() user: AuthenticatedUser, @Body() dto: CreateAdminAlertRuleDto) {
     return this.prisma.adminAlertRule.create({
       data: {
-        metric: dto.metric as never,
+        metric: dto.metric,
         threshold: dto.threshold,
         windowSeconds: dto.windowSeconds ?? 300,
-        comparator: (dto.comparator ?? 'GT') as never,
+        comparator: dto.comparator ?? AdminAlertComparator.GT,
         createdById: user.userId,
       },
     });

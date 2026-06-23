@@ -48,6 +48,7 @@
     "reportsTableFailed": "Табелата со пријави не се вчита.",
     "insightsFailed": "Увидите не се вчитаа.",
     "dashboardFailed": "Контролната табла не се вчита.",
+    "tryAgain": "Обидете се повторно",
     "signInAgain": "Најавете се повторно"
   },
   "reportsSection": {

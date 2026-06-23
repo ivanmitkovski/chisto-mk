@@ -9,6 +9,8 @@
     "lint": "eslint .",
     "lint:help-content": "node ./scripts/lint-help-content.mjs",
     "lint:legal-content": "node ./scripts/lint-legal-content.mjs && vitest run src/lib/legal/legal-content.lint.test.ts",
+    "lint:marketing-copy": "node ./scripts/lint-marketing-copy.mjs",
+    "launch:check": "node ./scripts/launch-check.mjs",
     "test": "vitest run",
     "test:e2e": "playwright test"
   },

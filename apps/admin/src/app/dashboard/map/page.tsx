@@ -1,28 +1,29 @@
 import type { Metadata } from 'next';
-import { cookies } from 'next/headers';
+import { getTranslations } from 'next-intl/server';
 import { AdminShell } from '@/features/admin-shell';
-import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell';
-import { SitesMap } from '@/features/map';
+import { readDashboardShellState } from '@/features/admin-shell/server';
+import { MapWorkspace } from '@/features/map';
 import { ADMIN_PERMISSIONS } from '@/lib/auth/rbac/permissions';
 import { requirePagePermission } from '@/lib/auth/rbac/server';
 
-export const metadata: Metadata = {
-  title: 'Map',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('map');
+  return { title: t('pageTitle') };
+}
 
 export default async function MapPage() {
   await requirePagePermission(ADMIN_PERMISSIONS['map:read']);
-  const cookieStore = await cookies();
-  const initialSidebarCollapsed = cookieStore.get(DESKTOP_SIDEBAR_COOKIE_KEY)?.value === '1';
+  const tNav = await getTranslations('nav');
+  const { initialSidebarCollapsed } = await readDashboardShellState();
 
   return (
     <AdminShell
-      title="Map"
+      title={tNav('map')}
       activeItem="map"
       initialSidebarCollapsed={initialSidebarCollapsed}
       contentMode="immersive"
     >
-      <SitesMap />
+      <MapWorkspace />
     </AdminShell>
   );
 }

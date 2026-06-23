@@ -36,11 +36,18 @@ function walkFiles(dir, acc = []) {
   return acc;
 }
 
+/** @type {Array<{ file: string; line: number; message: string }>} */
+const warnings = [];
+
 function checkFile(file) {
   const rel = path.relative(root, file);
   const content = fs.readFileSync(file, 'utf8');
   const lines = content.split('\n');
   const isUiModule = rel.includes('apps/admin/src/components/ui/') && rel.endsWith('.module.css');
+  const isFeatureModule =
+    (rel.includes('apps/admin/src/features/') || rel.includes('apps/admin/src/app/')) &&
+    rel.endsWith('.module.css');
+  const enforceFeatureHex = process.env.ADMIN_STYLES_ENFORCE_FEATURE_HEX === '1';
   const isTokens = rel.endsWith('tokens.css') || rel.endsWith('globals.css');
 
   lines.forEach((line, index) => {
@@ -97,12 +104,22 @@ function checkFile(file) {
       }
     }
 
-    if (isUiModule && !isTokens) {
+    if ((isUiModule || (isFeatureModule && enforceFeatureHex)) && !isTokens) {
       if (/#[0-9a-fA-F]{3,8}\b/.test(trimmed)) {
         violations.push({
           file: rel,
           line: lineNo,
-          message: 'Raw hex colors are not allowed in UI components — use tokens.css',
+          message: 'Raw hex colors are not allowed — use tokens.css',
+        });
+      }
+    }
+
+    if (isFeatureModule && !enforceFeatureHex && !isTokens) {
+      if (/#[0-9a-fA-F]{3,8}\b/.test(trimmed)) {
+        warnings.push({
+          file: rel,
+          line: lineNo,
+          message: 'Raw hex in feature CSS — migrate to tokens.css (warn-only until ADMIN_STYLES_ENFORCE_FEATURE_HEX=1)',
         });
       }
     }
@@ -111,6 +128,13 @@ function checkFile(file) {
 
 for (const file of walkFiles(adminSrc)) {
   checkFile(file);
+}
+
+if (warnings.length > 0) {
+  console.warn(`Admin style guardrail warnings (${warnings.length}):\n`);
+  for (const w of warnings) {
+    console.warn(`  ${w.file}:${w.line}  ${w.message}`);
+  }
 }
 
 if (violations.length > 0) {

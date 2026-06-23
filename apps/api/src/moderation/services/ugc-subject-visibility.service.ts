@@ -1,12 +1,16 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { AuthSessionRevocationService } from '../../auth/services/auth-session-revocation.service';
 
 @Injectable()
 export class UgcSubjectVisibilityService {
   private static readonly SUBTREE_MAX_DEPTH = 32;
   private static readonly SUBTREE_MAX_NODES = 500;
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly sessionRevocation: AuthSessionRevocationService,
+  ) {}
 
   async resolveContentStatus(subjectType: string, subjectId: string): Promise<string> {
     switch (subjectType) {
@@ -75,6 +79,9 @@ export class UgcSubjectVisibilityService {
           where: { id: subjectId },
           data: { status: hidden ? 'SUSPENDED' : 'ACTIVE' },
         });
+        if (hidden) {
+          await this.sessionRevocation.revokeAllForUser(subjectId, 'status_changed');
+        }
         return;
       case 'event':
         await this.prisma.cleanupEvent.updateMany({

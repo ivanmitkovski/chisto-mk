@@ -10,6 +10,7 @@
   "risk-signals": "Sinjalet e rrezikut të check-in",
   "moderation": "Moderimi UGC",
   "broadcasts": "Transmetimet",
+  "news": "Lajme",
   "team": "Ekipi",
   "gamification": "Gamifikimi",
   "app-config": "Konfigurimi i aplikacionit",
@@ -41,6 +42,10 @@
       "label": "Shko te vendet",
       "description": "Vendet e ndotjes dhe statusi i ciklit jetësor"
     },
+    "goResolutions": {
+      "label": "Shko te rezolutat e vendeve",
+      "description": "Shqyrto dhe menaxho rrjedhat e rezolutave të vendeve"
+    },
     "goMap": {
       "label": "Shko te harta",
       "description": "Vendet në hartë"
@@ -61,6 +66,10 @@
       "label": "Shko te transmetimet",
       "description": "Dërgo fushata njoftimesh"
     },
+    "goNews": {
+      "label": "Shko te lajmet",
+      "description": "Menaxho postimet dhe mediat e faqes së landing"
+    },
     "goTeam": {
       "label": "Shko te ekipi",
       "description": "Fto stafin dhe menaxho rolet admin"
@@ -76,6 +85,10 @@
     "goOperations": {
       "label": "Shko te operacionet",
       "description": "Shëndeti i platformës dhe operacionet e dorëzimit"
+    },
+    "goActiveUsers": {
+      "label": "Shko te përdoruesit aktivë",
+      "description": "Sesione live, angazhim dhe analitikë aktiviteti"
     },
     "goEmailSuppressions": {
       "label": "Shko te bllokimet e emailit",

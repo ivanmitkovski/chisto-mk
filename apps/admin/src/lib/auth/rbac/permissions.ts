@@ -41,6 +41,8 @@ export const ADMIN_PERMISSIONS = {
   'team:read': 'team:read',
   'team:write': 'team:write',
   'analytics:read': 'analytics:read',
+  'news:read': 'news:read',
+  'news:write': 'news:write',
 } as const;
 
 export type AdminPermission = (typeof ADMIN_PERMISSIONS)[keyof typeof ADMIN_PERMISSIONS];
@@ -66,6 +68,7 @@ const SUPPORT: AdminPermission[] = [
   ADMIN_PERMISSIONS['settings:read'],
   ADMIN_PERMISSIONS['settings:security'],
   ADMIN_PERMISSIONS['app-config:read'],
+  ADMIN_PERMISSIONS['news:read'],
   ADMIN_PERMISSIONS['analytics:read'],
 ];
 
@@ -86,6 +89,7 @@ const ADMIN_ROLE: AdminPermission[] = [
   ADMIN_PERMISSIONS['comms:write'],
   ADMIN_PERMISSIONS['notifications:broadcast'],
   ADMIN_PERMISSIONS['app-config:write'],
+  ADMIN_PERMISSIONS['news:write'],
 ];
 
 const SUPER_ADMIN: AdminPermission[] = [
@@ -147,4 +151,5 @@ export const NAV_PERMISSIONS: Record<string, AdminPermission> = {
   'webhook-logs': ADMIN_PERMISSIONS['comms:read'],
   team: ADMIN_PERMISSIONS['team:read'],
   'active-users': ADMIN_PERMISSIONS['analytics:read'],
+  news: ADMIN_PERMISSIONS['news:read'],
 };

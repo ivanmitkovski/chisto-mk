@@ -8,6 +8,7 @@ const PROXY_PATH_PREFIXES = [
   '/sites/',
   '/reports/',
   '/notifications/',
+  '/news/',
 ] as const;
 
 /** Read-only citizen routes the admin UI calls through the BFF (narrow allowlist). */

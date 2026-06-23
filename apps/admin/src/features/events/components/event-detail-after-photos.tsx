@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import styles from './event-detail.module.css';
 
@@ -24,7 +25,14 @@ export function EventDetailAfterPhotos({ afterImageUrls }: EventDetailAfterPhoto
         {afterImageUrls.map((url) => (
           <li key={url}>
             <a href={url} target="_blank" rel="noopener noreferrer" className={styles.afterPhotoLink}>
-              <img src={url} alt="" className={styles.afterPhoto} loading="lazy" />
+              <Image
+                src={url}
+                alt=""
+                width={240}
+                height={180}
+                className={styles.afterPhoto}
+                sizes="240px"
+              />
             </a>
           </li>
         ))}

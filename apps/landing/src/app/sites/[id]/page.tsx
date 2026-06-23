@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { defaultLocale, isLocale, type Locale } from "@/i18n/config";
+import { SharePageShell } from "@/components/layout/SharePageLayout/SharePageShell";
 import { chistoApiBase, chistoPublicSiteBase } from "@/lib/share-api";
+import { homeDownloadSectionUrl } from "@/lib/store-links";
 import { SiteShareAttribution } from "./SiteShareAttribution";
 import { formatSiteStatus, siteShareStrings } from "./site-share-strings";
-import styles from "./site-share-page.module.css";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -78,6 +78,7 @@ export default async function SiteSharePage({ params, searchParams }: Props) {
   const siteBase = chistoPublicSiteBase();
   const appDeepLink = `${siteBase}/sites/${encodeURIComponent(id)}${st ? `?st=${encodeURIComponent(st)}` : ""}`;
   const webHome = `${siteBase}/${uiLocale}`;
+  const downloadUrl = homeDownloadSectionUrl(siteBase, uiLocale);
   const statusLabel = formatSiteStatus(card.status, uiLocale);
   const jsonLd = {
     "@context": "https://schema.org",
@@ -88,36 +89,18 @@ export default async function SiteSharePage({ params, searchParams }: Props) {
   };
 
   return (
-    <main
-      style={{
-        fontFamily: "var(--font-sans), system-ui, sans-serif",
-        padding: 24,
-        maxWidth: 560,
-        margin: "0 auto",
-        lineHeight: 1.5,
-      }}
-    >
+    <>
       <SiteShareAttribution token={st ?? null} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <p style={{ fontSize: 13, color: "#64748b", marginBottom: 8 }}>Chisto.mk</p>
-      <h1 style={{ fontSize: "1.5rem", margin: "0 0 8px", color: "#0f172a" }}>{card.title}</h1>
-      <p style={{ color: "#475569", margin: "0 0 8px" }}>{card.siteLabel}</p>
-      <p style={{ color: "#64748b", margin: "0 0 24px" }}>
-        {t.statusPrefix}: {statusLabel}
-      </p>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
-        <Link href={appDeepLink} className={styles.linkPrimary}>
-          {t.openInApp}
-        </Link>
-        <a href={webHome} className={styles.linkSecondary}>
-          {t.getTheApp}
-        </a>
-      </div>
-      <p style={{ marginTop: 28, fontSize: 14 }}>
-        <a href={webHome} className={styles.textLink}>
-          {t.signInCta}
-        </a>
-      </p>
-    </main>
+      <SharePageShell
+        homeHref={webHome}
+        homeLabel={t.signInCta}
+        title={card.title}
+        lines={[card.siteLabel, `${t.statusPrefix}: ${statusLabel}`]}
+        primary={{ href: appDeepLink, label: t.openInApp }}
+        secondary={{ href: downloadUrl, label: t.getTheApp }}
+        footerLink={{ href: webHome, label: t.signInCta }}
+      />
+    </>
   );
 }

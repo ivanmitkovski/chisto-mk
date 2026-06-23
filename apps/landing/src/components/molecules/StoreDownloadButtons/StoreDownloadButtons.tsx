@@ -1,15 +1,8 @@
 "use client";
 
 import { AppStoreButton } from "@/components/molecules/AppStoreButton";
-import { getPublicOptionalUrl } from "@/lib/legal/legal-public-config";
+import { hasStoreDownloadLinks } from "@/lib/store-links";
 import { cn } from "@/lib/utils/cn";
-
-export function hasStoreDownloadLinks(): boolean {
-  return Boolean(
-    getPublicOptionalUrl(process.env.NEXT_PUBLIC_APP_STORE_URL) ||
-      getPublicOptionalUrl(process.env.NEXT_PUBLIC_GOOGLE_PLAY_URL),
-  );
-}
 
 interface StoreDownloadButtonsProps {
   className?: string;
@@ -27,3 +20,5 @@ export function StoreDownloadButtons({ className }: StoreDownloadButtonsProps) {
     </div>
   );
 }
+
+export { hasStoreDownloadLinks };

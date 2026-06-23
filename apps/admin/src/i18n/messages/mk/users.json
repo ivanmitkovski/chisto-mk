@@ -1,11 +1,13 @@
 {
   "pageTitle": "Корисници",
+  "pageDescription": "Пребарувајте, прегледувајте и модерирајте граѓански сметки низ платформата.",
   "deletedUser": "Избришан корисник",
   "detailTitle": "Корисник",
   "stats": {
     "totalUsers": "Вкупно корисници",
     "new7d": "Нови (7 дена)",
-    "activeSessions": "Активни сесии"
+    "activeSessions": "Активни сесии",
+    "suspended": "Суспендирани"
   },
   "filters": {
     "allRoles": "Сите улоги",
@@ -21,7 +23,12 @@
     "searchPlaceholder": "Пребарај корисници…",
     "searchAria": "Пребарај корисници",
     "filterByRole": "Филтрирај по улога",
-    "filterByStatus": "Филтрирај по статус"
+    "filterByStatus": "Филтрирај по статус",
+    "quickFiltersAria": "Брзи филтри за статус",
+    "lastActiveRange": "Опсег на последна активност",
+    "lastActiveAfter": "Активен после",
+    "lastActiveBefore": "Активен пред",
+    "viewActiveUsers": "Преглед на аналитика за активни корисници"
   },
   "table": {
     "selectAllAria": "Избери ги сите",
@@ -72,6 +79,7 @@
     "status": "Статус",
     "saveChanges": "Зачувај промени",
     "savedMessage": "Корисникот е ажуриран.",
+    "savedWithRoleMessage": "Профилот и улогата се ажурирани.",
     "roleUpdatedMessage": "Улогата на корисникот е ажурирана.",
     "roleUpdateFailed": "Ажурирањето на улогата не успеа",
     "validation": {
@@ -81,6 +89,7 @@
     },
     "confirmRoleTitle": "Потврди промена на улога",
     "confirmRoleDescription": "Промените на улогата се високо-влијателни. Да се потврди ажурирањето на улогата на корисникот?",
+    "confirmSaveWithRoleDescription": "Да се зачуваат промените на профилот и улогата од {fromRole} во {toRole}?",
     "updateRole": "Ажурирај улога",
     "suspendUserTitle": "Суспендирај корисник",
     "markDeletedTitle": "Означи корисник како избришан",
@@ -95,6 +104,8 @@
     "viewProfile": "Преглед на профил",
     "tabs": {
       "profile": "Профил",
+      "safety": "Безбедност и доверба",
+      "activity": "Активност",
       "privacy": "Приватност и верификација",
       "points": "Поени",
       "sessions": "Сесии ({count})",
@@ -112,7 +123,22 @@
       "privacyAccepted": "Прифатена приватност",
       "requiresTerms": "Бара прифаќање на услови",
       "totalPointsEarned": "Вкупно заработени поени",
-      "created": "Креиран"
+      "created": "Креиран",
+      "exportData": "Извези кориснички податоци",
+      "exportDataSuccess": "Извозот на кориснички податоци е преземен."
+    },
+    "reportCredits": {
+      "title": "Кредити за пријави",
+      "available": "Достапни кредити: {count}",
+      "spentTotal": "Вкупно потрошени: {count}",
+      "delta": "Делта (+/-)",
+      "reasonCode": "Код на причина",
+      "noteOptional": "Белешка (опционално)",
+      "adjust": "Прилагоди кредити",
+      "adjustedTitle": "Кредитите се прилагодени",
+      "adjustedMessage": "Балансот на кредити е ажуриран.",
+      "adjustFailed": "Прилагодувањето не успеа",
+      "adjustFailedMessage": "Не може да се прилагодат кредитите за пријави."
     },
     "sessions": {
       "created": "Креирана",
@@ -137,7 +163,8 @@
       "action": "Акција",
       "resource": "Ресурс",
       "actor": "Актер",
-      "empty": "Нема записи за ревизија"
+      "empty": "Нема записи за ревизија",
+      "loadFailed": "Историјата на ревизија не може да се вчита."
     },
     "points": {
       "currentBalance": "Тековен баланс: {balance}",
@@ -152,6 +179,119 @@
       "deltaCol": "Делта",
       "balance": "Баланс",
       "reason": "Причина"
+    },
+    "auditLoadFailed": "Историјата на ревизија не може да се вчита.",
+    "header": {
+      "lastActive": "Последна активност: {value}",
+      "copyId": "Копирај ID",
+      "copyIdSuccess": "ID на корисникот е копиран."
+    },
+    "moderation": {
+      "title": "Модерација",
+      "railAria": "Акции за модерација на корисник",
+      "toolbarAria": "Акции за модерација",
+      "suspend": "Суспендирај",
+      "activate": "Активирај",
+      "activateTitle": "Активирај корисник",
+      "activateDescription": "Реактивирај ја сметката за повторно најавување.",
+      "revokeAllSessions": "Повлечи ги сите сесии",
+      "revokeAllTitle": "Да се повлечат сите сесии?",
+      "revokeAllDescription": "Сите активни сесии на корисникот ќе бидат одјавени веднаш.",
+      "revokeAllSuccessTitle": "Сесиите се повлечени",
+      "revokeAllSuccessMessage": "Сите кориснички сесии беа повлечени.",
+      "revokeAllFailedTitle": "Неуспешно повлекување",
+      "revokeAllFailedMessage": "Не може да се повлечат сите сесии.",
+      "viewUgcQueue": "Преглед на UGC пријави",
+      "readOnlyHint": "Имате пристап само за читање до модерација на корисници.",
+      "profileDirtyBlocked": "Зачувајте или отфрлете ги промените на профилот пред модерација.",
+      "shortcutHint": "Кратенки: S суспендирај, A активирај, R повлечи сесии."
+    },
+    "safety": {
+      "ugcReports": "UGC пријави (субјект)",
+      "reportsFiled": "Поднесени пријави",
+      "blocksGiven": "Дадени блокирања",
+      "blocksReceived": "Примени блокирања",
+      "viewUgcReports": "Отвори UGC ред",
+      "viewReports": "Пребарај пријави",
+      "recentUgc": "Неодамнешни UGC пријави",
+      "noRecentUgc": "Нема UGC пријави против овој корисник."
+    },
+    "activity": {
+      "sessionsToday": "Сесии денес: {count}",
+      "lastActive": "Последна активност: {value}",
+      "timeline": "Временска линија на активност",
+      "noEvents": "Нема неодамнешни настани за активност.",
+      "empty": "Податоците за активност се недостапни."
+    },
+    "suspendReason": {
+      "title": "Суспендирај корисник",
+      "description": "Изберете причина за суспензијата. Ќе се зачува во ревизискиот запис.",
+      "reasonLabel": "Причина",
+      "noteLabel": "Белешка (опционално)"
+    },
+    "suspensionReasons": {
+      "spam": "Спам",
+      "harassment": "Вознемирување",
+      "tosViolation": "Кршење на условите",
+      "fraudAbuse": "Измама или злоупотреба",
+      "adminRequest": "Админ барање",
+      "other": "Друго"
+    },
+    "notes": {
+      "title": "Белешки на модератор",
+      "addLabel": "Додај белешка",
+      "add": "Додај белешка",
+      "added": "Белешката е додадена.",
+      "addFailed": "Белешката не може да се додаде.",
+      "empty": "Сè уште нема белешки од модератор."
+    },
+    "statusHistory": {
+      "title": "Историја на статус",
+      "empty": "Сè уште нема забележани промени на статус."
+    },
+    "changeEmail": {
+      "action": "Промени е-пошта",
+      "title": "Промена на е-пошта на корисник",
+      "requestDescription": "Испратете код за потврда на новата адреса. Тековна е-пошта: {currentEmail}",
+      "confirmDescription": "Внесете 6-цифрен код испратен на {email}.",
+      "newEmailLabel": "Нова е-пошта",
+      "reasonLabel": "Причина",
+      "noteLabel": "Белешка (опционално)",
+      "codeLabel": "Код за потврда",
+      "sendCode": "Испрати код",
+      "confirm": "Потврди промена",
+      "back": "Назад",
+      "requestSuccessTitle": "Кодот е испратен",
+      "requestSuccessMessage": "Код за потврда е испратен на {email}.",
+      "confirmSuccessTitle": "Е-поштата е ажурирана",
+      "confirmSuccessMessage": "Е-поштата на корисникот е променета и сите сесии се поништени.",
+      "reasons": {
+        "userRequest": "Барање од корисник",
+        "typoCorrection": "Поправка на грешка",
+        "accountRecovery": "Обновување на сметка",
+        "mergedAccount": "Споена сметка",
+        "other": "Друго"
+      },
+      "errors": {
+        "emailInUse": "Таа е-пошта е веќе регистрирана на друга сметка.",
+        "emailUnchanged": "Новата е-пошта мора да се разликува од тековната.",
+        "invalidCode": "Невалиден или истечен код за потврда.",
+        "serviceUnavailable": "Промената на е-пошта привремено не е достапна. Обидете се повторно.",
+        "userDeleted": "Не може да се промени е-поштата за избришан корисник.",
+        "generic": "Не можеше да се промени е-поштата. Обидете се повторно."
+      }
+    },
+    "identifierHistory": {
+      "title": "Промени на идентификатори",
+      "entry": "{field} променето ({initiatedBy})",
+      "fields": {
+        "email": "Е-пошта",
+        "phone": "Телефон"
+      },
+      "initiatedBy": {
+        "admin": "од админ",
+        "user": "самоуслуга"
+      }
     },
     "tabsAria": "Делови на детали за корисник"
   }

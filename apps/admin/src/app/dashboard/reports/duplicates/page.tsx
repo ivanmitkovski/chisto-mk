@@ -1,13 +1,14 @@
-import { cookies } from 'next/headers';
 import { getTranslations } from 'next-intl/server';
 import { AdminShell } from '@/features/admin-shell';
-import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell';
+import { readDashboardShellState } from '@/features/admin-shell/server';
 import { SectionState } from '@/components/ui';
 import {
   DuplicateReportsWorkspace,
+} from '@/features/reports';
+import {
   getDuplicateReportGroup,
   getDuplicateReportGroups,
-} from '@/features/reports';
+} from '@/features/reports/data/reports-adapter';
 import { ADMIN_PERMISSIONS } from '@/lib/auth/rbac/permissions';
 import { requirePagePermission } from '@/lib/auth/rbac/server';
 import { handleServerLoadError } from '@/lib/server/handle-server-load-error';
@@ -25,8 +26,7 @@ export default async function DuplicateReportsPage({ searchParams }: DuplicateRe
   await requirePagePermission(ADMIN_PERMISSIONS['reports:read']);
   const tNav = await getTranslations('nav');
   const t = await getTranslations('reports.duplicates');
-  const cookieStore = await cookies();
-  const initialSidebarCollapsed = cookieStore.get(DESKTOP_SIDEBAR_COOKIE_KEY)?.value === '1';
+  const { initialSidebarCollapsed } = await readDashboardShellState();
   const resolvedSearchParams = await searchParams;
   const page = Math.max(1, Number.parseInt(resolvedSearchParams.page ?? '1', 10) || 1);
 

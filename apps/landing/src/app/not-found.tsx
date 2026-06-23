@@ -2,18 +2,13 @@ import Link from "next/link";
 
 export default function NotFound() {
   return (
-    <main
-      style={{
-        minHeight: "100dvh",
-        display: "grid",
-        placeItems: "center",
-        padding: "2rem",
-        fontFamily: "system-ui, sans-serif",
-      }}
-    >
-      <div style={{ textAlign: "center" }}>
-        <p style={{ marginBottom: "1rem" }}>Not found.</p>
-        <Link href="/mk" style={{ color: "#25db86" }}>
+    <main className="grid min-h-dvh place-items-center bg-gray-50 px-8 font-sans">
+      <div className="text-center">
+        <p className="text-lg text-gray-700">Not found.</p>
+        <Link
+          href="/mk"
+          className="mt-4 inline-block font-semibold text-primary underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+        >
           Chisto.mk
         </Link>
       </div>

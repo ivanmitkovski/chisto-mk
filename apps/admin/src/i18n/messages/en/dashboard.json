@@ -48,6 +48,7 @@
     "reportsTableFailed": "Reports table failed to load.",
     "insightsFailed": "Insights failed to load.",
     "dashboardFailed": "Dashboard failed to load.",
+    "tryAgain": "Try again",
     "signInAgain": "Sign in again"
   },
   "reportsSection": {

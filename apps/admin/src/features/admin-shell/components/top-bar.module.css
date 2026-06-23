@@ -1,7 +1,7 @@
 .topbar {
   min-height: 4.875rem;
-  background: rgba(255, 255, 255, 0.84);
-  border-bottom: 1px solid rgba(37, 219, 134, 0.14);
+  background: var(--shell-topbar-bg);
+  border-bottom: 1px solid var(--shell-topbar-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -11,7 +11,7 @@
   top: 0;
   z-index: var(--z-topbar);
   backdrop-filter: blur(10px);
-  box-shadow: 0 1px 0 rgba(8, 54, 39, 0.04);
+  box-shadow: var(--shell-topbar-shadow);
   flex-wrap: wrap;
 }
 
@@ -33,27 +33,27 @@
   height: 0.5rem;
   border-radius: 50%;
   background: var(--color-error);
-  border: 2px solid #ffffff;
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.82);
+  border: 2px solid var(--bg-surface);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--bg-surface) 82%, transparent);
 }
 
 .iconButton {
-  background: rgba(244, 247, 255, 0.96);
-  border-color: rgba(232, 237, 249, 0.95);
-  color: #73849e;
-  box-shadow: 0 1px 2px rgba(8, 54, 39, 0.08);
+  background: var(--shell-icon-button-bg);
+  border-color: var(--shell-icon-button-border);
+  color: var(--shell-icon-button-fg);
+  box-shadow: var(--shadow-sm);
 }
 
 .profileButton {
-  background: rgba(37, 219, 134, 0.2);
-  border-color: rgba(37, 219, 134, 0.34);
-  color: #0f8b54;
-  box-shadow: 0 1px 2px rgba(8, 54, 39, 0.1);
+  background: var(--shell-profile-button-bg);
+  border-color: var(--shell-profile-button-border);
+  color: var(--shell-profile-button-fg);
+  box-shadow: var(--shadow-sm);
 }
 
 .iconButtonOpen {
-  border-color: rgba(37, 219, 134, 0.45);
-  box-shadow: 0 0 0 3px rgba(37, 219, 134, 0.18);
+  border-color: var(--shell-search-border-focus);
+  box-shadow: var(--shell-focus-halo);
 }
 
 @keyframes bellJiggle {

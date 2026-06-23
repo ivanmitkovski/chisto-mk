@@ -16,7 +16,12 @@ type UrlUpdates = {
   page?: number;
   sort?: UsersSortKey;
   dir?: UsersSortDir;
+  lastActiveBefore?: string;
+  lastActiveAfter?: string;
+  createdAfter?: string;
 };
+
+export type UsersQuickFilter = '' | 'ACTIVE' | 'SUSPENDED' | 'DELETED';
 
 export function useUsersListUrl() {
   const router = useRouter();
@@ -25,6 +30,9 @@ export function useUsersListUrl() {
   const search = searchParams.get('search') ?? '';
   const role = searchParams.get('role') ?? '';
   const status = searchParams.get('status') ?? '';
+  const lastActiveBefore = searchParams.get('lastActiveBefore') ?? '';
+  const lastActiveAfter = searchParams.get('lastActiveAfter') ?? '';
+  const createdAfter = searchParams.get('createdAfter') ?? '';
   const sortParam = searchParams.get('sort');
   const dirParam = searchParams.get('dir');
   const sort: UsersSortKey = isUsersSortKey(sortParam) ? sortParam : 'createdAt';
@@ -32,6 +40,8 @@ export function useUsersListUrl() {
 
   const [searchTerm, setSearchTerm] = useState(search);
   const [debouncedSearch, setDebouncedSearch] = useState(search);
+  const [draftLastActiveBefore, setDraftLastActiveBefore] = useState(lastActiveBefore);
+  const [draftLastActiveAfter, setDraftLastActiveAfter] = useState(lastActiveAfter);
 
   const buildUrl = useCallback(
     (updates: UrlUpdates) => {
@@ -60,6 +70,18 @@ export function useUsersListUrl() {
         if (updates.dir !== 'desc') sp.set('dir', updates.dir);
         else sp.delete('dir');
       }
+      if (updates.lastActiveBefore !== undefined) {
+        if (updates.lastActiveBefore) sp.set('lastActiveBefore', updates.lastActiveBefore);
+        else sp.delete('lastActiveBefore');
+      }
+      if (updates.lastActiveAfter !== undefined) {
+        if (updates.lastActiveAfter) sp.set('lastActiveAfter', updates.lastActiveAfter);
+        else sp.delete('lastActiveAfter');
+      }
+      if (updates.createdAfter !== undefined) {
+        if (updates.createdAfter) sp.set('createdAfter', updates.createdAfter);
+        else sp.delete('createdAfter');
+      }
       const q = sp.toString();
       return `/dashboard/users${q ? `?${q}` : ''}`;
     },
@@ -70,6 +92,11 @@ export function useUsersListUrl() {
     setSearchTerm(search);
     setDebouncedSearch(search);
   }, [search]);
+
+  useEffect(() => {
+    setDraftLastActiveBefore(lastActiveBefore);
+    setDraftLastActiveAfter(lastActiveAfter);
+  }, [lastActiveBefore, lastActiveAfter]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => setDebouncedSearch(searchTerm), ADMIN_SEARCH_DEBOUNCE_MS);
@@ -89,6 +116,26 @@ export function useUsersListUrl() {
     router.push(buildUrl({ status: value, page: 1 }));
   };
 
+  const handleQuickFilter = (value: UsersQuickFilter) => {
+    router.push(buildUrl({ status: value, page: 1 }));
+  };
+
+  const applyLastActiveFilters = () => {
+    router.push(
+      buildUrl({
+        lastActiveBefore: draftLastActiveBefore,
+        lastActiveAfter: draftLastActiveAfter,
+        page: 1,
+      }),
+    );
+  };
+
+  const clearLastActiveFilters = () => {
+    setDraftLastActiveBefore('');
+    setDraftLastActiveAfter('');
+    router.push(buildUrl({ lastActiveBefore: '', lastActiveAfter: '', page: 1 }));
+  };
+
   const handleSort = (key: string) => {
     const nextKey = isUsersSortKey(key) ? key : sort;
     const nextDir: UsersSortDir = sort === nextKey && dir === 'desc' ? 'asc' : 'desc';
@@ -100,6 +147,8 @@ export function useUsersListUrl() {
   }, [router]);
 
   const page = Number(searchParams.get('page') ?? '1') || 1;
+  const quickFilter: UsersQuickFilter =
+    status === 'ACTIVE' || status === 'SUSPENDED' || status === 'DELETED' ? status : '';
 
   return {
     search,
@@ -109,11 +158,22 @@ export function useUsersListUrl() {
     debouncedSearch,
     role,
     status,
+    quickFilter,
+    lastActiveBefore,
+    lastActiveAfter,
+    createdAfter,
+    draftLastActiveBefore,
+    draftLastActiveAfter,
+    setDraftLastActiveBefore,
+    setDraftLastActiveAfter,
     sort,
     dir,
     buildUrl,
     handleRoleChange,
     handleStatusChange,
+    handleQuickFilter,
+    applyLastActiveFilters,
+    clearLastActiveFilters,
     handleSort,
     refresh,
     router,

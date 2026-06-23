@@ -1,15 +1,16 @@
 'use client';
 
-import { RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
 import { signOutAndRedirectToLogin } from '@/features/auth/lib/admin-auth';
-import { usePermissions } from '@/lib/auth/rbac/use-permissions';
-import { topBarCommands } from '../data/top-bar-mocks';
-import { resolveTopBarCommand } from '../lib/resolve-top-bar-command';
 import { useCommandPalette } from './use-command-palette';
 import { useOverlayDismiss } from './use-overlay-dismiss';
-import type { TopBarCommand } from '../types/top-bar';
+import type { ResolvedCommand } from '../commands/types';
+import {
+  isCommandPaletteShortcut,
+  shouldBlockCommandPaletteShortcut,
+} from '../lib/command-palette-shortcut-guard';
+import { prefetchRouteMessages } from '@/i18n/prefetch-route-messages';
 
 type UseTopBarOverlaysOptions = {
   searchTriggerRef: RefObject<HTMLInputElement | null>;
@@ -19,6 +20,7 @@ type UseTopBarOverlaysOptions = {
   paletteInputRef: RefObject<HTMLInputElement | null>;
   notificationsPanelRef: RefObject<HTMLDivElement | null>;
   profileMenuRef: RefObject<HTMLDivElement | null>;
+  onPreloadPalette?: () => void;
 };
 
 export function useTopBarOverlays({
@@ -29,37 +31,17 @@ export function useTopBarOverlays({
   paletteInputRef,
   notificationsPanelRef,
   profileMenuRef,
+  onPreloadPalette,
 }: UseTopBarOverlaysOptions) {
   const router = useRouter();
-  const { can } = usePermissions();
-  const tNav = useTranslations('nav');
-  const tCommon = useTranslations('common');
-  const paletteFocusReturnRef = useRef<HTMLElement | null>(null);
-
-  const permittedCommands = useMemo(() => {
-    const allowed = topBarCommands.filter((command) => !command.permission || can(command.permission));
-    return allowed.map((command) => resolveTopBarCommand(command, tNav, tCommon));
-  }, [can, tCommon, tNav]);
-
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [shortcutLabel, setShortcutLabel] = useState('Ctrl+K');
   const [commandPalettePortalReady, setCommandPalettePortalReady] = useState(false);
+  const paletteFocusReturnRef = useRef<HTMLElement | null>(null);
 
-  const {
-    query,
-    activeIndex,
-    filteredCommands,
-    activeCommand,
-    onQueryChange,
-    moveSelection,
-    moveToBoundary,
-    selectIndex,
-  } = useCommandPalette({
-    isOpen: isPaletteOpen,
-    commands: permittedCommands,
-  });
+  const palette = useCommandPalette({ isOpen: isPaletteOpen });
 
   const closePalette = useCallback(() => {
     setIsPaletteOpen(false);
@@ -82,27 +64,28 @@ export function useTopBarOverlays({
       closePalette();
       return;
     }
-
     openPalette(searchTriggerRef.current);
   }, [closePalette, isPaletteOpen, openPalette, searchTriggerRef]);
 
-  const closeNotifications = useCallback(() => {
-    setIsNotificationsOpen(false);
-  }, []);
-
-  const closeProfile = useCallback(() => {
-    setIsProfileOpen(false);
-  }, []);
-
   const executeCommand = useCallback(
-    (command: TopBarCommand) => {
+    (command: ResolvedCommand) => {
+      if (command.action.type === 'clear-recents') {
+        palette.clearRecents();
+        return;
+      }
+
       if (command.action.type === 'navigate') {
+        const { href } = command.action;
+        palette.recordRecent(command.id);
         closePalette();
-        router.push(command.action.href);
+        void prefetchRouteMessages(href).finally(() => {
+          router.push(href);
+        });
         return;
       }
 
       if (command.action.type === 'open-profile') {
+        palette.recordRecent(command.id);
         closePalette();
         setIsNotificationsOpen(false);
         setIsProfileOpen(true);
@@ -110,13 +93,28 @@ export function useTopBarOverlays({
         return;
       }
 
+      if (command.action.type === 'open-notifications-panel') {
+        palette.recordRecent(command.id);
+        closePalette();
+        setIsProfileOpen(false);
+        setIsNotificationsOpen(true);
+        notifyButtonRef.current?.focus();
+        return;
+      }
+
+      if (command.action.type === 'refresh-page') {
+        palette.recordRecent(command.id);
+        closePalette();
+        router.refresh();
+        return;
+      }
+
       if (command.action.type === 'sign-out') {
         closePalette();
         void signOutAndRedirectToLogin();
-        return;
       }
     },
-    [closePalette, profileButtonRef, router],
+    [closePalette, notifyButtonRef, palette, profileButtonRef, router],
   );
 
   const toggleNotifications = useCallback(() => {
@@ -140,6 +138,9 @@ export function useTopBarOverlays({
       return next;
     });
   }, []);
+
+  const closeNotifications = useCallback(() => setIsNotificationsOpen(false), []);
+  const closeProfile = useCallback(() => setIsProfileOpen(false), []);
 
   useOverlayDismiss({
     isOpen: isPaletteOpen,
@@ -173,11 +174,13 @@ export function useTopBarOverlays({
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      const isShortcut = (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k';
-
-      if (!isShortcut) {
-        return;
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() !== 'k') {
+        onPreloadPalette?.();
       }
+
+      const isShortcut = isCommandPaletteShortcut(event);
+      if (!isShortcut) return;
+      if (shouldBlockCommandPaletteShortcut(event.target)) return;
 
       event.preventDefault();
       togglePalette();
@@ -185,17 +188,11 @@ export function useTopBarOverlays({
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [togglePalette]);
+  }, [onPreloadPalette, togglePalette]);
 
   useEffect(() => {
-    if (!isPaletteOpen) {
-      return;
-    }
-
-    const timeoutId = window.setTimeout(() => {
-      paletteInputRef.current?.focus();
-    }, 0);
-
+    if (!isPaletteOpen) return;
+    const timeoutId = window.setTimeout(() => paletteInputRef.current?.focus(), 0);
     return () => window.clearTimeout(timeoutId);
   }, [isPaletteOpen, paletteInputRef]);
 
@@ -205,12 +202,7 @@ export function useTopBarOverlays({
     isProfileOpen,
     shortcutLabel,
     commandPalettePortalReady,
-    query,
-    activeIndex,
-    filteredCommands,
-    activeCommand,
-    onQueryChange,
-    selectIndex,
+    ...palette,
     openPalette,
     closePalette,
     toggleNotifications,
@@ -220,7 +212,5 @@ export function useTopBarOverlays({
     setIsNotificationsOpen,
     setIsProfileOpen,
     executeCommand,
-    moveSelection,
-    moveToBoundary,
   };
 }

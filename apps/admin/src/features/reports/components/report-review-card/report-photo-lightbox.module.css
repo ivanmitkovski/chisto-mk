@@ -79,7 +79,12 @@
   align-items: center;
   gap: var(--space-5);
   padding: var(--space-5) var(--space-6);
-  background: linear-gradient(180deg, #111827 0%, #0f172a 35%, #0c1222 100%);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-text-strong) 92%, var(--color-black)) 0%,
+    var(--color-text-strong) 35%,
+    color-mix(in srgb, var(--color-text-strong) 88%, var(--color-black)) 100%
+  );
   overflow: hidden;
 }
 
@@ -99,7 +104,7 @@
 
 .lightboxNav:hover {
   background: rgba(255, 255, 255, 0.18);
-  color: #fff;
+  color: var(--bg-surface);
   transform: scale(1.08);
 }
 

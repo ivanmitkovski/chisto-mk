@@ -1,5 +1,6 @@
 {
   "pageTitle": "Map",
+  "pageDescription": "Explore reported sites geographically across North Macedonia.",
   "loadingMap": "Loading map",
   "loadingMapData": "Loading map data",
   "toolbarAria": "Map filters and actions",

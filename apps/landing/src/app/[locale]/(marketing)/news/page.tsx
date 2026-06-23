@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { CTASection } from "@/components/organisms/CTASection";
 import { NewsLanding } from "@/components/organisms/NewsPage";
 import { isLaunchPageVisible } from "@/config/launch";
-import { getNewsPosts, type NewsCategory } from "@/data/mock-news";
+import { getNewsPosts, type NewsCategory } from "@/data/news-posts";
 import { routing, type AppLocale } from "@/i18n/routing";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -42,7 +42,7 @@ export default async function NewsPage({ params }: Props) {
   }
   const { locale } = await params;
   const appLocale = locale as AppLocale;
-  const posts = getNewsPosts(locale);
+  const posts = await getNewsPosts(locale);
   const t = await getTranslations("newsPage");
 
   const categoryLabel = (c: NewsCategory) => t(`newsCategory.${c}`);

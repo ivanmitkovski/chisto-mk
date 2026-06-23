@@ -17,4 +17,14 @@ export class BulkAdminUsersDto {
   @IsOptional()
   @IsEnum(Role)
   role?: Role;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  reasonCode?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  note?: string;
 }

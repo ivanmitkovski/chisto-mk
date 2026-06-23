@@ -74,3 +74,10 @@
   color: var(--text-primary);
   font-weight: var(--font-weight-semibold);
 }
+
+.privacyActions {
+  margin-top: var(--space-4);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}

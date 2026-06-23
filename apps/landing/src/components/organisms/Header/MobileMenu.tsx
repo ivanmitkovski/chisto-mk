@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl";
 import { NavItem } from "@/components/molecules/NavItem";
 import { Button } from "@/components/atoms/Button";
 import { visibleMarketingNavItems } from "@/config/launch";
-import { prefersReducedMotion } from "@/lib/utils/smooth-scroll";
+import { scheduleScrollToDownloadSection } from "@/lib/utils/smooth-scroll";
 
 export function MobileMenu() {
   const [open, setOpen] = useState(false);
@@ -17,12 +17,7 @@ export function MobileMenu() {
 
   function handleDownloadClick() {
     setOpen(false);
-    const target = document.getElementById("download");
-    if (!target) return;
-    target.scrollIntoView({
-      behavior: prefersReducedMotion() ? "instant" : "smooth",
-      block: "start",
-    });
+    scheduleScrollToDownloadSection(220);
   }
 
   return (
@@ -52,7 +47,7 @@ export function MobileMenu() {
               <button
                 type="button"
                 className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-gray-600 transition-colors hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                aria-label="Close"
+                aria-label={tCommon("close")}
               >
                 <X className="h-5 w-5" strokeWidth={1.75} />
               </button>

@@ -80,7 +80,7 @@ export function StatCard({ number, label, icon: Icon }: StatCardProps) {
 
   return (
     <div ref={ref} className="group h-full text-center">
-      <div className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200/70 bg-white/75 p-6 shadow-[0_8px_32px_-10px_rgba(15,23,42,0.1),0_2px_8px_-4px_rgba(15,23,42,0.04)] ring-1 ring-black/[0.03] backdrop-blur-[8px] transition-[transform,box-shadow,border-color,ring-color] duration-300 ease-out motion-safe:group-hover:-translate-y-0.5 motion-safe:group-hover:border-primary/20 motion-safe:group-hover:shadow-[0_16px_40px_-12px_rgba(15,23,42,0.12),0_0_0_1px_rgba(0,217,142,0.08)] md:p-7">
+      <div className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200/70 bg-white/75 p-6 shadow-[var(--shadow-card)] ring-1 ring-black/[0.03] backdrop-blur-[8px] transition-[transform,box-shadow,border-color,ring-color] duration-300 ease-out motion-safe:group-hover:-translate-y-0.5 motion-safe:group-hover:border-primary/20 motion-safe:group-hover:shadow-[var(--shadow-lift)] md:p-7">
         <div
           className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-primary/35 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
           aria-hidden

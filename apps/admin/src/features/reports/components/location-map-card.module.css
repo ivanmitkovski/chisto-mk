@@ -130,7 +130,7 @@
 }
 
 .link {
-  color: #127e4c;
+  color: var(--color-status-success-fg);
 }
 
 .link:hover,

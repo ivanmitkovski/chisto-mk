@@ -1,15 +1,24 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Button, Card, ConfirmDialog, Pagination, SectionState, useToast } from '@/components/ui';
+import { Button, Card, ConfirmDialog, ExportButton, Pagination, SectionState, useToast } from '@/components/ui';
 import { Can } from '@/lib/auth/rbac';
 import { adminBrowserFetch } from '@/lib/api';
-import type { AuditEntry } from '@/features/users/data/users-adapter';
+import type { AuditEntry, UserActivityDetails, UserSafetySummary } from '@/features/users/data/users-adapter';
 import { UserDetailForm } from './user-detail-form';
 import { UserPointsPanel } from './user-points-panel';
+import { UserDetailHeader } from './user-detail-header';
+import { UserModerationActionRail } from './user-moderation-action-rail';
+import { UserSafetyPanel } from './user-safety-panel';
+import { UserIdentifierHistory } from './user-identifier-history';
+import { UserActivityPanel } from './user-activity-panel';
+import { UserModerationNotes } from './user-moderation-notes';
+import { UserStatusHistory, type UserStatusHistoryEntry } from './user-status-history';
+import type { UserModerationNote } from '@/features/users/data/users-adapter';
 import type { UserPointLedgerEntry } from '@/features/gamification';
 import { formatAdminDateTime, useAdminBcp47Locale } from '@/lib/i18n';
+import { formatUserAuditAction, filterIdentifierHistory } from '@/features/users/lib/format-user-audit-action';
 import styles from './user-detail-tabs.module.css';
 
 type SessionEntry = {
@@ -21,7 +30,7 @@ type SessionEntry = {
   revokedAt: string | null;
 };
 
-type TabId = 'profile' | 'privacy' | 'points' | 'sessions' | 'audit';
+type TabId = 'profile' | 'safety' | 'activity' | 'privacy' | 'points' | 'sessions' | 'audit';
 
 type UserDetailTabsProps = {
   userId: string;
@@ -31,6 +40,8 @@ type UserDetailTabsProps = {
   initialStatus: string;
   initialPhoneNumber: string;
   email: string;
+  avatarUrl?: string | null;
+  lastActiveAt: string | null;
   pointsBalance: number;
   totalPointsEarned: number;
   isPhoneVerified: boolean;
@@ -43,6 +54,12 @@ type UserDetailTabsProps = {
   reportsCount: number;
   sessionsCount: number;
   canViewSessions: boolean;
+  safetySummary: UserSafetySummary | null;
+  safetyError?: string | null;
+  moderationNotes: UserModerationNote[];
+  statusHistory: UserStatusHistoryEntry[];
+  activityDetails: UserActivityDetails | null;
+  activityError?: string | null;
   audit: { data: AuditEntry[]; meta: { page: number; limit: number; total: number } };
   auditError?: string | null;
   sessions: SessionEntry[];
@@ -52,6 +69,9 @@ type UserDetailTabsProps = {
   pointLedgerPage?: number;
   pointLedgerLimit?: number;
   pointsError?: string | null;
+  initialReportCreditsAvailable?: number;
+  initialReportCreditsSpentTotal?: number;
+  initialActiveTab?: TabId;
 };
 
 const AUDIT_PAGE_SIZE = 20;
@@ -60,8 +80,10 @@ export function UserDetailTabs(props: UserDetailTabsProps) {
   const t = useTranslations('users');
   const tCommon = useTranslations('common');
   const locale = useAdminBcp47Locale();
-  const [activeTab, setActiveTab] = useState<TabId>('profile');
+  const [activeTab, setActiveTab] = useState<TabId>(props.initialActiveTab ?? 'profile');
+  const [currentStatus, setCurrentStatus] = useState(props.initialStatus);
   const [profileDirty, setProfileDirty] = useState(false);
+  const actionButtonsRef = useRef<Array<HTMLButtonElement | null>>([]);
   const [pendingTab, setPendingTab] = useState<TabId | null>(null);
   const [discardConfirmOpen, setDiscardConfirmOpen] = useState(false);
   const [auditPage, setAuditPage] = useState(props.audit.meta.page);
@@ -72,10 +94,49 @@ export function UserDetailTabs(props: UserDetailTabsProps) {
   const [revokeTarget, setRevokeTarget] = useState<SessionEntry | null>(null);
   const [revokeBusy, setRevokeBusy] = useState(false);
   const { showToast } = useToast();
+  const identifierHistory = filterIdentifierHistory(auditRows);
+
+  function formatAuditActionLabel(entry: AuditEntry): string {
+    return formatUserAuditAction(entry, {
+      identifierChanged: ({ field, initiatedBy }) =>
+        t('detail.identifierHistory.entry', {
+          field: t(`detail.identifierHistory.fields.${field}`),
+          initiatedBy: t(`detail.identifierHistory.initiatedBy.${initiatedBy}`),
+        }),
+      defaultAction: (action) => action,
+    });
+  }
+
+  useEffect(() => {
+    setCurrentStatus(props.initialStatus);
+  }, [props.initialStatus]);
 
   useEffect(() => {
     setSessionRows(props.sessions);
   }, [props.sessions]);
+
+  function handleCopyUserId() {
+    void navigator.clipboard.writeText(props.userId);
+    showToast({
+      tone: 'success',
+      title: t('detail.header.copyId'),
+      message: t('detail.header.copyIdSuccess'),
+    });
+  }
+
+  function handleModerationRailKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+    if (profileDirty) return;
+    if (event.key === 's' || event.key === 'S') {
+      event.preventDefault();
+      actionButtonsRef.current[0]?.click();
+    } else if (event.key === 'a' || event.key === 'A') {
+      event.preventDefault();
+      actionButtonsRef.current[1]?.click();
+    } else if ((event.key === 'r' || event.key === 'R') && props.canViewSessions) {
+      event.preventDefault();
+      actionButtonsRef.current[2]?.click();
+    }
+  }
 
   const loadAuditPage = useCallback(
     async (page: number) => {
@@ -88,11 +149,17 @@ export function UserDetailTabs(props: UserDetailTabsProps) {
         setAuditRows(result.data);
         setAuditTotal(result.meta.total);
         setAuditPage(page);
+      } catch (error) {
+        showToast({
+          tone: 'warning',
+          title: tCommon('error'),
+          message: error instanceof Error ? error.message : t('detail.auditLoadFailed'),
+        });
       } finally {
         setAuditLoading(false);
       }
     },
-    [props.userId],
+    [props.userId, showToast, t, tCommon],
   );
 
   const formatDateTime = (value: string | null): string =>
@@ -100,6 +167,8 @@ export function UserDetailTabs(props: UserDetailTabsProps) {
 
   const tabItems: Array<{ id: TabId; label: string }> = [
     { id: 'profile', label: t('detail.tabs.profile') },
+    { id: 'safety', label: t('detail.tabs.safety') },
+    { id: 'activity', label: t('detail.tabs.activity') },
     { id: 'privacy', label: t('detail.tabs.privacy') },
     { id: 'points', label: t('detail.tabs.points') },
     ...(props.canViewSessions
@@ -179,6 +248,28 @@ export function UserDetailTabs(props: UserDetailTabsProps) {
 
   return (
     <div>
+      <UserDetailHeader
+        userId={props.userId}
+        firstName={props.initialFirstName}
+        lastName={props.initialLastName}
+        email={props.email}
+        role={props.initialRole}
+        status={currentStatus}
+        lastActiveAt={props.lastActiveAt}
+        avatarUrl={props.avatarUrl ?? null}
+        onCopyId={handleCopyUserId}
+      />
+
+      <UserModerationActionRail
+        userId={props.userId}
+        status={currentStatus}
+        profileDirty={profileDirty}
+        canViewSessions={props.canViewSessions}
+        actionButtonsRef={actionButtonsRef}
+        onActionRailKeyDown={handleModerationRailKeyDown}
+        onStatusChanged={setCurrentStatus}
+      />
+
       <div
         className={styles.tabs}
         role="tablist"
@@ -223,9 +314,34 @@ export function UserDetailTabs(props: UserDetailTabsProps) {
           reportsCount={props.reportsCount}
           sessionsCount={props.sessionsCount}
           hidden={activeTab !== 'profile'}
+          changeEmailDisabled={profileDirty}
           onDirtyChange={setProfileDirty}
         />
       </div>
+
+      {activeTab === 'safety' && (
+        <div id="user-panel-safety" role="tabpanel" aria-labelledby="user-tab-safety">
+          {props.safetyError ? (
+            <SectionState variant="error" message={props.safetyError} />
+          ) : props.safetySummary ? (
+            <>
+              <UserSafetyPanel userId={props.userId} email={props.email} summary={props.safetySummary} />
+              <UserIdentifierHistory entries={identifierHistory} />
+              <UserModerationNotes userId={props.userId} initialNotes={props.moderationNotes} />
+              <UserStatusHistory entries={props.statusHistory} />
+            </>
+          ) : null}
+        </div>
+      )}
+
+      {activeTab === 'activity' && (
+        <div id="user-panel-activity" role="tabpanel" aria-labelledby="user-tab-activity">
+          <UserActivityPanel
+            activity={props.activityDetails}
+            {...(props.activityError != null ? { loadError: props.activityError } : {})}
+          />
+        </div>
+      )}
 
       {activeTab === 'privacy' && (
         <div id="user-panel-privacy" role="tabpanel" aria-labelledby="user-tab-privacy">
@@ -264,6 +380,33 @@ export function UserDetailTabs(props: UserDetailTabsProps) {
               <dd>{formatDateTime(props.createdAt)}</dd>
             </div>
           </dl>
+          <div className={styles.privacyActions}>
+            <ExportButton
+              filename={`user-${props.userId}-data-export.json`}
+              mimeType="application/json;charset=utf-8"
+              label={t('detail.privacy.exportData')}
+              getData={async () => {
+                const data = await adminBrowserFetch<Record<string, unknown>>(
+                  `/admin/users/${props.userId}/data-export`,
+                );
+                return JSON.stringify(data, null, 2);
+              }}
+              onExportError={(error) => {
+                showToast({
+                  tone: 'warning',
+                  title: tCommon('exportFailed'),
+                  message: error instanceof Error ? error.message : tCommon('exportFailed'),
+                });
+              }}
+              onExported={() => {
+                showToast({
+                  tone: 'success',
+                  title: tCommon('exportReady'),
+                  message: t('detail.privacy.exportDataSuccess'),
+                });
+              }}
+            />
+          </div>
         </Card>
         </div>
       )}
@@ -277,6 +420,8 @@ export function UserDetailTabs(props: UserDetailTabsProps) {
           initialTotal={props.pointLedgerTotal}
           initialPage={props.pointLedgerPage ?? 1}
           pageSize={props.pointLedgerLimit ?? 20}
+          initialReportCreditsAvailable={props.initialReportCreditsAvailable ?? 0}
+          initialReportCreditsSpentTotal={props.initialReportCreditsSpentTotal ?? 0}
           {...(props.pointsError != null ? { loadError: props.pointsError } : {})}
         />
         </div>
@@ -356,7 +501,7 @@ export function UserDetailTabs(props: UserDetailTabsProps) {
               {auditRows.map((a) => (
                 <tr key={a.id}>
                   <td>{formatDateTime(a.createdAt)}</td>
-                  <td>{a.action}</td>
+                  <td>{formatAuditActionLabel(a)}</td>
                   <td>
                     {a.resourceType}
                     {a.resourceId ? ` · ${a.resourceId}` : ''}

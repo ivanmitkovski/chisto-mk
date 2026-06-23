@@ -36,7 +36,7 @@
   min-height: 1.9rem;
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
-  color: #334155;
+  color: var(--color-text-muted);
   cursor: pointer;
   transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease, box-shadow 140ms ease;
 }
@@ -44,7 +44,7 @@
 .filterChipActive {
   border-color: rgba(37, 219, 134, 0.5);
   background: rgba(37, 219, 134, 0.1);
-  color: #0f8c55;
+  color: var(--color-status-success-fg);
 }
 
 .filterChip:hover {
@@ -154,22 +154,22 @@
 
 .iconToneSuccess {
   background: rgba(37, 219, 134, 0.16);
-  color: #047857;
+  color: var(--color-success-fg);
 }
 
 .iconToneWarning {
   background: rgba(248, 187, 0, 0.16);
-  color: #92400e;
+  color: var(--color-status-warning-fg);
 }
 
 .iconToneInfo {
   background: rgba(36, 172, 249, 0.16);
-  color: #0369a1;
+  color: var(--color-status-info-fg);
 }
 
 .iconToneNeutral {
   background: rgba(148, 163, 184, 0.22);
-  color: #334155;
+  color: var(--color-text-muted);
 }
 
 .textWrap {
@@ -213,7 +213,7 @@
 }
 
 .link {
-  color: #0f766e;
+  color: var(--color-status-success-fg);
   text-decoration: none;
   font-size: var(--font-size-xs);
   transition: color 140ms ease;
@@ -221,7 +221,7 @@
 
 .link:hover {
   text-decoration: underline;
-  color: #0b5f59;
+  color: var(--color-green-900);
 }
 
 .link:focus-visible {

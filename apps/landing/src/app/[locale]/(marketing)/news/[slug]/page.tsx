@@ -3,15 +3,27 @@ import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { CTASection } from "@/components/organisms/CTASection";
 import { NewsArticle } from "@/components/organisms/NewsPage";
-import { getAllNewsSlugs, getNewsPostBySlug } from "@/data/mock-news";
+import { getAllNewsSlugs, getNewsPostBySlug } from "@/data/news-posts";
 import { isLaunchPageVisible } from "@/config/launch";
 import { routing, type AppLocale } from "@/i18n/routing";
 import { getSiteUrl } from "@/lib/site-url";
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
-export function generateStaticParams() {
-  return getAllNewsSlugs().map((slug) => ({ slug }));
+export const dynamicParams = true;
+export const revalidate = 60;
+
+export async function generateStaticParams() {
+  const slugs = await getAllNewsSlugs();
+  return slugs.map((slug) => ({ slug }));
+}
+
+function coverImageForMeta(coverImage?: string): string | undefined {
+  if (!coverImage) return undefined;
+  if (coverImage.startsWith('http://') || coverImage.startsWith('https://')) {
+    return coverImage;
+  }
+  return undefined;
 }
 
 function newsArticleJsonLd(opts: {
@@ -24,18 +36,15 @@ function newsArticleJsonLd(opts: {
   coverImage?: string;
 }): string {
   const pageUrl = `${opts.siteUrl}/${opts.locale}/news/${opts.slug}`;
-  const image =
-    opts.coverImage != null && opts.coverImage.length > 0
-      ? [`${opts.siteUrl}${opts.coverImage}`]
-      : undefined;
+  const image = coverImageForMeta(opts.coverImage);
   return JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "NewsArticle",
+    '@context': 'https://schema.org',
+    '@type': 'NewsArticle',
     headline: opts.headline,
     description: opts.description,
     datePublished: opts.datePublished,
-    ...(image ? { image } : {}),
-    mainEntityOfPage: { "@type": "WebPage", "@id": pageUrl },
+    ...(image ? { image: [image] } : {}),
+    mainEntityOfPage: { '@type': 'WebPage', '@id': pageUrl },
     url: pageUrl,
   });
 }
@@ -45,7 +54,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: "Not found" };
   }
   const { locale, slug } = await params;
-  const post = getNewsPostBySlug(locale, slug);
+  const post = await getNewsPostBySlug(locale, slug);
   const tMeta = await getTranslations({ locale, namespace: "metadata" });
   const siteName = tMeta("siteName");
 
@@ -61,10 +70,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const siteUrl = getSiteUrl();
   const canonical = `${siteUrl}/${locale}/news/${slug}`;
-  const ogImages =
-    post.coverImage != null && post.coverImage.length > 0
-      ? [{ url: `${siteUrl}${post.coverImage}` }]
-      : undefined;
+  const ogImage = coverImageForMeta(post.coverImage);
+  const ogImages = ogImage ? [{ url: ogImage }] : undefined;
 
   return {
     title,
@@ -94,7 +101,7 @@ export default async function NewsArticlePage({ params }: Props) {
     notFound();
   }
   const { locale, slug } = await params;
-  const post = getNewsPostBySlug(locale, slug);
+  const post = await getNewsPostBySlug(locale, slug);
   if (!post) {
     notFound();
   }

@@ -1,15 +1,20 @@
 'use client';
 
-import { useRef } from 'react';
+import dynamic from 'next/dynamic';
+import { useCallback, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { TopBarHeader } from './top-bar-header';
-import { TopBarCommandPalette } from './top-bar-command-palette';
 import { TopBarNotificationsPanel } from './top-bar-notifications-panel';
 import { TopBarProfileMenu } from './top-bar-profile-menu';
 import { useTopBarOverlays } from '../hooks/use-top-bar-overlays';
 import { useTopBarNotifications } from '../hooks/use-top-bar-notifications';
 import { useBellJiggleOnRealtime } from '../hooks/use-bell-jiggle-on-realtime';
 import type { TopBarNotification } from '../types/top-bar';
+
+const TopBarCommandPalette = dynamic(
+  () => import('./top-bar-command-palette').then((m) => ({ default: m.TopBarCommandPalette })),
+  { ssr: false },
+);
 
 type TopBarProps = {
   title: string;
@@ -40,33 +45,16 @@ export function TopBar({
   const notificationsPanelRef = useRef<HTMLDivElement>(null);
   const profileMenuRef = useRef<HTMLDivElement>(null);
 
+  const preloadPalette = useCallback(() => {
+    void import('./top-bar-command-palette');
+  }, []);
+
   const { notifications, unreadNotificationsCount, markAllNotificationsRead, markNotificationRead } =
     useTopBarNotifications({ initialNotifications });
 
   const { isBellJingling } = useBellJiggleOnRealtime();
 
-  const {
-    isPaletteOpen,
-    isNotificationsOpen,
-    isProfileOpen,
-    shortcutLabel,
-    commandPalettePortalReady,
-    query,
-    activeIndex,
-    filteredCommands,
-    activeCommand,
-    onQueryChange,
-    selectIndex,
-    openPalette,
-    toggleNotifications,
-    toggleProfileMenu,
-    closeNotifications,
-    closeProfile,
-    executeCommand,
-    moveSelection,
-    moveToBoundary,
-    closePalette,
-  } = useTopBarOverlays({
+  const overlays = useTopBarOverlays({
     searchTriggerRef,
     notifyButtonRef,
     profileButtonRef,
@@ -74,6 +62,7 @@ export function TopBar({
     paletteInputRef,
     notificationsPanelRef,
     profileMenuRef,
+    onPreloadPalette: preloadPalette,
   });
 
   return (
@@ -84,48 +73,55 @@ export function TopBar({
         isSidebarCollapsed={isSidebarCollapsed}
         isMobileSidebarOpen={isMobileSidebarOpen}
         searchPlaceholder={resolvedSearchPlaceholder}
-        shortcutLabel={shortcutLabel}
+        shortcutLabel={overlays.shortcutLabel}
         searchTriggerRef={searchTriggerRef}
         onMenuToggle={onMenuToggle}
-        onOpenPalette={() => openPalette(searchTriggerRef.current)}
+        onOpenPalette={() => overlays.openPalette(searchTriggerRef.current)}
       >
         <TopBarNotificationsPanel
-          isOpen={isNotificationsOpen}
+          isOpen={overlays.isNotificationsOpen}
           isBellJingling={isBellJingling}
           unreadNotificationsCount={unreadNotificationsCount}
           notifications={notifications}
           notifyButtonRef={notifyButtonRef}
           notificationsPanelRef={notificationsPanelRef}
-          onToggle={toggleNotifications}
+          onToggle={overlays.toggleNotifications}
           onMarkAllRead={markAllNotificationsRead}
           onMarkRead={markNotificationRead}
-          onClose={closeNotifications}
+          onClose={overlays.closeNotifications}
         />
         <TopBarProfileMenu
-          isOpen={isProfileOpen}
+          isOpen={overlays.isProfileOpen}
           profileButtonRef={profileButtonRef}
           profileMenuRef={profileMenuRef}
-          onToggle={toggleProfileMenu}
-          onClose={closeProfile}
+          onToggle={overlays.toggleProfileMenu}
+          onClose={overlays.closeProfile}
         />
       </TopBarHeader>
 
-      <TopBarCommandPalette
-        isOpen={isPaletteOpen}
-        portalReady={commandPalettePortalReady}
-        query={query}
-        activeIndex={activeIndex}
-        filteredCommands={filteredCommands}
-        activeCommand={activeCommand}
-        palettePanelRef={palettePanelRef}
-        paletteInputRef={paletteInputRef}
-        onQueryChange={onQueryChange}
-        onMoveSelection={moveSelection}
-        onMoveToBoundary={moveToBoundary}
-        onSelectIndex={selectIndex}
-        onExecuteCommand={executeCommand}
-        onClosePalette={closePalette}
-      />
+      {overlays.commandPalettePortalReady ? (
+        <TopBarCommandPalette
+          open={overlays.isPaletteOpen}
+          portalReady={overlays.commandPalettePortalReady}
+          shortcutLabel={overlays.shortcutLabel}
+          query={overlays.query}
+          activeIndex={overlays.activeIndex}
+          flatResults={overlays.flatResults}
+          groupedResults={overlays.groupedResults}
+          activeItem={overlays.activeItem}
+          entityLoading={overlays.entityLoading}
+          entityErrors={overlays.entityErrors}
+          resultCount={overlays.resultCount}
+          palettePanelRef={palettePanelRef}
+          paletteInputRef={paletteInputRef}
+          onQueryChange={overlays.onQueryChange}
+          onMoveSelection={overlays.moveSelection}
+          onMoveToBoundary={overlays.moveToBoundary}
+          onSelectIndex={overlays.selectIndex}
+          onExecuteCommand={overlays.executeCommand}
+          onClosePalette={overlays.closePalette}
+        />
+      ) : null}
     </>
   );
 }

@@ -19,7 +19,7 @@ function makeSvc(prisma: never) {
   const audit = { log: jest.fn().mockResolvedValue(undefined) } as never;
   const userEvents = { emitUserUpdated: jest.fn() } as never;
   const sessionRevocation = { revokeAllForUser: jest.fn().mockResolvedValue(undefined), revokeSessionForUser: jest.fn().mockResolvedValue({ ok: true }) };
-  const authSnapshotCache = { invalidate: jest.fn() } as never;
+  const authSnapshotCache = { invalidate: jest.fn() };
   const accountErasure = { eraseUserAccount: jest.fn().mockResolvedValue(undefined) };
   return {
     svc: new AdminUsersWriteService(
@@ -27,11 +27,12 @@ function makeSvc(prisma: never) {
       audit,
       userEvents,
       sessionRevocation as never,
-      authSnapshotCache,
+      authSnapshotCache as never,
       accountErasure as never,
     ),
     sessionRevocation,
     accountErasure,
+    authSnapshotCache,
   };
 }
 
@@ -168,12 +169,39 @@ describe('AdminUsersWriteService', () => {
         update: jest.fn().mockResolvedValue(updatedUser),
         findUniqueOrThrow: jest.fn().mockResolvedValue(updatedUser),
       },
+      userStatusAction: {
+        create: jest.fn().mockResolvedValue({ id: 'action-1' }),
+      },
     } as never;
     const { svc, sessionRevocation } = makeSvc(prisma);
 
     await svc.patch('u1', { status: UserStatus.SUSPENDED } as never, actor());
 
     expect(sessionRevocation.revokeAllForUser).toHaveBeenCalledWith('u1', 'status_changed');
+  });
+
+  it('bulk suspend revokes sessions for each updated user', async () => {
+    const prisma = {
+      user: {
+        findMany: jest.fn().mockResolvedValue([
+          { id: 'u1', role: Role.USER, status: UserStatus.ACTIVE },
+          { id: 'u2', role: Role.USER, status: UserStatus.ACTIVE },
+        ]),
+        updateMany: jest.fn().mockResolvedValue({ count: 2 }),
+      },
+      userStatusAction: {
+        create: jest.fn().mockResolvedValue({ id: 'action-1' }),
+      },
+    } as never;
+    const { svc, sessionRevocation, authSnapshotCache } = makeSvc(prisma);
+
+    await svc.bulk({ action: 'suspend', userIds: ['u1', 'u2'] } as never, actor());
+
+    expect(sessionRevocation.revokeAllForUser).toHaveBeenCalledTimes(2);
+    expect(sessionRevocation.revokeAllForUser).toHaveBeenCalledWith('u1', 'status_changed');
+    expect(sessionRevocation.revokeAllForUser).toHaveBeenCalledWith('u2', 'status_changed');
+    expect(authSnapshotCache.invalidate).toHaveBeenCalledWith('u1');
+    expect(authSnapshotCache.invalidate).toHaveBeenCalledWith('u2');
   });
 
   it('patch routes status DELETED through account erasure', async () => {

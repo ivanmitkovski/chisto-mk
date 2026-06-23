@@ -1,8 +1,8 @@
 /** Store-submission launch visibility — flip to `true` when pages are ready to ship. */
 export const LAUNCH_PAGE_VISIBILITY = {
-  about: false,
-  news: false,
-  press: false,
+  about: true,
+  news: true,
+  press: true,
 } as const;
 
 /** Home page sections — flip to `true` when real data is available. */
@@ -21,11 +21,15 @@ export function isLaunchHomeSectionVisible(section: HiddenLaunchHomeSection): bo
   return LAUNCH_HOME_SECTIONS[section];
 }
 
+/**
+ * Primary header navigation — left-to-right priority:
+ * Home → About → News → Help → Contact (support before contact is standard).
+ * Press stays in the footer only (media kit, not a consumer journey).
+ */
 export const MARKETING_NAV_ITEMS = [
   { href: "/", key: "home" as const },
   { href: "/about", key: "about" as const, hiddenPage: "about" as const },
   { href: "/news", key: "news" as const, hiddenPage: "news" as const },
-  { href: "/press", key: "press" as const, hiddenPage: "press" as const },
   { href: "/help", key: "help" as const },
   { href: "/contact", key: "contact" as const },
 ] as const;

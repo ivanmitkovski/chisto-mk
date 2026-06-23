@@ -27,6 +27,8 @@ export { Field, fieldDescriptionId } from './field';
 export type { FieldProps } from './field';
 export type { DataTableColumn } from './data-table/index';
 export { DatePicker } from './date-picker';
+export { Calendar } from './calendar';
+export type { CalendarProps } from './calendar';
 export { Drawer } from './drawer';
 export { DropdownMenu } from './dropdown-menu';
 export type { DropdownMenuProps } from './dropdown-menu';

@@ -8,5 +8,13 @@
   "export": "Eksporto",
   "selectedCount": "{count} të zgjedhura",
   "selectedCountOfTotal": "{count} të zgjedhura nga {total}",
-  "dismissNotification": "Hiq njoftimin"
+  "dismissNotification": "Hiq njoftimin",
+  "calendar": {
+    "previousMonth": "Muaji i mëparshëm",
+    "nextMonth": "Muaji tjetër",
+    "today": "Sot",
+    "selectDate": "Zgjidh datën",
+    "clearDate": "Pastro datën",
+    "days": "Ditët e kalendarit"
+  }
 }

@@ -1,6 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
+import { Camera, MapPin, Users } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Container } from "@/components/layout/Container";
 import { Section } from "@/components/layout/Section";
@@ -18,22 +20,33 @@ import {
 
 type FeatureItem = { title: string; description: string };
 
+const FEATURE_ICONS: LucideIcon[] = [MapPin, Camera, Users];
+
 function BlobBackdrop() {
+  const reduceMotion = useReducedMotion();
+
   return (
     <>
       <div
         className="absolute -inset-8 -z-20 rounded-[3rem] bg-gradient-to-tr from-sky-100/40 via-transparent to-primary/10 blur-2xl"
         aria-hidden
       />
-      <motion.div
-        className="absolute inset-0 -z-10 scale-[1.32] rounded-full bg-primary/22 blur-3xl"
-        aria-hidden
-        animate={{
-          scale: [1.32, 1.44, 1.32],
-          opacity: [0.2, 0.34, 0.2],
-        }}
-        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-      />
+      {reduceMotion ? (
+        <div
+          className="absolute inset-0 -z-10 scale-[1.36] rounded-full bg-primary/24 blur-3xl"
+          aria-hidden
+        />
+      ) : (
+        <motion.div
+          className="absolute inset-0 -z-10 scale-[1.32] rounded-full bg-primary/22 blur-3xl"
+          aria-hidden
+          animate={{
+            scale: [1.32, 1.44, 1.32],
+            opacity: [0.2, 0.34, 0.2],
+          }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+        />
+      )}
     </>
   );
 }
@@ -43,7 +56,7 @@ export function Features() {
   const items = t.raw("items") as FeatureItem[];
 
   return (
-    <Section className="relative overflow-hidden mesh-section-features">
+    <Section className="relative overflow-hidden mesh-section-features" defer>
       <div
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_85%_55%_at_50%_-8%,rgba(0,217,142,0.08),transparent_58%)]"
         aria-hidden
@@ -72,7 +85,7 @@ export function Features() {
           <motion.div variants={slideInLeft} className="relative mx-auto w-64 md:mx-0 lg:w-72">
             <BlobBackdrop />
             <PhoneMockup>
-              <PhoneScreenshot screenshotId="feed" />
+              <PhoneScreenshot screenshotId="map" priority />
             </PhoneMockup>
           </motion.div>
 
@@ -92,7 +105,11 @@ export function Features() {
                     ease: easeOutExpo,
                   }}
                 >
-                  <FeatureCard title={f.title} description={f.description} />
+                  <FeatureCard
+                    title={f.title}
+                    description={f.description}
+                    icon={FEATURE_ICONS[i] ?? MapPin}
+                  />
                 </motion.div>
               ))}
             </div>
@@ -118,7 +135,7 @@ export function Features() {
           >
             <BlobBackdrop />
             <PhoneMockup>
-              <PhoneScreenshot screenshotId="siteDetail" />
+              <PhoneScreenshot screenshotId="events" />
             </PhoneMockup>
           </motion.div>
         </motion.div>

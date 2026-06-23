@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { adminQueryKeys } from '@/lib/api';
-import { emitNewReportSignal, emitCheckInRiskSignal, emitReportViewersUpdated } from '@/lib/realtime';
+import { emitNewReportSignal, emitCheckInRiskSignal, emitReportViewersUpdated, emitUserUpdatedSignal } from '@/lib/realtime';
 import { refreshAdminSession, signOutAndRedirectToLogin } from '@/features/auth/lib/admin-auth';
 import { useDashboardSSE } from '../context/dashboard-sse-context';
 
@@ -143,10 +143,25 @@ function isCleanupEventSse(data: unknown): data is CleanupEventSsePayload {
   );
 }
 
-function invalidateAllAdminQueries(
-  qc: ReturnType<typeof useQueryClient>,
-): void {
-  void qc.invalidateQueries({ queryKey: adminQueryKeys.root });
+function invalidateReportsQueries(qc: ReturnType<typeof useQueryClient>): void {
+  void qc.invalidateQueries({ queryKey: adminQueryKeys.reportsAll });
+  void qc.invalidateQueries({ queryKey: adminQueryKeys.overview });
+}
+
+function invalidateNotificationsQueries(qc: ReturnType<typeof useQueryClient>): void {
+  void qc.invalidateQueries({ queryKey: adminQueryKeys.notificationsAll });
+}
+
+function invalidateUsersQueries(qc: ReturnType<typeof useQueryClient>): void {
+  void qc.invalidateQueries({ queryKey: adminQueryKeys.usersAll });
+}
+
+function invalidateCleanupEventsQueries(qc: ReturnType<typeof useQueryClient>): void {
+  void qc.invalidateQueries({ queryKey: adminQueryKeys.cleanupEventsAll });
+}
+
+function pathnameMatchesRefreshSegments(pathname: string, segments: string[]): boolean {
+  return segments.some((segment) => pathname === segment || pathname.startsWith(`${segment}/`));
 }
 
 export function DashboardSSEClient() {
@@ -191,12 +206,15 @@ export function DashboardSSEClient() {
     }, PERIODIC_RECONNECT_MS);
   }, [clearPeriodicReconnect]);
 
-  const scheduleRefresh = useCallback(() => {
+  const scheduleRefresh = useCallback((segments?: string[]) => {
     if (refreshTimerRef.current != null) return;
     refreshTimerRef.current = setTimeout(() => {
       refreshTimerRef.current = null;
       sseCtxRef.current?.touchLastUpdated();
-      routerRef.current.refresh();
+      const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+      if (!segments || segments.length === 0 || pathnameMatchesRefreshSegments(pathname, segments)) {
+        routerRef.current.refresh();
+      }
     }, REFRESH_DEBOUNCE_MS);
   }, []);
 
@@ -262,20 +280,18 @@ export function DashboardSSEClient() {
                   emitNewReportSignal(data.reportId);
                   sseCtxRef.current?.showRefreshToast('New report received');
                 }
-                invalidateAllAdminQueries(qc);
-                scheduleRefresh();
+                invalidateReportsQueries(qc);
+                scheduleRefresh(['/dashboard', '/dashboard/reports']);
               } else if (isNotificationEvent(data)) {
                 const message = data.title
                   ? `New notification: ${data.title}`
                   : 'New notification';
                 sseCtxRef.current?.showRefreshToast(message);
-                invalidateAllAdminQueries(qc);
-                scheduleRefresh();
+                invalidateNotificationsQueries(qc);
               } else if (isSiteEvent(data)) {
                 sseCtxRef.current?.showRefreshToast(
                   data.type === 'site_created' ? 'New site created' : 'Site updated',
                 );
-                invalidateAllAdminQueries(qc);
                 if (mapInvalidateTimerRef.current != null) {
                   clearTimeout(mapInvalidateTimerRef.current);
                 }
@@ -284,13 +300,16 @@ export function DashboardSSEClient() {
                     predicate: (query) => query.queryKey[0] === 'sites-map',
                   });
                 }, 750);
-                scheduleRefresh();
+                scheduleRefresh(['/dashboard/sites', '/dashboard/map', '/dashboard']);
               } else if (isUserEvent(data)) {
+                if (data.type === 'user_updated') {
+                  emitUserUpdatedSignal(data.userId);
+                }
                 sseCtxRef.current?.showRefreshToast(
                   data.type === 'user_created' ? t('sse.newUserRegistered') : t('sse.userUpdated'),
                 );
-                invalidateAllAdminQueries(qc);
-                scheduleRefresh();
+                invalidateUsersQueries(qc);
+                scheduleRefresh(['/dashboard/users', '/dashboard/active-users', '/dashboard']);
               } else if (isCleanupEventSse(data)) {
                 const label =
                   data.type === 'cleanup_event_pending'
@@ -299,12 +318,12 @@ export function DashboardSSEClient() {
                       ? t('sse.cleanupEventCreated')
                       : t('sse.cleanupEventUpdated');
                 sseCtxRef.current?.showRefreshToast(label);
-                invalidateAllAdminQueries(qc);
-                scheduleRefresh();
+                invalidateCleanupEventsQueries(qc);
+                scheduleRefresh(['/dashboard/events', '/dashboard']);
               } else if (isCheckInRiskSignalEvent(data)) {
                 emitCheckInRiskSignal(data.signalId);
                 sseCtxRef.current?.showRefreshToast(t('sse.newCheckInRiskSignal'));
-                scheduleRefresh();
+                scheduleRefresh(['/dashboard/events']);
               } else if (isReportViewersUpdatedEvent(data)) {
                 emitReportViewersUpdated(data.reportId, data.viewers);
               } else if (

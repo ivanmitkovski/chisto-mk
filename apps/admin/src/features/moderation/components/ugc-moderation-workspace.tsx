@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Badge, Button, Card, ConfirmDialog, Field, Input, Modal, Pagination, SectionState, useToast } from '@/components/ui';
+import { Badge, Button, Card, ConfirmDialog, Field, Input, Modal, PageHeader, Pagination, SectionState, useToast } from '@/components/ui';
 import { useServerSyncedState } from '@/features/admin-shell/hooks/use-server-synced-state';
 import { Can } from '@/lib/auth/rbac';
 import { useReadOnlyUnless } from '@/lib/auth/rbac/use-read-only-unless';
@@ -187,10 +187,13 @@ export function UgcModerationWorkspace({
   if (reports.length === 0) {
     const hasFilters = Boolean(initialStatusFilter || initialSubjectTypeFilter || initialSearch.trim());
     return (
-      <SectionState
-        variant="empty"
-        message={hasFilters && meta.total === 0 ? t('emptyFiltered') : t('empty')}
-      />
+      <div className={styles.layout}>
+        <PageHeader title={t('pageTitle')} description={t('pageDescription')} />
+        <SectionState
+          variant="empty"
+          message={hasFilters && meta.total === 0 ? t('emptyFiltered') : t('empty')}
+        />
+      </div>
     );
   }
 
@@ -209,6 +212,7 @@ export function UgcModerationWorkspace({
 
   return (
     <div className={styles.layout}>
+      <PageHeader title={t('pageTitle')} description={t('pageDescription')} />
       {readOnly ? (
         <div className={styles.readOnlyBanner} role="status">
           {t('readOnlyBanner')}

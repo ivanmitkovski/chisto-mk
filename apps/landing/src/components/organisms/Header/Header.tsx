@@ -10,7 +10,7 @@ import { LanguageSelector } from "@/components/molecules/LanguageSelector";
 import { MobileMenu } from "@/components/organisms/Header/MobileMenu";
 import { visibleMarketingNavItems } from "@/config/launch";
 import { cn } from "@/lib/utils/cn";
-import { prefersReducedMotion } from "@/lib/utils/smooth-scroll";
+import { scrollToDownloadSection } from "@/lib/utils/smooth-scroll";
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -26,12 +26,7 @@ export function Header() {
   }, []);
 
   function handleDownloadClick() {
-    const target = document.getElementById("download");
-    if (!target) return;
-    target.scrollIntoView({
-      behavior: prefersReducedMotion() ? "instant" : "smooth",
-      block: "start",
-    });
+    scrollToDownloadSection();
   }
 
   return (

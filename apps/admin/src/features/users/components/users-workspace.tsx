@@ -1,6 +1,8 @@
 'use client';
 
-import { AnimatePresence, motion } from 'framer-motion';
+import { useCallback, useState } from 'react';
+import Link from 'next/link';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { BROADCAST_PREFILL_STORAGE_KEY } from '@/features/broadcasts/types';
@@ -10,7 +12,11 @@ import { useServerSyncedState } from '@/features/admin-shell/hooks/use-server-sy
 import { usePermissions } from '@/lib/auth/rbac';
 import type { UserRow, UsersStats } from '@/features/users/data/users-adapter';
 import { ActionConfirmModal } from '@/features/reports/components/action-confirm-modal';
-import { Card, Icon, Pagination } from '@/components/ui';
+import { Card, Icon, PageHeader, Pagination, useToast } from '@/components/ui';
+import { adminBrowserFetch } from '@/lib/api';
+import { useUsersListHighlight } from '@/features/users/hooks/use-users-list-highlight';
+import { buildUsersExportCsv } from '@/features/users/lib/build-users-export-csv';
+import { UserSuspendReasonModal } from './user-suspend-reason-modal';
 import { useUsersListUrl } from '@/features/users/hooks/use-users-list-url';
 import { useUsersBulkSelection } from '@/features/users/hooks/use-users-bulk-selection';
 import { useUsersBulkActions } from '@/features/users/hooks/use-users-bulk-actions';
@@ -26,10 +32,18 @@ type UsersWorkspaceProps = {
   initialStats: UsersStats;
 };
 
+function sevenDaysAgoIso(): string {
+  const date = new Date();
+  date.setDate(date.getDate() - 7);
+  return date.toISOString().slice(0, 10);
+}
+
 export function UsersWorkspace({ initialData, initialMeta, initialStats }: UsersWorkspaceProps) {
   const t = useTranslations('users');
   const tCommon = useTranslations('common');
+  const { showToast } = useToast();
   const router = useRouter();
+  const reduceMotion = useReducedMotion();
   const { refresh: refreshPage, isRefreshing } = useWorkspaceRefresh();
   const [data] = useServerSyncedState(initialData);
   const [meta] = useServerSyncedState(initialMeta);
@@ -41,20 +55,83 @@ export function UsersWorkspace({ initialData, initialMeta, initialStats }: Users
   const showBulkUi = canBulkWrite || canBulkRole || canBroadcast;
 
   const url = useUsersListUrl();
-  const selectionKey = `${url.role}|${url.status}|${url.page}|${url.searchTerm}|${url.sort}|${url.dir}`;
+  const selectionKey = `${url.role}|${url.status}|${url.page}|${url.searchTerm}|${url.sort}|${url.dir}|${url.lastActiveBefore}|${url.lastActiveAfter}|${url.createdAfter}`;
   const selection = useUsersBulkSelection(data, selectionKey);
   const bulk = useUsersBulkActions(refreshPage);
+  const { highlightedUserIds } = useUsersListHighlight();
+  const [bulkSuspendReasonOpen, setBulkSuspendReasonOpen] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   async function handleBulkConfirm() {
     if (!bulk.bulkModal) return;
+    if (bulk.bulkModal === 'suspend') {
+      bulk.setBulkModal(null);
+      setBulkSuspendReasonOpen(true);
+      return;
+    }
     const ok = await bulk.runBulkAction(bulk.bulkModal, selection.selectedIds);
     if (ok) selection.clearSelection();
   }
 
-  async function handleBulkRoleConfirm(role: string) {
-    const ok = await bulk.runBulkAction('changeRole', selection.selectedIds, role);
+  async function handleBulkSuspendWithReason(reasonCode: string, note: string) {
+    const ok = await bulk.runBulkAction('suspend', selection.selectedIds, { reasonCode, note });
+    setBulkSuspendReasonOpen(false);
     if (ok) selection.clearSelection();
   }
+
+  async function handleBulkRoleConfirm(role: string) {
+    const ok = await bulk.runBulkAction('changeRole', selection.selectedIds, { role });
+    if (ok) selection.clearSelection();
+  }
+
+  const exportCsv = useCallback(async () => {
+    setExporting(true);
+    try {
+      const sp = new URLSearchParams({ page: '1', limit: '500' });
+      if (url.searchTerm) sp.set('search', url.searchTerm);
+      if (url.role) sp.set('role', url.role);
+      if (url.status) sp.set('status', url.status);
+      if (url.sort) sp.set('sort', url.sort);
+      if (url.dir) sp.set('dir', url.dir);
+      if (url.lastActiveBefore) sp.set('lastActiveBefore', url.lastActiveBefore);
+      if (url.lastActiveAfter) sp.set('lastActiveAfter', url.lastActiveAfter);
+      if (url.createdAfter) sp.set('createdAfter', url.createdAfter);
+
+      const result = await adminBrowserFetch<{ data: UserRow[] }>(`/admin/users?${sp.toString()}`);
+      const csv = buildUsersExportCsv(result.data);
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+      const blobUrl = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = blobUrl;
+      anchor.download = `users-export-${new Date().toISOString().slice(0, 10)}.csv`;
+      anchor.click();
+      URL.revokeObjectURL(blobUrl);
+      showToast({
+        tone: 'success',
+        title: tCommon('exportReady'),
+        message: tCommon('exportedRows', { count: result.data.length }),
+      });
+    } catch (error) {
+      showToast({
+        tone: 'warning',
+        title: tCommon('exportFailed'),
+        message: error instanceof Error ? error.message : tCommon('exportFailed'),
+      });
+    } finally {
+      setExporting(false);
+    }
+  }, [
+    showToast,
+    tCommon,
+    url.createdAfter,
+    url.dir,
+    url.lastActiveAfter,
+    url.lastActiveBefore,
+    url.role,
+    url.searchTerm,
+    url.sort,
+    url.status,
+  ]);
 
   function handleSendBroadcast() {
     const ids = Array.from(selection.selectedIds);
@@ -71,48 +148,83 @@ export function UsersWorkspace({ initialData, initialMeta, initialStats }: Users
     selection.clearSelection();
   }
 
+  const newUsersHref = url.buildUrl({
+    createdAfter: sevenDaysAgoIso(),
+    sort: 'createdAt',
+    dir: 'desc',
+    page: 1,
+    status: '',
+    role: '',
+    search: '',
+    lastActiveBefore: '',
+    lastActiveAfter: '',
+  });
+
   return (
     <WorkspaceRefreshOverlay isRefreshing={isRefreshing}>
       <div className={styles.layout}>
         <a href="#users-table" className="skipLink">
           {tCommon('skipToUsersTable')}
         </a>
+
+        <PageHeader title={t('pageTitle')} description={t('pageDescription')} />
+
         <div className={styles.statsBar}>
           <motion.div
             className={styles.statCard}
-            initial={{ opacity: 0, y: 4 }}
+            initial={reduceMotion ? false : { opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={reduceMotion ? { duration: 0 } : { duration: 0.2 }}
           >
-            <span className={styles.statIcon}>
-              <Icon name="users" size={18} aria-hidden />
-            </span>
-            <span className={styles.statValue}>{stats.usersCount}</span>
-            <span className={styles.statLabel}>{t('stats.totalUsers')}</span>
+            <Link href="/dashboard/users" className={styles.statCardLink}>
+              <span className={styles.statIcon}>
+                <Icon name="users" size={18} aria-hidden />
+              </span>
+              <span className={styles.statValue}>{stats.usersCount}</span>
+              <span className={styles.statLabel}>{t('stats.totalUsers')}</span>
+            </Link>
           </motion.div>
           <motion.div
             className={styles.statCard}
-            initial={{ opacity: 0, y: 4 }}
+            initial={reduceMotion ? false : { opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2, delay: 0.05 }}
+            transition={reduceMotion ? { duration: 0 } : { duration: 0.2, delay: 0.05 }}
           >
-            <span className={styles.statIcon}>
-              <Icon name="document-forward" size={18} aria-hidden />
-            </span>
-            <span className={styles.statValue}>{stats.usersNewLast7d}</span>
-            <span className={styles.statLabel}>{t('stats.new7d')}</span>
+            <Link href={newUsersHref} className={styles.statCardLink}>
+              <span className={styles.statIcon}>
+                <Icon name="document-forward" size={18} aria-hidden />
+              </span>
+              <span className={styles.statValue}>{stats.usersNewLast7d}</span>
+              <span className={styles.statLabel}>{t('stats.new7d')}</span>
+            </Link>
           </motion.div>
           <motion.div
             className={styles.statCard}
-            initial={{ opacity: 0, y: 4 }}
+            initial={reduceMotion ? false : { opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2, delay: 0.1 }}
+            transition={reduceMotion ? { duration: 0 } : { duration: 0.2, delay: 0.1 }}
           >
-            <span className={styles.statIcon}>
-              <Icon name="shield" size={18} aria-hidden />
-            </span>
-            <span className={styles.statValue}>{stats.sessionsActive}</span>
-            <span className={styles.statLabel}>{t('stats.activeSessions')}</span>
+            <Link href={url.buildUrl({ status: 'SUSPENDED', page: 1 })} className={styles.statCardLink}>
+              <span className={styles.statIcon}>
+                <Icon name="alert-triangle" size={18} aria-hidden />
+              </span>
+              <span className={styles.statValue}>{stats.usersSuspendedCount}</span>
+              <span className={styles.statLabel}>{t('stats.suspended')}</span>
+            </Link>
+          </motion.div>
+          <motion.div
+            className={styles.statCard}
+            initial={reduceMotion ? false : { opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={reduceMotion ? { duration: 0 } : { duration: 0.2, delay: 0.15 }}
+          >
+            <Link href="/dashboard/active-users" className={styles.statCardLink}>
+              <span className={styles.statIcon}>
+                <Icon name="shield" size={18} aria-hidden />
+              </span>
+              <span className={styles.statValue}>{stats.sessionsActive}</span>
+              <span className={styles.statLabel}>{t('stats.activeSessions')}</span>
+            </Link>
           </motion.div>
         </div>
 
@@ -121,10 +233,21 @@ export function UsersWorkspace({ initialData, initialMeta, initialStats }: Users
             searchTerm={url.searchTerm}
             role={url.role}
             status={url.status}
+            quickFilter={url.quickFilter}
+            draftLastActiveBefore={url.draftLastActiveBefore}
+            draftLastActiveAfter={url.draftLastActiveAfter}
+            isRefreshing={isRefreshing}
             onSearchTermChange={url.setSearchTerm}
             onRoleChange={url.handleRoleChange}
             onStatusChange={url.handleStatusChange}
+            onQuickFilter={url.handleQuickFilter}
+            onDraftLastActiveBeforeChange={url.setDraftLastActiveBefore}
+            onDraftLastActiveAfterChange={url.setDraftLastActiveAfter}
+            onApplyLastActiveFilters={url.applyLastActiveFilters}
+            onClearLastActiveFilters={url.clearLastActiveFilters}
             onRefresh={refreshPage}
+            onExportCsv={() => void exportCsv()}
+            exporting={exporting}
           />
 
           <AnimatePresence>
@@ -147,6 +270,7 @@ export function UsersWorkspace({ initialData, initialMeta, initialStats }: Users
           <UsersTable
             data={data}
             canBulk={showBulkUi}
+            highlightedUserIds={highlightedUserIds}
             selectedIds={selection.selectedIds}
             allSelected={selection.allSelected}
             selectAllRef={selection.selectAllRef}
@@ -193,6 +317,13 @@ export function UsersWorkspace({ initialData, initialMeta, initialStats }: Users
         isConfirming={bulk.isBulkLoading}
         onCancel={() => !bulk.isBulkLoading && bulk.setBulkModal(null)}
         onConfirm={() => void handleBulkConfirm()}
+      />
+
+      <UserSuspendReasonModal
+        open={bulkSuspendReasonOpen}
+        busy={bulk.isBulkLoading}
+        onClose={() => !bulk.isBulkLoading && setBulkSuspendReasonOpen(false)}
+        onConfirm={(payload) => void handleBulkSuspendWithReason(payload.reasonCode, payload.note ?? '')}
       />
     </WorkspaceRefreshOverlay>
   );

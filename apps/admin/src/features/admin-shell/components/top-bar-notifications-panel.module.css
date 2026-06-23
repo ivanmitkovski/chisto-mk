@@ -7,11 +7,9 @@
   display: flex;
   flex-direction: column;
   border-radius: var(--radius-xl);
-  border: 1px solid rgba(8, 54, 39, 0.1);
-  background: rgba(255, 255, 255, 0.94);
-  box-shadow:
-    0 18px 34px rgba(8, 54, 39, 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.82);
+  border: 1px solid var(--shell-panel-border);
+  background: var(--shell-panel-bg);
+  box-shadow: var(--shell-panel-shadow), var(--shell-panel-inset-highlight);
   backdrop-filter: blur(8px);
   overflow: hidden;
   z-index: var(--z-topbar-panel);
@@ -24,33 +22,33 @@
   justify-content: space-between;
   gap: var(--space-3);
   padding: var(--space-4) var(--space-4) var(--space-3);
-  border-bottom: 1px solid rgba(8, 54, 39, 0.08);
+  border-bottom: 1px solid var(--border-default);
 }
 
 .panelTitle {
   margin: 0;
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-bold);
-  color: rgba(8, 54, 39, 0.9);
+  color: var(--shell-strong-fg);
 }
 
 .panelSubtitle {
   margin: var(--space-1) 0 0;
   font-size: var(--font-size-sm);
-  color: rgba(8, 54, 39, 0.6);
+  color: var(--shell-muted-fg);
 }
 
 .panelAction {
-  border: 1px solid rgba(37, 219, 134, 0.26);
+  border: 1px solid var(--shell-search-border);
   border-radius: var(--radius-full);
   min-height: 1.875rem;
   padding: 0 var(--space-3);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
-  color: #0d8f55;
-  background: rgba(37, 219, 134, 0.12);
+  color: var(--color-status-success-fg);
+  background: var(--shell-nav-link-hover-bg);
   cursor: pointer;
-  transition: background-color 160ms ease;
+  transition: background-color var(--motion-duration-fast) ease;
 }
 
 .panelAction:disabled {
@@ -59,7 +57,7 @@
 }
 
 .panelAction:not(:disabled):hover {
-  background: rgba(37, 219, 134, 0.2);
+  background: var(--shell-profile-button-bg);
 }
 
 .panelAction:focus-visible {
@@ -85,11 +83,11 @@
 
 .notificationListScroll::-webkit-scrollbar-thumb {
   border-radius: 999px;
-  background: rgba(8, 54, 39, 0.18);
+  background: var(--border-default);
 }
 
 .notificationListScroll::-webkit-scrollbar-thumb:hover {
-  background: rgba(8, 54, 39, 0.28);
+  background: color-mix(in srgb, var(--shell-strong-fg) 28%, transparent);
 }
 
 .notificationList {
@@ -111,7 +109,7 @@
   border: none;
   background: transparent;
   padding: 0;
-  color: #0f766e;
+  color: var(--color-status-success-fg);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   cursor: pointer;
@@ -121,7 +119,7 @@
 
 .notificationLink:hover {
   text-decoration: underline;
-  color: #0b5f59;
+  color: var(--shell-nav-link-active-fg);
 }
 
 .notificationLink:focus-visible {
@@ -143,7 +141,7 @@
 }
 
 .notificationItem:hover {
-  background: rgba(8, 54, 39, 0.05);
+  background: var(--shell-row-hover-bg);
 }
 
 .notificationItem:focus-visible {
@@ -152,38 +150,38 @@
 }
 
 .notificationUnread {
-  border-color: rgba(37, 219, 134, 0.24);
-  background: rgba(37, 219, 134, 0.08);
+  border-color: var(--shell-search-border);
+  background: color-mix(in srgb, var(--color-primary) 8%, transparent);
 }
 
 .notificationHeading {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  color: rgba(8, 54, 39, 0.9);
+  color: var(--shell-strong-fg);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
 }
 
 .notificationMessage {
-  color: rgba(8, 54, 39, 0.68);
+  color: var(--shell-muted-fg);
   font-size: var(--font-size-sm);
 }
 
 .notificationTime {
-  color: rgba(8, 54, 39, 0.5);
+  color: var(--shell-subtle-fg);
   font-size: var(--font-size-xs);
 }
 
 .unreadPill {
-  border: 1px solid rgba(37, 219, 134, 0.38);
+  border: 1px solid var(--shell-profile-button-border);
   border-radius: var(--radius-full);
   min-height: 1.125rem;
   padding: 0 var(--space-2);
   font-size: 0.625rem;
   font-weight: var(--font-weight-semibold);
-  color: #0d8f55;
-  background: rgba(37, 219, 134, 0.12);
+  color: var(--color-status-success-fg);
+  background: var(--shell-nav-link-hover-bg);
 }
 
 @media (max-width: 48rem) {

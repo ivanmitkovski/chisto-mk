@@ -4,7 +4,7 @@ import { useCallback, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import '@/features/map/leaflet-setup';
 import { Icon } from '@/components/ui';
 import type { ReportMapPin } from '../types';
 import styles from './location-map-card.module.css';

@@ -1,8 +1,9 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
-import { Card, ConfirmDialog, Pagination } from '@/components/ui';
+import { Card, ConfirmDialog, PageHeader, Pagination } from '@/components/ui';
 import { useServerSyncedState } from '@/features/admin-shell/hooks/use-server-synced-state';
 import { useWorkspaceRefresh } from '@/features/admin-shell/hooks/use-workspace-refresh';
 import { WorkspaceRefreshOverlay } from '@/features/admin-shell/components/workspace-refresh-overlay';
@@ -27,7 +28,8 @@ const EventsWorkspaceStatsMotion = dynamic(
 type EventsWorkspaceProps = {
   initialData: CleanupEventRow[];
   initialMeta: { total: number; page: number; limit: number };
-  initialStats: EventsStats;
+  initialStats?: EventsStats;
+  statsSection?: ReactNode;
   canWriteCleanupEvents: boolean;
 };
 
@@ -35,12 +37,21 @@ export function EventsWorkspace({
   initialData,
   initialMeta,
   initialStats,
+  statsSection,
   canWriteCleanupEvents,
 }: EventsWorkspaceProps) {
   const t = useTranslations('events');
   const [data] = useServerSyncedState(initialData);
   const [meta] = useServerSyncedState(initialMeta);
-  const [stats] = useServerSyncedState(initialStats);
+  const [stats] = useServerSyncedState(
+    initialStats ?? {
+      total: 0,
+      upcoming: 0,
+      pending: 0,
+      completed: 0,
+      totalParticipants: 0,
+    },
+  );
 
   const url = useEventsListUrl();
   const { refresh: refreshPage, isRefreshing } = useWorkspaceRefresh();
@@ -60,11 +71,15 @@ export function EventsWorkspace({
   return (
     <WorkspaceRefreshOverlay isRefreshing={isRefreshing}>
     <div className={styles.layout}>
-      <EventsWorkspaceStatsMotion
-        stats={stats}
-        totalParticipants={stats.totalParticipants}
-        moderationQueueHref={url.buildUrl({ moderationStatus: 'PENDING', page: 1 })}
-      />
+      <PageHeader title={t('pageTitle')} description={t('pageDescription')} />
+
+      {statsSection ?? (
+        <EventsWorkspaceStatsMotion
+          stats={stats}
+          totalParticipants={stats.totalParticipants}
+          moderationQueueHref={url.buildUrl({ moderationStatus: 'PENDING', page: 1 })}
+        />
+      )}
 
       <Card className={styles.tableCard}>
         <EventsToolbar

@@ -9,7 +9,9 @@
     "lint": "eslint .",
     "analyze": "ANALYZE=true next build",
     "test": "vitest run",
-    "test:structure": "node ../../scripts/check-admin-structure.mjs && node ../../scripts/check-admin-tokens.mjs && node ../../scripts/check-admin-styles.mjs && node scripts/check-admin-i18n.mjs && node scripts/check-admin-i18n-scopes.mjs",
+    "test:structure": "node ../../scripts/check-admin-structure.mjs && node ../../scripts/check-admin-tokens.mjs && ADMIN_STYLES_ENFORCE_FEATURE_HEX=1 node ../../scripts/check-admin-styles.mjs && node scripts/check-admin-i18n.mjs && node scripts/check-admin-i18n-scopes.mjs && node scripts/check-admin-i18n-routes.mjs",
+    "test:bundle-budget": "node scripts/check-bundle-budget.mjs",
+    "test:perf": "playwright test -c playwright.config.cjs tests/perf",
     "test:watch": "vitest",
     "test:a11y": "playwright test -c playwright.config.cjs tests/a11y",
     "test:smoke": "playwright test -c playwright.config.cjs tests/smoke"
@@ -32,7 +34,8 @@
     "react-leaflet": "^5.0.0",
     "react-leaflet-cluster": "^4.0.0",
     "recharts": "^3.8.0",
-    "server-only": "0.0.1"
+    "server-only": "0.0.1",
+    "web-vitals": "^5.3.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.3",
@@ -45,7 +48,6 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
-    "jsdom": "^26.1.0",
     "@types/node": "^22.10.2",
     "@types/qrcode": "^1.5.6",
     "@types/react": "^19.0.1",
@@ -54,6 +56,7 @@
     "eslint-config-next": "^15.0.3",
     "eslint-plugin-react": "^7.37.5",
     "globals": "^17.3.0",
+    "jsdom": "^26.1.0",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.56.1",
     "vitest": "^3.2.4"

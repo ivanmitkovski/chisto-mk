@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import {
   APP_SCREENSHOTS,
+  SCREENSHOT_BLUR_DATA_URL,
   type AppScreenshotId,
 } from "@/lib/app-screenshots";
 import { cn } from "@/lib/utils/cn";
@@ -34,6 +35,8 @@ export function PhoneScreenshot({
         alt={t(altKey)}
         fill
         priority={priority}
+        placeholder="blur"
+        blurDataURL={SCREENSHOT_BLUR_DATA_URL}
         sizes="(max-width: 768px) 280px, 320px"
         className="object-cover object-top"
       />

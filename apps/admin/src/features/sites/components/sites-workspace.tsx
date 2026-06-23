@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
-import { BulkActionBar, Button, Card, Icon, Input, Pagination, useToast } from '@/components/ui';
+import { BulkActionBar, Button, Card, Icon, Input, PageHeader, Pagination, useToast } from '@/components/ui';
 import { WorkspaceRefreshOverlay } from '@/features/admin-shell/components/workspace-refresh-overlay';
 import { useWorkspaceRefresh } from '@/features/admin-shell/hooks/use-workspace-refresh';
 import { useServerSyncedState } from '@/features/admin-shell/hooks/use-server-synced-state';
@@ -91,6 +91,8 @@ export function SitesWorkspace({
   return (
     <WorkspaceRefreshOverlay isRefreshing={isRefreshing}>
       <div className={styles.layout}>
+        <PageHeader title={t('pageTitle')} description={t('pageDescription')} />
+
         <div className={styles.statsBar}>
           <motion.div
             className={styles.statCard}

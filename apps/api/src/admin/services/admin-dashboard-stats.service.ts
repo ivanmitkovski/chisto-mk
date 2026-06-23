@@ -15,6 +15,7 @@ export type AdminRawOverviewBundle = {
   completedEvents: number;
   usersCount: number;
   usersNewLast7d: number;
+  usersSuspendedCount: number;
   sessionsActive: number;
   reportCountsByDay: Array<{ date: string; count: bigint }>;
   recentLogs: Array<{
@@ -69,6 +70,7 @@ export class AdminDashboardStatsService {
       completedEvents,
       usersCount,
       usersNewLast7d,
+      usersSuspendedCount,
       sessionsActive,
       reportCountsByDay,
       recentLogs,
@@ -127,6 +129,9 @@ export class AdminDashboardStatsService {
       this.prisma.user.count({
         where: { createdAt: { gte: sevenDaysAgo } },
       }),
+      this.prisma.user.count({
+        where: { status: 'SUSPENDED' },
+      }),
       this.prisma.userSession.count({
         where: {
           revokedAt: null,
@@ -178,6 +183,7 @@ export class AdminDashboardStatsService {
       completedEvents,
       usersCount,
       usersNewLast7d,
+      usersSuspendedCount,
       sessionsActive,
       reportCountsByDay,
       recentLogs,

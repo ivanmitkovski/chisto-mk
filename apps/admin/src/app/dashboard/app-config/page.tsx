@@ -1,7 +1,6 @@
-import { cookies } from 'next/headers';
 import { getTranslations } from 'next-intl/server';
 import { AdminShell } from '@/features/admin-shell';
-import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell';
+import { readDashboardShellState } from '@/features/admin-shell/server';
 import { AppConfigWorkspace, getAppConfigSnapshot } from '@/features/app-config';
 import { SectionState } from '@/components/ui';
 import { ADMIN_PERMISSIONS } from '@/lib/auth/rbac/permissions';
@@ -10,8 +9,7 @@ import { handleServerLoadError } from '@/lib/server/handle-server-load-error';
 
 export default async function AppConfigPage() {
   const t = await getTranslations('appConfig');
-  const cookieStore = await cookies();
-  const initialSidebarCollapsed = cookieStore.get(DESKTOP_SIDEBAR_COOKIE_KEY)?.value === '1';
+  const { initialSidebarCollapsed } = await readDashboardShellState();
 
   await requirePagePermission(ADMIN_PERMISSIONS['app-config:read']);
   try {

@@ -8,5 +8,13 @@
   "export": "Export",
   "selectedCount": "{count} selected",
   "selectedCountOfTotal": "{count} selected of {total}",
-  "dismissNotification": "Dismiss notification"
+  "dismissNotification": "Dismiss notification",
+  "calendar": {
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
+    "today": "Today",
+    "selectDate": "Select date",
+    "clearDate": "Clear date",
+    "days": "Calendar days"
+  }
 }

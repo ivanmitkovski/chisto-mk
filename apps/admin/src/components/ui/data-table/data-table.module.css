@@ -40,7 +40,7 @@
 }
 
 .table tbody tr:hover {
-  background: rgba(37, 219, 134, 0.06);
+  background: var(--shell-table-row-hover-bg);
 }
 
 .link {

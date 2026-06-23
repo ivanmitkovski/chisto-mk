@@ -1,0 +1,28 @@
+{
+  "description": "Max First Load JS (approximate, from app-build-manifest chunk sums). Regenerate with: node scripts/check-bundle-budget.mjs --update",
+  "sharedFirstLoadJsKb": 110,
+  "routes": {
+    "/dashboard": 884,
+    "/dashboard/active-users": 917,
+    "/dashboard/app-config": 890,
+    "/dashboard/audit": 894,
+    "/dashboard/broadcasts": 907,
+    "/dashboard/comms/email-suppressions": 893,
+    "/dashboard/comms/webhook-logs": 893,
+    "/dashboard/events": 965,
+    "/dashboard/events/risk-signals": 963,
+    "/dashboard/gamification": 889,
+    "/dashboard/map": 1074,
+    "/dashboard/moderation/ugc": 894,
+    "/dashboard/notifications": 883,
+    "/dashboard/operations": 923,
+    "/dashboard/reports": 882,
+    "/dashboard/reports/duplicates": 882,
+    "/dashboard/resolutions": 885,
+    "/dashboard/settings": 943,
+    "/dashboard/sites": 925,
+    "/dashboard/team": 895,
+    "/dashboard/users": 952
+  },
+  "regressionPercent": 10
+}

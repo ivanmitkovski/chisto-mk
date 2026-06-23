@@ -155,7 +155,7 @@
   scrollbar-width: thin;
   -webkit-overflow-scrolling: touch;
   padding: 2px 0;
-  mask-image: linear-gradient(to right, #000 calc(100% - 1rem), transparent);
+  mask-image: linear-gradient(to right, var(--color-black) calc(100% - 1rem), transparent);
 }
 
 .statusChips .chip {
@@ -218,7 +218,12 @@
 
 .chipActive {
   border-color: rgba(22, 141, 99, 0.45);
-  background: linear-gradient(180deg, #3ded9a 0%, var(--color-primary) 52%, #1fd278 100%);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-primary) 75%, white) 0%,
+    var(--color-primary) 52%,
+    var(--color-primary-hover) 100%
+  );
   color: var(--color-green-900);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.45) inset,
@@ -229,7 +234,12 @@
 
 .chipActive:hover {
   border-color: rgba(22, 141, 99, 0.55);
-  background: linear-gradient(180deg, #36e892 0%, #1fce76 52%, #1bc46f 100%);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-primary) 70%, white) 0%,
+    var(--color-primary-hover) 52%,
+    var(--color-green-700) 100%
+  );
   color: var(--color-green-900);
   transform: translateY(-0.5px);
 }
@@ -304,7 +314,7 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #ffffff;
+  background: var(--bg-surface);
   box-shadow:
     0 1px 3px rgba(8, 54, 39, 0.2),
     0 0 0 3px rgba(255, 255, 255, 0.95);
@@ -388,7 +398,7 @@
   min-width: 0.9em;
 }
 
-.markerReported { border-color: var(--color-yellow-100); color: #b8860b; }
+.markerReported { border-color: var(--color-yellow-100); color: var(--color-status-warning-fg); }
 .markerVerified { border-color: var(--color-green-700); color: var(--color-green-700); }
 .markerCleanupScheduled { border-color: var(--color-info); color: var(--color-info); }
 .markerInProgress { border-color: var(--color-primary); color: var(--color-green-700); }
@@ -561,7 +571,7 @@
 }
 
 .mapAttributionLink:hover {
-  color: #15995f;
+  color: var(--color-status-success-fg);
   text-decoration: underline;
   text-underline-offset: 2px;
 }

@@ -11,6 +11,22 @@
   margin-bottom: var(--space-4);
 }
 
+.creditsSection {
+  margin: var(--space-6) 0;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border-default);
+}
+
+.creditsSection h3 {
+  margin: 0 0 var(--space-2);
+}
+
+.creditsMeta {
+  margin: 0 0 var(--space-4);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
 .table {
   width: 100%;
   border-collapse: collapse;

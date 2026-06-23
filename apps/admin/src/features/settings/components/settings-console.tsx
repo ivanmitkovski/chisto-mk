@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ActionConfirmModal } from '@/features/reports/components/action-confirm-modal';
-import { ConfirmDialog } from '@/components/ui';
+import { ConfirmDialog, SectionState } from '@/components/ui';
 import type { MeProfile } from '@/features/auth/data/me-adapter';
 import type { ConfigEntry } from '@/features/settings/data/config-adapter';
 import type { FeatureFlagRow } from '@/features/settings/data/feature-flags-adapter';
@@ -34,6 +34,7 @@ type SettingsConsoleProps = {
   initialConfig: ConfigEntry[];
   initialFlags: FeatureFlagRow[];
   initialModerationEmailPrefs: ModerationEmailPreferenceRow[];
+  initialModerationEmailPrefsError?: string | null;
 };
 
 export function SettingsConsole({
@@ -43,6 +44,7 @@ export function SettingsConsole({
   initialConfig,
   initialFlags,
   initialModerationEmailPrefs,
+  initialModerationEmailPrefsError = null,
 }: SettingsConsoleProps) {
   const t = useTranslations('settings');
   const tCommon = useTranslations('common');
@@ -171,12 +173,18 @@ export function SettingsConsole({
 
             {section === 'moderationEmails' && (
               <motion.div key="mod-email" {...motionProps}>
-                <SettingsModerationEmailsPanel
-                  rows={moderationEmails.rows}
-                  busyCategory={moderationEmails.busyCategory}
-                  panelTitleRef={panelTitleRef}
-                  onToggle={moderationEmails.toggle}
-                />
+                {initialModerationEmailPrefsError ? (
+                  <div className={panelStyles.panel}>
+                    <SectionState variant="error" message={initialModerationEmailPrefsError} />
+                  </div>
+                ) : (
+                  <SettingsModerationEmailsPanel
+                    rows={moderationEmails.rows}
+                    busyCategory={moderationEmails.busyCategory}
+                    panelTitleRef={panelTitleRef}
+                    onToggle={moderationEmails.toggle}
+                  />
+                )}
               </motion.div>
             )}
 

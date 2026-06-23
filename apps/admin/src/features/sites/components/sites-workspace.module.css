@@ -45,12 +45,12 @@
 
 .statIconReported {
   background: rgba(248, 187, 0, 0.18);
-  color: #b8860b;
+  color: var(--color-status-warning-fg);
 }
 
 .statIconVerified {
   background: rgba(36, 172, 249, 0.14);
-  color: #1a6e98;
+  color: var(--color-status-info-fg);
 }
 
 .statIconCleaned {
@@ -272,22 +272,22 @@
 
 .statusReported {
   background: rgba(248, 187, 0, 0.2);
-  color: #8b6914;
+  color: var(--color-status-warning-fg);
 }
 
 .statusVerified {
   background: rgba(36, 172, 249, 0.16);
-  color: #1a6e98;
+  color: var(--color-status-info-fg);
 }
 
 .statusScheduled {
   background: rgba(139, 92, 246, 0.16);
-  color: #5b21b6;
+  color: var(--color-stat-participants-fg);
 }
 
 .statusInProgress {
   background: rgba(36, 172, 249, 0.2);
-  color: #0369a1;
+  color: var(--color-status-info-fg);
 }
 
 .statusCleaned {

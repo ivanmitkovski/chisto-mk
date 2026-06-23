@@ -29,10 +29,8 @@ const DRAG_VELOCITY = 420;
 const HINT_ANIMATION_DURATION_S = 2.8;
 const HINT_FAILSAFE_MS = Math.round(HINT_ANIMATION_DURATION_S * 1000) + 800;
 
-const SHADOW_FRONT =
-  "shadow-[0_22px_52px_rgba(0,0,0,0.11),0_8px_24px_rgba(0,0,0,0.06)]";
-const SHADOW_BACK =
-  "shadow-[0_12px_32px_rgba(0,0,0,0.06),0_4px_14px_rgba(0,0,0,0.04)]";
+const SHADOW_FRONT = "shadow-[var(--shadow-phone-lg)]";
+const SHADOW_BACK = "shadow-[var(--shadow-phone)]";
 
 const slideLabelKey = (v: HeroPhoneVariant) => HERO_PHONE_DECK_LABEL_KEYS[v];
 
@@ -211,6 +209,15 @@ export function HeroPhoneSwipeDeck() {
           role="tablist"
           aria-orientation="horizontal"
           aria-label={t("phoneDeckDotsLabel")}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowRight") {
+              e.preventDefault();
+              setActiveIndex((i) => (i + 1) % COUNT);
+            } else if (e.key === "ArrowLeft") {
+              e.preventDefault();
+              setActiveIndex((i) => (i - 1 + COUNT) % COUNT);
+            }
+          }}
         >
           {HERO_PHONE_VARIANTS.map((variant, i) => (
             <button

@@ -133,8 +133,20 @@ jobs:
       - name: Lint landing legal content
         run: pnpm --filter @chisto/landing run lint:legal-content
 
+      - name: Lint landing marketing copy
+        run: pnpm --filter @chisto/landing run lint:marketing-copy
+
       - name: Landing ESLint
         run: pnpm --filter @chisto/landing lint
+
+      - name: Build landing (Playwright E2E)
+        run: pnpm --filter @chisto/landing build
+
+      - name: Install Playwright Chromium (landing)
+        run: pnpm --filter @chisto/landing exec playwright install chromium
+
+      - name: Landing Playwright E2E
+        run: pnpm --filter @chisto/landing test:e2e
 
       - name: API OpenAPI snapshot check
         run: pnpm --filter @chisto/api run snapshot:openapi:check
@@ -235,24 +247,26 @@ jobs:
       - name: Admin unit tests (Vitest)
         run: pnpm --filter @chisto/admin test
 
+      - name: Admin structure and i18n guardrails
+        run: pnpm --filter @chisto/admin run test:structure
+
+      - name: Admin ESLint
+        run: pnpm --filter @chisto/admin run lint
+
       - name: Build admin (Playwright a11y)
         run: pnpm --filter @chisto/admin build
+
+      - name: Admin bundle budget
+        run: pnpm --filter @chisto/admin run test:bundle-budget
 
       - name: Install Playwright (Chromium)
         run: pnpm --filter @chisto/admin exec playwright install chromium
 
-      - name: Admin map a11y (Playwright + axe)
-        run: |
-          (cd apps/admin && pnpm exec next start -p 3001 &)
-          for i in $(seq 1 60); do
-            if curl -sf "http://127.0.0.1:3001" >/dev/null; then
-              echo "admin server up"
-              break
-            fi
-            sleep 2
-          done
-          curl -sf "http://127.0.0.1:3001" >/dev/null
-          CI=true ADMIN_E2E_BASE_URL=http://127.0.0.1:3001 pnpm --filter @chisto/admin run test:a11y
+      - name: Admin Playwright E2E (smoke, perf, a11y)
+        env:
+          SMS_PROVIDER: none
+          EMAIL_ENABLED: 'false'
+        run: bash apps/admin/scripts/run-playwright-ci-stack.sh
 
   e2e:
     name: API E2E Tests (${{ matrix.shard }}/${{ strategy.job-total }})

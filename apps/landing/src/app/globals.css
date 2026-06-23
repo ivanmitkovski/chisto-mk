@@ -7,6 +7,7 @@
   --color-primary: #00D98E;
   --color-primary-600: #00C27F;
   --color-primary-700: #00A36B;
+  --color-primary-800: #006B47;
 
   --color-gray-50: #F9FAFB;
   --color-gray-100: #F5F5F5;
@@ -21,8 +22,9 @@
   --radius-4xl: 2rem;
   --radius-5xl: 2.5rem;
 
-  --shadow-phone: 0 20px 60px rgba(0, 0, 0, 0.15);
-  --shadow-phone-lg: 0 28px 80px rgba(0, 0, 0, 0.18), 0 12px 32px rgba(0, 217, 142, 0.08);
+  --shadow-phone: 0 24px 56px rgba(0, 0, 0, 0.16), 0 8px 22px rgba(0, 0, 0, 0.1);
+  --shadow-phone-lg: 0 32px 72px rgba(0, 0, 0, 0.2), 0 12px 32px rgba(0, 0, 0, 0.12),
+    0 2px 8px rgba(0, 217, 142, 0.06);
   --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.05);
   --shadow-lift: 0 20px 50px rgba(0, 0, 0, 0.08);
   --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.06);
@@ -76,6 +78,18 @@
     --container-max: 80rem;
     --copy-max: 65ch;
     --hairline: rgba(0, 0, 0, 0.06);
+    --header-height: 4.25rem;
+    --scroll-margin-top: calc(var(--header-height) + 1.5rem);
+  }
+
+  @media (width >= 768px) {
+    :root {
+      --header-height: 5rem;
+    }
+  }
+
+  html {
+    scroll-padding-top: var(--scroll-margin-top);
   }
 
   @media (prefers-reduced-motion: no-preference) {
@@ -320,115 +334,6 @@
         transparent 58%,
         rgba(56, 189, 248, 0.03) 100%
       );
-  }
-
-  /**
-   * Hero illustration — full color on top of atmosphere; edge-only blend into .mesh-hero.
-   */
-  .mesh-hero-illustration {
-    --hero-illustration-field: #f1f2f3;
-    --hero-illustration-wave: #f8fafc;
-
-    background-image: url("/brand/chisto-mk-hero-illustration.svg");
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: cover;
-    opacity: 0.9;
-    filter: saturate(1.04) brightness(1.03) contrast(1.01);
-    mix-blend-mode: normal;
-    -webkit-mask-image: linear-gradient(
-      180deg,
-      black 0%,
-      black 88%,
-      rgba(0, 0, 0, 0.75) 96%,
-      transparent 100%
-    );
-    mask-image: linear-gradient(
-      180deg,
-      black 0%,
-      black 88%,
-      rgba(0, 0, 0, 0.75) 96%,
-      transparent 100%
-    );
-  }
-
-  /* Edge brand whisper — not a white wash over the art */
-  .mesh-hero-illustration::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background:
-      radial-gradient(ellipse 48% 36% at 0% 0%, rgba(0, 217, 142, 0.09), transparent 72%),
-      radial-gradient(ellipse 44% 34% at 100% 4%, rgba(125, 211, 252, 0.08), transparent 70%);
-    mix-blend-mode: soft-light;
-    opacity: 0.2;
-  }
-
-  /* Feather only the outer rim into the section field */
-  .mesh-hero-illustration::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background:
-      linear-gradient(
-        90deg,
-        var(--hero-illustration-field) 0%,
-        transparent 10%,
-        transparent 90%,
-        var(--hero-illustration-field) 100%
-      ),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, transparent 16%),
-      linear-gradient(0deg, var(--hero-illustration-wave) 0%, transparent 18%);
-    opacity: 0.36;
-  }
-
-  @media (min-width: 768px) {
-    .mesh-hero-illustration {
-      background-position: center 42%;
-      opacity: 0.9;
-      filter: saturate(1.05) brightness(1.02) contrast(1.02);
-      -webkit-mask-image: radial-gradient(
-        ellipse 152% 132% at 50% 42%,
-        black 0%,
-        black 48%,
-        rgba(0, 0, 0, 0.94) 58%,
-        rgba(0, 0, 0, 0.78) 68%,
-        rgba(0, 0, 0, 0.5) 80%,
-        rgba(0, 0, 0, 0.22) 90%,
-        transparent 100%
-      );
-      mask-image: radial-gradient(
-        ellipse 152% 132% at 50% 42%,
-        black 0%,
-        black 48%,
-        rgba(0, 0, 0, 0.94) 58%,
-        rgba(0, 0, 0, 0.78) 68%,
-        rgba(0, 0, 0, 0.5) 80%,
-        rgba(0, 0, 0, 0.22) 90%,
-        transparent 100%
-      );
-    }
-  }
-
-  @media (max-width: 767px) {
-    .mesh-hero-illustration {
-      background-position: center 48%;
-    }
-
-    .mesh-hero-illustration::after {
-      opacity: 0.42;
-      background:
-        linear-gradient(
-          90deg,
-          var(--hero-illustration-field) 0%,
-          transparent 8%,
-          transparent 92%,
-          var(--hero-illustration-field) 100%
-        ),
-        linear-gradient(0deg, var(--hero-illustration-wave) 0%, transparent 12%);
-    }
   }
 
   .mesh-hero::before {
@@ -800,6 +705,77 @@
     background-clip: text;
     color: transparent;
     -webkit-text-fill-color: transparent;
+  }
+
+  /** iPhone-style device mockup: Space Black frame, hardware buttons, deep rounded corners. */
+  .phone-mockup {
+    border-radius: 3rem;
+    overflow: visible;
+  }
+
+  .phone-mockup--iphone .phone-mockup__frame {
+    position: relative;
+    border-radius: 3rem;
+    padding: 12px;
+    background: linear-gradient(
+      165deg,
+      #48484a 0%,
+      #2c2c2e 14%,
+      #1d1d1f 32%,
+      #000 56%,
+      #0a0a0a 84%,
+      #1c1c1e 100%
+    );
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.16),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.55),
+      0 0 0 1px rgba(255, 255, 255, 0.07);
+  }
+
+  .phone-mockup--iphone .phone-mockup__screen {
+    overflow: hidden;
+    border-radius: 2.35rem;
+    background: #000;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  }
+
+  .phone-mockup__button {
+    position: absolute;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #3a3a3c 0%, #1c1c1e 50%, #48484a 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      0 0 0 0.5px rgba(0, 0, 0, 0.65);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .phone-mockup__button--mute {
+    left: -3px;
+    top: 17%;
+    width: 3px;
+    height: 16px;
+  }
+
+  .phone-mockup__button--volume-up {
+    left: -3px;
+    top: 25%;
+    width: 3px;
+    height: 30px;
+  }
+
+  .phone-mockup__button--volume-down {
+    left: -3px;
+    top: 33.5%;
+    width: 3px;
+    height: 30px;
+  }
+
+  .phone-mockup__button--power {
+    right: -3px;
+    top: 23%;
+    width: 3px;
+    height: 48px;
   }
 
   @media (prefers-reduced-motion: reduce) {

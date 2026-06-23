@@ -8,12 +8,12 @@ import { Can, useReadOnlyUnless } from '@/lib/auth/rbac';
 import { useOptimisticMutation } from '@/features/admin-shell/hooks/use-optimistic-mutation';
 import { useUnsavedChangesGuard } from '@/features/admin-shell/hooks/use-unsaved-changes-guard';
 import { adminBrowserFetch } from '@/lib/api';
+import { UserChangeEmailModal } from './user-change-email-modal';
 import styles from './user-detail-form.module.css';
 
 const ROLE_LABEL_KEY_BY_VALUE: Record<string, string> = {
   USER: 'filters.roleUser',
   SUPPORT: 'filters.roleSupport',
-  MODERATOR: 'filters.roleModerator',
   ADMIN: 'filters.roleAdmin',
   SUPER_ADMIN: 'filters.roleSuperAdmin',
 };
@@ -21,14 +21,8 @@ const ROLE_LABEL_KEY_BY_VALUE: Record<string, string> = {
 const STATUS_LABEL_KEY_BY_VALUE: Record<string, string> = {
   ACTIVE: 'filters.active',
   SUSPENDED: 'filters.suspended',
+  DELETED: 'filters.deleted',
 };
-
-function formatToken(value: string): string {
-  return value
-    .replace(/_/g, ' ')
-    .toLowerCase()
-    .replace(/\b\w/g, (char) => char.toUpperCase());
-}
 
 type UserDetailFormProps = {
   userId: string;
@@ -42,6 +36,7 @@ type UserDetailFormProps = {
   reportsCount: number;
   sessionsCount: number;
   hidden?: boolean;
+  changeEmailDisabled?: boolean;
   onDirtyChange?: (dirty: boolean) => void;
 };
 
@@ -57,6 +52,7 @@ export function UserDetailForm({
   reportsCount,
   sessionsCount,
   hidden = false,
+  changeEmailDisabled = false,
   onDirtyChange,
 }: UserDetailFormProps) {
   const t = useTranslations('users');
@@ -68,25 +64,27 @@ export function UserDetailForm({
   const [phoneNumber, setPhoneNumber] = useState(initialPhoneNumber ?? '');
   const [role, setRole] = useState(initialRole);
   const [status, setStatus] = useState(initialStatus);
-  const [confirmRoleOpen, setConfirmRoleOpen] = useState(false);
+  const [confirmSaveOpen, setConfirmSaveOpen] = useState(false);
   const [confirmStatusOpen, setConfirmStatusOpen] = useState(false);
+  const [changeEmailOpen, setChangeEmailOpen] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<string | null>(null);
   const { showToast, clearToast } = useToast();
   const roleLabel = (roleValue: string) => {
     const labelKey = ROLE_LABEL_KEY_BY_VALUE[roleValue];
-    return labelKey ? t(labelKey) : formatToken(roleValue);
+    return labelKey ? t(labelKey) : roleValue;
   };
   const statusLabel = (statusValue: string) => {
     const labelKey = STATUS_LABEL_KEY_BY_VALUE[statusValue];
-    return labelKey ? t(labelKey) : formatToken(statusValue);
+    return labelKey ? t(labelKey) : statusValue;
   };
 
+  const roleChanged = role !== initialRole;
   const isDirty =
     firstName !== initialFirstName ||
     lastName !== initialLastName ||
     (phoneNumber ?? '') !== (initialPhoneNumber ?? '') ||
     status !== initialStatus ||
-    role !== initialRole;
+    roleChanged;
 
   useUnsavedChangesGuard(isDirty);
 
@@ -105,30 +103,21 @@ export function UserDetailForm({
           status,
         },
       });
+      if (roleChanged) {
+        await adminBrowserFetch(`/admin/users/${userId}/role`, {
+          method: 'PATCH',
+          body: { role },
+        });
+      }
       return null;
     },
-    successToast: { title: tCommon('saved'), message: t('detail.savedMessage') },
+    successToast: {
+      title: tCommon('saved'),
+      message: roleChanged ? t('detail.savedWithRoleMessage') : t('detail.savedMessage'),
+    },
     errorToast: { title: tCommon('error'), message: tCommon('updateFailed') },
     onSuccess: () => {
-      router.refresh();
-      if (role !== initialRole) {
-        setConfirmRoleOpen(true);
-      }
-    },
-  });
-
-  const roleMutation = useOptimisticMutation({
-    mutate: async () => {
-      await adminBrowserFetch(`/admin/users/${userId}/role`, {
-        method: 'PATCH',
-        body: { role },
-      });
-      return null;
-    },
-    successToast: { title: tCommon('saved'), message: t('detail.roleUpdatedMessage') },
-    errorToast: { title: tCommon('error'), message: t('detail.roleUpdateFailed') },
-    onSuccess: () => {
-      setConfirmRoleOpen(false);
+      setConfirmSaveOpen(false);
       router.refresh();
     },
   });
@@ -140,7 +129,7 @@ export function UserDetailForm({
     return null;
   }
 
-  async function saveProfile() {
+  async function executeSave() {
     const err = validate();
     if (err) {
       showToast({ tone: 'warning', title: tCommon('validation'), message: err });
@@ -148,6 +137,19 @@ export function UserDetailForm({
     }
     clearToast();
     await saveMutation.run(null);
+  }
+
+  function handleSaveClick() {
+    const err = validate();
+    if (err) {
+      showToast({ tone: 'warning', title: tCommon('validation'), message: err });
+      return;
+    }
+    if (roleChanged) {
+      setConfirmSaveOpen(true);
+      return;
+    }
+    void executeSave();
   }
 
   function handleStatusChange(nextStatus: string) {
@@ -166,14 +168,27 @@ export function UserDetailForm({
     setConfirmStatusOpen(false);
   }
 
-  const saving = saveMutation.isPending || roleMutation.isPending;
+  const saving = saveMutation.isPending;
 
   return (
     <Card className={hidden ? styles.hidden : styles.card} padding="md" aria-hidden={hidden}>
       <div className={styles.grid}>
         <div className={styles.summaryItemEmail}>
           <p className={styles.label}>{t('detail.email')}</p>
-          <p className={styles.value}>{email}</p>
+          <div className={styles.emailRow}>
+            <p className={styles.value}>{email}</p>
+            {!readOnly && initialStatus !== 'DELETED' ? (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={changeEmailDisabled}
+                onClick={() => setChangeEmailOpen(true)}
+              >
+                {t('detail.changeEmail.action')}
+              </Button>
+            ) : null}
+          </div>
         </div>
         <div>
           <p className={styles.label}>{t('detail.pointsSummary')}</p>
@@ -245,7 +260,6 @@ export function UserDetailForm({
             >
               <option value="USER">{t('filters.roleUser')}</option>
               <option value="SUPPORT">{t('filters.roleSupport')}</option>
-              <option value="MODERATOR">{t('filters.roleModerator')}</option>
               <option value="ADMIN">{t('filters.roleAdmin')}</option>
               <option value="SUPER_ADMIN">{t('filters.roleSuperAdmin')}</option>
             </select>
@@ -267,26 +281,29 @@ export function UserDetailForm({
             >
               <option value="ACTIVE">{t('filters.active')}</option>
               <option value="SUSPENDED">{t('filters.suspended')}</option>
-              <option value="DELETED">{formatToken('DELETED')}</option>
+              <option value="DELETED">{t('filters.deleted')}</option>
             </select>
           </label>
         )}
       </div>
       {!readOnly ? (
         <div className={styles.actions}>
-          <Button type="button" onClick={() => void saveProfile()} disabled={saving} className={styles.saveButton}>
+          <Button type="button" onClick={handleSaveClick} disabled={saving || !isDirty} className={styles.saveButton}>
             {saving ? tCommon('saving') : tCommon('saveChanges')}
           </Button>
         </div>
       ) : null}
       <ConfirmDialog
-        open={confirmRoleOpen}
+        open={confirmSaveOpen}
         title={t('detail.confirmRoleTitle')}
-        description={t('detail.confirmRoleDescription')}
-        confirmLabel={t('detail.updateRole')}
-        isLoading={roleMutation.isPending}
-        onConfirm={() => void roleMutation.run(null)}
-        onClose={() => setConfirmRoleOpen(false)}
+        description={t('detail.confirmSaveWithRoleDescription', {
+          fromRole: roleLabel(initialRole),
+          toRole: roleLabel(role),
+        })}
+        confirmLabel={tCommon('saveChanges')}
+        isLoading={saveMutation.isPending}
+        onConfirm={() => void executeSave()}
+        onClose={() => setConfirmSaveOpen(false)}
       />
       <ConfirmDialog
         open={confirmStatusOpen}
@@ -303,6 +320,12 @@ export function UserDetailForm({
           setConfirmStatusOpen(false);
           setPendingStatus(null);
         }}
+      />
+      <UserChangeEmailModal
+        open={changeEmailOpen}
+        userId={userId}
+        currentEmail={email}
+        onClose={() => setChangeEmailOpen(false)}
       />
     </Card>
   );

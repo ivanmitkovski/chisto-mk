@@ -5,6 +5,7 @@ import { getMessages, getTranslations, setRequestLocale } from "next-intl/server
 import { notFound } from "next/navigation";
 import { MotionProvider } from "@/components/layout/MotionProvider";
 import { getSiteUrl } from "@/lib/site-url";
+import { APP_STORE_APP_ID } from "@/lib/store-links";
 import { routing } from "@/i18n/routing";
 import "../globals.css";
 
@@ -13,6 +14,10 @@ export const metadata: Metadata = {
   icons: {
     icon: [{ url: "/brand/chisto-mark-green.svg", type: "image/svg+xml" }],
     apple: [{ url: "/brand/chisto-mark-green.svg", type: "image/svg+xml" }],
+  },
+  itunes: {
+    appId: APP_STORE_APP_ID,
+    appArgument: getSiteUrl(),
   },
 };
 

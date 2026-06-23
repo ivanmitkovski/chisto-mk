@@ -151,7 +151,7 @@
 
 .statusNew {
   background: var(--color-yellow-100);
-  color: #8d6600;
+  color: var(--color-status-warning-fg);
 }
 
 .statusInReview {

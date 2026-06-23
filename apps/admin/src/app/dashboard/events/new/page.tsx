@@ -1,12 +1,13 @@
-import { cookies } from 'next/headers';
+import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 import { AdminShell } from '@/features/admin-shell';
-import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell';
+import { readDashboardShellState } from '@/features/admin-shell/server';
 import { ApiError } from '@/lib/api';
 import { ADMIN_PERMISSIONS } from '@/lib/auth/rbac/permissions';
 import { requirePagePermission } from '@/lib/auth/rbac/server';
-import { getMeProfile } from '@/features/auth';
-import { getSiteDetail } from '@/features/sites';
+import { getMeProfile } from '@/features/auth/data/me-adapter';
+import { getSiteDetail } from '@/features/sites/data/sites-adapter';
 import { canWriteCleanupEvents } from '@/features/events';
 import { CreateEventForm } from '@/features/events';
 
@@ -14,10 +15,15 @@ type PageProps = {
   searchParams: Promise<{ siteId?: string }>;
 };
 
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('events');
+  return { title: t('createTitle') };
+}
+
 export default async function NewEventPage(props: PageProps) {
   await requirePagePermission(ADMIN_PERMISSIONS['events:read']);
-  const cookieStore = await cookies();
-  const initialSidebarCollapsed = cookieStore.get(DESKTOP_SIDEBAR_COOKIE_KEY)?.value === '1';
+  const tEvents = await getTranslations('events');
+  const { initialSidebarCollapsed } = await readDashboardShellState();
   const params = await props.searchParams;
   const siteId = params.siteId?.trim() ?? '';
 
@@ -58,7 +64,7 @@ export default async function NewEventPage(props: PageProps) {
 
   return (
     <AdminShell
-      title="Create cleanup event"
+      title={tEvents('createTitle')}
       activeItem="events"
       initialSidebarCollapsed={initialSidebarCollapsed}
     >

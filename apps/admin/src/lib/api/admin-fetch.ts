@@ -22,6 +22,20 @@ export type AdminFetchOptions = {
 
 const DEFAULT_TIMEOUT_MS = 30_000;
 const MAX_GET_RETRIES = 2;
+const FETCH_DURATION_SAMPLE_RATE = 0.1;
+
+async function logServerFetchDuration(
+  path: string,
+  method: HttpMethod,
+  requestId: string,
+  durationMs: number,
+): Promise<void> {
+  if (typeof window !== 'undefined' || Math.random() >= FETCH_DURATION_SAMPLE_RATE) {
+    return;
+  }
+  const { logger } = await import('../observability');
+  logger.info('admin_fetch_duration_ms', { path, method, requestId, durationMs });
+}
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -188,23 +202,7 @@ export async function fetchBackendResponse(
   const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   const retryOnGatewayError = options.retryOnGatewayError ?? (options.method ?? 'GET') === 'GET';
   const { url, init, requestId, method } = buildAdminFetchRequest(path, options);
-
-  return executeAdminFetch(url, init, {
-    path,
-    timeoutMs,
-    method,
-    retryOnGatewayError,
-    requestId,
-  });
-}
-
-export async function adminFetchCore<TResponse>(
-  path: string,
-  options: AdminFetchOptions = {},
-): Promise<TResponse> {
-  const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
-  const retryOnGatewayError = options.retryOnGatewayError ?? (options.method ?? 'GET') === 'GET';
-  const { url, init, requestId, method } = buildAdminFetchRequest(path, options);
+  const startedAt = Date.now();
 
   const response = await executeAdminFetch(url, init, {
     path,
@@ -214,5 +212,27 @@ export async function adminFetchCore<TResponse>(
     requestId,
   });
 
+  void logServerFetchDuration(path, method, requestId, Date.now() - startedAt);
+  return response;
+}
+
+export async function adminFetchCore<TResponse>(
+  path: string,
+  options: AdminFetchOptions = {},
+): Promise<TResponse> {
+  const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+  const retryOnGatewayError = options.retryOnGatewayError ?? (options.method ?? 'GET') === 'GET';
+  const { url, init, requestId, method } = buildAdminFetchRequest(path, options);
+  const startedAt = Date.now();
+
+  const response = await executeAdminFetch(url, init, {
+    path,
+    timeoutMs,
+    method,
+    retryOnGatewayError,
+    requestId,
+  });
+
+  void logServerFetchDuration(path, method, requestId, Date.now() - startedAt);
   return parseAdminFetchResponse<TResponse>(response, path, requestId);
 }

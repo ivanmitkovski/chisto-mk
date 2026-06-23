@@ -1,22 +1,23 @@
-import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 import { AdminShell } from '@/features/admin-shell';
-import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell';
+import { readDashboardShellState } from '@/features/admin-shell/server';
 import { SectionState } from '@/components/ui';
 import { ApiError } from '@/lib/api';
 import { ADMIN_PERMISSIONS } from '@/lib/auth/rbac/permissions';
 import { requirePagePermission } from '@/lib/auth/rbac/server';
-import { getSiteDetail } from '@/features/sites';
+import { getSiteDetail } from '@/features/sites/data/sites-adapter';
 import { SiteDetailClient } from '@/features/sites';
 import { getSiteResolutionsForSite } from '@/features/sites/data/resolutions-adapter';
+import { handleServerLoadError } from '@/lib/server/handle-server-load-error';
 
 type PageProps = { params: Promise<{ id: string }> };
 
 export default async function SiteDetailPage(props: PageProps) {
   await requirePagePermission(ADMIN_PERMISSIONS['sites:read']);
   const { id } = await props.params;
-  const cookieStore = await cookies();
-  const initialSidebarCollapsed = cookieStore.get(DESKTOP_SIDEBAR_COOKIE_KEY)?.value === '1';
+  const tSites = await getTranslations('sites');
+  const { initialSidebarCollapsed } = await readDashboardShellState();
 
   let site: Awaited<ReturnType<typeof getSiteDetail>>;
   let resolutions: Awaited<ReturnType<typeof getSiteResolutionsForSite>>;
@@ -26,9 +27,14 @@ export default async function SiteDetailPage(props: PageProps) {
     if (error instanceof ApiError && (error.code === 'SITE_NOT_FOUND' || error.status === 404)) {
       notFound();
     }
+    const message = await handleServerLoadError(error, { fallbackMessageKey: 'unableToLoadSite' });
     return (
-      <AdminShell title="Site" activeItem="sites" initialSidebarCollapsed={initialSidebarCollapsed}>
-        <SectionState variant="error" message="Unable to load site." />
+      <AdminShell
+        title={tSites('detailTitle')}
+        activeItem="sites"
+        initialSidebarCollapsed={initialSidebarCollapsed}
+      >
+        <SectionState variant="error" message={message} />
       </AdminShell>
     );
   }
@@ -50,7 +56,11 @@ export default async function SiteDetailPage(props: PageProps) {
   const reportCount = Array.isArray(s.reports) ? s.reports.length : 0;
 
   return (
-    <AdminShell title="Site detail" activeItem="sites" initialSidebarCollapsed={initialSidebarCollapsed}>
+    <AdminShell
+      title={tSites('detailPageTitle')}
+      activeItem="sites"
+      initialSidebarCollapsed={initialSidebarCollapsed}
+    >
       <SiteDetailClient
         siteId={s.id}
         initialStatus={s.status}

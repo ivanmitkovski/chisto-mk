@@ -34,7 +34,7 @@
 .tabActive {
   border-color: var(--color-green-010);
   background: rgba(37, 219, 134, 0.14);
-  color: #0f8d56;
+  color: var(--color-status-success-fg);
 }
 
 .grid {
@@ -94,7 +94,7 @@
 .section {
   border-radius: var(--radius-xl);
   border: 1px solid rgba(15, 141, 86, 0.12);
-  background: radial-gradient(circle at top left, rgba(37, 219, 134, 0.06), transparent 55%), #ffffff;
+  background: radial-gradient(circle at top left, rgba(37, 219, 134, 0.06), transparent 55%), var(--bg-surface);
   padding: var(--space-4);
   display: grid;
   gap: var(--space-3);
@@ -170,7 +170,7 @@
   padding-block: 0.125rem;
   border-radius: 999px;
   background: rgba(37, 219, 134, 0.1);
-  color: #0f8d56;
+  color: var(--color-status-success-fg);
   font-size: 0.7rem;
   font-weight: var(--font-weight-medium);
 }

@@ -1,8 +1,7 @@
-import { cookies } from 'next/headers';
 import { getTranslations } from 'next-intl/server';
 import { AdminShell } from '@/features/admin-shell';
-import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell';
-import { getMeProfile } from '@/features/auth';
+import { readDashboardShellState } from '@/features/admin-shell/server';
+import { getMeProfile } from '@/features/auth/data/me-adapter';
 import { loadTeamWorkspace, TeamWorkspace } from '@/features/team';
 import { SectionState } from '@/components/ui';
 import { ADMIN_PERMISSIONS } from '@/lib/auth/rbac/permissions';
@@ -11,8 +10,7 @@ import { handleServerLoadError } from '@/lib/server/handle-server-load-error';
 
 export default async function TeamPage() {
   const tNav = await getTranslations('nav');
-  const cookieStore = await cookies();
-  const initialSidebarCollapsed = cookieStore.get(DESKTOP_SIDEBAR_COOKIE_KEY)?.value === '1';
+  const { initialSidebarCollapsed } = await readDashboardShellState();
 
   await requirePagePermission(ADMIN_PERMISSIONS['team:read']);
 

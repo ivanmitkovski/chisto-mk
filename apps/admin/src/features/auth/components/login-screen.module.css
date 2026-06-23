@@ -4,7 +4,7 @@
   display: grid;
   grid-template-columns: minmax(20rem, 24rem) minmax(0, 1fr);
   grid-template-rows: 1fr;
-  background: linear-gradient(180deg, #ffffff 0%, #f8fffc 100%);
+  background: linear-gradient(180deg, var(--bg-surface) 0%, var(--surface-subtle) 100%);
   overflow-x: hidden;
 }
 
@@ -16,7 +16,7 @@
   padding-top: max(var(--space-12), env(safe-area-inset-top));
   padding-bottom: max(var(--space-7), env(safe-area-inset-bottom));
   border-right: 1px solid var(--color-green-010);
-  background: rgba(255, 255, 255, 0.72);
+  background: color-mix(in srgb, var(--bg-surface) 72%, transparent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   min-width: 0;
@@ -113,9 +113,9 @@
 .lockout {
   margin: 0;
   padding: var(--space-3);
-  border: 1px solid rgba(239, 68, 68, 0.22);
+  border: 1px solid color-mix(in srgb, var(--color-error) 22%, transparent);
   border-radius: var(--radius-lg);
-  background: rgba(239, 68, 68, 0.08);
+  background: color-mix(in srgb, var(--color-error) 8%, transparent);
   color: var(--color-error);
   font-size: var(--font-size-sm);
 }
@@ -140,7 +140,7 @@
 
 .right {
   background-image:
-    linear-gradient(rgba(37, 219, 134, 0.18), rgba(37, 219, 134, 0.18)),
+    linear-gradient(color-mix(in srgb, var(--color-primary) 18%, transparent), color-mix(in srgb, var(--color-primary) 18%, transparent)),
     url('/images/people-cleaning.png');
   background-size: cover;
   background-position: center;
@@ -152,7 +152,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.25), transparent 50%);
+  background: radial-gradient(circle at 20% 20%, color-mix(in srgb, var(--bg-surface) 25%, transparent), transparent 50%);
 }
 
 /* Tablet: stack form above image */

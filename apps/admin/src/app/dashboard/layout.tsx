@@ -2,12 +2,12 @@ import {
   DashboardSSEClient,
   DashboardSSEProvider,
   DashboardPollingFallback,
-  NewReportSoundEffect,
+  DashboardReportSoundEffect,
 } from '@/features/dashboard-overview';
 import { DashboardPermissionsProvider } from '@/features/admin-shell';
 import { DashboardLayoutError } from '@/features/admin-shell/components/dashboard-layout-error';
 import { MfaReminderBanner } from '@/features/admin-shell/components/mfa-reminder-banner';
-import { getMeProfile } from '@/features/auth';
+import { getMeProfile } from '@/features/auth/data/me-adapter';
 import { handleServerLoadError } from '@/lib/server/handle-server-load-error';
 
 /** Ensure RSC reads request cookies (auth token for API calls, notifications). */
@@ -21,17 +21,21 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const [profileResult, notificationsResult] = await Promise.allSettled([
+    getMeProfile(),
+    getAdminNotifications(),
+  ]);
+
   let role: string | null = null;
   let mfaEnabled = true;
   let profileLoadError: string | null = null;
 
-  try {
-    const me = await getMeProfile();
-    role = me.role ?? null;
-    mfaEnabled = me.mfaEnabled ?? false;
-  } catch (error) {
+  if (profileResult.status === 'fulfilled') {
+    role = profileResult.value.role ?? null;
+    mfaEnabled = profileResult.value.mfaEnabled ?? false;
+  } else {
     try {
-      profileLoadError = await handleServerLoadError(error);
+      profileLoadError = await handleServerLoadError(profileResult.reason);
     } catch {
       profileLoadError = null;
     }
@@ -52,8 +56,8 @@ export default async function DashboardLayout({
   }[] = [];
   let initialUnreadCount = 0;
 
-  try {
-    const result = await getAdminNotifications();
+  if (notificationsResult.status === 'fulfilled') {
+    const result = notificationsResult.value;
     initialItems = result.items.slice(0, 10).map((item) => {
       const base = {
         id: item.id,
@@ -66,8 +70,8 @@ export default async function DashboardLayout({
       return item.href ? { ...base, href: item.href } : base;
     });
     initialUnreadCount = result.unreadCount;
-  } catch {
-    // Leave empty on auth or network error
+  } else {
+    console.error('[Dashboard] Notification bootstrap failed', notificationsResult.reason);
   }
 
   return (
@@ -79,7 +83,7 @@ export default async function DashboardLayout({
         <NotificationsQuerySync />
         <DashboardSSEProvider>
           <DashboardSSEClient />
-          <NewReportSoundEffect />
+          <DashboardReportSoundEffect />
           <DashboardPollingFallback />
           <MfaReminderBanner mfaEnabled={mfaEnabled} />
           {children}

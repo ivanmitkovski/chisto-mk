@@ -4,11 +4,9 @@
   right: 0;
   width: 14rem;
   border-radius: var(--radius-xl);
-  border: 1px solid rgba(8, 54, 39, 0.1);
-  background: rgba(255, 255, 255, 0.94);
-  box-shadow:
-    0 18px 34px rgba(8, 54, 39, 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.82);
+  border: 1px solid var(--shell-panel-border);
+  background: var(--shell-panel-bg);
+  box-shadow: var(--shell-panel-shadow), var(--shell-panel-inset-highlight);
   backdrop-filter: blur(8px);
   overflow: hidden;
   z-index: var(--z-topbar-panel);
@@ -29,7 +27,7 @@
   min-height: 2.2rem;
   padding: 0 var(--space-3);
   background: transparent;
-  color: rgba(8, 54, 39, 0.86);
+  color: var(--shell-strong-fg);
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
@@ -40,8 +38,8 @@
 }
 
 .profileActionButton:hover {
-  border-color: rgba(37, 219, 134, 0.22);
-  background: rgba(37, 219, 134, 0.1);
+  border-color: var(--shell-search-border);
+  background: var(--shell-nav-link-hover-bg);
 }
 
 .profileActionButton:focus-visible {
