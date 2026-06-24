@@ -4401,6 +4401,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/news/posts/{slug}/related": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Related published news posts */
+        get: operations["PublicNewsController_related"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/news/posts/{slug}": {
         parameters: {
             query?: never;
@@ -4453,6 +4470,57 @@ export interface paths {
         head?: never;
         /** Update news post */
         patch: operations["AdminNewsController_update"];
+        trace?: never;
+    };
+    "/admin/news/posts/{id}/duplicate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Duplicate news post as draft */
+        post: operations["AdminNewsController_duplicate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/news/posts/{id}/revisions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List news post revisions */
+        get: operations["AdminNewsController_listRevisions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/news/posts/{id}/revisions/{revisionId}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Restore news post from revision */
+        post: operations["AdminNewsController_restoreRevision"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/admin/news/posts/{id}/publish": {
@@ -4537,7 +4605,8 @@ export interface paths {
         delete: operations["AdminNewsController_deleteMedia"];
         options?: never;
         head?: never;
-        patch?: never;
+        /** Update news media alt text */
+        patch: operations["AdminNewsController_updateMediaAlt"];
         trace?: never;
     };
 }
@@ -7054,28 +7123,32 @@ export interface components {
             mediaId?: string;
             caption?: string;
         };
-        NewsLocaleContentDto: {
-            title: string;
-            excerpt: string;
-            body: components["schemas"]["NewsBodyBlockDto"][];
+        DraftNewsLocaleContentDto: {
+            title?: string;
+            excerpt?: string;
+            body?: components["schemas"]["NewsBodyBlockDto"][];
         };
-        NewsTranslationsDto: {
-            en: components["schemas"]["NewsLocaleContentDto"];
-            mk: components["schemas"]["NewsLocaleContentDto"];
-            sq: components["schemas"]["NewsLocaleContentDto"];
+        DraftNewsTranslationsDto: {
+            en: components["schemas"]["DraftNewsLocaleContentDto"];
+            mk: components["schemas"]["DraftNewsLocaleContentDto"];
+            sq: components["schemas"]["DraftNewsLocaleContentDto"];
         };
         CreateNewsPostDto: {
             slug?: string;
             /** @enum {string} */
             category: "release" | "partnership" | "community" | "product";
-            translations: components["schemas"]["NewsTranslationsDto"];
+            translations: components["schemas"]["DraftNewsTranslationsDto"];
         };
         UpdateNewsPostDto: {
             slug?: string;
             /** @enum {string} */
             category?: "release" | "partnership" | "community" | "product";
-            translations?: components["schemas"]["NewsTranslationsDto"];
+            translations?: components["schemas"]["DraftNewsTranslationsDto"];
             scheduledAt?: Record<string, never> | null;
+            featured?: boolean;
+        };
+        UpdateNewsMediaAltDto: {
+            altText?: Record<string, never>;
         };
     };
     responses: never;
@@ -23341,6 +23414,60 @@ export interface operations {
             };
         };
     };
+    PublicNewsController_related: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     PublicNewsController_getBySlug: {
         parameters: {
             query?: never;
@@ -23397,7 +23524,14 @@ export interface operations {
     };
     AdminNewsController_list: {
         parameters: {
-            query?: never;
+            query?: {
+                status?: "draft" | "scheduled" | "published" | "archived";
+                category?: "release" | "partnership" | "community" | "product";
+                q?: string;
+                limit?: number;
+                offset?: number;
+                sort?: "publishedAt" | "updatedAt" | "title";
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -23669,6 +23803,169 @@ export interface operations {
             };
         };
     };
+    AdminNewsController_duplicate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminNewsController_listRevisions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminNewsController_restoreRevision: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                revisionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     AdminNewsController_publish: {
         parameters: {
             query?: never;
@@ -23897,6 +24194,64 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminNewsController_updateMediaAlt: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                mediaId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateNewsMediaAltDto"];
+            };
+        };
         responses: {
             200: {
                 headers: {
