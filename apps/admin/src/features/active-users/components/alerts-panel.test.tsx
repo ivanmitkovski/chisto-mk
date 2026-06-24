@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { NextIntlClientProvider } from 'next-intl';
 import { AlertsPanel } from './alerts-panel';
@@ -84,5 +84,9 @@ describe('AlertsPanel', () => {
     expect(screen.getByText('Concurrent users')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Add rule' }));
     expect(screen.getByText('Create alert')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+    await waitFor(() => {
+      expect(screen.queryByText('Create alert')).not.toBeInTheDocument();
+    });
   });
 });

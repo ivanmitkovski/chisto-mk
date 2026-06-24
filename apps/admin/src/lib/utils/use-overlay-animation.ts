@@ -10,10 +10,14 @@ export function useOverlayAnimation(open: boolean) {
   useEffect(() => {
     if (open) {
       setPhase('enter');
-      const frame = requestAnimationFrame(() => {
-        requestAnimationFrame(() => setPhase('open'));
+      let innerFrame = 0;
+      const outerFrame = requestAnimationFrame(() => {
+        innerFrame = requestAnimationFrame(() => setPhase('open'));
       });
-      return () => cancelAnimationFrame(frame);
+      return () => {
+        cancelAnimationFrame(outerFrame);
+        cancelAnimationFrame(innerFrame);
+      };
     }
     setPhase((current) => (current === 'hidden' ? 'hidden' : 'exit'));
     return undefined;

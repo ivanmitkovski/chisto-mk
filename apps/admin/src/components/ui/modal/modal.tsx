@@ -30,8 +30,9 @@ export function Modal({ open, title, description, children, footer, onClose }: M
       if (event.key === 'Escape') onClose();
     };
     document.addEventListener('keydown', onKeyDown);
-    window.setTimeout(() => dialogRef.current?.focus(), 0);
+    const focusTimeoutId = window.setTimeout(() => dialogRef.current?.focus(), 0);
     return () => {
+      window.clearTimeout(focusTimeoutId);
       document.body.style.overflow = previous;
       document.removeEventListener('keydown', onKeyDown);
     };
