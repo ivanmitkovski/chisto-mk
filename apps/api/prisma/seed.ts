@@ -477,6 +477,8 @@ async function main() {
     declinedEvent,
     cancelledEvent,
   });
+
+  await seedNewsLaunchPost(prisma);
 }
 
 function printEventSeedSummary(args: {
@@ -548,8 +550,6 @@ function printEventSeedSummary(args: {
 ║   ${cancelledEvent.id}
 ╚══════════════════════════════════════════════════════════════════════════════╝
 `);
-
-  await seedNewsLaunchPost(prisma);
 }
 
 main()
