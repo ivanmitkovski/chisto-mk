@@ -7,7 +7,9 @@ test.describe('Admin dashboard smoke journey', () => {
 
     await page.getByRole('link', { name: /reports/i }).first().click();
     await page.waitForURL('**/dashboard/reports**');
-    await expect(page.getByRole('searchbox').first()).toBeVisible();
+    await expect(
+      page.getByRole('textbox', { name: /search reports by name, location, or number/i }),
+    ).toBeVisible();
 
     await page.getByRole('button', { name: /sign out|log out/i }).click();
     await page.waitForURL('**/login**');

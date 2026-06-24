@@ -9,10 +9,12 @@ test.describe('News admin smoke', () => {
 
   test('create draft and open editor', async ({ authenticatedPage: page }) => {
     await page.goto('/dashboard/news/new');
-    await page.waitForURL('**/dashboard/news/new**');
-    await page.getByLabel(/title/i).first().fill('Smoke test draft');
+    await expect(page.getByRole('heading', { name: /new news post/i })).toBeVisible();
+    const titleField = page.getByRole('textbox', { name: /^title$/i });
+    await expect(titleField).toBeVisible();
+    await titleField.fill('Smoke test draft');
     await page.getByRole('button', { name: /create draft/i }).click();
-    await page.waitForURL('**/dashboard/news/**');
+    await page.waitForURL(/\/dashboard\/news\/(?!new)/);
     await expect(page.getByRole('heading').first()).toBeVisible();
   });
 });
