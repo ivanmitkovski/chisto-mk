@@ -91,16 +91,19 @@ describe('BroadcastAudienceUserPicker', () => {
     await vi.advanceTimersByTimeAsync(350);
 
     await waitFor(() => {
-      expect(screen.getAllByRole('option').length).toBeGreaterThan(0);
+      const options = screen.getAllByRole('option');
+      expect(options).toHaveLength(2);
+      expect(options[0]).toHaveAttribute('aria-selected', 'true');
+      expect(options[1]).toHaveAttribute('aria-selected', 'false');
     });
 
-    const options = screen.getAllByRole('option');
-    expect(options[0]).toHaveAttribute('aria-selected', 'true');
-    expect(options[1]).toHaveAttribute('aria-selected', 'false');
-
     await user.keyboard('{ArrowDown}');
-    expect(options[0]).toHaveAttribute('aria-selected', 'false');
-    expect(options[1]).toHaveAttribute('aria-selected', 'true');
+
+    await waitFor(() => {
+      const options = screen.getAllByRole('option');
+      expect(options[0]).toHaveAttribute('aria-selected', 'false');
+      expect(options[1]).toHaveAttribute('aria-selected', 'true');
+    });
   });
 
   it('does not add duplicate users', async () => {

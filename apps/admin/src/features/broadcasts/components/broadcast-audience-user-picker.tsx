@@ -75,6 +75,7 @@ export function BroadcastAudienceUserPicker({
     async function runSearch() {
       if (!debouncedQuery) {
         setResults([]);
+        setActiveIndex(-1);
         setLoading(false);
         setError(false);
         return;
@@ -90,10 +91,14 @@ export function BroadcastAudienceUserPicker({
           page: 1,
         });
         if (cancelled) return;
-        setResults(response.data);
+        const nextResults = response.data;
+        const nextAvailable = nextResults.filter((user) => !selectedIds.has(user.id));
+        setResults(nextResults);
+        setActiveIndex(nextAvailable.length > 0 ? 0 : -1);
       } catch {
         if (!cancelled) {
           setResults([]);
+          setActiveIndex(-1);
           setError(true);
         }
       } finally {
@@ -107,7 +112,7 @@ export function BroadcastAudienceUserPicker({
     return () => {
       cancelled = true;
     };
-  }, [debouncedQuery, open]);
+  }, [debouncedQuery, open, selectedIds]);
 
   const availableResults = useMemo(
     () => results.filter((user) => !selectedIds.has(user.id)),
