@@ -1,4 +1,13 @@
 import '@testing-library/jest-dom/vitest';
+import { cleanup } from '@testing-library/react';
+import { afterEach } from 'vitest';
+
+afterEach(async () => {
+  cleanup();
+  await new Promise<void>((resolve) => {
+    setImmediate(resolve);
+  });
+});
 
 if (typeof window !== 'undefined') {
   const localStorageMock = (() => {

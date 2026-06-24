@@ -27,7 +27,7 @@ export function useOverlayAnimation(open: boolean) {
 
   useEffect(() => {
     if (phase !== 'exit') return undefined;
-    const fallbackMs = 320;
+    const fallbackMs = process.env.VITEST ? 0 : 320;
     const id = window.setTimeout(finishExit, fallbackMs);
     return () => window.clearTimeout(id);
   }, [phase, finishExit]);

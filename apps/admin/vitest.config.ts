@@ -11,6 +11,7 @@ export default defineConfig({
     globals: false,
     include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
     setupFiles: ['./src/test/vitest-setup.ts'],
+    fileParallelism: false,
   },
   resolve: {
     alias: {

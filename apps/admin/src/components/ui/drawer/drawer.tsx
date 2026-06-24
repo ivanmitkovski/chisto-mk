@@ -29,8 +29,9 @@ export function Drawer({ open, title, children, onClose, side = 'right' }: Drawe
       if (event.key === 'Escape') onClose();
     };
     document.addEventListener('keydown', onKeyDown);
-    window.setTimeout(() => drawerRef.current?.focus(), 0);
+    const focusTimeoutId = window.setTimeout(() => drawerRef.current?.focus(), 0);
     return () => {
+      window.clearTimeout(focusTimeoutId);
       document.body.style.overflow = previous;
       document.removeEventListener('keydown', onKeyDown);
     };
