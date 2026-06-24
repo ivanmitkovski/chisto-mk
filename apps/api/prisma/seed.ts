@@ -13,16 +13,9 @@ import {
 } from '../src/prisma-client';
 import * as bcrypt from 'bcrypt';
 import { seedNewsLaunchPost } from './seed-news';
+import { resolvePgPoolConfig } from '../src/prisma/resolve-database-url';
 
-function connectionStringWithNoVerify(url: string): string {
-  const noVerify = 'sslmode=no-verify';
-  if (url.includes('sslmode=')) return url.replace(/sslmode=[^&]*/i, noVerify);
-  return `${url}${url.includes('?') ? '&' : '?'}${noVerify}`;
-}
-
-const adapter = new PrismaPg({
-  connectionString: connectionStringWithNoVerify(process.env.DATABASE_URL!),
-});
+const adapter = new PrismaPg(resolvePgPoolConfig(process.env.DATABASE_URL!));
 const prisma = new PrismaClient({ adapter });
 const SALT_ROUNDS = 12;
 
