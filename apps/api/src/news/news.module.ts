@@ -9,6 +9,7 @@ import { NewsPostsAdminQueryService } from './services/news-posts-admin-query.se
 import { NewsPostsQueryService } from './services/news-posts-query.service';
 import { NewsPostsService } from './services/news-posts.service';
 import { NewsPostsDeleteService } from './services/news-posts-delete.service';
+import { NewsPostsLifecycleService } from './services/news-posts-lifecycle.service';
 import { NewsRevalidateService } from './services/news-revalidate.service';
 import { NewsRevisionsService } from './services/news-revisions.service';
 import { NewsScheduleWorkerService } from './services/news-schedule-worker.service';
@@ -19,6 +20,7 @@ import { NewsScheduleWorkerService } from './services/news-schedule-worker.servi
   providers: [
     NewsPostsService,
     NewsPostsDeleteService,
+    NewsPostsLifecycleService,
     NewsPostsQueryService,
     NewsPostsAdminQueryService,
     NewsMediaUploadService,

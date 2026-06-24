@@ -50,6 +50,7 @@ describe('NewsPostsService featured exclusivity', () => {
       signedUrls as never,
       { triggerLandingRevalidate: jest.fn() } as never,
       { delete: jest.fn() } as never,
+      { publish: jest.fn(), unpublish: jest.fn(), archive: jest.fn() } as never,
       { createRevision: jest.fn() } as never,
     );
 
