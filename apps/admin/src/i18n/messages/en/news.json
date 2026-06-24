@@ -66,6 +66,12 @@
     "altText": "Alt text ({locale})",
     "mediaLibrary": "Media library",
     "uploadCover": "Upload cover",
+    "uploadCoverHint": "JPEG, PNG, WebP, or HEIC up to 10 MB.",
+    "addImageHint": "JPEG, PNG, WebP, or HEIC · max 10 MB · min 128×128 px",
+    "addVideoHint": "MP4, MOV, or WebM · max 25 MB",
+    "noMediaHint": "Upload a cover image or add inline media to enrich your post.",
+    "moveBlockUp": "Move block up",
+    "moveBlockDown": "Move block down",
     "insertMedia": "Insert in body",
     "deleteMedia": "Delete",
     "noMedia": "No media uploaded yet."
@@ -103,7 +109,12 @@
     "saved": "Saved {time} ago",
     "savedJustNow": "Saved just now",
     "saving": "Saving…",
-    "failed": "Autosave failed"
+    "failed": "Autosave failed",
+    "retry": "Retry save"
+  },
+  "previewBlocks": {
+    "imageUnavailable": "Image unavailable",
+    "videoUnavailable": "Video unavailable"
   },
   "preview": {
     "label": "Live preview",
@@ -130,11 +141,19 @@
   "revisions": {
     "label": "Revision history",
     "empty": "No revisions yet.",
+    "loading": "Loading revisions",
     "restore": "Restore",
     "restoreTitle": "Restore this revision?",
     "restoreBody": "Current content will be saved as a new revision before restoring.",
     "preview": "Preview",
-    "restored": "Revision restored"
+    "restored": "Revision restored",
+    "clear": "Clear history",
+    "clearTitle": "Clear revision history?",
+    "clearBody": "All saved revisions for this post will be permanently deleted. The current content is not affected.",
+    "cleared": "Revision history cleared",
+    "retentionHint": "Up to {max} revisions are kept automatically.",
+    "showAll": "Show all ({count})",
+    "showLess": "Show less"
   },
   "checklist": {
     "title": "Publish readiness",
@@ -145,7 +164,8 @@
     "coverField": "Cover image",
     "goToLocale": "Edit {locale}",
     "allReady": "All locales ready to publish.",
-    "confirmPublish": "Publish now"
+    "confirmPublish": "Publish now",
+    "cancel": "Cancel"
   },
   "meta": {
     "label": "Post metadata",
@@ -156,6 +176,7 @@
     "viewOnSite": "View on site",
     "previewHint": "Publish the post to preview it on the landing site.",
     "shortcuts": "⌘S Save · ⌘⇧P Publish",
+    "shortcutsWin": "Ctrl+S Save · Ctrl+Shift+P Publish",
     "scheduleTimezone": "Scheduled in {timezone}"
   },
   "completeness": {
@@ -168,7 +189,9 @@
     "unpublishTitle": "Unpublish this post?",
     "unpublishBody": "The post will be removed from the public site and returned to draft.",
     "archiveTitle": "Archive this post?",
-    "archiveBody": "Archived posts are hidden from the public site but remain in the admin."
+    "archiveBody": "Archived posts are hidden from the public site but remain in the admin.",
+    "unsavedTitle": "Save your changes first?",
+    "unsavedRestoreBody": "You have unsaved edits. Restoring will replace your current draft with this revision."
   },
   "delete": {
     "title": "Delete post?",
@@ -200,7 +223,34 @@
     "coverRequired": "Cover image is required before publishing.",
     "notFound": "News post not found.",
     "invalidCategory": "Invalid category.",
-    "s3NotConfigured": "File upload is not configured on the server."
+    "s3NotConfigured": "File upload is not configured on the server.",
+    "fileRequired": "Choose a file to upload.",
+    "invalidImageType": "This file type isn't supported. Use JPEG, PNG, WebP, or HEIC.",
+    "invalidVideoType": "Video must be MP4, MOV, or WebM.",
+    "imageTooLarge": "This image is over 10 MB. Try a smaller export from Photos.",
+    "videoTooLarge": "This video is over 25 MB.",
+    "imageTooSmall": "Images must be at least 128 × 128 pixels.",
+    "imageDimensionsTooLarge": "Image dimensions must not exceed 8192 × 8192 pixels.",
+    "imageTypeMismatch": "File content does not match its type.",
+    "invalidImage": "Could not read this image. Try another file.",
+    "uploadStorageError": "Couldn't save the file. Check your connection and try again.",
+    "mediaNotFound": "Media not found.",
+    "payloadTooLarge": "File exceeds the maximum upload size.",
+    "revisionNotFound": "Revision not found.",
+    "bodyTooManyBlocks": "Too many body blocks (maximum 50).",
+    "paragraphTooLong": "A paragraph exceeds the maximum length.",
+    "titleTooLong": "Title exceeds the maximum length.",
+    "excerptTooLong": "Excerpt exceeds the maximum length.",
+    "invalidSchedule": "Invalid schedule date.",
+    "coverMustBeImage": "Cover must be an image file."
+  },
+  "mediaValidation": {
+    "invalidImageType": "This file type isn't supported. Use JPEG, PNG, WebP, or HEIC.",
+    "invalidVideoType": "Video must be MP4, MOV, or WebM.",
+    "imageTooLarge": "This image is over 10 MB.",
+    "videoTooLarge": "This video is over 25 MB.",
+    "imageTooSmall": "Images must be at least 128 × 128 pixels.",
+    "imageDimensionsUnreadable": "Could not read image dimensions."
   },
   "toast": {
     "saved": "Post saved",
@@ -221,6 +271,7 @@
     "conflictTitle": "Newer version on server",
     "conflictMessage": "This post was updated elsewhere. Reload the latest version before saving.",
     "conflictReload": "Reload latest",
-    "duplicated": "Draft duplicated"
+    "duplicated": "Draft duplicated",
+    "duplicatedMediaHint": "Text copied. Re-add cover and inline media."
   }
 }

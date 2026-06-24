@@ -44,7 +44,7 @@
     "label": "Numri i postimeve sipas statusit"
   },
   "form": {
-    "slug": "URL slug",
+    "slug": "Slug URL-je",
     "slugPreview": "Rruga publike: /news/{slug}",
     "category": "Kategoria",
     "scheduledAt": "Planifiko publikimin (opsionale)",
@@ -59,13 +59,19 @@
     "addVideo": "Ngarko bllok video",
     "blockParagraph": "Paragraf",
     "blockImage": "Imazh",
-    "blockVideo": "Video",
+    "blockVideo": "Videoklip",
     "caption": "Përshkrim",
     "locales": "Gjuhët e përmbajtjes",
     "copyFromEn": "Kopjo titullin, përmbledhjen dhe përmbajtjen nga EN",
     "altText": "Tekst alt ({locale})",
     "mediaLibrary": "Biblioteka e medias",
     "uploadCover": "Ngarko kopertinën",
+    "uploadCoverHint": "JPEG, PNG, WebP ose HEIC deri në 10 MB.",
+    "addImageHint": "JPEG, PNG, WebP ose HEIC · maks. 10 MB · min. 128×128 px",
+    "addVideoHint": "MP4, MOV ose WebM · maks. 25 MB",
+    "noMediaHint": "Ngarkoni një imazh kopertine ose shtoni media të integruar për të pasuruar postimin.",
+    "moveBlockUp": "Lëviz bllokun lart",
+    "moveBlockDown": "Lëviz bllokun poshtë",
     "insertMedia": "Fut në përmbajtje",
     "deleteMedia": "Fshi",
     "noMedia": "Ende nuk është ngarkuar media."
@@ -103,21 +109,26 @@
     "saved": "Ruajtur para {time}",
     "savedJustNow": "Ruajtur tani",
     "saving": "Duke ruajtur…",
-    "failed": "Ruajtja automatike dështoi"
+    "failed": "Ruajtja automatike dështoi",
+    "retry": "Riprovo ruajtjen"
+  },
+  "previewBlocks": {
+    "imageUnavailable": "Imazhi nuk është i disponueshëm",
+    "videoUnavailable": "Videoja nuk është e disponueshme"
   },
   "preview": {
     "label": "Parapamje live",
     "draftWatermark": "Parapamje drafti",
     "toggle": "Parapamje",
     "devices": "Gjerësia e parapamjes",
-    "device_desktop": "Desktop",
-    "device_tablet": "Tablet",
+    "device_desktop": "Desktopi",
+    "device_tablet": "Tableti",
     "device_phone": "Telefon"
   },
   "seo": {
     "label": "SEO dhe rrjetet sociale",
     "googleTitle": "Parapamje Google",
-    "openGraph": "Open Graph",
+    "openGraph": "Pamja e rrjeteve sociale",
     "twitter": "Kartela Twitter",
     "canonical": "URL kanonike",
     "titleTooLong": "Titulli tejkalon 60 karaktere ({count})",
@@ -130,11 +141,19 @@
   "revisions": {
     "label": "Historiku i rishikimeve",
     "empty": "Ende nuk ka rishikime.",
+    "loading": "Duke ngarkuar rishikimet",
     "restore": "Rikthe",
     "restoreTitle": "Të rikthehet kjo rishikim?",
     "restoreBody": "Përmbajtja aktuale do të ruhet si rishikim i ri para rikthimit.",
     "preview": "Parapamje",
-    "restored": "Rishikimi u rikthye"
+    "restored": "Rishikimi u rikthye",
+    "clear": "Pastro historikun",
+    "clearTitle": "Të pastrohet historiku i rishikimeve?",
+    "clearBody": "Të gjitha rishikimet e ruajtura për këtë postim do të fshihen përgjithmonë. Përmbajtja aktuale nuk ndikohet.",
+    "cleared": "Historiku i rishikimeve u pastrua",
+    "retentionHint": "Ruhen automatikisht deri në {max} rishikime.",
+    "showAll": "Shfaq të gjitha ({count})",
+    "showLess": "Shfaq më pak"
   },
   "checklist": {
     "title": "Gatishmëria për publikim",
@@ -145,7 +164,8 @@
     "coverField": "Imazhi i kopertinës",
     "goToLocale": "Ndrysho {locale}",
     "allReady": "Të gjitha gjuhët janë gati për publikim.",
-    "confirmPublish": "Publiko tani"
+    "confirmPublish": "Publiko tani",
+    "cancel": "Anulo"
   },
   "meta": {
     "label": "Metadatat e postimit",
@@ -156,6 +176,7 @@
     "viewOnSite": "Shiko në faqe",
     "previewHint": "Publikoni postimin për ta parë në faqen kryesore.",
     "shortcuts": "⌘S Ruaj · ⌘⇧P Publiko",
+    "shortcutsWin": "Ctrl+S Ruaj · Ctrl+Shift+P Publiko",
     "scheduleTimezone": "Planifikuar në {timezone}"
   },
   "completeness": {
@@ -168,7 +189,9 @@
     "unpublishTitle": "Të hiqet publikimi?",
     "unpublishBody": "Postimi do të hiqet nga faqja publike dhe do të kthehet në draft.",
     "archiveTitle": "Të arkivohet ky postim?",
-    "archiveBody": "Postimet e arkivuara fshihen nga faqja publike, por mbeten në admin."
+    "archiveBody": "Postimet e arkivuara fshihen nga faqja publike, por mbeten në admin.",
+    "unsavedTitle": "Të ruhen ndryshimet së pari?",
+    "unsavedRestoreBody": "Keni ndryshime të paruajtura. Rikthimi do të zëvendësojë draftin aktual me këtë rishikim."
   },
   "delete": {
     "title": "Të fshihet postimi?",
@@ -200,7 +223,34 @@
     "coverRequired": "Imazhi i kopertinës kërkohet para publikimit.",
     "notFound": "Postimi i lajmeve nuk u gjet.",
     "invalidCategory": "Kategori e pavlefshme.",
-    "s3NotConfigured": "Ngarkimi i skedarëve nuk është konfiguruar në server."
+    "s3NotConfigured": "Ngarkimi i skedarëve nuk është konfiguruar në server.",
+    "fileRequired": "Zgjidhni një skedar për ngarkim.",
+    "invalidImageType": "Ky lloj skedari nuk mbështetet. Përdorni JPEG, PNG, WebP ose HEIC.",
+    "invalidVideoType": "Videoja duhet të jetë MP4, MOV ose WebM.",
+    "imageTooLarge": "Imazhi është mbi 10 MB.",
+    "videoTooLarge": "Videoja është mbi 25 MB.",
+    "imageTooSmall": "Imazhet duhet të jenë të paktën 128 × 128 piksel.",
+    "imageDimensionsTooLarge": "Dimensionet nuk duhet të tejkalojnë 8192 × 8192 piksel.",
+    "imageTypeMismatch": "Përmbajtja nuk përputhet me llojin e skedarit.",
+    "invalidImage": "Nuk mundëm ta lexonim imazhin.",
+    "uploadStorageError": "Skedari nuk u ruajt. Provoni përsëri.",
+    "mediaNotFound": "Media nuk u gjet.",
+    "payloadTooLarge": "Skedari tejkalon madhësinë maksimale.",
+    "revisionNotFound": "Rishikimi nuk u gjet.",
+    "bodyTooManyBlocks": "Shumë bllokë përmbajtjeje (maksimumi 50).",
+    "paragraphTooLong": "Një paragraf tejkalon gjatësinë maksimale.",
+    "titleTooLong": "Titulli tejkalon gjatësinë maksimale.",
+    "excerptTooLong": "Përmbledhja tejkalon gjatësinë maksimale.",
+    "invalidSchedule": "Datë planifikimi e pavlefshme.",
+    "coverMustBeImage": "Kopertina duhet të jetë imazh."
+  },
+  "mediaValidation": {
+    "invalidImageType": "Ky lloj skedari nuk mbështetet. Përdorni JPEG, PNG, WebP ose HEIC.",
+    "invalidVideoType": "Videoja duhet të jetë MP4, MOV ose WebM.",
+    "imageTooLarge": "Imazhi është mbi 10 MB.",
+    "videoTooLarge": "Videoja është mbi 25 MB.",
+    "imageTooSmall": "Imazhet duhet të jenë të paktën 128 × 128 piksel.",
+    "imageDimensionsUnreadable": "Nuk mundëm të lexonim dimensionet."
   },
   "toast": {
     "saved": "Postimi u ruajt",
@@ -221,6 +271,7 @@
     "conflictTitle": "Version më i ri në server",
     "conflictMessage": "Ky postim u përditësua diku tjetër. Ngarkuam versionin më të fundit.",
     "conflictReload": "Ringarko",
-    "duplicated": "Drafti u duplikua"
+    "duplicated": "Drafti u duplikua",
+    "duplicatedMediaHint": "Teksti u kopjua. Shtoni përsëri kopertinën dhe mediat e integruara."
   }
 }
