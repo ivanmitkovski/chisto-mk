@@ -36,11 +36,11 @@
 }
 
 .dotComplete {
-  background: #22c55e;
+  background: var(--color-primary);
 }
 
 .dotIncomplete {
-  background: #f59e0b;
+  background: var(--color-warning);
 }
 
 .field {
@@ -109,5 +109,5 @@
 .slugPreview {
   margin: -0.5rem 0 0;
   font-size: 0.8125rem;
-  color: var(--text-secondary, #64748b);
+  color: var(--text-secondary);
 }

@@ -18,8 +18,8 @@
   margin: 0;
   padding: 0.75rem 1rem;
   border-radius: 0.5rem;
-  background: #fef3c7;
-  color: #92400e;
+  background: color-mix(in srgb, var(--color-warning) 18%, transparent);
+  color: var(--color-status-warning-fg);
   font-size: 0.875rem;
 }
 
@@ -45,7 +45,7 @@
   min-width: 0;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 64rem) {
   .editorGrid {
     grid-template-columns: minmax(0, 1fr) min(16rem, 100%);
   }
@@ -65,7 +65,7 @@
   }
 }
 
-@media (max-width: 960px) {
+@media (max-width: 48rem) {
   .editorGrid {
     grid-template-columns: 1fr;
   }

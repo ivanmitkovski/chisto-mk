@@ -11,7 +11,7 @@
 
 .localeBlock {
   padding: 0.75rem;
-  border: 1px solid var(--border-default, #e2e8f0);
+  border: 1px solid var(--border-default);
   border-radius: 0.5rem;
 }
 
@@ -30,11 +30,11 @@
 }
 
 .localeReady {
-  color: #166534;
+  color: var(--color-status-success-fg);
 }
 
 .localeIncomplete {
-  color: #b45309;
+  color: var(--color-status-warning-fg);
 }
 
 .items {
@@ -64,15 +64,15 @@
 }
 
 .itemOk::before {
-  background: #22c55e;
+  background: var(--color-primary);
 }
 
 .itemMissing::before {
-  background: #f59e0b;
+  background: var(--color-warning);
 }
 
 .allReady {
   margin: 1rem 0 0;
   font-size: 0.875rem;
-  color: #166534;
+  color: var(--color-status-success-fg);
 }
