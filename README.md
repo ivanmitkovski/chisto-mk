@@ -77,6 +77,7 @@ Never commit real secrets.
   - blocks accidental `.env` commits
   - validates Prisma schema (`pnpm --filter @chisto/api exec prisma validate`)
 - `pre-push`:
+  - blocks push while local API/admin/landing dev servers are listening (they race with production builds)
   - runs `pnpm ci:check`
 
 ## Project structure
