@@ -115,6 +115,7 @@ export class AdminNewsController {
     );
   }
 
+  @Idempotent('admin_news_duplicate')
   @Post('posts/:id/duplicate')
   @Roles(...ADMIN_WRITE_ROLES)
   @RequirePermission(ADMIN_PERMISSIONS['news:write'])
@@ -131,6 +132,7 @@ export class AdminNewsController {
     return this.posts.listRevisions(id);
   }
 
+  // safe-to-retry: repeated restore is acceptable
   @Post('posts/:id/revisions/:revisionId/restore')
   @Roles(...ADMIN_WRITE_ROLES)
   @RequirePermission(ADMIN_PERMISSIONS['news:write'])
