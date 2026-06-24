@@ -109,6 +109,9 @@ export function toAdminDto(
     media: post.media.map((m) => toMediaDto(m, signedUrls)),
     createdAt: post.createdAt.toISOString(),
     updatedAt: post.updatedAt.toISOString(),
+    featured: post.featured,
+    createdById: post.createdById,
+    updatedById: post.updatedById,
   };
 }
 
@@ -128,6 +131,7 @@ export function toPublicListItem(
     title: content.title,
     excerpt: content.excerpt,
     coverImageUrl: coverUrl,
+    featured: post.featured,
   };
 }
 

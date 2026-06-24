@@ -3,6 +3,7 @@ import { SITEMAP_PATHS, isLaunchPageVisible } from "@/config/launch";
 import { HELP_ARTICLE_SLUGS } from "@/lib/help/help-catalog";
 import { helpArticleLastModified, helpHubLastModified } from "@/lib/help/help-sitemap-dates";
 import { getAllNewsSlugs } from "@/data/news-posts";
+import { fetchNewsSlugDates } from "@/lib/news/fetch-news";
 import { routing } from "@/i18n/routing";
 import { getSiteUrl } from "@/lib/site-url";
 
@@ -11,6 +12,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const lastModified = new Date();
   const entries: MetadataRoute.Sitemap = [];
   const newsSlugs = isLaunchPageVisible('news') ? await getAllNewsSlugs() : [];
+  const newsDates = isLaunchPageVisible('news') ? await fetchNewsSlugDates() : new Map<string, Date>();
 
   for (const locale of routing.locales) {
     const helpHubModified = helpHubLastModified(locale, lastModified);
@@ -29,7 +31,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       for (const slug of newsSlugs) {
         entries.push({
           url: `${base}/${locale}/news/${slug}`,
-          lastModified,
+          lastModified: newsDates.get(slug) ?? lastModified,
           changeFrequency: "monthly",
           priority: 0.65,
         });

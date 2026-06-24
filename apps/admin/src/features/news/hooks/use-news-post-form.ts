@@ -9,6 +9,7 @@ export function useNewsPostForm(initial?: Partial<NewsPostFormValues>) {
     slug: initial?.slug ?? '',
     category: initial?.category ?? 'release',
     scheduledAt: initial?.scheduledAt ?? '',
+    featured: initial?.featured ?? false,
     translations: initial?.translations ?? emptyTranslations(),
   });
   const [dirty, setDirty] = useState(false);

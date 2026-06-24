@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -32,12 +33,16 @@ import { ParseCuidPipe } from '../../common/pipes/parse-cuid.pipe';
 import { Idempotent } from '../../common/idempotency/idempotency.decorator';
 import { ApiStandardHttpErrorResponses } from '../../common/openapi/standard-http-error-responses.decorator';
 import {
+  AdminListNewsPostsQueryDto,
   CreateNewsPostDto,
+  UpdateNewsMediaAltDto,
   UpdateNewsPostDto,
   UploadNewsMediaQueryDto,
 } from '../dto/news.dto';
 import { NewsPostsService } from '../services/news-posts.service';
+import { NewsPostsAdminQueryService } from '../services/news-posts-admin-query.service';
 import { NewsMediaUploadService } from '../services/news-media-upload.service';
+import { coalesceDraftTranslations } from '../services/news-posts-validation';
 
 const NEWS_MULTER_MAX_BYTES = 25 * 1024 * 1024;
 
@@ -49,6 +54,7 @@ const NEWS_MULTER_MAX_BYTES = 25 * 1024 * 1024;
 export class AdminNewsController {
   constructor(
     private readonly posts: NewsPostsService,
+    private readonly adminQuery: NewsPostsAdminQueryService,
     private readonly media: NewsMediaUploadService,
   ) {}
 
@@ -56,8 +62,8 @@ export class AdminNewsController {
   @Roles(...ADMIN_PANEL_ROLES)
   @RequirePermission(ADMIN_PERMISSIONS['news:read'])
   @ApiOperation({ summary: 'List all news posts' })
-  list() {
-    return this.posts.list();
+  list(@Query() query: AdminListNewsPostsQueryDto) {
+    return this.adminQuery.list(query);
   }
 
   @Get('posts/:id')
@@ -78,7 +84,7 @@ export class AdminNewsController {
       {
         ...(body.slug !== undefined ? { slug: body.slug } : {}),
         category: body.category,
-        translations: body.translations,
+        translations: coalesceDraftTranslations(body.translations),
       },
       actor,
     );
@@ -99,11 +105,42 @@ export class AdminNewsController {
       {
         ...(body.slug !== undefined ? { slug: body.slug } : {}),
         ...(body.category !== undefined ? { category: body.category } : {}),
-        ...(body.translations !== undefined ? { translations: body.translations } : {}),
+        ...(body.translations !== undefined
+          ? { translations: coalesceDraftTranslations(body.translations) }
+          : {}),
         ...(body.scheduledAt !== undefined ? { scheduledAt: body.scheduledAt } : {}),
+        ...(body.featured !== undefined ? { featured: body.featured } : {}),
       },
       actor,
     );
+  }
+
+  @Post('posts/:id/duplicate')
+  @Roles(...ADMIN_WRITE_ROLES)
+  @RequirePermission(ADMIN_PERMISSIONS['news:write'])
+  @ApiOperation({ summary: 'Duplicate news post as draft' })
+  duplicate(@Param('id', ParseCuidPipe) id: string, @CurrentUser() actor: AuthenticatedUser) {
+    return this.posts.duplicate(id, actor);
+  }
+
+  @Get('posts/:id/revisions')
+  @Roles(...ADMIN_PANEL_ROLES)
+  @RequirePermission(ADMIN_PERMISSIONS['news:read'])
+  @ApiOperation({ summary: 'List news post revisions' })
+  listRevisions(@Param('id', ParseCuidPipe) id: string) {
+    return this.posts.listRevisions(id);
+  }
+
+  @Post('posts/:id/revisions/:revisionId/restore')
+  @Roles(...ADMIN_WRITE_ROLES)
+  @RequirePermission(ADMIN_PERMISSIONS['news:write'])
+  @ApiOperation({ summary: 'Restore news post from revision' })
+  restoreRevision(
+    @Param('id', ParseCuidPipe) id: string,
+    @Param('revisionId', ParseCuidPipe) revisionId: string,
+    @CurrentUser() actor: AuthenticatedUser,
+  ) {
+    return this.posts.restoreRevision(id, revisionId, actor);
   }
 
   // safe-to-retry: repeated Delete is acceptable
@@ -161,7 +198,10 @@ export class AdminNewsController {
     @UploadedFile() file: Express.Multer.File,
   ) {
     if (!file) {
-      return this.posts.getById(id);
+      throw new BadRequestException({
+        code: 'NEWS_FILE_REQUIRED',
+        message: 'File is required',
+      });
     }
     return this.media.upload({
       postId: id,
@@ -183,5 +223,17 @@ export class AdminNewsController {
   async deleteMedia(@Param('mediaId', ParseCuidPipe) mediaId: string) {
     await this.media.deleteMedia(mediaId);
     return { ok: true };
+  }
+
+  // safe-to-retry: repeated Patch is acceptable
+  @Patch('media/:mediaId')
+  @Roles(...ADMIN_WRITE_ROLES)
+  @RequirePermission(ADMIN_PERMISSIONS['news:write'])
+  @ApiOperation({ summary: 'Update news media alt text' })
+  updateMediaAlt(
+    @Param('mediaId', ParseCuidPipe) mediaId: string,
+    @Body() body: UpdateNewsMediaAltDto,
+  ) {
+    return this.media.updateAltText(mediaId, body.altText ?? {});
   }
 }

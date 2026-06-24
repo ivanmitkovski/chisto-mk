@@ -47,7 +47,7 @@ export const LEGAL_PUBLIC_DEFAULTS = {
   adCookieName: "Not used",
   adProvider: "Not used",
   adPurpose: "Not used",
-  appStoreUrl: "https://apps.apple.com/app/chisto-mk/id6771892086",
+  appStoreUrl: "https://apps.apple.com/app/id6771892086",
   googlePlayUrl: "",
   facebookUrl: "",
   instagramUrl: "",

@@ -50,6 +50,25 @@ export class NewsLocaleContentDto {
   body!: NewsBodyBlock[];
 }
 
+/** Draft saves: allow empty locale fields; publish validates in the service layer. */
+export class DraftNewsLocaleContentDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  title?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  excerpt?: string;
+
+  @ApiPropertyOptional({ type: [NewsBodyBlockDto] })
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => NewsBodyBlockDto)
+  body?: NewsBodyBlock[];
+}
+
 export class NewsTranslationsDto implements NewsTranslations {
   @ApiProperty({ type: NewsLocaleContentDto })
   @ValidateNested()
@@ -67,6 +86,23 @@ export class NewsTranslationsDto implements NewsTranslations {
   sq!: NewsLocaleContentDto;
 }
 
+export class DraftNewsTranslationsDto {
+  @ApiProperty({ type: DraftNewsLocaleContentDto })
+  @ValidateNested()
+  @Type(() => DraftNewsLocaleContentDto)
+  en!: DraftNewsLocaleContentDto;
+
+  @ApiProperty({ type: DraftNewsLocaleContentDto })
+  @ValidateNested()
+  @Type(() => DraftNewsLocaleContentDto)
+  mk!: DraftNewsLocaleContentDto;
+
+  @ApiProperty({ type: DraftNewsLocaleContentDto })
+  @ValidateNested()
+  @Type(() => DraftNewsLocaleContentDto)
+  sq!: DraftNewsLocaleContentDto;
+}
+
 export class CreateNewsPostDto {
   @ApiPropertyOptional()
   @IsOptional()
@@ -77,10 +113,10 @@ export class CreateNewsPostDto {
   @IsIn(['release', 'partnership', 'community', 'product'])
   category!: NewsCategoryApi;
 
-  @ApiProperty({ type: NewsTranslationsDto })
+  @ApiProperty({ type: DraftNewsTranslationsDto })
   @ValidateNested()
-  @Type(() => NewsTranslationsDto)
-  translations!: NewsTranslationsDto;
+  @Type(() => DraftNewsTranslationsDto)
+  translations!: DraftNewsTranslationsDto;
 }
 
 export class UpdateNewsPostDto {
@@ -94,16 +130,20 @@ export class UpdateNewsPostDto {
   @IsIn(['release', 'partnership', 'community', 'product'])
   category?: NewsCategoryApi;
 
-  @ApiPropertyOptional({ type: NewsTranslationsDto })
+  @ApiPropertyOptional({ type: DraftNewsTranslationsDto })
   @IsOptional()
   @ValidateNested()
-  @Type(() => NewsTranslationsDto)
-  translations?: NewsTranslationsDto;
+  @Type(() => DraftNewsTranslationsDto)
+  translations?: DraftNewsTranslationsDto;
 
   @ApiPropertyOptional({ nullable: true })
   @IsOptional()
   @IsString()
   scheduledAt?: string | null;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  featured?: boolean;
 }
 
 export class ListNewsPostsQueryDto {
@@ -132,4 +172,47 @@ export class UploadNewsMediaQueryDto {
   @ApiProperty({ enum: ['cover', 'inline_image', 'inline_video'] })
   @IsIn(['cover', 'inline_image', 'inline_video'])
   kind!: 'cover' | 'inline_image' | 'inline_video';
+}
+
+export class UpdateNewsMediaAltDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  altText?: Partial<Record<'en' | 'mk' | 'sq', string>>;
+}
+
+export class AdminListNewsPostsQueryDto {
+  @ApiPropertyOptional({ enum: ['draft', 'scheduled', 'published', 'archived'] })
+  @IsOptional()
+  @IsIn(['draft', 'scheduled', 'published', 'archived'])
+  status?: 'draft' | 'scheduled' | 'published' | 'archived';
+
+  @ApiPropertyOptional({ enum: ['release', 'partnership', 'community', 'product'] })
+  @IsOptional()
+  @IsIn(['release', 'partnership', 'community', 'product'])
+  category?: 'release' | 'partnership' | 'community' | 'product';
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  q?: string;
+
+  @ApiPropertyOptional({ default: 20 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  limit?: number;
+
+  @ApiPropertyOptional({ default: 0 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  offset?: number;
+
+  @ApiPropertyOptional({ enum: ['publishedAt', 'updatedAt', 'title'] })
+  @IsOptional()
+  @IsIn(['publishedAt', 'updatedAt', 'title'])
+  sort?: 'publishedAt' | 'updatedAt' | 'title';
 }

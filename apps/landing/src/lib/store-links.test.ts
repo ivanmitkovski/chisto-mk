@@ -15,7 +15,7 @@ describe("store-links", () => {
 
   it("returns the live App Store URL by default", () => {
     expect(getAppStoreUrl()).toBe(APP_STORE_URL_DEFAULT);
-    expect(APP_STORE_URL_DEFAULT).toContain(APP_STORE_APP_ID);
+    expect(APP_STORE_URL_DEFAULT).toBe(`https://apps.apple.com/app/id${APP_STORE_APP_ID}`);
     expect(hasStoreDownloadLinks()).toBe(true);
   });
 

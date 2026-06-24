@@ -10,15 +10,67 @@
   gap: 0.5rem;
 }
 
-.coverPreview {
-  position: relative;
-  width: 100%;
-  max-width: 640px;
-  height: 240px;
-  border-radius: 0.5rem;
-  overflow: hidden;
+.previewToggle {
+  display: none;
 }
 
-.coverImage {
-  object-fit: cover;
+.readOnlyBanner {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 0.875rem;
+}
+
+.editorGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) min(16rem, 100%);
+  gap: 1rem;
+  align-items: start;
+}
+
+.formColumn {
+  min-width: 0;
+}
+
+.previewColumn {
+  min-width: 0;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+}
+
+@media (max-width: 1200px) {
+  .editorGrid {
+    grid-template-columns: minmax(0, 1fr) min(16rem, 100%);
+  }
+
+  .previewColumn {
+    display: none;
+  }
+
+  .previewColumnOpen {
+    display: block;
+    grid-column: 1 / -1;
+    order: 3;
+  }
+
+  .previewToggle {
+    display: inline-flex;
+  }
+}
+
+@media (max-width: 960px) {
+  .editorGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    order: 2;
+  }
 }

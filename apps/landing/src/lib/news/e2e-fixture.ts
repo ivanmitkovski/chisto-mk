@@ -28,6 +28,7 @@ function postForLocale(locale: string): ResolvedNewsPost {
     slug: E2E_LAUNCH_SLUG,
     publishedAt: PUBLISHED_AT,
     category: 'release',
+    featured: true,
     title,
     excerpt,
     body: [{ type: 'paragraph', text }],

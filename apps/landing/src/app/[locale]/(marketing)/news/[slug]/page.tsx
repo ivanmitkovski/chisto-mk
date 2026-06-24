@@ -3,7 +3,8 @@ import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { CTASection } from "@/components/organisms/CTASection";
 import { NewsArticle } from "@/components/organisms/NewsPage";
-import { getAllNewsSlugs, getNewsPostBySlug } from "@/data/news-posts";
+import { getAllNewsSlugs, getNewsPostBySlug, getRelatedNewsPosts } from "@/data/news-posts";
+import { estimateReadMinutesFromParagraphBlocks } from "@/lib/news/reading-time";
 import { isLaunchPageVisible } from "@/config/launch";
 import { routing, type AppLocale } from "@/i18n/routing";
 import { getSiteUrl } from "@/lib/site-url";
@@ -106,8 +107,11 @@ export default async function NewsArticlePage({ params }: Props) {
     notFound();
   }
 
+  const relatedPosts = await getRelatedNewsPosts(locale, slug);
+
   const appLocale = locale as AppLocale;
   const t = await getTranslations("newsPage");
+  const readMinutes = estimateReadMinutesFromParagraphBlocks(post.body);
   const siteUrl = getSiteUrl();
   const jsonLd = newsArticleJsonLd({
     siteUrl,
@@ -126,11 +130,22 @@ export default async function NewsArticlePage({ params }: Props) {
       <NewsArticle
         locale={appLocale}
         post={post}
+        relatedPosts={relatedPosts}
         categoryLabel={t(`newsCategory.${post.category}`)}
+        relatedCategoryLabel={(category) => t(`newsCategory.${category}`)}
         jsonLd={jsonLd}
         copy={{
           badge: t("badge"),
           backToNews: t("backToNews"),
+          readingTime: t("readingTime", { minutes: readMinutes }),
+          relatedTitle: t("relatedTitle"),
+          share: {
+            copyLink: t("share.copyLink"),
+            copyLinkAria: t("share.copyLinkAria"),
+            copied: t("share.copied"),
+            share: t("share.share"),
+            shareAria: t("share.shareAria"),
+          },
         }}
       />
       <CTASection />

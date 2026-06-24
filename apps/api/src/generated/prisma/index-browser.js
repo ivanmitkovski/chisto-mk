@@ -980,7 +980,16 @@ exports.Prisma.NewsPostScalarFieldEnum = {
   coverMediaId: 'coverMediaId',
   translations: 'translations',
   createdById: 'createdById',
-  updatedById: 'updatedById'
+  updatedById: 'updatedById',
+  featured: 'featured'
+};
+
+exports.Prisma.NewsPostRevisionScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  postId: 'postId',
+  snapshot: 'snapshot',
+  createdById: 'createdById'
 };
 
 exports.Prisma.NewsMediaScalarFieldEnum = {
@@ -1367,6 +1376,7 @@ exports.Prisma.ModelName = {
   MapCdnPurgeLog: 'MapCdnPurgeLog',
   AdminMutationIdempotency: 'AdminMutationIdempotency',
   NewsPost: 'NewsPost',
+  NewsPostRevision: 'NewsPostRevision',
   NewsMedia: 'NewsMedia'
 };
 

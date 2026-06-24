@@ -5,6 +5,9 @@ import { Button, Input, Select } from '@/components/ui';
 import type { NewsBodyBlock, NewsMediaDto } from '../news-api-types';
 import type { NewsFormLocale, NewsPostFormValues } from '../types';
 import { NEWS_CATEGORIES, NEWS_LOCALES } from '../types';
+import { localeCompleteness } from '../lib/news-locale-utils';
+import { NewsBodyBlockEditor } from './news-body-block-editor';
+import { NewsLocaleCompleteness } from './news-locale-completeness';
 import styles from './news-post-form.module.css';
 
 type NewsPostFormProps = {
@@ -13,11 +16,12 @@ type NewsPostFormProps = {
   media: NewsMediaDto[];
   status: string;
   busy: boolean;
+  readOnly: boolean;
+  hasCover: boolean;
   onLocaleChange: (locale: NewsFormLocale) => void;
   onChange: <K extends keyof NewsPostFormValues>(key: K, value: NewsPostFormValues[K]) => void;
   onBodyChange: (blocks: NewsBodyBlock[]) => void;
-  onUploadCover: (file: File) => void;
-  onUploadInline: (file: File, kind: 'inline_image' | 'inline_video') => void;
+  onCopyFromLocale?: (source: NewsFormLocale) => void;
 };
 
 export function NewsPostForm({
@@ -26,14 +30,24 @@ export function NewsPostForm({
   media,
   status,
   busy,
+  readOnly,
+  hasCover,
   onLocaleChange,
   onChange,
   onBodyChange,
-  onUploadCover,
-  onUploadInline,
+  onCopyFromLocale,
 }: NewsPostFormProps) {
   const t = useTranslations('news');
   const content = values.translations[locale];
+  const scores = localeCompleteness(values, hasCover);
+
+  function moveBlock(index: number, direction: -1 | 1) {
+    const next = [...content.body];
+    const target = index + direction;
+    if (target < 0 || target >= next.length) return;
+    [next[index], next[target]] = [next[target], next[index]];
+    onBodyChange(next);
+  }
 
   function updateBlock(index: number, block: NewsBodyBlock) {
     const next = [...content.body];
@@ -41,51 +55,64 @@ export function NewsPostForm({
     onBodyChange(next);
   }
 
-  function addParagraph() {
-    onBodyChange([...content.body, { type: 'paragraph', text: '' }]);
-  }
-
-  function removeBlock(index: number) {
-    onBodyChange(content.body.filter((_, i) => i !== index));
-  }
-
-  const inlineMedia = media.filter((m) => m.kind !== 'cover');
-
   return (
     <div className={styles.root}>
-      <div className={styles.localeTabs}>
+      <NewsLocaleCompleteness values={values} hasCover={hasCover} activeLocale={locale} />
+
+      <div className={styles.localeTabs} role="tablist" aria-label={t('form.locales')}>
         {NEWS_LOCALES.map((loc) => (
           <button
             key={loc}
             type="button"
+            role="tab"
+            aria-selected={loc === locale}
             className={loc === locale ? styles.localeActive : styles.localeTab}
             onClick={() => onLocaleChange(loc)}
           >
             {loc.toUpperCase()}
+            <span className={scores[loc] ? styles.dotComplete : styles.dotIncomplete} aria-hidden />
           </button>
         ))}
       </div>
+
+      {!readOnly && locale !== 'en' && onCopyFromLocale ? (
+        <Button type="button" variant="outline" size="sm" disabled={busy} onClick={() => onCopyFromLocale('en')}>
+          {t('form.copyFromEn')}
+        </Button>
+      ) : null}
 
       <Input
         label={t('form.slug')}
         value={values.slug}
         onChange={(e) => onChange('slug', e.target.value)}
-        disabled={busy || status === 'published'}
+        disabled={busy || readOnly || status === 'published'}
       />
+      {values.slug.trim() ? (
+        <p className={styles.slugPreview}>{t('form.slugPreview', { slug: values.slug.trim() })}</p>
+      ) : null}
       <Select
         label={t('form.category')}
         value={values.category}
         options={NEWS_CATEGORIES.map((c) => ({ value: c, label: t(`category.${c}`) }))}
         onChange={(e) => onChange('category', e.target.value as NewsPostFormValues['category'])}
-        disabled={busy}
+        disabled={busy || readOnly}
       />
       <Input
         label={t('form.scheduledAt')}
         type="datetime-local"
         value={values.scheduledAt}
         onChange={(e) => onChange('scheduledAt', e.target.value)}
-        disabled={busy}
+        disabled={busy || readOnly}
       />
+      <label className={styles.checkboxField}>
+        <input
+          type="checkbox"
+          checked={values.featured}
+          onChange={(e) => onChange('featured', e.target.checked)}
+          disabled={busy || readOnly}
+        />
+        <span>{t('form.featured')}</span>
+      </label>
 
       <Input
         label={t('form.title')}
@@ -96,7 +123,7 @@ export function NewsPostForm({
             [locale]: { ...content, title: e.target.value },
           })
         }
-        disabled={busy}
+        disabled={busy || readOnly}
       />
       <label className={styles.field}>
         <span className={styles.label}>{t('form.excerpt')}</span>
@@ -110,99 +137,41 @@ export function NewsPostForm({
               [locale]: { ...content, excerpt: e.target.value },
             })
           }
-          disabled={busy}
+          disabled={busy || readOnly}
+          maxLength={500}
         />
       </label>
 
-      <div className={styles.coverSection}>
-        <span className={styles.label}>{t('form.cover')}</span>
-        <input
-          type="file"
-          accept="image/*,video/mp4,video/webm"
-          disabled={busy}
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) onUploadCover(file);
-            e.target.value = '';
-          }}
-        />
-      </div>
-
-      <div className={styles.bodySection}>
+      <div className={styles.bodySection} role="tabpanel">
         <div className={styles.bodyHeader}>
           <span className={styles.label}>{t('form.body')}</span>
-          <Button type="button" variant="outline" size="sm" onClick={addParagraph} disabled={busy}>
-            {t('form.addParagraph')}
-          </Button>
+          {!readOnly ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => onBodyChange([...content.body, { type: 'paragraph', text: '' }])}
+              disabled={busy}
+            >
+              {t('form.addParagraph')}
+            </Button>
+          ) : null}
         </div>
         {content.body.map((block, index) => (
-          <div key={`${locale}-${index}`} className={styles.block}>
-            {block.type === 'paragraph' ? (
-              <textarea
-                className={styles.textarea}
-                rows={4}
-                value={block.text}
-                onChange={(e) => updateBlock(index, { type: 'paragraph', text: e.target.value })}
-                disabled={busy}
-              />
-            ) : (
-              <p className={styles.mediaRef}>
-                {block.type}: {block.mediaId}
-                {block.caption ? ` — ${block.caption}` : ''}
-              </p>
-            )}
-            <Button type="button" variant="ghost" size="sm" onClick={() => removeBlock(index)} disabled={busy}>
-              {t('form.removeBlock')}
-            </Button>
-          </div>
+          <NewsBodyBlockEditor
+            key={`${locale}-${index}-${block.type}`}
+            block={block}
+            index={index}
+            total={content.body.length}
+            media={media}
+            readOnly={readOnly}
+            busy={busy}
+            onChange={(next) => updateBlock(index, next)}
+            onRemove={() => onBodyChange(content.body.filter((_, i) => i !== index))}
+            onMoveUp={() => moveBlock(index, -1)}
+            onMoveDown={() => moveBlock(index, 1)}
+          />
         ))}
-        <div className={styles.inlineUpload}>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            disabled={busy}
-            onClick={() => {
-              const input = document.createElement('input');
-              input.type = 'file';
-              input.accept = 'image/*';
-              input.onchange = () => {
-                const file = input.files?.[0];
-                if (file) onUploadInline(file, 'inline_image');
-              };
-              input.click();
-            }}
-          >
-            {t('form.addImage')}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            disabled={busy}
-            onClick={() => {
-              const input = document.createElement('input');
-              input.type = 'file';
-              input.accept = 'video/mp4,video/webm,video/quicktime';
-              input.onchange = () => {
-                const file = input.files?.[0];
-                if (file) onUploadInline(file, 'inline_video');
-              };
-              input.click();
-            }}
-          >
-            {t('form.addVideo')}
-          </Button>
-        </div>
-        {inlineMedia.length > 0 ? (
-          <ul className={styles.mediaList}>
-            {inlineMedia.map((m) => (
-              <li key={m.id}>
-                {m.fileName ?? m.id} ({m.kind})
-              </li>
-            ))}
-          </ul>
-        ) : null}
       </div>
     </div>
   );

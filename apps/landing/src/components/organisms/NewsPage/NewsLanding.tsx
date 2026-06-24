@@ -47,7 +47,8 @@ function CategoryPill({ label }: { label: string }) {
 }
 
 export function NewsLanding({ locale, posts, copy, categoryLabel }: NewsLandingProps) {
-  const [featured, ...rest] = posts;
+  const featuredPost = posts.find((post) => post.featured) ?? posts[0];
+  const rest = featuredPost ? posts.filter((post) => post.slug !== featuredPost.slug) : [];
 
   return (
     <Section className="relative overflow-hidden mesh-section-how">
@@ -82,7 +83,7 @@ export function NewsLanding({ locale, posts, copy, categoryLabel }: NewsLandingP
                 </Link>
               </p>
             </div>
-          ) : (
+          ) : featuredPost ? (
             <div className="mt-14 space-y-12">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">
@@ -90,12 +91,12 @@ export function NewsLanding({ locale, posts, copy, categoryLabel }: NewsLandingP
                 </p>
                 <article className="group mt-4 overflow-hidden rounded-2xl border border-gray-200/90 bg-white/80 shadow-sm ring-1 ring-black/[0.04] backdrop-blur-sm transition-[border-color,box-shadow,ring-color] duration-300 hover:border-primary/25 hover:shadow-lg hover:ring-primary/20 md:grid md:grid-cols-2 md:gap-0">
                   <Link
-                    href={`/news/${featured.slug}`}
+                    href={`/news/${featuredPost.slug}`}
                     className="relative block aspect-[4/3] overflow-hidden bg-gray-100 md:aspect-auto md:min-h-[280px]"
                   >
-                    {featured.coverImage ? (
+                    {featuredPost.coverImage ? (
                       <Image
-                        src={featured.coverImage}
+                        src={featuredPost.coverImage}
                         alt=""
                         fill
                         className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02]"
@@ -108,25 +109,25 @@ export function NewsLanding({ locale, posts, copy, categoryLabel }: NewsLandingP
                   </Link>
                   <div className="flex flex-col justify-center p-8 md:p-10">
                     <div className="flex flex-wrap items-center gap-2 gap-y-1">
-                      <CategoryPill label={categoryLabel(featured.category)} />
+                      <CategoryPill label={categoryLabel(featuredPost.category)} />
                       <time
                         className="text-sm text-gray-500"
-                        dateTime={featured.publishedAt}
+                        dateTime={featuredPost.publishedAt}
                       >
-                        {formatNewsDate(locale, featured.publishedAt)}
+                        {formatNewsDate(locale, featuredPost.publishedAt)}
                       </time>
                     </div>
                     <h2 className="mt-4 text-xl font-bold text-gray-900 md:text-2xl">
                       <Link
-                        href={`/news/${featured.slug}`}
+                        href={`/news/${featuredPost.slug}`}
                         className="transition-colors hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                       >
-                        {featured.title}
+                        {featuredPost.title}
                       </Link>
                     </h2>
-                    <p className="mt-3 leading-relaxed text-gray-600">{featured.excerpt}</p>
+                    <p className="mt-3 leading-relaxed text-gray-600">{featuredPost.excerpt}</p>
                     <div className="mt-6">
-                      <NewsReadMoreLink href={`/news/${featured.slug}`}>
+                      <NewsReadMoreLink href={`/news/${featuredPost.slug}`}>
                         {copy.readMore}
                       </NewsReadMoreLink>
                     </div>
@@ -194,7 +195,7 @@ export function NewsLanding({ locale, posts, copy, categoryLabel }: NewsLandingP
                 </div>
               ) : null}
             </div>
-          )}
+          ) : null}
         </Container>
       </Section>
   );

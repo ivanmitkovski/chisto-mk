@@ -283,6 +283,15 @@
     "latestHeading": "Më shumë histori",
     "readMore": "Lexo më shumë",
     "backToNews": "Kthehu te lajmet",
+    "readingTime": "{minutes, plural, one {# min lexim} other {# min lexim}}",
+    "relatedTitle": "Histori të ngjashme",
+    "share": {
+      "copyLink": "Kopjo lidhjen",
+      "copyLinkAria": "Kopjo lidhjen e artikullit",
+      "copied": "Lidhja u kopjua",
+      "share": "Ndaj",
+      "shareAria": "Ndaj këtë artikull"
+    },
     "newsCategory": {
       "release": "Publikim",
       "partnership": "Partneritet",

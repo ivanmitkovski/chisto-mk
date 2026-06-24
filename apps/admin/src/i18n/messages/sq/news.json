@@ -1,9 +1,18 @@
 {
   "pageTitle": "Lajme",
-  "pageDescription": "Menaxho postimet e lajmeve në faqen chisto.mk",
+  "pageDescription": "Menaxhoni postimet e lajmeve në faqen kryesore të chisto.mk",
   "create": {
-    "title": "Postim i ri",
-    "description": "Krijo një draft. Shto përmbajtje të plotë në të gjitha gjuhët para publikimit."
+    "title": "Postim i ri lajmesh",
+    "description": "Krijoni një draft. Shtoni përmbajtje të plotë në të gjitha gjuhët para publikimit.",
+    "slugPlaceholder": "Lëreni bosh për gjenerim automatik nga titulli",
+    "templateLabel": "Shabllon përmbajtjeje",
+    "templateNone": "Fillo bosh"
+  },
+  "templates": {
+    "release": "Njoftim për version të ri",
+    "partnership": "Njoftim për partneritet",
+    "community": "Përditësim nga komuniteti",
+    "product": "Përditësim produkti"
   },
   "table": {
     "title": "Titulli",
@@ -11,23 +20,58 @@
     "category": "Kategoria",
     "published": "Publikuar",
     "edit": "Ndrysho",
-    "empty": "Nuk ka postime ende."
+    "view": "Shiko",
+    "empty": "Ende nuk ka postime lajmesh.",
+    "featured": "Në pah",
+    "scheduledFor": "Planifikuar {date}",
+    "locales": "Plotësia sipas gjuhës"
+  },
+  "toolbar": {
+    "status": "Statusi",
+    "category": "Kategoria",
+    "sort": "Rendit",
+    "allStatuses": "Të gjitha statuset",
+    "allCategories": "Të gjitha kategoritë",
+    "search": "Kërko",
+    "searchPlaceholder": "Titull ose slug…",
+    "searchApply": "Kërko",
+    "refresh": "Rifresko",
+    "sort_publishedAt": "Data e publikimit",
+    "sort_updatedAt": "Përditësuar së fundmi",
+    "sort_title": "Titulli"
+  },
+  "stats": {
+    "label": "Numri i postimeve sipas statusit"
   },
   "form": {
-    "slug": "Adresa URL (slug)",
+    "slug": "URL slug",
+    "slugPreview": "Rruga publike: /news/{slug}",
     "category": "Kategoria",
     "scheduledAt": "Planifiko publikimin (opsionale)",
+    "featured": "Thekso në qendrën e lajmeve",
     "title": "Titulli",
     "excerpt": "Përmbledhje",
     "cover": "Imazh ose video kopertine",
     "body": "Përmbajtja",
     "addParagraph": "Shto paragraf",
     "removeBlock": "Hiq",
-    "addImage": "Ngarko imazh",
-    "addVideo": "Ngarko video"
+    "addImage": "Ngarko bllok imazhi",
+    "addVideo": "Ngarko bllok video",
+    "blockParagraph": "Paragraf",
+    "blockImage": "Imazh",
+    "blockVideo": "Video",
+    "caption": "Përshkrim",
+    "locales": "Gjuhët e përmbajtjes",
+    "copyFromEn": "Kopjo titullin, përmbledhjen dhe përmbajtjen nga EN",
+    "altText": "Tekst alt ({locale})",
+    "mediaLibrary": "Biblioteka e medias",
+    "uploadCover": "Ngarko kopertinën",
+    "insertMedia": "Fut në përmbajtje",
+    "deleteMedia": "Fshi",
+    "noMedia": "Ende nuk është ngarkuar media."
   },
   "category": {
-    "release": "Publikim",
+    "release": "Version i ri",
     "partnership": "Partneritet",
     "community": "Komunitet",
     "product": "Produkt"
@@ -46,15 +90,117 @@
     "unpublish": "Hiq publikimin",
     "archive": "Arkivo",
     "delete": "Fshi",
-    "createDraft": "Krijo draft"
+    "createDraft": "Krijo draft",
+    "duplicate": "Dupliko"
   },
   "editor": {
-    "status": "Statusi: {status}"
+    "status": "Statusi: {status}",
+    "readOnlyBanner": "Keni akses vetëm për lexim. Kontaktoni një administrator për të ndryshuar lajmet.",
+    "unsaved": "Ndryshime të paruajtura",
+    "saving": "Duke ruajtur…"
+  },
+  "autosave": {
+    "saved": "Ruajtur para {time}",
+    "savedJustNow": "Ruajtur tani",
+    "saving": "Duke ruajtur…",
+    "failed": "Ruajtja automatike dështoi"
+  },
+  "preview": {
+    "label": "Parapamje live",
+    "draftWatermark": "Parapamje drafti",
+    "toggle": "Parapamje",
+    "devices": "Gjerësia e parapamjes",
+    "device_desktop": "Desktop",
+    "device_tablet": "Tablet",
+    "device_phone": "Telefon"
+  },
+  "seo": {
+    "label": "SEO dhe rrjetet sociale",
+    "googleTitle": "Parapamje Google",
+    "openGraph": "Open Graph",
+    "twitter": "Kartela Twitter",
+    "canonical": "URL kanonike",
+    "titleTooLong": "Titulli tejkalon 60 karaktere ({count})",
+    "descriptionTooLong": "Përshkrimi tejkalon 160 karaktere ({count})",
+    "jsonLdReady": "Të dhënat e strukturuara janë gati",
+    "jsonLdIncomplete": "Mungojnë fusha për të dhënat e strukturuara",
+    "slugAvailable": "Slug-u është i disponueshëm",
+    "slugTaken": "Një postim tjetër e përdor tashmë këtë slug"
+  },
+  "revisions": {
+    "label": "Historiku i rishikimeve",
+    "empty": "Ende nuk ka rishikime.",
+    "restore": "Rikthe",
+    "restoreTitle": "Të rikthehet kjo rishikim?",
+    "restoreBody": "Përmbajtja aktuale do të ruhet si rishikim i ri para rikthimit.",
+    "preview": "Parapamje",
+    "restored": "Rishikimi u rikthye"
+  },
+  "checklist": {
+    "title": "Gatishmëria për publikim",
+    "description": "Rishikoni çdo gjuhë para publikimit.",
+    "titleField": "Titulli",
+    "excerptField": "Përmbledhja",
+    "bodyField": "Përmbajtja",
+    "coverField": "Imazhi i kopertinës",
+    "goToLocale": "Ndrysho {locale}",
+    "allReady": "Të gjitha gjuhët janë gati për publikim.",
+    "confirmPublish": "Publiko tani"
+  },
+  "meta": {
+    "label": "Metadatat e postimit",
+    "created": "Krijuar",
+    "updated": "Përditësuar",
+    "published": "Publikuar",
+    "scheduled": "Planifikuar",
+    "viewOnSite": "Shiko në faqe",
+    "previewHint": "Publikoni postimin për ta parë në faqen kryesore.",
+    "shortcuts": "⌘S Ruaj · ⌘⇧P Publiko",
+    "scheduleTimezone": "Planifikuar në {timezone}"
+  },
+  "completeness": {
+    "label": "Gatishmëria për publikim",
+    "coverMissing": "Imazhi i kopertinës kërkohet për publikim."
+  },
+  "confirm": {
+    "publishTitle": "Të publikohet ky postim?",
+    "publishBody": "Postimi do të bëhet i dukshëm në faqen kryesore (menjëherë ose në kohën e planifikuar).",
+    "unpublishTitle": "Të hiqet publikimi?",
+    "unpublishBody": "Postimi do të hiqet nga faqja publike dhe do të kthehet në draft.",
+    "archiveTitle": "Të arkivohet ky postim?",
+    "archiveBody": "Postimet e arkivuara fshihen nga faqja publike, por mbeten në admin."
   },
   "delete": {
-    "title": "Fshi postimin?",
-    "body": "Kjo e heq përgjithmonë postimin dhe mediat.",
+    "title": "Të fshihet postimi?",
+    "body": "Kjo e heq përfundimisht postimin dhe mediat e tij. Ky veprim nuk mund të zhbëhet.",
     "confirm": "Fshi"
+  },
+  "validation": {
+    "slugRequired": "Slug kërkohet.",
+    "slugInvalid": "Slug duhet të përdorë vetëm shkronja të vogla, numra dhe viza.",
+    "scheduleInPast": "Koha e planifikuar duhet të jetë në të ardhmen.",
+    "coverRequired": "Imazhi i kopertinës kërkohet para publikimit.",
+    "localeTitleRequired": "Të gjitha gjuhët duhet të kenë titull para publikimit.",
+    "localeExcerptRequired": "Të gjitha gjuhët duhet të kenë përmbledhje para publikimit.",
+    "localeBodyRequired": "Të gjitha gjuhët duhet të kenë të paktën një bllok përmbajtjeje para publikimit.",
+    "emptyParagraph": "Hiq paragrafët bosh ose shto tekst para publikimit.",
+    "mediaIdRequired": "Bllokët e imazhit dhe videos kërkojnë media të ngarkuar."
+  },
+  "apiErrors": {
+    "slugTaken": "Ekziston tashmë një postim me këtë slug.",
+    "invalidSlug": "Format i pavlefshëm slug.",
+    "slugImmutable": "Slug nuk mund të ndryshohet pas publikimit.",
+    "localeRequired": "Mungon përmbajtja për një gjuhë të kërkuar.",
+    "titleRequired": "Titulli kërkohet për të gjitha gjuhët.",
+    "excerptRequired": "Përmbledhja kërkohet për të gjitha gjuhët.",
+    "bodyRequired": "Përmbajtja kërkohet për të gjitha gjuhët.",
+    "emptyParagraph": "Paragrafët bosh nuk lejohen.",
+    "mediaIdRequired": "Një bllok i përmbajtjes referon media që mungon.",
+    "scheduleInPast": "Koha e planifikuar duhet të jetë në të ardhmen.",
+    "coverRequired": "Imazhi i kopertinës kërkohet para publikimit.",
+    "notFound": "Postimi i lajmeve nuk u gjet.",
+    "invalidCategory": "Kategori e pavlefshme.",
+    "s3NotConfigured": "Ngarkimi i skedarëve nuk është konfiguruar në server."
   },
   "toast": {
     "saved": "Postimi u ruajt",
@@ -64,7 +210,17 @@
     "archived": "Postimi u arkivua",
     "deleted": "Postimi u fshi",
     "mediaUploaded": "Media u ngarkua",
-    "error": "Diçka shkoi keq"
-  },
-  "unableToLoad": "Nuk mund të ngarkohen postimet."
+    "mediaDeleted": "Media u fshi",
+    "copiedLocale": "U kopjua nga anglishtja",
+    "error": "Diçka shkoi keq",
+    "validationTitle": "Kontrolloni formularin",
+    "unsavedTitle": "Ruani ndryshimet së pari",
+    "unsavedMessage": "Ruani draftin para se të ndryshoni statusin e publikimit.",
+    "mediaInUseTitle": "Media në përdorim",
+    "mediaInUseMessage": "Hiqeni këtë media nga përmbajtja para se ta fshini.",
+    "conflictTitle": "Version më i ri në server",
+    "conflictMessage": "Ky postim u përditësua diku tjetër. Ngarkuam versionin më të fundit.",
+    "conflictReload": "Ringarko",
+    "duplicated": "Drafti u duplikua"
+  }
 }

@@ -66,6 +66,7 @@ export async function seedNewsLaunchPost(prisma: PrismaClient): Promise<void> {
       category: 'RELEASE',
       status: 'PUBLISHED',
       publishedAt: new Date('2026-06-23T06:00:00.000Z'),
+      featured: true,
       translations: LAUNCH_TRANSLATIONS,
     },
   });

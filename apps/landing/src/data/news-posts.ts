@@ -3,6 +3,7 @@ import {
   fetchAllNewsSlugs,
   fetchNewsPostBySlug,
   fetchNewsPosts,
+  fetchRelatedNewsPosts,
   type NewsCategory,
   type ResolvedNewsPost,
 } from '@/lib/news/fetch-news';
@@ -20,6 +21,13 @@ export async function getNewsPostBySlug(
   slug: string,
 ): Promise<ResolvedNewsPost | null> {
   return fetchNewsPostBySlug(locale, slug);
+}
+
+export async function getRelatedNewsPosts(
+  locale: string,
+  slug: string,
+): Promise<ResolvedNewsPost[]> {
+  return fetchRelatedNewsPosts(locale, slug);
 }
 
 export async function getAllNewsSlugs(): Promise<string[]> {

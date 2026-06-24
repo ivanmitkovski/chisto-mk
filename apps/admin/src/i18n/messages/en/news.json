@@ -3,7 +3,16 @@
   "pageDescription": "Manage landing page news posts for chisto.mk",
   "create": {
     "title": "New news post",
-    "description": "Create a draft post. Add full content in all locales before publishing."
+    "description": "Create a draft post. Add full content in all locales before publishing.",
+    "slugPlaceholder": "Leave blank to auto-generate from title",
+    "templateLabel": "Content template",
+    "templateNone": "Start blank"
+  },
+  "templates": {
+    "release": "Release announcement",
+    "partnership": "Partnership announcement",
+    "community": "Community update",
+    "product": "Product update"
   },
   "table": {
     "title": "Title",
@@ -11,12 +20,35 @@
     "category": "Category",
     "published": "Published",
     "edit": "Edit",
-    "empty": "No news posts yet."
+    "view": "View",
+    "empty": "No news posts yet.",
+    "featured": "Featured",
+    "scheduledFor": "Scheduled {date}",
+    "locales": "Locale completeness"
+  },
+  "toolbar": {
+    "status": "Status",
+    "category": "Category",
+    "sort": "Sort",
+    "allStatuses": "All statuses",
+    "allCategories": "All categories",
+    "search": "Search",
+    "searchPlaceholder": "Title or slug…",
+    "searchApply": "Search",
+    "refresh": "Refresh",
+    "sort_publishedAt": "Published date",
+    "sort_updatedAt": "Last updated",
+    "sort_title": "Title"
+  },
+  "stats": {
+    "label": "News post counts by status"
   },
   "form": {
     "slug": "URL slug",
+    "slugPreview": "Public path: /news/{slug}",
     "category": "Category",
     "scheduledAt": "Schedule publish (optional)",
+    "featured": "Feature on news hub",
     "title": "Title",
     "excerpt": "Excerpt",
     "cover": "Cover image or video",
@@ -24,7 +56,19 @@
     "addParagraph": "Add paragraph",
     "removeBlock": "Remove",
     "addImage": "Upload image block",
-    "addVideo": "Upload video block"
+    "addVideo": "Upload video block",
+    "blockParagraph": "Paragraph",
+    "blockImage": "Image",
+    "blockVideo": "Video",
+    "caption": "Caption",
+    "locales": "Content locales",
+    "copyFromEn": "Copy title, excerpt & body from EN",
+    "altText": "Alt text ({locale})",
+    "mediaLibrary": "Media library",
+    "uploadCover": "Upload cover",
+    "insertMedia": "Insert in body",
+    "deleteMedia": "Delete",
+    "noMedia": "No media uploaded yet."
   },
   "category": {
     "release": "Release",
@@ -46,15 +90,117 @@
     "unpublish": "Unpublish",
     "archive": "Archive",
     "delete": "Delete",
-    "createDraft": "Create draft"
+    "createDraft": "Create draft",
+    "duplicate": "Duplicate"
   },
   "editor": {
-    "status": "Status: {status}"
+    "status": "Status: {status}",
+    "readOnlyBanner": "You have read-only access. Contact an admin to edit news posts.",
+    "unsaved": "Unsaved changes",
+    "saving": "Saving…"
+  },
+  "autosave": {
+    "saved": "Saved {time} ago",
+    "savedJustNow": "Saved just now",
+    "saving": "Saving…",
+    "failed": "Autosave failed"
+  },
+  "preview": {
+    "label": "Live preview",
+    "draftWatermark": "Draft preview",
+    "toggle": "Preview",
+    "devices": "Preview width",
+    "device_desktop": "Desktop",
+    "device_tablet": "Tablet",
+    "device_phone": "Phone"
+  },
+  "seo": {
+    "label": "SEO & social",
+    "googleTitle": "Google snippet",
+    "openGraph": "Open Graph",
+    "twitter": "Twitter card",
+    "canonical": "Canonical URL",
+    "titleTooLong": "Title exceeds 60 characters ({count})",
+    "descriptionTooLong": "Description exceeds 160 characters ({count})",
+    "jsonLdReady": "Structured data ready",
+    "jsonLdIncomplete": "Missing fields for structured data",
+    "slugAvailable": "Slug is available",
+    "slugTaken": "Another post already uses this slug"
+  },
+  "revisions": {
+    "label": "Revision history",
+    "empty": "No revisions yet.",
+    "restore": "Restore",
+    "restoreTitle": "Restore this revision?",
+    "restoreBody": "Current content will be saved as a new revision before restoring.",
+    "preview": "Preview",
+    "restored": "Revision restored"
+  },
+  "checklist": {
+    "title": "Publish readiness",
+    "description": "Review each locale before publishing.",
+    "titleField": "Title",
+    "excerptField": "Excerpt",
+    "bodyField": "Body",
+    "coverField": "Cover image",
+    "goToLocale": "Edit {locale}",
+    "allReady": "All locales ready to publish.",
+    "confirmPublish": "Publish now"
+  },
+  "meta": {
+    "label": "Post metadata",
+    "created": "Created",
+    "updated": "Updated",
+    "published": "Published",
+    "scheduled": "Scheduled",
+    "viewOnSite": "View on site",
+    "previewHint": "Publish the post to preview it on the landing site.",
+    "shortcuts": "⌘S Save · ⌘⇧P Publish",
+    "scheduleTimezone": "Scheduled in {timezone}"
+  },
+  "completeness": {
+    "label": "Publish readiness",
+    "coverMissing": "Cover image required for publish."
+  },
+  "confirm": {
+    "publishTitle": "Publish this post?",
+    "publishBody": "The post will become visible on the landing site (immediately or at the scheduled time).",
+    "unpublishTitle": "Unpublish this post?",
+    "unpublishBody": "The post will be removed from the public site and returned to draft.",
+    "archiveTitle": "Archive this post?",
+    "archiveBody": "Archived posts are hidden from the public site but remain in the admin."
   },
   "delete": {
     "title": "Delete post?",
-    "body": "This permanently removes the post and its media.",
+    "body": "This permanently removes the post and its media. This cannot be undone.",
     "confirm": "Delete"
+  },
+  "validation": {
+    "slugRequired": "Slug is required.",
+    "slugInvalid": "Slug must use lowercase letters, numbers, and hyphens only.",
+    "scheduleInPast": "Scheduled time must be in the future.",
+    "coverRequired": "Cover image is required before publishing.",
+    "localeTitleRequired": "All locales need a title before publishing.",
+    "localeExcerptRequired": "All locales need an excerpt before publishing.",
+    "localeBodyRequired": "All locales need at least one body block before publishing.",
+    "emptyParagraph": "Remove empty paragraphs or add text before publishing.",
+    "mediaIdRequired": "Image and video blocks need uploaded media."
+  },
+  "apiErrors": {
+    "slugTaken": "A post with this slug already exists.",
+    "invalidSlug": "Invalid slug format.",
+    "slugImmutable": "Slug cannot be changed after publication.",
+    "localeRequired": "Content is missing for a required locale.",
+    "titleRequired": "Title is required for all locales.",
+    "excerptRequired": "Excerpt is required for all locales.",
+    "bodyRequired": "Body content is required for all locales.",
+    "emptyParagraph": "Empty paragraph blocks are not allowed.",
+    "mediaIdRequired": "A body block references missing media.",
+    "scheduleInPast": "Scheduled time must be in the future.",
+    "coverRequired": "Cover image is required before publishing.",
+    "notFound": "News post not found.",
+    "invalidCategory": "Invalid category.",
+    "s3NotConfigured": "File upload is not configured on the server."
   },
   "toast": {
     "saved": "Post saved",
@@ -64,7 +210,17 @@
     "archived": "Post archived",
     "deleted": "Post deleted",
     "mediaUploaded": "Media uploaded",
-    "error": "Something went wrong"
-  },
-  "unableToLoad": "Could not load news posts."
+    "mediaDeleted": "Media deleted",
+    "copiedLocale": "Copied from English",
+    "error": "Something went wrong",
+    "validationTitle": "Check the form",
+    "unsavedTitle": "Save your changes first",
+    "unsavedMessage": "Save the draft before changing publish status.",
+    "mediaInUseTitle": "Media in use",
+    "mediaInUseMessage": "Remove this media from the body before deleting it.",
+    "conflictTitle": "Newer version on server",
+    "conflictMessage": "This post was updated elsewhere. Reload the latest version before saving.",
+    "conflictReload": "Reload latest",
+    "duplicated": "Draft duplicated"
+  }
 }

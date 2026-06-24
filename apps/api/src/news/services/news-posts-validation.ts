@@ -120,10 +120,76 @@ export function assertValidTranslations(translations: NewsTranslations, requireC
         message: `Too many body blocks for locale ${locale}`,
       });
     }
-    entry.body?.forEach((block, i) => assertBodyBlock(block, i));
+    entry.body?.forEach((block, i) => {
+      if (
+        !requireComplete &&
+        block.type === 'paragraph' &&
+        !(block.text?.trim())
+      ) {
+        return;
+      }
+      assertBodyBlock(block, i);
+    });
   }
+}
+
+export function coalesceDraftTranslations(input: {
+  en?: { title?: string; excerpt?: string; body?: NewsBodyBlock[] };
+  mk?: { title?: string; excerpt?: string; body?: NewsBodyBlock[] };
+  sq?: { title?: string; excerpt?: string; body?: NewsBodyBlock[] };
+}): NewsTranslations {
+  const out = {} as NewsTranslations;
+  for (const locale of NEWS_LOCALES) {
+    const entry = input[locale] ?? {};
+    out[locale] = {
+      title: entry.title ?? '',
+      excerpt: entry.excerpt ?? '',
+      body: entry.body?.length ? entry.body : [],
+    };
+  }
+  return out;
 }
 
 export function paragraphsToBody(paragraphs: string[]): NewsBodyBlock[] {
   return paragraphs.map((text) => ({ type: 'paragraph' as const, text }));
+}
+
+export function assertScheduledAtNotInPast(scheduledAt: string | null | undefined): void {
+  if (!scheduledAt) return;
+  const date = new Date(scheduledAt);
+  if (Number.isNaN(date.getTime())) {
+    throw new BadRequestException({
+      code: 'NEWS_INVALID_SCHEDULE',
+      message: 'Invalid schedule date',
+    });
+  }
+  if (date.getTime() < Date.now()) {
+    throw new BadRequestException({
+      code: 'NEWS_SCHEDULE_IN_PAST',
+      message: 'Scheduled publish time must be in the future',
+    });
+  }
+}
+
+export function assertMediaIntegrity(
+  translations: NewsTranslations,
+  mediaIds: Set<string>,
+  hasCover: boolean,
+): void {
+  if (!hasCover) {
+    throw new BadRequestException({
+      code: 'NEWS_COVER_REQUIRED',
+      message: 'Cover image is required before publishing',
+    });
+  }
+  for (const locale of NEWS_LOCALES) {
+    for (const block of translations[locale].body) {
+      if ((block.type === 'image' || block.type === 'video') && !mediaIds.has(block.mediaId)) {
+        throw new BadRequestException({
+          code: 'NEWS_MEDIA_NOT_FOUND',
+          message: `Media ${block.mediaId} is not attached to this post`,
+        });
+      }
+    }
+  }
 }

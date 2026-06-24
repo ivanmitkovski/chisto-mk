@@ -8,15 +8,18 @@ import { AuditService } from '../../audit/services/audit.service';
 import type { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { PrismaService } from '../../prisma/prisma.service';
 import type { NewsCategoryApi, NewsTranslations } from '../types/news.types';
-import { categoryFromApi, toAdminDto } from './news-posts.mapper';
+import { categoryFromApi, toAdminDto, parseTranslations } from './news-posts.mapper';
 import { NEWS_POST_ADMIN_INCLUDE, signNewsPostMedia } from './news-posts-signing';
 import { NewsMediaSignedUrlService } from './news-media-signed-url.service';
 import { NewsRevalidateService } from './news-revalidate.service';
 import { NewsPostsDeleteService } from './news-posts-delete.service';
+import { NewsRevisionsService } from './news-revisions.service';
 import {
   assertValidCategory,
   assertValidSlug,
   assertValidTranslations,
+  assertScheduledAtNotInPast,
+  assertMediaIntegrity,
   normalizeSlug,
 } from './news-posts-validation';
 
@@ -31,6 +34,7 @@ export type UpdateNewsPostInput = {
   category?: NewsCategoryApi;
   translations?: NewsTranslations;
   scheduledAt?: string | null;
+  featured?: boolean;
 };
 
 @Injectable()
@@ -40,6 +44,7 @@ export class NewsPostsService {
     private readonly signedUrls: NewsMediaSignedUrlService,
     private readonly revalidate: NewsRevalidateService,
     private readonly deleteService: NewsPostsDeleteService,
+    private readonly revisions: NewsRevisionsService,
     private readonly audit?: AuditService,
   ) {}
 
@@ -150,16 +155,32 @@ export class NewsPostsService {
       }
     }
     if (input.scheduledAt !== undefined) {
+      if (input.scheduledAt) {
+        assertScheduledAtNotInPast(input.scheduledAt);
+      }
       data.scheduledAt = input.scheduledAt ? new Date(input.scheduledAt) : null;
       if (input.scheduledAt && existing.status === 'DRAFT') {
         data.status = 'SCHEDULED';
       }
     }
+    if (input.featured !== undefined) {
+      data.featured = input.featured;
+    }
 
-    const row = await this.prisma.newsPost.update({
-      where: { id },
-      data,
-      include: NEWS_POST_ADMIN_INCLUDE,
+    await this.revisions.createRevision(id, actor);
+
+    const row = await this.prisma.$transaction(async (tx) => {
+      if (input.featured === true) {
+        await tx.newsPost.updateMany({
+          where: { id: { not: id }, featured: true },
+          data: { featured: false },
+        });
+      }
+      return tx.newsPost.update({
+        where: { id },
+        data,
+        include: NEWS_POST_ADMIN_INCLUDE,
+      });
     });
 
     await this.audit?.log({
@@ -169,6 +190,10 @@ export class NewsPostsService {
       resourceId: row.id,
       metadata: { slug: row.slug },
     });
+
+    if (row.status === 'PUBLISHED' || row.status === 'SCHEDULED') {
+      void this.revalidate.triggerLandingRevalidate();
+    }
 
     const signed = await signNewsPostMedia(this.signedUrls, row);
     return toAdminDto(row, signed);
@@ -188,6 +213,9 @@ export class NewsPostsService {
 
     const translations = existing.translations as NewsTranslations;
     assertValidTranslations(translations, true);
+
+    const mediaIds = new Set(existing.media.map((m) => m.id));
+    assertMediaIntegrity(translations, mediaIds, Boolean(existing.coverMediaId));
 
     const now = new Date();
     const publishedAt =
@@ -283,5 +311,59 @@ export class NewsPostsService {
 
   delete(id: string, actor?: AuthenticatedUser) {
     return this.deleteService.delete(id, actor);
+  }
+
+  async duplicate(id: string, actor?: AuthenticatedUser) {
+    const existing = await this.prisma.newsPost.findUnique({
+      where: { id },
+      include: NEWS_POST_ADMIN_INCLUDE,
+    });
+    if (!existing) {
+      throw new NotFoundException({
+        code: 'NEWS_POST_NOT_FOUND',
+        message: 'News post not found',
+      });
+    }
+
+    const translations = parseTranslations(existing.translations);
+    let suffix = 1;
+    let slug = `${existing.slug}-copy`;
+    while (await this.prisma.newsPost.findUnique({ where: { slug } })) {
+      suffix += 1;
+      slug = `${existing.slug}-copy-${suffix}`;
+    }
+
+    const row = await this.prisma.newsPost.create({
+      data: {
+        slug,
+        category: existing.category,
+        status: 'DRAFT',
+        translations: translations as unknown as Prisma.InputJsonValue,
+        featured: false,
+        createdById: actor?.userId ?? null,
+        updatedById: actor?.userId ?? null,
+      },
+      include: NEWS_POST_ADMIN_INCLUDE,
+    });
+
+    await this.audit?.log({
+      actorId: actor?.userId ?? null,
+      action: 'news.post.duplicate',
+      resourceType: 'NewsPost',
+      resourceId: row.id,
+      metadata: { sourceId: id, slug: row.slug },
+    });
+
+    const signed = await signNewsPostMedia(this.signedUrls, row);
+    return toAdminDto(row, signed);
+  }
+
+  async restoreRevision(id: string, revisionId: string, actor?: AuthenticatedUser) {
+    await this.revisions.restore(id, revisionId, actor);
+    return this.getById(id);
+  }
+
+  listRevisions(postId: string) {
+    return this.revisions.list(postId);
   }
 }

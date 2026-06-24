@@ -32,13 +32,17 @@ export class NewsPostsQueryService {
   async listPublished(locale: string, limit = 50, offset = 0) {
     const loc = this.normalizeLocale(locale);
     const now = new Date();
-    const rows = await this.prisma.newsPost.findMany({
-      where: this.publishedWhere(now),
-      orderBy: { publishedAt: 'desc' },
-      take: Math.min(limit, 100),
-      skip: offset,
-      include: { coverMedia: true },
-    });
+    const where = this.publishedWhere(now);
+    const [rows, total] = await Promise.all([
+      this.prisma.newsPost.findMany({
+        where,
+        orderBy: [{ featured: 'desc' }, { publishedAt: 'desc' }],
+        take: Math.min(limit, 100),
+        skip: offset,
+        include: { coverMedia: true },
+      }),
+      this.prisma.newsPost.count({ where }),
+    ]);
 
     const items = [];
     for (const row of rows) {
@@ -46,7 +50,7 @@ export class NewsPostsQueryService {
       const signed = await this.signedUrls.signMany(keys);
       items.push(toPublicListItem(row, loc, signed));
     }
-    return { items, total: items.length };
+    return { items, total };
   }
 
   async getPublishedBySlug(locale: string, slug: string) {
@@ -79,5 +83,38 @@ export class NewsPostsQueryService {
       orderBy: { publishedAt: 'desc' },
     });
     return rows.map((r) => r.slug);
+  }
+
+  async listRelated(locale: string, slug: string, limit = 3) {
+    const loc = this.normalizeLocale(locale);
+    const now = new Date();
+    const post = await this.prisma.newsPost.findFirst({
+      where: { slug, ...this.publishedWhere(now) },
+    });
+    if (!post) {
+      throw new NotFoundException({
+        code: 'NEWS_POST_NOT_FOUND',
+        message: 'News post not found',
+      });
+    }
+
+    const rows = await this.prisma.newsPost.findMany({
+      where: {
+        ...this.publishedWhere(now),
+        category: post.category,
+        slug: { not: slug },
+      },
+      orderBy: { publishedAt: 'desc' },
+      take: Math.min(limit, 10),
+      include: { coverMedia: true },
+    });
+
+    const items = [];
+    for (const row of rows) {
+      const keys = row.coverMedia ? [row.coverMedia.objectKey] : [];
+      const signed = await this.signedUrls.signMany(keys);
+      items.push(toPublicListItem(row, loc, signed));
+    }
+    return { items };
   }
 }

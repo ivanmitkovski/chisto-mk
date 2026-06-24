@@ -283,6 +283,15 @@
     "latestHeading": "Повеќе приказни",
     "readMore": "Прочитај повеќе",
     "backToNews": "Назад кон новостите",
+    "readingTime": "{minutes, plural, one {# мин читање} other {# мин читање}}",
+    "relatedTitle": "Слични приказни",
+    "share": {
+      "copyLink": "Копирај линк",
+      "copyLinkAria": "Копирај линк до статијата",
+      "copied": "Линкот е копиран",
+      "share": "Сподели",
+      "shareAria": "Сподели ја статијата"
+    },
     "newsCategory": {
       "release": "Издание",
       "partnership": "Партнерство",

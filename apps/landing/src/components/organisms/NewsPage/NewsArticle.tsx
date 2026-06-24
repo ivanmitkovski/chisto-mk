@@ -5,6 +5,9 @@ import { Badge } from "@/components/atoms/Badge";
 import { Container } from "@/components/layout/Container";
 import { Section } from "@/components/layout/Section";
 import { NewsBackLink } from "./NewsReadMoreLink";
+import { NewsArticleBlocks } from "./NewsArticleBlocks";
+import { NewsRelatedPosts } from "./NewsRelatedPosts";
+import { NewsShareBar, type NewsShareBarCopy } from "./NewsShareBar";
 
 const DATE_LOCALES: Record<AppLocale, string> = {
   mk: "mk-MK",
@@ -21,17 +24,30 @@ function formatNewsDate(locale: AppLocale, iso: string): string {
 export type NewsArticleCopy = {
   badge: string;
   backToNews: string;
+  readingTime: string;
+  share: NewsShareBarCopy;
+  relatedTitle: string;
 };
 
 type NewsArticleProps = {
   locale: AppLocale;
   post: ResolvedNewsPost;
+  relatedPosts: ResolvedNewsPost[];
   copy: NewsArticleCopy;
   categoryLabel: string;
+  relatedCategoryLabel: (category: ResolvedNewsPost["category"]) => string;
   jsonLd: string;
 };
 
-export function NewsArticle({ locale, post, copy, categoryLabel, jsonLd }: NewsArticleProps) {
+export function NewsArticle({
+  locale,
+  post,
+  relatedPosts,
+  copy,
+  categoryLabel,
+  relatedCategoryLabel,
+  jsonLd,
+}: NewsArticleProps) {
   return (
     <>
       <script
@@ -55,15 +71,21 @@ export function NewsArticle({ locale, post, copy, categoryLabel, jsonLd }: NewsA
             <time className="text-sm text-gray-500" dateTime={post.publishedAt}>
               {formatNewsDate(locale, post.publishedAt)}
             </time>
+            <span className="text-sm text-gray-400" aria-hidden>
+              ·
+            </span>
+            <span className="text-sm text-gray-500">{copy.readingTime}</span>
           </div>
           <h1 className="mt-4 max-w-copy text-section-title font-bold text-gray-900">{post.title}</h1>
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-gray-600">{post.excerpt}</p>
+
+          <NewsShareBar title={post.title} excerpt={post.excerpt} copy={copy.share} />
 
           {post.coverImage ? (
             <div className="relative mt-10 aspect-[21/9] max-w-4xl overflow-hidden rounded-2xl border border-gray-200/90 bg-gray-100 shadow-sm">
               <Image
                 src={post.coverImage}
-                alt=""
+                alt={post.title}
                 fill
                 className="object-cover"
                 sizes="(min-width: 896px) 896px, 100vw"
@@ -74,51 +96,14 @@ export function NewsArticle({ locale, post, copy, categoryLabel, jsonLd }: NewsA
           ) : null}
 
           <div className="prose-news mt-12 max-w-copy">
-            {post.body.map((block, i) => {
-              if (block.type === 'paragraph') {
-                return (
-                  <p key={i} className="mt-6 first:mt-0 leading-relaxed text-gray-700">
-                    {block.text}
-                  </p>
-                );
-              }
-              if (block.type === 'image' && block.url) {
-                return (
-                  <figure key={i} className="mt-8">
-                    <div className="relative aspect-[16/10] overflow-hidden rounded-xl border border-gray-200/90 bg-gray-100">
-                      <Image
-                        src={block.url}
-                        alt={block.caption ?? ''}
-                        fill
-                        className="object-cover"
-                        sizes="(min-width: 768px) 768px, 100vw"
-                        unoptimized
-                      />
-                    </div>
-                    {block.caption ? (
-                      <figcaption className="mt-2 text-sm text-gray-500">{block.caption}</figcaption>
-                    ) : null}
-                  </figure>
-                );
-              }
-              if (block.type === 'video' && block.url) {
-                return (
-                  <figure key={i} className="mt-8">
-                    <video
-                      className="w-full rounded-xl border border-gray-200/90"
-                      controls
-                      preload="metadata"
-                      src={block.url}
-                    />
-                    {block.caption ? (
-                      <figcaption className="mt-2 text-sm text-gray-500">{block.caption}</figcaption>
-                    ) : null}
-                  </figure>
-                );
-              }
-              return null;
-            })}
+            <NewsArticleBlocks body={post.body} />
           </div>
+
+          <NewsRelatedPosts
+            posts={relatedPosts}
+            title={copy.relatedTitle}
+            categoryLabel={relatedCategoryLabel}
+          />
 
           <p className="mt-14 border-t border-gray-200/90 pt-10">
             <NewsBackLink href="/news">{copy.backToNews}</NewsBackLink>

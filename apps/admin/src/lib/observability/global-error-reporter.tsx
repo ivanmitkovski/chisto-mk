@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { clientLogger } from './client-logger';
+import { describeClientRejection, isDomLoadEventRejection } from './normalize-client-rejection';
 
 export function GlobalErrorReporter() {
   useEffect(() => {
@@ -16,8 +17,18 @@ export function GlobalErrorReporter() {
 
     const onUnhandledRejection = (event: PromiseRejectionEvent) => {
       const reason = event.reason;
+      const message = describeClientRejection(reason);
+
+      if (isDomLoadEventRejection(reason)) {
+        // Webpack/Next chunk or CSS load failures reject with a DOM Event — not an Error.
+        // Log clearly and avoid surfacing "[object Event]" in the dev overlay.
+        event.preventDefault();
+        clientLogger.error('asset_load_failed', { message, kind: reason.type });
+        return;
+      }
+
       clientLogger.error('unhandled_rejection', {
-        message: reason instanceof Error ? reason.message : String(reason),
+        message,
         ...(reason instanceof Error ? { name: reason.name } : {}),
       });
     };

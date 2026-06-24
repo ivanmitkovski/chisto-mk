@@ -1,16 +1,14 @@
-import {
-  BadRequestException,
-  Injectable,
-  Logger,
-  NotFoundException,
-  ServiceUnavailableException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
 import { randomUUID } from 'crypto';
-import type { NewsMediaKind } from '../../prisma-client';
+import { Prisma, type NewsMediaKind } from '../../prisma-client';
+import { AuditService } from '../../audit/services/audit.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ImageContentValidator } from '../../storage/util/image-content-validator';
 import { S3StorageClient } from '../../storage/util/s3-storage.client';
 import { NewsMediaSignedUrlService } from './news-media-signed-url.service';
+import { NewsRevalidateService } from './news-revalidate.service';
+import type { NewsLocale } from '../types/news.types';
+import { toMediaDto } from './news-posts.mapper';
 
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
 const MAX_VIDEO_BYTES = 25 * 1024 * 1024;
@@ -33,6 +31,8 @@ export class NewsMediaUploadService {
     private readonly s3: S3StorageClient,
     private readonly imageValidator: ImageContentValidator,
     private readonly signedUrls: NewsMediaSignedUrlService,
+    private readonly revalidate: NewsRevalidateService,
+    private readonly audit?: AuditService,
   ) {}
 
   async upload(input: UploadNewsMediaInput) {
@@ -99,6 +99,18 @@ export class NewsMediaUploadService {
       });
     }
 
+    await this.audit?.log({
+      actorId: null,
+      action: 'news.media.upload',
+      resourceType: 'NewsMedia',
+      resourceId: media.id,
+      metadata: { postId: input.postId, kind: input.kind },
+    });
+
+    if (post.status === 'PUBLISHED' || post.status === 'SCHEDULED') {
+      void this.revalidate.triggerLandingRevalidate();
+    }
+
     const url = await this.signedUrls.getSignedGetUrl(key);
     return { ...media, url };
   }
@@ -106,7 +118,7 @@ export class NewsMediaUploadService {
   async deleteMedia(mediaId: string): Promise<void> {
     const media = await this.prisma.newsMedia.findUnique({
       where: { id: mediaId },
-      include: { coverForPost: true },
+      include: { coverForPost: true, post: true },
     });
     if (!media) {
       throw new NotFoundException({
@@ -121,6 +133,69 @@ export class NewsMediaUploadService {
       });
     }
     await this.deleteMediaRecord(media.id, media.objectKey);
+
+    await this.audit?.log({
+      actorId: null,
+      action: 'news.media.delete',
+      resourceType: 'NewsMedia',
+      resourceId: mediaId,
+      metadata: { postId: media.postId },
+    });
+
+    if (media.post.status === 'PUBLISHED' || media.post.status === 'SCHEDULED') {
+      void this.revalidate.triggerLandingRevalidate();
+    }
+  }
+
+  async updateAltText(mediaId: string, altText: Partial<Record<NewsLocale, string>>) {
+    const media = await this.prisma.newsMedia.findUnique({
+      where: { id: mediaId },
+      include: { post: true },
+    });
+    if (!media) {
+      throw new NotFoundException({
+        code: 'NEWS_MEDIA_NOT_FOUND',
+        message: 'News media not found',
+      });
+    }
+
+    const current = (media.altText as Partial<Record<NewsLocale, string>> | null) ?? {};
+    const merged: Partial<Record<NewsLocale, string>> = { ...current };
+    for (const [locale, value] of Object.entries(altText)) {
+      if (value === undefined) continue;
+      const trimmed = value.trim();
+      if (trimmed) {
+        merged[locale as NewsLocale] = trimmed;
+      } else {
+        delete merged[locale as NewsLocale];
+      }
+    }
+
+    const updated = await this.prisma.newsMedia.update({
+      where: { id: mediaId },
+      data: {
+        altText:
+          Object.keys(merged).length > 0
+            ? (merged as Prisma.InputJsonValue)
+            : Prisma.DbNull,
+      },
+    });
+
+    await this.audit?.log({
+      actorId: null,
+      action: 'news.media.alt_update',
+      resourceType: 'NewsMedia',
+      resourceId: mediaId,
+      metadata: { postId: media.postId },
+    });
+
+    if (media.post.status === 'PUBLISHED' || media.post.status === 'SCHEDULED') {
+      void this.revalidate.triggerLandingRevalidate();
+    }
+
+    const url = await this.signedUrls.getSignedGetUrl(updated.objectKey);
+    const signed = new Map<string, string | null>([[updated.objectKey, url]]);
+    return toMediaDto(updated, signed);
   }
 
   private async deleteMediaRecord(mediaId: string, objectKey: string): Promise<void> {

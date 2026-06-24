@@ -17,6 +17,14 @@ vi.mock("./NewsReadMoreLink", () => ({
   ),
 }));
 
+vi.mock("./NewsShareBar", () => ({
+  NewsShareBar: () => null,
+}));
+
+vi.mock("./NewsRelatedPosts", () => ({
+  NewsRelatedPosts: () => null,
+}));
+
 const basePost: ResolvedNewsPost = {
   slug: "sample-post",
   publishedAt: "2026-06-23T06:00:00.000Z",
@@ -46,8 +54,22 @@ describe("NewsArticle", () => {
       <NewsArticle
         locale="en"
         post={basePost}
-        copy={{ badge: "News", backToNews: "Back to news" }}
+        relatedPosts={[]}
+        copy={{
+          badge: "News",
+          backToNews: "Back to news",
+          readingTime: "1 min read",
+          relatedTitle: "Related stories",
+          share: {
+            copyLink: "Copy link",
+            copyLinkAria: "Copy article link",
+            copied: "Link copied",
+            share: "Share",
+            shareAria: "Share this article",
+          },
+        }}
         categoryLabel="Release"
+        relatedCategoryLabel={() => "Release"}
         jsonLd="{}"
       />,
     );

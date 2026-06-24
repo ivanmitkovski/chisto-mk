@@ -45,7 +45,14 @@ export function BroadcastAudienceUserPicker({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
-  const selectedIds = useMemo(() => new Set(selectedUsers.map((user) => user.id)), [selectedUsers]);
+  const selectedIdKey = useMemo(
+    () => selectedUsers.map((user) => user.id).sort().join(','),
+    [selectedUsers],
+  );
+  const selectedIds = useMemo(
+    () => new Set(selectedIdKey ? selectedIdKey.split(',') : []),
+    [selectedIdKey],
+  );
   const atCap = selectedUsers.length >= BROADCAST_RECIPIENT_CAP;
 
   useEffect(() => {
@@ -112,17 +119,12 @@ export function BroadcastAudienceUserPicker({
     return () => {
       cancelled = true;
     };
-  }, [debouncedQuery, open, selectedIds]);
+  }, [debouncedQuery, open, selectedIdKey]);
 
   const availableResults = useMemo(
     () => results.filter((user) => !selectedIds.has(user.id)),
     [results, selectedIds],
   );
-
-  useEffect(() => {
-    if (!open) return;
-    setActiveIndex(availableResults.length > 0 ? 0 : -1);
-  }, [availableResults.length, debouncedQuery, open]);
 
   useEffect(() => {
     if (!open || activeIndex < 0) return;

@@ -1,0 +1,55 @@
+.paragraph {
+  margin: 1.5rem 0 0;
+  line-height: 1.625;
+  color: #374151;
+}
+
+.paragraph:first-child {
+  margin-top: 0;
+}
+
+.figure {
+  margin: 2rem 0 0;
+}
+
+.imageWrap {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  border: 1px solid rgb(229 231 235 / 0.9);
+  background: #f3f4f6;
+}
+
+.image {
+  object-fit: cover;
+}
+
+.video {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid rgb(229 231 235 / 0.9);
+}
+
+.caption {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.mediaPlaceholder,
+.videoPlaceholder {
+  display: flex;
+  aspect-ratio: 16 / 10;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem;
+  border: 1px dashed #d1d5db;
+  background: #f9fafb;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.videoPlaceholder {
+  aspect-ratio: 16 / 9;
+}

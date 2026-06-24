@@ -1752,10 +1752,26 @@ model NewsPost {
   translations Json
   createdById  String?
   updatedById  String?
+  featured     Boolean @default(false)
 
-  media NewsMedia[] @relation("NewsPostMedia")
+  media     NewsMedia[]        @relation("NewsPostMedia")
+  revisions NewsPostRevision[]
 
   @@index([status, publishedAt(sort: Desc)])
+  @@index([featured, publishedAt(sort: Desc)])
+}
+
+model NewsPostRevision {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  postId String
+  post   NewsPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  snapshot    Json
+  createdById String?
+
+  @@index([postId, createdAt(sort: Desc)])
 }
 
 model NewsMedia {

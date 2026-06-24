@@ -2,7 +2,16 @@ import { getAdminCsrfHeaders } from '@/lib/auth/csrf-headers';
 import { recoverFromUnauthorized } from '@/lib/auth/client-auth-recovery';
 import { ApiConnectionError, ApiError } from '@/lib/api/api';
 import type { NewsPostAdminDto } from '../news-api-types';
-import type { NewsCategoryApi, NewsTranslations } from '../news-api-types';
+import type {
+  NewsCategoryApi,
+  NewsLocale,
+  NewsMediaDto,
+  NewsTranslations,
+  NewsListResponse,
+} from '../news-api-types';
+import type { NewsListQuery } from '../config/news-list-filters';
+import { NEWS_LIST_PAGE_SIZE } from '../config/news-list-filters';
+import { normalizeNewsListResponse } from '../lib/news-list-response';
 
 async function fetchOnce<T>(
   path: string,
@@ -68,6 +77,7 @@ export async function updateNewsPost(
     category?: NewsCategoryApi;
     translations?: NewsTranslations;
     scheduledAt?: string | null;
+    featured?: boolean;
   },
 ): Promise<NewsPostAdminDto> {
   return apiFetch(`/admin/news/posts/${encodeURIComponent(id)}`, {
@@ -137,5 +147,82 @@ export async function fetchNewsPost(id: string): Promise<NewsPostAdminDto> {
   return apiFetch(`/admin/news/posts/${encodeURIComponent(id)}`, {
     method: 'GET',
     headers: { Accept: 'application/json' },
+  });
+}
+
+function buildListQuery(params?: NewsListQuery): string {
+  const sp = new URLSearchParams();
+  const limit = NEWS_LIST_PAGE_SIZE;
+  const page = params?.page ?? 1;
+  sp.set('limit', String(limit));
+  sp.set('offset', String((page - 1) * limit));
+  if (params?.status) sp.set('status', params.status);
+  if (params?.category) sp.set('category', params.category);
+  if (params?.q) sp.set('q', params.q);
+  if (params?.sort && params.sort !== 'publishedAt') sp.set('sort', params.sort);
+  const qs = sp.toString();
+  return `/admin/news/posts${qs ? `?${qs}` : ''}`;
+}
+
+export async function listNewsPostsClient(params?: NewsListQuery): Promise<NewsListResponse> {
+  const payload = await apiFetch<NewsListResponse | NewsPostAdminDto[]>(buildListQuery(params), {
+    method: 'GET',
+    headers: { Accept: 'application/json' },
+  });
+  return normalizeNewsListResponse(payload, params);
+}
+
+export type NewsRevisionDto = {
+  id: string;
+  createdAt: string;
+  createdById: string | null;
+  snapshot: {
+    slug: string;
+    category: NewsCategoryApi;
+    featured: boolean;
+    scheduledAt: string | null;
+    translations: NewsTranslations;
+  };
+};
+
+export async function duplicateNewsPost(id: string): Promise<NewsPostAdminDto> {
+  return apiFetch(`/admin/news/posts/${encodeURIComponent(id)}/duplicate`, {
+    method: 'POST',
+    headers: { Accept: 'application/json', ...getAdminCsrfHeaders() },
+  });
+}
+
+export async function listNewsRevisions(postId: string): Promise<NewsRevisionDto[]> {
+  return apiFetch(`/admin/news/posts/${encodeURIComponent(postId)}/revisions`, {
+    method: 'GET',
+    headers: { Accept: 'application/json' },
+  });
+}
+
+export async function restoreNewsRevision(
+  postId: string,
+  revisionId: string,
+): Promise<NewsPostAdminDto> {
+  return apiFetch(
+    `/admin/news/posts/${encodeURIComponent(postId)}/revisions/${encodeURIComponent(revisionId)}/restore`,
+    {
+      method: 'POST',
+      headers: { Accept: 'application/json', ...getAdminCsrfHeaders() },
+    },
+  );
+}
+
+export async function updateNewsMediaAlt(
+  mediaId: string,
+  altText: Partial<Record<NewsLocale, string>>,
+): Promise<NewsMediaDto> {
+  return apiFetch(`/admin/news/media/${encodeURIComponent(mediaId)}`, {
+    method: 'PATCH',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      ...getAdminCsrfHeaders(),
+    },
+    body: JSON.stringify({ altText }),
   });
 }

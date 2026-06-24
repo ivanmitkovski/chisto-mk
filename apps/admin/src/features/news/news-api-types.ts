@@ -23,6 +23,9 @@ export type NewsMediaDto = {
   url: string | null;
   mimeType: string;
   fileName: string | null;
+  width?: number | null;
+  height?: number | null;
+  altText?: Partial<Record<NewsLocale, string>> | null;
 };
 
 export type NewsPostAdminDto = {
@@ -32,10 +35,22 @@ export type NewsPostAdminDto = {
   status: NewsPostStatusApi;
   publishedAt: string | null;
   scheduledAt: string | null;
+  featured?: boolean;
   translations: NewsTranslations;
   coverMediaId: string | null;
   coverImageUrl: string | null;
   media: NewsMediaDto[];
   createdAt: string;
   updatedAt: string;
+  createdById?: string | null;
+  updatedById?: string | null;
+  localeCompleteness?: Partial<Record<NewsLocale, boolean>>;
+};
+
+export type NewsListResponse = {
+  items: NewsPostAdminDto[];
+  total: number;
+  countsByStatus: Record<string, number>;
+  limit: number;
+  offset: number;
 };

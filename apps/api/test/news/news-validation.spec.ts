@@ -1,5 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 import {
+  assertScheduledAtNotInPast,
   assertValidSlug,
   assertValidTranslations,
   normalizeSlug,
@@ -40,6 +41,20 @@ describe('news-posts-validation', () => {
       sq: { title: '', excerpt: '', body: [] },
     };
     expect(() => assertValidTranslations(partial, false)).not.toThrow();
+  });
+
+  it('allows draft saves with empty paragraph placeholders', () => {
+    const draft: NewsTranslations = {
+      en: { title: 'T', excerpt: 'E', body: [{ type: 'paragraph', text: '' }] },
+      mk: { title: '', excerpt: '', body: [] },
+      sq: { title: '', excerpt: '', body: [] },
+    };
+    expect(() => assertValidTranslations(draft, false)).not.toThrow();
+  });
+
+  it('rejects schedule in past', () => {
+    const past = new Date(Date.now() - 60_000).toISOString();
+    expect(() => assertScheduledAtNotInPast(past)).toThrow(BadRequestException);
   });
 });
 

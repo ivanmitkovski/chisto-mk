@@ -283,6 +283,15 @@
     "latestHeading": "More stories",
     "readMore": "Read more",
     "backToNews": "Back to news",
+    "readingTime": "{minutes, plural, one {# min read} other {# min read}}",
+    "relatedTitle": "Related stories",
+    "share": {
+      "copyLink": "Copy link",
+      "copyLinkAria": "Copy article link",
+      "copied": "Link copied",
+      "share": "Share",
+      "shareAria": "Share this article"
+    },
     "newsCategory": {
       "release": "Release",
       "partnership": "Partnership",

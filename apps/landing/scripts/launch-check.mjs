@@ -24,7 +24,7 @@ const launchSrc = readFileSync(launchPath, "utf8");
 
 const appStore =
   process.env.NEXT_PUBLIC_APP_STORE_URL?.trim() ||
-  "https://apps.apple.com/app/chisto-mk/id6771892086";
+  "https://apps.apple.com/app/id6771892086";
 if (!appStore.startsWith("https://")) {
   fail("App Store URL must be HTTPS");
 } else {

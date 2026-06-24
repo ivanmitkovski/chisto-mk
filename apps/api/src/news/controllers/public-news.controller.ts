@@ -30,6 +30,18 @@ export class PublicNewsController {
     return this.query.listPublishedSlugs();
   }
 
+  @Get('posts/:slug/related')
+  @Throttle({ default: { ttl: 60_000, limit: 120 } })
+  @ApiOperation({ summary: 'Related published news posts' })
+  related(
+    @Param('slug') slug: string,
+    @Query('locale') locale: string | undefined,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=600, stale-while-revalidate=86400');
+    return this.query.listRelated(locale ?? 'en', slug);
+  }
+
   @Get('posts/:slug')
   @Throttle({ default: { ttl: 60_000, limit: 120 } })
   @ApiOperation({ summary: 'Get a published news post by slug' })
