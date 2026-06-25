@@ -2,7 +2,7 @@ import path from 'node:path';
 import { test as base, expect, type Page } from '@playwright/test';
 import { hasAdminE2ECredentials } from './auth';
 
-const authStatePath = path.join(__dirname, '.auth/admin.json');
+const authStatePath = path.join(__dirname, '..', '.auth/admin.json');
 
 export const authenticatedTest = base.extend<{ authenticatedPage: Page }>({
   authenticatedPage: async ({ browser }, use, testInfo) => {
