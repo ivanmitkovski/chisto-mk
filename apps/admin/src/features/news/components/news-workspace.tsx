@@ -9,7 +9,6 @@ import { Button, Card, DataTable, PageHeader, Pagination, useToast } from '@/com
 import { WorkspaceRefreshOverlay } from '@/features/admin-shell/components/workspace-refresh-overlay';
 import { useServerSyncedState } from '@/features/admin-shell/hooks/use-server-synced-state';
 import { useWorkspaceRefresh } from '@/features/admin-shell/hooks/use-workspace-refresh';
-import { Can } from '@/lib/auth/rbac';
 import { NEWS_LIST_PAGE_SIZE } from '../config/news-list-filters';
 import { duplicateNewsPost, listNewsPostsClient } from '../data/news-adapter-client';
 import { newsApiErrorMessage } from '../lib/news-api-messages';
@@ -195,9 +194,9 @@ export function NewsWorkspace({ initialData, canWriteNews }: NewsWorkspaceProps)
         title={t('pageTitle')}
         description={t('pageDescription')}
         actions={
-          <Can permission="news:write">
+          canWriteNews ? (
             <Button onClick={() => router.push('/dashboard/news/new')}>{t('actions.new')}</Button>
-          </Can>
+          ) : null
         }
       />
       <NewsStatsBar posts={data.items} countsByStatusFromApi={data.countsByStatus} />
