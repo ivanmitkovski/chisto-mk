@@ -39,6 +39,8 @@ pnpm-debug.log*
 # Testing
 coverage/
 .nyc_output/
+apps/admin/tests/.auth/
+apps/admin/test-results/
 
 # Prisma
 *.db

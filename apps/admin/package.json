@@ -13,7 +13,7 @@
     "test:bundle-budget": "node scripts/check-bundle-budget.mjs",
     "test:perf": "playwright test -c playwright.config.cjs tests/perf",
     "test:watch": "vitest",
-    "test:a11y": "playwright test -c playwright.config.cjs tests/a11y",
+    "test:a11y": "playwright test -c playwright.config.cjs tests/a11y --workers=1",
     "test:smoke": "playwright test -c playwright.config.cjs tests/smoke"
   },
   "dependencies": {

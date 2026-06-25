@@ -111,7 +111,7 @@
   --color-primary-shadow-hover: rgba(37, 219, 134, 0.34);
   --color-on-danger: #ffffff;
   --color-button-outline-border: var(--color-green-700);
-  --color-button-outline-fg: var(--color-green-600);
+  --color-button-outline-fg: var(--color-green-900);
   --color-button-outline-hover-bg: color-mix(in srgb, var(--color-primary) 12%, transparent);
   --color-button-icon-bg: color-mix(in srgb, var(--color-primary) 12%, transparent);
   --color-button-icon-border: color-mix(in srgb, var(--color-primary) 28%, transparent);

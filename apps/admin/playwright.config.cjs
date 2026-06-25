@@ -6,6 +6,7 @@ const rootDir = __dirname;
 
 module.exports = defineConfig({
   testDir: path.join(rootDir, 'tests'),
+  globalSetup: path.join(rootDir, 'tests/global-setup.ts'),
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   use: {
