@@ -11,7 +11,8 @@ test.describe('Admin dashboard smoke journey', () => {
       page.getByRole('textbox', { name: /search reports by name, location, or number/i }),
     ).toBeVisible();
 
-    await page.getByRole('button', { name: /sign out|log out/i }).click();
+    await page.getByRole('button', { name: /^profile$/i }).click();
+    await page.getByRole('menuitem', { name: /^sign out$/i }).click();
     await page.waitForURL('**/login**');
     await expect(page.locator('#login-email')).toBeVisible();
   });

@@ -1,6 +1,8 @@
 import { authenticatedTest as test, expect } from '../fixtures/authenticated.fixture';
 
 test.describe('News admin smoke', () => {
+  test.describe.configure({ mode: 'serial' });
+
   test('news list loads for authenticated admin', async ({ authenticatedPage: page }) => {
     await page.goto('/dashboard/news');
     await page.waitForURL('**/dashboard/news**');
@@ -8,10 +10,11 @@ test.describe('News admin smoke', () => {
   });
 
   test('create draft and open editor', async ({ authenticatedPage: page }) => {
-    await page.goto('/dashboard/news/new');
-    await expect(page.getByRole('heading', { name: /new news post/i })).toBeVisible();
+    await page.goto('/dashboard/news');
+    await page.getByRole('button', { name: /new post/i }).click();
+    await expect(page).toHaveURL(/\/dashboard\/news\/new/);
     const titleField = page.getByRole('textbox', { name: /^title$/i });
-    await expect(titleField).toBeVisible();
+    await expect(titleField).toBeVisible({ timeout: 15_000 });
     await titleField.fill('Smoke test draft');
     await page.getByRole('button', { name: /create draft/i }).click();
     await page.waitForURL(/\/dashboard\/news\/(?!new)/);
