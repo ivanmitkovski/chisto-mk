@@ -11,10 +11,10 @@
     "test": "vitest run",
     "test:structure": "node ../../scripts/check-admin-structure.mjs && node ../../scripts/check-admin-tokens.mjs && ADMIN_STYLES_ENFORCE_FEATURE_HEX=1 node ../../scripts/check-admin-styles.mjs && node scripts/check-admin-i18n.mjs && node scripts/check-admin-i18n-scopes.mjs && node scripts/check-admin-i18n-routes.mjs",
     "test:bundle-budget": "node scripts/check-bundle-budget.mjs",
-    "test:perf": "playwright test -c playwright.config.cjs tests/perf",
+    "test:perf": "playwright test -c playwright.config.cjs tests/perf --workers=1",
     "test:watch": "vitest",
     "test:a11y": "playwright test -c playwright.config.cjs tests/a11y --workers=1",
-    "test:smoke": "playwright test -c playwright.config.cjs tests/smoke"
+    "test:smoke": "playwright test -c playwright.config.cjs tests/smoke --workers=1"
   },
   "dependencies": {
     "@chisto/api-client": "workspace:*",

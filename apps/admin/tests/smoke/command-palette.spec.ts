@@ -4,6 +4,7 @@ test.describe('Command palette', () => {
   test('opens from header trigger and closes with Escape', async ({ authenticatedPage: page }) => {
     await page.goto('/dashboard');
     await expect(page).toHaveURL(/\/dashboard/);
+    await expect(page.getByRole('main')).toBeVisible({ timeout: 15_000 });
 
     const trigger = page.getByRole('textbox', { name: /open command palette/i });
     await expect(trigger).toBeVisible();
@@ -22,6 +23,7 @@ test.describe('Command palette', () => {
   test('reopens with keyboard shortcut after Escape', async ({ authenticatedPage: page }) => {
     await page.goto('/dashboard');
     await expect(page).toHaveURL(/\/dashboard/);
+    await expect(page.getByRole('main')).toBeVisible({ timeout: 15_000 });
 
     const trigger = page.getByRole('textbox', { name: /open command palette/i });
     await trigger.click();
@@ -37,6 +39,7 @@ test.describe('Command palette', () => {
 
   test('filters results when typing a query', async ({ authenticatedPage: page }) => {
     await page.goto('/dashboard');
+    await expect(page.getByRole('main')).toBeVisible({ timeout: 15_000 });
     await page.getByRole('textbox', { name: /open command palette/i }).click();
 
     const query = page.getByRole('combobox', { name: /search commands/i });

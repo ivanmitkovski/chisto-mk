@@ -42,6 +42,13 @@ async function readAuthTokensFromCookies(): Promise<{
   };
 }
 
+function isCookieStoreMutationBlocked(error: unknown): boolean {
+  return (
+    error instanceof Error &&
+    error.message.includes('Cookies can only be modified in a Server Action or Route Handler')
+  );
+}
+
 async function persistRefreshedTokens(tokens: {
   accessToken: string;
   refreshToken?: string;
@@ -71,12 +78,36 @@ async function persistRefreshedTokens(tokens: {
   cookieStore.delete(ADMIN_LEGACY_REFRESH_COOKIE_KEY);
 }
 
+async function tryPersistRefreshedTokens(tokens: {
+  accessToken: string;
+  refreshToken?: string;
+}): Promise<void> {
+  try {
+    await persistRefreshedTokens(tokens);
+  } catch (error) {
+    // RSC cannot mutate cookies; the in-memory refreshed token still serves this request.
+    if (!isCookieStoreMutationBlocked(error)) {
+      throw error;
+    }
+  }
+}
+
 async function clearAuthTokensFromCookies(): Promise<void> {
   const cookieStore = await cookies();
   cookieStore.delete(ADMIN_AUTH_COOKIE_KEY);
   cookieStore.delete(ADMIN_REFRESH_COOKIE_KEY);
   cookieStore.delete(ADMIN_LEGACY_AUTH_COOKIE_KEY);
   cookieStore.delete(ADMIN_LEGACY_REFRESH_COOKIE_KEY);
+}
+
+async function tryClearAuthTokensFromCookies(): Promise<void> {
+  try {
+    await clearAuthTokensFromCookies();
+  } catch (error) {
+    if (!isCookieStoreMutationBlocked(error)) {
+      throw error;
+    }
+  }
 }
 
 /**
@@ -113,7 +144,7 @@ export async function serverAuthenticatedFetch<TResponse>(
   if (response.status === 401 && refreshToken) {
     const refreshed = await refreshAdminTokens(refreshToken, deviceId ?? undefined);
     if (refreshed.ok) {
-      await persistRefreshedTokens(refreshed.tokens);
+      await tryPersistRefreshedTokens(refreshed.tokens);
       const retryOptions: AdminFetchOptions = {
         ...fetchOptions,
         authToken: refreshed.tokens.accessToken,
@@ -128,7 +159,7 @@ export async function serverAuthenticatedFetch<TResponse>(
         requestId,
       });
     } else if (refreshed.reason === 'unauthorized') {
-      await clearAuthTokensFromCookies();
+      await tryClearAuthTokensFromCookies();
     }
   }
 
