@@ -88,7 +88,7 @@
 
   --color-success: var(--color-green-700);
   --color-danger: var(--color-error);
-  --color-muted: #6b7b7a;
+  --color-muted: var(--text-secondary);
   --border-default: rgba(8, 54, 39, 0.12);
   --border-subtle: var(--color-green-010);
   --border-focus: var(--color-primary);
