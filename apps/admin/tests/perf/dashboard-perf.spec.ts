@@ -7,7 +7,7 @@ test.describe('Admin dashboard perf smoke', () => {
     const start = Date.now();
     await page.goto('/dashboard');
     await expect(page).toHaveURL(/\/dashboard/);
-    await expect(page.getByRole('main')).toBeVisible();
+    await expect(page.locator('#admin-main')).toBeVisible();
     const elapsed = Date.now() - start;
     expect(elapsed).toBeLessThan(ROUTE_BUDGET_MS);
   });
@@ -16,7 +16,7 @@ test.describe('Admin dashboard perf smoke', () => {
     const start = Date.now();
     await page.goto('/dashboard/active-users');
     await expect(page).toHaveURL(/\/dashboard\/active-users/);
-    await expect(page.getByRole('main')).toBeVisible();
+    await expect(page.locator('#admin-main')).toBeVisible();
     const elapsed = Date.now() - start;
     expect(elapsed).toBeLessThan(ROUTE_BUDGET_MS);
   });
