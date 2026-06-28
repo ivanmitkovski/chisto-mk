@@ -85,6 +85,7 @@
     "showAll": "Show all reports"
   },
   "columnsActions": "Actions",
+  "tableCaption": "Reports list columns",
   "confirmList": {
     "rejectDescription": "Reject \"{name}\"? A reason is required.",
     "approveDescription": "Approve \"{name}\" and move it to approved state?"

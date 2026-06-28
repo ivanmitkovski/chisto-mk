@@ -59,12 +59,7 @@ export function ReportListCard({ report, onApprove, onReject }: ReportListCardPr
   const actionsDisabled = isReportFinalStatus(report.status);
 
   return (
-    <Link
-      href={href}
-      className={styles.row}
-      aria-current={isCurrentReport ? 'page' : undefined}
-      role="listitem"
-    >
+    <Link href={href} className={styles.row} aria-current={isCurrentReport ? 'page' : undefined}>
       <span className={styles.cellReport}>{report.reportNumber}</span>
       <span className={styles.cellTitle}>{report.name}</span>
       <span className={styles.cellLocation}>

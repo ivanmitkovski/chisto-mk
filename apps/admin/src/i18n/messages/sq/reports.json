@@ -85,6 +85,7 @@
     "showAll": "Shfaq të gjitha raportet"
   },
   "columnsActions": "Veprimet",
+  "tableCaption": "Kolonat e listës së raporteve",
   "confirmList": {
     "rejectDescription": "Refuzo \"{name}\"? Kërkohet një arsye.",
     "approveDescription": "Mirato \"{name}\" dhe zhvendose në statusin e miratuar?"

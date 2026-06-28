@@ -85,6 +85,7 @@
     "showAll": "Прикажи ги сите пријави"
   },
   "columnsActions": "Акции",
+  "tableCaption": "Колони на листата со пријави",
   "confirmList": {
     "rejectDescription": "Одбиј \"{name}\"? Потребна е причина.",
     "approveDescription": "Одобри \"{name}\" и премести во одобрен статус?"

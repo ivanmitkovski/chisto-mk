@@ -36,39 +36,37 @@ export function ReportsListTable({
 
   return (
     <div className={styles.tableWrapper}>
-      <div className={styles.table} role="grid">
-        <div role="rowgroup">
-          <div className={styles.tableHeader} role="row">
-            {columns.map((col) => (
-              <span
-                key={col.key}
-                className={styles.headerCell}
-                role="columnheader"
-                aria-sort={ariaSortValue(col.key)}
-              >
-                {isOverview ? (
-                  <button
-                    type="button"
-                    className={styles.headerSortLink}
-                    onClick={() => onSort(col.key)}
-                  >
-                    {col.label}
-                    <Icon name={sortIconName(col.key)} size={13} className={styles.headerSortIcon} aria-hidden />
-                  </button>
-                ) : (
-                  <Link href={sortHref(col.key)} className={styles.headerSortLink}>
-                    {col.label}
-                    <Icon name={sortIconName(col.key)} size={13} className={styles.headerSortIcon} aria-hidden />
-                  </Link>
-                )}
-              </span>
-            ))}
-            <span className={`${styles.headerCell} ${styles.actionsHeader}`} role="columnheader">
-              {t('columnsActions')}
-            </span>
-          </div>
-        </div>
-        <div className={styles.rowList} role="list">
+      <div className={styles.table}>
+        <table className={styles.headerTable}>
+          <caption className={styles.headerCaption}>{t('tableCaption')}</caption>
+          <thead>
+            <tr>
+              {columns.map((col) => (
+                <th key={col.key} scope="col" aria-sort={ariaSortValue(col.key)}>
+                  {isOverview ? (
+                    <button
+                      type="button"
+                      className={styles.headerSortLink}
+                      onClick={() => onSort(col.key)}
+                    >
+                      {col.label}
+                      <Icon name={sortIconName(col.key)} size={13} className={styles.headerSortIcon} aria-hidden />
+                    </button>
+                  ) : (
+                    <Link href={sortHref(col.key)} className={styles.headerSortLink}>
+                      {col.label}
+                      <Icon name={sortIconName(col.key)} size={13} className={styles.headerSortIcon} aria-hidden />
+                    </Link>
+                  )}
+                </th>
+              ))}
+              <th scope="col" className={styles.actionsHeader}>
+                {t('columnsActions')}
+              </th>
+            </tr>
+          </thead>
+        </table>
+        <div className={styles.rowList}>
           {reports.map((report) => (
             <div
               key={report.id}
