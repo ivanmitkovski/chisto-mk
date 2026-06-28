@@ -187,9 +187,17 @@
   --color-success-fg: #15803d;
   /** Darker foreground on tinted info / warning badges (events admin). */
   --color-status-info-fg: #155a7a;
-  --color-status-warning-fg: #8b6914;
+  /** WCAG AA on --color-yellow-100 badge backgrounds. */
+  --color-status-warning-fg: #6b5010;
   --color-status-success-fg: #127e4c;
-  --color-status-danger-fg: var(--color-error);
+  /** WCAG AA on --color-red-050 badge backgrounds. */
+  --color-status-danger-fg: #c62828;
+
+  /** Text links and interactive labels on light surfaces (#ffffff). */
+  --color-link: var(--color-green-900);
+  --color-link-hover: var(--color-green-900);
+  /** Links and active nav on mint-tinted surfaces (--color-green-010). */
+  --color-link-on-tint: var(--color-green-900);
   --color-warning-foreground: var(--color-status-warning-fg);
   /** Participants stat icon (events workspace). */
   --color-stat-participants-fg: #5b21b6;

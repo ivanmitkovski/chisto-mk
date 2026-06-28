@@ -90,7 +90,7 @@
 
 .modStatusDeclined {
   background: var(--color-red-050);
-  color: var(--color-error);
+  color: var(--color-status-danger-fg);
 }
 
 .statIconParticipants {
@@ -320,13 +320,13 @@
 }
 
 .siteLink {
-  color: var(--color-green-700);
+  color: var(--color-link);
   font-weight: 600;
   text-decoration: none;
 }
 
 .titleLink {
-  color: var(--color-green-700);
+  color: var(--color-link);
   font-weight: 600;
   text-decoration: none;
 }

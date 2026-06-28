@@ -345,7 +345,7 @@
 }
 
 .nameLink {
-  color: var(--color-green-700);
+  color: var(--color-link);
   font-weight: 600;
   text-decoration: none;
 }
@@ -424,7 +424,7 @@
 .actionLink {
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--color-green-700);
+  color: var(--color-link);
   text-decoration: none;
 }
 

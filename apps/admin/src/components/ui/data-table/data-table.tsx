@@ -86,7 +86,19 @@ export function DataTable<T>({
                 <thead>
                   <tr>
                     {columns.map((col) => (
-                      <th key={col.key} scope="col">
+                      <th
+                        key={col.key}
+                        scope="col"
+                        aria-sort={
+                          col.sortable && onSort
+                            ? sortKey === col.key
+                              ? sortDir === 'asc'
+                                ? 'ascending'
+                                : 'descending'
+                              : 'none'
+                            : undefined
+                        }
+                      >
                         {col.renderHeader ? (
                           col.renderHeader()
                         ) : col.sortable && onSort ? (
@@ -94,13 +106,6 @@ export function DataTable<T>({
                             type="button"
                             className={styles.sortButton}
                             onClick={() => onSort(col.key)}
-                            aria-sort={
-                              sortKey === col.key
-                                ? sortDir === 'asc'
-                                  ? 'ascending'
-                                  : 'descending'
-                                : undefined
-                            }
                           >
                             {col.header}
                             {sortKey === col.key && (

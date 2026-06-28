@@ -141,7 +141,7 @@
 
 .statusInReview {
   background: var(--color-green-010);
-  color: var(--color-green-700);
+  color: var(--color-link-on-tint);
 }
 
 .statusApproved {
@@ -151,7 +151,7 @@
 
 .statusDeleted {
   background: var(--color-red-050);
-  color: var(--color-error);
+  color: var(--color-status-danger-fg);
 }
 
 .badges {

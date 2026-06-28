@@ -172,7 +172,7 @@
 
 .filterChipActive {
   background: var(--color-green-010);
-  color: var(--color-green-700);
+  color: var(--color-link-on-tint);
   border-color: rgba(37, 219, 134, 0.3);
 }
 
@@ -241,7 +241,7 @@
 }
 
 .headerSortLink:hover {
-  color: var(--color-green-700);
+  color: var(--color-link);
 }
 
 .headerSortLink:focus-visible {

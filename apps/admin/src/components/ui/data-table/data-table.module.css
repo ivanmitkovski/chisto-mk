@@ -44,7 +44,7 @@
 }
 
 .link {
-  color: var(--color-green-700);
+  color: var(--color-link);
   font-weight: var(--font-weight-semibold);
   text-decoration: none;
 }

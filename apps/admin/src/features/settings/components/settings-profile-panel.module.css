@@ -24,7 +24,7 @@
   justify-content: center;
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-green-700);
+  color: var(--color-link);
   letter-spacing: -0.02em;
 }
 
@@ -38,7 +38,7 @@
   box-shadow: var(--shadow-sm);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-green-700);
+  color: var(--color-link);
   text-transform: capitalize;
 }
 
