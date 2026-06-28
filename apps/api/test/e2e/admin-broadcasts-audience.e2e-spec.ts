@@ -1,51 +1,11 @@
 /// <reference types="jest" />
 
-import { randomUUID } from 'node:crypto';
 import type { INestApplication } from '@nestjs/common';
-import * as jwt from 'jsonwebtoken';
 import request from 'supertest';
 import { createE2eApplication } from './helpers/bootstrap-app';
 import { deleteUsersByEmailPrefix } from './helpers/db-cleanup';
-import { uniquePhone } from './helpers/auth-helper';
+import { createE2eAdminAccessToken } from './helpers/admin-access-token';
 import { PrismaService } from '../../src/prisma/prisma.service';
-import { Role } from '../../src/prisma-client';
-
-async function createAdminAccessToken(prisma: PrismaService): Promise<{ token: string; userId: string }> {
-  const adminEmail = `e2e_broadcast_admin_${Date.now()}@test.local`;
-  const adminPhone = uniquePhone();
-
-  const adminUser = await prisma.user.create({
-    data: {
-      firstName: 'Admin',
-      lastName: 'Broadcast',
-      email: adminEmail,
-      phoneNumber: adminPhone,
-      passwordHash: '$2b$04$placeholderhashplaceholderhashpl',
-      role: Role.ADMIN,
-      isPhoneVerified: true,
-      termsAcceptedAt: new Date(),
-      termsVersion: '1',
-    },
-  });
-
-  const session = await prisma.userSession.create({
-    data: {
-      userId: adminUser.id,
-      tokenId: randomUUID(),
-      refreshTokenHash: 'hash',
-      expiresAt: new Date(Date.now() + 86400000),
-    },
-  });
-
-  const secret = process.env.JWT_SECRET ?? 'ci_jwt_secret_must_be_at_least_thirty_two_chars';
-  const token = jwt.sign(
-    { sub: adminUser.id, role: Role.ADMIN, sid: session.id },
-    secret,
-    { expiresIn: 900, issuer: 'chisto-api', audience: 'chisto-api', header: { kid: 'default', alg: 'HS256' } },
-  );
-
-  return { token, userId: adminUser.id };
-}
 
 describe('Admin broadcasts audience (e2e)', () => {
   let app: INestApplication;
@@ -59,11 +19,12 @@ describe('Admin broadcasts audience (e2e)', () => {
 
   afterAll(async () => {
     await deleteUsersByEmailPrefix(prisma, 'e2e_broadcast_admin_');
+    await deleteUsersByEmailPrefix(prisma, 'e2e_admin');
     await app.close();
   });
 
   it('POST /admin/broadcasts/audience-preview returns recipient count', async () => {
-    const { token } = await createAdminAccessToken(prisma);
+    const { token } = await createE2eAdminAccessToken(prisma, { emailPrefix: 'e2e_broadcast_admin' });
     const server = app.getHttpServer();
 
     const res = await request(server)
@@ -80,7 +41,7 @@ describe('Admin broadcasts audience (e2e)', () => {
   });
 
   it('POST /admin/broadcasts/audience-users/lookup returns user rows', async () => {
-    const { token, userId } = await createAdminAccessToken(prisma);
+    const { token, userId } = await createE2eAdminAccessToken(prisma, { emailPrefix: 'e2e_broadcast_admin' });
     const server = app.getHttpServer();
 
     const res = await request(server)
@@ -94,7 +55,7 @@ describe('Admin broadcasts audience (e2e)', () => {
         expect.objectContaining({
           id: userId,
           firstName: 'Admin',
-          lastName: 'Broadcast',
+          lastName: 'E2E',
           status: 'ACTIVE',
         }),
       ]),

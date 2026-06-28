@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsBoolean, IsEnum, IsInt, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
 import { DevicePlatform, UserActivityEventType, AdminAlertMetric, AdminAlertComparator } from '../../prisma-client';
 
 export class ActiveUsersListQueryDto {
@@ -69,11 +69,14 @@ export class CreateAdminAlertRuleDto {
 
   @ApiProperty({ default: 100 })
   @Type(() => Number)
+  @IsNumber()
   threshold!: number;
 
   @ApiPropertyOptional({ default: 300 })
   @IsOptional()
   @Type(() => Number)
+  @IsInt()
+  @Min(1)
   windowSeconds?: number;
 
   @ApiPropertyOptional({ enum: AdminAlertComparator, default: AdminAlertComparator.GT })
@@ -86,9 +89,11 @@ export class UpdateAdminAlertRuleDto {
   @ApiPropertyOptional()
   @IsOptional()
   @Type(() => Number)
+  @IsNumber()
   threshold?: number;
 
   @ApiPropertyOptional()
   @IsOptional()
+  @IsBoolean()
   enabled?: boolean;
 }

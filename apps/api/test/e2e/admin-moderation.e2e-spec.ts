@@ -1,48 +1,12 @@
 /// <reference types="jest" />
 
 import type { INestApplication } from '@nestjs/common';
-import * as jwt from 'jsonwebtoken';
 import request from 'supertest';
 import { createE2eApplication } from './helpers/bootstrap-app';
 import { deleteUsersByEmailPrefix } from './helpers/db-cleanup';
-import { registerCitizen, uniquePhone } from './helpers/auth-helper';
+import { registerCitizen } from './helpers/auth-helper';
+import { createE2eAdminAccessToken } from './helpers/admin-access-token';
 import { PrismaService } from '../../src/prisma/prisma.service';
-import { Role } from '../../src/prisma-client';
-
-async function createAdminAccessToken(prisma: PrismaService): Promise<string> {
-  const adminEmail = `e2e_admin_${Date.now()}@test.local`;
-  const adminPhone = uniquePhone();
-
-  const adminUser = await prisma.user.create({
-    data: {
-      firstName: 'Admin',
-      lastName: 'E2E',
-      email: adminEmail,
-      phoneNumber: adminPhone,
-      passwordHash: '$2b$04$placeholderhashplaceholderhashpl',
-      role: Role.ADMIN,
-      isPhoneVerified: true,
-      termsAcceptedAt: new Date(),
-      termsVersion: '1',
-    },
-  });
-
-  const session = await prisma.userSession.create({
-    data: {
-      userId: adminUser.id,
-      tokenId: 'adminsess123456789012',
-      refreshTokenHash: 'hash',
-      expiresAt: new Date(Date.now() + 86400000),
-    },
-  });
-
-  const secret = process.env.JWT_SECRET ?? 'ci_jwt_secret_must_be_at_least_thirty_two_chars';
-  return jwt.sign(
-    { sub: adminUser.id, role: Role.ADMIN, sid: session.id },
-    secret,
-    { expiresIn: 900, issuer: 'chisto-api', audience: 'chisto-api', header: { kid: 'default', alg: 'HS256' } },
-  );
-}
 
 describe('Admin moderation (e2e)', () => {
   let app: INestApplication;
@@ -56,6 +20,7 @@ describe('Admin moderation (e2e)', () => {
 
   afterAll(async () => {
     await deleteUsersByEmailPrefix(prisma, 'e2e_admin_');
+    await deleteUsersByEmailPrefix(prisma, 'e2e_admin');
     await app.close();
   });
 
@@ -69,7 +34,7 @@ describe('Admin moderation (e2e)', () => {
   });
 
   it('routes admin report moderation endpoints before citizen GET /reports/:id', async () => {
-    const adminToken = await createAdminAccessToken(prisma);
+    const { token: adminToken } = await createE2eAdminAccessToken(prisma);
     const citizen = await registerCitizen(app, 'admin_reports_route');
     const server = app.getHttpServer();
 

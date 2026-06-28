@@ -5,8 +5,9 @@ import * as jwt from 'jsonwebtoken';
 import request from 'supertest';
 import { createE2eApplication } from './helpers/bootstrap-app';
 import { deleteUsersByEmailPrefix } from './helpers/db-cleanup';
+import { createE2eAdminAccessToken } from './helpers/admin-access-token';
 import { PrismaService } from '../../src/prisma/prisma.service';
-import { registerCitizen, uniquePhone, e2eThrottleIp } from './helpers/auth-helper';
+import { registerCitizen, e2eThrottleIp, uniquePhone } from './helpers/auth-helper';
 import { Role } from '../../src/prisma-client';
 
 describe('Auth hardening (e2e)', () => {
@@ -21,6 +22,7 @@ describe('Auth hardening (e2e)', () => {
 
   afterAll(async () => {
     await deleteUsersByEmailPrefix(prisma, 'e2e_hardening_');
+    await deleteUsersByEmailPrefix(prisma, 'e2e_admin');
     await app.close();
   });
 
@@ -39,41 +41,12 @@ describe('Auth hardening (e2e)', () => {
   });
 
   it('rejects demoted admin on next request', async () => {
-    const adminEmail = `e2e_hardening_admin_${Date.now()}@test.local`;
-    const adminPhone = `+1555${String(1_000_000 + Math.floor(Math.random() * 8_999_999))}`;
-
-    const adminUser = await prisma.user.create({
-      data: {
-        firstName: 'Admin',
-        lastName: 'E2E',
-        email: adminEmail,
-        phoneNumber: adminPhone,
-        passwordHash: '$2b$04$placeholderhashplaceholderhashpl',
-        role: Role.ADMIN,
-        isPhoneVerified: true,
-        termsAcceptedAt: new Date(),
-        termsVersion: '1',
-      },
+    const { token: accessToken, userId } = await createE2eAdminAccessToken(prisma, {
+      emailPrefix: 'e2e_hardening_admin',
     });
-
-    const session = await prisma.userSession.create({
-      data: {
-        userId: adminUser.id,
-        tokenId: 'adminsess123456789012',
-        refreshTokenHash: 'hash',
-        expiresAt: new Date(Date.now() + 86400000),
-      },
-    });
-
-    const secret = process.env.JWT_SECRET ?? 'ci_jwt_secret_must_be_at_least_thirty_two_chars';
-    const accessToken = jwt.sign(
-      { sub: adminUser.id, role: Role.ADMIN, sid: session.id },
-      secret,
-      { expiresIn: 900, issuer: 'chisto-api', audience: 'chisto-api', header: { kid: 'default', alg: 'HS256' } },
-    );
 
     await prisma.user.update({
-      where: { id: adminUser.id },
+      where: { id: userId },
       data: { role: Role.USER },
     });
 
