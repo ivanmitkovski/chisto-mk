@@ -1,7 +1,8 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Button, RichTextEditor } from '@/components/ui';
+import { Button } from '@/components/ui/button';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import type { NewsBodyBlock, NewsMediaDto } from '../news-api-types';
 import { blockTypeLabel } from '../lib/news-block-display';
 import { NewsGalleryBlockEditor } from './news-gallery-block-editor';

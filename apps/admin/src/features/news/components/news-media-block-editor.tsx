@@ -3,7 +3,8 @@
 import Image from 'next/image';
 import { useCallback, useId, useRef, useState, type DragEvent } from 'react';
 import { useTranslations } from 'next-intl';
-import { Button, Icon, MediaUploadZone, Spinner } from '@/components/ui';
+import { Button, Icon, Spinner } from '@/components/ui';
+import { MediaUploadZone } from '@/components/ui/media-upload-zone';
 import type { NewsBodyBlock, NewsMediaDto } from '../news-api-types';
 import { useNewsMediaGuidanceText } from '../hooks/use-news-media-guidance';
 import { NEWS_MEDIA_ACCEPT } from '../lib/news-media-validation';

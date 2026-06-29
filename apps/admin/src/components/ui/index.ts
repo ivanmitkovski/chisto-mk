@@ -1,5 +1,3 @@
-export { RichTextEditor } from './rich-text-editor';
-export type { RichTextEditorValue } from './rich-text-editor';
 export { MetadataView, formatMetadataValue } from './metadata-view';
 export { MetricTile, MetricTileGrid } from './metric-tile/metric-tile';
 export type { MetricTileProps, MetricTileTone } from './metric-tile/metric-tile';
@@ -21,8 +19,6 @@ export type { ComboboxOption } from './combobox';
 export { ConfirmDialog } from './confirm-dialog';
 export { DataTable, DataTableLink, DataTableMobileField } from './data-table/index';
 export type { DataTableProps } from './data-table/index';
-export { MediaUploadZone } from './media-upload-zone';
-export type { MediaUploadZoneProps } from './media-upload-zone';
 export { EmptyState } from './empty-state';
 export type { EmptyStateProps } from './empty-state';
 export { ExportButton } from './export-button';
