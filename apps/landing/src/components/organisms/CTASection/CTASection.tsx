@@ -5,9 +5,9 @@ import { useTranslations } from "next-intl";
 import { Container } from "@/components/layout/Container";
 import { StoreDownloadButtons, hasStoreDownloadLinks } from "@/components/molecules/StoreDownloadButtons";
 import { FloatingPhone } from "@/components/molecules/FloatingPhone";
+import { MarketingPhoneRow } from "@/components/molecules/MarketingPhoneRow";
 import { PhoneMockup } from "@/components/molecules/PhoneMockup";
 import { PhoneScreen } from "@/components/molecules/PhoneDemoScreens";
-import { MARKETING_PHONE_SCREENSHOTS } from "@/lib/app-screenshots";
 import { fadeInUp, staggerContainer, viewOnce } from "@/lib/animations/variants";
 
 export function CTASection() {
@@ -78,21 +78,13 @@ export function CTASection() {
             </FloatingPhone>
           </div>
 
-          <div className="relative hidden min-h-[20rem] overflow-visible md:flex md:items-end md:justify-center md:gap-2 md:pb-4 lg:gap-3">
-            {MARKETING_PHONE_SCREENSHOTS.map((screenshotId, index) => (
-              <FloatingPhone
-                key={screenshotId}
-                className={index === 1 ? "relative z-10 w-[11rem] lg:w-44" : "w-40"}
-                delay={index * 0.12}
-              >
-                <PhoneMockup
-                  {...(index === 1 ? { className: "shadow-[var(--shadow-phone-lg)]" } : {})}
-                >
-                  <PhoneScreen variant={screenshotId} />
-                </PhoneMockup>
-              </FloatingPhone>
-            ))}
-          </div>
+          <MarketingPhoneRow
+            floating
+            priorityIndex={1}
+            className="relative hidden min-h-[20rem] md:flex md:pb-4"
+            sideClassName="w-[8.75rem] shrink-0 origin-bottom scale-[0.94] lg:w-36"
+            centerClassName="relative z-10 w-[11rem] shrink-0 lg:w-44"
+          />
         </div>
       </Container>
     </div>

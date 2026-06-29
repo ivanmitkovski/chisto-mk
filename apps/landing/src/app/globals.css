@@ -706,16 +706,25 @@
     -webkit-text-fill-color: transparent;
   }
 
-  /** iPhone-style device mockup: Space Black frame, hardware buttons, deep rounded corners. */
+  /**
+   * iPhone-style device mockup: Space Black frame, hardware buttons, deep rounded corners.
+   * Bezels, radii, and buttons scale with container width so compact rows (CTA, side phones)
+   * keep the same screen-to-body ratio as the hero — no chunky fixed-pixel borders.
+   */
   .phone-mockup {
-    border-radius: 3rem;
+    border-radius: clamp(1.65rem, 16cqw, 3rem);
     overflow: visible;
+  }
+
+  .phone-mockup--iphone {
+    container-type: inline-size;
+    container-name: phone-mockup;
   }
 
   .phone-mockup--iphone .phone-mockup__frame {
     position: relative;
-    border-radius: 3rem;
-    padding: 12px;
+    border-radius: clamp(1.65rem, 16cqw, 3rem);
+    padding: clamp(4px, 4.15cqw, 12px);
     background: linear-gradient(
       165deg,
       #48484a 0%,
@@ -733,7 +742,7 @@
 
   .phone-mockup--iphone .phone-mockup__screen {
     overflow: hidden;
-    border-radius: 2.35rem;
+    border-radius: clamp(1.2rem, 12.5cqw, 2.35rem);
     background: #000;
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
   }
@@ -750,31 +759,37 @@
   }
 
   .phone-mockup__button--mute {
-    left: -3px;
+    left: clamp(-3px, -0.65cqw, -2px);
     top: 17%;
-    width: 3px;
-    height: 16px;
+    width: clamp(2px, 0.95cqw, 3px);
+    height: clamp(10px, 5cqw, 16px);
   }
 
   .phone-mockup__button--volume-up {
-    left: -3px;
+    left: clamp(-3px, -0.65cqw, -2px);
     top: 25%;
-    width: 3px;
-    height: 30px;
+    width: clamp(2px, 0.95cqw, 3px);
+    height: clamp(18px, 9.5cqw, 30px);
   }
 
   .phone-mockup__button--volume-down {
-    left: -3px;
+    left: clamp(-3px, -0.65cqw, -2px);
     top: 33.5%;
-    width: 3px;
-    height: 30px;
+    width: clamp(2px, 0.95cqw, 3px);
+    height: clamp(18px, 9.5cqw, 30px);
   }
 
   .phone-mockup__button--power {
-    right: -3px;
+    right: clamp(-3px, -0.65cqw, -2px);
     top: 23%;
-    width: 3px;
-    height: 48px;
+    width: clamp(2px, 0.95cqw, 3px);
+    height: clamp(28px, 15cqw, 48px);
+  }
+
+  @container phone-mockup (max-width: 10rem) {
+    .phone-mockup__button {
+      display: none;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
