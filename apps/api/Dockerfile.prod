@@ -9,6 +9,8 @@ WORKDIR /app
 FROM base AS deps
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY apps/api/package.json ./apps/api/
+COPY packages/map-contracts/package.json ./packages/map-contracts/
+COPY packages/news-content/package.json ./packages/news-content/
 COPY packages/prisma-cli/package.json ./packages/prisma-cli/
 RUN pnpm install --frozen-lockfile
 
@@ -16,6 +18,7 @@ FROM base AS builder
 COPY --from=deps /app ./
 COPY . .
 ENV DATABASE_URL="postgresql://build:build@localhost:5432/build"
+RUN pnpm --filter @chisto/news-content build
 RUN pnpm --filter @chisto/api exec prisma generate
 RUN pnpm --filter @chisto/api build
 

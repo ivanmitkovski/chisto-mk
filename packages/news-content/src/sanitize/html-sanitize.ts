@@ -55,7 +55,7 @@ export function sanitizeHtmlBlock(html: string): string {
     },
     disallowedTagsMode: 'discard',
     transformTags: {
-      iframe: (_tagName, attribs) => {
+      iframe: (_tagName: string, attribs: Record<string, string>) => {
         const src = attribs.src ?? '';
         if (!isAllowedEmbedUrl(src)) {
           return { tagName: 'iframe', attribs: {} };
