@@ -1,7 +1,12 @@
 import { getTranslations } from 'next-intl/server';
-import { SectionState } from '@/components/ui';
+import { DetailFormSkeleton } from '@/components/ui';
+import { createDashboardLoadingPage } from '@/features/admin-shell/server';
 
 export default async function NewsPreviewLoading() {
   const t = await getTranslations('news');
-  return <SectionState variant="loading" message={t('preview.loading')} />;
+  return createDashboardLoadingPage({
+    title: t('preview.fullPageTitle'),
+    activeItem: 'news',
+    children: <DetailFormSkeleton />,
+  });
 }

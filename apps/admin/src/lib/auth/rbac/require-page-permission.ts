@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { getMeProfile, type MeProfile } from '@/features/auth/data/me-adapter';
+import { getMeProfile, type MeProfile } from '@/lib/auth/me-profile';
 import { requirePermission } from './require-permission';
 import type { AdminPermission } from './permissions';
 
