@@ -76,7 +76,7 @@ test.describe("home page", () => {
     await expect(
       page.getByRole("heading", {
         level: 1,
-        name: /Chisto\.mk launches on the App Store, bringing pollution reporting to iPhone users in North Macedonia/i,
+        name: /Chisto\.mk launches on the App Store, bringing pollution reporting to iPhone users in Macedonia/i,
       }),
     ).toBeVisible();
   });

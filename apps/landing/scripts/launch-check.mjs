@@ -28,7 +28,7 @@ const appStore =
 if (!appStore.startsWith("https://")) {
   fail("App Store URL must be HTTPS");
 } else if (!appStore.includes("/mk/app/")) {
-  fail("App Store URL should use the North Macedonia storefront (/mk/app/…) for this listing");
+  fail("App Store URL should use the Macedonia storefront (/mk/app/…) for this listing");
 } else {
   pass("App Store URL configured");
 }
