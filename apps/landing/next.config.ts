@@ -5,6 +5,7 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  transpilePackages: ["@chisto/news-content"],
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '**.amazonaws.com' },

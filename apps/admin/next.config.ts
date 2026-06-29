@@ -60,6 +60,7 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  transpilePackages: ['@chisto/news-content'],
   experimental: {
     optimizePackageImports: ['lucide-react', 'recharts', 'framer-motion'],
   },
