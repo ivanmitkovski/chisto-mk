@@ -6,21 +6,20 @@ import type { AuthenticatedUser } from '../../auth/types/authenticated-user.type
 import { NewsMediaSignedUrlService } from './news-media-signed-url.service';
 import { NewsRevalidateService } from './news-revalidate.service';
 import { randomUUID } from 'crypto';
-import { Prisma, type NewsMediaKind } from '../../prisma-client';
+import { Prisma } from '../../prisma-client';
 import type { NewsLocale, NewsTranslations } from '../types/news.types';
 import { parseTranslations, toMediaDto } from './news-posts.mapper';
 import { stripMediaIdFromTranslations } from './news-posts-validation';
 import { NewsImageProcessor } from './news-image-processor';
-import { assertNewsVideoFile } from './news-video-validator';
-
-const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
-const MAX_VIDEO_BYTES = 25 * 1024 * 1024;
-
-const VIDEO_MIMES = new Set(['video/mp4', 'video/quicktime', 'video/webm']);
+import {
+  toNewsMediaPrismaKind,
+  validateAndProcessNewsMediaFile,
+  type NewsMediaUploadKind,
+} from './news-media-upload-validation';
 
 export type UploadNewsMediaInput = {
   postId: string;
-  kind: 'cover' | 'inline_image' | 'inline_video';
+  kind: NewsMediaUploadKind;
   file: { buffer: Buffer; mimetype: string; size: number; originalname: string };
   actor?: AuthenticatedUser;
 };
@@ -64,8 +63,12 @@ export class NewsMediaUploadService {
       });
     }
 
-    const prismaKind = this.toPrismaKind(input.kind);
-    const processed = await this.validateAndProcess(input.kind, input.file);
+    const prismaKind = toNewsMediaPrismaKind(input.kind);
+    const processed = await validateAndProcessNewsMediaFile(
+      this.imageProcessor,
+      input.kind,
+      input.file,
+    );
 
     const subfolder = input.kind === 'cover' ? 'cover' : 'inline';
     const key = `news/${input.postId}/${subfolder}/${randomUUID()}.${processed.ext}`;
@@ -277,54 +280,5 @@ export class NewsMediaUploadService {
         this.logger.warn(`news.delete s3_failed key=${objectKey} err=${(err as Error).message}`);
       }
     }
-  }
-
-  private toPrismaKind(kind: UploadNewsMediaInput['kind']): NewsMediaKind {
-    switch (kind) {
-      case 'cover':
-        return 'COVER';
-      case 'inline_image':
-        return 'INLINE_IMAGE';
-      case 'inline_video':
-        return 'INLINE_VIDEO';
-    }
-  }
-
-  private async validateAndProcess(
-    kind: UploadNewsMediaInput['kind'],
-    file: UploadNewsMediaInput['file'],
-  ): Promise<{
-    body: Buffer;
-    mime: string;
-    ext: string;
-    width: number | null;
-    height: number | null;
-  }> {
-    const mime = file.mimetype?.toLowerCase() ?? '';
-    if (kind === 'cover' && VIDEO_MIMES.has(mime)) {
-      throw new BadRequestException({
-        code: 'NEWS_COVER_MUST_BE_IMAGE',
-        message: 'Cover must be an image file',
-      });
-    }
-    if (kind === 'inline_video') {
-      const video = assertNewsVideoFile(file, MAX_VIDEO_BYTES);
-      return {
-        body: file.buffer,
-        mime: video.mime,
-        ext: video.ext,
-        width: null,
-        height: null,
-      };
-    }
-
-    const image = await this.imageProcessor.process(file, MAX_IMAGE_BYTES);
-    return {
-      body: image.buffer,
-      mime: image.mime,
-      ext: image.ext,
-      width: image.width,
-      height: image.height,
-    };
   }
 }

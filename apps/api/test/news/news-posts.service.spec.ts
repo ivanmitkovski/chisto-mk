@@ -1,7 +1,7 @@
 /// <reference types="jest" />
-import { NewsPostsService } from '../../src/news/services/news-posts.service';
+import { NewsPostsUpdateService } from '../../src/news/services/news-posts-update.service';
 
-describe('NewsPostsService featured exclusivity', () => {
+describe('NewsPostsUpdateService featured exclusivity', () => {
   it('clears featured on other posts when setting featured true', async () => {
     const updateMany = jest.fn().mockResolvedValue({ count: 1 });
     const update = jest.fn().mockResolvedValue({
@@ -45,12 +45,10 @@ describe('NewsPostsService featured exclusivity', () => {
       signMany: jest.fn().mockResolvedValue(new Map()),
     };
 
-    const svc = new NewsPostsService(
+    const svc = new NewsPostsUpdateService(
       prisma as never,
       signedUrls as never,
       { triggerLandingRevalidate: jest.fn() } as never,
-      { delete: jest.fn() } as never,
-      { publish: jest.fn(), unpublish: jest.fn(), archive: jest.fn() } as never,
       { createRevision: jest.fn() } as never,
     );
 

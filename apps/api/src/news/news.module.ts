@@ -9,6 +9,7 @@ import { NewsMediaUploadService } from './services/news-media-upload.service';
 import { NewsPostsAdminQueryService } from './services/news-posts-admin-query.service';
 import { NewsPostsQueryService } from './services/news-posts-query.service';
 import { NewsPostsService } from './services/news-posts.service';
+import { NewsPostsUpdateService } from './services/news-posts-update.service';
 import { NewsPostsDeleteService } from './services/news-posts-delete.service';
 import { NewsPostsLifecycleService } from './services/news-posts-lifecycle.service';
 import { NewsRevalidateService } from './services/news-revalidate.service';
@@ -20,6 +21,7 @@ import { NewsScheduleWorkerService } from './services/news-schedule-worker.servi
   controllers: [PublicNewsController, AdminNewsController],
   providers: [
     NewsPostsService,
+    NewsPostsUpdateService,
     NewsPostsDeleteService,
     NewsPostsLifecycleService,
     NewsPostsQueryService,
