@@ -8,8 +8,13 @@ import { Section } from "@/components/layout/Section";
 import { hasStoreDownloadLinks } from "@/components/molecules/StoreDownloadButtons";
 import { MarketingPhoneRow } from "@/components/molecules/MarketingPhoneRow";
 import { fadeInUp, staggerContainer } from "@/lib/animations/variants";
-import { DOWNLOAD_SECTION_ID } from "@/lib/utils/smooth-scroll";
-import { scrollToDownloadFromHashNavigation } from "@/lib/navigation/download-navigation";
+import {
+  DOWNLOAD_SECTION_ID,
+  scheduleScrollToDownloadSection,
+} from "@/lib/utils/smooth-scroll";
+import {
+  scrollToDownloadFromHashNavigation,
+} from "@/lib/navigation/download-navigation";
 import { HeroAtmosphere, HeroWaveFooter } from "./HeroAtmosphere";
 import { HeroDownloadSection } from "./HeroDownloadSection";
 import { HeroPhoneSwipeDeck } from "./HeroPhoneSwipeDeck";
@@ -20,13 +25,20 @@ export function Hero() {
   useEffect(() => {
     const syncHash = () => {
       if (window.location.hash === `#${DOWNLOAD_SECTION_ID}`) {
-        scrollToDownloadFromHashNavigation();
+        scheduleScrollToDownloadSection(0, { behavior: "instant" });
       }
     };
 
     syncHash();
-    window.addEventListener("hashchange", syncHash);
-    return () => window.removeEventListener("hashchange", syncHash);
+    const late = window.setTimeout(syncHash, 100);
+    const later = window.setTimeout(syncHash, 350);
+    const onHashChange = () => scrollToDownloadFromHashNavigation();
+    window.addEventListener("hashchange", onHashChange);
+    return () => {
+      window.clearTimeout(late);
+      window.clearTimeout(later);
+      window.removeEventListener("hashchange", onHashChange);
+    };
   }, []);
 
   return (

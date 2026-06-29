@@ -22,7 +22,7 @@ export function SharePageLayout({ children, homeHref, homeLabel }: SharePageLayo
             unoptimized
           />
           <span className="text-lg font-bold tracking-tight text-gray-900">
-            Chisto<span className="font-medium text-primary">.mk</span>
+            Chisto<span className="font-medium text-primary-text">.mk</span>
           </span>
         </div>
         <div className="rounded-2xl border border-gray-200/90 bg-white p-6 shadow-[var(--shadow-card)] ring-1 ring-black/[0.04] md:p-8">

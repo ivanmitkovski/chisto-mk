@@ -67,7 +67,8 @@ export function scrollToDownloadSection(options: ScrollToDownloadOptions = {}): 
 
   const { updateHash = true, behavior } = options;
   const target = document.getElementById(DOWNLOAD_SECTION_ID);
-  if (!target) return false;
+  const hashMatches = window.location.hash === `#${DOWNLOAD_SECTION_ID}`;
+  if (!target && !hashMatches) return false;
 
   window.scrollTo({
     top: 0,

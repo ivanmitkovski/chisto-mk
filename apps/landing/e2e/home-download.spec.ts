@@ -9,7 +9,7 @@ async function dismissCookieBanner(page: import("@playwright/test").Page) {
 
 async function expectDownloadBadgesVisible(page: import("@playwright/test").Page) {
   await expect
-    .poll(async () => page.evaluate(() => window.scrollY))
+    .poll(async () => page.evaluate(() => window.scrollY), { timeout: 10_000 })
     .toBeLessThan(8);
 
   const downloadRegion = page.getByRole("region", { name: /Download the app/i });

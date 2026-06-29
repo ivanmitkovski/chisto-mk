@@ -5,14 +5,14 @@
   --color-primary-50: #EDFFF6;
   --color-primary-100: #D4F9E8;
   --color-primary-500: #2FD788;
-  /** Logo leaf, wordmark “.mk”, nav hover — matches /brand/chisto-mark.svg */
+  /** Brand accent (SVG mark, buttons, fills) — matches /brand/chisto-mark.svg */
   --color-primary: #2FD788;
   --color-brand-mark: var(--color-primary);
   --color-primary-600: #22C97B;
   --color-primary-700: #14B96A;
   --color-primary-800: #0F9A58;
   --color-primary-dark: #14B96A;
-  /** Readable green on tinted surfaces (badges, chips); not the logo accent. */
+  /** Readable green on white/light surfaces (wordmark, nav, links, badges). */
   --color-primary-text: #086340;
   --color-on-primary: #121212;
 

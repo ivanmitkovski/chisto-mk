@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { getTranslations } from "next-intl/server";
 import { Hero } from "@/components/organisms/Hero";
 import { HowItWorks } from "@/components/organisms/HowItWorks";
@@ -87,6 +88,9 @@ export default async function HomePage({ params }: Props) {
 
   return (
     <>
+      <Script id="download-hash-scroll-boot" strategy="beforeInteractive">
+        {`(function(){var h="#download";if(location.hash!==h)return;history.scrollRestoration="manual";function s(){if(location.hash!==h)return;scrollTo(0,0);}s();addEventListener("load",s,{once:true});})();`}
+      </Script>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdBlocks) }}

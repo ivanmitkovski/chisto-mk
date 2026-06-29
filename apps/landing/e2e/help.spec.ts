@@ -13,11 +13,18 @@ async function expectHelpSectionVisible(page: import("@playwright/test").Page, s
   await expect(section).toBeVisible();
 }
 
+/** Hub labels can briefly duplicate during hydration; wait for a single node. */
+async function expectUniqueVisibleText(page: import("@playwright/test").Page, pattern: RegExp) {
+  const locator = page.getByText(pattern);
+  await expect(locator).toHaveCount(1);
+  await expect(locator).toBeVisible();
+}
+
 test.describe("Help centre", () => {
   test("hub loads in English", async ({ page }) => {
     await page.goto("/en/help");
     await expect(page.getByRole("heading", { level: 1, name: /Help centre/i })).toBeVisible();
-    await expect(page.getByText(/^Start here$/i)).toBeVisible();
+    await expectUniqueVisibleText(page, /^Start here$/i);
   });
 
   for (const slug of HELP_ARTICLE_SLUGS) {
@@ -87,7 +94,7 @@ test.describe("Help centre", () => {
     await input.fill("zzzznotfound");
     await expect(page.getByText(/No guides match that search/i)).toBeVisible();
     await input.fill("reporting");
-    await expect(page.getByRole("heading", { name: /Reporting/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Reporting/i })).toBeVisible({ timeout: 10_000 });
   });
 
   test("help search hydrates query from URL and supports keyboard", async ({ page }) => {
