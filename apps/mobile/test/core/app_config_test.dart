@@ -105,10 +105,22 @@ void main() {
     });
 
     test('helpCenterUrlForLocale returns locale-prefixed help hub', () {
-      expect(AppConfig.helpCenterUrlForLocale('en'), 'https://chisto.mk/en/help');
-      expect(AppConfig.helpCenterUrlForLocale('mk'), 'https://chisto.mk/mk/help');
-      expect(AppConfig.helpCenterUrlForLocale('sq'), 'https://chisto.mk/sq/help');
-      expect(AppConfig.helpCenterUrlForLocale('de'), 'https://chisto.mk/mk/help');
+      expect(
+        AppConfig.helpCenterUrlForLocale('en'),
+        'https://chisto.mk/en/help',
+      );
+      expect(
+        AppConfig.helpCenterUrlForLocale('mk'),
+        'https://chisto.mk/mk/help',
+      );
+      expect(
+        AppConfig.helpCenterUrlForLocale('sq'),
+        'https://chisto.mk/sq/help',
+      );
+      expect(
+        AppConfig.helpCenterUrlForLocale('de'),
+        'https://chisto.mk/mk/help',
+      );
     });
 
     test('helpArticleUrlForLocale builds article deep link', () {
