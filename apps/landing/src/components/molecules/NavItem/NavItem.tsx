@@ -33,7 +33,9 @@ export function NavItem({ href, label, onClick }: NavItemProps) {
       className={cn(
         "relative rounded-md px-1 py-2 text-[0.9375rem] font-medium tracking-tight transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
         "outline-none ring-offset-2 focus-visible:ring-2 focus-visible:ring-primary",
-        isActive ? "text-primary-text" : "text-gray-800 hover:text-primary-text",
+        isActive
+          ? "font-semibold text-primary"
+          : "text-gray-800 hover:text-primary",
       )}
       {...(isActive ? { "aria-current": "page" as const } : {})}
     >

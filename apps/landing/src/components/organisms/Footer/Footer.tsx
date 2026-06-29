@@ -101,7 +101,7 @@ export function Footer() {
                 <Link
                   href="/"
                   onClick={(e) => handleHomeNavigationClick(e, pathname, "/")}
-                  className="text-sm text-gray-600 transition-colors duration-300 ease-out hover:text-gray-900"
+                  className="text-sm text-gray-600 transition-colors duration-300 ease-out hover:text-primary"
                 >
                   {t("linkHome")}
                 </Link>
@@ -111,7 +111,7 @@ export function Footer() {
                   <Link
                     href="/about"
                     onClick={(e) => handleHomeNavigationClick(e, pathname, "/about")}
-                    className="text-sm text-gray-600 transition-colors duration-300 ease-out hover:text-gray-900"
+                    className="text-sm text-gray-600 transition-colors duration-300 ease-out hover:text-primary"
                   >
                     {t("linkPlatform")}
                   </Link>
@@ -121,7 +121,7 @@ export function Footer() {
                 <li>
                   <Link
                     href="/news"
-                    className="text-sm text-gray-600 transition-colors duration-300 ease-out hover:text-gray-900"
+                    className="text-sm text-gray-600 transition-colors duration-300 ease-out hover:text-primary"
                   >
                     {t("linkNews")}
                   </Link>
@@ -131,7 +131,7 @@ export function Footer() {
                 <li>
                   <Link
                     href="/news/rss.xml"
-                    className="text-sm text-gray-600 transition-colors duration-300 ease-out hover:text-gray-900"
+                    className="text-sm text-gray-600 transition-colors duration-300 ease-out hover:text-primary"
                   >
                     {t("linkRss")}
                   </Link>
@@ -140,7 +140,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/help"
-                  className="text-sm text-gray-600 transition-colors duration-300 ease-out hover:text-gray-900"
+                  className="text-sm text-gray-600 transition-colors duration-300 ease-out hover:text-primary"
                 >
                   {t("linkHelp")}
                 </Link>
@@ -148,7 +148,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/contact"
-                  className="text-sm text-gray-600 transition-colors duration-300 ease-out hover:text-gray-900"
+                  className="text-sm text-gray-600 transition-colors duration-300 ease-out hover:text-primary"
                 >
                   {t("linkContact")}
                 </Link>
@@ -157,7 +157,7 @@ export function Footer() {
                 <li>
                   <Link
                     href="/press"
-                    className="text-sm text-gray-600 transition-colors duration-300 ease-out hover:text-gray-900"
+                    className="text-sm text-gray-600 transition-colors duration-300 ease-out hover:text-primary"
                   >
                     {t("linkPress")}
                   </Link>
@@ -170,22 +170,22 @@ export function Footer() {
             <h4 className="mb-4 text-xs font-bold uppercase tracking-[0.14em] text-gray-900">{t("legal")}</h4>
             <ul className="space-y-3">
               <li>
-                <Link href="/terms" className="text-sm text-gray-600 transition-colors hover:text-gray-900">
+                <Link href="/terms" className="text-sm text-gray-600 transition-colors hover:text-primary">
                   {t("terms")}
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="text-sm text-gray-600 transition-colors hover:text-gray-900">
+                <Link href="/privacy" className="text-sm text-gray-600 transition-colors hover:text-primary">
                   {t("privacy")}
                 </Link>
               </li>
               <li>
-                <Link href="/cookies" className="text-sm text-gray-600 transition-colors hover:text-gray-900">
+                <Link href="/cookies" className="text-sm text-gray-600 transition-colors hover:text-primary">
                   {t("cookies")}
                 </Link>
               </li>
               <li>
-                <Link href="/data" className="text-sm text-gray-600 transition-colors hover:text-gray-900">
+                <Link href="/data" className="text-sm text-gray-600 transition-colors hover:text-primary">
                   {t("linkData")}
                 </Link>
               </li>
@@ -193,7 +193,7 @@ export function Footer() {
                 <button
                   type="button"
                   onClick={() => window.dispatchEvent(new Event(OPEN_COOKIE_PREFERENCES_EVENT))}
-                  className="text-left text-sm text-gray-600 transition-colors hover:text-gray-900"
+                  className="text-left text-sm text-gray-600 transition-colors hover:text-primary"
                 >
                   {t("cookieSettings")}
                 </button>
