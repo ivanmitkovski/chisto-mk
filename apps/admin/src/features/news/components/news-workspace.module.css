@@ -195,7 +195,7 @@
   flex-shrink: 0;
 }
 
-@media (max-width: 40rem) {
+@media (max-width: 36rem) {
   .filterStripDivider {
     display: none;
   }

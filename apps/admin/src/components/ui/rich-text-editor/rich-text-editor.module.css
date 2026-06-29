@@ -9,9 +9,9 @@
   flex-wrap: wrap;
   gap: 0.25rem;
   padding: 0.375rem;
-  border: 1px solid var(--admin-border-subtle, #e5e7eb);
+  border: 1px solid var(--border-default);
   border-radius: 0.375rem;
-  background: var(--admin-surface-muted, #f9fafb);
+  background: var(--surface-subtle);
 }
 
 .toolbarButton {
@@ -20,20 +20,20 @@
   border: none;
   border-radius: 0.25rem;
   background: transparent;
-  color: var(--admin-text-secondary, #4b5563);
+  color: var(--text-secondary);
   font-size: 0.8125rem;
   font-weight: 600;
   cursor: pointer;
 }
 
 .toolbarButton:hover:not(:disabled) {
-  background: var(--admin-surface-hover, #f3f4f6);
-  color: var(--admin-text-primary, #111827);
+  background: var(--color-button-ghost-hover-bg);
+  color: var(--text-primary);
 }
 
 .toolbarButtonActive {
-  background: var(--admin-accent-soft, #dbeafe);
-  color: var(--admin-accent, #2563eb);
+  background: var(--color-button-icon-bg);
+  color: var(--color-primary);
 }
 
 .toolbarButton:disabled {
@@ -44,16 +44,16 @@
 .editorSurface {
   min-height: 7rem;
   padding: 0.75rem;
-  border: 1px solid var(--admin-border-subtle, #e5e7eb);
+  border: 1px solid var(--border-default);
   border-radius: 0.375rem;
-  background: var(--admin-surface, #fff);
+  background: var(--bg-surface);
   font-size: 0.9375rem;
   line-height: 1.6;
 }
 
 .editorSurface:focus-within {
-  border-color: var(--admin-accent, #2563eb);
-  box-shadow: 0 0 0 3px rgb(37 99 235 / 0.12);
+  border-color: var(--border-focus);
+  box-shadow: var(--shell-focus-halo);
 }
 
 .editorSurface :global(.ProseMirror) {
@@ -76,14 +76,14 @@
 }
 
 .editorSurface :global(.ProseMirror a) {
-  color: var(--admin-accent, #2563eb);
+  color: var(--color-primary);
   text-decoration: underline;
 }
 
 .editorSurface :global(.ProseMirror p.is-editor-empty:first-child::before) {
   content: attr(data-placeholder);
   float: left;
-  color: var(--admin-text-muted, #9ca3af);
+  color: var(--shell-muted-fg);
   pointer-events: none;
   height: 0;
 }
@@ -95,7 +95,7 @@
 
 .charCount {
   font-size: 0.75rem;
-  color: var(--admin-text-muted, #9ca3af);
+  color: var(--shell-muted-fg);
 }
 
 .linkDialog {
@@ -107,8 +107,8 @@
 .linkTextPreview {
   padding: 0.75rem 0.875rem;
   border-radius: 0.375rem;
-  background: var(--surface-subtle, #f9fafb);
-  border: 1px solid var(--border-default, #e5e7eb);
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-default);
 }
 
 .linkTextLabel {
@@ -118,7 +118,7 @@
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--text-secondary, #6b7280);
+  color: var(--text-secondary);
 }
 
 .linkTextValue {
@@ -126,7 +126,7 @@
   font-size: 0.9375rem;
   font-weight: 600;
   line-height: 1.45;
-  color: var(--text-primary, #111827);
+  color: var(--text-primary);
   word-break: break-word;
 }
 
@@ -134,7 +134,7 @@
   margin: 0;
   font-size: 0.8125rem;
   line-height: 1.45;
-  color: var(--text-secondary, #6b7280);
+  color: var(--text-secondary);
   font-style: italic;
 }
 
@@ -151,7 +151,7 @@
 
 .linkField input {
   padding: 0.5rem 0.625rem;
-  border: 1px solid var(--admin-border-subtle, #e5e7eb);
+  border: 1px solid var(--border-default);
   border-radius: 0.375rem;
   font-size: 0.875rem;
 }
