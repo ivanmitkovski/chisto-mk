@@ -3,14 +3,21 @@
   "version": "0.1.0",
   "private": true,
   "description": "Shared news body block types, sanitization, and rendering",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./src/index.ts",
-    "./sanitize": "./src/sanitize/index.ts",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./sanitize": {
+      "types": "./dist/sanitize/index.d.ts",
+      "default": "./dist/sanitize/index.js"
+    },
     "./render": "./src/render/index.ts"
   },
   "scripts": {
+    "build": "tsc -p tsconfig.build.json",
     "test": "vitest run"
   },
   "dependencies": {

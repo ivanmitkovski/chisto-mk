@@ -3,13 +3,14 @@
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { RenderNewsBlocks, resolvePreviewBlocks as resolveSharedBlocks } from '@chisto/news-content/render';
+import type { ResolvedNewsBodyBlock } from '@chisto/news-content';
 import type { NewsBodyBlock, NewsMediaDto } from '../news-api-types';
 
 export function resolvePreviewBlocks(
   blocks: NewsBodyBlock[],
   media: NewsMediaDto[],
   locale: string,
-) {
+): ResolvedNewsBodyBlock[] {
   const mediaById = new Map(
     media.map((m) => [
       m.id,
@@ -23,7 +24,7 @@ export function resolvePreviewBlocks(
 }
 
 type NewsPreviewBlocksProps = {
-  body: ReturnType<typeof resolvePreviewBlocks>;
+  body: ResolvedNewsBodyBlock[];
 };
 
 export function NewsPreviewBlocks({ body }: NewsPreviewBlocksProps) {

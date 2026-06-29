@@ -8758,18 +8758,18 @@
           },
           {
             "name": "page",
-            "required": true,
+            "required": false,
             "in": "query",
             "schema": {
-              "type": "number"
+              "$ref": "#/components/schemas/Object"
             }
           },
           {
             "name": "limit",
-            "required": true,
+            "required": false,
             "in": "query",
             "schema": {
-              "type": "number"
+              "$ref": "#/components/schemas/Object"
             }
           }
         ],
@@ -8870,18 +8870,18 @@
           },
           {
             "name": "page",
-            "required": true,
+            "required": false,
             "in": "query",
             "schema": {
-              "type": "number"
+              "$ref": "#/components/schemas/Object"
             }
           },
           {
             "name": "limit",
-            "required": true,
+            "required": false,
             "in": "query",
             "schema": {
-              "type": "number"
+              "$ref": "#/components/schemas/Object"
             }
           }
         ],
@@ -9018,18 +9018,18 @@
           },
           {
             "name": "page",
-            "required": true,
+            "required": false,
             "in": "query",
             "schema": {
-              "type": "number"
+              "$ref": "#/components/schemas/Object"
             }
           },
           {
             "name": "limit",
-            "required": true,
+            "required": false,
             "in": "query",
             "schema": {
-              "type": "number"
+              "$ref": "#/components/schemas/Object"
             }
           }
         ],
@@ -18758,6 +18758,20 @@
               "default": 0,
               "type": "number"
             }
+          },
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "release",
+                "partnership",
+                "community",
+                "product"
+              ],
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -18811,6 +18825,36 @@
           }
         },
         "summary": "List published news slugs for sitemap",
+        "tags": [
+          "news"
+        ]
+      }
+    },
+    "/news/slug-dates": {
+      "get": {
+        "operationId": "PublicNewsController_slugDates",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "summary": "Published news slugs with last modified dates for sitemap",
         "tags": [
           "news"
         ]
@@ -19261,6 +19305,48 @@
           }
         ],
         "summary": "List news post revisions",
+        "tags": [
+          "admin-news"
+        ]
+      },
+      "delete": {
+        "operationId": "AdminNewsController_clearRevisions",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Validation or bad request"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Clear all revisions for a news post",
         "tags": [
           "admin-news"
         ]
@@ -27450,16 +27536,43 @@
       "NewsBodyBlockDto": {
         "type": "object",
         "properties": {
+          "id": {
+            "type": "string"
+          },
           "type": {
             "type": "string",
             "enum": [
               "paragraph",
+              "html",
+              "heading",
+              "list",
               "image",
-              "video"
+              "video",
+              "gallery"
             ]
           },
           "text": {
             "type": "string"
+          },
+          "html": {
+            "type": "string"
+          },
+          "level": {
+            "type": "number",
+            "enum": [
+              2,
+              3
+            ]
+          },
+          "ordered": {
+            "type": "boolean"
+          },
+          "items": {
+            "description": "List item strings or gallery media items",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "mediaId": {
             "type": "string"

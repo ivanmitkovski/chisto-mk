@@ -4401,6 +4401,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/news/slug-dates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Published news slugs with last modified dates for sitemap */
+        get: operations["PublicNewsController_slugDates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/news/posts/{slug}/related": {
         parameters: {
             query?: never;
@@ -4500,7 +4517,8 @@ export interface paths {
         get: operations["AdminNewsController_listRevisions"];
         put?: never;
         post?: never;
-        delete?: never;
+        /** Clear all revisions for a news post */
+        delete: operations["AdminNewsController_clearRevisions"];
         options?: never;
         head?: never;
         patch?: never;
@@ -7117,9 +7135,16 @@ export interface components {
             s3: string;
         };
         NewsBodyBlockDto: {
+            id?: string;
             /** @enum {string} */
-            type: "paragraph" | "image" | "video";
+            type: "paragraph" | "html" | "heading" | "list" | "image" | "video" | "gallery";
             text?: string;
+            html?: string;
+            /** @enum {number} */
+            level?: 2 | 3;
+            ordered?: boolean;
+            /** @description List item strings or gallery media items */
+            items?: string[];
             mediaId?: string;
             caption?: string;
         };
@@ -16475,9 +16500,9 @@ export interface operations {
     };
     AdminUsersController_getModerationNotes: {
         parameters: {
-            query: {
-                page: number;
-                limit: number;
+            query?: {
+                page?: components["schemas"]["Object"];
+                limit?: components["schemas"]["Object"];
             };
             header?: never;
             path: {
@@ -16590,9 +16615,9 @@ export interface operations {
     };
     AdminUsersController_getStatusHistory: {
         parameters: {
-            query: {
-                page: number;
-                limit: number;
+            query?: {
+                page?: components["schemas"]["Object"];
+                limit?: components["schemas"]["Object"];
             };
             header?: never;
             path: {
@@ -16757,9 +16782,9 @@ export interface operations {
     };
     AdminUsersController_getAudit: {
         parameters: {
-            query: {
-                page: number;
-                limit: number;
+            query?: {
+                page?: components["schemas"]["Object"];
+                limit?: components["schemas"]["Object"];
             };
             header?: never;
             path: {
@@ -23312,6 +23337,7 @@ export interface operations {
                 locale?: string;
                 limit?: number;
                 offset?: number;
+                category?: "release" | "partnership" | "community" | "product";
             };
             header?: never;
             path?: never;
@@ -23363,6 +23389,58 @@ export interface operations {
         };
     };
     PublicNewsController_slugs: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PublicNewsController_slugDates: {
         parameters: {
             query?: never;
             header?: never;
@@ -23858,6 +23936,60 @@ export interface operations {
         };
     };
     AdminNewsController_listRevisions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid bearer token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminNewsController_clearRevisions: {
         parameters: {
             query?: never;
             header?: never;
