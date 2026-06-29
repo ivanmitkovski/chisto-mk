@@ -1,11 +1,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { NextRequest } from 'next/server';
-import { ADMIN_AUTH_COOKIE_KEY, ADMIN_CSRF_HEADER, ADMIN_REFRESH_COOKIE_KEY, ADMIN_REMEMBER_DEVICE_COOKIE_KEY } from '@/lib/auth/auth-constants';
+import { ADMIN_AUTH_COOKIE_KEY, ADMIN_CSRF_COOKIE_KEY, ADMIN_CSRF_HEADER, ADMIN_REFRESH_COOKIE_KEY, ADMIN_REMEMBER_DEVICE_COOKIE_KEY } from '@/lib/auth/auth-constants';
 import { REFRESH_COOKIE_REMEMBER_MAX_AGE } from './admin-session';
 import {
   createBackendProxyHeaders,
   fetchBackendWithRefresh,
   proxyBackendWithRefresh,
+  readProxyRequestBody,
 } from './admin-api-with-refresh';
 
 function requestWithCookies(cookie: string, url = 'https://admin.chisto.mk/api/proxy/admin/users', init: RequestInit = {}) {
@@ -42,6 +43,39 @@ describe('createBackendProxyHeaders', () => {
   });
 });
 
+describe('readProxyRequestBody', () => {
+  it('returns undefined for GET', async () => {
+    const request = new NextRequest('https://admin.chisto.mk/api/proxy/admin/users', {
+      method: 'GET',
+    });
+    expect(await readProxyRequestBody(request)).toBeUndefined();
+  });
+
+  it('returns text for JSON POST', async () => {
+    const request = new NextRequest('https://admin.chisto.mk/api/proxy/admin/users', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ ok: true }),
+    });
+    expect(await readProxyRequestBody(request)).toBe('{"ok":true}');
+  });
+
+  it('returns binary buffer for multipart POST', async () => {
+    const boundary = '----testboundary';
+    const payload = `--${boundary}\r\nContent-Disposition: form-data; name="file"; filename="a.png"\r\nContent-Type: image/png\r\n\r\n\x89PNG\r\n\x1a\n--${boundary}--\r\n`;
+    const bytes = new TextEncoder().encode(payload);
+    const request = new NextRequest('https://admin.chisto.mk/api/proxy/admin/news/media', {
+      method: 'POST',
+      headers: { 'content-type': `multipart/form-data; boundary=${boundary}` },
+      body: bytes,
+    });
+    const body = await readProxyRequestBody(request);
+    expect(body).toBeInstanceOf(Buffer);
+    expect((body as Buffer).length).toBe(bytes.length);
+    expect((body as Buffer).equals(Buffer.from(bytes))).toBe(true);
+  });
+});
+
 describe('proxyBackendWithRefresh', () => {
   afterEach(() => {
     vi.restoreAllMocks();
@@ -56,6 +90,48 @@ describe('proxyBackendWithRefresh', () => {
     const body = (await response.json()) as { code?: string };
     expect(body.code).toBe('UNAUTHORIZED');
     expect(response.headers.getSetCookie().join('\n')).toContain('Max-Age=0');
+  });
+
+  it('forwards multipart body as binary to backend', async () => {
+    const boundary = '----proxyboundary';
+    const pngMagic = Buffer.from([0x89, 0x50, 0x4e, 0x47]);
+    const payload = Buffer.concat([
+      Buffer.from(
+        `--${boundary}\r\nContent-Disposition: form-data; name="file"; filename="cover.png"\r\nContent-Type: image/png\r\n\r\n`,
+      ),
+      pngMagic,
+      Buffer.from(`\r\n--${boundary}--\r\n`),
+    ]);
+
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ id: 'media-1' }), { status: 201 }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    vi.spyOn(await import('./admin-session'), 'verifyAdminCsrf').mockReturnValue(true);
+    vi.spyOn(await import('./mutation-rate-limit'), 'checkMutationRateLimit').mockResolvedValue(true);
+
+    const request = new NextRequest(
+      'https://admin.chisto.mk/api/proxy/admin/news/posts/p1/media?kind=cover',
+      {
+        method: 'POST',
+        headers: {
+          cookie: `${ADMIN_AUTH_COOKIE_KEY}=access-token; ${ADMIN_CSRF_COOKIE_KEY}=csrf-token`,
+          'content-type': `multipart/form-data; boundary=${boundary}`,
+          [ADMIN_CSRF_HEADER]: 'csrf-token',
+        },
+        body: payload,
+      },
+    );
+
+    const response = await proxyBackendWithRefresh('/admin/news/posts/p1/media?kind=cover', request);
+
+    expect(response.status).toBe(201);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const init = fetchMock.mock.calls[0][1] as RequestInit;
+    expect(init.body).toBeInstanceOf(Buffer);
+    expect((init.body as Buffer).length).toBe(payload.length);
+    expect((init.body as Buffer).equals(payload)).toBe(true);
+    const forwardedHeaders = init.headers as Headers;
+    expect(forwardedHeaders.get('content-type')).toContain(`boundary=${boundary}`);
   });
 });
 

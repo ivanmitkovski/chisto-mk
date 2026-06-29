@@ -46,16 +46,19 @@
 .content {
   flex: 1;
   padding: var(--space-4) var(--space-5) var(--space-6);
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: var(--space-4);
-  align-content: start;
   min-height: 0;
   overflow: auto;
 }
 
 .contentFrame {
   min-width: 0;
+  flex: 1;
   min-height: 0;
+  display: flex;
+  flex-direction: column;
   animation: dashboardContentIn 440ms cubic-bezier(0.22, 1, 0.36, 1) both;
   animation-delay: 40ms;
 }

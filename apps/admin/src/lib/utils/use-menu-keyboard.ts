@@ -37,7 +37,8 @@ export function useMenuKeyboard({
       const items = getMenuItems(menu);
       if (items.length === 0) return;
       const next = items[Math.max(0, Math.min(index, items.length - 1))];
-      next?.focus();
+      next?.focus({ preventScroll: false });
+      next?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
     },
     [menuRef],
   );

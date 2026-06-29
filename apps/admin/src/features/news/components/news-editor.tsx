@@ -2,24 +2,36 @@
 
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, Card, ConfirmDialog, PageHeader, useToast } from '@/components/ui';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Button, ConfirmDialog, PageHeader, useToast } from '@/components/ui';
 import { useUnsavedChangesGuard } from '@/features/admin-shell/hooks/use-unsaved-changes-guard';
+import { useNewsAltTextSave } from '../hooks/use-news-alt-text-save';
 import { useNewsAutosave } from '../hooks/use-news-autosave';
 import { useNewsPostForm } from '../hooks/use-news-post-form';
 import { useNewsPostMutations } from '../hooks/use-news-post-mutations';
+import { updateNewsMediaAlt } from '../data/news-adapter-client';
 import { copyLocaleFromSource } from '../lib/copy-locale-content';
+import { newsFormEditorFingerprint } from '../lib/news-save-payload';
+import { newsApiErrorMessage } from '../lib/news-api-messages';
 import { mediaReferencedInBody } from '../lib/news-locale-utils';
 import type { NewsPostAdminDto } from '../news-api-types';
 import type { NewsFormLocale } from '../types';
 import { postToFormValues } from '../types';
-import { NewsEditorMetaPanel } from './news-editor-meta-panel';
+import { NewsBlockList } from './news-block-list';
+import { NewsCoverHero } from './news-cover-hero';
+import { NewsDocumentShell } from './news-document-shell';
+import documentStyles from './news-document-shell.module.css';
+import { NewsInspectorDrawer } from './news-inspector-drawer';
+import { NewsInspectorPanels } from './news-inspector-panels';
+import { useNewsPreviewSync } from '../hooks/use-news-preview-sync';
+import { NewsEditorViewTabs, type NewsEditorView } from './news-editor-view-tabs';
 import { NewsLivePreview } from './news-live-preview';
-import { insertMediaBlock, NewsMediaLibrary } from './news-media-library';
-import { NewsPostForm } from './news-post-form';
+import { insertMediaBlockAt } from './news-media-library';
+import { NewsDocumentHeader } from './news-document-header';
+import { NewsDocumentEditorProvider } from '../context/news-document-editor-context';
+import { mergeBlocksAtIndex, NewsDocumentToolbar } from './news-document-toolbar';
 import { NewsPublishChecklistDialog } from './news-publish-checklist-dialog';
-import { NewsRevisionPanel } from './news-revision-panel';
-import { NewsSeoPreview } from './news-seo-preview';
+import { countIncompleteLocales } from '../lib/news-locale-utils';
 import styles from './news-editor.module.css';
 
 type NewsEditorProps = {
@@ -33,25 +45,60 @@ export function NewsEditor({ post: initialPost, canWriteNews }: NewsEditorProps)
   const { showToast } = useToast();
   const [post, setPost] = useState(initialPost);
   const [locale, setLocale] = useState<NewsFormLocale>('en');
-  const [previewOpen, setPreviewOpen] = useState(false);
+  const [editorView, setEditorView] = useState<NewsEditorView>('write');
   const form = useNewsPostForm(postToFormValues(post));
   const readOnly = !canWriteNews;
+  const savedFingerprintRef = useRef(newsFormEditorFingerprint(postToFormValues(initialPost)));
 
-  useUnsavedChangesGuard(form.dirty);
+  useEffect(() => {
+    savedFingerprintRef.current = newsFormEditorFingerprint(postToFormValues(post));
+  }, [post]);
+
+  const contentDirty = useMemo(
+    () => newsFormEditorFingerprint(form.values) !== savedFingerprintRef.current,
+    [form.values],
+  );
+
+  const persistAltText = useCallback(
+    async (mediaId: string, altText: Partial<Record<NewsFormLocale, string>>) => {
+      await updateNewsMediaAlt(mediaId, altText);
+    },
+    [],
+  );
+
+  const handleAltSaveError = useCallback(
+    (error: unknown) => {
+      showToast({
+        tone: 'error',
+        title: t('toast.error'),
+        message: newsApiErrorMessage(error, t, t('toast.altSaveFailed')),
+      });
+    },
+    [showToast, t],
+  );
+
+  const { scheduleAltSave, flushAltSaves, altPending } = useNewsAltTextSave(persistAltText, {
+    onError: handleAltSaveError,
+  });
+
+  useUnsavedChangesGuard(contentDirty || altPending, t('editor.unsavedLeaveConfirm'));
 
   const mutations = useNewsPostMutations({
     post,
     form,
     locale,
+    isDirty: () => contentDirty || altPending,
     onPostChange: setPost,
     onDeleted: () => router.push('/dashboard/news'),
+    flushBeforeAction: flushAltSaves,
   });
 
   const autosave = useNewsAutosave({
-    dirty: form.dirty,
+    dirty: contentDirty,
     readOnly,
     values: form.values,
     save: mutations.save,
+    hasCover: Boolean(post.coverMediaId),
   });
 
   const categoryLabel = t(`category.${form.values.category}`);
@@ -76,14 +123,14 @@ export function NewsEditor({ post: initialPost, canWriteNews }: NewsEditorProps)
     [form.values.translations, mutations],
   );
 
-  const handleInsertMedia = useCallback(
-    (mediaId: string, kind: 'inline_image' | 'inline_video') => {
+  const handleInsertMediaAt = useCallback(
+    (mediaId: string, kind: 'inline_image' | 'inline_video', insertIndex: number) => {
       const loc = form.values.translations[locale];
       form.onChange('translations', {
         ...form.values.translations,
         [locale]: {
           ...loc,
-          body: insertMediaBlock(loc.body, mediaId, kind),
+          body: insertMediaBlockAt(loc.body, mediaId, kind, insertIndex),
         },
       });
     },
@@ -94,9 +141,13 @@ export function NewsEditor({ post: initialPost, canWriteNews }: NewsEditorProps)
     (mediaId: string, altLocale: NewsFormLocale, value: string) => {
       const item = post.media.find((m) => m.id === mediaId);
       const nextAlt = { ...(item?.altText ?? {}), [altLocale]: value };
-      void mutations.updateMediaAlt(mediaId, nextAlt);
+      setPost((prev) => ({
+        ...prev,
+        media: prev.media.map((m) => (m.id === mediaId ? { ...m, altText: nextAlt } : m)),
+      }));
+      scheduleAltSave(mediaId, altLocale, nextAlt);
     },
-    [mutations, post.media],
+    [post.media, scheduleAltSave],
   );
 
   const handleRestored = useCallback(
@@ -119,10 +170,67 @@ export function NewsEditor({ post: initialPost, canWriteNews }: NewsEditorProps)
         e.preventDefault();
         mutations.requestPublish();
       }
+      if (mod && e.shiftKey && e.key === 'v') {
+        e.preventDefault();
+        setEditorView((v) => (v === 'preview' ? 'write' : 'preview'));
+      }
     }
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [mutations, readOnly]);
+
+  const localeContent = form.values.translations[locale];
+
+  const coverAltText = useMemo(() => {
+    if (!post.coverMediaId) return null;
+    const cover = post.media.find((m) => m.id === post.coverMediaId);
+    if (!cover?.altText) return null;
+    return cover.altText[locale]?.trim() || cover.altText.en?.trim() || null;
+  }, [locale, post.coverMediaId, post.media]);
+
+  const incompleteLocaleCount = useMemo(
+    () => countIncompleteLocales(form.values, Boolean(post.coverMediaId), post.media),
+    [form.values, post.coverMediaId, post.media],
+  );
+
+  const inspectorPanels = (
+    <NewsInspectorPanels
+      postId={post.id}
+      post={post}
+      values={form.values}
+      locale={locale}
+      readOnly={readOnly}
+      busy={mutations.busy}
+      lifecycleBusy={mutations.lifecycleBusy}
+      hasCover={Boolean(post.coverMediaId)}
+      coverImageUrl={post.coverImageUrl}
+      coverMediaId={post.coverMediaId}
+      contentDirty={contentDirty}
+      altPending={altPending}
+      media={post.media}
+      bodyBlockCount={localeContent.body.length}
+      onChange={form.onChange}
+      onCopyFromLocale={(source) => {
+        form.onChange('translations', copyLocaleFromSource(form.values, source, locale));
+        showToast({ tone: 'success', title: t('toast.copiedLocale'), message: '' });
+      }}
+      onInsertMediaAt={handleInsertMediaAt}
+      onDeleteMedia={handleDeleteMedia}
+      onAltTextChange={handleAltTextChange}
+      onBeforeRestore={flushAltSaves}
+      onRestored={handleRestored}
+    />
+  );
+
+  useNewsPreviewSync({
+    postId: post.id,
+    locale,
+    values: form.values,
+    media: post.media,
+    coverImageUrl: post.coverImageUrl,
+    coverMediaId: post.coverMediaId,
+    status: post.status,
+  });
 
   return (
     <div className={styles.root}>
@@ -141,14 +249,18 @@ export function NewsEditor({ post: initialPost, canWriteNews }: NewsEditorProps)
               </Button>
               <Button
                 variant="outline"
-                className={styles.previewToggle}
-                onClick={() => setPreviewOpen((v) => !v)}
+                onClick={() => setEditorView((v) => (v === 'preview' ? 'write' : 'preview'))}
               >
-                {t('preview.toggle')}
+                {editorView === 'preview' ? t('editor.writeTab') : t('editor.previewTab')}
               </Button>
-              <Button onClick={() => void mutations.save()} disabled={mutations.busy || !form.dirty}>
+              <Button onClick={() => void mutations.save()} disabled={mutations.busy || !contentDirty}>
                 {t('actions.save')}
               </Button>
+              {autosave.canRetry ? (
+                <Button variant="outline" onClick={() => void autosave.retrySave()} disabled={mutations.busy}>
+                  {t('autosave.retry')}
+                </Button>
+              ) : null}
               {post.status !== 'published' ? (
                 <Button onClick={mutations.requestPublish} disabled={mutations.busy}>
                   {t('actions.publish')}
@@ -175,73 +287,128 @@ export function NewsEditor({ post: initialPost, canWriteNews }: NewsEditorProps)
         </p>
       ) : null}
 
-      <div className={styles.editorGrid}>
-        <Card padding="md" className={styles.formColumn}>
-          <NewsPostForm
-            values={form.values}
-            locale={locale}
-            media={post.media}
-            status={post.status}
-            busy={mutations.busy}
-            readOnly={readOnly}
-            hasCover={Boolean(post.coverMediaId)}
-            onLocaleChange={setLocale}
-            onChange={form.onChange}
-            onBodyChange={(blocks) =>
-              form.onChange('translations', {
-                ...form.values.translations,
-                [locale]: { ...form.values.translations[locale], body: blocks },
-              })
-            }
-            onCopyFromLocale={(source) => {
-              form.onChange('translations', copyLocaleFromSource(form.values, source, locale));
-              showToast({ tone: 'success', title: t('toast.copiedLocale'), message: '' });
-            }}
-          />
-          {!readOnly ? (
-            <NewsMediaLibrary
-              media={post.media}
-              readOnly={readOnly}
-              busy={mutations.busy}
-              onInsert={handleInsertMedia}
-              onDelete={handleDeleteMedia}
-              onUploadCover={(file) => void mutations.uploadCover(file)}
-              onUploadInline={(file, kind) => void mutations.uploadInline(file, kind)}
-              onAltTextChange={handleAltTextChange}
-            />
-          ) : null}
-        </Card>
-
-        <div className={`${styles.previewColumn} ${previewOpen ? styles.previewColumnOpen : ''}`}>
-          <NewsLivePreview
-            values={form.values}
-            locale={locale}
-            media={post.media}
-            coverImageUrl={post.coverImageUrl}
-            status={post.status}
-            categoryLabel={categoryLabel}
-          />
-        </div>
-
-        <aside className={styles.sidebar}>
-          <NewsEditorMetaPanel post={post} locale={locale} />
-          <NewsSeoPreview
+      <NewsDocumentEditorProvider>
+      <NewsDocumentShell
+        document={
+          <NewsEditorViewTabs
+            view={editorView}
             postId={post.id}
-            values={form.values}
             locale={locale}
-            coverImageUrl={post.coverImageUrl}
-            publishedAt={post.publishedAt}
+            onViewChange={setEditorView}
+            writePanel={
+              <>
+                {!readOnly ? (
+                  <NewsDocumentToolbar
+                    readOnly={readOnly}
+                    busy={mutations.lifecycleBusy}
+                    bodyLength={localeContent.body.length}
+                    onInsertBlocks={(blocks, insertIndex) => {
+                      form.onChange('translations', {
+                        ...form.values.translations,
+                        [locale]: {
+                          ...localeContent,
+                          body: mergeBlocksAtIndex(localeContent.body, insertIndex, blocks),
+                        },
+                      });
+                    }}
+                    onUploadCover={(file) => void mutations.uploadCover(file)}
+                    onUploadInlineAt={(file, kind, insertIndex) =>
+                      void mutations.uploadInlineAt(file, kind, insertIndex)
+                    }
+                    onBlockLimit={() =>
+                      showToast({
+                        tone: 'warning',
+                        title: t('toast.validationTitle'),
+                        message: t('validation.blockLimit'),
+                      })
+                    }
+                  />
+                ) : null}
+                <div className={documentStyles.proseDocument}>
+                <NewsCoverHero
+                  coverImageUrl={post.coverImageUrl}
+                  coverAttached={Boolean(post.coverMediaId)}
+                  readOnly={readOnly}
+                  uploadBusy={mutations.uploadingKind === 'cover'}
+                  uploadError={mutations.uploadValidationErrors.cover ?? null}
+                  onUpload={(file) => void mutations.uploadCover(file)}
+                />
+                <NewsDocumentHeader
+                  values={form.values}
+                  locale={locale}
+                  media={post.media}
+                  hasCover={Boolean(post.coverMediaId)}
+                  busy={mutations.lifecycleBusy}
+                  readOnly={readOnly}
+                  onLocaleChange={setLocale}
+                  onChange={form.onChange}
+                />
+                <NewsBlockList
+                  blocks={localeContent.body}
+                  locale={locale}
+                  media={post.media}
+                  readOnly={readOnly}
+                  actionsDisabled={mutations.lifecycleBusy}
+                  documentMode
+                  uploadingBlockKind={
+                    mutations.uploadingKind === 'inline_image' || mutations.uploadingKind === 'inline_video'
+                      ? mutations.uploadingKind
+                      : null
+                  }
+                  uploadingGallerySlot={mutations.uploadingGallerySlot}
+                  blockUploadPreview={mutations.blockUploadPreview}
+                  uploadValidationErrors={mutations.uploadValidationErrors}
+                  onChange={(body) =>
+                    form.onChange('translations', {
+                      ...form.values.translations,
+                      [locale]: { ...localeContent, body },
+                    })
+                  }
+                  onUploadForBlock={(blockIndex, file, blockType) =>
+                    void mutations.uploadForBlock(
+                      blockIndex,
+                      file,
+                      blockType === 'video' ? 'inline_video' : 'inline_image',
+                    )
+                  }
+                  onUploadForGallerySlot={(blockIndex, itemIndex, file) =>
+                    void mutations.uploadForGallerySlot(blockIndex, itemIndex, file)
+                  }
+                />
+                </div>
+              </>
+            }
+            previewPanel={
+              <NewsLivePreview
+                values={form.values}
+                locale={locale}
+                media={post.media}
+                coverImageUrl={post.coverImageUrl}
+                coverAltText={coverAltText}
+                status={post.status}
+                categoryLabel={categoryLabel}
+                fullPage
+              />
+            }
           />
-          <NewsRevisionPanel postId={post.id} readOnly={readOnly} onRestored={handleRestored} />
-        </aside>
-      </div>
+        }
+        inspector={
+          <NewsInspectorDrawer incompleteLocaleCount={incompleteLocaleCount}>
+            {inspectorPanels}
+          </NewsInspectorDrawer>
+        }
+      />
+      </NewsDocumentEditorProvider>
 
       <NewsPublishChecklistDialog
         open={mutations.publishOpen}
         values={form.values}
         hasCover={Boolean(post.coverMediaId)}
+        dirty={contentDirty || altPending}
+        media={post.media}
         onClose={() => mutations.setPublishOpen(false)}
         onConfirm={() => void mutations.confirmPublish()}
+        onSaveAndPublish={() => void mutations.saveAndPublish()}
         onGoToLocale={setLocale}
       />
       <ConfirmDialog

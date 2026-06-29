@@ -2,9 +2,13 @@ export const NEWS_LOCALES = ['en', 'mk', 'sq'] as const;
 export type NewsLocale = (typeof NEWS_LOCALES)[number];
 
 export type NewsBodyBlock =
-  | { type: 'paragraph'; text: string }
-  | { type: 'image'; mediaId: string; caption?: string }
-  | { type: 'video'; mediaId: string; caption?: string };
+  | { id?: string; type: 'paragraph'; text: string; html?: string }
+  | { id?: string; type: 'html'; html: string }
+  | { id?: string; type: 'heading'; level: 2 | 3; text: string }
+  | { id?: string; type: 'list'; ordered: boolean; items: string[] }
+  | { id?: string; type: 'image'; mediaId: string; caption?: string }
+  | { id?: string; type: 'video'; mediaId: string; caption?: string }
+  | { id?: string; type: 'gallery'; items: Array<{ mediaId: string; caption?: string }> };
 
 export type NewsLocaleContent = {
   title: string;
@@ -56,6 +60,7 @@ export type NewsPostPublicDto = {
   slug: string;
   category: NewsCategoryApi;
   publishedAt: string;
+  updatedAt: string;
   title: string;
   excerpt: string;
   body: NewsBodyBlock[];

@@ -1,13 +1,21 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary-50: #E6FFF7;
-  --color-primary-100: #B3FFE6;
-  --color-primary-500: #00D98E;
-  --color-primary: #00D98E;
-  --color-primary-600: #00C27F;
-  --color-primary-700: #00A36B;
-  --color-primary-800: #006B47;
+  /* Brand greens aligned with apps/mobile/.../app_colors.dart */
+  --color-primary-50: #EDFFF6;
+  --color-primary-100: #D4F9E8;
+  --color-primary-500: #2FD788;
+  --color-primary: #2FD788;
+  --color-primary-600: #22C97B;
+  --color-primary-700: #14B96A;
+  --color-primary-800: #0F9A58;
+  --color-primary-dark: #14B96A;
+  --color-primary-text: #086340;
+  --color-on-primary: #121212;
+
+  --color-action: var(--color-primary);
+  --color-action-hover: var(--color-primary-dark);
+  --color-action-foreground: var(--color-on-primary);
 
   --color-gray-50: #F9FAFB;
   --color-gray-100: #F5F5F5;
@@ -24,7 +32,7 @@
 
   --shadow-phone: 0 24px 56px rgba(0, 0, 0, 0.16), 0 8px 22px rgba(0, 0, 0, 0.1);
   --shadow-phone-lg: 0 32px 72px rgba(0, 0, 0, 0.2), 0 12px 32px rgba(0, 0, 0, 0.12),
-    0 2px 8px rgba(0, 217, 142, 0.06);
+    0 2px 8px rgba(47, 215, 136, 0.06);
   --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.05);
   --shadow-lift: 0 20px 50px rgba(0, 0, 0, 0.08);
   --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.06);
@@ -107,7 +115,7 @@
   }
 
   ::selection {
-    background-color: color-mix(in srgb, #00d98e 28%, transparent);
+    background-color: color-mix(in srgb, #2fd788 28%, transparent);
     color: #000;
   }
 
@@ -159,7 +167,13 @@
     }
   }
 
+  /**
+   * Marketing type scale (Inter). Aligns with mobile app hierarchy — body ~16px,
+   * section titles clamped, hero display largest. Weights live in components.
+   * Source of truth for brand colors: apps/mobile/.../app_colors.dart
+   */
   .text-hero {
+    /* Hero display — semibold/bold applied in JSX. */
     font-size: clamp(2.25rem, 4.2vw + 1.25rem, 4.5rem);
     line-height: 1.08;
     letter-spacing: -0.025em;
@@ -485,21 +499,6 @@
       radial-gradient(ellipse 75% 55% at 100% 75%, rgba(125, 211, 252, 0.1), transparent 48%),
       radial-gradient(ellipse 60% 45% at 50% 0%, rgba(254, 243, 199, 0.14), transparent 58%),
       linear-gradient(180deg, rgba(249, 250, 251, 0.95) 0%, #ffffff 45%, rgba(252, 252, 251, 1) 100%);
-  }
-
-  /** Stats: banded rhythm + soft highlight. */
-  .mesh-section-stats {
-    background-color: #eceef0;
-    background-image:
-      repeating-linear-gradient(
-        90deg,
-        transparent,
-        transparent 120px,
-        rgba(0, 217, 142, 0.035) 120px,
-        rgba(0, 217, 142, 0.035) 121px
-      ),
-      radial-gradient(ellipse 100% 85% at 50% 0%, rgba(255, 255, 255, 0.78), transparent 58%),
-      linear-gradient(180deg, #f1f3f5 0%, #e4e7eb 48%, #eceef1 100%);
   }
 
   /** FAQ: soft violet + mint corners, gallery calm. */

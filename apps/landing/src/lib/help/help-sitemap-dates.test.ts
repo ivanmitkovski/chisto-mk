@@ -7,7 +7,7 @@ describe("help-sitemap-dates", () => {
 
   it("uses dateModified from messages for known article", () => {
     const d = helpArticleLastModified("en", "getting-started", fallback);
-    expect(d.toISOString()).toBe("2026-04-16T00:00:00.000Z");
+    expect(d.toISOString()).toBe("2026-06-28T00:00:00.000Z");
   });
 
   it("falls back when locale unknown", () => {

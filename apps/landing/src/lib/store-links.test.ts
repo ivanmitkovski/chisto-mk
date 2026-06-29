@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   APP_STORE_APP_ID,
+  APP_STORE_LISTING_SLUG,
   APP_STORE_URL_DEFAULT,
   getAppStoreUrl,
   getGooglePlayUrl,
@@ -15,7 +16,9 @@ describe("store-links", () => {
 
   it("returns the live App Store URL by default", () => {
     expect(getAppStoreUrl()).toBe(APP_STORE_URL_DEFAULT);
-    expect(APP_STORE_URL_DEFAULT).toBe(`https://apps.apple.com/app/id${APP_STORE_APP_ID}`);
+    expect(APP_STORE_URL_DEFAULT).toBe(
+      `https://apps.apple.com/mk/app/${APP_STORE_LISTING_SLUG}/id${APP_STORE_APP_ID}`,
+    );
     expect(hasStoreDownloadLinks()).toBe(true);
   });
 

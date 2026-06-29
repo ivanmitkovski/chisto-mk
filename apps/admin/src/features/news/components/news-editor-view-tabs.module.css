@@ -1,0 +1,67 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.tabBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.tabList {
+  display: inline-flex;
+  gap: 0.25rem;
+  padding: 0.125rem;
+  border-radius: var(--radius-md, 0.375rem);
+  background: var(--surface-subtle);
+}
+
+.tab,
+.tabActive {
+  border: 0;
+  border-radius: var(--radius-sm, 0.25rem);
+  padding: 0.4375rem 0.875rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.tab:hover {
+  color: var(--color-text-strong);
+}
+
+.tabActive {
+  background: var(--surface-default);
+  color: var(--color-text-strong);
+  box-shadow: var(--shadow-sm, 0 1px 2px rgb(0 0 0 / 0.06));
+}
+
+.tabActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.panel {
+  min-width: 0;
+}
+
+.previewPanel {
+  min-width: 0;
+}
+
+.previewPanelFull {
+  min-width: 0;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}

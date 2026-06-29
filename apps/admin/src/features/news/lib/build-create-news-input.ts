@@ -1,5 +1,6 @@
 import type { NewsCategoryApi, NewsTranslations } from '../news-api-types';
 import type { NewsLocale } from '../news-api-types';
+import { normalizeBodyBlocksForSave } from './news-save-payload';
 
 type CreateNewsInput = {
   slug?: string;
@@ -7,17 +8,21 @@ type CreateNewsInput = {
   translations: NewsTranslations;
 };
 
+function defaultBody(title: string) {
+  return normalizeBodyBlocksForSave([{ type: 'paragraph', text: title }]);
+}
+
 function fillLocale(translations: NewsTranslations, locale: NewsLocale, fallbackTitle: string) {
   const entry = translations[locale];
   const title = entry.title.trim() || fallbackTitle;
   const excerpt = entry.excerpt.trim() || title;
   if (entry.body.length > 0) {
-    return { title, excerpt, body: entry.body };
+    return { title, excerpt, body: normalizeBodyBlocksForSave(entry.body) };
   }
   return {
     title,
     excerpt,
-    body: [{ type: 'paragraph' as const, text: title }],
+    body: defaultBody(title),
   };
 }
 

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { KeyboardEvent as ReactKeyboardEvent, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Button, Icon } from '@/components/ui';
+import { Button, DateTimePicker, Icon } from '@/components/ui';
 import { useUnsavedChangesGuard } from '@/features/admin-shell/hooks/use-unsaved-changes-guard';
 import type { CleanupEventDetail } from '@/features/events/data/events-adapter';
 import { useEventDetailForm } from '@/features/events/hooks/use-event-detail-form';
@@ -152,30 +152,17 @@ export function EventDetailView({
               />
 
               {form.isCompleted ? (
-                <label className={styles.field} htmlFor="detail-event-completed">
-                  <span className={styles.fieldLabel}>{tDetail('completedDateTime')}</span>
-                  <input
-                    id="detail-event-completed"
-                    type="datetime-local"
-                    value={form.completedAt ? toDatetimeLocalField(form.completedAt) : ''}
-                    disabled={readOnly}
-                    onChange={(e) => {
-                      form.setCompletedAt(e.target.value ? new Date(e.target.value).toISOString() : '');
-                      mutations.clearFieldError('completedAt');
-                    }}
-                    className={styles.input}
-                    aria-invalid={mutations.fieldErrors.completedAt ? true : undefined}
-                    aria-describedby={
-                      mutations.fieldErrors.completedAt ? 'detail-event-completed-err' : undefined
-                    }
-                  />
-                  <span className={styles.fieldHint}>{tDetail('completedDateHint')}</span>
-                  {mutations.fieldErrors.completedAt ? (
-                    <span id="detail-event-completed-err" className={styles.fieldError} role="alert">
-                      {mutations.fieldErrors.completedAt}
-                    </span>
-                  ) : null}
-                </label>
+                <DateTimePicker
+                  label={tDetail('completedDateTime')}
+                  helperText={tDetail('completedDateHint')}
+                  value={form.completedAt ? toDatetimeLocalField(form.completedAt) : ''}
+                  disabled={readOnly}
+                  errorText={mutations.fieldErrors.completedAt}
+                  onValueChange={(next) => {
+                    form.setCompletedAt(next ? new Date(next).toISOString() : '');
+                    mutations.clearFieldError('completedAt');
+                  }}
+                />
               ) : null}
 
               <div className={styles.formActions}>

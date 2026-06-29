@@ -50,7 +50,14 @@ export function getScrollPaddingTopPx(): number {
 export type ScrollToDownloadOptions = {
   /** Sync the URL hash (default true). */
   updateHash?: boolean;
+  /** Scroll behavior override; defaults to reduced-motion aware smooth. */
+  behavior?: ScrollBehavior;
 };
+
+function resolveScrollBehavior(override?: ScrollBehavior): ScrollBehavior {
+  if (override) return override;
+  return prefersReducedMotion() ? "instant" : "smooth";
+}
 
 /**
  * Scrolls to the hero top so the download badges sit in view below the sticky header.
@@ -58,13 +65,13 @@ export type ScrollToDownloadOptions = {
 export function scrollToDownloadSection(options: ScrollToDownloadOptions = {}): boolean {
   if (typeof window === "undefined") return false;
 
-  const { updateHash = true } = options;
+  const { updateHash = true, behavior } = options;
   const target = document.getElementById(DOWNLOAD_SECTION_ID);
   if (!target) return false;
 
   window.scrollTo({
     top: 0,
-    behavior: prefersReducedMotion() ? "instant" : "smooth",
+    behavior: resolveScrollBehavior(behavior),
   });
 
   if (updateHash) {
@@ -81,11 +88,16 @@ export function scrollToDownloadSection(options: ScrollToDownloadOptions = {}): 
   return true;
 }
 
+export type ScheduleScrollToDownloadOptions = Pick<ScrollToDownloadOptions, "behavior">;
+
 /** Defer scroll until layout settles (e.g. after closing the mobile nav drawer). */
-export function scheduleScrollToDownloadSection(delayMs = 0): void {
+export function scheduleScrollToDownloadSection(
+  delayMs = 0,
+  options: ScheduleScrollToDownloadOptions = {},
+): void {
   if (typeof window === "undefined") return;
 
-  const run = () => scrollToDownloadSection();
+  const run = () => scrollToDownloadSection(options);
 
   if (delayMs > 0) {
     window.setTimeout(run, delayMs);

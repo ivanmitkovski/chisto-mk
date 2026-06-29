@@ -14,7 +14,12 @@
     "nextMonth": "Muaji tjetër",
     "today": "Sot",
     "selectDate": "Zgjidh datën",
+    "selectDateTime": "Zgjidh datën dhe orën",
     "clearDate": "Pastro datën",
+    "clearDateTime": "Pastro datën dhe orën",
+    "time": "Ora",
+    "hour": "Orë",
+    "minute": "Minuta",
     "days": "Ditët e kalendarit"
   }
 }

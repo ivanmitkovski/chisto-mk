@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Button, Input, Toolbar } from '@/components/ui';
+import { Button, SearchInput, Toolbar } from '@/components/ui';
 import {
   ACTIVE_USERS_PLATFORM_OPTIONS,
   ACTIVE_USERS_STATUS_OPTIONS,
@@ -26,18 +26,19 @@ export function ActiveUsersToolbar({
   onPlatformChange,
 }: ActiveUsersToolbarProps) {
   const t = useTranslations('activeUsers');
+  const tCommon = useTranslations('common');
 
   return (
     <div className={styles.toolbarSection}>
       <Toolbar className={styles.toolbar} aria-label={t('filters.toolbarAria')}>
         <div className={styles.toolbarFiltersRow}>
-          <Input
-            type="search"
+          <SearchInput
+            aria-label={t('filters.searchAria')}
             placeholder={t('filters.searchPlaceholder')}
             value={searchTerm}
-            onChange={(e) => onSearchTermChange(e.target.value)}
+            clearLabel={tCommon('clearSearch')}
+            onChange={onSearchTermChange}
             className={styles.searchInput}
-            aria-label={t('filters.searchAria')}
           />
           <div
             className={styles.statusChips}

@@ -79,10 +79,23 @@
   gap: var(--space-2);
 }
 
+.localePanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
 .bodyHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.bodyActions {
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--space-2);
 }
 

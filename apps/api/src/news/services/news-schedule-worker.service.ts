@@ -1,8 +1,9 @@
-import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import Redis from 'ioredis';
 import { AuditService } from '../../audit/services/audit.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { WorkerHeartbeatRegistry } from '../../observability/worker-heartbeat.registry';
+import { NewsPostsLifecycleService } from './news-posts-lifecycle.service';
 import { NewsRevalidateService } from './news-revalidate.service';
 
 const POLL_MS = 60_000;
@@ -26,6 +27,7 @@ export class NewsScheduleWorkerService implements OnModuleInit, OnModuleDestroy 
 
   constructor(
     private readonly prisma: PrismaService,
+    private readonly lifecycle: NewsPostsLifecycleService,
     private readonly revalidate: NewsRevalidateService,
     private readonly audit?: AuditService,
   ) {}
@@ -71,21 +73,26 @@ export class NewsScheduleWorkerService implements OnModuleInit, OnModuleDestroy 
       });
 
       for (const post of due) {
-        await this.prisma.newsPost.update({
-          where: { id: post.id },
-          data: {
-            status: 'PUBLISHED',
-            publishedAt: post.scheduledAt ?? now,
-          },
-        });
-        await this.audit?.log({
-          actorId: null,
-          action: 'news.post.scheduled_publish',
-          resourceType: 'NewsPost',
-          resourceId: post.id,
-          metadata: { slug: post.slug },
-        });
-        this.logger.log(`news scheduled publish: ${post.slug}`);
+        try {
+          await this.lifecycle.publish(post.id);
+          this.logger.log(`news scheduled publish: ${post.slug}`);
+        } catch (err) {
+          const message = (err as Error).message;
+          this.logger.warn(`news scheduled publish failed ${post.slug}: ${message}`);
+          if (err instanceof BadRequestException) {
+            await this.prisma.newsPost.update({
+              where: { id: post.id },
+              data: { status: 'DRAFT', scheduledAt: null },
+            });
+            await this.audit?.log({
+              actorId: null,
+              action: 'news.schedule.failed',
+              resourceType: 'NewsPost',
+              resourceId: post.id,
+              metadata: { slug: post.slug, error: message },
+            });
+          }
+        }
       }
 
       if (due.length > 0) {
@@ -99,7 +106,12 @@ export class NewsScheduleWorkerService implements OnModuleInit, OnModuleDestroy 
   }
 
   private async acquireLeaderLock(): Promise<boolean> {
-    if (!this.redis) return true;
+    if (!this.redis) {
+      this.logger.warn(
+        'news schedule worker disabled: REDIS_URL not set (leader election required)',
+      );
+      return false;
+    }
     try {
       if (!this.redis.status || this.redis.status === 'wait') await this.redis.connect();
       const result = await this.redis.set(

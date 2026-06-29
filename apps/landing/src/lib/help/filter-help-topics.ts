@@ -1,4 +1,5 @@
 import type { HelpArticleSlug, HelpCategoryId } from "./help-catalog";
+import { HELP_SEARCH_SYNONYMS } from "./help-search-synonyms";
 
 export type HelpTopicFilterItem = {
   slug: HelpArticleSlug;
@@ -7,6 +8,8 @@ export type HelpTopicFilterItem = {
   cardTitle: string;
   cardSummary: string;
   readTime: string;
+  /** Section titles + block text for body search (server-built). */
+  searchText?: string;
 };
 
 export type HelpSearchRankingOptions = {
@@ -23,9 +26,16 @@ export function normalizeHelpSearchQuery(query: string): string {
   return foldForSearch(query.trim());
 }
 
+function wordMatchesHaystack(word: string, haystack: string): boolean {
+  if (haystack.includes(word)) return true;
+  const synonyms = HELP_SEARCH_SYNONYMS[word];
+  if (!synonyms) return false;
+  return synonyms.some((syn) => haystack.includes(foldForSearch(syn)));
+}
+
 /**
  * Client-side filter: every non-empty word in the query must appear somewhere in
- * title, summary, or category label (case-insensitive).
+ * title, summary, category label, slug, or body (synonyms count as a match).
  */
 export function filterHelpTopics(items: readonly HelpTopicFilterItem[], query: string): HelpTopicFilterItem[] {
   const normalized = normalizeHelpSearchQuery(query);
@@ -35,8 +45,11 @@ export function filterHelpTopics(items: readonly HelpTopicFilterItem[], query: s
   const words = normalized.split(/\s+/).filter((w) => w.length > 0);
   return items.filter((item) => {
     const slugWords = item.slug.replace(/-/g, " ");
-    const haystack = foldForSearch(`${slugWords} ${item.cardTitle} ${item.cardSummary} ${item.categoryLabel}`);
-    return words.every((w) => haystack.includes(w));
+    const body = item.searchText ?? "";
+    const haystack = foldForSearch(
+      `${slugWords} ${item.cardTitle} ${item.cardSummary} ${item.categoryLabel} ${body}`,
+    );
+    return words.every((w) => wordMatchesHaystack(w, haystack));
   });
 }
 

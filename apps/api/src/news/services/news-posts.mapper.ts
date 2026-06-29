@@ -1,3 +1,5 @@
+import { BadRequestException } from '@nestjs/common';
+import { migrateLegacyBlocks } from '@chisto/news-content';
 import type { NewsCategory, NewsMedia, NewsMediaKind, NewsPost, NewsPostStatus } from '../../prisma-client';
 import type {
   NewsCategoryApi,
@@ -53,20 +55,28 @@ export function statusToApi(status: NewsPostStatus): NewsPostStatusApi {
 
 export function parseTranslations(raw: unknown): NewsTranslations {
   if (raw == null || typeof raw !== 'object') {
-    throw new Error('Invalid news translations');
+    throw new BadRequestException({
+      code: 'NEWS_INVALID_TRANSLATIONS',
+      message: 'Invalid news translations',
+    });
   }
   const obj = raw as Record<string, unknown>;
   const out = {} as NewsTranslations;
   for (const locale of NEWS_LOCALES) {
     const entry = obj[locale];
     if (entry == null || typeof entry !== 'object') {
-      throw new Error(`Missing news locale: ${locale}`);
+      throw new BadRequestException({
+        code: 'NEWS_INVALID_TRANSLATIONS',
+        message: `Missing news locale: ${locale}`,
+      });
     }
     const e = entry as Record<string, unknown>;
     out[locale] = {
       title: String(e.title ?? ''),
       excerpt: String(e.excerpt ?? ''),
-      body: Array.isArray(e.body) ? (e.body as NewsTranslations[NewsLocale]['body']) : [],
+      body: migrateLegacyBlocks(
+        Array.isArray(e.body) ? (e.body as NewsTranslations[NewsLocale]['body']) : [],
+      ),
     };
   }
   return out;
@@ -148,6 +158,7 @@ export function toPublicDto(
     slug: post.slug,
     category: categoryToApi(post.category),
     publishedAt: post.publishedAt!.toISOString(),
+    updatedAt: post.updatedAt.toISOString(),
     title: content.title,
     excerpt: content.excerpt,
     body: content.body,

@@ -8,6 +8,7 @@ export type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> & {
   errorText?: string | undefined;
   leftSlot?: ReactNode | undefined;
   rightSlot?: ReactNode | undefined;
+  fieldClassName?: string | undefined;
   inputRef?: RefObject<HTMLInputElement | null> | undefined;
 };
 
@@ -18,6 +19,7 @@ export function Input({
   errorText,
   leftSlot,
   rightSlot,
+  fieldClassName,
   inputRef,
   className,
   required,
@@ -38,6 +40,11 @@ export function Input({
     .join(' ')
     .trim();
 
+  const { type, role, ...inputRest } = rest;
+  const hasCustomClear = Boolean(rightSlot);
+  const resolvedType = type === 'search' && hasCustomClear ? 'text' : type;
+  const resolvedRole = role ?? (type === 'search' && hasCustomClear ? 'searchbox' : undefined);
+
   return (
     <Field
       label={label}
@@ -45,11 +52,14 @@ export function Input({
       helperText={helperText}
       errorText={errorText}
       required={required}
+      className={fieldClassName}
     >
       <div className={styles.inputWrap}>
         {leftSlot ? <span className={styles.leftSlot}>{leftSlot}</span> : null}
         <input
-          {...rest}
+          {...inputRest}
+          type={resolvedType}
+          {...(resolvedRole ? { role: resolvedRole } : {})}
           id={inputId}
           ref={inputRef}
           className={inputClassName}

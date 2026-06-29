@@ -28,6 +28,20 @@ const FORWARDED_HEADER_ALLOWLIST = new Set([
 
 const DEFAULT_TIMEOUT_MS = 30_000;
 
+/** Reads request body for BFF proxy — multipart must stay binary. */
+export async function readProxyRequestBody(
+  request: NextRequest,
+): Promise<string | Buffer | undefined> {
+  if (request.method === 'GET' || request.method === 'HEAD') {
+    return undefined;
+  }
+  const contentType = request.headers.get('content-type') ?? '';
+  if (contentType.includes('multipart/form-data')) {
+    return Buffer.from(await request.arrayBuffer());
+  }
+  return await request.text();
+}
+
 export async function createBackendProxyHeaders(
   request: NextRequest,
   accessToken: string | null,
@@ -233,8 +247,7 @@ export async function proxyBackendWithRefresh(
   const deviceId = getOrCreateAdminDeviceId(request);
   const headers = await createBackendProxyHeaders(request, accessToken);
 
-  const body =
-    request.method === 'GET' || request.method === 'HEAD' ? undefined : await request.text();
+  const body = await readProxyRequestBody(request);
   const method = request.method.toUpperCase() as HttpMethod;
   const requestId = headers.get('X-Request-Id') ?? crypto.randomUUID();
   const url = `${getApiBaseUrl()}${path}`;
@@ -246,7 +259,7 @@ export async function proxyBackendWithRefresh(
       cache: 'no-store',
     };
     if (body !== undefined) {
-      init.body = body;
+      init.body = typeof body === 'string' ? body : new Uint8Array(body);
     }
     return init;
   };

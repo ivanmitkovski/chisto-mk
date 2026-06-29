@@ -5,7 +5,6 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { Button, Card, Input, PageHeader, Select, useToast } from '@/components/ui';
 import { createNewsPost } from '../data/news-adapter-client';
-import { buildCreateNewsInput } from '../lib/build-create-news-input';
 import {
   applyContentTemplate,
   NEWS_CONTENT_TEMPLATE_OPTIONS,
@@ -26,11 +25,15 @@ export function NewsCreatePage() {
 
   function applyTemplate(nextId: NewsContentTemplateId) {
     setTemplateId(nextId);
-    const body = applyContentTemplate(nextId);
-    form.onChange('translations', {
-      ...form.values.translations,
-      en: { ...form.values.translations.en, body },
-    });
+    const locales = ['en', 'mk', 'sq'] as const;
+    const translations = { ...form.values.translations };
+    for (const loc of locales) {
+      translations[loc] = {
+        ...translations[loc],
+        body: applyContentTemplate(nextId, loc),
+      };
+    }
+    form.onChange('translations', translations);
     if (nextId !== 'blank' && NEWS_CATEGORIES.includes(nextId)) {
       form.onChange('category', nextId);
     }
@@ -49,7 +52,7 @@ export function NewsCreatePage() {
 
     setBusy(true);
     try {
-      const created = await createNewsPost(buildCreateNewsInput(form.values));
+      const created = await createNewsPost(form.values);
       showToast({ tone: 'success', title: t('toast.created'), message: '' });
       router.push(`/dashboard/news/${created.id}`);
     } catch (e) {

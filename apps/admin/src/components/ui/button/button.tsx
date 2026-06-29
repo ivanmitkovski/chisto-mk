@@ -42,7 +42,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   const resolvedClassName = [
     styles.button,
     variantClassByName[variant],
-    sizeClassByName[size],
+    variant === 'icon' ? '' : sizeClassByName[size],
     fullWidth ? styles.fullWidth : '',
     isLoading ? styles.loading : '',
     className ?? '',

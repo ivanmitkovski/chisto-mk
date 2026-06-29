@@ -46,6 +46,11 @@ export function LanguageSelector() {
   );
 
   const onTriggerKeyDown = (e: KeyboardEvent<HTMLButtonElement>) => {
+    if (e.key === "Escape") {
+      e.preventDefault();
+      setOpen(false);
+      return;
+    }
     if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       setOpen(true);
@@ -103,7 +108,7 @@ export function LanguageSelector() {
                 tabIndex={focusIndex === index ? 0 : -1}
                 className={cn(
                   "flex w-full items-center px-3 py-2 text-left text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset",
-                  loc === locale ? "bg-primary/10 text-primary-700" : "text-gray-800 hover:bg-gray-50",
+                  loc === locale ? "bg-primary/10 text-primary-800" : "text-gray-800 hover:bg-gray-50",
                 )}
                 onClick={() => selectLocale(loc)}
               >

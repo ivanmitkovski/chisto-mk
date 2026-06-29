@@ -2,12 +2,12 @@
 
 import { useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { Button, Card, SectionState } from '@/components/ui';
-import { formatAdminDateTime } from '@/lib/i18n/format-admin-datetime';
 import { ACTIVE_USERS_FEED_TYPE_OPTIONS } from '../constants/active-users-filters';
 import { feedTypeLabelKey } from '../lib/feed-type-label';
 import { useActiveUsersLive } from '../hooks/use-active-users-live';
+import { ActivityFeedTimestamp } from './activity-feed-timestamp';
 import styles from './activity-feed.module.css';
 
 type ActivityFeedPanelProps = {
@@ -19,7 +19,6 @@ const FEED_DOM_CAP = 100;
 
 export function ActivityFeedPanel({ feedType, onFeedTypeChange }: ActivityFeedPanelProps) {
   const t = useTranslations('activeUsers');
-  const locale = useLocale();
   const { feed, hasMore, isLoadingMore, loadMore, feedError, refresh, setFeedType } =
     useActiveUsersLive();
   const panelRef = useRef<HTMLDivElement>(null);
@@ -96,12 +95,7 @@ export function ActivityFeedPanel({ feedType, onFeedTypeChange }: ActivityFeedPa
                       {t('screenLabel')}: {item.screen}
                     </p>
                   ) : null}
-                  <span className={styles.time}>
-                    {formatAdminDateTime(item.occurredAt, locale, {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                  </span>
+                  <ActivityFeedTimestamp occurredAt={item.occurredAt} />
                 </li>
               ))
             )}

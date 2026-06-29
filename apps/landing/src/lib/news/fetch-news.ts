@@ -1,3 +1,4 @@
+import { resolvePreviewBlocks } from '@chisto/news-content/render';
 import { chistoApiBase } from '@/lib/share-api';
 import type { AppLocale } from '@/i18n/routing';
 import {
@@ -6,25 +7,36 @@ import {
   e2eNewsSlugs,
   isE2eNewsFixtureEnabled,
 } from './e2e-fixture';
+import { NewsFetchError } from './news-fetch-error';
 
 export type NewsCategory = 'release' | 'partnership' | 'community' | 'product';
 
-export type NewsBodyBlock =
-  | { type: 'paragraph'; text: string }
-  | { type: 'image'; mediaId: string; caption?: string; url?: string | null; altText?: string }
-  | { type: 'video'; mediaId: string; caption?: string; url?: string | null; altText?: string };
+import type { NewsBodyBlock as SharedNewsBodyBlock } from '@chisto/news-content';
+
+export type NewsBodyBlock = SharedNewsBodyBlock & {
+  url?: string | null;
+  altText?: string | null;
+};
 
 export type ResolvedNewsBodyBlock = NewsBodyBlock;
 
 export type ResolvedNewsPost = {
   slug: string;
   publishedAt: string;
+  updatedAt?: string;
   category: NewsCategory;
   featured?: boolean;
   coverImage?: string;
+  coverAltText?: string;
   title: string;
   excerpt: string;
   body: NewsBodyBlock[];
+};
+
+export type FetchNewsPostsOptions = {
+  limit?: number;
+  offset?: number;
+  category?: NewsCategory;
 };
 
 type PublicListResponse = {
@@ -37,12 +49,23 @@ type PublicListResponse = {
     coverImageUrl: string | null;
     featured?: boolean;
   }>;
+  total: number;
 };
+
+type SlugDateRow = { slug: string; updatedAt: string; publishedAt: string };
+export type NewsPostsPage = {
+  items: ResolvedNewsPost[];
+  total: number;
+};
+
+export const NEWS_HUB_PAGE_SIZE = 9;
+export const NEWS_CATEGORY_FETCH_LIMIT = 100;
 
 type PublicPostResponse = {
   slug: string;
   category: NewsCategory;
   publishedAt: string;
+  updatedAt?: string;
   title: string;
   excerpt: string;
   body: NewsBodyBlock[];
@@ -54,7 +77,7 @@ const REVALIDATE_SECONDS = 60;
 
 function normalizeLocale(locale: string): AppLocale {
   if (locale === 'en' || locale === 'mk' || locale === 'sq') return locale;
-  return 'mk';
+  return 'en';
 }
 
 function enrichBodyBlocks(
@@ -62,43 +85,70 @@ function enrichBodyBlocks(
   media: PublicPostResponse['media'],
   locale: AppLocale,
 ): NewsBodyBlock[] {
-  const mediaById = new Map(media.map((m) => [m.id, m]));
-  return blocks.map((block) => {
-    if (block.type === 'paragraph') return block;
-    const m = mediaById.get(block.mediaId);
-    const altText = m?.altText?.[locale] ?? m?.altText?.en;
-    return {
-      ...block,
-      url: m?.url ?? null,
-      ...(altText ? { altText } : {}),
-    };
-  });
+  const mediaById = new Map(
+    media.map((m) => [
+      m.id,
+      {
+        url: m.url,
+        altText: m.altText?.[locale] ?? m.altText?.en ?? null,
+      },
+    ]),
+  );
+  return resolvePreviewBlocks(blocks, mediaById);
 }
 
-export async function fetchNewsPosts(locale: string): Promise<ResolvedNewsPost[]> {
+function coverAltFromMedia(
+  media: PublicPostResponse['media'],
+  locale: AppLocale,
+): string | undefined {
+  const cover = media.find((m) => m.kind === 'cover');
+  if (!cover?.altText) return undefined;
+  return cover.altText[locale] ?? cover.altText.en;
+}
+
+export async function fetchNewsPosts(
+  locale: string,
+  options: FetchNewsPostsOptions = {},
+): Promise<NewsPostsPage> {
+  const limit = options.limit ?? 100;
+  const offset = options.offset ?? 0;
+  const category = options.category;
   if (isE2eNewsFixtureEnabled()) {
-    return e2eNewsPosts(locale);
+    const items = e2eNewsPosts(locale);
+    const filtered = category ? items.filter((p) => p.category === category) : items;
+    return { items: filtered, total: filtered.length };
   }
   const loc = normalizeLocale(locale);
   try {
-    const res = await fetch(
-      `${chistoApiBase()}/news/posts?locale=${encodeURIComponent(loc)}`,
-      { next: { revalidate: REVALIDATE_SECONDS, tags: ['news'] } },
-    );
-    if (!res.ok) return [];
+    const params = new URLSearchParams({
+      locale: loc,
+      limit: String(limit),
+      offset: String(offset),
+    });
+    if (category) params.set('category', category);
+    const res = await fetch(`${chistoApiBase()}/news/posts?${params.toString()}`, {
+      next: { revalidate: REVALIDATE_SECONDS, tags: ['news'] },
+    });
+    if (!res.ok) {
+      throw new NewsFetchError(`News list request failed (${res.status})`);
+    }
     const data = (await res.json()) as PublicListResponse;
-    return data.items.map((item) => ({
-      slug: item.slug,
-      publishedAt: item.publishedAt,
-      category: item.category,
-      title: item.title,
-      excerpt: item.excerpt,
-      body: [],
-      ...(item.featured ? { featured: true } : {}),
-      ...(item.coverImageUrl ? { coverImage: item.coverImageUrl } : {}),
-    }));
-  } catch {
-    return [];
+    return {
+      items: data.items.map((item) => ({
+        slug: item.slug,
+        publishedAt: item.publishedAt,
+        category: item.category,
+        title: item.title,
+        excerpt: item.excerpt,
+        body: [],
+        ...(item.featured ? { featured: true } : {}),
+        ...(item.coverImageUrl ? { coverImage: item.coverImageUrl } : {}),
+      })),
+      total: data.total,
+    };
+  } catch (error) {
+    if (error instanceof NewsFetchError) throw error;
+    throw new NewsFetchError();
   }
 }
 
@@ -116,19 +166,25 @@ export async function fetchNewsPostBySlug(
       { next: { revalidate: REVALIDATE_SECONDS, tags: ['news'] } },
     );
     if (res.status === 404) return null;
-    if (!res.ok) return null;
+    if (!res.ok) {
+      throw new NewsFetchError(`News post request failed (${res.status})`);
+    }
     const data = (await res.json()) as PublicPostResponse;
+    const coverAlt = coverAltFromMedia(data.media, loc);
     return {
       slug: data.slug,
       publishedAt: data.publishedAt,
+      ...(data.updatedAt ? { updatedAt: data.updatedAt } : {}),
       category: data.category,
       title: data.title,
       excerpt: data.excerpt,
       body: enrichBodyBlocks(data.body, data.media, loc),
       ...(data.coverImageUrl ? { coverImage: data.coverImageUrl } : {}),
+      ...(coverAlt ? { coverAltText: coverAlt } : {}),
     };
-  } catch {
-    return null;
+  } catch (error) {
+    if (error instanceof NewsFetchError) throw error;
+    throw new NewsFetchError();
   }
 }
 
@@ -146,7 +202,10 @@ export async function fetchRelatedNewsPosts(
       { next: { revalidate: REVALIDATE_SECONDS, tags: ['news'] } },
     );
     if (res.status === 404) return [];
-    if (!res.ok) return [];
+    if (!res.ok) {
+      console.error(`fetchRelatedNewsPosts failed (${res.status}) for slug=${slug}`);
+      return [];
+    }
     const data = (await res.json()) as PublicListResponse;
     return data.items.map((item) => ({
       slug: item.slug,
@@ -158,7 +217,8 @@ export async function fetchRelatedNewsPosts(
       ...(item.featured ? { featured: true } : {}),
       ...(item.coverImageUrl ? { coverImage: item.coverImageUrl } : {}),
     }));
-  } catch {
+  } catch (error) {
+    console.error('fetchRelatedNewsPosts network error', error);
     return [];
   }
 }
@@ -171,10 +231,18 @@ export async function fetchAllNewsSlugs(): Promise<string[]> {
     const res = await fetch(`${chistoApiBase()}/news/slugs`, {
       next: { revalidate: REVALIDATE_SECONDS, tags: ['news'] },
     });
-    if (!res.ok) return [];
+    if (!res.ok) {
+      if (res.status >= 500) {
+        throw new NewsFetchError(`News slugs request failed (${res.status})`);
+      }
+      console.error(`fetchAllNewsSlugs failed (${res.status})`);
+      return [];
+    }
     return (await res.json()) as string[];
-  } catch {
-    return [];
+  } catch (error) {
+    if (error instanceof NewsFetchError) throw error;
+    console.error('fetchAllNewsSlugs network error', error);
+    throw new NewsFetchError();
   }
 }
 
@@ -183,13 +251,21 @@ export async function fetchNewsSlugDates(): Promise<Map<string, Date>> {
     return new Map(e2eNewsSlugs().map((slug) => [slug, new Date('2026-06-23')]));
   }
   try {
-    const res = await fetch(`${chistoApiBase()}/news/posts?locale=en&limit=100`, {
+    const res = await fetch(`${chistoApiBase()}/news/slug-dates`, {
       next: { revalidate: REVALIDATE_SECONDS, tags: ['news'] },
     });
-    if (!res.ok) return new Map();
-    const data = (await res.json()) as PublicListResponse;
-    return new Map(data.items.map((item) => [item.slug, new Date(item.publishedAt)]));
-  } catch {
-    return new Map();
+    if (!res.ok) {
+      if (res.status >= 500) {
+        throw new NewsFetchError(`News slug dates request failed (${res.status})`);
+      }
+      console.error(`fetchNewsSlugDates failed (${res.status})`);
+      return new Map();
+    }
+    const data = (await res.json()) as SlugDateRow[];
+    return new Map(data.map((item) => [item.slug, new Date(item.updatedAt)]));
+  } catch (error) {
+    if (error instanceof NewsFetchError) throw error;
+    console.error('fetchNewsSlugDates network error', error);
+    throw new NewsFetchError();
   }
 }

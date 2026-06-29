@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 
 /** Stable % positions / motion params; avoids hydration drift. */
@@ -174,6 +175,19 @@ function AmbientOrbsNear({ reducedMotion }: { reducedMotion: boolean }) {
 
 export function MarketingAtmosphere() {
   const reducedMotion = useReducedMotion() ?? false;
+  const [active, setActive] = useState(false);
+
+  useEffect(() => {
+    const enable = () => setActive(true);
+    if (typeof window.requestIdleCallback === "function") {
+      const id = window.requestIdleCallback(enable, { timeout: 1200 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const timer = window.setTimeout(enable, 1);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  if (!active) return null;
 
   return (
     <div

@@ -1,3 +1,15 @@
+.blockDocument {
+  position: relative;
+  padding: 0.125rem 0;
+  margin: 0;
+  border-radius: 0;
+}
+
+.blockDocument:focus-within,
+.blockDocument:hover:not(:focus-within) {
+  background: transparent;
+}
+
 .block {
   border: 1px solid var(--border-default);
   border-radius: 0.5rem;
@@ -59,6 +71,34 @@
   background: var(--surface-subtle);
 }
 
+.previewDocument {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-lg, 0.75rem);
+  overflow: hidden;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-default);
+}
+
+.mediaPlaceholderWrap {
+  padding: 1rem 0;
+  text-align: center;
+}
+
+.mediaPlaceholder {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+.mediaPlaceholderAction {
+  margin: 0.375rem 0 0;
+  font-size: 0.75rem;
+  color: color-mix(in srgb, var(--text-secondary) 85%, transparent);
+}
+
 .previewImage {
   object-fit: cover;
 }
@@ -86,4 +126,74 @@
   padding: 0.375rem 0.5rem;
   border-radius: 0.375rem;
   border: 1px solid var(--border-default);
+}
+
+.headingBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.headingBlockDocument {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.headingMeta {
+  display: flex;
+  justify-content: flex-end;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.blockDocument:focus-within .headingMeta,
+.blockDocument:hover .headingMeta {
+  opacity: 1;
+}
+
+.headingLevelSelect {
+  padding: 0.125rem 0.375rem;
+  border: 1px solid var(--border-default);
+  border-radius: 999px;
+  background: var(--surface-default);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.headingInputDocument2,
+.headingInputDocument3 {
+  width: 100%;
+  padding: 0.125rem 0;
+  border: 0;
+  background: transparent;
+  outline: none;
+  color: var(--text-primary);
+}
+
+.headingInputDocument2 {
+  font-size: 1.625rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.headingInputDocument3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.headingInputDocument2::placeholder,
+.headingInputDocument3::placeholder {
+  color: color-mix(in srgb, var(--text-secondary) 65%, transparent);
+}
+
+.headingInput {
+  padding: 0.5rem 0.625rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--border-default);
+  font: inherit;
 }

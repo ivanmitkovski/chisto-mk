@@ -1,0 +1,4 @@
+Chisto.mk is a civic environmental platform in North Macedonia. Residents report pollution sites on a public map with photos and locations, join cleanup events, and follow site updates in the iOS app.
+
+For press inquiries: info@ekohab.mk
+Website: https://chisto.mk

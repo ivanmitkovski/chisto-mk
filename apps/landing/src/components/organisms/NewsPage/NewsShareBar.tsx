@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { Check, Link2, Share2 } from "lucide-react";
+import { trackNewsEvent } from "@/lib/analytics/track-news";
 import { cn } from "@/lib/utils/cn";
 
 export type NewsShareBarCopy = {
   copyLink: string;
   copyLinkAria: string;
   copied: string;
+  copyLinkFailed: string;
   share: string;
   shareAria: string;
 };
@@ -20,17 +22,22 @@ type NewsShareBarProps = {
 
 export function NewsShareBar({ title, excerpt, copy }: NewsShareBarProps) {
   const [copied, setCopied] = useState(false);
+  const [copyFailed, setCopyFailed] = useState(false);
   const canShare =
     typeof navigator !== "undefined" && typeof navigator.share === "function";
 
   async function onCopyLink() {
     if (typeof window === "undefined") return;
+    setCopyFailed(false);
     try {
       await navigator.clipboard.writeText(window.location.href);
       setCopied(true);
+      trackNewsEvent("news_share_copy_link");
       window.setTimeout(() => setCopied(false), 2000);
     } catch {
       setCopied(false);
+      setCopyFailed(true);
+      window.setTimeout(() => setCopyFailed(false), 3000);
     }
   }
 
@@ -42,6 +49,7 @@ export function NewsShareBar({ title, excerpt, copy }: NewsShareBarProps) {
         text: excerpt,
         url: window.location.href,
       });
+      trackNewsEvent("news_share_native");
     } catch {
       // User dismissed share sheet or share failed.
     }
@@ -67,6 +75,12 @@ export function NewsShareBar({ title, excerpt, copy }: NewsShareBarProps) {
         )}
         <span>{copied ? copy.copied : copy.copyLink}</span>
       </button>
+
+      {copyFailed ? (
+        <p className="text-sm text-red-600" role="status">
+          {copy.copyLinkFailed}
+        </p>
+      ) : null}
 
       {canShare ? (
         <button

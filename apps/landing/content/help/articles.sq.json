@@ -1,0 +1,2478 @@
+{
+  "getting-started": {
+    "cardTitle": "Konfiguroni Chisto.mk",
+    "cardSummary": "Instaloni aplikacionin nga MK App Store, hyni, kaloni portën e vendndodhjes për Maqedoninë dhe përfundoni coach tour.",
+    "title": "Konfiguroni Chisto.mk",
+    "lastUpdated": "28 qershor 2026",
+    "lastReviewed": "28 qershor 2026",
+    "datePublished": "2024-01-01T00:00:00.000Z",
+    "dateModified": "2026-06-28T00:00:00.000Z",
+    "sections": [
+      {
+        "id": "download-the-app",
+        "title": "Shkarkoni aplikacionin",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Shkarkoni Chisto.mk nga MK App Store: https://apps.apple.com/mk/app/chisto-mk/id6771892086. Mund të përdorni edhe butonat e shkarkimit në chisto.mk."
+          },
+          {
+            "type": "bullets",
+            "title": "Para instalimit",
+            "items": [
+              "Kërkoni në dyqan Chisto.mk dhe konfirmoni që botuesi përputhet me listimin tonë zyrtar.",
+              "Përdorni Wi-Fi nëse keni plan të kufizuar të dhënash. Hapja e parë mund të shkarkojë pllaka harte.",
+              "Mbajeni iOS të përditësuar që kamera, hartat dhe arnimet e sigurisë të mbeten aktuale."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "tip",
+            "text": "Nëse faqja e dyqanit nuk është e disponueshme, hapni chisto.mk në shfletues desktopi dhe ndiqni lidhjen zyrtare drejt App Store."
+          },
+          {
+            "type": "callout",
+            "variant": "note",
+            "text": "Fjalë si Home feed, Map tab, Report FAB dhe fazat e raportit përputhen me aplikacionin, që të dini gjithmonë cilin ekran kemi parasysh."
+          }
+        ]
+      },
+      {
+        "id": "create-your-account",
+        "title": "Krijoni llogarinë",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Hapni aplikacionin dhe regjistrohuni me numrin e telefonit, email-in, emrin dhe fjalëkalimin. Duhet të verifikoni telefonin me një kod njëpërdorimësh SMS para se llogaria të bëhet aktive."
+          },
+          {
+            "type": "bullets",
+            "title": "Çfarë të përgatisni",
+            "items": [
+              "Një numër celular maqedonas ku mund të lexoni SMS.",
+              "Një inbox email që e kontrolloni për njoftime llogarie.",
+              "Një fjalëkalim i fortë që nuk e përsërisni në shërbime të tjera."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/sign-in-and-verification",
+            "label": "Hyrja dhe verifikimi"
+          }
+        ]
+      },
+      {
+        "id": "location-gate-and-home",
+        "title": "Porta e vendndodhjes dhe Home feed",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Chisto.mk ofrohet në Maqedoni. Gjatë regjistrimit aplikacioni kontrollon që vendndodhja e pajisjes të jetë brenda vendit. Pas kësaj arrini te Home feed me vende ndotjeje pranë jush dhe filtra feed-i."
+          },
+          {
+            "type": "bullets",
+            "title": "Hapat e parë në Home feed",
+            "items": [
+              "Rrëshqitni feed-in ose prekni filtra si All, Urgent, Nearby dhe Top support.",
+              "Prekni një kartë vendi për të hapur foto, histori dhe opsionet Take action.",
+              "Hapni Map tab kur doni pinat dhe pamjen heatmap."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "note",
+            "text": "Nëse udhëtoni jashtë Maqedonisë, shfletimi mund të funksionojë ende, por raportimi dhe eco-action kërkojnë që të jeni në vend."
+          }
+        ]
+      },
+      {
+        "id": "coach-tour-and-navigation",
+        "title": "Coach tour dhe navigimi",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Pas hyrjes së parë, coach tour ju udhëzon nëpër skedat kryesore: Home feed, Map tab, lista Reports, Report FAB, Events dhe avatarin e profilit."
+          },
+          {
+            "type": "bullets",
+            "title": "Skedat kryesore",
+            "items": [
+              "Home feed shfaq karta vendesh të renditura dhe filtra.",
+              "Map tab shfaq pinat, heatmap dhe fletët e detajeve të vendit.",
+              "Reports liston parashtrimet tuaja me etiketa statusi.",
+              "Events liston pastrime dhe eco-action.",
+              "Report FAB në qendër nis magjistarin e raportit me 4 hapa."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "tip",
+            "text": "Mund ta kaloni coach tour në çdo kohë. Rihapeni më vonë nga cilësimet e profilit nëse doni një përsëritje."
+          }
+        ]
+      },
+      {
+        "id": "notifications-and-privacy",
+        "title": "Njoftimet dhe privatësia",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Ju kontrolloni njoftimet push në Settings të iOS dhe brenda preferencave të inbox-it në aplikacion. Politika jonë e privatësisë shpjegon si përpunohen të dhënat personale kur raportoni vende ose bashkoheni në ngjarje."
+          },
+          {
+            "type": "bullets",
+            "title": "Ku të shikoni",
+            "items": [
+              "iOS: Cilësimet → Njoftimet → Chisto.mk.",
+              "Në aplikacion: hapni inbox-in e njoftimeve dhe prekni ikonën e preferencave.",
+              "Rishikoni të tetë grupet e njoftimeve para pastrimit tuaj të parë."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/privacy",
+            "label": "Politika e privatësisë"
+          }
+        ]
+      }
+    ]
+  },
+  "sign-in-and-verification": {
+    "cardTitle": "Hyrja dhe verifikimi",
+    "cardSummary": "Hyni me telefon dhe fjalëkalim, përfundoni verifikimin SMS OTP dhe rikuperoni qasjen kur kodet pushojnë të mbërrijnë.",
+    "title": "Hyrja dhe verifikimi",
+    "lastUpdated": "28 qershor 2026",
+    "lastReviewed": "28 qershor 2026",
+    "datePublished": "2024-01-01T00:00:00.000Z",
+    "dateModified": "2026-06-28T00:00:00.000Z",
+    "sections": [
+      {
+        "id": "sign-in-basics",
+        "title": "Bazat e hyrjes",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Përdoruesit që kthehen hyjnë me të njëjtin numër telefoni dhe fjalëkalim që krijuar gjatë regjistrimit. Aplikacioni formaton automatikisht numrat maqedonas."
+          },
+          {
+            "type": "bullets",
+            "title": "Hapat e hyrjes",
+            "items": [
+              "Hapni Chisto.mk dhe prekni Sign in.",
+              "Shkruani numrin e telefonit dhe fjalëkalimin.",
+              "Prekni Sign in dhe prisni që sesioni të ngarkohet."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "note",
+            "text": "Mbajeni orën e pajisjes në automatike. Devijim i madh i orës mund të prishë validimin e kodit SMS."
+          }
+        ]
+      },
+      {
+        "id": "sms-otp-verification",
+        "title": "Verifikimi SMS OTP",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Llogaritë e reja dhe disa rrjedha sigurie dërgojnë një kod njëpërdorimësh me SMS. Shkruani kodin para se të skadojë. Kodet janë me jetë të shkurtër dhe nuk mund të ripërdoren."
+          },
+          {
+            "type": "bullets",
+            "title": "Nëse kodi nuk arrin",
+            "items": [
+              "Konfirmoni që modaliteti avion është i fikur dhe keni sinjal.",
+              "Prisni një minutë, pastaj prekni Resend code.",
+              "Kontrolloni që numri i telefonit të mos ketë gabime shkrimi.",
+              "Çaktivizoni aplikacionet e filtrimit SMS që mund të fshehin mesazhet e dërguesit."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "tip",
+            "text": "Ngjitni kodin me kujdes. Autofill nga Messages zakonisht funksionon në iOS."
+          }
+        ]
+      },
+      {
+        "id": "location-gate-at-sign-in",
+        "title": "Porta e vendndodhjes gjatë hyrjes",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Regjistrimi kërkon që vendndodhja e pajisjes të jetë brenda Maqedonisë. Hyrja vetë nuk e përsërit portën çdo herë, por raportimi, eco-action dhe disa redaktime kontrollojnë vendndodhjen përsëri."
+          },
+          {
+            "type": "bullets",
+            "title": "Kur vendndodhja bllokohet",
+            "items": [
+              "Aktivizoni Location Services për Chisto.mk ndërsa përdorni aplikacionin.",
+              "Fikni vendndodhjen e rreme ose mjetet e zhvilluesit GPS.",
+              "Dilni jashtë për pak që GPS të stabilizohet pranë ndërtesave të larta."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/app-permissions",
+            "label": "Lejet e aplikacionit"
+          }
+        ]
+      },
+      {
+        "id": "password-recovery",
+        "title": "Rivendosja e fjalëkalimit",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Përdorni Forgot password në ekranin e hyrjes. Merrni udhëzime me email ose SMS, varësisht nga rrjedha aktive në versionin tuaj."
+          },
+          {
+            "type": "bullets",
+            "title": "Lista kontrolluese e rikuperimit",
+            "items": [
+              "Përdorni të njëjtin email me të cilin u regjistruat.",
+              "Hapni lidhjet e rikuperimit në të njëjtën pajisje kur është e mundur.",
+              "Zgjidhni një fjalëkalim të ri që plotëson rregullat e aplikacionit."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/contact",
+            "label": "Kontaktoni mbështetjen"
+          }
+        ]
+      },
+      {
+        "id": "sign-out-and-devices",
+        "title": "Dalja dhe pajisjet e përbashkëta",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Dilni nga cilësimet e profilit para se t'i jepni telefonin dikujt tjetër. Skicat e raporteve mbeten në pajisje derisa t'i hidhni poshtë ose t'i parashtroni."
+          },
+          {
+            "type": "bullets",
+            "title": "Zakonet e mira",
+            "items": [
+              "Aktivizoni kyçjen e ekranit në telefonat që mbartni çdo ditë.",
+              "Mos ndani kodet SMS me askënd.",
+              "Përditësoni aplikacionin nga MK App Store kur shfaqen përditësime."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/your-profile-and-settings",
+            "label": "Profili dhe cilësimet tuaja"
+          }
+        ]
+      }
+    ]
+  },
+  "app-permissions": {
+    "cardTitle": "Lejet e aplikacionit",
+    "cardSummary": "Lejoni kamerën, fotot, vendndodhjen, njoftimet dhe lëvizjen që raportimi, pinat e hartës dhe check-in i ngjarjeve të funksionojnë me besueshmëri.",
+    "title": "Lejet e aplikacionit",
+    "lastUpdated": "28 qershor 2026",
+    "lastReviewed": "28 qershor 2026",
+    "datePublished": "2024-01-01T00:00:00.000Z",
+    "dateModified": "2026-06-28T00:00:00.000Z",
+    "sections": [
+      {
+        "id": "why-permissions-matter",
+        "title": "Pse kanë rëndësi lejet",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Chisto.mk kërkon leje iOS vetëm kur një funksion i ka nevojë. Refuzimi bllokon pjesë të magjistari të raportit me 4 hapa, saktësinë e Map tab ose check-in me QR të ngjarjes."
+          },
+          {
+            "type": "bullets",
+            "title": "Lejet kryesore",
+            "items": [
+              "Camera dhe Photos për fotot në fazën Evidence.",
+              "Location ndërsa përdorni aplikacionin për pinat në Maqedoni.",
+              "Notifications për statusin e raporteve dhe përditësimet e ngjarjeve."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "note",
+            "text": "Mund t'i ndryshoni lejet më vonë në Settings të iOS. Aplikacioni shfaq sugjerime brenda ekranit kur diçka mungon."
+          }
+        ]
+      },
+      {
+        "id": "location-permission",
+        "title": "Leja e vendndodhjes",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Zgjidhni Gjatë përdorimit të aplikacionit. Faza Vendndodhja kërkon një pin brenda Maqedonisë. Filtrat Nearby të feed-it dhe qendrimi i hartës përdorin gjithashtu pozicionin tuaj."
+          },
+          {
+            "type": "bullets",
+            "title": "Rregulloni problemet e vendndodhjes",
+            "items": [
+              "Hapni Settings, Privacy and Security, Location Services, Chisto.mk.",
+              "Aktivizoni Precise Location kur ofrohet.",
+              "Rinisni aplikacionin pas ndryshimit të cilësimit."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/troubleshooting",
+            "label": "Zgjidhja e problemeve"
+          }
+        ]
+      },
+      {
+        "id": "camera-and-photos",
+        "title": "Kamera dhe fotot",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Faza Evidence pranon deri në pesë foto nga kamera ose biblioteka. Pa qasje, nuk mund të përfundoni një raport."
+          },
+          {
+            "type": "bullets",
+            "title": "Cilësime të rekomanduara",
+            "items": [
+              "Lejoni qasjen e kamerës kur kërkohet gjatë raportit tuaj të parë.",
+              "Lejoni qasjen e bibliotekës së fotove për të bashkangjitur imazhe ekzistuese.",
+              "Lironi hapësirë ruajtjeje nëse ngarkimet dështojnë vazhdimisht."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "tip",
+            "text": "Fotografoni në dritë ditore kur është e sigurt. Mund të shtoni foto nga biblioteka më vonë në të njëjtën skicë."
+          }
+        ]
+      },
+      {
+        "id": "notifications-permission",
+        "title": "Leja e njoftimeve",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Njoftimet push mbulojnë statusin e raporteve, raportet pranë jush, ngjarjet e pastrimit dhe bisedën e ngjarjes. Mund të rregulloni finë tetë grupe njoftimesh brenda aplikacionit edhe kur push është i lejuar."
+          },
+          {
+            "type": "bullets",
+            "title": "Aktivizoni njoftimet",
+            "items": [
+              "Prekni Allow kur iOS kërkon gjatë onboarding.",
+              "Nëse e keni kaluar, hapni Settings, Notifications, Chisto.mk.",
+              "Hapni preferencat e inbox-it në aplikacion për të heshtur ose shtyrë grupe."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/notifications-in-the-app",
+            "label": "Njoftimet në aplikacion"
+          }
+        ]
+      },
+      {
+        "id": "review-permissions-anytime",
+        "title": "Rishikoni lejet në çdo kohë",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Hapni Settings të iOS, rrëshqitni te Chisto.mk dhe rishikoni çdo çelës. Të dhënat e lëvizjes ose fitnesit nuk kërkohen për raportimin bazë."
+          },
+          {
+            "type": "bullets",
+            "title": "Pas ndryshimit të cilësimeve",
+            "items": [
+              "Mbyllni plotësisht dhe rihapni Chisto.mk një herë.",
+              "Riprovoni veprimin që dështoi, si Report FAB ose skanimi QR.",
+              "Shikoni zgjidhjen e problemeve nëse gabimet vazhdojnë."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/report-a-site",
+            "label": "Raportoni një vend"
+          }
+        ]
+      }
+    ]
+  },
+  "offline-and-slow-networks": {
+    "cardTitle": "Oflajn dhe rrjete të ngadalta",
+    "cardSummary": "Ruani skica raportesh lokalisht, radhitni ngarkimet me sinjal të dobët dhe shmangni parashtrime të dyfishta ndërsa janë në pritje.",
+    "title": "Oflajn dhe rrjete të ngadalta",
+    "lastUpdated": "28 qershor 2026",
+    "lastReviewed": "28 qershor 2026",
+    "datePublished": "2024-01-01T00:00:00.000Z",
+    "dateModified": "2026-06-28T00:00:00.000Z",
+    "sections": [
+      {
+        "id": "how-the-app-uses-network",
+        "title": "Si aplikacioni përdor rrjetin",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Hartat, fotot dhe parashtrimet sinkronizohen kur kthehet lidhja. Disa pllaka harte ruhen në cache që të shfletoni pak oflajn. Veprimet e llogarisë zakonisht kërkojnë sesion të drejtpërdrejtë."
+          },
+          {
+            "type": "bullets",
+            "title": "Pritshmëritë",
+            "items": [
+              "Fushat e skicës ruhen lokalisht derisa të parashtroni.",
+              "Fotot e mëdha zgjasin më shumë me të dhëna celulare.",
+              "Biseda e ngjarjes dhe check-in kanë nevojë për lidhje."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "note",
+            "text": "Ngarkimet në pritje janë normale për pak kohë pas kalimit nga Wi-Fi te të dhënat celulare."
+          }
+        ]
+      },
+      {
+        "id": "report-drafts-offline",
+        "title": "Skicat e raporteve oflajn",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Magjistari i raportit me 4 hapa ruan progresin si skicë. Mund të largoheni në mes të rrjedhës dhe të vazhdoni nga Reports tab ose fleta Report FAB."
+          },
+          {
+            "type": "bullets",
+            "title": "Këshilla për skica",
+            "items": [
+              "Përfundoni Evidence dhe Details para se të humbisni sinjalin, nëse është e mundur.",
+              "Konfirmoni pinin Location kur rifitoni GPS.",
+              "Parashtroni me Wi-Fi kur fotot janë të mëdha."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/report-statuses-and-drafts",
+            "label": "Statuset e raporteve dhe skicat"
+          }
+        ]
+      },
+      {
+        "id": "uploads-and-pending-states",
+        "title": "Ngarkimet dhe gjendjet në pritje",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Në pritje do të thotë që pajisja ende po dërgon të dhëna ose serveri nuk ka konfirmuar marrjen. Mos nisni një raport të dytë për të njëjtin problem ndërsa treguesi në pritje po rrotullohet."
+          },
+          {
+            "type": "bullets",
+            "title": "Nëse jeni ngulur",
+            "items": [
+              "Hapni përmbledhjen e raportit dhe kërkoni njoftime për riprovim.",
+              "Bëni foto më të vogla nëse ngarkimet dështojnë vazhdimisht.",
+              "Prisni me Wi-Fi të qëndrueshme para se të mbyllni me forcë aplikacionin."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "tip",
+            "text": "Kreditet e raportimit harxhohen me parashtrim të suksesshëm, jo ndërsa skica është ende lokale."
+          }
+        ]
+      },
+      {
+        "id": "airplane-mode-and-roaming",
+        "title": "Modaliteti avion dhe roamingu",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Roamingu ndërkombëtar mund të bllokojë ngarkimet në sfond. Përfundoni ngarkimet para fluturimeve kur është e mundur."
+          },
+          {
+            "type": "bullets",
+            "title": "Këshilla udhëtimi",
+            "items": [
+              "Rilidhuni me Wi-Fi para se të redaktoni përshkrime të gjata.",
+              "Kontrolloni dy herë kujtuesit e ngjarjeve nëse ndryshojnë zonat kohore.",
+              "Check-in me QR ka nevojë për të dhëna live në vend."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "note",
+            "text": "Ndryshoni të dhënat celulare për Chisto.mk në Settings të iOS nëse roamingu bllokon vetëm këtë aplikacion."
+          }
+        ]
+      },
+      {
+        "id": "when-to-escalate",
+        "title": "Kur të eskaloni",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Nëse aplikacioni përplaset dy herë gjatë ngarkimit, ndaloni dhe mblidhni versionin e OS dhe versionin e aplikacionit para se të kontaktoni mbështetjen. Riinstalimi mund të pastrojë skicat lokale."
+          },
+          {
+            "type": "bullets",
+            "title": "Para se të na shkruani",
+            "items": [
+              "Rinisni pajisjen një herë.",
+              "Konfirmoni që jeni në versionin më të fundit nga MK App Store.",
+              "Kapni screenshot të tekstit të gabimit dhe turbulloni detajet personale."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/contact",
+            "label": "Kontakt"
+          }
+        ]
+      }
+    ]
+  },
+  "troubleshooting": {
+    "cardTitle": "Zgjidhja e problemeve",
+    "cardSummary": "Rregulloni hyrjen, kodet SMS, vendndodhjen në hartë, ngarkimet e kamerës dhe dini kur të përditësoni ose të kontaktoni mbështetjen.",
+    "title": "Zgjidhja e problemeve të zakonshme",
+    "lastUpdated": "28 qershor 2026",
+    "lastReviewed": "28 qershor 2026",
+    "datePublished": "2024-01-01T00:00:00.000Z",
+    "dateModified": "2026-06-28T00:00:00.000Z",
+    "sections": [
+      {
+        "id": "cannot-sign-in",
+        "title": "Nuk mund të hyni",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Shumica e problemeve të hyrjes vijnë nga lidhja, devijimi i orës ose një version i vjetër. Kaloni nëpër listën para se të supozoni se fjalëkalimi është gabim."
+          },
+          {
+            "type": "bullets",
+            "title": "Provoni fillimisht",
+            "items": [
+              "Fikni modalitetin avion, prisni, pastaj rilidhu.",
+              "Vendosni datën dhe orën në automatike.",
+              "Kërkoni një kod SMS të ri dhe ngjitni me kujdes.",
+              "Përditësoni Chisto.mk nga MK App Store, pastaj rinisni."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/sign-in-and-verification",
+            "label": "Hyrja dhe verifikimi"
+          }
+        ]
+      },
+      {
+        "id": "location-permission",
+        "title": "Probleme me hartën ose GPS",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Map tab dhe faza Location kanë nevojë për qasje në vendndodhje. Nëse pika blu lëviz, rregulloni lejet para se të parashtroni një raport."
+          },
+          {
+            "type": "bullets",
+            "title": "Lista kontrolluese",
+            "items": [
+              "Aktivizoni Location Services ndërsa përdorni aplikacionin.",
+              "Dilni në hapësirë të hapur disa sekonda që GPS të stabilizohet.",
+              "Çaktivizoni mjetet e vendndodhjes së rreme ndërsa përdorni Chisto.mk.",
+              "Zhvendosni pinin manualisht nëse GPS vendoset në bllokun e gabuar."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "note",
+            "text": "Pinat duhet të mbeten brenda Maqedonisë. Tërhiqni pinin nëse GPS ju vendos jashtë kufirit."
+          }
+        ]
+      },
+      {
+        "id": "photos-or-upload",
+        "title": "Dështime të kamerës ose ngarkimit",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Fotot e mëdha dhe rrjeti i dobët nuk përputhen. Jepuni kohë ngarkimeve ose kapni një foto më të vogël kur radha vazhdon të dështojë."
+          },
+          {
+            "type": "bullets",
+            "title": "Provoni fillimisht",
+            "items": [
+              "Konfirmoni lejen e kamerës dhe bibliotekës së fotove.",
+              "Lironi hapësirë ruajtjeje në pajisje.",
+              "Kalo në Wi-Fi për ngarkime me shumë foto.",
+              "Rihapni një skicë të ruajtur në vend që të filloni nga e para."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "tip",
+            "text": "Shmangni dublikimin e të njëjtit raport ndërsa ngarkimi i parë ende shfaqet si në pritje."
+          }
+        ]
+      },
+      {
+        "id": "report-credits-blocked",
+        "title": "Kreditet e raportimit të bllokuara",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Merrni një grup të kufizuar kreditesh raportimi. Kur të gjitha kreditet dhe leja emergjente janë përdorur, Report FAB shfaq një mesazh cooldown."
+          },
+          {
+            "type": "bullets",
+            "title": "Zhbllokoni më shumë raporte",
+            "items": [
+              "Bashkohuni në eco-action dhe verifikoni pjesëmarrjen në check-in.",
+              "Krijoni një eco action si organizator pasi të kaloni kuizin e organizatorit.",
+              "Prisni timerin e zhbllokimit emergjent nëse shfaqet."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/points-rankings-and-credits",
+            "label": "Pikët, renditjet dhe kreditet"
+          }
+        ]
+      },
+      {
+        "id": "still-stuck",
+        "title": "Ende problem?",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Kur asgjë më sipër nuk funksionon, mblidhni një përshkrim të shkurtër dhe na kontaktoni. Shënoni versionin e iOS dhe versionin e aplikacionit."
+          },
+          {
+            "type": "bullets",
+            "title": "Para se të na kontaktoni",
+            "items": [
+              "Rinisni telefonin një herë.",
+              "Konfirmoni listimin zyrtar në MK App Store.",
+              "Përshkruani cila skedë dështoi: Home feed, Map tab, Reports ose Events."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/contact",
+            "label": "Kontakt"
+          }
+        ]
+      }
+    ]
+  },
+  "partnerships-for-organisations": {
+    "cardTitle": "Partneritete për organizata",
+    "cardSummary": "Si bashkitë, OJQ-të, shkollat dhe gazetarët mund të përdorin me përgjegjësi të dhënat e hartës dhe ngjarjet e Chisto.mk.",
+    "title": "Partneritete për bashki, OJQ dhe media",
+    "lastUpdated": "28 qershor 2026",
+    "lastReviewed": "28 qershor 2026",
+    "datePublished": "2024-01-01T00:00:00.000Z",
+    "dateModified": "2026-06-28T00:00:00.000Z",
+    "sections": [
+      {
+        "id": "who-this-guide-is-for",
+        "title": "Për kë është ky udhëzues",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Ky artikull është për organizata që duan të përdorin të dhëna publike të hartës, të koordinojnë pastrime ose të eksplorojnë bashkëpunim. Nuk është këshillë ligjore."
+          },
+          {
+            "type": "bullets",
+            "title": "Lexues të zakonshëm",
+            "items": [
+              "Zyra mjedisore bashkiake që planifikojnë ndjekje në terren.",
+              "OJQ që hartojnë kapacitetin vullnetar pranë vendeve të raportuara.",
+              "Shkolla që organizojnë eco-action të mbikëqyrura.",
+              "Gazetarë që verifikojnë vendndodhjet para botimit."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "note",
+            "text": "Grupet studentore duhet të punojnë me një mësues ose kontakt OJQ para publikimit të ngjarjeve."
+          }
+        ]
+      },
+      {
+        "id": "what-the-platform-provides",
+        "title": "Çfarë ofron platforma",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Banorët parashtrojnë raporte përmes aplikacionit celular. Raportet e aprovuara bëhen vende publike ndotjeje në hartë. Organizatorët mund të publikojnë ngjarje pastrimi dhe eco-action, subjekt i moderimit."
+          },
+          {
+            "type": "bullets",
+            "title": "Sinjale publike mbi të cilat mund të mbështeteni",
+            "items": [
+              "Pinat e vendeve me foto dhe histori komunitare.",
+              "Listime ngjarjesh me RSVP dhe të dhëna check-in kur organizatorët i aktivizojnë.",
+              "Etiketa statusi si Under review, Approved dhe Declined në parashtrime."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "note",
+            "text": "Pinat e hartës janë sinjale qytetare, jo gjetje ligjore automatike. Përdorni kanale zyrtare për zbatim të rregulluar."
+          }
+        ]
+      },
+      {
+        "id": "before-you-contact-us",
+        "title": "Para se të na kontaktoni",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Mblidhni qëllimin, gjeografinë dhe afatin kohor. Nëse ju duhen të dhëna në sasi të mëdha, shpjegoni përfitimin publik dhe si do të mbrojnë të dhënat personale."
+          },
+          {
+            "type": "bullets",
+            "title": "Bashkëngjitje të dobishme",
+            "items": [
+              "Email zyrtar nga domeni i organizatës kur është e mundur.",
+              "Një paragraf për përdorimin e synuar të informacionit të hartës ose ngjarjeve.",
+              "Gjuha e preferuar: maqedonisht, shqip ose anglisht."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/contact",
+            "label": "Hap formularin e kontaktit"
+          }
+        ]
+      },
+      {
+        "id": "policies-and-public-data",
+        "title": "Politikat dhe të dhënat publike",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Rregullat ligjore gjenden te Kushtet, Politika e privatësisë dhe faqet e të dhënave. Qendra e ndihmës shpjegon sjelljen e produktit për banorët."
+          },
+          {
+            "type": "bullets",
+            "title": "Ku të lexoni më shumë",
+            "items": [
+              "Përdorni faqen e të dhënave për mbajtjen dhe rrugët e të drejtave.",
+              "Përdorni faqen e privatësisë para përpunimit të informacionit identifikues.",
+              "Udhëzoni stafin te qendra e ndihmës që ekipet në terren të përdorin të njëjtin fjalor me aplikacionin."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/data",
+            "label": "Përmbledhje e të dhënave"
+          },
+          {
+            "type": "internalLink",
+            "href": "/terms",
+            "label": "Kushtet e përdorimit"
+          }
+        ]
+      }
+    ]
+  },
+  "home-feed-and-sites": {
+    "cardTitle": "Home feed dhe vendet",
+    "cardSummary": "Shfletoni Home feed, përdorni filtrat e feed-it, hapni kartat e vendeve dhe nisni rrjedhat Take action nga një vend ndotjeje.",
+    "title": "Home feed dhe vendet e ndotjes",
+    "lastUpdated": "28 qershor 2026",
+    "lastReviewed": "28 qershor 2026",
+    "datePublished": "2024-01-01T00:00:00.000Z",
+    "dateModified": "2026-06-28T00:00:00.000Z",
+    "sections": [
+      {
+        "id": "home-feed-overview",
+        "title": "Përmbledhje e Home feed",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Home feed është skeda e parazgjedhur pas hyrjes. Shfaq vende ndotjeje të renditura për zonën tuaj me foto, status dhe aktivitet komunitar."
+          },
+          {
+            "type": "bullets",
+            "title": "Çfarë shihni",
+            "items": [
+              "Karta vendesh me titull, tregues vendndodhjeje dhe numra mbështetjeje.",
+              "Shenja kur një vend kërkon vëmendje ose ka raporte të reja.",
+              "Avatari i profilit në header për qasje të shpejtë te cilësimet."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "tip",
+            "text": "Tërhiqni për të rifreskuar kur ktheheni nga terreni me foto të reja."
+          }
+        ]
+      },
+      {
+        "id": "feed-filters",
+        "title": "Filtrat e feed-it",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Prekni filtrat e feed-it mbi listën për të ndryshuar renditjen. Filtrat përfshijnë All, Urgent, Nearby dhe Top support."
+          },
+          {
+            "type": "bullets",
+            "title": "Kur të përdorni secilin filter",
+            "items": [
+              "All: renditje e balancuar e parazgjedhur.",
+              "Urgent: vende të reja ose të paverifikuara që kërkojnë vëmendje komunitare.",
+              "Nearby: raportet më afër vendndodhjes suaj aktuale.",
+              "Top support: vendet me më shumë upvote nga komuniteti."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "note",
+            "text": "Nearby kërkon leje vendndodhjeje. Aktivizojeni në Settings nëse filteri duket bosh."
+          }
+        ]
+      },
+      {
+        "id": "open-a-site",
+        "title": "Hapni një vend",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Prekni një kartë për të hapur fletën e detajeve të vendit me foto, kronologji, komente dhe opsione Take action."
+          },
+          {
+            "type": "bullets",
+            "title": "Në faqen e vendit",
+            "items": [
+              "Rrëshqitni fotot dhe lexoni tekstin e fundit të raportit të aprovuar.",
+              "Shikoni ngjarjet historike si raporte të reja dhe pastrime.",
+              "Jepni upvote ose komentoni kur doni të tregoni mbështetje."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/exploring-the-map",
+            "label": "Eksplorimi i hartës"
+          }
+        ]
+      },
+      {
+        "id": "take-action-on-a-site",
+        "title": "Take action te një vend",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Take action hap opsione si parashtrim raporti të ri, Join eco-action ose shikimi i ngjarjeve të pastrimit të lidhura."
+          },
+          {
+            "type": "bullets",
+            "title": "Zgjedhje të zakonshme",
+            "items": [
+              "Raportoni përsëri kur keni foto të freskëta Evidence.",
+              "Join eco-action për të bërë RSVP në një pastrim ekzistues.",
+              "Create eco action kur planifikoni të organizoni një ngjarje të re."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/report-a-site",
+            "label": "Raportoni një vend"
+          }
+        ]
+      },
+      {
+        "id": "move-to-the-map",
+        "title": "Kaloni te Map tab",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Kalo te Map tab për të parë të njëjtat vende si pinat. Ndryshoni heatmap për të dalluar grumbuj aktiviteti."
+          },
+          {
+            "type": "bullets",
+            "title": "Këshilla për Map tab",
+            "items": [
+              "Ngushtoni ose zmadhoni derisa emrat e rrugëve përputhen me terrenin.",
+              "Prekni një pin për të hapur të njëjtën fletë vendi si në feed.",
+              "Përdorni Recenter kur doni të ktheheni te pozicioni juaj."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/verifying-sites-in-the-field",
+            "label": "Verifikimi i vendeve në terren"
+          }
+        ]
+      }
+    ]
+  },
+  "exploring-the-map": {
+    "cardTitle": "Përdorni Map tab",
+    "cardSummary": "Navigoni pinat, ndryshoni heatmap, hapni fletët e vendeve dhe vendosni kur të parashtroni një raport të ri.",
+    "title": "Eksplorimi i Map tab",
+    "lastUpdated": "28 qershor 2026",
+    "lastReviewed": "28 qershor 2026",
+    "datePublished": "2024-01-01T00:00:00.000Z",
+    "dateModified": "2026-06-28T00:00:00.000Z",
+    "sections": [
+      {
+        "id": "what-the-map-shows",
+        "title": "Çfarë tregon harta",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Map tab është një pamje qytetare e përbashkët e vendeve të ndotjes në Maqedoni. Çdo pin është një vend ku dikush dokumentoi një shqetësim mjedisor."
+          },
+          {
+            "type": "bullets",
+            "title": "Orientim i shpejtë",
+            "items": [
+              "Zmadhoni derisa emrat e rrugëve dhe pikat e referencës përputhen me atë që shihni jashtë.",
+              "Prekni një pin për të hapur foto, përshkrime dhe histori.",
+              "Numrat ndryshojnë ndërsa moderatorët aprovojnë raporte të reja."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/home-feed-and-sites",
+            "label": "Home feed dhe vendet"
+          }
+        ]
+      },
+      {
+        "id": "heatmap-layer",
+        "title": "Shtresa heatmap",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Ndryshoni Show heatmap për të theksuar zonat me më shumë aktivitet të raportuar. Fshihni heatmap kur ju duhet një pamje më e pastër për vendosje të saktë të pin-it."
+          },
+          {
+            "type": "bullets",
+            "title": "Përdorimi i heatmap",
+            "items": [
+              "Kërkoni zona të nxehta kur planifikoni pastrime në grup.",
+              "Fikni heatmap para se të konfirmoni një pin Location.",
+              "Kombinojeni me filtrin Nearby të feed-it kur kërkoni në këmbë."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "tip",
+            "text": "Dendësia e heatmap pasqyron vendet e raportuara, jo prioritetin zyrtar të zbatimit."
+          }
+        ]
+      },
+      {
+        "id": "site-detail-basics",
+        "title": "Bazat e detajeve të vendit",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Fleta e vendit përmbledh parashtrimet e komunitetit. Mbështet transparencën, jo caktimin e fajit te individët."
+          },
+          {
+            "type": "bullets",
+            "title": "Mbi çfarë mund të mbështeteni",
+            "items": [
+              "Fotot dhe teksti vijnë nga kontribues dhe moderatorë.",
+              "Vulat kohore tregojnë freskinë kur shfaqen.",
+              "Take action lidh raportimin, ngjarjet dhe komentet në një vend."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "note",
+            "text": "Mos i trajtoni pinat e hartës si provë ligjore vetë."
+          }
+        ]
+      },
+      {
+        "id": "moving-around-safely",
+        "title": "Lëvizni me siguri",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Përdorni hartën ndërsa jeni në vend ose si pasagjer. Ruani vëmendjen për trafikun dhe kufijtë e pronës private."
+          },
+          {
+            "type": "bullets",
+            "title": "Zakonet e mira",
+            "items": [
+              "Preferoni dritën e ditës për vizitat e para në skaje të panjohura.",
+              "Hapni distancë dhe kapni nga larg nëse një shteg duket i pasigurt.",
+              "Respektoni sinjalet e ndalimit edhe kur mbeturinat duken përtej tyre."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "note",
+            "text": "Mos përdorni Map tab ndërsa drejtoni. Ndaloni në vend të sigurt fillimisht."
+          }
+        ]
+      },
+      {
+        "id": "when-to-file-a-report",
+        "title": "Kur të parashtroni një raport",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Hapni Report FAB kur mund të shtoni prova të freskëta ose të korrigjoni një pin. Dublikatat pa fakte të reja e ngadalësojnë moderimin."
+          },
+          {
+            "type": "bullets",
+            "title": "Para se të filloni",
+            "items": [
+              "Mblidhni foto dhe shënoni çfarë ndryshoi që nga vizita e fundit.",
+              "Konfirmoni që keni kredite raportimi të disponueshme.",
+              "Përfundoni të katër fazat: Evidence, Details, Location, Review."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/report-a-site",
+            "label": "Raportoni një vend"
+          }
+        ]
+      }
+    ]
+  },
+  "verifying-sites-in-the-field": {
+    "cardTitle": "Verifikoni vendet në terren",
+    "cardSummary": "Planifikoni një vizitë të sigurt, krahasoni pinin me atë që shihni dhe parashtroni raport të ri kur provat kanë ndryshuar qartë.",
+    "title": "Verifikimi i vendeve të ndotjes në terren",
+    "lastUpdated": "28 qershor 2026",
+    "lastReviewed": "28 qershor 2026",
+    "datePublished": "2024-01-01T00:00:00.000Z",
+    "dateModified": "2026-06-28T00:00:00.000Z",
+    "sections": [
+      {
+        "id": "plan-the-visit",
+        "title": "Planifikoni vizitën",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Hapni vendin nga Home feed ose Map tab, shënoni pinin dhe fotot, pastaj planifikoni qasje ditore nga një pikë publike."
+          },
+          {
+            "type": "bullets",
+            "title": "Lista kontrolluese",
+            "items": [
+              "Karikoni telefonin dhe prisni sinjal të dobët në disa luginë.",
+              "Tregoni një kolegu ku shkoni nëse punoni vetëm.",
+              "Shmangni tokën private pa leje."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/exploring-the-map",
+            "label": "Eksplorimi i hartës"
+          }
+        ]
+      },
+      {
+        "id": "compare-pin-to-reality",
+        "title": "Krahasoni pinin me realitetin",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Qëndroni ku sugjeron harta dhe kërkoni të njëjtat tregues si në foto: bordurat, pemët, ndërtesat ose kthesat e bregut."
+          },
+          {
+            "type": "bullets",
+            "title": "Kur të raportoni përsëri",
+            "items": [
+              "Rreziku ka lëvizur në mënyrë të dukshme që nga fotot e fundit.",
+              "Pini është në bllokun ose bregun e gabuar.",
+              "Mund të dokumentoni një rrezik që nuk ishte i dukshëm më parë."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "tip",
+            "text": "Devijime të vogla GPS ndodhin pranë shkëmbinjve dhe ndërtesave të larta. Mospërputhjet e mëdha meritojnë një raport të ri të kujdesshëm."
+          }
+        ]
+      },
+      {
+        "id": "capture-fresh-evidence",
+        "title": "Kapni prova të freskëta",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Përdorni Report FAB dhe përfundoni Evidence me deri në pesë foto. Shtoni Details që shpjegojnë çfarë ndryshoi që nga vizitat e mëparshme."
+          },
+          {
+            "type": "bullets",
+            "title": "Këshilla për foto në terren",
+            "items": [
+              "Filloni me kornizë të gjerë për kontekst, pastaj afrohuni te problemi.",
+              "Përfshini tregues shkalle kur madhësia nuk është e qartë.",
+              "Qëndroni larg trafikut, tokës së paqëndrueshme dhe lëngjeve të panjohura."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/report-a-site",
+            "label": "Raportoni një vend"
+          }
+        ]
+      },
+      {
+        "id": "confirm-location-in-macedonia",
+        "title": "Konfirmoni vendndodhjen në Maqedoni",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Në fazën Location, tërhiqni pinin te vendi i saktë brenda Maqedonisë. Prekni Confirm location para Review."
+          },
+          {
+            "type": "bullets",
+            "title": "Cilësia e pin-it",
+            "items": [
+              "GPS ndihmon, por konfirmoni vizualisht në hartë.",
+              "Përshkruani kufijtë e qasjes në Details kur shtigjet janë të bllokuara.",
+              "Parashtroni vetëm kur Review tregon që të gjitha kërkesat janë plotësuar."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "tip",
+            "text": "Nëse GPS është jashtë Maqedonisë, tërhiqni pinin manualisht para se të konfirmoni."
+          }
+        ]
+      },
+      {
+        "id": "safety-and-respect",
+        "title": "Siguria dhe respekti",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Mos hyni në grumbuj të paqëndrueshëm, ujë të shpejtë ose oborre industriale pa trajnim. Sillet me banorët me mirësjellje."
+          },
+          {
+            "type": "callout",
+            "variant": "note",
+            "text": "Nëse zbuloni rrezik të menjëhershëm për jetën, përdorni së pari kanalet zyrtare të emergjencës, pastaj dokumentoni kur është e sigurt."
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/trust-safety-and-moderation",
+            "label": "Besimi, siguria dhe moderimi"
+          }
+        ]
+      }
+    ]
+  },
+  "report-a-site": {
+    "cardTitle": "Raportoni një vend ndotjeje",
+    "cardSummary": "Përdorni Report FAB dhe përfundoni Evidence, Details, Location dhe Review për të parashtruar një raport që moderatorët mund ta verifikojnë.",
+    "title": "Raportoni një vend ndotjeje",
+    "lastUpdated": "28 qershor 2026",
+    "lastReviewed": "28 qershor 2026",
+    "datePublished": "2024-01-01T00:00:00.000Z",
+    "dateModified": "2026-06-28T00:00:00.000Z",
+    "sections": [
+      {
+        "id": "start-from-report-fab",
+        "title": "Filloni nga Report FAB",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Prekni Report FAB nga çdo skedë kryesore. Nëse keni një skicë të ruajtur, zgjidhni Continue draft ose filloni nga e para. Konfirmoni që keni kredite raportimi para se të filloni."
+          },
+          {
+            "type": "bullets",
+            "title": "Para se të filloni",
+            "items": [
+              "Qëndroni të sigurt pranë trafikut, tokës së paqëndrueshme dhe lëngjeve të panjohura.",
+              "Kontrolloni kreditet e raportimit në profilin tuaj nëse Report FAB shfaq cooldown.",
+              "Lejoni lejet e kamerës dhe vendndodhjes kur kërkohen."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "note",
+            "text": "Raportimi kërkon që vendndodhja juaj të jetë në Maqedoni."
+          }
+        ]
+      },
+      {
+        "id": "evidence-stage",
+        "title": "Faza Evidence",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Shtoni deri në pesë foto që tregojnë qartë zonën e ndotur. Të paktën një foto kërkohet për të vazhduar."
+          },
+          {
+            "type": "bullets",
+            "title": "Çfarë të kapni",
+            "items": [
+              "Kornizë e gjerë për kontekst, pastaj korniza më afër për mbeturina, njolla ose mbetje.",
+              "Drita e ditës dhe dora e qëndrueshme ndihmojnë moderatorët të verifikojnë më shpejt.",
+              "Prekni ikonën e ndihmës së fazës për shembuj në çdo kohë."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "tip",
+            "text": "Mos hyni kurrë në pronë private pa leje. Kapni nga një pikë publique kur është e mundur."
+          }
+        ]
+      },
+      {
+        "id": "details-stage",
+        "title": "Faza Details",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Zgjidhni një kategori dhe shkruani një titull të shkurtër që të kuptojë kushdo. Shtoni opsionalisht rëndësi, përshkrim dhe shënime për përpjekjen e pastrimit."
+          },
+          {
+            "type": "bullets",
+            "title": "Fushat e kërkuara",
+            "items": [
+              "Kategori që përputhet me atë që patë.",
+              "Titull si lajm, jo si ese.",
+              "Përshkrim opsional për qasje, erë, ngjyrë uji ose pika referimi."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "note",
+            "text": "Vetëm kategoria dhe titulli kërkohen për të arritur fazën Location."
+          }
+        ]
+      },
+      {
+        "id": "location-stage",
+        "title": "Faza Location",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Zhvendosni pinin te vendi i saktë i ndotjes brenda Maqedonisë. Zmadhoni derisa ndërtesat ose bregu përputhen me atë që shihni në terren, pastaj prekni Confirm location."
+          },
+          {
+            "type": "bullets",
+            "title": "Këshilla për pin-in",
+            "items": [
+              "Tërhiqni pinin nëse GPS devijon pranë ndërtesave të larta.",
+              "Harta nuk mund të lëvizë jashtë Maqedonisë.",
+              "Kthehuni te kjo fazë nga Review nëse pin-i duhet korrigjim."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "tip",
+            "text": "Prekni dy herë Recenter për të kërcyer te pozicioni juaj GPS kur jeni brenda Maqedonisë."
+          }
+        ]
+      },
+      {
+        "id": "review-and-submit",
+        "title": "Faza Review dhe parashtrimi",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Review përmbledh fotot, Details dhe pin-in. Submit dërgon raportin për moderim. Statusi fillon si Under review derisa moderatorët ta aprovojnë ose refuzojnë."
+          },
+          {
+            "type": "bullets",
+            "title": "Pas parashtrimit",
+            "items": [
+              "Ndiqni statusin në Reports tab.",
+              "Raportet e aprovuara lidhen me një vend publik ndotjeje.",
+              "Raportet e refuzuara përfshijnë një arsye kur moderatorët e japin."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/report-statuses-and-drafts",
+            "label": "Statuset e raporteve dhe skicat"
+          }
+        ]
+      }
+    ]
+  },
+  "report-statuses-and-drafts": {
+    "cardTitle": "Statuset e raporteve dhe skicat",
+    "cardSummary": "Kuptoni etiketat Under review, Approved dhe Declined dhe vazhdoni skicat e ruajtura nga Reports ose Report FAB.",
+    "title": "Statuset e raporteve dhe skicat",
+    "lastUpdated": "28 qershor 2026",
+    "lastReviewed": "28 qershor 2026",
+    "datePublished": "2024-01-01T00:00:00.000Z",
+    "dateModified": "2026-06-28T00:00:00.000Z",
+    "sections": [
+      {
+        "id": "status-labels",
+        "title": "Etiketat e statusit",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Çdo parashtrim kalon nëpër moderim para se të ndikojë hartën publike. Etiketat e statusit shfaqen te skeda Reports dhe në njoftime."
+          },
+          {
+            "type": "bullets",
+            "title": "Statuset e zakonshme",
+            "items": [
+              "Under review: moderatorët po kontrollojnë provat dhe vendndodhjen.",
+              "Approved: raporti lidhet me një vend publik ndotjeje.",
+              "Declined: parashtrimi nuk plotëson udhëzimet."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "note",
+            "text": "Already reported mund të shfaqet kur parashtrimi juaj dublikon një vend të hapur ekzistues."
+          }
+        ]
+      },
+      {
+        "id": "track-in-reports-tab",
+        "title": "Ndiqni te skeda Reports",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Hapni skedën Reports për të kërkuar dhe filtruar parashtrimet tuaja. Prekni një rresht për kronologjinë e plotë dhe vendin e lidhur."
+          },
+          {
+            "type": "bullets",
+            "title": "Veprime te skeda Reports",
+            "items": [
+              "Filtroni sipas statusit, si Under review ose Approved.",
+              "Hapni raportet e aprovuara për të parë faqen publike të vendit.",
+              "Lexoni shënimet e moderatorit te artikujt e refuzuar kur janë të disponueshme."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "tip",
+            "text": "Tërhiqni poshtë për të rifreskuar skedën Reports pasi të merrni një njoftim Report status."
+          }
+        ]
+      },
+      {
+        "id": "saved-drafts",
+        "title": "Skicat e ruajtura",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Dalja nga magjistari ruan një skicë lokalisht me fazën aktuale. Etiketat e skicës tregojnë numrin e fotove te lista Reports."
+          },
+          {
+            "type": "bullets",
+            "title": "Vazhdoni një skicë",
+            "items": [
+              "Prekni rreshtin e skicës te Reports.",
+              "Ose prekni Report FAB dhe zgjidhni Continue draft.",
+              "Fshini skicën nga fleta e vazhdimit nëse doni të filloni nga e para."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "tip",
+            "text": "Skicat mbijetojnë rinisjes së aplikacionit, por mund të humbasin nëse riinstaloni ose pastroni të dhënat e aplikacionit."
+          }
+        ]
+      },
+      {
+        "id": "offline-and-failed-uploads",
+        "title": "Oflajn dhe ngarkime të dështuara",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Rrjetet e dobëta mund ta lënë dërgimin në pritje. Prisni në Wi-Fi para se ta fshini ose ta dublikoni të njëjtin raport."
+          },
+          {
+            "type": "bullets",
+            "title": "Nëse dërgimi dështon",
+            "items": [
+              "Rihapni skicën dhe prekni Submit sërish te Review.",
+              "Shihni zgjidhjen e problemeve për gabime kamerë ose ngarkimi.",
+              "Kontaktoni mbështetjen nëse i njëjti gabim përsëritet pas përditësimit."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/offline-and-slow-networks",
+            "label": "Oflajn dhe rrjete të ngadalta"
+          }
+        ]
+      },
+      {
+        "id": "report-credits-reminder",
+        "title": "Kujtesë për kreditet e raportit",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Dërgimet e suksesshme harxhojnë kredite raportimi. Bashkohuni në Join eco-action ose krijoni një Create eco action për të hapur më shumë kur arrini kufirin."
+          },
+          {
+            "type": "bullets",
+            "title": "Shihni bilancin",
+            "items": [
+              "Hapni profilin dhe gjeni kartën Report credits.",
+              "Lexoni mesazhin e cooldown kur të gjitha kreditet janë shpenzuar.",
+              "Verifikoni pjesëmarrjen në ngjarje për të rikthyer kapacitetin më shpejt."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/points-rankings-and-credits",
+            "label": "Pikët, renditjet dhe kreditet"
+          }
+        ]
+      }
+    ]
+  },
+  "join-a-cleanup-event": {
+    "cardTitle": "Bashkohuni në një ngjarje pastrimi",
+    "cardSummary": "Shfletoni veprimet ekologjike te skeda Events, konfirmoni me Join eco-action dhe përgatituni për check-in me QR në ditën e ngjarjes.",
+    "title": "Bashkohuni në një ngjarje pastrimi",
+    "lastUpdated": "28 qershor 2026",
+    "lastReviewed": "28 qershor 2026",
+    "datePublished": "2024-01-01T00:00:00.000Z",
+    "dateModified": "2026-06-28T00:00:00.000Z",
+    "sections": [
+      {
+        "id": "find-an-event",
+        "title": "Gjeni një ngjarje",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Hapni skedën Events për të shfletuar listat e pastrimit dhe veprimeve ekologjike në Maqedoni. Lexoni shënimet e organizatorit, vështirësinë dhe pinin e takimit para se të udhëtoni."
+          },
+          {
+            "type": "bullets",
+            "title": "Para se të udhëtoni",
+            "items": [
+              "Konfirmoni orën e fillimit në kohën lokale dhe kohëzgjatjen e pritur.",
+              "Kontrolloni terrenin dhe kërkesat për pajisje te listimi.",
+              "Shihni nëse regjistrimi mbyllet herët."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "note",
+            "text": "Filtrat e skedës Events ju ndihmojnë të ngushtoni sipas datës dhe statusit kur lista është e gjatë."
+          }
+        ]
+      },
+      {
+        "id": "join-eco-action",
+        "title": "Bashkohu me aksionin",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Prekni Join eco-action te një listim i hapur për të konfirmuar pjesëmarrjen. Duhet të jeni në Maqedoni për rrjedhat e bashkimit që krijojnë angazhime në hartë."
+          },
+          {
+            "type": "bullets",
+            "title": "Pas bashkimit",
+            "items": [
+              "Shtoni ngjarjen në kalendar pasi të angazhoheni.",
+              "Aktivizoni njoftimet Cleanup events për ndryshime të fundit.",
+              "Anuloni promptësisht nëse nuk mund të vini që numri i pjesëmarrësve të mbetet i saktë."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "tip",
+            "text": "Bashkimi dhe verifikimi i pjesëmarrjes mund të hapë kredite shtesë raportimi."
+          }
+        ]
+      },
+      {
+        "id": "from-a-site-take-action",
+        "title": "Nga fleta Take action e një vendi",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Te një vend ndotjeje, Take action mund të listojë veprime ekologjike të lidhura pranë atij pini. Kjo ju ndihmon të bashkoheni në pastrime ku raportet e komunitetit ekzistojnë tashmë."
+          },
+          {
+            "type": "bullets",
+            "title": "Ngjarje të lidhura me vendin",
+            "items": [
+              "Hapni vendin nga Home feed ose Map tab.",
+              "Prekni Take action dhe zgjidhni Join eco-action kur shfaqet.",
+              "Kontrolloni që pini përputhet me vendin që ju intereson."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/home-feed-and-sites",
+            "label": "Home feed dhe vendet"
+          }
+        ]
+      },
+      {
+        "id": "during-the-cleanup",
+        "title": "Gjatë pastrimit",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Ndiqni planin e sigurisë së organizatorit, respektoni pronën private dhe qëndroni brenda rregullave të aksesit publik."
+          },
+          {
+            "type": "bullets",
+            "title": "Në vend",
+            "items": [
+              "Vishni doreza ose veshje me dukshmëri të lartë kur listimi e kërkon.",
+              "Mbikëqyrni fëmijët nga afër pranë rrugëve dhe ujit.",
+              "Pyetni para se të fotografoni njerëz, automjete ose shtëpi."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "note",
+            "text": "Për emergjenca, përdorni kanalet zyrtare të emergjencës përveç çdo shënimi në aplikacion."
+          }
+        ]
+      },
+      {
+        "id": "check-in-preview",
+        "title": "Parapamje check-in",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Shumica e ngjarjeve përdorin check-in me QR në mbërritje. Hapni detajet e ngjarjes në ditën e ngjarjes dhe ndiqni Event check-in and chat për hapat e skanimit dhe rregullat e bisedës."
+          },
+          {
+            "type": "bullets",
+            "title": "Kujtesa për ditën e ngjarjes",
+            "items": [
+              "Mbërrini me bateri dhe të dhëna celulare ose Wi-Fi në vend.",
+              "Hapni ekranin e ngjarjes para se të bëni radhë te tavolina e organizatorit.",
+              "Mbajeni njoftimet Event chat të aktivizuara për përditësime në vend."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/event-check-in-and-chat",
+            "label": "Check-in i ngjarjes dhe biseda"
+          }
+        ]
+      }
+    ]
+  },
+  "event-check-in-and-chat": {
+    "cardTitle": "Check-in i ngjarjes dhe biseda",
+    "cardSummary": "Skanoni QR e organizatorit në mbërritje, konfirmoni pjesëmarrjen dhe përdorni bisedën e ngjarjes për përditësime në vend.",
+    "title": "Check-in i ngjarjes dhe biseda",
+    "lastUpdated": "28 qershor 2026",
+    "lastReviewed": "28 qershor 2026",
+    "datePublished": "2024-01-01T00:00:00.000Z",
+    "dateModified": "2026-06-28T00:00:00.000Z",
+    "sections": [
+      {
+        "id": "before-arrival",
+        "title": "Para mbërritjes",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Hapni ngjarjen ku u bashkuat nga skeda Events. Konfirmoni pinin e takimit, orën e fillimit dhe çdo mesazh të organizatorit në bisedën e ngjarjes."
+          },
+          {
+            "type": "bullets",
+            "title": "Përgatitni telefonin",
+            "items": [
+              "Karikoni mbi 30 për qind para se të udhëtoni.",
+              "Lejoni qasjen e kamerës për skanimin QR.",
+              "Aktivizoni njoftimet Event chat për ndryshime rruge."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/app-permissions",
+            "label": "Lejet e aplikacionit"
+          }
+        ]
+      },
+      {
+        "id": "qr-check-in",
+        "title": "Check-in me QR",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Në vend organizatori shfaq një kod QR. Prekni Check in te ekrani i ngjarjes dhe skanoni kodin më të ri që shfaqet."
+          },
+          {
+            "type": "bullets",
+            "title": "Hapat e skanimit",
+            "items": [
+              "Hapni detajet e ngjarjes ku u bashkuat.",
+              "Prekni Check in ose Scan QR.",
+              "Drejtoni kamerën drejt ekranit të organizatorit, jo një foto e ndarë më herët.",
+              "Prisni konfirmimin e suksesit para se të largoheni."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "note",
+            "text": "Kodet QR rifreskohen automatikisht. Skanoni kodin live në pajisjen e organizatorit."
+          }
+        ]
+      },
+      {
+        "id": "attendance-verification",
+        "title": "Verifikimi i pjesëmarrjes",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Pjesëmarrja e verifikuar mund të hapë kredite raportimi dhe pikë. Nëse skanimi dështon, kërkoni organizatorin të rifreskojë sesionin QR."
+          },
+          {
+            "type": "bullets",
+            "title": "Gabime të zakonshme skanimi",
+            "items": [
+              "QR i gabuar: konfirmoni që keni hapur listimin e duhur.",
+              "QR i skaduar: kërkoni organizatorin të shfaqë një kod të ri.",
+              "Tashmë i përdorur: prisni ndërsa organizatori rigjeneron sesionin."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "tip",
+            "text": "Qëndroni në dritë të mirë dhe mbajeni telefonin të qëndrueshëm në distancë të një krahu nga ekrani."
+          }
+        ]
+      },
+      {
+        "id": "event-chat",
+        "title": "Biseda e ngjarjes",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Biseda e ngjarjes lejon organizatorët dhe vullnetarët të koordinohen para, gjatë dhe pas turnit. Mesazhet njoftohen përmes grupit të preferencave Event chat."
+          },
+          {
+            "type": "bullets",
+            "title": "Etiketa e bisedës",
+            "items": [
+              "Mbajini mesazhet të shkurtra dhe në temë për vendin.",
+              "Mos ndani numra telefoni personalë publikisht në bisedë.",
+              "Raportoni mesazhe abuzive përmes mjeteve të besimit dhe sigurisë."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/notifications-in-the-app",
+            "label": "Njoftimet në aplikacion"
+          }
+        ]
+      },
+      {
+        "id": "after-check-in",
+        "title": "Pas check-in",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Ndiqni udhëzimet e organizatorit për zona, qese mbeturinash dhe rregulla fotografish. Pas ngjarjes, ngarkoni foto pasuese kur rrjedha ju fton."
+          },
+          {
+            "type": "bullets",
+            "title": "Përfundimi",
+            "items": [
+              "Falënderoni hostët përmes bisedës së ngjarjes kur është e përshtatshme.",
+              "Shmangni fytyrat ose tabelat e targave përveçse kur organizatorët i lejojnë.",
+              "Lini një vlerësim të ndershëm nëse aplikacioni ju kërkon."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/join-a-cleanup-event",
+            "label": "Bashkohuni në një ngjarje pastrimi"
+          }
+        ]
+      }
+    ]
+  },
+  "hosting-a-cleanup-event": {
+    "cardTitle": "Organizoni një ngjarje pastrimi",
+    "cardSummary": "Kaloni kuizin e organizatorit, publikoni një Create eco action, drejtoni check-in me QR dhe moderoni bisedën e ngjarjes në ditën e ngjarjes.",
+    "title": "Organizoni një ngjarje pastrimi",
+    "lastUpdated": "28 qershor 2026",
+    "lastReviewed": "28 qershor 2026",
+    "datePublished": "2024-01-01T00:00:00.000Z",
+    "dateModified": "2026-06-28T00:00:00.000Z",
+    "sections": [
+      {
+        "id": "organizer-quiz",
+        "title": "Kuizi i organizatorit",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Organizatorët për herë të parë plotësojnë kuizin e organizatorit para se të hapet Create eco action. Pyetjet mbulojnë sigurinë, moderimin dhe përdorimin e përgjegjshëm të platformës."
+          },
+          {
+            "type": "bullets",
+            "title": "Këshilla për kuizin",
+            "items": [
+              "Lexoni me kujdes çdo pyetje. Sesionet skadojnë nëse ndaloni shumë gjatë.",
+              "Ringarkoni kuizin nëse shihni mesazh gabimi sesioni.",
+              "Certifikimi mbetet në profilin tuaj pasi të kaloni."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "note",
+            "text": "Duhet të jeni në Maqedoni për të krijuar një Create eco action."
+          }
+        ]
+      },
+      {
+        "id": "create-eco-action",
+        "title": "Krijo eko-aksion",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Nga Events ose Take action te një vend, prekni Create eco action. Plotësoni fushat e detyrueshme si titulli, pini i takimit, orari dhe kapaciteti."
+          },
+          {
+            "type": "bullets",
+            "title": "Para publikimit",
+            "items": [
+              "Konfirmoni aksesin në tokë me pronarë ose bashki kur kërkohet.",
+              "Vendosni vështirësi dhe pritshmëri realiste për pajisjet.",
+              "Lidhni ngjarjen me një vend ndotjeje kur pastrimi synon një raport."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "tip",
+            "text": "Listimet e reja mund të shfaqin Under review derisa moderatorët t'i aprovojnë."
+          }
+        ]
+      },
+      {
+        "id": "moderation-status",
+        "title": "Statusi i moderimit",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Ngjarjet mund të jenë Under review, Approved ose Declined. Redaktoni dhe ridërgoni kur moderatorët kërkojnë ndryshime."
+          },
+          {
+            "type": "bullets",
+            "title": "Etiketat e panelit",
+            "items": [
+              "Under review: vullnetarët nuk mund të bashkohen ende.",
+              "Approved: Join eco-action hapet për të gjithë.",
+              "Declined: lexoni banderolën dhe prekni Edit and resubmit."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/trust-safety-and-moderation",
+            "label": "Besimi, siguria dhe moderimi"
+          }
+        ]
+      },
+      {
+        "id": "day-of-check-in",
+        "title": "Check-in në ditën e ngjarjes",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Hapni panelin e organizatorit dhe shfaqni QR live për vullnetarët. Anuloni kodet QR të mëparshme nëse ka rrjedhur një screenshot."
+          },
+          {
+            "type": "bullets",
+            "title": "Udhëheqje në vend",
+            "items": [
+              "Informoni të gjithë për rreziqet, çiftet e mbështetjes dhe ndihmën e parë.",
+              "Rifreskoni QR para çdo vale nëse kodet skadojnë.",
+              "Përdorni bisedën e ngjarjes për përditësime të shkurtra në vend të fijeve të gjata."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/event-check-in-and-chat",
+            "label": "Check-in i ngjarjes dhe biseda"
+          }
+        ]
+      },
+      {
+        "id": "after-the-event",
+        "title": "Pas ngjarjes",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Mbyllni ciklin me falënderime, foto pasuese dhe feedback të ndershëm. Ngjarjet e aprovuara nga organizatori mund të fitojnë pikë profili."
+          },
+          {
+            "type": "bullets",
+            "title": "Përfundimi",
+            "items": [
+              "Shënoni ngjarjen si të përfunduar kur mbaron turni.",
+              "Regjistroni ndjekjet bashkiake veç nga biseda vullnetare.",
+              "Arkivoni vendimet e bisedës që organizatorët e ardhshëm të mësojnë nga udhëzuesi juaj."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/points-rankings-and-credits",
+            "label": "Pikët, renditjet dhe kreditet"
+          }
+        ]
+      }
+    ]
+  },
+  "your-profile-and-settings": {
+    "cardTitle": "Profili dhe cilësimet tuaja",
+    "cardSummary": "Redaktoni avatarin, gjuhën, vendndodhjen bazë, preferencat e njoftimeve dhe kontrollet e llogarisë nga profili juaj.",
+    "title": "Profili dhe cilësimet tuaja",
+    "lastUpdated": "28 qershor 2026",
+    "lastReviewed": "28 qershor 2026",
+    "datePublished": "2024-01-01T00:00:00.000Z",
+    "dateModified": "2026-06-28T00:00:00.000Z",
+    "sections": [
+      {
+        "id": "open-your-profile",
+        "title": "Hapni profilin tuaj",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Prekni avatarin tuaj nga Home feed ose çdo skedë kryesore. Profili tregon pikët, renditjet javore, kreditet e raportit dhe përmbledhjet e aktivitetit."
+          },
+          {
+            "type": "bullets",
+            "title": "Seksionet e profilit",
+            "items": [
+              "Karta e pikëve dhe nivelit me arsyet e fundit.",
+              "Bilanci i Report credits dhe këshilla cooldown.",
+              "Lidhje te cilësimet, njoftimet dhe ndihma."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/points-rankings-and-credits",
+            "label": "Pikët, renditjet dhe kreditet"
+          }
+        ]
+      },
+      {
+        "id": "edit-profile-details",
+        "title": "Redaktoni detajet e profilit",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Përditësoni emrin e shfaqur, foton e avatarit dhe biografinë nga redaktimi i profilit. Mbajeni informacionin respektues dhe shmangni ndarjen e të dhënave private të kontaktit publikisht."
+          },
+          {
+            "type": "bullets",
+            "title": "Hapat e redaktimit",
+            "items": [
+              "Prekni Edit profile te ekrani i profilit tuaj.",
+              "Zgjidhni një foto katrore që lexohet mirë në madhësi të vogël.",
+              "Ruani dhe konfirmoni që parapamja duket e saktë."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "tip",
+            "text": "Përdorni një foto neutrale nëse përfaqësoni publikisht një organizatë."
+          }
+        ]
+      },
+      {
+        "id": "language-and-home-location",
+        "title": "Gjuha dhe vendndodhja bazë",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Ndryshoni gjuhën e ndërfaqes midis parazgjedhjes së sistemit, anglishtes, maqedonishtes dhe shqipes. Vendosni home location për të rregulluar renditjen e feed-it kur jeni larg GPS."
+          },
+          {
+            "type": "bullets",
+            "title": "Cilësimet e vendndodhjes",
+            "items": [
+              "Home location duhet të jetë brenda Maqedonisë.",
+              "Përditësojeni kur lëvizni në një qytet të ri për shfletim ditor.",
+              "Pinat e hartës për raportet përdorin ende pinin GPS të fazës Location."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/getting-started",
+            "label": "Fillimi"
+          }
+        ]
+      },
+      {
+        "id": "settings-and-sign-out",
+        "title": "Cilësimet dhe dalja",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Cilësimet përmbajnë ndryshimin e fjalëkalimit, shkurtore njoftimesh, lidhje ligjore dhe daljen. Dilni para se ta jepni pajisjen."
+          },
+          {
+            "type": "bullets",
+            "title": "Detyra të zakonshme",
+            "items": [
+              "Hapni preferencat e njoftimeve nga cilësimet ose inbox.",
+              "Riluani coach tour nëse e keni kaluar onboarding.",
+              "Lexoni lidhjet Terms dhe Privacy para se të ftoni të mitur."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/account-and-data",
+            "label": "Llogaria dhe të dhënat"
+          }
+        ]
+      },
+      {
+        "id": "block-user",
+        "title": "Blloko përdoruesin",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Block user nga profili i një tjetri ose nga një fije komentesh abuzive. Personat e bllokuar nuk mund të ndërveprojnë me ju në veçoritë sociale të aplikacionit."
+          },
+          {
+            "type": "bullets",
+            "title": "Kur të bllokoni",
+            "items": [
+              "Përdorni bllokimin për ngacmim ose spam të drejtuar ndaj jush.",
+              "Bllokimi është i kthyeshëm nga cilësimet kur të zgjidhni.",
+              "Raportoni kërcënime serioze edhe përmes Contact."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/trust-safety-and-moderation",
+            "label": "Besimi, siguria dhe moderimi"
+          }
+        ]
+      }
+    ]
+  },
+  "points-rankings-and-credits": {
+    "cardTitle": "Pikët, renditjet dhe kreditet",
+    "cardSummary": "Fitoni pikë për raporte dhe ngjarje të aprovuara, ngjitu në renditjet javore dhe menaxhoni kreditet e raportit.",
+    "title": "Pikët, renditjet dhe kreditet e raportit",
+    "lastUpdated": "28 qershor 2026",
+    "lastReviewed": "28 qershor 2026",
+    "datePublished": "2024-01-01T00:00:00.000Z",
+    "dateModified": "2026-06-28T00:00:00.000Z",
+    "sections": [
+      {
+        "id": "how-points-work",
+        "title": "Si funksionojnë pikët",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Pikët shpërblejnë pjesëmarrjen konstruktive. Arsyet e zakonshme përfshijnë report approved, eco action approved dhe pjesëmarrje të verifikuar në ngjarje."
+          },
+          {
+            "type": "bullets",
+            "title": "Ngjarje tipike pikësh",
+            "items": [
+              "Report approved pas moderimit.",
+              "Eco action approved për organizatorët.",
+              "Check-in i verifikuar në një pastrim ku u bashkuat."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "note",
+            "text": "Pikët janë vetëm gamifikim. Ato nuk zëvendësojnë zbatimin zyrtar mjedisor."
+          }
+        ]
+      },
+      {
+        "id": "weekly-rankings",
+        "title": "Renditjet javore",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Profili tregon renditjet javore për raporte, veprime ekologjike dhe aktivitet të lidhur. Renditjet rivendosen sipas orarit të shfaqur në aplikacion."
+          },
+          {
+            "type": "bullets",
+            "title": "Këshilla renditjeje",
+            "items": [
+              "Raportet me cilësi tejkalojnë dublikatat e nxituara.",
+              "Bashkohuni në Join eco-action dhe bëni check-in për të rritur pjesëmarrjen në ngjarje.",
+              "Krahasoni renditjen me miqtë për të qëndruar të motivuar."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "note",
+            "text": "Nëntitulli i renditjeve javore në profil përmend raporte, veprime ekologjike dhe më shumë."
+          }
+        ]
+      },
+      {
+        "id": "report-credits",
+        "title": "Kreditet e raportit",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Kreditet e raportit kufizojnë sa raporte standarde mund të dërgoni në një periudhë. Karta e profilit tregon kreditet e mbetura dhe kohëmatësit e riprovimit."
+          },
+          {
+            "type": "bullets",
+            "title": "Kur kreditet mbarojnë",
+            "items": [
+              "Lexoni modalin cooldown te Report FAB.",
+              "Bashkohuni në Join eco-action dhe verifikoni pjesëmarrjen me QR për të hapur më shumë.",
+              "Krijoni një Create eco action pas certifikimit të kuizit të organizatorit."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "tip",
+            "text": "Emergency allowance mund të shfaqet një herë për cikël. Vëzhgoni kohëmatësin e riprovimit në modal."
+          }
+        ]
+      },
+      {
+        "id": "levels-and-achievements",
+        "title": "Nivelet dhe arritjet",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Nivelet grupojnë pikët tuaja gjithë jetësore. Njoftimet System mund të njoftojnë arritje ose milestone."
+          },
+          {
+            "type": "bullets",
+            "title": "Qëndroni të informuar",
+            "items": [
+              "Lini grupin System të aktivizuar për arritjet.",
+              "Hapni kartën e pikëve për të lexuar arsyet e fundit.",
+              "Ndani fitoret në bisedën e ngjarjes, jo numra telefoni publik."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/notifications-in-the-app",
+            "label": "Njoftimet në aplikacion"
+          }
+        ]
+      },
+      {
+        "id": "fair-play",
+        "title": "Lojë e ndershme",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Moderatorët refuzojnë sjellje manipulative si spam dublikatash ose check-in të rremë. Luani ndershëm që renditjet të mbeten kuptimplota për të gjithë."
+          },
+          {
+            "type": "bullets",
+            "title": "Shmangni",
+            "items": [
+              "Raporte me cilësi të ulët masive për të fituar pikë.",
+              "Ndarjen e screenshot-eve QR për të falsifikuar pjesëmarrjen.",
+              "Ngacmimin e përdoruesve që renditen më lart se ju."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/trust-safety-and-moderation",
+            "label": "Besimi, siguria dhe moderimi"
+          }
+        ]
+      }
+    ]
+  },
+  "account-and-data": {
+    "cardTitle": "Llogaria dhe të dhënat tuaja",
+    "cardSummary": "Mbroni hyrjen, kuptoni çfarë ruajmë dhe përdorni faqet e duhura për privatësi dhe kërkesa të dhënash.",
+    "title": "Llogaria, privatësia dhe kërkesat për të dhëna",
+    "lastUpdated": "28 qershor 2026",
+    "lastReviewed": "28 qershor 2026",
+    "datePublished": "2024-01-01T00:00:00.000Z",
+    "dateModified": "2026-06-28T00:00:00.000Z",
+    "sections": [
+      {
+        "id": "what-the-app-stores",
+        "title": "Çfarë ruan aplikacioni",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Llogaria juaj Chisto.mk lidh raportet, veprimet ekologjike, preferencat e njoftimeve dhe aktivitetin e profilit në të gjithë Maqedoninë."
+          },
+          {
+            "type": "bullets",
+            "title": "Çfarë mund të lidhet me ju",
+            "items": [
+              "Numri i telefonit, emaili dhe hash i fjalëkalimit për hyrje.",
+              "Pinat e hartës dhe përshkrimet nga raportet që parashtroni.",
+              "Statusi RSVP, regjistrat e check-in dhe biseda e ngjarjes për ngjarjet ku merrni pjesë."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "note",
+            "text": "Faqet publike të vendeve tregojnë përmbajtjen e komunitetit, jo të dhënat tuaja private të kontaktit."
+          }
+        ]
+      },
+      {
+        "id": "password-and-devices",
+        "title": "Fjalëkalimet dhe pajisjet",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Trajtoni llogarinë si një kutë postare për çështje qytetare. Kontrollet e forta të aksesit ju mbrojnë juve dhe të dhënat e hartës nga të cilët varen të tjerët."
+          },
+          {
+            "type": "bullets",
+            "title": "Higjienë e përditshme",
+            "items": [
+              "Përdorni fjalëkalim unik ose menaxher fjalëkalimesh të sistemit operativ.",
+              "Mbajeni aktiv kyçjen e ekranit në telefonat që mbani çdo ditë.",
+              "Dilni nga llogaria para se t'i jepni pajisjen dikujt tjetër."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/sign-in-and-verification",
+            "label": "Hyrja dhe verifikimi"
+          }
+        ]
+      },
+      {
+        "id": "your-rights",
+        "title": "Qasje, korrigjim dhe fshirje",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Mund të kërkoni çfarë mbajmë, të korrigjoni gabime, të eksportoni një kopje ose të kërkoni fshirje, me përjashtime ligjore si regjistrat e moderimit."
+          },
+          {
+            "type": "bullets",
+            "title": "Si të nisni një kërkesë",
+            "items": [
+              "Përdorni cilësimet e llogarisë në aplikacion kur janë të disponueshme.",
+              "Dërgoni email mbështetjes nëse mungon një kontroll ose rrjedha jep gabim.",
+              "Pritni verifikim identiteti kur kërkesat janë të ndjeshme."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/data",
+            "label": "Të dhënat dhe llogaria juaj"
+          }
+        ]
+      },
+      {
+        "id": "legal-links",
+        "title": "Politikat në këtë sajt",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Teksti ligjor zyrtar qëndron në faqe të dedikuara. Lexojini kur ju duhet siguri përtej këtyre udhëzuesve."
+          },
+          {
+            "type": "bullets",
+            "title": "Ku të shikoni",
+            "items": [
+              "Privatësia shpjegon çfarë mbledhim dhe pse.",
+              "Kushtet shpjegojnë përdorimin e lejuar të platformës.",
+              "Cookies shpjegon analitikën opsionale të faqes web."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/privacy",
+            "label": "Politika e privatësisë"
+          },
+          {
+            "type": "internalLink",
+            "href": "/terms",
+            "label": "Kushtet e përdorimit"
+          },
+          {
+            "type": "internalLink",
+            "href": "/cookies",
+            "label": "Politika e cookies"
+          }
+        ]
+      }
+    ]
+  },
+  "notifications-in-the-app": {
+    "cardTitle": "Njoftimet",
+    "cardSummary": "Menaxhoni inbox, tetë grupet e njoftimeve, kontrollet snooze dhe cilësimet push të OS së bashku.",
+    "title": "Njoftimet në aplikacion",
+    "lastUpdated": "28 qershor 2026",
+    "lastReviewed": "28 qershor 2026",
+    "datePublished": "2024-01-01T00:00:00.000Z",
+    "dateModified": "2026-06-28T00:00:00.000Z",
+    "sections": [
+      {
+        "id": "inbox-overview",
+        "title": "Përmbledhje inbox",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Prekni ikonën e ziles për të hapur inbox e njoftimeve. Sinjale të ngjashme grumbullohen në grupe njoftimesh të zgjerueshme sipas ditës."
+          },
+          {
+            "type": "bullets",
+            "title": "Veprime inbox",
+            "items": [
+              "Prekni një rresht për të hapur vendin ose ngjarjen e lidhur.",
+              "Zgjeroni një grup për të lexuar çdo mesazh në stack.",
+              "Shënoni një grup si të lexuar ose arkivojeni kur mbaroni."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "tip",
+            "text": "Event chat grumbullohet sipas bisedës që një prekje të hapë fijen e plotë."
+          }
+        ]
+      },
+      {
+        "id": "eight-notification-groups",
+        "title": "Tetë grupet e njoftimeve",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Preferencat organizojnë sinjalet në tetë grupe që mund t'i heshtni ose t'i snooze veç e veç."
+          },
+          {
+            "type": "bullets",
+            "title": "Tetë grupet",
+            "items": [
+              "Përditësime vendesh",
+              "Status raporti",
+              "Vota mbështetëse",
+              "Komente",
+              "Raporte afër",
+              "Ngjarje pastrimi",
+              "Biseda e ngjarjes",
+              "Sistemi, përfshirë arritjet dhe mesazhet e mirëseardhjes"
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "tip",
+            "text": "Snooze Event chat natën para pastrimit nëse ju duhet gjumë, pastaj riaktivizojeni në mëngjesin e ngjarjes."
+          }
+        ]
+      },
+      {
+        "id": "system-settings",
+        "title": "Kontrollet OS dhe në aplikacion",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Telefoni gjithmonë fiton. Nëse push është i fikur në nivel iOS, Chisto.mk nuk mund ta anashkalojë atë. Përdorni njëkohësisht cilësimet OS dhe ato në aplikacion."
+          },
+          {
+            "type": "bullets",
+            "title": "Ku të shikoni",
+            "items": [
+              "iOS: Cilësimet → Njoftimet → Chisto.mk.",
+              "Në aplikacion: ikona e preferencave inbox për çelësat e grupeve.",
+              "Cilësimet e profilit për lidhje të shpejta te e njëjta fletë."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "note",
+            "text": "Snooze një grup përkohësisht nga fleta e preferencave kur ju duhen orë qetësie."
+          }
+        ]
+      },
+      {
+        "id": "report-and-event-alerts",
+        "title": "Sinjalizime raportesh dhe ngjarjesh",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Njoftimet Report status aktivizohen kur moderatorët e kalojnë një parashtrim në Approved ose Declined. Cleanup events njofton ndryshime RSVP dhe kujtesa."
+          },
+          {
+            "type": "bullets",
+            "title": "Parazgjedhje të rekomanduara",
+            "items": [
+              "Mbajeni Report status të ndezur për parashtrimet tuaja.",
+              "Aktivizoni Nearby reports kur vullnetarizoni lokal.",
+              "Aktivizoni Cleanup events dhe Event chat në ditët kur bashkoheni në Join eco-action."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/report-statuses-and-drafts",
+            "label": "Statuset e raporteve dhe skicat"
+          }
+        ]
+      },
+      {
+        "id": "email-and-sms",
+        "title": "Email dhe SMS",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Kodet SMS njëpërdorimësh dhe disa mesazhe sigurie kërkohen për hyrje. Mesazhet marketingu arrijnë vetëm kur pranoni qartë."
+          },
+          {
+            "type": "bullets",
+            "title": "Mbajeni kontrollin",
+            "items": [
+              "Mbajeni email-in të arritshëm për të rikuperuar qasjen nëse humbisni telefonin.",
+              "Nëse kodet SMS ndalojnë, shihni zgjidhjen e problemeve të hyrjes.",
+              "Lexoni Politikën e privatësisë për detaje përpunimi."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/privacy",
+            "label": "Politika e privatësisë"
+          }
+        ]
+      }
+    ]
+  },
+  "trust-safety-and-moderation": {
+    "cardTitle": "Besimi, siguria dhe moderimi",
+    "cardSummary": "Pse ekziston moderimi, si të kontribuoni me respekt, të bllokoni përdorues dhe ku qëndron teksti ligjor zyrtar.",
+    "title": "Besimi, siguria dhe moderimi",
+    "lastUpdated": "28 qershor 2026",
+    "lastReviewed": "28 qershor 2026",
+    "datePublished": "2024-01-01T00:00:00.000Z",
+    "dateModified": "2026-06-28T00:00:00.000Z",
+    "sections": [
+      {
+        "id": "why-moderation-exists",
+        "title": "Pse ekziston moderimi",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Chisto.mk publikon sinjale qytetare mjedisore. Moderimi ul spam-in, mbron njerëzit nga ngacmimi dhe e mban hartën të lexueshme për partnerët në Maqedoni."
+          },
+          {
+            "type": "bullets",
+            "title": "Çfarë kërkojnë rishikuesit",
+            "items": [
+              "Provë që përputhet me pinin Location dhe dritaren kohore.",
+              "Gjuhë respektuese pa sulme personale.",
+              "Dublikatat bashkohen në të njëjtin vend kur kjo e bën historinë më të qartë."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/report-a-site",
+            "label": "Paraqisni një raport ndotjeje"
+          }
+        ]
+      },
+      {
+        "id": "report-and-event-statuses",
+        "title": "Statuset e raporteve dhe ngjarjeve",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Raportet dhe veprimet ekologjike shfaqin Under review derisa moderatorët vendosin. Përmbajtja e aprovuar shfaqet publikisht. Përmbajtja e refuzuar përfshin udhëzime kur moderatorët i japin."
+          },
+          {
+            "type": "bullets",
+            "title": "Kuptimet e statusit",
+            "items": [
+              "Under review: shqyrtim njerëzor në progres.",
+              "Approved: e dukshme në Home feed, Map tab ose Events.",
+              "Declined: nuk plotëson udhëzimet. Redaktoni dhe ridërgoni kur lejohet."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/help/report-statuses-and-drafts",
+            "label": "Statuset e raporteve dhe skicat"
+          }
+        ]
+      },
+      {
+        "id": "respectful-contributions",
+        "title": "Kontribute respektuese",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Supozoni qëllim të mirë te fqinjët dhe organizatorët. Fokusohuni në kushte që mund t'i fotografoni ose përshkruani faktikisht."
+          },
+          {
+            "type": "bullets",
+            "title": "Normat e komunitetit",
+            "items": [
+              "Pa doxxing: shmangni postimin e adresave private të njerëzve në vend të vendeve.",
+              "Pa gjuhë urrejtjeje ose brigade të koordinuara.",
+              "Mos ngarkoni imazhe që seksualizojnë fëmijët ose lavdërojnë vetëdëmtimin."
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "tip",
+            "text": "Nëse tensioni rritet, pushoni dhe fiksoni vetëm fakte. Moderatorët vënë sigurinë para shpejtësisë."
+          }
+        ]
+      },
+      {
+        "id": "block-and-escalate",
+        "title": "Bllokoni dhe eskaloni",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Block user te profilet ose fijet e komenteve kur dikush ju synon. Për kërcënime serioze, na kontaktoni me screenshot dhe URL."
+          },
+          {
+            "type": "bullets",
+            "title": "Rrugët e eskalimit",
+            "items": [
+              "Bllokoni fillimisht për ngacmim të vazhdueshëm në aplikacion.",
+              "Përdorni Contact për përmbajtje të paligjshme ose dëm të menjëhershëm.",
+              "Organizatorët mund të heqin pjesëmarrës shqetësues nga biseda e ngjarjes sipas rregullave të shtëpisë."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/contact",
+            "label": "Kontakt"
+          }
+        ]
+      },
+      {
+        "id": "legal-detail",
+        "title": "Detaje ligjore",
+        "blocks": [
+          {
+            "type": "paragraph",
+            "text": "Ky artikull përmbledh pritshmëritë e sjelljes. Rregullat zyrtare qëndrojnë në faqet ligjore të lidhura më poshtë."
+          },
+          {
+            "type": "bullets",
+            "title": "Ku të lexoni më shumë",
+            "items": [
+              "Privatësia shpjegon kategoritë e të dhënave dhe mbajtjen.",
+              "Kushtet shpjegojnë përdorimin e lejuar dhe mekanizmat e zbatimit.",
+              "Faqja e të dhënave liston kërkesat e të drejtave për mbajtësit e llogarive."
+            ]
+          },
+          {
+            "type": "internalLink",
+            "href": "/privacy",
+            "label": "Politika e privatësisë"
+          },
+          {
+            "type": "internalLink",
+            "href": "/terms",
+            "label": "Kushtet e përdorimit"
+          }
+        ]
+      }
+    ]
+  }
+}

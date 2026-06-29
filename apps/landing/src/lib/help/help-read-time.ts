@@ -22,6 +22,14 @@ function countWordsInBlock(block: HelpContentBlock): number {
       const itemWords = block.items.reduce((sum, item) => sum + countWordsInText(item), 0);
       return titleWords + itemWords;
     }
+    case "steps": {
+      const titleWords = block.title != null ? countWordsInText(block.title) : 0;
+      const stepWords = block.items.reduce(
+        (sum, step) => sum + countWordsInText(step.title) + countWordsInText(step.text),
+        0,
+      );
+      return titleWords + stepWords;
+    }
   }
 }
 

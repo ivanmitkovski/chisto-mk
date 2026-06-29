@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { listNewsPostsClient } from '../data/news-adapter-client';
+import { landingNewsArticleUrl, landingSiteHost } from '../lib/landing-site-url';
 import type { NewsPostFormValues } from '../types';
 import type { NewsFormLocale } from '../types';
 import styles from './news-seo-preview.module.css';
@@ -16,6 +17,7 @@ type NewsSeoPreviewProps = {
   locale: NewsFormLocale;
   coverImageUrl: string | null;
   publishedAt: string | null;
+  embedded?: boolean;
 };
 
 export function NewsSeoPreview({
@@ -24,18 +26,22 @@ export function NewsSeoPreview({
   locale,
   coverImageUrl,
   publishedAt,
+  embedded = false,
 }: NewsSeoPreviewProps) {
   const t = useTranslations('news');
   const content = values.translations[locale];
   const slug = values.slug.trim() || 'your-slug';
-  const canonical = `https://chisto.mk/${locale}/news/${slug}`;
+  const canonical = landingNewsArticleUrl(locale, slug);
+  const siteHost = landingSiteHost();
   const titleLen = content.title.length;
   const descLen = content.excerpt.length;
   const jsonLdReady = Boolean(
     content.title.trim() && content.excerpt.trim() && coverImageUrl && publishedAt,
   );
+  const jsonLdDraftNote = !publishedAt && content.title.trim() && content.excerpt.trim() && coverImageUrl;
 
   const [slugStatus, setSlugStatus] = useState<'idle' | 'checking' | 'available' | 'taken'>('idle');
+  const requestIdRef = useRef(0);
 
   useEffect(() => {
     const trimmed = values.slug.trim();
@@ -44,27 +50,37 @@ export function NewsSeoPreview({
       return;
     }
 
+    const requestId = ++requestIdRef.current;
     setSlugStatus('checking');
     const timer = setTimeout(() => {
       void (async () => {
         try {
           const result = await listNewsPostsClient({ q: trimmed, page: 1 });
+          if (requestId !== requestIdRef.current) return;
           const conflict = result.items.some(
             (item) => item.slug === trimmed && item.id !== postId,
           );
           setSlugStatus(conflict ? 'taken' : 'available');
         } catch {
-          setSlugStatus('idle');
+          if (requestId === requestIdRef.current) {
+            setSlugStatus('idle');
+          }
         }
       })();
     }, 400);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      requestIdRef.current += 1;
+    };
   }, [postId, values.slug]);
 
   return (
-    <section className={styles.root} aria-label={t('seo.label')}>
-      <h3 className={styles.heading}>{t('seo.label')}</h3>
+    <section
+      className={embedded ? styles.embedded : styles.root}
+      aria-label={t('seo.label')}
+    >
+      {!embedded ? <h3 className={styles.heading}>{t('seo.label')}</h3> : null}
 
       <div className={styles.block}>
         <h4 className={styles.subheading}>{t('seo.googleTitle')}</h4>
@@ -100,7 +116,7 @@ export function NewsSeoPreview({
             <div className={styles.ogPlaceholder} />
           )}
           <div className={styles.ogBody}>
-            <p className={styles.ogSite}>chisto.mk</p>
+            <p className={styles.ogSite}>{siteHost}</p>
             <p className={styles.ogTitle}>{content.title || '—'}</p>
             <p className={styles.ogDesc}>{content.excerpt || '—'}</p>
           </div>
@@ -124,7 +140,11 @@ export function NewsSeoPreview({
       </div>
 
       <p className={jsonLdReady ? styles.jsonLdOk : styles.jsonLdWarn}>
-        {jsonLdReady ? t('seo.jsonLdReady') : t('seo.jsonLdIncomplete')}
+        {jsonLdReady
+          ? t('seo.jsonLdReady')
+          : jsonLdDraftNote
+            ? t('seo.jsonLdAfterPublish')
+            : t('seo.jsonLdIncomplete')}
       </p>
     </section>
   );

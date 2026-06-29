@@ -15,6 +15,12 @@ export function helpHowToStepsFromBlocks(sections: readonly { blocks: readonly H
           out.push(item);
         }
       }
+      if (block.type === "steps") {
+        for (const step of block.items) {
+          if (out.length >= MAX_HOWTO_STEPS) return out;
+          out.push(`${step.title}. ${step.text}`);
+        }
+      }
     }
   }
   return out;

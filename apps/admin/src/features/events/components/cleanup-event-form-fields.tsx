@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Input } from '@/components/ui';
+import { DateTimePicker, Input } from '@/components/ui';
 import type { CleanupEventFieldErrors } from '@/features/events/lib/admin-cleanup-event-validation';
 import type { ConflictingEventInfo } from '@/features/events/lib/event-schedule-conflict-client';
 import { ScheduleConflictBanner } from './schedule-conflict-banner';
@@ -140,51 +140,29 @@ export function CleanupEventFormFields({
         ) : null}
       </label>
 
-      <label className={styles.field} htmlFor={`${idPrefix}-scheduled`}>
-        <span className={styles.fieldLabel}>{t('form.startDateTime')}</span>
-        <input
-          id={`${idPrefix}-scheduled`}
-          type="datetime-local"
-          value={values.scheduledAtLocal}
-          disabled={readOnly}
-          onChange={(e) => {
-            onFieldChange('scheduledAtLocal', e.target.value);
-            onClearFieldError('scheduledAt');
-          }}
-          className={styles.input}
-          aria-invalid={fieldErrors.scheduledAt ? true : undefined}
-          aria-describedby={fieldErrors.scheduledAt ? `${idPrefix}-scheduled-err` : undefined}
-        />
-        {fieldErrors.scheduledAt ? (
-          <span id={`${idPrefix}-scheduled-err`} className={styles.fieldError} role="alert">
-            {fieldErrors.scheduledAt}
-          </span>
-        ) : null}
-      </label>
+      <DateTimePicker
+        label={t('form.startDateTime')}
+        value={values.scheduledAtLocal}
+        errorText={fieldErrors.scheduledAt}
+        disabled={readOnly}
+        onValueChange={(next) => {
+          onFieldChange('scheduledAtLocal', next);
+          onClearFieldError('scheduledAt');
+        }}
+      />
 
       {showEndAt ? (
-        <label className={styles.field} htmlFor={`${idPrefix}-end`}>
-          <span className={styles.fieldLabel}>{t('form.endDateTime')}</span>
-          <span className={styles.fieldHint}>{t('form.endDateHint')}</span>
-          <input
-            id={`${idPrefix}-end`}
-            type="datetime-local"
-            value={values.endAtLocal}
-            disabled={readOnly}
-            onChange={(e) => {
-              onFieldChange('endAtLocal', e.target.value);
-              onClearFieldError('endAt');
-            }}
-            className={styles.input}
-            aria-invalid={fieldErrors.endAt ? true : undefined}
-            aria-describedby={fieldErrors.endAt ? `${idPrefix}-end-err` : undefined}
-          />
-          {fieldErrors.endAt ? (
-            <span id={`${idPrefix}-end-err`} className={styles.fieldError} role="alert">
-              {fieldErrors.endAt}
-            </span>
-          ) : null}
-        </label>
+        <DateTimePicker
+          label={t('form.endDateTime')}
+          helperText={t('form.endDateHint')}
+          value={values.endAtLocal}
+          errorText={fieldErrors.endAt}
+          disabled={readOnly}
+          onValueChange={(next) => {
+            onFieldChange('endAtLocal', next);
+            onClearFieldError('endAt');
+          }}
+        />
       ) : null}
 
       {(scheduleConflictHint || scheduleConflictFetchFailed || scheduleConflictChecking) ? (

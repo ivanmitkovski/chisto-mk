@@ -9,9 +9,11 @@ import type {
   NewsTranslations,
   NewsListResponse,
 } from '../news-api-types';
+import type { NewsPostFormValues } from '../types';
 import type { NewsListQuery } from '../config/news-list-filters';
 import { NEWS_LIST_PAGE_SIZE } from '../config/news-list-filters';
 import { normalizeNewsListResponse } from '../lib/news-list-response';
+import { buildCreateNewsInput } from '../lib/build-create-news-input';
 
 async function fetchOnce<T>(
   path: string,
@@ -30,12 +32,14 @@ async function fetchOnce<T>(
   const payload = (await response.json().catch(() => ({}))) as {
     code?: string;
     message?: string;
+    details?: unknown;
   };
   if (!response.ok) {
     throw new ApiError(
       response.status,
       payload.code ?? 'HTTP_ERROR',
       payload.message ?? `Request failed (${response.status})`,
+      payload.details,
     );
   }
   return payload as T;
@@ -53,11 +57,10 @@ async function apiFetch<T>(path: string, init: RequestInit): Promise<T> {
   }
 }
 
-export async function createNewsPost(input: {
-  slug?: string;
-  category: NewsCategoryApi;
-  translations: NewsTranslations;
-}): Promise<NewsPostAdminDto> {
+export async function createNewsPost(
+  input: Pick<NewsPostFormValues, 'slug' | 'category' | 'translations'>,
+): Promise<NewsPostAdminDto> {
+  const payload = buildCreateNewsInput(input);
   return apiFetch('/admin/news/posts', {
     method: 'POST',
     headers: {
@@ -66,7 +69,7 @@ export async function createNewsPost(input: {
       ...getAdminCsrfHeaders(),
       'X-Idempotency-Key': crypto.randomUUID(),
     },
-    body: JSON.stringify(input),
+    body: JSON.stringify(payload),
   });
 }
 
@@ -123,7 +126,7 @@ export async function uploadNewsMedia(
   postId: string,
   kind: 'cover' | 'inline_image' | 'inline_video',
   file: File,
-): Promise<unknown> {
+): Promise<NewsMediaDto> {
   const form = new FormData();
   form.append('file', file);
   return apiFetch(
@@ -210,6 +213,13 @@ export async function restoreNewsRevision(
       headers: { Accept: 'application/json', ...getAdminCsrfHeaders() },
     },
   );
+}
+
+export async function clearNewsRevisions(postId: string): Promise<{ deleted: number }> {
+  return apiFetch(`/admin/news/posts/${encodeURIComponent(postId)}/revisions`, {
+    method: 'DELETE',
+    headers: { Accept: 'application/json', ...getAdminCsrfHeaders() },
+  });
 }
 
 export async function updateNewsMediaAlt(

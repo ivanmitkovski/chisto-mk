@@ -57,7 +57,7 @@ export async function HelpArticleShell({ slug }: { slug: HelpArticleSlug }) {
       />
       <div className="pointer-events-none absolute inset-0 pattern-dots-soft opacity-20 print:hidden" aria-hidden />
       <Container className="relative z-10 pb-10 md:pb-14">
-        <nav aria-label="Breadcrumb" className="text-sm text-gray-600 print:hidden">
+        <nav aria-label={tCommon("breadcrumbAriaLabel")} className="text-sm text-gray-600 print:hidden">
           <ol className="flex flex-wrap items-center gap-x-2 gap-y-1">
             <li>
               <Link href="/" className="font-medium text-primary transition-colors hover:text-primary/85">

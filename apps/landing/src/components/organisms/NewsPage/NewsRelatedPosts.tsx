@@ -1,14 +1,16 @@
 import Image from "next/image";
-import { Link } from "@/i18n/routing";
+import { shouldUseUnoptimizedNewsImage } from "@/lib/images/news-image-optimization";
 import type { ResolvedNewsPost } from "@/data/news-posts";
+import { NewsRelatedAnalyticsLink } from "./NewsRelatedAnalyticsLink";
 
 type NewsRelatedPostsProps = {
   posts: ResolvedNewsPost[];
   title: string;
   categoryLabel: (category: ResolvedNewsPost["category"]) => string;
+  fromSlug: string;
 };
 
-export function NewsRelatedPosts({ posts, title, categoryLabel }: NewsRelatedPostsProps) {
+export function NewsRelatedPosts({ posts, title, categoryLabel, fromSlug }: NewsRelatedPostsProps) {
   if (posts.length === 0) return null;
 
   return (
@@ -22,19 +24,21 @@ export function NewsRelatedPosts({ posts, title, categoryLabel }: NewsRelatedPos
       <ul className="mt-5 grid gap-3 sm:grid-cols-2 md:mt-6 md:gap-4">
         {posts.map((post) => (
           <li key={post.slug}>
-            <Link
+            <NewsRelatedAnalyticsLink
               href={`/news/${post.slug}`}
+              slug={post.slug}
+              fromSlug={fromSlug}
               className="group flex h-full gap-4 rounded-2xl border border-gray-200/90 bg-white/90 p-4 shadow-sm transition-[border-color,box-shadow] hover:border-primary/25 hover:shadow-md md:p-5"
             >
               {post.coverImage ? (
                 <div className="relative h-16 w-20 shrink-0 overflow-hidden rounded-xl bg-gray-100 md:h-[4.5rem] md:w-24">
                   <Image
                     src={post.coverImage}
-                    alt=""
+                    alt={post.title}
                     fill
                     className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
                     sizes="96px"
-                    unoptimized
+                    unoptimized={shouldUseUnoptimizedNewsImage(post.coverImage)}
                   />
                 </div>
               ) : (
@@ -52,7 +56,7 @@ export function NewsRelatedPosts({ posts, title, categoryLabel }: NewsRelatedPos
                 </span>
                 <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-gray-600">{post.excerpt}</p>
               </div>
-            </Link>
+            </NewsRelatedAnalyticsLink>
           </li>
         ))}
       </ul>

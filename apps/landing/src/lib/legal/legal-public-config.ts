@@ -47,10 +47,11 @@ export const LEGAL_PUBLIC_DEFAULTS = {
   adCookieName: "Not used",
   adProvider: "Not used",
   adPurpose: "Not used",
-  appStoreUrl: "https://apps.apple.com/app/id6771892086",
+  appStoreUrl: "https://apps.apple.com/mk/app/chisto-mk/id6771892086",
   googlePlayUrl: "",
-  facebookUrl: "",
-  instagramUrl: "",
+  facebookUrl: "https://www.facebook.com/profile.php?id=61590541866009",
+  instagramUrl: "https://www.instagram.com/chisto.mk/",
+  linkedinUrl: "https://www.linkedin.com/company/chisto-mk/",
 } as const;
 
 type LegalPublicDefaultKey = keyof typeof LEGAL_PUBLIC_DEFAULTS;

@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
+import { submitHelpFeedback } from "@/app/actions/help-feedback";
 import { trackHelpEvent } from "@/lib/analytics/track-help";
+import { trackMarketingEvent } from "@/lib/analytics/track-marketing";
 import type { HelpArticleSlug } from "@/lib/help/help-catalog";
 
 type Phase = "ask" | "no_followup" | "thanks";
@@ -12,13 +14,15 @@ const REASON_MAX = 500;
 
 export function HelpArticleFeedback({ slug }: { slug: HelpArticleSlug }) {
   const t = useTranslations("helpCentre.common");
+  const locale = useLocale();
   const [phase, setPhase] = useState<Phase>("ask");
   const [reason, setReason] = useState("");
   const [terminalLocked, setTerminalLocked] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   if (phase === "thanks") {
     return (
-      <p className="text-sm text-gray-600" role="status">
+      <p className="text-sm text-gray-600" role="status" aria-live="polite">
         {t("feedbackThanks")}
       </p>
     );
@@ -50,21 +54,29 @@ export function HelpArticleFeedback({ slug }: { slug: HelpArticleSlug }) {
         <div className="mt-5 flex flex-wrap gap-3">
           <button
             type="button"
-            disabled={terminalLocked}
+            disabled={terminalLocked || submitting}
             className="rounded-full border border-gray-200 bg-white px-5 py-2 text-sm font-semibold text-gray-800 shadow-sm transition-colors hover:border-primary/35 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
-            onClick={() => {
-              if (terminalLocked) return;
+            onClick={async () => {
+              if (terminalLocked || submitting) return;
               setTerminalLocked(true);
+              setSubmitting(true);
               const trimmed = reason.trim();
               trackHelpEvent("help_feedback_no", {
                 slug,
                 hasReason: trimmed.length > 0,
                 reasonChars: trimmed.length,
               });
+              if (trimmed.length > 0) {
+                const result = await submitHelpFeedback({ slug, reason: trimmed, locale });
+                if (result.ok) {
+                  trackMarketingEvent("help_feedback_submit", { slug });
+                }
+              }
+              setSubmitting(false);
               setPhase("thanks");
             }}
           >
-            {t("feedbackSubmit")}
+            {submitting ? t("feedbackSending") : t("feedbackSubmit")}
           </button>
           <button
             type="button"

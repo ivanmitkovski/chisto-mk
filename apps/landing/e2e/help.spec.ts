@@ -31,11 +31,47 @@ test.describe("Help centre", () => {
     await expect(page.getByRole("heading", { level: 1, name: /Центар за помош/i })).toBeVisible();
   });
 
+  test("hub loads in Albanian locale path", async ({ page }) => {
+    await page.goto("/sq/help");
+    await expect(page.getByRole("heading", { level: 1, name: /Qendra e ndihmës/i })).toBeVisible();
+  });
+
   test("help article has no critical or serious axe violations", async ({ page }) => {
     await page.goto("/en/help/report-a-site");
     const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
     const bad = criticalAndSerious(results.violations);
     expect(bad, JSON.stringify(bad, null, 2)).toHaveLength(0);
+  });
+
+  test("search filters topics by body terms", async ({ page }) => {
+    await page.goto("/en/help");
+    const input = page.getByRole("searchbox");
+    await input.fill("otp");
+    await expect(page.getByRole("region", { name: /Search results/i })).toContainText("Sign in and verification", {
+      timeout: 10_000,
+    });
+    await input.fill("");
+    await input.fill("heatmap");
+    await expect(page.getByRole("region", { name: /Search results/i })).toContainText("Use the Map tab", {
+      timeout: 10_000,
+    });
+    await input.fill("");
+    await input.fill("draft");
+    await expect(page.getByRole("region", { name: /Search results/i })).toContainText("Report statuses and drafts", {
+      timeout: 10_000,
+    });
+    await input.fill("");
+    await input.fill("qr");
+    await expect(page.getByRole("region", { name: /Search results/i })).toContainText("Event check-in and chat", {
+      timeout: 10_000,
+    });
+  });
+
+  test("start here paths link to key guides", async ({ page }) => {
+    await page.goto("/en/help");
+    await expect(page.getByRole("heading", { level: 2, name: /What do you want to do/i })).toBeVisible();
+    await page.getByRole("link", { name: /Report pollution/i }).click();
+    await expect(page).toHaveURL(/\/en\/help\/report-a-site$/);
   });
 
   test("search filters topics", async ({ page }) => {
@@ -85,12 +121,12 @@ test.describe("Help centre", () => {
 
   test("keyboard: copy section link writes URL to clipboard", async ({ page, context }) => {
     await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-    await page.goto("/en/help/report-a-site#before-you-start");
-    const section = page.locator("#before-you-start");
+    await page.goto("/en/help/report-a-site#start-from-report-fab");
+    const section = page.locator("#start-from-report-fab");
     const copyBtn = section.getByRole("button", { name: /copy link to this section/i });
     await copyBtn.focus();
     await copyBtn.press("Enter");
     const text = await page.evaluate(() => navigator.clipboard.readText());
-    expect(text).toMatch(/\/en\/help\/report-a-site#before-you-start$/);
+    expect(text).toMatch(/\/en\/help\/report-a-site#start-from-report-fab$/);
   });
 });

@@ -61,7 +61,9 @@ export function TopBarHeader({
         >
           <Icon name={menuIcon} size={16} />
         </Button>
-        <h1 className={styles.title}>{title}</h1>
+        <h1 className={styles.title} title={title}>
+          {title}
+        </h1>
       </div>
       <div className={styles.actions}>
         <Input

@@ -6,7 +6,7 @@ void main() {
     test('dev points at the temporary HTTP dev backend', () {
       // Dev has no valid TLS cert yet, so the app uses HTTP for it.
       expect(AppConfig.dev.apiBaseUrl, equals('http://api-dev.chisto.mk'));
-      expect(AppConfig.dev.helpCenterUrl, equals('https://chisto.mk/help'));
+      expect(AppConfig.dev.helpCenterUrl, equals('https://chisto.mk/mk/help'));
       expect(AppConfig.dev.environment, equals(AppEnvironment.dev));
     });
 
@@ -101,6 +101,20 @@ void main() {
       expect(
         AppConfig.prod.assertTransportSecurityForEnvironment,
         returnsNormally,
+      );
+    });
+
+    test('helpCenterUrlForLocale returns locale-prefixed help hub', () {
+      expect(AppConfig.helpCenterUrlForLocale('en'), 'https://chisto.mk/en/help');
+      expect(AppConfig.helpCenterUrlForLocale('mk'), 'https://chisto.mk/mk/help');
+      expect(AppConfig.helpCenterUrlForLocale('sq'), 'https://chisto.mk/sq/help');
+      expect(AppConfig.helpCenterUrlForLocale('de'), 'https://chisto.mk/mk/help');
+    });
+
+    test('helpArticleUrlForLocale builds article deep link', () {
+      expect(
+        AppConfig.helpArticleUrlForLocale('en', 'report-a-site'),
+        'https://chisto.mk/en/help/report-a-site',
       );
     });
   });

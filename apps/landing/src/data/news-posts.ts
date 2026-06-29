@@ -1,19 +1,41 @@
-import { locales, type AppLocale } from '@/i18n/routing';
 import {
   fetchAllNewsSlugs,
   fetchNewsPostBySlug,
   fetchNewsPosts,
   fetchRelatedNewsPosts,
+  NEWS_CATEGORY_FETCH_LIMIT,
+  NEWS_HUB_PAGE_SIZE,
+  type FetchNewsPostsOptions,
   type NewsCategory,
+  type NewsPostsPage,
   type ResolvedNewsPost,
 } from '@/lib/news/fetch-news';
 
-export type { NewsCategory, ResolvedNewsPost };
+export type { NewsCategory, ResolvedNewsPost, NewsPostsPage, FetchNewsPostsOptions };
+export { NEWS_HUB_PAGE_SIZE, NEWS_CATEGORY_FETCH_LIMIT };
 
-const LOCALES = locales;
+export async function getNewsPosts(
+  locale: string,
+  options?: FetchNewsPostsOptions,
+): Promise<NewsPostsPage> {
+  return fetchNewsPosts(locale, options);
+}
 
-export async function getNewsPosts(locale: string): Promise<ResolvedNewsPost[]> {
-  return fetchNewsPosts(locale);
+export async function getLatestNewsPosts(locale: string, limit = 3): Promise<ResolvedNewsPost[]> {
+  const { items } = await fetchNewsPosts(locale, { limit });
+  return items;
+}
+
+export async function getNewsHubPosts(
+  locale: string,
+  page: number,
+  category?: NewsCategory,
+): Promise<NewsPostsPage> {
+  return fetchNewsPosts(locale, {
+    limit: NEWS_HUB_PAGE_SIZE,
+    offset: (page - 1) * NEWS_HUB_PAGE_SIZE,
+    ...(category ? { category } : {}),
+  });
 }
 
 export async function getNewsPostBySlug(
@@ -32,15 +54,4 @@ export async function getRelatedNewsPosts(
 
 export async function getAllNewsSlugs(): Promise<string[]> {
   return fetchAllNewsSlugs();
-}
-
-export async function getAllNewsStaticParams(): Promise<{ locale: AppLocale; slug: string }[]> {
-  const slugs = await getAllNewsSlugs();
-  const out: { locale: AppLocale; slug: string }[] = [];
-  for (const locale of LOCALES) {
-    for (const slug of slugs) {
-      out.push({ locale, slug });
-    }
-  }
-  return out;
 }

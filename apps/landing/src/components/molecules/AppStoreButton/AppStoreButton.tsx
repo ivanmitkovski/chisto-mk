@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { cn } from "@/lib/utils/cn";
 import { getAppStoreUrl, getGooglePlayUrl } from "@/lib/store-links";
+import { trackMarketingEvent } from "@/lib/analytics/track-marketing";
 
 /** Apple Marketing Tools badge SVGs (localized where available). */
 const APPLE_BADGES: Record<string, string> = {
@@ -22,9 +23,10 @@ const GOOGLE_BADGES: Record<string, string> = {
 interface AppStoreButtonProps {
   store: "apple" | "google";
   className?: string;
+  analyticsSource?: string;
 }
 
-export function AppStoreButton({ store, className }: AppStoreButtonProps) {
+export function AppStoreButton({ store, className, analyticsSource }: AppStoreButtonProps) {
   const locale = useLocale();
   const t = useTranslations("appStore");
   const isApple = store === "apple";
@@ -54,6 +56,13 @@ export function AppStoreButton({ store, className }: AppStoreButtonProps) {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() => {
+        const source =
+          analyticsSource ?? (isApple ? "app_store_badge" : "google_play_badge");
+        trackMarketingEvent(isApple ? "app_store_open" : "download_cta_click", {
+          source,
+        });
+      }}
       className={cn(
         "inline-flex items-center leading-none transition-opacity hover:opacity-[0.92]",
         "focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",

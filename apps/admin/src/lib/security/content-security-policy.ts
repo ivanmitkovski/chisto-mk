@@ -1,3 +1,5 @@
+import { NEWS_EMBED_FRAME_SRC_ORIGINS } from '@chisto/news-content';
+
 /** Carto basemap tiles (Leaflet); explicit hosts avoid widening connect-src to untrusted origins. */
 const CARTO_TILE_HOSTS = [
   'https://a.basemaps.cartocdn.com',
@@ -9,6 +11,8 @@ const S3_MEDIA_HOSTS = [
   'https://chisto-dev-media.s3.eu-central-1.amazonaws.com',
   'https://chisto-prod-media.s3.eu-central-1.amazonaws.com',
 ] as const;
+
+const FRAME_SRC = ["'self'", ...NEWS_EMBED_FRAME_SRC_ORIGINS].join(' ');
 
 /**
  * Per-request CSP for the admin app. Call from middleware (Edge) so `getApiBaseUrl()` matches
@@ -28,7 +32,9 @@ export function buildAdminContentSecurityPolicy(nonce: string, isDev: boolean): 
     `script-src ${scriptSrc}`,
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: https: blob:",
+    `media-src 'self' blob: https: ${S3_MEDIA_HOSTS.join(' ')}`,
     `connect-src 'self' ${CARTO_TILE_HOSTS.join(' ')}`,
+    `frame-src ${FRAME_SRC}`,
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'",
@@ -48,7 +54,9 @@ export function buildAdminReportOnlyContentSecurityPolicy(nonce: string, isDev: 
     `script-src ${scriptSrc}`,
     "style-src 'self'",
     `img-src 'self' data: blob: ${S3_MEDIA_HOSTS.join(' ')} ${CARTO_TILE_HOSTS.join(' ')}`,
+    `media-src 'self' blob: ${S3_MEDIA_HOSTS.join(' ')}`,
     `connect-src 'self' ${CARTO_TILE_HOSTS.join(' ')}`,
+    `frame-src ${FRAME_SRC}`,
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'",

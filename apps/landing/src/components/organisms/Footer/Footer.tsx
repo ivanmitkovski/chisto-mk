@@ -7,13 +7,15 @@ import { OPEN_COOKIE_PREFERENCES_EVENT } from "@/contexts/CookieConsentContext";
 import { Container } from "@/components/layout/Container";
 import { Logo } from "@/components/atoms/Logo";
 import { Button } from "@/components/atoms/Button";
-import { SocialIcon } from "@/components/molecules/SocialIcon";
+import { SocialLinks } from "@/components/molecules/SocialLinks";
 import { StoreDownloadButtons } from "@/components/molecules/StoreDownloadButtons";
 import { subscribeNewsletter } from "@/app/actions/newsletter";
+import { trackMarketingEvent } from "@/lib/analytics/track-marketing";
 import { Mail, Phone } from "lucide-react";
 import { handleHomeNavigationClick } from "@/lib/utils/smooth-scroll";
-import { getPublicOptionalUrl, LEGAL_PUBLIC_DEFAULTS } from "@/lib/legal/legal-public-config";
+import { LEGAL_PUBLIC_DEFAULTS } from "@/lib/legal/legal-public-config";
 import { hasStoreDownloadLinks } from "@/lib/store-links";
+import { hasSocialLinks } from "@/lib/social-links";
 import { isLaunchPageVisible } from "@/config/launch";
 
 export function Footer() {
@@ -33,9 +35,6 @@ export function Footer() {
     process.env.NEXT_PUBLIC_LEGAL_ENTITY_NAME?.trim() || LEGAL_PUBLIC_DEFAULTS.legalEntityName;
   const registrationNumber =
     process.env.NEXT_PUBLIC_REGISTRATION_NUMBER?.trim() || LEGAL_PUBLIC_DEFAULTS.registrationNumber;
-  const facebookUrl = getPublicOptionalUrl(process.env.NEXT_PUBLIC_FACEBOOK_URL);
-  const instagramUrl = getPublicOptionalUrl(process.env.NEXT_PUBLIC_INSTAGRAM_URL);
-  const hasSocialLinks = Boolean(facebookUrl || instagramUrl);
 
   async function handleSubscribe(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -48,6 +47,7 @@ export function Footer() {
     );
     if (result.ok) {
       setStatus("success");
+      trackMarketingEvent("newsletter_submit_success");
       setEmail("");
     } else {
       setStatus("error");
@@ -85,16 +85,11 @@ export function Footer() {
               <Phone className="h-4 w-4 shrink-0 text-primary" strokeWidth={2} />
               {contactPhone}
             </a>
-            {hasSocialLinks && (
-              <div className="mt-5 flex gap-2">
-                {facebookUrl && <SocialIcon platform="facebook" href={facebookUrl} />}
-                {instagramUrl && <SocialIcon platform="instagram" href={instagramUrl} />}
-              </div>
-            )}
+            {hasSocialLinks() && <SocialLinks className="mt-5" />}
             {hasStoreDownloadLinks() && (
               <div className="mt-6">
                 <p className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-gray-900">{t("downloadApp")}</p>
-                <StoreDownloadButtons />
+                <StoreDownloadButtons analyticsSource="footer" />
               </div>
             )}
           </div>
@@ -129,6 +124,16 @@ export function Footer() {
                     className="text-sm text-gray-600 transition-colors duration-300 ease-out hover:text-gray-900"
                   >
                     {t("linkNews")}
+                  </Link>
+                </li>
+              )}
+              {isLaunchPageVisible("news") && (
+                <li>
+                  <Link
+                    href="/news/rss.xml"
+                    className="text-sm text-gray-600 transition-colors duration-300 ease-out hover:text-gray-900"
+                  >
+                    {t("linkRss")}
                   </Link>
                 </li>
               )}
@@ -199,7 +204,10 @@ export function Footer() {
           <div className="md:col-span-12 lg:col-span-5">
             <h4 className="mb-4 text-xs font-bold uppercase tracking-[0.14em] text-gray-900">{t("newsletter")}</h4>
             <p className="mb-4 text-sm text-gray-500">{t("stayUpToDate")}</p>
-            <form onSubmit={handleSubscribe} className="w-full max-w-[20.4rem] space-y-2">
+            <form onSubmit={handleSubscribe} className="w-full max-w-[20.4rem] space-y-2" aria-busy={status === "loading"}>
+              <label htmlFor="footer-newsletter-email" className="sr-only">
+                {t("emailPlaceholder")}
+              </label>
               <input
                 type="text"
                 name="companyWebsite"
@@ -208,9 +216,10 @@ export function Footer() {
                 aria-hidden
                 className="absolute left-[-9999px] h-px w-px opacity-0"
               />
-              <div className="rounded-full bg-gradient-to-r from-primary/55 via-emerald-400/45 to-sky-400/50 p-px shadow-[var(--shadow-lift)] transition-shadow focus-within:shadow-[0_12px_44px_rgba(0,217,142,0.28)]">
+              <div className="rounded-full bg-gradient-to-r from-primary/55 via-emerald-400/45 to-sky-400/50 p-px shadow-[var(--shadow-lift)] transition-shadow focus-within:shadow-[0_12px_44px_rgba(47,215,136,0.28)]">
                 <div className="flex min-w-0 items-center gap-2 rounded-full bg-white py-1 pl-4 pr-1.5 shadow-inner ring-1 ring-black/[0.04] transition-shadow focus-within:ring-2 focus-within:ring-primary/30">
                   <input
+                    id="footer-newsletter-email"
                     type="email"
                     name="newsletter-email"
                     placeholder={t("emailPlaceholder")}
@@ -225,15 +234,17 @@ export function Footer() {
                     disabled={status === "loading"}
                     className="shrink-0 whitespace-nowrap rounded-full px-4 shadow-md shadow-primary/25 sm:px-5"
                   >
-                    {tCommon("subscribe")}
+                    {status === "loading" ? tNews("subscribing") : tCommon("subscribe")}
                   </Button>
                 </div>
               </div>
               {status === "success" && (
-                <p className="text-xs font-medium text-primary">{t("subscribedSuccess")}</p>
+                <p className="text-xs font-medium text-primary" role="status" aria-live="polite">
+                  {t("subscribedSuccess")}
+                </p>
               )}
               {status === "error" && newsletterError && (
-                <p className="text-xs text-red-500">
+                <p className="text-xs text-red-500" role="alert">
                   {newsletterError === "generic" ? tNews("genericError") : tErrors(newsletterError)}
                 </p>
               )}

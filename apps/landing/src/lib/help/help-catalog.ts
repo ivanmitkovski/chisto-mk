@@ -4,25 +4,38 @@
  */
 export const HELP_ARTICLE_SLUGS = [
   "getting-started",
-  "exploring-the-map",
-  "report-a-site",
-  "trust-safety-and-moderation",
-  "join-a-cleanup-event",
-  "hosting-a-cleanup-event",
+  "sign-in-and-verification",
+  "app-permissions",
   "offline-and-slow-networks",
-  "account-and-data",
-  "notifications-in-the-app",
   "troubleshooting",
   "partnerships-for-organisations",
+  "home-feed-and-sites",
+  "exploring-the-map",
   "verifying-sites-in-the-field",
+  "report-a-site",
+  "report-statuses-and-drafts",
+  "join-a-cleanup-event",
+  "event-check-in-and-chat",
+  "hosting-a-cleanup-event",
+  "your-profile-and-settings",
+  "points-rankings-and-credits",
+  "account-and-data",
+  "notifications-in-the-app",
+  "trust-safety-and-moderation",
 ] as const;
 
 export type HelpArticleSlug = (typeof HELP_ARTICLE_SLUGS)[number];
 
-export type HelpCategoryId = "basics" | "map" | "reporting" | "events";
+export type HelpCategoryId = "basics" | "map" | "reporting" | "events" | "profile";
 
 /** Column order on the hub (category headers + tiles). */
-export const HELP_CATEGORY_ORDER: readonly HelpCategoryId[] = ["basics", "map", "reporting", "events"] as const;
+export const HELP_CATEGORY_ORDER: readonly HelpCategoryId[] = [
+  "basics",
+  "map",
+  "reporting",
+  "events",
+  "profile",
+] as const;
 
 export type HelpArticleMeta = {
   slug: HelpArticleSlug;
@@ -40,37 +53,37 @@ export const HELP_ARTICLES: readonly HelpArticleMeta[] = [
   {
     slug: "getting-started",
     categoryId: "basics",
-    tags: ["basics", "app", "onboarding", "map-entry", "first-report"],
+    tags: ["basics", "app", "onboarding", "map-entry", "first-report", "permissions"],
   },
   {
-    slug: "account-and-data",
+    slug: "sign-in-and-verification",
     categoryId: "basics",
-    tags: ["basics", "account", "privacy", "data", "safety", "trust"],
+    tags: ["basics", "account", "onboarding", "fixes", "permissions"],
   },
   {
-    slug: "notifications-in-the-app",
+    slug: "app-permissions",
     categoryId: "basics",
-    tags: ["basics", "notifications", "events", "reminders", "hosting"],
-  },
-  {
-    slug: "trust-safety-and-moderation",
-    categoryId: "basics",
-    tags: ["basics", "safety", "moderation", "reporting", "community", "trust", "organisations"],
+    tags: ["basics", "permissions", "fixes", "onboarding", "mobile"],
   },
   {
     slug: "offline-and-slow-networks",
     categoryId: "basics",
-    tags: ["basics", "offline", "network", "mobile", "fixes", "troubleshooting"],
+    tags: ["basics", "offline", "network", "mobile", "fixes", "troubleshooting", "reporting"],
   },
   {
     slug: "troubleshooting",
     categoryId: "basics",
-    tags: ["basics", "fixes", "errors", "offline", "support", "onboarding"],
+    tags: ["basics", "fixes", "errors", "offline", "support", "onboarding", "permissions"],
   },
   {
     slug: "partnerships-for-organisations",
     categoryId: "basics",
     tags: ["basics", "organisations", "schools", "safety", "account", "trust"],
+  },
+  {
+    slug: "home-feed-and-sites",
+    categoryId: "map",
+    tags: ["map", "feed", "pins", "navigation", "reporting", "community"],
   },
   {
     slug: "exploring-the-map",
@@ -82,12 +95,55 @@ export const HELP_ARTICLES: readonly HelpArticleMeta[] = [
     categoryId: "map",
     tags: ["map", "fieldwork", "verification", "reporting", "pins", "navigation"],
   },
-  { slug: "report-a-site", categoryId: "reporting", tags: ["reporting", "map", "photos", "safety", "map-entry", "fieldwork"] },
-  { slug: "join-a-cleanup-event", categoryId: "events", tags: ["events", "volunteer", "calendar", "onboarding", "notifications"] },
+  {
+    slug: "report-a-site",
+    categoryId: "reporting",
+    tags: ["reporting", "map", "photos", "safety", "map-entry", "fieldwork", "offline"],
+  },
+  {
+    slug: "report-statuses-and-drafts",
+    categoryId: "reporting",
+    tags: ["reporting", "offline", "fixes", "onboarding"],
+  },
+  {
+    slug: "join-a-cleanup-event",
+    categoryId: "events",
+    tags: ["events", "volunteer", "calendar", "onboarding", "notifications"],
+  },
+  {
+    slug: "event-check-in-and-chat",
+    categoryId: "events",
+    tags: ["events", "volunteer", "notifications", "hosting", "permissions"],
+  },
   {
     slug: "hosting-a-cleanup-event",
     categoryId: "events",
     tags: ["events", "organiser", "host", "notifications", "volunteer", "calendar"],
+  },
+  {
+    slug: "your-profile-and-settings",
+    categoryId: "profile",
+    tags: ["profile", "account", "onboarding", "permissions"],
+  },
+  {
+    slug: "points-rankings-and-credits",
+    categoryId: "profile",
+    tags: ["profile", "reporting", "events", "community"],
+  },
+  {
+    slug: "account-and-data",
+    categoryId: "profile",
+    tags: ["profile", "account", "privacy", "data", "safety", "trust"],
+  },
+  {
+    slug: "notifications-in-the-app",
+    categoryId: "profile",
+    tags: ["profile", "notifications", "events", "reminders", "hosting"],
+  },
+  {
+    slug: "trust-safety-and-moderation",
+    categoryId: "profile",
+    tags: ["profile", "safety", "moderation", "reporting", "community", "trust", "organisations"],
   },
 ] as const;
 
@@ -95,18 +151,25 @@ export const HELP_ARTICLES: readonly HelpArticleMeta[] = [
  * Manual related links override per slug. When absent, `helpRelatedSlugs` uses tag overlap (see `deriveHelpRelatedFromTags`).
  */
 export const HELP_RELATED_OVERRIDES: Partial<Record<HelpArticleSlug, readonly HelpArticleSlug[]>> = {
-  "getting-started": ["exploring-the-map", "report-a-site"],
-  "exploring-the-map": ["report-a-site", "verifying-sites-in-the-field"],
-  "report-a-site": ["exploring-the-map", "trust-safety-and-moderation"],
+  "getting-started": ["sign-in-and-verification", "report-a-site"],
+  "sign-in-and-verification": ["app-permissions", "troubleshooting"],
+  "app-permissions": ["troubleshooting", "getting-started"],
+  "home-feed-and-sites": ["exploring-the-map", "report-a-site"],
+  "exploring-the-map": ["home-feed-and-sites", "verifying-sites-in-the-field"],
+  "report-a-site": ["report-statuses-and-drafts", "app-permissions"],
+  "report-statuses-and-drafts": ["report-a-site", "offline-and-slow-networks"],
+  "join-a-cleanup-event": ["event-check-in-and-chat", "getting-started"],
+  "event-check-in-and-chat": ["join-a-cleanup-event", "notifications-in-the-app"],
+  "hosting-a-cleanup-event": ["event-check-in-and-chat", "points-rankings-and-credits"],
+  "your-profile-and-settings": ["account-and-data", "notifications-in-the-app"],
+  "points-rankings-and-credits": ["report-a-site", "join-a-cleanup-event"],
+  "offline-and-slow-networks": ["troubleshooting", "report-statuses-and-drafts"],
+  "account-and-data": ["trust-safety-and-moderation", "your-profile-and-settings"],
+  "notifications-in-the-app": ["join-a-cleanup-event", "event-check-in-and-chat"],
+  "troubleshooting": ["app-permissions", "offline-and-slow-networks"],
   "trust-safety-and-moderation": ["report-a-site", "partnerships-for-organisations"],
-  "join-a-cleanup-event": ["hosting-a-cleanup-event", "getting-started"],
-  "hosting-a-cleanup-event": ["join-a-cleanup-event", "notifications-in-the-app"],
-  "offline-and-slow-networks": ["troubleshooting", "getting-started"],
-  "account-and-data": ["trust-safety-and-moderation", "getting-started"],
-  "notifications-in-the-app": ["join-a-cleanup-event", "hosting-a-cleanup-event"],
-  "troubleshooting": ["offline-and-slow-networks", "getting-started"],
   "partnerships-for-organisations": ["trust-safety-and-moderation", "account-and-data"],
-  "verifying-sites-in-the-field": ["exploring-the-map", "report-a-site"],
+  "verifying-sites-in-the-field": ["home-feed-and-sites", "exploring-the-map"],
 };
 
 /** Tag overlap + same-category tie-break; used when `HELP_RELATED_OVERRIDES` has no entry for a slug. */
@@ -137,11 +200,14 @@ export function helpRelatedSlugs(slug: HelpArticleSlug): readonly HelpArticleSlu
   return deriveHelpRelatedFromTags(slug);
 }
 
-/** Articles whose bullet blocks feed optional HowTo JSON-LD (step-heavy guides). */
+/** Articles whose bullet/step blocks feed optional HowTo JSON-LD (step-heavy guides). */
 export const HELP_ARTICLES_HOWTO_JSONLD: readonly HelpArticleSlug[] = [
+  "getting-started",
+  "sign-in-and-verification",
   "report-a-site",
   "join-a-cleanup-event",
   "hosting-a-cleanup-event",
+  "event-check-in-and-chat",
 ] as const;
 
 export function isHelpArticleSlug(value: string): value is HelpArticleSlug {

@@ -12,6 +12,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { SkipThrottle } from '@nestjs/throttler';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import {
@@ -48,6 +49,7 @@ const NEWS_MULTER_MAX_BYTES = 25 * 1024 * 1024;
 
 @ApiTags('admin-news')
 @Controller('admin/news')
+@SkipThrottle()
 @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
 @ApiBearerAuth()
 @ApiStandardHttpErrorResponses()
@@ -132,6 +134,14 @@ export class AdminNewsController {
     return this.posts.listRevisions(id);
   }
 
+  @Delete('posts/:id/revisions')
+  @Roles(...ADMIN_WRITE_ROLES)
+  @RequirePermission(ADMIN_PERMISSIONS['news:write'])
+  @ApiOperation({ summary: 'Clear all revisions for a news post' })
+  clearRevisions(@Param('id', ParseCuidPipe) id: string, @CurrentUser() actor: AuthenticatedUser) {
+    return this.posts.clearRevisionHistory(id, actor);
+  }
+
   // safe-to-retry: repeated restore is acceptable
   @Post('posts/:id/revisions/:revisionId/restore')
   @Roles(...ADMIN_WRITE_ROLES)
@@ -198,6 +208,7 @@ export class AdminNewsController {
     @Param('id', ParseCuidPipe) id: string,
     @Query() query: UploadNewsMediaQueryDto,
     @UploadedFile() file: Express.Multer.File,
+    @CurrentUser() actor: AuthenticatedUser,
   ) {
     if (!file) {
       throw new BadRequestException({
@@ -214,6 +225,7 @@ export class AdminNewsController {
         size: file.size,
         originalname: file.originalname,
       },
+      actor,
     });
   }
 
@@ -222,8 +234,11 @@ export class AdminNewsController {
   @Roles(...ADMIN_WRITE_ROLES)
   @RequirePermission(ADMIN_PERMISSIONS['news:write'])
   @ApiOperation({ summary: 'Delete news media' })
-  async deleteMedia(@Param('mediaId', ParseCuidPipe) mediaId: string) {
-    await this.media.deleteMedia(mediaId);
+  async deleteMedia(
+    @Param('mediaId', ParseCuidPipe) mediaId: string,
+    @CurrentUser() actor: AuthenticatedUser,
+  ) {
+    await this.media.deleteMedia(mediaId, actor);
     return { ok: true };
   }
 
@@ -235,7 +250,8 @@ export class AdminNewsController {
   updateMediaAlt(
     @Param('mediaId', ParseCuidPipe) mediaId: string,
     @Body() body: UpdateNewsMediaAltDto,
+    @CurrentUser() actor: AuthenticatedUser,
   ) {
-    return this.media.updateAltText(mediaId, body.altText ?? {});
+    return this.media.updateAltText(mediaId, body.altText ?? {}, actor);
   }
 }

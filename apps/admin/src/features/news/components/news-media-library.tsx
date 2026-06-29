@@ -2,96 +2,55 @@
 
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-import { Button, Input } from '@/components/ui';
+import { Button, EmptyState, Input } from '@/components/ui';
 import type { NewsBodyBlock, NewsMediaDto } from '../news-api-types';
 import type { NewsFormLocale } from '../types';
 import { NEWS_LOCALES } from '../types';
+import { insertBlockAt } from '../lib/news-block-factory';
+import { useOptionalNewsDocumentEditor } from '../context/news-document-editor-context';
 import styles from './news-media-library.module.css';
 
 type NewsMediaLibraryProps = {
   media: NewsMediaDto[];
+  bodyBlockCount: number;
   readOnly: boolean;
   busy: boolean;
-  onInsert: (mediaId: string, kind: 'inline_image' | 'inline_video') => void;
+  embedded?: boolean;
+  onInsertAt: (mediaId: string, kind: 'inline_image' | 'inline_video', insertIndex: number) => void;
   onDelete: (mediaId: string) => void;
-  onUploadCover: (file: File) => void;
-  onUploadInline: (file: File, kind: 'inline_image' | 'inline_video') => void;
   onAltTextChange?: (mediaId: string, locale: NewsFormLocale, value: string) => void;
 };
 
 export function NewsMediaLibrary({
   media,
+  bodyBlockCount,
   readOnly,
   busy,
-  onInsert,
+  embedded = false,
+  onInsertAt,
   onDelete,
-  onUploadCover,
-  onUploadInline,
   onAltTextChange,
 }: NewsMediaLibraryProps) {
   const t = useTranslations('news');
+  const documentEditor = useOptionalNewsDocumentEditor();
+  const insertIndex = documentEditor ? documentEditor.resolveInsertIndex(bodyBlockCount) : bodyBlockCount;
 
   if (readOnly && media.length === 0) return null;
 
   return (
-    <section className={styles.root} aria-label={t('form.mediaLibrary')}>
-      <h3 className={styles.title}>{t('form.mediaLibrary')}</h3>
-      {!readOnly ? (
-        <div className={styles.uploadRow}>
-          <label className={styles.uploadBtn}>
-            {t('form.uploadCover')}
-            <input
-              type="file"
-              accept="image/*,video/mp4,video/webm"
-              disabled={busy}
-              hidden
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) onUploadCover(file);
-                e.target.value = '';
-              }}
-            />
-          </label>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            disabled={busy}
-            onClick={() => {
-              const input = document.createElement('input');
-              input.type = 'file';
-              input.accept = 'image/*';
-              input.onchange = () => {
-                const file = input.files?.[0];
-                if (file) onUploadInline(file, 'inline_image');
-              };
-              input.click();
-            }}
-          >
-            {t('form.addImage')}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            disabled={busy}
-            onClick={() => {
-              const input = document.createElement('input');
-              input.type = 'file';
-              input.accept = 'video/mp4,video/webm,video/quicktime';
-              input.onchange = () => {
-                const file = input.files?.[0];
-                if (file) onUploadInline(file, 'inline_video');
-              };
-              input.click();
-            }}
-          >
-            {t('form.addVideo')}
-          </Button>
-        </div>
-      ) : null}
+    <section className={embedded ? styles.embedded : styles.root} aria-label={t('form.mediaLibrary')}>
+      {!embedded ? <h3 className={styles.title}>{t('form.mediaLibrary')}</h3> : null}
+      {!readOnly ? <p className={styles.libraryHint}>{t('mediaGuidance.library')}</p> : null}
       {media.length === 0 ? (
-        <p className={styles.empty}>{t('form.noMedia')}</p>
+        readOnly ? (
+          <p className={styles.empty}>{t('form.noMedia')}</p>
+        ) : (
+          <EmptyState
+            title={t('form.noMedia')}
+            description={t('form.noMediaHint')}
+            icon="document-text"
+          />
+        )
       ) : (
         <ul className={styles.grid}>
           {media.map((m) => (
@@ -121,6 +80,14 @@ export function NewsMediaLibrary({
                     />
                   ))}
                 </div>
+              ) : readOnly && m.altText ? (
+                <div className={styles.altFields}>
+                  {NEWS_LOCALES.filter((loc) => m.altText?.[loc]).map((loc) => (
+                    <p key={loc} className={styles.altReadOnly}>
+                      <span className={styles.altLabel}>{loc.toUpperCase()}:</span> {m.altText?.[loc]}
+                    </p>
+                  ))}
+                </div>
               ) : null}
               {!readOnly ? (
                 <div className={styles.actions}>
@@ -131,9 +98,10 @@ export function NewsMediaLibrary({
                       size="sm"
                       disabled={busy}
                       onClick={() =>
-                        onInsert(
+                        onInsertAt(
                           m.id,
                           m.kind === 'inline_video' ? 'inline_video' : 'inline_image',
+                          insertIndex,
                         )
                       }
                     >
@@ -159,12 +127,22 @@ export function NewsMediaLibrary({
   );
 }
 
+export function insertMediaBlockAt(
+  blocks: NewsBodyBlock[],
+  mediaId: string,
+  kind: 'inline_image' | 'inline_video',
+  insertIndex: number,
+): NewsBodyBlock[] {
+  const block: NewsBodyBlock =
+    kind === 'inline_video' ? { type: 'video', mediaId } : { type: 'image', mediaId };
+  return insertBlockAt(blocks, insertIndex, block);
+}
+
+/** @deprecated Use insertMediaBlockAt */
 export function insertMediaBlock(
   blocks: NewsBodyBlock[],
   mediaId: string,
   kind: 'inline_image' | 'inline_video',
 ): NewsBodyBlock[] {
-  const block: NewsBodyBlock =
-    kind === 'inline_video' ? { type: 'video', mediaId } : { type: 'image', mediaId };
-  return [...blocks, block];
+  return insertMediaBlockAt(blocks, mediaId, kind, blocks.length);
 }

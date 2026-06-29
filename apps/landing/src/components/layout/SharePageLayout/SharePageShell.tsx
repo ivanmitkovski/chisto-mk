@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SharePageLayout } from "@/components/layout/SharePageLayout";
+import { ShareActionLink } from "@/components/layout/SharePageLayout/ShareActionLink";
 import { buttonVariants } from "@/components/atoms/Button";
 import { cn } from "@/lib/utils/cn";
 
@@ -46,12 +47,12 @@ export function SharePageShell({
           {primary.label}
         </Link>
         {secondary ? (
-          <a
+          <ShareActionLink
             href={secondary.href}
-            className={cn(buttonVariants({ variant: "outline", size: "md" }))}
-          >
-            {secondary.label}
-          </a>
+            label={secondary.label}
+            variant="outline"
+            analyticsSource="share_get_app"
+          />
         ) : null}
       </div>
       {footerLink ? (

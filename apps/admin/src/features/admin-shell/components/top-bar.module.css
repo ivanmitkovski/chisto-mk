@@ -12,7 +12,8 @@
   z-index: var(--z-topbar);
   backdrop-filter: blur(10px);
   box-shadow: var(--shell-topbar-shadow);
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  min-width: 0;
 }
 
 .notifyWrap {
@@ -79,6 +80,7 @@
 @media (max-width: 48rem) {
   .topbar {
     padding-inline: var(--space-5);
+    flex-wrap: wrap;
   }
 }
 

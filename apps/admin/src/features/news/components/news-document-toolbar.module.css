@@ -1,0 +1,200 @@
+.root {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky, 30);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem;
+  margin: 0 0 1rem;
+  padding: 0.5rem 0.625rem;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg, 0.75rem);
+  background: color-mix(in srgb, var(--surface-default) 92%, transparent);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-sm, 0 1px 3px rgb(0 0 0 / 0.06));
+}
+
+.group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.125rem;
+}
+
+.divider {
+  width: 1px;
+  align-self: stretch;
+  margin: 0.125rem 0.25rem;
+  background: var(--border-default);
+}
+
+.button,
+.buttonActive {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 0.5rem;
+  border: 0;
+  border-radius: var(--radius-md, 0.375rem);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease;
+}
+
+.button:hover:not(:disabled) {
+  background: var(--surface-subtle);
+  color: var(--text-primary);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+
+.buttonActive {
+  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  color: var(--color-primary);
+}
+
+.button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.insertWrap {
+  position: relative;
+}
+
+.insertButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  height: 2rem;
+  padding: 0 0.75rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md, 0.375rem);
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.insertButton:hover:not(:disabled) {
+  background: var(--surface-subtle);
+}
+
+.insertButtonOpen {
+  background: color-mix(in srgb, var(--color-primary) 8%, var(--surface-subtle));
+  border-color: color-mix(in srgb, var(--color-primary) 20%, var(--border-default));
+}
+
+.insertChevron {
+  opacity: 0.65;
+  transition: transform 0.15s ease;
+}
+
+.insertChevronOpen {
+  transform: rotate(180deg);
+}
+
+.insertButton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.hiddenInput {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.status {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.linkDialog {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.linkTextPreview {
+  padding: 0.75rem 0.875rem;
+  border-radius: var(--radius-md, 0.375rem);
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-default);
+}
+
+.linkTextLabel {
+  display: block;
+  margin-bottom: 0.375rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.linkTextValue {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--text-primary);
+  word-break: break-word;
+}
+
+.linkTextEmpty {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.linkField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.linkField span {
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.linkField input {
+  padding: 0.5rem 0.625rem;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md, 0.375rem);
+  font-size: 0.875rem;
+}
+
+.linkActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.checkboxRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}

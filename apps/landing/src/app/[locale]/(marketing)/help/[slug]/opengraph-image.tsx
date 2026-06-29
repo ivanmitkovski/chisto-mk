@@ -48,10 +48,12 @@ export default async function Image({ params }: Props) {
   }
 
   const tMeta = await getTranslations({ locale, namespace: "metadata" });
+  const th = await getTranslations({ locale, namespace: "helpCentre.hub" });
   const t = await getTranslations({ locale, namespace: "helpCentre" });
   const articleTitle = t(`articles.${slug}.title`);
   const summary = t(`articles.${slug}.cardSummary`);
   const site = tMeta("siteName");
+  const helpBadge = th("title");
 
   return new ImageResponse(
     (
@@ -69,7 +71,7 @@ export default async function Image({ params }: Props) {
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 24 }}>
           <div style={{ fontSize: 28, fontWeight: 600, color: "#4ade80" }}>{site}</div>
-          <div style={{ fontSize: 22, color: "#94a3b8" }}>Help</div>
+          <div style={{ fontSize: 22, color: "#94a3b8" }}>{helpBadge}</div>
         </div>
         <div>
           <div style={{ fontSize: 52, fontWeight: 700, letterSpacing: "-0.03em", lineHeight: 1.12 }}>{articleTitle}</div>

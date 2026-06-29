@@ -8,10 +8,8 @@ import { Section } from "@/components/layout/Section";
 import { hasStoreDownloadLinks } from "@/components/molecules/StoreDownloadButtons";
 import { MarketingPhoneRow } from "@/components/molecules/MarketingPhoneRow";
 import { fadeInUp, staggerContainer } from "@/lib/animations/variants";
-import {
-  DOWNLOAD_SECTION_ID,
-  scheduleScrollToDownloadSection,
-} from "@/lib/utils/smooth-scroll";
+import { DOWNLOAD_SECTION_ID } from "@/lib/utils/smooth-scroll";
+import { scrollToDownloadFromHashNavigation } from "@/lib/navigation/download-navigation";
 import { HeroAtmosphere, HeroWaveFooter } from "./HeroAtmosphere";
 import { HeroDownloadSection } from "./HeroDownloadSection";
 import { HeroPhoneSwipeDeck } from "./HeroPhoneSwipeDeck";
@@ -22,7 +20,7 @@ export function Hero() {
   useEffect(() => {
     const syncHash = () => {
       if (window.location.hash === `#${DOWNLOAD_SECTION_ID}`) {
-        scheduleScrollToDownloadSection();
+        scrollToDownloadFromHashNavigation();
       }
     };
 

@@ -13,7 +13,7 @@ export default function MarketingLayout({
   return (
     <CookieConsentProvider>
       <Header />
-      <main className="relative overflow-x-clip">
+      <main id="main-content" tabIndex={-1} className="relative overflow-x-clip outline-none">
         <MarketingAtmosphere />
         <div className="relative z-10">{children}</div>
       </main>

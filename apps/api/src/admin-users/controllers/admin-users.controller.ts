@@ -24,6 +24,7 @@ import {
   AdminRequestEmailChangeDto,
 } from '../dto/admin-email-change.dto';
 import { ApiStandardHttpErrorResponses } from '../../common/openapi/standard-http-error-responses.decorator';
+import { PaginationQueryDto20 } from '../../common/dto/pagination-query.dto';
 
 @ApiTags('admin-users')
 @ApiStandardHttpErrorResponses()
@@ -60,12 +61,8 @@ export class AdminUsersController {
   @Roles(...ADMIN_PANEL_ROLES)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'List moderator notes for user' })
-  getModerationNotes(
-    @Param('id') id: string,
-    @Query('page') page?: number,
-    @Query('limit') limit?: number,
-  ) {
-    return this.moderationService.getModerationNotes(id, page ?? 1, limit ?? 20);
+  getModerationNotes(@Param('id') id: string, @Query() query: PaginationQueryDto20) {
+    return this.moderationService.getModerationNotes(id, query.page, query.limit);
   }
 
   @Get(':id/status-history')
@@ -73,12 +70,8 @@ export class AdminUsersController {
   @Roles(...ADMIN_PANEL_ROLES)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'List status change history for user' })
-  getStatusHistory(
-    @Param('id') id: string,
-    @Query('page') page?: number,
-    @Query('limit') limit?: number,
-  ) {
-    return this.moderationService.getStatusHistory(id, page ?? 1, limit ?? 20);
+  getStatusHistory(@Param('id') id: string, @Query() query: PaginationQueryDto20) {
+    return this.moderationService.getStatusHistory(id, query.page, query.limit);
   }
 
   @Idempotent('admin-users_moderation_note_create')
@@ -121,12 +114,8 @@ export class AdminUsersController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get audit entries for user' })
   @ApiOkResponse({ description: 'User audit log' })
-  getAudit(
-    @Param('id') id: string,
-    @Query('page') page?: number,
-    @Query('limit') limit?: number,
-  ) {
-    return this.adminUsersService.getAudit(id, page ?? 1, limit ?? 20);
+  getAudit(@Param('id') id: string, @Query() query: PaginationQueryDto20) {
+    return this.adminUsersService.getAudit(id, query.page, query.limit);
   }
 
   @Get(':id/sessions')

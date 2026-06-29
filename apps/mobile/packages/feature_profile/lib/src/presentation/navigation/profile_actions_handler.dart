@@ -1,3 +1,4 @@
+import 'package:chisto_infrastructure/core/config/app_config.dart';
 import 'package:chisto_infrastructure/core/errors/app_error.dart';
 import 'package:chisto_infrastructure/core/l10n/context_l10n.dart';
 import 'package:chisto_infrastructure/core/navigation/app_navigation.dart';
@@ -76,9 +77,10 @@ abstract final class ProfileActionsHandler {
 
   static Future<void> handleHelp(BuildContext context, WidgetRef ref) async {
     final String failedSnack = context.l10n.profileHelpCenterOpenFailedSnack;
+    final String locale = Localizations.localeOf(context).languageCode;
     await openExternalUrl(
       context,
-      ref.read(appConfigProvider).helpCenterUrl,
+      AppConfig.helpCenterUrlForLocale(locale),
       failedSnackMessage: failedSnack,
     );
   }

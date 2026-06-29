@@ -44,6 +44,8 @@
   },
   "nav": {
     "menu": "Menu",
+    "mainAria": "Main navigation",
+    "mobileAria": "Mobile navigation",
     "home": "Home",
     "about": "About us",
     "news": "News",
@@ -139,47 +141,38 @@
       }
     ]
   },
-  "stats": {
-    "asOf": "Community figures as of {date}",
-    "labels": {
-      "reports": "Reports submitted",
-      "sites": "Public pollution sites",
-      "events": "Cleanup events hosted",
-      "appStore": "On the App Store"
-    }
-  },
   "faq": {
     "badge": "FAQ",
     "title": "Frequently asked questions",
     "items": [
       {
         "title": "What is Chisto.mk?",
-        "content": "Chisto.mk is a civic environmental platform for Macedonia. You report pollution sites with photos and locations, follow them on a public map, and join cleanup events when organisers publish them.",
+        "content": "Chisto.mk is a civic environmental platform for North Macedonia. With the iOS app you photograph pollution sites, pin them on a public map, follow updates, and join cleanup events when organisers publish them.",
         "variant": "green"
       },
       {
         "title": "Is the app free?",
-        "content": "Yes. Accounts and reports are free. We charge nothing at signup. If that ever changes, we will say so clearly.",
+        "content": "Yes, and it will stay free. Creating an account, submitting reports, using the map, and joining cleanups cost nothing. There are no subscriptions, in-app purchases, or hidden fees. Chisto.mk is built as a public civic tool, not a paid product.",
         "variant": "white"
       },
       {
         "title": "Who sees my reports?",
-        "content": "Reports are tied to your account and shown on the public map after review. Communities, journalists, and partners use the map to verify and follow up. See our privacy policy for how we handle personal data.",
+        "content": "After moderation, approved reports appear on the public map with the photo and location you submitted. Communities, journalists, and partners use the map to verify sites and track progress. We explain what personal data is shown in our privacy policy.",
         "variant": "white"
       },
       {
         "title": "Can I report anonymously?",
-        "content": "You need an account to submit reports. Your name is not shown on every screen, but reports are linked to your account and visible on the public map. See the privacy policy for details.",
+        "content": "You need a verified account to submit reports, so we can reduce spam and follow up when needed. Your full name is not shown on every screen, but reports are linked to your account and may be visible to moderators. Read the privacy policy for details.",
         "variant": "green"
       },
       {
         "title": "How do cleanup events work?",
-        "content": "Organisers publish cleanup events in the app, often linked to a pollution site. Browse nearby events, RSVP when registration is open, and check outcomes after the activity.",
+        "content": "Organisers publish cleanup events in the app, usually linked to a pollution site on the map. Browse nearby events, register when signup is open, check in on the day, and see outcomes after the activity finishes.",
         "variant": "green"
       },
       {
         "title": "How can organisations partner with you?",
-        "content": "Municipalities, NGOs, and companies can reach out via the contact form to explore data access, campaigns, or joint activities.",
+        "content": "Municipalities, NGOs, schools, and companies can contact us to explore map data, joint cleanups, or awareness campaigns. Use the contact form and we will reply with next steps.",
         "variant": "white"
       }
     ]
@@ -203,6 +196,7 @@
     "linkHome": "Home",
     "linkPlatform": "Platform",
     "linkNews": "News",
+    "linkRss": "RSS feed",
     "linkPress": "Press",
     "linkContact": "Contact",
     "linkHelp": "Help centre",
@@ -211,7 +205,11 @@
     "cookies": "Cookie policy",
     "cookieSettings": "Cookie settings",
     "linkData": "Your data and account",
-    "downloadApp": "Get the app"
+    "downloadApp": "Get the app",
+    "socialNavLabel": "Follow Chisto.mk on social media",
+    "socialFacebook": "Chisto.mk on Facebook (opens in a new tab)",
+    "socialInstagram": "Chisto.mk on Instagram (opens in a new tab)",
+    "socialLinkedin": "Chisto.mk on LinkedIn (opens in a new tab)"
   },
   "contact": {
     "kicker": "Contact",
@@ -219,6 +217,7 @@
     "successTitle": "Thank you!",
     "successBody": "We will get back to you shortly.",
     "submitError": "We could not send your message. Please try again later or email us directly.",
+    "sending": "Sending…",
     "privacyNoticePrefix": "By sending this form, you agree that we process your contact details to reply under our ",
     "privacyNoticeLink": "Privacy Policy",
     "privacyNoticeSuffix": ".",
@@ -234,7 +233,8 @@
     }
   },
   "newsletter": {
-    "genericError": "Something went wrong. Please try again."
+    "genericError": "Something went wrong. Please try again.",
+    "subscribing": "Subscribing…"
   },
   "appStore": {
     "appleAria": "Download on the App Store",
@@ -282,6 +282,8 @@
     "featuredLabel": "Featured",
     "latestHeading": "More stories",
     "readMore": "Read more",
+    "loadingLabel": "Loading news",
+    "articleLoadingLabel": "Loading article",
     "backToNews": "Back to news",
     "readingTime": "{minutes, plural, one {# min read} other {# min read}}",
     "relatedTitle": "Related stories",
@@ -289,6 +291,7 @@
       "copyLink": "Copy link",
       "copyLinkAria": "Copy article link",
       "copied": "Link copied",
+      "copyLinkFailed": "Could not copy link",
       "share": "Share",
       "shareAria": "Share this article"
     },
@@ -300,7 +303,50 @@
     },
     "emptyTitle": "Fresh posts soon",
     "emptyBody": "We are preparing this section. Follow our social channels or contact us if you have a story to share.",
-    "contactCta": "Suggest a story or ask a question"
+    "contactCta": "Suggest a story or ask a question",
+    "errorTitle": "Could not load news",
+    "errorBody": "We could not reach the news service. Check your connection and try again.",
+    "errorRetry": "Try again",
+    "imageUnavailable": "Image unavailable",
+    "videoUnavailable": "Video unavailable",
+    "galleryClose": "Close",
+    "galleryPrevious": "Previous image",
+    "galleryNext": "Next image",
+    "galleryUnavailable": "Gallery unavailable",
+    "galleryAriaLabel": "Image gallery",
+    "gallerySlideLabel": "Image {index} of {total}",
+    "breadcrumbAriaLabel": "Breadcrumb",
+    "updatedLabel": "Updated {date}",
+    "filterAll": "All",
+    "paginationPrev": "Previous",
+    "paginationNext": "Next",
+    "paginationPage": "Page {current} of {total}",
+    "breadcrumbHome": "Home",
+    "breadcrumbNews": "News",
+    "notFound": {
+      "title": "News section unavailable",
+      "body": "This news page could not be found or is not available yet.",
+      "articleTitle": "Article not found",
+      "articleBody": "This news article does not exist or may have been removed.",
+      "backToNews": "Back to news"
+    }
+  },
+  "homeLatestNews": {
+    "badge": "News",
+    "title": "Latest from Chisto.mk",
+    "viewAll": "View all news",
+    "readMore": "Read more",
+    "category": {
+      "release": "Release",
+      "partnership": "Partnership",
+      "community": "Community",
+      "product": "Product"
+    },
+    "emptyTitle": "No posts yet",
+    "emptyBody": "When we publish updates, they will appear here and on the news hub.",
+    "errorTitle": "News is temporarily unavailable",
+    "errorBody": "We could not load the latest posts. Try the news hub later or contact us if this keeps happening.",
+    "errorContact": "Contact us"
   },
   "pressPage": {
     "badge": "Press",
@@ -310,6 +356,15 @@
     "logoTitle": "Mark",
     "logoBody": "SVG suitable for light backgrounds. Use clear space around the symbol; do not stretch or change colours.",
     "downloadMark": "Download chisto-mark.svg",
+    "screenshotsTitle": "App screenshots",
+    "screenshot": {
+      "welcome": "Welcome screen (JPG)",
+      "feed": "Community feed (JPG)",
+      "map": "Pollution map (JPG)"
+    },
+    "pressKitTitle": "Press kit",
+    "pressKitBody": "Logo, sample screenshots, and boilerplate text in one ZIP.",
+    "downloadPressKit": "Download press kit (ZIP)",
     "inquiriesTitle": "Contact",
     "inquiriesLead": "Press and partnership questions:",
     "boilerplateTitle": "Short description",
@@ -625,9 +680,11 @@
     "linkCookies": "Cookie policy"
   },
   "helpCentre": {
+    "loadingLabel": "Loading help centre",
     "common": {
       "breadcrumbHome": "Home",
       "breadcrumbHelp": "Help",
+      "breadcrumbAriaLabel": "Breadcrumb",
       "readTimeFormatted": "{minutes, plural, one {# min read} other {# min read}}",
       "lastUpdatedPrefix": "Updated",
       "lastReviewedPrefix": "Reviewed",
@@ -647,6 +704,7 @@
       "feedbackContactIntro": "Prefer a reply from the team?",
       "feedbackContactLink": "Contact us",
       "feedbackSubmit": "Send",
+      "feedbackSending": "Sending…",
       "feedbackSkipDetails": "Skip",
       "copySectionLinkAria": "Copy link to this section",
       "sectionLinkCopied": "Link copied",
@@ -662,7 +720,7 @@
       "empty": "No guides match that search. Try shorter words, or jump to a category below.",
       "searchTipsTitle": "Search tips",
       "searchTips": [
-        "Try everyday words: report, pollution site, map, cleanup event, account, password, notification.",
+        "Try everyday words: report, draft, QR, heatmap, OTP, points, notification.",
         "If nothing matches, browse the topic cards by category.",
         "Long guides have a table of contents at the top of the article."
       ],
@@ -672,17 +730,41 @@
       "jumpToCategoryNav": "Jump to a category",
       "jumpToCategoryLead": "Browse by topic",
       "featuredTitle": "Start here",
-      "featuredIntro": "New to Chisto.mk? Open one of these first, then explore the rest at your pace.",
+      "featuredIntro": "New to Chisto.mk? Pick a path below or search. Wording matches the app.",
       "catalogMetrics": "{count, plural, one {# guide · same terms as in the app} other {# guides · same terms as in the app}}",
       "featuredSlugs": [
         "getting-started",
-        "exploring-the-map",
-        "report-a-site"
+        "report-a-site",
+        "join-a-cleanup-event"
+      ],
+      "startHereTitle": "What do you want to do?",
+      "startHerePaths": [
+        {
+          "id": "report",
+          "label": "Report pollution",
+          "description": "Photos, pin placement, and what happens after you submit.",
+          "href": "/help/report-a-site"
+        },
+        {
+          "id": "join",
+          "label": "Join a cleanup",
+          "description": "Find events, RSVP, check in, and use event chat.",
+          "href": "/help/join-a-cleanup-event"
+        },
+        {
+          "id": "organize",
+          "label": "Organize a cleanup",
+          "description": "Plan, publish, and run an event for volunteers.",
+          "href": "/help/hosting-a-cleanup-event"
+        }
       ]
     },
     "categories": {
       "basics": {
         "label": "Getting started"
+      },
+      "map": {
+        "label": "Map and sites"
       },
       "reporting": {
         "label": "Reporting"
@@ -690,19 +772,19 @@
       "events": {
         "label": "Cleanups"
       },
-      "map": {
-        "label": "Map and sites"
+      "profile": {
+        "label": "Your account"
       }
     },
     "articles": {
       "getting-started": {
         "cardTitle": "Set up Chisto.mk",
-        "cardSummary": "Install the app, create your account, pick a language, and learn where notifications and privacy settings live.",
+        "cardSummary": "Install the app from the MK App Store, sign in, pass the Macedonia location gate, and finish the coach tour.",
         "title": "Set up Chisto.mk",
-        "lastUpdated": "22 June 2026",
-        "lastReviewed": "22 June 2026",
+        "lastUpdated": "28 June 2026",
+        "lastReviewed": "28 June 2026",
         "datePublished": "2024-01-01T00:00:00.000Z",
-        "dateModified": "2026-04-16T00:00:00.000Z",
+        "dateModified": "2026-06-28T00:00:00.000Z",
         "sections": [
           {
             "id": "download-the-app",
@@ -710,26 +792,26 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Download Chisto.mk from the App Store, or use the download buttons on the chisto.mk home page."
+                "text": "Download Chisto.mk from the MK App Store: https://apps.apple.com/mk/app/chisto-mk/id6771892086. You can also use the download buttons on chisto.mk."
               },
               {
                 "type": "bullets",
                 "title": "Before you install",
                 "items": [
-                  "Search the store for «Chisto.mk» and check the publisher matches our official listing.",
-                  "On a limited data plan, use Wi-Fi. The first launch may download map data.",
-                  "Keep the OS updated so the camera, maps, and security patches stay current."
+                  "Search the store for Chisto.mk and confirm the publisher matches our official listing.",
+                  "Use Wi-Fi on a limited data plan. The first launch may download map tiles.",
+                  "Keep iOS updated so camera, maps, and security patches stay current."
                 ]
               },
               {
                 "type": "callout",
                 "variant": "tip",
-                "text": "If the store page is unavailable in your region, open chisto.mk on a desktop browser and use the official store links from there."
+                "text": "If the store page is unavailable, open chisto.mk in a desktop browser and follow the official App Store link."
               },
               {
                 "type": "callout",
                 "variant": "note",
-                "text": "In these guides, words like report, pollution site, and cleanup event match the app so you always know which screen we mean."
+                "text": "Words like Home feed, Map tab, Report FAB, and report stages match the app so you always know which screen we mean."
               }
             ]
           },
@@ -739,40 +821,71 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Open the app and complete sign up. You need a phone number you can verify by SMS (or a similar one-time code), an email you read regularly, your name, and a password that meets the app rules. The same expectations are spelled out in our Terms of use."
+                "text": "Open the app and sign up with your phone number, email, name, and password. You must verify your phone with an SMS one-time code before the account is active."
               },
               {
                 "type": "bullets",
                 "title": "What to prepare",
                 "items": [
-                  "A phone number you can access for the verification code.",
-                  "An email inbox you check regularly for account notices.",
-                  "A strong password that you do not reuse on other services."
+                  "A Macedonian mobile number you can read SMS on.",
+                  "An email inbox you check for account notices.",
+                  "A strong password you do not reuse on other services."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/sign-in-and-verification",
+                "label": "Sign in and verification"
+              }
+            ]
+          },
+          {
+            "id": "location-gate-and-home",
+            "title": "Location gate and Home feed",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Chisto.mk is available in Macedonia. During sign up the app checks that your device location is inside the country. After that you land on the Home feed with nearby pollution sites and feed filters."
+              },
+              {
+                "type": "bullets",
+                "title": "First steps on Home feed",
+                "items": [
+                  "Scroll the feed or tap feed filters such as All, Urgent, Nearby, and Top support.",
+                  "Tap a site card to open photos, history, and Take action options.",
+                  "Open the Map tab when you want pins and the heatmap view."
                 ]
               },
               {
                 "type": "callout",
                 "variant": "note",
-                "text": "Keep your device clock accurate. Large clock skew can sometimes interfere with code-based sign-in."
+                "text": "If you travel outside Macedonia, browsing may still work, but reporting and eco actions require you to be in the country."
               }
             ]
           },
           {
-            "id": "language-and-region",
-            "title": "Language and region",
+            "id": "coach-tour-and-navigation",
+            "title": "Coach tour and navigation",
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Where the app offers it, you can change the interface language. Map data focuses on Macedonia, but you still place each report exactly where it belongs."
+                "text": "After your first sign in, a coach tour walks you through the main tabs: Home feed, Map tab, Reports list, Report FAB, Events, and your profile avatar."
               },
               {
                 "type": "bullets",
-                "title": "Good habits",
+                "title": "Main tabs",
                 "items": [
-                  "Switch languages in settings if several people share one device.",
-                  "If text looks untranslated, update the app. Translations ship with releases.",
-                  "Drop the pin on the real location you mean, not a random city centre unless the whole area is affected."
+                  "Home feed shows ranked site cards and filters.",
+                  "Map tab shows pins, heatmap, and site detail sheets.",
+                  "Reports lists your submissions with status chips.",
+                  "Events lists cleanup and eco-action listings.",
+                  "The Report FAB in the center starts the 4-step report wizard."
                 ]
+              },
+              {
+                "type": "callout",
+                "variant": "tip",
+                "text": "You can skip the coach tour anytime. Reopen it later from profile settings if you want a refresher."
               }
             ]
           },
@@ -782,15 +895,15 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "You control whether the app may send push notifications in your device settings and in the app where offered. Our Privacy Policy explains how personal data is processed when you report issues or join events."
+                "text": "You control push notifications in iOS Settings and inside the app inbox preferences. Our Privacy policy explains how personal data is processed when you report sites or join events."
               },
               {
                 "type": "bullets",
                 "title": "Where to look",
                 "items": [
-                  "iOS: Settings → Notifications → Chisto.mk.",
-                  "Android: Settings → Apps → Chisto.mk → Notifications.",
-                  "In-app toggles may exist for specific categories such as events or report status."
+                  "iOS: Settings, Notifications, Chisto.mk.",
+                  "In app: open the notifications inbox and tap the preferences icon.",
+                  "Review the eight notification groups before your first cleanup."
                 ]
               },
               {
@@ -802,91 +915,1294 @@
           }
         ]
       },
-      "report-a-site": {
-        "cardTitle": "File a pollution report",
-        "cardSummary": "Capture useful photos, place the pin accurately, and follow the review journey after you send it.",
-        "title": "File a pollution report",
-        "lastUpdated": "22 June 2026",
-        "lastReviewed": "22 June 2026",
+      "sign-in-and-verification": {
+        "cardTitle": "Sign in and verification",
+        "cardSummary": "Sign in with phone and password, complete SMS OTP verification, and recover access when codes stop arriving.",
+        "title": "Sign in and verification",
+        "lastUpdated": "28 June 2026",
+        "lastReviewed": "28 June 2026",
+        "datePublished": "2024-01-01T00:00:00.000Z",
+        "dateModified": "2026-06-28T00:00:00.000Z",
         "sections": [
           {
-            "id": "before-you-start",
-            "title": "Before you start",
+            "id": "sign-in-basics",
+            "title": "Sign in basics",
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "You get the best results on site with recent photos. Stay out of danger: traffic, unstable ground, and unknown liquids are never worth a closer shot."
+                "text": "Returning users sign in with the same phone number and password created at registration. The app formats Macedonian numbers automatically."
               },
               {
                 "type": "bullets",
-                "title": "Safety checklist",
+                "title": "Sign in steps",
                 "items": [
-                  "Stand away from traffic, unstable edges, and unknown liquids or sharp metal.",
-                  "If wind or sun hurts readability, change angle rather than stepping closer to danger.",
-                  "If you only have old photos, say so in the description so moderators understand context."
+                  "Open Chisto.mk and tap Sign in.",
+                  "Enter your phone number and password.",
+                  "Tap Sign in and wait for the session to load."
                 ]
               },
               {
                 "type": "callout",
                 "variant": "note",
-                "text": "Never enter private property without permission. Capture from a public vantage when possible."
+                "text": "Keep your device clock set to automatic. Large clock skew can break SMS code validation."
               }
             ]
           },
           {
-            "id": "photos-and-description",
-            "title": "Photos and description",
+            "id": "sms-otp-verification",
+            "title": "SMS OTP verification",
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Add up to five photos. Start wide for context, then move closer to the problem: piles, pipes, stains, or debris. Pair images with a short headline and a factual description."
+                "text": "New accounts and some security flows send a one-time code by SMS. Enter the code before it expires. Codes are short lived and cannot be reused."
               },
               {
                 "type": "bullets",
-                "title": "What moderators look for",
+                "title": "If the code does not arrive",
                 "items": [
-                  "Daylight and a steady hand make verification faster for moderators.",
-                  "Include scale cues when size is unclear, for example a common object or a person at safe distance.",
-                  "Mention smells, colours, or water flow only as observations, not medical claims."
+                  "Confirm airplane mode is off and you have signal.",
+                  "Wait one minute, then tap Resend code.",
+                  "Check that the phone number has no typos.",
+                  "Disable SMS filtering apps that might hide sender messages."
                 ]
+              },
+              {
+                "type": "callout",
+                "variant": "tip",
+                "text": "Paste the code carefully. Autofill from Messages usually works on iOS."
               }
             ]
           },
           {
-            "id": "location-on-the-map",
-            "title": "Location on the map",
+            "id": "location-gate-at-sign-in",
+            "title": "Location gate at sign in",
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Move the pin to the exact pollution site inside Macedonia. Zoom until the building, shoreline, or roadside matches what you see on the ground."
+                "text": "Registration requires your device location to be inside Macedonia. Sign in itself does not repeat the gate every time, but reporting, eco actions, and some edits check location again."
+              },
+              {
+                "type": "bullets",
+                "title": "When location is blocked",
+                "items": [
+                  "Enable Location Services for Chisto.mk while using the app.",
+                  "Turn off mock location or developer GPS tools.",
+                  "Move outdoors briefly so GPS can settle near tall buildings."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/app-permissions",
+                "label": "App permissions"
+              }
+            ]
+          },
+          {
+            "id": "password-recovery",
+            "title": "Password recovery",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Use Forgot password on the sign in screen. You receive instructions by email or SMS depending on the flow active in your build."
+              },
+              {
+                "type": "bullets",
+                "title": "Recovery checklist",
+                "items": [
+                  "Use the same email you registered with.",
+                  "Open recovery links on the same device when possible.",
+                  "Choose a new password that meets the app rules."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/contact",
+                "label": "Contact support"
+              }
+            ]
+          },
+          {
+            "id": "sign-out-and-devices",
+            "title": "Sign out and shared devices",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Sign out from profile settings before handing your phone to someone else. Draft reports stay on the device until you discard them or submit."
+              },
+              {
+                "type": "bullets",
+                "title": "Good habits",
+                "items": [
+                  "Enable a screen lock on phones you carry daily.",
+                  "Do not share SMS codes with anyone.",
+                  "Update the app from the MK App Store when updates appear."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/your-profile-and-settings",
+                "label": "Your profile and settings"
+              }
+            ]
+          }
+        ]
+      },
+      "app-permissions": {
+        "cardTitle": "App permissions",
+        "cardSummary": "Allow camera, photos, location, notifications, and motion access so reporting, map pins, and event check-in work reliably.",
+        "title": "App permissions",
+        "lastUpdated": "28 June 2026",
+        "lastReviewed": "28 June 2026",
+        "datePublished": "2024-01-01T00:00:00.000Z",
+        "dateModified": "2026-06-28T00:00:00.000Z",
+        "sections": [
+          {
+            "id": "why-permissions-matter",
+            "title": "Why permissions matter",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Chisto.mk asks for iOS permissions only when a feature needs them. Denying access blocks parts of the 4-step report wizard, Map tab accuracy, or event QR check-in."
+              },
+              {
+                "type": "bullets",
+                "title": "Core permissions",
+                "items": [
+                  "Camera and Photos for Evidence stage photos.",
+                  "Location while using the app for pins in Macedonia.",
+                  "Notifications for report status and event updates."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "note",
+                "text": "You can change permissions later in iOS Settings. The app shows inline hints when something is missing."
+              }
+            ]
+          },
+          {
+            "id": "location-permission",
+            "title": "Location permission",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Choose While Using the App. The Location stage needs a pin inside Macedonia. Nearby feed filters and map centering also use your position."
+              },
+              {
+                "type": "bullets",
+                "title": "Fix location issues",
+                "items": [
+                  "Open Settings, Privacy and Security, Location Services, Chisto.mk.",
+                  "Enable Precise Location when offered.",
+                  "Restart the app after changing the setting."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/troubleshooting",
+                "label": "Troubleshooting"
+              }
+            ]
+          },
+          {
+            "id": "camera-and-photos",
+            "title": "Camera and photos",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "The Evidence stage accepts up to five photos from the camera or library. Without access, you cannot complete a report."
+              },
+              {
+                "type": "bullets",
+                "title": "Recommended settings",
+                "items": [
+                  "Allow camera access when prompted during your first report.",
+                  "Allow photo library access to attach existing images.",
+                  "Free storage space if uploads fail repeatedly."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "tip",
+                "text": "Capture in daylight when safe. You can add library photos later in the same draft."
+              }
+            ]
+          },
+          {
+            "id": "notifications-permission",
+            "title": "Notifications permission",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Push alerts cover report status, nearby reports, cleanup events, and event chat. You can fine tune eight notification groups inside the app even when push is allowed."
+              },
+              {
+                "type": "bullets",
+                "title": "Enable alerts",
+                "items": [
+                  "Tap Allow when iOS asks during onboarding.",
+                  "If you skipped it, open Settings, Notifications, Chisto.mk.",
+                  "Open the in app inbox preferences to mute or snooze groups."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/notifications-in-the-app",
+                "label": "Notifications in the app"
+              }
+            ]
+          },
+          {
+            "id": "review-permissions-anytime",
+            "title": "Review permissions anytime",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Open iOS Settings, scroll to Chisto.mk, and review each toggle. Motion or fitness data is not required for core reporting."
+              },
+              {
+                "type": "bullets",
+                "title": "After you change settings",
+                "items": [
+                  "Force close and reopen Chisto.mk once.",
+                  "Retry the action that failed, such as Report FAB or QR scan.",
+                  "Check troubleshooting if errors persist."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/report-a-site",
+                "label": "Report a site"
+              }
+            ]
+          }
+        ]
+      },
+      "offline-and-slow-networks": {
+        "cardTitle": "Offline and slow networks",
+        "cardSummary": "Save report drafts locally, queue uploads on weak signal, and avoid duplicate submissions while pending.",
+        "title": "Offline and slow networks",
+        "lastUpdated": "28 June 2026",
+        "lastReviewed": "28 June 2026",
+        "datePublished": "2024-01-01T00:00:00.000Z",
+        "dateModified": "2026-06-28T00:00:00.000Z",
+        "sections": [
+          {
+            "id": "how-the-app-uses-network",
+            "title": "How the app uses the network",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Maps, photos, and submissions sync when connectivity returns. Some map tiles cache so you can browse lightly offline. Account actions usually need a live session."
+              },
+              {
+                "type": "bullets",
+                "title": "Expectations",
+                "items": [
+                  "Draft fields save locally until you submit.",
+                  "Large photos take longer on mobile data.",
+                  "Event chat and check-in need a connection."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "note",
+                "text": "Pending uploads are normal briefly after switching from Wi-Fi to mobile data."
+              }
+            ]
+          },
+          {
+            "id": "report-drafts-offline",
+            "title": "Report drafts offline",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "The 4-step report wizard saves progress as a draft. You can leave mid flow and resume from the Reports tab or the Report FAB sheet."
+              },
+              {
+                "type": "bullets",
+                "title": "Draft tips",
+                "items": [
+                  "Finish Evidence and Details before you lose signal if possible.",
+                  "Confirm the Location pin when you regain GPS.",
+                  "Submit on Wi-Fi when photos are large."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/report-statuses-and-drafts",
+                "label": "Report statuses and drafts"
+              }
+            ]
+          },
+          {
+            "id": "uploads-and-pending-states",
+            "title": "Uploads and pending states",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Pending means the device is still sending data or the server has not confirmed receipt. Do not start a second report for the same issue while pending spins."
+              },
+              {
+                "type": "bullets",
+                "title": "If you are stuck",
+                "items": [
+                  "Open the report summary and look for retry prompts.",
+                  "Capture smaller photos if uploads fail repeatedly.",
+                  "Wait on stable Wi-Fi before force closing the app."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "tip",
+                "text": "Report credits are consumed on successful submit, not while a draft is still local."
+              }
+            ]
+          },
+          {
+            "id": "airplane-mode-and-roaming",
+            "title": "Airplane mode and roaming",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "International roaming can block background uploads. Finish uploads before flights when possible."
+              },
+              {
+                "type": "bullets",
+                "title": "Travel tips",
+                "items": [
+                  "Reconnect to Wi-Fi before editing long descriptions.",
+                  "Double check event reminders if time zones shift.",
+                  "QR check-in needs live data at the venue."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "note",
+                "text": "Toggle cellular data for Chisto.mk in iOS Settings if roaming blocks only this app."
+              }
+            ]
+          },
+          {
+            "id": "when-to-escalate",
+            "title": "When to escalate",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "If the app crashes twice while uploading, pause and collect OS version and app version before contacting support. Reinstalling can clear local drafts."
+              },
+              {
+                "type": "bullets",
+                "title": "Before you write to us",
+                "items": [
+                  "Restart the device once.",
+                  "Confirm you are on the latest build from the MK App Store.",
+                  "Capture screenshots of error text and blur personal details."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/contact",
+                "label": "Contact"
+              }
+            ]
+          }
+        ]
+      },
+      "troubleshooting": {
+        "cardTitle": "Troubleshooting",
+        "cardSummary": "Fix sign-in, SMS codes, map location, camera uploads, and know when to update or contact support.",
+        "title": "Troubleshooting common issues",
+        "lastUpdated": "28 June 2026",
+        "lastReviewed": "28 June 2026",
+        "datePublished": "2024-01-01T00:00:00.000Z",
+        "dateModified": "2026-06-28T00:00:00.000Z",
+        "sections": [
+          {
+            "id": "cannot-sign-in",
+            "title": "Cannot sign in",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Most login issues come from connectivity, clock skew, or an outdated build. Work through the list before you assume the password is wrong."
+              },
+              {
+                "type": "bullets",
+                "title": "Try this first",
+                "items": [
+                  "Turn airplane mode off, wait, then reconnect.",
+                  "Set date and time to automatic.",
+                  "Request a fresh SMS code and paste carefully.",
+                  "Update Chisto.mk from the MK App Store, then restart."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/sign-in-and-verification",
+                "label": "Sign in and verification"
+              }
+            ]
+          },
+          {
+            "id": "location-permission",
+            "title": "Map or GPS issues",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "The Map tab and Location stage need location access. If the blue dot drifts, fix permissions before you file a report."
+              },
+              {
+                "type": "bullets",
+                "title": "Checklist",
+                "items": [
+                  "Enable Location Services while using the app.",
+                  "Open sky for a few seconds so GPS settles.",
+                  "Disable mock location tools while using Chisto.mk.",
+                  "Move the pin manually if GPS lands on the wrong block."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "note",
+                "text": "Pins must stay inside Macedonia. Drag the pin if GPS places you outside the border."
+              }
+            ]
+          },
+          {
+            "id": "photos-or-upload",
+            "title": "Camera or upload failures",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Large photos and weak networks do not mix. Give uploads time or capture a smaller photo when the queue keeps failing."
+              },
+              {
+                "type": "bullets",
+                "title": "Try this first",
+                "items": [
+                  "Confirm camera and photo library permission.",
+                  "Free storage space on the device.",
+                  "Switch to Wi-Fi for multi photo uploads.",
+                  "Reopen a saved draft instead of starting over."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "tip",
+                "text": "Avoid duplicating the same report while the first upload still shows pending."
+              }
+            ]
+          },
+          {
+            "id": "report-credits-blocked",
+            "title": "Report credits blocked",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "You receive a limited pool of report credits. When all credits and the emergency allowance are used, the Report FAB shows a cooldown message."
+              },
+              {
+                "type": "bullets",
+                "title": "Unlock more reports",
+                "items": [
+                  "Join eco-action and verify attendance at check-in.",
+                  "Create an eco action as an organizer after passing the organizer quiz.",
+                  "Wait for the emergency unlock timer if shown."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/points-rankings-and-credits",
+                "label": "Points, rankings, and credits"
+              }
+            ]
+          },
+          {
+            "id": "still-stuck",
+            "title": "Still stuck?",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "When nothing above works, collect a short description and reach out. Note your iOS version and app version."
+              },
+              {
+                "type": "bullets",
+                "title": "Before you contact us",
+                "items": [
+                  "Restart the phone once.",
+                  "Confirm the official MK App Store listing.",
+                  "Describe which tab failed: Home feed, Map tab, Reports, or Events."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/contact",
+                "label": "Contact"
+              }
+            ]
+          }
+        ]
+      },
+      "partnerships-for-organisations": {
+        "cardTitle": "Partnerships for organisations",
+        "cardSummary": "How municipalities, NGOs, schools, and journalists can use Chisto.mk map data and events responsibly.",
+        "title": "Partnerships for municipalities, NGOs, and media",
+        "lastUpdated": "28 June 2026",
+        "lastReviewed": "28 June 2026",
+        "datePublished": "2024-01-01T00:00:00.000Z",
+        "dateModified": "2026-06-28T00:00:00.000Z",
+        "sections": [
+          {
+            "id": "who-this-guide-is-for",
+            "title": "Who this guide is for",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "This article is for organisations that want to use public map data, coordinate cleanups, or explore collaboration. It is not legal advice."
+              },
+              {
+                "type": "bullets",
+                "title": "Typical readers",
+                "items": [
+                  "Municipal environment desks planning field follow up.",
+                  "NGOs mapping volunteer capacity near reported sites.",
+                  "Schools hosting supervised eco actions.",
+                  "Journalists verifying locations before publishing."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "note",
+                "text": "Student groups should work with a teacher or NGO contact before publishing events."
+              }
+            ]
+          },
+          {
+            "id": "what-the-platform-provides",
+            "title": "What the platform provides",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Residents file reports through the mobile app. Approved reports become public pollution sites on the map. Organizers can publish cleanup events and eco actions subject to moderation."
+              },
+              {
+                "type": "bullets",
+                "title": "Public signals you can rely on",
+                "items": [
+                  "Site pins with photos and community history.",
+                  "Event listings with RSVP and check-in data when organizers enable it.",
+                  "Status labels such as Under review, Approved, and Declined on submissions."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "note",
+                "text": "Map pins are civic signals, not automatic legal findings. Use official channels for regulated enforcement."
+              }
+            ]
+          },
+          {
+            "id": "before-you-contact-us",
+            "title": "Before you contact us",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Gather your goal, geography, and timeline. If you need bulk data, explain public benefit and how you will protect personal data."
+              },
+              {
+                "type": "bullets",
+                "title": "Helpful attachments",
+                "items": [
+                  "Official email from an organisational domain when possible.",
+                  "One paragraph on intended use of map or event information.",
+                  "Preferred language: Macedonian, Albanian, or English."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/contact",
+                "label": "Open the contact form"
+              }
+            ]
+          },
+          {
+            "id": "policies-and-public-data",
+            "title": "Policies and public data",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Binding rules live in our Terms, Privacy policy, and data pages. The help centre explains product behavior for residents."
+              },
+              {
+                "type": "bullets",
+                "title": "Where to read more",
+                "items": [
+                  "Use the data page for retention and rights paths.",
+                  "Use the privacy page before processing identifiable information.",
+                  "Link staff to the help hub so field teams share app vocabulary."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/data",
+                "label": "Data overview"
+              },
+              {
+                "type": "internalLink",
+                "href": "/terms",
+                "label": "Terms of use"
+              }
+            ]
+          }
+        ]
+      },
+      "home-feed-and-sites": {
+        "cardTitle": "Home feed and sites",
+        "cardSummary": "Browse the Home feed, use feed filters, open site cards, and start Take action flows from a pollution site.",
+        "title": "Home feed and pollution sites",
+        "lastUpdated": "28 June 2026",
+        "lastReviewed": "28 June 2026",
+        "datePublished": "2024-01-01T00:00:00.000Z",
+        "dateModified": "2026-06-28T00:00:00.000Z",
+        "sections": [
+          {
+            "id": "home-feed-overview",
+            "title": "Home feed overview",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "The Home feed is the default tab after sign in. It shows pollution sites ranked for your area with photos, status, and community activity."
+              },
+              {
+                "type": "bullets",
+                "title": "What you see",
+                "items": [
+                  "Site cards with headline, location hint, and support counts.",
+                  "Badges when a site needs attention or has new reports.",
+                  "Your profile avatar in the header for quick access to settings."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "tip",
+                "text": "Pull to refresh when you return from the field with new photos."
+              }
+            ]
+          },
+          {
+            "id": "feed-filters",
+            "title": "Feed filters",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Tap feed filters above the list to change ranking. Filters include All, Urgent, Nearby, and Top support."
+              },
+              {
+                "type": "bullets",
+                "title": "When to use each filter",
+                "items": [
+                  "All: balanced default ranking.",
+                  "Urgent: new or unverified sites that need community attention.",
+                  "Nearby: closest reports around your current location.",
+                  "Top support: sites with the most community upvotes."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "note",
+                "text": "Nearby requires location permission. Enable it in Settings if the filter looks empty."
+              }
+            ]
+          },
+          {
+            "id": "open-a-site",
+            "title": "Open a site",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Tap a card to open the site detail sheet with photos, timeline, comments, and Take action options."
+              },
+              {
+                "type": "bullets",
+                "title": "On the site page",
+                "items": [
+                  "Swipe photos and read the latest approved report text.",
+                  "View history events such as new reports and cleanups.",
+                  "Upvote or comment when you want to show support."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/exploring-the-map",
+                "label": "Exploring the map"
+              }
+            ]
+          },
+          {
+            "id": "take-action-on-a-site",
+            "title": "Take action on a site",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Take action opens options such as filing a new report, Join eco-action, or viewing linked cleanup events."
+              },
+              {
+                "type": "bullets",
+                "title": "Common choices",
+                "items": [
+                  "Report again when you have fresh Evidence photos.",
+                  "Join eco-action to RSVP to an existing cleanup.",
+                  "Create eco action when you plan to host a new event."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/report-a-site",
+                "label": "Report a site"
+              }
+            ]
+          },
+          {
+            "id": "move-to-the-map",
+            "title": "Move to the Map tab",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Switch to the Map tab to see the same sites as pins. Toggle the heatmap to spot clusters of activity."
+              },
+              {
+                "type": "bullets",
+                "title": "Map tab tips",
+                "items": [
+                  "Pinch to zoom until street names match the ground.",
+                  "Tap a pin to open the same site sheet as the feed.",
+                  "Use Recenter when you want to jump back to your position."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/verifying-sites-in-the-field",
+                "label": "Verifying sites in the field"
+              }
+            ]
+          }
+        ]
+      },
+      "exploring-the-map": {
+        "cardTitle": "Use the Map tab",
+        "cardSummary": "Navigate pins, toggle the heatmap, open site sheets, and decide when to file a new report.",
+        "title": "Exploring the Map tab",
+        "lastUpdated": "28 June 2026",
+        "lastReviewed": "28 June 2026",
+        "datePublished": "2024-01-01T00:00:00.000Z",
+        "dateModified": "2026-06-28T00:00:00.000Z",
+        "sections": [
+          {
+            "id": "what-the-map-shows",
+            "title": "What the map shows",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "The Map tab is a shared civic view of pollution sites in Macedonia. Each pin is a place where someone documented an environmental concern."
+              },
+              {
+                "type": "bullets",
+                "title": "Quick orientation",
+                "items": [
+                  "Zoom until street names and landmarks match what you see outside.",
+                  "Tap a pin to open photos, descriptions, and history.",
+                  "Counts change as moderators approve new reports."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/home-feed-and-sites",
+                "label": "Home feed and sites"
+              }
+            ]
+          },
+          {
+            "id": "heatmap-layer",
+            "title": "Heatmap layer",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Toggle Show heatmap to highlight areas with more reported activity. Hide heatmap when you need a cleaner view for precise pin placement."
+              },
+              {
+                "type": "bullets",
+                "title": "Using the heatmap",
+                "items": [
+                  "Look for hot zones when planning group cleanups.",
+                  "Turn heatmap off before confirming a Location pin.",
+                  "Combine with Nearby feed filter when scouting on foot."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "tip",
+                "text": "Heatmap density reflects reported sites, not official enforcement priority."
+              }
+            ]
+          },
+          {
+            "id": "site-detail-basics",
+            "title": "Site detail basics",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "A site sheet summarises community submissions. It supports transparency, not assigning blame to individuals."
+              },
+              {
+                "type": "bullets",
+                "title": "What you can rely on",
+                "items": [
+                  "Photos and text come from contributors and moderators.",
+                  "Timestamps show recency when displayed.",
+                  "Take action links reporting, events, and comments in one place."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "note",
+                "text": "Do not treat map pins as legal proof on their own."
+              }
+            ]
+          },
+          {
+            "id": "moving-around-safely",
+            "title": "Moving around safely",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Use the map while stationary or as a passenger. Keep awareness of traffic and private property boundaries."
+              },
+              {
+                "type": "bullets",
+                "title": "Good habits",
+                "items": [
+                  "Prefer daylight for first visits to unfamiliar edges.",
+                  "Step back and capture from a distance if a path feels unsafe.",
+                  "Respect no entry signs even when rubbish is visible beyond them."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "note",
+                "text": "Do not use the Map tab while driving. Pull over safely first."
+              }
+            ]
+          },
+          {
+            "id": "when-to-file-a-report",
+            "title": "When to file a report",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Open the Report FAB when you can add fresh evidence or correct a pin. Duplicates without new facts slow moderation."
+              },
+              {
+                "type": "bullets",
+                "title": "Before you start",
+                "items": [
+                  "Gather photos and note what changed since the last visit.",
+                  "Confirm you have report credits available.",
+                  "Complete all four stages: Evidence, Details, Location, Review."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/report-a-site",
+                "label": "Report a site"
+              }
+            ]
+          }
+        ]
+      },
+      "verifying-sites-in-the-field": {
+        "cardTitle": "Verify sites in the field",
+        "cardSummary": "Plan a safe visit, compare the pin to what you see, and file a new report when evidence clearly changed.",
+        "title": "Verifying pollution sites on the ground",
+        "lastUpdated": "28 June 2026",
+        "lastReviewed": "28 June 2026",
+        "datePublished": "2024-01-01T00:00:00.000Z",
+        "dateModified": "2026-06-28T00:00:00.000Z",
+        "sections": [
+          {
+            "id": "plan-the-visit",
+            "title": "Plan the visit",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Open the site from Home feed or Map tab, note the pin and photos, then plan daylight access from a public vantage."
+              },
+              {
+                "type": "bullets",
+                "title": "Checklist",
+                "items": [
+                  "Charge your phone and expect weak signal in some valleys.",
+                  "Tell a colleague where you go if you work alone.",
+                  "Avoid private land unless you already have permission."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/exploring-the-map",
+                "label": "Exploring the map"
+              }
+            ]
+          },
+          {
+            "id": "compare-pin-to-reality",
+            "title": "Compare the pin to reality",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Stand where the map suggests and scan for the same cues in photos: kerb lines, trees, buildings, or shoreline bends."
+              },
+              {
+                "type": "bullets",
+                "title": "When to report again",
+                "items": [
+                  "The hazard moved materially since the last photos.",
+                  "The pin sits on the wrong block or riverbank.",
+                  "You can document a risk that was not visible earlier."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "tip",
+                "text": "Small GPS offsets happen near cliffs and tall buildings. Large mismatches deserve a careful new report."
+              }
+            ]
+          },
+          {
+            "id": "capture-fresh-evidence",
+            "title": "Capture fresh evidence",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Use the Report FAB and complete Evidence with up to five photos. Add Details that explain what changed since prior visits."
+              },
+              {
+                "type": "bullets",
+                "title": "Field photo tips",
+                "items": [
+                  "Start wide for context, then move closer to the problem.",
+                  "Include scale cues when size is unclear.",
+                  "Stay out of traffic, unstable ground, and unknown liquids."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/report-a-site",
+                "label": "Report a site"
+              }
+            ]
+          },
+          {
+            "id": "confirm-location-in-macedonia",
+            "title": "Confirm location in Macedonia",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "On the Location stage, drag the pin to the exact spot inside Macedonia. Tap Confirm location before Review."
               },
               {
                 "type": "bullets",
                 "title": "Pin quality",
                 "items": [
-                  "GPS helps, but confirm visually because multipath errors happen near cliffs and tall buildings.",
-                  "If the address field exists, keep it consistent with the pin so partners can route field teams.",
-                  "When reporting a whole area, zoom out only as far as needed to describe the extent truthfully."
+                  "GPS helps, but confirm visually on the map.",
+                  "Describe access limits in Details when paths are blocked.",
+                  "Submit only when Review shows all requirements met."
                 ]
+              },
+              {
+                "type": "callout",
+                "variant": "tip",
+                "text": "If GPS is outside Macedonia, drag the pin manually before you confirm."
               }
             ]
           },
           {
-            "id": "after-you-submit",
-            "title": "After you submit",
+            "id": "safety-and-respect",
+            "title": "Safety and respect",
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Every report is reviewed before it is shown publicly. Track status in My reports while moderators work through the queue."
+                "text": "Do not enter unstable piles, fast water, or industrial yards without training. Treat residents courteously."
+              },
+              {
+                "type": "callout",
+                "variant": "note",
+                "text": "If you discover immediate danger to life, use official emergency channels first, then document when safe."
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/trust-safety-and-moderation",
+                "label": "Trust, safety, and moderation"
+              }
+            ]
+          }
+        ]
+      },
+      "report-a-site": {
+        "cardTitle": "Report a pollution site",
+        "cardSummary": "Use the Report FAB and complete Evidence, Details, Location, and Review to submit a report that moderators can verify.",
+        "title": "Report a pollution site",
+        "lastUpdated": "28 June 2026",
+        "lastReviewed": "28 June 2026",
+        "datePublished": "2024-01-01T00:00:00.000Z",
+        "dateModified": "2026-06-28T00:00:00.000Z",
+        "sections": [
+          {
+            "id": "start-from-report-fab",
+            "title": "Start from the Report FAB",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Tap the Report FAB from any main tab. If you have a saved draft, choose Continue draft or start fresh. Confirm you have report credits before you begin."
               },
               {
                 "type": "bullets",
-                "title": "What to expect",
+                "title": "Before you start",
                 "items": [
-                  "Public pins help neighbours and organisers coordinate, but they do not force a municipality to act on a fixed schedule.",
-                  "Edits may be possible while moderation is open; check the row for the report in the app.",
-                  "If something urgent threatens health or safety, also use official emergency channels where appropriate."
+                  "Stay safe around traffic, unstable ground, and unknown liquids.",
+                  "Check report credits on your profile if the FAB shows a cooldown.",
+                  "Allow camera and location permissions when prompted."
                 ]
+              },
+              {
+                "type": "callout",
+                "variant": "note",
+                "text": "Reporting requires your location to be in Macedonia."
+              }
+            ]
+          },
+          {
+            "id": "evidence-stage",
+            "title": "Evidence stage",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Add up to five photos that show the polluted area clearly. At least one photo is required to continue."
+              },
+              {
+                "type": "bullets",
+                "title": "What to capture",
+                "items": [
+                  "Wide shot for context, then closer frames of waste, stains, or debris.",
+                  "Daylight and a steady hand help moderators verify faster.",
+                  "Tap the stage help icon for examples any time."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "tip",
+                "text": "Never enter private property without permission. Capture from a public vantage when possible."
+              }
+            ]
+          },
+          {
+            "id": "details-stage",
+            "title": "Details stage",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Choose a category and write a short headline anyone could understand. Add optional severity, description, and cleanup effort notes."
+              },
+              {
+                "type": "bullets",
+                "title": "Required fields",
+                "items": [
+                  "Category that matches what you saw.",
+                  "Headline like a news title, not an essay.",
+                  "Optional description for access, smell, color of water, or landmarks."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "note",
+                "text": "Only category and title are required to reach the Location stage."
+              }
+            ]
+          },
+          {
+            "id": "location-stage",
+            "title": "Location stage",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Move the pin to the exact pollution site inside Macedonia. Zoom until buildings or shoreline match what you see on the ground, then tap Confirm location."
+              },
+              {
+                "type": "bullets",
+                "title": "Pin tips",
+                "items": [
+                  "Drag the pin if GPS is offset near tall buildings.",
+                  "The map cannot pan outside Macedonia.",
+                  "Return to this stage from Review if the pin needs a fix."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "tip",
+                "text": "Double-tap Recenter to jump to your GPS position when you are inside Macedonia."
+              }
+            ]
+          },
+          {
+            "id": "review-and-submit",
+            "title": "Review stage and submit",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Review summarizes photos, Details, and the pin. Submit sends the report for moderation. Status starts as Under review until moderators approve or decline it."
+              },
+              {
+                "type": "bullets",
+                "title": "After submit",
+                "items": [
+                  "Track status in the Reports tab.",
+                  "Approved reports link to a public pollution site.",
+                  "Declined reports include a reason when moderators provide one."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/report-statuses-and-drafts",
+                "label": "Report statuses and drafts"
+              }
+            ]
+          }
+        ]
+      },
+      "report-statuses-and-drafts": {
+        "cardTitle": "Report statuses and drafts",
+        "cardSummary": "Understand Under review, Approved, and Declined labels, and resume saved drafts from Reports or the Report FAB.",
+        "title": "Report statuses and drafts",
+        "lastUpdated": "28 June 2026",
+        "lastReviewed": "28 June 2026",
+        "datePublished": "2024-01-01T00:00:00.000Z",
+        "dateModified": "2026-06-28T00:00:00.000Z",
+        "sections": [
+          {
+            "id": "status-labels",
+            "title": "Status labels",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Each submission moves through moderation before it affects the public map. Status chips appear on the Reports tab and in notifications."
+              },
+              {
+                "type": "bullets",
+                "title": "Common statuses",
+                "items": [
+                  "Under review: moderators are checking evidence and location.",
+                  "Approved: the report linked to a public pollution site.",
+                  "Declined: the submission did not meet guidelines."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "note",
+                "text": "Already reported may appear when your submission duplicates an existing open site."
+              }
+            ]
+          },
+          {
+            "id": "track-in-reports-tab",
+            "title": "Track in the Reports tab",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Open the Reports tab to search and filter your submissions. Tap a row for the full timeline and linked site."
+              },
+              {
+                "type": "bullets",
+                "title": "Reports tab actions",
+                "items": [
+                  "Filter by status such as Under review or Approved.",
+                  "Open approved reports to see the public site page.",
+                  "Read moderator notes on declined items when available."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "tip",
+                "text": "Pull to refresh the Reports tab after you receive a Report status notification."
+              }
+            ]
+          },
+          {
+            "id": "saved-drafts",
+            "title": "Saved drafts",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Leaving the wizard saves a draft locally with your current stage. Draft chips show photo count on the Reports list."
+              },
+              {
+                "type": "bullets",
+                "title": "Resume a draft",
+                "items": [
+                  "Tap the draft row in Reports.",
+                  "Or tap Report FAB and choose Continue draft.",
+                  "Discard draft from the resume sheet if you want to start over."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "tip",
+                "text": "Drafts survive app restarts but may be lost if you reinstall or clear app data."
+              }
+            ]
+          },
+          {
+            "id": "offline-and-failed-uploads",
+            "title": "Offline and failed uploads",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Weak networks may leave a submit pending. Wait on Wi-Fi before you discard or duplicate the same report."
+              },
+              {
+                "type": "bullets",
+                "title": "If submit fails",
+                "items": [
+                  "Reopen the draft and tap Submit again on Review.",
+                  "Check troubleshooting for camera or upload errors.",
+                  "Contact support if the same error repeats after an update."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/offline-and-slow-networks",
+                "label": "Offline and slow networks"
+              }
+            ]
+          },
+          {
+            "id": "report-credits-reminder",
+            "title": "Report credits reminder",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Successful submits use report credits. Join eco-action or create an eco action to unlock more when you hit the limit."
+              },
+              {
+                "type": "bullets",
+                "title": "See your balance",
+                "items": [
+                  "Open profile and find the Report credits card.",
+                  "Read the cooldown message when all credits are spent.",
+                  "Verify event attendance to restore capacity faster."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/points-rankings-and-credits",
+                "label": "Points, rankings, and credits"
               }
             ]
           }
@@ -894,10 +2210,12 @@
       },
       "join-a-cleanup-event": {
         "cardTitle": "Join a cleanup event",
-        "cardSummary": "Browse cleanups near you, RSVP, and follow organiser guidance before, during, and after the shift.",
+        "cardSummary": "Browse eco actions on the Events tab, RSVP with Join eco-action, and prepare for QR check-in on the day.",
         "title": "Join a cleanup event",
-        "lastUpdated": "22 June 2026",
-        "lastReviewed": "22 June 2026",
+        "lastUpdated": "28 June 2026",
+        "lastReviewed": "28 June 2026",
+        "datePublished": "2024-01-01T00:00:00.000Z",
+        "dateModified": "2026-06-28T00:00:00.000Z",
         "sections": [
           {
             "id": "find-an-event",
@@ -905,35 +2223,69 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Open the Events area in the app to browse cleanup events in Macedonia, read organiser notes, and join when registration is open."
+                "text": "Open the Events tab to browse cleanup and eco-action listings in Macedonia. Read organiser notes, difficulty, and the meeting pin before you travel."
               },
               {
                 "type": "bullets",
                 "title": "Before you travel",
                 "items": [
-                  "Confirm the meeting pin, start time in local time, and how long the shift runs.",
-                  "Check difficulty and terrain so clothing and footwear match the day.",
-                  "See whether registration closes early or needs extra details from you."
+                  "Confirm start time in local time and expected duration.",
+                  "Check terrain and kit requirements in the listing.",
+                  "See whether registration closes early."
                 ]
+              },
+              {
+                "type": "callout",
+                "variant": "note",
+                "text": "Events tab filters help you narrow by date and status when the list is long."
               }
             ]
           },
           {
-            "id": "join-and-reminders",
-            "title": "Join and reminders",
+            "id": "join-eco-action",
+            "title": "Join eco-action",
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Tap Join on an open event to reserve a spot. Organisers may post updates or reminders through notifications."
+                "text": "Tap Join eco-action on an open listing to RSVP. You must be in Macedonia for join flows that create commitments on the map."
               },
               {
                 "type": "bullets",
-                "title": "Stay on top of plans",
+                "title": "After you join",
                 "items": [
                   "Add the event to your calendar once you commit.",
-                  "Turn on notifications if the organiser posts last minute changes.",
-                  "Cancel your RSVP promptly if you cannot attend so headcounts stay accurate."
+                  "Enable Cleanup events notifications for last minute changes.",
+                  "Cancel promptly if you cannot attend so headcounts stay accurate."
                 ]
+              },
+              {
+                "type": "callout",
+                "variant": "tip",
+                "text": "Joining and verifying attendance can unlock additional report credits."
+              }
+            ]
+          },
+          {
+            "id": "from-a-site-take-action",
+            "title": "From a site Take action sheet",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "On a pollution site, Take action may list linked eco actions near that pin. This helps you join cleanups where community reports already exist."
+              },
+              {
+                "type": "bullets",
+                "title": "Site linked events",
+                "items": [
+                  "Open the site from Home feed or Map tab.",
+                  "Tap Take action and pick Join eco-action when listed.",
+                  "Review the pin matches the site you care about."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/home-feed-and-sites",
+                "label": "Home feed and sites"
               }
             ]
           },
@@ -949,29 +2301,564 @@
                 "type": "bullets",
                 "title": "On site",
                 "items": [
-                  "Wear gloves or high vis gear only when the listing asks for them.",
-                  "Supervise children closely and keep phones away from heavy lifting unless photos are welcome.",
+                  "Wear gloves or high vis gear when the listing asks for them.",
+                  "Supervise children closely around roads and water.",
                   "Ask before photographing people, vehicles, or homes."
                 ]
+              },
+              {
+                "type": "callout",
+                "variant": "note",
+                "text": "For emergencies, use official emergency channels alongside any in-app notes."
               }
             ]
           },
           {
-            "id": "after-photos-and-feedback",
-            "title": "After photos and feedback",
+            "id": "check-in-preview",
+            "title": "Check-in preview",
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "After the event, add after photos if the flow invites them and leave short feedback so future volunteers know what to expect."
+                "text": "Most events use QR check-in at arrival. Open the event detail on the day and follow Event check-in and chat for scan steps and chat rules."
               },
               {
                 "type": "bullets",
-                "title": "Wrap up well",
+                "title": "Day of reminders",
                 "items": [
-                  "Upload through the event flow when it is exposed in the app.",
-                  "Avoid faces or licence plates unless organisers explicitly allow them.",
-                  "Thank hosts through the in-app channel when one is available."
+                  "Arrive with battery and mobile data or venue Wi-Fi.",
+                  "Open the event screen before you queue at the organiser desk.",
+                  "Keep Event chat notifications on for venue updates."
                 ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/event-check-in-and-chat",
+                "label": "Event check-in and chat"
+              }
+            ]
+          }
+        ]
+      },
+      "event-check-in-and-chat": {
+        "cardTitle": "Event check-in and chat",
+        "cardSummary": "Scan the organiser QR at arrival, confirm attendance, and use event chat for venue updates.",
+        "title": "Event check-in and chat",
+        "lastUpdated": "28 June 2026",
+        "lastReviewed": "28 June 2026",
+        "datePublished": "2024-01-01T00:00:00.000Z",
+        "dateModified": "2026-06-28T00:00:00.000Z",
+        "sections": [
+          {
+            "id": "before-arrival",
+            "title": "Before arrival",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Open the event you joined from the Events tab. Confirm the meeting pin, start time, and any organiser messages in event chat."
+              },
+              {
+                "type": "bullets",
+                "title": "Prepare your phone",
+                "items": [
+                  "Charge above 30 percent before you travel.",
+                  "Allow camera access for QR scanning.",
+                  "Enable Event chat notifications for route changes."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/app-permissions",
+                "label": "App permissions"
+              }
+            ]
+          },
+          {
+            "id": "qr-check-in",
+            "title": "QR check-in",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "At the venue the organiser displays a QR code. Tap Check in on the event screen and scan the newest code shown."
+              },
+              {
+                "type": "bullets",
+                "title": "Scan steps",
+                "items": [
+                  "Open the joined event detail.",
+                  "Tap Check in or Scan QR.",
+                  "Point the camera at the organiser screen, not a photo shared earlier.",
+                  "Wait for the success confirmation before you walk away."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "note",
+                "text": "QR codes refresh automatically. Scan the live code on the organiser device."
+              }
+            ]
+          },
+          {
+            "id": "attendance-verification",
+            "title": "Attendance verification",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Verified attendance can unlock report credits and points. If scan fails, ask the organiser to refresh the QR session."
+              },
+              {
+                "type": "bullets",
+                "title": "Common scan errors",
+                "items": [
+                  "Wrong event QR: confirm you opened the correct listing.",
+                  "QR expired: ask the organiser to show a fresh code.",
+                  "Already used: wait while the organiser regenerates the session."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "tip",
+                "text": "Stand in good light and hold the phone steady a forearm length from the screen."
+              }
+            ]
+          },
+          {
+            "id": "event-chat",
+            "title": "Event chat",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Event chat lets organisers and volunteers coordinate before, during, and after the shift. Messages notify through the Event chat preference group."
+              },
+              {
+                "type": "bullets",
+                "title": "Chat etiquette",
+                "items": [
+                  "Keep messages short and on topic for the venue.",
+                  "Do not share personal phone numbers publicly in chat.",
+                  "Report abusive messages through trust and safety tools."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/notifications-in-the-app",
+                "label": "Notifications in the app"
+              }
+            ]
+          },
+          {
+            "id": "after-check-in",
+            "title": "After check-in",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Follow organiser instructions for zones, waste bags, and photo rules. After the event, upload after photos when the flow invites them."
+              },
+              {
+                "type": "bullets",
+                "title": "Wrap up",
+                "items": [
+                  "Thank hosts through event chat when appropriate.",
+                  "Avoid faces or licence plates unless organisers allow them.",
+                  "Leave the listing a fair rating if the app prompts you."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/join-a-cleanup-event",
+                "label": "Join a cleanup event"
+              }
+            ]
+          }
+        ]
+      },
+      "hosting-a-cleanup-event": {
+        "cardTitle": "Host a cleanup event",
+        "cardSummary": "Pass the organizer quiz, publish an eco action, run QR check-in, and moderate event chat on the day.",
+        "title": "Host a cleanup event",
+        "lastUpdated": "28 June 2026",
+        "lastReviewed": "28 June 2026",
+        "datePublished": "2024-01-01T00:00:00.000Z",
+        "dateModified": "2026-06-28T00:00:00.000Z",
+        "sections": [
+          {
+            "id": "organizer-quiz",
+            "title": "Organizer quiz",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "First time hosts complete the organizer quiz before Create eco action unlocks. Questions cover safety, moderation, and responsible use of the platform."
+              },
+              {
+                "type": "bullets",
+                "title": "Quiz tips",
+                "items": [
+                  "Read each question carefully. Sessions expire if you pause too long.",
+                  "Reload the quiz if you see a session error message.",
+                  "Certification stays on your profile after you pass."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "note",
+                "text": "You must be in Macedonia to create an eco action."
+              }
+            ]
+          },
+          {
+            "id": "create-eco-action",
+            "title": "Create eco action",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "From Events or Take action on a site, tap Create eco action. Fill required fields such as title, meeting pin, schedule, and capacity."
+              },
+              {
+                "type": "bullets",
+                "title": "Before you publish",
+                "items": [
+                  "Confirm land access with owners or municipalities when required.",
+                  "Set realistic difficulty and kit expectations.",
+                  "Link the event to a pollution site when the cleanup targets a report."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "tip",
+                "text": "New listings may show Under review until moderators approve them."
+              }
+            ]
+          },
+          {
+            "id": "moderation-status",
+            "title": "Moderation status",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Events can be Under review, Approved, or Declined. Edit and resubmit when moderators ask for changes."
+              },
+              {
+                "type": "bullets",
+                "title": "Dashboard labels",
+                "items": [
+                  "Under review: volunteers cannot join yet.",
+                  "Approved: Join eco-action opens for everyone.",
+                  "Declined: read the banner and tap Edit and resubmit."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/trust-safety-and-moderation",
+                "label": "Trust, safety, and moderation"
+              }
+            ]
+          },
+          {
+            "id": "day-of-check-in",
+            "title": "Day of check-in",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Open the organiser dashboard and display the live QR for volunteers. Invalidate previous QR codes if a screenshot leaked."
+              },
+              {
+                "type": "bullets",
+                "title": "On site leadership",
+                "items": [
+                  "Brief everyone on hazards, buddy pairs, and first aid.",
+                  "Refresh QR before each wave if codes expire.",
+                  "Use event chat for short updates instead of long threads."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/event-check-in-and-chat",
+                "label": "Event check-in and chat"
+              }
+            ]
+          },
+          {
+            "id": "after-the-event",
+            "title": "After the event",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Close the loop with thank you notes, after photos, and honest feedback. Organizer approved events can earn profile points."
+              },
+              {
+                "type": "bullets",
+                "title": "Wrap up",
+                "items": [
+                  "Mark the event complete when the shift ends.",
+                  "Log municipal follow ups separately from volunteer chat.",
+                  "Archive chat decisions so future hosts learn from your runbook."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/points-rankings-and-credits",
+                "label": "Points, rankings, and credits"
+              }
+            ]
+          }
+        ]
+      },
+      "your-profile-and-settings": {
+        "cardTitle": "Your profile and settings",
+        "cardSummary": "Edit your avatar, language, home location, notification prefs, and account controls from your profile.",
+        "title": "Your profile and settings",
+        "lastUpdated": "28 June 2026",
+        "lastReviewed": "28 June 2026",
+        "datePublished": "2024-01-01T00:00:00.000Z",
+        "dateModified": "2026-06-28T00:00:00.000Z",
+        "sections": [
+          {
+            "id": "open-your-profile",
+            "title": "Open your profile",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Tap your avatar from Home feed or any main tab. Profile shows points, weekly rankings, report credits, and activity summaries."
+              },
+              {
+                "type": "bullets",
+                "title": "Profile sections",
+                "items": [
+                  "Points and level card with recent reasons.",
+                  "Report credits balance and cooldown hints.",
+                  "Links to settings, notifications, and help."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/points-rankings-and-credits",
+                "label": "Points, rankings, and credits"
+              }
+            ]
+          },
+          {
+            "id": "edit-profile-details",
+            "title": "Edit profile details",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Update display name, avatar photo, and bio from profile edit. Keep information respectful and avoid sharing private contact details publicly."
+              },
+              {
+                "type": "bullets",
+                "title": "Edit steps",
+                "items": [
+                  "Tap Edit profile on your profile screen.",
+                  "Choose a square photo that reads well at small size.",
+                  "Save and confirm the preview looks correct."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "tip",
+                "text": "Use a neutral photo if you represent an organisation publicly."
+              }
+            ]
+          },
+          {
+            "id": "language-and-home-location",
+            "title": "Language and home location",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Switch interface language among system default, English, Macedonian, and Albanian. Set home location to tune feed ranking when you are away from GPS."
+              },
+              {
+                "type": "bullets",
+                "title": "Location settings",
+                "items": [
+                  "Home location must be inside Macedonia.",
+                  "Update it when you move to a new city for daily browsing.",
+                  "Map pins for reports still use the Location stage GPS pin."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/getting-started",
+                "label": "Getting started"
+              }
+            ]
+          },
+          {
+            "id": "settings-and-sign-out",
+            "title": "Settings and sign out",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Settings holds password change, notification shortcuts, legal links, and sign out. Sign out before sharing your device."
+              },
+              {
+                "type": "bullets",
+                "title": "Common tasks",
+                "items": [
+                  "Open notification preferences from settings or the inbox.",
+                  "Replay the coach tour if you skipped onboarding.",
+                  "Review Terms and Privacy links before you invite minors."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/account-and-data",
+                "label": "Account and data"
+              }
+            ]
+          },
+          {
+            "id": "block-user",
+            "title": "Block user",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Block user from another profile or from an abusive comment thread. Blocked people cannot interact with you in app social features."
+              },
+              {
+                "type": "bullets",
+                "title": "When to block",
+                "items": [
+                  "Use block for harassment or spam directed at you.",
+                  "Blocking is reversible from settings when you choose.",
+                  "Report serious threats through Contact as well."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/trust-safety-and-moderation",
+                "label": "Trust, safety, and moderation"
+              }
+            ]
+          }
+        ]
+      },
+      "points-rankings-and-credits": {
+        "cardTitle": "Points, rankings, and credits",
+        "cardSummary": "Earn points for approved reports and events, climb weekly rankings, and manage report credits.",
+        "title": "Points, rankings, and report credits",
+        "lastUpdated": "28 June 2026",
+        "lastReviewed": "28 June 2026",
+        "datePublished": "2024-01-01T00:00:00.000Z",
+        "dateModified": "2026-06-28T00:00:00.000Z",
+        "sections": [
+          {
+            "id": "how-points-work",
+            "title": "How points work",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Points reward constructive participation. Common reasons include report approved, eco action approved, and verified event attendance."
+              },
+              {
+                "type": "bullets",
+                "title": "Typical point events",
+                "items": [
+                  "Report approved after moderation.",
+                  "Eco action approved for organizers.",
+                  "Verified check-in at a cleanup you joined."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "note",
+                "text": "Points are gamification only. They do not replace official environmental enforcement."
+              }
+            ]
+          },
+          {
+            "id": "weekly-rankings",
+            "title": "Weekly rankings",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Profile shows weekly rankings for reports, eco actions, and related activity. Rankings reset on a schedule shown in the app."
+              },
+              {
+                "type": "bullets",
+                "title": "Ranking tips",
+                "items": [
+                  "Quality reports beat rushed duplicates.",
+                  "Join eco-action and check in to boost event participation.",
+                  "Compare your rank with friends to stay motivated."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "note",
+                "text": "Weekly rankings subtitle in profile mentions reports, eco actions, and more."
+              }
+            ]
+          },
+          {
+            "id": "report-credits",
+            "title": "Report credits",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Report credits limit how many standard reports you can submit in a period. The profile card shows remaining credits and retry timers."
+              },
+              {
+                "type": "bullets",
+                "title": "When credits run out",
+                "items": [
+                  "Read the cooldown modal on the Report FAB.",
+                  "Join eco-action and verify QR attendance to unlock more.",
+                  "Create an eco action after organizer quiz certification."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "tip",
+                "text": "Emergency allowance may appear once per cycle. Watch the retry timer in the modal."
+              }
+            ]
+          },
+          {
+            "id": "levels-and-achievements",
+            "title": "Levels and achievements",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Levels group your lifetime points. System notifications may announce achievements or milestones."
+              },
+              {
+                "type": "bullets",
+                "title": "Stay informed",
+                "items": [
+                  "Leave the System notification group enabled for achievements.",
+                  "Open the points card to read recent reasons.",
+                  "Share wins in event chat, not public phone numbers."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/notifications-in-the-app",
+                "label": "Notifications in the app"
+              }
+            ]
+          },
+          {
+            "id": "fair-play",
+            "title": "Fair play",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Moderators decline gaming behavior such as duplicate spam or fake check-ins. Play fair so rankings stay meaningful for everyone."
+              },
+              {
+                "type": "bullets",
+                "title": "Avoid",
+                "items": [
+                  "Mass low quality reports to farm points.",
+                  "Sharing QR screenshots to fake attendance.",
+                  "Harassing users who rank above you."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/trust-safety-and-moderation",
+                "label": "Trust, safety, and moderation"
               }
             ]
           }
@@ -981,8 +2868,10 @@
         "cardTitle": "Your account and data",
         "cardSummary": "Protect your login, understand what we store, and use the right pages for privacy and data requests.",
         "title": "Your account, privacy, and data requests",
-        "lastUpdated": "22 June 2026",
-        "lastReviewed": "22 June 2026",
+        "lastUpdated": "28 June 2026",
+        "lastReviewed": "28 June 2026",
+        "datePublished": "2024-01-01T00:00:00.000Z",
+        "dateModified": "2026-06-28T00:00:00.000Z",
         "sections": [
           {
             "id": "what-the-app-stores",
@@ -990,16 +2879,21 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Your Chisto.mk account connects the reports you file, cleanup events you join, and notification preferences across Macedonia."
+                "text": "Your Chisto.mk account connects reports, eco actions, notification preferences, and profile activity across Macedonia."
               },
               {
                 "type": "bullets",
                 "title": "What may be linked to you",
                 "items": [
-                  "Sign-in identifiers such as your phone number and email.",
-                  "Approximate map pins and descriptions from reports you submit.",
-                  "RSVP status, attendance notes, and organiser messages for events you join."
+                  "Phone number, email, and password hash for sign in.",
+                  "Map pins and descriptions from reports you submit.",
+                  "RSVP status, check-in records, and event chat for events you join."
                 ]
+              },
+              {
+                "type": "callout",
+                "variant": "note",
+                "text": "Public site pages show community content, not your private contact details."
               }
             ]
           },
@@ -1016,9 +2910,14 @@
                 "title": "Everyday hygiene",
                 "items": [
                   "Use a unique password or your OS password manager.",
-                  "Keep screen lock enabled on phones that leave the house with you.",
+                  "Keep screen lock enabled on phones you carry daily.",
                   "Sign out before handing a device to someone else."
                 ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/sign-in-and-verification",
+                "label": "Sign in and verification"
               }
             ]
           },
@@ -1034,9 +2933,9 @@
                 "type": "bullets",
                 "title": "How to start a request",
                 "items": [
-                  "Use in-app account settings wherever they are available.",
+                  "Use in app account settings wherever available.",
                   "Email support if a control is missing or the flow errors.",
-                  "Expect identity checks when requests are sensitive or high risk."
+                  "Expect identity checks when requests are sensitive."
                 ]
               },
               {
@@ -1060,13 +2959,8 @@
                 "items": [
                   "Privacy explains what we collect and why.",
                   "Terms explain acceptable use of the platform.",
-                  "The data page summarises retention and rights paths in one place."
+                  "Cookies explains optional website analytics."
                 ]
-              },
-              {
-                "type": "internalLink",
-                "href": "/data",
-                "label": "Your data and account"
               },
               {
                 "type": "internalLink",
@@ -1077,6 +2971,11 @@
                 "type": "internalLink",
                 "href": "/terms",
                 "label": "Terms of use"
+              },
+              {
+                "type": "internalLink",
+                "href": "/cookies",
+                "label": "Cookie policy"
               }
             ]
           }
@@ -1084,27 +2983,63 @@
       },
       "notifications-in-the-app": {
         "cardTitle": "Notifications",
-        "cardSummary": "Choose which updates you get for reports, cleanup events, and account activity.",
+        "cardSummary": "Manage the inbox, eight notification groups, snooze controls, and OS push settings together.",
         "title": "Notifications in the app",
-        "lastUpdated": "22 June 2026",
-        "lastReviewed": "22 June 2026",
+        "lastUpdated": "28 June 2026",
+        "lastReviewed": "28 June 2026",
+        "datePublished": "2024-01-01T00:00:00.000Z",
+        "dateModified": "2026-06-28T00:00:00.000Z",
         "sections": [
           {
-            "id": "types-of-alerts",
-            "title": "What you might receive",
+            "id": "inbox-overview",
+            "title": "Inbox overview",
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Chisto.mk can notify you when something important happens: for example a report you follow changes status, an event you joined is updated, or your account needs attention."
+                "text": "Tap the bell icon to open the notifications inbox. Similar alerts collapse into expandable notification groups by day."
               },
               {
                 "type": "bullets",
-                "title": "Typical channels",
+                "title": "Inbox actions",
                 "items": [
-                  "Push notifications on your phone when you allow them.",
-                  "In-app banners or badges where the product surfaces them.",
-                  "Email or SMS for account security or things you explicitly opt into."
+                  "Tap a row to open the related site or event.",
+                  "Expand a group to read every message in the stack.",
+                  "Mark a group as read or archive it when done."
                 ]
+              },
+              {
+                "type": "callout",
+                "variant": "tip",
+                "text": "Event chat stacks by conversation so one tap opens the full thread."
+              }
+            ]
+          },
+          {
+            "id": "eight-notification-groups",
+            "title": "Eight notification groups",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Preferences organize alerts into eight groups you can mute or snooze independently."
+              },
+              {
+                "type": "bullets",
+                "title": "The eight groups",
+                "items": [
+                  "Site updates",
+                  "Report status",
+                  "Upvotes",
+                  "Comments",
+                  "Nearby reports",
+                  "Cleanup events",
+                  "Event chat",
+                  "System, including achievements and welcome messages"
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "tip",
+                "text": "Snooze Event chat the night before a cleanup if you need sleep, then re-enable it on event morning."
               }
             ]
           },
@@ -1114,35 +3049,45 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Your phone always wins. If push is off at the OS level, Chisto.mk cannot override that. Use both OS settings and in-app toggles so alerts match how you work."
+                "text": "Your phone always wins. If push is off at the iOS level, Chisto.mk cannot override that. Use both OS settings and in-app toggles."
               },
               {
                 "type": "bullets",
                 "title": "Where to look",
                 "items": [
-                  "iOS: Settings → Notifications → Chisto.mk.",
-                  "Android: Settings → Apps → Chisto.mk → Notifications.",
-                  "Inside Chisto.mk, open settings and review each category you still want, such as events or report updates."
+                  "iOS: Settings, Notifications, Chisto.mk.",
+                  "In app: inbox preferences icon for group switches.",
+                  "Profile settings for quick links to the same sheet."
                 ]
+              },
+              {
+                "type": "callout",
+                "variant": "note",
+                "text": "Snooze a group temporarily from the preferences sheet when you need quiet hours."
               }
             ]
           },
           {
-            "id": "respect-quiet-hours",
-            "title": "Quiet hours and courtesy",
+            "id": "report-and-event-alerts",
+            "title": "Report and event alerts",
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Batching alerts limits noise for volunteers and neighbours. Turn off categories you do not need, especially overnight."
+                "text": "Report status notifications fire when moderators move a submission to Approved or Declined. Cleanup events notify RSVP changes and reminders."
               },
               {
                 "type": "bullets",
-                "title": "Practical habits",
+                "title": "Recommended defaults",
                 "items": [
-                  "Use Focus modes or Do not disturb on iOS, and similar modes on Android, before sleep.",
-                  "Mute long threads inside events if the organiser enables quieter updates.",
-                  "Re-enable notifications before big cleanup days so last minute changes reach you."
+                  "Keep Report status on for your own submissions.",
+                  "Enable Nearby reports when you volunteer locally.",
+                  "Enable Cleanup events and Event chat on days you join eco-action."
                 ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/report-statuses-and-drafts",
+                "label": "Report statuses and drafts"
               }
             ]
           },
@@ -1152,15 +3097,15 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Some messages are required for security, such as password resets or login codes. Marketing style messages only arrive when you clearly opt in."
+                "text": "SMS one-time codes and some security messages are required for sign in. Marketing style messages only arrive when you clearly opt in."
               },
               {
                 "type": "bullets",
                 "title": "Stay in control",
                 "items": [
-                  "Keep your email inbox reachable so you can recover access if you lose your phone.",
-                  "If SMS codes stop arriving, check spam filters, carrier blocks, and whether roaming is on.",
-                  "For how data is processed, read the Privacy policy linked below."
+                  "Keep email reachable to recover access if you lose your phone.",
+                  "If SMS codes stop, see sign in troubleshooting.",
+                  "Read the Privacy policy for processing details."
                 ]
               },
               {
@@ -1172,215 +3117,14 @@
           }
         ]
       },
-      "troubleshooting": {
-        "cardTitle": "Troubleshooting",
-        "cardSummary": "Fix sign-in, map location, camera uploads, and know when to update or contact support.",
-        "title": "Troubleshooting common issues",
-        "lastUpdated": "22 June 2026",
-        "lastReviewed": "22 June 2026",
-        "sections": [
-          {
-            "id": "cannot-sign-in",
-            "title": "Cannot sign in",
-            "blocks": [
-              {
-                "type": "paragraph",
-                "text": "Most login issues come down to connectivity, clock skew, or an outdated build. Work through the list below before you assume the password is wrong."
-              },
-              {
-                "type": "bullets",
-                "title": "Try this first",
-                "items": [
-                  "Turn airplane mode off, wait a few seconds, then reconnect to Wi-Fi or mobile data.",
-                  "Set date and time to automatic. Large drift can break SMS or email codes.",
-                  "Request a fresh code, wait for it, and paste carefully. Codes expire quickly.",
-                  "Update Chisto.mk from the store, then restart the app."
-                ]
-              },
-              {
-                "type": "callout",
-                "variant": "tip",
-                "text": "If the app crashes on launch, note your OS version and app version before you contact us. That detail speeds up support."
-              }
-            ]
-          },
-          {
-            "id": "location-permission",
-            "title": "Map or GPS issues",
-            "blocks": [
-              {
-                "type": "paragraph",
-                "text": "The map needs location access when you place or verify pins. If the blue dot drifts or disappears, fix permissions before you file a report."
-              },
-              {
-                "type": "bullets",
-                "title": "Checklist",
-                "items": [
-                  "iOS: Settings → Privacy & Security → Location Services → Chisto.mk → While using the app.",
-                  "Android: Settings → Location → App permissions → Chisto.mk → Allow only while in use when possible.",
-                  "Open sky for a few seconds so GPS can settle, especially between tall buildings.",
-                  "Disable mock location or developer GPS spoofing tools while using Chisto.mk."
-                ]
-              },
-              {
-                "type": "callout",
-                "variant": "note",
-                "text": "If the pin still lands wrong after GPS settles, move it manually and describe why in the report text."
-              }
-            ]
-          },
-          {
-            "id": "photos-or-upload",
-            "title": "Camera or upload failures",
-            "blocks": [
-              {
-                "type": "paragraph",
-                "text": "Large photos and weak networks do not mix. Give uploads time, or capture a smaller photo when the queue keeps failing."
-              },
-              {
-                "type": "bullets",
-                "title": "Try this first",
-                "items": [
-                  "Check that Chisto.mk has camera and photo library permission.",
-                  "Free a little storage space on the device.",
-                  "Switch to Wi-Fi for multi photo uploads.",
-                  "Force close the app once, reopen, and retry the same report draft if it is still there."
-                ]
-              },
-              {
-                "type": "callout",
-                "variant": "tip",
-                "text": "Avoid starting a second report for the same issue while the first upload still shows pending."
-              }
-            ]
-          },
-          {
-            "id": "still-stuck",
-            "title": "Still stuck?",
-            "blocks": [
-              {
-                "type": "paragraph",
-                "text": "When nothing above works, collect a short description and reach out. Reinstalling is a last resort because it can clear local drafts."
-              },
-              {
-                "type": "bullets",
-                "title": "Before you write to us",
-                "items": [
-                  "Restart the phone once.",
-                  "Confirm you are on the latest Chisto.mk build from the official store.",
-                  "Capture screenshots of any error text (blur personal details first)."
-                ]
-              },
-              {
-                "type": "internalLink",
-                "href": "/contact",
-                "label": "Contact"
-              }
-            ]
-          }
-        ]
-      },
-      "exploring-the-map": {
-        "cardTitle": "Use the map and site pages",
-        "cardSummary": "Understand pins, open a site page, and read public information before you report or join a cleanup.",
-        "title": "Use the map and site pages",
-        "lastUpdated": "22 June 2026",
-        "lastReviewed": "22 June 2026",
-        "sections": [
-          {
-            "id": "what-the-map-shows",
-            "title": "What the map shows",
-            "blocks": [
-              {
-                "type": "paragraph",
-                "text": "The map is a shared civic view of pollution sites in Macedonia. Each pin is a place where someone documented an environmental concern."
-              },
-              {
-                "type": "bullets",
-                "title": "Quick orientation",
-                "items": [
-                  "Zoom until street names and landmarks match what you see outside.",
-                  "Tap a pin to open the site page with photos, descriptions, and history when available.",
-                  "Newer activity may appear after moderation, so counts can change over time."
-                ]
-              }
-            ]
-          },
-          {
-            "id": "site-detail-basics",
-            "title": "Site detail basics",
-            "blocks": [
-              {
-                "type": "paragraph",
-                "text": "A site page summarises what the community submitted. It is meant for transparency, not for assigning blame to individuals."
-              },
-              {
-                "type": "bullets",
-                "title": "What you can rely on",
-                "items": [
-                  "Photos and text come from contributors and moderators, not automated enforcement.",
-                  "Timestamps help you understand recency when they are shown.",
-                  "If something looks wrong, you can often add a new report rather than arguing in text."
-                ]
-              },
-              {
-                "type": "callout",
-                "variant": "note",
-                "text": "Do not treat map pins as legal proof on their own. Use official channels for regulated decisions."
-              }
-            ]
-          },
-          {
-            "id": "moving-around-safely",
-            "title": "Moving around safely",
-            "blocks": [
-              {
-                "type": "paragraph",
-                "text": "Use the map while stationary or as a passenger. Keep awareness of traffic and private property boundaries."
-              },
-              {
-                "type": "bullets",
-                "title": "Good habits",
-                "items": [
-                  "Prefer daylight for first visits to unfamiliar industrial edges.",
-                  "If a path feels unsafe, step back and capture from a distance.",
-                  "Respect no entry signs even when rubbish is visible beyond them."
-                ]
-              }
-            ]
-          },
-          {
-            "id": "when-to-file-a-report",
-            "title": "When to file a report",
-            "blocks": [
-              {
-                "type": "paragraph",
-                "text": "Open a report when you can add fresh evidence or correct a pin. Duplicates without new facts slow moderation for everyone."
-              },
-              {
-                "type": "bullets",
-                "title": "Before you start",
-                "items": [
-                  "Gather photos and a clear description of what changed since the last visit.",
-                  "Move the pin to the exact spot that needs attention.",
-                  "Mention safety limits you observed so organisers can plan."
-                ]
-              },
-              {
-                "type": "internalLink",
-                "href": "/help/report-a-site",
-                "label": "File a pollution report"
-              }
-            ]
-          }
-        ]
-      },
       "trust-safety-and-moderation": {
         "cardTitle": "Trust, safety, and moderation",
-        "cardSummary": "Why moderation exists, how to contribute respectfully, and where the binding legal text lives.",
+        "cardSummary": "Why moderation exists, how to contribute respectfully, block users, and where binding legal text lives.",
         "title": "Trust, safety, and moderation",
-        "lastUpdated": "22 June 2026",
-        "lastReviewed": "22 June 2026",
+        "lastUpdated": "28 June 2026",
+        "lastReviewed": "28 June 2026",
+        "datePublished": "2024-01-01T00:00:00.000Z",
+        "dateModified": "2026-06-28T00:00:00.000Z",
         "sections": [
           {
             "id": "why-moderation-exists",
@@ -1388,16 +3132,45 @@
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Chisto.mk publishes civic environmental signals. Moderation reduces spam, protects people from harassment, and keeps the map readable for partners and volunteers in Macedonia."
+                "text": "Chisto.mk publishes civic environmental signals. Moderation reduces spam, protects people from harassment, and keeps the map readable for partners in Macedonia."
               },
               {
                 "type": "bullets",
                 "title": "What reviewers look for",
                 "items": [
-                  "Evidence that matches the location and time window you describe.",
+                  "Evidence that matches the Location pin and time window.",
                   "Respectful language without personal attacks.",
                   "Duplicates folded into the same site when that keeps the story clearer."
                 ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/report-a-site",
+                "label": "Report a site"
+              }
+            ]
+          },
+          {
+            "id": "report-and-event-statuses",
+            "title": "Report and event statuses",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Reports and eco actions show Under review until moderators decide. Approved content appears publicly. Declined content includes guidance when moderators provide it."
+              },
+              {
+                "type": "bullets",
+                "title": "Status meanings",
+                "items": [
+                  "Under review: human review in progress.",
+                  "Approved: visible on Home feed, Map tab, or Events.",
+                  "Declined: does not meet guidelines. Edit and resubmit when allowed."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/report-statuses-and-drafts",
+                "label": "Report statuses and drafts"
               }
             ]
           },
@@ -1426,37 +3199,42 @@
             ]
           },
           {
-            "id": "duplicates-and-corrections",
-            "title": "Duplicates and corrections",
+            "id": "block-and-escalate",
+            "title": "Block and escalate",
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "Multiple reports about the same place can help show persistence, but identical copies add noise. Prefer updates with new angles or dates."
+                "text": "Block user on profiles or comment threads when someone targets you. For serious threats, contact us with screenshots and URLs."
               },
               {
                 "type": "bullets",
-                "title": "Practical guidance",
+                "title": "Escalation paths",
                 "items": [
-                  "If a pin is slightly wrong, file a correction through the reporting flow when the product allows it.",
-                  "If categories are wrong, choose the closest honest label and explain in text.",
-                  "Expect status labels to lag briefly while humans review."
+                  "Block first for persistent harassment in app.",
+                  "Use Contact for illegal content or imminent harm.",
+                  "Organisers can remove disruptive event chat participants per house rules."
                 ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/contact",
+                "label": "Contact"
               }
             ]
           },
           {
-            "id": "legal-detail-and-escalation",
-            "title": "Legal detail and escalation",
+            "id": "legal-detail",
+            "title": "Legal detail",
             "blocks": [
               {
                 "type": "paragraph",
-                "text": "This article summarises behaviour expectations. Binding rules sit in the legal pages linked below."
+                "text": "This article summarises behavior expectations. Binding rules sit in the legal pages linked below."
               },
               {
                 "type": "bullets",
                 "title": "Where to read more",
                 "items": [
-                  "Privacy explains data categories and retention at a high level.",
+                  "Privacy explains data categories and retention.",
                   "Terms explain acceptable use and enforcement levers.",
                   "The data page lists rights requests for account holders."
                 ]
@@ -1470,349 +3248,6 @@
                 "type": "internalLink",
                 "href": "/terms",
                 "label": "Terms of use"
-              }
-            ]
-          }
-        ]
-      },
-      "hosting-a-cleanup-event": {
-        "cardTitle": "Host a cleanup event",
-        "cardSummary": "Plan logistics, manage sign ups, keep people safe on the day, and close the loop afterwards.",
-        "title": "Host a cleanup event",
-        "lastUpdated": "22 June 2026",
-        "lastReviewed": "22 June 2026",
-        "sections": [
-          {
-            "id": "plan-before-you-publish",
-            "title": "Plan before you publish",
-            "blocks": [
-              {
-                "type": "paragraph",
-                "text": "Organisers set the tone. Clear logistics reduce no-shows and keep volunteers safer around roads, water edges, and weather shifts in Macedonia."
-              },
-              {
-                "type": "bullets",
-                "title": "Checklist",
-                "items": [
-                  "Pick a meeting pin, duration, difficulty, and any kit you will supply.",
-                  "Confirm land access with owners or municipalities when required.",
-                  "Publish contact expectations, for example whether phones stay on silent."
-                ]
-              }
-            ]
-          },
-          {
-            "id": "signups-and-messaging",
-            "title": "Sign ups and messaging",
-            "blocks": [
-              {
-                "type": "paragraph",
-                "text": "Use notifications thoughtfully. Short updates beat long threads when plans change."
-              },
-              {
-                "type": "bullets",
-                "title": "Operational tips",
-                "items": [
-                  "Close registration early if capacity is limited.",
-                  "Send a reminder the evening before with parking and toilet notes.",
-                  "After cancellations, refresh headcounts so materials match reality."
-                ]
-              },
-              {
-                "type": "internalLink",
-                "href": "/help/join-a-cleanup-event",
-                "label": "Join a cleanup event"
-              }
-            ]
-          },
-          {
-            "id": "day-of-safety",
-            "title": "Day of safety",
-            "blocks": [
-              {
-                "type": "paragraph",
-                "text": "Brief everyone on hazards, buddy pairs, and what to do if someone feels unwell."
-              },
-              {
-                "type": "bullets",
-                "title": "On site leadership",
-                "items": [
-                  "Keep first aid basics and water visible.",
-                  "Rotate heavy lifting roles and watch for heat stress.",
-                  "Photograph results only where volunteers consent."
-                ]
-              },
-              {
-                "type": "callout",
-                "variant": "note",
-                "text": "For emergencies, use official emergency channels alongside any in-app notes."
-              }
-            ]
-          },
-          {
-            "id": "after-the-event",
-            "title": "After the event",
-            "blocks": [
-              {
-                "type": "paragraph",
-                "text": "Close the loop with thank you notes, photo uploads if your flow supports them, and honest feedback for the next crew."
-              },
-              {
-                "type": "bullets",
-                "title": "Wrap up",
-                "items": [
-                  "Archive chat decisions so future hosts learn from your runbook.",
-                  "Log issues that need municipal follow up separately from volunteer chatter.",
-                  "Celebrate wins briefly so newcomers see momentum."
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      "offline-and-slow-networks": {
-        "cardTitle": "Offline and slow networks",
-        "cardSummary": "Understand pending uploads, retries, and when to wait instead of duplicating a report.",
-        "title": "Offline and slow networks",
-        "lastUpdated": "22 June 2026",
-        "lastReviewed": "22 June 2026",
-        "sections": [
-          {
-            "id": "how-the-app-uses-network",
-            "title": "How the app uses the network",
-            "blocks": [
-              {
-                "type": "paragraph",
-                "text": "Maps, photos, and submissions sync when connectivity returns. Some screens cache tiles so you can browse lightly offline."
-              },
-              {
-                "type": "bullets",
-                "title": "Expectations",
-                "items": [
-                  "Account actions usually need a live session.",
-                  "Draft fields may save locally until you submit.",
-                  "Large photos take longer on 3G; queue them instead of forcing retries in a tunnel."
-                ]
-              }
-            ]
-          },
-          {
-            "id": "uploads-and-pending-states",
-            "title": "Uploads and pending states",
-            "blocks": [
-              {
-                "type": "paragraph",
-                "text": "Pending means the device is still sending data or the server has not confirmed receipt. It is normal briefly after switching from Wi Fi to mobile data."
-              },
-              {
-                "type": "bullets",
-                "title": "If you are stuck",
-                "items": [
-                  "Open the report summary and look for retry or resume prompts.",
-                  "Avoid duplicating the same submission while pending is spinning.",
-                  "Capture smaller photos if uploads fail repeatedly."
-                ]
-              }
-            ]
-          },
-          {
-            "id": "airplane-mode-and-roaming",
-            "title": "Airplane mode and roaming",
-            "blocks": [
-              {
-                "type": "paragraph",
-                "text": "International roaming can block background uploads. Toggle data for the app explicitly if your OS allows per app cellular control."
-              },
-              {
-                "type": "bullets",
-                "title": "Travel tips",
-                "items": [
-                  "Finish uploads before flights when possible.",
-                  "Reconnect to Wi Fi before editing long descriptions.",
-                  "If time zones shift, double check scheduled event reminders."
-                ]
-              }
-            ]
-          },
-          {
-            "id": "when-to-stop-and-escalate",
-            "title": "When to stop and escalate",
-            "blocks": [
-              {
-                "type": "paragraph",
-                "text": "If the app crashes twice while uploading, pause and collect diagnostics such as OS version and app version before contacting support."
-              },
-              {
-                "type": "bullets",
-                "title": "Escalation",
-                "items": [
-                  "Try restarting the device once.",
-                  "Reinstall only after backing up credentials.",
-                  "Use the contact page on this site for persistent blockers."
-                ]
-              },
-              {
-                "type": "internalLink",
-                "href": "/contact",
-                "label": "Contact"
-              }
-            ]
-          }
-        ]
-      },
-      "partnerships-for-organisations": {
-        "cardTitle": "Partnerships for organisations",
-        "cardSummary": "How municipalities, NGOs, and journalists can collaborate with Chisto.mk without surprises.",
-        "title": "Partnerships for municipalities, NGOs, and media",
-        "lastUpdated": "22 June 2026",
-        "lastReviewed": "22 June 2026",
-        "sections": [
-          {
-            "id": "who-this-guide-is-for",
-            "title": "Who this guide is for",
-            "blocks": [
-              {
-                "type": "paragraph",
-                "text": "This article is for organisations that want to use public map data, coordinate cleanups, or explore collaboration. It is not legal advice and does not replace your own counsel or procurement rules."
-              },
-              {
-                "type": "bullets",
-                "title": "Typical readers",
-                "items": [
-                  "Municipal environment desks planning field follow up.",
-                  "NGOs mapping volunteer capacity next to reported sites.",
-                  "Journalists verifying locations before publishing."
-                ]
-              }
-            ]
-          },
-          {
-            "id": "before-you-contact-us",
-            "title": "Before you contact us",
-            "blocks": [
-              {
-                "type": "paragraph",
-                "text": "Gather a short summary of your goal, the geography you care about, and any timeline. If you need bulk data or recurring exports, say how the public benefits and how you will protect personal data you might receive."
-              },
-              {
-                "type": "bullets",
-                "title": "Helpful attachments",
-                "items": [
-                  "Official letterhead or email from an organisational domain when possible.",
-                  "One paragraph on intended use of map or event information.",
-                  "Preferred language for replies: Macedonian, Albanian, or English."
-                ]
-              },
-              {
-                "type": "internalLink",
-                "href": "/contact",
-                "label": "Open the contact form"
-              }
-            ]
-          },
-          {
-            "id": "policies-and-public-data",
-            "title": "Policies and public data",
-            "blocks": [
-              {
-                "type": "paragraph",
-                "text": "Binding rules live in our Terms, Privacy policy, and data pages. The help centre explains how the product behaves for residents; legal language stays on those policy pages."
-              },
-              {
-                "type": "bullets",
-                "title": "Where to read more",
-                "items": [
-                  "Use the data page for high level descriptions of what the platform publishes.",
-                  "Use the privacy page before you process any information that might identify individuals.",
-                  "Link staff to the help hub so field teams share the same vocabulary as app users."
-                ]
-              },
-              {
-                "type": "internalLink",
-                "href": "/data",
-                "label": "Data overview"
-              },
-              {
-                "type": "internalLink",
-                "href": "/terms",
-                "label": "Terms of use"
-              }
-            ]
-          }
-        ]
-      },
-      "verifying-sites-in-the-field": {
-        "cardTitle": "Verify sites in the field",
-        "cardSummary": "Plan a safe visit, compare the pin to what you see, and file a new report when the evidence clearly changed.",
-        "title": "Verifying pollution sites on the ground",
-        "lastUpdated": "22 June 2026",
-        "lastReviewed": "22 June 2026",
-        "sections": [
-          {
-            "id": "plan-the-visit",
-            "title": "Plan the visit",
-            "blocks": [
-              {
-                "type": "paragraph",
-                "text": "Open the site page in the app or website, note the pin, photos, and timestamps, then plan daylight access from a public vantage. Tell a colleague where you are going if you work alone."
-              },
-              {
-                "type": "bullets",
-                "title": "Checklist",
-                "items": [
-                  "Charge your phone and download offline tiles if connectivity is weak.",
-                  "Bring a notebook for observations you cannot photograph safely.",
-                  "Avoid private land unless you already have permission."
-                ]
-              },
-              {
-                "type": "internalLink",
-                "href": "/help/exploring-the-map",
-                "label": "Use the map and site pages"
-              }
-            ]
-          },
-          {
-            "id": "compare-pin-to-reality",
-            "title": "Compare the pin to reality",
-            "blocks": [
-              {
-                "type": "paragraph",
-                "text": "Stand where the map suggests and scan for the same cues shown in photos: kerb lines, trees, buildings, or shoreline bends. Small offsets happen; large mismatches deserve a careful new report rather than a comment alone."
-              },
-              {
-                "type": "bullets",
-                "title": "When to file again",
-                "items": [
-                  "The hazard moved materially since the last photos.",
-                  "The original pin sits on the wrong block or riverbank.",
-                  "You can document a regulated risk that was not visible earlier."
-                ]
-              },
-              {
-                "type": "internalLink",
-                "href": "/help/report-a-site",
-                "label": "File a pollution report"
-              }
-            ]
-          },
-          {
-            "id": "safety-and-respect",
-            "title": "Safety and respect",
-            "blocks": [
-              {
-                "type": "paragraph",
-                "text": "Do not enter unstable piles, fast water, or industrial yards without training. Treat residents and workers courteously; the map is a civic space, not a place for confrontation."
-              },
-              {
-                "type": "callout",
-                "variant": "tip",
-                "text": "If you discover an immediate danger to life, use official emergency channels first, then document for the map when it is safe."
-              },
-              {
-                "type": "internalLink",
-                "href": "/help/trust-safety-and-moderation",
-                "label": "Trust, safety, and moderation"
               }
             ]
           }

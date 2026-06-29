@@ -379,6 +379,9 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     url?: string,
   ): { maxBytes: number; maxFiles: number } {
     const path = (url ?? '').split('?')[0].toLowerCase();
+    if (path.includes('/admin/news/')) {
+      return { maxBytes: 25 * 1024 * 1024, maxFiles: 1 };
+    }
     if (path.includes('/event-chat/')) {
       return { maxBytes: 25 * 1024 * 1024, maxFiles: 5 };
     }

@@ -65,7 +65,7 @@ export function CTASection() {
                 className="mt-10 flex flex-wrap items-center gap-3 sm:gap-4"
                 variants={fadeInUp}
               >
-                <StoreDownloadButtons />
+                <StoreDownloadButtons analyticsSource="cta_section" />
               </motion.div>
             ) : null}
           </motion.div>
@@ -73,7 +73,7 @@ export function CTASection() {
           <div className="relative flex min-h-[14rem] items-end justify-center overflow-visible md:hidden">
             <FloatingPhone className="w-[11rem]" delay={0}>
               <PhoneMockup className="shadow-[var(--shadow-phone-lg)]">
-                <PhoneScreen variant="feed" priority />
+                <PhoneScreen variant="feed" />
               </PhoneMockup>
             </FloatingPhone>
           </div>
@@ -88,10 +88,7 @@ export function CTASection() {
                 <PhoneMockup
                   {...(index === 1 ? { className: "shadow-[var(--shadow-phone-lg)]" } : {})}
                 >
-                  <PhoneScreen
-                    variant={screenshotId}
-                    {...(index === 1 ? { priority: true } : {})}
-                  />
+                  <PhoneScreen variant={screenshotId} />
                 </PhoneMockup>
               </FloatingPhone>
             ))}

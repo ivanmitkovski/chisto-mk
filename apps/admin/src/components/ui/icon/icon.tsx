@@ -44,6 +44,12 @@ import {
   UserCog,
   Download,
   Newspaper,
+  Heading2,
+  List,
+  Image,
+  Images,
+  Video,
+  Code2,
 } from 'lucide-react';
 
 export type IconName =
@@ -90,7 +96,13 @@ export type IconName =
   | 'webhook'
   | 'user-cog'
   | 'download'
-  | 'newspaper';
+  | 'newspaper'
+  | 'heading'
+  | 'list'
+  | 'image'
+  | 'gallery'
+  | 'video'
+  | 'code';
 
 const iconByName: Record<IconName, LucideIcon> = {
   home: House,
@@ -137,6 +149,12 @@ const iconByName: Record<IconName, LucideIcon> = {
   'user-cog': UserCog,
   download: Download,
   newspaper: Newspaper,
+  heading: Heading2,
+  list: List,
+  image: Image,
+  gallery: Images,
+  video: Video,
+  code: Code2,
 };
 
 type IconProps = {

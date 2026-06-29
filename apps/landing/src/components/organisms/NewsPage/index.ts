@@ -1,5 +1,6 @@
 export { NewsArticle } from "./NewsArticle";
 export { NewsLanding } from "./NewsLanding";
+export { LatestNewsSection } from "./LatestNewsSection";
 export { NewsRelatedPosts } from "./NewsRelatedPosts";
 export { NewsShareBar } from "./NewsShareBar";
 export { NewsBackLink, NewsReadMoreLink } from "./NewsReadMoreLink";

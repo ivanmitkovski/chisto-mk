@@ -6,7 +6,9 @@ import type { NewsCategoryApi, NewsPostStatusApi } from '../types/news.types';
 import { categoryFromApi, toAdminDto } from './news-posts.mapper';
 import { NEWS_POST_ADMIN_INCLUDE, signNewsPostMedia } from './news-posts-signing';
 import { NewsMediaSignedUrlService } from './news-media-signed-url.service';
+import { htmlBlockHasContent } from '@chisto/news-content';
 import { NEWS_LOCALES, type NewsTranslations } from '../types/news.types';
+import { paragraphHasContent } from './news-content-sanitize.service';
 
 export type AdminListNewsQuery = {
   status?: NewsPostStatusApi;
@@ -35,7 +37,10 @@ function localeCompleteForLocale(
   const entry = translations[locale];
   if (!entry.title.trim() || !entry.excerpt.trim() || !entry.body.length) return false;
   for (const block of entry.body) {
-    if (block.type === 'paragraph' && !block.text.trim()) return false;
+    if (block.type === 'paragraph' && !paragraphHasContent(block)) return false;
+    if (block.type === 'html' && !htmlBlockHasContent(block.html ?? '')) return false;
+    if (block.type === 'heading' && !block.text.trim()) return false;
+    if (block.type === 'list' && !block.items.some((item) => item.trim())) return false;
     if ((block.type === 'image' || block.type === 'video') && !block.mediaId?.trim()) return false;
   }
   return hasCover;

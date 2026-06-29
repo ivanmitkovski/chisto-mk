@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
-import { Button, Card, Input, Select } from '@/components/ui';
+import { Button, Card, DateTimePicker, Input, Select } from '@/components/ui';
 import {
   audienceTranslationKey,
   BROADCAST_AUDIENCE_VALUES,
@@ -91,11 +91,12 @@ export function BroadcastCampaignForm({
                 : t('audiencePreview.recipientCount', { count: preview.recipientCount })}
           </p>
         ) : null}
-        <Input
+        <DateTimePicker
           label={t('form.schedule')}
-          type="datetime-local"
+          helperText={t('form.scheduleHint')}
           value={values.scheduledAt}
-          onChange={(e) => onChange('scheduledAt', e.target.value)}
+          onValueChange={(next) => onChange('scheduledAt', next)}
+          disabled={busy}
         />
       </div>
       <div className={styles.actions}>

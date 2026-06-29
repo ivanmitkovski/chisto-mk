@@ -19,6 +19,7 @@
     "userSearchFailed": "Nuk mund të kërkohen përdoruesit. Provoni përsëri.",
     "maxRecipientsReached": "Keni arritur maksimumin prej 5.000 marrësish për një transmetim.",
     "schedule": "Planifiko për më vonë (opsionale)",
+    "scheduleHint": "Zgjidhni një datë dhe orë në të ardhmen. Lëreni bosh për ta ruajtur si draft pa planifikim.",
     "saveDraft": "Ruaj draftin",
     "cancelEdit": "Anulo redaktimin"
   },

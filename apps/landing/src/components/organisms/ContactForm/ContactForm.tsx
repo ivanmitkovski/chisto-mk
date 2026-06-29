@@ -9,9 +9,11 @@ import { Button } from "@/components/atoms/Button";
 import { Input } from "@/components/atoms/Input";
 import { Textarea } from "@/components/atoms/Input/Textarea";
 import { FormField } from "@/components/molecules/FormField";
-import { SocialIcon } from "@/components/molecules/SocialIcon";
+import { SocialLinks } from "@/components/molecules/SocialLinks";
+import { MarketingReveal } from "@/components/molecules/MarketingReveal";
 import { submitContactForm } from "@/app/actions/contact";
-import { getPublicOptionalUrl } from "@/lib/legal/legal-public-config";
+import { trackMarketingEvent } from "@/lib/analytics/track-marketing";
+import { hasSocialLinks } from "@/lib/social-links";
 import type { ContactFormData, FieldError } from "@/lib/utils/validators";
 
 function fieldLabel(field: keyof ContactFormData, tc: (key: string) => string) {
@@ -48,9 +50,6 @@ export function ContactForm() {
   const te = useTranslations("errors");
   const tCommon = useTranslations("common");
   const tp = useTranslations("contact.placeholders");
-  const facebookUrl = getPublicOptionalUrl(process.env.NEXT_PUBLIC_FACEBOOK_URL);
-  const instagramUrl = getPublicOptionalUrl(process.env.NEXT_PUBLIC_INSTAGRAM_URL);
-  const hasSocialLinks = Boolean(facebookUrl || instagramUrl);
 
   function getError(field: string) {
     const err = errors.find((e) => e.field === field);
@@ -75,6 +74,7 @@ export function ContactForm() {
 
     if (result.ok) {
       setStatus("success");
+      trackMarketingEvent("contact_submit_success");
       (e.target as HTMLFormElement).reset();
     } else if (result.errors?.length) {
       setErrors(result.errors);
@@ -92,26 +92,25 @@ export function ContactForm() {
         aria-hidden
       />
       <Container className="relative z-10">
-        <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between md:gap-12">
+        <MarketingReveal className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between md:gap-12">
           <div className="max-w-copy">
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-gray-900">{tc("kicker")}</p>
             <h1 className="mt-3 text-section-title font-bold text-gray-900">{tc("title")}</h1>
           </div>
-          {hasSocialLinks && (
-            <div className="flex gap-2 md:flex-col md:gap-3 md:pt-1">
-              {facebookUrl && <SocialIcon platform="facebook" href={facebookUrl} />}
-              {instagramUrl && <SocialIcon platform="instagram" href={instagramUrl} />}
-            </div>
-          )}
-        </div>
+          {hasSocialLinks() && <SocialLinks className="md:flex-col md:gap-2.5 md:pt-1" />}
+        </MarketingReveal>
 
         {status === "success" ? (
-          <div className="mt-12 rounded-3xl border border-primary/15 bg-primary/8 p-10 text-center shadow-sm md:mt-14">
+          <div
+            className="mt-12 rounded-3xl border border-primary/15 bg-primary/8 p-10 text-center shadow-sm md:mt-14"
+            role="status"
+            aria-live="polite"
+          >
             <p className="text-lg font-semibold text-primary">{tc("successTitle")}</p>
             <p className="mt-2 text-gray-600">{tc("successBody")}</p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="mt-12 md:mt-14">
+          <form onSubmit={handleSubmit} className="mt-12 md:mt-14" aria-busy={status === "loading"}>
             <input
               type="text"
               name="companyWebsite"
@@ -120,17 +119,19 @@ export function ContactForm() {
               aria-hidden
               className="absolute left-[-9999px] h-px w-px opacity-0"
             />
-            <div className="grid gap-6 sm:gap-8 md:grid-cols-3">
-              <FormField label={tc("fullName")}>
+            <div className="grid gap-6 sm:gap-8 md:grid-cols-2 lg:grid-cols-3">
+              <FormField label={tc("fullName")} htmlFor="contact-fullName">
                 <Input
+                  id="contact-fullName"
                   name="fullName"
                   placeholder={tp("fullName")}
                   autoComplete="name"
                   error={getError("fullName")}
                 />
               </FormField>
-              <FormField label={tc("phone")}>
+              <FormField label={tc("phone")} htmlFor="contact-phone">
                 <Input
+                  id="contact-phone"
                   name="phone"
                   type="tel"
                   placeholder={tp("phone")}
@@ -138,8 +139,9 @@ export function ContactForm() {
                   error={getError("phone")}
                 />
               </FormField>
-              <FormField label={tc("email")}>
+              <FormField label={tc("email")} htmlFor="contact-email">
                 <Input
+                  id="contact-email"
                   name="email"
                   type="email"
                   placeholder={tp("email")}
@@ -150,15 +152,15 @@ export function ContactForm() {
             </div>
 
             <div className="mt-8">
-              <FormField label={tc("message")}>
-                <Textarea name="message" placeholder={tp("message")} error={getError("message")} />
+              <FormField label={tc("message")} htmlFor="contact-message">
+                <Textarea id="contact-message" name="message" placeholder={tp("message")} error={getError("message")} />
               </FormField>
             </div>
 
             <div className="mt-10 space-y-3">
               {serverError && <p className="text-sm text-red-500">{tc("submitError")}</p>}
               <Button type="submit" size="lg" className="shadow-md shadow-primary/25" disabled={status === "loading"}>
-                {tCommon("send")}
+                {status === "loading" ? tc("sending") : tCommon("send")}
               </Button>
               <p className="max-w-2xl text-xs leading-relaxed text-gray-500">
                 {tc("privacyNoticePrefix")}

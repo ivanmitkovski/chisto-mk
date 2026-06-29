@@ -90,6 +90,30 @@ describe('GlobalExceptionFilter', () => {
     );
   });
 
+  it('maps MulterError on admin news upload to 25MB envelope', () => {
+    const filter = new GlobalExceptionFilter();
+    const json = jest.fn();
+    const status = jest.fn().mockReturnValue({ json });
+    const host = {
+      switchToHttp: () => ({
+        getResponse: () => ({ status }),
+        getRequest: () => ({
+          method: 'POST',
+          url: '/admin/news/posts/post-1/media',
+          requestId: 'rid-news-multer',
+        }),
+      }),
+    };
+
+    filter.catch(new MulterError('LIMIT_FILE_SIZE'), host as never);
+
+    expect(json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        details: { maxBytes: 25 * 1024 * 1024, maxFiles: 1 },
+      }),
+    );
+  });
+
   it('maps Prisma P2002 on ReportSubmitIdempotency to 409 DUPLICATE_SUBMIT_INFLIGHT', () => {
     const filter = new GlobalExceptionFilter();
     const json = jest.fn();

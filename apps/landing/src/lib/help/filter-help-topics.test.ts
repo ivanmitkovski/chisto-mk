@@ -60,6 +60,36 @@ describe("filterHelpTopics", () => {
     ];
     expect(filterHelpTopics(items, "offline")).toHaveLength(1);
   });
+
+  it("matches body searchText when present", () => {
+    const items: HelpTopicFilterItem[] = [
+      {
+        slug: "event-check-in-and-chat",
+        categoryId: "events",
+        categoryLabel: "Cleanups",
+        cardTitle: "At the event",
+        cardSummary: "Short card.",
+        readTime: "4 min",
+        searchText: "QR code scanner for volunteer check-in heatmap",
+      },
+    ];
+    expect(filterHelpTopics(items, "qr")).toHaveLength(1);
+    expect(filterHelpTopics(items, "heatmap")).toHaveLength(1);
+  });
+
+  it("matches OTP via verification synonym", () => {
+    const items: HelpTopicFilterItem[] = [
+      {
+        slug: "sign-in-and-verification",
+        categoryId: "basics",
+        categoryLabel: "Getting started",
+        cardTitle: "Sign in and verification",
+        cardSummary: "Phone sign-in and SMS codes.",
+        readTime: "4 min",
+      },
+    ];
+    expect(filterHelpTopics(items, "otp")).toHaveLength(1);
+  });
 });
 
 describe("normalizeHelpSearchQuery", () => {

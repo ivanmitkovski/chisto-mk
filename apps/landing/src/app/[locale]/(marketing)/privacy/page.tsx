@@ -6,32 +6,21 @@ import {
   substituteLegalSections,
   substituteLegalText,
 } from "@/lib/legal/substitute-placeholders";
-import { routing, type AppLocale } from "@/i18n/routing";
+import { type AppLocale } from "@/i18n/routing";
+import { buildMarketingMetadata } from "@/lib/seo/marketing-metadata";
 
 type Props = { params: Promise<{ locale: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "metadata" });
-  const title = t("privacy.title");
-  const description = t("privacy.description");
-  const languages = Object.fromEntries(
-    routing.locales.map((l) => [l, `/${l}/privacy`]),
-  ) as Record<string, string>;
-
-  return {
-    title,
-    description,
-    alternates: { languages },
-    openGraph: {
-      title,
-      description,
-      type: "website",
-      locale: locale === "mk" ? "mk_MK" : locale === "sq" ? "sq_AL" : "en_US",
-      siteName: t("siteName"),
-    },
-    twitter: { card: "summary_large_image", title, description },
-  };
+  return buildMarketingMetadata({
+    locale,
+    path: "/privacy",
+    title: t("privacy.title"),
+    description: t("privacy.description"),
+    siteName: t("siteName"),
+  });
 }
 
 export default async function PrivacyPage({ params }: Props) {

@@ -1,4 +1,5 @@
 import type { AdminLocale } from '@/lib/preferences/admin-locale';
+import { getStaticNewsMessages } from './static-news-messages';
 
 export const CORE_MESSAGE_NAMESPACES = [
   'common',
@@ -106,6 +107,9 @@ export function getNamespacesForPathname(pathname: string): MessageNamespace[] {
 }
 
 async function loadNamespace(locale: AdminLocale, namespace: MessageNamespace) {
+  if (namespace === 'news') {
+    return [namespace, getStaticNewsMessages(locale)] as const;
+  }
   const mod = await import(`./messages/${locale}/${namespace}.json`);
   return [namespace, mod.default] as const;
 }

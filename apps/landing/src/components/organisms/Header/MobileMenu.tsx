@@ -2,26 +2,45 @@
 
 import * as Dialog from "@radix-ui/react-dialog";
 import { Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { NavItem } from "@/components/molecules/NavItem";
-import { Button } from "@/components/atoms/Button";
+import { DownloadCTA } from "@/components/molecules/DownloadCTA";
 import { visibleMarketingNavItems } from "@/config/launch";
-import { scheduleScrollToDownloadSection } from "@/lib/utils/smooth-scroll";
+import {
+  isOnHomePage,
+  navigateToDownloadFromPath,
+  scrollToDownloadOnHome,
+  useDownloadNavigation,
+} from "@/lib/navigation/download-navigation";
+import styles from "./mobile-menu.module.css";
 
 export function MobileMenu() {
   const [open, setOpen] = useState(false);
+  const pendingDownload = useRef(false);
   const tNav = useTranslations("nav");
   const tCommon = useTranslations("common");
   const navItems = visibleMarketingNavItems();
+  const { pathname, router } = useDownloadNavigation();
 
-  function handleDownloadClick() {
+  function handleOpenChange(nextOpen: boolean) {
+    setOpen(nextOpen);
+    if (nextOpen || !pendingDownload.current) return;
+    pendingDownload.current = false;
+    if (!isOnHomePage(pathname)) {
+      navigateToDownloadFromPath(pathname, router);
+      return;
+    }
+    scrollToDownloadOnHome(true);
+  }
+
+  function handleDownloadNavigate() {
+    pendingDownload.current = isOnHomePage(pathname);
     setOpen(false);
-    scheduleScrollToDownloadSection(220);
   }
 
   return (
-    <Dialog.Root open={open} onOpenChange={setOpen}>
+    <Dialog.Root open={open} onOpenChange={handleOpenChange}>
       <Dialog.Trigger asChild>
         <button
           type="button"
@@ -34,12 +53,9 @@ export function MobileMenu() {
       </Dialog.Trigger>
 
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/45 backdrop-blur-[2px] data-[state=open]:animate-fade-in" />
-        <Dialog.Content
-          className="fixed inset-y-0 right-0 z-50 flex w-[min(100vw-1.5rem,20rem)] flex-col border-l border-gray-200/80 bg-white p-6 shadow-[-12px_0_40px_rgba(0,0,0,0.08)] data-[state=open]:animate-slide-up focus:outline-none"
-          aria-describedby={undefined}
-        >
-          <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+        <Dialog.Overlay className={styles.overlay} />
+        <Dialog.Content className={styles.panel} aria-describedby={undefined}>
+          <div className="flex shrink-0 items-center justify-between border-b border-gray-100 pb-4">
             <Dialog.Title className="text-sm font-semibold uppercase tracking-wider text-gray-500">
               {tNav("menu")}
             </Dialog.Title>
@@ -53,9 +69,12 @@ export function MobileMenu() {
               </button>
             </Dialog.Close>
           </div>
-          <nav className="mt-8 flex flex-col gap-1" aria-label="Mobile navigation">
+          <nav
+            className="mt-8 flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto overscroll-contain"
+            aria-label={tNav("mobileAria")}
+          >
             {navItems.map((item) => (
-              <div key={item.href} className="rounded-lg py-1">
+              <div key={item.href} className="shrink-0 rounded-lg py-1">
                 <NavItem
                   href={item.href}
                   label={tNav(item.key)}
@@ -64,14 +83,13 @@ export function MobileMenu() {
               </div>
             ))}
           </nav>
-          <div className="mt-auto border-t border-gray-100 pt-6">
-            <Button
-              className="w-full shadow-md shadow-primary/25"
+          <div className="mt-auto shrink-0 border-t border-gray-100 pt-6">
+            <DownloadCTA
               size="md"
-              onClick={handleDownloadClick}
-            >
-              {tCommon("download")}
-            </Button>
+              className="w-full shadow-md shadow-primary/25"
+              onNavigate={handleDownloadNavigate}
+              analyticsSource="mobile_menu"
+            />
           </div>
         </Dialog.Content>
       </Dialog.Portal>

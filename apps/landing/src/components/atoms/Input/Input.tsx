@@ -1,4 +1,4 @@
-import { forwardRef, InputHTMLAttributes } from "react";
+import { forwardRef, InputHTMLAttributes, useId } from "react";
 import { cn } from "@/lib/utils/cn";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -6,20 +6,33 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, error, ...props }, ref) => (
-    <div className="w-full">
-      <input
-        ref={ref}
-        className={cn(
-          "w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition-colors placeholder:text-gray-400 focus:border-primary focus:ring-1 focus:ring-primary",
-          error && "border-red-400 focus:border-red-400 focus:ring-red-400",
-          className,
-        )}
-        {...props}
-      />
-      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
-    </div>
-  ),
+  ({ className, error, id: idProp, ...props }, ref) => {
+    const autoId = useId();
+    const id = idProp ?? autoId;
+    const errorId = error ? `${id}-error` : undefined;
+
+    return (
+      <div className="w-full">
+        <input
+          ref={ref}
+          id={id}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={errorId}
+          className={cn(
+            "w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition-colors placeholder:text-gray-400 focus:border-primary focus:ring-1 focus:ring-primary",
+            error && "border-red-400 focus:border-red-400 focus:ring-red-400",
+            className,
+          )}
+          {...props}
+        />
+        {error ? (
+          <p id={errorId} className="mt-1 text-xs text-red-500" role="alert">
+            {error}
+          </p>
+        ) : null}
+      </div>
+    );
+  },
 );
 
 Input.displayName = "Input";

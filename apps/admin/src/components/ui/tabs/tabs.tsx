@@ -12,19 +12,29 @@ export type TabItem = {
 type TabsProps = {
   items: TabItem[];
   defaultValue?: string;
+  value?: string;
+  onValueChange?: (id: string) => void;
   ariaLabel: string;
 };
 
-export function Tabs({ items, defaultValue, ariaLabel }: TabsProps) {
+export function Tabs({ items, defaultValue, value, onValueChange, ariaLabel }: TabsProps) {
   const initial = defaultValue ?? items[0]?.id ?? '';
-  const [activeId, setActiveId] = useState(initial);
+  const [internalId, setInternalId] = useState(initial);
+  const activeId = value ?? internalId;
   const active = useMemo(
     () => items.find((item) => item.id === activeId) ?? items[0],
     [activeId, items],
   );
 
+  function selectTab(id: string) {
+    if (value === undefined) {
+      setInternalId(id);
+    }
+    onValueChange?.(id);
+  }
+
   function focusTab(id: string) {
-    setActiveId(id);
+    selectTab(id);
     document.getElementById(`${id}-tab`)?.focus();
   }
 
@@ -68,7 +78,7 @@ export function Tabs({ items, defaultValue, ariaLabel }: TabsProps) {
               aria-selected={selected}
               aria-controls={`${item.id}-panel`}
               tabIndex={selected ? 0 : -1}
-              onClick={() => setActiveId(item.id)}
+              onClick={() => selectTab(item.id)}
             >
               {item.label}
             </button>

@@ -24,9 +24,11 @@ const launchSrc = readFileSync(launchPath, "utf8");
 
 const appStore =
   process.env.NEXT_PUBLIC_APP_STORE_URL?.trim() ||
-  "https://apps.apple.com/app/id6771892086";
+  "https://apps.apple.com/mk/app/chisto-mk/id6771892086";
 if (!appStore.startsWith("https://")) {
   fail("App Store URL must be HTTPS");
+} else if (!appStore.includes("/mk/app/")) {
+  fail("App Store URL should use the North Macedonia storefront (/mk/app/…) for this listing");
 } else {
   pass("App Store URL configured");
 }
@@ -43,8 +45,12 @@ for (const file of ["welcome.jpg", "feed.jpg", "map.jpg", "site-detail.jpg", "si
   }
 }
 
-if (launchSrc.includes("stats: false")) {
-  console.warn("launch-check: LAUNCH_HOME_SECTIONS.stats is still false");
+if (!existsSync(join(root, "public/press/chisto-press-kit.zip"))) {
+  fail("missing press kit: public/press/chisto-press-kit.zip");
+}
+
+if (launchSrc.includes("LAUNCH_HOME_SECTIONS")) {
+  console.warn("launch-check: remove stale LAUNCH_HOME_SECTIONS reference from launch.ts");
 }
 for (const page of ["about: false", "news: false", "press: false"]) {
   if (launchSrc.includes(page)) {

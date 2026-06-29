@@ -4,18 +4,16 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Container } from "@/components/layout/Container";
 import { Logo } from "@/components/atoms/Logo";
-import { Button } from "@/components/atoms/Button";
+import { DownloadCTA } from "@/components/molecules/DownloadCTA";
 import { NavItem } from "@/components/molecules/NavItem";
 import { LanguageSelector } from "@/components/molecules/LanguageSelector";
 import { MobileMenu } from "@/components/organisms/Header/MobileMenu";
 import { visibleMarketingNavItems } from "@/config/launch";
 import { cn } from "@/lib/utils/cn";
-import { scrollToDownloadSection } from "@/lib/utils/smooth-scroll";
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const tNav = useTranslations("nav");
-  const tCommon = useTranslations("common");
   const navItems = visibleMarketingNavItems();
 
   useEffect(() => {
@@ -25,16 +23,12 @@ export function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  function handleDownloadClick() {
-    scrollToDownloadSection();
-  }
-
   return (
     <header
       className={cn(
         "sticky top-0 z-50 border-b transition-[background-color,box-shadow,backdrop-filter,border-color] duration-300",
         scrolled
-          ? "border-black/[0.06] border-b-primary/10 bg-white/90 shadow-[0_10px_40px_rgba(0,0,0,0.07),0_1px_0_rgba(0,217,142,0.12)] backdrop-blur-xl backdrop-saturate-150"
+          ? "border-black/[0.06] border-b-primary/10 bg-white/90 shadow-[0_10px_40px_rgba(0,0,0,0.07),0_1px_0_rgba(47,215,136,0.12)] backdrop-blur-xl backdrop-saturate-150"
           : "border-transparent bg-white/75 shadow-[0_1px_0_rgba(0,0,0,0.04)] backdrop-blur-md backdrop-saturate-125",
       )}
     >
@@ -43,7 +37,7 @@ export function Header() {
 
         <nav
           className="hidden items-center justify-center gap-5 lg:gap-7 md:flex"
-          aria-label="Main navigation"
+          aria-label={tNav("mainAria")}
         >
           {navItems.map((item) => (
             <NavItem key={item.href} href={item.href} label={tNav(item.key)} />
@@ -52,13 +46,11 @@ export function Header() {
 
         <div className="flex shrink-0 items-center justify-end gap-2 md:gap-3">
           <LanguageSelector />
-          <Button
+          <DownloadCTA
             size="sm"
             className="hidden px-7 shadow-sm shadow-primary/20 md:inline-flex"
-            onClick={handleDownloadClick}
-          >
-            {tCommon("download")}
-          </Button>
+            analyticsSource="header"
+          />
           <div className="md:hidden">
             <MobileMenu />
           </div>

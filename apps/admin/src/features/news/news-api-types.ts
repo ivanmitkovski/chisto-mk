@@ -1,7 +1,15 @@
-export type NewsBodyBlock =
-  | { type: 'paragraph'; text: string }
-  | { type: 'image'; mediaId: string; caption?: string }
-  | { type: 'video'; mediaId: string; caption?: string };
+export type {
+  NewsBodyBlock,
+  NewsParagraphBlock,
+  NewsHtmlBlock,
+  NewsHeadingBlock,
+  NewsListBlock,
+  NewsImageBlock,
+  NewsVideoBlock,
+  ResolvedNewsBodyBlock,
+} from '@chisto/news-content';
+
+export { createBlockId } from '@chisto/news-content';
 
 export type NewsLocale = 'en' | 'mk' | 'sq';
 
@@ -10,7 +18,7 @@ export type NewsTranslations = Record<
   {
     title: string;
     excerpt: string;
-    body: NewsBodyBlock[];
+    body: import('@chisto/news-content').NewsBodyBlock[];
   }
 >;
 

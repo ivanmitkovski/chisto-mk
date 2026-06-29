@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: `${card.title} · Chisto.mk`,
     description,
     alternates: { canonical },
-    robots: { index: true, follow: true },
+    robots: { index: false, follow: true },
     openGraph: {
       type: "website",
       url: canonical,

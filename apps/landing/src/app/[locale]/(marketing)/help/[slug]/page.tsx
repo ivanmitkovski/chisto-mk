@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { HelpArticleShell } from "@/components/organisms/HelpCentre/HelpArticleShell";
 import { HelpArticleViewAnalytics } from "@/components/organisms/HelpCentre/HelpArticleViewAnalytics";
 import { HELP_ARTICLE_SLUGS, isHelpArticleSlug, type HelpArticleSlug } from "@/lib/help/help-catalog";
-import { routing } from "@/i18n/routing";
+import { buildMarketingMetadata } from "@/lib/seo/marketing-metadata";
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
@@ -22,23 +22,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const articleTitle = t(`articles.${slug}.title`);
   const title = `${articleTitle} | ${tMeta("siteName")}`;
   const description = t(`articles.${slug}.cardSummary`);
-  const languages = Object.fromEntries(
-    routing.locales.map((l) => [l, `/${l}/help/${slug}`]),
-  ) as Record<string, string>;
 
-  return {
+  return buildMarketingMetadata({
+    locale,
+    path: `/help/${slug}`,
     title,
     description,
-    alternates: { languages },
-    openGraph: {
-      title,
-      description,
-      type: "article",
-      locale: locale === "mk" ? "mk_MK" : locale === "sq" ? "sq_AL" : "en_US",
-      siteName: tMeta("siteName"),
-    },
-    twitter: { card: "summary_large_image", title, description },
-  };
+    siteName: tMeta("siteName"),
+  });
 }
 
 export default async function HelpArticlePage({ params }: Props) {

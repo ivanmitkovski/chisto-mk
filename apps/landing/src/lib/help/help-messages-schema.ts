@@ -39,6 +39,18 @@ export const helpContentBlockSchema = z.discriminatedUnion("type", [
     text: z.string().min(1),
   }),
   internalLinkBlockSchema,
+  z.object({
+    type: z.literal("steps"),
+    title: z.string().optional(),
+    items: z
+      .array(
+        z.object({
+          title: z.string().min(1),
+          text: z.string().min(1),
+        }),
+      )
+      .min(1),
+  }),
 ]);
 
 export type HelpContentBlock = z.infer<typeof helpContentBlockSchema>;

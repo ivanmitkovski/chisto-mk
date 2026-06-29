@@ -63,4 +63,16 @@ describe('news-post-policy', () => {
       ),
     ).toBe('scheduleInPast');
   });
+
+  it('requires publish-ready locales when scheduling', () => {
+    const values = {
+      slug: 'valid-slug',
+      category: 'release' as const,
+      scheduledAt: '2099-01-01T10:00',
+      featured: false,
+      translations: emptyTranslations(),
+    };
+    values.translations.en.title = 'Title';
+    expect(validateNewsPostForm(values, { mode: 'save', hasCover: true })).toBe('localeExcerptRequired');
+  });
 });

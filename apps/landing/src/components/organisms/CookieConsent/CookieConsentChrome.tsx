@@ -40,7 +40,7 @@ export function CookieConsentChrome() {
 
       {showBar ? (
         <div
-          className="fixed inset-x-0 bottom-0 z-[60] border-t border-gray-200/90 bg-white/95 p-4 shadow-[0_-8px_30px_rgba(0,0,0,0.08)] backdrop-blur-md md:p-5"
+          className="fixed inset-x-0 bottom-0 z-[60] border-t border-gray-200/90 bg-white/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-[0_-8px_30px_rgba(0,0,0,0.08)] backdrop-blur-md md:p-5 md:pb-[max(1.25rem,env(safe-area-inset-bottom))]"
           role="region"
           aria-label={t("regionLabel")}
         >

@@ -1,3 +1,5 @@
+import { toDatetimeLocalValue } from '@/lib/datetime/datetime-local';
+import { ensureBlocksHaveIds } from './lib/news-block-factory';
 import type {
   NewsBodyBlock,
   NewsCategoryApi,
@@ -36,11 +38,18 @@ export function emptyTranslations(): NewsTranslations {
 }
 
 export function postToFormValues(post: NewsPostAdminDto): NewsPostFormValues {
+  const translations = { ...post.translations };
+  for (const locale of NEWS_LOCALES) {
+    translations[locale] = {
+      ...translations[locale],
+      body: ensureBlocksHaveIds(translations[locale].body),
+    };
+  }
   return {
     slug: post.slug,
     category: post.category,
-    scheduledAt: post.scheduledAt ?? '',
+    scheduledAt: toDatetimeLocalValue(post.scheduledAt),
     featured: post.featured ?? false,
-    translations: post.translations,
+    translations,
   };
 }

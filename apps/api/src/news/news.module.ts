@@ -3,6 +3,7 @@ import { AuditModule } from '../audit/audit.module';
 import { StorageModule } from '../storage/storage.module';
 import { AdminNewsController } from './controllers/admin-news.controller';
 import { PublicNewsController } from './controllers/public-news.controller';
+import { NewsImageProcessor } from './services/news-image-processor';
 import { NewsMediaSignedUrlService } from './services/news-media-signed-url.service';
 import { NewsMediaUploadService } from './services/news-media-upload.service';
 import { NewsPostsAdminQueryService } from './services/news-posts-admin-query.service';
@@ -24,6 +25,7 @@ import { NewsScheduleWorkerService } from './services/news-schedule-worker.servi
     NewsPostsQueryService,
     NewsPostsAdminQueryService,
     NewsMediaUploadService,
+    NewsImageProcessor,
     NewsMediaSignedUrlService,
     NewsRevalidateService,
     NewsScheduleWorkerService,

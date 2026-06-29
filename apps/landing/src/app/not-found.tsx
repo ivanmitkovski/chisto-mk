@@ -1,17 +1,18 @@
-import Link from "next/link";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import { defaultLocale, isLocale, type Locale } from "@/i18n/config";
 
-export default function NotFound() {
-  return (
-    <main className="grid min-h-dvh place-items-center bg-gray-50 px-8 font-sans">
-      <div className="text-center">
-        <p className="text-lg text-gray-700">Not found.</p>
-        <Link
-          href="/mk"
-          className="mt-4 inline-block font-semibold text-primary underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-        >
-          Chisto.mk
-        </Link>
-      </div>
-    </main>
-  );
+function localeFromAcceptLanguage(accept: string): Locale {
+  const lower = accept.toLowerCase();
+  if (lower.includes("sq")) return "sq";
+  if (lower.includes("en")) return "en";
+  return defaultLocale;
+}
+
+export default async function RootNotFound() {
+  const h = await headers();
+  const fromHeader = h.get("x-locale");
+  const locale =
+    fromHeader && isLocale(fromHeader) ? fromHeader : localeFromAcceptLanguage(h.get("accept-language") ?? "");
+  redirect(`/${locale}`);
 }

@@ -1,25 +1,28 @@
 import { BadRequestException, Injectable, Logger, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
-import { randomUUID } from 'crypto';
-import { Prisma, type NewsMediaKind } from '../../prisma-client';
 import { AuditService } from '../../audit/services/audit.service';
 import { PrismaService } from '../../prisma/prisma.service';
-import { ImageContentValidator } from '../../storage/util/image-content-validator';
 import { S3StorageClient } from '../../storage/util/s3-storage.client';
+import type { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { NewsMediaSignedUrlService } from './news-media-signed-url.service';
 import { NewsRevalidateService } from './news-revalidate.service';
-import type { NewsLocale } from '../types/news.types';
-import { toMediaDto } from './news-posts.mapper';
+import { randomUUID } from 'crypto';
+import { Prisma, type NewsMediaKind } from '../../prisma-client';
+import type { NewsLocale, NewsTranslations } from '../types/news.types';
+import { parseTranslations, toMediaDto } from './news-posts.mapper';
+import { stripMediaIdFromTranslations } from './news-posts-validation';
+import { NewsImageProcessor } from './news-image-processor';
+import { assertNewsVideoFile } from './news-video-validator';
 
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
 const MAX_VIDEO_BYTES = 25 * 1024 * 1024;
 
-const IMAGE_MIMES = new Set(['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic']);
 const VIDEO_MIMES = new Set(['video/mp4', 'video/quicktime', 'video/webm']);
 
 export type UploadNewsMediaInput = {
   postId: string;
   kind: 'cover' | 'inline_image' | 'inline_video';
   file: { buffer: Buffer; mimetype: string; size: number; originalname: string };
+  actor?: AuthenticatedUser;
 };
 
 @Injectable()
@@ -29,7 +32,7 @@ export class NewsMediaUploadService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly s3: S3StorageClient,
-    private readonly imageValidator: ImageContentValidator,
+    private readonly imageProcessor: NewsImageProcessor,
     private readonly signedUrls: NewsMediaSignedUrlService,
     private readonly revalidate: NewsRevalidateService,
     private readonly audit?: AuditService,
@@ -46,8 +49,12 @@ export class NewsMediaUploadService {
         message: 'News post not found',
       });
     }
-    if (post.status === 'PUBLISHED' && post.publishedAt && post.publishedAt <= new Date()) {
-      // allow media on published posts for corrections via admin
+
+    if (post.status === 'ARCHIVED') {
+      throw new BadRequestException({
+        code: 'NEWS_POST_ARCHIVED',
+        message: 'Archived posts cannot be modified',
+      });
     }
 
     if (!this.s3.enabled) {
@@ -58,16 +65,16 @@ export class NewsMediaUploadService {
     }
 
     const prismaKind = this.toPrismaKind(input.kind);
-    const { mime, ext } = this.validateFile(input.kind, input.file);
+    const processed = await this.validateAndProcess(input.kind, input.file);
 
     const subfolder = input.kind === 'cover' ? 'cover' : 'inline';
-    const key = `news/${input.postId}/${subfolder}/${randomUUID()}.${ext}`;
+    const key = `news/${input.postId}/${subfolder}/${randomUUID()}.${processed.ext}`;
 
     try {
       await this.s3.putObject({
         Key: key,
-        Body: input.file.buffer,
-        ContentType: mime,
+        Body: processed.body,
+        ContentType: processed.mime,
       });
     } catch (err) {
       this.logger.warn(`news.upload s3_put_failed key=${key} err=${(err as Error).message}`);
@@ -82,25 +89,37 @@ export class NewsMediaUploadService {
         postId: input.postId,
         kind: prismaKind,
         objectKey: key,
-        mimeType: mime,
+        mimeType: processed.mime,
         fileName: input.file.originalname?.slice(0, 255) ?? null,
-        sizeBytes: input.file.size,
+        sizeBytes: processed.body.length,
+        width: processed.width,
+        height: processed.height,
         sortOrder: 0,
       },
     });
 
-    if (input.kind === 'cover') {
-      if (post.coverMediaId && post.coverMedia) {
-        await this.deleteMediaRecord(post.coverMedia.id, post.coverMedia.objectKey);
+    try {
+      if (input.kind === 'cover') {
+        const previousCoverId = post.coverMediaId;
+        const previousCover = post.coverMedia;
+        await this.prisma.newsPost.update({
+          where: { id: input.postId },
+          data: { coverMediaId: media.id },
+        });
+        if (previousCoverId && previousCover) {
+          await this.deleteMediaRecord(previousCover.id, previousCover.objectKey);
+        }
       }
-      await this.prisma.newsPost.update({
-        where: { id: input.postId },
-        data: { coverMediaId: media.id },
-      });
+    } catch (err) {
+      await this.prisma.newsMedia.delete({ where: { id: media.id } }).catch(() => undefined);
+      if (this.s3.enabled) {
+        await this.s3.deleteObject(key).catch(() => undefined);
+      }
+      throw err;
     }
 
     await this.audit?.log({
-      actorId: null,
+      actorId: input.actor?.userId ?? null,
       action: 'news.media.upload',
       resourceType: 'NewsMedia',
       resourceId: media.id,
@@ -115,7 +134,7 @@ export class NewsMediaUploadService {
     return { ...media, url };
   }
 
-  async deleteMedia(mediaId: string): Promise<void> {
+  async deleteMedia(mediaId: string, actor?: AuthenticatedUser): Promise<void> {
     const media = await this.prisma.newsMedia.findUnique({
       where: { id: mediaId },
       include: { coverForPost: true, post: true },
@@ -126,16 +145,55 @@ export class NewsMediaUploadService {
         message: 'News media not found',
       });
     }
-    if (media.coverForPost) {
-      await this.prisma.newsPost.update({
-        where: { id: media.coverForPost.id },
-        data: { coverMediaId: null },
+
+    if (media.post.status === 'ARCHIVED') {
+      throw new BadRequestException({
+        code: 'NEWS_POST_ARCHIVED',
+        message: 'Archived posts cannot be modified',
       });
     }
-    await this.deleteMediaRecord(media.id, media.objectKey);
+
+    const isLive = media.post.status === 'PUBLISHED' || media.post.status === 'SCHEDULED';
+    if (isLive && media.coverForPost) {
+      throw new BadRequestException({
+        code: 'NEWS_MEDIA_IN_USE',
+        message: 'Cover image cannot be deleted on a live post',
+      });
+    }
+
+    await this.prisma.$transaction(async (tx) => {
+      if (media.coverForPost) {
+        await tx.newsPost.update({
+          where: { id: media.coverForPost.id },
+          data: { coverMediaId: null },
+        });
+      }
+
+      if (isLive) {
+        const translations = parseTranslations(media.post.translations) as NewsTranslations;
+        const stripped = stripMediaIdFromTranslations(translations, mediaId);
+        await tx.newsPost.update({
+          where: { id: media.postId },
+          data: {
+            translations: stripped as unknown as Prisma.InputJsonValue,
+          },
+        });
+      }
+
+      await tx.newsMedia.delete({ where: { id: mediaId } });
+    });
+
+    this.signedUrls.invalidateKey(media.objectKey);
+    if (this.s3.enabled) {
+      try {
+        await this.s3.deleteObject(media.objectKey);
+      } catch (err) {
+        this.logger.warn(`news.delete s3_failed key=${media.objectKey} err=${(err as Error).message}`);
+      }
+    }
 
     await this.audit?.log({
-      actorId: null,
+      actorId: actor?.userId ?? null,
       action: 'news.media.delete',
       resourceType: 'NewsMedia',
       resourceId: mediaId,
@@ -147,7 +205,11 @@ export class NewsMediaUploadService {
     }
   }
 
-  async updateAltText(mediaId: string, altText: Partial<Record<NewsLocale, string>>) {
+  async updateAltText(
+    mediaId: string,
+    altText: Partial<Record<NewsLocale, string>>,
+    actor?: AuthenticatedUser,
+  ) {
     const media = await this.prisma.newsMedia.findUnique({
       where: { id: mediaId },
       include: { post: true },
@@ -156,6 +218,13 @@ export class NewsMediaUploadService {
       throw new NotFoundException({
         code: 'NEWS_MEDIA_NOT_FOUND',
         message: 'News media not found',
+      });
+    }
+
+    if (media.post.status === 'ARCHIVED') {
+      throw new BadRequestException({
+        code: 'NEWS_POST_ARCHIVED',
+        message: 'Archived posts cannot be modified',
       });
     }
 
@@ -182,7 +251,7 @@ export class NewsMediaUploadService {
     });
 
     await this.audit?.log({
-      actorId: null,
+      actorId: actor?.userId ?? null,
       action: 'news.media.alt_update',
       resourceType: 'NewsMedia',
       resourceId: mediaId,
@@ -221,41 +290,41 @@ export class NewsMediaUploadService {
     }
   }
 
-  private validateFile(
+  private async validateAndProcess(
     kind: UploadNewsMediaInput['kind'],
     file: UploadNewsMediaInput['file'],
-  ): { mime: string; ext: string } {
+  ): Promise<{
+    body: Buffer;
+    mime: string;
+    ext: string;
+    width: number | null;
+    height: number | null;
+  }> {
     const mime = file.mimetype?.toLowerCase() ?? '';
-    if (kind === 'inline_video' || (kind === 'cover' && VIDEO_MIMES.has(mime))) {
-      if (!VIDEO_MIMES.has(mime)) {
-        throw new BadRequestException({
-          code: 'NEWS_INVALID_VIDEO_TYPE',
-          message: 'Video must be MP4, MOV, or WebM',
-        });
-      }
-      if (file.size > MAX_VIDEO_BYTES) {
-        throw new BadRequestException({
-          code: 'NEWS_VIDEO_TOO_LARGE',
-          message: 'Video exceeds maximum size',
-        });
-      }
-      const ext = mime === 'video/quicktime' ? 'mov' : mime.split('/')[1] || 'mp4';
-      return { mime, ext };
-    }
-
-    const { mime: validated } = this.imageValidator.assertReportImage(file, {
-      maxBytes: MAX_IMAGE_BYTES,
-    });
-    if (!IMAGE_MIMES.has(validated)) {
+    if (kind === 'cover' && VIDEO_MIMES.has(mime)) {
       throw new BadRequestException({
-        code: 'NEWS_INVALID_IMAGE_TYPE',
-        message: 'Image must be JPEG, PNG, WebP, or HEIC',
+        code: 'NEWS_COVER_MUST_BE_IMAGE',
+        message: 'Cover must be an image file',
       });
     }
-    const ext =
-      validated === 'image/jpeg' || validated === 'image/jpg'
-        ? 'jpg'
-        : validated.split('/')[1] || 'jpg';
-    return { mime: validated, ext };
+    if (kind === 'inline_video') {
+      const video = assertNewsVideoFile(file, MAX_VIDEO_BYTES);
+      return {
+        body: file.buffer,
+        mime: video.mime,
+        ext: video.ext,
+        width: null,
+        height: null,
+      };
+    }
+
+    const image = await this.imageProcessor.process(file, MAX_IMAGE_BYTES);
+    return {
+      body: image.buffer,
+      mime: image.mime,
+      ext: image.ext,
+      width: image.width,
+      height: image.height,
+    };
   }
 }

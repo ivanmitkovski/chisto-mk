@@ -14,7 +14,12 @@
     "nextMonth": "Next month",
     "today": "Today",
     "selectDate": "Select date",
+    "selectDateTime": "Select date and time",
     "clearDate": "Clear date",
+    "clearDateTime": "Clear date and time",
+    "time": "Time",
+    "hour": "Hour",
+    "minute": "Minute",
     "days": "Calendar days"
   }
 }

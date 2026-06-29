@@ -92,6 +92,30 @@ export function HelpArticleBlocks({
                 </Link>
               </p>
             );
+          case "steps":
+            return (
+              <div key={key} className="rounded-2xl border border-gray-200/80 bg-white px-4 py-4 md:px-5 md:py-5">
+                {block.title ? (
+                  <p className="mb-4 text-xs font-semibold uppercase tracking-[0.12em] text-gray-500">{block.title}</p>
+                ) : null}
+                <ol className="space-y-4">
+                  {block.items.map((step, j) => (
+                    <li key={j} className="flex gap-3">
+                      <span
+                        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold tabular-nums text-primary-text"
+                        aria-hidden
+                      >
+                        {j + 1}
+                      </span>
+                      <div className="min-w-0">
+                        <p className="font-semibold text-gray-900">{step.title}</p>
+                        <p className="mt-1 text-pretty text-gray-700">{step.text}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            );
           default: {
             const _exhaustive: never = block;
             return _exhaustive;

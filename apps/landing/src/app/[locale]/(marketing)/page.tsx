@@ -5,9 +5,12 @@ import { HowItWorks } from "@/components/organisms/HowItWorks";
 import { Features } from "@/components/organisms/Features";
 import { FAQ } from "@/components/organisms/FAQ";
 import { CTASection } from "@/components/organisms/CTASection";
+import { LatestNewsSection } from "@/components/organisms/NewsPage";
 import { getAppStoreUrl } from "@/lib/store-links";
+import { getSocialProfileUrls } from "@/lib/social-links";
 import { buildMarketingMetadata } from "@/lib/seo/marketing-metadata";
 import { LEGAL_PUBLIC_DEFAULTS } from "@/lib/legal/legal-public-config";
+import { type AppLocale } from "@/i18n/routing";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -25,17 +28,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function HomePage({ params }: Props) {
   const { locale } = await params;
+  const tMeta = await getTranslations({ locale, namespace: "metadata" });
+  const siteName = tMeta("siteName");
   const tFaq = await getTranslations({ locale, namespace: "faq" });
   const appStoreUrl = getAppStoreUrl();
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim() || LEGAL_PUBLIC_DEFAULTS.siteUrl;
 
   const faqItems = tFaq.raw("items") as { title: string; content: string }[];
+  const socialProfileUrls = getSocialProfileUrls();
 
   const jsonLdBlocks: Record<string, unknown>[] = [
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
-      name: "Chisto.mk",
+      name: siteName,
       url: siteUrl,
       inLanguage: ["mk", "en", "sq"],
     },
@@ -45,6 +51,7 @@ export default async function HomePage({ params }: Props) {
       name: LEGAL_PUBLIC_DEFAULTS.legalEntityName,
       url: siteUrl,
       logo: `${siteUrl}/brand/chisto-mark-green.svg`,
+      ...(socialProfileUrls.length > 0 ? { sameAs: socialProfileUrls } : {}),
       contactPoint: {
         "@type": "ContactPoint",
         email: LEGAL_PUBLIC_DEFAULTS.contactEmail,
@@ -70,7 +77,7 @@ export default async function HomePage({ params }: Props) {
     jsonLdBlocks.push({
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
-      name: "Chisto.mk",
+      name: siteName,
       operatingSystem: "iOS",
       applicationCategory: "LifestyleApplication",
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
@@ -87,6 +94,7 @@ export default async function HomePage({ params }: Props) {
       <Hero />
       <HowItWorks />
       <Features />
+      <LatestNewsSection locale={locale as AppLocale} />
       <FAQ />
       <CTASection />
     </>

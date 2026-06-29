@@ -1,3 +1,6 @@
+import 'server-only';
+
+import { cache } from 'react';
 import { serverAuthenticatedFetch } from '@/lib/auth/server-api-with-refresh';
 
 export type MeProfile = {
@@ -10,8 +13,9 @@ export type MeProfile = {
   mfaEnabled?: boolean;
 };
 
-export async function getMeProfile(): Promise<MeProfile> {
+/** Deduplicated per RSC request (layout + page + permission checks share one /auth/me). */
+export const getMeProfile = cache(async (): Promise<MeProfile> => {
   return serverAuthenticatedFetch<MeProfile>('/auth/me', {
     method: 'GET',
   });
-}
+});

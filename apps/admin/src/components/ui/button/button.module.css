@@ -74,8 +74,12 @@
 }
 
 .variantIcon {
+  flex: 0 0 auto;
   width: 2.125rem;
   height: 2.125rem;
+  min-width: 2.125rem;
+  min-height: 2.125rem;
+  aspect-ratio: 1;
   border-radius: 50%;
   background: var(--color-button-icon-bg);
   border-color: var(--color-button-icon-border);

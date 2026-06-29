@@ -44,6 +44,20 @@ test.describe("home page", () => {
     expect(bad, JSON.stringify(bad, null, 2)).toHaveLength(0);
   });
 
+  test("mk home has no critical or serious axe violations", async ({ page }) => {
+    await page.goto("/mk");
+    const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
+    const bad = criticalAndSerious(results.violations);
+    expect(bad, JSON.stringify(bad, null, 2)).toHaveLength(0);
+  });
+
+  test("sq home has no critical or serious axe violations", async ({ page }) => {
+    await page.goto("/sq");
+    const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
+    const bad = criticalAndSerious(results.violations);
+    expect(bad, JSON.stringify(bad, null, 2)).toHaveLength(0);
+  });
+
   test("about page loads when launched", async ({ page }) => {
     await page.goto("/en/about");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
@@ -55,7 +69,7 @@ test.describe("home page", () => {
       page.getByRole("heading", { level: 1, name: /News from Chisto\.mk/i }),
     ).toBeVisible();
     await expect(
-      page.getByRole("link", { name: /Chisto\.mk launches on the App Store/i }),
+      page.getByRole("link", { name: /Chisto\.mk launches on the App Store/i }).first(),
     ).toBeVisible();
 
     await page.goto("/en/news/chisto-mk-ios-app-store-launch-2026");

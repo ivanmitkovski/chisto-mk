@@ -6,7 +6,8 @@ import { Container } from "@/components/layout/Container";
 import { Section } from "@/components/layout/Section";
 import { LegalPageNav } from "@/components/molecules/LegalPageNav";
 import type { LegalSection } from "@/components/organisms/LegalLayout";
-import { routing, type AppLocale } from "@/i18n/routing";
+import { type AppLocale } from "@/i18n/routing";
+import { buildMarketingMetadata } from "@/lib/seo/marketing-metadata";
 import { getDataRequestChannelHref } from "@/lib/data-request-url";
 import { getPublicLegalValue } from "@/lib/legal/legal-public-config";
 import { LegalRichBody } from "@/lib/legal/legal-rich-body";
@@ -22,25 +23,13 @@ type Props = { params: Promise<{ locale: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "metadata" });
-  const title = t("data.title");
-  const description = t("data.description");
-  const languages = Object.fromEntries(
-    routing.locales.map((l) => [l, `/${l}/data`]),
-  ) as Record<string, string>;
-
-  return {
-    title,
-    description,
-    alternates: { languages },
-    openGraph: {
-      title,
-      description,
-      type: "website",
-      locale: locale === "mk" ? "mk_MK" : locale === "sq" ? "sq_AL" : "en_US",
-      siteName: t("siteName"),
-    },
-    twitter: { card: "summary_large_image", title, description },
-  };
+  return buildMarketingMetadata({
+    locale,
+    path: "/data",
+    title: t("data.title"),
+    description: t("data.description"),
+    siteName: t("siteName"),
+  });
 }
 
 export default async function DataPage({ params }: Props) {

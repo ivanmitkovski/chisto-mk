@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { Icon, Input } from '@/components/ui';
+import { SearchInput } from '@/components/ui';
 import styles from '../reports-list.module.css';
 
 type FilterOption = { key: string; label: string };
@@ -33,25 +33,14 @@ export function ReportsListToolbar({
 
   return (
     <div className={styles.toolbar} role="toolbar" aria-label={tCommon('filterAndSearch')}>
-      <Input
+      <SearchInput
         aria-label={t('searchAria')}
         placeholder={t('searchPlaceholder')}
         value={searchTerm}
-        onChange={(e) => onSearchTermChange(e.target.value)}
+        clearLabel={tCommon('clearSearch')}
+        onChange={onSearchTermChange}
+        onClear={onClearSearch}
         className={styles.search}
-        leftSlot={<Icon name="magnifying-glass" size={14} aria-hidden />}
-        rightSlot={
-          searchTerm ? (
-            <button
-              type="button"
-              className={styles.clearSearchBtn}
-              onClick={onClearSearch}
-              aria-label={tCommon('clearSearch')}
-            >
-              <Icon name="x" size={14} aria-hidden />
-            </button>
-          ) : null
-        }
       />
       <div className={styles.filterRow} role="group" aria-label={t('filterByStatusAria')}>
         <div className={styles.filterChips}>

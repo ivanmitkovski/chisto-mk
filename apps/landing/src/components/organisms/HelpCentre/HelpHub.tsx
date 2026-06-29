@@ -11,6 +11,7 @@ import {
 } from "@/lib/help/help-catalog";
 import type { HelpTopicFilterItem } from "@/lib/help/filter-help-topics";
 import { helpArticleSectionSchema } from "@/lib/help/help-messages-schema";
+import { helpSectionsToSearchText } from "@/lib/help/help-search-corpus";
 import { estimateReadMinutesFromSections } from "@/lib/help/help-read-time";
 import { HelpCentreHubAnalytics } from "./HelpCentreHubAnalytics";
 import { HelpSearch } from "./HelpSearch";
@@ -32,6 +33,7 @@ export async function HelpHub() {
       throw new Error(`Invalid help article sections for ${slug}: ${sectionsParsed.error.message}`);
     }
     const minutes = estimateReadMinutesFromSections(sectionsParsed.data);
+    const searchText = helpSectionsToSearchText(sectionsParsed.data);
     return {
       slug,
       categoryId: meta.categoryId,
@@ -39,6 +41,7 @@ export async function HelpHub() {
       cardTitle: t(`articles.${slug}.cardTitle`),
       cardSummary: t(`articles.${slug}.cardSummary`),
       readTime: tCommon("readTimeFormatted", { minutes }),
+      searchText,
     };
   });
 
@@ -46,6 +49,11 @@ export async function HelpHub() {
   const featuredSlugs: HelpArticleSlug[] = Array.isArray(featuredSlugsRaw)
     ? featuredSlugsRaw.filter((s): s is HelpArticleSlug => typeof s === "string" && isHelpArticleSlug(s))
     : [];
+
+  const startHerePathsRaw = th.raw("startHerePaths") as
+    | { id: string; label: string; description: string; href: string }[]
+    | undefined;
+  const startHerePaths = Array.isArray(startHerePathsRaw) ? startHerePathsRaw : [];
 
   return (
     <Section className="relative overflow-hidden mesh-section-faq">
@@ -78,6 +86,25 @@ export async function HelpHub() {
             ))}
           </ul>
         </div>
+
+        {startHerePaths.length > 0 ? (
+          <div className="mt-8 md:mt-10">
+            <h2 className="text-lg font-bold tracking-tight text-gray-900 md:text-xl">{th("startHereTitle")}</h2>
+            <ul className="mt-4 grid gap-3 sm:grid-cols-3">
+              {startHerePaths.map((path) => (
+                <li key={path.id}>
+                  <Link
+                    href={path.href}
+                    className="flex h-full flex-col rounded-2xl border border-gray-200/80 bg-white/90 p-5 shadow-sm transition-[border-color,box-shadow] hover:border-primary/25 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                  >
+                    <span className="font-semibold text-gray-900">{path.label}</span>
+                    <span className="mt-2 text-sm leading-relaxed text-gray-600">{path.description}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
 
         <div className="mt-8 md:mt-10">
           <Suspense

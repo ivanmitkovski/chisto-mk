@@ -1,9 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import type { NewsPostStatus } from '../../prisma-client';
 import { PrismaService } from '../../prisma/prisma.service';
 import type { NewsLocale } from '../types/news.types';
 import { NEWS_LOCALES } from '../types/news.types';
-import { toPublicDto, toPublicListItem } from './news-posts.mapper';
+import { toPublicDto, toPublicListItem, categoryFromApi } from './news-posts.mapper';
 import { NewsMediaSignedUrlService } from './news-media-signed-url.service';
 
 @Injectable()
@@ -18,21 +17,23 @@ export class NewsPostsQueryService {
     if ((NEWS_LOCALES as readonly string[]).includes(lower)) {
       return lower as NewsLocale;
     }
-    return 'mk';
+    return 'en';
   }
 
   private publishedWhere(now = new Date()) {
-    const statuses: NewsPostStatus[] = ['PUBLISHED', 'SCHEDULED'];
     return {
-      status: { in: statuses },
+      status: 'PUBLISHED' as const,
       publishedAt: { lte: now, not: null },
     };
   }
 
-  async listPublished(locale: string, limit = 50, offset = 0) {
+  async listPublished(locale: string, limit = 50, offset = 0, category?: string) {
     const loc = this.normalizeLocale(locale);
     const now = new Date();
-    const where = this.publishedWhere(now);
+    const where = {
+      ...this.publishedWhere(now),
+      ...(category ? { category: categoryFromApi(category as Parameters<typeof categoryFromApi>[0]) } : {}),
+    };
     const [rows, total] = await Promise.all([
       this.prisma.newsPost.findMany({
         where,
@@ -83,6 +84,20 @@ export class NewsPostsQueryService {
       orderBy: { publishedAt: 'desc' },
     });
     return rows.map((r) => r.slug);
+  }
+
+  async listPublishedSlugDates(): Promise<Array<{ slug: string; updatedAt: string; publishedAt: string }>> {
+    const now = new Date();
+    const rows = await this.prisma.newsPost.findMany({
+      where: this.publishedWhere(now),
+      select: { slug: true, updatedAt: true, publishedAt: true },
+      orderBy: { publishedAt: 'desc' },
+    });
+    return rows.map((r) => ({
+      slug: r.slug,
+      updatedAt: r.updatedAt.toISOString(),
+      publishedAt: r.publishedAt!.toISOString(),
+    }));
   }
 
   async listRelated(locale: string, slug: string, limit = 3) {

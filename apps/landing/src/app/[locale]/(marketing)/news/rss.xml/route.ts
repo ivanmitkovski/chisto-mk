@@ -1,7 +1,8 @@
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { blocksToEncodedHtml } from "@chisto/news-content";
 import { isLaunchPageVisible } from "@/config/launch";
-import { fetchNewsPosts } from "@/lib/news/fetch-news";
+import { fetchNewsPostBySlug, fetchNewsPosts } from "@/lib/news/fetch-news";
 import { getSiteUrl } from "@/lib/site-url";
 import type { AppLocale } from "@/i18n/routing";
 
@@ -17,7 +18,15 @@ function escapeXml(text: string): string {
 }
 
 function toRssDate(iso: string): string {
-  return new Date(iso).toUTCString();
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) {
+    return new Date().toUTCString();
+  }
+  return date.toUTCString();
+}
+
+function wrapCdata(html: string): string {
+  return html.replace(/]]>/g, "]]]]><![CDATA[>");
 }
 
 type RouteContext = { params: Promise<{ locale: string }> };
@@ -34,11 +43,30 @@ export async function GET(_request: Request, context: RouteContext) {
   const t = await getTranslations({ locale: appLocale, namespace: "newsPage" });
   const tMeta = await getTranslations({ locale: appLocale, namespace: "metadata" });
 
-  const posts = (await fetchNewsPosts(appLocale)).slice(0, RSS_LIMIT);
+  const posts = await (async () => {
+    try {
+      const { items } = await fetchNewsPosts(appLocale, { limit: RSS_LIMIT });
+      const fullPosts = await Promise.all(
+        items.map(async (item) => {
+          try {
+            return await fetchNewsPostBySlug(appLocale, item.slug);
+          } catch {
+            return item;
+          }
+        }),
+      );
+      return fullPosts.filter(Boolean);
+    } catch (error) {
+      console.error('RSS fetchNewsPosts failed', error);
+      return [];
+    }
+  })();
 
   const items = posts
     .map((post) => {
+      if (!post) return '';
       const itemUrl = `${siteUrl}/${appLocale}/news/${post.slug}`;
+      const encoded = blocksToEncodedHtml(post.body ?? []);
       return [
         "    <item>",
         `      <title>${escapeXml(post.title)}</title>`,
@@ -46,14 +74,18 @@ export async function GET(_request: Request, context: RouteContext) {
         `      <guid isPermaLink="true">${escapeXml(itemUrl)}</guid>`,
         `      <pubDate>${toRssDate(post.publishedAt)}</pubDate>`,
         `      <description>${escapeXml(post.excerpt)}</description>`,
+        encoded ? `      <content:encoded><![CDATA[${wrapCdata(encoded)}]]></content:encoded>` : '',
         "    </item>",
-      ].join("\n");
+      ]
+        .filter(Boolean)
+        .join("\n");
     })
+    .filter(Boolean)
     .join("\n");
 
   const xml = [
     '<?xml version="1.0" encoding="UTF-8"?>',
-    '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">',
+    '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">',
     "  <channel>",
     `    <title>${escapeXml(`${t("title")} | ${tMeta("siteName")}`)}</title>`,
     `    <link>${escapeXml(channelUrl)}</link>`,

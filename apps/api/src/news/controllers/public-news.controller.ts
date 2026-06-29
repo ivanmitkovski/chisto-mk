@@ -19,7 +19,7 @@ export class PublicNewsController {
   @ApiOperation({ summary: 'List published news posts for a locale' })
   list(@Query() query: ListNewsPostsQueryDto, @Res({ passthrough: true }) res: Response) {
     res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=600, stale-while-revalidate=86400');
-    return this.query.listPublished(query.locale ?? 'en', query.limit ?? 50, query.offset ?? 0);
+    return this.query.listPublished(query.locale ?? 'en', query.limit ?? 50, query.offset ?? 0, query.category);
   }
 
   @Get('slugs')
@@ -28,6 +28,14 @@ export class PublicNewsController {
   slugs(@Res({ passthrough: true }) res: Response) {
     res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=600, stale-while-revalidate=86400');
     return this.query.listPublishedSlugs();
+  }
+
+  @Get('slug-dates')
+  @Throttle({ default: { ttl: 60_000, limit: 60 } })
+  @ApiOperation({ summary: 'Published news slugs with last modified dates for sitemap' })
+  slugDates(@Res({ passthrough: true }) res: Response) {
+    res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=600, stale-while-revalidate=86400');
+    return this.query.listPublishedSlugDates();
   }
 
   @Get('posts/:slug/related')

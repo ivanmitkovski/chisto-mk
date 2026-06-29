@@ -142,6 +142,11 @@ jobs:
       - name: Build landing (Playwright E2E)
         run: pnpm --filter @chisto/landing build
 
+      - name: Landing launch check
+        run: pnpm --filter @chisto/landing launch:check
+        env:
+          NEXT_PUBLIC_APP_STORE_URL: https://apps.apple.com/mk/app/chisto-mk/id6771892086
+
       - name: Install Playwright Chromium (landing)
         run: pnpm --filter @chisto/landing exec playwright install chromium
 

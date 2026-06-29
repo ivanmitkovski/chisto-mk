@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { AdminShell } from '@/features/admin-shell';
 import { readDashboardShellState } from '@/features/admin-shell/server';
@@ -8,15 +9,19 @@ import { canWriteNews } from '@/features/news/lib/news-write-access';
 import { SectionState } from '@/components/ui';
 import { ADMIN_PERMISSIONS } from '@/lib/auth/rbac/permissions';
 import { requirePagePermission } from '@/lib/auth/rbac/server';
-import { getMeProfile } from '@/features/auth/data/me-adapter';
 import { handleServerLoadError } from '@/lib/server/handle-server-load-error';
 
 type Props = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('news');
+  return { title: t('pageTitle') };
+}
+
 export default async function NewsPage({ searchParams }: Props) {
-  await requirePagePermission(ADMIN_PERMISSIONS['news:read']);
+  const me = await requirePagePermission(ADMIN_PERMISSIONS['news:read']);
   const sp = await searchParams;
   const t = await getTranslations('news');
   const { initialSidebarCollapsed } = await readDashboardShellState();
@@ -27,16 +32,13 @@ export default async function NewsPage({ searchParams }: Props) {
   const sort = typeof sp.sort === 'string' ? (sp.sort as 'publishedAt' | 'updatedAt' | 'title') : undefined;
 
   try {
-    const [listResult, me] = await Promise.all([
-      listNewsPosts({
-        page,
-        ...(status ? { status } : {}),
-        ...(category ? { category } : {}),
-        ...(q ? { q } : {}),
-        ...(sort ? { sort } : {}),
-      }),
-      getMeProfile(),
-    ]);
+    const listResult = await listNewsPosts({
+      page,
+      ...(status ? { status } : {}),
+      ...(category ? { category } : {}),
+      ...(q ? { q } : {}),
+      ...(sort ? { sort } : {}),
+    });
     return (
       <AdminShell title={t('pageTitle')} activeItem="news" initialSidebarCollapsed={initialSidebarCollapsed}>
         <Suspense fallback={<ListWorkspaceSkeleton />}>

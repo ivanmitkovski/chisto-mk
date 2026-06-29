@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import { type ReactNode, useLayoutEffect, useRef, useState } from 'react';
 import { getRouteMessages } from '@/i18n/get-route-messages';
+import { overlayStaticNewsMessages } from '@/i18n/static-news-messages';
 import { consumeStagedRouteMessages } from '@/i18n/route-message-cache';
 import { mergeRouteMessages, messagesSatisfyPathname } from '@/i18n/route-messages-client';
 
@@ -22,21 +23,24 @@ export function IntlProvider({
 }: IntlProviderProps) {
   const pathname = usePathname();
   const messagesRef = useRef(initialMessages);
-  const [messages, setMessages] = useState(initialMessages);
+  const [messages, setMessages] = useState(() => overlayStaticNewsMessages(initialMessages, locale));
   const [messagesReady, setMessagesReady] = useState(() =>
-    messagesSatisfyPathname(pathname, initialMessages),
+    messagesSatisfyPathname(pathname, overlayStaticNewsMessages(initialMessages, locale)),
   );
 
   useLayoutEffect(() => {
-    messagesRef.current = initialMessages;
-    setMessages(initialMessages);
-    setMessagesReady(messagesSatisfyPathname(pathname, initialMessages));
-  }, [initialMessages]);
+    messagesRef.current = overlayStaticNewsMessages(initialMessages, locale);
+    setMessages(messagesRef.current);
+    setMessagesReady(messagesSatisfyPathname(pathname, messagesRef.current));
+  }, [initialMessages, locale, pathname]);
 
   useLayoutEffect(() => {
     let cancelled = false;
     const staged = consumeStagedRouteMessages();
-    let merged = staged ? mergeRouteMessages(messagesRef.current, staged) : messagesRef.current;
+    let merged = overlayStaticNewsMessages(
+      staged ? mergeRouteMessages(staged, initialMessages) : initialMessages,
+      locale,
+    );
 
     if (messagesSatisfyPathname(pathname, merged)) {
       messagesRef.current = merged;
@@ -51,7 +55,7 @@ export function IntlProvider({
 
     void getRouteMessages(pathname).then((nextMessages) => {
       if (cancelled) return;
-      merged = mergeRouteMessages(merged, nextMessages);
+      merged = overlayStaticNewsMessages(mergeRouteMessages(merged, nextMessages), locale);
       messagesRef.current = merged;
       setMessages(merged);
       setMessagesReady(true);
@@ -60,7 +64,7 @@ export function IntlProvider({
     return () => {
       cancelled = true;
     };
-  }, [locale, pathname]);
+  }, [initialMessages, locale, pathname]);
 
   if (!messagesReady) {
     return null;

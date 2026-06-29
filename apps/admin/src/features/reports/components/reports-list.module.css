@@ -115,7 +115,7 @@
 }
 
 .search {
-  width: min(100%, 18rem);
+  max-width: 18rem;
 }
 
 .linkChevron {

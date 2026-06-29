@@ -21,9 +21,9 @@ import { HelpTopicCard } from "./HelpTopicCard";
 
 const SUGGESTED_SLUGS: readonly HelpArticleSlug[] = [
   "getting-started",
-  "exploring-the-map",
+  "sign-in-and-verification",
   "report-a-site",
-  "offline-and-slow-networks",
+  "event-check-in-and-chat",
   "troubleshooting",
 ];
 

@@ -1,0 +1,246 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.rootClassic {
+  gap: 0.5rem;
+}
+
+.rootDocument {
+  gap: 0.5rem;
+}
+
+.previewWrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.imageFrame,
+.imageFrameDocument,
+.videoFrame,
+.videoFrameDocument {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--text-primary) 4%, var(--surface-subtle));
+}
+
+.imageFrame,
+.videoFrame {
+  max-width: 24rem;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+}
+
+.imageFrameDocument,
+.videoFrameDocument {
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-default);
+}
+
+.image {
+  object-fit: cover;
+}
+
+.video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #0a0a0a;
+}
+
+.videoErrorFrame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.videoError {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.previewToolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  opacity: 0;
+  transform: translateY(-2px);
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+
+.previewWrap:hover .previewToolbar,
+.previewWrap:focus-within .previewToolbar {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.dropZone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  min-height: 9rem;
+  padding: 1.25rem 1rem;
+  border-radius: var(--radius-lg);
+  border: 1px dashed color-mix(in srgb, var(--border-default) 90%, transparent);
+  background: color-mix(in srgb, var(--surface-subtle) 55%, transparent);
+  text-align: center;
+  color: var(--text-secondary);
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.dropZoneDragOver {
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 6%, var(--surface-subtle));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 10%, transparent);
+}
+
+.dropZoneBusy {
+  pointer-events: none;
+}
+
+.dropZoneError {
+  border-color: var(--color-error);
+}
+
+.dropTitle {
+  margin: 0.25rem 0 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.dropHint {
+  margin: 0;
+  max-width: 22rem;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: color-mix(in srgb, var(--text-secondary) 90%, transparent);
+}
+
+.dropAction {
+  margin: 0.125rem 0 0;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: color-mix(in srgb, var(--text-secondary) 75%, transparent);
+}
+
+.dropTapTarget {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.dropTapTarget:disabled {
+  cursor: default;
+}
+
+.fileInput {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.uploadError {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--color-error);
+}
+
+.emptyRef {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  word-break: break-all;
+}
+
+.captionField,
+.captionDocument {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.captionLabel {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-secondary);
+}
+
+.captionInput {
+  width: 100%;
+  min-height: 2.25rem;
+  padding: 0.375rem 0.625rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
+  font: inherit;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--text-primary);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.captionInput:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--color-primary) 25%, var(--border-default));
+}
+
+.captionInput:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--color-primary) 45%, var(--border-default));
+  box-shadow: var(--focus-ring);
+}
+
+.captionInputDocument {
+  width: 100%;
+  min-height: 2rem;
+  padding: 0.125rem 0;
+  border: 0;
+  background: transparent;
+  outline: none;
+  font: inherit;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--text-primary);
+}
+
+.captionInputDocument::placeholder,
+.captionInput::placeholder {
+  color: color-mix(in srgb, var(--text-secondary) 55%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .previewToolbar {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

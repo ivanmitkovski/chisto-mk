@@ -22,6 +22,26 @@ class AppConfig implements ApiClientConfig {
     return trimmed.isNotEmpty ? trimmed : fallback;
   }
 
+  /// Marketing help centre base (locale prefix added in [helpCenterUrlForLocale]).
+  static const String helpCenterSiteBase = 'https://chisto.mk';
+
+  /// Locale-aware help hub URL (`/mk/help`, `/en/help`, `/sq/help`).
+  static String helpCenterUrlForLocale(String languageCode) {
+    switch (languageCode) {
+      case 'en':
+      case 'sq':
+      case 'mk':
+        return '$helpCenterSiteBase/$languageCode/help';
+      default:
+        return '$helpCenterSiteBase/mk/help';
+    }
+  }
+
+  /// Deep link to a specific help article in the user's locale.
+  static String helpArticleUrlForLocale(String languageCode, String slug) {
+    return '${helpCenterUrlForLocale(languageCode)}/$slug';
+  }
+
   /// TEMP: the dev backend currently has no valid TLS certificate
   /// (`https://api-dev.chisto.mk` fails the handshake), so the app talks to it
   /// over HTTP. Cleartext for this single host is allowlisted in the Android
@@ -31,7 +51,7 @@ class AppConfig implements ApiClientConfig {
 
   static final AppConfig dev = AppConfig._(
     apiBaseUrl: devApiBaseUrl,
-    helpCenterUrl: 'https://chisto.mk/help',
+    helpCenterUrl: 'https://chisto.mk/mk/help',
     termsUrl: _legalUrlFromEnvironment('TERMS_URL', 'https://chisto.mk/terms'),
     privacyUrl: _legalUrlFromEnvironment(
       'PRIVACY_URL',
@@ -46,7 +66,7 @@ class AppConfig implements ApiClientConfig {
   /// switch beta to ENV=prod) once that environment is deployed.
   static final AppConfig staging = AppConfig._(
     apiBaseUrl: devApiBaseUrl,
-    helpCenterUrl: 'https://chisto.mk/help',
+    helpCenterUrl: 'https://chisto.mk/mk/help',
     termsUrl: _legalUrlFromEnvironment('TERMS_URL', 'https://chisto.mk/terms'),
     privacyUrl: _legalUrlFromEnvironment(
       'PRIVACY_URL',
@@ -57,7 +77,7 @@ class AppConfig implements ApiClientConfig {
 
   static final AppConfig prod = AppConfig._(
     apiBaseUrl: 'https://api.chisto.mk',
-    helpCenterUrl: 'https://chisto.mk/help',
+    helpCenterUrl: 'https://chisto.mk/mk/help',
     termsUrl: _legalUrlFromEnvironment('TERMS_URL', 'https://chisto.mk/terms'),
     privacyUrl: _legalUrlFromEnvironment(
       'PRIVACY_URL',
@@ -69,7 +89,7 @@ class AppConfig implements ApiClientConfig {
   /// Local API (iOS Simulator). Use with --dart-define=ENV=local
   static final AppConfig local = AppConfig._(
     apiBaseUrl: 'http://127.0.0.1:3000',
-    helpCenterUrl: 'https://chisto.mk/help',
+    helpCenterUrl: 'https://chisto.mk/mk/help',
     termsUrl: _legalUrlFromEnvironment('TERMS_URL', 'https://chisto.mk/terms'),
     privacyUrl: _legalUrlFromEnvironment(
       'PRIVACY_URL',
@@ -81,7 +101,7 @@ class AppConfig implements ApiClientConfig {
   /// Local API (Android Emulator). Use with --dart-define=ENV=localAndroid
   static final AppConfig localAndroid = AppConfig._(
     apiBaseUrl: 'http://10.0.2.2:3000',
-    helpCenterUrl: 'https://chisto.mk/help',
+    helpCenterUrl: 'https://chisto.mk/mk/help',
     termsUrl: _legalUrlFromEnvironment('TERMS_URL', 'https://chisto.mk/terms'),
     privacyUrl: _legalUrlFromEnvironment(
       'PRIVACY_URL',
@@ -95,7 +115,7 @@ class AppConfig implements ApiClientConfig {
   static final AppConfig localDevice = AppConfig._(
     apiBaseUrl:
         'http://${const String.fromEnvironment('API_HOST', defaultValue: '192.168.1.100')}:3000',
-    helpCenterUrl: 'https://chisto.mk/help',
+    helpCenterUrl: 'https://chisto.mk/mk/help',
     termsUrl: _legalUrlFromEnvironment('TERMS_URL', 'https://chisto.mk/terms'),
     privacyUrl: _legalUrlFromEnvironment(
       'PRIVACY_URL',
@@ -118,7 +138,7 @@ class AppConfig implements ApiClientConfig {
       'API_URL',
       defaultValue: devApiBaseUrl,
     ),
-    helpCenterUrl: 'https://chisto.mk/help',
+    helpCenterUrl: 'https://chisto.mk/mk/help',
     termsUrl: _legalUrlFromEnvironment('TERMS_URL', 'https://chisto.mk/terms'),
     privacyUrl: _legalUrlFromEnvironment(
       'PRIVACY_URL',

@@ -12,7 +12,8 @@ import {
   substituteLegalSections,
   substituteLegalText,
 } from "@/lib/legal/substitute-placeholders";
-import { routing, type AppLocale } from "@/i18n/routing";
+import { type AppLocale } from "@/i18n/routing";
+import { buildMarketingMetadata } from "@/lib/seo/marketing-metadata";
 
 type CookieRow = {
   name: string;
@@ -27,25 +28,13 @@ type Props = { params: Promise<{ locale: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "metadata" });
-  const title = t("cookies.title");
-  const description = t("cookies.description");
-  const languages = Object.fromEntries(
-    routing.locales.map((l) => [l, `/${l}/cookies`]),
-  ) as Record<string, string>;
-
-  return {
-    title,
-    description,
-    alternates: { languages },
-    openGraph: {
-      title,
-      description,
-      type: "website",
-      locale: locale === "mk" ? "mk_MK" : locale === "sq" ? "sq_AL" : "en_US",
-      siteName: t("siteName"),
-    },
-    twitter: { card: "summary_large_image", title, description },
-  };
+  return buildMarketingMetadata({
+    locale,
+    path: "/cookies",
+    title: t("cookies.title"),
+    description: t("cookies.description"),
+    siteName: t("siteName"),
+  });
 }
 
 export default async function CookiesPage({ params }: Props) {

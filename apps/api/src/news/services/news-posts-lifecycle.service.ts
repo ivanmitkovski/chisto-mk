@@ -1,9 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import type { AuthenticatedUser } from '../../auth/types/authenticated-user.type';
 import { AuditService } from '../../audit/services/audit.service';
 import { PrismaService } from '../../prisma/prisma.service';
-import type { NewsTranslations } from '../types/news.types';
-import { toAdminDto } from './news-posts.mapper';
+import { toAdminDto, parseTranslations } from './news-posts.mapper';
 import { NEWS_POST_ADMIN_INCLUDE, signNewsPostMedia } from './news-posts-signing';
 import { NewsMediaSignedUrlService } from './news-media-signed-url.service';
 import { NewsRevalidateService } from './news-revalidate.service';
@@ -30,22 +29,38 @@ export class NewsPostsLifecycleService {
       });
     }
 
-    const translations = existing.translations as NewsTranslations;
+    if (existing.status === 'ARCHIVED') {
+      throw new BadRequestException({
+        code: 'NEWS_POST_ARCHIVED',
+        message: 'Archived posts cannot be published',
+      });
+    }
+
+    if (existing.status === 'PUBLISHED') {
+      const now = new Date();
+      const isFutureSchedule = Boolean(existing.scheduledAt && existing.scheduledAt > now);
+      if (!isFutureSchedule) {
+        const signed = await signNewsPostMedia(this.signedUrls, existing);
+        return toAdminDto(existing, signed);
+      }
+    }
+
+    const translations = parseTranslations(existing.translations);
     assertValidTranslations(translations, true);
 
-    const mediaIds = new Set(existing.media.map((m) => m.id));
-    assertMediaIntegrity(translations, mediaIds, Boolean(existing.coverMediaId));
+    assertMediaIntegrity(translations, existing.media, existing.coverMediaId, {
+      requireAltText: true,
+    });
 
     const now = new Date();
-    const publishedAt =
-      existing.scheduledAt && existing.scheduledAt > now ? existing.scheduledAt : now;
-    const status = existing.scheduledAt && existing.scheduledAt > now ? 'SCHEDULED' : 'PUBLISHED';
+    const isFutureSchedule = Boolean(existing.scheduledAt && existing.scheduledAt > now);
 
     const row = await this.prisma.newsPost.update({
       where: { id },
       data: {
-        status,
-        publishedAt,
+        status: isFutureSchedule ? 'SCHEDULED' : 'PUBLISHED',
+        publishedAt: isFutureSchedule ? null : now,
+        scheduledAt: isFutureSchedule ? existing.scheduledAt : null,
         updatedById: actor?.userId ?? null,
       },
       include: NEWS_POST_ADMIN_INCLUDE,
@@ -56,7 +71,7 @@ export class NewsPostsLifecycleService {
       action: 'news.post.publish',
       resourceType: 'NewsPost',
       resourceId: row.id,
-      metadata: { slug: row.slug, status },
+      metadata: { slug: row.slug, status: row.status },
     });
 
     void this.revalidate.triggerLandingRevalidate();
@@ -72,6 +87,22 @@ export class NewsPostsLifecycleService {
         code: 'NEWS_POST_NOT_FOUND',
         message: 'News post not found',
       });
+    }
+
+    if (existing.status === 'ARCHIVED') {
+      throw new BadRequestException({
+        code: 'NEWS_POST_ARCHIVED',
+        message: 'Archived posts cannot be unpublished',
+      });
+    }
+
+    if (existing.status === 'DRAFT') {
+      const row = await this.prisma.newsPost.findUnique({
+        where: { id },
+        include: NEWS_POST_ADMIN_INCLUDE,
+      });
+      const signed = await signNewsPostMedia(this.signedUrls, row!);
+      return toAdminDto(row!, signed);
     }
 
     const row = await this.prisma.newsPost.update({
@@ -108,9 +139,24 @@ export class NewsPostsLifecycleService {
       });
     }
 
+    if (existing.status === 'ARCHIVED') {
+      const row = await this.prisma.newsPost.findUnique({
+        where: { id },
+        include: NEWS_POST_ADMIN_INCLUDE,
+      });
+      const signed = await signNewsPostMedia(this.signedUrls, row!);
+      return toAdminDto(row!, signed);
+    }
+
     const row = await this.prisma.newsPost.update({
       where: { id },
-      data: { status: 'ARCHIVED', updatedById: actor?.userId ?? null },
+      data: {
+        status: 'ARCHIVED',
+        publishedAt: null,
+        scheduledAt: null,
+        featured: false,
+        updatedById: actor?.userId ?? null,
+      },
       include: NEWS_POST_ADMIN_INCLUDE,
     });
 

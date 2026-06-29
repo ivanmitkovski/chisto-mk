@@ -11,6 +11,7 @@ import "../globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
+  manifest: "/manifest.webmanifest",
   icons: {
     icon: [{ url: "/brand/chisto-mark-green.svg", type: "image/svg+xml" }],
     apple: [{ url: "/brand/chisto-mark-green.svg", type: "image/svg+xml" }],
@@ -55,11 +56,7 @@ export default async function LocaleLayout({
           <a href="#main-content" className="skip-link">
             {tCommon("skipToContent")}
           </a>
-          <MotionProvider>
-            <div id="main-content" tabIndex={-1} className="outline-none">
-              {children}
-            </div>
-          </MotionProvider>
+          <MotionProvider>{children}</MotionProvider>
         </NextIntlClientProvider>
       </body>
     </html>

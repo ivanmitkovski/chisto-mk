@@ -85,7 +85,7 @@ export function Features() {
           <motion.div variants={slideInLeft} className="relative mx-auto w-64 md:mx-0 lg:w-72">
             <BlobBackdrop />
             <PhoneMockup>
-              <PhoneScreenshot screenshotId="map" priority />
+              <PhoneScreenshot screenshotId="map" />
             </PhoneMockup>
           </motion.div>
 

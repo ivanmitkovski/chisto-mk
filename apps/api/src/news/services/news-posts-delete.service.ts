@@ -28,6 +28,8 @@ export class NewsPostsDeleteService {
       });
     }
 
+    await this.prisma.newsPost.delete({ where: { id } });
+
     for (const m of existing.media) {
       this.signedUrls.invalidateKey(m.objectKey);
       if (this.s3.enabled) {
@@ -38,8 +40,6 @@ export class NewsPostsDeleteService {
         }
       }
     }
-
-    await this.prisma.newsPost.delete({ where: { id } });
 
     await this.audit?.log({
       actorId: actor?.userId ?? null,

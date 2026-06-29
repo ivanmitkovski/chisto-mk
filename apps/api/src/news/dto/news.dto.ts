@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
+  IsBoolean,
   IsIn,
   IsInt,
   IsOptional,
@@ -12,15 +13,50 @@ import {
 } from 'class-validator';
 import type { NewsBodyBlock, NewsCategoryApi, NewsTranslations } from '../types/news.types';
 
+export class NewsGalleryItemDto {
+  @ApiProperty()
+  @IsString()
+  mediaId!: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  caption?: string;
+}
+
 export class NewsBodyBlockDto {
-  @ApiProperty({ enum: ['paragraph', 'image', 'video'] })
-  @IsIn(['paragraph', 'image', 'video'])
-  type!: 'paragraph' | 'image' | 'video';
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  id?: string;
+
+  @ApiProperty({ enum: ['paragraph', 'html', 'heading', 'list', 'image', 'video', 'gallery'] })
+  @IsIn(['paragraph', 'html', 'heading', 'list', 'image', 'video', 'gallery'])
+  type!: 'paragraph' | 'html' | 'heading' | 'list' | 'image' | 'video' | 'gallery';
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   text?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  html?: string;
+
+  @ApiPropertyOptional({ enum: [2, 3] })
+  @IsOptional()
+  @IsIn([2, 3])
+  level?: 2 | 3;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  ordered?: boolean;
+
+  @ApiPropertyOptional({ description: 'List item strings or gallery media items' })
+  @IsOptional()
+  items?: string[] | NewsGalleryItemDto[];
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -143,6 +179,7 @@ export class UpdateNewsPostDto {
 
   @ApiPropertyOptional()
   @IsOptional()
+  @IsBoolean()
   featured?: boolean;
 }
 
@@ -166,6 +203,11 @@ export class ListNewsPostsQueryDto {
   @IsInt()
   @Min(0)
   offset?: number;
+
+  @ApiPropertyOptional({ enum: ['release', 'partnership', 'community', 'product'] })
+  @IsOptional()
+  @IsIn(['release', 'partnership', 'community', 'product'])
+  category?: 'release' | 'partnership' | 'community' | 'product';
 }
 
 export class UploadNewsMediaQueryDto {
