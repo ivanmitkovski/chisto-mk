@@ -9,6 +9,14 @@ import {
   readProxyRequestBody,
 } from './admin-api-with-refresh';
 
+function expectSameBinaryBody(actual: unknown, expected: Buffer | Uint8Array) {
+  expect(actual).toBeInstanceOf(Uint8Array);
+  const actualBytes = actual as Uint8Array;
+  const expectedBytes = expected instanceof Buffer ? new Uint8Array(expected) : expected;
+  expect(actualBytes.length).toBe(expectedBytes.length);
+  expect(Buffer.from(actualBytes).equals(Buffer.from(expectedBytes))).toBe(true);
+}
+
 function requestWithCookies(cookie: string, url = 'https://admin.chisto.mk/api/proxy/admin/users', init: RequestInit = {}) {
   const headers = new Headers(init.headers);
   headers.set('cookie', cookie);
@@ -127,9 +135,7 @@ describe('proxyBackendWithRefresh', () => {
     expect(response.status).toBe(201);
     expect(fetchMock).toHaveBeenCalledTimes(1);
     const init = fetchMock.mock.calls[0][1] as RequestInit;
-    expect(init.body).toBeInstanceOf(Buffer);
-    expect((init.body as Buffer).length).toBe(payload.length);
-    expect((init.body as Buffer).equals(payload)).toBe(true);
+    expectSameBinaryBody(init.body, payload);
     const forwardedHeaders = init.headers as Headers;
     expect(forwardedHeaders.get('content-type')).toContain(`boundary=${boundary}`);
   });

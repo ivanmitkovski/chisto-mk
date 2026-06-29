@@ -44,7 +44,7 @@ describe('ReportsList', () => {
     expect(screen.getByRole('heading', { name: 'Reports' })).toBeInTheDocument();
     expect(screen.getAllByText('Illegal dumping near park').length).toBeGreaterThan(0);
     expect(
-      screen.getByRole('textbox', { name: 'Search reports by name, location, or number' }),
+      screen.getByRole('searchbox', { name: 'Search reports by name, location, or number' }),
     ).toBeInTheDocument();
   });
 });
