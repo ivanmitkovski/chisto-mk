@@ -4,14 +4,14 @@
   "private": true,
   "description": "Shared news body block types, sanitization, and rendering",
   "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "types": "./src/index.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": "./src/index.ts",
       "default": "./dist/index.js"
     },
     "./sanitize": {
-      "types": "./dist/sanitize/index.d.ts",
+      "types": "./src/sanitize/index.ts",
       "default": "./dist/sanitize/index.js"
     },
     "./render": "./src/render/index.ts"
