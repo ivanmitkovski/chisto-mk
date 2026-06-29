@@ -6,6 +6,13 @@ function criticalAndSerious(violations: { impact?: string }[]) {
   return violations.filter((v) => v.impact === "critical" || v.impact === "serious");
 }
 
+/** Help article sections can briefly duplicate in the DOM during hydration; wait for a single node. */
+async function expectHelpSectionVisible(page: import("@playwright/test").Page, sectionId: string) {
+  const section = page.locator(`#${sectionId}`);
+  await expect(section).toHaveCount(1);
+  await expect(section).toBeVisible();
+}
+
 test.describe("Help centre", () => {
   test("hub loads in English", async ({ page }) => {
     await page.goto("/en/help");
@@ -23,7 +30,7 @@ test.describe("Help centre", () => {
 
   test("article in-page anchor focuses target section", async ({ page }) => {
     await page.goto("/en/help/getting-started#download-the-app");
-    await expect(page.locator("#download-the-app")).toBeVisible();
+    await expectHelpSectionVisible(page, "download-the-app");
   });
 
   test("hub loads in Macedonian locale path", async ({ page }) => {
@@ -107,7 +114,7 @@ test.describe("Help centre", () => {
     await link.focus();
     await link.press("Enter");
     await expect(page).toHaveURL(/#download-the-app$/);
-    await expect(page.locator("#download-the-app")).toBeVisible();
+    await expectHelpSectionVisible(page, "download-the-app");
   });
 
   test("keyboard: mobile TOC opens then link navigates to hash", async ({ page }) => {
@@ -122,6 +129,7 @@ test.describe("Help centre", () => {
   test("keyboard: copy section link writes URL to clipboard", async ({ page, context }) => {
     await context.grantPermissions(["clipboard-read", "clipboard-write"]);
     await page.goto("/en/help/report-a-site#start-from-report-fab");
+    await expectHelpSectionVisible(page, "start-from-report-fab");
     const section = page.locator("#start-from-report-fab");
     const copyBtn = section.getByRole("button", { name: /copy link to this section/i });
     await copyBtn.focus();
