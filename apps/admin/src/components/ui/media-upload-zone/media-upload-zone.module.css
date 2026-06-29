@@ -4,9 +4,9 @@
   border-radius: var(--radius-card);
   background: var(--surface-subtle);
   transition:
-    border-color var(--motion-spring-short),
-    background var(--motion-spring-short),
-    transform var(--motion-spring-short);
+    border-color var(--motion-duration-fast) var(--motion-ease-out),
+    background var(--motion-duration-fast) var(--motion-ease-out),
+    transform var(--motion-duration-fast) var(--motion-ease-out);
 }
 
 .compact {
