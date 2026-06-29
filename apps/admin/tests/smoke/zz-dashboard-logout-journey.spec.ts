@@ -8,7 +8,7 @@ test.describe('Admin dashboard smoke journey', () => {
     await page.getByRole('link', { name: /reports/i }).first().click();
     await page.waitForURL('**/dashboard/reports**');
     await expect(
-      page.getByRole('textbox', { name: /search reports by name, location, or number/i }),
+      page.getByRole('searchbox', { name: /search reports by name, location, or number/i }),
     ).toBeVisible();
 
     await page.getByRole('button', { name: /^profile$/i }).click();
