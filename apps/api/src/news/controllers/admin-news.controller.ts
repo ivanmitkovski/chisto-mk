@@ -134,6 +134,7 @@ export class AdminNewsController {
     return this.posts.listRevisions(id);
   }
 
+  // safe-to-retry: repeated Delete is acceptable
   @Delete('posts/:id/revisions')
   @Roles(...ADMIN_WRITE_ROLES)
   @RequirePermission(ADMIN_PERMISSIONS['news:write'])
