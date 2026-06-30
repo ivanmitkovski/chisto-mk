@@ -27,7 +27,7 @@
     "check:structure": "STRUCTURE_CHECK_ENFORCE=1 node scripts/check-module-structure.mjs",
     "snapshot:openapi": "node scripts/snapshot-openapi-run.cjs",
     "snapshot:openapi:check": "node scripts/snapshot-openapi-run.cjs --check",
-    "test:e2e": "NODE_OPTIONS='--experimental-vm-modules --max-old-space-size=6144' jest --config test/e2e/jest-e2e.config.js --runInBand",
+    "test:e2e": "pnpm --filter @chisto/news-content build && NODE_OPTIONS='--experimental-vm-modules --max-old-space-size=6144' jest --config test/e2e/jest-e2e.config.js --runInBand",
     "test:e2e:local": "bash scripts/run-e2e-local.sh",
     "perf:smoke": "k6 run perf/smoke.js",
     "perf:load": "k6 run perf/k6-load-test.js",

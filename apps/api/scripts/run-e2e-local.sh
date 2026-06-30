@@ -74,6 +74,9 @@ cd "${API_ROOT}"
 pnpm exec prisma generate
 pnpm exec prisma migrate deploy
 
+echo "[e2e-local] build workspace packages required by jest…"
+pnpm --filter @chisto/news-content build
+
 echo "[e2e-local] jest e2e…"
 pnpm exec jest --config test/e2e/jest-e2e.config.js --runInBand
 

@@ -351,6 +351,9 @@ jobs:
       - name: Apply database migrations
         run: pnpm --filter @chisto/api exec prisma migrate deploy
 
+      - name: Build workspace packages required by API e2e
+        run: pnpm --filter @chisto/news-content build
+
       - name: Run e2e tests
         env:
           NODE_OPTIONS: '--experimental-vm-modules --max-old-space-size=6144'
