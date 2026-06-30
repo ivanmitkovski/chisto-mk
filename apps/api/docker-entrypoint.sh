@@ -28,12 +28,19 @@ fi
 
 if [ "${SKIP_MIGRATE_STATUS_CHECK:-}" != "1" ]; then
   echo "Checking migration status..."
-  prisma migrate status || {
-    echo "ERROR: Database migrations are pending or failed after migrate deploy."
-    echo "  From a machine with RDS access: cd apps/api && bash scripts/run-migrate-deploy.sh"
+  if ! migrate_status_out=$(prisma migrate status 2>&1); then
+    echo "$migrate_status_out"
+    if echo "$migrate_status_out" | grep -qE 'P1000|28P01|Authentication failed|password authentication failed'; then
+      echo "ERROR: Database authentication failed during migrate status (check DATABASE_URL / RDS managed password sync)."
+      echo "  Run: bash infra/scripts/sync-production-database-url.sh && redeploy ECS"
+    else
+      echo "ERROR: Database migrations are pending or failed after migrate deploy."
+      echo "  From a machine with RDS access: cd apps/api && bash scripts/run-migrate-deploy.sh"
+      echo "  News featured split: cd apps/api && bash scripts/repair-news-featured-migration.sh"
+    fi
     echo "  Emergency only: SKIP_MIGRATE_STATUS_CHECK=1 (schema drift risk)."
     exit 1
-  }
+  fi
   echo "Database migrations are up to date."
 fi
 

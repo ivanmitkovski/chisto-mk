@@ -26,6 +26,25 @@ cd infra/terraform/envs/production
 | `AWS_REGION` | `eu-central-1` |
 | `ECR_REPOSITORY` | `chisto-api` |
 
+## Deploy gating
+
+- **`main` push** or **`workflow_dispatch` → production**: deploy to the cluster configured in `ECS_*` secrets, then run `verify-production`.
+- **`develop` push**: build only (no AWS deploy) unless `API_STAGING_DEPLOY=true` (staging secrets/cluster).
+- **Never** rely on `develop` pushes to update production.
+
+Optional secrets for post-deploy checks: `PRODUCTION_API_BASE`, `PRODUCTION_AUTH_TOKEN`.
+
+## RDS password drift
+
+RDS uses AWS-managed master password rotation. When ECS tasks fail with `P1000` / `28P01`, sync `DATABASE_URL` in `chisto/production/api` from the RDS managed secret:
+
+```bash
+bash infra/scripts/sync-production-database-url.sh
+aws ecs update-service --cluster chisto-prod --service chisto-api --force-new-deployment --region eu-central-1
+```
+
+Then run **API deploy** workflow (`workflow_dispatch`, environment `production`) from `main`.
+
 ## Using GitHub CLI (optional)
 
 ```bash
@@ -44,5 +63,3 @@ gh variable set API_AWS_DEPLOY --body true
 gh variable set AWS_REGION --body eu-central-1
 gh variable set ECR_REPOSITORY --body chisto-api
 ```
-
-Then run **API deploy** workflow (`workflow_dispatch`, environment `production`) from `main`.

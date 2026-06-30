@@ -120,9 +120,9 @@ resource "aws_cloudwatch_metric_alarm" "ecs_running_tasks" {
   namespace           = "ECS/ContainerInsights"
   period              = 60
   statistic           = "Average"
-  threshold           = 1
+  threshold           = var.ecs_min_capacity
   treat_missing_data  = "breaching"
-  alarm_description   = "ECS running task count below minimum"
+  alarm_description   = "ECS running task count below minimum HA capacity (${var.ecs_min_capacity})"
   alarm_actions       = [aws_sns_topic.alarms.arn]
 
   dimensions = {

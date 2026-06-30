@@ -104,6 +104,7 @@ module "alb" {
   security_group_id                     = module.security_groups.alb_security_group_id
   certificate_domain_name               = var.api_domain
   certificate_subject_alternative_names = var.certificate_subject_alternative_names
+  health_check_path                     = "/health/ready"
   tags                                  = local.common_tags
 }
 
@@ -156,6 +157,7 @@ module "observability" {
   target_group_arn_suffix    = module.alb.target_group_arn_suffix
   ecs_cluster_name           = module.ecs.cluster_name
   ecs_service_name           = module.ecs.service_name
+  ecs_min_capacity           = var.ecs_min_capacity
   rds_instance_id            = module.rds.db_instance_id
   redis_replication_group_id = module.elasticache.replication_group_id
   tags                       = local.common_tags

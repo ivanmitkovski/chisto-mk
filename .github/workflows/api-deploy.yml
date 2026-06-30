@@ -35,6 +35,47 @@ permissions:
 # AWS_ROLE_ARN, ECS_*, and related secrets are configured (secrets cannot
 # appear in job `if:` expressions).
 jobs:
+  resolve-env:
+    runs-on: ubuntu-latest
+    outputs:
+      deploy_aws: ${{ steps.out.outputs.deploy_aws }}
+      verify_staging: ${{ steps.out.outputs.verify_staging }}
+      verify_production: ${{ steps.out.outputs.verify_production }}
+    steps:
+      - id: out
+        run: |
+          deploy_aws=false
+          verify_staging=false
+          verify_production=false
+
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            case "${{ github.event.inputs.environment }}" in
+              production)
+                deploy_aws=true
+                verify_production=true
+                ;;
+              staging)
+                deploy_aws=true
+                verify_staging=true
+                ;;
+              awsDev)
+                deploy_aws=true
+                ;;
+            esac
+          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            deploy_aws=true
+            verify_production=true
+          elif [[ "${{ github.ref }}" == "refs/heads/develop" && "${{ vars.API_STAGING_DEPLOY }}" == "true" ]]; then
+            deploy_aws=true
+            verify_staging=true
+          fi
+
+          {
+            echo "deploy_aws=${deploy_aws}"
+            echo "verify_staging=${verify_staging}"
+            echo "verify_production=${verify_production}"
+          } >> "$GITHUB_OUTPUT"
+
   build:
     runs-on: ubuntu-latest
     steps:
@@ -69,9 +110,9 @@ jobs:
           docker rm -f api-smoke
 
   push-ecr:
-    needs: build
+    needs: [build, resolve-env]
     runs-on: ubuntu-latest
-    if: ${{ vars.API_AWS_DEPLOY == 'true' }}
+    if: ${{ vars.API_AWS_DEPLOY == 'true' && needs.resolve-env.outputs.deploy_aws == 'true' }}
     outputs:
       image_digest: ${{ steps.push.outputs.digest }}
       image: ${{ steps.push.outputs.image }}
@@ -107,8 +148,9 @@ jobs:
           echo "image=${IMAGE}:${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
 
   migrate:
-    needs: push-ecr
+    needs: [push-ecr, resolve-env]
     runs-on: ubuntu-latest
+    if: ${{ vars.API_AWS_DEPLOY == 'true' && needs.resolve-env.outputs.deploy_aws == 'true' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -146,8 +188,9 @@ jobs:
           test "$EXIT" = "0"
 
   deploy-ecs:
-    needs: [push-ecr, migrate]
+    needs: [push-ecr, migrate, resolve-env]
     runs-on: ubuntu-latest
+    if: ${{ vars.API_AWS_DEPLOY == 'true' && needs.resolve-env.outputs.deploy_aws == 'true' }}
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -183,11 +226,23 @@ jobs:
           aws ecs wait services-stable \
             --cluster "${{ secrets.ECS_CLUSTER }}" \
             --services "${{ secrets.ECS_SERVICE }}"
+          DESIRED=$(aws ecs describe-services \
+            --cluster "${{ secrets.ECS_CLUSTER }}" \
+            --services "${{ secrets.ECS_SERVICE }}" \
+            --query 'services[0].desiredCount' --output text)
+          RUNNING=$(aws ecs describe-services \
+            --cluster "${{ secrets.ECS_CLUSTER }}" \
+            --services "${{ secrets.ECS_SERVICE }}" \
+            --query 'services[0].runningCount' --output text)
+          if [ "$RUNNING" -lt "$DESIRED" ]; then
+            echo "::error::ECS runningCount ($RUNNING) is below desiredCount ($DESIRED) after services-stable"
+            exit 1
+          fi
 
   verify-staging:
-    needs: deploy-ecs
+    needs: [deploy-ecs, resolve-env]
     runs-on: ubuntu-latest
-    if: ${{ vars.API_STAGING_VERIFY == 'true' }}
+    if: ${{ needs.resolve-env.outputs.verify_staging == 'true' }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -204,6 +259,47 @@ jobs:
       - name: Blackbox probe
         env:
           API_BASE: ${{ secrets.STAGING_API_BASE }}
+        run: node apps/api/scripts/blackbox-probe.mjs
+
+  verify-production:
+    needs: [deploy-ecs, resolve-env]
+    runs-on: ubuntu-latest
+    if: ${{ needs.resolve-env.outputs.verify_production == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.19'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Production health and ECS capacity
+        env:
+          API_BASE: ${{ secrets.PRODUCTION_API_BASE || 'https://api.chisto.mk' }}
+          ECS_CLUSTER: ${{ secrets.ECS_CLUSTER }}
+          ECS_SERVICE: ${{ secrets.ECS_SERVICE }}
+          AWS_REGION: ${{ env.AWS_REGION }}
+        run: bash infra/terraform/scripts/verify-production.sh
+      - name: verify:v1
+        env:
+          API_BASE: ${{ secrets.PRODUCTION_API_BASE || 'https://api.chisto.mk' }}
+          AUTH_TOKEN: ${{ secrets.PRODUCTION_AUTH_TOKEN }}
+        run: |
+          if [ -z "${AUTH_TOKEN:-}" ]; then
+            echo "Skipping verify:v1 (PRODUCTION_AUTH_TOKEN not configured)"
+            exit 0
+          fi
+          pnpm --filter @chisto/api run verify:v1
+      - name: Blackbox probe
+        env:
+          API_BASE: ${{ secrets.PRODUCTION_API_BASE || 'https://api.chisto.mk' }}
         run: node apps/api/scripts/blackbox-probe.mjs
 
   cosign-sign:

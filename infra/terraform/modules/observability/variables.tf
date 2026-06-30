@@ -31,6 +31,11 @@ variable "redis_replication_group_id" {
   type = string
 }
 
+variable "ecs_min_capacity" {
+  type    = number
+  default = 2
+}
+
 variable "tags" {
   type    = map(string)
   default = {}
